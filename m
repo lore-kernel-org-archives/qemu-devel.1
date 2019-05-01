@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49023)
+Received: from eggs.gnu.org ([209.51.188.92]:51397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1hLn8R-0005RN-8Z
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 07:10:50 -0400
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hLnMX-0003It-13
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 07:25:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1hLn8N-0007BX-Fw
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 07:10:47 -0400
-Received: from mail-it1-x141.google.com ([2607:f8b0:4864:20::141]:35525)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1hLn8J-0007AG-PJ
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 07:10:40 -0400
-Received: by mail-it1-x141.google.com with SMTP id l140so8043585itb.0
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 04:10:37 -0700 (PDT)
-MIME-Version: 1.0
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hLnMT-0000fE-To
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 07:25:20 -0400
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Date: Wed, 1 May 2019 11:25:00 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA83F137685@lhreml524-mbs.china.huawei.com>
 References: <20190409102935.28292-1-shameerali.kolothum.thodi@huawei.com>
 	<20190409102935.28292-4-shameerali.kolothum.thodi@huawei.com>
-In-Reply-To: <20190409102935.28292-4-shameerali.kolothum.thodi@huawei.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Wed, 1 May 2019 13:10:24 +0200
-Message-ID: <CAKv+Gu_guvAydmCZDeVnj0NR_WyTHeCmwh4tK9WKUBY6cy-4Pg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<CAKv+Gu_guvAydmCZDeVnj0NR_WyTHeCmwh4tK9WKUBY6cy-4Pg@mail.gmail.com>
+In-Reply-To: <CAKv+Gu_guvAydmCZDeVnj0NR_WyTHeCmwh4tK9WKUBY6cy-4Pg@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Subject: Re: [Qemu-devel] [PATCH v4 3/8] hw/acpi: Add ACPI Generic Event
  Device Support
 List-Id: <qemu-devel.nongnu.org>
@@ -30,517 +28,360 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Auger Eric <eric.auger@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, shannon.zhaosl@gmail.com, sameo@linux.intel.com, sebastien.boeuf@intel.com, Wei Xu <xuwei5@hisilicon.com>, Laszlo Ersek <lersek@redhat.com>, Linuxarm <linuxarm@huawei.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Auger Eric <eric.auger@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>, "xuwei (O)" <xuwei5@huawei.com>, Laszlo Ersek <lersek@redhat.com>, Linuxarm <linuxarm@huawei.com>
 
-On Tue, 9 Apr 2019 at 12:31, Shameer Kolothum
-<shameerali.kolothum.thodi@huawei.com> wrote:
->
-> From: Samuel Ortiz <sameo@linux.intel.com>
->
-> The ACPI Generic Event Device (GED) is a hardware-reduced specific
-> device[ACPI v6.1 Section 5.6.9] that handles all platform events,
-> including the hotplug ones.This patch generates the AML code that
-> defines GEDs.
->
-> Platforms need to specify their own GedEvent array to describe what
-> kind of events they want to support through GED.  Also this uses a
-> a single interrupt for the  GED device, relying on IO memory region
-> to communicate the type of device affected by the interrupt. This
-> way, we can support up to 32 events with a unique interrupt.
->
-> This supports only memory hotplug for now.
->
-> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-
-Apologies if this question has been raised before, but do we really
-need a separate device for this? We already handle the power button
-via _AEI/_Exx on the GPIO device, and I think we should be able to add
-additional events using that interface, rather than have two event
-signalling methods/devices on the same platform.
-
-
-
-> ---
->  hw/acpi/Kconfig                        |   4 +
->  hw/acpi/Makefile.objs                  |   1 +
->  hw/acpi/generic_event_device.c         | 311 +++++++++++++++++++++++++++++++++
->  include/hw/acpi/generic_event_device.h | 121 +++++++++++++
->  4 files changed, 437 insertions(+)
->  create mode 100644 hw/acpi/generic_event_device.c
->  create mode 100644 include/hw/acpi/generic_event_device.h
->
-> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-> index eca3bee..01a8b41 100644
-> --- a/hw/acpi/Kconfig
-> +++ b/hw/acpi/Kconfig
-> @@ -27,3 +27,7 @@ config ACPI_VMGENID
->      bool
->      default y
->      depends on PC
-> +
-> +config ACPI_HW_REDUCED
-> +    bool
-> +    depends on ACPI
-> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-> index 2d46e37..b753232 100644
-> --- a/hw/acpi/Makefile.objs
-> +++ b/hw/acpi/Makefile.objs
-> @@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
->  common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
->  common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
->  common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
-> +common-obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device.o
->  common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
->
->  common-obj-y += acpi_interface.o
-> diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
-> new file mode 100644
-> index 0000000..856ca04
-> --- /dev/null
-> +++ b/hw/acpi/generic_event_device.c
-> @@ -0,0 +1,311 @@
-> +/*
-> + *
-> + * Copyright (c) 2018 Intel Corporation
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "exec/address-spaces.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/acpi/acpi.h"
-> +#include "hw/acpi/generic_event_device.h"
-> +#include "hw/mem/pc-dimm.h"
-> +
-> +static Aml *ged_event_aml(const GedEvent *event)
-> +{
-> +
-> +    if (!event) {
-> +        return NULL;
-> +    }
-> +
-> +    switch (event->event) {
-> +    case GED_MEMORY_HOTPLUG:
-> +        /* We run a complete memory SCAN when getting a memory hotplug event */
-> +        return aml_call0(MEMORY_DEVICES_CONTAINER "." MEMORY_SLOT_SCAN_METHOD);
-> +    default:
-> +        break;
-> +    }
-> +
-> +    return NULL;
-> +}
-> +
-> +/*
-> + * The ACPI Generic Event Device (GED) is a hardware-reduced specific
-> + * device[ACPI v6.1 Section 5.6.9] that handles all platform events,
-> + * including the hotplug ones. Platforms need to specify their own
-> + * GedEvent array to describe what kind of events they want to support
-> + * through GED. This routine uses a single interrupt for the GED device,
-> + * relying on IO memory region to communicate the type of device
-> + * affected by the interrupt. This way, we can support up to 32 events
-> + * with a unique interrupt.
-> + */
-> +void build_ged_aml(Aml *table, const char *name, HotplugHandler *hotplug_dev,
-> +                   uint32_t ged_irq, AmlRegionSpace rs)
-> +{
-> +    AcpiGedState *s = ACPI_GED(hotplug_dev);
-> +    GedEvent *ged_events = s->ged_events;
-> +    Aml *crs = aml_resource_template();
-> +    Aml *evt, *field;
-> +    Aml *dev = aml_device("%s", name);
-> +    Aml *irq_sel = aml_local(0);
-> +    Aml *isel = aml_name(AML_GED_IRQ_SEL);
-> +    uint32_t i;
-> +
-> +    if (!s->ged_base || !ged_events || !s->ged_events_size) {
-> +        return;
-> +    }
-> +
-> +    /* _CRS interrupt */
-> +    aml_append(crs, aml_interrupt(AML_CONSUMER, AML_EDGE, AML_ACTIVE_HIGH,
-> +                                  AML_EXCLUSIVE, &ged_irq, 1));
-> +    /*
-> +     * For each GED event we:
-> +     * - Add an interrupt to the CRS section.
-> +     * - Add a conditional block for each event, inside a while loop.
-> +     *   This is semantically equivalent to a switch/case implementation.
-> +     */
-> +    evt = aml_method("_EVT", 1, AML_SERIALIZED);
-> +    {
-> +        Aml *ged_aml;
-> +        Aml *if_ctx;
-> +
-> +        /* Local0 = ISEL */
-> +        aml_append(evt, aml_store(isel, irq_sel));
-> +
-> +        /*
-> +         * Here we want to call a method for each supported GED event type.
-> +         * The resulting ASL code looks like:
-> +         *
-> +         * Local0 = ISEL
-> +         * If ((Local0 & irq0) == irq0)
-> +         * {
-> +         *     MethodEvent0()
-> +         * }
-> +         *
-> +         * If ((Local0 & irq1) == irq1)
-> +         * {
-> +         *     MethodEvent1()
-> +         * }
-> +         * ...
-> +         */
-> +
-> +        for (i = 0; i < s->ged_events_size; i++) {
-> +            ged_aml = ged_event_aml(&ged_events[i]);
-> +            if (!ged_aml) {
-> +                continue;
-> +            }
-> +
-> +            /* If ((Local1 == irq))*/
-> +            if_ctx = aml_if(aml_equal(aml_and(irq_sel,
-> +                                      aml_int(ged_events[i].selector), NULL),
-> +                                      aml_int(ged_events[i].selector)));
-> +            {
-> +                /* AML for this specific type of event */
-> +                aml_append(if_ctx, ged_aml);
-> +            }
-> +
-> +            /*
-> +             * We append the first "if" to the "while" context.
-> +             * Other "if"s will be "elseif"s.
-> +             */
-> +            aml_append(evt, if_ctx);
-> +        }
-> +    }
-> +
-> +    aml_append(dev, aml_name_decl("_HID", aml_string("ACPI0013")));
-> +    aml_append(dev, aml_name_decl("_UID", aml_string(GED_DEVICE)));
-> +    aml_append(dev, aml_name_decl("_CRS", crs));
-> +
-> +    /* Append IO region */
-> +    aml_append(dev, aml_operation_region(AML_GED_IRQ_REG, rs,
-> +               aml_int(s->ged_base + ACPI_GED_IRQ_SEL_OFFSET),
-> +               ACPI_GED_IRQ_SEL_LEN));
-> +    field = aml_field(AML_GED_IRQ_REG, AML_DWORD_ACC, AML_NOLOCK,
-> +                      AML_WRITE_AS_ZEROS);
-> +    aml_append(field, aml_named_field(AML_GED_IRQ_SEL,
-> +                                      ACPI_GED_IRQ_SEL_LEN * 8));
-> +    aml_append(dev, field);
-> +
-> +    /* Append _EVT method */
-> +    aml_append(dev, evt);
-> +
-> +    aml_append(table, dev);
-> +}
-> +
-> +/* Memory read by the GED _EVT AML dynamic method */
-> +static uint64_t ged_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    uint64_t val = 0;
-> +    GEDState *ged_st = opaque;
-> +
-> +    switch (addr) {
-> +    case ACPI_GED_IRQ_SEL_OFFSET:
-> +        /* Read the selector value and reset it */
-> +        qemu_mutex_lock(&ged_st->lock);
-> +        val = ged_st->sel;
-> +        ged_st->sel = 0;
-> +        qemu_mutex_unlock(&ged_st->lock);
-> +        break;
-> +    default:
-> +        break;
-> +    }
-> +
-> +    return val;
-> +}
-> +
-> +/* Nothing is expected to be written to the GED memory region */
-> +static void ged_write(void *opaque, hwaddr addr, uint64_t data,
-> +                      unsigned int size)
-> +{
-> +}
-> +
-> +static const MemoryRegionOps ged_ops = {
-> +    .read = ged_read,
-> +    .write = ged_write,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +    .valid = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
-> +    },
-> +};
-> +
-> +static void acpi_ged_event(GEDState *ged_st, uint32_t ged_irq_sel)
-> +{
-> +    /*
-> +     * Set the GED IRQ selector to the expected device type value. This
-> +     * way, the ACPI method will be able to trigger the right code based
-> +     * on a unique IRQ.
-> +     */
-> +    qemu_mutex_lock(&ged_st->lock);
-> +    ged_st->sel = ged_irq_sel;
-> +    qemu_mutex_unlock(&ged_st->lock);
-> +
-> +    /* Trigger the event by sending an interrupt to the guest. */
-> +    qemu_irq_pulse(ged_st->gsi[ged_st->irq]);
-> +}
-> +
-> +static void acpi_ged_init(MemoryRegion *as, DeviceState *dev, GEDState *ged_st)
-> +{
-> +    AcpiGedState *s = ACPI_GED(dev);
-> +
-> +    assert(s->ged_base);
-> +
-> +    ged_st->irq = s->ged_irq;
-> +    ged_st->gsi = s->gsi;
-> +    qemu_mutex_init(&ged_st->lock);
-> +    memory_region_init_io(&ged_st->io, OBJECT(dev), &ged_ops, ged_st,
-> +                          "acpi-ged-event", ACPI_GED_REG_LEN);
-> +    memory_region_add_subregion(as, s->ged_base, &ged_st->io);
-> +}
-> +
-> +static void acpi_ged_device_plug_cb(HotplugHandler *hotplug_dev,
-> +                                    DeviceState *dev, Error **errp)
-> +{
-> +    AcpiGedState *s = ACPI_GED(hotplug_dev);
-> +
-> +    if (s->memhp_state.is_enabled &&
-> +        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> +            acpi_memory_plug_cb(hotplug_dev, &s->memhp_state,
-> +                                dev, errp);
-> +    } else {
-> +        error_setg(errp, "virt: device plug request for unsupported device"
-> +                   " type: %s", object_get_typename(OBJECT(dev)));
-> +    }
-> +}
-> +
-> +static void acpi_ged_send_event(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
-> +{
-> +    AcpiGedState *s = ACPI_GED(adev);
-> +    uint32_t sel;
-> +
-> +    if (ev & ACPI_MEMORY_HOTPLUG_STATUS) {
-> +        sel = ACPI_GED_IRQ_SEL_MEM;
-> +    } else {
-> +        /* Unknown event. Return without generating interrupt. */
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * We inject the hotplug interrupt. The IRQ selector will make
-> +     * the difference from the ACPI table.
-> +     */
-> +    acpi_ged_event(&s->ged_state, sel);
-> +}
-> +
-> +static void acpi_ged_device_realize(DeviceState *dev, Error **errp)
-> +{
-> +    AcpiGedState *s = ACPI_GED(dev);
-> +
-> +    if (s->memhp_state.is_enabled) {
-> +        acpi_memory_hotplug_init(get_system_memory(), OBJECT(dev),
-> +                                 &s->memhp_state,
-> +                                 s->memhp_base);
-> +        acpi_ged_init(get_system_memory(), dev, &s->ged_state);
-> +    }
-> +}
-> +
-> +static Property acpi_ged_properties[] = {
-> +    /*
-> +     * Memory hotplug base address is a property of GED here,
-> +     * because GED handles memory hotplug event and MEMORY_HOTPLUG_DEVICE
-> +     * gets initialized when GED device is realized.
-> +     */
-> +    DEFINE_PROP_UINT64("memhp-base", AcpiGedState, memhp_base, 0),
-> +    DEFINE_PROP_BOOL("memory-hotplug-support", AcpiGedState,
-> +                     memhp_state.is_enabled, true),
-> +    DEFINE_PROP_PTR("gsi", AcpiGedState, gsi),
-> +    DEFINE_PROP_UINT64("ged-base", AcpiGedState, ged_base, 0),
-> +    DEFINE_PROP_UINT32("ged-irq", AcpiGedState, ged_irq, 0),
-> +    DEFINE_PROP_PTR("ged-events", AcpiGedState, ged_events),
-> +    DEFINE_PROP_UINT32("ged-events-size", AcpiGedState, ged_events_size, 0),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void acpi_ged_class_init(ObjectClass *class, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(class);
-> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(class);
-> +    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_CLASS(class);
-> +
-> +    dc->desc = "ACPI";
-> +    dc->props = acpi_ged_properties;
-> +    dc->realize = acpi_ged_device_realize;
-> +
-> +    /* Reason: pointer properties "gsi" and "ged_events" */
-> +    dc->user_creatable = false;
-> +
-> +    hc->plug = acpi_ged_device_plug_cb;
-> +
-> +    adevc->send_event = acpi_ged_send_event;
-> +}
-> +
-> +static const TypeInfo acpi_ged_info = {
-> +    .name          = TYPE_ACPI_GED,
-> +    .parent        = TYPE_DEVICE,
-> +    .instance_size = sizeof(AcpiGedState),
-> +    .class_init    = acpi_ged_class_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { TYPE_HOTPLUG_HANDLER },
-> +        { TYPE_ACPI_DEVICE_IF },
-> +        { }
-> +    }
-> +};
-> +
-> +static void acpi_ged_register_types(void)
-> +{
-> +    type_register_static(&acpi_ged_info);
-> +}
-> +
-> +type_init(acpi_ged_register_types)
-> diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
-> new file mode 100644
-> index 0000000..9c840d8
-> --- /dev/null
-> +++ b/include/hw/acpi/generic_event_device.h
-> @@ -0,0 +1,121 @@
-> +/*
-> + *
-> + * Copyright (c) 2018 Intel Corporation
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + *
-> + * The ACPI Generic Event Device (GED) is a hardware-reduced specific
-> + * device[ACPI v6.1 Section 5.6.9] that handles all platform events,
-> + * including the hotplug ones. Generic Event Device allows platforms
-> + * to handle interrupts in ACPI ASL statements. It follows a very
-> + * similar approach like the _EVT method from GPIO events. All
-> + * interrupts are listed in  _CRS and the handler is written in _EVT
-> + * method. Here, we use a single interrupt for the GED device, relying
-> + * on IO memory region to communicate the type of device affected by
-> + * the interrupt. This way, we can support up to 32 events with a
-> + * unique interrupt.
-> + *
-> + * Here is an example.
-> + *
-> + * Device (\_SB.GED)
-> + * {
-> + *     Name (_HID, "ACPI0013")
-> + *     Name (_UID, Zero)
-> + *     Name (_CRS, ResourceTemplate ()
-> + *     {
-> + *         Interrupt (ResourceConsumer, Edge, ActiveHigh, Exclusive, ,, )
-> + *         {
-> + *              0x00000029,
-> + *         }
-> + *     })
-> + *     OperationRegion (IREG, SystemMemory, 0x09080000, 0x04)
-> + *     Field (IREG, DWordAcc, NoLock, WriteAsZeros)
-> + *     {
-> + *         ISEL,   32
-> + *     }
-> + *
-> + *     Method (_EVT, 1, Serialized)  // _EVT: Event
-> + *     {
-> + *         Local0 = ISEL // ISEL = IO memory region which specifies the
-> + *                       // device type.
-> + *         If (((Local0 & irq0) == irq0))
-> + *         {
-> + *             MethodEvent0()
-> + *         }
-> + *         ElseIf ((Local0 & irq1) == irq1)
-> + *         {
-> + *             MethodEvent1()
-> + *         }
-> + *         ...
-> + *     }
-> + * }
-> + *
-> + */
-> +
-> +#ifndef HW_ACPI_GED_H
-> +#define HW_ACPI_GED_H
-> +
-> +#include "hw/acpi/memory_hotplug.h"
-> +
-> +#define TYPE_ACPI_GED "acpi-ged"
-> +#define ACPI_GED(obj) \
-> +    OBJECT_CHECK(AcpiGedState, (obj), TYPE_ACPI_GED)
-> +
-> +#define ACPI_GED_IRQ_SEL_OFFSET 0x0
-> +#define ACPI_GED_IRQ_SEL_LEN    0x4
-> +#define ACPI_GED_IRQ_SEL_MEM    0x1
-> +#define ACPI_GED_REG_LEN        0x4
-> +
-> +#define GED_DEVICE      "GED"
-> +#define AML_GED_IRQ_REG "IREG"
-> +#define AML_GED_IRQ_SEL "ISEL"
-> +
-> +typedef enum {
-> +    GED_MEMORY_HOTPLUG = 1,
-> +} GedEventType;
-> +
-> +/*
-> + * Platforms need to specify their own GedEvent array
-> + * to describe what kind of events they want to support
-> + * through GED.
-> + */
-> +typedef struct GedEvent {
-> +    uint32_t     selector;
-> +    GedEventType event;
-> +} GedEvent;
-> +
-> +typedef struct GEDState {
-> +    MemoryRegion io;
-> +    uint32_t     sel;
-> +    uint32_t     irq;
-> +    qemu_irq     *gsi;
-> +    QemuMutex    lock;
-> +} GEDState;
-> +
-> +
-> +typedef struct AcpiGedState {
-> +    DeviceClass parent_obj;
-> +    MemHotplugState memhp_state;
-> +    hwaddr memhp_base;
-> +    void *gsi;
-> +    hwaddr ged_base;
-> +    GEDState ged_state;
-> +    uint32_t ged_irq;
-> +    void *ged_events;
-> +    uint32_t ged_events_size;
-> +} AcpiGedState;
-> +
-> +void build_ged_aml(Aml *table, const char* name, HotplugHandler *hotplug_dev,
-> +                   uint32_t ged_irq, AmlRegionSpace rs);
-> +
-> +#endif
-> --
-> 2.7.4
->
->
+SGkgQXJkLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEFyZCBCaWVz
+aGV1dmVsIFttYWlsdG86YXJkLmJpZXNoZXV2ZWxAbGluYXJvLm9yZ10NCj4gU2VudDogMDEgTWF5
+IDIwMTkgMTI6MTANCj4gVG86IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGku
+a29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT4NCj4gQ2M6IFFFTVUgRGV2ZWxvcGVycyA8cWVtdS1k
+ZXZlbEBub25nbnUub3JnPjsgcWVtdS1hcm0NCj4gPHFlbXUtYXJtQG5vbmdudS5vcmc+OyBBdWdl
+ciBFcmljIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+OyBJZ29yDQo+IE1hbW1lZG92IDxpbWFtbWVk
+b0ByZWRoYXQuY29tPjsgUGV0ZXIgTWF5ZGVsbA0KPiA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
+Pjsgc2hhbm5vbi56aGFvc2xAZ21haWwuY29tOw0KPiBzYW1lb0BsaW51eC5pbnRlbC5jb207IHNl
+YmFzdGllbi5ib2V1ZkBpbnRlbC5jb207IHh1d2VpIChPKQ0KPiA8eHV3ZWk1QGh1YXdlaS5jb20+
+OyBMYXN6bG8gRXJzZWsgPGxlcnNla0ByZWRoYXQuY29tPjsgTGludXhhcm0NCj4gPGxpbnV4YXJt
+QGh1YXdlaS5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjQgMy84XSBody9hY3BpOiBBZGQg
+QUNQSSBHZW5lcmljIEV2ZW50IERldmljZSBTdXBwb3J0DQo+IA0KPiBPbiBUdWUsIDkgQXByIDIw
+MTkgYXQgMTI6MzEsIFNoYW1lZXIgS29sb3RodW0NCj4gPHNoYW1lZXJhbGkua29sb3RodW0udGhv
+ZGlAaHVhd2VpLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBGcm9tOiBTYW11ZWwgT3J0aXogPHNhbWVv
+QGxpbnV4LmludGVsLmNvbT4NCj4gPg0KPiA+IFRoZSBBQ1BJIEdlbmVyaWMgRXZlbnQgRGV2aWNl
+IChHRUQpIGlzIGEgaGFyZHdhcmUtcmVkdWNlZCBzcGVjaWZpYw0KPiA+IGRldmljZVtBQ1BJIHY2
+LjEgU2VjdGlvbiA1LjYuOV0gdGhhdCBoYW5kbGVzIGFsbCBwbGF0Zm9ybSBldmVudHMsDQo+ID4g
+aW5jbHVkaW5nIHRoZSBob3RwbHVnIG9uZXMuVGhpcyBwYXRjaCBnZW5lcmF0ZXMgdGhlIEFNTCBj
+b2RlIHRoYXQNCj4gPiBkZWZpbmVzIEdFRHMuDQo+ID4NCj4gPiBQbGF0Zm9ybXMgbmVlZCB0byBz
+cGVjaWZ5IHRoZWlyIG93biBHZWRFdmVudCBhcnJheSB0byBkZXNjcmliZSB3aGF0DQo+ID4ga2lu
+ZCBvZiBldmVudHMgdGhleSB3YW50IHRvIHN1cHBvcnQgdGhyb3VnaCBHRUQuICBBbHNvIHRoaXMg
+dXNlcyBhDQo+ID4gYSBzaW5nbGUgaW50ZXJydXB0IGZvciB0aGUgIEdFRCBkZXZpY2UsIHJlbHlp
+bmcgb24gSU8gbWVtb3J5IHJlZ2lvbg0KPiA+IHRvIGNvbW11bmljYXRlIHRoZSB0eXBlIG9mIGRl
+dmljZSBhZmZlY3RlZCBieSB0aGUgaW50ZXJydXB0LiBUaGlzDQo+ID4gd2F5LCB3ZSBjYW4gc3Vw
+cG9ydCB1cCB0byAzMiBldmVudHMgd2l0aCBhIHVuaXF1ZSBpbnRlcnJ1cHQuDQo+ID4NCj4gPiBU
+aGlzIHN1cHBvcnRzIG9ubHkgbWVtb3J5IGhvdHBsdWcgZm9yIG5vdy4NCj4gPg0KPiA+IFNpZ25l
+ZC1vZmYtYnk6IFNhbXVlbCBPcnRpeiA8c2FtZW9AbGludXguaW50ZWwuY29tPg0KPiA+IFNpZ25l
+ZC1vZmYtYnk6IFNlYmFzdGllbiBCb2V1ZiA8c2ViYXN0aWVuLmJvZXVmQGludGVsLmNvbT4NCj4g
+PiBTaWduZWQtb2ZmLWJ5OiBTaGFtZWVyIEtvbG90aHVtIDxzaGFtZWVyYWxpLmtvbG90aHVtLnRo
+b2RpQGh1YXdlaS5jb20+DQo+IA0KPiBBcG9sb2dpZXMgaWYgdGhpcyBxdWVzdGlvbiBoYXMgYmVl
+biByYWlzZWQgYmVmb3JlLCBidXQgZG8gd2UgcmVhbGx5DQo+IG5lZWQgYSBzZXBhcmF0ZSBkZXZp
+Y2UgZm9yIHRoaXM/IFdlIGFscmVhZHkgaGFuZGxlIHRoZSBwb3dlciBidXR0b24NCj4gdmlhIF9B
+RUkvX0V4eCBvbiB0aGUgR1BJTyBkZXZpY2UsIGFuZCBJIHRoaW5rIHdlIHNob3VsZCBiZSBhYmxl
+IHRvIGFkZA0KPiBhZGRpdGlvbmFsIGV2ZW50cyB1c2luZyB0aGF0IGludGVyZmFjZSwgcmF0aGVy
+IHRoYW4gaGF2ZSB0d28gZXZlbnQNCj4gc2lnbmFsbGluZyBtZXRob2RzL2RldmljZXMgb24gdGhl
+IHNhbWUgcGxhdGZvcm0uDQoNClJpZ2h0LiBUaGUgaW5pdGlhbCBSRkMgd2FzIGJhc2VkIG9uIEdQ
+SU8gZGV2aWNlWzFdIGFuZCBsYXRlciBJZ29yIGNvbW1lbnRlZA0KaGVyZVsyXSB0aGF0LA0KDQoi
+IEFSTSBib2FyZHMgd2VyZSBmaXJzdCB0byB1c2UgQUNQSSBody1yZWR1Y2VkIHByb2ZpbGUgc28g
+dGhleSBwaWNrZWQgdXANCmF2YWlsYWJsZSBiYWNrIHRoZW4gR1BJTyBiYXNlZCB3YXkgdG8gZGVs
+aXZlciBob3RwbHVnIGV2ZW50LCBsYXRlciBzcGVjDQppbnRyb2R1Y2VkIEdlbmVyaWMgRXZlbnQg
+RGV2aWNlIGZvciB0aGF0IG1lYW5zIHRvIHVzZSB3aXRoIGh3LXJlZHVjZWQNCnByb2ZpbGUsIHdo
+aWNoIE5FTVUgaW1wbGVtZW50ZWRbMV0sIHNvIEknZCB1c2UgdGhhdCByYXRoZXIgdGhhbiBhZC1o
+b2MNCkdQSU8gbWFwcGluZy4gSSdkIGd1ZXNzIGl0IHdpbGwgbW9yZSBjb21wYXRpYmxlIHdpdGgg
+dmFyaW91cyBjb250ZW1wb3JhcnkNCmd1ZXN0cyBhbmQgd2UgY291bGQgcmV1c2UgdGhlIHNhbWUg
+Y29kZSBmb3IgYm90aCB4ODYvYXJtIHZpcnQgYm9hcmRzKSAiDQoNClRoYW5rcywNClNoYW1lZXIN
+Cg0KWzFdLiBodHRwczovL3BhdGNod29yay5rZXJuZWwub3JnL2NvdmVyLzEwNzgzNTg5Lw0KWzJd
+IGh0dHA6Ly9wYXRjaHdvcmsub3psYWJzLm9yZy9jb3Zlci8xMDQ1NjA0Lw0KDQo+IA0KPiANCj4g
+PiAtLS0NCj4gPiAgaHcvYWNwaS9LY29uZmlnICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDQg
+Kw0KPiA+ICBody9hY3BpL01ha2VmaWxlLm9ianMgICAgICAgICAgICAgICAgICB8ICAgMSArDQo+
+ID4gIGh3L2FjcGkvZ2VuZXJpY19ldmVudF9kZXZpY2UuYyAgICAgICAgIHwgMzExDQo+ICsrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiA+ICBpbmNsdWRlL2h3L2FjcGkvZ2VuZXJp
+Y19ldmVudF9kZXZpY2UuaCB8IDEyMSArKysrKysrKysrKysrDQo+ID4gIDQgZmlsZXMgY2hhbmdl
+ZCwgNDM3IGluc2VydGlvbnMoKykNCj4gPiAgY3JlYXRlIG1vZGUgMTAwNjQ0IGh3L2FjcGkvZ2Vu
+ZXJpY19ldmVudF9kZXZpY2UuYw0KPiA+ICBjcmVhdGUgbW9kZSAxMDA2NDQgaW5jbHVkZS9ody9h
+Y3BpL2dlbmVyaWNfZXZlbnRfZGV2aWNlLmgNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9ody9hY3Bp
+L0tjb25maWcgYi9ody9hY3BpL0tjb25maWcNCj4gPiBpbmRleCBlY2EzYmVlLi4wMWE4YjQxIDEw
+MDY0NA0KPiA+IC0tLSBhL2h3L2FjcGkvS2NvbmZpZw0KPiA+ICsrKyBiL2h3L2FjcGkvS2NvbmZp
+Zw0KPiA+IEBAIC0yNywzICsyNyw3IEBAIGNvbmZpZyBBQ1BJX1ZNR0VOSUQNCj4gPiAgICAgIGJv
+b2wNCj4gPiAgICAgIGRlZmF1bHQgeQ0KPiA+ICAgICAgZGVwZW5kcyBvbiBQQw0KPiA+ICsNCj4g
+PiArY29uZmlnIEFDUElfSFdfUkVEVUNFRA0KPiA+ICsgICAgYm9vbA0KPiA+ICsgICAgZGVwZW5k
+cyBvbiBBQ1BJDQo+ID4gZGlmZiAtLWdpdCBhL2h3L2FjcGkvTWFrZWZpbGUub2JqcyBiL2h3L2Fj
+cGkvTWFrZWZpbGUub2Jqcw0KPiA+IGluZGV4IDJkNDZlMzcuLmI3NTMyMzIgMTAwNjQ0DQo+ID4g
+LS0tIGEvaHcvYWNwaS9NYWtlZmlsZS5vYmpzDQo+ID4gKysrIGIvaHcvYWNwaS9NYWtlZmlsZS5v
+YmpzDQo+ID4gQEAgLTYsNiArNiw3IEBAIGNvbW1vbi1vYmotJChDT05GSUdfQUNQSV9NRU1PUllf
+SE9UUExVRykgKz0NCj4gbWVtb3J5X2hvdHBsdWcubw0KPiA+ICBjb21tb24tb2JqLSQoQ09ORklH
+X0FDUElfQ1BVX0hPVFBMVUcpICs9IGNwdS5vDQo+ID4gIGNvbW1vbi1vYmotJChDT05GSUdfQUNQ
+SV9OVkRJTU0pICs9IG52ZGltbS5vDQo+ID4gIGNvbW1vbi1vYmotJChDT05GSUdfQUNQSV9WTUdF
+TklEKSArPSB2bWdlbmlkLm8NCj4gPiArY29tbW9uLW9iai0kKENPTkZJR19BQ1BJX0hXX1JFRFVD
+RUQpICs9IGdlbmVyaWNfZXZlbnRfZGV2aWNlLm8NCj4gPiAgY29tbW9uLW9iai0kKGNhbGwgbG5v
+dCwkKENPTkZJR19BQ1BJX1g4NikpICs9IGFjcGktc3R1Yi5vDQo+ID4NCj4gPiAgY29tbW9uLW9i
+ai15ICs9IGFjcGlfaW50ZXJmYWNlLm8NCj4gPiBkaWZmIC0tZ2l0IGEvaHcvYWNwaS9nZW5lcmlj
+X2V2ZW50X2RldmljZS5jDQo+IGIvaHcvYWNwaS9nZW5lcmljX2V2ZW50X2RldmljZS5jDQo+ID4g
+bmV3IGZpbGUgbW9kZSAxMDA2NDQNCj4gPiBpbmRleCAwMDAwMDAwLi44NTZjYTA0DQo+ID4gLS0t
+IC9kZXYvbnVsbA0KPiA+ICsrKyBiL2h3L2FjcGkvZ2VuZXJpY19ldmVudF9kZXZpY2UuYw0KPiA+
+IEBAIC0wLDAgKzEsMzExIEBADQo+ID4gKy8qDQo+ID4gKyAqDQo+ID4gKyAqIENvcHlyaWdodCAo
+YykgMjAxOCBJbnRlbCBDb3Jwb3JhdGlvbg0KPiA+ICsgKg0KPiA+ICsgKiBUaGlzIHByb2dyYW0g
+aXMgZnJlZSBzb2Z0d2FyZTsgeW91IGNhbiByZWRpc3RyaWJ1dGUgaXQgYW5kL29yIG1vZGlmeSBp
+dA0KPiA+ICsgKiB1bmRlciB0aGUgdGVybXMgYW5kIGNvbmRpdGlvbnMgb2YgdGhlIEdOVSBHZW5l
+cmFsIFB1YmxpYyBMaWNlbnNlLA0KPiA+ICsgKiB2ZXJzaW9uIDIgb3IgbGF0ZXIsIGFzIHB1Ymxp
+c2hlZCBieSB0aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9uLg0KPiA+ICsgKg0KPiA+ICsgKiBU
+aGlzIHByb2dyYW0gaXMgZGlzdHJpYnV0ZWQgaW4gdGhlIGhvcGUgaXQgd2lsbCBiZSB1c2VmdWws
+IGJ1dCBXSVRIT1VUDQo+ID4gKyAqIEFOWSBXQVJSQU5UWTsgd2l0aG91dCBldmVuIHRoZSBpbXBs
+aWVkIHdhcnJhbnR5IG9mDQo+IE1FUkNIQU5UQUJJTElUWSBvcg0KPiA+ICsgKiBGSVRORVNTIEZP
+UiBBIFBBUlRJQ1VMQVIgUFVSUE9TRS4gIFNlZSB0aGUgR05VIEdlbmVyYWwgUHVibGljDQo+IExp
+Y2Vuc2UgZm9yDQo+ID4gKyAqIG1vcmUgZGV0YWlscy4NCj4gPiArICoNCj4gPiArICogWW91IHNo
+b3VsZCBoYXZlIHJlY2VpdmVkIGEgY29weSBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vu
+c2UgYWxvbmcNCj4gd2l0aA0KPiA+ICsgKiB0aGlzIHByb2dyYW0uICBJZiBub3QsIHNlZSA8aHR0
+cDovL3d3dy5nbnUub3JnL2xpY2Vuc2VzLz4uDQo+ID4gKyAqLw0KPiA+ICsNCj4gPiArI2luY2x1
+ZGUgInFlbXUvb3NkZXAuaCINCj4gPiArI2luY2x1ZGUgInFhcGkvZXJyb3IuaCINCj4gPiArI2lu
+Y2x1ZGUgImV4ZWMvYWRkcmVzcy1zcGFjZXMuaCINCj4gPiArI2luY2x1ZGUgImh3L3N5c2J1cy5o
+Ig0KPiA+ICsjaW5jbHVkZSAiaHcvYWNwaS9hY3BpLmgiDQo+ID4gKyNpbmNsdWRlICJody9hY3Bp
+L2dlbmVyaWNfZXZlbnRfZGV2aWNlLmgiDQo+ID4gKyNpbmNsdWRlICJody9tZW0vcGMtZGltbS5o
+Ig0KPiA+ICsNCj4gPiArc3RhdGljIEFtbCAqZ2VkX2V2ZW50X2FtbChjb25zdCBHZWRFdmVudCAq
+ZXZlbnQpDQo+ID4gK3sNCj4gPiArDQo+ID4gKyAgICBpZiAoIWV2ZW50KSB7DQo+ID4gKyAgICAg
+ICAgcmV0dXJuIE5VTEw7DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgc3dpdGNoIChldmVu
+dC0+ZXZlbnQpIHsNCj4gPiArICAgIGNhc2UgR0VEX01FTU9SWV9IT1RQTFVHOg0KPiA+ICsgICAg
+ICAgIC8qIFdlIHJ1biBhIGNvbXBsZXRlIG1lbW9yeSBTQ0FOIHdoZW4gZ2V0dGluZyBhIG1lbW9y
+eQ0KPiBob3RwbHVnIGV2ZW50ICovDQo+ID4gKyAgICAgICAgcmV0dXJuIGFtbF9jYWxsMChNRU1P
+UllfREVWSUNFU19DT05UQUlORVIgIi4iDQo+IE1FTU9SWV9TTE9UX1NDQU5fTUVUSE9EKTsNCj4g
+PiArICAgIGRlZmF1bHQ6DQo+ID4gKyAgICAgICAgYnJlYWs7DQo+ID4gKyAgICB9DQo+ID4gKw0K
+PiA+ICsgICAgcmV0dXJuIE5VTEw7DQo+ID4gK30NCj4gPiArDQo+ID4gKy8qDQo+ID4gKyAqIFRo
+ZSBBQ1BJIEdlbmVyaWMgRXZlbnQgRGV2aWNlIChHRUQpIGlzIGEgaGFyZHdhcmUtcmVkdWNlZCBz
+cGVjaWZpYw0KPiA+ICsgKiBkZXZpY2VbQUNQSSB2Ni4xIFNlY3Rpb24gNS42LjldIHRoYXQgaGFu
+ZGxlcyBhbGwgcGxhdGZvcm0gZXZlbnRzLA0KPiA+ICsgKiBpbmNsdWRpbmcgdGhlIGhvdHBsdWcg
+b25lcy4gUGxhdGZvcm1zIG5lZWQgdG8gc3BlY2lmeSB0aGVpciBvd24NCj4gPiArICogR2VkRXZl
+bnQgYXJyYXkgdG8gZGVzY3JpYmUgd2hhdCBraW5kIG9mIGV2ZW50cyB0aGV5IHdhbnQgdG8gc3Vw
+cG9ydA0KPiA+ICsgKiB0aHJvdWdoIEdFRC4gVGhpcyByb3V0aW5lIHVzZXMgYSBzaW5nbGUgaW50
+ZXJydXB0IGZvciB0aGUgR0VEIGRldmljZSwNCj4gPiArICogcmVseWluZyBvbiBJTyBtZW1vcnkg
+cmVnaW9uIHRvIGNvbW11bmljYXRlIHRoZSB0eXBlIG9mIGRldmljZQ0KPiA+ICsgKiBhZmZlY3Rl
+ZCBieSB0aGUgaW50ZXJydXB0LiBUaGlzIHdheSwgd2UgY2FuIHN1cHBvcnQgdXAgdG8gMzIgZXZl
+bnRzDQo+ID4gKyAqIHdpdGggYSB1bmlxdWUgaW50ZXJydXB0Lg0KPiA+ICsgKi8NCj4gPiArdm9p
+ZCBidWlsZF9nZWRfYW1sKEFtbCAqdGFibGUsIGNvbnN0IGNoYXIgKm5hbWUsIEhvdHBsdWdIYW5k
+bGVyDQo+ICpob3RwbHVnX2RldiwNCj4gPiArICAgICAgICAgICAgICAgICAgIHVpbnQzMl90IGdl
+ZF9pcnEsIEFtbFJlZ2lvblNwYWNlIHJzKQ0KPiA+ICt7DQo+ID4gKyAgICBBY3BpR2VkU3RhdGUg
+KnMgPSBBQ1BJX0dFRChob3RwbHVnX2Rldik7DQo+ID4gKyAgICBHZWRFdmVudCAqZ2VkX2V2ZW50
+cyA9IHMtPmdlZF9ldmVudHM7DQo+ID4gKyAgICBBbWwgKmNycyA9IGFtbF9yZXNvdXJjZV90ZW1w
+bGF0ZSgpOw0KPiA+ICsgICAgQW1sICpldnQsICpmaWVsZDsNCj4gPiArICAgIEFtbCAqZGV2ID0g
+YW1sX2RldmljZSgiJXMiLCBuYW1lKTsNCj4gPiArICAgIEFtbCAqaXJxX3NlbCA9IGFtbF9sb2Nh
+bCgwKTsNCj4gPiArICAgIEFtbCAqaXNlbCA9IGFtbF9uYW1lKEFNTF9HRURfSVJRX1NFTCk7DQo+
+ID4gKyAgICB1aW50MzJfdCBpOw0KPiA+ICsNCj4gPiArICAgIGlmICghcy0+Z2VkX2Jhc2UgfHwg
+IWdlZF9ldmVudHMgfHwgIXMtPmdlZF9ldmVudHNfc2l6ZSkgew0KPiA+ICsgICAgICAgIHJldHVy
+bjsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4gKyAgICAvKiBfQ1JTIGludGVycnVwdCAqLw0KPiA+
+ICsgICAgYW1sX2FwcGVuZChjcnMsIGFtbF9pbnRlcnJ1cHQoQU1MX0NPTlNVTUVSLCBBTUxfRURH
+RSwNCj4gQU1MX0FDVElWRV9ISUdILA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgQU1MX0VYQ0xVU0lWRSwgJmdlZF9pcnEsIDEpKTsNCj4gPiArICAgIC8qDQo+ID4gKyAg
+ICAgKiBGb3IgZWFjaCBHRUQgZXZlbnQgd2U6DQo+ID4gKyAgICAgKiAtIEFkZCBhbiBpbnRlcnJ1
+cHQgdG8gdGhlIENSUyBzZWN0aW9uLg0KPiA+ICsgICAgICogLSBBZGQgYSBjb25kaXRpb25hbCBi
+bG9jayBmb3IgZWFjaCBldmVudCwgaW5zaWRlIGEgd2hpbGUgbG9vcC4NCj4gPiArICAgICAqICAg
+VGhpcyBpcyBzZW1hbnRpY2FsbHkgZXF1aXZhbGVudCB0byBhIHN3aXRjaC9jYXNlIGltcGxlbWVu
+dGF0aW9uLg0KPiA+ICsgICAgICovDQo+ID4gKyAgICBldnQgPSBhbWxfbWV0aG9kKCJfRVZUIiwg
+MSwgQU1MX1NFUklBTElaRUQpOw0KPiA+ICsgICAgew0KPiA+ICsgICAgICAgIEFtbCAqZ2VkX2Ft
+bDsNCj4gPiArICAgICAgICBBbWwgKmlmX2N0eDsNCj4gPiArDQo+ID4gKyAgICAgICAgLyogTG9j
+YWwwID0gSVNFTCAqLw0KPiA+ICsgICAgICAgIGFtbF9hcHBlbmQoZXZ0LCBhbWxfc3RvcmUoaXNl
+bCwgaXJxX3NlbCkpOw0KPiA+ICsNCj4gPiArICAgICAgICAvKg0KPiA+ICsgICAgICAgICAqIEhl
+cmUgd2Ugd2FudCB0byBjYWxsIGEgbWV0aG9kIGZvciBlYWNoIHN1cHBvcnRlZCBHRUQgZXZlbnQN
+Cj4gdHlwZS4NCj4gPiArICAgICAgICAgKiBUaGUgcmVzdWx0aW5nIEFTTCBjb2RlIGxvb2tzIGxp
+a2U6DQo+ID4gKyAgICAgICAgICoNCj4gPiArICAgICAgICAgKiBMb2NhbDAgPSBJU0VMDQo+ID4g
+KyAgICAgICAgICogSWYgKChMb2NhbDAgJiBpcnEwKSA9PSBpcnEwKQ0KPiA+ICsgICAgICAgICAq
+IHsNCj4gPiArICAgICAgICAgKiAgICAgTWV0aG9kRXZlbnQwKCkNCj4gPiArICAgICAgICAgKiB9
+DQo+ID4gKyAgICAgICAgICoNCj4gPiArICAgICAgICAgKiBJZiAoKExvY2FsMCAmIGlycTEpID09
+IGlycTEpDQo+ID4gKyAgICAgICAgICogew0KPiA+ICsgICAgICAgICAqICAgICBNZXRob2RFdmVu
+dDEoKQ0KPiA+ICsgICAgICAgICAqIH0NCj4gPiArICAgICAgICAgKiAuLi4NCj4gPiArICAgICAg
+ICAgKi8NCj4gPiArDQo+ID4gKyAgICAgICAgZm9yIChpID0gMDsgaSA8IHMtPmdlZF9ldmVudHNf
+c2l6ZTsgaSsrKSB7DQo+ID4gKyAgICAgICAgICAgIGdlZF9hbWwgPSBnZWRfZXZlbnRfYW1sKCZn
+ZWRfZXZlbnRzW2ldKTsNCj4gPiArICAgICAgICAgICAgaWYgKCFnZWRfYW1sKSB7DQo+ID4gKyAg
+ICAgICAgICAgICAgICBjb250aW51ZTsNCj4gPiArICAgICAgICAgICAgfQ0KPiA+ICsNCj4gPiAr
+ICAgICAgICAgICAgLyogSWYgKChMb2NhbDEgPT0gaXJxKSkqLw0KPiA+ICsgICAgICAgICAgICBp
+Zl9jdHggPSBhbWxfaWYoYW1sX2VxdWFsKGFtbF9hbmQoaXJxX3NlbCwNCj4gPiArDQo+IGFtbF9p
+bnQoZ2VkX2V2ZW50c1tpXS5zZWxlY3RvciksIE5VTEwpLA0KPiA+ICsNCj4gYW1sX2ludChnZWRf
+ZXZlbnRzW2ldLnNlbGVjdG9yKSkpOw0KPiA+ICsgICAgICAgICAgICB7DQo+ID4gKyAgICAgICAg
+ICAgICAgICAvKiBBTUwgZm9yIHRoaXMgc3BlY2lmaWMgdHlwZSBvZiBldmVudCAqLw0KPiA+ICsg
+ICAgICAgICAgICAgICAgYW1sX2FwcGVuZChpZl9jdHgsIGdlZF9hbWwpOw0KPiA+ICsgICAgICAg
+ICAgICB9DQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAvKg0KPiA+ICsgICAgICAgICAgICAgKiBX
+ZSBhcHBlbmQgdGhlIGZpcnN0ICJpZiIgdG8gdGhlICJ3aGlsZSIgY29udGV4dC4NCj4gPiArICAg
+ICAgICAgICAgICogT3RoZXIgImlmInMgd2lsbCBiZSAiZWxzZWlmInMuDQo+ID4gKyAgICAgICAg
+ICAgICAqLw0KPiA+ICsgICAgICAgICAgICBhbWxfYXBwZW5kKGV2dCwgaWZfY3R4KTsNCj4gPiAr
+ICAgICAgICB9DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgYW1sX2FwcGVuZChkZXYsIGFt
+bF9uYW1lX2RlY2woIl9ISUQiLCBhbWxfc3RyaW5nKCJBQ1BJMDAxMyIpKSk7DQo+ID4gKyAgICBh
+bWxfYXBwZW5kKGRldiwgYW1sX25hbWVfZGVjbCgiX1VJRCIsIGFtbF9zdHJpbmcoR0VEX0RFVklD
+RSkpKTsNCj4gPiArICAgIGFtbF9hcHBlbmQoZGV2LCBhbWxfbmFtZV9kZWNsKCJfQ1JTIiwgY3Jz
+KSk7DQo+ID4gKw0KPiA+ICsgICAgLyogQXBwZW5kIElPIHJlZ2lvbiAqLw0KPiA+ICsgICAgYW1s
+X2FwcGVuZChkZXYsIGFtbF9vcGVyYXRpb25fcmVnaW9uKEFNTF9HRURfSVJRX1JFRywgcnMsDQo+
+ID4gKyAgICAgICAgICAgICAgIGFtbF9pbnQocy0+Z2VkX2Jhc2UgKyBBQ1BJX0dFRF9JUlFfU0VM
+X09GRlNFVCksDQo+ID4gKyAgICAgICAgICAgICAgIEFDUElfR0VEX0lSUV9TRUxfTEVOKSk7DQo+
+ID4gKyAgICBmaWVsZCA9IGFtbF9maWVsZChBTUxfR0VEX0lSUV9SRUcsIEFNTF9EV09SRF9BQ0Ms
+DQo+IEFNTF9OT0xPQ0ssDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICBBTUxfV1JJVEVfQVNf
+WkVST1MpOw0KPiA+ICsgICAgYW1sX2FwcGVuZChmaWVsZCwgYW1sX25hbWVkX2ZpZWxkKEFNTF9H
+RURfSVJRX1NFTCwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBB
+Q1BJX0dFRF9JUlFfU0VMX0xFTiAqDQo+IDgpKTsNCj4gPiArICAgIGFtbF9hcHBlbmQoZGV2LCBm
+aWVsZCk7DQo+ID4gKw0KPiA+ICsgICAgLyogQXBwZW5kIF9FVlQgbWV0aG9kICovDQo+ID4gKyAg
+ICBhbWxfYXBwZW5kKGRldiwgZXZ0KTsNCj4gPiArDQo+ID4gKyAgICBhbWxfYXBwZW5kKHRhYmxl
+LCBkZXYpOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICsvKiBNZW1vcnkgcmVhZCBieSB0aGUgR0VEIF9F
+VlQgQU1MIGR5bmFtaWMgbWV0aG9kICovDQo+ID4gK3N0YXRpYyB1aW50NjRfdCBnZWRfcmVhZCh2
+b2lkICpvcGFxdWUsIGh3YWRkciBhZGRyLCB1bnNpZ25lZCBzaXplKQ0KPiA+ICt7DQo+ID4gKyAg
+ICB1aW50NjRfdCB2YWwgPSAwOw0KPiA+ICsgICAgR0VEU3RhdGUgKmdlZF9zdCA9IG9wYXF1ZTsN
+Cj4gPiArDQo+ID4gKyAgICBzd2l0Y2ggKGFkZHIpIHsNCj4gPiArICAgIGNhc2UgQUNQSV9HRURf
+SVJRX1NFTF9PRkZTRVQ6DQo+ID4gKyAgICAgICAgLyogUmVhZCB0aGUgc2VsZWN0b3IgdmFsdWUg
+YW5kIHJlc2V0IGl0ICovDQo+ID4gKyAgICAgICAgcWVtdV9tdXRleF9sb2NrKCZnZWRfc3QtPmxv
+Y2spOw0KPiA+ICsgICAgICAgIHZhbCA9IGdlZF9zdC0+c2VsOw0KPiA+ICsgICAgICAgIGdlZF9z
+dC0+c2VsID0gMDsNCj4gPiArICAgICAgICBxZW11X211dGV4X3VubG9jaygmZ2VkX3N0LT5sb2Nr
+KTsNCj4gPiArICAgICAgICBicmVhazsNCj4gPiArICAgIGRlZmF1bHQ6DQo+ID4gKyAgICAgICAg
+YnJlYWs7DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgcmV0dXJuIHZhbDsNCj4gPiArfQ0K
+PiA+ICsNCj4gPiArLyogTm90aGluZyBpcyBleHBlY3RlZCB0byBiZSB3cml0dGVuIHRvIHRoZSBH
+RUQgbWVtb3J5IHJlZ2lvbiAqLw0KPiA+ICtzdGF0aWMgdm9pZCBnZWRfd3JpdGUodm9pZCAqb3Bh
+cXVlLCBod2FkZHIgYWRkciwgdWludDY0X3QgZGF0YSwNCj4gPiArICAgICAgICAgICAgICAgICAg
+ICAgIHVuc2lnbmVkIGludCBzaXplKQ0KPiA+ICt7DQo+ID4gK30NCj4gPiArDQo+ID4gK3N0YXRp
+YyBjb25zdCBNZW1vcnlSZWdpb25PcHMgZ2VkX29wcyA9IHsNCj4gPiArICAgIC5yZWFkID0gZ2Vk
+X3JlYWQsDQo+ID4gKyAgICAud3JpdGUgPSBnZWRfd3JpdGUsDQo+ID4gKyAgICAuZW5kaWFubmVz
+cyA9IERFVklDRV9MSVRUTEVfRU5ESUFOLA0KPiA+ICsgICAgLnZhbGlkID0gew0KPiA+ICsgICAg
+ICAgIC5taW5fYWNjZXNzX3NpemUgPSA0LA0KPiA+ICsgICAgICAgIC5tYXhfYWNjZXNzX3NpemUg
+PSA0LA0KPiA+ICsgICAgfSwNCj4gPiArfTsNCj4gPiArDQo+ID4gK3N0YXRpYyB2b2lkIGFjcGlf
+Z2VkX2V2ZW50KEdFRFN0YXRlICpnZWRfc3QsIHVpbnQzMl90IGdlZF9pcnFfc2VsKQ0KPiA+ICt7
+DQo+ID4gKyAgICAvKg0KPiA+ICsgICAgICogU2V0IHRoZSBHRUQgSVJRIHNlbGVjdG9yIHRvIHRo
+ZSBleHBlY3RlZCBkZXZpY2UgdHlwZSB2YWx1ZS4gVGhpcw0KPiA+ICsgICAgICogd2F5LCB0aGUg
+QUNQSSBtZXRob2Qgd2lsbCBiZSBhYmxlIHRvIHRyaWdnZXIgdGhlIHJpZ2h0IGNvZGUgYmFzZWQN
+Cj4gPiArICAgICAqIG9uIGEgdW5pcXVlIElSUS4NCj4gPiArICAgICAqLw0KPiA+ICsgICAgcWVt
+dV9tdXRleF9sb2NrKCZnZWRfc3QtPmxvY2spOw0KPiA+ICsgICAgZ2VkX3N0LT5zZWwgPSBnZWRf
+aXJxX3NlbDsNCj4gPiArICAgIHFlbXVfbXV0ZXhfdW5sb2NrKCZnZWRfc3QtPmxvY2spOw0KPiA+
+ICsNCj4gPiArICAgIC8qIFRyaWdnZXIgdGhlIGV2ZW50IGJ5IHNlbmRpbmcgYW4gaW50ZXJydXB0
+IHRvIHRoZSBndWVzdC4gKi8NCj4gPiArICAgIHFlbXVfaXJxX3B1bHNlKGdlZF9zdC0+Z3NpW2dl
+ZF9zdC0+aXJxXSk7DQo+ID4gK30NCj4gPiArDQo+ID4gK3N0YXRpYyB2b2lkIGFjcGlfZ2VkX2lu
+aXQoTWVtb3J5UmVnaW9uICphcywgRGV2aWNlU3RhdGUgKmRldiwgR0VEU3RhdGUNCj4gKmdlZF9z
+dCkNCj4gPiArew0KPiA+ICsgICAgQWNwaUdlZFN0YXRlICpzID0gQUNQSV9HRUQoZGV2KTsNCj4g
+PiArDQo+ID4gKyAgICBhc3NlcnQocy0+Z2VkX2Jhc2UpOw0KPiA+ICsNCj4gPiArICAgIGdlZF9z
+dC0+aXJxID0gcy0+Z2VkX2lycTsNCj4gPiArICAgIGdlZF9zdC0+Z3NpID0gcy0+Z3NpOw0KPiA+
+ICsgICAgcWVtdV9tdXRleF9pbml0KCZnZWRfc3QtPmxvY2spOw0KPiA+ICsgICAgbWVtb3J5X3Jl
+Z2lvbl9pbml0X2lvKCZnZWRfc3QtPmlvLCBPQkpFQ1QoZGV2KSwgJmdlZF9vcHMsIGdlZF9zdCwN
+Cj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAiYWNwaS1nZWQtZXZlbnQiLCBBQ1BJX0dF
+RF9SRUdfTEVOKTsNCj4gPiArICAgIG1lbW9yeV9yZWdpb25fYWRkX3N1YnJlZ2lvbihhcywgcy0+
+Z2VkX2Jhc2UsICZnZWRfc3QtPmlvKTsNCj4gPiArfQ0KPiA+ICsNCj4gPiArc3RhdGljIHZvaWQg
+YWNwaV9nZWRfZGV2aWNlX3BsdWdfY2IoSG90cGx1Z0hhbmRsZXIgKmhvdHBsdWdfZGV2LA0KPiA+
+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBEZXZpY2VTdGF0ZSAqZGV2LCBF
+cnJvciAqKmVycnApDQo+ID4gK3sNCj4gPiArICAgIEFjcGlHZWRTdGF0ZSAqcyA9IEFDUElfR0VE
+KGhvdHBsdWdfZGV2KTsNCj4gPiArDQo+ID4gKyAgICBpZiAocy0+bWVtaHBfc3RhdGUuaXNfZW5h
+YmxlZCAmJg0KPiA+ICsgICAgICAgIG9iamVjdF9keW5hbWljX2Nhc3QoT0JKRUNUKGRldiksIFRZ
+UEVfUENfRElNTSkpIHsNCj4gPiArICAgICAgICAgICAgYWNwaV9tZW1vcnlfcGx1Z19jYihob3Rw
+bHVnX2RldiwgJnMtPm1lbWhwX3N0YXRlLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIGRldiwgZXJycCk7DQo+ID4gKyAgICB9IGVsc2Ugew0KPiA+ICsgICAgICAgIGVycm9y
+X3NldGcoZXJycCwgInZpcnQ6IGRldmljZSBwbHVnIHJlcXVlc3QgZm9yIHVuc3VwcG9ydGVkDQo+
+IGRldmljZSINCj4gPiArICAgICAgICAgICAgICAgICAgICIgdHlwZTogJXMiLCBvYmplY3RfZ2V0
+X3R5cGVuYW1lKE9CSkVDVChkZXYpKSk7DQo+ID4gKyAgICB9DQo+ID4gK30NCj4gPiArDQo+ID4g
+K3N0YXRpYyB2b2lkIGFjcGlfZ2VkX3NlbmRfZXZlbnQoQWNwaURldmljZUlmICphZGV2LCBBY3Bp
+RXZlbnRTdGF0dXNCaXRzDQo+IGV2KQ0KPiA+ICt7DQo+ID4gKyAgICBBY3BpR2VkU3RhdGUgKnMg
+PSBBQ1BJX0dFRChhZGV2KTsNCj4gPiArICAgIHVpbnQzMl90IHNlbDsNCj4gPiArDQo+ID4gKyAg
+ICBpZiAoZXYgJiBBQ1BJX01FTU9SWV9IT1RQTFVHX1NUQVRVUykgew0KPiA+ICsgICAgICAgIHNl
+bCA9IEFDUElfR0VEX0lSUV9TRUxfTUVNOw0KPiA+ICsgICAgfSBlbHNlIHsNCj4gPiArICAgICAg
+ICAvKiBVbmtub3duIGV2ZW50LiBSZXR1cm4gd2l0aG91dCBnZW5lcmF0aW5nIGludGVycnVwdC4g
+Ki8NCj4gPiArICAgICAgICByZXR1cm47DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgLyoN
+Cj4gPiArICAgICAqIFdlIGluamVjdCB0aGUgaG90cGx1ZyBpbnRlcnJ1cHQuIFRoZSBJUlEgc2Vs
+ZWN0b3Igd2lsbCBtYWtlDQo+ID4gKyAgICAgKiB0aGUgZGlmZmVyZW5jZSBmcm9tIHRoZSBBQ1BJ
+IHRhYmxlLg0KPiA+ICsgICAgICovDQo+ID4gKyAgICBhY3BpX2dlZF9ldmVudCgmcy0+Z2VkX3N0
+YXRlLCBzZWwpOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICtzdGF0aWMgdm9pZCBhY3BpX2dlZF9kZXZp
+Y2VfcmVhbGl6ZShEZXZpY2VTdGF0ZSAqZGV2LCBFcnJvciAqKmVycnApDQo+ID4gK3sNCj4gPiAr
+ICAgIEFjcGlHZWRTdGF0ZSAqcyA9IEFDUElfR0VEKGRldik7DQo+ID4gKw0KPiA+ICsgICAgaWYg
+KHMtPm1lbWhwX3N0YXRlLmlzX2VuYWJsZWQpIHsNCj4gPiArICAgICAgICBhY3BpX21lbW9yeV9o
+b3RwbHVnX2luaXQoZ2V0X3N5c3RlbV9tZW1vcnkoKSwgT0JKRUNUKGRldiksDQo+ID4gKyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICZzLT5tZW1ocF9zdGF0ZSwNCj4gPiArICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgcy0+bWVtaHBfYmFzZSk7DQo+ID4gKyAgICAgICAg
+YWNwaV9nZWRfaW5pdChnZXRfc3lzdGVtX21lbW9yeSgpLCBkZXYsICZzLT5nZWRfc3RhdGUpOw0K
+PiA+ICsgICAgfQ0KPiA+ICt9DQo+ID4gKw0KPiA+ICtzdGF0aWMgUHJvcGVydHkgYWNwaV9nZWRf
+cHJvcGVydGllc1tdID0gew0KPiA+ICsgICAgLyoNCj4gPiArICAgICAqIE1lbW9yeSBob3RwbHVn
+IGJhc2UgYWRkcmVzcyBpcyBhIHByb3BlcnR5IG9mIEdFRCBoZXJlLA0KPiA+ICsgICAgICogYmVj
+YXVzZSBHRUQgaGFuZGxlcyBtZW1vcnkgaG90cGx1ZyBldmVudCBhbmQNCj4gTUVNT1JZX0hPVFBM
+VUdfREVWSUNFDQo+ID4gKyAgICAgKiBnZXRzIGluaXRpYWxpemVkIHdoZW4gR0VEIGRldmljZSBp
+cyByZWFsaXplZC4NCj4gPiArICAgICAqLw0KPiA+ICsgICAgREVGSU5FX1BST1BfVUlOVDY0KCJt
+ZW1ocC1iYXNlIiwgQWNwaUdlZFN0YXRlLCBtZW1ocF9iYXNlLA0KPiAwKSwNCj4gPiArICAgIERF
+RklORV9QUk9QX0JPT0woIm1lbW9yeS1ob3RwbHVnLXN1cHBvcnQiLCBBY3BpR2VkU3RhdGUsDQo+
+ID4gKyAgICAgICAgICAgICAgICAgICAgIG1lbWhwX3N0YXRlLmlzX2VuYWJsZWQsIHRydWUpLA0K
+PiA+ICsgICAgREVGSU5FX1BST1BfUFRSKCJnc2kiLCBBY3BpR2VkU3RhdGUsIGdzaSksDQo+ID4g
+KyAgICBERUZJTkVfUFJPUF9VSU5UNjQoImdlZC1iYXNlIiwgQWNwaUdlZFN0YXRlLCBnZWRfYmFz
+ZSwgMCksDQo+ID4gKyAgICBERUZJTkVfUFJPUF9VSU5UMzIoImdlZC1pcnEiLCBBY3BpR2VkU3Rh
+dGUsIGdlZF9pcnEsIDApLA0KPiA+ICsgICAgREVGSU5FX1BST1BfUFRSKCJnZWQtZXZlbnRzIiwg
+QWNwaUdlZFN0YXRlLCBnZWRfZXZlbnRzKSwNCj4gPiArICAgIERFRklORV9QUk9QX1VJTlQzMigi
+Z2VkLWV2ZW50cy1zaXplIiwgQWNwaUdlZFN0YXRlLA0KPiBnZWRfZXZlbnRzX3NpemUsIDApLA0K
+PiA+ICsgICAgREVGSU5FX1BST1BfRU5EX09GX0xJU1QoKSwNCj4gPiArfTsNCj4gPiArDQo+ID4g
+K3N0YXRpYyB2b2lkIGFjcGlfZ2VkX2NsYXNzX2luaXQoT2JqZWN0Q2xhc3MgKmNsYXNzLCB2b2lk
+ICpkYXRhKQ0KPiA+ICt7DQo+ID4gKyAgICBEZXZpY2VDbGFzcyAqZGMgPSBERVZJQ0VfQ0xBU1Mo
+Y2xhc3MpOw0KPiA+ICsgICAgSG90cGx1Z0hhbmRsZXJDbGFzcyAqaGMgPSBIT1RQTFVHX0hBTkRM
+RVJfQ0xBU1MoY2xhc3MpOw0KPiA+ICsgICAgQWNwaURldmljZUlmQ2xhc3MgKmFkZXZjID0gQUNQ
+SV9ERVZJQ0VfSUZfQ0xBU1MoY2xhc3MpOw0KPiA+ICsNCj4gPiArICAgIGRjLT5kZXNjID0gIkFD
+UEkiOw0KPiA+ICsgICAgZGMtPnByb3BzID0gYWNwaV9nZWRfcHJvcGVydGllczsNCj4gPiArICAg
+IGRjLT5yZWFsaXplID0gYWNwaV9nZWRfZGV2aWNlX3JlYWxpemU7DQo+ID4gKw0KPiA+ICsgICAg
+LyogUmVhc29uOiBwb2ludGVyIHByb3BlcnRpZXMgImdzaSIgYW5kICJnZWRfZXZlbnRzIiAqLw0K
+PiA+ICsgICAgZGMtPnVzZXJfY3JlYXRhYmxlID0gZmFsc2U7DQo+ID4gKw0KPiA+ICsgICAgaGMt
+PnBsdWcgPSBhY3BpX2dlZF9kZXZpY2VfcGx1Z19jYjsNCj4gPiArDQo+ID4gKyAgICBhZGV2Yy0+
+c2VuZF9ldmVudCA9IGFjcGlfZ2VkX3NlbmRfZXZlbnQ7DQo+ID4gK30NCj4gPiArDQo+ID4gK3N0
+YXRpYyBjb25zdCBUeXBlSW5mbyBhY3BpX2dlZF9pbmZvID0gew0KPiA+ICsgICAgLm5hbWUgICAg
+ICAgICAgPSBUWVBFX0FDUElfR0VELA0KPiA+ICsgICAgLnBhcmVudCAgICAgICAgPSBUWVBFX0RF
+VklDRSwNCj4gPiArICAgIC5pbnN0YW5jZV9zaXplID0gc2l6ZW9mKEFjcGlHZWRTdGF0ZSksDQo+
+ID4gKyAgICAuY2xhc3NfaW5pdCAgICA9IGFjcGlfZ2VkX2NsYXNzX2luaXQsDQo+ID4gKyAgICAu
+aW50ZXJmYWNlcyA9IChJbnRlcmZhY2VJbmZvW10pIHsNCj4gPiArICAgICAgICB7IFRZUEVfSE9U
+UExVR19IQU5ETEVSIH0sDQo+ID4gKyAgICAgICAgeyBUWVBFX0FDUElfREVWSUNFX0lGIH0sDQo+
+ID4gKyAgICAgICAgeyB9DQo+ID4gKyAgICB9DQo+ID4gK307DQo+ID4gKw0KPiA+ICtzdGF0aWMg
+dm9pZCBhY3BpX2dlZF9yZWdpc3Rlcl90eXBlcyh2b2lkKQ0KPiA+ICt7DQo+ID4gKyAgICB0eXBl
+X3JlZ2lzdGVyX3N0YXRpYygmYWNwaV9nZWRfaW5mbyk7DQo+ID4gK30NCj4gPiArDQo+ID4gK3R5
+cGVfaW5pdChhY3BpX2dlZF9yZWdpc3Rlcl90eXBlcykNCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVk
+ZS9ody9hY3BpL2dlbmVyaWNfZXZlbnRfZGV2aWNlLmgNCj4gYi9pbmNsdWRlL2h3L2FjcGkvZ2Vu
+ZXJpY19ldmVudF9kZXZpY2UuaA0KPiA+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+ID4gaW5kZXgg
+MDAwMDAwMC4uOWM4NDBkOA0KPiA+IC0tLSAvZGV2L251bGwNCj4gPiArKysgYi9pbmNsdWRlL2h3
+L2FjcGkvZ2VuZXJpY19ldmVudF9kZXZpY2UuaA0KPiA+IEBAIC0wLDAgKzEsMTIxIEBADQo+ID4g
+Ky8qDQo+ID4gKyAqDQo+ID4gKyAqIENvcHlyaWdodCAoYykgMjAxOCBJbnRlbCBDb3Jwb3JhdGlv
+bg0KPiA+ICsgKg0KPiA+ICsgKiBUaGlzIHByb2dyYW0gaXMgZnJlZSBzb2Z0d2FyZTsgeW91IGNh
+biByZWRpc3RyaWJ1dGUgaXQgYW5kL29yIG1vZGlmeSBpdA0KPiA+ICsgKiB1bmRlciB0aGUgdGVy
+bXMgYW5kIGNvbmRpdGlvbnMgb2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlLA0KPiA+
+ICsgKiB2ZXJzaW9uIDIgb3IgbGF0ZXIsIGFzIHB1Ymxpc2hlZCBieSB0aGUgRnJlZSBTb2Z0d2Fy
+ZSBGb3VuZGF0aW9uLg0KPiA+ICsgKg0KPiA+ICsgKiBUaGlzIHByb2dyYW0gaXMgZGlzdHJpYnV0
+ZWQgaW4gdGhlIGhvcGUgaXQgd2lsbCBiZSB1c2VmdWwsIGJ1dCBXSVRIT1VUDQo+ID4gKyAqIEFO
+WSBXQVJSQU5UWTsgd2l0aG91dCBldmVuIHRoZSBpbXBsaWVkIHdhcnJhbnR5IG9mDQo+IE1FUkNI
+QU5UQUJJTElUWSBvcg0KPiA+ICsgKiBGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIgUFVSUE9TRS4g
+IFNlZSB0aGUgR05VIEdlbmVyYWwgUHVibGljDQo+IExpY2Vuc2UgZm9yDQo+ID4gKyAqIG1vcmUg
+ZGV0YWlscy4NCj4gPiArICoNCj4gPiArICogWW91IHNob3VsZCBoYXZlIHJlY2VpdmVkIGEgY29w
+eSBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2UgYWxvbmcNCj4gd2l0aA0KPiA+ICsg
+KiB0aGlzIHByb2dyYW0uICBJZiBub3QsIHNlZSA8aHR0cDovL3d3dy5nbnUub3JnL2xpY2Vuc2Vz
+Lz4uDQo+ID4gKyAqDQo+ID4gKyAqIFRoZSBBQ1BJIEdlbmVyaWMgRXZlbnQgRGV2aWNlIChHRUQp
+IGlzIGEgaGFyZHdhcmUtcmVkdWNlZCBzcGVjaWZpYw0KPiA+ICsgKiBkZXZpY2VbQUNQSSB2Ni4x
+IFNlY3Rpb24gNS42LjldIHRoYXQgaGFuZGxlcyBhbGwgcGxhdGZvcm0gZXZlbnRzLA0KPiA+ICsg
+KiBpbmNsdWRpbmcgdGhlIGhvdHBsdWcgb25lcy4gR2VuZXJpYyBFdmVudCBEZXZpY2UgYWxsb3dz
+IHBsYXRmb3Jtcw0KPiA+ICsgKiB0byBoYW5kbGUgaW50ZXJydXB0cyBpbiBBQ1BJIEFTTCBzdGF0
+ZW1lbnRzLiBJdCBmb2xsb3dzIGEgdmVyeQ0KPiA+ICsgKiBzaW1pbGFyIGFwcHJvYWNoIGxpa2Ug
+dGhlIF9FVlQgbWV0aG9kIGZyb20gR1BJTyBldmVudHMuIEFsbA0KPiA+ICsgKiBpbnRlcnJ1cHRz
+IGFyZSBsaXN0ZWQgaW4gIF9DUlMgYW5kIHRoZSBoYW5kbGVyIGlzIHdyaXR0ZW4gaW4gX0VWVA0K
+PiA+ICsgKiBtZXRob2QuIEhlcmUsIHdlIHVzZSBhIHNpbmdsZSBpbnRlcnJ1cHQgZm9yIHRoZSBH
+RUQgZGV2aWNlLCByZWx5aW5nDQo+ID4gKyAqIG9uIElPIG1lbW9yeSByZWdpb24gdG8gY29tbXVu
+aWNhdGUgdGhlIHR5cGUgb2YgZGV2aWNlIGFmZmVjdGVkIGJ5DQo+ID4gKyAqIHRoZSBpbnRlcnJ1
+cHQuIFRoaXMgd2F5LCB3ZSBjYW4gc3VwcG9ydCB1cCB0byAzMiBldmVudHMgd2l0aCBhDQo+ID4g
+KyAqIHVuaXF1ZSBpbnRlcnJ1cHQuDQo+ID4gKyAqDQo+ID4gKyAqIEhlcmUgaXMgYW4gZXhhbXBs
+ZS4NCj4gPiArICoNCj4gPiArICogRGV2aWNlIChcX1NCLkdFRCkNCj4gPiArICogew0KPiA+ICsg
+KiAgICAgTmFtZSAoX0hJRCwgIkFDUEkwMDEzIikNCj4gPiArICogICAgIE5hbWUgKF9VSUQsIFpl
+cm8pDQo+ID4gKyAqICAgICBOYW1lIChfQ1JTLCBSZXNvdXJjZVRlbXBsYXRlICgpDQo+ID4gKyAq
+ICAgICB7DQo+ID4gKyAqICAgICAgICAgSW50ZXJydXB0IChSZXNvdXJjZUNvbnN1bWVyLCBFZGdl
+LCBBY3RpdmVIaWdoLCBFeGNsdXNpdmUsICwsICkNCj4gPiArICogICAgICAgICB7DQo+ID4gKyAq
+ICAgICAgICAgICAgICAweDAwMDAwMDI5LA0KPiA+ICsgKiAgICAgICAgIH0NCj4gPiArICogICAg
+IH0pDQo+ID4gKyAqICAgICBPcGVyYXRpb25SZWdpb24gKElSRUcsIFN5c3RlbU1lbW9yeSwgMHgw
+OTA4MDAwMCwgMHgwNCkNCj4gPiArICogICAgIEZpZWxkIChJUkVHLCBEV29yZEFjYywgTm9Mb2Nr
+LCBXcml0ZUFzWmVyb3MpDQo+ID4gKyAqICAgICB7DQo+ID4gKyAqICAgICAgICAgSVNFTCwgICAz
+Mg0KPiA+ICsgKiAgICAgfQ0KPiA+ICsgKg0KPiA+ICsgKiAgICAgTWV0aG9kIChfRVZULCAxLCBT
+ZXJpYWxpemVkKSAgLy8gX0VWVDogRXZlbnQNCj4gPiArICogICAgIHsNCj4gPiArICogICAgICAg
+ICBMb2NhbDAgPSBJU0VMIC8vIElTRUwgPSBJTyBtZW1vcnkgcmVnaW9uIHdoaWNoIHNwZWNpZmll
+cyB0aGUNCj4gPiArICogICAgICAgICAgICAgICAgICAgICAgIC8vIGRldmljZSB0eXBlLg0KPiA+
+ICsgKiAgICAgICAgIElmICgoKExvY2FsMCAmIGlycTApID09IGlycTApKQ0KPiA+ICsgKiAgICAg
+ICAgIHsNCj4gPiArICogICAgICAgICAgICAgTWV0aG9kRXZlbnQwKCkNCj4gPiArICogICAgICAg
+ICB9DQo+ID4gKyAqICAgICAgICAgRWxzZUlmICgoTG9jYWwwICYgaXJxMSkgPT0gaXJxMSkNCj4g
+PiArICogICAgICAgICB7DQo+ID4gKyAqICAgICAgICAgICAgIE1ldGhvZEV2ZW50MSgpDQo+ID4g
+KyAqICAgICAgICAgfQ0KPiA+ICsgKiAgICAgICAgIC4uLg0KPiA+ICsgKiAgICAgfQ0KPiA+ICsg
+KiB9DQo+ID4gKyAqDQo+ID4gKyAqLw0KPiA+ICsNCj4gPiArI2lmbmRlZiBIV19BQ1BJX0dFRF9I
+DQo+ID4gKyNkZWZpbmUgSFdfQUNQSV9HRURfSA0KPiA+ICsNCj4gPiArI2luY2x1ZGUgImh3L2Fj
+cGkvbWVtb3J5X2hvdHBsdWcuaCINCj4gPiArDQo+ID4gKyNkZWZpbmUgVFlQRV9BQ1BJX0dFRCAi
+YWNwaS1nZWQiDQo+ID4gKyNkZWZpbmUgQUNQSV9HRUQob2JqKSBcDQo+ID4gKyAgICBPQkpFQ1Rf
+Q0hFQ0soQWNwaUdlZFN0YXRlLCAob2JqKSwgVFlQRV9BQ1BJX0dFRCkNCj4gPiArDQo+ID4gKyNk
+ZWZpbmUgQUNQSV9HRURfSVJRX1NFTF9PRkZTRVQgMHgwDQo+ID4gKyNkZWZpbmUgQUNQSV9HRURf
+SVJRX1NFTF9MRU4gICAgMHg0DQo+ID4gKyNkZWZpbmUgQUNQSV9HRURfSVJRX1NFTF9NRU0gICAg
+MHgxDQo+ID4gKyNkZWZpbmUgQUNQSV9HRURfUkVHX0xFTiAgICAgICAgMHg0DQo+ID4gKw0KPiA+
+ICsjZGVmaW5lIEdFRF9ERVZJQ0UgICAgICAiR0VEIg0KPiA+ICsjZGVmaW5lIEFNTF9HRURfSVJR
+X1JFRyAiSVJFRyINCj4gPiArI2RlZmluZSBBTUxfR0VEX0lSUV9TRUwgIklTRUwiDQo+ID4gKw0K
+PiA+ICt0eXBlZGVmIGVudW0gew0KPiA+ICsgICAgR0VEX01FTU9SWV9IT1RQTFVHID0gMSwNCj4g
+PiArfSBHZWRFdmVudFR5cGU7DQo+ID4gKw0KPiA+ICsvKg0KPiA+ICsgKiBQbGF0Zm9ybXMgbmVl
+ZCB0byBzcGVjaWZ5IHRoZWlyIG93biBHZWRFdmVudCBhcnJheQ0KPiA+ICsgKiB0byBkZXNjcmli
+ZSB3aGF0IGtpbmQgb2YgZXZlbnRzIHRoZXkgd2FudCB0byBzdXBwb3J0DQo+ID4gKyAqIHRocm91
+Z2ggR0VELg0KPiA+ICsgKi8NCj4gPiArdHlwZWRlZiBzdHJ1Y3QgR2VkRXZlbnQgew0KPiA+ICsg
+ICAgdWludDMyX3QgICAgIHNlbGVjdG9yOw0KPiA+ICsgICAgR2VkRXZlbnRUeXBlIGV2ZW50Ow0K
+PiA+ICt9IEdlZEV2ZW50Ow0KPiA+ICsNCj4gPiArdHlwZWRlZiBzdHJ1Y3QgR0VEU3RhdGUgew0K
+PiA+ICsgICAgTWVtb3J5UmVnaW9uIGlvOw0KPiA+ICsgICAgdWludDMyX3QgICAgIHNlbDsNCj4g
+PiArICAgIHVpbnQzMl90ICAgICBpcnE7DQo+ID4gKyAgICBxZW11X2lycSAgICAgKmdzaTsNCj4g
+PiArICAgIFFlbXVNdXRleCAgICBsb2NrOw0KPiA+ICt9IEdFRFN0YXRlOw0KPiA+ICsNCj4gPiAr
+DQo+ID4gK3R5cGVkZWYgc3RydWN0IEFjcGlHZWRTdGF0ZSB7DQo+ID4gKyAgICBEZXZpY2VDbGFz
+cyBwYXJlbnRfb2JqOw0KPiA+ICsgICAgTWVtSG90cGx1Z1N0YXRlIG1lbWhwX3N0YXRlOw0KPiA+
+ICsgICAgaHdhZGRyIG1lbWhwX2Jhc2U7DQo+ID4gKyAgICB2b2lkICpnc2k7DQo+ID4gKyAgICBo
+d2FkZHIgZ2VkX2Jhc2U7DQo+ID4gKyAgICBHRURTdGF0ZSBnZWRfc3RhdGU7DQo+ID4gKyAgICB1
+aW50MzJfdCBnZWRfaXJxOw0KPiA+ICsgICAgdm9pZCAqZ2VkX2V2ZW50czsNCj4gPiArICAgIHVp
+bnQzMl90IGdlZF9ldmVudHNfc2l6ZTsNCj4gPiArfSBBY3BpR2VkU3RhdGU7DQo+ID4gKw0KPiA+
+ICt2b2lkIGJ1aWxkX2dlZF9hbWwoQW1sICp0YWJsZSwgY29uc3QgY2hhciogbmFtZSwgSG90cGx1
+Z0hhbmRsZXINCj4gKmhvdHBsdWdfZGV2LA0KPiA+ICsgICAgICAgICAgICAgICAgICAgdWludDMy
+X3QgZ2VkX2lycSwgQW1sUmVnaW9uU3BhY2UgcnMpOw0KPiA+ICsNCj4gPiArI2VuZGlmDQo+ID4g
+LS0NCj4gPiAyLjcuNA0KPiA+DQo+ID4NCg==
