@@ -2,89 +2,99 @@ Return-Path: <SRS0=aVj3=TB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C9F9C43219
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 08:33:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C10E2C43219
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 08:59:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2502C20835
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 08:33:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C8382081C
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 May 2019 08:59:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IRxXd7jM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2502C20835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="iimQPlfP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C8382081C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40144 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40585 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hLkfm-0002A5-Fl
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 04:33:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39273)
+	id 1hLl5T-00081A-Ej
+	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 04:59:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hLkcx-0000K5-5x
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 04:30:10 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1hLl4V-0007dy-Dl
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 04:58:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hLkcu-0000ur-53
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 04:30:07 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41977)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hLkct-0000sJ-TQ
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 04:30:04 -0400
-Received: by mail-wr1-x444.google.com with SMTP id c12so23824044wrt.8
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 01:30:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=9uxh3wA0VQwkUd/c3XSQevr1pkhzyq4Y6eYVE3BjJ08=;
-	b=IRxXd7jMyne9oE+mx9TjjiPMwIqOjAJLPXpX7RHEkmWuSWpncR7sDkprfsuJi4m9oj
-	jhjoHaqbBlVwAPtoAtuNiujgWns5mwz8/uc500A9dpkAfiHGidJDIbj0rmNTc21LSGOR
-	lx6PRSxCGR7iO21QBZZkOEtXfw/bRHVnh6Hhd7Q0QGMCVrHhKUyuKeFbV0As0atLPMVi
-	l2JOpySk3YLoPD2mjTsDhXNxxKPl2BB68D7HHVpEMg2+yf4z8KuXiPmvj2SR/zU4SWul
-	sqMR4gig6oRliYrCBSPCNbwrZUn6eT3JmB2NNPnJmtB8WTZ50G4a6dkxxU5K7zaGeyLw
-	6bOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=9uxh3wA0VQwkUd/c3XSQevr1pkhzyq4Y6eYVE3BjJ08=;
-	b=OmeMQ6ETy2c5todPm1pl3/GvUzBjjMJd/aw/g/ZJ+CwEL8WNUJIMLgVIsZg+fcPsUa
-	RlN03s4A1nnP8ZnXsZd5Lxx+AUvuldN+hzeqc5KIn3S7sd9dvOR2/xlTl1tUduQ7P36q
-	Flc9eypySnWv0wrjbGkS3zzvKa0xEyz94gJzzinTJ4XsGNpkUL4B6W3fk6tcaQYC4mUg
-	Y92J2oVNEsL+p06KvE576OxdtWlzM9+XGKjcpntlT8YY7ACxGfnevcIXl8HvwqZV/SkM
-	O+R/G36cw2FjekeEaBgc3T2k5ZeJMRqga3NViZPU1dlNaWtCDPFIzSSV69NModu1vMLf
-	+ldg==
-X-Gm-Message-State: APjAAAUmaassNvStsTvOt6c0C5PNZnmix9ca9wxLv4X9YDnUZmLu+xzH
-	q6RbMLhR0pDKgalnsw/7h12Cig==
-X-Google-Smtp-Source: APXvYqyajbpJ8WrZ5StW0M5V6bNVl94EyRwLB2fk9A1dyuTMgp9R58Nb9VZaF7GYjbFAcP9+IcMijA==
-X-Received: by 2002:adf:bac9:: with SMTP id w9mr23556221wrg.256.1556699402625; 
-	Wed, 01 May 2019 01:30:02 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id z9sm1041993wma.39.2019.05.01.01.30.01
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 01 May 2019 01:30:01 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 98D391FF87;
-	Wed,  1 May 2019 09:30:01 +0100 (BST)
-References: <20190428155451.15653-1-thuth@redhat.com>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Thomas Huth <thuth@redhat.com>
-In-reply-to: <20190428155451.15653-1-thuth@redhat.com>
-Date: Wed, 01 May 2019 09:30:01 +0100
-Message-ID: <87bm0m7f1y.fsf@zen.linaroharston>
+	(envelope-from <yuval.shaia@oracle.com>) id 1hLl4S-0001vf-Ae
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 04:58:35 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:42362)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1hLl4L-0001qP-QS; Wed, 01 May 2019 04:58:25 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+	by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x418s7hB085578; Wed, 1 May 2019 08:58:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=date : from : to : cc
+	: subject : message-id : references : mime-version : content-type :
+	in-reply-to; s=corp-2018-07-02;
+	bh=A8YADu2rwKAWQLEiDUXG3KJGUE1l397TUlHOb3L6fLM=;
+	b=iimQPlfPW3V3sgiaFtTDrqyKzZ1cdR13rNCQgWz2DbwZN0YzNz5ODveEx8mp62n15Ak2
+	yIxAcovzdhpegxNg1qEWBcZtAuL2m/ISaNz7hSG5iCc67CvNyoLuFyZD0mWZw6R0mEUI
+	dkq0Umh2WfXTv8Rd5WN1BY18mLKMUbitKznDSSAqxnqclFZQRRlIXwiy/4Oz3OlfSHN/
+	8ZgbD68AEQdKM/4sGwWbkqU8Bd8MmdSFEoFV6K0NW9cidkW7XOSWP4yi3uCDTtLQXvz0
+	4rUVIPexaAS8rZjYGKr37cNfTJyli9Ad7dh2x2Bu7uUN9C+tv5fNDNso1n6oPLoxHIYn
+	Cw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+	by aserp2130.oracle.com with ESMTP id 2s6xhy9kwn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 01 May 2019 08:58:20 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+	by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x418vFeb081647; Wed, 1 May 2019 08:58:20 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+	by aserp3030.oracle.com with ESMTP id 2s6xhgedcb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 01 May 2019 08:58:20 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+	by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x418wAKN008357;
+	Wed, 1 May 2019 08:58:12 GMT
+Received: from lap1 (/77.138.183.59) by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Wed, 01 May 2019 01:58:10 -0700
+Date: Wed, 1 May 2019 11:58:06 +0300
+From: Yuval Shaia <yuval.shaia@oracle.com>
+To: Boxuan Li <liboxuan@connect.hku.hk>
+Message-ID: <20190501085805.GA8174@lap1>
+References: <20190501081039.58938-1-liboxuan@connect.hku.hk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH v2 0/8] tests/qemu-iotests: Run basic
- iotests during "make check"
+Content-Disposition: inline
+In-Reply-To: <20190501081039.58938-1-liboxuan@connect.hku.hk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9243
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1905010060
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9243
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1905010060
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.79
+Subject: Re: [Qemu-devel] [PATCH v2] hw/virtio/virtio-mmio: Convert DPRINTF
+ to traces
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,195 +106,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
-	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org, Christophe Fergeau <cfergeau@redhat.com>,
-	Max Reitz <mreitz@redhat.com>,
-	Wainer dos Santos Moschetta <wainersm@redhat.com>,
-	Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-trivial@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org,
+	"Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190501083001.KxJYP8yO1A1DfCeVGhzhoKjnDK1w1K1gsInTnLLng6c@z>
+Message-ID: <20190501085806.hmRfRPacoXgkQsyYJEyiVEv3a5PJSa4CENwCQyaORbM@z>
 
+On Wed, May 01, 2019 at 04:10:39PM +0800, Boxuan Li wrote:
+> Signed-off-by: Boxuan Li <liboxuan@connect.hku.hk>
+> ---
+> v2: Instead of using conditional debugs, convert DPRINTF to traces
+> ---
+>  hw/virtio/trace-events  | 13 +++++++++++++
+>  hw/virtio/virtio-mmio.c | 35 ++++++++++++-----------------------
+>  2 files changed, 25 insertions(+), 23 deletions(-)
+> 
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> index 60c649c4bc..37c781b487 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -46,3 +46,16 @@ virtio_balloon_handle_output(const char *name, uint64_t gpa) "section name: %s g
+>  virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_pages: %d actual: %d"
+>  virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: %d oldactual: %d"
+>  virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon target: 0x%"PRIx64" num_pages: %d"
+> +
+> +# virtio-mmio.c
+> +virtio_mmio_read(int offset) "virtio_mmio_read offset 0x%x"
+> +virtio_mmio_wrong_size_read(void) "wrong size access to register!"
+> +virtio_mmio_read_interrupt(void) "read of write-only register"
+> +virtio_mmio_bad_read_offset(void) "bad register offset"
+> +virtio_mmio_write_offset(int offset, uint64_t value) "virtio_mmio_write offset 0x%x value 0x%" PRIx64
+> +virtio_mmio_wrong_size_write(void) "wrong size access to register!"
+> +virtio_mmio_guest_page(uint64_t size, int shift) "guest page size 0x%" PRIx64 " shift %d"
+> +virtio_mmio_queue_write(int value, int max_size) "mmio_queue write %d max %d"
+> +virtio_mmio_write_interrupt(void) "write to readonly register"
+> +virtio_mmio_bad_write_offset(void) "bad register offset"
+> +virtio_mmio_setting_irq(int level) "virtio_mmio setting IRQ %d"
+> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+> index 5807aa87fe..4251df399d 100644
+> --- a/hw/virtio/virtio-mmio.c
+> +++ b/hw/virtio/virtio-mmio.c
+> @@ -27,16 +27,7 @@
+>  #include "sysemu/kvm.h"
+>  #include "hw/virtio/virtio-bus.h"
+>  #include "qemu/error-report.h"
+> -
+> -/* #define DEBUG_VIRTIO_MMIO */
+> -
+> -#ifdef DEBUG_VIRTIO_MMIO
+> -
+> -#define DPRINTF(fmt, ...) \
+> -do { printf("virtio_mmio: " fmt , ## __VA_ARGS__); } while (0)
+> -#else
+> -#define DPRINTF(fmt, ...) do {} while (0)
+> -#endif
+> +#include "trace.h"
+>  
+>  /* QOM macros */
+>  /* virtio-mmio-bus */
+> @@ -107,7 +98,7 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
+>      VirtIOMMIOProxy *proxy = (VirtIOMMIOProxy *)opaque;
+>      VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
+>  
+> -    DPRINTF("virtio_mmio_read offset 0x%x\n", (int)offset);
+> +    trace_virtio_mmio_read((int)offset);
+>  
+>      if (!vdev) {
+>          /* If no backend is present, we treat most registers as
+> @@ -144,7 +135,7 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
+>          }
+>      }
+>      if (size != 4) {
+> -        DPRINTF("wrong size access to register!\n");
+> +        trace_virtio_mmio_wrong_size_read();
 
-Thomas Huth <thuth@redhat.com> writes:
+Have you considered using qemu_error_report to report such errors?
 
-> People often forget to run the iotests before submitting patches or
-> pull requests - this is likely due to the fact that we do not run the
-> tests during our mandatory "make check" tests yet.
-> This patch series now changes the "auto" group to only include tests
-> that should be safe to run in all CI environments (including FreeBSD
-> and macOS!). Thus these iotests can now always be run during "make
-> check" automatically, too.
+>          return 0;
+>      }
+>      switch (offset) {
+> @@ -182,10 +173,10 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
+>      case VIRTIO_MMIO_QUEUE_ALIGN:
+>      case VIRTIO_MMIO_QUEUE_NOTIFY:
+>      case VIRTIO_MMIO_INTERRUPT_ACK:
+> -        DPRINTF("read of write-only register\n");
+> +        trace_virtio_mmio_read_interrupt();
+>          return 0;
+>      default:
+> -        DPRINTF("bad register offset\n");
+> +        trace_virtio_mmio_bad_read_offset();
 
-Assuming my local tests work I think I should queue these and submit a
-PR right away. Sorry about the delay getting to them.
+Ditto to all other errors.
 
->
-> v2:
->  - Use "auto" group instead of adding a new "ci" group
->  - Adjusted the tests that are run automatically (after doing lots
->    of CI runs on cirrus-ci.com, gitlab and travis)
->  - Added patch to fix the current regression with the "qemu-io:"
->    prefix in the master branch
->  - Added a fix for iotest 005 on ext4 filesystems (skip it there)
->
-> Thomas Huth (8):
->   tests/qemu-iotests: Fix output of qemu-io related tests
->   tests/qemu-iotests/005: Add a sanity check for large sparse file
->     support
->   tests/qemu-iotests/check: Pick a default machine if necessary
->   tests/qemu-iotests: Do not hard-code the path to bash
->   cirrus / travis: Add gnu-sed and bash for macOS and FreeBSD
->   tests/qemu-iotests: Remove the "_supported_os Linux" line from many
->     tests
->   tests/qemu-iotests/group: Re-use the "auto" group for tests that can
->     always run
->   tests: Run the iotests during "make check" again
->
->  .cirrus.yml                 |   4 +-
->  .travis.yml                 |   1 +
->  tests/Makefile.include      |   8 +-
->  tests/check-block.sh        |  44 +++++++---
->  tests/qemu-iotests-quick.sh |   8 --
->  tests/qemu-iotests/001      |   1 -
->  tests/qemu-iotests/002      |   1 -
->  tests/qemu-iotests/003      |   1 -
->  tests/qemu-iotests/004      |   1 -
->  tests/qemu-iotests/005      |   9 ++
->  tests/qemu-iotests/007      |   1 -
->  tests/qemu-iotests/008      |   1 -
->  tests/qemu-iotests/009      |   1 -
->  tests/qemu-iotests/010      |   1 -
->  tests/qemu-iotests/011      |   1 -
->  tests/qemu-iotests/012      |   1 -
->  tests/qemu-iotests/015      |   1 -
->  tests/qemu-iotests/017      |   1 -
->  tests/qemu-iotests/020      |   1 -
->  tests/qemu-iotests/021      |   1 -
->  tests/qemu-iotests/022      |   1 -
->  tests/qemu-iotests/025      |   1 -
->  tests/qemu-iotests/026      |   1 -
->  tests/qemu-iotests/026.out  | 168 +++++++++++++++++------------------
->  tests/qemu-iotests/027      |   1 -
->  tests/qemu-iotests/029      |   1 -
->  tests/qemu-iotests/031      |   1 -
->  tests/qemu-iotests/032      |   1 -
->  tests/qemu-iotests/033      |   1 -
->  tests/qemu-iotests/035      |   1 -
->  tests/qemu-iotests/036      |   1 -
->  tests/qemu-iotests/037      |   1 -
->  tests/qemu-iotests/042      |   1 -
->  tests/qemu-iotests/043      |   1 -
->  tests/qemu-iotests/046      |   1 -
->  tests/qemu-iotests/047      |   1 -
->  tests/qemu-iotests/049      |   1 -
->  tests/qemu-iotests/050      |   1 -
->  tests/qemu-iotests/051      |   1 -
->  tests/qemu-iotests/052      |   1 -
->  tests/qemu-iotests/053      |   1 -
->  tests/qemu-iotests/054      |   1 -
->  tests/qemu-iotests/060.out  |   6 +-
->  tests/qemu-iotests/062      |   1 -
->  tests/qemu-iotests/063      |   1 -
->  tests/qemu-iotests/066      |   1 -
->  tests/qemu-iotests/067      |   1 -
->  tests/qemu-iotests/068      |   1 -
->  tests/qemu-iotests/069      |   1 -
->  tests/qemu-iotests/069.out  |   2 +-
->  tests/qemu-iotests/070.out  |   2 +-
->  tests/qemu-iotests/071      |   1 -
->  tests/qemu-iotests/072      |   1 -
->  tests/qemu-iotests/073      |   1 -
->  tests/qemu-iotests/075.out  |  14 +--
->  tests/qemu-iotests/076.out  |   6 +-
->  tests/qemu-iotests/078.out  |  12 +--
->  tests/qemu-iotests/079      |   1 -
->  tests/qemu-iotests/080.out  |  40 ++++-----
->  tests/qemu-iotests/081.out  |   2 +-
->  tests/qemu-iotests/082      |   1 -
->  tests/qemu-iotests/085      |   1 -
->  tests/qemu-iotests/088.out  |  12 +--
->  tests/qemu-iotests/089      |   1 -
->  tests/qemu-iotests/090      |   1 -
->  tests/qemu-iotests/094      |   1 -
->  tests/qemu-iotests/095      |   1 -
->  tests/qemu-iotests/098      |   1 -
->  tests/qemu-iotests/102      |   1 -
->  tests/qemu-iotests/103      |   1 -
->  tests/qemu-iotests/103.out  |  14 +--
->  tests/qemu-iotests/104      |   1 -
->  tests/qemu-iotests/105      |   1 -
->  tests/qemu-iotests/107      |   1 -
->  tests/qemu-iotests/110      |   1 -
->  tests/qemu-iotests/111      |   1 -
->  tests/qemu-iotests/112      |   1 -
->  tests/qemu-iotests/114      |   1 -
->  tests/qemu-iotests/114.out  |   2 +-
->  tests/qemu-iotests/115      |   1 -
->  tests/qemu-iotests/116.out  |  14 +--
->  tests/qemu-iotests/117      |   1 -
->  tests/qemu-iotests/120      |   1 -
->  tests/qemu-iotests/125      |   1 -
->  tests/qemu-iotests/126      |   1 -
->  tests/qemu-iotests/127      |   1 -
->  tests/qemu-iotests/131.out  |   2 +-
->  tests/qemu-iotests/133      |   1 -
->  tests/qemu-iotests/133.out  |  30 +++----
->  tests/qemu-iotests/134      |   1 -
->  tests/qemu-iotests/137.out  |  28 +++---
->  tests/qemu-iotests/140.out  |   2 +-
->  tests/qemu-iotests/142      |   1 -
->  tests/qemu-iotests/143      |   1 -
->  tests/qemu-iotests/143.out  |   2 +-
->  tests/qemu-iotests/144      |   1 -
->  tests/qemu-iotests/145      |   1 -
->  tests/qemu-iotests/153      |   1 -
->  tests/qemu-iotests/153.out  |  30 +++----
->  tests/qemu-iotests/156      |   1 -
->  tests/qemu-iotests/157      |   1 -
->  tests/qemu-iotests/158      |   1 -
->  tests/qemu-iotests/159      |   1 -
->  tests/qemu-iotests/162      |   1 -
->  tests/qemu-iotests/170      |   1 -
->  tests/qemu-iotests/173      |   1 -
->  tests/qemu-iotests/182      |   1 -
->  tests/qemu-iotests/183      |   1 -
->  tests/qemu-iotests/186      |   1 -
->  tests/qemu-iotests/187      |   1 -
->  tests/qemu-iotests/187.out  |   6 +-
->  tests/qemu-iotests/188.out  |   2 +-
->  tests/qemu-iotests/190      |   1 -
->  tests/qemu-iotests/191      |   1 -
->  tests/qemu-iotests/192      |   1 -
->  tests/qemu-iotests/195      |   1 -
->  tests/qemu-iotests/197      |   1 -
->  tests/qemu-iotests/197.out  |   2 +-
->  tests/qemu-iotests/200      |   1 -
->  tests/qemu-iotests/205      |   2 +-
->  tests/qemu-iotests/214      |   1 -
->  tests/qemu-iotests/215      |   1 -
->  tests/qemu-iotests/215.out  |   2 +-
->  tests/qemu-iotests/217      |   1 -
->  tests/qemu-iotests/226.out  |  16 ++--
->  tests/qemu-iotests/227      |   1 -
->  tests/qemu-iotests/231      |   1 -
->  tests/qemu-iotests/233      |   1 -
->  tests/qemu-iotests/239      |   2 +-
->  tests/qemu-iotests/240      |   3 +-
->  tests/qemu-iotests/241      |   2 +-
->  tests/qemu-iotests/243      |   2 +-
->  tests/qemu-iotests/244      |   2 +-
->  tests/qemu-iotests/244.out  |  10 +--
->  tests/qemu-iotests/247      |   1 -
->  tests/qemu-iotests/check    |  13 ++-
->  tests/qemu-iotests/group    | 169 +++++++++++++++++++-----------------
->  137 files changed, 372 insertions(+), 421 deletions(-)
->  delete mode 100755 tests/qemu-iotests-quick.sh
+>          return 0;
+>      }
+>      return 0;
+> @@ -197,8 +188,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
+>      VirtIOMMIOProxy *proxy = (VirtIOMMIOProxy *)opaque;
+>      VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
+>  
+> -    DPRINTF("virtio_mmio_write offset 0x%x value 0x%" PRIx64 "\n",
+> -            (int)offset, value);
+> +    trace_virtio_mmio_write_offset((int)offset, value);
+>  
+>      if (!vdev) {
+>          /* If no backend is present, we just make all registers
+> @@ -226,7 +216,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
+>          return;
+>      }
+>      if (size != 4) {
+> -        DPRINTF("wrong size access to register!\n");
+> +        trace_virtio_mmio_wrong_size_write();
+>          return;
+>      }
+>      switch (offset) {
+> @@ -246,8 +236,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
+>          if (proxy->guest_page_shift > 31) {
+>              proxy->guest_page_shift = 0;
+>          }
+> -        DPRINTF("guest page size %" PRIx64 " shift %d\n", value,
+> -                proxy->guest_page_shift);
+> +        trace_virtio_mmio_guest_page(value, proxy->guest_page_shift);
+>          break;
+>      case VIRTIO_MMIO_QUEUE_SEL:
+>          if (value < VIRTIO_QUEUE_MAX) {
+> @@ -255,7 +244,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
+>          }
+>          break;
+>      case VIRTIO_MMIO_QUEUE_NUM:
+> -        DPRINTF("mmio_queue write %d max %d\n", (int)value, VIRTQUEUE_MAX_SIZE);
+> +        trace_virtio_mmio_queue_write((int)value, VIRTQUEUE_MAX_SIZE);
+>          virtio_queue_set_num(vdev, vdev->queue_sel, value);
+>          /* Note: only call this function for legacy devices */
+>          virtio_queue_update_rings(vdev, vdev->queue_sel);
+> @@ -303,11 +292,11 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
+>      case VIRTIO_MMIO_DEVICE_FEATURES:
+>      case VIRTIO_MMIO_QUEUE_NUM_MAX:
+>      case VIRTIO_MMIO_INTERRUPT_STATUS:
+> -        DPRINTF("write to readonly register\n");
+> +        trace_virtio_mmio_write_interrupt();
+>          break;
+>  
+>      default:
+> -        DPRINTF("bad register offset\n");
+> +        trace_virtio_mmio_bad_write_offset();
+>      }
+>  }
+>  
+> @@ -327,7 +316,7 @@ static void virtio_mmio_update_irq(DeviceState *opaque, uint16_t vector)
+>          return;
+>      }
+>      level = (atomic_read(&vdev->isr) != 0);
+> -    DPRINTF("virtio_mmio setting IRQ %d\n", level);
+> +    trace_virtio_mmio_setting_irq(level);
+>      qemu_set_irq(proxy->irq, level);
+>  }
 
+I went through all code changes and found no mistakes but suggesting to
+turn errors to errors and not just threat them as traces.
 
---
-Alex Benn=C3=A9e
+If you already considered it then fine.
+
+>  
+> -- 
+> 2.13.2
+> 
+> 
 
