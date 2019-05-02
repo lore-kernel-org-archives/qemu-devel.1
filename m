@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42812)
+Received: from eggs.gnu.org ([209.51.188.92]:42829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6tg-0003Y9-W1
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:54 -0400
+	(envelope-from <arilou@gmail.com>) id 1hM6th-0003YP-6G
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6te-000835-Cq
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:52 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50251)
+	(envelope-from <arilou@gmail.com>) id 1hM6te-00085x-O9
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:53 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40660)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6ta-0007Sx-CN
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:48 -0400
-Received: by mail-wm1-x341.google.com with SMTP id p21so1485702wmc.0
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:25 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6te-0007ot-F5
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:50 -0400
+Received: by mail-wm1-x343.google.com with SMTP id h11so1376514wmb.5
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:44 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Thu,  2 May 2019 11:15:38 +0300
-Message-Id: <20190502081554.5521-12-arilou@gmail.com>
+Date: Thu,  2 May 2019 11:15:50 +0300
+Message-Id: <20190502081554.5521-24-arilou@gmail.com>
 In-Reply-To: <20190502081554.5521-1-arilou@gmail.com>
 References: <20190502081554.5521-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v9 11/27] gdbstub: Implement write memory (M
- pkt) with new infra
+Subject: [Qemu-devel] [PATCH v9 23/27] gdbstub: Implement qemu physical
+ memory mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +31,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 
+Add a new query/set which changes the memory GDB sees to physical memory
+only.
+
+gdb> maint packet qqemu.PhyMemMode
+will reply the current phy_mem_mode state (1 for enabled, 0 for disabled)
+gdb> maint packet Qqemu.PhyMemMode:1
+Will make GDB read/write only to physical memory, set to 0 to disable
+
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 51 +++++++++++++++++++++++++++++++++------------------
- 1 file changed, 33 insertions(+), 18 deletions(-)
+ gdbstub.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 55 insertions(+), 3 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index e9a3d0c2bc..8dc2e1d507 100644
+index 00c07d6ec0..88ff6224e6 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1685,6 +1685,31 @@ static void handle_get_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, gdb_ctx->str_buf);
- }
+@@ -46,11 +46,23 @@
+ #define GDB_ATTACHED "1"
+ #endif
  
-+static void handle_write_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    if (gdb_ctx->num_params < 3) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
++static int phy_memory_mode;
++
+ static inline int target_memory_rw_debug(CPUState *cpu, target_ulong addr,
+                                          uint8_t *buf, int len, bool is_write)
+ {
+-    CPUClass *cc = CPU_GET_CLASS(cpu);
++    CPUClass *cc;
+ 
++    if (phy_memory_mode) {
++        if (is_write) {
++            cpu_physical_memory_write(addr, buf, len);
++        } else {
++            cpu_physical_memory_read(addr, buf, len);
++        }
++        return 0;
 +    }
 +
-+    /* hextomem() reads 2*len bytes */
-+    if (gdb_ctx->params[1].val_ull > strlen(gdb_ctx->params[2].data) / 2) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[2].data,
-+             gdb_ctx->params[1].val_ull);
-+    if (target_memory_rw_debug(gdb_ctx->s->g_cpu, gdb_ctx->params[0].val_ull,
-+                               gdb_ctx->mem_buf,
-+                               gdb_ctx->params[1].val_ull, true)) {
-+        put_packet(gdb_ctx->s, "E14");
-+        return;
-+    }
-+
-+    put_packet(gdb_ctx->s, "OK");
++    cc = CPU_GET_CLASS(cpu);
+     if (cc->memory_rw_debug) {
+         return cc->memory_rw_debug(cpu, addr, buf, len, is_write);
+     }
+@@ -2129,7 +2141,29 @@ static void handle_query_attached(GdbCmdContext *gdb_ctx, void *user_ctx)
+ 
+ static void handle_query_qemu_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
+ {
+-    put_packet(gdb_ctx->s, "sstepbits;sstep");
++    put_packet(gdb_ctx->s, "sstepbits;sstep;PhyMemMode");
 +}
 +
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -1893,24 +1918,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-         break;
-     case 'M':
--        addr = strtoull(p, (char **)&p, 16);
--        if (*p == ',')
--            p++;
--        len = strtoull(p, (char **)&p, 16);
--        if (*p == ':')
--            p++;
--
--        /* hextomem() reads 2*len bytes */
--        if (len > strlen(p) / 2) {
--            put_packet (s, "E22");
--            break;
--        }
--        hextomem(mem_buf, p, len);
--        if (target_memory_rw_debug(s->g_cpu, addr, mem_buf, len,
--                                   true) != 0) {
--            put_packet(s, "E14");
--        } else {
--            put_packet(s, "OK");
-+        {
-+            static const GdbCmdParseEntry write_mem_cmd_desc = {
-+                .handler = handle_write_mem,
-+                .cmd = "M",
-+                .cmd_startswith = 1,
-+                .schema = "L,L:s0"
-+            };
-+            cmd_parser = &write_mem_cmd_desc;
-         }
-         break;
-     case 'p':
++static void handle_query_qemu_phy_mem_mode(GdbCmdContext *gdb_ctx,
++                                           void *user_ctx)
++{
++    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "%d", phy_memory_mode);
++    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
++}
++
++static void handle_set_qemu_phy_mem_mode(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    if (!gdb_ctx->num_params) {
++        put_packet(gdb_ctx->s, "E22");
++        return;
++    }
++
++    if (!gdb_ctx->params[0].val_ul) {
++        phy_memory_mode = 0;
++    } else {
++        phy_memory_mode = 1;
++    }
++    put_packet(gdb_ctx->s, "OK");
+ }
+ 
+ static GdbCmdParseEntry gdb_gen_query_set_common_table[] = {
+@@ -2212,6 +2246,20 @@ static GdbCmdParseEntry gdb_gen_query_table[] = {
+         .handler = handle_query_qemu_supported,
+         .cmd = "qemu.Supported",
+     },
++    {
++        .handler = handle_query_qemu_phy_mem_mode,
++        .cmd = "qemu.PhyMemMode",
++    },
++};
++
++static GdbCmdParseEntry gdb_gen_set_table[] = {
++    /* Order is important if has same prefix */
++    {
++        .handler = handle_set_qemu_phy_mem_mode,
++        .cmd = "qemu.PhyMemMode:",
++        .cmd_startswith = 1,
++        .schema = "l0"
++    },
+ };
+ 
+ static void handle_gen_query(GdbCmdContext *gdb_ctx, void *user_ctx)
+@@ -2245,7 +2293,11 @@ static void handle_gen_set(GdbCmdContext *gdb_ctx, void *user_ctx)
+         return;
+     }
+ 
+-    put_packet(gdb_ctx->s, "");
++    if (process_string_cmd(gdb_ctx->s, NULL, gdb_ctx->params[0].data,
++                           gdb_gen_set_table,
++                           ARRAY_SIZE(gdb_gen_set_table))) {
++        put_packet(gdb_ctx->s, "");
++    }
+ }
+ 
+ static void handle_target_halt(GdbCmdContext *gdb_ctx, void *user_ctx)
 -- 
 2.20.1
