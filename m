@@ -2,85 +2,65 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB6CBC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 07:50:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43B3AC43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 07:50:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A166020873
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 07:50:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WL9fiPMG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A166020873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 15CC320873
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 07:50:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15CC320873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46807 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46825 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM6Tx-0006ST-U6
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 03:50:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59923)
+	id 1hM6UL-0006sz-CM
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 03:50:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6AS-0005FM-D7
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:30:09 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hM6GO-0002BK-V8
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:36:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6AO-0003VD-MA
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:30:06 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51312)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6AL-0008Vy-Vs
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:30:02 -0400
-Received: by mail-wm1-x343.google.com with SMTP id t76so1284464wmt.1
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 00:27:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=9IF4rsqYBB5CcGAeM/Zis8CV+HM8l1BP4iU1qHaXB5E=;
-	b=WL9fiPMGBCF1NmRGm9kQzCB/NU7xF5Kj0HB7VgceGV3g6g4aMysoIOMOh9gDHU8/8H
-	x4OreLILKjVz9iIOqpF2cbJLbOWpO+4pQwP8oetj7809N2pofhlJfvDcTv0dX0jhEZ3O
-	YX0hIZ+GOMHR/W+e0UgTf/wsn5cHHAKlc9MQF3dw3zpqz2Y+/JIf2o2q+LiDUCsmh87X
-	MnEvzybxP0xqoVqmsYRiSGnEpEQk+hTTZ4etatxvHbZ7z5GQT3I7GZj4Db4u0G77yEWQ
-	RoQbVRchlZXW4hjzbWaP00o6s3HINKrUUivSE5zbU4jswl1R8j/fqY1U1nBmULAw/FUq
-	yL9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=9IF4rsqYBB5CcGAeM/Zis8CV+HM8l1BP4iU1qHaXB5E=;
-	b=j74yRedA36eXfrI/kNbT+QRkSM+GNhNJ0Q41tCddP4DoMkB6JD7YNiWs4B7lKJ8YvC
-	W2O3DVuat4Bo9HLQlGPPFrmm0AN8WIba+0heNlSe7EFqi0DBaopJpOTnsx+jAFKpzzeH
-	W6l0u2gn3kW9xdhqz439l/fM6N6/bihK3I6+czuLb179vs7egpwbL4WlrFhcSWfn/Arq
-	ONKlB6qcuWB4uoIAAcD1wwp/ttZK0LnRMedMm7uKhqMHUlFjLXxv2kwRn2HqkM6syouy
-	Q730JtJH9z/i6YpaqE9FZS1+jt8r4pPEzjr/GpsoSbAL6F5vRSh/vzmL8E5LP1Av0zaF
-	5jVQ==
-X-Gm-Message-State: APjAAAW9Qq38KY0EzW09cXGgUmqqRzHVvLEHhvalxJhsKUx7LTCS2BAM
-	Gn4OK9qgfzzgLYMjX8GMEtQbzFTc
-X-Google-Smtp-Source: APXvYqyBgmhYwBJitqIi2a4xYtc5FR5p1yOrW6H2Y8HsxrJMGOpo3mxGwKrm3YXZ4Ovr6RGNa3imHA==
-X-Received: by 2002:a1c:3d6:: with SMTP id 205mr1264221wmd.66.1556782019896;
-	Thu, 02 May 2019 00:26:59 -0700 (PDT)
-Received: from localhost.localdomain ([176.230.64.186])
-	by smtp.gmail.com with ESMTPSA id z5sm8769289wre.70.2019.05.02.00.26.57
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 02 May 2019 00:26:59 -0700 (PDT)
-From: Jon Doron <arilou@gmail.com>
+	(envelope-from <kraxel@redhat.com>) id 1hM6GM-00015X-W1
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:36:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52310)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hM6GK-0000hs-5G
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:36:14 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 924963007C26;
+	Thu,  2 May 2019 07:35:47 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-45.ams2.redhat.com
+	[10.36.116.45])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 891588271B;
+	Thu,  2 May 2019 07:35:44 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id 9A84417536; Thu,  2 May 2019 09:35:43 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu,  2 May 2019 10:26:18 +0300
-Message-Id: <20190502072641.4667-5-arilou@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190502072641.4667-1-arilou@gmail.com>
-References: <20190502072641.4667-1-arilou@gmail.com>
+Date: Thu,  2 May 2019 09:35:40 +0200
+Message-Id: <20190502073543.4391-5-kraxel@redhat.com>
+In-Reply-To: <20190502073543.4391-1-kraxel@redhat.com>
+References: <20190502073543.4391-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH v8 04/27] gdbstub: Implement continue (c pkt)
- with new infra
+Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Thu, 02 May 2019 07:35:47 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 4/7] usb/xhci: avoid trigger assertion if guest
+ write wrong epid
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,63 +72,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liran.alon@oracle.com, alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
+Cc: Longpeng <longpeng2@huawei.com>, Gonglei <arei.gonglei@huawei.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190502072618.KaxbjIQiVBg9RgrDA9X2NE04BwEf96QBj6mlwE7-04g@z>
+Message-ID: <20190502073540.7Vb9s6YHg8SBE_qDWiAqgiO7MmJ5QMQqaGTf2yGzqr4@z>
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
+From: Longpeng <longpeng2@huawei.com>
+
+we found the following core in our environment:
+0  0x00007fc6b06c2237 in raise ()
+1  0x00007fc6b06c3928 in abort ()
+2  0x00007fc6b06bb056 in __assert_fail_base ()
+3  0x00007fc6b06bb102 in __assert_fail ()
+4  0x0000000000702e36 in xhci_kick_ep (...)
+5  0x000000000047897a in memory_region_write_accessor (...)
+6  0x000000000047767f in access_with_adjusted_size (...)
+7  0x000000000047944d in memory_region_dispatch_write (...)
+(mr=3Dmr@entry=3D0x7fc6a0138df0, addr=3Daddr@entry=3D156, data=3D16488924=
+16,
+size=3Dsize@entry=3D4, attrs=3Dattrs@entry=3D...)
+8  0x000000000042df17 in address_space_write_continue (...)
+10 0x000000000043084d in address_space_rw (...)
+11 0x000000000047451b in kvm_cpu_exec (cpu=3Dcpu@entry=3D0x1ab11b0)
+12 0x000000000045dcf5 in qemu_kvm_cpu_thread_fn (arg=3D0x1ab11b0)
+13 0x0000000000870631 in qemu_thread_start (args=3Dargs@entry=3D0x1acfb50=
+)
+14 0x00000000008959a7 in thread_entry_for_hotfix (pthread_cb=3D<optimized=
+ out>)
+15 0x00007fc6b0a60dd5 in start_thread ()
+16 0x00007fc6b078a59d in clone ()
+
+(gdb) f 5
+5  0x000000000047897a in memory_region_write_accessor (...)
+529	    mr->ops->write(mr->opaque, addr, tmp, size);
+(gdb) p /x tmp
+$9 =3D 0x62481a00 <-- last byte 0x00 is @epid
+
+xhci_doorbell_write() already check the upper bound of @slotid an @epid,
+it also need to check the lower bound.
+
+Cc: Gonglei <arei.gonglei@huawei.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Longpeng <longpeng2@huawei.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-id: 1556605301-44112-1-git-send-email-longpeng2@huawei.com
+
+[ kraxel: fixed typo in subject line ]
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- gdbstub.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
+ hw/usb/hcd-xhci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index c47ef7dd9c..89f1ab6524 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1522,6 +1522,16 @@ static void handle_thread_alive(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, "OK");
- }
- 
-+static void handle_continue(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    if (gdb_ctx->num_params) {
-+        gdb_set_cpu_pc(gdb_ctx->s, gdb_ctx->params[0].val_ull);
-+    }
-+
-+    gdb_ctx->s->signal = 0;
-+    gdb_continue(gdb_ctx->s);
-+}
-+
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -1558,13 +1568,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         gdb_breakpoint_remove_all();
-         break;
-     case 'c':
--        if (*p != '\0') {
--            addr = strtoull(p, (char **)&p, 16);
--            gdb_set_cpu_pc(s, addr);
-+        {
-+            static const GdbCmdParseEntry continue_cmd_desc = {
-+                .handler = handle_continue,
-+                .cmd = "c",
-+                .cmd_startswith = 1,
-+                .schema = "L0"
-+            };
-+            cmd_parser = &continue_cmd_desc;
-         }
--        s->signal = 0;
--        gdb_continue(s);
--        return RS_IDLE;
-+        break;
-     case 'C':
-         s->signal = gdb_signal_to_target (strtoul(p, (char **)&p, 16));
-         if (s->signal == -1)
--- 
-2.20.1
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index ec28bee31963..d8472b4fea7f 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -3137,7 +3137,7 @@ static void xhci_doorbell_write(void *ptr, hwaddr r=
+eg,
+         streamid =3D (val >> 16) & 0xffff;
+         if (reg > xhci->numslots) {
+             DPRINTF("xhci: bad doorbell %d\n", (int)reg);
+-        } else if (epid > 31) {
++        } else if (epid =3D=3D 0 || epid > 31) {
+             DPRINTF("xhci: bad doorbell %d write: 0x%x\n",
+                     (int)reg, (uint32_t)val);
+         } else {
+--=20
+2.18.1
 
 
