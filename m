@@ -2,91 +2,94 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F8ABC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 15:26:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C222BC43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 15:37:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 585DB20449
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 15:26:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 86DC520449
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 15:37:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aO165QBL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 585DB20449
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kybsHBGp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86DC520449
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53147 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53254 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMDbi-00081s-Li
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 11:26:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59944)
+	id 1hMDm3-0002Jg-KY
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 11:37:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMDaa-0006zx-0x
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:25:37 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hMDkj-0001SC-DV
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:36:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMDaY-0001TV-9k
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:25:35 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40831)
+	(envelope-from <richard.henderson@linaro.org>) id 1hMDki-0006Gh-8c
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:36:05 -0400
+Received: from mail-pf1-x429.google.com ([2607:f8b0:4864:20::429]:42982)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hMDaW-0001Ir-Fx
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:25:34 -0400
-Received: by mail-wm1-x344.google.com with SMTP id h11so3149281wmb.5
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 08:25:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hMDki-0006GR-1i
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:36:04 -0400
+Received: by mail-pf1-x429.google.com with SMTP id 13so998455pfw.9
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 08:36:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:subject:in-reply-to:date:message-id
-	:mime-version:content-transfer-encoding;
-	bh=U7DsVjgrtKC8/0nAUR6e3ok0/6AAH5MALF+j6ENbECU=;
-	b=aO165QBLU1ArO6yiuXI6TO47TJka93FbQHSPMzE8F2alLV284EWeo5xMW3KvKAT6u/
-	nIm3trg4hYcZ5U+sljOgEVZGrTSvdCtEicZB5825vd0tSIHJuGjiUlkytVsSz50EfXkT
-	JiQIdgUI0V8wpqpH2bznL7ke5yu8GwoApuLjA0vnf/5M+P7SzNjl4H1kSX0Z5QCORHWT
-	8vn/HKoSKmFEpNtAgfphfKC1CYc9O5Q6Rsn0f/Tf7/7LqrGRpn4QWbKE3EkCbk6DvipB
-	IUgye6jHW9yyk55FjqhyzKz+edKErJ8naZPhhc8zRWelnROBhGVJJzWIW0uX+RNiYDci
-	I54w==
+	h=subject:to:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=YecrrvNdO0lTc7lEfxGqmf/+qLE1W6OB0uJHC/E1fYw=;
+	b=kybsHBGp4n+suhWeYFh0ovY79R8r/bpCtRY9CsBlGlwb3Wj8ACIQHMprdTQbT9hHed
+	hDGUF5atRurU5ygiUvnuGjAdGFcn/6F7fvaSRrA59P6QVgBTRjteR3EpKqaSGYDFVwgU
+	Uwuq1E69G5MBCGOUaNMEbbKB7JButJdC1VCKyJUK5WTAnX3ERDV0Rkau7SU9Mh6z8OA3
+	CB65DLsWwaSxO81AmfCNowclHaZoxc6JtVajIaVtgBefetXynSV88z9B4gSnpuQOZFi5
+	Yu+sjcQB6VZTYyUtqdXeqopRODZoD2nasEgAcViUQWMzdakLlP+nrtgASNszyad/nZMs
+	/gMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=U7DsVjgrtKC8/0nAUR6e3ok0/6AAH5MALF+j6ENbECU=;
-	b=gJ4yoNkNG/odiiBcf2zz9CSSkJDdyToHAlM/ywXuraZ5eHlxsRAjaUDgfzFfOqjI4R
-	reuXJPVTYPqHuGpStL9c4RpgKmx0YW0kFWIbj8O80yW72UtDLEE5Rfb8vmmix3uZmytk
-	8OKF9oO90zRx4fmRpJzAaehzknh+IjiOFJMkZ4wswlKZ7gZj/83BkLjGEDZXwoqN2Fsp
-	nXph4X8uFems2fwUjBvBSqEJUaR+7PY3IFYSU8pIi6V5k0fyDt3hBvLmioI1cbSZ5soC
-	+V7XfFCUzHLLKbKgJD8hX8KkmHUdS9l8AfsigNa44KQNG3rkHPmLwDNo8fTs9VXVhjEJ
-	GnZA==
-X-Gm-Message-State: APjAAAV4GNWuR78gc3BZS+w3bI4J3CaosCXu0qMCvi57KQwXVay1PS6d
-	BEYPQ4PXQBBC/r7SQc2Oou1jsK19CQw=
-X-Google-Smtp-Source: APXvYqyL6rE7smj26tpahU1GBXALSJ7rQokYSDzuMBxjAH8mVu6TxJHyCBwCVcSaCFcnoRAIhvhJnA==
-X-Received: by 2002:a7b:cd05:: with SMTP id f5mr2757590wmj.98.1556810729923;
-	Thu, 02 May 2019 08:25:29 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=YecrrvNdO0lTc7lEfxGqmf/+qLE1W6OB0uJHC/E1fYw=;
+	b=ARxH2hOUz2Db5stqqv76T1hnwYmsG/OVG3wUF0eXIfUpPWAHlOTC3UYcTR8PFEIJYu
+	XsaWBZhI2JjRHIpvJzXHS6GT1EKRsBHQZSEUgiInt65U9c9UL9TUsolcQi6wLMCIBfNB
+	10GxGLpC0gCeNGAVB00msfXDL+gFKS5aY5D3fP5IfOxwE0cKzkamgNRX6S8sOZ4s/ika
+	cxQQMs2sRqznK0C4ZhYvnyUb87O2PMTVgrOJLrAUvAyIl87eiVS2JnBJON4AMvbim6j6
+	AQ5sy/03lSkKqFIIqmj3zkT6dqm2JSqHToKHw1WLHO8hpyHfjNDeHRQX2sUH2LdarxtO
+	5vZg==
+X-Gm-Message-State: APjAAAWd1Xx2HqgjAdv4g1uns9pWykbrRhCYhgPs0wEBEsFR5d1uWM5c
+	j+WLInEyq3HuvxfwwRRf0Jsut4h0OwM=
+X-Google-Smtp-Source: APXvYqxLmBQyVUXpS3Ial0jW1oUOvPDL7tYNVsb5vEV/a7zQg/2YTOT/wO1JiDxJv9R9NLI9NNVnSA==
+X-Received: by 2002:a62:e501:: with SMTP id n1mr4855282pff.17.1556811362052;
+	Thu, 02 May 2019 08:36:02 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-189-189.tukw.qwest.net. [97.113.189.189])
 	by smtp.gmail.com with ESMTPSA id
-	s145sm18802137wme.38.2019.05.02.08.25.29 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 02 May 2019 08:25:29 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id F109C1FF87
-	for <qemu-devel@nongnu.org>; Thu,  2 May 2019 16:25:28 +0100 (BST)
+	r87sm74744349pfa.71.2019.05.02.08.36.00
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 02 May 2019 08:36:01 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	qemu-devel@nongnu.org
 References: <20190501050536.15580-1-richard.henderson@linaro.org>
-	<20190501050536.15580-20-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190501050536.15580-20-richard.henderson@linaro.org>
-Date: Thu, 02 May 2019 16:25:28 +0100
-Message-ID: <874l6c6fpz.fsf@zen.linaroharston>
+	<20190501050536.15580-13-richard.henderson@linaro.org>
+	<87ef5h56nx.fsf@zen.linaroharston>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <7db35187-c7c8-a95e-2d26-efc0339acad6@linaro.org>
+Date: Thu, 2 May 2019 08:35:59 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <87ef5h56nx.fsf@zen.linaroharston>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH v2 19/29] tcg: Add support for integer
- absolute value
+X-Received-From: 2607:f8b0:4864:20::429
+Subject: Re: [Qemu-devel] [PATCH v2 12/29] tcg/aarch64: Implement
+ tcg_out_dupm_vec
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,142 +104,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502152528.yKeC-dnzQM3liBRHjnEND150StYEv-7eFxWT8SzEXTk@z>
+Message-ID: <20190502153559.7UtNqMIP3x5zTT8zi_vdg09bjz7MqK9WfwvtU6I6hU0@z>
+
+On 5/2/19 6:26 AM, Alex Bennée wrote:
+>> +    /* AdvSIMD load/store single structure.  */
+>> +    I3303_LD1R      = 0x0d40c000,
+>> +
+> 
+> I can't recall where these magic numbers come from again? The (moving)
+> section numbers of the ARM ARM?
+
+They come from the A_a version of the ARM ARM.
+
+The current D_a version has now even removed the section numbers, instead of
+slowly modifying them as they did through B and C revisions.
+
+> I was hoping the XML had a bit more guidance on the encoding names but
+> we get:
+
+Yeah, ARM doesn't name these at all.
+
+I have wondered if they are adverse to naming encodings, because if they had to
+name them all they would feel constrained to not invent so many strange
+encodings.  ;-)
+
+> The above is basically a winge as to what do we really get out of this
+> "type checking"?
+
+Well, ignore the "type checking" for a moment.
+
+How would you distinguish all of the different encoding functions?
+Or would you just open-code every single instruction like we do in
+tcg/arm/ and tcg/ppc/?
+
+Let me know if you come up with a scheme that works better than this.
 
 
-Richard Henderson <richard.henderson@linaro.org> writes:
 
-> Remove a function of the same name from target/arm/.
-> Use a branchless implementation of abs gleaned from gcc.
->
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  tcg/tcg-op.h           |  5 +++++
->  target/arm/translate.c | 10 ----------
->  tcg/tcg-op.c           | 20 ++++++++++++++++++++
->  3 files changed, 25 insertions(+), 10 deletions(-)
->
-> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-> index 472b73cb38..660fe205d0 100644
-> --- a/tcg/tcg-op.h
-> +++ b/tcg/tcg-op.h
-> @@ -335,6 +335,7 @@ void tcg_gen_smin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i=
-32 arg2);
->  void tcg_gen_smax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->  void tcg_gen_umin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
->  void tcg_gen_umax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
-> +void tcg_gen_abs_i32(TCGv_i32, TCGv_i32);
->
->  static inline void tcg_gen_discard_i32(TCGv_i32 arg)
->  {
-> @@ -534,6 +535,7 @@ void tcg_gen_smin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i=
-64 arg2);
->  void tcg_gen_smax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->  void tcg_gen_umin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
->  void tcg_gen_umax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
-> +void tcg_gen_abs_i64(TCGv_i64, TCGv_i64);
->
->  #if TCG_TARGET_REG_BITS =3D=3D 64
->  static inline void tcg_gen_discard_i64(TCGv_i64 arg)
-> @@ -973,6 +975,7 @@ void tcg_gen_nor_vec(unsigned vece, TCGv_vec r, TCGv_=
-vec a, TCGv_vec b);
->  void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
->  void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->  void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
-> +void tcg_gen_abs_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
->  void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b=
-);
->  void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b=
-);
->  void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b=
-);
-> @@ -1019,6 +1022,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCG=
-Arg offset, TCGType t);
->  #define tcg_gen_addi_tl tcg_gen_addi_i64
->  #define tcg_gen_sub_tl tcg_gen_sub_i64
->  #define tcg_gen_neg_tl tcg_gen_neg_i64
-> +#define tcg_gen_abs_tl tcg_gen_abs_i64
->  #define tcg_gen_subfi_tl tcg_gen_subfi_i64
->  #define tcg_gen_subi_tl tcg_gen_subi_i64
->  #define tcg_gen_and_tl tcg_gen_and_i64
-> @@ -1131,6 +1135,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCG=
-Arg offset, TCGType t);
->  #define tcg_gen_addi_tl tcg_gen_addi_i32
->  #define tcg_gen_sub_tl tcg_gen_sub_i32
->  #define tcg_gen_neg_tl tcg_gen_neg_i32
-> +#define tcg_gen_abs_tl tcg_gen_abs_i32
->  #define tcg_gen_subfi_tl tcg_gen_subfi_i32
->  #define tcg_gen_subi_tl tcg_gen_subi_i32
->  #define tcg_gen_and_tl tcg_gen_and_i32
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 35bd426a3d..b25781554f 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -604,16 +604,6 @@ static void gen_sar(TCGv_i32 dest, TCGv_i32 t0, TCGv=
-_i32 t1)
->      tcg_temp_free_i32(tmp1);
->  }
->
-> -static void tcg_gen_abs_i32(TCGv_i32 dest, TCGv_i32 src)
-> -{
-> -    TCGv_i32 c0 =3D tcg_const_i32(0);
-> -    TCGv_i32 tmp =3D tcg_temp_new_i32();
-> -    tcg_gen_neg_i32(tmp, src);
-> -    tcg_gen_movcond_i32(TCG_COND_GT, dest, src, c0, src, tmp);
-> -    tcg_temp_free_i32(c0);
-> -    tcg_temp_free_i32(tmp);
-> -}
-> -
->  static void shifter_out_im(TCGv_i32 var, int shift)
->  {
->      if (shift =3D=3D 0) {
-> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-> index a00d1df37e..0ac291f1c4 100644
-> --- a/tcg/tcg-op.c
-> +++ b/tcg/tcg-op.c
-> @@ -1091,6 +1091,16 @@ void tcg_gen_umax_i32(TCGv_i32 ret, TCGv_i32 a, TC=
-Gv_i32 b)
->      tcg_gen_movcond_i32(TCG_COND_LTU, ret, a, b, b, a);
->  }
->
-> +void tcg_gen_abs_i32(TCGv_i32 ret, TCGv_i32 a)
-> +{
-> +    TCGv_i32 t =3D tcg_temp_new_i32();
-> +
-> +    tcg_gen_sari_i32(t, a, 31);
-> +    tcg_gen_xor_i32(ret, a, t);
-> +    tcg_gen_sub_i32(ret, ret, t);
-> +    tcg_temp_free_i32(t);
-> +}
-> +
->  /* 64-bit ops */
->
->  #if TCG_TARGET_REG_BITS =3D=3D 32
-> @@ -2548,6 +2558,16 @@ void tcg_gen_umax_i64(TCGv_i64 ret, TCGv_i64 a, TC=
-Gv_i64 b)
->      tcg_gen_movcond_i64(TCG_COND_LTU, ret, a, b, b, a);
->  }
->
-> +void tcg_gen_abs_i64(TCGv_i64 ret, TCGv_i64 a)
-> +{
-> +    TCGv_i64 t =3D tcg_temp_new_i64();
-> +
-> +    tcg_gen_sari_i64(t, a, 63);
-> +    tcg_gen_xor_i64(ret, a, t);
-> +    tcg_gen_sub_i64(ret, ret, t);
-> +    tcg_temp_free_i64(t);
-> +}
-> +
->  /* Size changing operations.  */
->
->  void tcg_gen_extrl_i64_i32(TCGv_i32 ret, TCGv_i64 arg)
-
-
---
-Alex Benn=C3=A9e
+r~
 
