@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59923)
+Received: from eggs.gnu.org ([209.51.188.92]:59947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6AS-0005FM-D7
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:30:09 -0400
+	(envelope-from <ppandit@redhat.com>) id 1hM6AU-0005Jg-Si
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:30:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6AO-0003VD-MA
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:30:06 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51312)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6AL-0008Vy-Vs
+	(envelope-from <ppandit@redhat.com>) id 1hM6AP-0003Vm-Ls
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:30:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:24268)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1hM6AL-0002Ea-Vl
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:30:02 -0400
-Received: by mail-wm1-x343.google.com with SMTP id t76so1284464wmt.1
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 00:27:01 -0700 (PDT)
-From: Jon Doron <arilou@gmail.com>
-Date: Thu,  2 May 2019 10:26:18 +0300
-Message-Id: <20190502072641.4667-5-arilou@gmail.com>
-In-Reply-To: <20190502072641.4667-1-arilou@gmail.com>
-References: <20190502072641.4667-1-arilou@gmail.com>
+Date: Thu, 2 May 2019 12:58:37 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <20190425063534.32747-1-ppandit@redhat.com>
+Message-ID: <nycvar.YSQ.7.76.1905021257340.11724@xnncv>
+References: <20190425063534.32747-1-ppandit@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 04/27] gdbstub: Implement continue (c pkt)
- with new infra
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH] qxl: check release info object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, liran.alon@oracle.com, Jon Doron <arilou@gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Bugs SysSec <bugs-syssec@rub.de>
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
----
- gdbstub.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
++-- On Thu, 25 Apr 2019, P J P wrote --+
+| When releasing spice resources in release_resource() routine,
+| if release info object 'ext.info' is null, it leads to null
+| pointer dereference. Add check to avoid it.
+| 
+| diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+| index c8ce5781e0..632923add2 100644
+| --- a/hw/display/qxl.c
+| +++ b/hw/display/qxl.c
+| @@ -777,6 +777,9 @@ static void interface_release_resource(QXLInstance *sin,
+|      QXLReleaseRing *ring;
+|      uint64_t *item, id;
+|  
+| +    if (!ext.info) {
+| +        return;
+| +    }
+|      if (ext.group_id == MEMSLOT_GROUP_HOST) {
+|          /* host group -> vga mode update request */
+|          QXLCommandExt *cmdext = (void *)(intptr_t)(ext.info->id);
+| 
 
-diff --git a/gdbstub.c b/gdbstub.c
-index c47ef7dd9c..89f1ab6524 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1522,6 +1522,16 @@ static void handle_thread_alive(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, "OK");
- }
- 
-+static void handle_continue(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    if (gdb_ctx->num_params) {
-+        gdb_set_cpu_pc(gdb_ctx->s, gdb_ctx->params[0].val_ull);
-+    }
-+
-+    gdb_ctx->s->signal = 0;
-+    gdb_continue(gdb_ctx->s);
-+}
-+
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -1558,13 +1568,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         gdb_breakpoint_remove_all();
-         break;
-     case 'c':
--        if (*p != '\0') {
--            addr = strtoull(p, (char **)&p, 16);
--            gdb_set_cpu_pc(s, addr);
-+        {
-+            static const GdbCmdParseEntry continue_cmd_desc = {
-+                .handler = handle_continue,
-+                .cmd = "c",
-+                .cmd_startswith = 1,
-+                .schema = "L0"
-+            };
-+            cmd_parser = &continue_cmd_desc;
-         }
--        s->signal = 0;
--        gdb_continue(s);
--        return RS_IDLE;
-+        break;
-     case 'C':
-         s->signal = gdb_signal_to_target (strtoul(p, (char **)&p, 16));
-         if (s->signal == -1)
--- 
-2.20.1
+Ping...!
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
