@@ -2,91 +2,83 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81ED7C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 22:03:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2907DC43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 22:25:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4441D20651
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 22:03:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4441D20651
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DE25220644
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 22:25:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="NwDoh7zV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE25220644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59090 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59300 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMJnz-0006HR-Kj
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 18:03:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41402)
+	id 1hMK9C-00045C-6l
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 18:25:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hMJn1-0005w5-Jc
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 18:02:52 -0400
+	(envelope-from <driver1998@foxmail.com>) id 1hMK8J-0003hw-AU
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 18:24:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hMJn0-0005zw-Hm
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 18:02:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53860)
+	(envelope-from <driver1998@foxmail.com>) id 1hMK8I-0002GD-6q
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 18:24:51 -0400
+Received: from smtpbgsg2.qq.com ([54.254.200.128]:50898)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hMJmy-0005yY-6C; Thu, 02 May 2019 18:02:48 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 473773680B;
-	Thu,  2 May 2019 22:02:47 +0000 (UTC)
-Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D12D5D70A;
-	Thu,  2 May 2019 22:02:46 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
-	QEMU Developers <qemu-devel@nongnu.org>
-References: <e3e75fd5-661e-95ab-d7d6-f9a7bf6548d4@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <316d5b3f-d25a-6f9d-6d28-a91f7d2bc22e@redhat.com>
-Date: Thu, 2 May 2019 17:02:45 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <e3e75fd5-661e-95ab-d7d6-f9a7bf6548d4@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="L4Y2TEEyzcSdtVJhyUK43HTUNSu5ftLE3"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Thu, 02 May 2019 22:02:47 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] Failing QEMU iotest 221
+	(Exim 4.71) (envelope-from <driver1998@foxmail.com>)
+	id 1hMK8H-0002DO-DT
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 18:24:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1556835877;
+	bh=hTVQtuhslYMBK8jsw9MXUT8Xvr8+CbSUWPMaX1HkK4g=;
+	h=From:To:Subject:Mime-Version:Date:Message-ID;
+	b=NwDoh7zV43jMpmfLgyhyTATz3r3RhFhNAa/EXb5CW9WfjScg4KM9L/c0+DAxC4L6c
+	5hdGf5xl+rx/t9JrE44qzmqm7w8uy9eaZRfdmC1XBFrrzuW9PtVKk5elM7DuDdHWWr
+	xHpyGJAg4lrGGoiwS5pIu1UYdyJdZu2h+b/zRai8=
+X-QQ-FEAT: SDGPAIwMd/K8eE+AtiojIhfeAfBv2egiE4w/CwVUd7Lfzr4LQFIz45/32iNjw
+	rV++yx99nYmefqpxCUsqkfkf2aiFn/+khWkHtSWeRYU1jJI9mTxJOvt+zTNUMgFf3qvCngj
+	WXLKlU+diCsQXkdjU8N3areVOIkAUWqxR6ZP7BDZjFy09fAuSLE4XRGTVFXhGEeXUiIr2no
+	gEEDRPqNoRpXSOLylactRVoBsWtxsyBuWmmPEZPR6A0Nv1FNGUZwe4bM/rGKvyy3VkuD6jm
+	WhAhejYT30QTHt
+X-QQ-SSF: 000000000000003000000000000000P
+X-HAS-ATTACH: no
+X-QQ-BUSINESS-ORIGIN: 2
+X-Originating-IP: 183.63.18.252
+In-Reply-To: <d23b59fa-2909-f124-3aab-cc5ded90f063@redhat.com>
+References: <tencent_9962D5F9426BA267581CCB79DB1FE17AD508@qq.com>
+	<d23b59fa-2909-f124-3aab-cc5ded90f063@redhat.com>
+X-QQ-STYLE: 
+X-QQ-mid: webmail122t1556835876t6672583
+From: "=?ISO-8859-1?B?R0ggQ2Fv?=" <driver1998@foxmail.com>
+To: "=?ISO-8859-1?B?RXJpYyBCbGFrZQ==?=" <eblake@redhat.com>,
+	"=?ISO-8859-1?B?cWVtdS1kZXZlbA==?=" <qemu-devel@nongnu.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+Date: Fri, 3 May 2019 06:24:36 +0800
+X-Priority: 3
+Message-ID: <tencent_EE29897A62292DA76CA785FB55AF5507090A@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+X-QQ-ReplyHash: 1164750064
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
+	id ; Fri, 03 May 2019 06:24:37 +0800 (CST)
+Feedback-ID: webmail:foxmail.com:bgforeign:bgforeign4
+X-QQ-Bgrelay: 1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 54.254.200.128
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] qga: Fix an enum conversion
+ warningincommands-win32.c, hit by clang.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,101 +90,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502220245.3NbeXquw_GYbdl2_tkU5q91616FlY8fEXY-3TxU8Gq4@z>
+Message-ID: <20190502222436.-TPmRfGV4GZOgbtp6CLDMedSto3c1UAXgmyccCrczgE@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---L4Y2TEEyzcSdtVJhyUK43HTUNSu5ftLE3
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <316d5b3f-d25a-6f9d-6d28-a91f7d2bc22e@redhat.com>
-Subject: Re: Failing QEMU iotest 221
-References: <e3e75fd5-661e-95ab-d7d6-f9a7bf6548d4@redhat.com>
-In-Reply-To: <e3e75fd5-661e-95ab-d7d6-f9a7bf6548d4@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 4/28/19 10:21 AM, Thomas Huth wrote:
-> QEMU iotest 221 is failing for me, too, when I run it with -raw:
-
-Which filesystem?
-
->=20
-> tests/qemu-iotests$ ./check -raw 221
-> QEMU          -- "/home/thuth/tmp/qemu-build/tests/qemu-iotests/../../x=
-86_64-softmmu/qemu-system-x86_64" -nodefaults -machine accel=3Dqtest
-> QEMU_IMG      -- "/home/thuth/tmp/qemu-build/tests/qemu-iotests/../../q=
-emu-img"=20
-> QEMU_IO       -- "/home/thuth/tmp/qemu-build/tests/qemu-iotests/../../q=
-emu-io"  --cache writeback -f raw
-> QEMU_NBD      -- "/home/thuth/tmp/qemu-build/tests/qemu-iotests/../../q=
-emu-nbd"=20
-> IMGFMT        -- raw
-> IMGPROTO      -- file
-> PLATFORM      -- Linux/x86_64 thuth 3.10.0-957.10.1.el7.x86_64
-> TEST_DIR      -- /home/thuth/tmp/qemu-build/tests/qemu-iotests/scratch
-> SOCKET_SCM_HELPER -- /home/thuth/tmp/qemu-build/tests/qemu-iotests/sock=
-et_scm_helper
->=20
-> 221         - output mismatch (see 221.out.bad)
-> --- /home/thuth/devel/qemu/tests/qemu-iotests/221.out	2019-04-23 16:43:=
-12.000000000 +0200
-> +++ /home/thuth/tmp/qemu-build/tests/qemu-iotests/221.out.bad	2019-04-2=
-8 17:18:52.000000000 +0200
-> @@ -7,10 +7,10 @@
->  [{ "start": 0, "length": 43520, "depth": 0, "zero": true, "data": fals=
-e, "offset": OFFSET}]
->  wrote 1/1 bytes at offset 43008
->  1 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> -[{ "start": 0, "length": 40960, "depth": 0, "zero": true, "data": fals=
-e, "offset": OFFSET},
-> -{ "start": 40960, "length": 2049, "depth": 0, "zero": false, "data": t=
-rue, "offset": OFFSET},
-> +[{ "start": 0, "length": 43008, "depth": 0, "zero": true, "data": fals=
-e, "offset": OFFSET},
-> +{ "start": 43008, "length": 1, "depth": 0, "zero": false, "data": true=
-, "offset": OFFSET},
-
-Ugh. Hole granularities are file-system specific, so we need to figure
-out some way to fuzz the input. It might also be possible to pick nicer
-size numbers - perhaps if the test image is sized at 64k+1 instead of
-43009 (84*512, but NOT evenly divisible by 4k), the +1 byte is more
-likely to be directly one a hole boundary, rather than being somewhere
-that causes rounding the hole boundary 2k earlier because of 4k or 64k
-sizing constraints.
-
-> Any ideas how to fix this?
->=20
->  Thomas
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+T24gNS8zLzE5IDY6MjAgQU0sIEVyaWMgQmxha2Ugd3JvdGU6DQoNCj4gV2hlcmUgaXMgZW51
+bSBTVE9SQUdFX0JVU19UWVBFIGRlZmluZWQ/IA0KSW4gdGhlIFdpbmRvd3MgU0RLICh3aW5p
+b2N0bC5oKSwgc28gYSB0d28td2F5IGNvbnZlcnNpb24gdGFibGUgaXMgbmVlZGVkLg0KDQo+
+IEluIGZhY3QsIGl0IGxvb2tzIGxpa2Ugd2luMnFlbXVbXSBpcyBzdXBwb3NlZCB0byBiZSB0
+aGF0IHRhYmxlLA0KPiBidXQgaXQgd2FzIGluY29ycmVjdGx5IHdyaXR0ZW4uICBZb3UgV0FO
+VCB0byBkbzoNCg0KPiBkaWZmIC0tZ2l0IGkvcWdhL2NvbW1hbmRzLXdpbjMyLmMgdy9xZ2Ev
+Y29tbWFuZHMtd2luMzIuYw0KPiBpbmRleCBkNDBkNjFmNjA1Yy4uNmI2N2YxNmZhZjEgMTAw
+NjQ0DQo+IC0tLSBpL3FnYS9jb21tYW5kcy13aW4zMi5jDQo+ICsrKyB3L3FnYS9jb21tYW5k
+cy13aW4zMi5jDQo+IEBAIC00NTcsNyArNDU3LDcgQEAgdm9pZCBxbXBfZ3Vlc3RfZmlsZV9m
+bHVzaChpbnQ2NF90IGhhbmRsZSwgRXJyb3IgKiplcnJwKQ0KPg0KPiAjaWZkZWYgQ09ORklH
+X1FHQV9OVEREU0NTSQ0KPg0KPiAtc3RhdGljIFNUT1JBR0VfQlVTX1RZUEUgd2luMnFlbXVb
+XSA9IHsNCj4gK3N0YXRpYyBHdWVzdERpc2tCdXNUeXBlIHdpbjJxZW11W10gPSB7DQo+ICAg
+ICBbQnVzVHlwZVVua25vd25dID0gR1VFU1RfRElTS19CVVNfVFlQRV9VTktOT1dOLA0KPiAg
+ICAgW0J1c1R5cGVTY3NpXSA9IEdVRVNUX0RJU0tfQlVTX1RZUEVfU0NTSSwNCj4gICAgIFtC
+dXNUeXBlQXRhcGldID0gR1VFU1RfRElTS19CVVNfVFlQRV9JREUsDQo+DQo+IHdpdGggbm8g
+Y2FzdHMgbmVlZGVkLCBlaXRoZXIgaW4gdGhlIHRhYmxlIG9yIGluIHRoZSBmdW5jdGlvbiB0
+aGF0DQo+IHJlZmVyZW5jZXMgdGhlIHRhYmxlLg0KDQpZZXMsIEkgY2FuIGNvbmZpcm0gdGhh
+dCBmaXhlcyB0aGUgaXNzdWUsIGFuZCBjbGVhcmx5IGJldHRlciB0aGFuIG15IHByZXZpb3Vz
+IGVmZm9ydC4NCkknbGwgdXNlIHRoaXMgaW5zdGVhZCBpbiBteSB1cGNvbWluZyB2MyBwYXRj
+aCBzZXQu
 
 
---L4Y2TEEyzcSdtVJhyUK43HTUNSu5ftLE3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzLaQUACgkQp6FrSiUn
-Q2r8BAf/UreFg2mCxt4Xftu31lXncf/i+IEdeO4pXSrg80xq88sWohUCTSdzM2uS
-OBG4lpC6HI3U0g6j8eyXxHM/gZZGciE0xXY2qoMlImYW1dEbzptLP3oi9agcz9mS
-yQ16C2VJK3v+R2UBqVWJTytgZVJCI7P2Y8AUZHxlENBx4I2MvYAQgagarQ1UhYKi
-BM1vu+utu6SB3X8DHll8t+6R2whLoA5HJEHUblIReUGNPSmkvYcBQDkJ21880TjS
-bhMHm8uQyHpndTjiBAroUF+rdq16fukCKKVOk5tbrnGhhMoOfrvhZXosXR+k9Fbi
-VeEhb40AHKcy7+zpIMA0sJNWKh/fRg==
-=yhSy
------END PGP SIGNATURE-----
-
---L4Y2TEEyzcSdtVJhyUK43HTUNSu5ftLE3--
 
