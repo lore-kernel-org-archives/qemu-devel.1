@@ -6,50 +6,50 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23BF7C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:58:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B252C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:59:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB4802085A
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:58:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB4802085A
+	by mail.kernel.org (Postfix) with ESMTPS id 401552075E
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:59:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 401552075E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52574 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52578 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMDAn-0001pI-0c
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:58:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44880)
+	id 1hMDBE-0002Df-E4
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:59:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCnE-0003Xt-So
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCnD-0003Wj-Ey
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCn9-0008P3-Ed
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:36 -0400
-Received: from mail01.asahi-net.or.jp ([202.224.55.13]:34456)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCn9-0008Oc-AG
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:34 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:41244)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCn7-0008Jj-A4
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:31 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCn7-0008Ji-AL
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:29 -0400
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.vps.ablenet.jp
 	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
-	by mail01.asahi-net.or.jp (Postfix) with ESMTPA id DE2BE11A090;
+	by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 552403BC52;
 	Thu,  2 May 2019 23:34:24 +0900 (JST)
 Received: from ysato.dip.jp (ZM005235.ppp.dion.ne.jp [222.8.5.235])
-	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 587B1240089; 
-	Thu,  2 May 2019 23:34:24 +0900 (JST)
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 76DAC240087; 
+	Thu,  2 May 2019 23:34:23 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Date: Thu,  2 May 2019 23:34:01 +0900
-Message-Id: <20190502143409.59600-5-ysato@users.sourceforge.jp>
+Date: Thu,  2 May 2019 23:33:59 +0900
+Message-Id: <20190502143409.59600-3-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.11.0
 In-Reply-To: <20190502143409.59600-1-ysato@users.sourceforge.jp>
 References: <20190502143409.59600-1-ysato@users.sourceforge.jp>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 202.224.55.13
-Subject: [Qemu-devel] [PATCH RFC v8 04/12] target/rx: RX disassembler
+X-Received-From: 202.224.55.14
+Subject: [Qemu-devel] [PATCH RFC v8 02/12] target/rx: TCG helper
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,48 +67,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190502143401.6Nh13lZhch3i0BOoK63l7ygIDwsrJSVMrwKpBfQIltI@z>
+Message-ID: <20190502143359.gsOOX_DdprPE0TWZO_DCHujcnqmwwfLaR6SH-Fizfh8@z>
 
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 ---
- include/disas/dis-asm.h |    5 +
- target/rx/disas.c       | 1481 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 1486 insertions(+)
- create mode 100644 target/rx/disas.c
+ target/rx/helper.h    |  31 ++++
+ target/rx/helper.c    | 148 ++++++++++++++++
+ target/rx/op_helper.c | 481 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 660 insertions(+)
+ create mode 100644 target/rx/helper.h
+ create mode 100644 target/rx/helper.c
+ create mode 100644 target/rx/op_helper.c
 
-diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-index 9240ec32c2..de17792e88 100644
---- a/include/disas/dis-asm.h
-+++ b/include/disas/dis-asm.h
-@@ -226,6 +226,10 @@ enum bfd_architecture
- #define bfd_mach_nios2r2        2
-   bfd_arch_lm32,       /* Lattice Mico32 */
- #define bfd_mach_lm32 1
-+  bfd_arch_rx,       /* Renesas RX */
-+#define bfd_mach_rx            0x75
-+#define bfd_mach_rx_v2         0x76
-+#define bfd_mach_rx_v3         0x77
-   bfd_arch_last
-   };
- #define bfd_mach_s390_31 31
-@@ -433,6 +437,7 @@ int print_insn_little_nios2     (bfd_vma, disassemble_info*);
- int print_insn_xtensa           (bfd_vma, disassemble_info*);
- int print_insn_riscv32          (bfd_vma, disassemble_info*);
- int print_insn_riscv64          (bfd_vma, disassemble_info*);
-+int print_insn_rx(bfd_vma, disassemble_info *);
- 
- #if 0
- /* Fetch the disassembler for a given BFD, if that support is available.  */
-diff --git a/target/rx/disas.c b/target/rx/disas.c
+diff --git a/target/rx/helper.h b/target/rx/helper.h
 new file mode 100644
-index 0000000000..014fadfca3
+index 0000000000..f0b7ebbbf7
 --- /dev/null
-+++ b/target/rx/disas.c
-@@ -0,0 +1,1481 @@
++++ b/target/rx/helper.h
+@@ -0,0 +1,31 @@
++DEF_HELPER_1(raise_illegal_instruction, noreturn, env)
++DEF_HELPER_1(raise_access_fault, noreturn, env)
++DEF_HELPER_1(raise_privilege_violation, noreturn, env)
++DEF_HELPER_1(wait, noreturn, env)
++DEF_HELPER_1(debug, noreturn, env)
++DEF_HELPER_2(rxint, noreturn, env, i32)
++DEF_HELPER_1(rxbrk, noreturn, env)
++DEF_HELPER_FLAGS_3(fadd, TCG_CALL_NO_WG, f32, env, f32, f32)
++DEF_HELPER_FLAGS_3(fsub, TCG_CALL_NO_WG, f32, env, f32, f32)
++DEF_HELPER_FLAGS_3(fmul, TCG_CALL_NO_WG, f32, env, f32, f32)
++DEF_HELPER_FLAGS_3(fdiv, TCG_CALL_NO_WG, f32, env, f32, f32)
++DEF_HELPER_FLAGS_3(fcmp, TCG_CALL_NO_WG, void, env, f32, f32)
++DEF_HELPER_FLAGS_2(ftoi, TCG_CALL_NO_WG, i32, env, f32)
++DEF_HELPER_FLAGS_2(round, TCG_CALL_NO_WG, i32, env, f32)
++DEF_HELPER_FLAGS_2(itof, TCG_CALL_NO_WG, f32, env, i32)
++DEF_HELPER_2(set_fpsw, void, env, i32)
++DEF_HELPER_FLAGS_2(racw, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_FLAGS_2(set_psw_rte, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_FLAGS_2(set_psw, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_1(pack_psw, i32, env)
++DEF_HELPER_FLAGS_3(div, TCG_CALL_NO_WG, i32, env, i32, i32)
++DEF_HELPER_FLAGS_3(divu, TCG_CALL_NO_WG, i32, env, i32, i32)
++DEF_HELPER_FLAGS_1(scmpu, TCG_CALL_NO_WG, void, env)
++DEF_HELPER_1(smovu, void, env)
++DEF_HELPER_1(smovf, void, env)
++DEF_HELPER_1(smovb, void, env)
++DEF_HELPER_2(sstr, void, env, i32)
++DEF_HELPER_FLAGS_2(swhile, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_FLAGS_2(suntil, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_FLAGS_2(rmpa, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_1(satr, void, env)
+diff --git a/target/rx/helper.c b/target/rx/helper.c
+new file mode 100644
+index 0000000000..8e598c9c1d
+--- /dev/null
++++ b/target/rx/helper.c
+@@ -0,0 +1,148 @@
 +/*
-+ * Renesas RX Disassembler
++ *  RX emulation
 + *
-+ * Copyright (c) 2019 Yoshinori Sato <ysato@users.sourceforge.jp>
++ *  Copyright (c) 2019 Yoshinori Sato
 + *
 + * This program is free software; you can redistribute it and/or modify it
 + * under the terms and conditions of the GNU General Public License,
@@ -124,1467 +141,621 @@ index 0000000000..014fadfca3
 + */
 +
 +#include "qemu/osdep.h"
-+#include "disas/dis-asm.h"
 +#include "qemu/bitops.h"
 +#include "cpu.h"
++#include "exec/log.h"
++#include "exec/cpu_ldst.h"
++#include "sysemu/sysemu.h"
 +
-+typedef struct DisasContext {
-+    disassemble_info *dis;
-+    uint32_t addr;
-+    uint32_t pc;
-+} DisasContext;
-+
-+
-+static uint32_t decode_load_bytes(DisasContext *ctx, uint32_t insn,
-+                           int i, int n)
++void rx_cpu_unpack_psw(CPURXState *env, uint32_t psw, int rte)
 +{
-+    bfd_byte buf;
-+    while (++i <= n) {
-+        ctx->dis->read_memory_func(ctx->addr++, &buf, 1, ctx->dis);
-+        insn |= buf << (32 - i * 8);
-+    }
-+    return insn;
-+}
-+
-+static int32_t li(DisasContext *ctx, int sz)
-+{
-+    int32_t addr;
-+    bfd_byte buf[4];
-+    addr = ctx->addr;
-+
-+    switch (sz) {
-+    case 1:
-+        ctx->addr += 1;
-+        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
-+        return buf[0];
-+    case 2:
-+        ctx->addr += 2;
-+        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
-+        return buf[1] << 8 | buf[0];
-+    case 3:
-+        ctx->addr += 3;
-+        ctx->dis->read_memory_func(addr, buf, 3, ctx->dis);
-+        return buf[2] << 16 | buf[1] << 8 | buf[0];
-+    case 0:
-+        ctx->addr += 4;
-+        ctx->dis->read_memory_func(addr, buf, 4, ctx->dis);
-+        return buf[3] << 24 | buf[2] << 16 | buf[1] << 8 | buf[0];
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
-+static int bdsp_s(DisasContext *ctx, int d)
-+{
-+    /*
-+     * 0 -> 8
-+     * 1 -> 9
-+     * 2 -> 10
-+     * 3 -> 3
-+     * :
-+     * 7 -> 7
-+     */
-+    if (d < 3) {
-+        d += 8;
-+    }
-+    return d;
-+}
-+
-+/* Include the auto-generated decoder.  */
-+#include "decode.inc.c"
-+
-+#define prt(...) (ctx->dis->fprintf_func)((ctx->dis->stream), __VA_ARGS__)
-+
-+#define RX_MEMORY_BYTE 0
-+#define RX_MEMORY_WORD 1
-+#define RX_MEMORY_LONG 2
-+
-+#define RX_IM_BYTE 0
-+#define RX_IM_WORD 1
-+#define RX_IM_LONG 2
-+#define RX_IM_UWORD 3
-+
-+static const char size[] = {'b', 'w', 'l'};
-+static const char cond[][4] = {
-+    "eq", "ne", "c", "nc", "gtu", "leu", "pz", "n",
-+    "ge", "lt", "gt", "le", "o", "no", "ra", "f"
-+};
-+static const char psw[] = {
-+    'c', 'z', 's', 'o', 0, 0, 0, 0,
-+    'i', 'u', 0, 0, 0, 0, 0, 0,
-+};
-+
-+static uint32_t rx_index_addr(int ld, int size, DisasContext *ctx)
-+{
-+    bfd_byte buf[2];
-+    switch (ld) {
-+    case 0:
-+        return 0;
-+    case 1:
-+        ctx->dis->read_memory_func(ctx->addr, buf, 1, ctx->dis);
-+        ctx->addr += 1;
-+        return buf[0];
-+    case 2:
-+        ctx->dis->read_memory_func(ctx->addr, buf, 2, ctx->dis);
-+        ctx->addr += 2;
-+        return buf[1] << 8 | buf[0];
-+    }
-+    g_assert_not_reached();
-+}
-+
-+static void operand(DisasContext *ctx, int ld, int mi, int rs, int rd)
-+{
-+    int dsp;
-+    static const char sizes[][4] = {".b", ".w", ".l", ".uw", ".ub"};
-+    if (ld < 3) {
-+        switch (mi) {
-+        case 4:
-+            /* dsp[rs].ub */
-+            dsp = rx_index_addr(ld, RX_MEMORY_BYTE, ctx);
-+            break;
-+        case 3:
-+            /* dsp[rs].uw */
-+            dsp = rx_index_addr(ld, RX_MEMORY_WORD, ctx);
-+            break;
-+        default:
-+            /* dsp[rs].b */
-+            /* dsp[rs].w */
-+            /* dsp[rs].l */
-+            dsp = rx_index_addr(ld, mi, ctx);
-+            break;
++    if (env->psw_pm == 0) {
++        env->psw_ipl = FIELD_EX32(psw, PSW, IPL);
++        if (rte) {
++            /* PSW.PM can write RTE and RTFI */
++            env->psw_pm = FIELD_EX32(psw, PSW, PM);
 +        }
-+        if (dsp > 0) {
-+            dsp <<= ld;
-+            prt("%d", dsp);
++        env->psw_u = FIELD_EX32(psw, PSW, U);
++        env->psw_i = FIELD_EX32(psw, PSW, I);
++    }
++    env->psw_o = FIELD_EX32(psw, PSW, O) << 31;
++    env->psw_s = FIELD_EX32(psw, PSW, S) << 31;
++    env->psw_z = 1 - FIELD_EX32(psw, PSW, Z);
++    env->psw_c = FIELD_EX32(psw, PSW, C);
++}
++
++#define INT_FLAGS (CPU_INTERRUPT_HARD | CPU_INTERRUPT_FIR)
++void rx_cpu_do_interrupt(CPUState *cs)
++{
++    RXCPU *cpu = RXCPU(cs);
++    CPURXState *env = &cpu->env;
++    int do_irq = cs->interrupt_request & INT_FLAGS;
++    uint32_t save_psw;
++
++    env->in_sleep = 0;
++
++    if (env->psw_u) {
++        env->usp = env->regs[0];
++    } else {
++        env->isp = env->regs[0];
++    }
++    save_psw = rx_cpu_pack_psw(env);
++    env->psw_pm = env->psw_i = env->psw_u = 0;
++
++    if (do_irq) {
++        if (do_irq & CPU_INTERRUPT_FIR) {
++            env->bpc = env->pc;
++            env->bpsw = save_psw;
++            env->pc = env->fintv;
++            env->psw_ipl = 15;
++            cs->interrupt_request &= ~CPU_INTERRUPT_FIR;
++            qemu_set_irq(env->ack, env->ack_irq);
++            qemu_log_mask(CPU_LOG_INT, "fast interrupt raised\n");
++        } else if (do_irq & CPU_INTERRUPT_HARD) {
++            env->isp -= 4;
++            cpu_stl_all(env, env->isp, save_psw);
++            env->isp -= 4;
++            cpu_stl_all(env, env->isp, env->pc);
++            env->pc = cpu_ldl_all(env, env->intb + env->ack_irq * 4);
++            env->psw_ipl = env->ack_ipl;
++            cs->interrupt_request &= ~CPU_INTERRUPT_HARD;
++            qemu_set_irq(env->ack, env->ack_irq);
++            qemu_log_mask(CPU_LOG_INT,
++                          "interrupt 0x%02x raised\n", env->ack_irq);
 +        }
-+        prt("[r%d]%s", rs, sizes[mi]);
 +    } else {
-+        prt("r%d", rs);
++        uint32_t vec = cs->exception_index;
++        const char *expname = "unknown exception";
++
++        env->isp -= 4;
++        cpu_stl_all(env, env->isp, save_psw);
++        env->isp -= 4;
++        cpu_stl_all(env, env->isp, env->pc);
++
++        if (vec < 0x100) {
++            env->pc = cpu_ldl_all(env, 0xffffffc0 + vec * 4);
++        } else {
++            env->pc = cpu_ldl_all(env, env->intb + (vec & 0xff) * 4);
++        }
++        switch (vec) {
++        case 20:
++            expname = "previlage violation";
++            break;
++        case 21:
++            expname = "access exception";
++            break;
++        case 23:
++            expname = "illegal instruction";
++            break;
++        case 25:
++            expname = "fpu exception";
++            break;
++        case 30:
++            expname = "NMI interrupt";
++            break;
++        case 0x100 ... 0x1ff:
++            expname = "unconditional trap";
++        }
++        qemu_log_mask(CPU_LOG_INT, "exception 0x%02x [%s] raised\n",
++                      (vec & 0xff), expname);
 +    }
-+    prt(", r%d", rd);
++    env->regs[0] = env->isp;
 +}
 +
-+static void prt_ir(DisasContext *ctx, const char *insn, int imm, int rd)
++bool rx_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
 +{
-+    if (imm < 0x100) {
-+        prt("%s\t#%d, r%d", insn, imm, rd);
-+    } else {
-+        prt("%s\t#0x%08x, r%d", insn, imm, rd);
++    RXCPU *cpu = RXCPU(cs);
++    CPURXState *env = &cpu->env;
++    int accept = 0;
++    /* hardware interrupt (Normal) */
++    if ((interrupt_request & CPU_INTERRUPT_HARD) &&
++        env->psw_i && (env->psw_ipl < env->req_ipl)) {
++        env->ack_irq = env->req_irq;
++        env->ack_ipl = env->req_ipl;
++        accept = 1;
 +    }
-+}
-+
-+/* mov.[bwl] rs,dsp:[rd] */
-+static bool trans_MOV_rm(DisasContext *ctx, arg_MOV_rm *a)
-+{
-+    if (a->dsp > 0) {
-+        prt("mov.%c\tr%d,%d[r%d]",
-+            size[a->sz], a->rs, a->dsp << a->sz, a->rd);
-+    } else {
-+        prt("mov.%c\tr%d,[r%d]",
-+            size[a->sz], a->rs, a->rd);
++    /* hardware interrupt (FIR) */
++    if ((interrupt_request & CPU_INTERRUPT_FIR) &&
++        env->psw_i && (env->psw_ipl < 15)) {
++        accept = 1;
 +    }
-+    return true;
-+}
-+
-+/* mov.[bwl] dsp:[rd],rs */
-+static bool trans_MOV_mr(DisasContext *ctx, arg_MOV_mr *a)
-+{
-+    if (a->dsp > 0) {
-+        prt("mov.%c\t%d[r%d], r%d",
-+            size[a->sz], a->dsp << a->sz, a->rd, a->rs);
-+    } else {
-+        prt("mov.%c\t[r%d], r%d",
-+            size[a->sz], a->rd, a->rs);
-+    }
-+    return true;
-+}
-+
-+/* mov.l #uimm4,rd */
-+/* mov.l #uimm8,rd */
-+/* mov.l #imm,rd */
-+static bool trans_MOV_ir(DisasContext *ctx, arg_MOV_ir *a)
-+{
-+    prt_ir(ctx, "mov.l", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* mov.[bwl] #uimm8,dsp:[rd] */
-+/* mov #imm, dsp:[rd] */
-+static bool trans_MOV_im(DisasContext *ctx, arg_MOV_im *a)
-+{
-+    if (a->dsp > 0) {
-+        prt("mov.%c\t#%d,%d[r%d]",
-+            size[a->sz], a->imm, a->dsp << a->sz, a->rd);
-+    } else {
-+        prt("mov.%c\t#%d,[r%d]",
-+            size[a->sz], a->imm, a->rd);
-+    }
-+    return true;
-+}
-+
-+/* mov.[bwl] [ri,rb],rd */
-+static bool trans_MOV_ar(DisasContext *ctx, arg_MOV_ar *a)
-+{
-+    prt("mov.%c\t[r%d,r%d], r%d", size[a->sz], a->ri, a->rb, a->rd);
-+    return true;
-+}
-+
-+/* mov.[bwl] rd,[ri,rb] */
-+static bool trans_MOV_ra(DisasContext *ctx, arg_MOV_ra *a)
-+{
-+    prt("mov.%c\tr%d, [r%d, r%d]", size[a->sz], a->rs, a->ri, a->rb);
-+    return true;
-+}
-+
-+
-+/* mov.[bwl] dsp:[rs],dsp:[rd] */
-+/* mov.[bwl] rs,dsp:[rd] */
-+/* mov.[bwl] dsp:[rs],rd */
-+/* mov.[bwl] rs,rd */
-+static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_mm *a)
-+{
-+    int dsp;
-+
-+    prt("mov.%c\t", size[a->sz]);
-+    if (a->lds == 3 && a->ldd == 3) {
-+        /* mov.[bwl] rs,rd */
-+        prt("r%d, r%d", a->rs, a->rd);
++    if (accept) {
++        rx_cpu_do_interrupt(cs);
 +        return true;
 +    }
-+    if (a->lds == 3) {
-+        prt("r%d, ", a->rd);
-+        dsp = rx_index_addr(a->ldd, a->sz, ctx);
-+        if (dsp > 0) {
-+            prt("%d", dsp);
++    return false;
++}
++
++hwaddr rx_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
++{
++    return addr;
++}
+diff --git a/target/rx/op_helper.c b/target/rx/op_helper.c
+new file mode 100644
+index 0000000000..9a460070e9
+--- /dev/null
++++ b/target/rx/op_helper.c
+@@ -0,0 +1,481 @@
++/*
++ *  RX helper functions
++ *
++ *  Copyright (c) 2019 Yoshinori Sato
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/bitops.h"
++#include "cpu.h"
++#include "exec/exec-all.h"
++#include "exec/helper-proto.h"
++#include "exec/cpu_ldst.h"
++#include "fpu/softfloat.h"
++
++static inline void QEMU_NORETURN raise_exception(CPURXState *env, int index,
++                                                 uintptr_t retaddr);
++
++static void _set_psw(CPURXState *env, uint32_t psw, uint32_t rte)
++{
++    uint32_t prev_u;
++    prev_u = env->psw_u;
++    rx_cpu_unpack_psw(env, psw, rte);
++    if (prev_u != env->psw_u) {
++        /* switch r0  */
++        if (env->psw_u) {
++            env->isp = env->regs[0];
++            env->regs[0] = env->usp;
++        } else {
++            env->usp = env->regs[0];
++            env->regs[0] = env->isp;
 +        }
-+        prt("[r%d]", a->rs);
-+    } else if (a->ldd == 3) {
-+        dsp = rx_index_addr(a->lds, a->sz, ctx);
-+        if (dsp > 0) {
-+            prt("%d", dsp);
-+        }
-+        prt("[r%d], r%d", a->rs, a->rd);
-+    } else {
-+        dsp = rx_index_addr(a->lds, a->sz, ctx);
-+        if (dsp > 0) {
-+            prt("%d", dsp);
-+        }
-+        prt("[r%d], ", a->rs);
-+        dsp = rx_index_addr(a->ldd, a->sz, ctx);
-+        if (dsp > 0) {
-+            prt("%d", dsp);
-+        }
-+        prt("[r%d]", a->rd);
 +    }
-+    return true;
 +}
 +
-+/* mov.[bwl] rs,[rd+] */
-+/* mov.[bwl] rs,[-rd] */
-+static bool trans_MOV_rp(DisasContext *ctx, arg_MOV_rp *a)
++void helper_set_psw(CPURXState *env, uint32_t psw)
 +{
-+    prt("mov.%c\tr%d, ", size[a->sz], a->rs);
-+    prt((a->ad == 0) ? "[r%d+]" : "[-r%d]", a->rd);
-+    return true;
++    _set_psw(env, psw, 0);
 +}
 +
-+/* mov.[bwl] [rd+],rs */
-+/* mov.[bwl] [-rd],rs */
-+static bool trans_MOV_pr(DisasContext *ctx, arg_MOV_pr *a)
++void helper_set_psw_rte(CPURXState *env, uint32_t psw)
 +{
-+    prt("mov.%c\t", size[a->sz]);
-+    prt((a->ad == 0) ? "[r%d+]" : "[-r%d]", a->rd);
-+    prt(", r%d", a->rs);
-+    return true;
++    _set_psw(env, psw, 1);
 +}
 +
-+/* movu.[bw] dsp5:[rs],rd */
-+static bool trans_MOVU_mr(DisasContext *ctx, arg_MOVU_mr *a)
++uint32_t helper_pack_psw(CPURXState *env)
 +{
-+    if (a->dsp > 0) {
-+        prt("movu.%c\t%d[r%d], r%d", size[a->sz],
-+            a->dsp << a->sz, a->rs, a->rd);
-+    } else {
-+        prt("movu.%c\t[r%d], r%d", size[a->sz], a->rs, a->rd);
++    return rx_cpu_pack_psw(env);
++}
++
++#define SET_FPSW(b)                                             \
++    do {                                                        \
++        env->fpsw = FIELD_DP32(env->fpsw, FPSW, C ## b, 1);     \
++        if (!FIELD_EX32(env->fpsw, FPSW, E ## b)) {             \
++            env->fpsw = FIELD_DP32(env->fpsw, FPSW, F ## b, 1); \
++        }                                                       \
++    } while (0)
++
++/* fp operations */
++static void update_fpsw(CPURXState *env, float32 ret, uintptr_t retaddr)
++{
++    int xcpt, cause, enable;
++
++    env->psw_z = ret & ~(1 << 31); /* mask sign bit */
++    env->psw_s = ret;
++
++    xcpt = get_float_exception_flags(&env->fp_status);
++
++    /* Clear the cause entries */
++    env->fpsw = FIELD_DP32(env->fpsw, FPSW, CAUSE, 0);
++
++    /* set FPSW */
++    if (unlikely(xcpt)) {
++        if (xcpt & float_flag_invalid) {
++            SET_FPSW(V);
++        }
++        if (xcpt & float_flag_divbyzero) {
++            SET_FPSW(Z);
++        }
++        if (xcpt & float_flag_overflow) {
++            SET_FPSW(O);
++        }
++        if (xcpt & float_flag_underflow) {
++            SET_FPSW(U);
++        }
++        if (xcpt & float_flag_inexact) {
++            SET_FPSW(X);
++        }
++        if ((xcpt & (float_flag_input_denormal
++                     | float_flag_output_denormal))
++            && !FIELD_EX32(env->fpsw, FPSW, DN)) {
++            env->fpsw = FIELD_DP32(env->fpsw, FPSW, CE, 1);
++        }
++
++        /* update FPSW_FLAG_S */
++        if (FIELD_EX32(env->fpsw, FPSW, FLAGS) != 0) {
++            env->fpsw = FIELD_DP32(env->fpsw, FPSW, FS, 1);
++        }
++
++        /* Generate an exception if enabled */
++        cause = FIELD_EX32(env->fpsw, FPSW, CAUSE);
++        enable = FIELD_EX32(env->fpsw, FPSW, ENABLE);
++        enable |= 1 << 5; /* CE always enabled */
++        if (cause & enable) {
++            raise_exception(env, 21, retaddr);
++        }
 +    }
-+    return true;
 +}
 +
-+/* movu.[bw] rs,rd */
-+static bool trans_MOVU_rr(DisasContext *ctx, arg_MOVU_rr *a)
++void helper_set_fpsw(CPURXState *env, uint32_t val)
 +{
-+    prt("movu.%c\tr%d, r%d", size[a->sz], a->rs, a->rd);
-+    return true;
-+}
-+
-+/* movu.[bw] [ri,rb],rd */
-+static bool trans_MOVU_ar(DisasContext *ctx, arg_MOVU_ar *a)
-+{
-+    prt("mov.%c\t[r%d,r%d], r%d", size[a->sz], a->ri, a->rb, a->rd);
-+    return true;
-+}
-+
-+/* movu.[bw] [rs+],rd */
-+/* movu.[bw] [-rs],rd */
-+static bool trans_MOVU_pr(DisasContext *ctx, arg_MOVU_pr *a)
-+{
-+    prt("movu.%c\t", size[a->sz]);
-+    prt((a->ad == 0) ? "[r%d+]" : "[-r%d]", a->rd);
-+    prt(", r%d", a->rs);
-+    return true;
-+}
-+
-+/* pop rd */
-+static bool trans_POP(DisasContext *ctx, arg_POP *a)
-+{
-+    prt("pop\tr%d", a->rd);
-+    return true;
-+}
-+
-+/* popc rx */
-+static bool trans_POPC(DisasContext *ctx, arg_POPC *a)
-+{
-+    prt("pop\tr%s", rx_crname[a->cr]);
-+    return true;
-+}
-+
-+/* popm rd-rd2 */
-+static bool trans_POPM(DisasContext *ctx, arg_POPM *a)
-+{
-+    prt("popm\tr%d-r%d", a->rd, a->rd2);
-+    return true;
-+}
-+
-+/* push rs */
-+static bool trans_PUSH_r(DisasContext *ctx, arg_PUSH_r *a)
-+{
-+    prt("push\tr%d", a->rs);
-+    return true;
-+}
-+
-+/* push dsp[rs] */
-+static bool trans_PUSH_m(DisasContext *ctx, arg_PUSH_m *a)
-+{
-+    prt("push\t");
-+    int dsp = rx_index_addr(a->ld, a->sz, ctx);
-+    if (dsp > 0) {
-+        prt("%d", dsp);
-+    }
-+    prt("[r%d]", a->rs);
-+    return true;
-+}
-+
-+/* pushc rx */
-+static bool trans_PUSHC(DisasContext *ctx, arg_PUSHC *a)
-+{
-+    prt("push\t%s", rx_crname[a->cr]);
-+    return true;
-+}
-+
-+/* pushm rs-rs2*/
-+static bool trans_PUSHM(DisasContext *ctx, arg_PUSHM *a)
-+{
-+    prt("pushm\tr%d-r%d", a->rs, a->rs2);
-+    return true;
-+}
-+
-+/* xchg rs,rd */
-+static bool trans_XCHG_rr(DisasContext *ctx, arg_XCHG_rr *a)
-+{
-+    prt("xchg\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+/* xchg dsp[rs].<mi>,rd */
-+static bool trans_XCHG_mr(DisasContext *ctx, arg_XCHG_mr *a)
-+{
-+    int dsp;
-+    static const char msize[][4] = {
-+        "b", "w", "l", "ub", "uw",
++    static const int roundmode[] = {
++        float_round_nearest_even,
++        float_round_to_zero,
++        float_round_up,
++        float_round_down,
 +    };
++    uint32_t fpsw = env->fpsw;
++    fpsw |= 0x7fffff03;
++    val &= ~0x80000000;
++    fpsw &= val;
++    FIELD_DP32(fpsw, FPSW, FS, FIELD_EX32(fpsw, FPSW, FLAGS) != 0);
++    env->fpsw = fpsw;
++    set_float_rounding_mode(roundmode[FIELD_EX32(env->fpsw, FPSW, RM)],
++                            &env->fp_status);
++}
 +
-+    prt("xchg\t");
-+    dsp = rx_index_addr(a->ld, a->mi, ctx);
-+    if (dsp > 0) {
-+        prt("%d", dsp);
++#define FLOATOP(op, func)                                           \
++    float32 helper_##op(CPURXState *env, float32 t0, float32 t1)    \
++    {                                                               \
++        float32 ret;                                                \
++        ret = func(t0, t1, &env->fp_status);                        \
++        update_fpsw(env, *(uint32_t *)&ret, GETPC());               \
++        return ret;                                                 \
 +    }
-+    prt("[r%d].%s, r%d", a->rs, msize[a->mi], a->rd);
-+    return true;
-+}
 +
-+/* stz #imm,rd */
-+static bool trans_STZ(DisasContext *ctx, arg_STZ *a)
-+{
-+    prt_ir(ctx, "stz", a->imm, a->rd);
-+    return true;
-+}
++FLOATOP(fadd, float32_add)
++FLOATOP(fsub, float32_sub)
++FLOATOP(fmul, float32_mul)
++FLOATOP(fdiv, float32_div)
 +
-+/* stnz #imm,rd */
-+static bool trans_STNZ(DisasContext *ctx, arg_STNZ *a)
++void helper_fcmp(CPURXState *env, float32 t0, float32 t1)
 +{
-+    prt_ir(ctx, "stnz", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* rtsd #imm */
-+static bool trans_RTSD_i(DisasContext *ctx, arg_RTSD_i *a)
-+{
-+    prt("rtsd\t#%d", a->imm << 2);
-+    return true;
-+}
-+
-+/* rtsd #imm, rd-rd2 */
-+static bool trans_RTSD_irr(DisasContext *ctx, arg_RTSD_irr *a)
-+{
-+    prt("rtsd\t#%d, r%d - r%d", a->imm << 2, a->rd, a->rd2);
-+    return true;
-+}
-+
-+/* and #uimm:4, rd */
-+/* and #imm, rd */
-+static bool trans_AND_ir(DisasContext *ctx, arg_AND_ir *a)
-+{
-+    prt_ir(ctx, "and", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* and dsp[rs], rd */
-+/* and rs,rd */
-+static bool trans_AND_mr(DisasContext *ctx, arg_AND_mr *a)
-+{
-+    prt("and\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* and rs,rs2,rd */
-+static bool trans_AND_rrr(DisasContext *ctx, arg_AND_rrr *a)
-+{
-+    prt("and\tr%d,r%d, r%d", a->rs, a->rs2, a->rd);
-+    return true;
-+}
-+
-+/* or #uimm:4, rd */
-+/* or #imm, rd */
-+static bool trans_OR_ir(DisasContext *ctx, arg_OR_ir *a)
-+{
-+    prt_ir(ctx, "or", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* or dsp[rs], rd */
-+/* or rs,rd */
-+static bool trans_OR_mr(DisasContext *ctx, arg_OR_mr *a)
-+{
-+    prt("or\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* or rs,rs2,rd */
-+static bool trans_OR_rrr(DisasContext *ctx, arg_OR_rrr *a)
-+{
-+    prt("or\tr%d, r%d, r%d", a->rs, a->rs2, a->rd);
-+    return true;
-+}
-+
-+/* xor #imm, rd */
-+static bool trans_XOR_ir(DisasContext *ctx, arg_XOR_ir *a)
-+{
-+    prt_ir(ctx, "xor", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* xor dsp[rs], rd */
-+/* xor rs,rd */
-+static bool trans_XOR_mr(DisasContext *ctx, arg_XOR_mr *a)
-+{
-+    prt("xor\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* tst #imm, rd */
-+static bool trans_TST_ir(DisasContext *ctx, arg_TST_ir *a)
-+{
-+    prt_ir(ctx, "tst", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* tst dsp[rs], rd */
-+/* tst rs, rd */
-+static bool trans_TST_mr(DisasContext *ctx, arg_TST_mr *a)
-+{
-+    prt("tst\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* not rd */
-+/* not rs, rd */
-+static bool trans_NOT_rr(DisasContext *ctx, arg_NOT_rr *a)
-+{
-+    prt("not\t");
-+    if (a->rs != a->rd) {
-+        prt("r%d, ", a->rs);
++    int st;
++    st = float32_compare(t0, t1, &env->fp_status);
++    update_fpsw(env, 0, GETPC());
++    env->psw_z = 1;
++    env->psw_s = env->psw_o = 0;
++    switch (st) {
++    case float_relation_equal:
++        env->psw_z = 0;
++        break;
++    case float_relation_less:
++        env->psw_s = -1;
++        break;
++    case float_relation_unordered:
++        env->psw_o = -1;
++        break;
 +    }
-+    prt("r%d", a->rd);
-+    return true;
 +}
 +
-+/* neg rd */
-+/* neg rs, rd */
-+static bool trans_NEG_rr(DisasContext *ctx, arg_NEG_rr *a)
++uint32_t helper_ftoi(CPURXState *env, float32 t0)
 +{
-+    prt("neg\t");
-+    if (a->rs != a->rd) {
-+        prt("r%d, ", a->rs);
++    uint32_t ret;
++    ret = float32_to_int32_round_to_zero(t0, &env->fp_status);
++    update_fpsw(env, ret, GETPC());
++    return ret;
++}
++
++uint32_t helper_round(CPURXState *env, float32 t0)
++{
++    uint32_t ret;
++    ret = float32_to_int32(t0, &env->fp_status);
++    update_fpsw(env, ret, GETPC());
++    return ret;
++}
++
++float32 helper_itof(CPURXState *env, uint32_t t0)
++{
++    float32 ret;
++    ret = int32_to_float32(t0, &env->fp_status);
++    update_fpsw(env, ret, GETPC());
++    return ret;
++}
++
++/* string operations */
++void helper_scmpu(CPURXState *env)
++{
++    uint8_t tmp0, tmp1;
++    if (env->regs[3] == 0) {
++        return;
 +    }
-+    prt("r%d", a->rd);
-+    return true;
-+}
-+
-+/* adc #imm, rd */
-+static bool trans_ADC_ir(DisasContext *ctx, arg_ADC_ir *a)
-+{
-+    prt_ir(ctx, "adc", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* adc rs, rd */
-+static bool trans_ADC_rr(DisasContext *ctx, arg_ADC_rr *a)
-+{
-+    prt("adc\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* adc dsp[rs], rd */
-+static bool trans_ADC_mr(DisasContext *ctx, arg_ADC_mr *a)
-+{
-+    int dsp;
-+    prt("adc\t");
-+    dsp = rx_index_addr(a->ld, 2, ctx);
-+    if (dsp > 0) {
-+        prt("%d", dsp);
-+    }
-+    prt("[r%d], r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* add #uimm4, rd */
-+/* add #imm, rs, rd */
-+static bool trans_ADD_irr(DisasContext *ctx, arg_ADD_irr *a)
-+{
-+    if (a->imm < 0x10 && a->rs2 == a->rd) {
-+        prt("add\t#%d, r%d", a->imm, a->rd);
-+    } else {
-+        prt("add\t#0x%08x, r%d, r%d", a->imm, a->rs2, a->rd);
-+    }
-+    return true;
-+}
-+
-+/* add rs, rd */
-+/* add dsp[rs], rd */
-+static bool trans_ADD_mr(DisasContext *ctx, arg_ADD_mr *a)
-+{
-+    prt("add\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* add rs, rs2, rd */
-+static bool trans_ADD_rrr(DisasContext *ctx, arg_ADD_rrr *a)
-+{
-+    prt("add\tr%d, r%d, r%d", a->rs, a->rs2, a->rd);
-+    return true;
-+}
-+
-+/* cmp #imm4, rd */
-+/* cmp #imm8, rd */
-+/* cmp #imm, rs2 */
-+static bool trans_CMP_ir(DisasContext *ctx, arg_CMP_ir *a)
-+{
-+    prt_ir(ctx, "cmp", a->imm, a->rs2);
-+    return true;
-+}
-+
-+/* cmp rs, rs2 */
-+/* cmp dsp[rs], rs2 */
-+static bool trans_CMP_mr(DisasContext *ctx, arg_CMP_mr *a)
-+{
-+    prt("cmp\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* sub #imm4, rd */
-+static bool trans_SUB_ir(DisasContext *ctx, arg_SUB_ir *a)
-+{
-+    prt("sub\t#%d, r%d", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* sub rs, rd */
-+/* sub dsp[rs], rd */
-+static bool trans_SUB_mr(DisasContext *ctx, arg_SUB_mr *a)
-+{
-+    prt("sub\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* sub rs, rs2, rd */
-+static bool trans_SUB_rrr(DisasContext *ctx, arg_SUB_rrr *a)
-+{
-+    prt("sub\tr%d, r%d, r%d", a->rs, a->rs2, a->rd);
-+    return true;
-+}
-+
-+/* sbb rs, rd */
-+static bool trans_SBB_rr(DisasContext *ctx, arg_SBB_rr *a)
-+{
-+    prt("sbb\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* sbb dsp[rs], rd */
-+static bool trans_SBB_mr(DisasContext *ctx, arg_SBB_mr *a)
-+{
-+    prt("sbb\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* abs rd */
-+/* abs rs, rd */
-+static bool trans_ABS_rr(DisasContext *ctx, arg_ABS_rr *a)
-+{
-+    prt("abs\t");
-+    if (a->rs == a->rd) {
-+        prt("r%d", a->rd);
-+    } else {
-+        prt("r%d, r%d", a->rs, a->rd);
-+    }
-+    return true;
-+}
-+
-+/* max #imm, rd */
-+static bool trans_MAX_ir(DisasContext *ctx, arg_MAX_ir *a)
-+{
-+    prt_ir(ctx, "max", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* max rs, rd */
-+/* max dsp[rs], rd */
-+static bool trans_MAX_mr(DisasContext *ctx, arg_MAX_mr *a)
-+{
-+    prt("max\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* min #imm, rd */
-+static bool trans_MIN_ir(DisasContext *ctx, arg_MIN_ir *a)
-+{
-+    prt_ir(ctx, "min", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* min rs, rd */
-+/* min dsp[rs], rd */
-+static bool trans_MIN_mr(DisasContext *ctx, arg_MIN_mr *a)
-+{
-+    prt("max\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* mul #uimm4, rd */
-+/* mul #imm, rd */
-+static bool trans_MUL_ir(DisasContext *ctx, arg_MUL_ir *a)
-+{
-+    prt_ir(ctx, "mul", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* mul rs, rd */
-+/* mul dsp[rs], rd */
-+static bool trans_MUL_mr(DisasContext *ctx, arg_MUL_mr *a)
-+{
-+    prt("mul\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* mul rs, rs2, rd */
-+static bool trans_MUL_rrr(DisasContext *ctx, arg_MUL_rrr *a)
-+{
-+    prt("mul\tr%d,r%d,r%d", a->rs, a->rs2, a->rd);
-+    return true;
-+}
-+
-+/* emul #imm, rd */
-+static bool trans_EMUL_ir(DisasContext *ctx, arg_EMUL_ir *a)
-+{
-+    prt_ir(ctx, "emul", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* emul rs, rd */
-+/* emul dsp[rs], rd */
-+static bool trans_EMUL_mr(DisasContext *ctx, arg_EMUL_mr *a)
-+{
-+    prt("emul\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* emulu #imm, rd */
-+static bool trans_EMULU_ir(DisasContext *ctx, arg_EMULU_ir *a)
-+{
-+    prt_ir(ctx, "emulu", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* emulu rs, rd */
-+/* emulu dsp[rs], rd */
-+static bool trans_EMULU_mr(DisasContext *ctx, arg_EMULU_mr *a)
-+{
-+    prt("emulu\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* div #imm, rd */
-+static bool trans_DIV_ir(DisasContext *ctx, arg_DIV_ir *a)
-+{
-+    prt_ir(ctx, "div", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* div rs, rd */
-+/* div dsp[rs], rd */
-+static bool trans_DIV_mr(DisasContext *ctx, arg_DIV_mr *a)
-+{
-+    prt("div\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* divu #imm, rd */
-+static bool trans_DIVU_ir(DisasContext *ctx, arg_DIVU_ir *a)
-+{
-+    prt_ir(ctx, "divu", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* divu rs, rd */
-+/* divu dsp[rs], rd */
-+static bool trans_DIVU_mr(DisasContext *ctx, arg_DIVU_mr *a)
-+{
-+    prt("divu\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+
-+/* shll #imm:5, rd */
-+/* shll #imm:5, rs, rd */
-+static bool trans_SHLL_irr(DisasContext *ctx, arg_SHLL_irr *a)
-+{
-+    prt("shll\t#%d, ", a->imm);
-+    if (a->rs2 != a->rd) {
-+        prt("r%d, ", a->rs2);
-+    }
-+    prt("r%d", a->rd);
-+    return true;
-+}
-+
-+/* shll rs, rd */
-+static bool trans_SHLL_rr(DisasContext *ctx, arg_SHLL_rr *a)
-+{
-+    prt("shll\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* shar #imm:5, rd */
-+/* shar #imm:5, rs, rd */
-+static bool trans_SHAR_irr(DisasContext *ctx, arg_SHAR_irr *a)
-+{
-+    prt("shar\t#%d,", a->imm);
-+    if (a->rs2 != a->rd) {
-+        prt("r%d, ", a->rs2);
-+    }
-+    prt("r%d", a->rd);
-+    return true;
-+}
-+
-+/* shar rs, rd */
-+static bool trans_SHAR_rr(DisasContext *ctx, arg_SHAR_rr *a)
-+{
-+    prt("shar\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* shlr #imm:5, rd */
-+/* shlr #imm:5, rs, rd */
-+static bool trans_SHLR_irr(DisasContext *ctx, arg_SHLR_irr *a)
-+{
-+    prt("shlr\t#%d, ", a->imm);
-+    if (a->rs2 != a->rd) {
-+        prt("r%d, ", a->rs2);
-+    }
-+    prt("r%d", a->rd);
-+    return true;
-+}
-+
-+/* shlr rs, rd */
-+static bool trans_SHLR_rr(DisasContext *ctx, arg_SHLR_rr *a)
-+{
-+    prt("shlr\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* rolc rd */
-+static bool trans_ROLC(DisasContext *ctx, arg_ROLC *a)
-+{
-+    prt("rorc\tr%d", a->rd);
-+    return true;
-+}
-+
-+/* rorc rd */
-+static bool trans_RORC(DisasContext *ctx, arg_RORC *a)
-+{
-+    prt("rorc\tr%d", a->rd);
-+    return true;
-+}
-+
-+/* rotl #imm, rd */
-+static bool trans_ROTL_ir(DisasContext *ctx, arg_ROTL_ir *a)
-+{
-+    prt("rotl\t#%d, r%d", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* rotl rs, rd */
-+static bool trans_ROTL_rr(DisasContext *ctx, arg_ROTL_rr *a)
-+{
-+    prt("rotl\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* rotr #imm, rd */
-+static bool trans_ROTR_ir(DisasContext *ctx, arg_ROTR_ir *a)
-+{
-+    prt("rotr\t#%d, r%d", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* rotr rs, rd */
-+static bool trans_ROTR_rr(DisasContext *ctx, arg_ROTR_rr *a)
-+{
-+    prt("rotr\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* revl rs, rd */
-+static bool trans_REVL(DisasContext *ctx, arg_REVL *a)
-+{
-+    prt("revl\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* revw rs, rd */
-+static bool trans_REVW(DisasContext *ctx, arg_REVW *a)
-+{
-+    prt("revw\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* conditional branch helper */
-+static void rx_bcnd_main(DisasContext *ctx, int cd, int len, int dst)
-+{
-+    static const char sz[] = {'s', 'b', 'w', 'a'};
-+    prt("b%s.%c\t%08x", cond[cd], sz[len - 1], ctx->pc + dst);
-+}
-+
-+/* beq dsp:3 / bne dsp:3 */
-+/* beq dsp:8 / bne dsp:8 */
-+/* bc dsp:8 / bnc dsp:8 */
-+/* bgtu dsp:8 / bleu dsp:8 */
-+/* bpz dsp:8 / bn dsp:8 */
-+/* bge dsp:8 / blt dsp:8 */
-+/* bgt dsp:8 / ble dsp:8 */
-+/* bo dsp:8 / bno dsp:8 */
-+/* beq dsp:16 / bne dsp:16 */
-+static bool trans_BCnd(DisasContext *ctx, arg_BCnd *a)
-+{
-+    rx_bcnd_main(ctx, a->cd, a->sz, a->dsp);
-+    return true;
-+}
-+
-+/* bra dsp:3 */
-+/* bra dsp:8 */
-+/* bra dsp:16 */
-+/* bra dsp:24 */
-+static bool trans_BRA(DisasContext *ctx, arg_BRA *a)
-+{
-+    rx_bcnd_main(ctx, 14, a->sz, a->dsp);
-+    return true;
-+}
-+
-+/* bra rs */
-+static bool trans_BRA_l(DisasContext *ctx, arg_BRA_l *a)
-+{
-+    prt("bra.l\tr%d", a->rd);
-+    return true;
-+}
-+
-+/* jmp rs */
-+static bool trans_JMP(DisasContext *ctx, arg_JMP *a)
-+{
-+    prt("jmp\tr%d", a->rs);
-+    return true;
-+}
-+
-+/* jsr rs */
-+static bool trans_JSR(DisasContext *ctx, arg_JSR *a)
-+{
-+    prt("jsr\tr%d", a->rs);
-+    return true;
-+}
-+
-+/* bsr dsp:16 */
-+/* bsr dsp:24 */
-+static bool trans_BSR(DisasContext *ctx, arg_BSR *a)
-+{
-+    static const char sz[] = {'w', 'a'};
-+    prt("bsr.%c\t%08x", sz[a->sz - 3], ctx->pc + a->dsp);
-+    return true;
-+}
-+
-+/* bsr rs */
-+static bool trans_BSR_l(DisasContext *ctx, arg_BSR_l *a)
-+{
-+    prt("bsr.l\tr%d", a->rd);
-+    return true;
-+}
-+
-+/* rts */
-+static bool trans_RTS(DisasContext *ctx, arg_RTS *a)
-+{
-+    prt("rts");
-+    return true;
-+}
-+
-+/* nop */
-+static bool trans_NOP(DisasContext *ctx, arg_NOP *a)
-+{
-+    prt("nop");
-+    return true;
-+}
-+
-+/* scmpu */
-+static bool trans_SCMPU(DisasContext *ctx, arg_SCMPU *a)
-+{
-+    prt("scmpu");
-+    return true;
-+}
-+
-+/* smovu */
-+static bool trans_SMOVU(DisasContext *ctx, arg_SMOVU *a)
-+{
-+    prt("smovu");
-+    return true;
-+}
-+
-+/* smovf */
-+static bool trans_SMOVF(DisasContext *ctx, arg_SMOVF *a)
-+{
-+    prt("smovf");
-+    return true;
-+}
-+
-+/* smovb */
-+static bool trans_SMOVB(DisasContext *ctx, arg_SMOVB *a)
-+{
-+    prt("smovb");
-+    return true;
-+}
-+
-+/* suntile */
-+static bool trans_SUNTIL(DisasContext *ctx, arg_SUNTIL *a)
-+{
-+    prt("suntil.%c", size[a->sz]);
-+    return true;
-+}
-+
-+/* swhile */
-+static bool trans_SWHILE(DisasContext *ctx, arg_SWHILE *a)
-+{
-+    prt("swhile.%c", size[a->sz]);
-+    return true;
-+}
-+/* sstr */
-+static bool trans_SSTR(DisasContext *ctx, arg_SSTR *a)
-+{
-+    prt("sstr.%c", size[a->sz]);
-+    return true;
-+}
-+
-+/* rmpa */
-+static bool trans_RMPA(DisasContext *ctx, arg_RMPA *a)
-+{
-+    prt("rmpa.%c", size[a->sz]);
-+    return true;
-+}
-+
-+/* mulhi rs,rs2 */
-+static bool trans_MULHI(DisasContext *ctx, arg_MULHI *a)
-+{
-+    prt("mulhi\tr%d,r%d", a->rs, a->rs2);
-+    return true;
-+}
-+
-+/* mullo rs,rs2 */
-+static bool trans_MULLO(DisasContext *ctx, arg_MULLO *a)
-+{
-+    prt("mullo\tr%d, r%d", a->rs, a->rs2);
-+    return true;
-+}
-+
-+/* machi rs,rs2 */
-+static bool trans_MACHI(DisasContext *ctx, arg_MACHI *a)
-+{
-+    prt("machi\tr%d, r%d", a->rs, a->rs2);
-+    return true;
-+}
-+
-+/* maclo rs,rs2 */
-+static bool trans_MACLO(DisasContext *ctx, arg_MACLO *a)
-+{
-+    prt("maclo\tr%d, r%d", a->rs, a->rs2);
-+    return true;
-+}
-+
-+/* mvfachi rd */
-+static bool trans_MVFACHI(DisasContext *ctx, arg_MVFACHI *a)
-+{
-+    prt("mvfachi\tr%d", a->rd);
-+    return true;
-+}
-+
-+/* mvfacmi rd */
-+static bool trans_MVFACMI(DisasContext *ctx, arg_MVFACMI *a)
-+{
-+    prt("mvfacmi\tr%d", a->rd);
-+    return true;
-+}
-+
-+/* mvtachi rs */
-+static bool trans_MVTACHI(DisasContext *ctx, arg_MVTACHI *a)
-+{
-+    prt("mvtachi\tr%d", a->rs);
-+    return true;
-+}
-+
-+/* mvtaclo rs */
-+static bool trans_MVTACLO(DisasContext *ctx, arg_MVTACLO *a)
-+{
-+    prt("mvtaclo\tr%d", a->rs);
-+    return true;
-+}
-+
-+/* racw #imm */
-+static bool trans_RACW(DisasContext *ctx, arg_RACW *a)
-+{
-+    prt("racw\t#%d", a->imm + 1);
-+    return true;
-+}
-+
-+/* sat rd */
-+static bool trans_SAT(DisasContext *ctx, arg_SAT *a)
-+{
-+    prt("sat\tr%d", a->rd);
-+    return true;
-+}
-+
-+/* satr */
-+static bool trans_SATR(DisasContext *ctx, arg_SATR *a)
-+{
-+    prt("satr");
-+    return true;
-+}
-+
-+/* fadd #imm, rd */
-+static bool trans_FADD_ir(DisasContext *ctx, arg_FADD_ir *a)
-+{
-+    prt("fadd\t#%d,r%d", li(ctx, 0), a->rd);
-+    return true;
-+}
-+
-+/* fadd dsp[rs], rd */
-+/* fadd rs, rd */
-+static bool trans_FADD_mr(DisasContext *ctx, arg_FADD_mr *a)
-+{
-+    prt("fadd\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* fcmp #imm, rd */
-+static bool trans_FCMP_ir(DisasContext *ctx, arg_FCMP_ir *a)
-+{
-+    prt("fadd\t#%d,r%d", li(ctx, 0), a->rd);
-+    return true;
-+}
-+
-+/* fcmp dsp[rs], rd */
-+/* fcmp rs, rd */
-+static bool trans_FCMP_mr(DisasContext *ctx, arg_FCMP_mr *a)
-+{
-+    prt("fcmp\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* fsub #imm, rd */
-+static bool trans_FSUB_ir(DisasContext *ctx, arg_FSUB_ir *a)
-+{
-+    prt("fsub\t#%d,r%d", li(ctx, 0), a->rd);
-+    return true;
-+}
-+
-+/* fsub dsp[rs], rd */
-+/* fsub rs, rd */
-+static bool trans_FSUB_mr(DisasContext *ctx, arg_FSUB_mr *a)
-+{
-+    prt("fsub\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* ftoi dsp[rs], rd */
-+/* ftoi rs, rd */
-+static bool trans_FTOI(DisasContext *ctx, arg_FTOI *a)
-+{
-+    prt("ftoi\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* fmul #imm, rd */
-+static bool trans_FMUL_ir(DisasContext *ctx, arg_FMUL_ir *a)
-+{
-+    prt("fmul\t#%d,r%d", li(ctx, 0), a->rd);
-+    return true;
-+}
-+
-+/* fmul dsp[rs], rd */
-+/* fmul rs, rd */
-+static bool trans_FMUL_mr(DisasContext *ctx, arg_FMUL_mr *a)
-+{
-+    prt("fmul\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* fdiv #imm, rd */
-+static bool trans_FDIV_ir(DisasContext *ctx, arg_FDIV_ir *a)
-+{
-+    prt("fdiv\t#%d,r%d", li(ctx, 0), a->rd);
-+    return true;
-+}
-+
-+/* fdiv dsp[rs], rd */
-+/* fdiv rs, rd */
-+static bool trans_FDIV_mr(DisasContext *ctx, arg_FDIV_mr *a)
-+{
-+    prt("fdiv\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* round dsp[rs], rd */
-+/* round rs, rd */
-+static bool trans_ROUND(DisasContext *ctx, arg_ROUND *a)
-+{
-+    prt("round\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* itof rs, rd */
-+/* itof dsp[rs], rd */
-+static bool trans_ITOF(DisasContext *ctx, arg_ITOF *a)
-+{
-+    prt("itof\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+#define BOP_IM(name, reg)                                       \
-+    do {                                                        \
-+        int dsp;                                                \
-+        prt("b%s\t#%d, ", #name, a->imm);                       \
-+        dsp = rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);        \
-+        if (dsp > 0) {                                          \
-+            prt("%d", dsp);                                     \
-+        }                                                       \
-+        prt("[r%d]", reg);                                      \
-+        return true;                                            \
-+    } while (0)
-+
-+#define BOP_RM(name)                                            \
-+    do {                                                        \
-+        int dsp;                                                \
-+        prt("b%s\tr%d, ", #name, a->rd);                        \
-+        dsp = rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);        \
-+        if (dsp > 0) {                                          \
-+            prt("%d", dsp);                                     \
-+        }                                                       \
-+        prt("[r%d]", a->rs);                                    \
-+        return true;                                            \
-+    } while (0)
-+
-+/* bset #imm, dsp[rd] */
-+static bool trans_BSET_im(DisasContext *ctx, arg_BSET_im *a)
-+{
-+    BOP_IM(bset, a->rs);
-+}
-+
-+/* bset rs, dsp[rd] */
-+static bool trans_BSET_rm(DisasContext *ctx, arg_BSET_rm *a)
-+{
-+    BOP_RM(set);
-+}
-+
-+/* bset rs, rd */
-+static bool trans_BSET_rr(DisasContext *ctx, arg_BSET_rr *a)
-+{
-+    prt("bset\tr%d,r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* bset #imm, rd */
-+static bool trans_BSET_ir(DisasContext *ctx, arg_BSET_ir *a)
-+{
-+    prt("bset\t#%d, r%d", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* bclr #imm, dsp[rd] */
-+static bool trans_BCLR_im(DisasContext *ctx, arg_BCLR_im *a)
-+{
-+    BOP_IM(clr, a->rs);
-+}
-+
-+/* bclr rs, dsp[rd] */
-+static bool trans_BCLR_rm(DisasContext *ctx, arg_BCLR_rm *a)
-+{
-+    BOP_RM(clr);
-+}
-+
-+/* bclr rs, rd */
-+static bool trans_BCLR_rr(DisasContext *ctx, arg_BCLR_rr *a)
-+{
-+    prt("bclr\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* bclr #imm, rd */
-+static bool trans_BCLR_ir(DisasContext *ctx, arg_BCLR_ir *a)
-+{
-+    prt("bclr\t#%d,r%d", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* btst #imm, dsp[rd] */
-+static bool trans_BTST_im(DisasContext *ctx, arg_BTST_im *a)
-+{
-+    BOP_IM(tst, a->rs);
-+}
-+
-+/* btst rs, dsp[rd] */
-+static bool trans_BTST_rm(DisasContext *ctx, arg_BTST_rm *a)
-+{
-+    BOP_RM(tst);
-+}
-+
-+/* btst rs, rd */
-+static bool trans_BTST_rr(DisasContext *ctx, arg_BTST_rr *a)
-+{
-+    prt("btst\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* btst #imm, rd */
-+static bool trans_BTST_ir(DisasContext *ctx, arg_BTST_ir *a)
-+{
-+    prt("btst\t#%d, r%d", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* bnot rs, dsp[rd] */
-+static bool trans_BNOT_rm(DisasContext *ctx, arg_BNOT_rm *a)
-+{
-+    BOP_RM(not);
-+}
-+
-+/* bnot rs, rd */
-+static bool trans_BNOT_rr(DisasContext *ctx, arg_BNOT_rr *a)
-+{
-+    prt("bnot\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* bnot #imm, dsp[rd] */
-+static bool trans_BNOT_im(DisasContext *ctx, arg_BNOT_im *a)
-+{
-+    BOP_IM(not, a->rs);
-+}
-+
-+/* bnot #imm, rd */
-+static bool trans_BNOT_ir(DisasContext *ctx, arg_BNOT_ir *a)
-+{
-+    prt("bnot\t#%d, r%d", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* bmcond #imm, dsp[rd] */
-+static bool trans_BMCnd_im(DisasContext *ctx, arg_BMCnd_im *a)
-+{
-+    int dsp = rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);
-+    prt("bm%s\t#%d, ", cond[a->cd], a->imm);
-+    if (dsp > 0) {
-+        prt("%d", dsp);
-+    }
-+    prt("[%d]", a->rd);
-+    return true;
-+}
-+
-+/* bmcond #imm, rd */
-+static bool trans_BMCnd_ir(DisasContext *ctx, arg_BMCnd_ir *a)
-+{
-+    prt("bm%s\t#%d, r%d", cond[a->cd], a->imm, a->rd);
-+    return true;
-+}
-+
-+/* clrpsw psw */
-+static bool trans_CLRPSW(DisasContext *ctx, arg_CLRPSW *a)
-+{
-+    prt("clrpsw\t%c", psw[a->cb]);
-+    return true;
-+}
-+
-+/* setpsw psw */
-+static bool trans_SETPSW(DisasContext *ctx, arg_SETPSW *a)
-+{
-+    prt("setpsw\t%c", psw[a->cb]);
-+    return true;
-+}
-+
-+/* mvtipl #imm */
-+static bool trans_MVTIPL(DisasContext *ctx, arg_MVTIPL *a)
-+{
-+    prt("movtipl\t#%d", a->imm);
-+    return true;
-+}
-+
-+/* mvtc #imm, rd */
-+static bool trans_MVTC_i(DisasContext *ctx, arg_MVTC_i *a)
-+{
-+    prt("mvtc/t#0x%08x, %s", a->imm, rx_crname[a->cr]);
-+    return true;
-+}
-+
-+/* mvtc rs, rd */
-+static bool trans_MVTC_r(DisasContext *ctx, arg_MVTC_r *a)
-+{
-+    prt("mvtc/tr%d, %s", a->rs, rx_crname[a->cr]);
-+    return true;
-+}
-+
-+/* mvfc rs, rd */
-+static bool trans_MVFC(DisasContext *ctx, arg_MVFC *a)
-+{
-+    prt("mvfc/t%s, r%d", rx_crname[a->cr], a->rd);
-+    return true;
-+}
-+
-+/* rtfi */
-+static bool trans_RTFI(DisasContext *ctx, arg_RTFI *a)
-+{
-+    prt("rtfi");
-+    return true;
-+}
-+
-+/* rte */
-+static bool trans_RTE(DisasContext *ctx, arg_RTE *a)
-+{
-+    prt("rte");
-+    return true;
-+}
-+
-+/* brk */
-+static bool trans_BRK(DisasContext *ctx, arg_BRK *a)
-+{
-+    prt("brk");
-+    return true;
-+}
-+
-+/* int #imm */
-+static bool trans_INT(DisasContext *ctx, arg_INT *a)
-+{
-+    prt("int\t#%d", a->imm);
-+    return true;
-+}
-+
-+/* wait */
-+static bool trans_WAIT(DisasContext *ctx, arg_WAIT *a)
-+{
-+    prt("wait");
-+    return true;
-+}
-+
-+/* sccnd.[bwl] rd */
-+/* sccnd.[bwl] dsp:[rd] */
-+static bool trans_SCCnd(DisasContext *ctx, arg_SCCnd *a)
-+{
-+    int dsp;
-+    prt("sc%s.%c\t", cond[a->cd], size[a->sz]);
-+    if (a->ld < 3) {
-+        dsp = rx_index_addr(a->sz, a->ld, ctx);
-+        if (dsp > 0) {
-+            prt("%d", dsp);
++    while (env->regs[3] != 0) {
++        tmp0 = cpu_ldub_data_ra(env, env->regs[1]++, GETPC());
++        tmp1 = cpu_ldub_data_ra(env, env->regs[2]++, GETPC());
++        env->regs[3]--;
++        if (tmp0 != tmp1 || tmp0 == '\0') {
++            break;
 +        }
-+        prt("[r%d]", a->rd);
-+    } else {
-+        prt("r%d", a->rd);
 +    }
-+    return true;
++    env->psw_z = tmp0 - tmp1;
++    env->psw_c = (tmp0 >= tmp1);
 +}
 +
-+int print_insn_rx(bfd_vma addr, disassemble_info *dis)
-+{
-+    DisasContext ctx;
-+    uint32_t insn;
-+    int i;
-+    ctx.dis = dis;
-+    ctx.pc = ctx.addr = addr;
++static uint32_t (* const cpu_ldufn[])(CPUArchState *env,
++                                     target_ulong ptr,
++                                     uintptr_t retaddr) = {
++    cpu_ldub_data_ra, cpu_lduw_data_ra, cpu_ldl_data_ra,
++};
 +
-+    insn = decode_load(&ctx);
-+    if (!decode(&ctx, insn)) {
-+        ctx.dis->fprintf_func(ctx.dis->stream, ".byte\t");
-+        for (i = 0; i < ctx.addr - addr; i++) {
-+            if (i > 0) {
-+                ctx.dis->fprintf_func(ctx.dis->stream, ",");
++static uint32_t (* const cpu_ldfn[])(CPUArchState *env,
++                                     target_ulong ptr,
++                                     uintptr_t retaddr) = {
++    cpu_ldub_data_ra, cpu_lduw_data_ra, cpu_ldl_data_ra,
++};
++
++static void (* const cpu_stfn[])(CPUArchState *env,
++                                 target_ulong ptr,
++                                 uint32_t val,
++                                 uintptr_t retaddr) = {
++    cpu_stb_data_ra, cpu_stw_data_ra, cpu_stl_data_ra,
++};
++
++void helper_sstr(CPURXState *env, uint32_t sz)
++{
++    tcg_debug_assert(sz < 3);
++    while (env->regs[3] != 0) {
++        cpu_stfn[sz](env, env->regs[1], env->regs[2], GETPC());
++        env->regs[1] += 1 << sz;
++        env->regs[3]--;
++    }
++}
++
++#define OP_SMOVU 1
++#define OP_SMOVF 0
++#define OP_SMOVB 2
++
++static void smov(uint32_t mode, CPURXState *env)
++{
++    uint8_t tmp;
++    int dir;
++
++    dir = (mode & OP_SMOVB) ? -1 : 1;
++    while (env->regs[3] != 0) {
++        tmp = cpu_ldub_data_ra(env, env->regs[2], GETPC());
++        cpu_stb_data_ra(env, env->regs[1], tmp, GETPC());
++        env->regs[1] += dir;
++        env->regs[2] += dir;
++        env->regs[3]--;
++        if ((mode & OP_SMOVU) && tmp == 0) {
++            break;
++        }
++    }
++}
++
++void helper_smovu(CPURXState *env)
++{
++    smov(OP_SMOVU, env);
++}
++
++void helper_smovf(CPURXState *env)
++{
++    smov(OP_SMOVF, env);
++}
++
++void helper_smovb(CPURXState *env)
++{
++    smov(OP_SMOVB, env);
++}
++
++
++void helper_suntil(CPURXState *env, uint32_t sz)
++{
++    uint32_t tmp;
++    tcg_debug_assert(sz < 3);
++    if (env->regs[3] == 0) {
++        return ;
++    }
++    while (env->regs[3] != 0) {
++        tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
++        env->regs[1] += 1 << sz;
++        env->regs[3]--;
++        if (tmp == env->regs[2]) {
++            break;
++        }
++    }
++    env->psw_z = tmp - env->regs[2];
++    env->psw_c = (tmp <= env->regs[2]);
++}
++
++void helper_swhile(CPURXState *env, uint32_t sz)
++{
++    uint32_t tmp;
++    tcg_debug_assert(sz < 3);
++    if (env->regs[3] == 0) {
++        return ;
++    }
++    while (env->regs[3] != 0) {
++        tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
++        env->regs[1] += 1 << sz;
++        env->regs[3]--;
++        if (tmp != env->regs[2]) {
++            break;
++        }
++    }
++    env->psw_z = env->regs[3];
++    env->psw_c = (tmp <= env->regs[2]);
++}
++
++/* accumlator operations */
++void helper_rmpa(CPURXState *env, uint32_t sz)
++{
++    uint64_t result_l, prev;
++    int32_t result_h;
++    int64_t tmp0, tmp1;
++
++    if (env->regs[3] == 0) {
++        return;
++    }
++    result_l = env->regs[5];
++    result_l <<= 32;
++    result_l |= env->regs[4];
++    result_h = env->regs[6];
++    env->psw_o = 0;
++
++    while (env->regs[3] != 0) {
++        tmp0 = cpu_ldfn[sz](env, env->regs[1], GETPC());
++        tmp1 = cpu_ldfn[sz](env, env->regs[2], GETPC());
++        tmp0 *= tmp1;
++        prev = result_l;
++        result_l += tmp0;
++        /* carry / bollow */
++        if (tmp0 < 0) {
++            if (prev > result_l) {
++                result_h--;
 +            }
-+            ctx.dis->fprintf_func(ctx.dis->stream, "0x%02x", insn >> 24);
-+            insn <<= 8;
++        } else {
++            if (prev < result_l) {
++                result_h++;
++            }
++        }
++
++        env->regs[1] += 1 << sz;
++        env->regs[2] += 1 << sz;
++    }
++    env->psw_s = result_h;
++    env->psw_o = (result_h != 0 && result_h != -1) << 31;
++    env->regs[6] = result_h;
++    env->regs[5] = result_l >> 32;
++    env->regs[4] = result_l & 0xffffffff;
++}
++
++void helper_racw(CPURXState *env, uint32_t imm)
++{
++    int64_t acc;
++    acc = env->acc;
++    acc <<= (imm + 1);
++    acc += 0x0000000080000000LL;
++    if (acc > 0x00007fff00000000LL) {
++        acc = 0x00007fff00000000LL;
++    } else if (acc < -0x800000000000LL) {
++        acc = -0x800000000000LL;
++    } else {
++        acc &= 0xffffffff00000000LL;
++    }
++    env->acc = acc;
++}
++
++void helper_satr(CPURXState *env)
++{
++    if (env->psw_o >> 31) {
++        if ((int)env->psw_s < 0) {
++            env->regs[6] = 0x00000000;
++            env->regs[5] = 0x7fffffff;
++            env->regs[4] = 0xffffffff;
++        } else {
++            env->regs[6] = 0xffffffff;
++            env->regs[5] = 0x80000000;
++            env->regs[4] = 0x00000000;
 +        }
 +    }
-+    return ctx.addr - addr;
++}
++
++/* div */
++uint32_t helper_div(CPURXState *env, uint32_t num, uint32_t den)
++{
++    uint32_t ret = num;
++    if (!((num == INT_MIN && den == -1) || den == 0)) {
++        ret = (int32_t)num / (int32_t)den;
++        env->psw_o = 0;
++    } else {
++        env->psw_o = -1;
++    }
++    return ret;
++}
++
++uint32_t helper_divu(CPURXState *env, uint32_t num, uint32_t den)
++{
++    uint32_t ret = num;
++    if (den != 0) {
++        ret = num / den;
++        env->psw_o = 0;
++    } else {
++        env->psw_o = -1;
++    }
++    return ret;
++}
++
++/* exception */
++static inline void QEMU_NORETURN raise_exception(CPURXState *env, int index,
++                                                 uintptr_t retaddr)
++{
++    CPUState *cs = CPU(rx_env_get_cpu(env));
++
++    cs->exception_index = index;
++    cpu_loop_exit_restore(cs, retaddr);
++}
++
++void QEMU_NORETURN helper_raise_privilege_violation(CPURXState *env)
++{
++    raise_exception(env, 20, GETPC());
++}
++
++void QEMU_NORETURN helper_raise_access_fault(CPURXState *env)
++{
++    raise_exception(env, 21, GETPC());
++}
++
++void QEMU_NORETURN helper_raise_illegal_instruction(CPURXState *env)
++{
++    raise_exception(env, 23, GETPC());
++}
++
++void QEMU_NORETURN helper_wait(CPURXState *env)
++{
++    CPUState *cs = CPU(rx_env_get_cpu(env));
++
++    cs->halted = 1;
++    env->in_sleep = 1;
++    raise_exception(env, EXCP_HLT, 0);
++}
++
++void QEMU_NORETURN helper_debug(CPURXState *env)
++{
++    CPUState *cs = CPU(rx_env_get_cpu(env));
++
++    cs->exception_index = EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++void QEMU_NORETURN helper_rxint(CPURXState *env, uint32_t vec)
++{
++    raise_exception(env, 0x100 + vec, 0);
++}
++
++void QEMU_NORETURN helper_rxbrk(CPURXState *env)
++{
++    raise_exception(env, 0x100, 0);
++}
++
++void tlb_fill(CPUState *cs, target_ulong addr, int size,
++              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
++{
++    uint32_t address, physical, prot;
++
++    /* Linear mapping */
++    address = physical = addr & TARGET_PAGE_MASK;
++    prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
++    tlb_set_page(cs, address, physical, prot, mmu_idx, TARGET_PAGE_SIZE);
 +}
 -- 
 2.11.0
