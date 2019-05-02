@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42699)
+Received: from eggs.gnu.org ([209.51.188.92]:42695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6te-0003V0-At
+	(envelope-from <arilou@gmail.com>) id 1hM6te-0003Ux-AX
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6ta-0007z6-Cv
+	(envelope-from <arilou@gmail.com>) id 1hM6ta-0007zA-CA
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:48 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36600)
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55513)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6tY-0007mD-Ej
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6tY-0007Lr-Dj
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:46 -0400
-Received: by mail-wr1-x444.google.com with SMTP id o4so2024719wra.3
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:42 -0700 (PDT)
+Received: by mail-wm1-x344.google.com with SMTP id y2so1154116wmi.5
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:20 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Thu,  2 May 2019 11:15:49 +0300
-Message-Id: <20190502081554.5521-23-arilou@gmail.com>
+Date: Thu,  2 May 2019 11:15:34 +0300
+Message-Id: <20190502081554.5521-8-arilou@gmail.com>
 In-Reply-To: <20190502081554.5521-1-arilou@gmail.com>
 References: <20190502081554.5521-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v9 22/27] gdbstub: Implement generic query
- qemu.Supported
+Subject: [Qemu-devel] [PATCH v9 07/27] gdbstub: Implement insert breakpoint
+ (Z pkt) with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +31,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 
-qemu.Supported query reply back with the supported qemu query/set
-commands (commands are seperated with a semicolon from each other).
-
-gdb> maint packet qqemu.Supported
-
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ gdbstub.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 8bdfae4b29..00c07d6ec0 100644
+index 21cdaf4678..36c7353a22 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -2127,6 +2127,11 @@ static void handle_query_attached(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, GDB_ATTACHED);
+@@ -1588,6 +1588,29 @@ static void handle_set_thread(GdbCmdContext *gdb_ctx, void *user_ctx)
+     }
  }
  
-+static void handle_query_qemu_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_insert_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    put_packet(gdb_ctx->s, "sstepbits;sstep");
++    int res;
++
++    if (gdb_ctx->num_params < 3) {
++        put_packet(gdb_ctx->s, "E22");
++        return;
++    }
++
++    res = gdb_breakpoint_insert(gdb_ctx->params[1].val_ull,
++                                gdb_ctx->params[2].val_ull,
++                                gdb_ctx->params[0].val_ul);
++    if (res >= 0) {
++        put_packet(gdb_ctx->s, "OK");
++        return;
++    } else if (res == -ENOSYS) {
++        put_packet(gdb_ctx->s, "");
++        return;
++    }
++
++    put_packet(gdb_ctx->s, "E22");
 +}
 +
- static GdbCmdParseEntry gdb_gen_query_set_common_table[] = {
-     /* Order is important if has same prefix */
-     {
-@@ -2203,6 +2208,10 @@ static GdbCmdParseEntry gdb_gen_query_table[] = {
-         .handler = handle_query_attached,
-         .cmd = "Attached",
-     },
-+    {
-+        .handler = handle_query_qemu_supported,
-+        .cmd = "qemu.Supported",
-+    },
- };
- 
- static void handle_gen_query(GdbCmdContext *gdb_ctx, void *user_ctx)
+ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+ {
+     CPUState *cpu;
+@@ -1843,6 +1866,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+         put_packet(s, "OK");
+         break;
+     case 'Z':
++        {
++            static const GdbCmdParseEntry insert_bp_cmd_desc = {
++                .handler = handle_insert_bp,
++                .cmd = "Z",
++                .cmd_startswith = 1,
++                .schema = "l?L?L0"
++            };
++            cmd_parser = &insert_bp_cmd_desc;
++        }
++        break;
+     case 'z':
+         type = strtoul(p, (char **)&p, 16);
+         if (*p == ',')
 -- 
 2.20.1
