@@ -2,70 +2,71 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7A5DC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 07:57:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F06C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 08:06:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97BF12085A
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 07:57:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97BF12085A
+	by mail.kernel.org (Postfix) with ESMTPS id 49B952085A
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 08:06:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49B952085A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46963 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47064 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM6bN-0004dw-P0
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 03:57:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34630)
+	id 1hM6jn-0007zL-JN
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 04:06:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hM6L3-0006X7-9H
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:41:06 -0400
+	(envelope-from <bounces@canonical.com>) id 1hM6j3-0007JB-J1
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:05:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hM6L1-0004Ee-Hb
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:41:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57444)
+	(envelope-from <bounces@canonical.com>) id 1hM6j1-0006iH-Kp
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:05:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34456)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hM6L1-0004DN-7h
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:41:03 -0400
+	id 1hM6j1-0006hS-7t
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:05:51 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hM6Kz-0007aR-9X
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 07:41:01 +0000
+	id 1hM6iz-0002MQ-RS
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 08:05:49 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 470DF2E80C9
-	for <qemu-devel@nongnu.org>; Thu,  2 May 2019 07:41:01 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id CC09D2E800F
+	for <qemu-devel@nongnu.org>; Thu,  2 May 2019 08:05:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 May 2019 07:30:22 -0000
-From: Gerd Hoffmann <1825452@bugs.launchpad.net>
+Date: Thu, 02 May 2019 07:57:10 -0000
+From: Stefano Garzarella <1826393@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ivan1024 kraxel-redhat
-X-Launchpad-Bug-Reporter: Ivan Volosyuk (ivan1024)
-X-Launchpad-Bug-Modifier: Gerd Hoffmann (kraxel-redhat)
-References: <155563917977.14412.17112414712610030215.malonedeb@gac.canonical.com>
+X-Launchpad-Bug-Commenters: sgarzare stefanha wkozaczuk
+X-Launchpad-Bug-Reporter: Waldemar Kozaczuk (wkozaczuk)
+X-Launchpad-Bug-Modifier: Stefano Garzarella (sgarzare)
+References: <155619222209.13917.4120344041326080857.malonedeb@gac.canonical.com>
 Message-Id:
- <155678222246.13615.4633674796133228393.malone@wampee.canonical.com>
+ <155678383044.13902.634296520708639219.malone@wampee.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18928";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 3c9078b21e7b7cd3f9c6fa4b2166653d5d65275c
+X-Launchpad-Hash: 77988d4520f48cf9911684ee295108d25a7704e0
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1825452] Re: Pulse audio backend doesn't work in
- v4.0.0-rc4 release
+Subject: [Qemu-devel] [Bug 1826393] Re: QEMU 3.1.0 stuck waiting for 800ms
+ (5 times slower) in pre-bios phase
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -76,67 +77,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1825452 <1825452@bugs.launchpad.net>
+Reply-To: Bug 1826393 <1826393@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502073022.2jjlu4ifMDfW91HdcUxziiASkO4RnzgdKf7V6SR7VNo@z>
+Message-ID: <20190502075710.5z0yt5tPHOw8_-PXpDR-aJGbP9bk9Xm9ysDyTVO7M_4@z>
 
-You can use -audiodev
-pa,id=3Dwhatever,server=3Dunix:/home/ivan/.pulse_server to get things going
-with your configuration.
-
-Oh, and this has nothing to do with systemd:
-
-kraxel@gentoo ~ $ set | grep ^XDG
-XDG_CONFIG_DIRS=3D/etc/xdg
-XDG_DATA_DIRS=3D/usr/local/share:/usr/share
-XDG_RUNTIME_DIR=3D/var/run/user/1000
-XDG_SESSION_COOKIE=3Dgentoo-1556780854.41316-799155214
-
-(gentoo with openrc + xfce, serial console login, x11 login has a few
-more of these set).
+Oh sorry, you're using the 'pc' machine, so please try this bios:
+https://github.com/qemu/qemu/blob/v4.0.0/pc-bios/bios.bin
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1825452
+https://bugs.launchpad.net/bugs/1826393
 
 Title:
-  Pulse audio backend doesn't work in  v4.0.0-rc4 release
+  QEMU 3.1.0 stuck waiting for 800ms (5 times slower) in pre-bios phase
 
 Status in QEMU:
   New
 
 Bug description:
-  Using Gentoo linux, build from source: qemu v4.0.0-rc4 release
-  (eeba63fc7fface36f438bcbc0d3b02e7dcb59983)
+  Yesterday I have upgraded my laptop from Ubuntu 18.10 to 19.04 and
+  that way got newer QEMU 3.1.0 along vs QEMU 2.12.0 before. I have
+  noticed that everytime I start QEMU to run OSv, QEMU seems to hand
+  noticably longer (~1 second) before showing SeaBIOS output. I have
+  tried all kind of combinations to get rid of that pause and nothing
+  helped.
 
-  Pulse audio backend doesn't initialize because of the:
-  audio/paaudio.c:
-  -    if (!popts->has_server) {
-  -        char pidfile[64];
-  -        char *runtime;
-  -        struct stat st;
-  -
-  -        runtime =3D getenv("XDG_RUNTIME_DIR");
-  -        if (!runtime) {
-  -            return NULL;
-  -        }
-  -        snprintf(pidfile, sizeof(pidfile), "%s/pulse/pid", runtime);
-  -        if (stat(pidfile, &st) !=3D 0) {
-  -            return NULL;
-  -        }
-  -    }
-  XDG_RUNTIME_DIR is not set for me. There is no /run/user directory exist =
-in my system.
+  Here is my start command:
+  time qemu-system-x86_64 -m 256M -smp 1 -nographic -nodefaults \
+   -device virtio-blk-pci,id=3Dblk0,bootindex=3D0,drive=3Dhd0,scsi=3Doff \
+   -drive file=3Dusr.img,if=3Dnone,id=3Dhd0,cache=3Dnone,aio=3Dthre\
+   -enable-kvm \
+   -cpu host,+x2apic -chardev stdio,mux=3Don,id=3Dstdio,signal=3Doff \
+   -mon chardev=3Dstdio,mode=3Dreadline -device isa-serial,chardev=3Dstdio
 
-  Also:
-  $ less ~/.pulse/client.conf  =
+  It looks like qemu process starts, waits almost a second for something
+  and then print SeaBIOS splashscreen and continues boot:
 
-  default-server =3D unix:/home/ivan/.pulse_server
+  --> waits here
+  SeaBIOS (version 1.12.0-1)
+  Booting from Hard Disk..OSv v0.53.0-6-gc8395118
+  	disk read (real mode): 27.25ms, (+27.25ms)
+  	uncompress lzloader.elf: 46.22ms, (+18.97ms)
+  	TLS initialization: 46.79ms, (+0.57ms)
+  	.init functions: 47.82ms, (+1.03ms)
+  	SMP launched: 48.08ms, (+0.26ms)
+  	VFS initialized: 49.25ms, (+1.17ms)
+  	Network initialized: 49.48ms, (+0.24ms)
+  	pvpanic done: 49.57ms, (+0.08ms)
+  	pci enumerated: 52.42ms, (+2.85ms)
+  	drivers probe: 52.42ms, (+0.00ms)
+  	drivers loaded: 55.33ms, (+2.90ms)
+  	ROFS mounted: 56.37ms, (+1.04ms)
+  	Total time: 56.37ms, (+0.00ms)
+  Found optarg
+  dev  etc  hello  libenviron.so	libvdso.so  proc  tmp  tools  usr
+
+  real	0m0.935s
+  user	0m0.426s
+  sys	0m0.490s
+
+  With version 2.12.0 I used to see real below 200ms. So it seems qemu
+  slowed down 5 times.
+
+  I ran strace -tt against it and I have noticed a pause here:
+  ...
+  07:31:41.848579 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 0
+  07:31:41.848604 futex(0x55c4a2ff6308, FUTEX_WAIT_PRIVATE, 0, NULL) =3D 0
+  07:31:41.848649 ioctl(10, KVM_SET_PIT2, 0x7ffdd272d1f0) =3D 0
+  07:31:41.848674 ioctl(9, KVM_CHECK_EXTENSION, KVM_CAP_KVMCLOCK_CTRL) =3D 1
+  07:31:41.848699 ioctl(10, KVM_SET_CLOCK, 0x7ffdd272d230) =3D 0
+  07:31:41.848724 futex(0x55c4a49a9a9c, FUTEX_WAKE_PRIVATE, 2147483647) =3D=
+ 1
+  07:31:41.848747 getpid()                =3D 5162
+  07:31:41.848769 tgkill(5162, 5166, SIGUSR1) =3D 0
+  07:31:41.848791 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 0
+  07:31:41.848814 futex(0x55c4a49a9a98, FUTEX_WAKE_PRIVATE, 2147483647) =3D=
+ 1
+  07:31:41.848837 getpid()                =3D 5162
+  07:31:41.848858 tgkill(5162, 5166, SIGUSR1) =3D 0
+  07:31:41.848889 write(8, "\1\0\0\0\0\0\0\0", 8) =3D 8
+  07:31:41.848919 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 1
+  07:31:41.848943 ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D4, events=3DPOLLI=
+N}, {fd=3D5, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN}, =
+
+  {fd=3D8, events=3DPOLLIN}], 5, {tv_sec=3D0, tv_nsec=3D0}, NULL, 8) =3D 1 =
+([{fd=3D8, revents=3DPOLLIN}], left {tv_sec=3D0, tv_nsec=3D0
+  })
+  07:31:41.849003 futex(0x55c4a2fd34c0, FUTEX_WAIT_PRIVATE, 2, NULL) =3D -1=
+ EAGAIN (Resource temporarily unavailable)
+  07:31:41.849031 read(8, "\5\0\0\0\0\0\0\0", 16) =3D 8
+  07:31:41.849064 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 0
+  07:31:41.849086 ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D4, events=3DPOLLI=
+N}, {fd=3D5, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN}, =
+
+  {fd=3D8, events=3DPOLLIN}], 5, {tv_sec=3D0, tv_nsec=3D984624000}, NULL, 8=
+) =3D 1 ([{fd=3D7, revents=3DPOLLIN}], left {tv_sec=3D0, t
+  v_nsec=3D190532609})
+
+  --> waits for almost 800ms
+
+  07:31:42.643272 futex(0x55c4a2fd34c0, FUTEX_WAIT_PRIVATE, 2, NULL) =3D 0
+  07:31:42.643522 read(7, "\1\0\0\0\0\0\0\0", 512) =3D 8
+  07:31:42.643625 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 1
+  07:31:42.643646 ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D4, events=3DPOLLI=
+N}, {fd=3D5, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN}, =
+
+  {fd=3D8, events=3DPOLLIN}], 5, {tv_sec=3D0, tv_nsec=3D190066000}, NULL, 8=
+) =3D 2 ([{fd=3D4, revents=3DPOLLIN}, {fd=3D8, revents=3DPOL
+  LIN}], left {tv_sec=3D0, tv_nsec=3D189909632})
+  07:31:42.643836 futex(0x55c4a2fd34c0, FUTEX_WAIT_PRIVATE, 2, NULL) =3D -1=
+ EAGAIN (Resource temporarily unavailable)
+  07:31:42.643859 read(8, "\2\0\0\0\0\0\0\0", 16) =3D 8
+  07:31:42.643880 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 1
+
+  ...
+
+  when I run same command using qemu 3.0.5 that I still happen to have
+  on the same machine that I built directly from source I see total boot
+  time at around 200ms. It seems like a regression.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1825452/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1826393/+subscriptions
 
