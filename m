@@ -2,65 +2,67 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89656C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 18:03:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E0DBC43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 18:37:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 642B62089E
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 18:03:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 642B62089E
+	by mail.kernel.org (Postfix) with ESMTPS id 53D41204FD
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 18:37:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D41204FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56790 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57077 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMG3A-0001ZI-OU
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 14:03:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52288)
+	id 1hMGaD-0007rG-JZ
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 14:37:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1hMG2D-0001Fi-GK
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:02:18 -0400
+	(envelope-from <lersek@redhat.com>) id 1hMGZP-0007SO-Gy
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:36:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1hMG29-0001FP-Pi
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:02:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47180)
+	(envelope-from <lersek@redhat.com>) id 1hMGZO-0003rU-FG
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:36:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:61174)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1hMG27-00011s-3x
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:02:11 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hMGZO-0003qy-1z
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:36:34 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BE0F586678
-	for <qemu-devel@nongnu.org>; Thu,  2 May 2019 18:02:08 +0000 (UTC)
-Received: from paraplu.localdomain (ovpn-116-56.ams2.redhat.com [10.36.116.56])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 03C9617D50;
-	Thu,  2 May 2019 18:02:06 +0000 (UTC)
-Received: by paraplu.localdomain (Postfix, from userid 1001)
-	id 0D5B43E0255; Thu,  2 May 2019 20:02:02 +0200 (CEST)
-Date: Thu, 2 May 2019 20:02:01 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190502180201.GA31376@paraplu>
-References: <20180921154323.GS28120@paraplu>
+	by mx1.redhat.com (Postfix) with ESMTPS id 8D80B3082E60;
+	Thu,  2 May 2019 18:36:32 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-207.rdu2.redhat.com
+	[10.10.120.207])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 672EE608A5;
+	Thu,  2 May 2019 18:36:25 +0000 (UTC)
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <1556808723-226478-1-git-send-email-imammedo@redhat.com>
+	<1556808723-226478-12-git-send-email-imammedo@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <370545b5-66fb-ed49-bd96-e270dcbdd56b@redhat.com>
+Date: Thu, 2 May 2019 20:36:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.9.1
 MIME-Version: 1.0
+In-Reply-To: <1556808723-226478-12-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20180921154323.GS28120@paraplu>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Thu, 02 May 2019 18:02:08 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.46]);
+	Thu, 02 May 2019 18:36:32 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC] Virtio RNG: Consider changing the default
- entropy source to /dev/urandom?
+Subject: Re: [Qemu-devel] [PATCH v4 11/15] tests: acpi: allow to override
+ default accelerator
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,86 +74,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: nmav@redhat.com, lersek@redhat.com, rjones@redhat.com, armbru@redhat.com
+Cc: Andrew Jones <drjones@redhat.com>, Ben Warren <ben@skyportsystems.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, linuxarm@huawei.com,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Shannon Zhao <shannon.zhaosl@gmail.com>, Gonglei <arei.gonglei@huawei.com>,
+	Wei Yang <richardw.yang@linux.intel.com>, xuwei5@huawei.com,
+	xuwei5@hisilicon.com,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502180201.eDEzoyo58wLUPm66I6ip2jmnF-78DPfYLcrvt0qPD8Q@z>
+Message-ID: <20190502183621.I72Vsux0epaPXtrszybAgD0UO7YFNO8MhVLCKv_h6NY@z>
 
-[Reviving this old thread as I don't think we came to a conclusion on
-this.]
-
-On Fri, Sep 21, 2018 at 05:43:23PM +0200, Kashyap Chamarthy wrote:
-> Hi folks,
+On 05/02/19 16:51, Igor Mammedov wrote:
+> By default test cases were run with 'kvm:tcg' accelerators to speed up
+> tests execution. While it works for x86, were change of accelerator
+> doesn't affect ACPI tables, the approach doesn't works for ARM usecase
+> though.
 > 
-> As Markus pointed out in this 'qemu-devel' thread[1],
-> backends/rng-random.c uses '/dev/random' in TYPE_RNG_RANDOM's
-> instance_init() method:
+> In arm/virt case, KVM mode requires using 'host' cpu model, which
+> isn't available in TCG mode. That could be worked around with 'max'
+> cpu model, which works both for KVM and TCG. However in KVM mode it
+> is necessary to specify matching GIC version, which also could use
+> 'max' value to automatically pick GIC version suitable for host's CPU.
+> Depending on host cpu type, different GIC versions would be used,
+> which in turn leads to different ACPI tables (APIC) generated.
+> As result while comparing with reference blobs, test would fail if
+> host's GIC version won't match the version on the host where
+> reference blobs where generated.
 > 
->     [...]
->     static void rng_random_init(Object *obj)
->     {
->         RngRandom *s = RNG_RANDOM(obj);
->     
->         object_property_add_str(obj, "filename",
->                                 rng_random_get_filename,
->                                 rng_random_set_filename,
->                                 NULL);
->     
->         s->filename = g_strdup("/dev/random");
->         s->fd = -1;
->     }
->     [...]
+> Let's keep testing simple for now and allow ARM tests run in TCG only
+> mode. To do so introduce 'accel' parameter in test configuration, so
+> test case could override default "kvm:tcg" with accelerator of choice.
 > 
-> And I've looked at hw/virtio/virtio-rng.c:
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  tests/bios-tables-test.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 > 
->     [...]
->     static void virtio_rng_device_realize(DeviceState *dev, Error **errp)
->     {
->     [...]
->     
->         if (vrng->conf.rng == NULL) {
->             vrng->conf.default_backend = RNG_RANDOM(object_new(TYPE_RNG_RANDOM));
->     [...]
-> 
-> From the above, I'm assuming QEMU uses `/dev/random` as the _default_
-> entropy source for a 'virtio-rng-pci' device.  If my assumption is
-> correct, any reason why not to change the default entropy source for
-> 'virtio-rng-pci' devices to `/dev/urandom` (which is the preferred[2]
-> source of entropy)?
-> 
-> And I understand (thanks: Eric Blake for correcting my confusion) that
-> there are two cases to distinguish:
-> 
-> (a) When QEMU needs a random number, the entropy source it chooses.
->     IIUC, the answer is: QEMU defers to GnuTLS by default, which uses
->     getrandom(2), which in turn uses '/dev/urandom' as its entropy
->     source; if getrandom(2) isn't available, GnuTLS uses `/dev/urandom`
->     anyway.  (Thanks: Nikos for clarifying this.)
-> 
->     If QEMU is built with GnuTLS _disabled_, which I'm not sure if any
->     Linux distribution does, then it uses libgcrypt, which in turn uses
->     the undesired and legacy `/dev/random` as the default entropy
->     source.
-> 
-> (b) When QEMU exposes a Virtio RNG device to the guest, that device
->     needs a source of entropy, and IIUC, that source needs to be
->     "non-blocking" (i.e. `/dev/urandom`).  However, currently QEMU
->     defaults to the problematic `/dev/random`.
-> 
-> I'd like to get some more clarity on case (b).  
-> 
-> 
-> [1] https://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg08335.html
->     -- RNG: Any reason QEMU doesn't default to `/dev/urandom`
-> 
-> [2] http://man7.org/linux/man-pages/man4/urandom.4.html
-> 
-> 
-> -- 
-> /kashyap
+> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> index 8302ffc..39c1e24 100644
+> --- a/tests/bios-tables-test.c
+> +++ b/tests/bios-tables-test.c
+> @@ -24,6 +24,7 @@
+>  #define ACPI_REBUILD_EXPECTED_AML "TEST_ACPI_REBUILD_AML"
+>  
+>  typedef struct {
+> +    const char *accel;
+>      const char *machine;
+>      const char *variant;
+>      const char *uefi_fl1;
+> @@ -532,8 +533,8 @@ static void test_acpi_one(const char *params, test_data *data)
+>          args = g_strdup_printf("-machine %s,accel=%s -nodefaults -nographic "
+>              "-drive if=pflash,format=raw,file=%s,readonly "
+>              "-drive if=pflash,format=raw,file=%s,snapshot=on -cdrom %s %s",
+> -            data->machine, "kvm:tcg", data->uefi_fl1, data->uefi_fl2,
+> -            data->cd, params ? params : "");
+> +            data->machine, data->accel ? data->accel : "kvm:tcg",
+> +            data->uefi_fl1, data->uefi_fl2, data->cd, params ? params : "");
+>  
+>      } else {
+>          /* Disable kernel irqchip to be able to override apic irq0. */
+> @@ -541,7 +542,8 @@ static void test_acpi_one(const char *params, test_data *data)
+>              "-net none -display none %s "
+>              "-drive id=hd0,if=none,file=%s,format=raw "
+>              "-device ide-hd,drive=hd0 ",
+> -             data->machine, "kvm:tcg", params ? params : "", disk);
+> +             data->machine, data->accel ? data->accel : "kvm:tcg",
+> +             params ? params : "", disk);
+>      }
+>  
+>      data->qts = qtest_init(args);
 > 
 
--- 
-/kashyap
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
