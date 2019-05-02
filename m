@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90611C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 08:30:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28A48C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 08:30:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1447620873
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 08:30:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E381A20873
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 08:30:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PepwTe7h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1447620873
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Irxp139Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E381A20873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47397 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47401 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM77A-000851-W0
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 04:30:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42977)
+	id 1hM77I-0008A8-4G
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 04:30:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6tk-0003cX-RO
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:59 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6th-0008OM-A6
+	(envelope-from <arilou@gmail.com>) id 1hM6th-0003YP-6G
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:56 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34196)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6tg-0007Ww-Vp
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <arilou@gmail.com>) id 1hM6te-00085x-O9
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:53 -0400
-Received: by mail-wr1-x442.google.com with SMTP id e9so2033576wrc.1
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:31 -0700 (PDT)
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40660)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6te-0007ot-F5
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:50 -0400
+Received: by mail-wm1-x343.google.com with SMTP id h11so1376514wmb.5
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=/kC4Ra5FAbXCGpLaIRgx76fPd1eNM+Za2+9T+4B8JSs=;
-	b=PepwTe7hStnTonZBcIzfB1nRJqu+OsGlAh9Ytf1s++5xl6bDau96T5sxQOkswuGF/S
-	Tjexj5tqfuSfAgs5KdvxFlu8wH0Ii0MuHkJYPTpL7xY1hkkib797DP67F94wV1eUdlVc
-	r4/0EhIC5MEcL6aGSzktKwkWA87JB2GWpd3TtlTzejy0xWgNsHaC96cP9nZSwXB1nPrG
-	oIjtRwJ/mU6caogoh3PRCpbah+zFqZlEng1BaRu3RWhhPhPERkCZbPrEVGZnBvlFlVHV
-	jbem4Y2WaBINlTS9pqWheoGYrZQJMIp1fbKVYFDHpbhqqOT1QXdPAoFoFLHMYCBMljgH
-	LeLA==
+	bh=DkxdB1SSP3ygac21G5Sl2UZoz/G9CYkw1Wrg+VlI4Ww=;
+	b=Irxp139ZMKljG8THkEBhszOYzo3QX5Z7Y75xFX6M6UqhpBw04QkKvd6jKr8qEn4fpD
+	Ochl4S5GDn1rA3mCphbXAETmJ64sCerkERiZKl71tTGnwTxwvIPfQ33LUjjP9wObzJVa
+	gKsCvzj6r0jils+fbcUTPGgRb8CE2P+jAikp9U6j1Nv7/98FCBpbaC405cIbaOgpbApz
+	Yukn70e1zx7vNUhDDKNiExUx3eMISHGmnDBFpHFtudP7ENVQJkFeRrb836YUUvTOjr9L
+	J8LDR9Wx0Qhd0viY+qJck4DpnPMT9lWyfduFIQGVtS5zh6EYmBWGzwEop9sGEc3NFg+U
+	+wWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=/kC4Ra5FAbXCGpLaIRgx76fPd1eNM+Za2+9T+4B8JSs=;
-	b=fjOCw5xalsBYs1zLsEx0GNQKI8iBL1gVScNcBwQ+ZFcYkngJACJAloMrUiTH5TxVzV
-	Lb8lXysyjnBnNMYZIEA065aKpk1ZuiKSuyqnHlqZfAFzwqA/BzTY+MTfKZWiadmMrai3
-	SlWfZ3KzoTR2qfP/KJiJSCX6252LZDEjIc9uMAqYzR+9CZFxavW/v0ggsna74ywGzuxb
-	oaMthnTlHgVEBXXwnKL8MECFtJeCyZtxYK7MSm3020tp13DBAhPnn9MTYhZgbdlNURVw
-	LdasYFHXp3r+Z3v7uYCOyIpHdQdJMm2w/gzGM0Dkf6NSqBNiidiaAzB5mMhg4BrVPgpo
-	oeTw==
-X-Gm-Message-State: APjAAAXoIQ6PjChZKH7c3hM83g7LoaYnWjScKkR/jotNRqXnase/ij4p
-	EdjPTT09Bj6VMzJFmIEQvS2wlHao
-X-Google-Smtp-Source: APXvYqxSN3+joOhM7XNbgNiUGTOc0WTN9dG72C/4ml0YKnkNvOAyHIC2sHbykct2AQ3dfDR1JwSqDw==
-X-Received: by 2002:adf:eb03:: with SMTP id s3mr878251wrn.170.1556784990882;
-	Thu, 02 May 2019 01:16:30 -0700 (PDT)
+	bh=DkxdB1SSP3ygac21G5Sl2UZoz/G9CYkw1Wrg+VlI4Ww=;
+	b=eJo0SyX/hD+zXe27a+FW384bpmhNjfXfK74Yln+g9N9pvlzWQ/c3FdlXhyqLHkwOSB
+	t/qduYKZ027677lQqYDhIl7uUysKgMfRKyI4+MxY7621ODk7Olq4EycSkinhDxuqHysZ
+	voptm9iKmFle+V1fKmSsTsi6fGtix4nZRli3N8efZ22n4v2o7789qnGNcRbQWcfXKR2f
+	tAzGFxSu4jc9CFMewhDJetOTwwPPzZdBafaXDMJ0MVINy1Wzp0EwEtYygAnNCz9Q+s5Q
+	JGKxCKEC9yn+ZSUaLzGgDiMoBbqHBnMi6TLcSKQhIIccsMFl6vciKzhuOi56BnERPRpd
+	Wf+Q==
+X-Gm-Message-State: APjAAAVpXPkXIefnl6f5y2xAwIhUrBvSEc1q6AZGWvVOZASa7Ea22qCj
+	xZcU/vDKSXYz7d0xdRmYm6SXuJup
+X-Google-Smtp-Source: APXvYqww2nVnlKoSjNaZp0o8YMmbUNXoDxJroOI04BLexpfBg+24La05NLr35TpssCL0A365sUVC+Q==
+X-Received: by 2002:a1c:67c1:: with SMTP id b184mr1344235wmc.12.1556785003232; 
+	Thu, 02 May 2019 01:16:43 -0700 (PDT)
 Received: from localhost.localdomain ([176.230.64.186])
 	by smtp.gmail.com with ESMTPSA id
-	d16sm44698367wra.54.2019.05.02.01.16.29
+	d16sm44698367wra.54.2019.05.02.01.16.41
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 02 May 2019 01:16:30 -0700 (PDT)
+	Thu, 02 May 2019 01:16:42 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Thu,  2 May 2019 11:15:42 +0300
-Message-Id: <20190502081554.5521-16-arilou@gmail.com>
+Date: Thu,  2 May 2019 11:15:50 +0300
+Message-Id: <20190502081554.5521-24-arilou@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190502081554.5521-1-arilou@gmail.com>
 References: <20190502081554.5521-1-arilou@gmail.com>
@@ -79,9 +79,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH v9 15/27] gdbstub: Implement file io (F pkt)
- with new infra
+X-Received-From: 2a00:1450:4864:20::343
+Subject: [Qemu-devel] [PATCH v9 23/27] gdbstub: Implement qemu physical
+ memory mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,93 +98,115 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190502081542.69K8u51E-wTxO8FXnAGW9URd2BDvXqI6hS2iiKPN1aI@z>
+Message-ID: <20190502081550.3CpG8PHbxBUJFreoiAjb-o5xxgxTaleMHdNsBIFCIo4@z>
+
+Add a new query/set which changes the memory GDB sees to physical memory
+only.
+
+gdb> maint packet qqemu.PhyMemMode
+will reply the current phy_mem_mode state (1 for enabled, 0 for disabled)
+gdb> maint packet Qqemu.PhyMemMode:1
+Will make GDB read/write only to physical memory, set to 0 to disable
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 62 +++++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 40 insertions(+), 22 deletions(-)
+ gdbstub.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 55 insertions(+), 3 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 3478ac778d..9fe130f30d 100644
+index 00c07d6ec0..88ff6224e6 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1772,6 +1772,39 @@ static void handle_read_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, gdb_ctx->str_buf);
- }
+@@ -46,11 +46,23 @@
+ #define GDB_ATTACHED "1"
+ #endif
  
-+static void handle_file_io(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    int num_syscall_params;
-+    GdbCmdVariant syscall_params[3] = {};
++static int phy_memory_mode;
 +
-+    if (!gdb_ctx->num_params) {
-+        return;
+ static inline int target_memory_rw_debug(CPUState *cpu, target_ulong addr,
+                                          uint8_t *buf, int len, bool is_write)
+ {
+-    CPUClass *cc = CPU_GET_CLASS(cpu);
++    CPUClass *cc;
+ 
++    if (phy_memory_mode) {
++        if (is_write) {
++            cpu_physical_memory_write(addr, buf, len);
++        } else {
++            cpu_physical_memory_read(addr, buf, len);
++        }
++        return 0;
 +    }
 +
-+    if (cmd_parse_params(gdb_ctx->params[0].data, "L,L,o0", syscall_params,
-+                         &num_syscall_params)) {
-+        return;
-+    }
-+
-+    if (!num_syscall_params) {
-+        return;
-+    }
-+
-+    if (gdb_ctx->s->current_syscall_cb) {
-+        gdb_ctx->s->current_syscall_cb(gdb_ctx->s->c_cpu,
-+                                       (target_ulong)syscall_params[0].val_ull,
-+                                       (target_ulong)syscall_params[1].val_ull);
-+        gdb_ctx->s->current_syscall_cb = NULL;
-+    }
-+
-+    if (syscall_params[2].opcode == (uint8_t)'C') {
-+        put_packet(gdb_ctx->s, "T02");
-+        return;
-+    }
-+
-+    gdb_continue(gdb_ctx->s);
++    cc = CPU_GET_CLASS(cpu);
+     if (cc->memory_rw_debug) {
+         return cc->memory_rw_debug(cpu, addr, buf, len, is_write);
+     }
+@@ -2129,7 +2141,29 @@ static void handle_query_attached(GdbCmdContext *gdb_ctx, void *user_ctx)
+ 
+ static void handle_query_qemu_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
+ {
+-    put_packet(gdb_ctx->s, "sstepbits;sstep");
++    put_packet(gdb_ctx->s, "sstepbits;sstep;PhyMemMode");
 +}
 +
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -1913,28 +1946,13 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         return RS_IDLE;
-     case 'F':
-         {
--            target_ulong ret;
--            target_ulong err;
--
--            ret = strtoull(p, (char **)&p, 16);
--            if (*p == ',') {
--                p++;
--                err = strtoull(p, (char **)&p, 16);
--            } else {
--                err = 0;
--            }
--            if (*p == ',')
--                p++;
--            type = *p;
--            if (s->current_syscall_cb) {
--                s->current_syscall_cb(s->c_cpu, ret, err);
--                s->current_syscall_cb = NULL;
--            }
--            if (type == 'C') {
--                put_packet(s, "T02");
--            } else {
--                gdb_continue(s);
--            }
-+            static const GdbCmdParseEntry file_io_cmd_desc = {
-+                .handler = handle_file_io,
-+                .cmd = "F",
-+                .cmd_startswith = 1,
-+                .schema = "s0"
-+            };
-+            cmd_parser = &file_io_cmd_desc;
-         }
-         break;
-     case 'g':
++static void handle_query_qemu_phy_mem_mode(GdbCmdContext *gdb_ctx,
++                                           void *user_ctx)
++{
++    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "%d", phy_memory_mode);
++    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
++}
++
++static void handle_set_qemu_phy_mem_mode(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    if (!gdb_ctx->num_params) {
++        put_packet(gdb_ctx->s, "E22");
++        return;
++    }
++
++    if (!gdb_ctx->params[0].val_ul) {
++        phy_memory_mode = 0;
++    } else {
++        phy_memory_mode = 1;
++    }
++    put_packet(gdb_ctx->s, "OK");
+ }
+ 
+ static GdbCmdParseEntry gdb_gen_query_set_common_table[] = {
+@@ -2212,6 +2246,20 @@ static GdbCmdParseEntry gdb_gen_query_table[] = {
+         .handler = handle_query_qemu_supported,
+         .cmd = "qemu.Supported",
+     },
++    {
++        .handler = handle_query_qemu_phy_mem_mode,
++        .cmd = "qemu.PhyMemMode",
++    },
++};
++
++static GdbCmdParseEntry gdb_gen_set_table[] = {
++    /* Order is important if has same prefix */
++    {
++        .handler = handle_set_qemu_phy_mem_mode,
++        .cmd = "qemu.PhyMemMode:",
++        .cmd_startswith = 1,
++        .schema = "l0"
++    },
+ };
+ 
+ static void handle_gen_query(GdbCmdContext *gdb_ctx, void *user_ctx)
+@@ -2245,7 +2293,11 @@ static void handle_gen_set(GdbCmdContext *gdb_ctx, void *user_ctx)
+         return;
+     }
+ 
+-    put_packet(gdb_ctx->s, "");
++    if (process_string_cmd(gdb_ctx->s, NULL, gdb_ctx->params[0].data,
++                           gdb_gen_set_table,
++                           ARRAY_SIZE(gdb_gen_set_table))) {
++        put_packet(gdb_ctx->s, "");
++    }
+ }
+ 
+ static void handle_target_halt(GdbCmdContext *gdb_ctx, void *user_ctx)
 -- 
 2.20.1
 
