@@ -2,72 +2,79 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC3EBC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 09:11:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FEF6C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 09:15:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B90620873
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 09:11:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B90620873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 222472089E
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 09:15:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 222472089E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48045 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48075 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM7k8-0003QC-Hi
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 05:11:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56060)
+	id 1hM7o7-0004rp-BI
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 05:15:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hM7jQ-00038a-O0
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 05:10:21 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hM7nI-0004WO-Az
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 05:14:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hM7jB-0005oP-Sy
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 05:10:11 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:58615)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hM7if-0004Nu-QN; Thu, 02 May 2019 05:09:40 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1MIMXC-1haNJ8374u-00EKiG; Thu, 02 May 2019 11:07:38 +0200
-To: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	qemu-devel@nongnu.org
-References: <20190423160608.7519-1-thuth@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <33e682e0-59e3-14f6-8f87-471ceea2657f@vivier.eu>
-Date: Thu, 2 May 2019 11:07:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <sgarzare@redhat.com>) id 1hM7my-0007hO-LH
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 05:14:10 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46904)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hM7me-0006tM-TI
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 05:13:41 -0400
+Received: by mail-wr1-f67.google.com with SMTP id r7so2201415wrr.13
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 02:11:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=vvFEIl7DU83KmuJ1H5TgksA5dUYVlmX0aiGoidKKB58=;
+	b=Y0Bw0X8xwxZcKpIPsj5NbBWv5Uq/in89ZsjIKgLBiylwDC/Fkw8VI+yiuMeubCzTIZ
+	c/6InCO7ePdl7xT6to+Cije1yo+pzgyqcJWTwy0qRQ2xBxy1IIU10XuwVfEZBgXh1uEW
+	AF3bebavquZkdN6gTDDuUiggJIns4wlMsr+Cxr4m9yF+YDPyciKY1N06UZf6iIIi3z3w
+	ThG1IVTh97Vo/QYz9Qwu75BlpvP//qRcerBO17JeHkplQBS/meuml+Gm4+8E1RCr4n5Z
+	O29I1rgL+yDBRIziLK2VeovJ1r0V0fF3kpbG0WIzd+MRT/eYWRmS0XDFsJPfMcTc1qeY
+	rQaQ==
+X-Gm-Message-State: APjAAAUdPbKwZQSWcIEFV+qGpnxjn3E3UqAuTLE+VGUqlCA8Vz8D/3V5
+	oHhD69V20C92ZLv915nVOZ02zw==
+X-Google-Smtp-Source: APXvYqwgoy0JslPk1/QXztmO2yordzndsjKq8cmou5ui3L9mFaeCltL4f+BLR/xWJHrLnO1F8CaHUA==
+X-Received: by 2002:adf:df88:: with SMTP id z8mr1837656wrl.209.1556788318250; 
+	Thu, 02 May 2019 02:11:58 -0700 (PDT)
+Received: from steredhat (host103-125-dynamic.46-79-r.retail.telecomitalia.it.
+	[79.46.125.103]) by smtp.gmail.com with ESMTPSA id
+	g185sm6870889wmf.30.2019.05.02.02.11.56
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 02 May 2019 02:11:57 -0700 (PDT)
+Date: Thu, 2 May 2019 11:11:54 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Message-ID: <20190502091154.y34h7qvm6ubta632@steredhat>
+References: <20190423125706.26989-1-vsementsov@virtuozzo.com>
+	<20190423125706.26989-3-vsementsov@virtuozzo.com>
+	<20190430092437.jbecehdkqa4zdavd@steredhat>
+	<4dabb261-f2d1-b6e0-8d97-ace159b87a54@virtuozzo.com>
+	<20190430110918.GF5607@linux.fritz.box>
+	<2c8b3197-316d-7215-9284-6f1e986a0803@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190423160608.7519-1-thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:zzQojMkdvaKX1eEHph0pSp1zzUuaMLwtE51B+yWtc6t4ZYR6eFy
-	FG99pSjhjgCEaf5bP0G+hWdRWezuVUORWjbbR3FXpYENbSH+h74WFPP/fGBcGyXa6vCHxuB
-	Ihe1MCaF013aym25T8B4LAZ0rbyixoxIeX26L7PE7uvetoAhpssCu4zcBebFLuP1CgL7PJA
-	pD0PMtsyH5vAsag3OeLIA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:WnEJj1PidDk=:swGZwuySFEfpdxjE+7ZqAE
-	1Vyikr2hizVPa0mW+i2l5ZuUmcOxhe4dLLXCXKzj0wbNlCz628FWH1Xy9vNeujVobB8dTBZMV
-	RChnmmuJZjFCji8bzWU7YbneOy4sSf7dG6dB4gwdPx3iht296kg5dwWuV2v+FrOOCk4c/Y75S
-	3GuvkX223DmfjCHltC9TMpJ76fA0hAEOE4TS0ucdwnNKK5yj+wnD0CX8mZ7fjuo4AwOCHojw3
-	c6L0Nkms6ee4f8OJ1eMe3Bg6gUn4K4eiT42LoeU61vqOEGEGOF93py4K5zw72Ylb+gghkBtot
-	gkhuiAM513RC40z5T69PMyuMQz3NfHQk73N2pHKin69O6ILjqMlC2MXHlQemXb8kRWFA1rFm9
-	MAABoGMuzPGz13+hBTP96XYVpVt8CiJUE7YnaxA+PLRgKSlIBl3Q+sv8woPOlqiCloHy0vWMs
-	wStQpjNA0kwZ0qg/ep8PVAPbfZWDAyYjifKXW/d1V+vkDrTJk6Z3FmEjoZEk9rGtYBUVlfT/r
-	J4hdTrfLALZz8nspHakjUR7NjCnzreaiGB5voSxj59n0TZJ31d550TcAlKeqy+51wpC+Txeda
-	KsyawV4mCXkenYnaRRFF4WyDh0vQ7EowaDy1qHW7oMENAwYD1+SB1mVrdRiNxwROUvOK/ce7P
-	cb1U33ynFKMSk2R+QVWo7z1oEl9SHmU+FE/hpPNO4t+xjYIMKOilG+547uNse01uzQ9YEy3hH
-	4nS8xx3jdeOGeP+FActUBVaVr9HgRugoNYqEZtvWaf/oftUSxjNGci3vFO8=
+Content-Disposition: inline
+In-Reply-To: <2c8b3197-316d-7215-9284-6f1e986a0803@redhat.com>
+User-Agent: NeoMutt/20180716
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.75
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] net: Print output of "-net
- nic, model=help" to stdout instead of stderr
+	[fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] block/io: bdrv_pdiscard: support
+ int64_t bytes parameter
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,47 +86,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
+	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	Denis Lunev <den@virtuozzo.com>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"mreitz@redhat.com" <mreitz@redhat.com>,
+	"stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502090737.-gmzBfzAPjUKGOAL150jysc2ENzzr_Wkr0Jakq_nde8@z>
+Message-ID: <20190502091154.5mQGH0Qsps6rOLhP_f6mGfaCoNBG4l5ZeBBCLKiix1w@z>
 
-On 23/04/2019 18:06, Thomas Huth wrote:
-> We are printing all other help output to stdout already (e.g. "-help",
-> "-cpu help" and "-machine help" output). So the "-net nic,model=help"
-> output should go to stdout instead of stderr, too. And while we're at
-> it, also print the NICs line by line, like we do it e.g. with the
-> "-cpu help" or "-M help" output, too.
+On Tue, Apr 30, 2019 at 10:41:02AM -0500, Eric Blake wrote:
+> On 4/30/19 6:09 AM, Kevin Wolf wrote:
+> > Am 30.04.2019 um 12:03 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> >> 30.04.2019 12:24, Stefano Garzarella wrote:
+> >>> On Tue, Apr 23, 2019 at 03:57:05PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> >>>> This fixes at least one overflow in qcow2_process_discards, which
+> >>>> passes 64bit region length to bdrv_pdiscard where bytes (or sectors in
+> >>>> the past) parameter is int since its introduction in 0b919fae.
+> >>>>
+> >>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > 
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1574327
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  net/net.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+> >>>> -    if (!bs || !bs->drv) {
+> >>>> +    if (!bs || !bs->drv || !bdrv_is_inserted(bs)) {
+> >>>
+> >>> Should we describe this change in the commit message?
+> >>
+> >> Honestly, don't want to resend the series for this.
+> > 
+> > I haven't reviewed the patches yet, but if this remains the only thing
+> > to change, it can be updated while applying the series if we have a
+> > specific proposal for a new commit message.
 > 
-> diff --git a/net/net.c b/net/net.c
-> index f3a3c5444c..2cf5e76469 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -837,9 +837,10 @@ int qemu_show_nic_models(const char *arg, const char *const *models)
->          return 0;
->      }
->  
-> -    fprintf(stderr, "qemu: Supported NIC models: ");
-> -    for (i = 0 ; models[i]; i++)
-> -        fprintf(stderr, "%s%c", models[i], models[i+1] ? ',' : '\n');
-> +    printf("Supported NIC models:\n");
-> +    for (i = 0 ; models[i]; i++) {
-> +        printf("%s\n", models[i]);
-> +    }
->      return 1;
->  }
->  
+> How about:
+> 
+> This fixes at least one overflow in qcow2_process_discards, which was
+> inadvertently truncating a 64-bit region length to the bdrv_pdiscard
+> 'int bytes' parameter (previously bdrv_discard's 'int sectors') since
+> its introduction in 0b919fae.
+> 
+> By inlining the remaining portions of bdrv_check_byte_request() that are
+> still independent from the code previously validating a 32-bit request,
+> we can drop the call to that function. A request larger than 31 bits (or
+> the driver's max discard limit, if specified) is still split into
+> smaller chunks by the block layer before reaching the driver.
 > 
 
-Applied to my trivial-patches branch.
+That sounds good to me!
 
 Thanks,
-Laurent
+Stefano
 
