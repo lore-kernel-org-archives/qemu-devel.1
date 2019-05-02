@@ -2,66 +2,84 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CD0CC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 04:26:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 579F6C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 04:29:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F8AF2081C
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 04:26:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F8AF2081C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 01E002081C
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 04:29:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Etvdu4Io"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01E002081C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44897 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44903 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM3Io-0000Zo-Fh
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 00:26:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34261)
+	id 1hM3M5-0001FY-A6
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 00:29:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hM3I5-0008CU-Ix
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:25:50 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hM3LM-0000yk-8J
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:29:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hM3Hi-00072T-5B
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:25:34 -0400
-Resent-Date: Thu, 02 May 2019 00:25:27 -0400
-Resent-Message-Id: <E1hM3Hi-00072T-5B@eggs.gnu.org>
-Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21914)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hM3Hd-0006Mg-0P
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:25:21 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1556771048; cv=none; d=zoho.com; s=zohoarc; 
-	b=ZBTATsA+ujasMlspN74niKzQPWuJ36/jsLe0pKwEVf81QkghqlIIDnYFI12Jl1MAAI29j+67VZtCHpIJ9EYoOis37tX+aNhgivqLny3CmXmxMkeKlS0cCQdNV2RGzNaUyPQf7Bing8t+kMckZY0SyYoomGBCfGbEp3QTm36lAl8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1556771048;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=bqZTX5Wjhq8r9j7kMSK7ogMzcKXGFrwrxI8F/DHdyEg=; 
-	b=fmDJ7F1vPV3T42KXl8Ya0zP5hg4wG+aogTYPJxENBScK7ib9yUXVN0tQsCRVaW5bMiF1xwuoGTpW+98dkkJ1SFGtAYl3uUl8FBN5v3MJ/BjqebZ2y2RPVTFE56Q2N5e+l4uNtClwinCSNbLvs7wPgtL4KyomuyFcKTnWwUbomUM=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1556771046109134.09433020530037;
-	Wed, 1 May 2019 21:24:06 -0700 (PDT)
-In-Reply-To: <20190430034412.12935-1-richardw.yang@linux.intel.com>
-Message-ID: <155677104475.10667.17544832182226944733@c2072b67cc0c>
+	(envelope-from <alistair23@gmail.com>) id 1hM3LK-0001cj-Q4
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:29:11 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:45462)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hM3LK-0001Rm-Df
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:29:10 -0400
+Received: by mail-lf1-x141.google.com with SMTP id t11so814177lfl.12
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 21:29:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=zZdVNWS0Debndhkz/49UU+5K/wZDXYRviOl1WKd3FGw=;
+	b=Etvdu4IoL9nJcT6dGUAYphotmI93dZQaOhMv2WF7TK2eGankUdVrFKCY+t6vc7FuKV
+	6O8fpK4lPNwa3b22MDjFMjjsxviEH8+Af4OJcLgIIGa6vfb1qbn61Z6KHNbc35n9JP3g
+	nBtd7tAL3efSieO920LSFcTw+fs8sCeafu60TiXsySdkWDrzCHTPZZFv4lmL8lBX9jhU
+	OrCpqJXVDQ3s3eV5gZapKlP89hR5E7WcdsnUkriUeGXwgDy/dllaX6AMvcEujSfPwfLz
+	igZskHdM7eTHJ4ipXLiP3HaVFyXO1oez5pwY76+rhOva9LU0NB1blOZgGZFXQDouf7cd
+	UapQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=zZdVNWS0Debndhkz/49UU+5K/wZDXYRviOl1WKd3FGw=;
+	b=Af4SN9TRVeT+jJpJsrDGTrTQ9qkULr1Xv9fI4rf4NUfPkoscSFUlUJYSMDVqYjBCxj
+	JT9loMDakJ4gnFe9bMoHGuntm3xNavu5nSWfReSWgnfOXJRwN4QpwxjLp+uWCk3yFVHR
+	FU1QZ9mGOytONOQIJ/u5lnbZu37QkTfLkuhiTSJJq7RdMPQWuOpqZqFPwWymHLejMqzd
+	Fo11RCT1RkEIeZ7Fje0rirHj/PaEYWzIa8lMrMESkv/x0dv8reChmuct3wqqdG5+ODp4
+	LSXCc1Yw86DDa7bin67ZMjS0d5EGkx/GGG1WRqy5v24fcWo84xHVk2OI8iX+s7IAc5wQ
+	JM/g==
+X-Gm-Message-State: APjAAAWpx4gXuYam0UfgX5a7+Jyg0+h6oR6mWCgRmq54Bdh1cLYijitW
+	Q4Ld4cy+TxWdeucz/vVugRrL0CW8G/vF0+yb1iI=
+X-Google-Smtp-Source: APXvYqx4Nc01l3yeFvot7y06OxE9orjR/l8tZd8+Uh0At6rCH56nB44ayygWE9E4n92ujBefo5SzGh8wUh4rlm5gBqo=
+X-Received: by 2002:a05:6512:309:: with SMTP id
+	t9mr705057lfp.103.1556771346333; 
+	Wed, 01 May 2019 21:29:06 -0700 (PDT)
 MIME-Version: 1.0
+References: <cover.1556515687.git.alistair@alistair23.me>
+	<PSXP216MB0277D0653D098FF32C5DC07DDD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+	<CAFEAcA_T7-+de9=V=hnku9f0BXdpLfz6wLFFZYp9LyYDx2KLCw@mail.gmail.com>
+In-Reply-To: <CAFEAcA_T7-+de9=V=hnku9f0BXdpLfz6wLFFZYp9LyYDx2KLCw@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 1 May 2019 21:28:37 -0700
+Message-ID:
+ <CAKmqyKN2hDm_v7B81=V9HKOKMs4=3qXsNz-UyidmNktYdMACSw@mail.gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: richardw.yang@linux.intel.com
-Date: Wed, 1 May 2019 21:24:06 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.59
-Subject: Re: [Qemu-devel] [PATCH 0/3] Cleanup migration/ram.c
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::141
+Subject: Re: [Qemu-devel] [PATCH v1 3/5] hw/misc: Add the STM32F4xx EXTI
+ device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,34 +91,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, quintela@redhat.com, qemu-devel@nongnu.org,
-	dgilbert@redhat.com, richardw.yang@linux.intel.com, pbonzini@redhat.com
+Cc: Alistair Francis <alistair@alistair23.me>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502042406.vDE3cFtOjw6a0ponAuBdjUqi6h1llAIVqpDWPLAGQgE@z>
+Message-ID: <20190502042837.E5QfEoe7ZKuvP9VWRt7vfewy9alm3W4BbxFYsHUukos@z>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQzMDAzNDQxMi4xMjkz
-NS0xLXJpY2hhcmR3LnlhbmdAbGludXguaW50ZWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
-aWxlZCB0aGUgYXNhbiBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5k
-cyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5
-b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhIFRB
-UkdFVF9MSVNUPXg4Nl82NC1zb2Z0bW11IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgogIENPUFkgICAgUlVOTkVSCiAgICBSVU4gdGVzdC1kZWJ1ZyBpbiBxZW11OmZlZG9y
-YSAKY29udGFpbmVyX2xpbnV4LmdvOjI0Nzogc3RhcnRpbmcgY29udGFpbmVyIHByb2Nlc3MgY2F1
-c2VkICJwcm9jZXNzX2xpbnV4LmdvOjI1ODogYXBwbHlpbmcgY2dyb3VwIGNvbmZpZ3VyYXRpb24g
-Zm9yIHByb2Nlc3MgY2F1c2VkIFwiVGhlIG1heGltdW0gbnVtYmVyIG9mIGFjdGl2ZSBjb25uZWN0
-aW9ucyBmb3IgVUlEIDAgaGFzIGJlZW4gcmVhY2hlZFwiIgovdXNyL2Jpbi9kb2NrZXItY3VycmVu
-dDogRXJyb3IgcmVzcG9uc2UgZnJvbSBkYWVtb246IG9jaSBydW50aW1lIGVycm9yOiBUaGUgbWF4
-aW11bSBudW1iZXIgb2YgYWN0aXZlIGNvbm5lY3Rpb25zIGZvciBVSUQgMCBoYXMgYmVlbiByZWFj
-aGVkLgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9k
-b2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2MTUsIGluIDxtb2R1bGU+CiAgICBzeXMuZXhpdChtYWlu
-KCkpCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
-cy8yMDE5MDQzMDAzNDQxMi4xMjkzNS0xLXJpY2hhcmR3LnlhbmdAbGludXguaW50ZWwuY29tL3Rl
-c3RpbmcuYXNhbi8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
-bHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
-ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Tue, Apr 30, 2019 at 8:48 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Mon, 29 Apr 2019 at 06:37, Alistair Francis <alistair@alistair23.me> wrote:
+> >
+> > Signed-off-by: Alistair Francis <alistair@alistair23.me>
+> > ---
+> >  default-configs/arm-softmmu.mak  |   1 +
+> >  hw/misc/Kconfig                  |   3 +
+> >  hw/misc/Makefile.objs            |   1 +
+> >  hw/misc/stm32f4xx_exti.c         | 175 +++++++++++++++++++++++++++++++
+> >  include/hw/misc/stm32f4xx_exti.h |  57 ++++++++++
+> >  5 files changed, 237 insertions(+)
+> >  create mode 100644 hw/misc/stm32f4xx_exti.c
+> >  create mode 100644 include/hw/misc/stm32f4xx_exti.h
+>
+> Minor comments here only.
+>
+> (If Thomas's kconfig patchset gets into master before this
+> there might be some minor fixups required to the kconfig
+> stuff, but it shouldn't be too hard to adapt.)
 
+Yep, I'm happy to rebase on top of his work.
+
+>
+> > +#include "qemu/osdep.h"
+> > +#include "hw/sysbus.h"
+> > +#include "qemu/log.h"
+> > +#include "hw/misc/stm32f4xx_exti.h"
+> > +
+> > +#ifndef STM_EXTI_ERR_DEBUG
+> > +#define STM_EXTI_ERR_DEBUG 0
+> > +#endif
+> > +
+> > +#define DB_PRINT_L(lvl, fmt, args...) do { \
+> > +    if (STM_EXTI_ERR_DEBUG >= lvl) { \
+> > +        qemu_log("%s: " fmt, __func__, ## args); \
+> > +    } \
+> > +} while (0)
+> > +
+> > +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
+>
+> Could we use a tracepoint instead?
+
+Yep, fixed in both patches.
+
+>
+> > +
+> > +#define NUM_GPIO_EVENT_IN_LINES 16
+> > +#define NUM_INTERRUPT_OUT_LINES 16
+> > +
+> > +static void stm32f4xx_exti_reset(DeviceState *dev)
+> > +{
+> > +    STM32F4xxExtiState *s = STM32F4XX_EXTI(dev);
+> > +
+> > +    s->exti_imr = 0x00000000;
+> > +    s->exti_emr = 0x00000000;
+> > +    s->exti_rtsr = 0x00000000;
+> > +    s->exti_ftsr = 0x00000000;
+> > +    s->exti_swier = 0x00000000;
+> > +    s->exti_pr = 0x00000000;
+> > +}
+> > +
+> > +static void stm32f4xx_exti_set_irq(void *opaque, int irq, int level)
+> > +{
+> > +    STM32F4xxExtiState *s = opaque;
+> > +
+> > +    DB_PRINT("Set EXTI: %d to %d\n", irq, level);
+> > +
+> > +    if (level) {
+> > +        qemu_irq_pulse(s->irq[irq]);
+> > +        s->exti_pr |= 1 << irq;
+> > +    }
+> > +}
+>
+> Just to check -- this should definitely be a pulse? I'm always
+> a little bit wary of uses of qemu_irq_pulse(), though some
+> hardware does pulse IRQ lines rather than holding them until
+> dismissed.
+
+The datasheet seems to specify pulse:
+"When the selected edge occurs on the event line, an event pulse is generated"
+
+>
+> > +static void stm32f4xx_exti_init(Object *obj)
+> > +{
+> > +    STM32F4xxExtiState *s = STM32F4XX_EXTI(obj);
+> > +    int i;
+> > +
+> > +    s->irq = g_new0(qemu_irq, NUM_INTERRUPT_OUT_LINES);
+>
+> You could just have the array be inline in the
+> STM32F4xxExtiState rather than allocating it separately,
+> right?
+
+Yep.
+
+>
+> > +    for (i = 0; i < NUM_INTERRUPT_OUT_LINES; i++) {
+> > +        sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq[i]);
+> > +    }
+> > +
+> > +    memory_region_init_io(&s->mmio, obj, &stm32f4xx_exti_ops, s,
+> > +                          TYPE_STM32F4XX_EXTI, 0x400);
+> > +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
+> > +
+> > +    qdev_init_gpio_in(DEVICE(obj), stm32f4xx_exti_set_irq,
+> > +                      NUM_GPIO_EVENT_IN_LINES);
+> > +}
+> > +
+> > +static void stm32f4xx_exti_class_init(ObjectClass *klass, void *data)
+> > +{
+> > +    DeviceClass *dc = DEVICE_CLASS(klass);
+> > +
+> > +    dc->reset = stm32f4xx_exti_reset;
+>
+> This one's missing vmstate too.
+
+Fixed in both.
+
+Alistair
+
+>
+> > +}
+> > +
+> > +static const TypeInfo stm32f4xx_exti_info = {
+> > +    .name          = TYPE_STM32F4XX_EXTI,
+> > +    .parent        = TYPE_SYS_BUS_DEVICE,
+> > +    .instance_size = sizeof(STM32F4xxExtiState),
+> > +    .instance_init = stm32f4xx_exti_init,
+> > +    .class_init    = stm32f4xx_exti_class_init,
+> > +};
+> > +
+> > +static void stm32f4xx_exti_register_types(void)
+> > +{
+> > +    type_register_static(&stm32f4xx_exti_info);
+> > +}
+> > +
+>
+> thanks
+> -- PMM
 
