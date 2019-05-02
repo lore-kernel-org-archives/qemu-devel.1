@@ -1,29 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43865)
+Received: from eggs.gnu.org ([209.51.188.92]:44792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xuwei5@huawei.com>) id 1hMCjv-00010K-Py
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:31:13 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCnB-0003WO-Bi
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xuwei5@huawei.com>) id 1hMCju-0006BW-O4
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:31:11 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:45394 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <xuwei5@huawei.com>) id 1hMCju-0005yt-HA
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:31:10 -0400
-References: <1556170489-131927-12-git-send-email-imammedo@redhat.com>
-	<1556211116-172721-1-git-send-email-xuwei5@huawei.com>
-	<20190426135412.758769f9@Igors-MacBook-Pro.local>
-	<b87a2b31-0389-2df0-42a6-a1593d437fcd@hisilicon.com>
-	<20190502162420.6c8280c8@Igors-MacBook-Pro>
-From: Wei Xu <xuwei5@hisilicon.com>
-Message-ID: <9caa067d-df2e-78c6-5672-e276da3263a6@hisilicon.com>
-Date: Thu, 2 May 2019 15:30:54 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190502162420.6c8280c8@Igors-MacBook-Pro>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 11/13] tests: acpi: add simple arm/virt
- testcase
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCn9-0008OT-9N
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:33 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:41242)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCn7-0008Jh-AM
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:29 -0400
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+Date: Thu,  2 May 2019 23:33:57 +0900
+Message-Id: <20190502143409.59600-1-ysato@users.sourceforge.jp>
+Subject: [Qemu-devel] [PATCH RFC v8 00/12] Add RX archtecture support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,101 +21,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: x00249684 <xuwei5@huawei.com>, qemu-devel@nongnu.org, shameerali.kolothum.thodi@huawei.com, linuxarm@huawei.com, Andrew Jones <drjones@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, mst@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>, peter.maydell@linaro.org, richard.henderson@linaro.org
 
-Hi Igor,
+Hello.
+This patch series is added Renesas RX target emulation.
 
-On 5/2/2019 3:24 PM, Igor Mammedov wrote:
-> On Fri, 26 Apr 2019 17:28:10 +0100
-> Wei Xu <xuwei5@hisilicon.com> wrote:
-> 
->> Hi Igor,
->>
->> On 4/26/2019 12:54 PM, Igor Mammedov wrote:
->>> On Fri, 26 Apr 2019 00:51:56 +0800
->>> x00249684 <xuwei5@huawei.com> wrote:
->>>
->>>> Hi Igor,
->>>>
->>>> +static void test_acpi_virt_tcg(void)
->>>> +{
->>>> +    test_data data = {
->>>> +        .machine = "virt",
->>>> +        .uefi_fl1 = "pc-bios/edk2-aarch64-code.fd",
->>>> +        .uefi_fl2 = "pc-bios/edk2-arm-vars.fd",
->>>> +        .cd = "tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2",
->>>> +        .ram_start = 0x40000000ULL,
->>>> +        .scan_len = 128ULL * 1024 * 1024,
->>>> +    };
->>>> +
->>>> +    test_acpi_one("-cpu cortex-a57 ", &data);
->>>>
->>>> Replaced the cortex-a57 with host and succesfully tested on the hisilicon arm64 
->>>> D05 board. Otherwise it failed with "kvm_init_vcpu failed: Invalid argument".
->>>> Is it possilbe to set the cpu type like numa-test.c?
->>>
->>> I think it works with numa-test because it uses TCG only but in case of bios-tables-test
->>> it uses accel="kvm:tcg" to leverage KVM capabilities whenever possible to speed up test.
->>>
->>> Now back to our ARM test case, uefi requirement is to use 64bit CPU (hence it was cortex-a57)
->>> however unlike x86 it obviously breaks since KVM accelerator on ARM host is used
->>> and it doesn't work with anything other than 'host' cpu model.
->>>
->>> I think we still want to use KVM whenever possible, but problem lies in that
->>> user (testcase) doesn't have an idea if KVM accelerator is available and host is 64 CPU.
->>>
->>> to sum up we need to support 2 modes:
->>>   1. host is 64 ARM, use kvm with -cpu host
->>>   2. all other cases use tcg with -cpu cortex-a57
->>>
->>> I can hack to probe if /dev/kvm is accessible and host is 64 bit and use #1
->>> otherwise fallback to #2
->>> or as quick fix do only #2 initially and think about a better solution to #1 
->>
->> Thanks!
->> Fine to me.
->>
->>>
->>> Is there any other suggestions/opinions how to approach issue/proceed.
->>
->> To check the host cpu architecture is ARM or not, maybe we can check the value
->> of "CPU implementer" is 0x41 or not from the /proc/cpuinfo.
-> 
-> it turned out it's more complicated.
-> we also should pick a correct GIC depending on host's CPU and that
-> changes ACPI tables, so it will worn on some hosts and fail on other.
-Sorry, I did not consider that case.
+It was corrected because the correspondence to registerfield was insufficient.
 
-> 
-> I'll add a patch to enable test case to pick accelerator and force TCG
-> for ARM tests for now.
->
+My git repository is bellow.
+git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git
 
-Thanks!
+Testing binaries bellow.
+u-boot
+Download - https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
 
-Best Regards,
-Wei
+starting
+$ gzip -d u-boot.bin.gz
+$ qemu-system-rx -bios u-boot.bin
 
->>
->> Best Regards,
->> Wei
->>
->>>
->>> PS:
->>> we probably would like to reuse this not only for acpi tests but also for other
->>> arm/virt test cases that involve running guest code. 
->>>
->>>> Thanks!
->>>>
->>>> Best Regards,
->>>> Wei
->>>
->>>
->>> .
->>>
->>
-> 
-> 
-> .
-> 
+linux and pico-root (only sash)
+Download - https://osdn.net/users/ysato/pf/qemu/dl/zImage (kernel)
+           https://osdn.net/users/ysato/pf/qemu/dl/rx-qemu.dtb (DeviceTree)
+
+starting
+$ qemu-system-rx -kernel zImage -dtb rx-qemu.dtb -append "earlycon"
+
+Changes for v7.
+Fix bra.l and bsr.l instructions.
+Following the fix of the master branch.
+
+Yoshinori Sato (12):
+  target/rx: TCG translation
+  target/rx: TCG helper
+  target/rx: CPU definition
+  target/rx: RX disassembler
+  target/rx: Miscellaneous files
+  hw/intc: RX62N interrupt controller (ICUa)
+  hw/timer: RX62N internal timer modules
+  hw/char: RX62N serical communication interface (SCI)
+  hw/rx: RX Target hardware definition
+  Add rx-softmmu
+  MAINTAINERS: Add RX
+  hw/registerfields.h: Add 8bit and 16bit register macros.
+
+ configure                      |    8 +
+ default-configs/rx-softmmu.mak |    7 +
+ include/disas/dis-asm.h        |    5 +
+ include/hw/char/renesas_sci.h  |   45 +
+ include/hw/intc/rx_icu.h       |   49 +
+ include/hw/registerfields.h    |   28 +-
+ include/hw/rx/rx.h             |    7 +
+ include/hw/rx/rx62n.h          |   54 +
+ include/hw/timer/renesas_cmt.h |   33 +
+ include/hw/timer/renesas_tmr.h |   46 +
+ include/sysemu/arch_init.h     |    1 +
+ target/rx/cpu-qom.h            |   52 +
+ target/rx/cpu.h                |  196 ++++
+ target/rx/helper.h             |   31 +
+ arch_init.c                    |    2 +
+ hw/char/renesas_sci.c          |  341 ++++++
+ hw/intc/rx_icu.c               |  373 ++++++
+ hw/rx/rx62n.c                  |  226 ++++
+ hw/rx/rxqemu.c                 |  100 ++
+ hw/timer/renesas_cmt.c         |  277 +++++
+ hw/timer/renesas_tmr.c         |  458 ++++++++
+ target/rx/cpu.c                |  222 ++++
+ target/rx/disas.c              | 1481 ++++++++++++++++++++++++
+ target/rx/gdbstub.c            |  112 ++
+ target/rx/helper.c             |  148 +++
+ target/rx/monitor.c            |   38 +
+ target/rx/op_helper.c          |  481 ++++++++
+ target/rx/translate.c          | 2433 ++++++++++++++++++++++++++++++++++++++++
+ MAINTAINERS                    |   19 +
+ hw/Kconfig                     |    1 +
+ hw/char/Kconfig                |    3 +
+ hw/char/Makefile.objs          |    2 +-
+ hw/intc/Makefile.objs          |    1 +
+ hw/rx/Kconfig                  |    2 +
+ hw/rx/Makefile.objs            |    1 +
+ hw/timer/Kconfig               |    6 +
+ hw/timer/Makefile.objs         |    3 +
+ target/rx/Makefile.objs        |   11 +
+ target/rx/insns.decode         |  617 ++++++++++
+ 39 files changed, 7918 insertions(+), 2 deletions(-)
+ create mode 100644 default-configs/rx-softmmu.mak
+ create mode 100644 include/hw/char/renesas_sci.h
+ create mode 100644 include/hw/intc/rx_icu.h
+ create mode 100644 include/hw/rx/rx.h
+ create mode 100644 include/hw/rx/rx62n.h
+ create mode 100644 include/hw/timer/renesas_cmt.h
+ create mode 100644 include/hw/timer/renesas_tmr.h
+ create mode 100644 target/rx/cpu-qom.h
+ create mode 100644 target/rx/cpu.h
+ create mode 100644 target/rx/helper.h
+ create mode 100644 hw/char/renesas_sci.c
+ create mode 100644 hw/intc/rx_icu.c
+ create mode 100644 hw/rx/rx62n.c
+ create mode 100644 hw/rx/rxqemu.c
+ create mode 100644 hw/timer/renesas_cmt.c
+ create mode 100644 hw/timer/renesas_tmr.c
+ create mode 100644 target/rx/cpu.c
+ create mode 100644 target/rx/disas.c
+ create mode 100644 target/rx/gdbstub.c
+ create mode 100644 target/rx/helper.c
+ create mode 100644 target/rx/monitor.c
+ create mode 100644 target/rx/op_helper.c
+ create mode 100644 target/rx/translate.c
+ create mode 100644 hw/rx/Kconfig
+ create mode 100644 hw/rx/Makefile.objs
+ create mode 100644 target/rx/Makefile.objs
+ create mode 100644 target/rx/insns.decode
+
+-- 
+2.11.0
