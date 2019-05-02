@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36522)
+Received: from eggs.gnu.org ([209.51.188.92]:36503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMGvx-0003x6-LN
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:59:54 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMGvw-0003Ji-Gu
+	(envelope-from <laurent@vivier.eu>) id 1hMGvw-0003vW-B2
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:59:53 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <laurent@vivier.eu>) id 1hMGvv-0003G5-6g
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:59:52 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  2 May 2019 20:58:34 +0200
-Message-Id: <20190502185835.15185-13-laurent@vivier.eu>
+Date: Thu,  2 May 2019 20:58:24 +0200
+Message-Id: <20190502185835.15185-3-laurent@vivier.eu>
 In-Reply-To: <20190502185835.15185-1-laurent@vivier.eu>
 References: <20190502185835.15185-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 12/13] hw/sparc/leon3: Allow load of uImage
- firmwares
+Subject: [Qemu-devel] [PULL 02/13] CODING_STYLE: specify the indent rule for
+ multiline code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +23,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Viktor Prutyanov <viktor.prutyanov@phystech.edu>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Jason Wang <jasowang@redhat.com>, qemu-trivial@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, KONRAD Frederic <frederic.konrad@adacore.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Viktor Prutyanov <viktor.prutyanov@phystech.edu>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Jason Wang <jasowang@redhat.com>, qemu-trivial@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Wei Yang <richardw.yang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-Currently the Leon3 machine doesn't allow to load legacy u-boot images:
+We didn't specify the indent rule for multiline code here, which may
+mislead users. And in current code, the code use various styles.
 
-  $ qemu-system-sparc -M leon3_generic -d in_asm \
-      -kernel HelenOS-0.6.0-sparc32-leon3.bin
-  qemu-system-sparc: could not load kernel 'HelenOS-0.6.0-sparc32-leon3.bin'
+Add this rule in CODING_STYLE to make sure this is clear to every one.
 
-  $ file HelenOS-0.6.0-sparc32-leon3.bin
-  HelenOS-0.6.0-sparc32-leon3.bin: u-boot legacy uImage, HelenOS-0.6.0,\
-    Linux/ARM, OS Kernel Image (Not compressed), 2424229 bytes,\
-    Sun Dec 21 19:18:09 2014,\
-    Load Address: 0x40000000, Entry Point: 0x40000000,\
-    Header CRC: 0x8BCFA236, Data CRC: 0x37AD87DF
-
-Since QEMU can load uImages, add the necessary code,
-so the Leon3 machine can load these images:
-
-  $ qemu-system-sparc -M leon3_generic -d in_asm \
-      -kernel HelenOS-0.6.0-sparc32-leon3.bin
-  ----------------
-  IN:
-  0x40000000:  b  0x400007a8
-  0x40000004:  nop
-  ----------------
-  IN:
-  0x400007a8:  save  %sp, -136, %sp
-  0x400007ac:  call  0x40000020
-  0x400007b0:  sethi  %hi(0x4000b800), %i1
-  ...
-
-Tested with the following firmware:
-http://www.helenos.org/releases/HelenOS-0.6.0-sparc32-leon3.bin
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
-Tested-by: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-Id: <20190427162922.4207-1-f4bug@amsat.org>
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Message-Id: <20190304071631.27567-2-richardw.yang@linux.intel.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/sparc/leon3.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ CODING_STYLE | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index 774639af3393..0383b17c298f 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -193,6 +193,10 @@ static void leon3_generic_hw_init(MachineState *machine)
-         kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
-                                &entry, NULL, NULL,
-                                1 /* big endian */, EM_SPARC, 0, 0);
-+        if (kernel_size < 0) {
-+            kernel_size = load_uimage(kernel_filename, NULL, &entry,
-+                                      NULL, NULL, NULL);
-+        }
-         if (kernel_size < 0) {
-             error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
+diff --git a/CODING_STYLE b/CODING_STYLE
+index ec075dedc4a8..90321e9c2821 100644
+--- a/CODING_STYLE
++++ b/CODING_STYLE
+@@ -29,6 +29,45 @@ Spaces of course are superior to tabs because:
+ 
+ Do not leave whitespace dangling off the ends of lines.
+ 
++1.1 Multiline Indent
++
++There are several places where indent is necessary:
++
++ - if/else
++ - while/for
++ - function definition & call
++
++When breaking up a long line to fit within line width, we need a proper indent
++for the following lines.
++
++In case of if/else, while/for, align the secondary lines just after the
++opening parenthesis of the first.
++
++For example:
++
++    if (a == 1 &&
++        b == 2) {
++
++    while (a == 1 &&
++           b == 2) {
++
++In case of function, there are several variants:
++
++    * 4 spaces indent from the beginning
++    * align the secondary lines just after the opening parenthesis of the
++      first
++
++For example:
++
++    do_something(x, y,
++        z);
++
++    do_something(x, y,
++                 z);
++
++    do_something(x, do_another(y,
++                               z));
++
+ 2. Line width
+ 
+ Lines should be 80 characters; try not to make them longer.
 -- 
 2.20.1
