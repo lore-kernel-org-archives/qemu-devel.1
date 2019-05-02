@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42695)
+Received: from eggs.gnu.org ([209.51.188.92]:42700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6te-0003Ux-AX
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:51 -0400
+	(envelope-from <arilou@gmail.com>) id 1hM6te-0003V1-BB
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6ta-0007zA-CA
+	(envelope-from <arilou@gmail.com>) id 1hM6ta-0007yj-B5
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:48 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55513)
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53881)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6tY-0007Lr-Dj
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6tY-0007gt-BO
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:46 -0400
-Received: by mail-wm1-x344.google.com with SMTP id y2so1154116wmi.5
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:20 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id q15so1477341wmf.3
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:39 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Thu,  2 May 2019 11:15:34 +0300
-Message-Id: <20190502081554.5521-8-arilou@gmail.com>
+Date: Thu,  2 May 2019 11:15:47 +0300
+Message-Id: <20190502081554.5521-21-arilou@gmail.com>
 In-Reply-To: <20190502081554.5521-1-arilou@gmail.com>
 References: <20190502081554.5521-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v9 07/27] gdbstub: Implement insert breakpoint
- (Z pkt) with new infra
+Subject: [Qemu-devel] [PATCH v9 20/27] gdbstub: Implement target halted (?
+ pkt) with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,59 +33,68 @@ Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ gdbstub.c | 36 ++++++++++++++++++++++++++----------
+ 1 file changed, 26 insertions(+), 10 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 21cdaf4678..36c7353a22 100644
+index 2fd0d66f4d..d678191705 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1588,6 +1588,29 @@ static void handle_set_thread(GdbCmdContext *gdb_ctx, void *user_ctx)
-     }
+@@ -2239,13 +2239,30 @@ static void handle_gen_set(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, "");
  }
  
-+static void handle_insert_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_target_halt(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    int res;
++    char thread_id[16];
 +
-+    if (gdb_ctx->num_params < 3) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    res = gdb_breakpoint_insert(gdb_ctx->params[1].val_ull,
-+                                gdb_ctx->params[2].val_ull,
-+                                gdb_ctx->params[0].val_ul);
-+    if (res >= 0) {
-+        put_packet(gdb_ctx->s, "OK");
-+        return;
-+    } else if (res == -ENOSYS) {
-+        put_packet(gdb_ctx->s, "");
-+        return;
-+    }
-+
-+    put_packet(gdb_ctx->s, "E22");
++    /* TODO: Make this return the correct value for user-mode.  */
++    gdb_fmt_thread_id(gdb_ctx->s, gdb_ctx->s->c_cpu, thread_id,
++                      sizeof(thread_id));
++    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "T%02xthread:%s;",
++             GDB_SIGNAL_TRAP, thread_id);
++    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
++    /*
++     * Remove all the breakpoints when this query is issued,
++     * because gdb is doing and initial connect and the state
++     * should be cleaned up.
++     */
++    gdb_breakpoint_remove_all();
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
-     CPUState *cpu;
-@@ -1843,6 +1866,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+     const char *p;
+     int ch;
+     uint8_t mem_buf[MAX_PACKET_LENGTH];
+     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
+-    char thread_id[16];
+     const GdbCmdParseEntry *cmd_parser = NULL;
+ 
+     trace_gdbstub_io_command(line_buf);
+@@ -2257,15 +2274,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
          put_packet(s, "OK");
          break;
-     case 'Z':
+     case '?':
+-        /* TODO: Make this return the correct value for user-mode.  */
+-        snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
+-                 gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thread_id)));
+-        put_packet(s, buf);
+-        /* Remove all the breakpoints when this query is issued,
+-         * because gdb is doing and initial connect and the state
+-         * should be cleaned up.
+-         */
+-        gdb_breakpoint_remove_all();
 +        {
-+            static const GdbCmdParseEntry insert_bp_cmd_desc = {
-+                .handler = handle_insert_bp,
-+                .cmd = "Z",
-+                .cmd_startswith = 1,
-+                .schema = "l?L?L0"
++            static const GdbCmdParseEntry target_halted_cmd_desc = {
++                .handler = handle_target_halt,
++                .cmd = "?",
++                .cmd_startswith = 1
 +            };
-+            cmd_parser = &insert_bp_cmd_desc;
++            cmd_parser = &target_halted_cmd_desc;
 +        }
-+        break;
-     case 'z':
-         type = strtoul(p, (char **)&p, 16);
-         if (*p == ',')
+         break;
+     case 'c':
+         {
 -- 
 2.20.1
