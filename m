@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50520)
+Received: from eggs.gnu.org ([209.51.188.92]:50596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hM7M7-0004TX-Va
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:46:17 -0400
+	(envelope-from <thuth@redhat.com>) id 1hM7MB-0004XR-Gy
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:46:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hM7M6-0003iz-6d
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:46:15 -0400
+	(envelope-from <thuth@redhat.com>) id 1hM7M7-0003kv-OO
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:46:18 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  2 May 2019 10:45:01 +0200
-Message-Id: <20190502084506.8009-3-thuth@redhat.com>
+Date: Thu,  2 May 2019 10:45:00 +0200
+Message-Id: <20190502084506.8009-2-thuth@redhat.com>
 In-Reply-To: <20190502084506.8009-1-thuth@redhat.com>
 References: <20190502084506.8009-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/7] tests/qemu-iotests/check: Pick a
- default machine if necessary
+Subject: [Qemu-devel] [PATCH v3 1/7] tests/qemu-iotests/005: Add a sanity
+ check for large sparse file support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,50 +25,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, Christophe Fergeau <cfergeau@redhat.com>, Ed Maste <emaste@freebsd.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-qemu-system-arm, qemu-system-aarch64 and qemu-system-tricore do not have
-a default machine, so when running the qemu-iotests with such a binary,
-lots of tests are failing. Fix it by picking a default machine in the
-"check" script instead.
+"check -raw 005" fails when running on certain filesystems - these do not
+support such large sparse files. Use the same check as in test 220 to
+skip the test in this case.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Suggested-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/qemu-iotests/check | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/005 | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index f9c24b6753..922c5d1d3d 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -130,7 +130,6 @@ export CACHEMODE=3D"writeback"
- export QEMU_IO_OPTIONS=3D""
- export QEMU_IO_OPTIONS_NO_FMT=3D""
- export CACHEMODE_IS_DEFAULT=3Dtrue
--export QEMU_OPTIONS=3D"-nodefaults -machine accel=3Dqtest"
- export VALGRIND_QEMU=3D
- export IMGKEYSECRET=3D
- export IMGOPTSSYNTAX=3Dfalse
-@@ -564,6 +563,18 @@ then
+diff --git a/tests/qemu-iotests/005 b/tests/qemu-iotests/005
+index 2fef63af88..9c7681c19b 100755
+--- a/tests/qemu-iotests/005
++++ b/tests/qemu-iotests/005
+@@ -55,6 +55,15 @@ if [ "$IMGPROTO" =3D "sheepdog" ]; then
+     _notrun "image protocol $IMGPROTO does not support large image sizes=
+"
  fi
- export QEMU_PROG=3D"$(type -p "$QEMU_PROG")"
 =20
-+case "$QEMU_PROG" in
-+    *qemu-system-arm|*qemu-system-aarch64)
-+        export QEMU_OPTIONS=3D"-nodefaults -machine virt,accel=3Dqtest"
-+        ;;
-+    *qemu-system-tricore)
-+        export QEMU_OPTIONS=3D"-nodefaults -machine tricore_testboard,ac=
-cel=3Dqtest"
-+        ;;
-+    *)
-+        export QEMU_OPTIONS=3D"-nodefaults -machine accel=3Dqtest"
-+        ;;
-+esac
++# Sanity check: For raw, we require a file system that permits the creat=
+ion
++# of a HUGE (but very sparse) file. Check we can create it before contin=
+uing.
++if [ "$IMGFMT" =3D "raw" ]; then
++    if ! truncate --size=3D5T "$TEST_IMG"; then
++        _notrun "file system on $TEST_DIR does not support large enough =
+files"
++    fi
++    rm "$TEST_IMG"
++fi
 +
- if [ -z "$QEMU_IMG_PROG" ]; then
-     if [ -x "$build_iotests/qemu-img" ]; then
-         export QEMU_IMG_PROG=3D"$build_iotests/qemu-img"
+ echo
+ echo "creating large image"
+ _make_test_img 5000G
 --=20
 2.21.0
