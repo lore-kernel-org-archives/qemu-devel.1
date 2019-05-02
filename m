@@ -2,72 +2,87 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDCA6C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 09:19:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96970C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 09:32:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF72120873
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 09:19:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF72120873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 57A182075E
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 09:32:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QJUKcMzP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57A182075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48146 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48265 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM7sW-0007vY-2z
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 05:19:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57626)
+	id 1hM84P-00027p-KX
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 05:32:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hM7r9-0007Kq-US
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 05:18:21 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hM83F-0001eA-Q4
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 05:30:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hM7qz-0001Yh-AX
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 05:18:12 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:48243)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hM7qi-0001Kn-5f; Thu, 02 May 2019 05:17:54 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1MC3H1-1hU4Jt3IjN-00CVDX; Thu, 02 May 2019 11:17:32 +0200
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-	qemu-trivial@nongnu.org, qemu-devel@nongnu.org
-References: <20190427162922.4207-1-f4bug@amsat.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <fc2aab1e-b709-2f1b-f357-3a027e499309@vivier.eu>
-Date: Thu, 2 May 2019 11:17:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <alex.bennee@linaro.org>) id 1hM82u-0002CA-LJ
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 05:30:36 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33607)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hM82j-0008MA-FG
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 05:30:22 -0400
+Received: by mail-wr1-x441.google.com with SMTP id e28so2362489wra.0
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 02:27:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=T90yMf4Uw+rh8WoiHNWPGToWmRXp8q4oIT22E4IxyoI=;
+	b=QJUKcMzPI4tzAprkmXxKCd5wXIro8pLxip7gP4BUh2qSOBiCBf+ZGgGtLcAapooHPp
+	FV9yHuvMwY005oqqbUQBwy0n53RkNiHM6VuS2SlKF0cErvp4JZlhTGOhaC4T63izWiaT
+	vY8UzQIDFa5O1aC3VrWiMhnbfjLSIFU7qZceV+j+6AjLVOfRoDRPD8I2Uy08Sj0KadJF
+	Q9wWX1GGiYnh6CRybE8NOdpPp/OOwksfjA8c5N04l7fMP8RaD7eqPOhB9TU9YCBjb/KT
+	rI3wwvtzDm5E6mim3J+Bn9Lsr2vSnasB6qWmkPsnUU+EsVHsPFmjac5wYigSLCnbB6bP
+	T3xA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=T90yMf4Uw+rh8WoiHNWPGToWmRXp8q4oIT22E4IxyoI=;
+	b=qa8KrS6/n/LNVUmU/Anv1Msp1+ZYv9tyt0iJ+Q/s3Af5AyX7v6gbI7x2xzoUf+Nnta
+	AQAXVB6xsvLvNJEVwZqDfVkAeRBLMr2iAvfhfEqwGoa7JYXoQDWH/hKhcbDWh1MPIy7E
+	PhWEjPdZcywMBZUJV4KJCLizvhcObtlvN02HQALdaN73uVXnjGpTNX7duQThSGDbm9we
+	b0IYcHzDqRzTTh29T6FqZL/i/hWt070h0jd+1waU+34Ft3wBezWioCoQzaq5yBCdatWH
+	EBZQ4piVBp5ioUPb0jCvCuntZgHHAPBrDKyuUviEyhm5pCAnZqkclc7/KmJYsL/nsO+7
+	oWTA==
+X-Gm-Message-State: APjAAAVNh7cRvH30/wFA4bMjIRGjLUszh5i3wyU/71w1gxVCy3QKERYa
+	yjiiB4iGQHosa98zwmWOmJKRpw==
+X-Google-Smtp-Source: APXvYqwEduqQAgCVK/WF0MS9Xg7boud+hcW1vIyisoEuvablFTottNHjOeni6ruXRvolqBeSOrp0Qg==
+X-Received: by 2002:a5d:480e:: with SMTP id l14mr1996758wrq.301.1556789266653; 
+	Thu, 02 May 2019 02:27:46 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	v17sm5795164wmc.30.2019.05.02.02.27.45
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 02 May 2019 02:27:46 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id A3CB21FF87;
+	Thu,  2 May 2019 10:27:45 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Thu,  2 May 2019 10:27:28 +0100
+Message-Id: <20190502092728.32727-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190427162922.4207-1-f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:mb4Qb7CWye0F/VsRPXLZ9OCeVa2RQQnuOF7OfA5sV8WP9TN18gC
-	cfhDYekC8foQHsZrJhBP7xX4Mtpt93EpuXcTkUmqnV8w5pBNbUUG6LFf4KKz4bs+qxjajA9
-	xKNKKIT6DIl7gFd9uy4MJ9tgv1KMPFqnD6SOkHJ+VGrZ0Z5M1ADpeXegaSrXCv/S3KQhm2U
-	QI2jowsm9seA6Qze+Mz4Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:hUdJfFwA2To=:Orcgg9Bd5nezXsHp4CqVcl
-	tdU4sFRby5FrX5VFRa9WAU3nFKtiTZZMj/Il5Vkws6xlQWj7XlD2HwtDFWD2xXZAW25+S8rMa
-	QCtyjk7QPoqt2nnodLIaIgPLWKTWupJP7MCY0PJk+MUNoE7iIilatMKXY1/GjFu0+iRc3JaR2
-	quD+jQ0tn42zfUtOFAFrKHYUAejECMvC9W1UH6UWyguAt0aq3uKJvrxklJW1UwaEa1apPvnnj
-	T36vsBa9s/PhT+AHBdTVtC1JznNOAMGe8PgZZEMYOH8hwihaL4tD/eue9Onu2PH9unJumM8Rn
-	V5qc1jz0z2Tpqm5WdZ+u8s73FivhYbWCPFBNOa5x8se8qXFdoOOnTJlx797Num24QobkiPeum
-	k9xINTXVq55egAvVrmLaYJF3+sM8DELnKdluDsxKkSX80xuKFUSTMl8U7BgIHNMjm1djGC439
-	faDZzdArrTStuccfBgtZYGrjfXQSgICDoAUxcNyYNxgdQHZ+lW950drB0XioqsqcohuyPFFHF
-	frcpELWOcxcVrPez+29MW4+YXMLe56HiGEYwvvybmwubmwnE9nBRYf+gXI+whVIBVgAZSQPC6
-	jDSj3bYnSStHqRvU+UeulerqU63rz4c48GK00NsdsBSOcGJmPFmrQ7NPxH1n6yguV6KKdkRA4
-	57OouM4Szs2WImGl2tGrxAIud0cxV9V1hJzOvIOVgN5lPYM6AiHu9ZIV7qlWc3IfPmp9KGOjS
-	Q8ZEKHoAUA9mUsT43KzIk9cMqgqhz7ZBd4PHGuMus/bTEJKICtgb4LEyPtk=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2] hw/sparc/leon3: Allow
- load of uImage firmwares
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PATCH] linux-user: fix GPROF build failure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,74 +94,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: KONRAD Frederic <frederic.konrad@adacore.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	Artyom Tarasenko <atar4qemu@gmail.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502091730.SazQdhEID2uFowb_3_WAMWB-kWjhAnBjlhHvm89-oy0@z>
+Message-ID: <20190502092728.iNRad-lXHZ48Kp5VznPIT4XxVy8CYaunHe7Xp35vpk8@z>
 
-On 27/04/2019 18:29, Philippe Mathieu-Daudé wrote:
-> Currently the Leon3 machine doesn't allow to load legacy u-boot images:
-> 
->   $ qemu-system-sparc -M leon3_generic -d in_asm \
->       -kernel HelenOS-0.6.0-sparc32-leon3.bin
->   qemu-system-sparc: could not load kernel 'HelenOS-0.6.0-sparc32-leon3.bin'
-> 
->   $ file HelenOS-0.6.0-sparc32-leon3.bin
->   HelenOS-0.6.0-sparc32-leon3.bin: u-boot legacy uImage, HelenOS-0.6.0,\
->     Linux/ARM, OS Kernel Image (Not compressed), 2424229 bytes,\
->     Sun Dec 21 19:18:09 2014,\
->     Load Address: 0x40000000, Entry Point: 0x40000000,\
->     Header CRC: 0x8BCFA236, Data CRC: 0x37AD87DF
-> 
-> Since QEMU can load uImages, add the necessary code,
-> so the Leon3 machine can load these images:
-> 
->   $ qemu-system-sparc -M leon3_generic -d in_asm \
->       -kernel HelenOS-0.6.0-sparc32-leon3.bin
->   ----------------
->   IN:
->   0x40000000:  b  0x400007a8
->   0x40000004:  nop
->   ----------------
->   IN:
->   0x400007a8:  save  %sp, -136, %sp
->   0x400007ac:  call  0x40000020
->   0x400007b0:  sethi  %hi(0x4000b800), %i1
->   ...
-> 
-> Tested with the following firmware:
-> http://www.helenos.org/releases/HelenOS-0.6.0-sparc32-leon3.bin
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
-> v2: Fixed GIT_AUTHOR_EMAIL
-> ---
->  hw/sparc/leon3.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-> index 774639af33..0383b17c29 100644
-> --- a/hw/sparc/leon3.c
-> +++ b/hw/sparc/leon3.c
-> @@ -193,6 +193,10 @@ static void leon3_generic_hw_init(MachineState *machine)
->          kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
->                                 &entry, NULL, NULL,
->                                 1 /* big endian */, EM_SPARC, 0, 0);
-> +        if (kernel_size < 0) {
-> +            kernel_size = load_uimage(kernel_filename, NULL, &entry,
-> +                                      NULL, NULL, NULL);
-> +        }
->          if (kernel_size < 0) {
->              error_report("could not load kernel '%s'", kernel_filename);
->              exit(1);
-> 
+When linux-user/exit was introduced we failed to move the gprof
+include at the same time. The CI didn't notice because it only builds
+system emulation. Fix it for those that still find gprof useful.
 
-Applied to my trivial-patches branch.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ linux-user/exit.c    | 3 +++
+ linux-user/syscall.c | 3 ---
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-Thanks,
-Laurent
+diff --git a/linux-user/exit.c b/linux-user/exit.c
+index 14e94e28fa..bdda720553 100644
+--- a/linux-user/exit.c
++++ b/linux-user/exit.c
+@@ -18,6 +18,9 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
++#ifdef TARGET_GPROF
++#include <sys/gmon.h>
++#endif
+ 
+ #ifdef CONFIG_GCOV
+ extern void __gcov_dump(void);
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 96cd4bf86d..f2d9883aef 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -59,9 +59,6 @@
+ #ifdef CONFIG_TIMERFD
+ #include <sys/timerfd.h>
+ #endif
+-#ifdef TARGET_GPROF
+-#include <sys/gmon.h>
+-#endif
+ #ifdef CONFIG_EVENTFD
+ #include <sys/eventfd.h>
+ #endif
+-- 
+2.20.1
+
 
