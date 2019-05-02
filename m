@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42636)
+Received: from eggs.gnu.org ([209.51.188.92]:42641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6ta-0003Rb-B3
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:47 -0400
+	(envelope-from <arilou@gmail.com>) id 1hM6ta-0003Re-Bs
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6tY-0007pH-Av
+	(envelope-from <arilou@gmail.com>) id 1hM6tY-0007pD-Aw
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:46 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37765)
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38448)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6tU-0007WC-NN
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6tU-0007SR-Nw
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:42 -0400
-Received: by mail-wm1-x342.google.com with SMTP id y5so1399354wma.2
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:30 -0700 (PDT)
+Received: by mail-wr1-x444.google.com with SMTP id k16so2002400wrn.5
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:24 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Thu,  2 May 2019 11:15:41 +0300
-Message-Id: <20190502081554.5521-15-arilou@gmail.com>
+Date: Thu,  2 May 2019 11:15:37 +0300
+Message-Id: <20190502081554.5521-11-arilou@gmail.com>
 In-Reply-To: <20190502081554.5521-1-arilou@gmail.com>
 References: <20190502081554.5521-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v9 14/27] gdbstub: Implement read all registers
- (g pkt) with new infra
+Subject: [Qemu-devel] [PATCH v9 10/27] gdbstub: Implement get register (p
+ pkt) with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +33,76 @@ Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 31 +++++++++++++++++++++++--------
- 1 file changed, 23 insertions(+), 8 deletions(-)
+ gdbstub.c | 50 ++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 38 insertions(+), 12 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index adfe39b3a3..3478ac778d 100644
+index 10e3f12a68..e9a3d0c2bc 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1757,6 +1757,21 @@ static void handle_write_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
+@@ -1655,6 +1655,36 @@ static void handle_set_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
      put_packet(gdb_ctx->s, "OK");
  }
  
-+static void handle_read_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_get_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    target_ulong addr, len;
++    int reg_size;
 +
-+    cpu_synchronize_state(gdb_ctx->s->g_cpu);
-+    len = 0;
-+    for (addr = 0; addr < gdb_ctx->s->g_cpu->gdb_num_g_regs; addr++) {
-+        len += gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf + len,
-+                                 addr);
++    /*
++     * Older gdb are really dumb, and don't use 'g' if 'p' is avaialable.
++     * This works, but can be very slow.  Anything new enough to
++     * understand XML also knows how to use this properly.
++     */
++    if (!gdb_has_xml) {
++        put_packet(gdb_ctx->s, "");
++        return;
 +    }
 +
-+    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, len);
++    if (!gdb_ctx->num_params) {
++        put_packet(gdb_ctx->s, "E14");
++        return;
++    }
++
++    reg_size = gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf,
++                                 gdb_ctx->params[0].val_ull);
++    if (!reg_size) {
++        put_packet(gdb_ctx->s, "E14");
++        return;
++    }
++
++    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, reg_size);
 +    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
      CPUState *cpu;
-@@ -1764,7 +1779,7 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-     CPUClass *cc;
-     const char *p;
-     uint32_t pid, tid;
--    int ch, reg_size, type, res;
-+    int ch, type, res;
-     uint8_t mem_buf[MAX_PACKET_LENGTH];
-     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
-     char thread_id[16];
-@@ -1923,14 +1938,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+@@ -1884,18 +1914,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
          }
          break;
-     case 'g':
--        cpu_synchronize_state(s->g_cpu);
--        len = 0;
--        for (addr = 0; addr < s->g_cpu->gdb_num_g_regs; addr++) {
--            reg_size = gdb_read_register(s->g_cpu, mem_buf + len, addr);
--            len += reg_size;
+     case 'p':
+-        /* Older gdb are really dumb, and don't use 'g' if 'p' is avaialable.
+-           This works, but can be very slow.  Anything new enough to
+-           understand XML also knows how to use this properly.  */
+-        if (!gdb_has_xml)
+-            goto unknown_command;
+-        addr = strtoull(p, (char **)&p, 16);
+-        reg_size = gdb_read_register(s->g_cpu, mem_buf, addr);
+-        if (reg_size) {
+-            memtohex(buf, mem_buf, reg_size);
+-            put_packet(s, buf);
+-        } else {
+-            put_packet(s, "E14");
 +        {
-+            static const GdbCmdParseEntry read_all_regs_cmd_desc = {
-+                .handler = handle_read_all_regs,
-+                .cmd = "g",
-+                .cmd_startswith = 1
++            static const GdbCmdParseEntry get_reg_cmd_desc = {
++                .handler = handle_get_reg,
++                .cmd = "p",
++                .cmd_startswith = 1,
++                .schema = "L0"
 +            };
-+            cmd_parser = &read_all_regs_cmd_desc;
++            cmd_parser = &get_reg_cmd_desc;
          }
--        memtohex(buf, mem_buf, len);
--        put_packet(s, buf);
          break;
-     case 'G':
-         {
+     case 'P':
 -- 
 2.20.1
