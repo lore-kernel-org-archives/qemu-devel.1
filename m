@@ -2,83 +2,82 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E6DEC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 10:12:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE1CC43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 10:15:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41BF120652
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 10:12:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0001820873
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 10:15:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ay0iR7We"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41BF120652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LIZypCm9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0001820873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48700 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48737 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM8hX-0006Y3-Hs
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 06:12:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40192)
+	id 1hM8kT-0007P5-8R
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 06:15:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hM8gb-0006Eb-AY
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 06:11:30 -0400
+	(envelope-from <laurent.desnogues@gmail.com>) id 1hM8jk-00075e-4p
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 06:14:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hM8gZ-0004Up-9v
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 06:11:29 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:42227)
+	(envelope-from <laurent.desnogues@gmail.com>) id 1hM8jj-0005vx-Bh
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 06:14:44 -0400
+Received: from mail-it1-x141.google.com ([2607:f8b0:4864:20::141]:52029)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hM8gY-0004Sg-M8
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 06:11:27 -0400
-Received: by mail-oi1-x244.google.com with SMTP id k9so1168163oig.9
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 03:11:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	(Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
+	id 1hM8jj-0005uf-4U
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 06:14:43 -0400
+Received: by mail-it1-x141.google.com with SMTP id s3so2347565itk.1
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 03:14:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
 	:cc:content-transfer-encoding;
-	bh=xMYhaYEkdDSRjtWMuaokJ0R48E+isDAM3paGQ7J3Sv0=;
-	b=Ay0iR7WesVtRYIOdXlv8ke59LIMTzGWz2agtuwfEoxU5M/pKtvFkcek7A6eELdqN14
-	8AyBMzMLgrsXtRF50E+4LPBzhDu+1Bg44Y2dkKB0YgWQJiX2wqB7njDcpRtTNwP1NsXA
-	s8aDIivf4nohOsViuk1Z066d1QYsNUpdPrVUHxlXIcFWi1T5b+kApDh2cLhxGm113iYL
-	vS1jP2i3wrMH/8I7fxvkODoIhdzLp5ku0YuIKadOMdXaqXgO9BTddGxlDHqApW6klX4l
-	QYuHGEJ/W+wqIxJ+lUH1iMDm/H77qO2aABwbwryHx+Em+p5q2D6GLN+j98bKyCntQ7ne
-	AMlg==
+	bh=qBeiteXdYtsE85pywkveO0AVnFwBNBYSM7PGTuFc8qA=;
+	b=LIZypCm9cHX+n1RmWf2b1EzKw4ixpAUCdTtpa2/LgNsCMNgAOHYVmxemXdfYAHqHBE
+	bHXNxOplMsFl1y115jcphK+XIKeAe4ie3OBXt5Rfp70+KWhPTEj5t18K+C9BbiqtacnT
+	vu7HrUcBmN3EAtaDAgyojQFJogvjQ+dGuse5UH+5cGnTG/3o7Mqt8zIH6vwyj/R8TCnc
+	9F+2OfKWRRwIa42Vz81yap/mC0SsnR412+nlRNkDBCcPjjSI0CDaCK+w0v1XqPaubgLL
+	OXhAQIKTL1EY5ZLjNA4iqunppJKbJOY/T963vJQsbcua2J5WsKMY2cgSiFKSolNsyc1i
+	22qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=xMYhaYEkdDSRjtWMuaokJ0R48E+isDAM3paGQ7J3Sv0=;
-	b=jZaptSbAAgOaxQPP9A/fUxME2HiwsqQ8TK3qZEFn/CgCjJtYvqhfzqhbcfaru9raKF
-	FkmWMMTxpyURoACmpr00L8UHN3fsyExbFbWuB6uj8OjJRYuRwHvP5Zcv5YOTcHyxHKo1
-	XLr6fL2FJ2hMji8+Qk7c4a2dpKH+pxuEovhckW/88MGaDcTMVThesGr7/qSGzy7NmmJJ
-	9SO630pNtfUhuK1IS2F28Q/QUTMszRETP6mGMjXpRh4FMTAgWce+TMyRXIZKKtdb1ivS
-	i8p9+jqrI1nzcM5xNr387/4PF4GZ5MRwWzkytPMtHHGEkwFR0f1IX8H4LSsXvZME7ok2
-	xKIg==
-X-Gm-Message-State: APjAAAVZOnfzFfRyUX4k1MaBLFOCulxbf0HePHGIaIKktgGo73GlaaQ2
-	S0aEaqNveOVDXYkReg8mH2Th8wjRFW90fHljMEbsZA==
-X-Google-Smtp-Source: APXvYqym+BvCN3bHgbuAMGsOa3iQjQIlDXUm/JpaoxrMPeUY/pSTKkhK3t3scKfou21tgyH0ZmqW5TgTWwZNYkTk2gs=
-X-Received: by 2002:aca:4b04:: with SMTP id y4mr1874906oia.170.1556791885011; 
-	Thu, 02 May 2019 03:11:25 -0700 (PDT)
+	bh=qBeiteXdYtsE85pywkveO0AVnFwBNBYSM7PGTuFc8qA=;
+	b=e9MEGgJT7N30jFxzgu/SQGH7MScAXFt7O4U8JPci8oTuD993jGCcIhbSPfeVIK2qJi
+	x8xXkP78seQXpkl8BK8c/Jj6qIeMv5CbLfid1ZY40pifRGMjky7rWBQC9ewnOliXR8ho
+	j0UwkfuOPCPpvUod8iu+bRf1jWrFznLiUZEYY4qyAPkX9nJ0ktb1VZfd+ACY4Xbt/2cT
+	Uj3Vn59zbNAjuGN4wSYg3e6OfD9PkLMfPMeFXrXCmQsuMdBO3CfR7FlMBoRi30ymFuTk
+	+SrwCqr/PlZ9kJQN3VCnXvlkWWK0QAo+OP+z9JYoXmrdmKwPjw4r7yvxiRmD2tVC+kbG
+	kR0Q==
+X-Gm-Message-State: APjAAAUcXnvT8tEaImInFnPa2xq3il0NE2HhY9Ol/rdCIwMqEODOCpJb
+	p5kf+z7Cyu9wa+1pNIVoZ6qYl8VEoA/eJs3JU6o=
+X-Google-Smtp-Source: APXvYqzzrhVR1qCNtkYqDxuxRsKQz/H82xUFNPNQ5VnCsf63Xts5h03hKjKcV2+1wWhUNddZm7J8gPlaBqQHnSD+EYQ=
+X-Received: by 2002:a24:798c:: with SMTP id z134mr1606006itc.5.1556792078889; 
+	Thu, 02 May 2019 03:14:38 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190425145420.8888-1-stefanha@redhat.com>
-	<20190501162055.GB21155@stefanha-x1.localdomain>
-In-Reply-To: <20190501162055.GB21155@stefanha-x1.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 2 May 2019 11:11:14 +0100
+References: <20190502092728.32727-1-alex.bennee@linaro.org>
+In-Reply-To: <20190502092728.32727-1-alex.bennee@linaro.org>
+From: Laurent Desnogues <laurent.desnogues@gmail.com>
+Date: Thu, 2 May 2019 12:14:27 +0200
 Message-ID:
- <CAFEAcA8Go-8Ux9AGzw5CGiU3wDyAQSrV1HOb0gbZP8+b06-EPQ@mail.gmail.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
+ <CABoDooPLQAGi+gtYX+jPaZk9=OgGOLwpJdwfJML-aKMiHu3Azw@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::244
-Subject: Re: [Qemu-devel] [PATCH v2] gitmodules: use qemu.org git mirrors
+X-Received-From: 2607:f8b0:4864:20::141
+Subject: Re: [Qemu-devel] [PATCH] linux-user: fix GPROF build failure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,68 +89,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502101114.PVfwSnEW70sW6WeTG5GofA01mzw-wULoX58uai1PcGc@z>
+Message-ID: <20190502101427.cRyBORldv2JQyjjmiYUK0ztcs64aRFBLVVU0eA1-IqA@z>
 
-On Wed, 1 May 2019 at 17:20, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->
-> On Thu, Apr 25, 2019 at 03:54:20PM +0100, Stefan Hajnoczi wrote:
-> > qemu.org hosts git repository mirrors of all submodules.  Update
-> > .gitmodules to use the mirrors and not the upstream repositories.
-> >
-> > Mirroring upstream repositories ensures that QEMU continues to build
-> > even when upstream repositories are deleted or temporarily offline.
-> >
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > ---
-> >  .gitmodules | 10 +++++-----
-> >  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> Ping?
->
-> > diff --git a/.gitmodules b/.gitmodules
-> > index aa77ce6f50..2857eec763 100644
-> > --- a/.gitmodules
-> > +++ b/.gitmodules
-> > @@ -39,19 +39,19 @@
-> >       url =3D https://git.qemu.org/git/capstone.git
-> >  [submodule "roms/seabios-hppa"]
-> >       path =3D roms/seabios-hppa
-> > -     url =3D https://github.com/hdeller/seabios-hppa.git
-> > +     url =3D https://git.qemu.org/git/seabios-hppa.git
-> >  [submodule "roms/u-boot-sam460ex"]
-> >       path =3D roms/u-boot-sam460ex
-> >       url =3D https://git.qemu.org/git/u-boot-sam460ex.git
-> >  [submodule "tests/fp/berkeley-testfloat-3"]
-> >       path =3D tests/fp/berkeley-testfloat-3
-> > -     url =3D https://github.com/cota/berkeley-testfloat-3
-> > +     url =3D https://git.qemu.org/git/berkeley-testfloat-3.git
-> >  [submodule "tests/fp/berkeley-softfloat-3"]
-> >       path =3D tests/fp/berkeley-softfloat-3
-> > -     url =3D https://github.com/cota/berkeley-softfloat-3
-> > +     url =3D https://git.qemu.org/git/berkeley-softfloat-3.git
-> >  [submodule "roms/edk2"]
-> >       path =3D roms/edk2
-> > -     url =3D https://github.com/tianocore/edk2.git
-> > +     url =3D https://git.qemu.org/git/edk2.git
-> >  [submodule "slirp"]
-> >       path =3D slirp
-> > -     url =3D https://gitlab.freedesktop.org/slirp/libslirp.git
-> > +     url =3D https://git.qemu.org/git/libslirp.git
-> > --
+Hello,
 
-This won't apply because currently master's .gitmodules
-has no [submodule "slirp"] entry. I was assuming you'd
-ping or repost once the slirp changes went in.
+On Thu, May 2, 2019 at 11:31 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>
+> When linux-user/exit was introduced we failed to move the gprof
+> include at the same time. The CI didn't notice because it only builds
+> system emulation. Fix it for those that still find gprof useful.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-thanks
--- PMM
+Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+
+Thanks,
+
+Laurent
+
+> ---
+>  linux-user/exit.c    | 3 +++
+>  linux-user/syscall.c | 3 ---
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/linux-user/exit.c b/linux-user/exit.c
+> index 14e94e28fa..bdda720553 100644
+> --- a/linux-user/exit.c
+> +++ b/linux-user/exit.c
+> @@ -18,6 +18,9 @@
+>   */
+>  #include "qemu/osdep.h"
+>  #include "qemu.h"
+> +#ifdef TARGET_GPROF
+> +#include <sys/gmon.h>
+> +#endif
+>
+>  #ifdef CONFIG_GCOV
+>  extern void __gcov_dump(void);
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 96cd4bf86d..f2d9883aef 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -59,9 +59,6 @@
+>  #ifdef CONFIG_TIMERFD
+>  #include <sys/timerfd.h>
+>  #endif
+> -#ifdef TARGET_GPROF
+> -#include <sys/gmon.h>
+> -#endif
+>  #ifdef CONFIG_EVENTFD
+>  #include <sys/eventfd.h>
+>  #endif
+> --
+> 2.20.1
+>
+>
 
