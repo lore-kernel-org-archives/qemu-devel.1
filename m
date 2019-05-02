@@ -2,94 +2,74 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F6C3C04AAA
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 16:32:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A15BC43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 16:34:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDBA420645
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 16:32:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="weaaAmlE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDBA420645
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1E1BB20652
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 16:34:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E1BB20652
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55525 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55600 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMEdA-0001xZ-8B
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 12:32:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59570)
+	id 1hMEfi-00035l-EA
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 12:34:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hMEcI-0001W8-Vy
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:31:29 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hMEen-0002bY-An
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:34:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hMEcI-0005jV-7j
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:31:26 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:33149)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hMEcI-0005j5-0K
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:31:26 -0400
-Received: by mail-pl1-x641.google.com with SMTP id y3so1282466plp.0
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 09:31:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=26AoND6sl8M1LmmGDJhZPJWUGafQXbB4Pv59Xsjosx0=;
-	b=weaaAmlEhF+T3PZc73gwQVPpuaB5Jowi7BXZmzPbuLrgp25CsuyCGPxgc9iyMuSH9X
-	LZshc1/Kd96PaOgV44TmFLCBHYscblWHxDzr3upJT17nOwrYIqZf+l/t2aG7uq6mT4fw
-	CmKh+VGQA1HksEutrbnuI8XOagMxhDZhfZyXdWC8Z4/3bIhiuhusOQzU3LAg3SPYpmwX
-	d7wJz+GftDBqzon5+aAAoOnmoIeQL0lDiyCJGkZzy16bLVcG6xfBiCbCG8VOpy1SxCI9
-	sJz48Ntvgb3Dzgg6lLDkh85PiMhZN6sw6QM26fc2tpZz5jowaQ6F5vEzxmRBe5wzelh/
-	unkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=26AoND6sl8M1LmmGDJhZPJWUGafQXbB4Pv59Xsjosx0=;
-	b=EgF81PkIekZRTGNpzGBqQXT+4aMm5K4fScJaGDN7xx9Lb/v6fQoTZb0TnWjnTZiC6K
-	995YeBiGNhKVarpbVhyqHtMx4/xx25+xKc3x3nVRLqCn/mI6ApODudVYYbRUSprz0DF+
-	ekZjwfOABr+o4q8hKu+XPv4TLPvQy0Gv/wXEFEyVC9fOfsPuHz9pAcuzK92tNDuizMQx
-	8VSYZn8/f/NPG1RSHKTWiUe2DF3x4pTO3QwZJV+9uQkc5ceNx1fkZCiC1zBXIxRHD3iO
-	wL5ks4lKffiBaeHSDUSNZ+lpi07TrOxQ5Ze6cNN/87pKfe6qdd9lRxCJjbIuZI1ibt2K
-	XNTA==
-X-Gm-Message-State: APjAAAW1W2PKs4kVBtOiIdtK1K3i8xcjFp97TGK8tJOwyhmNQEhHzWh8
-	wSuTBuB9TyeFMxJiJX1wApgqDrP5HcU=
-X-Google-Smtp-Source: APXvYqw6E11fkSVzp1Pd7pk6EcG1mzH5VHptFkW6bOtQ8Bb4yaxFjg3E4y6iTuXOlRknzupWEkZI2Q==
-X-Received: by 2002:a17:902:5995:: with SMTP id
-	p21mr4763105pli.216.1556814684316; 
-	Thu, 02 May 2019 09:31:24 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-189-189.tukw.qwest.net. [97.113.189.189])
-	by smtp.gmail.com with ESMTPSA id
-	j20sm61328783pfn.84.2019.05.02.09.31.23
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 02 May 2019 09:31:23 -0700 (PDT)
-To: Thomas Huth <thuth@redhat.com>, Cao Jiaxi <driver1998@foxmail.com>,
-	qemu-devel@nongnu.org
-References: <20190430181326.1314-1-driver1998@foxmail.com>
-	<6e3335b8-a5ce-ef0a-bf24-08165d877a2a@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <31bdbd72-32af-1fc9-be06-3f1998062161@linaro.org>
-Date: Thu, 2 May 2019 09:31:21 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <laurent@vivier.eu>) id 1hMEem-0008H3-9P
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:34:01 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:41323)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hMEel-0008GL-59
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:34:00 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1M9nAB-1hRRii1sHd-005qTj; Thu, 02 May 2019 18:33:49 +0200
+To: Laurent Desnogues <laurent.desnogues@gmail.com>
+References: <877eb86hcf.fsf@zen.linaroharston>
+	<20190502145846.26226-1-alex.bennee@linaro.org>
+	<765fa2ab-2803-1945-61ea-2e80b2da6072@vivier.eu>
+	<CABoDooM+DtCbTTsoYdvAJOOKuybgKUAR1yYmckM1b=dGA10=NA@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <280c5642-725a-ba94-076b-f0bb3b778dec@vivier.eu>
+Date: Thu, 2 May 2019 18:33:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
 MIME-Version: 1.0
-In-Reply-To: <6e3335b8-a5ce-ef0a-bf24-08165d877a2a@redhat.com>
+In-Reply-To: <CABoDooM+DtCbTTsoYdvAJOOKuybgKUAR1yYmckM1b=dGA10=NA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] util/cacheinfo.c: Use uintptr_t
- instead of unsigned long in AArch64 arch_cache_info()
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:ofTDa6wLO3mos0MqueTSxBhdE6pLJIfPi4hdJUrzqzcjxtJCq0C
+	ZrihmXie8KOkD6LMdu/tIiAWjhixRR71XbbDvLEZzouuCGwXJAkb9t4ouX2DRf3O1/dPpZY
+	0u7bcEfyGLRSyz/Yji2gtJLGSnNvSyeNDJqJk33Hi3918FLedHM83y5EYH6jHY9fWGRAYTV
+	HW6/YxZfbrRp1dT1b4L4w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:jM6fah8D9b4=:SE7Wvzcedu//0mIOC/78Yq
+	f4aTY3x9t6sWIG1/5qyv7h08sZLhavg0SHyi1qjfPmtiTwkDInSRhvZ4wtychoZ2drhMIl2DT
+	FM5yy9Q5dFpg+ekprHcnIClYGwL3gZlE8LQ6rQfUrTrqM8CR6QxlZPEJa31xverk2DuCHzgXR
+	+0rlzWm/hPXAkhd/rrdGgg7T7cNlU7PCMZKF5oarUklZWqgNUlAohHJDbHxUbi5idoiboNXvH
+	KPru1S0y6Aq+rvTuohwADX5B+b1NYn0HRogbeVfrvcxS1RXZyLyuVh/EbyfNfg06Ce/Ot2kIC
+	ri7dEN0AseigHyyxvIwu+ssYXP6hON46YlfVzy3bo/oKj4hl073MUeM/VofrOfauePzQNyIHD
+	gIDuq6pzYKNV+SlBsL71r9xAToPkD4+Dhq4ojzvc0sEZFfN8YjbODBiE3CzZDNCTkhF47NIRS
+	8FH5kIjzsOlBef5SCX/+U64q/u5RNBJWnwtcj2SoaZ47zaIazu7OyAVsrjx7L8GFz1W2JUtzD
+	2kbJjvuyzOK8pDP0CVR2wFch4JkDp+ZcMwMhAywEHgvuC3DLdfKirHHOjVqxMpPAro8vF3zUD
+	xTSqvaXvdhJo2vrdyk0NoqzsfmXvn9QcXhnOcyMjOH/DCN+LVMmY9EcGz+82yyZaEQWd8/McY
+	70kln66BPkAOgBbscoTdnDzZlRwRPzHBUzB/YD19yaAszc2U2sUj8SYEG/Toi1z3jUAKTsAcQ
+	hFPZhb5uiI9nFnJxPAbQOH2gcoEIkKoFwcyJiB5UjqSCKvA/VH0tUPLkuSk=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.17.13
+Subject: Re: [Qemu-devel] [PATCH] linux-user: avoid treading on gprof's
+ SIGPROF signals
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,28 +81,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502163121.qSQc7OKfo-WL4kXtqgusPfGoQAqo8nSG1uubYSAI-Zw@z>
+Message-ID: <20190502163348.-iBnVmlvzG56-zmskeVRl3OLPtEXNdxDzMtYeQ-b1u0@z>
 
-On 5/2/19 1:26 AM, Thomas Huth wrote:
->> @@ -107,7 +107,7 @@ static void sys_cache_info(int *isize, int *dsize)
->>  static void arch_cache_info(int *isize, int *dsize)
->>  {
->>      if (*isize == 0 || *dsize == 0) {
->> -        unsigned long ctr;
->> +        uintptr_t ctr;
+On 02/05/2019 18:27, Laurent Desnogues wrote:
+> On Thu, May 2, 2019 at 6:17 PM Laurent Vivier <laurent@vivier.eu> wrote:
+>>
+>> On 02/05/2019 16:58, Alex Bennée wrote:
+>>> The guest tends to get confused when it receives signals it doesn't
+>>> know about. Given the gprof magic has also set up it's own handler we
+>>> would do well to avoid stomping on it as well.
+>>>
+>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>> ---
+>>>  linux-user/signal.c | 5 +++++
+>>>  1 file changed, 5 insertions(+)
+>>>
+>>> diff --git a/linux-user/signal.c b/linux-user/signal.c
+>>> index e2c0b37173..44b2d3b35a 100644
+>>> --- a/linux-user/signal.c
+>>> +++ b/linux-user/signal.c
+>>> @@ -508,6 +508,11 @@ void signal_init(void)
+>>>      act.sa_flags = SA_SIGINFO;
+>>>      act.sa_sigaction = host_signal_handler;
+>>>      for(i = 1; i <= TARGET_NSIG; i++) {
+>>> +#ifdef TARGET_GPROF
+>>> +        if (i == SIGPROF) {
+>>> +            continue;
+>>> +        }
+>>> +#endif
+>>>          host_sig = target_to_host_signal(i);
+>>>          sigaction(host_sig, NULL, &oact);
+>>>          if (oact.sa_sigaction == (void *)SIG_IGN) {
+>>>
+>>
+>> Perhaps merge this with the previous one and send a v2: it will ease
+>> bisecting.
 > 
-> Looking at the whole function, is uintptr_t really the right type to use
-> here? ctr does not seem to contain the value of a pointer variable, so
-> this looks wrong to me...
-> Do you get a compiler warning here? If so, how does it look like?
-> Anyway, I think it would be better to use a uint64_t or uint32_t type
-> here instead if possible?
+> I agree it would be better, though it should be noted that the signal
+> issue has existed for at least 8 years (that's when I had to add a
+> specific patch in my private repository).
 
-uint64_t is the proper type to use with MRS.
+I can also apply the second first, and the first then...
 
+Thanks,
+Laurent
 
-r~
 
