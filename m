@@ -2,54 +2,93 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51F4FC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:46:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71F4EC43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:47:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 242CF20656
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:46:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 242CF20656
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id 43AB720644
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:47:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43AB720644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52381 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52385 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMCyz-0000N1-QW
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:46:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44774)
+	id 1hMCze-0000yH-BM
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:47:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCn9-0003VS-BG
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1hMCay-0001P2-RG
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:21:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCn7-0008MQ-Ni
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:31 -0400
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:56533)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCn7-0008Kg-AR
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:29 -0400
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.vps.ablenet.jp
-	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
-	by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 71F0A3F5BA;
-	Thu,  2 May 2019 23:34:27 +0900 (JST)
-Received: from ysato.dip.jp (ZM005235.ppp.dion.ne.jp [222.8.5.235])
-	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 302F9240086; 
-	Thu,  2 May 2019 23:34:27 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-To: qemu-devel@nongnu.org
-Date: Thu,  2 May 2019 23:34:07 +0900
-Message-Id: <20190502143409.59600-11-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20190502143409.59600-1-ysato@users.sourceforge.jp>
-References: <20190502143409.59600-1-ysato@users.sourceforge.jp>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 202.224.55.15
-Subject: [Qemu-devel] [PATCH RFC v8 10/12] Add rx-softmmu
+	(envelope-from <eblake@redhat.com>) id 1hMCay-0008Dw-06
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:21:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34254)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hMCav-0008Ch-OY; Thu, 02 May 2019 10:21:53 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A776630832D1;
+	Thu,  2 May 2019 14:21:52 +0000 (UTC)
+Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id BCF2A10027C2;
+	Thu,  2 May 2019 14:21:51 +0000 (UTC)
+To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
+	mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190502085029.30776-1-shmuel.eiderman@oracle.com>
+	<20190502135828.42797-1-shmuel.eiderman@oracle.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <3a211c90-f031-07ea-0833-35efcff5f6cb@redhat.com>
+Date: Thu, 2 May 2019 09:21:50 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190502135828.42797-1-shmuel.eiderman@oracle.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="TMdW8fGMu5nzVn3zjv1319eeodRFnlUb0"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.44]);
+	Thu, 02 May 2019 14:21:52 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] qemu-img: rebase: Improve/optimize
+ rebase operation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -61,101 +100,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
-	Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: sagi.amit@oracle.com, karl.heubaum@oracle.com, liran.alon@oracle.com,
+	eyal.moscovici@oracle.com, arbel.moshe@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190502143407.Qtu86povwFjoZ0JosPaMjYqfstCgBX6SngTpdudx3F4@z>
+Message-ID: <20190502142150.OBQ8fCEY1yd_tLSmZEWQrw48ZGafhJXGplsuJ5yv5vY@z>
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
----
- configure                      | 8 ++++++++
- default-configs/rx-softmmu.mak | 7 +++++++
- include/sysemu/arch_init.h     | 1 +
- arch_init.c                    | 2 ++
- hw/Kconfig                     | 1 +
- 5 files changed, 19 insertions(+)
- create mode 100644 default-configs/rx-softmmu.mak
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TMdW8fGMu5nzVn3zjv1319eeodRFnlUb0
+From: Eric Blake <eblake@redhat.com>
+To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
+ mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: eyal.moscovici@oracle.com, arbel.moshe@oracle.com, liran.alon@oracle.com,
+ sagi.amit@oracle.com, karl.heubaum@oracle.com
+Message-ID: <3a211c90-f031-07ea-0833-35efcff5f6cb@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] qemu-img: rebase: Improve/optimize
+ rebase operation
+References: <20190502085029.30776-1-shmuel.eiderman@oracle.com>
+ <20190502135828.42797-1-shmuel.eiderman@oracle.com>
+In-Reply-To: <20190502135828.42797-1-shmuel.eiderman@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/configure b/configure
-index 60719ddcc5..71bd70bf8f 100755
---- a/configure
-+++ b/configure
-@@ -7545,6 +7545,11 @@ case "$target_name" in
-     gdb_xml_files="riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml"
-     target_compiler=$cross_cc_riscv64
-   ;;
-+  rx)
-+    TARGET_ARCH=rx
-+    bflt="yes"
-+    target_compiler=$cross_cc_rx
-+  ;;
-   sh4|sh4eb)
-     TARGET_ARCH=sh4
-     bflt="yes"
-@@ -7765,6 +7770,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-   riscv*)
-     disas_config "RISCV"
-   ;;
-+  rx)
-+    disas_config "RX"
-+  ;;
-   s390*)
-     disas_config "S390"
-   ;;
-diff --git a/default-configs/rx-softmmu.mak b/default-configs/rx-softmmu.mak
-new file mode 100644
-index 0000000000..3f62f04e9b
---- /dev/null
-+++ b/default-configs/rx-softmmu.mak
-@@ -0,0 +1,7 @@
-+# Default configuration for rx-softmmu
-+
-+CONFIG_SERIAL=y
-+CONFIG_RX=y
-+CONFIG_RENESAS_SCI=y
-+CONFIG_RENESAS_TMR=y
-+CONFIG_RENESAS_CMT=y
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 10cbafe970..3f4f844f7b 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -25,6 +25,7 @@ enum {
-     QEMU_ARCH_NIOS2 = (1 << 17),
-     QEMU_ARCH_HPPA = (1 << 18),
-     QEMU_ARCH_RISCV = (1 << 19),
-+    QEMU_ARCH_RX = (1 << 20),
- };
- 
- extern const uint32_t arch_type;
-diff --git a/arch_init.c b/arch_init.c
-index f4f3f610c8..cc25ddd7ca 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -74,6 +74,8 @@ int graphic_depth = 32;
- #define QEMU_ARCH QEMU_ARCH_PPC
- #elif defined(TARGET_RISCV)
- #define QEMU_ARCH QEMU_ARCH_RISCV
-+#elif defined(TARGET_RX)
-+#define QEMU_ARCH QEMU_ARCH_RX
- #elif defined(TARGET_S390X)
- #define QEMU_ARCH QEMU_ARCH_S390X
- #elif defined(TARGET_SH4)
-diff --git a/hw/Kconfig b/hw/Kconfig
-index 88b9f15007..63a071092e 100644
---- a/hw/Kconfig
-+++ b/hw/Kconfig
-@@ -53,6 +53,7 @@ source nios2/Kconfig
- source openrisc/Kconfig
- source ppc/Kconfig
- source riscv/Kconfig
-+source rx/Kconfig
- source s390x/Kconfig
- source sh4/Kconfig
- source sparc/Kconfig
--- 
-2.11.0
+On 5/2/19 8:58 AM, Sam Eiderman wrote:
+> This patch series aims to improve the speed of qemu-img rebase.
+>=20
+> 1. Mainly by removing unnecessary reads when rebasing on the same
+>    chain.
+> 2. But also by minimizing the number of bdrv_open calls rebase
+>    requires.
+>=20
 
+When sending a v2 series, it's best to do so as a new top-level thread
+rather than in-reply-to the v1 series, as our CI tools are more likely
+to spot it that way.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--TMdW8fGMu5nzVn3zjv1319eeodRFnlUb0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzK/P4ACgkQp6FrSiUn
+Q2qF2ggAnetVLCLTObEcAy/naivXf55IXOvOQjzd+/9GfUqwvZinfIaeCJZZjInQ
+7aKXrlBQJdlQAIyMjN9zfTJ9YODONFnGEIWV2vuBnKaHqiI4kKn4Ms1TsodRZZGl
+g1tHs/WqdFqe8k5RLJuXejkx2w6ovmOrkHclTrXCfZGrPTe6z16M074dJKbY/Bng
+HZf+Y+I3HAp3jUIQBNb4yzaILNX2aMehxoWUZNdzmy1jCs4XfITnFBHQwx19JjZq
+tC4m5PxG94bd3+q59lh9XIEF4hO1UudBVAuXdtWVzoFQxVtu9rZ1U5mjlXdSTDcB
+/Me6ksR3ooOT9AI5fxu9RA5pCzXkCw==
+=au1U
+-----END PGP SIGNATURE-----
+
+--TMdW8fGMu5nzVn3zjv1319eeodRFnlUb0--
 
