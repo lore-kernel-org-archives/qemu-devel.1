@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59600)
+Received: from eggs.gnu.org ([209.51.188.92]:59693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hMDZW-0005uI-Gk
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:24:31 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hMDZc-0005yS-Ou
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:24:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hMDZV-00082B-15
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:24:30 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38695)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hMDZT-00081q-TL
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:24:28 -0400
-Received: by mail-pl1-x644.google.com with SMTP id a59so1188887pla.5
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 08:24:26 -0700 (PDT)
-References: <20190501050536.15580-1-richard.henderson@linaro.org>
-	<20190501050536.15580-10-richard.henderson@linaro.org>
-	<87imut5h10.fsf@zen.linaroharston>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2b019ad5-396f-c337-499f-b120aea2e4ad@linaro.org>
-Date: Thu, 2 May 2019 08:24:21 -0700
+	(envelope-from <imammedo@redhat.com>) id 1hMDZb-0008Iq-FN
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:24:36 -0400
+Date: Thu, 2 May 2019 17:24:18 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190502172418.2b7d6d84@Igors-MacBook-Pro>
+In-Reply-To: <CAKv+Gu9yw6s=N+LkKmQ+0d5ZQBJ+5tE0_cKtZAYHh_cTXnjyCQ@mail.gmail.com>
+References: <20190409102935.28292-1-shameerali.kolothum.thodi@huawei.com>
+	<20190409102935.28292-4-shameerali.kolothum.thodi@huawei.com>
+	<CAKv+Gu_guvAydmCZDeVnj0NR_WyTHeCmwh4tK9WKUBY6cy-4Pg@mail.gmail.com>
+	<5FC3163CFD30C246ABAA99954A238FA83F137685@lhreml524-mbs.china.huawei.com>
+	<CAKv+Gu9yw6s=N+LkKmQ+0d5ZQBJ+5tE0_cKtZAYHh_cTXnjyCQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <87imut5h10.fsf@zen.linaroharston>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 09/29] tcg: Manually expand
- INDEX_op_dup_vec
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 3/8] hw/acpi: Add ACPI Generic Event
+ Device Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,62 +27,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Peter Maydell <peter.maydell@linaro.org>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, Auger Eric <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>, Laszlo Ersek <lersek@redhat.com>
 
-On 5/2/19 2:42 AM, Alex Bennée wrote:
->> +static void tcg_reg_alloc_dup(TCGContext *s, const TCGOp *op)
->> +{
->> +    const TCGLifeData arg_life = op->life;
->> +    TCGRegSet dup_out_regs, dup_in_regs;
->> +    TCGTemp *its, *ots;
->> +    TCGType itype, vtype;
->> +    unsigned vece;
->> +    bool ok;
->> +
->> +    ots = arg_temp(op->args[0]);
->> +    its = arg_temp(op->args[1]);
->> +
->> +    /* There should be no fixed vector registers.  */
->> +    tcg_debug_assert(!ots->fixed_reg);
+On Thu, 2 May 2019 09:22:35 +0200
+Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+
+> On Wed, 1 May 2019 at 13:25, Shameerali Kolothum Thodi
+> <shameerali.kolothum.thodi@huawei.com> wrote:
+> >
+> > Hi Ard,
+> >
+> > > -----Original Message-----
+> > > From: Ard Biesheuvel [mailto:ard.biesheuvel@linaro.org]
+> > > Sent: 01 May 2019 12:10
+> > > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> > > Cc: QEMU Developers <qemu-devel@nongnu.org>; qemu-arm
+> > > <qemu-arm@nongnu.org>; Auger Eric <eric.auger@redhat.com>; Igor
+> > > Mammedov <imammedo@redhat.com>; Peter Maydell
+> > > <peter.maydell@linaro.org>; shannon.zhaosl@gmail.com;
+> > > sameo@linux.intel.com; sebastien.boeuf@intel.com; xuwei (O)
+> > > <xuwei5@huawei.com>; Laszlo Ersek <lersek@redhat.com>; Linuxarm
+> > > <linuxarm@huawei.com>
+> > > Subject: Re: [PATCH v4 3/8] hw/acpi: Add ACPI Generic Event Device Support
+> > >
+> > > On Tue, 9 Apr 2019 at 12:31, Shameer Kolothum
+> > > <shameerali.kolothum.thodi@huawei.com> wrote:
+> > > >
+> > > > From: Samuel Ortiz <sameo@linux.intel.com>
+> > > >
+> > > > The ACPI Generic Event Device (GED) is a hardware-reduced specific
+> > > > device[ACPI v6.1 Section 5.6.9] that handles all platform events,
+> > > > including the hotplug ones.This patch generates the AML code that
+> > > > defines GEDs.
+> > > >
+> > > > Platforms need to specify their own GedEvent array to describe what
+> > > > kind of events they want to support through GED.  Also this uses a
+> > > > a single interrupt for the  GED device, relying on IO memory region
+> > > > to communicate the type of device affected by the interrupt. This
+> > > > way, we can support up to 32 events with a unique interrupt.
+> > > >
+> > > > This supports only memory hotplug for now.
+> > > >
+> > > > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> > > > Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> > > > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> > >
+> > > Apologies if this question has been raised before, but do we really
+> > > need a separate device for this? We already handle the power button
+> > > via _AEI/_Exx on the GPIO device, and I think we should be able to add
+> > > additional events using that interface, rather than have two event
+> > > signalling methods/devices on the same platform.
+> >
+> > Right. The initial RFC was based on GPIO device[1] and later Igor commented
+> > here[2] that,
+> >
+> > " ARM boards were first to use ACPI hw-reduced profile so they picked up
+> > available back then GPIO based way to deliver hotplug event, later spec
+> > introduced Generic Event Device for that means to use with hw-reduced
+> > profile, which NEMU implemented[1], so I'd use that rather than ad-hoc
+> > GPIO mapping. I'd guess it will more compatible with various contemporary
+> > guests and we could reuse the same code for both x86/arm virt boards) "
+> >
 > 
-> This threw me slightly. I guess you only really duplicate vectors so I'm
-> wondering if this should be called tcg_vec_reg_alloc_dup? Or maybe just
-> a bit of verbiage in a block comment above the helper?
-
-Perhaps just a bit more verbiage.
-
-The convention so far is "tcg_reg_alloc_<opcode>", where so far mov, movi, and
-call have specialized allocators.  Everything else happens in tcg_reg_alloc_op.
- So tcg_reg_alloc_dup is correct for handling dup.
-
-
->> +    case TEMP_VAL_MEM:
->> +        /* TODO: dup from memory */
->> +        tcg_out_ld(s, itype, ots->reg, its->mem_base->reg,
->> its->mem_offset);
+> On mach-virt, we already use the GPIO controller for the ACPI event
+> involving the power button, so by aligning with virt-x86, we end up in
+> the opposite situation for mach-virt.
 > 
-> Should we be aborting here? That said it looks like you are loading
-> something directly from the register memory address here...
+> The problem with the GED device is that it only supports GSI
+> interrupts, while the GPIO device supports arbitrary interrupts (such
+> as GPIO signalled ones). This means that mach-virt will be stuck with
+> having two different methods of signalling ACPI events, unless we
+> rewire the power button not to use a GPIO interrupt but use a GSI
+> directly.
 
-No, we should not abort.  We load the scalar value into a register that we have
-allocated that matches the input constraint for dup.  We then fall through...
-
-> 
->> +        break;
->> +
->> +    default:
->> +        g_assert_not_reached();
->> +    }
->> +
->> +    /* We now have a vector input register, so dup must succeed. */
->> +    ok = tcg_out_dup_vec(s, vtype, vece, ots->reg, ots->reg);
->> +    tcg_debug_assert(ok);
-
-... to here, where we duplicate the scalar across the vector.
-Success.
-
-The TODO comment is about duplicating directly from the memory slot, with a new
-dupm primitive, which appears in the next patch.
+we can rewire power button then.
 
 
-r~
+> In general, I think the ACPI event delivery mechanism doesn't really
+> have to be aligned: the ACPI event is ultimately converted into a AML
+> notification to the right device, and how we end up there can remain
+> platform specific.
+
+Reasoning for using GED is to reduce code duplication with x86
+and not creating zoo of different approached (if it could be avoided).
