@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57322)
+Received: from eggs.gnu.org ([209.51.188.92]:59843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMBoC-00045P-0F
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:31:36 -0400
+	(envelope-from <david@redhat.com>) id 1hMC0l-0006nF-Ar
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:44:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMBoB-0003zT-0s
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:31:31 -0400
-Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:46453)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hMBoA-0003vX-Sb
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:31:30 -0400
-Received: by mail-ot1-x32e.google.com with SMTP id 77so2009860otu.13
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 06:31:30 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1hMC0j-00071w-DF
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:44:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:11719)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hMC0h-0006wQ-Eh
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:44:28 -0400
+References: <20190501050536.15580-1-richard.henderson@linaro.org>
+	<20190501050536.15580-28-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <eaf5b7ff-b3cf-2053-ac1f-aa913be49a6e@redhat.com>
+Date: Thu, 2 May 2019 15:44:20 +0200
 MIME-Version: 1.0
-References: <20190502073543.4391-1-kraxel@redhat.com>
-	<CAFEAcA-OyrwAqp1Kwt-sFJY3xj=0mUszGtF3RewwLs25vOhNLg@mail.gmail.com>
-	<20190502132105.qkudeunhcueadka7@sirius.home.kraxel.org>
-In-Reply-To: <20190502132105.qkudeunhcueadka7@sirius.home.kraxel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 2 May 2019 14:31:18 +0100
-Message-ID: <CAFEAcA-85EsCJGOPZ1ugZwa9GHQBYoGVi-im8kt2yjrSY+HJow@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/7] Usb 20190502 patches
+In-Reply-To: <20190501050536.15580-28-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 27/29] target/s390x: Use tcg_gen_abs_i64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-On Thu, 2 May 2019 at 14:21, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> > Hi -- I'm afraid this failed to compile on one of my systems:
-> >
-> >   CC      hw/usb/hcd-xhci.o
-> > /home/petmay01/linaro/qemu-for-merges/hw/usb/hcd-xhci.c: In function
-> > =E2=80=98usb_xhci_realize=E2=80=99:
-> > /home/petmay01/linaro/qemu-for-merges/hw/usb/hcd-xhci.c:3340:66:
-> > error: =E2=80=98%d=E2=80=99 directive output may be truncated writing b=
-etween 1 and 11
-> > bytes into a region of size 5 [-Werror=3Dformat-truncation=3D]
-> >              snprintf(port->name, sizeof(port->name), "usb2 port #%d", =
-i+1);
->
-> Which system/compiler is this?
+On 01.05.19 07:05, Richard Henderson wrote:
+> Cc: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/s390x/translate.c | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
+> 
+> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+> index d4951836ad..e8e8a79b7d 100644
+> --- a/target/s390x/translate.c
+> +++ b/target/s390x/translate.c
+> @@ -1407,13 +1407,7 @@ static DisasJumpType help_branch(DisasContext *s, DisasCompare *c,
+>  
+>  static DisasJumpType op_abs(DisasContext *s, DisasOps *o)
+>  {
+> -    TCGv_i64 z, n;
+> -    z = tcg_const_i64(0);
+> -    n = tcg_temp_new_i64();
+> -    tcg_gen_neg_i64(n, o->in2);
+> -    tcg_gen_movcond_i64(TCG_COND_LT, o->out, o->in2, z, n, o->in2);
+> -    tcg_temp_free_i64(n);
+> -    tcg_temp_free_i64(z);
+> +    tcg_gen_abs_i64(o->out, o->in2);
+>      return DISAS_NEXT;
+>  }
+>  
+> 
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-x86-64 Linux, gcc (Ubuntu 7.3.0-27ubuntu1~18.04) 7.3.0,
-non-debug build.
+-- 
 
-thanks
--- PMM
+Thanks,
+
+David / dhildenb
