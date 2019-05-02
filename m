@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59464)
+Received: from eggs.gnu.org ([209.51.188.92]:59523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM68z-0003xc-Aq
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:28:38 -0400
+	(envelope-from <arilou@gmail.com>) id 1hM69I-0004B1-EO
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:28:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM68q-0001pT-SV
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:28:31 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33810)
+	(envelope-from <arilou@gmail.com>) id 1hM694-0002DK-HW
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:28:51 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39152)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM68k-0000ZV-Dj
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:28:23 -0400
-Received: by mail-wr1-x444.google.com with SMTP id e9so1827900wrc.1
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 00:27:17 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM68u-0000sd-IW
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:28:36 -0400
+Received: by mail-wr1-x442.google.com with SMTP id a9so1794839wrp.6
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 00:27:41 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Thu,  2 May 2019 10:26:27 +0300
-Message-Id: <20190502072641.4667-14-arilou@gmail.com>
+Date: Thu,  2 May 2019 10:26:41 +0300
+Message-Id: <20190502072641.4667-28-arilou@gmail.com>
 In-Reply-To: <20190502072641.4667-1-arilou@gmail.com>
 References: <20190502072641.4667-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 13/27] gdbstub: Implement write all
- registers (G pkt) with new infra
+Subject: [Qemu-devel] [PATCH v8 27/27] gdbstub: Add support to write a MSR
+ for KVM target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,77 +31,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org, liran.alon@oracle.com, Jon Doron <arilou@gmail.com>
 
+gdb> maint packet Qqemu.kvm.Wrmsr:MsrIndex,Value
+
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 41 +++++++++++++++++++++++++++++++----------
- 1 file changed, 31 insertions(+), 10 deletions(-)
+ gdbstub.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index daa602edc3..adfe39b3a3 100644
+index d5cdda190a..2d9a8e6942 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1734,6 +1734,29 @@ static void handle_read_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
+@@ -2145,7 +2145,8 @@ static void handle_query_qemu_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
+              "sstepbits;sstep;PhyMemMode");
+ 
+     if (kvm_enabled()) {
+-        pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";kvm.Rdmsr");
++        pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf),
++                ";kvm.Rdmsr;kvm.Wrmsr");
+     }
+ 
+     put_packet(gdb_ctx->s, gdb_ctx->str_buf);
+@@ -2196,6 +2197,26 @@ static void handle_query_kvm_read_msr(GdbCmdContext *gdb_ctx, void *user_ctx)
      put_packet(gdb_ctx->s, gdb_ctx->str_buf);
  }
  
-+static void handle_write_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_set_kvm_write_msr(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    target_ulong addr, len;
-+    uint8_t *registers;
-+    int reg_size;
-+
-+    if (!gdb_ctx->num_params) {
++    if (!kvm_enabled()) {
 +        return;
 +    }
 +
-+    cpu_synchronize_state(gdb_ctx->s->g_cpu);
-+    registers = gdb_ctx->mem_buf;
-+    len = strlen(gdb_ctx->params[0].data) / 2;
-+    hextomem(registers, gdb_ctx->params[0].data, len);
-+    for (addr = 0; addr < gdb_ctx->s->g_cpu->gdb_num_g_regs && len > 0;
-+         addr++) {
-+        reg_size = gdb_write_register(gdb_ctx->s->g_cpu, registers, addr);
-+        len -= reg_size;
-+        registers += reg_size;
++    if (gdb_ctx->num_params < 2) {
++        put_packet(gdb_ctx->s, "E22");
++        return;
 +    }
++
++    if (kvm_arch_write_msr(gdbserver_state->c_cpu, gdb_ctx->params[0].val_ul,
++                           gdb_ctx->params[1].val_ull)) {
++        put_packet(gdb_ctx->s, "E00");
++        return;
++    }
++
 +    put_packet(gdb_ctx->s, "OK");
 +}
 +
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -1745,7 +1768,6 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-     uint8_t mem_buf[MAX_PACKET_LENGTH];
-     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
-     char thread_id[16];
--    uint8_t *registers;
-     target_ulong addr, len;
-     const GdbCmdParseEntry *cmd_parser = NULL;
+ static GdbCmdParseEntry gdb_gen_query_set_common_table[] = {
+     /* Order is important if has same prefix */
+     {
+@@ -2302,6 +2323,12 @@ static GdbCmdParseEntry gdb_gen_set_table[] = {
+         .cmd_startswith = 1,
+         .schema = "l0"
+     },
++    {
++        .handler = handle_set_kvm_write_msr,
++        .cmd = "qemu.kvm.Wrmsr:",
++        .cmd_startswith = 1,
++        .schema = "l,L0"
++    },
+ };
  
-@@ -1911,16 +1933,15 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         put_packet(s, buf);
-         break;
-     case 'G':
--        cpu_synchronize_state(s->g_cpu);
--        registers = mem_buf;
--        len = strlen(p) / 2;
--        hextomem((uint8_t *)registers, p, len);
--        for (addr = 0; addr < s->g_cpu->gdb_num_g_regs && len > 0; addr++) {
--            reg_size = gdb_write_register(s->g_cpu, registers, addr);
--            len -= reg_size;
--            registers += reg_size;
-+        {
-+            static const GdbCmdParseEntry write_all_regs_cmd_desc = {
-+                .handler = handle_write_all_regs,
-+                .cmd = "G",
-+                .cmd_startswith = 1,
-+                .schema = "s0"
-+            };
-+            cmd_parser = &write_all_regs_cmd_desc;
-         }
--        put_packet(s, "OK");
-         break;
-     case 'm':
-         {
+ static void handle_gen_query(GdbCmdContext *gdb_ctx, void *user_ctx)
 -- 
 2.20.1
