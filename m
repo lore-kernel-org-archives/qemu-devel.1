@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42816)
+Received: from eggs.gnu.org ([209.51.188.92]:42891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6th-0003YC-0f
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:54 -0400
+	(envelope-from <arilou@gmail.com>) id 1hM6ti-0003aB-RU
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6te-00085U-NA
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:52 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38447)
+	(envelope-from <arilou@gmail.com>) id 1hM6th-0008Nm-8k
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:54 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51691)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6te-0007YJ-DK
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:50 -0400
-Received: by mail-wr1-x442.google.com with SMTP id k16so2003032wrn.5
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:34 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6te-0007Ma-VM
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:52 -0400
+Received: by mail-wm1-x344.google.com with SMTP id t76so1484525wmt.1
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:21 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Thu,  2 May 2019 11:15:43 +0300
-Message-Id: <20190502081554.5521-17-arilou@gmail.com>
+Date: Thu,  2 May 2019 11:15:35 +0300
+Message-Id: <20190502081554.5521-9-arilou@gmail.com>
 In-Reply-To: <20190502081554.5521-1-arilou@gmail.com>
 References: <20190502081554.5521-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v9 16/27] gdbstub: Implement step (s pkt) with
- new infra
+Subject: [Qemu-devel] [PATCH v9 08/27] gdbstub: Implement remove breakpoint
+ (z pkt) with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +33,75 @@ Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
+ gdbstub.c | 49 ++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 32 insertions(+), 17 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 9fe130f30d..9b0556f8be 100644
+index 36c7353a22..b42425b24c 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1805,6 +1805,16 @@ static void handle_file_io(GdbCmdContext *gdb_ctx, void *user_ctx)
-     gdb_continue(gdb_ctx->s);
+@@ -1611,6 +1611,29 @@ static void handle_insert_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, "E22");
  }
  
-+static void handle_step(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_remove_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    if (gdb_ctx->num_params) {
-+        gdb_set_cpu_pc(gdb_ctx->s, (target_ulong)gdb_ctx->params[0].val_ull);
++    int res;
++
++    if (gdb_ctx->num_params < 3) {
++        put_packet(gdb_ctx->s, "E22");
++        return;
 +    }
 +
-+    cpu_single_step(gdb_ctx->s->c_cpu, sstep_flags);
-+    gdb_continue(gdb_ctx->s);
++    res = gdb_breakpoint_remove(gdb_ctx->params[1].val_ull,
++                                gdb_ctx->params[2].val_ull,
++                                gdb_ctx->params[0].val_ul);
++    if (res >= 0) {
++        put_packet(gdb_ctx->s, "OK");
++        return;
++    } else if (res == -ENOSYS) {
++        put_packet(gdb_ctx->s, "");
++        return;
++    }
++
++    put_packet(gdb_ctx->s, "E22");
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
      CPUState *cpu;
-@@ -1937,13 +1947,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+@@ -1877,23 +1900,15 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
          }
          break;
-     case 's':
--        if (*p != '\0') {
--            addr = strtoull(p, (char **)&p, 16);
--            gdb_set_cpu_pc(s, addr);
+     case 'z':
+-        type = strtoul(p, (char **)&p, 16);
+-        if (*p == ',')
+-            p++;
+-        addr = strtoull(p, (char **)&p, 16);
+-        if (*p == ',')
+-            p++;
+-        len = strtoull(p, (char **)&p, 16);
+-        if (ch == 'Z')
+-            res = gdb_breakpoint_insert(addr, len, type);
+-        else
+-            res = gdb_breakpoint_remove(addr, len, type);
+-        if (res >= 0)
+-             put_packet(s, "OK");
+-        else if (res == -ENOSYS)
+-            put_packet(s, "");
+-        else
+-            put_packet(s, "E22");
 +        {
-+            static const GdbCmdParseEntry step_cmd_desc = {
-+                .handler = handle_step,
-+                .cmd = "s",
++            static const GdbCmdParseEntry remove_bp_cmd_desc = {
++                .handler = handle_remove_bp,
++                .cmd = "z",
 +                .cmd_startswith = 1,
-+                .schema = "L0"
++                .schema = "l?L?L0"
 +            };
-+            cmd_parser = &step_cmd_desc;
-         }
--        cpu_single_step(s->c_cpu, sstep_flags);
--        gdb_continue(s);
--        return RS_IDLE;
-+        break;
-     case 'F':
++            cmd_parser = &remove_bp_cmd_desc;
++        }
+         break;
+     case 'H':
          {
-             static const GdbCmdParseEntry file_io_cmd_desc = {
 -- 
 2.20.1
