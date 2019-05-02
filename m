@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36711)
+Received: from eggs.gnu.org ([209.51.188.92]:37019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hMDwR-0006sJ-ID
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:48:12 -0400
+	(envelope-from <berrange@redhat.com>) id 1hMDxB-0007Uc-Px
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:48:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hMDwQ-0002Tk-KS
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:48:11 -0400
-Date: Thu, 2 May 2019 17:48:05 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190502174805.383e42c1.cohuck@redhat.com>
-In-Reply-To: <20190430203009.GJ28722@habkost.net>
-References: <20190425132134.2839-1-cohuck@redhat.com>
-	<20190425132134.2839-2-cohuck@redhat.com>
-	<CAFEAcA8TvMqZRCrMF5orgaWy-CxTR8fr6yF2W_-Y6LYfi1pGng@mail.gmail.com>
-	<20190430203009.GJ28722@habkost.net>
+	(envelope-from <berrange@redhat.com>) id 1hMDxA-0002rk-Ma
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:48:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37668)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hMDxA-0002rQ-Gf
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:48:56 -0400
+Date: Thu, 2 May 2019 16:48:49 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190502154849.GH15718@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190412121626.19829-1-berrange@redhat.com>
+	<20190412121626.19829-4-berrange@redhat.com>
+	<a0e3bdd6-6003-1fb9-4d52-315b6441e966@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 01/19] s390 vfio-ccw: Add bootindex property
- and IPLB data
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a0e3bdd6-6003-1fb9-4d52-315b6441e966@vivier.eu>
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] sockets: avoid string truncation
+ warnings when copying UNIX path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +30,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Tue, 30 Apr 2019 17:30:09 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
-
-> On Tue, Apr 30, 2019 at 05:54:49PM +0100, Peter Maydell wrote:
-> > On Thu, 25 Apr 2019 at 14:21, Cornelia Huck <cohuck@redhat.com> wrote:  
-> [...]
-> > > -        SCSIDevice *sd = (SCSIDevice *) object_dynamic_cast(OBJECT(dev_st),
-> > > -                                                            TYPE_SCSI_DEVICE);
-> > > -
-> > > -        if (sd) {
-> > > +        switch (devtype) {
-> > > +        case CCW_DEVTYPE_SCSI:
-> > > +            sd = (SCSIDevice *) object_dynamic_cast(OBJECT(dev_st),
-> > > +                                                           TYPE_SCSI_DEVICE);  
-> > 
-> > Coverity doesn't like the use of object_dynamic_cast() without a
-> > check that the return value isn't NULL before we dereference
-> > it a few lines further down.
-> > 
-> > I think that if we know this cast must always succeed, we
-> > could instead just write
-> >   SCSIDevice *sd = SCSI_DEVICE(dev_st);
-> > 
-> > On the other hand if the cast might not succeed because dev_st
-> > isn't necessarily of the right type, then we should check it
-> > for NULL and handle that appropriately.  
+On Thu, May 02, 2019 at 05:45:30PM +0200, Laurent Vivier wrote:
+> Dan,
 > 
-> s390_get_ccw_device() will set devtype=CCW_DEVTYPE_SCSI only if
-> dev_st is TYPE_SCSI_DEVICE, so the cast must always succeed and
-> we should use SCSI_DEVICE(dev_st) here.
-> 
+> do you want I take this through the trivial branch queue or do you add
+> it into the Sockets branch queue?
 
-Yes; sending a patch.
+I'm fine with you sending it via trivial queue since there's nothing
+else pending for the sockets code.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
