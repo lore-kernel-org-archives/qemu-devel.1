@@ -2,74 +2,86 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3271C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 11:17:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 614BDC43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 12:14:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A42482085A
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 11:17:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A42482085A
+	by mail.kernel.org (Postfix) with ESMTPS id 31F6020645
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 12:14:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31F6020645
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49331 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50334 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM9iG-0003a5-Mp
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 07:17:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53983)
+	id 1hMAbG-0006r5-Tv
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 08:14:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hM9hB-0003Dm-3h
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 07:16:09 -0400
+	(envelope-from <philmd@redhat.com>) id 1hMAZG-0005Vk-Lt
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 08:12:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hM9hA-0004xP-8s
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 07:16:09 -0400
-Received: from mail-wr1-f48.google.com ([209.85.221.48]:39860)
+	(envelope-from <philmd@redhat.com>) id 1hMAZE-0004Wp-OU
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 08:12:02 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:40701)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hM9h9-0004wo-E2
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 07:16:07 -0400
-Received: by mail-wr1-f48.google.com with SMTP id a9so2776193wrp.6
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 04:16:07 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hMAZC-0004V5-NM
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 08:12:00 -0400
+Received: by mail-wm1-f66.google.com with SMTP id h11so2294816wmb.5
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 05:11:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=Q8L9zvdDabkWGgeIvbfIdJLGIrgZkCgFgyJ/KDuNIJE=;
-	b=jRIAIvURVVUKwFsVQnl35O0gIvSn70PN6VY1EWEDMZycudZAPX5+VJmkCiy4FqwCEM
-	6/5xTmyGgLWoscRL3EdjBQvU2jYFAqQTPpMLwS1xnJuONO6wbjx22JzWNcD+D1Xe6EEs
-	yYe/3ad9Xmph2+BBFuozbf2aGFnfOzbFo4vew1HtHQuTaPiS9Nm4a+Q81F0DQuoYDb5V
-	X0hr8swAwNYU8yytQSRSdrxMbsSVqTY/90eO6rTPYWGBn4dIUBOk9hzmCYVmHwLZ5Mbp
-	gAAoy5heaYutYxkGUQDn8Ka5OKRXHZdCJGgt4nqHzD5wiaM3UVw+7h8UySFp/0Qk3eEg
-	6ELw==
-X-Gm-Message-State: APjAAAXEKt9K0z6BamQCG8QmafW4DTnwMcHLrs0PJC6691FpPMLHxZ83
-	JO1WXlbKxtH8MUVKJ/my3fw3QQ==
-X-Google-Smtp-Source: APXvYqwdyETTxiiz2cMouTmRpF+ACFTgy0NDZ/0ybA1PqrZdwkRGjjlGsGsZ8J3DK6CzvEvCQUTseg==
-X-Received: by 2002:a5d:4805:: with SMTP id l5mr2422466wrq.279.1556795766202; 
-	Thu, 02 May 2019 04:16:06 -0700 (PDT)
-Received: from steredhat (host103-125-dynamic.46-79-r.retail.telecomitalia.it.
-	[79.46.125.103])
-	by smtp.gmail.com with ESMTPSA id r2sm9129620wmh.31.2019.05.02.04.16.04
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 02 May 2019 04:16:05 -0700 (PDT)
-Date: Thu, 2 May 2019 13:16:03 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Message-ID: <20190502111603.wwf2lpymrhx76x6g@steredhat>
-References: <20190501134127.21104-1-thuth@redhat.com>
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=8ibxnsl1k7mOd8u+30nF9rFetxOQh/taXjr+yKGxL+g=;
+	b=bY06Py6gb7nF+CFnxfffPxmLvJrn1j0qfepF8Km5mtqozlrL0u0S0aiXy0V2e94PuL
+	BRpTieDgAALrwDhgTXFX9e8cdI3xdxCEWzM7TXfQqruTCwPfQ1RRRAVtxXVbq0fTI5fl
+	mzYmLDnVCLQqZDeOG/NAEzVptLUXvUP1JJrfwrgrZbymJbJTjMI3eC6r9t1/bpWG+HiJ
+	1VX9ZtWyh2fe4D+ydaOJWCuXHWEmQjxf27X06W2mNO2WwxIxvJO82H5+x54DDLVjeElj
+	joBg63FAEbBnTtbPSg1cxQZ7So8XYLubF0CxCNEu90WREL/CDth219GzsohKnWrwrscI
+	p44g==
+X-Gm-Message-State: APjAAAURhMmhhL3A6UC3sm5wO29ZusxYVe22ePo+vcIFbbk4bCvb2TJz
+	MDDxxDapAoldoDJkwBfKxBaw1g==
+X-Google-Smtp-Source: APXvYqxmUk+djEyljZXX+nNR7cxfgkO+yIsBCzxTKfbhqKtFtcp7A6t9eSjcz+baRZ55jgI5QW/fbA==
+X-Received: by 2002:a1c:a00f:: with SMTP id j15mr2068837wme.148.1556799114983; 
+	Thu, 02 May 2019 05:11:54 -0700 (PDT)
+Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	h81sm13923519wmf.33.2019.05.02.05.11.53
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Thu, 02 May 2019 05:11:54 -0700 (PDT)
+To: Laurent Vivier <laurent@vivier.eu>,
+	Stephen Checkoway <stephen.checkoway@oberlin.edu>,
+	Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers
+	<qemu-devel@nongnu.org>, Artyom Tarasenko <atar4qemu@gmail.com>,
+	qemu-trivial@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?=
+	<marcandre.lureau@redhat.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+References: <20190419154041.77802-1-stephen.checkoway@oberlin.edu>
+	<45e6247e-cddb-2185-7f7b-503be00bd453@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <f61fc519-da75-5b41-21d0-508cf89016f2@redhat.com>
+Date: Thu, 2 May 2019 14:11:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <45e6247e-cddb-2185-7f7b-503be00bd453@vivier.eu>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190501134127.21104-1-thuth@redhat.com>
-User-Agent: NeoMutt/20180716
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.221.48
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tests/qemu-iotests: Fix more
- reference output files due to recent qemu-io change
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v3] hw/char/escc: Lower irq
+ when transmit buffer is filled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -81,29 +93,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
-	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502111603.oQOuwFotjAG73VwPwaHjhJAg706kpsdOrZx0q2aGAl4@z>
+Message-ID: <20190502121153.cugOkYPSs49pcT4B-Djkhv7T6P2VKRpD6sCM10cnkU8@z>
 
-On Wed, May 01, 2019 at 03:41:27PM +0200, Thomas Huth wrote:
-> The output of qemu-io changed recently - most tests have been fixed in
-> commit 36b9986b08787019ef42 ("tests/qemu-iotests: Fix output of qemu-io
-> related tests") already, but the qcow1 and the vmdk test was still missing.
+On 5/2/19 11:04 AM, Laurent Vivier wrote:
+> On 19/04/2019 17:40, Stephen Checkoway wrote:
+>> The SCC/ESCC will briefly stop asserting an interrupt when the
+>> transmit FIFO is filled.
+>>
+>> This code doesn't model the transmit FIFO/shift register so the
+>> pending transmit interrupt is never deasserted which means that an
+>> edge-triggered interrupt controller will never see the low-to-high
+>> transition it needs to raise another interrupt. The practical
+>> consequence of this is that guest firmware with an interrupt service
+>> routine for the ESCC that does not send all of the data it has
+>> immediately will stop sending data if the following sequence of
+>> events occurs:
+>> 1. Disable processor interrupts
+>> 2. Write a character to the ESCC
+>> 3. Add additional characters to a buffer which is drained by the ISR
+>> 4. Enable processor interrupts
+>>
+>> In this case, the first character will be sent, the interrupt will
+>> fire and the ISR will output the second character. Since the pending
+>> transmit interrupt remains asserted, no additional interrupts will
+>> ever fire.
+>>
+>> This behavior was triggered by firmware for an embedded system with a
+>> Z85C30 which necessitated this patch.
+>>
+>> This patch fixes that situation by explicitly lowering the IRQ when a
+>> character is written to the buffer and no other interrupts are currently
+>> pending.
+>>
+>> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>
+>> I added a sentence about the Z85C30 necessitating this to the commit message.
+>>
+>>  hw/char/escc.c | 7 +++++++
+>>  1 file changed, 7 insertions(+)
+>>
+>> diff --git a/hw/char/escc.c b/hw/char/escc.c
+>> index 628f5f81f7..c5b05a63f1 100644
+>> --- a/hw/char/escc.c
+>> +++ b/hw/char/escc.c
+>> @@ -509,6 +509,13 @@ static void escc_mem_write(void *opaque, hwaddr addr,
+>>          break;
+>>      case SERIAL_DATA:
+>>          trace_escc_mem_writeb_data(CHN_C(s), val);
+>> +        /*
+>> +         * Lower the irq when data is written to the Tx buffer and no other
+>> +         * interrupts are currently pending. The irq will be raised again once
+>> +         * the Tx buffer becomes empty below.
+>> +         */
+>> +        s->txint = 0;
+>> +        escc_update_irq(s);
+>>          s->tx = val;
+>>          if (s->wregs[W_TXCTRL2] & TXCTRL2_TXEN) { // tx enabled
+>>              if (qemu_chr_fe_backend_connected(&s->chr)) {
+>>
 > 
-> Fixes: 99e98d7c9fc1a1639fad ("qemu-io: Use error_[gs]et_progname()")
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/qemu-iotests/059.out |  8 ++++----
->  tests/qemu-iotests/092.out | 24 ++++++++++++------------
->  2 files changed, 16 insertions(+), 16 deletions(-)
 > 
+> Applied to my trivial-patches branch.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Tested-by: Stefano Garzarella <sgarzare@redhat.com>
+Mark, Artyom, are you OK with this patch?
 
-Thanks,
-Stefano
+> 
+> Paolo, Marc-André, if you disagree with this change or prefer to take it
+> through one of your queues, I can remove it from mine. Let me know.
+> 
+> 
+> Thanks,
+> Laurent
+> 
 
