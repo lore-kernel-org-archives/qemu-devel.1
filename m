@@ -2,87 +2,97 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55174C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 05:33:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5B74C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 05:43:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1892E2085A
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 05:33:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KjmYMO8j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1892E2085A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id B78B120873
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 05:43:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B78B120873
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=alistair23.me
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45421 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45506 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM4Ls-0007eK-8y
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 01:33:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55580)
+	id 1hM4V3-0001lm-Lw
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 01:43:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hM4L5-0007LG-BN
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 01:33:01 -0400
+	(envelope-from <alistair@alistair23.me>) id 1hM4TT-0000kw-VY
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 01:41:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hM4L2-0004Id-TV
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 01:32:58 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:45349)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
-	id 1hM4L2-0002oV-Gl
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 01:32:56 -0400
-Received: by mail-ed1-x543.google.com with SMTP id g57so957410edc.12
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 22:32:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
-	:content-disposition:in-reply-to:user-agent;
-	bh=fiqfkx5w/v6l/z4tVxxxAOoXMfWTvWJBTOo59NAvBXU=;
-	b=KjmYMO8j53ZLZtyBOeACnEl86WvFqGL4F5ETitp0jDa77oh6DrNUKC7h60Kw91EMMk
-	tMmwdNT7bvokpfPHN9F0LoPP0rVwz/vxAl9OCHOU7H7DBCYSS/YbUcIaGzJXQQupORaZ
-	P/DW/FPe77qr/5JMlwl2yfWXH1xpgnJdjiAb0QcXCK2bg9UETmoPLTFVqILcmNWrDjOW
-	P/YSD7Ct4WoodbWe5YH/IrMumLOnpgqdFsQa0yhGaik97tN9tl9B9zokSX+mn/ibNuzM
-	pHB/dHN+cutJXJAOm/f+aBTQ4dShur0xEEMXGiwhzazlifSmzNKaox7YPO9BflKWH6Uo
-	tO5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
-	:references:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=fiqfkx5w/v6l/z4tVxxxAOoXMfWTvWJBTOo59NAvBXU=;
-	b=sHtIBa6+G3tY6l5zwOfTjB2awBhKf9PD7IItLEfrovYG0x3pcp2jfOSAA1JuTyWL47
-	DwroA5lO4ta7va2XBCrB4IuUrZQBJdymYWyY1H9P+ifNsCOVHUlHeefqGzP6hMLiY2KA
-	W8VZyWczE4a9P5bsSOegZMLPqsBzk14/3zKH4ub21muUlfVTv9lL+lrqvrZl80CBjQpq
-	wnr4krIXFlv7iOxyb72zDw2T4AWkzcbmBOd0V7Su+Ow/YM9CEme7G0/j0IXyLzMjAN/0
-	G9eH6b2aFfUiINxBwD/gSTPGoPe8J/XWmhGehd4AUB4oGqDbXdL30wt1w/CBrYikVzgc
-	gRPg==
-X-Gm-Message-State: APjAAAUrVW/+MTFIZlTi8VBrO41RxYVXTQNwR+jF027vxaKbLSDQOsiH
-	D6is7iRkoqXcnpDn1IAqsTJqJrAx
-X-Google-Smtp-Source: APXvYqxJABLhAc5hh3EMvJWrOfJSt/xyj2RYRpVHg+anvtKl5m1p1aovVq6/XAQ+59WlBA7pu1vyMQ==
-X-Received: by 2002:a17:906:6a82:: with SMTP id p2mr790438ejr.91.1556775128710;
-	Wed, 01 May 2019 22:32:08 -0700 (PDT)
-Received: from localhost ([185.92.221.13])
-	by smtp.gmail.com with ESMTPSA id q5sm7127819ejm.63.2019.05.01.22.32.07
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 01 May 2019 22:32:07 -0700 (PDT)
-Date: Thu, 2 May 2019 05:32:07 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190502053207.ix637eb6v7umujas@master>
-References: <20190430034412.12935-1-richardw.yang@linux.intel.com>
-	<155677104475.10667.17544832182226944733@c2072b67cc0c>
-MIME-Version: 1.0
+	(envelope-from <alistair@alistair23.me>) id 1hM4TR-0003Jd-5C
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 01:41:39 -0400
+Received: from mail-hk2apc01olkn0805.outbound.protection.outlook.com
+	([2a01:111:f400:febc::805]:22687
+	helo=APC01-HK2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alistair@alistair23.me>)
+	id 1hM4TD-0002vl-90
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 01:41:29 -0400
+Received: from SG2APC01FT014.eop-APC01.prod.protection.outlook.com
+	(10.152.250.51) by SG2APC01HT121.eop-APC01.prod.protection.outlook.com
+	(10.152.251.206) with Microsoft SMTP Server (version=TLS1_2,
+	cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.1835.13;
+	Thu, 2 May 2019 05:40:34 +0000
+Received: from PSXP216MB0277.KORP216.PROD.OUTLOOK.COM (10.152.250.58) by
+	SG2APC01FT014.mail.protection.outlook.com (10.152.250.188) with
+	Microsoft SMTP Server (version=TLS1_2,
+	cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1835.13 via Frontend Transport; Thu, 2 May 2019 05:40:34 +0000
+Received: from PSXP216MB0277.KORP216.PROD.OUTLOOK.COM
+	([fe80::d5cf:d2af:3aea:e2a3]) by PSXP216MB0277.KORP216.PROD.OUTLOOK.COM
+	([fe80::d5cf:d2af:3aea:e2a3%3]) with mapi id 15.20.1856.008;
+	Thu, 2 May 2019 05:40:34 +0000
+From: Alistair Francis <alistair@alistair23.me>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Thread-Topic: [PATCH v1 0/5]  Add the STM32F405 and Netduino Plus 2 machine
+Thread-Index: AQHVAKmP1wzVv6HtkUGCn4ebIHsq8Q==
+Date: Thu, 2 May 2019 05:40:34 +0000
+Message-ID:
+ <PSXP216MB02777FF1122DB78DEC580ACEDD340@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+Accept-Language: en-AU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: BYAPR04CA0036.namprd04.prod.outlook.com
+	(2603:10b6:a03:40::49) To PSXP216MB0277.KORP216.PROD.OUTLOOK.COM
+	(2603:1096:300:a::18)
+x-incomingtopheadermarker: OriginalChecksum:281F37AF3AB090D567B66DE789D84308973A90C99ABCBCE0F8E2C6A4BE49A5D6;
+	UpperCasedChecksum:71C59ACA2B4EF137ED833927CBD3378AAFCFFC6D32C064C8CFFF4E7A5E5EEC4F;
+	SizeAsReceived:7437; Count:48
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 2.21.0
+x-tmn: [sCjrnCgKUyCH3NQHRsdFS588KTHOVcQF2LHJsYUhWnjMEmTynGoNK0Bh2Es/VzN8]
+x-microsoft-original-message-id: <cover.1556774049.git.alistair@alistair23.me>
+x-ms-publictraffictype: Email
+x-incomingheadercount: 48
+x-eopattributedmessage: 0
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(5050001)(7020095)(20181119110)(201702061078)(5061506573)(5061507331)(1603103135)(2017031320274)(2017031323274)(2017031324274)(2017031322404)(1601125500)(1603101475)(1701031045);
+	SRVR:SG2APC01HT121; 
+x-ms-traffictypediagnostic: SG2APC01HT121:
+x-microsoft-antispam-message-info: RH3iBgxysQfXQbkWkYnCHi1CI3iePW9hbU73b7sGJ2NKDn+1zX+nkwjt9jz6+rEMHt4tttFNEVtHCqIE3+CV5vS1cbaJli7yVUQgwq/ALZVKyqKqX5TD09TSJporyB48rQ4NE0D9WgpjjKC6Q9YR5P/ZsQpcXEXvB5Xg38wU7ma3JH+LJ1p4KDaBnrj7a0TR
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <155677104475.10667.17544832182226944733@c2072b67cc0c>
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::543
-Subject: Re: [Qemu-devel] [PATCH 0/3] Cleanup migration/ram.c
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: d31494a7-9d8d-4ac3-9c8e-08d6cec0b1c4
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 May 2019 05:40:34.7132 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Internet
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SG2APC01HT121
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 2a01:111:f400:febc::805
+Subject: [Qemu-devel] [PATCH v1 0/5] Add the STM32F405 and Netduino Plus 2
+ machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,49 +104,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-Cc: fam@euphon.net, pbonzini@redhat.com, richardw.yang@linux.intel.com,
-	dgilbert@redhat.com, quintela@redhat.com
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502053207.3nhK1tblwsNgQYZUILhbsWpu7kfDLDzCGvHBl1w8eBY@z>
+Message-ID: <20190502054034.nLW-68WgEOaq3oNf8PNgugHKeLetkjvFxm9cbcjtknE@z>
 
-On Wed, May 01, 2019 at 09:24:06PM -0700, no-reply@patchew.org wrote:
->Patchew URL: https://patchew.org/QEMU/20190430034412.12935-1-richardw.yang@linux.intel.com/
->
->
->
->Hi,
->
->This series failed the asan build test. Please find the testing commands and
->their output below. If you have Docker installed, you can probably reproduce it
->locally.
->
->=== TEST SCRIPT BEGIN ===
->#!/bin/bash
->time make docker-test-debug@fedora TARGET_LIST=x86_64-softmmu J=14 NETWORK=1
->=== TEST SCRIPT END ===
->
->  COPY    RUNNER
->    RUN test-debug in qemu:fedora 
->container_linux.go:247: starting container process caused "process_linux.go:258: applying cgroup configuration for process caused \"The maximum number of active connections for UID 0 has been reached\""
->/usr/bin/docker-current: Error response from daemon: oci runtime error: The maximum number of active connections for UID 0 has been reached.
->Traceback (most recent call last):
->  File "./tests/docker/docker.py", line 615, in <module>
->    sys.exit(main())
->
-
-May I ask how I can reproduce this?
-
->
->The full log is available at
->http://patchew.org/logs/20190430034412.12935-1-richardw.yang@linux.intel.com/testing.asan/?type=message.
->---
->Email generated automatically by Patchew [https://patchew.org/].
->Please send your feedback to patchew-devel@redhat.com
-
--- 
-Wei Yang
-Help you, Help me
+DQpOb3cgdGhhdCB0aGUgQXJtLU00IENQVSBoYXMgYmVlbiBhZGRlZCB0byBRRU1VIHdlIGNhbiBh
+ZGQgdGhlIE5ldGR1aW5vDQpQbHVzIDIgbWFjaGluZS4gVGhpcyBpcyB2ZXJ5IHNpbWlsYXIgdG8g
+dGhlIFNUTTMyRjIwNSBhbmQgTmV0ZHVpbm8gMiBTb0MNCmFuZCBtYWNoaW5lLg0KDQp2MjoNCiAt
+IFJlb3JkZXIgcGF0Y2hzZXQNCiAtIFJldHVybiB0aGUga2VybmVsIGVudHJ5IHBvaW50IGluc3Rl
+YWQgb2YgdXNpbmcgYSBwb2ludGVyDQogLSBBZGRyZXNzIFBldGVyJ3MgY29tbWVudHMNCg0KDQpB
+bGlzdGFpciBGcmFuY2lzICg1KToNCiAgaHcvbWlzYzogQWRkIHRoZSBTVE0zMkY0eHggU3lzY29u
+ZmlnIGRldmljZQ0KICBody9taXNjOiBBZGQgdGhlIFNUTTMyRjR4eCBFWFRJIGRldmljZQ0KICBh
+cm12N206IEFsbG93IGVudHJ5IGluZm9ybWF0aW9uIHRvIGJlIHJldHVybmVkDQogIGh3L2FybTog
+QWRkIHRoZSBTVE0zMkY0eHggU29DDQogIGh3L2FybTogQWRkIHRoZSBOZXRkdWlubyBQbHVzIDIN
+Cg0KIE1BSU5UQUlORVJTICAgICAgICAgICAgICAgICAgICAgICAgfCAgMTQgKysNCiBkZWZhdWx0
+LWNvbmZpZ3MvYXJtLXNvZnRtbXUubWFrICAgIHwgICA0ICsNCiBody9hcm0vS2NvbmZpZyAgICAg
+ICAgICAgICAgICAgICAgIHwgICA2ICsNCiBody9hcm0vTWFrZWZpbGUub2JqcyAgICAgICAgICAg
+ICAgIHwgICAyICsNCiBody9hcm0vYXJtdjdtLmMgICAgICAgICAgICAgICAgICAgIHwgICA0ICst
+DQogaHcvYXJtL25ldGR1aW5vcGx1czIuYyAgICAgICAgICAgICB8ICA3NyArKysrKysrKw0KIGh3
+L2FybS9zdG0zMmY0MDVfc29jLmMgICAgICAgICAgICAgfCAzMDYgKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysNCiBody9taXNjL0tjb25maWcgICAgICAgICAgICAgICAgICAgIHwgICA2ICsN
+CiBody9taXNjL01ha2VmaWxlLm9ianMgICAgICAgICAgICAgIHwgICAyICsNCiBody9taXNjL3N0
+bTMyZjR4eF9leHRpLmMgICAgICAgICAgIHwgMTg3ICsrKysrKysrKysrKysrKysrKw0KIGh3L21p
+c2Mvc3RtMzJmNHh4X3N5c2NmZy5jICAgICAgICAgfCAxNjggKysrKysrKysrKysrKysrKw0KIGh3
+L21pc2MvdHJhY2UtZXZlbnRzICAgICAgICAgICAgICAgfCAgMTEgKysNCiBpbmNsdWRlL2h3L2Fy
+bS9hcm0uaCAgICAgICAgICAgICAgIHwgICA0ICstDQogaW5jbHVkZS9ody9hcm0vc3RtMzJmNDA1
+X3NvYy5oICAgICB8ICA3NCArKysrKysrDQogaW5jbHVkZS9ody9taXNjL3N0bTMyZjR4eF9leHRp
+LmggICB8ICA2MCArKysrKysNCiBpbmNsdWRlL2h3L21pc2Mvc3RtMzJmNHh4X3N5c2NmZy5oIHwg
+IDYxICsrKysrKw0KIDE2IGZpbGVzIGNoYW5nZWQsIDk4NCBpbnNlcnRpb25zKCspLCAyIGRlbGV0
+aW9ucygtKQ0KIGNyZWF0ZSBtb2RlIDEwMDY0NCBody9hcm0vbmV0ZHVpbm9wbHVzMi5jDQogY3Jl
+YXRlIG1vZGUgMTAwNjQ0IGh3L2FybS9zdG0zMmY0MDVfc29jLmMNCiBjcmVhdGUgbW9kZSAxMDA2
+NDQgaHcvbWlzYy9zdG0zMmY0eHhfZXh0aS5jDQogY3JlYXRlIG1vZGUgMTAwNjQ0IGh3L21pc2Mv
+c3RtMzJmNHh4X3N5c2NmZy5jDQogY3JlYXRlIG1vZGUgMTAwNjQ0IGluY2x1ZGUvaHcvYXJtL3N0
+bTMyZjQwNV9zb2MuaA0KIGNyZWF0ZSBtb2RlIDEwMDY0NCBpbmNsdWRlL2h3L21pc2Mvc3RtMzJm
+NHh4X2V4dGkuaA0KIGNyZWF0ZSBtb2RlIDEwMDY0NCBpbmNsdWRlL2h3L21pc2Mvc3RtMzJmNHh4
+X3N5c2NmZy5oDQoNCi0tIA0KMi4yMS4wDQoNCg==
 
