@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59579)
+Received: from eggs.gnu.org ([209.51.188.92]:59584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM69S-0004JF-VZ
+	(envelope-from <arilou@gmail.com>) id 1hM69V-0004My-Fd
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM69Q-0002SK-4V
+	(envelope-from <arilou@gmail.com>) id 1hM69Q-0002SI-4a
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:05 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36222)
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44041)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM69G-000056-Nr
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM69G-0000fX-CL
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:28:58 -0400
-Received: by mail-wr1-x443.google.com with SMTP id o4so1817405wra.3
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 00:27:02 -0700 (PDT)
+Received: by mail-wr1-x442.google.com with SMTP id c5so1772998wrs.11
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 00:27:25 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Thu,  2 May 2019 10:26:19 +0300
-Message-Id: <20190502072641.4667-6-arilou@gmail.com>
+Date: Thu,  2 May 2019 10:26:31 +0300
+Message-Id: <20190502072641.4667-18-arilou@gmail.com>
 In-Reply-To: <20190502072641.4667-1-arilou@gmail.com>
 References: <20190502072641.4667-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 05/27] gdbstub: Implement continue with
- signal (C pkt) with new infra
+Subject: [Qemu-devel] [PATCH v8 17/27] gdbstub: Implement v commands with
+ new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,56 +33,204 @@ Cc: alex.bennee@linaro.org, liran.alon@oracle.com, Jon Doron <arilou@gmail.com>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 30 +++++++++++++++++++++++++-----
- 1 file changed, 25 insertions(+), 5 deletions(-)
+ gdbstub.c | 170 +++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 110 insertions(+), 60 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 89f1ab6524..469aaeb875 100644
+index 9b0556f8be..d56d0fd235 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1532,6 +1532,21 @@ static void handle_continue(GdbCmdContext *gdb_ctx, void *user_ctx)
+@@ -1815,6 +1815,106 @@ static void handle_step(GdbCmdContext *gdb_ctx, void *user_ctx)
      gdb_continue(gdb_ctx->s);
  }
  
-+static void handle_cont_with_sig(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_v_cont_query(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    unsigned long signal = 0;
++    put_packet(gdb_ctx->s, "vCont;c;C;s;S");
++}
 +
-+    if (gdb_ctx->num_params) {
-+        signal = gdb_ctx->params[0].val_ul;
++static void handle_v_cont(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    int res;
++
++    if (!gdb_ctx->num_params) {
++        return;
 +    }
 +
-+    gdb_ctx->s->signal = gdb_signal_to_target(signal);
-+    if (gdb_ctx->s->signal == -1) {
-+        gdb_ctx->s->signal = 0;
++    res = gdb_handle_vcont(gdb_ctx->s, gdb_ctx->params[0].data);
++    if ((res == -EINVAL) || (res == -ERANGE)) {
++        put_packet(gdb_ctx->s, "E22");
++    } else if (res) {
++        put_packet(gdb_ctx->s, "\0");
 +    }
-+    gdb_continue(gdb_ctx->s);
++}
++
++static void handle_v_attach(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    GDBProcess *process;
++    CPUState *cpu;
++    char thread_id[16];
++
++    strcpy(gdb_ctx->str_buf, "E22");
++    if (!gdb_ctx->num_params) {
++        goto cleanup;
++    }
++
++    process = gdb_get_process(gdb_ctx->s, gdb_ctx->params[0].val_ul);
++    if (!process) {
++        goto cleanup;
++    }
++
++    cpu = get_first_cpu_in_process(gdb_ctx->s, process);
++    if (!cpu) {
++        goto cleanup;
++    }
++
++    process->attached = true;
++    gdb_ctx->s->g_cpu = cpu;
++    gdb_ctx->s->c_cpu = cpu;
++
++    gdb_fmt_thread_id(gdb_ctx->s, cpu, thread_id, sizeof(thread_id));
++    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "T%02xthread:%s;",
++             GDB_SIGNAL_TRAP, thread_id);
++cleanup:
++    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
++}
++
++static void handle_v_kill(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    /* Kill the target */
++    put_packet(gdb_ctx->s, "OK");
++    error_report("QEMU: Terminated via GDBstub");
++    exit(0);
++}
++
++static GdbCmdParseEntry gdb_v_commands_table[] = {
++    /* Order is important if has same prefix */
++    {
++        .handler = handle_v_cont_query,
++        .cmd = "Cont?",
++        .cmd_startswith = 1
++    },
++    {
++        .handler = handle_v_cont,
++        .cmd = "Cont",
++        .cmd_startswith = 1,
++        .schema = "s0"
++    },
++    {
++        .handler = handle_v_attach,
++        .cmd = "Attach;",
++        .cmd_startswith = 1,
++        .schema = "l0"
++    },
++    {
++        .handler = handle_v_kill,
++        .cmd = "Kill;",
++        .cmd_startswith = 1
++    },
++};
++
++static void handle_v_commands(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    if (!gdb_ctx->num_params) {
++        return;
++    }
++
++    if (process_string_cmd(gdb_ctx->s, NULL, gdb_ctx->params[0].data,
++                           gdb_v_commands_table,
++                           ARRAY_SIZE(gdb_v_commands_table))) {
++        put_packet(gdb_ctx->s, "");
++    }
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
      CPUState *cpu;
-@@ -1579,11 +1594,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+@@ -1822,7 +1922,7 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+     CPUClass *cc;
+     const char *p;
+     uint32_t pid, tid;
+-    int ch, type, res;
++    int ch, type;
+     uint8_t mem_buf[MAX_PACKET_LENGTH];
+     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
+     char thread_id[16];
+@@ -1871,66 +1971,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
          }
          break;
-     case 'C':
--        s->signal = gdb_signal_to_target (strtoul(p, (char **)&p, 16));
--        if (s->signal == -1)
--            s->signal = 0;
--        gdb_continue(s);
--        return RS_IDLE;
-+        {
-+            static const GdbCmdParseEntry cont_with_sig_cmd_desc = {
-+                .handler = handle_cont_with_sig,
-+                .cmd = "C",
-+                .cmd_startswith = 1,
-+                .schema = "l0"
-+            };
-+            cmd_parser = &cont_with_sig_cmd_desc;
-+        }
-+        break;
      case 'v':
-         if (strncmp(p, "Cont", 4) == 0) {
-             p += 4;
+-        if (strncmp(p, "Cont", 4) == 0) {
+-            p += 4;
+-            if (*p == '?') {
+-                put_packet(s, "vCont;c;C;s;S");
+-                break;
+-            }
+-
+-            res = gdb_handle_vcont(s, p);
+-
+-            if (res) {
+-                if ((res == -EINVAL) || (res == -ERANGE)) {
+-                    put_packet(s, "E22");
+-                    break;
+-                }
+-                goto unknown_command;
+-            }
+-            break;
+-        } else if (strncmp(p, "Attach;", 7) == 0) {
+-            unsigned long pid;
+-
+-            p += 7;
+-
+-            if (qemu_strtoul(p, &p, 16, &pid)) {
+-                put_packet(s, "E22");
+-                break;
+-            }
+-
+-            process = gdb_get_process(s, pid);
+-
+-            if (process == NULL) {
+-                put_packet(s, "E22");
+-                break;
+-            }
+-
+-            cpu = get_first_cpu_in_process(s, process);
+-
+-            if (cpu == NULL) {
+-                /* Refuse to attach an empty process */
+-                put_packet(s, "E22");
+-                break;
+-            }
+-
+-            process->attached = true;
+-
+-            s->g_cpu = cpu;
+-            s->c_cpu = cpu;
+-
+-            snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
+-                     gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_id)));
+-
+-            put_packet(s, buf);
+-            break;
+-        } else if (strncmp(p, "Kill;", 5) == 0) {
+-            /* Kill the target */
+-            put_packet(s, "OK");
+-            error_report("QEMU: Terminated via GDBstub");
+-            exit(0);
+-        } else {
+-            goto unknown_command;
++        {
++            static const GdbCmdParseEntry v_cmd_desc = {
++                .handler = handle_v_commands,
++                .cmd = "v",
++                .cmd_startswith = 1,
++                .schema = "s0"
++            };
++            cmd_parser = &v_cmd_desc;
+         }
++        break;
+     case 'k':
+         /* Kill the target */
+         error_report("QEMU: Terminated via GDBstub");
 -- 
 2.20.1
