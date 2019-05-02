@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57288)
+Received: from eggs.gnu.org ([209.51.188.92]:51491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hLy6e-0007Bp-RS
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 18:53:41 -0400
+	(envelope-from <richard.weiyang@gmail.com>) id 1hLzJI-0000FV-Nw
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 20:10:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hLy6Y-0007Sz-JE
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 18:53:36 -0400
-Resent-Message-Id: <E1hLy6Y-0007Sz-JE@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21884)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hLy6T-0007M3-Ao
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 18:53:30 -0400
-In-Reply-To: <20190430034412.12935-1-richardw.yang@linux.intel.com>
-Message-ID: <155675118046.10667.9255070406416571267@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <richard.weiyang@gmail.com>) id 1hLzJH-0001SN-Hg
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 20:10:48 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:37752)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
+	id 1hLzJH-0001JL-8C
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 20:10:47 -0400
+Received: by mail-ed1-x544.google.com with SMTP id w37so595764edw.4
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 17:10:30 -0700 (PDT)
+Date: Thu, 2 May 2019 00:10:26 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+Message-ID: <20190502001026.s4kit4ygz7mqdbgt@master>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+References: <20190430034412.12935-1-richardw.yang@linux.intel.com>
+	<155675118046.10667.9255070406416571267@c2072b67cc0c>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 1 May 2019 15:53:01 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <155675118046.10667.9255070406416571267@c2072b67cc0c>
 Subject: Re: [Qemu-devel] [PATCH 0/3] Cleanup migration/ram.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,18 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richardw.yang@linux.intel.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+To: qemu-devel@nongnu.org
+Cc: richardw.yang@linux.intel.com, fam@euphon.net, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQzMDAzNDQxMi4xMjkz
-NS0xLXJpY2hhcmR3LnlhbmdAbGludXguaW50ZWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
-aWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUg
-dGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2Nr
-ZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3Qt
-bWluZ3dAZmVkb3JhIFNIT1dfRU5WPTEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVO
-RCA9PT0KCgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
-L2xvZ3MvMjAxOTA0MzAwMzQ0MTIuMTI5MzUtMS1yaWNoYXJkdy55YW5nQGxpbnV4LmludGVsLmNv
-bS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdl
-bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4K
-UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Wed, May 01, 2019 at 03:53:01PM -0700, no-reply@patchew.org wrote:
+>Patchew URL: https://patchew.org/QEMU/20190430034412.12935-1-richardw.yang@linux.intel.com/
+>
+>
+>
+>Hi,
+>
+>This series failed the docker-mingw@fedora build test. Please find the testing commands and
+>their output below. If you have Docker installed, you can probably reproduce it
+>locally.
+>
+>=== TEST SCRIPT BEGIN ===
+>#!/bin/bash
+>time make docker-test-mingw@fedora SHOW_ENV=1 J=14 NETWORK=1
+>=== TEST SCRIPT END ===
+>
+>
+>
+>
+>The full log is available at
+>http://patchew.org/logs/20190430034412.12935-1-richardw.yang@linux.intel.com/testing.docker-mingw@fedora/?type=message.
+
+Where can I see the test case?
+
+>---
+>Email generated automatically by Patchew [https://patchew.org/].
+>Please send your feedback to patchew-devel@redhat.com
+
+-- 
+Wei Yang
+Help you, Help me
