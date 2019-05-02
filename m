@@ -2,80 +2,67 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6341DC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 06:26:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA6A7C04AA9
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 06:42:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34F9C2089E
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 06:26:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34F9C2089E
+	by mail.kernel.org (Postfix) with ESMTPS id 9AEF721479
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 06:42:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AEF721479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45904 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46065 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM5B2-0003iG-8y
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 02:26:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44054)
+	id 1hM5QX-0007Tg-OF
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 02:42:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hM5AB-0003Kj-TT
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:25:49 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hM5Po-0007Ai-JT
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:41:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hM5AA-0007We-75
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:25:47 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:55875)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hM5A9-0007RA-Rk
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:25:46 -0400
-Received: by mail-wm1-f67.google.com with SMTP id y2so746504wmi.5
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 23:25:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=70yUGOitSbX3Drm5NCoc8yqrzQOfX3tY5SDmtwPVPgw=;
-	b=JJQIg3sLKxwQJERCaTxgYNtJ45XLhPv+h7BgkmuWEbfFS8iHvS3DmXOmbAnKadqjNg
-	mwZYkLiwxsTWVaeGUVJoGkT+fwexAMYvJWXBLH+0gSWCHQgqXCAtCJtuo/vlOXB7JAiR
-	+P+nmHC8nmtuF4hkwXpYRO2cq20TcXtIzfrDe5ftQak9cQUxhaENC1CM9/NI5trHl4js
-	IiC3jkUSiYJw8e4FSE+wwjWwN2YnTf6cPu9YQIJrhnvkrrvP5MejWRH9hXXYc8M0GHLe
-	DgpToBZQqyJYQEd/Ygy8ucUw4lPgl3hcUZv88OCh64u/2pznnOg2xFm4G85wh+RGsY1C
-	7Hjw==
-X-Gm-Message-State: APjAAAXWlaBIBG+l6HWsByFPmnXkHrKqZLLj9PUXay5bFAsYkWBDPvGK
-	8t/y8DBVI2sbuql3Jgi70zSbyA==
-X-Google-Smtp-Source: APXvYqzl0aOY6oJniJqoXkg7zVrYv4SO9zGwZVTLfSH5VcGgZBUallfylnjKrEkABGv2fZYbUg6SfA==
-X-Received: by 2002:a1c:f205:: with SMTP id s5mr923357wmc.131.1556778339649;
-	Wed, 01 May 2019 23:25:39 -0700 (PDT)
-Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193])
-	by smtp.gmail.com with ESMTPSA id i8sm11329110wrb.5.2019.05.01.23.25.38
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Wed, 01 May 2019 23:25:39 -0700 (PDT)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190501223819.8584-1-richard.henderson@linaro.org>
-	<20190501223819.8584-3-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <776e0e87-494a-1bd3-8074-09c6390d498c@redhat.com>
-Date: Thu, 2 May 2019 08:25:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <kraxel@redhat.com>) id 1hM5Pn-00036j-Nx
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:41:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40544)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hM5Pn-0002wD-Eb
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:41:55 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 742F6307D935;
+	Thu,  2 May 2019 06:41:31 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-45.ams2.redhat.com
+	[10.36.116.45])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 16E71379D;
+	Thu,  2 May 2019 06:41:30 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id ADDDD11AAF; Thu,  2 May 2019 08:41:29 +0200 (CEST)
+Date: Thu, 2 May 2019 08:41:29 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: "Longpeng(Mike)" <longpeng2@huawei.com>
+Message-ID: <20190502064129.tklft35yvgaj6pq3@sirius.home.kraxel.org>
+References: <1556605301-44112-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20190501223819.8584-3-richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+In-Reply-To: <1556605301-44112-1-git-send-email-longpeng2@huawei.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.48]);
+	Thu, 02 May 2019 06:41:32 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH 2/2] configure: Use quotes around uses of
- $CPU_CFLAGS
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2] usb/xchi: avoid trigger assertion if
+ guest write wrong epid
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,89 +74,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org,
-	david@gibson.dropbear.id.au
+Cc: Gonglei <arei.gonglei@huawei.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502062538.b856MkxomcIRN7RUHQCgqvFikFA4CxlHKbOmK2Pe6fY@z>
+Message-ID: <20190502064129.W5-UgQodpog_xYOTevrMun51dpBc97pkxWc3d2BySqM@z>
 
-On 5/2/19 12:38 AM, Richard Henderson wrote:
-> About half of the values to which CPU_CFLAGS is set
-> have multiple space separated arguments.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On Tue, Apr 30, 2019 at 02:21:41PM +0800, Longpeng(Mike) wrote:
+> From: Longpeng <longpeng2@huawei.com>
+>=20
+> we found the following core in our environment:
+> 0  0x00007fc6b06c2237 in raise ()
+> 1  0x00007fc6b06c3928 in abort ()
+> 2  0x00007fc6b06bb056 in __assert_fail_base ()
+> 3  0x00007fc6b06bb102 in __assert_fail ()
+> 4  0x0000000000702e36 in xhci_kick_ep (...)
+> 5  0x000000000047897a in memory_region_write_accessor (...)
+> 6  0x000000000047767f in access_with_adjusted_size (...)
+> 7  0x000000000047944d in memory_region_dispatch_write (...)
+> (mr=3Dmr@entry=3D0x7fc6a0138df0, addr=3Daddr@entry=3D156, data=3D164889=
+2416,
+> size=3Dsize@entry=3D4, attrs=3Dattrs@entry=3D...)
+> 8  0x000000000042df17 in address_space_write_continue (...)
+> 10 0x000000000043084d in address_space_rw (...)
+> 11 0x000000000047451b in kvm_cpu_exec (cpu=3Dcpu@entry=3D0x1ab11b0)
+> 12 0x000000000045dcf5 in qemu_kvm_cpu_thread_fn (arg=3D0x1ab11b0)
+> 13 0x0000000000870631 in qemu_thread_start (args=3Dargs@entry=3D0x1acfb=
+50)
+> 14 0x00000000008959a7 in thread_entry_for_hotfix (pthread_cb=3D<optimiz=
+ed out>)
+> 15 0x00007fc6b0a60dd5 in start_thread ()
+> 16 0x00007fc6b078a59d in clone ()
+>=20
+> (gdb) f 5
+> 5  0x000000000047897a in memory_region_write_accessor (...)
+> 529	    mr->ops->write(mr->opaque, addr, tmp, size);
+> (gdb) p /x tmp
+> $9 =3D 0x62481a00 <-- last byte 0x00 is @epid
+>=20
+> xhci_doorbell_write() already check the upper bound of @slotid an @epid=
+,
+> it also need to check the lower bound.
+>=20
+> Cc: Gonglei <arei.gonglei@huawei.com>
+> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Signed-off-by: Longpeng <longpeng2@huawei.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Added to usb queue.
 
-> ---
->  configure | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index 234cb929ca..16bd4375d1 100755
-> --- a/configure
-> +++ b/configure
-> @@ -1543,37 +1543,37 @@ case "$cpu" in
->             CPU_CFLAGS="-m64"
->             LDFLAGS="-m64 $LDFLAGS"
->             cross_cc_ppc64=$cc
-> -           cross_cc_cflags_ppc64=$CPU_CFLAGS
-> +           cross_cc_cflags_ppc64="$CPU_CFLAGS"
->             ;;
->      sparc)
->             CPU_CFLAGS="-m32 -mv8plus -mcpu=ultrasparc"
->             LDFLAGS="-m32 -mv8plus $LDFLAGS"
->             cross_cc_sparc=$cc
-> -           cross_cc_cflags_sparc=$CPU_CFLAGS
-> +           cross_cc_cflags_sparc="$CPU_CFLAGS"
->             ;;
->      sparc64)
->             CPU_CFLAGS="-m64 -mcpu=ultrasparc"
->             LDFLAGS="-m64 $LDFLAGS"
->             cross_cc_sparc64=$cc
-> -           cross_cc_cflags_sparc64=$CPU_CFLAGS
-> +           cross_cc_cflags_sparc64="$CPU_CFLAGS"
->             ;;
->      s390)
->             CPU_CFLAGS="-m31"
->             LDFLAGS="-m31 $LDFLAGS"
->             cross_cc_s390=$cc
-> -           cross_cc_cflags_s390=$CPU_CFLAGS
-> +           cross_cc_cflags_s390="$CPU_CFLAGS"
->             ;;
->      s390x)
->             CPU_CFLAGS="-m64"
->             LDFLAGS="-m64 $LDFLAGS"
->             cross_cc_s390x=$cc
-> -           cross_cc_cflags_s390x=$CPU_CFLAGS
-> +           cross_cc_cflags_s390x="$CPU_CFLAGS"
->             ;;
->      i386)
->             CPU_CFLAGS="-m32"
->             LDFLAGS="-m32 $LDFLAGS"
->             cross_cc_i386=$cc
-> -           cross_cc_cflags_i386=$CPU_CFLAGS
-> +           cross_cc_cflags_i386="$CPU_CFLAGS"
->             ;;
->      x86_64)
->             # ??? Only extremely old AMD cpus do not have cmpxchg16b.
-> @@ -1582,13 +1582,13 @@ case "$cpu" in
->             CPU_CFLAGS="-m64 -mcx16"
->             LDFLAGS="-m64 $LDFLAGS"
->             cross_cc_x86_64=$cc
-> -           cross_cc_cflags_x86_64=$CPU_CFLAGS
-> +           cross_cc_cflags_x86_64="$CPU_CFLAGS"
->             ;;
->      x32)
->             CPU_CFLAGS="-mx32"
->             LDFLAGS="-mx32 $LDFLAGS"
->             cross_cc_i386=$cc
-> -           cross_cc_cflags_i386=$CPU_CFLAGS
-> +           cross_cc_cflags_i386="$CPU_CFLAGS"
->             ;;
->      # No special flags required for other host CPUs
->  esac
-> 
+thanks,
+  Gerd
+
 
