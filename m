@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57450)
+Received: from eggs.gnu.org ([209.51.188.92]:34261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hM2zd-0003oP-FY
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:06:46 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hM3I5-0008CU-Ix
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:25:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hM2zY-0002Al-FG
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:06:43 -0400
-Date: Thu, 2 May 2019 14:04:59 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190502040459.GE13618@umbus.fritz.box>
-References: <20190501223819.8584-1-richard.henderson@linaro.org>
+	(envelope-from <no-reply@patchew.org>) id 1hM3Hi-00072T-5B
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:25:34 -0400
+Resent-Message-Id: <E1hM3Hi-00072T-5B@eggs.gnu.org>
+Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21914)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hM3Hd-0006Mg-0P
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:25:21 -0400
+In-Reply-To: <20190430034412.12935-1-richardw.yang@linux.intel.com>
+Message-ID: <155677104475.10667.17544832182226944733@c2072b67cc0c>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="9l24NVCWtSuIVIod"
-Content-Disposition: inline
-In-Reply-To: <20190501223819.8584-1-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 0/2] configure: Fix make check-tcg for
- ppc64le
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 1 May 2019 21:24:06 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/3] Cleanup migration/ram.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org
+To: richardw.yang@linux.intel.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 
-
---9l24NVCWtSuIVIod
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, May 01, 2019 at 03:38:17PM -0700, Richard Henderson wrote:
-> At present make check-tcg will produce errors like
->=20
->   RUN     tests for ppc64
->   TEST    test-mmap (default) on ppc64
-> test-mmap: Invalid ELF image for this architecture
-> make[2]: *** [run-test-mmap] Error 255
-> make[1]: *** [run-guest-tests] Error 2
-> make: *** [run-tcg-tests-ppc64-linux-user] Error 2
->=20
-> which is caused by the use of the host ppc64le compiler
-> in building guest ppc64(be) executables.
-
-Thanks for looking at this.
-
-I've staged this tentatively in ppc-for-4.1.  However while it removes
-the "Invalid ELF image" message I still get:
-
-  TEST    test-mmap (4096 byte pages) on ppc64le
-test-mmap: Invalid argument
-make[2]: *** [/home/dwg/qemu/tests/tcg/multiarch/Makefile.target:35: run-te=
-st-mmap-4096] Error 255
-make[2]: Target 'run' not remade because of errors.
-make[1]: *** [/home/dwg/qemu/tests/tcg/Makefile.include:71: run-guest-tests=
-] Error 2
-make: *** [/home/dwg/qemu/tests/Makefile.include:1079: run-tcg-tests-ppc64l=
-e-linux-user] Error 2
-
-Running on a POWER9 host.  Do you see that as well?
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---9l24NVCWtSuIVIod
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzKbGgACgkQbDjKyiDZ
-s5L24w//REl6xvTe5wVXIqtnzSHNRg5ICnV0AyZDD9M93o4Z6M0njqy6fEICrNTh
-HOXJcExnDl9Mvn50zhYfeHghSYRyZi6PgbMfs3vVc2TBM7eOIJo9+m1suSA3V0WM
-Q+yuCwaA+6+Ff2mvczd3sbFlXKPsOLieMcI9qup3ajhDp+wlHL6VtlysRh/z2P1r
-JjL+Zu3M+VhUg28y1lUiAS8bnVXBjNW1YbFGm/rs0Znfr7eHYBrfpAuCA4CYd8EB
-0qerJ6QuEw7AD9QTWgckXAfsSmSxPXXQ+s3he2otFg9txr9hbEpfYuXpuJlVemIv
-U0kw9NkqkDEhRZlcWCj5S4nWjgnueoYreV02McPqH6NlC/bsWKz6DlCWOwVE8syB
-fvHm1IT2coSTh9pQM1rgRg7VTSOAxJq8dYRqJX7hKhUP7/ddrkKUJi+gRBSpPvq3
-/7daim5YQBgqoLatqY8ML1gFYlrG9LFdArew/y/Jv7RM+yE9B9m2nZx4l2ZGjiBp
-z6oIupCb+P9wMCjtlpaiFotgcH0Ob8NoIK78f+6JeSi4f5oYWuF9EXwuYJVfoZkR
-i2mqp05SE4ZbrYn7efQUGwttRkYr5dcA55kVnY3GuEmNbMq7JVvWTupB+9BNvtLe
-jIxK5OngiFIqC0h76OZ20jh1pqVgbfjHDFH+xoVO1hKxx0cnugo=
-=4hKQ
------END PGP SIGNATURE-----
-
---9l24NVCWtSuIVIod--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQzMDAzNDQxMi4xMjkz
+NS0xLXJpY2hhcmR3LnlhbmdAbGludXguaW50ZWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
+aWxlZCB0aGUgYXNhbiBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5k
+cyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5
+b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhIFRB
+UkdFVF9MSVNUPXg4Nl82NC1zb2Z0bW11IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBF
+TkQgPT09CgogIENPUFkgICAgUlVOTkVSCiAgICBSVU4gdGVzdC1kZWJ1ZyBpbiBxZW11OmZlZG9y
+YSAKY29udGFpbmVyX2xpbnV4LmdvOjI0Nzogc3RhcnRpbmcgY29udGFpbmVyIHByb2Nlc3MgY2F1
+c2VkICJwcm9jZXNzX2xpbnV4LmdvOjI1ODogYXBwbHlpbmcgY2dyb3VwIGNvbmZpZ3VyYXRpb24g
+Zm9yIHByb2Nlc3MgY2F1c2VkIFwiVGhlIG1heGltdW0gbnVtYmVyIG9mIGFjdGl2ZSBjb25uZWN0
+aW9ucyBmb3IgVUlEIDAgaGFzIGJlZW4gcmVhY2hlZFwiIgovdXNyL2Jpbi9kb2NrZXItY3VycmVu
+dDogRXJyb3IgcmVzcG9uc2UgZnJvbSBkYWVtb246IG9jaSBydW50aW1lIGVycm9yOiBUaGUgbWF4
+aW11bSBudW1iZXIgb2YgYWN0aXZlIGNvbm5lY3Rpb25zIGZvciBVSUQgMCBoYXMgYmVlbiByZWFj
+aGVkLgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9k
+b2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2MTUsIGluIDxtb2R1bGU+CiAgICBzeXMuZXhpdChtYWlu
+KCkpCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
+cy8yMDE5MDQzMDAzNDQxMi4xMjkzNS0xLXJpY2hhcmR3LnlhbmdAbGludXguaW50ZWwuY29tL3Rl
+c3RpbmcuYXNhbi8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
+bHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
+ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
