@@ -2,92 +2,61 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E99C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:32:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E46A6C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:33:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 905DF205F4
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:32:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UheoWFit"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 905DF205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id BA198205F4
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:33:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA198205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52084 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52092 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMCkq-0001Di-NM
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:32:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39502)
+	id 1hMCmE-0002Lg-TT
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:33:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMCRh-0001qp-EV
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:12:22 -0400
+	(envelope-from <david@redhat.com>) id 1hMCQe-0000Ds-Fc
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:11:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMCRg-0000dN-A7
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:12:21 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34973)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hMCRg-0000Y5-2C
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:12:20 -0400
-Received: by mail-wr1-x444.google.com with SMTP id f7so3623388wrs.2
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 07:12:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:subject:in-reply-to:date:message-id
-	:mime-version:content-transfer-encoding;
-	bh=MTu70O0GYRhEClmHSJ6g7DLAHzmf8HKweQ0ydqaE0V8=;
-	b=UheoWFitg1rAFrwtCrw13EKyM3zpmva+keI8ByCVc4YltUYWhr98fHNxX5wk+beL80
-	KZrdqJ2zvtQrP9/MYJyauyYLbpqEQNVEBvBXMJ1Mau/6TlswYhr8LXUwVeOHb1G+zVk7
-	nM1sLG2rbcoDlR4wh4rTmL6jeag3lUr/aBYdKGvspeRXggFOj3mV3ZcTFpuAd7dLp4ir
-	aefNg4T01nNNil4bUx8nJpgmIbFXjBvyH6HrFNXSJbdaDKRYMJThnTNk34wPXBJOdGys
-	HGmKsPqLBRj5UJWY+BZo1rNyjRzYjE5u4zBNACg9YBrxevV3vE/A1zdpHZNVZbLx/vhE
-	ZE1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=MTu70O0GYRhEClmHSJ6g7DLAHzmf8HKweQ0ydqaE0V8=;
-	b=kWPVZWhsBY5kGI48fgU53J3cC5AIIbidZTdAW8jJBhRoG/FRsVai/m+YBncr1BNcCO
-	kmKZ5OCpNyVqY8ziy6vUstooCSE4rjQGTfvJLC4QSTI2LM1xNa2z4XpJwC9MRQ+/pcjQ
-	J1qtuha3Tk6+A72csGxDf09wsmkNigmhof+L/slDZSxv+A56qslB/xBQTbWqlPtKcMEt
-	gs9CzGcn2tUqIuoEn+wWkLEwl1rk4VERkI7QRCCeKC61Pzq7BQ3LhWVaEHqESMR4qE8I
-	YAL/b0YS1xja14oDqzQXD/99+Lg9sPBtZv5No+uHlUvbmXajPWzEqu0v5k10cxEs+dhh
-	Ddtw==
-X-Gm-Message-State: APjAAAXMgXSefl7Ryve2/5JOWsp9kDRWeO/F1FiK84bVCwmhkWIobdkr
-	3LiEPRTH3ZPu6K3+7o7mze3aWs8kKEU=
-X-Google-Smtp-Source: APXvYqzvhXAQqYbJCDv+/BKAYt88+a655pbIERQTMr0iXAmLrxU808fulo48UnDj0aRCVUT4geXrkA==
-X-Received: by 2002:a5d:4b0c:: with SMTP id v12mr3104168wrq.330.1556806338231; 
-	Thu, 02 May 2019 07:12:18 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	z7sm12273258wme.26.2019.05.02.07.12.17 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 02 May 2019 07:12:17 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id EC31C1FF87
-	for <qemu-devel@nongnu.org>; Thu,  2 May 2019 15:12:16 +0100 (BST)
-References: <20190501050536.15580-1-richard.henderson@linaro.org>
-	<20190501050536.15580-17-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+	(envelope-from <david@redhat.com>) id 1hMCQd-00073Q-Ib
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:11:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52884)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hMCQd-00072l-DC; Thu, 02 May 2019 10:11:15 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A617F30024B1;
+	Thu,  2 May 2019 14:11:14 +0000 (UTC)
+Received: from t460s.redhat.com (ovpn-117-88.ams2.redhat.com [10.36.117.88])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2842A3793;
+	Thu,  2 May 2019 14:11:13 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-In-reply-to: <20190501050536.15580-17-richard.henderson@linaro.org>
-Date: Thu, 02 May 2019 15:12:16 +0100
-Message-ID: <87a7g554jj.fsf@zen.linaroharston>
+Date: Thu,  2 May 2019 16:10:01 +0200
+Message-Id: <20190502141019.6385-23-david@redhat.com>
+In-Reply-To: <20190502141019.6385-1-david@redhat.com>
+References: <20190502141019.6385-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Thu, 02 May 2019 14:11:14 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH v2 16/29] tcg/aarch64: Support vector
- variable shift opcodes
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3 22/40] s390x/tcg: Implement VECTOR NOT
+ EXCLUSIVE OR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,141 +68,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502141216.PNZ8eRTRdWA4j6rpDWNA-FdqjiQdf-AxQ5L4J9RV5-E@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190502141001.UairnipPv1gvEFveV74KhXHJvTVpl9jH8-Gn1OGzTT0@z>
 
+Again, part of vector enhancement facility 1. The operation corresponds
+to an bitwise equality check.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/insn-data.def      | 2 ++
+ target/s390x/translate_vx.inc.c | 7 +++++++
+ 2 files changed, 9 insertions(+)
 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 4983867a44..b549b76b96 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1138,6 +1138,8 @@
+     F(0xe76e, VNN,     VRR_c, VE,  0, 0, 0, 0, vnn, 0, IF_VEC)
+ /* VECTOR NOR */
+     F(0xe76b, VNO,     VRR_c, V,   0, 0, 0, 0, vno, 0, IF_VEC)
++/* VECTOR NOT EXCLUSIVE OR */
++    F(0xe76c, VNX,     VRR_c, VE,  0, 0, 0, 0, vnx, 0, IF_VEC)
+=20
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
+diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
+inc.c
+index 6aa996d230..c67edd4f44 100644
+--- a/target/s390x/translate_vx.inc.c
++++ b/target/s390x/translate_vx.inc.c
+@@ -1801,3 +1801,10 @@ static DisasJumpType op_vno(DisasContext *s, Disas=
+Ops *o)
+                   get_field(s->fields, v3));
+     return DISAS_NEXT;
+ }
++
++static DisasJumpType op_vnx(DisasContext *s, DisasOps *o)
++{
++    gen_gvec_fn_3(eqv, ES_8, get_field(s->fields, v1), get_field(s->fiel=
+ds, v2),
++                  get_field(s->fields, v3));
++    return DISAS_NEXT;
++}
+--=20
+2.20.1
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  tcg/aarch64/tcg-target.h     |  2 +-
->  tcg/aarch64/tcg-target.opc.h |  2 ++
->  tcg/aarch64/tcg-target.inc.c | 42 ++++++++++++++++++++++++++++++++++++
->  3 files changed, 45 insertions(+), 1 deletion(-)
->
-> diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
-> index ce2bb1f90b..f5640a229b 100644
-> --- a/tcg/aarch64/tcg-target.h
-> +++ b/tcg/aarch64/tcg-target.h
-> @@ -134,7 +134,7 @@ typedef enum {
->  #define TCG_TARGET_HAS_neg_vec          1
->  #define TCG_TARGET_HAS_shi_vec          1
->  #define TCG_TARGET_HAS_shs_vec          0
-> -#define TCG_TARGET_HAS_shv_vec          0
-> +#define TCG_TARGET_HAS_shv_vec          1
->  #define TCG_TARGET_HAS_cmp_vec          1
->  #define TCG_TARGET_HAS_mul_vec          1
->  #define TCG_TARGET_HAS_sat_vec          1
-> diff --git a/tcg/aarch64/tcg-target.opc.h b/tcg/aarch64/tcg-target.opc.h
-> index 4816a6c3d4..59e1d3f7f7 100644
-> --- a/tcg/aarch64/tcg-target.opc.h
-> +++ b/tcg/aarch64/tcg-target.opc.h
-> @@ -1,3 +1,5 @@
->  /* Target-specific opcodes for host vector expansion.  These will be
->     emitted by tcg_expand_vec_op.  For those familiar with GCC internals,
->     consider these to be UNSPEC with names.  */
-> +
-> +DEF(aa64_sshl_vec, 1, 2, 0, IMPLVEC)
-> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-> index 16381f5175..61c2dbbff2 100644
-> --- a/tcg/aarch64/tcg-target.inc.c
-> +++ b/tcg/aarch64/tcg-target.inc.c
-> @@ -538,12 +538,14 @@ typedef enum {
->      I3616_CMEQ      =3D 0x2e208c00,
->      I3616_SMAX      =3D 0x0e206400,
->      I3616_SMIN      =3D 0x0e206c00,
-> +    I3616_SSHL      =3D 0x0e204400,
->      I3616_SQADD     =3D 0x0e200c00,
->      I3616_SQSUB     =3D 0x0e202c00,
->      I3616_UMAX      =3D 0x2e206400,
->      I3616_UMIN      =3D 0x2e206c00,
->      I3616_UQADD     =3D 0x2e200c00,
->      I3616_UQSUB     =3D 0x2e202c00,
-> +    I3616_USHL      =3D 0x2e204400,
->
->      /* AdvSIMD two-reg misc.  */
->      I3617_CMGT0     =3D 0x0e208800,
-> @@ -2258,6 +2260,12 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcod=
-e opc,
->      case INDEX_op_sari_vec:
->          tcg_out_insn(s, 3614, SSHR, is_q, a0, a1, (16 << vece) - a2);
->          break;
-> +    case INDEX_op_shlv_vec:
-> +        tcg_out_insn(s, 3616, USHL, is_q, vece, a0, a1, a2);
-> +        break;
-> +    case INDEX_op_aa64_sshl_vec:
-> +        tcg_out_insn(s, 3616, SSHL, is_q, vece, a0, a1, a2);
-> +        break;
->      case INDEX_op_cmp_vec:
->          {
->              TCGCond cond =3D args[3];
-> @@ -2325,7 +2333,11 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType typ=
-e, unsigned vece)
->      case INDEX_op_smin_vec:
->      case INDEX_op_umax_vec:
->      case INDEX_op_umin_vec:
-> +    case INDEX_op_shlv_vec:
->          return 1;
-> +    case INDEX_op_shrv_vec:
-> +    case INDEX_op_sarv_vec:
-> +        return -1;
->      case INDEX_op_mul_vec:
->          return vece < MO_64;
->
-> @@ -2337,6 +2349,32 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType typ=
-e, unsigned vece)
->  void tcg_expand_vec_op(TCGOpcode opc, TCGType type, unsigned vece,
->                         TCGArg a0, ...)
->  {
-> +    va_list va;
-> +    TCGv_vec v0, v1, v2, t1;
-> +
-> +    va_start(va, a0);
-> +    v0 =3D temp_tcgv_vec(arg_temp(a0));
-> +    v1 =3D temp_tcgv_vec(arg_temp(va_arg(va, TCGArg)));
-> +    v2 =3D temp_tcgv_vec(arg_temp(va_arg(va, TCGArg)));
-> +
-> +    switch (opc) {
-> +    case INDEX_op_shrv_vec:
-> +    case INDEX_op_sarv_vec:
-> +        /* Right shifts are negative left shifts for AArch64.  */
-> +        t1 =3D tcg_temp_new_vec(type);
-> +        tcg_gen_neg_vec(vece, t1, v2);
-> +        opc =3D (opc =3D=3D INDEX_op_shrv_vec
-> +               ? INDEX_op_shlv_vec : INDEX_op_aa64_sshl_vec);
-> +        vec_gen_3(opc, type, vece, tcgv_vec_arg(v0),
-> +                  tcgv_vec_arg(v1), tcgv_vec_arg(t1));
-> +        tcg_temp_free_vec(t1);
-> +        break;
-> +
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +
-> +    va_end(va);
->  }
->
->  static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-> @@ -2518,6 +2556,10 @@ static const TCGTargetOpDef *tcg_target_op_def(TCG=
-Opcode op)
->      case INDEX_op_smin_vec:
->      case INDEX_op_umax_vec:
->      case INDEX_op_umin_vec:
-> +    case INDEX_op_shlv_vec:
-> +    case INDEX_op_shrv_vec:
-> +    case INDEX_op_sarv_vec:
-> +    case INDEX_op_aa64_sshl_vec:
->          return &w_w_w;
->      case INDEX_op_not_vec:
->      case INDEX_op_neg_vec:
-
-
---
-Alex Benn=C3=A9e
 
