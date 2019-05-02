@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54898)
+Received: from eggs.gnu.org ([209.51.188.92]:56647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hMDLI-0003nB-KN
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:09:50 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hMDQ3-00081C-KL
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:14:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hMDLE-0002a2-Vm
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:09:46 -0400
-Date: Thu, 2 May 2019 17:09:28 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190502170928.001c01df@Igors-MacBook-Pro>
-In-Reply-To: <a765e3ac-45e6-310e-aa66-7036b5717a26@linux.intel.com>
-References: <1553849325-44201-1-git-send-email-like.xu@linux.intel.com>
-	<1553849325-44201-3-git-send-email-like.xu@linux.intel.com>
-	<20190404162555.0a2267ee@redhat.com>
-	<a765e3ac-45e6-310e-aa66-7036b5717a26@linux.intel.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hMDPy-0005Lp-Qh
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:14:43 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:35852)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hMDPv-0005IM-3x
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:14:36 -0400
+Received: by mail-pf1-x443.google.com with SMTP id v80so1287434pfa.3
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 08:14:33 -0700 (PDT)
+References: <20190501223819.8584-1-richard.henderson@linaro.org>
+	<20190502040459.GE13618@umbus.fritz.box>
+	<5aca63b1-72e9-9402-8828-d2dd054b3313@linaro.org>
+	<87h8ad5e0h.fsf@zen.linaroharston>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e7318909-cae9-eef5-7f59-c9a2992fffeb@linaro.org>
+Date: Thu, 2 May 2019 08:14:28 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/9] cpu/topology: add general support for
- machine properties
+In-Reply-To: <87h8ad5e0h.fsf@zen.linaroharston>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] configure: Fix make check-tcg for
+ ppc64le
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,35 +34,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Like Xu <like.xu@linux.intel.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org, "Dr.
-	David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, like.xu@intel.com, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org
 
-On Tue, 30 Apr 2019 15:30:31 +0800
-Like Xu <like.xu@linux.intel.com> wrote:
-
-> On 2019/4/4 22:25, Igor Mammedov wrote:
-> > On Fri, 29 Mar 2019 16:48:38 +0800
-> > Like Xu <like.xu@linux.intel.com> wrote:
-> > 
-
-[...]
-
+On 5/2/19 3:47 AM, Alex Bennée wrote:
+>> This needs a different set of cleanups.  ;-)
 > 
-> The division of responsibility for this case (refactoring 
-> qemu_init_vcpu) seems to be a poisonous apple.
-> 
-> The prerequisite for setting cpu-> nr_cores / nr_threads from the parent 
-> is that the CPU has been created, so if any process during 
-> initialization needs this topo information, it will use the default 
-> values form cpu_common_initfn() instead of user-configured parameters.
+> I guess this is another use case for softmmu support in linux-user where
+> HOST_PAGE != TARGET_PAGE?
 
-can you point to concrete place that needs access to nr_cores / nr_threads
-before cpu is 'realized'?
+Well, yes, but I was thinking more short-term, wherein we do not test things
+that we know will not work.  E.g. testing 4k pages on a 64k page host.
 
- 
-> We may not want to repeat those assignment operations using the new 
-> values and what do you think, Igor?
-> 
-> <snipp>
-> 
+
+r~
