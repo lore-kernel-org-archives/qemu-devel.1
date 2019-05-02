@@ -1,18 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34778)
+Received: from eggs.gnu.org ([209.51.188.92]:34892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shmuel.eiderman@oracle.com>) id 1hMCFF-0002N0-9S
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:59:31 -0400
+	(envelope-from <groug@kaod.org>) id 1hMCFd-0002et-Qf
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:59:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shmuel.eiderman@oracle.com>) id 1hMCF7-0008Mc-8p
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:59:22 -0400
-From: Sam Eiderman <shmuel.eiderman@oracle.com>
-Date: Thu,  2 May 2019 16:58:27 +0300
-Message-Id: <20190502135828.42797-3-shmuel.eiderman@oracle.com>
-In-Reply-To: <20190502135828.42797-1-shmuel.eiderman@oracle.com>
-References: <20190502085029.30776-1-shmuel.eiderman@oracle.com>
-	<20190502135828.42797-1-shmuel.eiderman@oracle.com>
-Subject: [Qemu-devel] [PATCH v2 2/3] qemu-img: rebase: Reduce reads on
- in-chain rebase
+	(envelope-from <groug@kaod.org>) id 1hMCFX-00006L-5m
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:59:49 -0400
+Received: from 3.mo6.mail-out.ovh.net ([178.33.253.26]:44146)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hMCFV-0008N8-LM
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:59:47 -0400
+Received: from player157.ha.ovh.net (unknown [10.108.42.88])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 55FC81C0A05
+	for <qemu-devel@nongnu.org>; Thu,  2 May 2019 15:59:20 +0200 (CEST)
+Date: Thu, 2 May 2019 15:59:11 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190502155911.59f054a1@bahia.lan>
+In-Reply-To: <20190501053522.10967-2-sjitindarsingh@gmail.com>
+References: <20190501053522.10967-1-sjitindarsingh@gmail.com>
+	<20190501053522.10967-2-sjitindarsingh@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 2/2] ppc: Add dump-stack
+ implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,83 +31,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: shmuel.eiderman@oracle.com, eyal.moscovici@oracle.com, sagi.amit@oracle.com, karl.heubaum@oracle.com, liran.alon@oracle.com, arbel.moshe@oracle.com
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, qemu-ppc@nongnu.org, dgilbert@redhat.com, armbru@redhat.com
 
-In the following case:
+On Wed,  1 May 2019 15:35:22 +1000
+Suraj Jitindar Singh <sjitindarsingh@gmail.com> wrote:
 
-(base) A <- B <- C (tip)
+> The monitor function dump-stack is used to dump the stack for a cpu.
+> This can be useful for debugging purposes when the stack cannot be
+> dumped by another means.
+> 
+> Add a ppc implementation ppc_cpu_dump_stack().
+> The stack pointer is stored in R1 with the back pointer at offset 0 and
+> the link register at offset 2.
+> Also dump the registers from the stack frame if the marker "regshere" is
+> found.
+> This only dumps the kernel stack, stopping if a non-kernel address is
+> found in the stack.
+> 
+> Sample output:
+> (qemu) dump-stack
+> sp: 0xc00000007bfc5690 lr: 0xc0000000000974b8
+> sp: 0xc00000007bfc56f0 lr: 0xc00000000065aab4
+> sp: 0xc00000007bfc5720 lr: 0xc00000000065ab04
+> sp: 0xc00000007bfc5740 lr: 0xc0000000000c29b8
+> sp: 0xc00000007bfc57b0 lr: 0xc0000000000bc9e8
+> sp: 0xc00000007bfc57e0 lr: 0xc0000000000bd584
+> sp: 0xc00000007bfc5800 lr: 0xc0000000000bee14
+> sp: 0xc00000007bfc5ac0 lr: 0xc0000000000c2100
+> sp: 0xc00000007bfc5c60 lr: 0xc000000000029460
+> sp: 0xc00000007bfc5ca0 lr: 0xc00000000010b5e8
+> sp: 0xc00000007bfc5d00 lr: 0xc000000000105f34
+> 	trap : 0x0000000000000700
+> 	pc   : 0xc000000000104490
+> 	msr  : 0x9000000002843003
+> 	lr   : 0xc000000000103ffc
+> 	gpr 0: 0x0000000000000001
+> 	gpr 1: 0xc00000005051f530
+> 	gpr 2: 0xc000000001088200
+> 	gpr 3: 0x0000000000000001
+> 	gpr 4: 0xc000000032d60000
+> 	gpr 5: 0xc0000000014b8f00
+> 	gpr 6: 0x0000000000c835e0
+> 	gpr 7: 0x0000000000000000
+> 	gpr 8: 0x0000000000000000
+> 	gpr 9: 0xc000000032f00000
+> 	gpr10: 0x9000000002803033
+> 	gpr11: 0xc000000000b60f00
+> 	gpr12: 0x0000000000002000
+> 	gpr13: 0xc000000001250000
+> 	gpr14: 0x0000000000000000
+> 	gpr15: 0x0000000000000008
+> 	gpr16: 0x0000000000000000
+> 	gpr17: 0xc00000000114f790
+> 	gpr18: 0x00000000ffffffff
+> 	gpr19: 0xc00000005051f8e8
+> 	gpr20: 0x0000000000000001
+> 	gpr21: 0x0000000000000000
+> 	gpr22: 0x0000000000000001
+> 	gpr23: 0x0000000000000001
+> 	gpr24: 0x0000000000000001
+> 	gpr25: 0xc0000000014b8f70
+> 	gpr26: 0x0000000000000000
+> 	gpr27: 0x0000000000000001
+> 	gpr28: 0x0000000000000001
+> 	gpr29: 0x0000000000000000
+> 	gpr30: 0xc0000000014b8f00
+> 	gpr31: 0xc0000000014b8f00
+> sp: 0xc00000005051f530 lr: 0x0000000000000000
+> sp: 0xc00000005051f600 lr: 0xc000000000103ffc
+> sp: 0xc00000005051f670 lr: 0xc0000000000f60a8
+> sp: 0xc00000005051f850 lr: 0xc0000000000f18c0
+> sp: 0xc00000005051fa10 lr: 0xc0000000000f5184
+> sp: 0xc00000005051fae0 lr: 0xc0000000000ddf54
+> sp: 0xc00000005051fb00 lr: 0xc0000000000dab9c
+> sp: 0xc00000005051fb90 lr: 0xc0000000000cbf88
+> sp: 0xc00000005051fd00 lr: 0xc0000000003e7480
+> sp: 0xc00000005051fdb0 lr: 0xc0000000003e7ce4
+> sp: 0xc00000005051fe00 lr: 0xc0000000003e7d88
+> sp: 0xc00000005051fe20 lr: 0xc00000000000b3a4
+> 	trap : 0x0000000000000c01
+> 	pc   : 0x00007fffa6c9d8d0
+> 	msr  : 0x900000000280f033
+> 	lr   : 0x0000000010090f40
+> 	gpr 0: 0x0000000000000036
+> 	gpr 1: 0x00007fffa62fdd70
+> 	gpr 2: 0x00007fffa6d57300
+> 	gpr 3: 0x000000000000000d
+> 	gpr 4: 0x000000002000ae80
+> 	gpr 5: 0x0000000000000000
+> 	gpr 6: 0x0000000000000537
+> 	gpr 7: 0x0000000000000000
+> 	gpr 8: 0x000000000000000d
+> 	gpr 9: 0x0000000000000000
+> 	gpr10: 0x0000000000000000
+> 	gpr11: 0x0000000000000000
+> 	gpr12: 0x0000000000000000
+> 	gpr13: 0x00007fffa6306380
+> 	gpr14: 0x0000000000000000
+> 	gpr15: 0x0000000000000001
+> 	gpr16: 0x0000000039ba6928
+> 	gpr17: 0x0000000000000000
+> 	gpr18: 0x0000000000000000
+> 	gpr19: 0x00007fffa6d702f0
+> 	gpr20: 0x00007fffa62fddf0
+> 	gpr21: 0x0000000000000080
+> 	gpr22: 0x0000000000000004
+> 	gpr23: 0x0000000000000000
+> 	gpr24: 0x0000000010ac85c0
+> 	gpr25: 0x0000000000000008
+> 	gpr26: 0x00007fffa62fde10
+> 	gpr27: 0x0000000000000000
+> 	gpr28: 0x0000000000000002
+> 	gpr29: 0x0000000000000000
+> 	gpr30: 0x0000000039ba6900
+> 	gpr31: 0x0000000010ac85c0
+> sp: 0x00007fffa62fdd70
+> 
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> ---
+>  target/ppc/cpu.h                |  1 +
+>  target/ppc/translate.c          | 60 +++++++++++++++++++++++++++++++++++++++++
+>  target/ppc/translate_init.inc.c |  1 +
+>  3 files changed, 62 insertions(+)
+> 
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 5e7cf54b2f..28c4dffca1 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1284,6 +1284,7 @@ struct PPCVirtualHypervisorClass {
+>  void ppc_cpu_do_interrupt(CPUState *cpu);
+>  bool ppc_cpu_exec_interrupt(CPUState *cpu, int int_req);
+>  void ppc_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
+> +void ppc_cpu_dump_stack(CPUState *cpu, FILE *f);
+>  void ppc_cpu_dump_statistics(CPUState *cpu, int flags);
+>  hwaddr ppc_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+>  int ppc_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index 8d08625c33..b162998ce7 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -7705,6 +7705,66 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+>  #undef RFPL
+>  }
+>  
+> +struct ppc_pt_regs {
+> +        unsigned long gpr[32];
+> +        unsigned long nip;
+> +        unsigned long msr;
+> +        unsigned long orig_gpr3;
+> +        unsigned long ctr;
+> +        unsigned long link;
+> +        unsigned long xer;
+> +        unsigned long ccr;
+> +        unsigned long softe;
+> +        unsigned long trap;
+> +        unsigned long dar;
+> +        unsigned long dsisr;
+> +        unsigned long result;
+> +};
+> +
+> +void ppc_cpu_dump_stack(CPUState *cs, FILE *f)
+> +{
+> +#if defined(TARGET_PPC64)
+> +    PowerPCCPU *cpu = POWERPC_CPU(cs);
+> +    CPUPPCState *env = &cpu->env;
+> +    uint64_t sp, next_sp, lr, buf[4];
+> +
+> +    /* stack pointer stored in r1 */
+> +    sp = env->gpr[1];
+> +
+> +    while (sp && (sp & (0xCUL << 60))) {
 
-when running:
+0xCUL << 60 isn't appropriate for 32-bit hosts. Use 0xCULL instead.
 
-    qemu-img rebase -b A C
-
-QEMU would read all sectors not allocated in the file being rebased (C)
-and compare them to the new base image (A), regardless of whether they
-were changed or even allocated anywhere along the chain between the new
-base and the top image (B). This causes many unneeded reads when
-rebasing an image which represents a small diff of a large disk, as it
-would read most of the disk's sectors.
-
-Instead, use bdrv_is_allocated_above() to reduce the number of
-unnecessary reads.
-
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
-Signed-off-by: Eyal Moscovici <eyal.moscovici@oracle.com>
----
- qemu-img.c | 25 ++++++++++++++++++++++++-
- 1 file changed, 24 insertions(+), 1 deletion(-)
-
-diff --git a/qemu-img.c b/qemu-img.c
-index d9b609b3f0..7f20858cb9 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -3152,7 +3152,7 @@ static int img_rebase(int argc, char **argv)
-     BlockBackend *blk = NULL, *blk_old_backing = NULL, *blk_new_backing = NULL;
-     uint8_t *buf_old = NULL;
-     uint8_t *buf_new = NULL;
--    BlockDriverState *bs = NULL;
-+    BlockDriverState *bs = NULL, *prefix_chain_bs = NULL;
-     char *filename;
-     const char *fmt, *cache, *src_cache, *out_basefmt, *out_baseimg;
-     int c, flags, src_flags, ret;
-@@ -3343,6 +3343,12 @@ static int img_rebase(int argc, char **argv)
-                 goto out;
-             }
- 
-+            /*
-+             * Find out whether we rebase an image on top of a previous image
-+             * in its chain.
-+             */
-+            prefix_chain_bs = bdrv_find_backing_image(bs, out_real_path);
-+
-             blk_new_backing = blk_new_open(out_real_path, NULL,
-                                            options, src_flags, &local_err);
-             g_free(out_real_path);
-@@ -3422,6 +3428,23 @@ static int img_rebase(int argc, char **argv)
-                 continue;
-             }
- 
-+            if (prefix_chain_bs) {
-+                /*
-+                 * If cluster wasn't changed since prefix_chain, we don't need
-+                 * to take action
-+                 */
-+                ret = bdrv_is_allocated_above(bs, prefix_chain_bs,
-+                                              offset, n, &n);
-+                if (ret < 0) {
-+                    error_report("error while reading image metadata: %s",
-+                                 strerror(-ret));
-+                    goto out;
-+                }
-+                if (!ret) {
-+                    continue;
-+                }
-+            }
-+
-             /*
-              * Read old and new backing file and take into consideration that
-              * backing files may be smaller than the COW image.
--- 
-2.13.3
+> +        uint64_t marker = 0UL;
+> +
+> +        /* read and print LR */
+> +        cpu_physical_memory_read(sp & ~(0xCUL << 60), buf, sizeof(*buf) * 4);
+> +        next_sp = buf[0];
+> +        lr = buf[2];
+> +        qemu_fprintf(f, "sp: 0x%.16lx lr: 0x%.16lx\n", sp, lr);
+> +        sp &= ~(0xCUL << 60);
+> +
+> +        /* Does the stackframe contain regs? */
+> +        cpu_physical_memory_read(sp + 96, &marker, sizeof(marker));
+> +        if (marker == 0x7265677368657265) { /* regshere */
+> +            struct ppc_pt_regs regs;
+> +            int i;
+> +
+> +            cpu_physical_memory_read(sp + 112, &regs, sizeof(regs));
+> +
+> +            qemu_fprintf(f, "\ttrap : 0x%.16lx\n", regs.trap);
+> +            qemu_fprintf(f, "\tpc   : 0x%.16lx\n", regs.nip);
+> +            qemu_fprintf(f, "\tmsr  : 0x%.16lx\n", regs.msr);
+> +            qemu_fprintf(f, "\tlr   : 0x%.16lx\n", regs.link);
+> +            for (i = 0; i < 32; i++)
+> +                qemu_fprintf(f, "\tgpr%2d: 0x%.16lx\n", i,
+> +                            regs.gpr[i]);
+> +        }
+> +
+> +        sp = next_sp;
+> +    }
+> +
+> +    qemu_fprintf(f, "sp: 0x%.16lx\n", sp);
+> +#endif
+> +}
+> +
+>  void ppc_cpu_dump_statistics(CPUState *cs, int flags)
+>  {
+>  #if defined(DO_PPC_STATISTICS)
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+> index 0394a9ddad..3fd24f85cc 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -10587,6 +10587,7 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
+>      cc->do_interrupt = ppc_cpu_do_interrupt;
+>      cc->cpu_exec_interrupt = ppc_cpu_exec_interrupt;
+>      cc->dump_state = ppc_cpu_dump_state;
+> +    cc->dump_stack = ppc_cpu_dump_stack;
+>      cc->dump_statistics = ppc_cpu_dump_statistics;
+>      cc->set_pc = ppc_cpu_set_pc;
+>      cc->gdb_read_register = ppc_cpu_gdb_read_register;
