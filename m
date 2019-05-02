@@ -2,85 +2,65 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C756FC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 07:41:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E105C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 07:42:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EC5820873
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 07:41:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W1f0oXW0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EC5820873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4BA5520873
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 07:42:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BA5520873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46702 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46706 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM6LN-0006SP-Qq
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 03:41:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59809)
+	id 1hM6M1-0007Kc-IL
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 03:42:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6AD-00052b-Rf
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:54 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hM6GS-0002F8-9t
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:36:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6A3-0002tl-Pz
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:47 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34889)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM69v-0000jZ-Lo
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:37 -0400
-Received: by mail-wr1-x444.google.com with SMTP id f7so1831542wrs.2
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 00:27:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=0s6me8TS+YJwMJaLYgFa/gUYh4mdTLo/usW+gDFwuc4=;
-	b=W1f0oXW0udUzCj6hVNoZMmevJaV+VXN2zc97NBTFTZO5+KUcwMeIM7WiWPWtGehVR5
-	AGIcqLKBHkpzlOcZVrl5/og1ebq8uNjso0UF4jdWvuLuluNZ9NzboTjsroyKMDBobdh8
-	d7kID+ZOtm/yflTE9BjytH7PvKAyklh3wTxH6h6mz5tJmMTAlIK9t7fLgG9tQeO3GPA3
-	1N5mELi8fjUHrDh7xHgvrCaatUJPZVBS/3GmXe8vQVT7YYXyucbzM8WlZas/g+LQHsVO
-	xS4Ov0wg+AWvyoL/EyIJmBcloAH8/HHoqrEYyIVNhk9a8kQiqnliwwxM3g1HAFJkhK9C
-	l2Fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=0s6me8TS+YJwMJaLYgFa/gUYh4mdTLo/usW+gDFwuc4=;
-	b=pXZGI4WfKiKlTWsMmFxPOnBqUWcDb7ApgO9v/CDOhtcgDMbeUvcPNmr4vYMDjCZzHW
-	rCoaAVu3iMNlZYNBOTwX6qZ+T68E+ceO1k3SUkwEWsiXB3Efb9xQlfGBGG/r5j3HSxto
-	mHkCzUttoESMohCB5oRontShDocI484O104/5Oi8egHHwIPS3xATpPP6knuMDma/jsPv
-	kIh5sZn6VQFvRbMVKU5gD2CwaQMgFYjJZKGllqEQBB3ixHTEyjNA+e4hUOLvwcG8A7bV
-	azfS6uuQtjNTpZT1BpnxGMfB/8y3e0egVHh8gDikRibLl9pn+kiG1sqY8kyqxPBdIhcP
-	RQaA==
-X-Gm-Message-State: APjAAAWr2JhVtr9VF7TJ8slmqWJXyyzyLPe3q+I094Wjm7SZOsjmYljD
-	RDGqtR26CN3GbjZGl962TYpUCXWF
-X-Google-Smtp-Source: APXvYqxTmvZKv/gl0fvdYLMxqRmA1kRBTHEoh21V/GelxquMuU/Tq4SWyenQ9qRCYKrqlKM/K5CXOg==
-X-Received: by 2002:a05:6000:1184:: with SMTP id g4mr8770wrx.70.1556782051771; 
-	Thu, 02 May 2019 00:27:31 -0700 (PDT)
-Received: from localhost.localdomain ([176.230.64.186])
-	by smtp.gmail.com with ESMTPSA id z5sm8769289wre.70.2019.05.02.00.27.30
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 02 May 2019 00:27:31 -0700 (PDT)
-From: Jon Doron <arilou@gmail.com>
+	(envelope-from <kraxel@redhat.com>) id 1hM6GO-00016f-VP
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:36:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48232)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hM6GN-0000k8-6e
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:36:16 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7A775859FF;
+	Thu,  2 May 2019 07:35:50 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-45.ams2.redhat.com
+	[10.36.116.45])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 045BC5630B;
+	Thu,  2 May 2019 07:35:48 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id BD5581753B; Thu,  2 May 2019 09:35:43 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu,  2 May 2019 10:26:36 +0300
-Message-Id: <20190502072641.4667-23-arilou@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190502072641.4667-1-arilou@gmail.com>
-References: <20190502072641.4667-1-arilou@gmail.com>
+Date: Thu,  2 May 2019 09:35:43 +0200
+Message-Id: <20190502073543.4391-8-kraxel@redhat.com>
+In-Reply-To: <20190502073543.4391-1-kraxel@redhat.com>
+References: <20190502073543.4391-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH v8 22/27] gdbstub: Implement generic query
- qemu.Supported
+Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.26]);
+	Thu, 02 May 2019 07:35:50 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 7/7] hw/usb: avoid format truncation warning
+ when formatting port name
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,51 +72,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liran.alon@oracle.com, alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190502072636.pP_0IbWj_7ukfNZLAB4-4IcubppWpWa9BoZVQyYCgJo@z>
+Message-ID: <20190502073543.xuOJIHiEyuAzFnVbanWNi7CbMUy3a0_f5wOMdKvnANo@z>
 
-qemu.Supported query reply back with the supported qemu query/set
-commands (commands are seperated with a semicolon from each other).
+From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-gdb> maint packet qqemu.Supported
+hw/usb/hcd-xhci.c: In function =E2=80=98usb_xhci_realize=E2=80=99:
+hw/usb/hcd-xhci.c:3339:66: warning: =E2=80=98%d=E2=80=99 directive output=
+ may be truncated writing between 1 and 10 bytes into a region of size 5 =
+[-Wformat-trunca\
+tion=3D]
+ 3339 |             snprintf(port->name, sizeof(port->name), "usb2 port #=
+%d", i+1);
+      |                                                                  =
+^~
+hw/usb/hcd-xhci.c:3339:54: note: directive argument in the range [1, 2147=
+483647]
+ 3339 |             snprintf(port->name, sizeof(port->name), "usb2 port #=
+%d", i+1);
+      |                                                      ^~~~~~~~~~~~=
+~~~
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
+The xhci code formats the port name into a fixed length
+buffer which is only large enough to hold port numbers
+upto 5 digits in decimal representation. We're never
+going to have a port number that large, so aserting the
+port number is sensible is sufficient to tell GCC the
+formatted string won't be truncated.
+
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Message-Id: <20190412121626.19829-5-berrange@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- gdbstub.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ hw/usb/hcd-xhci.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 8bdfae4b29..00c07d6ec0 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -2127,6 +2127,11 @@ static void handle_query_attached(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, GDB_ATTACHED);
- }
- 
-+static void handle_query_qemu_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    put_packet(gdb_ctx->s, "sstepbits;sstep");
-+}
-+
- static GdbCmdParseEntry gdb_gen_query_set_common_table[] = {
-     /* Order is important if has same prefix */
-     {
-@@ -2203,6 +2208,10 @@ static GdbCmdParseEntry gdb_gen_query_table[] = {
-         .handler = handle_query_attached,
-         .cmd = "Attached",
-     },
-+    {
-+        .handler = handle_query_qemu_supported,
-+        .cmd = "qemu.Supported",
-+    },
- };
- 
- static void handle_gen_query(GdbCmdContext *gdb_ctx, void *user_ctx)
--- 
-2.20.1
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index d8472b4fea7f..9f8f9e45eceb 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -3336,6 +3336,7 @@ static void usb_xhci_init(XHCIState *xhci)
+                 USB_SPEED_MASK_LOW  |
+                 USB_SPEED_MASK_FULL |
+                 USB_SPEED_MASK_HIGH;
++            assert(i < MAXPORTS);
+             snprintf(port->name, sizeof(port->name), "usb2 port #%d", i+=
+1);
+             speedmask |=3D port->speedmask;
+         }
+@@ -3349,6 +3350,7 @@ static void usb_xhci_init(XHCIState *xhci)
+             }
+             port->uport =3D &xhci->uports[i];
+             port->speedmask =3D USB_SPEED_MASK_SUPER;
++            assert(i < MAXPORTS);
+             snprintf(port->name, sizeof(port->name), "usb3 port #%d", i+=
+1);
+             speedmask |=3D port->speedmask;
+         }
+--=20
+2.18.1
 
 
