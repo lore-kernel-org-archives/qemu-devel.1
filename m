@@ -2,91 +2,82 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E4DC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 09:44:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80AF2C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 10:06:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F6FC206DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 09:44:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F9482075E
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 10:06:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T3s7LkR5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F6FC206DF
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="efiaXMGO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F9482075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48399 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48634 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM8GL-0007T4-UE
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 05:44:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34557)
+	id 1hM8bo-0004up-Ft
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 06:06:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hM8Fd-00079y-13
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 05:43:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hM8b3-0004bW-4F
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 06:05:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hM8FY-0003eZ-BY
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 05:43:35 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:35167)
+	(envelope-from <peter.maydell@linaro.org>) id 1hM8b2-0000Q4-7T
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 06:05:45 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:43043)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hM8FV-0003Kg-TW
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 05:43:30 -0400
-Received: by mail-wr1-x430.google.com with SMTP id f7so2415082wrs.2
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 02:42:37 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hM8b2-0000OU-23
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 06:05:44 -0400
+Received: by mail-oi1-x242.google.com with SMTP id j9so469605oie.10
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 03:05:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:subject:in-reply-to:date:message-id
-	:mime-version:content-transfer-encoding;
-	bh=XRBlt+4inYH/0rSaUqt0ddg65tKLPpJYxDNU8NCr5BE=;
-	b=T3s7LkR5JVOupeEIEBpqABZXC/WahP8dmGYqlBQYPQ2P7Djd5XDiKo/+KA/yotfjOA
-	gjz/JWxFdKoCyPDY0Dvu0Dprk7AIJKvIKonx1f2a2bKYz4OpEIkpX/54tSj6Sd4qOtfJ
-	gd3SFbH8A6HhLG0L/1k5TLjf3wTX/XD49FfaMlrNQHR0IgR6tYpwI/hLo35MMLzZTiqc
-	g3ykBW7T6PLdyMACMywzxT2qvBdVRo69TokH+ymfxZWyHEPDxV3uD2DR+umRZRdbgCkM
-	ikFX2Vb3p7U7klINXm+gpW5tawvTey0qPVpjw69bjI0T8p2XXRtNwdi3ed+QfKS5b5jy
-	2xig==
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=pNk0Q3QckoxPkrut+nhTjV/QVf8jMvXhiGFwpItB8T0=;
+	b=efiaXMGO2BCARn/ChTMCqaVezSHUfCiOy6B+nzt+J2vBBOZdsYoz9ghs1yixpzk6AF
+	kistrNi2Q8jsJH7JehunCBlPnacyB3xweW09XTQRatzR9wP2Qc7jndBIjt8B4oRyojcI
+	R6qcpJ7BrTG8ysDwFHez/te8VsfJU1Hc30VWIoT6xVHBYQzgDVHE2GsruxZm7Vty/EmL
+	ebHhU6dUMWz3/CAa1fnbufO690YMWZJlAASH/LlT+Q+8UTUUXljtPIcjaadaUceoZORJ
+	mxRAT5q3h1tFbCpp9PH7w9im9u4OTyNcYTqzH8zMOlO4J0IQGBmra6qRLNr8VZQz+TPA
+	u6sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=XRBlt+4inYH/0rSaUqt0ddg65tKLPpJYxDNU8NCr5BE=;
-	b=nqKN482SV+8rX879++EQ0le1SMiUVe3nV5r1EaJVSsw20Wrb/Ie5zbwlJtEMHu20iI
-	9gVOHRTfKRpKql0RuZbWvYNo7dVWByNvXmUaHRiOO9R+/Q16uRf94yDq8KqxWcH7r1cC
-	zBjrktm5MbRpuFKNlZCVphtSQUGr0127uWUqtnMUOqtsar6JTETOVibGdWyGbnxnUJES
-	YFpwO7hfJ83F/REWxQdtCBBq5Qqwy30/+sDf41LmDvQjts8WZMb2hEEhoQK6vcAa+GZz
-	0jzRVvp/JXTGhc0IlGYCtgb9f0v1mCw84Zepbw6FXbE8gpLZ2G5TjOnAIqPNMSQkYa5+
-	4MEA==
-X-Gm-Message-State: APjAAAXpOwPa0xIsb7H8gJiM+XyOoqmgadPiKZkJM2lXG4O1wGHdvbJi
-	zbg9ZtQZ/4AbPBDF5xNy41Wy0bSncgA=
-X-Google-Smtp-Source: APXvYqy4M8IgnSM7Wd2blk1WUe9GEyA5mELcgsYALVGLi/Y726kv9dga51nAy9vhIR3ZuD50GOV83w==
-X-Received: by 2002:adf:9301:: with SMTP id 1mr2075586wro.231.1556790156569;
-	Thu, 02 May 2019 02:42:36 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	s18sm6484964wmc.41.2019.05.02.02.42.35 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 02 May 2019 02:42:35 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 934BA1FF87
-	for <qemu-devel@nongnu.org>; Thu,  2 May 2019 10:42:35 +0100 (BST)
-References: <20190501050536.15580-1-richard.henderson@linaro.org>
-	<20190501050536.15580-10-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190501050536.15580-10-richard.henderson@linaro.org>
-Date: Thu, 02 May 2019 10:42:35 +0100
-Message-ID: <87imut5h10.fsf@zen.linaroharston>
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=pNk0Q3QckoxPkrut+nhTjV/QVf8jMvXhiGFwpItB8T0=;
+	b=a+rynXvh7YtBRlSNvOqsd8gS0ts8pU14J6wyw4CwOGEcchMCw0hKDf2Gu9r7Hz9r/J
+	f9n+vL7mtkvDz6OE1Wp0/txePveL567SuA3J9eAqOsiosc8jsbFYiXRFanxv9b+KuwZ0
+	td9/wFwNEqGHLOJzWQYgP4WFtNvLMMpsLcpItG+GSR4imAAYkIMOu8EAG7A/S2j9/8oV
+	zuCWpPcXiFeqADNOK1km7GzC28evjNXqOMuZGr2L3Annn0Af7EahqInfJOb7K1OHnf3o
+	ikI9MosXIZwGJG6XLzlua2xwKOoDdWs9jxULYpZd2XU291uO8rkM3BRDWBTcROHpweUa
+	/zIg==
+X-Gm-Message-State: APjAAAVd89augj/bnohvcCLE/Rkx2XZDzv9dOCBaYIHECnEGbc+luEBf
+	uVS0bKrzL8Av+GVHgBJ0gq4QpWs6xO5xpQhwsFbcXg==
+X-Google-Smtp-Source: APXvYqz0OD7Lz/EdbW1SVvU82D0JJYwvx4oLqfnFX+YeNCfoIkopkIy3P6kqYusIZ5xBnF/UajCEJ7VOeua220mAkZQ=
+X-Received: by 2002:aca:ab12:: with SMTP id u18mr1708710oie.48.1556791541964; 
+	Thu, 02 May 2019 03:05:41 -0700 (PDT)
 MIME-Version: 1.0
+References: <cover.1556515687.git.alistair@alistair23.me>
+	<PSXP216MB02771957D4B9C5A15914D05FDD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+	<CAFEAcA86i3aZx-h2ys5kmc35AMqzd6k=JrfVXObdbcppnn-J8w@mail.gmail.com>
+	<CAKmqyKMM0QHgdS3Z9Fd13XjeFsiG1UnZYz5brdjJgnbHXmxBrQ@mail.gmail.com>
+In-Reply-To: <CAKmqyKMM0QHgdS3Z9Fd13XjeFsiG1UnZYz5brdjJgnbHXmxBrQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 2 May 2019 11:05:31 +0100
+Message-ID:
+ <CAFEAcA-dZ5qdh58QCmX+t2RpJim8Fu9FY0UBY1tMpQOHkG06mA@mail.gmail.com>
+To: Alistair Francis <alistair23@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::430
-Subject: Re: [Qemu-devel] [PATCH v2 09/29] tcg: Manually expand
- INDEX_op_dup_vec
+X-Received-From: 2607:f8b0:4864:20::242
+Subject: Re: [Qemu-devel] [PATCH v1 5/5] hw/arm: Add the Netduino Plus 2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,149 +89,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Alistair Francis <alistair@alistair23.me>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502094235.ohUKSnVqJq92xSqB3IuLo_ss6jH3KrQT0SWFXYnsDyI@z>
+Message-ID: <20190502100531.RSyKo-Ehj8cbH6MVcKU929TrdQoS87k-jURy_dJMVRQ@z>
 
-
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> This case is similar to INDEX_op_mov_* in that we need to do
-> different things depending on the current location of the source.
+On Tue, 30 Apr 2019 at 21:29, Alistair Francis <alistair23@gmail.com> wrote:
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
-<snip>
+> On Tue, Apr 30, 2019 at 9:02 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+> > Can you explain the purpose of the reset code? None of the other
+> > v7m boards seem to need to do a manual qemu_register_reset().
 >
-> +static void tcg_reg_alloc_dup(TCGContext *s, const TCGOp *op)
-> +{
-> +    const TCGLifeData arg_life =3D op->life;
-> +    TCGRegSet dup_out_regs, dup_in_regs;
-> +    TCGTemp *its, *ots;
-> +    TCGType itype, vtype;
-> +    unsigned vece;
-> +    bool ok;
-> +
-> +    ots =3D arg_temp(op->args[0]);
-> +    its =3D arg_temp(op->args[1]);
-> +
-> +    /* There should be no fixed vector registers.  */
-> +    tcg_debug_assert(!ots->fixed_reg);
+> The reset code allows the machine to work with the -kernel option.
+> Without the reset override using -kernel results in the guest starting
+> at the wrong address. We can use the -device loader option without the
+> reset code though.
 
-This threw me slightly. I guess you only really duplicate vectors so I'm
-wondering if this should be called tcg_vec_reg_alloc_dup? Or maybe just
-a bit of verbiage in a block comment above the helper?
+That sounds in line with how -kernel works on the other armv7m
+boards -- the expectation is that your image file includes a
+full vector table and the CPU will read the PC and SP from it
+when it resets. If you want "honour the entry point" you can
+use -device loader, as you say.
 
-> +
-> +    itype =3D its->type;
-> +    vece =3D TCGOP_VECE(op);
-> +    vtype =3D TCGOP_VECL(op) + TCG_TYPE_V64;
-> +
-> +    if (its->val_type =3D=3D TEMP_VAL_CONST) {
-> +        /* Propagate constant via movi -> dupi.  */
-> +        tcg_target_ulong val =3D its->val;
-> +        if (IS_DEAD_ARG(1)) {
-> +            temp_dead(s, its);
-> +        }
-> +        tcg_reg_alloc_do_movi(s, ots, val, arg_life, op->output_pref[0]);
-> +        return;
-> +    }
-> +
-> +    dup_out_regs =3D tcg_op_defs[INDEX_op_dup_vec].args_ct[0].u.regs;
-> +    dup_in_regs =3D tcg_op_defs[INDEX_op_dup_vec].args_ct[1].u.regs;
-> +
-> +    /* Allocate the output register now.  */
-> +    if (ots->val_type !=3D TEMP_VAL_REG) {
-> +        TCGRegSet allocated_regs =3D s->reserved_regs;
-> +
-> +        if (!IS_DEAD_ARG(1) && its->val_type =3D=3D TEMP_VAL_REG) {
-> +            /* Make sure to not spill the input register. */
-> +            tcg_regset_set_reg(allocated_regs, its->reg);
-> +        }
-> +        ots->reg =3D tcg_reg_alloc(s, dup_out_regs, allocated_regs,
-> +                                 op->output_pref[0], ots->indirect_base);
-> +        ots->val_type =3D TEMP_VAL_REG;
-> +        ots->mem_coherent =3D 0;
-> +        s->reg_to_temp[ots->reg] =3D ots;
-> +    }
-> +
-> +    switch (its->val_type) {
-> +    case TEMP_VAL_REG:
-> +        /*
-> +         * The dup constriaints must be broad, covering all possible VEC=
-E.
-> +         * However, tcg_op_dup_vec() gets to see the VECE and we allow it
-> +         * to fail, indicating that extra moves are required for that ca=
-se.
-> +         */
-> +        if (tcg_regset_test_reg(dup_in_regs, its->reg)) {
-> +            if (tcg_out_dup_vec(s, vtype, vece, ots->reg, its->reg)) {
-> +                goto done;
-> +            }
-> +            /* Try again from memory or a vector input register.  */
-> +        }
-> +        if (!its->mem_coherent) {
-> +            /*
-> +             * The input register is not synced, and so an extra store
-> +             * would be required to use memory.  Attempt an integer-vect=
-or
-> +             * register move first.  We do not have a TCGRegSet for this.
-> +             */
-> +            if (tcg_out_mov(s, itype, ots->reg, its->reg)) {
-> +                break;
-> +            }
-> +            /* Sync the temp back to its slot and load from there.  */
-> +            temp_sync(s, its, s->reserved_regs, 0, 0);
-> +        }
-> +        /* fall through */
-> +
-> +    case TEMP_VAL_MEM:
-> +        /* TODO: dup from memory */
-> +        tcg_out_ld(s, itype, ots->reg, its->mem_base->reg,
-> its->mem_offset);
+Ignoring the entry point for -kernel ELF files is certainly
+a bit confusing, but I think if we want to change this we should
+do it globally, rather than having one board which behaves
+differently to the rest. Changing it does have some awkwardness:
+ * possibility of breaking previously working images
+ * we can get the initial PC from the ELF entrypoint, but if
+   we do this what do we do about the initial SP value ?
 
-Should we be aborting here? That said it looks like you are loading
-something directly from the register memory address here...
-
-> +        break;
-> +
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +
-> +    /* We now have a vector input register, so dup must succeed. */
-> +    ok =3D tcg_out_dup_vec(s, vtype, vece, ots->reg, ots->reg);
-> +    tcg_debug_assert(ok);
-> +
-> + done:
-> +    if (IS_DEAD_ARG(1)) {
-> +        temp_dead(s, its);
-> +    }
-> +    if (NEED_SYNC_ARG(0)) {
-> +        temp_sync(s, ots, s->reserved_regs, 0, 0);
-> +    }
-> +    if (IS_DEAD_ARG(0)) {
-> +        temp_dead(s, ots);
-> +    }
-> +}
-> +
->  static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
->  {
->      const TCGLifeData arg_life =3D op->life;
-> @@ -3981,6 +4080,9 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *t=
-b)
->          case INDEX_op_dupi_vec:
->              tcg_reg_alloc_movi(s, op);
->              break;
-> +        case INDEX_op_dup_vec:
-> +            tcg_reg_alloc_dup(s, op);
-> +            break;
->          case INDEX_op_insn_start:
->              if (num_insns >=3D 0) {
->                  size_t off =3D tcg_current_code_size(s);
-
-
---
-Alex Benn=C3=A9e
+thanks
+-- PMM
 
