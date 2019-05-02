@@ -2,80 +2,74 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A15EC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 11:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3271C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 11:17:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19B2B20873
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 11:06:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yL1nVFzh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19B2B20873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A42482085A
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 11:17:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A42482085A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49218 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49331 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM9XV-0000i4-6u
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 07:06:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51590)
+	id 1hM9iG-0003a5-Mp
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 07:17:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hM9WR-00005b-3q
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 07:05:04 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hM9hB-0003Dm-3h
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 07:16:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hM9WM-0006i6-Rz
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 07:05:01 -0400
-Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:43778)
+	(envelope-from <sgarzare@redhat.com>) id 1hM9hA-0004xP-8s
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 07:16:09 -0400
+Received: from mail-wr1-f48.google.com ([209.85.221.48]:39860)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hM9WK-0006eB-GS
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 07:04:58 -0400
-Received: by mail-ot1-x332.google.com with SMTP id e108so1634117ote.10
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 04:04:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=yE0I1xWURVrQVbj7Vfl82OHn557M4cVJKgatl4uxJgA=;
-	b=yL1nVFzhOFc7COo4ooXM/N30dlLhAdi/U2tGSDwOcgjzeyQnQ3fGhq6u5WE6CPUkmS
-	jXpheun+t97CF6G2x2eHWVG1MflaaSmjL9pMfMQKN/BJF5hPhXbbLkNVF86qN9X+ZYhQ
-	E8E5SejFXPPHPkOZiBh9fSDwxKvLBNgtTUZgFLuSWRG/2r92w2ijNxjct7tMSPdlQLNx
-	0BCI2iyBVVZjeXHXJLCXXBLlOSdTCmhGKte9y5xZOUBxiG++x++HGrySQ9YDlKW79Owt
-	b6CEbq9lhNEg6rczqLdQHY7qpQIvAbVesHBeKgz0opfD586/WtrFiye82F9OeWTCwPs9
-	aG2w==
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hM9h9-0004wo-E2
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 07:16:07 -0400
+Received: by mail-wr1-f48.google.com with SMTP id a9so2776193wrp.6
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 04:16:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=yE0I1xWURVrQVbj7Vfl82OHn557M4cVJKgatl4uxJgA=;
-	b=Dp4of3Fexhbhbc9HaGbfBXjGhZm5kDHa4PUGU9NavLOyANMFeg+SOG1T6rYYe98EWi
-	suzLvCRYsQGHEKaVSzAdHhw14gN4iOfgmenJRh99WeTmSzPI3kX0FSLQv6wntoc/YNGc
-	CScTVedPbckq475JwqUuBNcM7Ep9755nkCBO4mOLEWHQlFAaVNE9+A18YvaztJP20db+
-	p8reFLFYgkN0+RC8TT3N2xbcYjKXwn6mKcVJ7AcHxaV5JCrP9j9Y7LAXYoJ7pvsnc1a1
-	/6L5Q+OT91HPEQCEv93XFA7HKYbGqvV7KKMnyB3IN7w3qTBr9WAjSNEPjzyH1tfTc2Ls
-	amUA==
-X-Gm-Message-State: APjAAAWYh5QfzR5JEGH43ArA9CVBevWrfvrPIioDsQ9ukwRmv8pBTBky
-	4jpi46eaKCoSRigaoyc3GnJyf2lwYtePJL9b4MP3JA==
-X-Google-Smtp-Source: APXvYqwpfuuNhUgK43i+WEHYC2E26VBfoV6eGQuBFHrLU5sXls4BTx51eIh7zSSdFd48qVpctJryoV4oyGutxyGFOm4=
-X-Received: by 2002:a9d:61c6:: with SMTP id h6mr1929166otk.316.1556795089168; 
-	Thu, 02 May 2019 04:04:49 -0700 (PDT)
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=Q8L9zvdDabkWGgeIvbfIdJLGIrgZkCgFgyJ/KDuNIJE=;
+	b=jRIAIvURVVUKwFsVQnl35O0gIvSn70PN6VY1EWEDMZycudZAPX5+VJmkCiy4FqwCEM
+	6/5xTmyGgLWoscRL3EdjBQvU2jYFAqQTPpMLwS1xnJuONO6wbjx22JzWNcD+D1Xe6EEs
+	yYe/3ad9Xmph2+BBFuozbf2aGFnfOzbFo4vew1HtHQuTaPiS9Nm4a+Q81F0DQuoYDb5V
+	X0hr8swAwNYU8yytQSRSdrxMbsSVqTY/90eO6rTPYWGBn4dIUBOk9hzmCYVmHwLZ5Mbp
+	gAAoy5heaYutYxkGUQDn8Ka5OKRXHZdCJGgt4nqHzD5wiaM3UVw+7h8UySFp/0Qk3eEg
+	6ELw==
+X-Gm-Message-State: APjAAAXEKt9K0z6BamQCG8QmafW4DTnwMcHLrs0PJC6691FpPMLHxZ83
+	JO1WXlbKxtH8MUVKJ/my3fw3QQ==
+X-Google-Smtp-Source: APXvYqwdyETTxiiz2cMouTmRpF+ACFTgy0NDZ/0ybA1PqrZdwkRGjjlGsGsZ8J3DK6CzvEvCQUTseg==
+X-Received: by 2002:a5d:4805:: with SMTP id l5mr2422466wrq.279.1556795766202; 
+	Thu, 02 May 2019 04:16:06 -0700 (PDT)
+Received: from steredhat (host103-125-dynamic.46-79-r.retail.telecomitalia.it.
+	[79.46.125.103])
+	by smtp.gmail.com with ESMTPSA id r2sm9129620wmh.31.2019.05.02.04.16.04
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 02 May 2019 04:16:05 -0700 (PDT)
+Date: Thu, 2 May 2019 13:16:03 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Message-ID: <20190502111603.wwf2lpymrhx76x6g@steredhat>
+References: <20190501134127.21104-1-thuth@redhat.com>
 MIME-Version: 1.0
-References: <20190501105904.29907-1-dgilbert@redhat.com>
-In-Reply-To: <20190501105904.29907-1-dgilbert@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 2 May 2019 12:04:38 +0100
-Message-ID:
- <CAFEAcA-RkbwHbAigw7cezfVbCPspahBNEn_J1LCvcYYRjFg+vw@mail.gmail.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::332
-Subject: Re: [Qemu-devel] [PULL 0/2] hmp queue
+Content-Disposition: inline
+In-Reply-To: <20190501134127.21104-1-thuth@redhat.com>
+User-Agent: NeoMutt/20180716
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.48
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tests/qemu-iotests: Fix more
+ reference output files due to recent qemu-io change
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,42 +81,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
-	Cole Robinson <crobinso@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502110438.UEJ1Bq5Y6FQHey5mTvwC2rW4AKDEQAKumkUb2rCSd5Y@z>
+Message-ID: <20190502111603.oQOuwFotjAG73VwPwaHjhJAg706kpsdOrZx0q2aGAl4@z>
 
-On Wed, 1 May 2019 at 12:00, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
->
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> The following changes since commit f75d15231e56cb0f2bafe19faf1229c459a60731:
->
->   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-04-30 17:06:57 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/dagrh/qemu.git tags/pull-hmp-20190501
->
-> for you to fetch changes up to 574d96933ceff60b2d13fe97602572fc7e95f7c6:
->
->   hmp: gva2gpa debug command (2019-05-01 10:46:59 +0100)
->
-> ----------------------------------------------------------------
-> HMP pull
->
-> New gva2gpa command
-> delvm now uses hmp_handle_error so gets Error: prefix in messages
->
+On Wed, May 01, 2019 at 03:41:27PM +0200, Thomas Huth wrote:
+> The output of qemu-io changed recently - most tests have been fixed in
+> commit 36b9986b08787019ef42 ("tests/qemu-iotests: Fix output of qemu-io
+> related tests") already, but the qcow1 and the vmdk test was still missing.
+> 
+> Fixes: 99e98d7c9fc1a1639fad ("qemu-io: Use error_[gs]et_progname()")
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/qemu-iotests/059.out |  8 ++++----
+>  tests/qemu-iotests/092.out | 24 ++++++++++++------------
+>  2 files changed, 16 insertions(+), 16 deletions(-)
+> 
 
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Tested-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
-
--- PMM
+Thanks,
+Stefano
 
