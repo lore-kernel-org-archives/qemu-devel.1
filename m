@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44618)
+Received: from eggs.gnu.org ([209.51.188.92]:46510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hMFTx-0004dK-Ir
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 13:26:54 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hMFeM-00072Z-D4
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 13:37:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hMFTw-00028q-II
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 13:26:53 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hMFeL-0005mk-BH
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 13:37:38 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55138)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hMFeL-0005lX-4L
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 13:37:37 -0400
+Received: by mail-wm1-x342.google.com with SMTP id b10so4011254wmj.4
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 10:37:36 -0700 (PDT)
+References: <20190502084506.8009-1-thuth@redhat.com>
+	<20190502084506.8009-2-thuth@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190502084506.8009-2-thuth@redhat.com>
+Date: Thu, 02 May 2019 18:37:34 +0100
+Message-ID: <87y33o4v1d.fsf@zen.linaroharston>
 MIME-Version: 1.0
-References: <cover.1556666645.git.alistair.francis@wdc.com>
-	<14aab381eaa678eca875d0b8bd456feb22a21bd8.1556666645.git.alistair.francis@wdc.com>
-	<503a1f5f-7dad-1e4e-e1b1-aaeeeac9739f@vivier.eu>
-	<af19377f-4874-0374-99b6-ee9ab5b0f446@redhat.com>
-In-Reply-To: <af19377f-4874-0374-99b6-ee9ab5b0f446@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 2 May 2019 10:24:53 -0700
-Message-ID: <CAKmqyKP+o6MfqBQfkOmSXvoj-BX43KJD+ayzxZA6t-N-DucD5w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] linux-user/uname: Fix GCC 9 build
- warnings
+Subject: Re: [Qemu-devel] [PATCH v3 1/7] tests/qemu-iotests/005: Add a
+ sanity check for large sparse file support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Laurent Vivier <laurent@vivier.eu>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "kraxel@redhat.com" <kraxel@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, Christophe Fergeau <cfergeau@redhat.com>, Ed Maste <emaste@freebsd.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>, Philippe =?utf-8?Q?M?= =?utf-8?Q?athieu-Daud=C3=A9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Wed, May 1, 2019 at 5:00 AM Eric Blake <eblake@redhat.com> wrote:
->
-> On 5/1/19 4:40 AM, Laurent Vivier wrote:
-> > On 01/05/2019 01:28, Alistair Francis wrote:
-> >> Fix this warning when building with GCC9 on Fedora 30:
-> >> In function =E2=80=98strncpy=E2=80=99,
-> >>     inlined from =E2=80=98sys_uname=E2=80=99 at /home/alistair/qemu/li=
-nux-user/uname.c:94:3:
-> >> /usr/include/bits/string_fortified.h:106:10: error: =E2=80=98__builtin=
-_strncpy=E2=80=99 output may be truncated copying 64 bytes from a string of=
- length 64 [-Werror=3Dstringop-truncation]
-> >>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos =
-(__dest));
-> >>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~~
-> >>
-> >> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 
-I'm dropping this patch in favour of the other one.
+Thomas Huth <thuth@redhat.com> writes:
 
-Alistair
+> "check -raw 005" fails when running on certain filesystems - these do not
+> support such large sparse files. Use the same check as in test 220 to
+> skip the test in this case.
+>
+> Suggested-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-> >> ---
-> >>  linux-user/uname.c | 2 +-
-> >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/linux-user/uname.c b/linux-user/uname.c
-> >> index 313b79dbad..2fc6096a5b 100644
-> >> --- a/linux-user/uname.c
-> >> +++ b/linux-user/uname.c
-> >> @@ -73,7 +73,7 @@ const char *cpu_to_uname_machine(void *cpu_env)
-> >>  #define COPY_UTSNAME_FIELD(dest, src) \
-> >>    do { \
-> >>        /* __NEW_UTS_LEN doesn't include terminating null */ \
-> >> -      (void) strncpy((dest), (src), __NEW_UTS_LEN); \
-> >> +      (void) memcpy((dest), (src), MIN(strlen(src), __NEW_UTS_LEN)); =
-\
-> >
-> > You should use MIN(strlen(src) + 1, __NEW_UTS_LEN) to copy the NUL
-> > character if it is present and fit in __NEW_UTS_LEN.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  tests/qemu-iotests/005 | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 >
-> No, the NUL character is already present, due to the memset() prior to
-> any use of COPY_UTSNAME_FIELD().  However, the commit message should
-> call that out, as it is not part of the default 3-line diff.
+> diff --git a/tests/qemu-iotests/005 b/tests/qemu-iotests/005
+> index 2fef63af88..9c7681c19b 100755
+> --- a/tests/qemu-iotests/005
+> +++ b/tests/qemu-iotests/005
+> @@ -55,6 +55,15 @@ if [ "$IMGPROTO" =3D "sheepdog" ]; then
+>      _notrun "image protocol $IMGPROTO does not support large image sizes"
+>  fi
 >
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
->
+> +# Sanity check: For raw, we require a file system that permits the creat=
+ion
+> +# of a HUGE (but very sparse) file. Check we can create it before contin=
+uing.
+> +if [ "$IMGFMT" =3D "raw" ]; then
+> +    if ! truncate --size=3D5T "$TEST_IMG"; then
+> +        _notrun "file system on $TEST_DIR does not support large enough =
+files"
+> +    fi
+> +    rm "$TEST_IMG"
+> +fi
+> +
+>  echo
+>  echo "creating large image"
+>  _make_test_img 5000G
+
+
+--
+Alex Benn=C3=A9e
