@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43988)
+Received: from eggs.gnu.org ([209.51.188.92]:45698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hM6x6-0006Lu-Cy
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:20:26 -0400
+	(envelope-from <thuth@redhat.com>) id 1hM73A-0004aT-M7
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:26:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hM6x5-0003YJ-78
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:20:24 -0400
-Resent-Message-Id: <E1hM6x5-0003YJ-78@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21449)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hM6x3-00037g-Sr
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:20:23 -0400
-In-Reply-To: <20190429134757.13570-1-marcandre.lureau@redhat.com>
-Message-ID: <155671401236.10667.11403551007670440961@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <thuth@redhat.com>) id 1hM738-00074V-TQ
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:26:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48966)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hM738-00072L-94
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:26:38 -0400
+References: <20190430181326.1314-1-driver1998@foxmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6e3335b8-a5ce-ef0a-bf24-08165d877a2a@redhat.com>
+Date: Thu, 2 May 2019 10:26:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 1 May 2019 05:33:33 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] vl: fix -sandbox parsing crash when
- seccomp support is disabled
+In-Reply-To: <20190430181326.1314-1-driver1998@foxmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] util/cacheinfo.c: Use uintptr_t
+ instead of unsigned long in AArch64 arch_cache_info()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, otubo@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Cao Jiaxi <driver1998@foxmail.com>, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQyOTEzNDc1Ny4xMzU3
-MC0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWls
-ZWQgdGhlIGFzYW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMg
-YW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91
-IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJ
-TiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJH
-RVRfTElTVD14ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcv
-bG9ncy8yMDE5MDQyOTEzNDc1Ny4xMzU3MC0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS90
-ZXN0aW5nLmFzYW4vP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 30/04/2019 20.13, Cao Jiaxi wrote:
+> Windows ARM64 uses LLP64 model, which breaks current assumptions.
+> 
+> Signed-off-by: Cao Jiaxi <driver1998@foxmail.com>
+> ---
+>  util/cacheinfo.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/util/cacheinfo.c b/util/cacheinfo.c
+> index 3cd080b83d..ce6f0dbf6a 100644
+> --- a/util/cacheinfo.c
+> +++ b/util/cacheinfo.c
+> @@ -107,7 +107,7 @@ static void sys_cache_info(int *isize, int *dsize)
+>  static void arch_cache_info(int *isize, int *dsize)
+>  {
+>      if (*isize == 0 || *dsize == 0) {
+> -        unsigned long ctr;
+> +        uintptr_t ctr;
+
+Looking at the whole function, is uintptr_t really the right type to use
+here? ctr does not seem to contain the value of a pointer variable, so
+this looks wrong to me...
+Do you get a compiler warning here? If so, how does it look like?
+Anyway, I think it would be better to use a uint64_t or uint32_t type
+here instead if possible?
+
+ Thomas
