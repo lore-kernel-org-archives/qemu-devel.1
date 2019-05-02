@@ -6,64 +6,65 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94FB0C43219
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D7AC04AAA
 	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 19:04:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53F192080C
+	by mail.kernel.org (Postfix) with ESMTPS id 2B4C820651
 	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 19:04:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53F192080C
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B4C820651
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57401 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57399 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMH0c-0007lD-Bi
+	id 1hMH0c-0007jS-55
 	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 15:04:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36351)
+Received: from eggs.gnu.org ([209.51.188.92]:36266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMGvq-0003nc-0E
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:59:47 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hMGvm-0003jj-AY
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:59:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMGvn-00036g-WE
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:59:45 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:42833)
+	(envelope-from <laurent@vivier.eu>) id 1hMGvh-00034G-VK
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:59:41 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:43023)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hMGve-00030R-2c; Thu, 02 May 2019 14:59:35 -0400
+	id 1hMGvf-00033M-UL; Thu, 02 May 2019 14:59:37 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA
 	(Nemesis)
-	id 1McHQA-1gm69o2gvc-00cjJx; Thu, 02 May 2019 20:59:00 +0200
+	id 1MploR-1gyyBN4BJN-00qDii; Thu, 02 May 2019 20:58:53 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Thu,  2 May 2019 20:58:31 +0200
-Message-Id: <20190502185835.15185-10-laurent@vivier.eu>
+Date: Thu,  2 May 2019 20:58:27 +0200
+Message-Id: <20190502185835.15185-6-laurent@vivier.eu>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190502185835.15185-1-laurent@vivier.eu>
 References: <20190502185835.15185-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:PuriRZNUZFML41VXaNZWRCel79SGpp1LmytZAYC3+G2pC7PABVC
-	4fbdHg/iUeowiTFVklAdZM1meAPzMhOx5Y0fjH2nwzAuXDMKTAhSHe3WXzJFai0k09YXVSb
-	dpTg2+MIALR+F4gr0AsrFSMNC9J9LdFf+cDkILhDBzCc3cL2Wn9TybO9gJ5w2rcGwVVPL98
-	+qbxiaO5RDSPyCqg8QNzQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:VKA+zKdUgW4=:O18ZjeSPBOeFxsOKQ0Mw1Z
-	ryDcUh83BszOXOaIhOfdg7fDTtL9X3hC6qs0/5TzL2UlhwB2guP/ZJs5HJna7Q9DSmhGDP85o
-	GCbJ59Z5UgQbPgVKe2sz04z5jNJGXm5GWOpvmEyDaEwf6EwgQHFZTswz/D7eseFN8davo/4Og
-	qrHTcb/f1DL+1eSvShOEcfyXBy0rVgtA/b3TL5JKK0Qp4KO9m22m4ZK/ivimyF8D9JjHwtk0/
-	ZZEYBk5hL5zEHEl/3zkVgqJV4GSZlgEGkDIbqLa7/45teROh8Vj/NasBALXTCJfGPbLLtN8Jo
-	r4kJza9sGI2m2GJvHlYQSv7hAa3AlMJlq/SxEGEQ9DJrt72DGf2APCiXATrYjsuILYHxdpf0+
-	RzvxERIQSWxUl2zxdabqSOhElYeCamGGvyClACNlHrnIc/QOeFHDNLkIjCYKPFbx37v0Xiep3
-	xbmTRpHDJB3QnDK7cTH4drIDrkm4fro5ZUrcPXpq0lixJxJDMJ0EWWIcKDzVC9VXv2rIfANkd
-	97WJ3jXYmgrb6vPCy9FdA01rBedmJO/IGA2oj4cYbupVYVIwaDcPgac01Xd0nwFqmngOcgGE0
-	W6cltf+ZWpUlWvKMXs2o0OnJEWXNC70+sQ7XyCwcAwYalnc31WJOP+PjKIy8RT6iNI7F5fQjT
-	rx2FGKibU8ohmIt7ZVgnS6JdJEz5YwvZRytbNK+eXyX+8C4YTHbxBj/mb3iCRt55/X7aCpm/U
-	kJ2RoHX7VC2v3IaUGL1wTox4na8u5M8q9jC8aw==
+X-Provags-ID: V03:K1:EuFW6QXXDhfSBoO1sW1/UpU4tStfXqkjNUl5Qim3N6zbnDiHy/K
+	SCms3QSP2GMuS5W5tH7CR8vYoLgxir32oTn5V2PGKPe8JMCeVyccG4YTxyH9aaDcRDaXCCO
+	0hq8TtP3h67eyp1cRVOn0pQZOf0H/g+ctEIOwNllIgd1SUgjBJAa62BRkI1Te+5b0GhOLoe
+	D4Rg9TokUeFWw8D300Wsw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:hoDHAHMzAj4=:SWm2wVIyRvcOI1GsCp0Bj0
+	tOywv8KcH+ASk1Fws3BFCQ552mzcict0QUMUFW890qKpJhespBSt8dEo4tUm5F1ysXpnngoy6
+	hDOGLUzz12DZQrBMKVn/vraCcssnVMf9oKZKfryF4y+39E+URCFTH1BeBBHGMhqSyyk0dWr59
+	ZPSQHKEqnXb/SLR0z8/TAv08rfiMvWBXEVPlI/vgc+FmL8Pm8YSlgTeMBYCOgMw+BzWEYE15b
+	D9sO99LpRoSISfUVwXABWGpoF/Xm1L7x1grInXqOt48gu0qsnEHmRR3xyx61CXEd52GYEr3RQ
+	9FZ+edObcxDiml59lDJDtBRUB1mb3a9v3YBvMJO82OXOZAI7cvMfHutu/UVL1wZL3JPjgCnlt
+	V/tDyluGZ0JpDMo8Vq94EoYh5duVCgOdVQBcxGdUdqKZxUBnp1v/TXDN4Zx8ClFR5LtMYiQWg
+	SHAo9fhHh8wHwS8CV0rMAofHCoxPovwCCd/A8Otrf0fgD6jc3GJpaDSfD/s8yCrf4YA13VNJe
+	JifLnjaBU2wwwJN5V9MQGO2AhCQNzPKiuyQvJbFY/BYS0B4at3X0aO6vpPClC1yF69+TM0tvg
+	615Jdn33PiGnOZmzD3dnBpOZuTWcS0pS50dUPMrYAiXew4t8tjBtYYQ+oqQkqeSAgoy0EJt40
+	SDE/Q4Mp1kRNLSHhj3zhQ6QgzgI2hueHU/oCihnbItioVRXBFWmlXxN+ohBC2F6E4mQ8PRKJg
+	ZYzMzNlQ6VvNVJnWw5JGLqNpQSDmGFjeIE0kH69BlJTgPIQ/FNdN8A0rLPQ=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
-Subject: [Qemu-devel] [PULL 09/13] Header cleanups
+X-Received-From: 212.227.17.24
+Subject: [Qemu-devel] [PULL 05/13] doc: fix the configuration path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,9 +77,11 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
-	Michael Tokarev <mjt@tls.msk.ru>, Gerd Hoffmann <kraxel@redhat.com>,
-	Aruna Jayasena <aruna.15@cse.mrt.ac.lk>, qemu-trivial@nongnu.org,
+	Michael Tokarev <mjt@tls.msk.ru>,
+	Gerd Hoffmann <kraxel@redhat.com>, qemu-trivial@nongnu.org,
 	Michael Roth <mdroth@linux.vnet.ibm.com>,
+	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
 	Artyom Tarasenko <atar4qemu@gmail.com>,
 	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
 	Eduardo Habkost <ehabkost@redhat.com>,
@@ -93,38 +96,69 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190502185831.5bkWYwCbc21oN81CH_4wM8GXg0xnmkAr8HlFkqXkaq8@z>
+Message-ID: <20190502185827.RV9wWmuQFgLxyz1pUXdSbQq1Y2zsqpcHHV2Spjd4vEY@z>
 
-From: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Removed unwanted includes from cpu-common.h
-This task was under https://wiki.qemu.org/Contribute/BiteSizedTasks
+Use a CONFDIR variable to show the configured sysconf path in the
+generated documentations (html, man pages etc).
 
-Signed-off-by: Aruna Jayasena <aruna.15@cse.mrt.ac.lk>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190409155635.10276-1-aruna.15@cse.mrt.ac.lk>
-[lv: fix conflict on rebase]
+Related to:
+https://bugzilla.redhat.com/show_bug.cgi?id=1644985
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20181126105125.30973-1-marcandre.lureau@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- include/exec/cpu-common.h | 3 ---
- 1 file changed, 3 deletions(-)
+ qemu-ga.texi | 4 ++--
+ Makefile     | 9 ++++++---
+ 2 files changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index 848a4b94ab73..f7dbe75fbc38 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -7,9 +7,6 @@
- #include "exec/hwaddr.h"
- #endif
+diff --git a/qemu-ga.texi b/qemu-ga.texi
+index 4c7a8fd16329..f00ad830f283 100644
+--- a/qemu-ga.texi
++++ b/qemu-ga.texi
+@@ -30,7 +30,7 @@ set user's password
+ @end itemize
  
--#include "qemu/bswap.h"
--#include "qemu/queue.h"
--
- /* The CPU list lock nests outside page_(un)lock or mmap_(un)lock */
- void qemu_init_cpu_list(void);
- void cpu_list_lock(void);
+ qemu-ga will read a system configuration file on startup (located at
+-@file{/etc/qemu/qemu-ga.conf} by default), then parse remaining
++@file{@value{CONFDIR}/qemu-ga.conf} by default), then parse remaining
+ configuration options on the command line. For the same key, the last
+ option wins, but the lists accumulate (see below for configuration
+ file format).
+@@ -58,7 +58,7 @@ file format).
+   Enable fsfreeze hook. Accepts an optional argument that specifies
+   script to run on freeze/thaw. Script will be called with
+   'freeze'/'thaw' arguments accordingly (default is
+-  @samp{/etc/qemu/fsfreeze-hook}). If using -F with an argument, do
++  @samp{@value{CONFDIR}/fsfreeze-hook}). If using -F with an argument, do
+   not follow -F with a space (for example:
+   @samp{-F/var/run/fsfreezehook.sh}).
+ 
+diff --git a/Makefile b/Makefile
+index 1211e78c91ed..43a7a047b452 100644
+--- a/Makefile
++++ b/Makefile
+@@ -899,11 +899,14 @@ ui/shader.o: $(SRC_PATH)/ui/shader.c \
+ MAKEINFO=makeinfo
+ MAKEINFOINCLUDES= -I docs -I $(<D) -I $(@D)
+ MAKEINFOFLAGS=--no-split --number-sections $(MAKEINFOINCLUDES)
+-TEXI2PODFLAGS=$(MAKEINFOINCLUDES) "-DVERSION=$(VERSION)"
++TEXI2PODFLAGS=$(MAKEINFOINCLUDES) -DVERSION="$(VERSION)" -DCONFDIR="$(qemu_confdir)"
+ TEXI2PDFFLAGS=$(if $(V),,--quiet) -I $(SRC_PATH) $(MAKEINFOINCLUDES)
+ 
+-docs/version.texi: $(SRC_PATH)/VERSION
+-	$(call quiet-command,echo "@set VERSION $(VERSION)" > $@,"GEN","$@")
++docs/version.texi: $(SRC_PATH)/VERSION config-host.mak
++	$(call quiet-command,(\
++		echo "@set VERSION $(VERSION)" && \
++		echo "@set CONFDIR $(qemu_confdir)" \
++	)> $@,"GEN","$@")
+ 
+ %.html: %.texi docs/version.texi
+ 	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
 -- 
 2.20.1
 
