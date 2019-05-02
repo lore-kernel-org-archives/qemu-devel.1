@@ -1,24 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59693)
+Received: from eggs.gnu.org ([209.51.188.92]:59944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hMDZc-0005yS-Ou
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:24:38 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hMDaa-0006zx-0x
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:25:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hMDZb-0008Iq-FN
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:24:36 -0400
-Date: Thu, 2 May 2019 17:24:18 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190502172418.2b7d6d84@Igors-MacBook-Pro>
-In-Reply-To: <CAKv+Gu9yw6s=N+LkKmQ+0d5ZQBJ+5tE0_cKtZAYHh_cTXnjyCQ@mail.gmail.com>
-References: <20190409102935.28292-1-shameerali.kolothum.thodi@huawei.com>
-	<20190409102935.28292-4-shameerali.kolothum.thodi@huawei.com>
-	<CAKv+Gu_guvAydmCZDeVnj0NR_WyTHeCmwh4tK9WKUBY6cy-4Pg@mail.gmail.com>
-	<5FC3163CFD30C246ABAA99954A238FA83F137685@lhreml524-mbs.china.huawei.com>
-	<CAKv+Gu9yw6s=N+LkKmQ+0d5ZQBJ+5tE0_cKtZAYHh_cTXnjyCQ@mail.gmail.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1hMDaY-0001TV-9k
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:25:35 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40831)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hMDaW-0001Ir-Fx
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 11:25:34 -0400
+Received: by mail-wm1-x344.google.com with SMTP id h11so3149281wmb.5
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 08:25:31 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	s145sm18802137wme.38.2019.05.02.08.25.29 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 02 May 2019 08:25:29 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id F109C1FF87
+	for <qemu-devel@nongnu.org>; Thu,  2 May 2019 16:25:28 +0100 (BST)
+References: <20190501050536.15580-1-richard.henderson@linaro.org>
+	<20190501050536.15580-20-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190501050536.15580-20-richard.henderson@linaro.org>
+Date: Thu, 02 May 2019 16:25:28 +0100
+Message-ID: <874l6c6fpz.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 3/8] hw/acpi: Add ACPI Generic Event
- Device Support
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 19/29] tcg: Add support for integer
+ absolute value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +39,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Peter Maydell <peter.maydell@linaro.org>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>, Auger Eric <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, "xuwei (O)" <xuwei5@huawei.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>, Laszlo Ersek <lersek@redhat.com>
-
-On Thu, 2 May 2019 09:22:35 +0200
-Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-
-> On Wed, 1 May 2019 at 13:25, Shameerali Kolothum Thodi
-> <shameerali.kolothum.thodi@huawei.com> wrote:
-> >
-> > Hi Ard,
-> >
-> > > -----Original Message-----
-> > > From: Ard Biesheuvel [mailto:ard.biesheuvel@linaro.org]
-> > > Sent: 01 May 2019 12:10
-> > > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> > > Cc: QEMU Developers <qemu-devel@nongnu.org>; qemu-arm
-> > > <qemu-arm@nongnu.org>; Auger Eric <eric.auger@redhat.com>; Igor
-> > > Mammedov <imammedo@redhat.com>; Peter Maydell
-> > > <peter.maydell@linaro.org>; shannon.zhaosl@gmail.com;
-> > > sameo@linux.intel.com; sebastien.boeuf@intel.com; xuwei (O)
-> > > <xuwei5@huawei.com>; Laszlo Ersek <lersek@redhat.com>; Linuxarm
-> > > <linuxarm@huawei.com>
-> > > Subject: Re: [PATCH v4 3/8] hw/acpi: Add ACPI Generic Event Device Support
-> > >
-> > > On Tue, 9 Apr 2019 at 12:31, Shameer Kolothum
-> > > <shameerali.kolothum.thodi@huawei.com> wrote:
-> > > >
-> > > > From: Samuel Ortiz <sameo@linux.intel.com>
-> > > >
-> > > > The ACPI Generic Event Device (GED) is a hardware-reduced specific
-> > > > device[ACPI v6.1 Section 5.6.9] that handles all platform events,
-> > > > including the hotplug ones.This patch generates the AML code that
-> > > > defines GEDs.
-> > > >
-> > > > Platforms need to specify their own GedEvent array to describe what
-> > > > kind of events they want to support through GED.  Also this uses a
-> > > > a single interrupt for the  GED device, relying on IO memory region
-> > > > to communicate the type of device affected by the interrupt. This
-> > > > way, we can support up to 32 events with a unique interrupt.
-> > > >
-> > > > This supports only memory hotplug for now.
-> > > >
-> > > > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> > > > Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
-> > > > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> > >
-> > > Apologies if this question has been raised before, but do we really
-> > > need a separate device for this? We already handle the power button
-> > > via _AEI/_Exx on the GPIO device, and I think we should be able to add
-> > > additional events using that interface, rather than have two event
-> > > signalling methods/devices on the same platform.
-> >
-> > Right. The initial RFC was based on GPIO device[1] and later Igor commented
-> > here[2] that,
-> >
-> > " ARM boards were first to use ACPI hw-reduced profile so they picked up
-> > available back then GPIO based way to deliver hotplug event, later spec
-> > introduced Generic Event Device for that means to use with hw-reduced
-> > profile, which NEMU implemented[1], so I'd use that rather than ad-hoc
-> > GPIO mapping. I'd guess it will more compatible with various contemporary
-> > guests and we could reuse the same code for both x86/arm virt boards) "
-> >
-> 
-> On mach-virt, we already use the GPIO controller for the ACPI event
-> involving the power button, so by aligning with virt-x86, we end up in
-> the opposite situation for mach-virt.
-> 
-> The problem with the GED device is that it only supports GSI
-> interrupts, while the GPIO device supports arbitrary interrupts (such
-> as GPIO signalled ones). This means that mach-virt will be stuck with
-> having two different methods of signalling ACPI events, unless we
-> rewire the power button not to use a GPIO interrupt but use a GSI
-> directly.
-
-we can rewire power button then.
+To: qemu-devel@nongnu.org
 
 
-> In general, I think the ACPI event delivery mechanism doesn't really
-> have to be aligned: the ACPI event is ultimately converted into a AML
-> notification to the right device, and how we end up there can remain
-> platform specific.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Reasoning for using GED is to reduce code duplication with x86
-and not creating zoo of different approached (if it could be avoided).
+> Remove a function of the same name from target/arm/.
+> Use a branchless implementation of abs gleaned from gcc.
+>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  tcg/tcg-op.h           |  5 +++++
+>  target/arm/translate.c | 10 ----------
+>  tcg/tcg-op.c           | 20 ++++++++++++++++++++
+>  3 files changed, 25 insertions(+), 10 deletions(-)
+>
+> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+> index 472b73cb38..660fe205d0 100644
+> --- a/tcg/tcg-op.h
+> +++ b/tcg/tcg-op.h
+> @@ -335,6 +335,7 @@ void tcg_gen_smin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i=
+32 arg2);
+>  void tcg_gen_smax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
+>  void tcg_gen_umin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
+>  void tcg_gen_umax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
+> +void tcg_gen_abs_i32(TCGv_i32, TCGv_i32);
+>
+>  static inline void tcg_gen_discard_i32(TCGv_i32 arg)
+>  {
+> @@ -534,6 +535,7 @@ void tcg_gen_smin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i=
+64 arg2);
+>  void tcg_gen_smax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
+>  void tcg_gen_umin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
+>  void tcg_gen_umax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
+> +void tcg_gen_abs_i64(TCGv_i64, TCGv_i64);
+>
+>  #if TCG_TARGET_REG_BITS =3D=3D 64
+>  static inline void tcg_gen_discard_i64(TCGv_i64 arg)
+> @@ -973,6 +975,7 @@ void tcg_gen_nor_vec(unsigned vece, TCGv_vec r, TCGv_=
+vec a, TCGv_vec b);
+>  void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+>  void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
+>  void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
+> +void tcg_gen_abs_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
+>  void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b=
+);
+>  void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b=
+);
+>  void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b=
+);
+> @@ -1019,6 +1022,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCG=
+Arg offset, TCGType t);
+>  #define tcg_gen_addi_tl tcg_gen_addi_i64
+>  #define tcg_gen_sub_tl tcg_gen_sub_i64
+>  #define tcg_gen_neg_tl tcg_gen_neg_i64
+> +#define tcg_gen_abs_tl tcg_gen_abs_i64
+>  #define tcg_gen_subfi_tl tcg_gen_subfi_i64
+>  #define tcg_gen_subi_tl tcg_gen_subi_i64
+>  #define tcg_gen_and_tl tcg_gen_and_i64
+> @@ -1131,6 +1135,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCG=
+Arg offset, TCGType t);
+>  #define tcg_gen_addi_tl tcg_gen_addi_i32
+>  #define tcg_gen_sub_tl tcg_gen_sub_i32
+>  #define tcg_gen_neg_tl tcg_gen_neg_i32
+> +#define tcg_gen_abs_tl tcg_gen_abs_i32
+>  #define tcg_gen_subfi_tl tcg_gen_subfi_i32
+>  #define tcg_gen_subi_tl tcg_gen_subi_i32
+>  #define tcg_gen_and_tl tcg_gen_and_i32
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 35bd426a3d..b25781554f 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -604,16 +604,6 @@ static void gen_sar(TCGv_i32 dest, TCGv_i32 t0, TCGv=
+_i32 t1)
+>      tcg_temp_free_i32(tmp1);
+>  }
+>
+> -static void tcg_gen_abs_i32(TCGv_i32 dest, TCGv_i32 src)
+> -{
+> -    TCGv_i32 c0 =3D tcg_const_i32(0);
+> -    TCGv_i32 tmp =3D tcg_temp_new_i32();
+> -    tcg_gen_neg_i32(tmp, src);
+> -    tcg_gen_movcond_i32(TCG_COND_GT, dest, src, c0, src, tmp);
+> -    tcg_temp_free_i32(c0);
+> -    tcg_temp_free_i32(tmp);
+> -}
+> -
+>  static void shifter_out_im(TCGv_i32 var, int shift)
+>  {
+>      if (shift =3D=3D 0) {
+> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+> index a00d1df37e..0ac291f1c4 100644
+> --- a/tcg/tcg-op.c
+> +++ b/tcg/tcg-op.c
+> @@ -1091,6 +1091,16 @@ void tcg_gen_umax_i32(TCGv_i32 ret, TCGv_i32 a, TC=
+Gv_i32 b)
+>      tcg_gen_movcond_i32(TCG_COND_LTU, ret, a, b, b, a);
+>  }
+>
+> +void tcg_gen_abs_i32(TCGv_i32 ret, TCGv_i32 a)
+> +{
+> +    TCGv_i32 t =3D tcg_temp_new_i32();
+> +
+> +    tcg_gen_sari_i32(t, a, 31);
+> +    tcg_gen_xor_i32(ret, a, t);
+> +    tcg_gen_sub_i32(ret, ret, t);
+> +    tcg_temp_free_i32(t);
+> +}
+> +
+>  /* 64-bit ops */
+>
+>  #if TCG_TARGET_REG_BITS =3D=3D 32
+> @@ -2548,6 +2558,16 @@ void tcg_gen_umax_i64(TCGv_i64 ret, TCGv_i64 a, TC=
+Gv_i64 b)
+>      tcg_gen_movcond_i64(TCG_COND_LTU, ret, a, b, b, a);
+>  }
+>
+> +void tcg_gen_abs_i64(TCGv_i64 ret, TCGv_i64 a)
+> +{
+> +    TCGv_i64 t =3D tcg_temp_new_i64();
+> +
+> +    tcg_gen_sari_i64(t, a, 63);
+> +    tcg_gen_xor_i64(ret, a, t);
+> +    tcg_gen_sub_i64(ret, ret, t);
+> +    tcg_temp_free_i64(t);
+> +}
+> +
+>  /* Size changing operations.  */
+>
+>  void tcg_gen_extrl_i64_i32(TCGv_i32 ret, TCGv_i64 arg)
+
+
+--
+Alex Benn=C3=A9e
