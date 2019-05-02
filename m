@@ -1,150 +1,88 @@
-Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D139C04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 10:20:15 +0000 (UTC)
-X-Greylist: delayed 184 seconds by postgrey-1.34 at mail.kernel.org; Mon, 06 May 2019 10:20:15 UTC
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30A842082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
-Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from lists.gnu.org (unknown [209.51.188.17])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F7C3C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 08:33:53 +0000 (UTC)
+Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30A842082F
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 10:20:15 +0000 (UTC)
-Received: from localhost ([127.0.0.1]:53931 helo=lists.gnu.org)
+	by mail.kernel.org (Postfix) with ESMTPS id EC60220873
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 08:33:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="grpkV6ns"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC60220873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
+Received: from localhost ([127.0.0.1]:47427 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNajC-0004e6-FM
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 06:20:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48071)
+	id 1hM7A8-0002AV-6c
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 04:33:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hNai8-0003r6-17
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 06:19:05 -0400
+	(envelope-from <arilou@gmail.com>) id 1hM6tk-0003cU-PN
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hNai6-0005Np-7D
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 06:19:03 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58118
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1hNai5-0005Mx-Cd
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 06:19:02 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x46AHqQ4157110
-	for <qemu-devel@nongnu.org>; Mon, 6 May 2019 06:18:58 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2sag58y88h-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 06:18:57 -0400
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 6 May 2019 11:18:47 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-	by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Mon, 6 May 2019 11:18:45 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
-	[9.149.105.62])
-	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x46AIhPo48496804
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Mon, 6 May 2019 10:18:43 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 83955AE059;
-	Mon,  6 May 2019 10:18:43 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2A56CAE04D;
-	Mon,  6 May 2019 10:18:43 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.177])
-	by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-	Mon,  6 May 2019 10:18:43 +0000 (GMT)
-To: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
-	"Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org,
-	qemu-s390x@nongnu.org, cohuck@redhat.com, alifm@linux.ibm.com
-References: <1556543381-12671-1-git-send-email-jjherne@linux.ibm.com>
-	<daad75f0-c8bb-1c9f-5b43-afa828601c42@redhat.com>
-	<df6bde4f-9c83-5009-3ca8-32d7a5e088d3@redhat.com>
-	<55907be5-61a5-f251-4609-b0336818de17@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
-	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
-	syiRa+UVlsKmx1hsEg==
-Date: Mon, 6 May 2019 12:18:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <arilou@gmail.com>) id 1hM6th-0008OG-9j
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:56 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38474)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6tg-000805-Vm
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:53 -0400
+Received: by mail-wm1-x341.google.com with SMTP id w15so1392460wmc.3
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=Fq+y9Y8taPmtsyd8oOc7f9ZWDD3UWEkWOvqVLG/Lt40=;
+	b=grpkV6nsRirFoFebYjC6MxNOtEAlrmjk4xmZdRENo8+NFdj8E4YmUbEy6w8x5uWIiB
+	fVeL1722iLSrmD/gRUaJ5BijubBeonzVXGiFZ615e8QWTxuyLCgFhaoY1xR8BwdFGJvB
+	tUOo5pFcTXd5grPFqmLkpM3kK1fHcJIxRvFt77VgPYN8ecwBrmH4k09VmX2jCI/6MjXh
+	g2zjnN3HMcFroQGQoZy316iUxDJdzfU1OMPxTrYWByWK5DqVh1UYR+/BzD0+hDX0+i6S
+	G5a7/FMKtcnmMGUURDoKSJAiQwAByr4wHgmlKnlDWmfRkQGWK64RqVs9PCheLVUNQoRJ
+	9ssw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=Fq+y9Y8taPmtsyd8oOc7f9ZWDD3UWEkWOvqVLG/Lt40=;
+	b=TwEisCo3gIihh+PT0UpkoPcLBgMzy8xGc+MeSp7NvetJ/EV1jcJC1/4q76TxbnZykG
+	dQU6TWmAt6V6h/k1bIlcaRiikYYtHf9Mp7axiMY6DJMwSF6aWeqBjkWg99P6aVtYFmWE
+	G3KKPVW3aMObeo3+AyLhxSM2wH1J3BY5x+8cooAq5L/R107am7r9tnnoJ6ZciyFdGZ2T
+	Lqwl7hcklAjKEsu5RBWw+2Vp18cnBcy24ZPwxpCBOOVYN8TDi14iKFFdDrxWpZr2B4RB
+	akmQERONzcMIGxSJRwWZkPjn7FFgp/XqO2pIJSaP+yqXovgM2qN/9XqdbPU0cMUB3He/
+	HRsQ==
+X-Gm-Message-State: APjAAAXdtYfWPpOcU05KsnDq4lL2HEEWllupkytt19jxPAZnLZSlpZVf
+	ICy12wukU5Q/iQR3m6F864pYDk83
+X-Google-Smtp-Source: APXvYqxai+JM1yRaeKDe8Ko1NKXeAr/fb9HVj9Du0pq7EoYCTb3hrMeRJqOs2kgT5p7pp/5UpJw9gg==
+X-Received: by 2002:a1c:a00f:: with SMTP id j15mr1308089wme.148.1556785006192; 
+	Thu, 02 May 2019 01:16:46 -0700 (PDT)
+Received: from localhost.localdomain ([176.230.64.186])
+	by smtp.gmail.com with ESMTPSA id
+	d16sm44698367wra.54.2019.05.02.01.16.44
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 02 May 2019 01:16:45 -0700 (PDT)
+From: Jon Doron <arilou@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Thu,  2 May 2019 11:15:52 +0300
+Message-Id: <20190502081554.5521-26-arilou@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190502081554.5521-1-arilou@gmail.com>
+References: <20190502081554.5521-1-arilou@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <55907be5-61a5-f251-4609-b0336818de17@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19050610-0028-0000-0000-0000036AC7E8
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050610-0029-0000-0000-0000242A3C1C
-Message-Id: <98a268ee-17fb-079e-01d1-5dc554a24efd@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-06_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1905060090
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] s390-bios: Skip bootmap
- signature entries
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: [Qemu-devel] [PATCH v9 25/27] kvm: Add API to read/write a CPU MSR
+ value
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -156,116 +94,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190502081552.2buO7tRqnWsD_0o19rNghT-ySp1qTCH9McxnZSSGYzs@z>
 
+Signed-off-by: Jon Doron <arilou@gmail.com>
+---
+ accel/kvm/kvm-all.c  | 39 +++++++++++++++++++++++++++++++++++++++
+ include/sysemu/kvm.h |  2 ++
+ 2 files changed, 41 insertions(+)
 
-
-On 06.05.19 12:16, Thomas Huth wrote:
-> On 06/05/2019 12.10, David Hildenbrand wrote:
->> On 06.05.19 12:01, David Hildenbrand wrote:
->>> On 29.04.19 15:09, Jason J. Herne wrote:
->>>> Newer versions of zipl have the ability to write signature entries to the boot
->>>> script for secure boot. We don't yet support secure boot, but we need to skip
->>>> over signature entries while reading the boot script in order to maintain our
->>>> ability to boot guest operating systems that have a secure bootloader.
->>>>
->>>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
->>>> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
->>>> ---
->>>>  pc-bios/s390-ccw/bootmap.c | 19 +++++++++++++++++--
->>>>  pc-bios/s390-ccw/bootmap.h | 10 ++++++----
->>>>  2 files changed, 23 insertions(+), 6 deletions(-)
->>>>
->>>> diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
->>>> index 7aef65a..d13b7cb 100644
->>>> --- a/pc-bios/s390-ccw/bootmap.c
->>>> +++ b/pc-bios/s390-ccw/bootmap.c
->>>> @@ -254,7 +254,14 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr,
->>>>      memset(sec, FREE_SPACE_FILLER, sizeof(sec));
->>>>      read_block(block_nr, sec, "Cannot read Boot Map Script");
->>>>  
->>>> -    for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD; i++) {
->>>> +    for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD ||
->>>> +                bms->entry[i].type == BOOT_SCRIPT_SIGNATURE; i++) {
->>>> +
->>>> +        /* We don't support secure boot yet, so we skip signature entries */
->>>> +        if (bms->entry[i].type == BOOT_SCRIPT_SIGNATURE) {
->>>> +            continue;
->>>> +        }
->>>> +
->>>>          address = bms->entry[i].address.load_address;
->>>>          block_nr = eckd_block_num(&bms->entry[i].blkptr.xeckd.bptr.chs);
->>>>  
->>>> @@ -489,7 +496,15 @@ static void zipl_run(ScsiBlockPtr *pte)
->>>>  
->>>>      /* Load image(s) into RAM */
->>>>      entry = (ComponentEntry *)(&header[1]);
->>>> -    while (entry->component_type == ZIPL_COMP_ENTRY_LOAD) {
->>>> +    while (entry->component_type == ZIPL_COMP_ENTRY_LOAD ||
->>>> +           entry->component_type == ZIPL_COMP_ENTRY_SIGNATURE) {
->>>> +
->>>> +        /* We don't support secure boot yet, so we skip signature entries */
->>>> +        if (entry->component_type == ZIPL_COMP_ENTRY_SIGNATURE) {
->>>> +            entry++;
->>>> +            continue;
->>>> +        }
->>>> +
->>>>          zipl_load_segment(entry);
->>>>  
->>>>          entry++;
->>>> diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
->>>> index a085212..94f53a5 100644
->>>> --- a/pc-bios/s390-ccw/bootmap.h
->>>> +++ b/pc-bios/s390-ccw/bootmap.h
->>>> @@ -98,8 +98,9 @@ typedef struct ScsiMbr {
->>>>  #define ZIPL_COMP_HEADER_IPL    0x00
->>>>  #define ZIPL_COMP_HEADER_DUMP   0x01
->>>>  
->>>> -#define ZIPL_COMP_ENTRY_LOAD    0x02
->>>> -#define ZIPL_COMP_ENTRY_EXEC    0x01
->>>> +#define ZIPL_COMP_ENTRY_EXEC      0x01
->>>> +#define ZIPL_COMP_ENTRY_LOAD      0x02
->>>> +#define ZIPL_COMP_ENTRY_SIGNATURE 0x03
->>>>  
->>>>  typedef struct XEckdMbr {
->>>>      uint8_t magic[4];   /* == "xIPL"        */
->>>> @@ -117,8 +118,9 @@ typedef struct BootMapScriptEntry {
->>>>      BootMapPointer blkptr;
->>>>      uint8_t pad[7];
->>>>      uint8_t type;   /* == BOOT_SCRIPT_* */
->>>> -#define BOOT_SCRIPT_EXEC 0x01
->>>> -#define BOOT_SCRIPT_LOAD 0x02
->>>> +#define BOOT_SCRIPT_EXEC      0x01
->>>> +#define BOOT_SCRIPT_LOAD      0x02
->>>> +#define BOOT_SCRIPT_SIGNATURE 0x03
->>>>      union {
->>>>          uint64_t load_address;
->>>>          uint64_t load_psw;
->>>>
->>>
->>> Naive question from me:
->>>
->>> Can't we place the signatures somewhere else, and instead associate them
->>> with entries? This avoids breaking backwards compatibility for the sake
->>> of signatures we want unmodified zipl loaders to ignore.
->>>
->>
->>
->> ... but I guess this is already documented somewhere internally and
->> other components have been adjusted. IOW, cannot be changed anymore.
->>
->> Guess our implementation should have tolerated other entries than
->> "BOOT_SCRIPT_LOAD" right from the beginning.
-> 
-> Hmm, now we only tolerate the _LOAD and _SIGNATURE entries, but still
-> nothing else... would it make sense to rewrite the code a little bit to
-> tolerate all other kind of entries, but just act on the well-known _LOAD
-> entries, so that we do not step into this trap in the future anymore?
-
-I think we should not. Those entries might have sematic elements that the guest
-wants to enforce. I do not think that this will come, but imagine a boot entry
-that mandates some security wishes (e.g. do only run on non-shared cores).
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 524c4ddfbd..35207d910b 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -2444,6 +2444,45 @@ void kvm_remove_all_breakpoints(CPUState *cpu)
+ }
+ #endif /* !KVM_CAP_SET_GUEST_DEBUG */
+ 
++int kvm_arch_read_msr(CPUState *cpu, uint32_t index, uint64_t *value)
++{
++    struct {
++        struct kvm_msrs info;
++        struct kvm_msr_entry entries[1];
++    } msr_data;
++    int ret;
++
++    msr_data.info.nmsrs = 1;
++    msr_data.entries[0].index = index;
++    ret = kvm_vcpu_ioctl(cpu, KVM_GET_MSRS, &msr_data);
++    if (ret < 0) {
++        return ret;
++    }
++
++    *value = msr_data.entries[0].data;
++    return 0;
++}
++
++int kvm_arch_write_msr(CPUState *cpu, uint32_t index, uint64_t value)
++{
++    struct {
++        struct kvm_msrs info;
++        struct kvm_msr_entry entries[1];
++    } msr_data;
++    int ret;
++
++    msr_data.info.nmsrs = 1;
++    msr_data.entries[0].index = index;
++    msr_data.entries[0].reserved = 0;
++    msr_data.entries[0].data = value;
++    ret = kvm_vcpu_ioctl(cpu, KVM_SET_MSRS, &msr_data);
++    if (ret < 0) {
++        return ret;
++    }
++
++    return 0;
++}
++
+ static int kvm_set_signal_mask(CPUState *cpu, const sigset_t *sigset)
+ {
+     KVMState *s = kvm_state;
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index a6d1cd190f..409b1a5444 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -462,6 +462,8 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension);
+ uint32_t kvm_arch_get_supported_cpuid(KVMState *env, uint32_t function,
+                                       uint32_t index, int reg);
+ uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index);
++int kvm_arch_read_msr(CPUState *cpu, uint32_t index, uint64_t *value);
++int kvm_arch_write_msr(CPUState *cpu, uint32_t index, uint64_t value);
+ 
+ 
+ void kvm_set_sigmask_len(KVMState *s, unsigned int sigmask_len);
+-- 
+2.20.1
 
 
