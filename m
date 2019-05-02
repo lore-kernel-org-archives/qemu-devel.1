@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50083)
+Received: from eggs.gnu.org ([209.51.188.92]:51447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hM5S5-0008RZ-Bo
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:44:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1hM5XI-0001Nq-Hw
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:49:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hM5S1-0005WT-QE
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:44:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41102)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hM5Rv-0005Ry-GE
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:44:11 -0400
-Date: Thu, 2 May 2019 08:44:00 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190502064400.cvfkul7aelyyfme5@sirius.home.kraxel.org>
-References: <20190412121626.19829-1-berrange@redhat.com>
-	<20190412121626.19829-5-berrange@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1hM5XG-0008N8-Mp
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:49:40 -0400
+References: <20190501223819.8584-1-richard.henderson@linaro.org>
+	<20190501223819.8584-3-richard.henderson@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9e4a2f00-7652-c1dc-e45e-7407810ce4d2@redhat.com>
+Date: Thu, 2 May 2019 01:49:19 -0500
 MIME-Version: 1.0
+In-Reply-To: <20190501223819.8584-3-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190412121626.19829-5-berrange@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] hw/usb: avoid format truncation
- warning when formatting port name
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] configure: Use quotes around uses of
+ $CPU_CFLAGS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, mark.cave-ayland@ilande.co.uk, alex.bennee@linaro.org, david@gibson.dropbear.id.au
 
-On Fri, Apr 12, 2019 at 01:16:25PM +0100, Daniel P. Berrang=C3=A9 wrote:
-> hw/usb/hcd-xhci.c: In function =E2=80=98usb_xhci_realize=E2=80=99:
-> hw/usb/hcd-xhci.c:3339:66: warning: =E2=80=98%d=E2=80=99 directive outp=
-ut may be truncated writing between 1 and 10 bytes into a region of size =
-5 [-Wformat-trunca\
-> tion=3D]
->  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port=
- #%d", i+1);
->       |                                                                =
-  ^~
-> hw/usb/hcd-xhci.c:3339:54: note: directive argument in the range [1, 21=
-47483647]
->  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port=
- #%d", i+1);
->       |                                                      ^~~~~~~~~~=
-~~~~~
->=20
-> The xhci code formats the port name into a fixed length
-> buffer which is only large enough to hold port numbers
-> upto 5 digits in decimal representation. We're never
-> going to have a port number that large, so aserting the
-> port number is sensible is sufficient to tell GCC the
-> formatted string won't be truncated.
+On 5/1/19 5:38 PM, Richard Henderson wrote:
+> About half of the values to which CPU_CFLAGS is set
+> have multiple space separated arguments.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  configure | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 234cb929ca..16bd4375d1 100755
+> --- a/configure
+> +++ b/configure
+> @@ -1543,37 +1543,37 @@ case "$cpu" in
+>             CPU_CFLAGS="-m64"
+>             LDFLAGS="-m64 $LDFLAGS"
+>             cross_cc_ppc64=$cc
+> -           cross_cc_cflags_ppc64=$CPU_CFLAGS
+> +           cross_cc_cflags_ppc64="$CPU_CFLAGS"
 
-Picked into the usb queue.
+Makes no difference semantically (bare variable assignments are not
+subject to word splitting or globbing, so the quotes don't change the
+result); the only reason to change this is for consistency (using quotes
+everywhere is easier to remember, whether or not they are in a context
+that matter).
 
-thanks,
-  Gerd
+So I'm okay whether this patch goes in or is omitted.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
