@@ -2,79 +2,93 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D57C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 21:19:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E74C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 21:46:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0664120651
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 21:19:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="uLbj+3Ch"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0664120651
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 10E922087F
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 21:46:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10E922087F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58667 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58940 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMJ7E-0000jE-Us
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 17:19:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33493)
+	id 1hMJX2-0001VB-6s
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 17:46:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <driver1998@foxmail.com>) id 1hMJ66-0000He-UJ
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 17:18:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1hMJV6-0008Dm-5E
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 17:44:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <driver1998@foxmail.com>) id 1hMJ65-0002JR-0k
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 17:18:30 -0400
-Received: from smtpbgbr2.qq.com ([54.207.22.56]:39340)
+	(envelope-from <eblake@redhat.com>) id 1hMJV3-0005KO-JD
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 17:44:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43826)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <driver1998@foxmail.com>)
-	id 1hMJ63-0001vA-Ju
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 17:18:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1556831898;
-	bh=ZxXqRiSgHAzRZub19E15ED6WmN+lJym9DOGZ7o8khuQ=;
-	h=From:To:Subject:Mime-Version:Date:Message-ID;
-	b=uLbj+3Ch1DwZElgo/Y+yA1s53uGjKU77ku+W0+VU+Vio5plW6HjxvCktE5ZTN0gcJ
-	t+PoRjnNi1qiFfqOprS/Z7Q/38RI2lePJS0zozqmcKHJB8bYh9USmC2Ejnenap09Ef
-	M1l/mC2BJmNxxpvaxwF2RHSQuwTKQf6XRlddxZQI=
-X-QQ-FEAT: 3p7n3kIA6lXTrvIqubXpDAIXZzaFiWPlAxjnX5lPCvxPTTZf9Z9urjHGJofy2
-	mCvgrzMrbgEvRe508Abxugh1xxbssMaprMhj4yaL1kgyrGWej7qZ+M5zGtF0z9kjiVtd5EQ
-	fEYm/HL8AGfXf0NLwc/1KYlRNdG0QI7ZnbPA+3CKLVhvNg5wEvM+RS5au5yt9PfwliRLACy
-	GZQ7RwtXYpnrHOcoGNEn+OWzckHdWcnwRTUh1HUW2zaJvy/47b0zq486Z9s1CEtonlnSDmy
-	OmeKEkaXE1n/ef
-X-QQ-SSF: 000000000000003000000000000000P
-X-HAS-ATTACH: no
-X-QQ-BUSINESS-ORIGIN: 2
-X-Originating-IP: 183.63.18.252
-X-QQ-STYLE: 
-X-QQ-mid: webmail122t1556831897t5793276
-From: "=?ISO-8859-1?B?ZHJpdmVyMTk5OA==?=" <driver1998@foxmail.com>
-To: "=?ISO-8859-1?B?cWVtdS1kZXZlbA==?=" <qemu-devel@nongnu.org>,
-	"=?ISO-8859-1?B?RXJpYyBCbGFrZQ==?=" <eblake@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Date: Fri, 3 May 2019 05:18:16 +0800
-X-Priority: 3
-Message-ID: <tencent_9962D5F9426BA267581CCB79DB1FE17AD508@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
-	id ; Fri, 03 May 2019 05:18:17 +0800 (CST)
-Feedback-ID: webmail:foxmail.com:bgforeign:bgforeign4
-X-QQ-Bgrelay: 1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 54.207.22.56
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] qga: Fix an enum conversion
- warningin commands-win32.c, hit by clang.
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hMJUx-0005AM-SR
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 17:44:14 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7A1F683F4C;
+	Thu,  2 May 2019 21:44:06 +0000 (UTC)
+Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CE54183AA;
+	Thu,  2 May 2019 21:44:05 +0000 (UTC)
+To: driver1998 <driver1998@foxmail.com>, qemu-devel <qemu-devel@nongnu.org>
+References: <20190430181343.1362-1-driver1998@foxmail.com>
+	<141080f9-8374-1d16-7b40-a4848a455086@redhat.com>
+	<tencent_DAABF38404447BB09E9711B789C215AAD109@qq.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <153ed8ff-73b1-b120-9f83-a143c6bdac64@redhat.com>
+Date: Thu, 2 May 2019 16:44:05 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <tencent_DAABF38404447BB09E9711B789C215AAD109@qq.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="oFhh7Xu7cvW0S1qfReAuLeHb6vmaxh9vU"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.27]);
+	Thu, 02 May 2019 21:44:06 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] include/qemu/osdep.h: Move
+ the__USE_MINGW_ANSI_STDIO define up to avoid confliction.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,106 +103,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502211816.j_4pnywDO3CST5cg2p8pFaFVLG2j1lMlopPsbExDwcg@z>
+Message-ID: <20190502214405.Nj3vtmzPQsl9ZYttGP8eybP0HWMZnpXbrBCmzv2gjos@z>
 
-T24gNS8xLzE5IDI6MjUgQU0sIEVyaWMgQmxha2Ugd3JvdGU6DQo+IFRoaXMgYWRkcyBsb3Rz
-IG9mIGV4cGxpY2l0IGNhc3RzLiBBcmUgdGhleSBhY3R1YWxseSBuZWNlc3Nhcnk/IFdpdGhv
-dXQNCj4gc2VlaW5nIHRoZSBhY3R1YWwgd2FybmluZywgaXQgc2VlbXMgZmlzaHkgdG8gaGF2
-ZSB0byBiZSB0aGlzIGV4cGxpY2l0Lg0KDQpTbyBoZXJlIGFyZSB0aGUgd2FybmluZ3MsIG9u
-IGNsYW5nIHZlcnNpb24gOS4wLjAgKHRydW5rIDM1MTk3NykuDQoNCnFnYS9jb21tYW5kcy13
-aW4zMi5jOjQ2MToyNDogZXJyb3I6IGltcGxpY2l0IGNvbnZlcnNpb24gZnJvbSBlbnVtZXJh
-dGlvbiB0eXBlICdlbnVtIEd1ZXN0RGlza0J1c1R5cGUnIHRvIGRpZmZlcmVudA0KICAgICAg
-ZW51bWVyYXRpb24gdHlwZSAnU1RPUkFHRV9CVVNfVFlQRScgKGFrYSAnZW51bSBfU1RPUkFH
-RV9CVVNfVFlQRScpIFstV2Vycm9yLC1XZW51bS1jb252ZXJzaW9uXQ0KICAgIFtCdXNUeXBl
-VW5rbm93bl0gPSBHVUVTVF9ESVNLX0JVU19UWVBFX1VOS05PV04sDQogICAgICAgICAgICAg
-ICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fg0KcWdhL2NvbW1hbmRzLXdp
-bjMyLmM6NDYyOjIxOiBlcnJvcjogaW1wbGljaXQgY29udmVyc2lvbiBmcm9tIGVudW1lcmF0
-aW9uIHR5cGUgJ2VudW0gR3Vlc3REaXNrQnVzVHlwZScgdG8gZGlmZmVyZW50DQogICAgICBl
-bnVtZXJhdGlvbiB0eXBlICdTVE9SQUdFX0JVU19UWVBFJyAoYWthICdlbnVtIF9TVE9SQUdF
-X0JVU19UWVBFJykgWy1XZXJyb3IsLVdlbnVtLWNvbnZlcnNpb25dDQogICAgW0J1c1R5cGVT
-Y3NpXSA9IEdVRVNUX0RJU0tfQlVTX1RZUEVfU0NTSSwNCiAgICAgICAgICAgICAgICAgICAg
-Xn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+DQpxZ2EvY29tbWFuZHMtd2luMzIuYzo0NjM6MjI6
-IGVycm9yOiBpbXBsaWNpdCBjb252ZXJzaW9uIGZyb20gZW51bWVyYXRpb24gdHlwZSAnZW51
-bSBHdWVzdERpc2tCdXNUeXBlJyB0byBkaWZmZXJlbnQNCiAgICAgIGVudW1lcmF0aW9uIHR5
-cGUgJ1NUT1JBR0VfQlVTX1RZUEUnIChha2EgJ2VudW0gX1NUT1JBR0VfQlVTX1RZUEUnKSBb
-LVdlcnJvciwtV2VudW0tY29udmVyc2lvbl0NCiAgICBbQnVzVHlwZUF0YXBpXSA9IEdVRVNU
-X0RJU0tfQlVTX1RZUEVfSURFLA0KICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn4NCnFnYS9jb21tYW5kcy13aW4zMi5jOjQ2NDoyMDogZXJyb3I6IGltcGxp
-Y2l0IGNvbnZlcnNpb24gZnJvbSBlbnVtZXJhdGlvbiB0eXBlICdlbnVtIEd1ZXN0RGlza0J1
-c1R5cGUnIHRvIGRpZmZlcmVudA0KICAgICAgZW51bWVyYXRpb24gdHlwZSAnU1RPUkFHRV9C
-VVNfVFlQRScgKGFrYSAnZW51bSBfU1RPUkFHRV9CVVNfVFlQRScpIFstV2Vycm9yLC1XZW51
-bS1jb252ZXJzaW9uXQ0KICAgIFtCdXNUeXBlQXRhXSA9IEdVRVNUX0RJU0tfQlVTX1RZUEVf
-SURFLA0KICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+DQpxZ2Ev
-Y29tbWFuZHMtd2luMzIuYzo0NjU6MjE6IGVycm9yOiBpbXBsaWNpdCBjb252ZXJzaW9uIGZy
-b20gZW51bWVyYXRpb24gdHlwZSAnZW51bSBHdWVzdERpc2tCdXNUeXBlJyB0byBkaWZmZXJl
-bnQNCiAgICAgIGVudW1lcmF0aW9uIHR5cGUgJ1NUT1JBR0VfQlVTX1RZUEUnIChha2EgJ2Vu
-dW0gX1NUT1JBR0VfQlVTX1RZUEUnKSBbLVdlcnJvciwtV2VudW0tY29udmVyc2lvbl0NCiAg
-ICBbQnVzVHlwZTEzOTRdID0gR1VFU1RfRElTS19CVVNfVFlQRV9JRUVFMTM5NCwNCiAgICAg
-ICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fg0KcWdhL2NvbW1h
-bmRzLXdpbjMyLmM6NDY2OjIwOiBlcnJvcjogaW1wbGljaXQgY29udmVyc2lvbiBmcm9tIGVu
-dW1lcmF0aW9uIHR5cGUgJ2VudW0gR3Vlc3REaXNrQnVzVHlwZScgdG8gZGlmZmVyZW50DQog
-ICAgICBlbnVtZXJhdGlvbiB0eXBlICdTVE9SQUdFX0JVU19UWVBFJyAoYWthICdlbnVtIF9T
-VE9SQUdFX0JVU19UWVBFJykgWy1XZXJyb3IsLVdlbnVtLWNvbnZlcnNpb25dDQogICAgW0J1
-c1R5cGVTc2FdID0gR1VFU1RfRElTS19CVVNfVFlQRV9TU0EsDQogICAgICAgICAgICAgICAg
-ICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4NCnFnYS9jb21tYW5kcy13aW4zMi5jOjQ2Nzoy
-MjogZXJyb3I6IGltcGxpY2l0IGNvbnZlcnNpb24gZnJvbSBlbnVtZXJhdGlvbiB0eXBlICdl
-bnVtIEd1ZXN0RGlza0J1c1R5cGUnIHRvIGRpZmZlcmVudA0KICAgICAgZW51bWVyYXRpb24g
-dHlwZSAnU1RPUkFHRV9CVVNfVFlQRScgKGFrYSAnZW51bSBfU1RPUkFHRV9CVVNfVFlQRScp
-IFstV2Vycm9yLC1XZW51bS1jb252ZXJzaW9uXQ0KICAgIFtCdXNUeXBlRmlicmVdID0gR1VF
-U1RfRElTS19CVVNfVFlQRV9TU0EsDQogICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fg0KcWdhL2NvbW1hbmRzLXdpbjMyLmM6NDY4OjIwOiBlcnJvcjogaW1w
-bGljaXQgY29udmVyc2lvbiBmcm9tIGVudW1lcmF0aW9uIHR5cGUgJ2VudW0gR3Vlc3REaXNr
-QnVzVHlwZScgdG8gZGlmZmVyZW50DQogICAgICBlbnVtZXJhdGlvbiB0eXBlICdTVE9SQUdF
-X0JVU19UWVBFJyAoYWthICdlbnVtIF9TVE9SQUdFX0JVU19UWVBFJykgWy1XZXJyb3IsLVdl
-bnVtLWNvbnZlcnNpb25dDQogICAgW0J1c1R5cGVVc2JdID0gR1VFU1RfRElTS19CVVNfVFlQ
-RV9VU0IsDQogICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4NCnFn
-YS9jb21tYW5kcy13aW4zMi5jOjQ2OToyMTogZXJyb3I6IGltcGxpY2l0IGNvbnZlcnNpb24g
-ZnJvbSBlbnVtZXJhdGlvbiB0eXBlICdlbnVtIEd1ZXN0RGlza0J1c1R5cGUnIHRvIGRpZmZl
-cmVudA0KICAgICAgZW51bWVyYXRpb24gdHlwZSAnU1RPUkFHRV9CVVNfVFlQRScgKGFrYSAn
-ZW51bSBfU1RPUkFHRV9CVVNfVFlQRScpIFstV2Vycm9yLC1XZW51bS1jb252ZXJzaW9uXQ0K
-ICAgIFtCdXNUeXBlUkFJRF0gPSBHVUVTVF9ESVNLX0JVU19UWVBFX1JBSUQsDQogICAgICAg
-ICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fg0KcWdhL2NvbW1hbmRzLXdp
-bjMyLmM6NDcwOjIyOiBlcnJvcjogaW1wbGljaXQgY29udmVyc2lvbiBmcm9tIGVudW1lcmF0
-aW9uIHR5cGUgJ2VudW0gR3Vlc3REaXNrQnVzVHlwZScgdG8gZGlmZmVyZW50DQogICAgICBl
-bnVtZXJhdGlvbiB0eXBlICdTVE9SQUdFX0JVU19UWVBFJyAoYWthICdlbnVtIF9TVE9SQUdF
-X0JVU19UWVBFJykgWy1XZXJyb3IsLVdlbnVtLWNvbnZlcnNpb25dDQogICAgW0J1c1R5cGVp
-U2NzaV0gPSBHVUVTVF9ESVNLX0JVU19UWVBFX0lTQ1NJLA0KICBDQyAgICAgIHFnYS9xYXBp
-LWdlbmVyYXRlZC9xZ2EtcWFwaS12aXNpdC5vDQogICAgICAgICAgICAgICAgICAgICBefn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+DQpxZ2EvY29tbWFuZHMtd2luMzIuYzo0NzE6MjA6IGVy
-cm9yOiBpbXBsaWNpdCBjb252ZXJzaW9uIGZyb20gZW51bWVyYXRpb24gdHlwZSAnZW51bSBH
-dWVzdERpc2tCdXNUeXBlJyB0byBkaWZmZXJlbnQNCiAgICAgIGVudW1lcmF0aW9uIHR5cGUg
-J1NUT1JBR0VfQlVTX1RZUEUnIChha2EgJ2VudW0gX1NUT1JBR0VfQlVTX1RZUEUnKSBbLVdl
-cnJvciwtV2VudW0tY29udmVyc2lvbl0NCiAgICBbQnVzVHlwZVNhc10gPSBHVUVTVF9ESVNL
-X0JVU19UWVBFX1NBUywNCiAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fg0KcWdhL2NvbW1hbmRzLXdpbjMyLmM6NDcyOjIxOiBlcnJvcjogaW1wbGljaXQgY29u
-dmVyc2lvbiBmcm9tIGVudW1lcmF0aW9uIHR5cGUgJ2VudW0gR3Vlc3REaXNrQnVzVHlwZScg
-dG8gZGlmZmVyZW50DQogICAgICBlbnVtZXJhdGlvbiB0eXBlICdTVE9SQUdFX0JVU19UWVBF
-JyAoYWthICdlbnVtIF9TVE9SQUdFX0JVU19UWVBFJykgWy1XZXJyb3IsLVdlbnVtLWNvbnZl
-cnNpb25dDQogICAgW0J1c1R5cGVTYXRhXSA9IEdVRVNUX0RJU0tfQlVTX1RZUEVfU0FUQSwN
-CiAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+DQpxZ2EvY29t
-bWFuZHMtd2luMzIuYzo0NzM6MjA6IGVycm9yOiBpbXBsaWNpdCBjb252ZXJzaW9uIGZyb20g
-ZW51bWVyYXRpb24gdHlwZSAnZW51bSBHdWVzdERpc2tCdXNUeXBlJyB0byBkaWZmZXJlbnQN
-CiAgICAgIGVudW1lcmF0aW9uIHR5cGUgJ1NUT1JBR0VfQlVTX1RZUEUnIChha2EgJ2VudW0g
-X1NUT1JBR0VfQlVTX1RZUEUnKSBbLVdlcnJvciwtV2VudW0tY29udmVyc2lvbl0NCiAgICBb
-QnVzVHlwZVNkXSA9ICBHVUVTVF9ESVNLX0JVU19UWVBFX1NELA0KICAgICAgICAgICAgICAg
-ICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn4NCnFnYS9jb21tYW5kcy13aW4zMi5jOjQ3NDoy
-MDogZXJyb3I6IGltcGxpY2l0IGNvbnZlcnNpb24gZnJvbSBlbnVtZXJhdGlvbiB0eXBlICdl
-bnVtIEd1ZXN0RGlza0J1c1R5cGUnIHRvIGRpZmZlcmVudA0KICAgICAgZW51bWVyYXRpb24g
-dHlwZSAnU1RPUkFHRV9CVVNfVFlQRScgKGFrYSAnZW51bSBfU1RPUkFHRV9CVVNfVFlQRScp
-IFstV2Vycm9yLC1XZW51bS1jb252ZXJzaW9uXQ0KICAgIFtCdXNUeXBlTW1jXSA9IEdVRVNU
-X0RJU0tfQlVTX1RZUEVfTU1DLA0KICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+DQpxZ2EvY29tbWFuZHMtd2luMzIuYzo0ODY6MTI6IGVycm9yOiBpbXBsaWNp
-dCBjb252ZXJzaW9uIGZyb20gZW51bWVyYXRpb24gdHlwZSAnU1RPUkFHRV9CVVNfVFlQRScN
-CiAgICAgIChha2EgJ2VudW0gX1NUT1JBR0VfQlVTX1RZUEUnKSB0byBkaWZmZXJlbnQgZW51
-bWVyYXRpb24gdHlwZSAnR3Vlc3REaXNrQnVzVHlwZScgKGFrYSAnZW51bSBHdWVzdERpc2tC
-dXNUeXBlJykNCiAgICAgIFstV2Vycm9yLC1XZW51bS1jb252ZXJzaW9uXQ0KICAgIHJldHVy
-biB3aW4ycWVtdVsoaW50KWJ1c107DQogICAgfn5+fn5+IF5+fn5+fn5+fn5+fn5+fn5+fg0K
-DQo+IE9yIGlzIGl0IGNvbXBsYWluaW5nIHRoYXQgR3Vlc3REaXNrQnVzVHlwZSBhbmQgU1RP
-UkFHRV9CVVNfVFlQRSBhcmUNCj4gZGlzdGluY3QgdHlwZXMsIGFuZCB0aGF0IHdlIGFyZSBp
-bmRlZWQgY3Jvc3MtYXNzaWduaW5nIGJldHdlZW4gdGhlIHR3bw0KPiBlbnVtcyBiZWNhdXNl
-IHdlIGludGVudGlvbmFsbHkgd2FudCB0aGVtIHRvIHNoYXJlIHZhbHVlcz8NCg0KSXQgbG9v
-a3MgbGlrZSBpdCBpcywgYWNjb3JkaW5nIHRvIHRoZSBsYXN0IHdhcm5pbmcu
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oFhh7Xu7cvW0S1qfReAuLeHb6vmaxh9vU
+From: Eric Blake <eblake@redhat.com>
+To: driver1998 <driver1998@foxmail.com>, qemu-devel <qemu-devel@nongnu.org>
+Message-ID: <153ed8ff-73b1-b120-9f83-a143c6bdac64@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] include/qemu/osdep.h: Move
+ the__USE_MINGW_ANSI_STDIO define up to avoid confliction.
+References: <20190430181343.1362-1-driver1998@foxmail.com>
+ <141080f9-8374-1d16-7b40-a4848a455086@redhat.com>
+ <tencent_DAABF38404447BB09E9711B789C215AAD109@qq.com>
+In-Reply-To: <tencent_DAABF38404447BB09E9711B789C215AAD109@qq.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 5/2/19 4:05 PM, driver1998 wrote:
+> On 5/1/19 2:30 AM, Eric Blake wrote:
+>> Your entire series is missing 'In-Reply-To:' and 'References:' headers=
+,
+>> making each message show up as individual new threads rather than
+>> properly threaded to a 0/4 cover letter. You'll want to fix your sendi=
+ng
+>> habits to avoid that problem in future submissions.
+>=20
+> I am terribly sorry about that, this is the first time I summit patches=
+, and I am still getting used to the tooling.
+
+That's okay, we were all first-timers once; and most human maintainers
+try to be more forgiving than automated tools when it comes to working
+around first-timer learning curves. There may be other useful hints you
+can use at https://wiki.qemu.org/Contribute/SubmitAPatch
+
+> Thank you for pointing out the issue though.
+>=20
+>> It's unusual to use a trailing '.' in the subject line. Also, your
+>> subject is very long; commit message summaries should typically be
+>> around 60-70 characters because 'git log' shows them with further
+>> indentation, where an 80-column terminal window makes it hard to see t=
+he
+>> tail at a glance.  Better might be a short subject line explaining the=
+
+>> "what", and then a non-empty commit message explaining the "why"
+>=20
+> Thank you for pointing out, I'll update that in the upcoming v3 set.
+>=20
+>> Question - does it hurt to make the define of __USE_MINGW_ANSI_STDIO
+>> unconditional?  In other words, we're unlikely to break any non-mingw
+>> platform if we drop the #ifdef __MINGW32__ line.
+>=20
+> I personally have no idea, so I'll keep it as is.
+
+Fair enough for your patch.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
+--oFhh7Xu7cvW0S1qfReAuLeHb6vmaxh9vU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzLZKUACgkQp6FrSiUn
+Q2pdvQgAql9L8zApXNRLq5WkHnALApNsOTysaJjf/Raow/VeU2yZihhIdafKDpLJ
+MmfhrDlWbIp3kTaqiaOCRpoBvuEt7ipoDTdjjNdDFZybOJuf6AKr6rSJv29O5MUc
+Uz5ddl4urw/IR8lBQWL69tDnOUZC88BUVWlgRBorI6EqKCvcx4Q1JU4oaS9lRA2h
+mQkx5NF1697DEic03w3pIbBuiPemDD6eS+8Ofz8N8oFuRXQ9C9BdaQIU0Y+gjtl0
+1K4MkVePwJZIokAa9L3ZqByxwt5QoCqRQOIlQRCYZXZEsjOx1pskDnICU8vw7URU
+Hdts6bO5xCMsypncfvr0V+IG0F1Ryg==
+=Oo0Z
+-----END PGP SIGNATURE-----
+
+--oFhh7Xu7cvW0S1qfReAuLeHb6vmaxh9vU--
 
