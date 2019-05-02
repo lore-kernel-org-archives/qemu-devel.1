@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42893)
+Received: from eggs.gnu.org ([209.51.188.92]:42831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hM6ti-0003aC-SX
+	(envelope-from <arilou@gmail.com>) id 1hM6th-0003YR-7K
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hM6th-0008Nq-6X
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:54 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:41417)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hM6te-0007ht-Ug
+	(envelope-from <arilou@gmail.com>) id 1hM6te-00087a-WB
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:52 -0400
-References: <20190501144646.4851-1-berrange@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <2875a50f-6720-1346-6c14-83c5165cf6a8@vivier.eu>
-Date: Thu, 2 May 2019 10:16:24 +0200
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:53885)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6te-000814-O4
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:50 -0400
+Received: by mail-wm1-x344.google.com with SMTP id q15so1477857wmf.3
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:48 -0700 (PDT)
+From: Jon Doron <arilou@gmail.com>
+Date: Thu,  2 May 2019 11:15:53 +0300
+Message-Id: <20190502081554.5521-27-arilou@gmail.com>
+In-Reply-To: <20190502081554.5521-1-arilou@gmail.com>
+References: <20190502081554.5521-1-arilou@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190501144646.4851-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: avoid string truncation
- warnings in uname field copying
+Subject: [Qemu-devel] [PATCH v9 26/27] gdbstub: Add support to read a MSR
+ for KVM target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Alistair Francis <Alistair.Francis@wdc.com>
+To: qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 
-On 01/05/2019 16:46, Daniel P. Berrangé wrote:
-> In file included from /usr/include/string.h:494,
->                  from include/qemu/osdep.h:101,
->                  from linux-user/uname.c:20:
-> In function ‘strncpy’,
->     inlined from ‘sys_uname’ at linux-user/uname.c:94:3:
-> /usr/include/bits/string_fortified.h:106:10: warning: ‘__builtin_strncpy’ output may be truncated copying 64 bytes from a string of length 64 [-Wstringop-truncation]
->   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> We don't care where the NUL terminator in the original uname
-> field was. It suffices to copy the entire original field and
-> simply force a NUL terminator at the end of the new field.
-> 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-> ---
-> 
-> Changed in v2:
-> 
->  - Always use sizeof() in preference to __NEW_UTS_LEN
-> 
->  linux-user/uname.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/linux-user/uname.c b/linux-user/uname.c
-> index 313b79dbad..1c05f95387 100644
-> --- a/linux-user/uname.c
-> +++ b/linux-user/uname.c
-> @@ -72,9 +72,8 @@ const char *cpu_to_uname_machine(void *cpu_env)
->  
->  #define COPY_UTSNAME_FIELD(dest, src) \
->    do { \
-> -      /* __NEW_UTS_LEN doesn't include terminating null */ \
-> -      (void) strncpy((dest), (src), __NEW_UTS_LEN); \
-> -      (dest)[__NEW_UTS_LEN] = '\0'; \
-> +      memcpy((dest), (src), MIN(sizeof(src), sizeof(dest))); \
-> +      (dest)[sizeof(dest) - 1] = '\0'; \
->    } while (0)
->  
->  int sys_uname(struct new_utsname *buf)
-> 
+gdb> maint packet qqemu.kvm.Rdmsr:MsrIndex
 
-Applied to my linux-user branch.
+Signed-off-by: Jon Doron <arilou@gmail.com>
+---
+ gdbstub.c | 38 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 37 insertions(+), 1 deletion(-)
 
-Thanks,
-Laurent
+diff --git a/gdbstub.c b/gdbstub.c
+index 34da10260d..f48c3a2b5f 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -2141,7 +2141,14 @@ static void handle_query_attached(GdbCmdContext *gdb_ctx, void *user_ctx)
+ 
+ static void handle_query_qemu_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
+ {
+-    put_packet(gdb_ctx->s, "sstepbits;sstep;PhyMemMode");
++    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf),
++             "sstepbits;sstep;PhyMemMode");
++
++    if (kvm_enabled()) {
++        pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";kvm.Rdmsr");
++    }
++
++    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
+ }
+ 
+ static void handle_query_qemu_phy_mem_mode(GdbCmdContext *gdb_ctx,
+@@ -2166,6 +2173,29 @@ static void handle_set_qemu_phy_mem_mode(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, "OK");
+ }
+ 
++static void handle_query_kvm_read_msr(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    uint64_t msr_val;
++
++    if (!kvm_enabled()) {
++        return;
++    }
++
++    if (!gdb_ctx->num_params) {
++        put_packet(gdb_ctx->s, "E22");
++        return;
++    }
++
++    if (kvm_arch_read_msr(gdbserver_state->c_cpu, gdb_ctx->params[0].val_ul,
++                          &msr_val)) {
++        put_packet(gdb_ctx->s, "E00");
++        return;
++    }
++
++    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "0x%" PRIx64, msr_val);
++    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
++}
++
+ static GdbCmdParseEntry gdb_gen_query_set_common_table[] = {
+     /* Order is important if has same prefix */
+     {
+@@ -2250,6 +2280,12 @@ static GdbCmdParseEntry gdb_gen_query_table[] = {
+         .handler = handle_query_qemu_phy_mem_mode,
+         .cmd = "qemu.PhyMemMode",
+     },
++    {
++        .handler = handle_query_kvm_read_msr,
++        .cmd = "qemu.kvm.Rdmsr:",
++        .cmd_startswith = 1,
++        .schema = "l0"
++    },
+ };
+ 
+ static GdbCmdParseEntry gdb_gen_set_table[] = {
+-- 
+2.20.1
