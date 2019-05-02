@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33DCDC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 15:13:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D376C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 15:13:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0ADEC20675
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 15:13:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ADEC20675
+	by mail.kernel.org (Postfix) with ESMTPS id E713B20675
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 15:13:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E713B20675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52851 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52853 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMDOe-0006PD-8h
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 11:13:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49726)
+	id 1hMDOg-0006SG-58
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 11:13:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hMD4t-0005gy-44
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:52:52 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hMD4F-00058b-E3
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:52:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hMD4r-00038i-Ai
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:52:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54400)
+	(envelope-from <imammedo@redhat.com>) id 1hMD4E-0002od-E3
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:52:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33982)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hMD4p-000374-8N
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:52:47 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hMD4E-0002oJ-8Y
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:52:10 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B4B5B30ADBB5;
-	Thu,  2 May 2019 14:52:45 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 746D7883B8;
+	Thu,  2 May 2019 14:52:09 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
 	(dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 45B5471C80;
-	Thu,  2 May 2019 14:52:43 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0304971C80;
+	Thu,  2 May 2019 14:52:06 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu,  2 May 2019 16:52:01 +0200
-Message-Id: <1556808723-226478-14-git-send-email-imammedo@redhat.com>
+Date: Thu,  2 May 2019 16:51:53 +0200
+Message-Id: <1556808723-226478-6-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1556808723-226478-1-git-send-email-imammedo@redhat.com>
 References: <1556808723-226478-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Thu, 02 May 2019 14:52:45 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.26]);
+	Thu, 02 May 2019 14:52:09 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 13/15] tests: acpi: add simple arm/virt
- testcase
+Subject: [Qemu-devel] [PATCH v4 05/15] tests: acpi: fetch X_DSDT if pointer
+ to DSDT is 0
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -81,90 +81,63 @@ Cc: Andrew Jones <drjones@redhat.com>, Ben Warren <ben@skyportsystems.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502145201.gG4_Q8nOvNq5izldRdnm-Swl3dUr67iaKKxBLetCed8@z>
+Message-ID: <20190502145153.4TyGZGJRUwFYS_semFEGiDlKKJ0LR-SlLN6kL8dK6co@z>
 
-adds simple arm/virt test case that starts guest with
-bios-tables-test.aarch64.iso.qcow2 boot image which
-initializes UefiTestSupport* structure in RAM once
-guest is booted.
+that way it would be possible to test a DSDT pointed by
+64bit X_DSDT field in FADT.
 
- * see commit: tests: acpi: add acpi_find_rsdp_address_uefi() helper
+PS:
+it will allow to enable testing arm/virt board, which sets
+only newer X_DSDT field.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
 v4:
-  * force test to use TCG accelerator
-v3:
-  * use firmware blobs directly from pc-bios directory
-  * use bios-tables-test.aarch64.iso.qcow2 as test boot image
-  * drop leftover qtest-uefi-images-aarch64 iMakefile rule from
-    previos version (Laszlo)
-  * add Makefile rule to include bios-tables-test into
-    check-qtest-aarch64 target
+ * dropping Reviewed-bys due to acpi_fetch_table() change
+   introduced by earlier patch:
+   "tests: acpi: make acpi_fetch_table() take size of fetched table point=
+er"
 v2:
-  * specify in test_data where board's RAM starts and RAM size
-
-fixup! tests: acpi: add simple arm/virt testcase
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+  add 'val =3D le32_to_cpu(val)' even if it doesn't necessary
+  it works as reminder that value copied from table is in
+  little-endian format (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
 ---
- tests/Makefile.include   |  1 +
- tests/bios-tables-test.c | 18 ++++++++++++++++++
- 2 files changed, 19 insertions(+)
+ tests/bios-tables-test.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index e2432d5..983c8b1 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -267,6 +267,7 @@ check-qtest-arm-y +=3D tests/hexloader-test$(EXESUF)
- check-qtest-aarch64-y =3D tests/numa-test$(EXESUF)
- check-qtest-aarch64-y +=3D tests/boot-serial-test$(EXESUF)
- check-qtest-aarch64-y +=3D tests/migration-test$(EXESUF)
-+check-qtest-aarch64-y +=3D tests/bios-tables-test$(EXESUF)
-=20
- check-qtest-microblazeel-y +=3D $(check-qtest-microblaze-y)
-=20
 diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 39c1e24..eaa1b0c 100644
+index a164d27..d165a1b 100644
 --- a/tests/bios-tables-test.c
 +++ b/tests/bios-tables-test.c
-@@ -810,6 +810,22 @@ static void test_acpi_piix4_tcg_dimm_pxm(void)
-     test_acpi_tcg_dimm_pxm(MACHINE_PC);
- }
+@@ -140,6 +140,9 @@ static void test_acpi_fadt_table(test_data *data)
+     AcpiSdtTable table =3D g_array_index(data->tables, typeof(table), 0)=
+;
+     uint8_t *fadt_aml =3D table.aml;
+     uint32_t fadt_len =3D table.aml_len;
++    uint32_t val;
++    int dsdt_offset =3D 40 /* DSDT */;
++    int dsdt_entry_size =3D 4;
 =20
-+static void test_acpi_virt_tcg(void)
-+{
-+    test_data data =3D {
-+        .machine =3D "virt",
-+        .accel =3D "tcg",
-+        .uefi_fl1 =3D "pc-bios/edk2-aarch64-code.fd",
-+        .uefi_fl2 =3D "pc-bios/edk2-arm-vars.fd",
-+        .cd =3D "tests/data/uefi-boot-images/bios-tables-test.aarch64.is=
-o.qcow2",
-+        .ram_start =3D 0x40000000ULL,
-+        .scan_len =3D 128ULL * 1024 * 1024,
-+    };
-+
-+    test_acpi_one("-cpu cortex-a57", &data);
-+    free_test_data(&data);
-+}
-+
- int main(int argc, char *argv[])
- {
-     const char *arch =3D qtest_get_arch();
-@@ -838,6 +854,8 @@ int main(int argc, char *argv[])
-         qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
-         qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_px=
-m);
-         qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
-+    } else if (strcmp(arch, "aarch64") =3D=3D 0) {
-+        qtest_add_func("acpi/virt", test_acpi_virt_tcg);
-     }
-     ret =3D g_test_run();
-     boot_sector_cleanup(disk);
+     g_assert(compare_signature(&table, "FACP"));
+=20
+@@ -148,8 +151,14 @@ static void test_acpi_fadt_table(test_data *data)
+                      fadt_aml + 36 /* FIRMWARE_CTRL */, 4, "FACS", false=
+);
+     g_array_append_val(data->tables, table);
+=20
++    memcpy(&val, fadt_aml + dsdt_offset, 4);
++    val =3D le32_to_cpu(val);
++    if (!val) {
++        dsdt_offset =3D 140 /* X_DSDT */;
++        dsdt_entry_size =3D 8;
++    }
+     acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
+-                     fadt_aml + 40 /* DSDT */, 4, "DSDT", true);
++                     fadt_aml + dsdt_offset, dsdt_entry_size, "DSDT", tr=
+ue);
+     g_array_append_val(data->tables, table);
+=20
+     memset(fadt_aml + 36, 0, 4); /* sanitize FIRMWARE_CTRL ptr */
 --=20
 2.7.4
 
