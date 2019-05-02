@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49652)
+Received: from eggs.gnu.org ([209.51.188.92]:56379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hMERe-0002NM-1v
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:20:27 -0400
+	(envelope-from <laurent.desnogues@gmail.com>) id 1hMEYr-0007j4-C8
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:27:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hMERV-00078F-4k
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:20:24 -0400
-Date: Thu, 2 May 2019 18:19:29 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190502181929.0bad1fb5@Igors-MacBook-Pro>
-In-Reply-To: <20190409102935.28292-5-shameerali.kolothum.thodi@huawei.com>
-References: <20190409102935.28292-1-shameerali.kolothum.thodi@huawei.com>
-	<20190409102935.28292-5-shameerali.kolothum.thodi@huawei.com>
+	(envelope-from <laurent.desnogues@gmail.com>) id 1hMEYq-0003Cz-9P
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:27:53 -0400
+Received: from mail-it1-x144.google.com ([2607:f8b0:4864:20::144]:38275)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
+	id 1hMEYp-00033j-UX
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:27:52 -0400
+Received: by mail-it1-x144.google.com with SMTP id q19so4457633itk.3
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 09:27:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 4/8] hw/arm/virt: Add memory hotplug
- framework
+References: <877eb86hcf.fsf@zen.linaroharston>
+	<20190502145846.26226-1-alex.bennee@linaro.org>
+	<765fa2ab-2803-1945-61ea-2e80b2da6072@vivier.eu>
+In-Reply-To: <765fa2ab-2803-1945-61ea-2e80b2da6072@vivier.eu>
+From: Laurent Desnogues <laurent.desnogues@gmail.com>
+Date: Thu, 2 May 2019 18:27:17 +0200
+Message-ID: <CABoDooM+DtCbTTsoYdvAJOOKuybgKUAR1yYmckM1b=dGA10=NA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] linux-user: avoid treading on gprof's
+ SIGPROF signals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,126 +32,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, eric.auger@redhat.com, peter.maydell@linaro.org, shannon.zhaosl@gmail.com, sameo@linux.intel.com, sebastien.boeuf@intel.com, xuwei5@hisilicon.com, lersek@redhat.com, ard.biesheuvel@linaro.org, linuxarm@huawei.com
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-On Tue, 9 Apr 2019 11:29:31 +0100
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+On Thu, May 2, 2019 at 6:17 PM Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> On 02/05/2019 16:58, Alex Benn=C3=A9e wrote:
+> > The guest tends to get confused when it receives signals it doesn't
+> > know about. Given the gprof magic has also set up it's own handler we
+> > would do well to avoid stomping on it as well.
+> >
+> > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> > ---
+> >  linux-user/signal.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> >
+> > diff --git a/linux-user/signal.c b/linux-user/signal.c
+> > index e2c0b37173..44b2d3b35a 100644
+> > --- a/linux-user/signal.c
+> > +++ b/linux-user/signal.c
+> > @@ -508,6 +508,11 @@ void signal_init(void)
+> >      act.sa_flags =3D SA_SIGINFO;
+> >      act.sa_sigaction =3D host_signal_handler;
+> >      for(i =3D 1; i <=3D TARGET_NSIG; i++) {
+> > +#ifdef TARGET_GPROF
+> > +        if (i =3D=3D SIGPROF) {
+> > +            continue;
+> > +        }
+> > +#endif
+> >          host_sig =3D target_to_host_signal(i);
+> >          sigaction(host_sig, NULL, &oact);
+> >          if (oact.sa_sigaction =3D=3D (void *)SIG_IGN) {
+> >
+>
+> Perhaps merge this with the previous one and send a v2: it will ease
+> bisecting.
 
-> From: Eric Auger <eric.auger@redhat.com>
-> 
-> This patch adds the memory hot-plug/hot-unplug infrastructure
-> in machvirt. The device memory is not yet exposed to the Guest
-> either though DT or ACPI and hence both cold/hot plug of memory
-s/though/through/
+I agree it would be better, though it should be noted that the signal
+issue has existed for at least 8 years (that's when I had to add a
+specific patch in my private repository).
 
-> is explicitly disabled for now.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->  default-configs/arm-softmmu.mak |  3 +++
->  hw/arm/virt.c                   | 45 ++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 47 insertions(+), 1 deletion(-)
-> 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 613d19a..9f4b803 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -160,3 +160,6 @@ CONFIG_MUSICPAL=y
->  
->  # for realview and versatilepb
->  CONFIG_LSI_SCSI_PCI=y
-> +
-> +CONFIG_MEM_DEVICE=y
-> +CONFIG_DIMM=y
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index ce2664a..da516b3 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -61,6 +61,8 @@
->  #include "hw/arm/smmuv3.h"
->  #include "hw/acpi/acpi.h"
->  #include "target/arm/internals.h"
-> +#include "hw/mem/pc-dimm.h"
-> +#include "hw/mem/nvdimm.h"
->  
->  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
->      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-> @@ -1806,6 +1808,34 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
->      return ms->possible_cpus;
->  }
->  
-> +static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                                 Error **errp)
-> +{
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> +        error_setg(errp, "memory cold/hot plug is not yet supported");
-> +        return;
-> +    }
-add comment here why it's needed.
+Thanks,
 
-> +
-> +    pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
-maybe before calling this there probably should be check if acpi is enabled.
-
-not sure if arm/virt board honors -no-acpi CLI option.
-
-> +}
-> +
-> +static void virt_memory_plug(HotplugHandler *hotplug_dev,
-> +                             DeviceState *dev, Error **errp)
-> +{
-> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-> +
-> +    pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), NULL);
-> +
-> +}
-> +
-> +static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-> +                                            DeviceState *dev, Error **errp)
-> +{
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> +        virt_memory_pre_plug(hotplug_dev, dev, errp);
-> +    }
-> +}
-> +
->  static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
->                                          DeviceState *dev, Error **errp)
->  {
-> @@ -1817,12 +1847,23 @@ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
->                                       SYS_BUS_DEVICE(dev));
->          }
->      }
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> +        virt_memory_plug(hotplug_dev, dev, errp);
-> +    }
-> +}
-> +
-> +static void virt_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-> +                                          DeviceState *dev, Error **errp)
-> +{
-> +    error_setg(errp, "device unplug request for unsupported device"
-> +               " type: %s", object_get_typename(OBJECT(dev)));
->  }
->  
->  static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
->                                                          DeviceState *dev)
->  {
-> -    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE) ||
-> +       (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM))) {
->          return HOTPLUG_HANDLER(machine);
->      }
->  
-> @@ -1886,7 +1927,9 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
->      mc->kvm_type = virt_kvm_type;
->      assert(!mc->get_hotplug_handler);
->      mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-> +    hc->pre_plug = virt_machine_device_pre_plug_cb;
->      hc->plug = virt_machine_device_plug_cb;
-> +    hc->unplug_request = virt_machine_device_unplug_request_cb;
->  }
->  
->  static void virt_instance_init(Object *obj)
+Laurent
