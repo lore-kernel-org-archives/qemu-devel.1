@@ -2,75 +2,77 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD8E8C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 07:40:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5A08C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 07:41:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A114B20873
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 07:40:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E1A620873
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 07:41:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RwBI31t8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A114B20873
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M08Tkbow"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E1A620873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46696 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46700 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM6Ku-0005vX-QI
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 03:40:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59783)
+	id 1hM6LC-0006Dh-N4
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 03:41:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6A7-0004vw-2x
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:48 -0400
+	(envelope-from <arilou@gmail.com>) id 1hM69W-0004P3-HM
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM69x-0002rT-Vm
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:40 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34590)
+	(envelope-from <arilou@gmail.com>) id 1hM69R-0002TF-N9
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:09 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39151)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM69n-0000d5-4s
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:32 -0400
-Received: by mail-wm1-x343.google.com with SMTP id b67so5964444wmg.1
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 00:27:22 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM69M-0000mD-3M
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:04 -0400
+Received: by mail-wr1-x442.google.com with SMTP id a9so1794635wrp.6
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 00:27:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=/kC4Ra5FAbXCGpLaIRgx76fPd1eNM+Za2+9T+4B8JSs=;
-	b=RwBI31t8OFRejI4t3acuDizKCkuymMwmCLrD1hF+TRwAPURb4qNgFmMR4VDWisk6x2
-	Wmwa7u5QfPpIdfVA7ilPAkkgoEYrp0Vp1Eu0mn7OoQu6RW+IXiTCLRlw+6kQVbtEIMIU
-	OW8JDPsppTaX+gj1RsvIIT25pIvdiJEI+2YjOHyih8x7DGp/9aqpeAUPQv/0lwK+a9ON
-	GBhstTKYAEEXnsqmEefr97tr0t03F1CUF26uewlGY9Itbv4QZc7yAy90ygL+ibwaUncu
-	fGM3M0svH5PXbv7prB2bsal3317to9TfQWPm4fbnLW6T618S+Pv68CxSLxuxdddRzi0d
-	cntg==
+	bh=Fq+y9Y8taPmtsyd8oOc7f9ZWDD3UWEkWOvqVLG/Lt40=;
+	b=M08TkbowMNzKjXu92BROOswqomQg3jQWqbVYbvAvdoHrrKtXdFl0obLqqWyvJP5OoB
+	4qYoQbNTUN45z7e+KP8IfqAz+DGywmg8d4hv7q5VJKvRX2JuqaO0wzup4JpCT0v3nkfc
+	rPgkEJH8qIea0F4daMLm9VRGLnJUF14vt7L3kPjG6ayI2+Q0mjpy5t0JL9HL60lcI4DC
+	0SmC0hLkAu7M0KFJcO2i51kJfZ6TsQh6rPf2P2TYpKDSMM1B3e4a4SABc9+DW5oSGWt6
+	hPELVUb69eZoAt0me0SvboRVXu1DsOdBuSsG3mc5st3d6ASLGCuHlg7+A33S2nFyjYne
+	YOwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=/kC4Ra5FAbXCGpLaIRgx76fPd1eNM+Za2+9T+4B8JSs=;
-	b=sHu68MmbpbmDy5zc0UKUOjGvG9DkGhWdn0wtnN1m9Fv9+aTVUfCnMeK1ctcyyltOcI
-	PC/h2QerMqA30FSdoFyxI1T5gHMwtXs32hbqENPiv6VvD4lAcKSDMCRniDDdlZ2QdK+x
-	FgWbUGrpeKmD7xUC4C9lg5vBdOpUB+E4T4Z3Qyu5DwqBItPdyqnn9bQBVD5tjsgPgSDj
-	iWYbtejvnr445Bpb+5R0N4x9Ic4seOaHeiuHHBexCwbInFdz1HyvNcoaSJ3lpO3Rhf/i
-	LWiTNHEu9MEpOdn0mZyqyw5nD6JmRmimrBhOqZxgDjoQbgndH4cRVhLsjzAcKopCoxRQ
-	KGhg==
-X-Gm-Message-State: APjAAAWCbEElklqVxhYeWf1nEiYgAEtjZoOPzX0V+PnwJ+orqH/JrCHY
-	k+0XOO0ic4eirJDq9BI1NgzWsPGy
-X-Google-Smtp-Source: APXvYqwVtHKT50ty821HkFxqeDRM5NeSyszIczH5wIZ7gKCbx6uBE0FppFIxAIroT0uPlIp/QWPGWw==
-X-Received: by 2002:a1c:eb07:: with SMTP id j7mr1150958wmh.138.1556782041127; 
-	Thu, 02 May 2019 00:27:21 -0700 (PDT)
+	bh=Fq+y9Y8taPmtsyd8oOc7f9ZWDD3UWEkWOvqVLG/Lt40=;
+	b=AfNj4UUvkU29WHNyft/tg7g8ug7J1gEGX4z0Yx0RtqMb5s5feJqVvVBot3JZbgWqbl
+	RFtKQM4Ue6TP4wtncjS8cMcuD5dqGvgmW08lahORqGz+Led50Q2AbV5ThW6Xt+XXi8Yr
+	z//TUllDKOxRKnzwMJtn88mXk6LOeeVCZVp50wQQdT0hwOndo8Nrv7m49ZXrBGgid4ae
+	pmy5fjdLh90VVfpUzoZDUn413jcGqlnyXLFBLp3aSXzjZbw8MUdSaqB5uMkQIlqykS2M
+	vxVPc+Zz3CkDg/lREeObsgP90eptaLuLuOmnZR74FOnymL+WUgc6bIh1rcM3TrvKT/UL
+	5uyA==
+X-Gm-Message-State: APjAAAXpPrOeH1K0Wqu7S7lN7LLpmOocIWjq4n8kw3pcY/qDsh75R5Br
+	3VM8e+4y1up2VzwRodsYmBBfvRkc
+X-Google-Smtp-Source: APXvYqwQo9wX6s6DwDn0wXKvrFc9LVj12oKft45CJXj997Yt16iABIyk2dEv1BrFAhOzR5Q0jDusIA==
+X-Received: by 2002:a05:6000:45:: with SMTP id
+	k5mr1575120wrx.261.1556782056515; 
+	Thu, 02 May 2019 00:27:36 -0700 (PDT)
 Received: from localhost.localdomain ([176.230.64.186])
-	by smtp.gmail.com with ESMTPSA id z5sm8769289wre.70.2019.05.02.00.27.19
+	by smtp.gmail.com with ESMTPSA id z5sm8769289wre.70.2019.05.02.00.27.34
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 02 May 2019 00:27:20 -0700 (PDT)
+	Thu, 02 May 2019 00:27:35 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Thu,  2 May 2019 10:26:29 +0300
-Message-Id: <20190502072641.4667-16-arilou@gmail.com>
+Date: Thu,  2 May 2019 10:26:39 +0300
+Message-Id: <20190502072641.4667-26-arilou@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190502072641.4667-1-arilou@gmail.com>
 References: <20190502072641.4667-1-arilou@gmail.com>
@@ -78,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH v8 15/27] gdbstub: Implement file io (F pkt)
- with new infra
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH v8 25/27] kvm: Add API to read/write a CPU MSR
+ value
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,93 +99,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190502072629.0_l0HOSxm6eFgWWXDN4YsyBpLPDgXJ_B0INlCv32F1o@z>
+Message-ID: <20190502072639.GcQmFuM7YXTYqAcSOCamy-Z7o6Pd9PjId7cFNEAPN0M@z>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 62 +++++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 40 insertions(+), 22 deletions(-)
+ accel/kvm/kvm-all.c  | 39 +++++++++++++++++++++++++++++++++++++++
+ include/sysemu/kvm.h |  2 ++
+ 2 files changed, 41 insertions(+)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 3478ac778d..9fe130f30d 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1772,6 +1772,39 @@ static void handle_read_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, gdb_ctx->str_buf);
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 524c4ddfbd..35207d910b 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -2444,6 +2444,45 @@ void kvm_remove_all_breakpoints(CPUState *cpu)
  }
+ #endif /* !KVM_CAP_SET_GUEST_DEBUG */
  
-+static void handle_file_io(GdbCmdContext *gdb_ctx, void *user_ctx)
++int kvm_arch_read_msr(CPUState *cpu, uint32_t index, uint64_t *value)
 +{
-+    int num_syscall_params;
-+    GdbCmdVariant syscall_params[3] = {};
++    struct {
++        struct kvm_msrs info;
++        struct kvm_msr_entry entries[1];
++    } msr_data;
++    int ret;
 +
-+    if (!gdb_ctx->num_params) {
-+        return;
++    msr_data.info.nmsrs = 1;
++    msr_data.entries[0].index = index;
++    ret = kvm_vcpu_ioctl(cpu, KVM_GET_MSRS, &msr_data);
++    if (ret < 0) {
++        return ret;
 +    }
 +
-+    if (cmd_parse_params(gdb_ctx->params[0].data, "L,L,o0", syscall_params,
-+                         &num_syscall_params)) {
-+        return;
-+    }
-+
-+    if (!num_syscall_params) {
-+        return;
-+    }
-+
-+    if (gdb_ctx->s->current_syscall_cb) {
-+        gdb_ctx->s->current_syscall_cb(gdb_ctx->s->c_cpu,
-+                                       (target_ulong)syscall_params[0].val_ull,
-+                                       (target_ulong)syscall_params[1].val_ull);
-+        gdb_ctx->s->current_syscall_cb = NULL;
-+    }
-+
-+    if (syscall_params[2].opcode == (uint8_t)'C') {
-+        put_packet(gdb_ctx->s, "T02");
-+        return;
-+    }
-+
-+    gdb_continue(gdb_ctx->s);
++    *value = msr_data.entries[0].data;
++    return 0;
 +}
 +
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
++int kvm_arch_write_msr(CPUState *cpu, uint32_t index, uint64_t value)
++{
++    struct {
++        struct kvm_msrs info;
++        struct kvm_msr_entry entries[1];
++    } msr_data;
++    int ret;
++
++    msr_data.info.nmsrs = 1;
++    msr_data.entries[0].index = index;
++    msr_data.entries[0].reserved = 0;
++    msr_data.entries[0].data = value;
++    ret = kvm_vcpu_ioctl(cpu, KVM_SET_MSRS, &msr_data);
++    if (ret < 0) {
++        return ret;
++    }
++
++    return 0;
++}
++
+ static int kvm_set_signal_mask(CPUState *cpu, const sigset_t *sigset)
  {
-     CPUState *cpu;
-@@ -1913,28 +1946,13 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         return RS_IDLE;
-     case 'F':
-         {
--            target_ulong ret;
--            target_ulong err;
--
--            ret = strtoull(p, (char **)&p, 16);
--            if (*p == ',') {
--                p++;
--                err = strtoull(p, (char **)&p, 16);
--            } else {
--                err = 0;
--            }
--            if (*p == ',')
--                p++;
--            type = *p;
--            if (s->current_syscall_cb) {
--                s->current_syscall_cb(s->c_cpu, ret, err);
--                s->current_syscall_cb = NULL;
--            }
--            if (type == 'C') {
--                put_packet(s, "T02");
--            } else {
--                gdb_continue(s);
--            }
-+            static const GdbCmdParseEntry file_io_cmd_desc = {
-+                .handler = handle_file_io,
-+                .cmd = "F",
-+                .cmd_startswith = 1,
-+                .schema = "s0"
-+            };
-+            cmd_parser = &file_io_cmd_desc;
-         }
-         break;
-     case 'g':
+     KVMState *s = kvm_state;
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index a6d1cd190f..409b1a5444 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -462,6 +462,8 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension);
+ uint32_t kvm_arch_get_supported_cpuid(KVMState *env, uint32_t function,
+                                       uint32_t index, int reg);
+ uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index);
++int kvm_arch_read_msr(CPUState *cpu, uint32_t index, uint64_t *value);
++int kvm_arch_write_msr(CPUState *cpu, uint32_t index, uint64_t value);
+ 
+ 
+ void kvm_set_sigmask_len(KVMState *s, unsigned int sigmask_len);
 -- 
 2.20.1
 
