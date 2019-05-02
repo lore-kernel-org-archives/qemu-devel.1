@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41633)
+Received: from eggs.gnu.org ([209.51.188.92]:42269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hMCay-0001P2-RG
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:21:58 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hMCdY-0003gW-SF
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:24:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hMCay-0008Dw-06
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:21:56 -0400
-References: <20190502085029.30776-1-shmuel.eiderman@oracle.com>
-	<20190502135828.42797-1-shmuel.eiderman@oracle.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3a211c90-f031-07ea-0833-35efcff5f6cb@redhat.com>
-Date: Thu, 2 May 2019 09:21:50 -0500
+	(envelope-from <imammedo@redhat.com>) id 1hMCdX-0001Bb-Pa
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:24:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33521)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hMCdX-0001AK-Hk
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:24:35 -0400
+Date: Thu, 2 May 2019 16:24:20 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190502162420.6c8280c8@Igors-MacBook-Pro>
+In-Reply-To: <b87a2b31-0389-2df0-42a6-a1593d437fcd@hisilicon.com>
+References: <1556170489-131927-12-git-send-email-imammedo@redhat.com>
+	<1556211116-172721-1-git-send-email-xuwei5@huawei.com>
+	<20190426135412.758769f9@Igors-MacBook-Pro.local>
+	<b87a2b31-0389-2df0-42a6-a1593d437fcd@hisilicon.com>
 MIME-Version: 1.0
-In-Reply-To: <20190502135828.42797-1-shmuel.eiderman@oracle.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="TMdW8fGMu5nzVn3zjv1319eeodRFnlUb0"
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] qemu-img: rebase: Improve/optimize
- rebase operation
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 11/13] tests: acpi: add simple arm/virt
+ testcase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +30,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: eyal.moscovici@oracle.com, arbel.moshe@oracle.com, liran.alon@oracle.com, sagi.amit@oracle.com, karl.heubaum@oracle.com
+To: Wei Xu <xuwei5@hisilicon.com>
+Cc: x00249684 <xuwei5@huawei.com>, qemu-devel@nongnu.org, shameerali.kolothum.thodi@huawei.com, linuxarm@huawei.com, Andrew Jones <drjones@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, mst@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TMdW8fGMu5nzVn3zjv1319eeodRFnlUb0
-From: Eric Blake <eblake@redhat.com>
-To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
- mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: eyal.moscovici@oracle.com, arbel.moshe@oracle.com, liran.alon@oracle.com,
- sagi.amit@oracle.com, karl.heubaum@oracle.com
-Message-ID: <3a211c90-f031-07ea-0833-35efcff5f6cb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] qemu-img: rebase: Improve/optimize
- rebase operation
-References: <20190502085029.30776-1-shmuel.eiderman@oracle.com>
- <20190502135828.42797-1-shmuel.eiderman@oracle.com>
-In-Reply-To: <20190502135828.42797-1-shmuel.eiderman@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, 26 Apr 2019 17:28:10 +0100
+Wei Xu <xuwei5@hisilicon.com> wrote:
 
-On 5/2/19 8:58 AM, Sam Eiderman wrote:
-> This patch series aims to improve the speed of qemu-img rebase.
->=20
-> 1. Mainly by removing unnecessary reads when rebasing on the same
->    chain.
-> 2. But also by minimizing the number of bdrv_open calls rebase
->    requires.
->=20
+> Hi Igor,
+> 
+> On 4/26/2019 12:54 PM, Igor Mammedov wrote:
+> > On Fri, 26 Apr 2019 00:51:56 +0800
+> > x00249684 <xuwei5@huawei.com> wrote:
+> > 
+> >> Hi Igor,
+> >>
+> >> +static void test_acpi_virt_tcg(void)
+> >> +{
+> >> +    test_data data = {
+> >> +        .machine = "virt",
+> >> +        .uefi_fl1 = "pc-bios/edk2-aarch64-code.fd",
+> >> +        .uefi_fl2 = "pc-bios/edk2-arm-vars.fd",
+> >> +        .cd = "tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2",
+> >> +        .ram_start = 0x40000000ULL,
+> >> +        .scan_len = 128ULL * 1024 * 1024,
+> >> +    };
+> >> +
+> >> +    test_acpi_one("-cpu cortex-a57 ", &data);
+> >>
+> >> Replaced the cortex-a57 with host and succesfully tested on the hisilicon arm64 
+> >> D05 board. Otherwise it failed with "kvm_init_vcpu failed: Invalid argument".
+> >> Is it possilbe to set the cpu type like numa-test.c?
+> > 
+> > I think it works with numa-test because it uses TCG only but in case of bios-tables-test
+> > it uses accel="kvm:tcg" to leverage KVM capabilities whenever possible to speed up test.
+> > 
+> > Now back to our ARM test case, uefi requirement is to use 64bit CPU (hence it was cortex-a57)
+> > however unlike x86 it obviously breaks since KVM accelerator on ARM host is used
+> > and it doesn't work with anything other than 'host' cpu model.
+> > 
+> > I think we still want to use KVM whenever possible, but problem lies in that
+> > user (testcase) doesn't have an idea if KVM accelerator is available and host is 64 CPU.
+> > 
+> > to sum up we need to support 2 modes:
+> >   1. host is 64 ARM, use kvm with -cpu host
+> >   2. all other cases use tcg with -cpu cortex-a57
+> > 
+> > I can hack to probe if /dev/kvm is accessible and host is 64 bit and use #1
+> > otherwise fallback to #2
+> > or as quick fix do only #2 initially and think about a better solution to #1 
+> 
+> Thanks!
+> Fine to me.
+> 
+> > 
+> > Is there any other suggestions/opinions how to approach issue/proceed.
+> 
+> To check the host cpu architecture is ARM or not, maybe we can check the value
+> of "CPU implementer" is 0x41 or not from the /proc/cpuinfo.
 
-When sending a v2 series, it's best to do so as a new top-level thread
-rather than in-reply-to the v1 series, as our CI tools are more likely
-to spot it that way.
+it turned out it's more complicated.
+we also should pick a correct GIC depending on host's CPU and that
+changes ACPI tables, so it will worn on some hosts and fail on other.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+I'll add a patch to enable test case to pick accelerator and force TCG
+for ARM tests for now.
 
-
---TMdW8fGMu5nzVn3zjv1319eeodRFnlUb0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzK/P4ACgkQp6FrSiUn
-Q2qF2ggAnetVLCLTObEcAy/naivXf55IXOvOQjzd+/9GfUqwvZinfIaeCJZZjInQ
-7aKXrlBQJdlQAIyMjN9zfTJ9YODONFnGEIWV2vuBnKaHqiI4kKn4Ms1TsodRZZGl
-g1tHs/WqdFqe8k5RLJuXejkx2w6ovmOrkHclTrXCfZGrPTe6z16M074dJKbY/Bng
-HZf+Y+I3HAp3jUIQBNb4yzaILNX2aMehxoWUZNdzmy1jCs4XfITnFBHQwx19JjZq
-tC4m5PxG94bd3+q59lh9XIEF4hO1UudBVAuXdtWVzoFQxVtu9rZ1U5mjlXdSTDcB
-/Me6ksR3ooOT9AI5fxu9RA5pCzXkCw==
-=au1U
------END PGP SIGNATURE-----
-
---TMdW8fGMu5nzVn3zjv1319eeodRFnlUb0--
+> 
+> Best Regards,
+> Wei
+> 
+> > 
+> > PS:
+> > we probably would like to reuse this not only for acpi tests but also for other
+> > arm/virt test cases that involve running guest code. 
+> > 
+> >> Thanks!
+> >>
+> >> Best Regards,
+> >> Wei
+> > 
+> > 
+> > .
+> > 
+> 
