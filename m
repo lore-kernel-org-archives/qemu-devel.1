@@ -2,61 +2,54 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51A52C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:45:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51F4FC43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:46:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B5A020656
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:45:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B5A020656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 242CF20656
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:46:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 242CF20656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52371 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52381 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMCy1-0007m6-Bw
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:45:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39199)
+	id 1hMCyz-0000N1-QW
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:46:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hMCRD-0001IE-SG
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:11:52 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCn9-0003VS-BG
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hMCRC-0007c7-V4
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:11:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53684)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hMCRC-0007bi-Pc; Thu, 02 May 2019 10:11:50 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E889A30B8FAC;
-	Thu,  2 May 2019 14:11:49 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-117-88.ams2.redhat.com [10.36.117.88])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 63DC8989B;
-	Thu,  2 May 2019 14:11:48 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCn7-0008MQ-Ni
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:31 -0400
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:56533)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCn7-0008Kg-AR
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:29 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.vps.ablenet.jp
+	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+	by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 71F0A3F5BA;
+	Thu,  2 May 2019 23:34:27 +0900 (JST)
+Received: from ysato.dip.jp (ZM005235.ppp.dion.ne.jp [222.8.5.235])
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 302F9240086; 
+	Thu,  2 May 2019 23:34:27 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Date: Thu,  2 May 2019 16:10:16 +0200
-Message-Id: <20190502141019.6385-38-david@redhat.com>
-In-Reply-To: <20190502141019.6385-1-david@redhat.com>
-References: <20190502141019.6385-1-david@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Thu, 02 May 2019 14:11:50 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 37/40] s390x/tcg: Implement VECTOR SUM
- ACROSS DOUBLEWORD
+Date: Thu,  2 May 2019 23:34:07 +0900
+Message-Id: <20190502143409.59600-11-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20190502143409.59600-1-ysato@users.sourceforge.jp>
+References: <20190502143409.59600-1-ysato@users.sourceforge.jp>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 202.224.55.15
+Subject: [Qemu-devel] [PATCH RFC v8 10/12] Add rx-softmmu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,82 +61,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+	Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190502141016.LqKBnueMKb3_Q5ULOn5-dQ50z3ZncGzR6VF4e3UQtKE@z>
+Message-ID: <20190502143407.Qtu86povwFjoZ0JosPaMjYqfstCgBX6SngTpdudx3F4@z>
 
-Perform the calculations without a helper. Only 16 bit or 32 bit values
-have to be added.
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 ---
- target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c | 29 +++++++++++++++++++++++++++++
- 2 files changed, 31 insertions(+)
+ configure                      | 8 ++++++++
+ default-configs/rx-softmmu.mak | 7 +++++++
+ include/sysemu/arch_init.h     | 1 +
+ arch_init.c                    | 2 ++
+ hw/Kconfig                     | 1 +
+ 5 files changed, 19 insertions(+)
+ create mode 100644 default-configs/rx-softmmu.mak
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index a8d90517f6..dd37003082 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1182,6 +1182,8 @@
-     F(0xe7bf, VSBI,    VRR_d, V,   0, 0, 0, 0, vsbi, 0, IF_VEC)
- /* VECTOR SUBTRACT WITH BORROW COMPUTE BORROW INDICATION */
-     F(0xe7bd, VSBCBI,  VRR_d, V,   0, 0, 0, 0, vsbcbi, 0, IF_VEC)
-+/* VECTOR SUM ACROSS DOUBLEWORD */
-+    F(0xe765, VSUMG,   VRR_c, V,   0, 0, 0, 0, vsumg, 0, IF_VEC)
-=20
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
-inc.c
-index b0b4d3640e..5e948ecff1 100644
---- a/target/s390x/translate_vx.inc.c
-+++ b/target/s390x/translate_vx.inc.c
-@@ -2248,3 +2248,32 @@ static DisasJumpType op_vsbcbi(DisasContext *s, Di=
-sasOps *o)
-                       get_field(s->fields, v4));
-     return DISAS_NEXT;
- }
+diff --git a/configure b/configure
+index 60719ddcc5..71bd70bf8f 100755
+--- a/configure
++++ b/configure
+@@ -7545,6 +7545,11 @@ case "$target_name" in
+     gdb_xml_files="riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml"
+     target_compiler=$cross_cc_riscv64
+   ;;
++  rx)
++    TARGET_ARCH=rx
++    bflt="yes"
++    target_compiler=$cross_cc_rx
++  ;;
+   sh4|sh4eb)
+     TARGET_ARCH=sh4
+     bflt="yes"
+@@ -7765,6 +7770,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+   riscv*)
+     disas_config "RISCV"
+   ;;
++  rx)
++    disas_config "RX"
++  ;;
+   s390*)
+     disas_config "S390"
+   ;;
+diff --git a/default-configs/rx-softmmu.mak b/default-configs/rx-softmmu.mak
+new file mode 100644
+index 0000000000..3f62f04e9b
+--- /dev/null
++++ b/default-configs/rx-softmmu.mak
+@@ -0,0 +1,7 @@
++# Default configuration for rx-softmmu
 +
-+static DisasJumpType op_vsumg(DisasContext *s, DisasOps *o)
-+{
-+    const uint8_t es =3D get_field(s->fields, m4);
-+    TCGv_i64 sum, tmp;
-+    uint8_t dst_idx;
-+
-+    if (es =3D=3D ES_8 || es > ES_32) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    sum =3D tcg_temp_new_i64();
-+    tmp =3D tcg_temp_new_i64();
-+    for (dst_idx =3D 0; dst_idx < 2; dst_idx++) {
-+        uint8_t idx =3D dst_idx * NUM_VEC_ELEMENTS(es) / 2;
-+        const uint8_t max_idx =3D idx + NUM_VEC_ELEMENTS(es) / 2 - 1;
-+
-+        read_vec_element_i64(sum, get_field(s->fields, v3), max_idx, es)=
-;
-+        for (; idx <=3D max_idx; idx++) {
-+            read_vec_element_i64(tmp, get_field(s->fields, v2), idx, es)=
-;
-+            tcg_gen_add_i64(sum, sum, tmp);
-+        }
-+        write_vec_element_i64(sum, get_field(s->fields, v1), dst_idx, ES=
-_64);
-+    }
-+    tcg_temp_free_i64(sum);
-+    tcg_temp_free_i64(tmp);
-+    return DISAS_NEXT;
-+}
---=20
-2.20.1
++CONFIG_SERIAL=y
++CONFIG_RX=y
++CONFIG_RENESAS_SCI=y
++CONFIG_RENESAS_TMR=y
++CONFIG_RENESAS_CMT=y
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+index 10cbafe970..3f4f844f7b 100644
+--- a/include/sysemu/arch_init.h
++++ b/include/sysemu/arch_init.h
+@@ -25,6 +25,7 @@ enum {
+     QEMU_ARCH_NIOS2 = (1 << 17),
+     QEMU_ARCH_HPPA = (1 << 18),
+     QEMU_ARCH_RISCV = (1 << 19),
++    QEMU_ARCH_RX = (1 << 20),
+ };
+ 
+ extern const uint32_t arch_type;
+diff --git a/arch_init.c b/arch_init.c
+index f4f3f610c8..cc25ddd7ca 100644
+--- a/arch_init.c
++++ b/arch_init.c
+@@ -74,6 +74,8 @@ int graphic_depth = 32;
+ #define QEMU_ARCH QEMU_ARCH_PPC
+ #elif defined(TARGET_RISCV)
+ #define QEMU_ARCH QEMU_ARCH_RISCV
++#elif defined(TARGET_RX)
++#define QEMU_ARCH QEMU_ARCH_RX
+ #elif defined(TARGET_S390X)
+ #define QEMU_ARCH QEMU_ARCH_S390X
+ #elif defined(TARGET_SH4)
+diff --git a/hw/Kconfig b/hw/Kconfig
+index 88b9f15007..63a071092e 100644
+--- a/hw/Kconfig
++++ b/hw/Kconfig
+@@ -53,6 +53,7 @@ source nios2/Kconfig
+ source openrisc/Kconfig
+ source ppc/Kconfig
+ source riscv/Kconfig
++source rx/Kconfig
+ source s390x/Kconfig
+ source sh4/Kconfig
+ source sparc/Kconfig
+-- 
+2.11.0
 
 
