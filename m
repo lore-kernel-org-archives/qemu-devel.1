@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45772)
+Received: from eggs.gnu.org ([209.51.188.92]:48199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hM3oo-0007GR-UN
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:59:40 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hM3vu-0001mp-Sa
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 01:07:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hM3om-0005M9-Bd
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:59:38 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:33684)
+	(envelope-from <alistair23@gmail.com>) id 1hM3vY-0005Wg-2Z
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 01:06:46 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:36978)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hM3od-0004d2-74
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:59:29 -0400
-Received: by mail-pf1-x442.google.com with SMTP id z28so542015pfk.0
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 21:59:13 -0700 (PDT)
-References: <20190501223819.8584-1-richard.henderson@linaro.org>
-	<20190502040459.GE13618@umbus.fritz.box>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <5aca63b1-72e9-9402-8828-d2dd054b3313@linaro.org>
-Date: Wed, 1 May 2019 21:59:09 -0700
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hM3vB-0003YN-5Q
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 01:06:20 -0400
+Received: by mail-lf1-x142.google.com with SMTP id h126so886851lfh.4
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 22:04:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190502040459.GE13618@umbus.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] configure: Fix make check-tcg for
- ppc64le
+References: <cover.1556515687.git.alistair@alistair23.me>
+	<PSXP216MB027793B449E7DAAB995E0F33DD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+	<CAFEAcA_rzfL_-zZPpMhqvyGLe7wS-HFh0znd8n2ysnfhg4kHLA@mail.gmail.com>
+In-Reply-To: <CAFEAcA_rzfL_-zZPpMhqvyGLe7wS-HFh0znd8n2ysnfhg4kHLA@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 1 May 2019 22:04:01 -0700
+Message-ID: <CAKmqyKN_JUjEguT5oHcgGEVQ7-viWq1gBKhdQ6hdp_RFA546Dw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 4/5] hw/arm: Add the STM32F4xx SoC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +30,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair@alistair23.me>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 5/1/19 9:04 PM, David Gibson wrote:
-> I've staged this tentatively in ppc-for-4.1.  However while it removes
-> the "Invalid ELF image" message I still get:
-> 
->   TEST    test-mmap (4096 byte pages) on ppc64le
-> test-mmap: Invalid argument
-> make[2]: *** [/home/dwg/qemu/tests/tcg/multiarch/Makefile.target:35: run-test-mmap-4096] Error 255
-> make[2]: Target 'run' not remade because of errors.
-> make[1]: *** [/home/dwg/qemu/tests/tcg/Makefile.include:71: run-guest-tests] Error 2
-> make: *** [/home/dwg/qemu/tests/Makefile.include:1079: run-tcg-tests-ppc64le-linux-user] Error 2
-> 
-> Running on a POWER9 host.  Do you see that as well?
+On Tue, Apr 30, 2019 at 8:59 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Mon, 29 Apr 2019 at 06:38, Alistair Francis <alistair@alistair23.me> wrote:
+> >
+> > Signed-off-by: Alistair Francis <alistair@alistair23.me>
+> > ---
+> >  MAINTAINERS                     |   8 +
+> >  default-configs/arm-softmmu.mak |   1 +
+> >  hw/arm/Kconfig                  |   3 +
+> >  hw/arm/Makefile.objs            |   1 +
+> >  hw/arm/stm32f405_soc.c          | 292 ++++++++++++++++++++++++++++++++
+> >  include/hw/arm/stm32f405_soc.h  |  70 ++++++++
+> >  6 files changed, 375 insertions(+)
+> >  create mode 100644 hw/arm/stm32f405_soc.c
+> >  create mode 100644 include/hw/arm/stm32f405_soc.h
+>
+> Looks good; a few minor things below.
+>
+> > +static void stm32f405_soc_initfn(Object *obj)
+> > +{
+> > +    STM32F405State *s = STM32F405_SOC(obj);
+> > +    int i;
+> > +
+> > +    sysbus_init_child_obj(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
+> > +                          TYPE_ARMV7M);
+> > +
+> > +    sysbus_init_child_obj(obj, "syscfg", &s->syscfg, sizeof(s->syscfg),
+> > +                          TYPE_STM32F4XX_SYSCFG);
+> > +
+> > +    for (i = 0; i < STM_NUM_USARTS; i++) {
+> > +        sysbus_init_child_obj(obj, "usart[*]", &s->usart[i],
+> > +                              sizeof(s->usart[i]), TYPE_STM32F2XX_USART);
+> > +    }
+> > +
+> > +    for (i = 0; i < STM_NUM_TIMERS; i++) {
+> > +        sysbus_init_child_obj(obj, "timer[*]", &s->timer[i],
+> > +                              sizeof(s->timer[i]), TYPE_STM32F2XX_TIMER);
+> > +    }
+> > +
+> > +    s->adc_irqs = OR_IRQ(object_new(TYPE_OR_IRQ));
+>
+> It would be more in keeping with the style of the rest of this
+> device to have the device be inline in the STM32F405State
+> struct and initialized with object_initialize_child() rather
+> than allocated separately with object_new(). (hw/arm/armsse.c
+> has an example of doing this with a TYPE_OR_IRQ object.)
 
-Yes.
+I have addressed all your comments.
 
-It's a semi-bogus test, really.  We can't run test-mmap
-with a page size smaller than that of the host, and of
-course ppc64le uses 64k pages.
+Alistair
 
-This needs a different set of cleanups.  ;-)
-
-
-r~
+>
+> > +
+> > +    for (i = 0; i < STM_NUM_ADCS; i++) {
+> > +        sysbus_init_child_obj(obj, "adc[*]", &s->adc[i], sizeof(s->adc[i]),
+> > +                              TYPE_STM32F2XX_ADC);
+> > +    }
+> > +
+> > +    for (i = 0; i < STM_NUM_SPIS; i++) {
+> > +        sysbus_init_child_obj(obj, "spi[*]", &s->spi[i], sizeof(s->spi[i]),
+> > +                              TYPE_STM32F2XX_SPI);
+> > +    }
+> > +
+> > +    sysbus_init_child_obj(obj, "exti", &s->exti, sizeof(s->exti),
+> > +                          TYPE_STM32F4XX_EXTI);
+> > +}
+> > +
+> > +static void stm32f405_soc_realize(DeviceState *dev_soc, Error **errp)
+> > +{
+> > +    STM32F405State *s = STM32F405_SOC(dev_soc);
+> > +    DeviceState *dev, *armv7m;
+> > +    SysBusDevice *busdev;
+> > +    Error *err = NULL;
+> > +    int i;
+> > +
+> > +    MemoryRegion *system_memory = get_system_memory();
+> > +    MemoryRegion *sram = g_new(MemoryRegion, 1);
+> > +    MemoryRegion *flash = g_new(MemoryRegion, 1);
+> > +    MemoryRegion *flash_alias = g_new(MemoryRegion, 1);
+>
+> I would prefer to have these MemoryRegions be in the STM32F405State
+> struct rather than separately allocated.
+>
+> > +
+> > +    memory_region_init_ram(flash, NULL, "STM32F405.flash", FLASH_SIZE,
+> > +                           &error_fatal);
+>
+> Better to pass the error back up via errp rather than use error_fatal
+> in a realize function.
+>
+> > +    memory_region_init_alias(flash_alias, NULL, "STM32F405.flash.alias",
+> > +                             flash, 0, FLASH_SIZE);
+> > +
+> > +    memory_region_set_readonly(flash, true);
+> > +    memory_region_set_readonly(flash_alias, true);
+> > +
+> > +    memory_region_add_subregion(system_memory, FLASH_BASE_ADDRESS, flash);
+> > +    memory_region_add_subregion(system_memory, 0, flash_alias);
+> > +
+> > +    memory_region_init_ram(sram, NULL, "STM32F405.sram", SRAM_SIZE,
+> > +                           &error_fatal);
+> > +    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
+> > +
+> > +    armv7m = DEVICE(&s->armv7m);
+> > +    qdev_prop_set_uint32(armv7m, "num-irq", 96);
+> > +    qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
+> > +    qdev_prop_set_bit(armv7m, "enable-bitband", true);
+> > +    object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
+>
+> You could use OBJECT(system_memory) rather than calling
+> get_system_memory() again.
+>
+> > +static Property stm32f405_soc_properties[] = {
+> > +    DEFINE_PROP_STRING("cpu-type", STM32F405State, cpu_type),
+> > +    DEFINE_PROP_END_OF_LIST(),
+> > +};
+> > +
+> > +static void stm32f405_soc_class_init(ObjectClass *klass, void *data)
+> > +{
+> > +    DeviceClass *dc = DEVICE_CLASS(klass);
+> > +
+> > +    dc->realize = stm32f405_soc_realize;
+> > +    dc->props = stm32f405_soc_properties;
+>
+> A comment here "No vmstate or reset required: device has no internal state"
+> would help indicate that dc->vmsd and dc->reset have not merely
+> been forgotten.
+>
+> (Eventually I might actually write a patch to let us express
+> in code "dc->vmsd = device_has_no_state;"...)
+>
+> > +}
+>
+> thanks
+> -- PMM
