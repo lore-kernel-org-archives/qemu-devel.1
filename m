@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39271)
+Received: from eggs.gnu.org ([209.51.188.92]:39325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hMCRH-0001N2-C3
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:11:56 -0400
+	(envelope-from <david@redhat.com>) id 1hMCRL-0001Us-Sl
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:12:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hMCRG-0007gM-FP
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:11:55 -0400
+	(envelope-from <david@redhat.com>) id 1hMCRK-0007jV-Gt
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:11:59 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Thu,  2 May 2019 16:10:18 +0200
-Message-Id: <20190502141019.6385-40-david@redhat.com>
+Date: Thu,  2 May 2019 16:10:19 +0200
+Message-Id: <20190502141019.6385-41-david@redhat.com>
 In-Reply-To: <20190502141019.6385-1-david@redhat.com>
 References: <20190502141019.6385-1-david@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 39/40] s390x/tcg: Implement VECTOR SUM
- ACROSS WORD
+Subject: [Qemu-devel] [PATCH v3 40/40] s390x/tcg: Implement VECTOR TEST
+ UNDER MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +25,110 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
-Similar to VECTOR SUM ACROSS DOUBLEWORD.
+Let's return the cc value directly via cpu_env. Unfortunately there
+isn't a simple way to calculate the value lazily - one would have to
+calculate and store e.g. the population count of the mask and the
+result so it can be evaluated in a cc helper.
+
+But as VTM only sets the cc, we can assume the value will be needed soon
+either way.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
+ target/s390x/helper.h           |  1 +
  target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c | 29 +++++++++++++++++++++++++++++
- 2 files changed, 31 insertions(+)
+ target/s390x/translate_vx.inc.c | 11 +++++++++++
+ target/s390x/vec_int_helper.c   | 18 ++++++++++++++++++
+ 4 files changed, 32 insertions(+)
 
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 2cb1f369bd..7755a96c33 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -209,6 +209,7 @@ DEF_HELPER_FLAGS_4(gvec_vsra, TCG_CALL_NO_RWG, void, =
+ptr, cptr, i64, i32)
+ DEF_HELPER_FLAGS_4(gvec_vsrl, TCG_CALL_NO_RWG, void, ptr, cptr, i64, i32=
+)
+ DEF_HELPER_FLAGS_4(gvec_vscbi8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
+i32)
+ DEF_HELPER_FLAGS_4(gvec_vscbi16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
+ i32)
++DEF_HELPER_4(gvec_vtm, void, ptr, cptr, env, i32)
+=20
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_3(servc, i32, env, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 2483ee01d7..a52db41388 100644
+index a52db41388..e61475bdc4 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1186,6 +1186,8 @@
-     F(0xe765, VSUMG,   VRR_c, V,   0, 0, 0, 0, vsumg, 0, IF_VEC)
- /* VECTOR SUM ACROSS QUADWORD */
+@@ -1188,6 +1188,8 @@
      F(0xe767, VSUMQ,   VRR_c, V,   0, 0, 0, 0, vsumq, 0, IF_VEC)
-+/* VECTOR SUM ACROSS WORD */
-+    F(0xe764, VSUM,    VRR_c, V,   0, 0, 0, 0, vsum, 0, IF_VEC)
+ /* VECTOR SUM ACROSS WORD */
+     F(0xe764, VSUM,    VRR_c, V,   0, 0, 0, 0, vsum, 0, IF_VEC)
++/* VECTOR TEST UNDER MASK */
++    F(0xe7d8, VTM,     VRR_a, V,   0, 0, 0, 0, vtm, 0, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index c77c224d5d..23eca2b332 100644
+index 23eca2b332..e12ba00a13 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -2309,3 +2309,32 @@ static DisasJumpType op_vsumq(DisasContext *s, Dis=
-asOps *o)
-     tcg_temp_free_i64(tmpl);
+@@ -191,6 +191,9 @@ static void get_vec_element_ptr_i64(TCGv_ptr ptr, uin=
+t8_t reg, TCGv_i64 enr,
+ #define gen_gvec_2i_ool(v1, v2, c, data, fn) \
+     tcg_gen_gvec_2i_ool(vec_full_reg_offset(v1), vec_full_reg_offset(v2)=
+, \
+                         c, 16, 16, data, fn)
++#define gen_gvec_2_ptr(v1, v2, ptr, data, fn) \
++    tcg_gen_gvec_2_ptr(vec_full_reg_offset(v1), vec_full_reg_offset(v2),=
+ \
++                       ptr, 16, 16, data, fn)
+ #define gen_gvec_3(v1, v2, v3, gen) \
+     tcg_gen_gvec_3(vec_full_reg_offset(v1), vec_full_reg_offset(v2), \
+                    vec_full_reg_offset(v3), 16, 16, gen)
+@@ -2338,3 +2341,11 @@ static DisasJumpType op_vsum(DisasContext *s, Disa=
+sOps *o)
+     tcg_temp_free_i32(tmp);
      return DISAS_NEXT;
  }
 +
-+static DisasJumpType op_vsum(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vtm(DisasContext *s, DisasOps *o)
 +{
-+    const uint8_t es =3D get_field(s->fields, m4);
-+    TCGv_i32 sum, tmp;
-+    uint8_t dst_idx;
-+
-+    if (es > ES_16) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    sum =3D tcg_temp_new_i32();
-+    tmp =3D tcg_temp_new_i32();
-+    for (dst_idx =3D 0; dst_idx < 4; dst_idx++) {
-+        uint8_t idx =3D dst_idx * NUM_VEC_ELEMENTS(es) / 4;
-+        const uint8_t max_idx =3D idx + NUM_VEC_ELEMENTS(es) / 4 - 1;
-+
-+        read_vec_element_i32(sum, get_field(s->fields, v3), max_idx, es)=
-;
-+        for (; idx <=3D max_idx; idx++) {
-+            read_vec_element_i32(tmp, get_field(s->fields, v2), idx, es)=
-;
-+            tcg_gen_add_i32(sum, sum, tmp);
-+        }
-+        write_vec_element_i32(sum, get_field(s->fields, v1), dst_idx, ES=
-_32);
-+    }
-+    tcg_temp_free_i32(sum);
-+    tcg_temp_free_i32(tmp);
++    gen_gvec_2_ptr(get_field(s->fields, v1), get_field(s->fields, v2),
++                   cpu_env, 0, gen_helper_gvec_vtm);
++    set_cc_static(s);
 +    return DISAS_NEXT;
++}
+diff --git a/target/s390x/vec_int_helper.c b/target/s390x/vec_int_helper.=
+c
+index 09137dab99..3e8837e09a 100644
+--- a/target/s390x/vec_int_helper.c
++++ b/target/s390x/vec_int_helper.c
+@@ -583,3 +583,21 @@ void HELPER(gvec_vscbi##BITS)(void *v1, const void *=
+v2, const void *v3,        \
+ }
+ DEF_VSCBI(8)
+ DEF_VSCBI(16)
++
++void HELPER(gvec_vtm)(void *v1, const void *v2, CPUS390XState *env,
++                      uint32_t desc)
++{
++    S390Vector tmp;
++
++    s390_vec_and(&tmp, v1, v2);
++    if (s390_vec_is_zero(&tmp)) {
++        /* Selected bits all zeros; or all mask bits zero */
++        env->cc_op =3D 0;
++    } else if (s390_vec_equal(&tmp, v2)) {
++        /* Selected bits all ones */
++        env->cc_op =3D 3;
++    } else {
++        /* Selected bits a mix of zeros and ones */
++        env->cc_op =3D 1;
++    }
 +}
 --=20
 2.20.1
