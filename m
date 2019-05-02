@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49502)
+Received: from eggs.gnu.org ([209.51.188.92]:49526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hMD4I-0005Cs-4j
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:52:15 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hMD4L-0005G0-Py
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:52:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hMD4H-0002rH-5O
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:52:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34020)
+	(envelope-from <imammedo@redhat.com>) id 1hMD4K-0002sq-O2
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:52:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58530)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hMD4G-0002qr-Vz
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:52:13 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hMD4K-0002sP-HU
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:52:16 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu,  2 May 2019 16:51:54 +0200
-Message-Id: <1556808723-226478-7-git-send-email-imammedo@redhat.com>
+Date: Thu,  2 May 2019 16:51:55 +0200
+Message-Id: <1556808723-226478-8-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1556808723-226478-1-git-send-email-imammedo@redhat.com>
 References: <1556808723-226478-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 06/15] tests: acpi: skip FACS table if board
- uses hw reduced ACPI profile
+Subject: [Qemu-devel] [PATCH v4 07/15] tests: acpi: move boot_sector_init()
+ into x86 tests branch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +30,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Gonglei <arei.gonglei@huawei.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Wei Yang <richardw.yang@linux.intel.com>, Andrew Jones <drjones@redhat.com>, Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Ben Warren <ben@skyportsystems.com>, xuwei5@hisilicon.com, xuwei5@huawei.com, linuxarm@huawei.com
 
-If FADT has HW_REDUCED_ACPI flag set, do not attempt to fetch
-FACS as it's not provided by the board.
+boot_sector_init() won't be used by arm/virt board, so move it from
+global scope to x86 branch that uses it.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
 ---
- tests/bios-tables-test.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+v3:
+  - fix checkpatch errors triggered by moved old code (ident/space/braces=
+)
+---
+ tests/bios-tables-test.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index d165a1b..e2fc341 100644
+index e2fc341..4d13a3c 100644
 --- a/tests/bios-tables-test.c
 +++ b/tests/bios-tables-test.c
-@@ -147,9 +147,13 @@ static void test_acpi_fadt_table(test_data *data)
-     g_assert(compare_signature(&table, "FACP"));
+@@ -788,13 +788,14 @@ int main(int argc, char *argv[])
+     const char *arch =3D qtest_get_arch();
+     int ret;
 =20
-     /* Since DSDT/FACS isn't in RSDT, add them to ASL test list manually=
- */
--    acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
--                     fadt_aml + 36 /* FIRMWARE_CTRL */, 4, "FACS", false=
-);
--    g_array_append_val(data->tables, table);
-+    memcpy(&val, fadt_aml + 112 /* Flags */, 4);
-+    val =3D le32_to_cpu(val);
-+    if (!(val & 1UL << 20 /* HW_REDUCED_ACPI */)) {
-+        acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
-+                         fadt_aml + 36 /* FIRMWARE_CTRL */, 4, "FACS", f=
-alse);
-+        g_array_append_val(data->tables, table);
-+    }
+-    ret =3D boot_sector_init(disk);
+-    if(ret)
+-        return ret;
+-
+     g_test_init(&argc, &argv, NULL);
 =20
-     memcpy(&val, fadt_aml + dsdt_offset, 4);
-     val =3D le32_to_cpu(val);
+     if (strcmp(arch, "i386") =3D=3D 0 || strcmp(arch, "x86_64") =3D=3D 0=
+) {
++        ret =3D boot_sector_init(disk);
++        if (ret) {
++            return ret;
++        }
++
+         qtest_add_func("acpi/piix4", test_acpi_piix4_tcg);
+         qtest_add_func("acpi/piix4/bridge", test_acpi_piix4_tcg_bridge);
+         qtest_add_func("acpi/q35", test_acpi_q35_tcg);
 --=20
 2.7.4
