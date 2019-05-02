@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44054)
+Received: from eggs.gnu.org ([209.51.188.92]:49283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hM5AB-0003Kj-TT
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:25:49 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hM5Po-0007Ai-JT
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:41:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hM5AA-0007We-75
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:25:47 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:55875)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hM5A9-0007RA-Rk
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:25:46 -0400
-Received: by mail-wm1-f67.google.com with SMTP id y2so746504wmi.5
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 23:25:40 -0700 (PDT)
-References: <20190501223819.8584-1-richard.henderson@linaro.org>
-	<20190501223819.8584-3-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <776e0e87-494a-1bd3-8074-09c6390d498c@redhat.com>
-Date: Thu, 2 May 2019 08:25:38 +0200
+	(envelope-from <kraxel@redhat.com>) id 1hM5Pn-00036j-Nx
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:41:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40544)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hM5Pn-0002wD-Eb
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:41:55 -0400
+Date: Thu, 2 May 2019 08:41:29 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190502064129.tklft35yvgaj6pq3@sirius.home.kraxel.org>
+References: <1556605301-44112-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20190501223819.8584-3-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] configure: Use quotes around uses of
- $CPU_CFLAGS
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <1556605301-44112-1-git-send-email-longpeng2@huawei.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] usb/xchi: avoid trigger assertion if
+ guest write wrong epid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,84 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, mark.cave-ayland@ilande.co.uk, alex.bennee@linaro.org, david@gibson.dropbear.id.au
+To: "Longpeng(Mike)" <longpeng2@huawei.com>
+Cc: qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>
 
-On 5/2/19 12:38 AM, Richard Henderson wrote:
-> About half of the values to which CPU_CFLAGS is set
-> have multiple space separated arguments.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On Tue, Apr 30, 2019 at 02:21:41PM +0800, Longpeng(Mike) wrote:
+> From: Longpeng <longpeng2@huawei.com>
+>=20
+> we found the following core in our environment:
+> 0  0x00007fc6b06c2237 in raise ()
+> 1  0x00007fc6b06c3928 in abort ()
+> 2  0x00007fc6b06bb056 in __assert_fail_base ()
+> 3  0x00007fc6b06bb102 in __assert_fail ()
+> 4  0x0000000000702e36 in xhci_kick_ep (...)
+> 5  0x000000000047897a in memory_region_write_accessor (...)
+> 6  0x000000000047767f in access_with_adjusted_size (...)
+> 7  0x000000000047944d in memory_region_dispatch_write (...)
+> (mr=3Dmr@entry=3D0x7fc6a0138df0, addr=3Daddr@entry=3D156, data=3D164889=
+2416,
+> size=3Dsize@entry=3D4, attrs=3Dattrs@entry=3D...)
+> 8  0x000000000042df17 in address_space_write_continue (...)
+> 10 0x000000000043084d in address_space_rw (...)
+> 11 0x000000000047451b in kvm_cpu_exec (cpu=3Dcpu@entry=3D0x1ab11b0)
+> 12 0x000000000045dcf5 in qemu_kvm_cpu_thread_fn (arg=3D0x1ab11b0)
+> 13 0x0000000000870631 in qemu_thread_start (args=3Dargs@entry=3D0x1acfb=
+50)
+> 14 0x00000000008959a7 in thread_entry_for_hotfix (pthread_cb=3D<optimiz=
+ed out>)
+> 15 0x00007fc6b0a60dd5 in start_thread ()
+> 16 0x00007fc6b078a59d in clone ()
+>=20
+> (gdb) f 5
+> 5  0x000000000047897a in memory_region_write_accessor (...)
+> 529	    mr->ops->write(mr->opaque, addr, tmp, size);
+> (gdb) p /x tmp
+> $9 =3D 0x62481a00 <-- last byte 0x00 is @epid
+>=20
+> xhci_doorbell_write() already check the upper bound of @slotid an @epid=
+,
+> it also need to check the lower bound.
+>=20
+> Cc: Gonglei <arei.gonglei@huawei.com>
+> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Signed-off-by: Longpeng <longpeng2@huawei.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Added to usb queue.
 
-> ---
->  configure | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index 234cb929ca..16bd4375d1 100755
-> --- a/configure
-> +++ b/configure
-> @@ -1543,37 +1543,37 @@ case "$cpu" in
->             CPU_CFLAGS="-m64"
->             LDFLAGS="-m64 $LDFLAGS"
->             cross_cc_ppc64=$cc
-> -           cross_cc_cflags_ppc64=$CPU_CFLAGS
-> +           cross_cc_cflags_ppc64="$CPU_CFLAGS"
->             ;;
->      sparc)
->             CPU_CFLAGS="-m32 -mv8plus -mcpu=ultrasparc"
->             LDFLAGS="-m32 -mv8plus $LDFLAGS"
->             cross_cc_sparc=$cc
-> -           cross_cc_cflags_sparc=$CPU_CFLAGS
-> +           cross_cc_cflags_sparc="$CPU_CFLAGS"
->             ;;
->      sparc64)
->             CPU_CFLAGS="-m64 -mcpu=ultrasparc"
->             LDFLAGS="-m64 $LDFLAGS"
->             cross_cc_sparc64=$cc
-> -           cross_cc_cflags_sparc64=$CPU_CFLAGS
-> +           cross_cc_cflags_sparc64="$CPU_CFLAGS"
->             ;;
->      s390)
->             CPU_CFLAGS="-m31"
->             LDFLAGS="-m31 $LDFLAGS"
->             cross_cc_s390=$cc
-> -           cross_cc_cflags_s390=$CPU_CFLAGS
-> +           cross_cc_cflags_s390="$CPU_CFLAGS"
->             ;;
->      s390x)
->             CPU_CFLAGS="-m64"
->             LDFLAGS="-m64 $LDFLAGS"
->             cross_cc_s390x=$cc
-> -           cross_cc_cflags_s390x=$CPU_CFLAGS
-> +           cross_cc_cflags_s390x="$CPU_CFLAGS"
->             ;;
->      i386)
->             CPU_CFLAGS="-m32"
->             LDFLAGS="-m32 $LDFLAGS"
->             cross_cc_i386=$cc
-> -           cross_cc_cflags_i386=$CPU_CFLAGS
-> +           cross_cc_cflags_i386="$CPU_CFLAGS"
->             ;;
->      x86_64)
->             # ??? Only extremely old AMD cpus do not have cmpxchg16b.
-> @@ -1582,13 +1582,13 @@ case "$cpu" in
->             CPU_CFLAGS="-m64 -mcx16"
->             LDFLAGS="-m64 $LDFLAGS"
->             cross_cc_x86_64=$cc
-> -           cross_cc_cflags_x86_64=$CPU_CFLAGS
-> +           cross_cc_cflags_x86_64="$CPU_CFLAGS"
->             ;;
->      x32)
->             CPU_CFLAGS="-mx32"
->             LDFLAGS="-mx32 $LDFLAGS"
->             cross_cc_i386=$cc
-> -           cross_cc_cflags_i386=$CPU_CFLAGS
-> +           cross_cc_cflags_i386="$CPU_CFLAGS"
->             ;;
->      # No special flags required for other host CPUs
->  esac
-> 
+thanks,
+  Gerd
