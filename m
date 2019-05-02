@@ -2,92 +2,60 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7A4CC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:09:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A7DEC43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:12:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71605208C4
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:09:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dC26OCQ3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71605208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4DD8B206DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:12:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DD8B206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51662 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51733 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMCOv-0007KU-MS
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:09:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37683)
+	id 1hMCRl-0001Sj-Bw
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:12:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMCO3-00070N-Sz
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:08:37 -0400
+	(envelope-from <david@redhat.com>) id 1hMCPu-0007qW-UK
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:10:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMCO1-0002RE-Tj
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:08:35 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54584)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hMCO1-0002LB-Hd
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:08:33 -0400
-Received: by mail-wm1-x341.google.com with SMTP id b10so3039235wmj.4
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 07:08:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:subject:in-reply-to:date:message-id
-	:mime-version:content-transfer-encoding;
-	bh=JArF4Ks+B2PJTZP7S4mNaFDLIBgduYBI3/YUdJFe5no=;
-	b=dC26OCQ3/QSwDKTvCS7YBow6SD3HCJNl25wnEn0JLMustkuenK+tUENdYyk62WEXeZ
-	/5tebNIrDHq/pyvynls6PdeSoKnUpZ6xeXMRbM4hlPZf+4pm7qK19vzMJsU2sCJ3ULm/
-	ORpU5iQMO3j+EuDWZvfOGzYhY0wHv9MT3ko9YYXOYI6ysnDk0voLwAAWiDERj0txSeVz
-	t8ma2fLF8WJUKj7h4S+3wvcfhg+1I/Xr5rtykOKopHFlTIryADkY23tCPGqwc/uuktKI
-	B9rSvcIU52Diuv+I5ivAsOc2oHJg5WCrdldZim/teH9CwrdhUq6EmD6Vk3ogMIaC0pMs
-	547Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=JArF4Ks+B2PJTZP7S4mNaFDLIBgduYBI3/YUdJFe5no=;
-	b=tKKTcd5blsL1A7ISQBqYBTCw42XARaM7Ns4GarY9i2bd4QpVWYy/zYHdc4hq5k/hxo
-	QrddznhnDO3CYQvjmtcf5HJ42MJLrN5qc6fEpdFV8g1ketPOpu0ftQm0rCd8Pyp0QDaK
-	LazP/BqlRR06jVWY8Dv1hzKtRsB1XeOkS2UzkYJ81nCONm50XE5anZDR+6M7gyVcbzC7
-	6LLOZX2ElnYkciifxwtxcPyAZPcLCEiG88LYGpfkavscryD+KFu07emsQm3cRbLwCrO/
-	B8TnuK1weis4LMukm3n2mdOG7l0C/XADtLG7cWWbqMAoFdsXePqvSpiUJQjdlCXs76vV
-	VIOw==
-X-Gm-Message-State: APjAAAWfzJCTtIQ/kgsPaaBP57RPylPcF77X9T9/q8TgJ3tVluwjX+AE
-	zU5+EL9CwnvpwhtwypxXWpgf0Z4TAvg=
-X-Google-Smtp-Source: APXvYqwhJ2XZy2sydPIkPeueOVboJ1JlnzV7pcwfdbgsk0597/T4uaFj7M9ZoIQtxtCEiENL5eyBqA==
-X-Received: by 2002:a1c:c917:: with SMTP id f23mr2426478wmb.4.1556806109776;
-	Thu, 02 May 2019 07:08:29 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	x18sm45762955wrw.14.2019.05.02.07.08.28 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 02 May 2019 07:08:28 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 29D481FF87
-	for <qemu-devel@nongnu.org>; Thu,  2 May 2019 15:08:28 +0100 (BST)
-References: <20190501050536.15580-1-richard.henderson@linaro.org>
-	<20190501050536.15580-15-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+	(envelope-from <david@redhat.com>) id 1hMCPt-0005vJ-Il
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:10:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52402)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hMCPt-0005uc-B5; Thu, 02 May 2019 10:10:29 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4119F30031B0;
+	Thu,  2 May 2019 14:10:28 +0000 (UTC)
+Received: from t460s.redhat.com (ovpn-117-88.ams2.redhat.com [10.36.117.88])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B03C717D58;
+	Thu,  2 May 2019 14:10:26 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-In-reply-to: <20190501050536.15580-15-richard.henderson@linaro.org>
-Date: Thu, 02 May 2019 15:08:28 +0100
-Message-ID: <87bm0l54pv.fsf@zen.linaroharston>
+Date: Thu,  2 May 2019 16:09:40 +0200
+Message-Id: <20190502141019.6385-2-david@redhat.com>
+In-Reply-To: <20190502141019.6385-1-david@redhat.com>
+References: <20190502141019.6385-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Thu, 02 May 2019 14:10:28 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v2 14/29] tcg: Add gvec expanders for
- variable shift
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3 01/40] s390x/tcg: Implement VECTOR ADD
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,496 +67,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502140828.Ne-fG9ZXcqGw0rVJRrkiORUZv8kuY9h7HR1VF_IQtyw@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190502140940.cfNqh25DoK4DEwC-MneUVNcXHodfUJgWhGtC1nLf5n0@z>
 
+Introduce two types of fancy new helpers that will be reused a couple of
+times
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+1. gen_gvec_fn_3: Call an existing tcg_gen_gvec_X function with 3
+   parameters, simplifying parameter passing
+2. gen_gvec128_3_i64: Call a function that performs 128 bit calculations
+   using two 64 bit values per vector.
 
-> The gvec expanders perform a modulo on the shift count.  If the target
-> requires alternate behaviour, then it cannot use the generic gvec
-> expanders anyway, and will have to have its own custom code.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Luckily, for VECTOR ADD we already have everything we need.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/insn-data.def      |  5 ++++
+ target/s390x/translate_vx.inc.c | 52 +++++++++++++++++++++++++++++++++
+ 2 files changed, 57 insertions(+)
 
-> ---
->  accel/tcg/tcg-runtime.h      |  15 +++
->  tcg/tcg-op-gvec.h            |  11 ++
->  tcg/tcg-op.h                 |   4 +
->  accel/tcg/tcg-runtime-gvec.c | 144 ++++++++++++++++++++++++++
->  tcg/tcg-op-gvec.c            | 195 +++++++++++++++++++++++++++++++++++
->  tcg/tcg-op-vec.c             |  15 +++
->  6 files changed, 384 insertions(+)
->
-> diff --git a/accel/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
-> index dfe325625c..ed3ce5fd91 100644
-> --- a/accel/tcg/tcg-runtime.h
-> +++ b/accel/tcg/tcg-runtime.h
-> @@ -254,6 +254,21 @@ DEF_HELPER_FLAGS_3(gvec_sar16i, TCG_CALL_NO_RWG, voi=
-d, ptr, ptr, i32)
->  DEF_HELPER_FLAGS_3(gvec_sar32i, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
->  DEF_HELPER_FLAGS_3(gvec_sar64i, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
->
-> +DEF_HELPER_FLAGS_4(gvec_shl8v, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_4(gvec_shl16v, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i3=
-2)
-> +DEF_HELPER_FLAGS_4(gvec_shl32v, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i3=
-2)
-> +DEF_HELPER_FLAGS_4(gvec_shl64v, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i3=
-2)
-> +
-> +DEF_HELPER_FLAGS_4(gvec_shr8v, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_4(gvec_shr16v, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i3=
-2)
-> +DEF_HELPER_FLAGS_4(gvec_shr32v, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i3=
-2)
-> +DEF_HELPER_FLAGS_4(gvec_shr64v, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i3=
-2)
-> +
-> +DEF_HELPER_FLAGS_4(gvec_sar8v, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-> +DEF_HELPER_FLAGS_4(gvec_sar16v, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i3=
-2)
-> +DEF_HELPER_FLAGS_4(gvec_sar32v, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i3=
-2)
-> +DEF_HELPER_FLAGS_4(gvec_sar64v, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i3=
-2)
-> +
->  DEF_HELPER_FLAGS_4(gvec_eq8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
->  DEF_HELPER_FLAGS_4(gvec_eq16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
->  DEF_HELPER_FLAGS_4(gvec_eq32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-> diff --git a/tcg/tcg-op-gvec.h b/tcg/tcg-op-gvec.h
-> index ac744ff7c9..84a6247b16 100644
-> --- a/tcg/tcg-op-gvec.h
-> +++ b/tcg/tcg-op-gvec.h
-> @@ -318,6 +318,17 @@ void tcg_gen_gvec_shri(unsigned vece, uint32_t dofs,=
- uint32_t aofs,
->  void tcg_gen_gvec_sari(unsigned vece, uint32_t dofs, uint32_t aofs,
->                         int64_t shift, uint32_t oprsz, uint32_t maxsz);
->
-> +/*
-> + * Perform vector shift by vector element, modulo the element size.
-> + * E.g.  D[i] =3D A[i] << (B[i] % (8 << vece)).
-> + */
-> +void tcg_gen_gvec_shlv(unsigned vece, uint32_t dofs, uint32_t aofs,
-> +                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
-> +void tcg_gen_gvec_shrv(unsigned vece, uint32_t dofs, uint32_t aofs,
-> +                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
-> +void tcg_gen_gvec_sarv(unsigned vece, uint32_t dofs, uint32_t aofs,
-> +                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
-> +
->  void tcg_gen_gvec_cmp(TCGCond cond, unsigned vece, uint32_t dofs,
->                        uint32_t aofs, uint32_t bofs,
->                        uint32_t oprsz, uint32_t maxsz);
-> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-> index 9fff9864f6..833c6330b5 100644
-> --- a/tcg/tcg-op.h
-> +++ b/tcg/tcg-op.h
-> @@ -986,6 +986,10 @@ void tcg_gen_shli_vec(unsigned vece, TCGv_vec r, TCG=
-v_vec a, int64_t i);
->  void tcg_gen_shri_vec(unsigned vece, TCGv_vec r, TCGv_vec a, int64_t i);
->  void tcg_gen_sari_vec(unsigned vece, TCGv_vec r, TCGv_vec a, int64_t i);
->
-> +void tcg_gen_shlv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec s);
-> +void tcg_gen_shrv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec s);
-> +void tcg_gen_sarv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec s);
-> +
->  void tcg_gen_cmp_vec(TCGCond cond, unsigned vece, TCGv_vec r,
->                       TCGv_vec a, TCGv_vec b);
->
-> diff --git a/accel/tcg/tcg-runtime-gvec.c b/accel/tcg/tcg-runtime-gvec.c
-> index e2c6f24262..2152fb6903 100644
-> --- a/accel/tcg/tcg-runtime-gvec.c
-> +++ b/accel/tcg/tcg-runtime-gvec.c
-> @@ -725,6 +725,150 @@ void HELPER(gvec_sar64i)(void *d, void *a, uint32_t=
- desc)
->      clear_high(d, oprsz, desc);
->  }
->
-> +void HELPER(gvec_shl8v)(void *d, void *a, void *b, uint32_t desc)
-> +{
-> +    intptr_t oprsz =3D simd_oprsz(desc);
-> +    intptr_t i;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D sizeof(uint8_t)) {
-> +        uint8_t sh =3D *(uint8_t *)(b + i) & 7;
-> +        *(uint8_t *)(d + i) =3D *(uint8_t *)(a + i) << sh;
-> +    }
-> +    clear_high(d, oprsz, desc);
-> +}
-> +
-> +void HELPER(gvec_shl16v)(void *d, void *a, void *b, uint32_t desc)
-> +{
-> +    intptr_t oprsz =3D simd_oprsz(desc);
-> +    intptr_t i;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D sizeof(uint16_t)) {
-> +        uint8_t sh =3D *(uint16_t *)(b + i) & 15;
-> +        *(uint16_t *)(d + i) =3D *(uint16_t *)(a + i) << sh;
-> +    }
-> +    clear_high(d, oprsz, desc);
-> +}
-> +
-> +void HELPER(gvec_shl32v)(void *d, void *a, void *b, uint32_t desc)
-> +{
-> +    intptr_t oprsz =3D simd_oprsz(desc);
-> +    intptr_t i;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D sizeof(uint32_t)) {
-> +        uint8_t sh =3D *(uint32_t *)(b + i) & 31;
-> +        *(uint32_t *)(d + i) =3D *(uint32_t *)(a + i) << sh;
-> +    }
-> +    clear_high(d, oprsz, desc);
-> +}
-> +
-> +void HELPER(gvec_shl64v)(void *d, void *a, void *b, uint32_t desc)
-> +{
-> +    intptr_t oprsz =3D simd_oprsz(desc);
-> +    intptr_t i;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D sizeof(uint64_t)) {
-> +        uint8_t sh =3D *(uint64_t *)(b + i) & 63;
-> +        *(uint64_t *)(d + i) =3D *(uint64_t *)(a + i) << sh;
-> +    }
-> +    clear_high(d, oprsz, desc);
-> +}
-> +
-> +void HELPER(gvec_shr8v)(void *d, void *a, void *b, uint32_t desc)
-> +{
-> +    intptr_t oprsz =3D simd_oprsz(desc);
-> +    intptr_t i;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D sizeof(uint8_t)) {
-> +        uint8_t sh =3D *(uint8_t *)(b + i) & 7;
-> +        *(uint8_t *)(d + i) =3D *(uint8_t *)(a + i) >> sh;
-> +    }
-> +    clear_high(d, oprsz, desc);
-> +}
-> +
-> +void HELPER(gvec_shr16v)(void *d, void *a, void *b, uint32_t desc)
-> +{
-> +    intptr_t oprsz =3D simd_oprsz(desc);
-> +    intptr_t i;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D sizeof(uint16_t)) {
-> +        uint8_t sh =3D *(uint16_t *)(b + i) & 15;
-> +        *(uint16_t *)(d + i) =3D *(uint16_t *)(a + i) >> sh;
-> +    }
-> +    clear_high(d, oprsz, desc);
-> +}
-> +
-> +void HELPER(gvec_shr32v)(void *d, void *a, void *b, uint32_t desc)
-> +{
-> +    intptr_t oprsz =3D simd_oprsz(desc);
-> +    intptr_t i;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D sizeof(uint32_t)) {
-> +        uint8_t sh =3D *(uint32_t *)(b + i) & 31;
-> +        *(uint32_t *)(d + i) =3D *(uint32_t *)(a + i) >> sh;
-> +    }
-> +    clear_high(d, oprsz, desc);
-> +}
-> +
-> +void HELPER(gvec_shr64v)(void *d, void *a, void *b, uint32_t desc)
-> +{
-> +    intptr_t oprsz =3D simd_oprsz(desc);
-> +    intptr_t i;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D sizeof(uint64_t)) {
-> +        uint8_t sh =3D *(uint64_t *)(b + i) & 63;
-> +        *(uint64_t *)(d + i) =3D *(uint64_t *)(a + i) >> sh;
-> +    }
-> +    clear_high(d, oprsz, desc);
-> +}
-> +
-> +void HELPER(gvec_sar8v)(void *d, void *a, void *b, uint32_t desc)
-> +{
-> +    intptr_t oprsz =3D simd_oprsz(desc);
-> +    intptr_t i;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D sizeof(vec8)) {
-> +        uint8_t sh =3D *(uint8_t *)(b + i) & 7;
-> +        *(int8_t *)(d + i) =3D *(int8_t *)(a + i) >> sh;
-> +    }
-> +    clear_high(d, oprsz, desc);
-> +}
-> +
-> +void HELPER(gvec_sar16v)(void *d, void *a, void *b, uint32_t desc)
-> +{
-> +    intptr_t oprsz =3D simd_oprsz(desc);
-> +    intptr_t i;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D sizeof(int16_t)) {
-> +        uint8_t sh =3D *(uint16_t *)(b + i) & 15;
-> +        *(int16_t *)(d + i) =3D *(int16_t *)(a + i) >> sh;
-> +    }
-> +    clear_high(d, oprsz, desc);
-> +}
-> +
-> +void HELPER(gvec_sar32v)(void *d, void *a, void *b, uint32_t desc)
-> +{
-> +    intptr_t oprsz =3D simd_oprsz(desc);
-> +    intptr_t i;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D sizeof(vec32)) {
-> +        uint8_t sh =3D *(uint32_t *)(b + i) & 31;
-> +        *(int32_t *)(d + i) =3D *(int32_t *)(a + i) >> sh;
-> +    }
-> +    clear_high(d, oprsz, desc);
-> +}
-> +
-> +void HELPER(gvec_sar64v)(void *d, void *a, void *b, uint32_t desc)
-> +{
-> +    intptr_t oprsz =3D simd_oprsz(desc);
-> +    intptr_t i;
-> +
-> +    for (i =3D 0; i < oprsz; i +=3D sizeof(vec64)) {
-> +        uint8_t sh =3D *(uint64_t *)(b + i) & 63;
-> +        *(int64_t *)(d + i) =3D *(int64_t *)(a + i) >> sh;
-> +    }
-> +    clear_high(d, oprsz, desc);
-> +}
-> +
->  /* If vectors are enabled, the compiler fills in -1 for true.
->     Otherwise, we must take care of this by hand.  */
->  #ifdef CONFIG_VECTOR16
-> diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-> index 35ebc5a201..061ef329f1 100644
-> --- a/tcg/tcg-op-gvec.c
-> +++ b/tcg/tcg-op-gvec.c
-> @@ -2555,6 +2555,201 @@ void tcg_gen_gvec_sari(unsigned vece, uint32_t do=
-fs, uint32_t aofs,
->      }
->  }
->
-> +/*
-> + * Expand D =3D A << (B % element bits)
-> + *
-> + * Unlike scalar shifts, where it is easy for the target front end
-> + * to include the modulo as part of the expansion.  If the target
-> + * naturally includes the modulo as part of the operation, great!
-> + * If the target has some other behaviour from out-of-range shifts,
-> + * then it could not use this function anyway, and would need to
-> + * do it's own expansion with custom functions.
-> + */
-> +static void tcg_gen_shlv_mod_vec(unsigned vece, TCGv_vec d,
-> +                                 TCGv_vec a, TCGv_vec b)
-> +{
-> +    TCGv_vec t =3D tcg_temp_new_vec_matching(d);
-> +
-> +    tcg_gen_dupi_vec(vece, t, (8 << vece) - 1);
-> +    tcg_gen_and_vec(vece, t, t, b);
-> +    tcg_gen_shlv_vec(vece, d, a, t);
-> +    tcg_temp_free_vec(t);
-> +}
-> +
-> +static void tcg_gen_shl_mod_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
-> +{
-> +    TCGv_i32 t =3D tcg_temp_new_i32();
-> +
-> +    tcg_gen_andi_i32(t, b, 31);
-> +    tcg_gen_shl_i32(d, a, t);
-> +    tcg_temp_free_i32(t);
-> +}
-> +
-> +static void tcg_gen_shl_mod_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
-> +{
-> +    TCGv_i64 t =3D tcg_temp_new_i64();
-> +
-> +    tcg_gen_andi_i64(t, b, 63);
-> +    tcg_gen_shl_i64(d, a, t);
-> +    tcg_temp_free_i64(t);
-> +}
-> +
-> +void tcg_gen_gvec_shlv(unsigned vece, uint32_t dofs, uint32_t aofs,
-> +                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
-> +{
-> +    static const TCGOpcode vecop_list[] =3D { INDEX_op_shlv_vec, 0 };
-> +    static const GVecGen3 g[4] =3D {
-> +        { .fniv =3D tcg_gen_shlv_mod_vec,
-> +          .fno =3D gen_helper_gvec_shl8v,
-> +          .opt_opc =3D vecop_list,
-> +          .vece =3D MO_8 },
-> +        { .fniv =3D tcg_gen_shlv_mod_vec,
-> +          .fno =3D gen_helper_gvec_shl16v,
-> +          .opt_opc =3D vecop_list,
-> +          .vece =3D MO_16 },
-> +        { .fni4 =3D tcg_gen_shl_mod_i32,
-> +          .fniv =3D tcg_gen_shlv_mod_vec,
-> +          .fno =3D gen_helper_gvec_shl32v,
-> +          .opt_opc =3D vecop_list,
-> +          .vece =3D MO_32 },
-> +        { .fni8 =3D tcg_gen_shl_mod_i64,
-> +          .fniv =3D tcg_gen_shlv_mod_vec,
-> +          .fno =3D gen_helper_gvec_shl64v,
-> +          .opt_opc =3D vecop_list,
-> +          .prefer_i64 =3D TCG_TARGET_REG_BITS =3D=3D 64,
-> +          .vece =3D MO_64 },
-> +    };
-> +
-> +    tcg_debug_assert(vece <=3D MO_64);
-> +    tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
-> +}
-> +
-> +/*
-> + * Similarly for logical right shifts.
-> + */
-> +
-> +static void tcg_gen_shrv_mod_vec(unsigned vece, TCGv_vec d,
-> +                                 TCGv_vec a, TCGv_vec b)
-> +{
-> +    TCGv_vec t =3D tcg_temp_new_vec_matching(d);
-> +
-> +    tcg_gen_dupi_vec(vece, t, (8 << vece) - 1);
-> +    tcg_gen_and_vec(vece, t, t, b);
-> +    tcg_gen_shrv_vec(vece, d, a, t);
-> +    tcg_temp_free_vec(t);
-> +}
-> +
-> +static void tcg_gen_shr_mod_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
-> +{
-> +    TCGv_i32 t =3D tcg_temp_new_i32();
-> +
-> +    tcg_gen_andi_i32(t, b, 31);
-> +    tcg_gen_shr_i32(d, a, t);
-> +    tcg_temp_free_i32(t);
-> +}
-> +
-> +static void tcg_gen_shr_mod_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
-> +{
-> +    TCGv_i64 t =3D tcg_temp_new_i64();
-> +
-> +    tcg_gen_andi_i64(t, b, 63);
-> +    tcg_gen_shr_i64(d, a, t);
-> +    tcg_temp_free_i64(t);
-> +}
-> +
-> +void tcg_gen_gvec_shrv(unsigned vece, uint32_t dofs, uint32_t aofs,
-> +                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
-> +{
-> +    static const TCGOpcode vecop_list[] =3D { INDEX_op_shrv_vec, 0 };
-> +    static const GVecGen3 g[4] =3D {
-> +        { .fniv =3D tcg_gen_shrv_mod_vec,
-> +          .fno =3D gen_helper_gvec_shr8v,
-> +          .opt_opc =3D vecop_list,
-> +          .vece =3D MO_8 },
-> +        { .fniv =3D tcg_gen_shrv_mod_vec,
-> +          .fno =3D gen_helper_gvec_shr16v,
-> +          .opt_opc =3D vecop_list,
-> +          .vece =3D MO_16 },
-> +        { .fni4 =3D tcg_gen_shr_mod_i32,
-> +          .fniv =3D tcg_gen_shrv_mod_vec,
-> +          .fno =3D gen_helper_gvec_shr32v,
-> +          .opt_opc =3D vecop_list,
-> +          .vece =3D MO_32 },
-> +        { .fni8 =3D tcg_gen_shr_mod_i64,
-> +          .fniv =3D tcg_gen_shrv_mod_vec,
-> +          .fno =3D gen_helper_gvec_shr64v,
-> +          .opt_opc =3D vecop_list,
-> +          .prefer_i64 =3D TCG_TARGET_REG_BITS =3D=3D 64,
-> +          .vece =3D MO_64 },
-> +    };
-> +
-> +    tcg_debug_assert(vece <=3D MO_64);
-> +    tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
-> +}
-> +
-> +/*
-> + * Similarly for arithmetic right shifts.
-> + */
-> +
-> +static void tcg_gen_sarv_mod_vec(unsigned vece, TCGv_vec d,
-> +                                 TCGv_vec a, TCGv_vec b)
-> +{
-> +    TCGv_vec t =3D tcg_temp_new_vec_matching(d);
-> +
-> +    tcg_gen_dupi_vec(vece, t, (8 << vece) - 1);
-> +    tcg_gen_and_vec(vece, t, t, b);
-> +    tcg_gen_sarv_vec(vece, d, a, t);
-> +    tcg_temp_free_vec(t);
-> +}
-> +
-> +static void tcg_gen_sar_mod_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
-> +{
-> +    TCGv_i32 t =3D tcg_temp_new_i32();
-> +
-> +    tcg_gen_andi_i32(t, b, 31);
-> +    tcg_gen_sar_i32(d, a, t);
-> +    tcg_temp_free_i32(t);
-> +}
-> +
-> +static void tcg_gen_sar_mod_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
-> +{
-> +    TCGv_i64 t =3D tcg_temp_new_i64();
-> +
-> +    tcg_gen_andi_i64(t, b, 63);
-> +    tcg_gen_sar_i64(d, a, t);
-> +    tcg_temp_free_i64(t);
-> +}
-> +
-> +void tcg_gen_gvec_sarv(unsigned vece, uint32_t dofs, uint32_t aofs,
-> +                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
-> +{
-> +    static const TCGOpcode vecop_list[] =3D { INDEX_op_sarv_vec, 0 };
-> +    static const GVecGen3 g[4] =3D {
-> +        { .fniv =3D tcg_gen_sarv_mod_vec,
-> +          .fno =3D gen_helper_gvec_sar8v,
-> +          .opt_opc =3D vecop_list,
-> +          .vece =3D MO_8 },
-> +        { .fniv =3D tcg_gen_sarv_mod_vec,
-> +          .fno =3D gen_helper_gvec_sar16v,
-> +          .opt_opc =3D vecop_list,
-> +          .vece =3D MO_16 },
-> +        { .fni4 =3D tcg_gen_sar_mod_i32,
-> +          .fniv =3D tcg_gen_sarv_mod_vec,
-> +          .fno =3D gen_helper_gvec_sar32v,
-> +          .opt_opc =3D vecop_list,
-> +          .vece =3D MO_32 },
-> +        { .fni8 =3D tcg_gen_sar_mod_i64,
-> +          .fniv =3D tcg_gen_sarv_mod_vec,
-> +          .fno =3D gen_helper_gvec_sar64v,
-> +          .opt_opc =3D vecop_list,
-> +          .prefer_i64 =3D TCG_TARGET_REG_BITS =3D=3D 64,
-> +          .vece =3D MO_64 },
-> +    };
-> +
-> +    tcg_debug_assert(vece <=3D MO_64);
-> +    tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
-> +}
-> +
->  /* Expand OPSZ bytes worth of three-operand operations using i32 element=
-s.  */
->  static void expand_cmp_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
->                             uint32_t oprsz, TCGCond cond)
-> diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
-> index 213d2e22aa..96317dbd10 100644
-> --- a/tcg/tcg-op-vec.c
-> +++ b/tcg/tcg-op-vec.c
-> @@ -583,3 +583,18 @@ void tcg_gen_umax_vec(unsigned vece, TCGv_vec r, TCG=
-v_vec a, TCGv_vec b)
->  {
->      do_op3(vece, r, a, b, INDEX_op_umax_vec);
->  }
-> +
-> +void tcg_gen_shlv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
-> +{
-> +    do_op3(vece, r, a, b, INDEX_op_shlv_vec);
-> +}
-> +
-> +void tcg_gen_shrv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
-> +{
-> +    do_op3(vece, r, a, b, INDEX_op_shrv_vec);
-> +}
-> +
-> +void tcg_gen_sarv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
-> +{
-> +    do_op3(vece, r, a, b, INDEX_op_sarv_vec);
-> +}
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 71fa9b8d6c..74a0ccc770 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1054,6 +1054,11 @@
+ /* VECTOR UNPACK LOGICAL LOW */
+     F(0xe7d4, VUPLL,   VRR_a, V,   0, 0, 0, 0, vup, 0, IF_VEC)
+=20
++/* =3D=3D=3D Vector Integer Instructions =3D=3D=3D */
++
++/* VECTOR ADD */
++    F(0xe7f3, VA,      VRR_c, V,   0, 0, 0, 0, va, 0, IF_VEC)
++
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
+     E(0xb250, CSP,     RRE,   Z,   r1_32u, ra2, r1_P, 0, csp, 0, MO_TEUL=
+, IF_PRIV)
+diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
+inc.c
+index 76f9a5d939..2f84ea0511 100644
+--- a/target/s390x/translate_vx.inc.c
++++ b/target/s390x/translate_vx.inc.c
+@@ -157,6 +157,41 @@ static void get_vec_element_ptr_i64(TCGv_ptr ptr, ui=
+nt8_t reg, TCGv_i64 enr,
+                      16)
+ #define gen_gvec_dup64i(v1, c) \
+     tcg_gen_gvec_dup64i(vec_full_reg_offset(v1), 16, 16, c)
++#define gen_gvec_fn_3(fn, es, v1, v2, v3) \
++    tcg_gen_gvec_##fn(es, vec_full_reg_offset(v1), vec_full_reg_offset(v=
+2), \
++                      vec_full_reg_offset(v3), 16, 16)
++
++/*
++ * Helper to carry out a 128 bit vector computation using 2 i64 values p=
+er
++ * vector.
++ */
++typedef void (*gen_gvec128_3_i64_fn)(TCGv_i64 dl, TCGv_i64 dh, TCGv_i64 =
+al,
++                                     TCGv_i64 ah, TCGv_i64 bl, TCGv_i64 =
+bh);
++static void gen_gvec128_3_i64(gen_gvec128_3_i64_fn fn, uint8_t d, uint8_=
+t a,
++                              uint8_t b)
++{
++        TCGv_i64 dh =3D tcg_temp_new_i64();
++        TCGv_i64 dl =3D tcg_temp_new_i64();
++        TCGv_i64 ah =3D tcg_temp_new_i64();
++        TCGv_i64 al =3D tcg_temp_new_i64();
++        TCGv_i64 bh =3D tcg_temp_new_i64();
++        TCGv_i64 bl =3D tcg_temp_new_i64();
++
++        read_vec_element_i64(ah, a, 0, ES_64);
++        read_vec_element_i64(al, a, 1, ES_64);
++        read_vec_element_i64(bh, b, 0, ES_64);
++        read_vec_element_i64(bl, b, 1, ES_64);
++        fn(dl, dh, al, ah, bl, bh);
++        write_vec_element_i64(dh, d, 0, ES_64);
++        write_vec_element_i64(dl, d, 1, ES_64);
++
++        tcg_temp_free_i64(dh);
++        tcg_temp_free_i64(dl);
++        tcg_temp_free_i64(ah);
++        tcg_temp_free_i64(al);
++        tcg_temp_free_i64(bh);
++        tcg_temp_free_i64(bl);
++}
+=20
+ static void gen_gvec_dupi(uint8_t es, uint8_t reg, uint64_t c)
+ {
+@@ -933,3 +968,20 @@ static DisasJumpType op_vup(DisasContext *s, DisasOp=
+s *o)
+     tcg_temp_free_i64(tmp);
+     return DISAS_NEXT;
+ }
++
++static DisasJumpType op_va(DisasContext *s, DisasOps *o)
++{
++    const uint8_t es =3D get_field(s->fields, m4);
++
++    if (es > ES_128) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    } else if (es =3D=3D ES_128) {
++        gen_gvec128_3_i64(tcg_gen_add2_i64, get_field(s->fields, v1),
++                          get_field(s->fields, v2), get_field(s->fields,=
+ v3));
++        return DISAS_NEXT;
++    }
++    gen_gvec_fn_3(add, es, get_field(s->fields, v1), get_field(s->fields=
+, v2),
++                  get_field(s->fields, v3));
++    return DISAS_NEXT;
++}
+--=20
+2.20.1
 
-
---
-Alex Benn=C3=A9e
 
