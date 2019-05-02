@@ -2,61 +2,64 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03784C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:38:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68EE6C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:38:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C420B20656
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:38:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C420B20656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3026A20656
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:38:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3026A20656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=hisilicon.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52183 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52198 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMCqZ-0006bj-Vr
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:38:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39037)
+	id 1hMCrO-000843-8b
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:38:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hMCQy-0000dW-8P
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:11:37 -0400
+	(envelope-from <xuwei5@huawei.com>) id 1hMCjv-00010K-Py
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:31:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hMCQx-0007Rd-6l
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:11:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51174)
+	(envelope-from <xuwei5@huawei.com>) id 1hMCju-0006BW-O4
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:31:11 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:45394 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hMCQw-0007R7-VX; Thu, 02 May 2019 10:11:35 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3C1EB307E042;
-	Thu,  2 May 2019 14:11:34 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-117-88.ams2.redhat.com [10.36.117.88])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id AF5E117D58;
-	Thu,  2 May 2019 14:11:32 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu,  2 May 2019 16:10:10 +0200
-Message-Id: <20190502141019.6385-32-david@redhat.com>
-In-Reply-To: <20190502141019.6385-1-david@redhat.com>
-References: <20190502141019.6385-1-david@redhat.com>
+	(Exim 4.71) (envelope-from <xuwei5@huawei.com>) id 1hMCju-0005yt-HA
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:31:10 -0400
+Received: from lhreml703-cah.china.huawei.com (unknown [172.18.7.108])
+	by Forcepoint Email with ESMTP id B6D45C372521642EFE5F;
+	Thu,  2 May 2019 15:31:04 +0100 (IST)
+Received: from [127.0.0.1] (10.202.226.56) by lhreml703-cah.china.huawei.com
+	(10.201.108.44) with Microsoft SMTP Server id 14.3.408.0;
+	Thu, 2 May 2019 15:30:56 +0100
+To: Igor Mammedov <imammedo@redhat.com>
+References: <1556170489-131927-12-git-send-email-imammedo@redhat.com>
+	<1556211116-172721-1-git-send-email-xuwei5@huawei.com>
+	<20190426135412.758769f9@Igors-MacBook-Pro.local>
+	<b87a2b31-0389-2df0-42a6-a1593d437fcd@hisilicon.com>
+	<20190502162420.6c8280c8@Igors-MacBook-Pro>
+From: Wei Xu <xuwei5@hisilicon.com>
+Message-ID: <9caa067d-df2e-78c6-5672-e276da3263a6@hisilicon.com>
+Date: Thu, 2 May 2019 15:30:54 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+	Thunderbird/60.4.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Thu, 02 May 2019 14:11:34 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190502162420.6c8280c8@Igors-MacBook-Pro>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.226.56]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 31/40] s390x/tcg: Implement VECTOR SHIFT
- RIGHT ARITHMETIC
+X-Received-From: 185.176.76.210
+Subject: Re: [Qemu-devel] [PATCH v3 11/13] tests: acpi: add simple arm/virt
+ testcase
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,134 +71,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>,
+	mst@redhat.com, linuxarm@huawei.com,
+	shameerali.kolothum.thodi@huawei.com, qemu-devel@nongnu.org,
+	x00249684 <xuwei5@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190502141010.XGMLzs8r4OE2Hng_O6KDA1Z7Qa6MBFivv-6aTeaKxQY@z>
+Message-ID: <20190502143054.DJj7CSJa0aO8mnQF9iT6YyNL7xzoa3XOZsEuuLEgPvc@z>
 
-Similar to VECTOR SHIFT LEFT ARITHMETIC. Add s390_vec_sar() similar to
-s390_vec_shr().
+Hi Igor,
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/helper.h           |  1 +
- target/s390x/insn-data.def      |  4 ++++
- target/s390x/translate_vx.inc.c | 17 +++++++++++++++++
- target/s390x/vec_int_helper.c   | 26 ++++++++++++++++++++++++++
- 4 files changed, 48 insertions(+)
+On 5/2/2019 3:24 PM, Igor Mammedov wrote:
+> On Fri, 26 Apr 2019 17:28:10 +0100
+> Wei Xu <xuwei5@hisilicon.com> wrote:
+> 
+>> Hi Igor,
+>>
+>> On 4/26/2019 12:54 PM, Igor Mammedov wrote:
+>>> On Fri, 26 Apr 2019 00:51:56 +0800
+>>> x00249684 <xuwei5@huawei.com> wrote:
+>>>
+>>>> Hi Igor,
+>>>>
+>>>> +static void test_acpi_virt_tcg(void)
+>>>> +{
+>>>> +    test_data data = {
+>>>> +        .machine = "virt",
+>>>> +        .uefi_fl1 = "pc-bios/edk2-aarch64-code.fd",
+>>>> +        .uefi_fl2 = "pc-bios/edk2-arm-vars.fd",
+>>>> +        .cd = "tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2",
+>>>> +        .ram_start = 0x40000000ULL,
+>>>> +        .scan_len = 128ULL * 1024 * 1024,
+>>>> +    };
+>>>> +
+>>>> +    test_acpi_one("-cpu cortex-a57 ", &data);
+>>>>
+>>>> Replaced the cortex-a57 with host and succesfully tested on the hisilicon arm64 
+>>>> D05 board. Otherwise it failed with "kvm_init_vcpu failed: Invalid argument".
+>>>> Is it possilbe to set the cpu type like numa-test.c?
+>>>
+>>> I think it works with numa-test because it uses TCG only but in case of bios-tables-test
+>>> it uses accel="kvm:tcg" to leverage KVM capabilities whenever possible to speed up test.
+>>>
+>>> Now back to our ARM test case, uefi requirement is to use 64bit CPU (hence it was cortex-a57)
+>>> however unlike x86 it obviously breaks since KVM accelerator on ARM host is used
+>>> and it doesn't work with anything other than 'host' cpu model.
+>>>
+>>> I think we still want to use KVM whenever possible, but problem lies in that
+>>> user (testcase) doesn't have an idea if KVM accelerator is available and host is 64 CPU.
+>>>
+>>> to sum up we need to support 2 modes:
+>>>   1. host is 64 ARM, use kvm with -cpu host
+>>>   2. all other cases use tcg with -cpu cortex-a57
+>>>
+>>> I can hack to probe if /dev/kvm is accessible and host is 64 bit and use #1
+>>> otherwise fallback to #2
+>>> or as quick fix do only #2 initially and think about a better solution to #1 
+>>
+>> Thanks!
+>> Fine to me.
+>>
+>>>
+>>> Is there any other suggestions/opinions how to approach issue/proceed.
+>>
+>> To check the host cpu architecture is ARM or not, maybe we can check the value
+>> of "CPU implementer" is 0x41 or not from the /proc/cpuinfo.
+> 
+> it turned out it's more complicated.
+> we also should pick a correct GIC depending on host's CPU and that
+> changes ACPI tables, so it will worn on some hosts and fail on other.
+Sorry, I did not consider that case.
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index b4ddc8a722..fda274d325 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -205,6 +205,7 @@ DEF_HELPER_FLAGS_4(gvec_verll16, TCG_CALL_NO_RWG, voi=
-d, ptr, cptr, i64, i32)
- DEF_HELPER_FLAGS_4(gvec_verim8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-i32)
- DEF_HELPER_FLAGS_4(gvec_verim16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
- i32)
- DEF_HELPER_FLAGS_4(gvec_vsl, TCG_CALL_NO_RWG, void, ptr, cptr, i64, i32)
-+DEF_HELPER_FLAGS_4(gvec_vsra, TCG_CALL_NO_RWG, void, ptr, cptr, i64, i32=
-)
-=20
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 76aec5a21f..587de3eaac 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1166,6 +1166,10 @@
-     F(0xe775, VSLB,    VRR_c, V,   0, 0, 0, 0, vsl, 0, IF_VEC)
- /* VECTOR SHIFT LEFT DOUBLE BY BYTE */
-     F(0xe777, VSLDB,   VRI_d, V,   0, 0, 0, 0, vsldb, 0, IF_VEC)
-+/* VECTOR SHIFT RIGHT ARITHMETIC */
-+    F(0xe77e, VSRA,    VRR_c, V,   0, 0, 0, 0, vsra, 0, IF_VEC)
-+/* VECTOR SHIFT RIGHT ARITHMETIC BY BYTE */
-+    F(0xe77f, VSRAB,   VRR_c, V,   0, 0, 0, 0, vsra, 0, IF_VEC)
-=20
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
-inc.c
-index fd9c5a46e0..a54682987a 100644
---- a/target/s390x/translate_vx.inc.c
-+++ b/target/s390x/translate_vx.inc.c
-@@ -2085,3 +2085,20 @@ static DisasJumpType op_vsldb(DisasContext *s, Dis=
-asOps *o)
-     tcg_temp_free(t2);
-     return DISAS_NEXT;
- }
-+
-+static DisasJumpType op_vsra(DisasContext *s, DisasOps *o)
-+{
-+    TCGv_i64 shift =3D tcg_temp_new_i64();
-+
-+    read_vec_element_i64(shift, get_field(s->fields, v3), 7, ES_8);
-+    if (s->fields->op2 =3D=3D 0x7e) {
-+        tcg_gen_andi_i64(shift, shift, 0x7);
-+    } else {
-+        tcg_gen_andi_i64(shift, shift, 0x78);
-+    }
-+
-+    gen_gvec_2i_ool(get_field(s->fields, v1), get_field(s->fields, v2),
-+                    shift, 0, gen_helper_gvec_vsra);
-+    tcg_temp_free_i64(shift);
-+    return DISAS_NEXT;
-+}
-diff --git a/target/s390x/vec_int_helper.c b/target/s390x/vec_int_helper.=
-c
-index 3df069f033..67e9f2b0ed 100644
---- a/target/s390x/vec_int_helper.c
-+++ b/target/s390x/vec_int_helper.c
-@@ -49,6 +49,26 @@ static void s390_vec_shl(S390Vector *d, const S390Vect=
-or *a, uint64_t count)
-     }
- }
-=20
-+static void s390_vec_sar(S390Vector *d, const S390Vector *a, uint64_t co=
-unt)
-+{
-+    uint64_t tmp;
-+
-+    if (count =3D=3D 0) {
-+        d->doubleword[0] =3D a->doubleword[0];
-+        d->doubleword[1] =3D a->doubleword[1];
-+    } else if (count =3D=3D 64) {
-+        d->doubleword[1] =3D a->doubleword[0];
-+        d->doubleword[0] =3D 0;
-+    } else if (count < 64) {
-+        tmp =3D a->doubleword[1] >> count;
-+        d->doubleword[1] =3D deposit64(tmp, 64 - count, count, a->double=
-word[0]);
-+        d->doubleword[0] =3D (int64_t)a->doubleword[0] >> count;
-+    } else {
-+        d->doubleword[1] =3D (int64_t)a->doubleword[0] >> (count - 64);
-+        d->doubleword[0] =3D 0;
-+    }
-+}
-+
- static void s390_vec_shr(S390Vector *d, const S390Vector *a, uint64_t co=
-unt)
- {
-     uint64_t tmp;
-@@ -535,3 +555,9 @@ void HELPER(gvec_vsl)(void *v1, const void *v2, uint6=
-4_t count,
- {
-     s390_vec_shl(v1, v2, count);
- }
-+
-+void HELPER(gvec_vsra)(void *v1, const void *v2, uint64_t count,
-+                       uint32_t desc)
-+{
-+    s390_vec_sar(v1, v2, count);
-+}
---=20
-2.20.1
+> 
+> I'll add a patch to enable test case to pick accelerator and force TCG
+> for ARM tests for now.
+>
+
+Thanks!
+
+Best Regards,
+Wei
+
+>>
+>> Best Regards,
+>> Wei
+>>
+>>>
+>>> PS:
+>>> we probably would like to reuse this not only for acpi tests but also for other
+>>> arm/virt test cases that involve running guest code. 
+>>>
+>>>> Thanks!
+>>>>
+>>>> Best Regards,
+>>>> Wei
+>>>
+>>>
+>>> .
+>>>
+>>
+> 
+> 
+> .
+> 
 
 
