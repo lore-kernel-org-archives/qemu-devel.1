@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42630)
+Received: from eggs.gnu.org ([209.51.188.92]:42699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6ta-0003RX-A8
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:49 -0400
+	(envelope-from <arilou@gmail.com>) id 1hM6te-0003V0-At
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6tY-0007pQ-Aw
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:46 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39540)
+	(envelope-from <arilou@gmail.com>) id 1hM6ta-0007z6-Cv
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:48 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36600)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6tU-0007L5-Mo
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:42 -0400
-Received: by mail-wr1-x443.google.com with SMTP id a9so1997324wrp.6
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:19 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6tY-0007mD-Ej
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:46 -0400
+Received: by mail-wr1-x444.google.com with SMTP id o4so2024719wra.3
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:42 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Thu,  2 May 2019 11:15:33 +0300
-Message-Id: <20190502081554.5521-7-arilou@gmail.com>
+Date: Thu,  2 May 2019 11:15:49 +0300
+Message-Id: <20190502081554.5521-23-arilou@gmail.com>
 In-Reply-To: <20190502081554.5521-1-arilou@gmail.com>
 References: <20190502081554.5521-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v9 06/27] gdbstub: Implement set_thread (H pkt)
- with new infra
+Subject: [Qemu-devel] [PATCH v9 22/27] gdbstub: Implement generic query
+ qemu.Supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,114 +31,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 
+qemu.Supported query reply back with the supported qemu query/set
+commands (commands are seperated with a semicolon from each other).
+
+gdb> maint packet qqemu.Supported
+
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 79 ++++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 49 insertions(+), 30 deletions(-)
+ gdbstub.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 469aaeb875..21cdaf4678 100644
+index 8bdfae4b29..00c07d6ec0 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1547,6 +1547,47 @@ static void handle_cont_with_sig(GdbCmdContext *gdb_ctx, void *user_ctx)
-     gdb_continue(gdb_ctx->s);
+@@ -2127,6 +2127,11 @@ static void handle_query_attached(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, GDB_ATTACHED);
  }
  
-+static void handle_set_thread(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_query_qemu_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    CPUState *cpu;
-+
-+    if (gdb_ctx->num_params < 2) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    if (gdb_ctx->params[1].thread_id.kind == GDB_READ_THREAD_ERR) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    if (gdb_ctx->params[1].thread_id.kind != GDB_ONE_THREAD) {
-+        put_packet(gdb_ctx->s, "OK");
-+        return;
-+    }
-+
-+    cpu = gdb_get_cpu(gdb_ctx->s, gdb_ctx->params[1].thread_id.pid,
-+                      gdb_ctx->params[1].thread_id.tid);
-+    if (!cpu) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    switch (gdb_ctx->params[0].opcode) {
-+    case 'c':
-+        gdb_ctx->s->c_cpu = cpu;
-+        put_packet(gdb_ctx->s, "OK");
-+        break;
-+    case 'g':
-+        gdb_ctx->s->g_cpu = cpu;
-+        put_packet(gdb_ctx->s, "OK");
-+        break;
-+    default:
-+        put_packet(gdb_ctx->s, "E22");
-+        break;
-+    }
++    put_packet(gdb_ctx->s, "sstepbits;sstep");
 +}
 +
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -1560,7 +1601,6 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-     char thread_id[16];
-     uint8_t *registers;
-     target_ulong addr, len;
--    GDBThreadIdKind thread_kind;
-     const GdbCmdParseEntry *cmd_parser = NULL;
+ static GdbCmdParseEntry gdb_gen_query_set_common_table[] = {
+     /* Order is important if has same prefix */
+     {
+@@ -2203,6 +2208,10 @@ static GdbCmdParseEntry gdb_gen_query_table[] = {
+         .handler = handle_query_attached,
+         .cmd = "Attached",
+     },
++    {
++        .handler = handle_query_qemu_supported,
++        .cmd = "qemu.Supported",
++    },
+ };
  
-     trace_gdbstub_io_command(line_buf);
-@@ -1823,35 +1863,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-             put_packet(s, "E22");
-         break;
-     case 'H':
--        type = *p++;
--
--        thread_kind = read_thread_id(p, &p, &pid, &tid);
--        if (thread_kind == GDB_READ_THREAD_ERR) {
--            put_packet(s, "E22");
--            break;
--        }
--
--        if (thread_kind != GDB_ONE_THREAD) {
--            put_packet(s, "OK");
--            break;
--        }
--        cpu = gdb_get_cpu(s, pid, tid);
--        if (cpu == NULL) {
--            put_packet(s, "E22");
--            break;
--        }
--        switch (type) {
--        case 'c':
--            s->c_cpu = cpu;
--            put_packet(s, "OK");
--            break;
--        case 'g':
--            s->g_cpu = cpu;
--            put_packet(s, "OK");
--            break;
--        default:
--             put_packet(s, "E22");
--             break;
-+        {
-+            static const GdbCmdParseEntry set_thread_cmd_desc = {
-+                .handler = handle_set_thread,
-+                .cmd = "H",
-+                .cmd_startswith = 1,
-+                .schema = "o.t0"
-+            };
-+            cmd_parser = &set_thread_cmd_desc;
-         }
-         break;
-     case 'T':
+ static void handle_gen_query(GdbCmdContext *gdb_ctx, void *user_ctx)
 -- 
 2.20.1
