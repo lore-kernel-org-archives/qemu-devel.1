@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39600)
+Received: from eggs.gnu.org ([209.51.188.92]:39880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hMAZG-0005Vk-Lt
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 08:12:03 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hMAa1-00066k-4n
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 08:12:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hMAZE-0004Wp-OU
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 08:12:02 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:40701)
+	(envelope-from <peter.maydell@linaro.org>) id 1hMAa0-0004vp-3f
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 08:12:49 -0400
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:43207)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hMAZC-0004V5-NM
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 08:12:00 -0400
-Received: by mail-wm1-f66.google.com with SMTP id h11so2294816wmb.5
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 05:11:56 -0700 (PDT)
-References: <20190419154041.77802-1-stephen.checkoway@oberlin.edu>
-	<45e6247e-cddb-2185-7f7b-503be00bd453@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f61fc519-da75-5b41-21d0-508cf89016f2@redhat.com>
-Date: Thu, 2 May 2019 14:11:53 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hMAZz-0004vK-Tb
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 08:12:48 -0400
+Received: by mail-ot1-x334.google.com with SMTP id e108so1795511ote.10
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 05:12:47 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <45e6247e-cddb-2185-7f7b-503be00bd453@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v3] hw/char/escc: Lower irq
- when transmit buffer is filled
+References: <20190501202506.13875-1-jsnow@redhat.com>
+In-Reply-To: <20190501202506.13875-1-jsnow@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 2 May 2019 13:12:35 +0100
+Message-ID: <CAFEAcA9etUEg3E8VGTMqcfNM+5oxqnY9x8zdU_mHN+AN1og+5w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/2] Bitmaps patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,77 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Stephen Checkoway <stephen.checkoway@oberlin.edu>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Artyom Tarasenko <atar4qemu@gmail.com>, qemu-trivial@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: John Snow <jsnow@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
 
-On 5/2/19 11:04 AM, Laurent Vivier wrote:
-> On 19/04/2019 17:40, Stephen Checkoway wrote:
->> The SCC/ESCC will briefly stop asserting an interrupt when the
->> transmit FIFO is filled.
->>
->> This code doesn't model the transmit FIFO/shift register so the
->> pending transmit interrupt is never deasserted which means that an
->> edge-triggered interrupt controller will never see the low-to-high
->> transition it needs to raise another interrupt. The practical
->> consequence of this is that guest firmware with an interrupt service
->> routine for the ESCC that does not send all of the data it has
->> immediately will stop sending data if the following sequence of
->> events occurs:
->> 1. Disable processor interrupts
->> 2. Write a character to the ESCC
->> 3. Add additional characters to a buffer which is drained by the ISR
->> 4. Enable processor interrupts
->>
->> In this case, the first character will be sent, the interrupt will
->> fire and the ISR will output the second character. Since the pending
->> transmit interrupt remains asserted, no additional interrupts will
->> ever fire.
->>
->> This behavior was triggered by firmware for an embedded system with a
->> Z85C30 which necessitated this patch.
->>
->> This patch fixes that situation by explicitly lowering the IRQ when a
->> character is written to the buffer and no other interrupts are currently
->> pending.
->>
->> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>
->> I added a sentence about the Z85C30 necessitating this to the commit message.
->>
->>  hw/char/escc.c | 7 +++++++
->>  1 file changed, 7 insertions(+)
->>
->> diff --git a/hw/char/escc.c b/hw/char/escc.c
->> index 628f5f81f7..c5b05a63f1 100644
->> --- a/hw/char/escc.c
->> +++ b/hw/char/escc.c
->> @@ -509,6 +509,13 @@ static void escc_mem_write(void *opaque, hwaddr addr,
->>          break;
->>      case SERIAL_DATA:
->>          trace_escc_mem_writeb_data(CHN_C(s), val);
->> +        /*
->> +         * Lower the irq when data is written to the Tx buffer and no other
->> +         * interrupts are currently pending. The irq will be raised again once
->> +         * the Tx buffer becomes empty below.
->> +         */
->> +        s->txint = 0;
->> +        escc_update_irq(s);
->>          s->tx = val;
->>          if (s->wregs[W_TXCTRL2] & TXCTRL2_TXEN) { // tx enabled
->>              if (qemu_chr_fe_backend_connected(&s->chr)) {
->>
-> 
-> 
-> Applied to my trivial-patches branch.
+On Wed, 1 May 2019 at 21:25, John Snow <jsnow@redhat.com> wrote:
+>
+> The following changes since commit 46316f1dfffc6be72e94e89f7b0e9162e7dcdcf1:
+>
+>   Merge remote-tracking branch 'remotes/awilliam/tags/vfio-updates-20190311.0' into staging (2019-03-12 13:37:29 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/jnsnow/qemu.git tags/bitmaps-pull-request
+>
+> for you to fetch changes up to 90edef80a0852cf8a3d2668898ee40e8970e4314:
+>
+>   docs/interop/bitmaps: rewrite and modernize doc (2019-05-01 16:21:24 -0400)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> ----------------------------------------------------------------
+>
+> John Snow (2):
+>   Makefile: add nit-picky mode to sphinx-build
+>   docs/interop/bitmaps: rewrite and modernize doc
+>
 
-Mark, Artyom, are you OK with this patch?
 
-> 
-> Paolo, Marc-André, if you disagree with this change or prefer to take it
-> through one of your queues, I can remove it from mine. Let me know.
-> 
-> 
-> Thanks,
-> Laurent
-> 
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
+
+-- PMM
