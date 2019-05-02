@@ -3,72 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B07CC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 16:18:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD795C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 16:21:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EAFC2081C
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 16:18:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EAFC2081C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id A3D832081C
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 16:21:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3D832081C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54062 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54110 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMEPx-0000SO-Ax
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 12:18:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43809)
+	id 1hMESJ-0002Yn-Oy
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 12:21:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMEM9-0005Mo-4g
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:14:46 -0400
+	(envelope-from <thuth@redhat.com>) id 1hMEKw-00049j-5c
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:13:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMEM8-0002vS-4v
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:14:45 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:59689)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hMEM7-0002uy-Sf
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:14:44 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1MKKpV-1h2mBx0UJz-00LlcE; Thu, 02 May 2019 18:14:34 +0200
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	(envelope-from <thuth@redhat.com>) id 1hMEKv-0002Js-3P
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:13:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38856)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hMEKu-0002Jk-Rn
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:13:29 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1F00459450;
+	Thu,  2 May 2019 16:13:28 +0000 (UTC)
+Received: from thuth.com (ovpn-116-131.ams2.redhat.com [10.36.116.131])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A0F8D17D58;
+	Thu,  2 May 2019 16:13:26 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-References: <877eb86hcf.fsf@zen.linaroharston>
-	<20190502145846.26226-1-alex.bennee@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <765fa2ab-2803-1945-61ea-2e80b2da6072@vivier.eu>
-Date: Thu, 2 May 2019 18:14:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+Date: Thu,  2 May 2019 18:13:04 +0200
+Message-Id: <20190502161310.15624-3-thuth@redhat.com>
+In-Reply-To: <20190502161310.15624-1-thuth@redhat.com>
+References: <20190502161310.15624-1-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190502145846.26226-1-alex.bennee@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:A3KEGNr7iTl/i34T0xwfZpvBMlfEUcXFK3epCgEzq7m0kLH8DlW
-	Xs/alMlaJREqShL2DydRZRvWhQtyar6aSzhQGge50fDy6cI8BGt4O+Z3060ktvO4frB8MC+
-	rEnGL2cVaQO+e9ua14GCP3XabIZAHy01KD5m8IDaxJ8JHKhxl4m4eh+QhlQb2bKPJ+jV1PD
-	HlJdBeXJnFzQa+fTBNerg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:SBDtjpnqfoI=:z87g363o4ZRd50ZtMVZ5N8
-	odq/t/CTMjULCA89JXfDl4BRZGQmmPeyGnI5R0T3V+LScsrSX2zf1K1oyzSH5qyc1Be4xyJxX
-	HKB1+otBWtnAzakNI7BSly81bF4+IoSxDiMX+HLPJoiYrDSG/uEOyoEYg4+mNu54FYkiUtkET
-	dVXyoWpUp0ChHT6hYUVPXap6xU1i0LVE7UtpBfEkjFCC4Qawh+K3zZoomOjiQ5tr+UD8qJ+Lr
-	iNnFqzYRotO1GlOJbjNno2KtaWId3KFClsOqxMNDnjfWgLyH29eQxQ6d8NiElMXhC9F4Wg+tE
-	n5o/gF7qCNn5BcDvR6mF5XxPw3qo+Ps8k39Np8FtsGbk7E9xt/hTbqA2xQDWAMmkNee/Car3f
-	7FXoQ4bznBmADIQTEjrIK2z27WIRB/2r6TYErbf2YONcXAevk9WcQ1wY4H8sNEfMPCkW1m2d4
-	GDtpv+2OF16NgTwFyBm7skGmkNQjm0Q2T49AHtd7ch1j67I/f2sZV9uGVhYvcQm2a6KQzsxq7
-	fUNroPM0xseCwlJ0S2wrVvS/VnZHv5hsifnm/WaYxcYHPPrQTEB909XhFNHqU9ZZf4kUzBTD1
-	KzeJPeNOqMgm0i2G0FNu8OT4M4eMViipmu5hwNO/VnFBjkDqTKskL54E0tC4OnaTQKnPrhNs+
-	SJvvu8eJ18ckB4X4TM00FKQrkZrDCbdGpHVGQIZGlaDMeULcYDA2RNq5DVdhTuPzhCsepQeOl
-	//4G5mtXojJJ8psN/xHZbhFVoO606k6o3z/49xDgaB3QjGpdmIuxOy51yOM=
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.39]);
+	Thu, 02 May 2019 16:13:28 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.10
-Subject: Re: [Qemu-devel] [PATCH] linux-user: avoid treading on gprof's
- SIGPROF signals
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 2/8] qtest: Move accel code to accel/qtest.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,43 +69,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>
+Cc: Eduardo Otubo <otubo@redhat.com>, Helge Deller <deller@gmx.de>,
+	Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502161432.1gB-UUPP6Dr0MMqoLu7ic9SZh4hI9Zl5F3msSDpKbAs@z>
+Message-ID: <20190502161304.Hxfmy3CX1rBUwBtZVzl0foE4k_Ufa5dRGHd3Bf1H1B8@z>
 
-On 02/05/2019 16:58, Alex Bennée wrote:
-> The guest tends to get confused when it receives signals it doesn't
-> know about. Given the gprof magic has also set up it's own handler we
-> would do well to avoid stomping on it as well.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  linux-user/signal.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/linux-user/signal.c b/linux-user/signal.c
-> index e2c0b37173..44b2d3b35a 100644
-> --- a/linux-user/signal.c
-> +++ b/linux-user/signal.c
-> @@ -508,6 +508,11 @@ void signal_init(void)
->      act.sa_flags = SA_SIGINFO;
->      act.sa_sigaction = host_signal_handler;
->      for(i = 1; i <= TARGET_NSIG; i++) {
-> +#ifdef TARGET_GPROF
-> +        if (i == SIGPROF) {
-> +            continue;
-> +        }
-> +#endif
->          host_sig = target_to_host_signal(i);
->          sigaction(host_sig, NULL, &oact);
->          if (oact.sa_sigaction == (void *)SIG_IGN) {
-> 
+From: Eduardo Habkost <ehabkost@redhat.com>
 
-Perhaps merge this with the previous one and send a v2: it will ease
-bisecting.
+QTest has two parts: the server (-qtest) and the accelerator
+(-machine accel=3Dqtest).  The accelerator depends on CONFIG_POSIX
+due to its usage of sigwait(), but the server doesn't.
 
-Thanks,
-Laurent
+Move the accel code to accel/qtest.c.  Later we will disable
+compilation of accel/qtest.c on non-POSIX systems.
+
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20190422210448.2488-2-ehabkost@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+[thuth: added fixup for MAINTAINERS file]
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ MAINTAINERS         |  1 +
+ accel/Makefile.objs |  1 +
+ accel/qtest.c       | 55 +++++++++++++++++++++++++++++++++++++++++++++
+ qtest.c             | 34 ----------------------------
+ 4 files changed, 57 insertions(+), 34 deletions(-)
+ create mode 100644 accel/qtest.c
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 7dd71e0a2d..66ddbda9c9 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2035,6 +2035,7 @@ M: Laurent Vivier <lvivier@redhat.com>
+ R: Paolo Bonzini <pbonzini@redhat.com>
+ S: Maintained
+ F: qtest.c
++F: accel/qtest.c
+ F: tests/libqtest.*
+ F: tests/libqos/
+ F: tests/*-test.c
+diff --git a/accel/Makefile.objs b/accel/Makefile.objs
+index c3718a10c5..2a5ed46940 100644
+--- a/accel/Makefile.objs
++++ b/accel/Makefile.objs
+@@ -1,4 +1,5 @@
+ obj-$(CONFIG_SOFTMMU) +=3D accel.o
++obj-$(CONFIG_SOFTMMU) +=3D qtest.o
+ obj-$(CONFIG_KVM) +=3D kvm/
+ obj-$(CONFIG_TCG) +=3D tcg/
+ obj-y +=3D stubs/
+diff --git a/accel/qtest.c b/accel/qtest.c
+new file mode 100644
+index 0000000000..a02b3c26c7
+--- /dev/null
++++ b/accel/qtest.c
+@@ -0,0 +1,55 @@
++/*
++ * QTest accelerator code
++ *
++ * Copyright IBM, Corp. 2011
++ *
++ * Authors:
++ *  Anthony Liguori   <aliguori@us.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu/module.h"
++#include "qemu/option.h"
++#include "qemu/config-file.h"
++#include "sysemu/accel.h"
++#include "sysemu/qtest.h"
++#include "sysemu/cpus.h"
++
++static int qtest_init_accel(MachineState *ms)
++{
++    QemuOpts *opts =3D qemu_opts_create(qemu_find_opts("icount"), NULL, =
+0,
++                                      &error_abort);
++    qemu_opt_set(opts, "shift", "0", &error_abort);
++    configure_icount(opts, &error_abort);
++    qemu_opts_del(opts);
++    return 0;
++}
++
++static void qtest_accel_class_init(ObjectClass *oc, void *data)
++{
++    AccelClass *ac =3D ACCEL_CLASS(oc);
++    ac->name =3D "QTest";
++    ac->available =3D qtest_available;
++    ac->init_machine =3D qtest_init_accel;
++    ac->allowed =3D &qtest_allowed;
++}
++
++#define TYPE_QTEST_ACCEL ACCEL_CLASS_NAME("qtest")
++
++static const TypeInfo qtest_accel_type =3D {
++    .name =3D TYPE_QTEST_ACCEL,
++    .parent =3D TYPE_ACCEL,
++    .class_init =3D qtest_accel_class_init,
++};
++
++static void qtest_type_init(void)
++{
++    type_register_static(&qtest_accel_type);
++}
++
++type_init(qtest_type_init);
+diff --git a/qtest.c b/qtest.c
+index 527141785f..f2e2f27778 100644
+--- a/qtest.c
++++ b/qtest.c
+@@ -749,16 +749,6 @@ static void qtest_event(void *opaque, int event)
+     }
+ }
+=20
+-static int qtest_init_accel(MachineState *ms)
+-{
+-    QemuOpts *opts =3D qemu_opts_create(qemu_find_opts("icount"), NULL, =
+0,
+-                                      &error_abort);
+-    qemu_opt_set(opts, "shift", "0", &error_abort);
+-    configure_icount(opts, &error_abort);
+-    qemu_opts_del(opts);
+-    return 0;
+-}
+-
+ void qtest_init(const char *qtest_chrdev, const char *qtest_log, Error *=
+*errp)
+ {
+     Chardev *chr;
+@@ -791,27 +781,3 @@ bool qtest_driver(void)
+ {
+     return qtest_chr.chr !=3D NULL;
+ }
+-
+-static void qtest_accel_class_init(ObjectClass *oc, void *data)
+-{
+-    AccelClass *ac =3D ACCEL_CLASS(oc);
+-    ac->name =3D "QTest";
+-    ac->available =3D qtest_available;
+-    ac->init_machine =3D qtest_init_accel;
+-    ac->allowed =3D &qtest_allowed;
+-}
+-
+-#define TYPE_QTEST_ACCEL ACCEL_CLASS_NAME("qtest")
+-
+-static const TypeInfo qtest_accel_type =3D {
+-    .name =3D TYPE_QTEST_ACCEL,
+-    .parent =3D TYPE_ACCEL,
+-    .class_init =3D qtest_accel_class_init,
+-};
+-
+-static void qtest_type_init(void)
+-{
+-    type_register_static(&qtest_accel_type);
+-}
+-
+-type_init(qtest_type_init);
+--=20
+2.21.0
+
 
