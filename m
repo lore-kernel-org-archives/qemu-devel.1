@@ -2,63 +2,55 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A8F8C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:52:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C3CAC43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:53:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C28EB20652
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:52:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C28EB20652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4DB5C20652
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:53:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DB5C20652
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52485 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52487 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMD4G-0004ml-W5
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:52:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48044)
+	id 1hMD53-0005S5-I7
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:53:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hMCzE-00015R-Do
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:47:02 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCnD-0003Wq-F9
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hMCzC-0000o9-Gg
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:47:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55802)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hMCzC-0000nj-8I
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:46:58 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5FC9C30832C5
-	for <qemu-devel@nongnu.org>; Thu,  2 May 2019 14:46:57 +0000 (UTC)
-Received: from Igors-MacBook-Pro (unknown [10.40.205.168])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5CA8E5DA5B;
-	Thu,  2 May 2019 14:46:54 +0000 (UTC)
-Date: Thu, 2 May 2019 16:46:52 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <20190502164652.30964a2b@Igors-MacBook-Pro>
-In-Reply-To: <20190425104326.12835-2-lersek@redhat.com>
-References: <20190425104326.12835-1-lersek@redhat.com>
-	<20190425104326.12835-2-lersek@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Thu, 02 May 2019 14:46:57 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] tests/uefi-test-tools: report the
- SMBIOS entry point structures
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCnB-0008QK-My
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:35 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:41262)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCnB-0008PO-C6
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:33 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.vps.ablenet.jp
+	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+	by mail02.asahi-net.or.jp (Postfix) with ESMTPA id ED0EB3BC86;
+	Thu,  2 May 2019 23:34:27 +0900 (JST)
+Received: from ysato.dip.jp (ZM005235.ppp.dion.ne.jp [222.8.5.235])
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id ABDBF240086; 
+	Thu,  2 May 2019 23:34:27 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Date: Thu,  2 May 2019 23:34:09 +0900
+Message-Id: <20190502143409.59600-13-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20190502143409.59600-1-ysato@users.sourceforge.jp>
+References: <20190502143409.59600-1-ysato@users.sourceforge.jp>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 202.224.55.14
+Subject: [Qemu-devel] [PATCH RFC v8 12/12] hw/registerfields.h: Add 8bit and
+ 16bit register macros.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,194 +62,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?UTF-8?Q?Mathieu-Da?= =?UTF-8?Q?ud=C3=A9?= <philmd@redhat.com>,
-	qemu devel list <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+	Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502144652.85pgWJvJ9VCUNEq8_rT3QQW23CrqSYYq3-xSlssr-jM@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190502143409.54qfpG8c2WRLkWulmnP32DAwSekk9qWWVXnnK33O2cg@z>
 
-On Thu, 25 Apr 2019 12:43:25 +0200
-Laszlo Ersek <lersek@redhat.com> wrote:
+Some RX peripheral using 8bit and 16bit registers.
+Added 8bit and 16bit APIs.
 
-> On UEFI systems, the SMBIOS entry point (a.k.a. anchor) structures are
-> found similarly to the ACPI RSD PTR table(s): by scanning the
-> ConfigurationTable array in the EFI system table for well-known GUIDs.
->=20
-> Locate the SMBIOS 2.1 (32-bit) and 3.0 (64-bit) anchors in the
-> BiosTablesTest UEFI application, and report the addresses in new fields
-> appended to the BIOS_TABLES_TEST structure.
->=20
-> Cc: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Launchpad: https://bugs.launchpad.net/qemu/+bug/1821884
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+---
+ include/hw/registerfields.h | 28 +++++++++++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h    =
- | 25 +++++++++++++++-----
->  tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.inf=
- |  2 ++
->  tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.c  =
- | 23 ++++++++++++++----
->  3 files changed, 40 insertions(+), 10 deletions(-)
->=20
-> diff --git a/tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTabl=
-esTest.h b/tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTe=
-st.h
-> index 0b72c61254af..7a74c121d596 100644
-> --- a/tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h
-> +++ b/tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h
-> @@ -1,13 +1,14 @@
->  /** @file
-> -  Expose the address(es) of the ACPI RSD PTR table(s) in a MB-aligned st=
-ructure
-> -  to the hypervisor.
-> +  Expose the address(es) of the ACPI RSD PTR table(s) and the SMBIOS ent=
-ry
-> +  point(s) in a MB-aligned structure to the hypervisor.
-> =20
->    The hypervisor locates the MB-aligned structure based on the signature=
- GUID
-> -  that is at offset 0 in the structure. Once the RSD PTR address(es) are
-> -  retrieved, the hypervisor may perform various ACPI checks.
-> +  that is at offset 0 in the structure. Once the RSD PTR and SMBIOS anch=
-or
-> +  address(es) are retrieved, the hypervisor may perform various ACPI and=
- SMBIOS
-> +  checks.
-> =20
-> -  This feature is a development aid, for supporting ACPI table unit test=
-s in
-> -  hypervisors. Do not enable in production builds.
-> +  This feature is a development aid, for supporting ACPI and SMBIOS tabl=
-e unit
-> +  tests in hypervisors. Do not enable in production builds.
-> =20
->    Copyright (C) 2019, Red Hat, Inc.
-> =20
-> @@ -61,6 +62,18 @@ typedef struct {
->    //
->    EFI_PHYSICAL_ADDRESS Rsdp10;
->    EFI_PHYSICAL_ADDRESS Rsdp20;
-> +  //
-> +  // The Smbios21 and Smbios30 fields may be read when the signature GUID
-> +  // matches. Smbios21 is the guest-physical address of the SMBIOS 2.1 (=
-32-bit)
-> +  // Entry Point Structure from the SMBIOS v3.2.0 specification, in 8-by=
-te
-> +  // little endian representation. Smbios30 is the guest-physical addres=
-s of
-> +  // the SMBIOS 3.0 (64-bit) Entry Point Structure from the same specifi=
-cation,
-> +  // in the same representation. Each of these fields may be zero
-> +  // (independently of the other) if the UEFI System Table does not prov=
-ide the
-> +  // corresponding UEFI Configuration Table.
-> +  //
-> +  EFI_PHYSICAL_ADDRESS Smbios21;
-> +  EFI_PHYSICAL_ADDRESS Smbios30;
->  } BIOS_TABLES_TEST;
->  #pragma pack ()
-> =20
-> diff --git a/tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTa=
-blesTest.inf b/tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTa=
-blesTest.inf
-> index 924d8a80d00b..708bc1e7982b 100644
-> --- a/tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTes=
-t.inf
-> +++ b/tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTes=
-t.inf
-> @@ -35,6 +35,8 @@
->    gBiosTablesTestGuid
->    gEfiAcpi10TableGuid
->    gEfiAcpi20TableGuid
-> +  gEfiSmbios3TableGuid
-> +  gEfiSmbiosTableGuid
-> =20
->  [Packages]
->    MdePkg/MdePkg.dec
-> diff --git a/tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTa=
-blesTest.c b/tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTabl=
-esTest.c
-> index b208e17fb00f..75891e68ec20 100644
-> --- a/tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTes=
-t.c
-> +++ b/tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTes=
-t.c
-> @@ -14,6 +14,7 @@
-> =20
->  #include <Guid/Acpi.h>
->  #include <Guid/BiosTablesTest.h>
-> +#include <Guid/SmBios.h>
->  #include <Library/BaseLib.h>
->  #include <Library/BaseMemoryLib.h>
->  #include <Library/MemoryAllocationLib.h>
-> @@ -55,6 +56,8 @@ BiosTablesTestMain (
->    volatile BIOS_TABLES_TEST     *BiosTablesTest;
->    CONST VOID                    *Rsdp10;
->    CONST VOID                    *Rsdp20;
-> +  CONST VOID                    *Smbios21;
-> +  CONST VOID                    *Smbios30;
->    CONST EFI_CONFIGURATION_TABLE *ConfigTable;
->    CONST EFI_CONFIGURATION_TABLE *ConfigTablesEnd;
->    volatile EFI_GUID             *InverseSignature;
-> @@ -77,31 +80,43 @@ BiosTablesTestMain (
->    }
-> =20
->    //
-> -  // Locate both gEfiAcpi10TableGuid and gEfiAcpi20TableGuid config tabl=
-es in
-> -  // one go.
-> +  // Locate all the gEfiAcpi10TableGuid, gEfiAcpi20TableGuid,
-> +  // gEfiSmbiosTableGuid, gEfiSmbios3TableGuid config tables in one go.
->    //
->    Rsdp10 =3D NULL;
->    Rsdp20 =3D NULL;
-> +  Smbios21 =3D NULL;
-> +  Smbios30 =3D NULL;
->    ConfigTable =3D gST->ConfigurationTable;
->    ConfigTablesEnd =3D gST->ConfigurationTable + gST->NumberOfTableEntrie=
-s;
-> -  while ((Rsdp10 =3D=3D NULL || Rsdp20 =3D=3D NULL) && ConfigTable < Con=
-figTablesEnd) {
-> +  while ((Rsdp10 =3D=3D NULL || Rsdp20 =3D=3D NULL ||
-> +          Smbios21 =3D=3D NULL || Smbios30 =3D=3D NULL) &&
-> +         ConfigTable < ConfigTablesEnd) {
->      if (CompareGuid (&ConfigTable->VendorGuid, &gEfiAcpi10TableGuid)) {
->        Rsdp10 =3D ConfigTable->VendorTable;
->      } else if (CompareGuid (&ConfigTable->VendorGuid, &gEfiAcpi20TableGu=
-id)) {
->        Rsdp20 =3D ConfigTable->VendorTable;
-> +    } else if (CompareGuid (&ConfigTable->VendorGuid, &gEfiSmbiosTableGu=
-id)) {
-> +      Smbios21 =3D ConfigTable->VendorTable;
-> +    } else if (CompareGuid (&ConfigTable->VendorGuid, &gEfiSmbios3TableG=
-uid)) {
-> +      Smbios30 =3D ConfigTable->VendorTable;
->      }
->      ++ConfigTable;
->    }
-> =20
->    AsciiPrint ("%a: BiosTablesTest=3D%p Rsdp10=3D%p Rsdp20=3D%p\n",
->      gEfiCallerBaseName, Pages, Rsdp10, Rsdp20);
-> +  AsciiPrint ("%a: Smbios21=3D%p Smbios30=3D%p\n", gEfiCallerBaseName, S=
-mbios21,
-> +    Smbios30);
-> =20
->    //
-> -  // Store the RSD PTR address(es) first, then the signature second.
-> +  // Store the config table addresses first, then the signature second.
->    //
->    BiosTablesTest =3D Pages;
->    BiosTablesTest->Rsdp10 =3D (UINTN)Rsdp10;
->    BiosTablesTest->Rsdp20 =3D (UINTN)Rsdp20;
-> +  BiosTablesTest->Smbios21 =3D (UINTN)Smbios21;
-> +  BiosTablesTest->Smbios30 =3D (UINTN)Smbios30;
-> =20
->    MemoryFence();
-> =20
+diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
+index 2659a58737..51bfd0cf67 100644
+--- a/include/hw/registerfields.h
++++ b/include/hw/registerfields.h
+@@ -22,6 +22,14 @@
+     enum { A_ ## reg = (addr) };                                          \
+     enum { R_ ## reg = (addr) / 4 };
+ 
++#define REG8(reg, addr)                                                  \
++    enum { A_ ## reg = (addr) };                                          \
++    enum { R_ ## reg = (addr) };
++
++#define REG16(reg, addr)                                                  \
++    enum { A_ ## reg = (addr) };                                          \
++    enum { R_ ## reg = (addr) / 2 };
++
+ /* Define SHIFT, LENGTH and MASK constants for a field within a register */
+ 
+ /* This macro will define R_FOO_BAR_MASK, R_FOO_BAR_SHIFT and R_FOO_BAR_LENGTH
+@@ -40,6 +48,8 @@
+ #define FIELD_EX64(storage, reg, field)                                   \
+     extract64((storage), R_ ## reg ## _ ## field ## _SHIFT,               \
+               R_ ## reg ## _ ## field ## _LENGTH)
++#define FIELD_EX8  FIELD_EX32
++#define FIELD_EX16 FIELD_EX32
+ 
+ /* Extract a field from an array of registers */
+ #define ARRAY_FIELD_EX32(regs, reg, field)                                \
+@@ -49,6 +59,22 @@
+  * Assigning values larger then the target field will result in
+  * compilation warnings.
+  */
++#define FIELD_DP8(storage, reg, field, val) ({                            \
++    struct {                                                              \
++        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;                \
++    } v = { .v = val };                                                   \
++    uint8_t d;                                                            \
++    d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,           \
++                  R_ ## reg ## _ ## field ## _LENGTH, v.v);               \
++    d; })
++#define FIELD_DP16(storage, reg, field, val) ({                           \
++    struct {                                                              \
++        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;                \
++    } v = { .v = val };                                                   \
++    uint16_t d;                                                           \
++    d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,           \
++                  R_ ## reg ## _ ## field ## _LENGTH, v.v);               \
++    d; })
+ #define FIELD_DP32(storage, reg, field, val) ({                           \
+     struct {                                                              \
+         unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;                \
+@@ -57,7 +83,7 @@
+     d = deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,           \
+                   R_ ## reg ## _ ## field ## _LENGTH, v.v);               \
+     d; })
+-#define FIELD_DP64(storage, reg, field, val) ({                           \
++#define FIELD_DP64(storage, reg, field, val) ({                         \
+     struct {                                                              \
+         unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;                \
+     } v = { .v = val };                                                   \
+-- 
+2.11.0
 
 
