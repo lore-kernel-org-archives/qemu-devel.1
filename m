@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55580)
+Received: from eggs.gnu.org ([209.51.188.92]:57668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hM4L5-0007LG-BN
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 01:33:01 -0400
+	(envelope-from <alistair@alistair23.me>) id 1hM4TT-0000kw-VY
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 01:41:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hM4L2-0004Id-TV
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 01:32:58 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:45349)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
-	id 1hM4L2-0002oV-Gl
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 01:32:56 -0400
-Received: by mail-ed1-x543.google.com with SMTP id g57so957410edc.12
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 22:32:10 -0700 (PDT)
-Date: Thu, 2 May 2019 05:32:07 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-Message-ID: <20190502053207.ix637eb6v7umujas@master>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-References: <20190430034412.12935-1-richardw.yang@linux.intel.com>
-	<155677104475.10667.17544832182226944733@c2072b67cc0c>
+	(envelope-from <alistair@alistair23.me>) id 1hM4TR-0003Jd-5C
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 01:41:39 -0400
+Received: from mail-hk2apc01olkn0805.outbound.protection.outlook.com
+	([2a01:111:f400:febc::805]:22687
+	helo=APC01-HK2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alistair@alistair23.me>)
+	id 1hM4TD-0002vl-90
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 01:41:29 -0400
+From: Alistair Francis <alistair@alistair23.me>
+Date: Thu, 2 May 2019 05:40:34 +0000
+Message-ID: <PSXP216MB02777FF1122DB78DEC580ACEDD340@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <155677104475.10667.17544832182226944733@c2072b67cc0c>
-Subject: Re: [Qemu-devel] [PATCH 0/3] Cleanup migration/ram.c
+Subject: [Qemu-devel] [PATCH v1 0/5] Add the STM32F405 and Netduino Plus 2
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: richardw.yang@linux.intel.com, fam@euphon.net, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>
 
-On Wed, May 01, 2019 at 09:24:06PM -0700, no-reply@patchew.org wrote:
->Patchew URL: https://patchew.org/QEMU/20190430034412.12935-1-richardw.yang@linux.intel.com/
->
->
->
->Hi,
->
->This series failed the asan build test. Please find the testing commands and
->their output below. If you have Docker installed, you can probably reproduce it
->locally.
->
->=== TEST SCRIPT BEGIN ===
->#!/bin/bash
->time make docker-test-debug@fedora TARGET_LIST=x86_64-softmmu J=14 NETWORK=1
->=== TEST SCRIPT END ===
->
->  COPY    RUNNER
->    RUN test-debug in qemu:fedora 
->container_linux.go:247: starting container process caused "process_linux.go:258: applying cgroup configuration for process caused \"The maximum number of active connections for UID 0 has been reached\""
->/usr/bin/docker-current: Error response from daemon: oci runtime error: The maximum number of active connections for UID 0 has been reached.
->Traceback (most recent call last):
->  File "./tests/docker/docker.py", line 615, in <module>
->    sys.exit(main())
->
-
-May I ask how I can reproduce this?
-
->
->The full log is available at
->http://patchew.org/logs/20190430034412.12935-1-richardw.yang@linux.intel.com/testing.asan/?type=message.
->---
->Email generated automatically by Patchew [https://patchew.org/].
->Please send your feedback to patchew-devel@redhat.com
-
--- 
-Wei Yang
-Help you, Help me
+DQpOb3cgdGhhdCB0aGUgQXJtLU00IENQVSBoYXMgYmVlbiBhZGRlZCB0byBRRU1VIHdlIGNhbiBh
+ZGQgdGhlIE5ldGR1aW5vDQpQbHVzIDIgbWFjaGluZS4gVGhpcyBpcyB2ZXJ5IHNpbWlsYXIgdG8g
+dGhlIFNUTTMyRjIwNSBhbmQgTmV0ZHVpbm8gMiBTb0MNCmFuZCBtYWNoaW5lLg0KDQp2MjoNCiAt
+IFJlb3JkZXIgcGF0Y2hzZXQNCiAtIFJldHVybiB0aGUga2VybmVsIGVudHJ5IHBvaW50IGluc3Rl
+YWQgb2YgdXNpbmcgYSBwb2ludGVyDQogLSBBZGRyZXNzIFBldGVyJ3MgY29tbWVudHMNCg0KDQpB
+bGlzdGFpciBGcmFuY2lzICg1KToNCiAgaHcvbWlzYzogQWRkIHRoZSBTVE0zMkY0eHggU3lzY29u
+ZmlnIGRldmljZQ0KICBody9taXNjOiBBZGQgdGhlIFNUTTMyRjR4eCBFWFRJIGRldmljZQ0KICBh
+cm12N206IEFsbG93IGVudHJ5IGluZm9ybWF0aW9uIHRvIGJlIHJldHVybmVkDQogIGh3L2FybTog
+QWRkIHRoZSBTVE0zMkY0eHggU29DDQogIGh3L2FybTogQWRkIHRoZSBOZXRkdWlubyBQbHVzIDIN
+Cg0KIE1BSU5UQUlORVJTICAgICAgICAgICAgICAgICAgICAgICAgfCAgMTQgKysNCiBkZWZhdWx0
+LWNvbmZpZ3MvYXJtLXNvZnRtbXUubWFrICAgIHwgICA0ICsNCiBody9hcm0vS2NvbmZpZyAgICAg
+ICAgICAgICAgICAgICAgIHwgICA2ICsNCiBody9hcm0vTWFrZWZpbGUub2JqcyAgICAgICAgICAg
+ICAgIHwgICAyICsNCiBody9hcm0vYXJtdjdtLmMgICAgICAgICAgICAgICAgICAgIHwgICA0ICst
+DQogaHcvYXJtL25ldGR1aW5vcGx1czIuYyAgICAgICAgICAgICB8ICA3NyArKysrKysrKw0KIGh3
+L2FybS9zdG0zMmY0MDVfc29jLmMgICAgICAgICAgICAgfCAzMDYgKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysNCiBody9taXNjL0tjb25maWcgICAgICAgICAgICAgICAgICAgIHwgICA2ICsN
+CiBody9taXNjL01ha2VmaWxlLm9ianMgICAgICAgICAgICAgIHwgICAyICsNCiBody9taXNjL3N0
+bTMyZjR4eF9leHRpLmMgICAgICAgICAgIHwgMTg3ICsrKysrKysrKysrKysrKysrKw0KIGh3L21p
+c2Mvc3RtMzJmNHh4X3N5c2NmZy5jICAgICAgICAgfCAxNjggKysrKysrKysrKysrKysrKw0KIGh3
+L21pc2MvdHJhY2UtZXZlbnRzICAgICAgICAgICAgICAgfCAgMTEgKysNCiBpbmNsdWRlL2h3L2Fy
+bS9hcm0uaCAgICAgICAgICAgICAgIHwgICA0ICstDQogaW5jbHVkZS9ody9hcm0vc3RtMzJmNDA1
+X3NvYy5oICAgICB8ICA3NCArKysrKysrDQogaW5jbHVkZS9ody9taXNjL3N0bTMyZjR4eF9leHRp
+LmggICB8ICA2MCArKysrKysNCiBpbmNsdWRlL2h3L21pc2Mvc3RtMzJmNHh4X3N5c2NmZy5oIHwg
+IDYxICsrKysrKw0KIDE2IGZpbGVzIGNoYW5nZWQsIDk4NCBpbnNlcnRpb25zKCspLCAyIGRlbGV0
+aW9ucygtKQ0KIGNyZWF0ZSBtb2RlIDEwMDY0NCBody9hcm0vbmV0ZHVpbm9wbHVzMi5jDQogY3Jl
+YXRlIG1vZGUgMTAwNjQ0IGh3L2FybS9zdG0zMmY0MDVfc29jLmMNCiBjcmVhdGUgbW9kZSAxMDA2
+NDQgaHcvbWlzYy9zdG0zMmY0eHhfZXh0aS5jDQogY3JlYXRlIG1vZGUgMTAwNjQ0IGh3L21pc2Mv
+c3RtMzJmNHh4X3N5c2NmZy5jDQogY3JlYXRlIG1vZGUgMTAwNjQ0IGluY2x1ZGUvaHcvYXJtL3N0
+bTMyZjQwNV9zb2MuaA0KIGNyZWF0ZSBtb2RlIDEwMDY0NCBpbmNsdWRlL2h3L21pc2Mvc3RtMzJm
+NHh4X2V4dGkuaA0KIGNyZWF0ZSBtb2RlIDEwMDY0NCBpbmNsdWRlL2h3L21pc2Mvc3RtMzJmNHh4
+X3N5c2NmZy5oDQoNCi0tIA0KMi4yMS4wDQoNCg==
