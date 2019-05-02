@@ -2,61 +2,98 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F1DC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 08:54:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B8BBC43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 08:55:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A03420651
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 08:54:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A03420651
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5608020651
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 08:55:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ZlWXildd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5608020651
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47797 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47819 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM7US-00046f-Sa
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 04:54:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50644)
+	id 1hM7VI-0004yO-Ij
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 04:55:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hM7MD-0004Zs-G3
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:46:22 -0400
+	(envelope-from <shmuel.eiderman@oracle.com>) id 1hM7R5-0000WS-RV
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:51:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hM7MB-0003oU-Dy
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:46:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48810)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hM7M4-0003Mr-Lo; Thu, 02 May 2019 04:46:12 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C5AAE3086215;
-	Thu,  2 May 2019 08:45:43 +0000 (UTC)
-Received: from thuth.com (ovpn-116-131.ams2.redhat.com [10.36.116.131])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 40ABC54FDF;
-	Thu,  2 May 2019 08:45:41 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu,  2 May 2019 10:45:06 +0200
-Message-Id: <20190502084506.8009-8-thuth@redhat.com>
-In-Reply-To: <20190502084506.8009-1-thuth@redhat.com>
-References: <20190502084506.8009-1-thuth@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Thu, 02 May 2019 08:45:43 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 7/7] tests: Run the iotests during "make
- check" again
+	(envelope-from <shmuel.eiderman@oracle.com>) id 1hM7R4-0000ZJ-HX
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:51:23 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:58396)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+	id 1hM7R1-0000Ao-GA; Thu, 02 May 2019 04:51:19 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+	by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x428nmlX190140; Thu, 2 May 2019 08:50:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=from : to : cc :
+	subject : date : message-id : in-reply-to : references;
+	s=corp-2018-07-02; 
+	bh=9ccw3z6s2hPMEok4793CteM3gasxj/Ia2H+u0wiDWIc=;
+	b=ZlWXilddp5nYadHxRHXjtvDEaSN2eTD/wEuMzZQBg0+i/W+nvOsQiHJ8yTYMKWr8KKl0
+	P0b3pueeVGl+u/tfMEHmAk1A9V1nTV8i2JA6cLDjIeJ9kq6szXxqm50lTmwh+5qKcwfI
+	lbc40kgklq5Wapzg7nB3w9OyVz6NlsAOmPEXAyJbwegPED97z8vITkFrC0kTWC6Ovk3x
+	EgBOzNBymZtd7u7h72DRr+HLcVKOzYjKCVFJ4BB4KImXugMrw3t7uEIT6aek4oq0bHTJ
+	/USQMUL22k3raPytHYXEM3+moIYTHmw2CMLZj1JzyDmpYZmrfCcZXz+isxJVh7BoYgc4
+	5g== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+	by userp2120.oracle.com with ESMTP id 2s6xhyq56y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 02 May 2019 08:50:59 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+	by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x428okYN186684; Thu, 2 May 2019 08:50:58 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+	by aserp3030.oracle.com with ESMTP id 2s7rtbksfy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 02 May 2019 08:50:58 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+	by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x428ovtc006722;
+	Thu, 2 May 2019 08:50:57 GMT
+Received: from nexus.ravello.local (/213.57.127.2)
+	by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Thu, 02 May 2019 01:50:56 -0700
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+To: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Thu,  2 May 2019 11:50:27 +0300
+Message-Id: <20190502085029.30776-2-shmuel.eiderman@oracle.com>
+X-Mailer: git-send-email 2.13.3
+In-Reply-To: <20190502085029.30776-1-shmuel.eiderman@oracle.com>
+References: <20190502085029.30776-1-shmuel.eiderman@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9244
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=963
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1905020067
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9244
+	signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=983
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1905020067
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.85
+Subject: [Qemu-devel] [PATCH 1/3] qemu-img: rebase: Reuse parent
+ BlockDriverState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,170 +105,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
-	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
-	Markus Armbruster <armbru@redhat.com>,
-	Christophe Fergeau <cfergeau@redhat.com>, Max Reitz <mreitz@redhat.com>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Wainer dos Santos Moschetta <wainersm@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: eyal.moscovici@oracle.com, arbel.moshe@oracle.com, liran.alon@oracle.com,
+	shmuel.eiderman@oracle.com, sagi.amit@oracle.com, karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190502084506.7rktU_8s27j4aOityWy4nxwkGTn1uX6rkehh2hQgY7k@z>
+Message-ID: <20190502085027.Xl-MIhxhxNSg7c0n5w_6U4KnhGFtrnVHsZdOe9VB2TA@z>
 
-People often forget to run the iotests before submitting patches or
-pull requests - this is likely due to the fact that we do not run the
-tests during our mandatory "make check" tests yet. Now that we've got
-a proper "auto" group of iotests that should be fine to run in every
-environment, we can enable the iotests during "make check" again by
-running the "auto" tests by default from the check-block.sh script.
+In safe mode we open the entire chain, including the parent backing
+file of the rebased file.
+Do not open a new BlockBackend for the parent backing file, which
+saves opening the rest of the chain twice, which for long chains
+saves many "pricy" bdrv_open() calls.
 
-Some cases still need to be checked first, though: iotests need bash
-and GNU sed (otherwise they fail), and if gprof is enabled, it spoils
-the output of some test cases causing them to fail. So if we detect
-that one of the required programs is missing or that gprof is enabled,
-we still have to skip the iotests to avoid failures.
+Permissions for blk_new() were copied from blk_new_open() when
+flags = 0.
 
-And finally, since we are using check-block.sh now again, this patch also
-removes the qemu-iotests-quick.sh script since we do not need that anymor=
-e
-(and having two shell wrapper scripts around the block tests seem
-rather confusing than helpful).
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Eyal Moscovici <eyal.moscovici@oracle.com>
+Signed-off-by: Sagi Amit <sagi.amit@oracle.com>
+Co-developed-by: Sagi Amit <sagi.amit@oracle.com>
+Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
 ---
- tests/Makefile.include      |  8 +++----
- tests/check-block.sh        | 44 ++++++++++++++++++++++++++++---------
- tests/qemu-iotests-quick.sh |  8 -------
- 3 files changed, 38 insertions(+), 22 deletions(-)
- delete mode 100755 tests/qemu-iotests-quick.sh
+ qemu-img.c | 29 ++++++++++++-----------------
+ 1 file changed, 12 insertions(+), 17 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index e2432d5e77..3bb7793d4a 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -140,7 +140,7 @@ check-unit-y +=3D tests/test-uuid$(EXESUF)
- check-unit-y +=3D tests/ptimer-test$(EXESUF)
- check-unit-y +=3D tests/test-qapi-util$(EXESUF)
-=20
--check-block-$(CONFIG_POSIX) +=3D tests/qemu-iotests-quick.sh
-+check-block-$(CONFIG_POSIX) +=3D tests/check-block.sh
-=20
- # All QTests for now are POSIX-only, but the dependencies are
- # really in libqtest, not in the testcases themselves.
-@@ -1096,8 +1096,8 @@ clean-tcg: $(CLEAN_TCG_TARGET_RULES)
-=20
- QEMU_IOTESTS_HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) =3D =
-tests/qemu-iotests/socket_scm_helper$(EXESUF)
-=20
--.PHONY: check-tests/qemu-iotests-quick.sh
--check-tests/qemu-iotests-quick.sh: tests/qemu-iotests-quick.sh qemu-img$=
-(EXESUF) qemu-io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y)
-+.PHONY: check-tests/check-block.sh
-+check-tests/check-block.sh: tests/check-block.sh qemu-img$(EXESUF) qemu-=
-io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y)
- 	$<
-=20
- .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
-@@ -1168,7 +1168,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
- check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-t=
-ests/qapi-schema/doc-good.texi
- check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
- check-block: $(patsubst %,check-%, $(check-block-y))
--check: check-qapi-schema check-unit check-softfloat check-qtest check-de=
-codetree
-+check: check-qapi-schema check-unit check-softfloat check-qtest check-de=
-codetree check-block
- check-clean:
- 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
- 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(t=
-arget)-y)) $(check-qtest-generic-y))
-diff --git a/tests/check-block.sh b/tests/check-block.sh
-index f3d12fd602..3b971d6cf4 100755
---- a/tests/check-block.sh
-+++ b/tests/check-block.sh
-@@ -1,24 +1,48 @@
- #!/bin/sh
-=20
--FORMAT_LIST=3D"raw qcow2 qed vmdk vpc"
-+# Honor the SPEED environment variable, just like we do it for the qtest=
-s.
-+if [ "$SPEED" =3D "slow" ]; then
-+    format_list=3D"raw qcow2"
-+    group=3D
-+elif [ "$SPEED" =3D "thorough" ]; then
-+    format_list=3D"raw qcow2 qed vmdk vpc"
-+    group=3D
-+else
-+    format_list=3Dqcow2
-+    group=3D"-g auto"
-+fi
-+
- if [ "$#" -ne 0 ]; then
--    FORMAT_LIST=3D"$@"
-+    format_list=3D"$@"
-+fi
-+
-+if grep -q "TARGET_GPROF=3Dy" *-softmmu/config-target.mak 2>/dev/null ; =
-then
-+    echo "GPROF is enabled =3D=3D> Not running the qemu-iotests."
-+    exit 0
- fi
-=20
--export QEMU_PROG=3D"$PWD/x86_64-softmmu/qemu-system-x86_64"
--export QEMU_IMG_PROG=3D"$PWD/qemu-img"
--export QEMU_IO_PROG=3D"$PWD/qemu-io"
-+if [ -z "$(find . -name 'qemu-system-*' -print)" ]; then
-+    echo "No qemu-system binary available =3D=3D> Not running the qemu-i=
-otests."
-+    exit 0
-+fi
-+
-+if ! command -v bash >/dev/null 2>&1 ; then
-+    echo "bash not available =3D=3D> Not running the qemu-iotests."
-+    exit 0
-+fi
-=20
--if [ ! -x $QEMU_PROG ]; then
--    echo "'make check-block' requires qemu-system-x86_64"
--    exit 1
-+if ! (sed --version | grep 'GNU sed') > /dev/null 2>&1 ; then
-+    if ! command -v gsed >/dev/null 2>&1; then
-+        echo "GNU sed not available =3D=3D> Not running the qemu-iotests=
-."
-+        exit 0
-+    fi
- fi
-=20
- cd tests/qemu-iotests
-=20
- ret=3D0
--for FMT in $FORMAT_LIST ; do
--    ./check -T -nocache -$FMT || ret=3D1
-+for fmt in $format_list ; do
-+    ./check -$fmt $group || ret=3D1
- done
-=20
- exit $ret
-diff --git a/tests/qemu-iotests-quick.sh b/tests/qemu-iotests-quick.sh
-deleted file mode 100755
-index 0e554bb972..0000000000
---- a/tests/qemu-iotests-quick.sh
-+++ /dev/null
-@@ -1,8 +0,0 @@
--#!/bin/sh
--
--cd tests/qemu-iotests
--
--ret=3D0
--TEST_DIR=3D${TEST_DIR:-/tmp/qemu-iotests-quick-$$} ./check -T -qcow2 -g =
-quick || ret=3D1
--
--exit $ret
---=20
-2.21.0
+diff --git a/qemu-img.c b/qemu-img.c
+index 8ee63daeae..d9b609b3f0 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -3297,28 +3297,23 @@ static int img_rebase(int argc, char **argv)
+ 
+     /* For safe rebasing we need to compare old and new backing file */
+     if (!unsafe) {
+-        char backing_name[PATH_MAX];
+         QDict *options = NULL;
++        BlockDriverState *base_bs = backing_bs(bs);
+ 
+-        if (bs->backing_format[0] != '\0') {
+-            options = qdict_new();
+-            qdict_put_str(options, "driver", bs->backing_format);
++        if (!base_bs) {
++            error_setg(&local_err, "Image does not have a backing file");
++            ret = -1;
++            goto out;
+         }
+ 
+-        if (force_share) {
+-            if (!options) {
+-                options = qdict_new();
+-            }
+-            qdict_put_bool(options, BDRV_OPT_FORCE_SHARE, true);
+-        }
+-        bdrv_get_backing_filename(bs, backing_name, sizeof(backing_name));
+-        blk_old_backing = blk_new_open(backing_name, NULL,
+-                                       options, src_flags, &local_err);
+-        if (!blk_old_backing) {
++        blk_old_backing = blk_new(BLK_PERM_CONSISTENT_READ,
++                                  BLK_PERM_ALL);
++        ret = blk_insert_bs(blk_old_backing, base_bs,
++                            &local_err);
++        if (ret < 0) {
+             error_reportf_err(local_err,
+-                              "Could not open old backing file '%s': ",
+-                              backing_name);
+-            ret = -1;
++                              "Could not reuse old backing file '%s': ",
++                              base_bs->filename);
+             goto out;
+         }
+ 
+-- 
+2.13.3
 
 
