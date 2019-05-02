@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59809)
+Received: from eggs.gnu.org ([209.51.188.92]:59814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6AD-00052b-Rf
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:54 -0400
+	(envelope-from <arilou@gmail.com>) id 1hM6AE-000537-8E
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6A3-0002tl-Pz
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:47 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34889)
+	(envelope-from <arilou@gmail.com>) id 1hM6A5-0002vX-Ot
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:48 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39148)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM69v-0000jZ-Lo
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:37 -0400
-Received: by mail-wr1-x444.google.com with SMTP id f7so1831542wrs.2
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 00:27:32 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM69w-0000cj-PC
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 03:29:39 -0400
+Received: by mail-wr1-x442.google.com with SMTP id a9so1793624wrp.6
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 00:27:20 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Thu,  2 May 2019 10:26:36 +0300
-Message-Id: <20190502072641.4667-23-arilou@gmail.com>
+Date: Thu,  2 May 2019 10:26:28 +0300
+Message-Id: <20190502072641.4667-15-arilou@gmail.com>
 In-Reply-To: <20190502072641.4667-1-arilou@gmail.com>
 References: <20190502072641.4667-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 22/27] gdbstub: Implement generic query
- qemu.Supported
+Subject: [Qemu-devel] [PATCH v8 14/27] gdbstub: Implement read all registers
+ (g pkt) with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +31,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org, liran.alon@oracle.com, Jon Doron <arilou@gmail.com>
 
-qemu.Supported query reply back with the supported qemu query/set
-commands (commands are seperated with a semicolon from each other).
-
-gdb> maint packet qqemu.Supported
-
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ gdbstub.c | 31 +++++++++++++++++++++++--------
+ 1 file changed, 23 insertions(+), 8 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 8bdfae4b29..00c07d6ec0 100644
+index adfe39b3a3..3478ac778d 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -2127,6 +2127,11 @@ static void handle_query_attached(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, GDB_ATTACHED);
+@@ -1757,6 +1757,21 @@ static void handle_write_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, "OK");
  }
  
-+static void handle_query_qemu_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_read_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    put_packet(gdb_ctx->s, "sstepbits;sstep");
++    target_ulong addr, len;
++
++    cpu_synchronize_state(gdb_ctx->s->g_cpu);
++    len = 0;
++    for (addr = 0; addr < gdb_ctx->s->g_cpu->gdb_num_g_regs; addr++) {
++        len += gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf + len,
++                                 addr);
++    }
++
++    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, len);
++    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
 +}
 +
- static GdbCmdParseEntry gdb_gen_query_set_common_table[] = {
-     /* Order is important if has same prefix */
-     {
-@@ -2203,6 +2208,10 @@ static GdbCmdParseEntry gdb_gen_query_table[] = {
-         .handler = handle_query_attached,
-         .cmd = "Attached",
-     },
-+    {
-+        .handler = handle_query_qemu_supported,
-+        .cmd = "qemu.Supported",
-+    },
- };
- 
- static void handle_gen_query(GdbCmdContext *gdb_ctx, void *user_ctx)
+ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+ {
+     CPUState *cpu;
+@@ -1764,7 +1779,7 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+     CPUClass *cc;
+     const char *p;
+     uint32_t pid, tid;
+-    int ch, reg_size, type, res;
++    int ch, type, res;
+     uint8_t mem_buf[MAX_PACKET_LENGTH];
+     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
+     char thread_id[16];
+@@ -1923,14 +1938,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+         }
+         break;
+     case 'g':
+-        cpu_synchronize_state(s->g_cpu);
+-        len = 0;
+-        for (addr = 0; addr < s->g_cpu->gdb_num_g_regs; addr++) {
+-            reg_size = gdb_read_register(s->g_cpu, mem_buf + len, addr);
+-            len += reg_size;
++        {
++            static const GdbCmdParseEntry read_all_regs_cmd_desc = {
++                .handler = handle_read_all_regs,
++                .cmd = "g",
++                .cmd_startswith = 1
++            };
++            cmd_parser = &read_all_regs_cmd_desc;
+         }
+-        memtohex(buf, mem_buf, len);
+-        put_packet(s, buf);
+         break;
+     case 'G':
+         {
 -- 
 2.20.1
