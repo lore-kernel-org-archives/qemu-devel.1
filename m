@@ -2,67 +2,95 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5275BC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 13:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D73E7C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 13:25:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2361C2063F
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 13:22:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2361C2063F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9F74B2075E
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 13:25:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bNQGq9QS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F74B2075E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51101 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51152 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMBf4-0008TE-C3
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 09:22:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55239)
+	id 1hMBij-0001Q2-TY
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 09:25:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hMBeG-0008Bv-Te
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:21:17 -0400
+	(envelope-from <tcminyard@gmail.com>) id 1hMBhq-0000m6-2C
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:25:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hMBeF-00073K-0G
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:21:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:31494)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hMBeD-000703-4z
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:21:14 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 930A83097032;
-	Thu,  2 May 2019 13:21:07 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-45.ams2.redhat.com
-	[10.36.116.45])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3025D608A6;
-	Thu,  2 May 2019 13:21:06 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 3DB7611AAF; Thu,  2 May 2019 15:21:05 +0200 (CEST)
-Date: Thu, 2 May 2019 15:21:05 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190502132105.qkudeunhcueadka7@sirius.home.kraxel.org>
-References: <20190502073543.4391-1-kraxel@redhat.com>
-	<CAFEAcA-OyrwAqp1Kwt-sFJY3xj=0mUszGtF3RewwLs25vOhNLg@mail.gmail.com>
+	(envelope-from <tcminyard@gmail.com>) id 1hMBhe-0008Ly-Q5
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:24:58 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45090)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1hMBhe-0008Lm-LA
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:24:46 -0400
+Received: by mail-ot1-x341.google.com with SMTP id a10so1992072otl.12
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 06:24:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=sender:date:from:to:cc:subject:message-id:reply-to:references
+	:mime-version:content-disposition:content-transfer-encoding
+	:in-reply-to:user-agent;
+	bh=+ambnEVN/ny4DJEs50btTtF4CLCAsUiPmDX0DQHB2mE=;
+	b=bNQGq9QS5dqo/3S3gv3Nzx2fhutZC6eIYd3L642Qseggvd21Jril1JMa+76YBDUhcu
+	hcJPo+Zlej8+6BOVPbFgJ9i92QtOX1FIaa810t4UeyMgXN3e21yvXyR86ZMNlZGgmZkk
+	d4yDjmCPZnBVleWQ0hCw4DaJUmNngjnGvmgtSQnB7vJcXrZXwMOnFrLxGXM+OPe7tERQ
+	5zn2BPTm1SS0GgXjM5wWugYcyfFiDX+Rkf0NBb8T1jkb9UF/RC0cUVfiNiuI/oH25bsp
+	0vhcntr03MNQb4PUq04fSZhs+unhOmhQhAOO5ZmNKEuzoioiQ+fMYM70T1hix4gvTFiH
+	GBUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+	:reply-to:references:mime-version:content-disposition
+	:content-transfer-encoding:in-reply-to:user-agent;
+	bh=+ambnEVN/ny4DJEs50btTtF4CLCAsUiPmDX0DQHB2mE=;
+	b=qXJPSKt1x4nziqj2TSZwZUBFNJc/KAIkp4R9WAT7KWJXgZmyFO4v1lF9v6JfCriO6q
+	opRUBvAF4573I1cgtjqBi1WVfXUbCDOcB8wJ55BOHBIEsa3f8lCfrD6/RYWOaAPbApDQ
+	NVtIbcUiWmtDQuYChxW5nlCHhh+eCKaiPvz2m2LnYrrxn2Bj2e0sg+7av6hBlEXsknWk
+	PdtuKCwIT/BL25s1AlEoYYOoFvFBm628avVGKI/ZYYfIJhqWvf9kVri5GzRQ7u7uqA6b
+	WMsw9UZr6QM0fpWps/9Eu2lJM2GheiovCl5nIGwKD+zvbabpFX6GMg8tAjWH5KEB6pu5
+	P0oQ==
+X-Gm-Message-State: APjAAAU1K5tcktk75DWHpXQbUYdm1exEQ/YJxkfvtsW+OGLF2ay6pcyM
+	cUe5mMdI9++PggMr1rwrRw==
+X-Google-Smtp-Source: APXvYqyrAcKMYcNpu3JSazGdvP+rv9HfwrBLJrfOPpkx51unym0Z47t9LKHw7UnvwiUkt77LJa08KA==
+X-Received: by 2002:a05:6830:1115:: with SMTP id
+	w21mr2507070otq.179.1556803483820; 
+	Thu, 02 May 2019 06:24:43 -0700 (PDT)
+Received: from serve.minyard.net ([47.184.134.43])
+	by smtp.gmail.com with ESMTPSA id
+	k16sm3796153oic.43.2019.05.02.06.24.43
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 02 May 2019 06:24:43 -0700 (PDT)
+Received: from minyard.net (unknown [IPv6:2001:470:b8f6:1b:d5e:aa5a:44d8:6907])
+	by serve.minyard.net (Postfix) with ESMTPSA id 9B83A1818F3;
+	Thu,  2 May 2019 13:24:42 +0000 (UTC)
+Date: Thu, 2 May 2019 08:24:37 -0500
+From: Corey Minyard <minyard@acm.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Message-ID: <20190502132437.GI6623@minyard.net>
+References: <20190428064731.29913-1-philmd@redhat.com>
+	<20190428064731.29913-2-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA-OyrwAqp1Kwt-sFJY3xj=0mUszGtF3RewwLs25vOhNLg@mail.gmail.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Thu, 02 May 2019 13:21:10 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 0/7] Usb 20190502 patches
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190428064731.29913-2-philmd@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] hw/acpi: Move the IPMI stub to the
+ stubs/ directory
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,28 +102,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
+Reply-To: minyard@acm.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
 	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502132105.8lcRKJcTe2p6EXYeddivopoHchVCVcNOvxlLrSnvjJs@z>
+Message-ID: <20190502132437.Dps6MlXkVcua3l88wOz2WmcAVwWUQMp-CUUSGm6SUZE@z>
 
-> Hi -- I'm afraid this failed to compile on one of my systems:
->=20
->   CC      hw/usb/hcd-xhci.o
-> /home/petmay01/linaro/qemu-for-merges/hw/usb/hcd-xhci.c: In function
-> =E2=80=98usb_xhci_realize=E2=80=99:
-> /home/petmay01/linaro/qemu-for-merges/hw/usb/hcd-xhci.c:3340:66:
-> error: =E2=80=98%d=E2=80=99 directive output may be truncated writing b=
-etween 1 and 11
-> bytes into a region of size 5 [-Werror=3Dformat-truncation=3D]
->              snprintf(port->name, sizeof(port->name), "usb2 port #%d", =
-i+1);
+On Sun, Apr 28, 2019 at 08:47:26AM +0200, Philippe Mathieu-Daudé wrote:
+> Move the IPMI stub file to the stubs/ directory to simplify the
+> hw/acpi Makefile.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Which system/compiler is this?
+I'm not sure of the overall view of this, but this is ok from an
+IPMI point of view in my view.
 
-cheers,
-  Gerd
+Acked-by: Corey Minyard <cminyard@mvista.com>
 
+> ---
+>  MAINTAINERS                         | 1 +
+>  hw/acpi/Makefile.objs               | 3 +--
+>  stubs/Makefile.objs                 | 1 +
+>  hw/acpi/ipmi-stub.c => stubs/ipmi.c | 0
+>  4 files changed, 3 insertions(+), 2 deletions(-)
+>  rename hw/acpi/ipmi-stub.c => stubs/ipmi.c (100%)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 23db6f8408a..e1681eca5cb 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1309,6 +1309,7 @@ S: Maintained
+>  F: include/hw/ipmi/*
+>  F: hw/ipmi/*
+>  F: hw/smbios/smbios_type_38.c
+> +F: stubs/ipmi.c
+>  F: tests/ipmi*
+>  T: git https://github.com/cminyard/qemu.git master-ipmi-rebase
+>  
+> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+> index 2d46e3789ae..4e302feb885 100644
+> --- a/hw/acpi/Makefile.objs
+> +++ b/hw/acpi/Makefile.objs
+> @@ -14,8 +14,7 @@ common-obj-y += aml-build.o
+>  common-obj-$(CONFIG_TPM) += tpm.o
+>  
+>  common-obj-$(CONFIG_IPMI) += ipmi.o
+> -common-obj-$(call lnot,$(CONFIG_IPMI)) += ipmi-stub.o
+>  else
+>  common-obj-y += acpi-stub.o
+>  endif
+> -common-obj-$(CONFIG_ALL) += acpi-stub.o ipmi-stub.o
+> +common-obj-$(CONFIG_ALL) += acpi-stub.o
+> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+> index 269dfa58326..36bb9ff0b1d 100644
+> --- a/stubs/Makefile.objs
+> +++ b/stubs/Makefile.objs
+> @@ -9,6 +9,7 @@ stub-obj-y += error-printf.o
+>  stub-obj-y += fdset.o
+>  stub-obj-y += gdbstub.o
+>  stub-obj-y += get-vm-name.o
+> +stub-obj-y += ipmi.o
+>  stub-obj-y += iothread.o
+>  stub-obj-y += iothread-lock.o
+>  stub-obj-y += is-daemonized.o
+> diff --git a/hw/acpi/ipmi-stub.c b/stubs/ipmi.c
+> similarity index 100%
+> rename from hw/acpi/ipmi-stub.c
+> rename to stubs/ipmi.c
+> -- 
+> 2.20.1
+> 
 
