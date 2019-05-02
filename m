@@ -2,95 +2,91 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D73E7C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 13:25:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE02DC43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 13:27:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F74B2075E
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 13:25:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7787D2075E
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 13:27:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bNQGq9QS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F74B2075E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SMHAc3zf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7787D2075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51152 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51168 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMBij-0001Q2-TY
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 09:25:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55854)
+	id 1hMBkD-0002Y1-LB
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 09:27:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1hMBhq-0000m6-2C
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:25:07 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hMBjM-0002Ce-Ti
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:26:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1hMBhe-0008Ly-Q5
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:24:58 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45090)
+	(envelope-from <alex.bennee@linaro.org>) id 1hMBjL-0000ki-UI
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:26:32 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55286)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1hMBhe-0008Lm-LA
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:24:46 -0400
-Received: by mail-ot1-x341.google.com with SMTP id a10so1992072otl.12
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 06:24:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=sender:date:from:to:cc:subject:message-id:reply-to:references
-	:mime-version:content-disposition:content-transfer-encoding
-	:in-reply-to:user-agent;
-	bh=+ambnEVN/ny4DJEs50btTtF4CLCAsUiPmDX0DQHB2mE=;
-	b=bNQGq9QS5dqo/3S3gv3Nzx2fhutZC6eIYd3L642Qseggvd21Jril1JMa+76YBDUhcu
-	hcJPo+Zlej8+6BOVPbFgJ9i92QtOX1FIaa810t4UeyMgXN3e21yvXyR86ZMNlZGgmZkk
-	d4yDjmCPZnBVleWQ0hCw4DaJUmNngjnGvmgtSQnB7vJcXrZXwMOnFrLxGXM+OPe7tERQ
-	5zn2BPTm1SS0GgXjM5wWugYcyfFiDX+Rkf0NBb8T1jkb9UF/RC0cUVfiNiuI/oH25bsp
-	0vhcntr03MNQb4PUq04fSZhs+unhOmhQhAOO5ZmNKEuzoioiQ+fMYM70T1hix4gvTFiH
-	GBUg==
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hMBjK-0000j7-3C
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 09:26:31 -0400
+Received: by mail-wm1-x344.google.com with SMTP id b10so2825623wmj.4
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 06:26:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:subject:in-reply-to:date:message-id
+	:mime-version:content-transfer-encoding;
+	bh=1gi/3ZV+/J2IRQLU6J5G/GeEaIENZ8fZVJQkNyIESEI=;
+	b=SMHAc3zfWBiHIDe2osiHSJ1qs6uTI7nUnfHfQPKvfm+tjmX91JItesuLxWpajGHyuJ
+	VjRcNcewp9psq9fad1ay2nBuQ3ApJffasTM6O3w/1qj+6N3H7URiYS6LZX+DMJSmIoYf
+	MGtAqdjEwAU28R38RMZZKCGv4FzwuMo8Z6MQpEDLwBHVxyVFAGmisz9CjFminVfA4t+f
+	hulGR6Cg8TZttziD/+TDnxYIfHxNCUqVs1liPMH8n67D+25LUbn4zDaiLFGwq8ltxC4y
+	ImmfqtICAK01lsPd9ydZFZBQB/RHYY7e1rxdpzfqoMaK6ZMTfcAqHtiLywQeptOMWDOG
+	Rncg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-	:reply-to:references:mime-version:content-disposition
-	:content-transfer-encoding:in-reply-to:user-agent;
-	bh=+ambnEVN/ny4DJEs50btTtF4CLCAsUiPmDX0DQHB2mE=;
-	b=qXJPSKt1x4nziqj2TSZwZUBFNJc/KAIkp4R9WAT7KWJXgZmyFO4v1lF9v6JfCriO6q
-	opRUBvAF4573I1cgtjqBi1WVfXUbCDOcB8wJ55BOHBIEsa3f8lCfrD6/RYWOaAPbApDQ
-	NVtIbcUiWmtDQuYChxW5nlCHhh+eCKaiPvz2m2LnYrrxn2Bj2e0sg+7av6hBlEXsknWk
-	PdtuKCwIT/BL25s1AlEoYYOoFvFBm628avVGKI/ZYYfIJhqWvf9kVri5GzRQ7u7uqA6b
-	WMsw9UZr6QM0fpWps/9Eu2lJM2GheiovCl5nIGwKD+zvbabpFX6GMg8tAjWH5KEB6pu5
-	P0oQ==
-X-Gm-Message-State: APjAAAU1K5tcktk75DWHpXQbUYdm1exEQ/YJxkfvtsW+OGLF2ay6pcyM
-	cUe5mMdI9++PggMr1rwrRw==
-X-Google-Smtp-Source: APXvYqyrAcKMYcNpu3JSazGdvP+rv9HfwrBLJrfOPpkx51unym0Z47t9LKHw7UnvwiUkt77LJa08KA==
-X-Received: by 2002:a05:6830:1115:: with SMTP id
-	w21mr2507070otq.179.1556803483820; 
-	Thu, 02 May 2019 06:24:43 -0700 (PDT)
-Received: from serve.minyard.net ([47.184.134.43])
-	by smtp.gmail.com with ESMTPSA id
-	k16sm3796153oic.43.2019.05.02.06.24.43
+	h=x-gm-message-state:references:user-agent:from:to:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=1gi/3ZV+/J2IRQLU6J5G/GeEaIENZ8fZVJQkNyIESEI=;
+	b=rby454gXIMhkWwiHPzvce9bCIHHRkTIxlOoLO4uQstHRThpFB2W1pLV+shGxsj/XUG
+	tNVMvPMaiyUNx9eh/AQOw+LvYdYnqbtwe/okT8FiD7INmu/o2Dht7agfSIjTlfuQ5dnv
+	Ty6GFZvyZOEWw2TEM5TbEWeXJRY+UgkmXHaXtGh8jeKNQ2t7fzCRSFbATiQlwTI668EJ
+	gI2yszfif5AomivWuhCihbLo2kouofQFbUmGuyX/T74TxhLKQF/VClEmliDMI1vcMTf4
+	46HmhRJu9yNJZl88EpDJAZC86Z7Zpglcpb3TMBP3oL0h6uEPfJWo3ldbbwnjGQzdEK7n
+	Hp7w==
+X-Gm-Message-State: APjAAAV3yIRBSWDH8eF1RKgeGLzI2/rni+vAXoYLSFtlJr7DSYgem6Qe
+	cOs01gMRqxnGLmr6dBhDdDENDvZxmUE=
+X-Google-Smtp-Source: APXvYqyt6JEC7Ij+mLp2Stwu2jskMsJwilzEabEHK9/3CxhoNjQ9zA3bloHWjKeb66h4dBXqUYfRaQ==
+X-Received: by 2002:a1c:ef09:: with SMTP id n9mr2412408wmh.104.1556803587911; 
+	Thu, 02 May 2019 06:26:27 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id h9sm7135382wmb.5.2019.05.02.06.26.27
+	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 02 May 2019 06:24:43 -0700 (PDT)
-Received: from minyard.net (unknown [IPv6:2001:470:b8f6:1b:d5e:aa5a:44d8:6907])
-	by serve.minyard.net (Postfix) with ESMTPSA id 9B83A1818F3;
-	Thu,  2 May 2019 13:24:42 +0000 (UTC)
-Date: Thu, 2 May 2019 08:24:37 -0500
-From: Corey Minyard <minyard@acm.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Message-ID: <20190502132437.GI6623@minyard.net>
-References: <20190428064731.29913-1-philmd@redhat.com>
-	<20190428064731.29913-2-philmd@redhat.com>
+	Thu, 02 May 2019 06:26:27 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id F151D1FF87
+	for <qemu-devel@nongnu.org>; Thu,  2 May 2019 14:26:26 +0100 (BST)
+References: <20190501050536.15580-1-richard.henderson@linaro.org>
+	<20190501050536.15580-13-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190501050536.15580-13-richard.henderson@linaro.org>
+Date: Thu, 02 May 2019 14:26:26 +0100
+Message-ID: <87ef5h56nx.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190428064731.29913-2-philmd@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] hw/acpi: Move the IPMI stub to the
- stubs/ directory
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH v2 12/29] tcg/aarch64: Implement
+ tcg_out_dupm_vec
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -102,79 +98,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: minyard@acm.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502132437.Dps6MlXkVcua3l88wOz2WmcAVwWUQMp-CUUSGm6SUZE@z>
+Message-ID: <20190502132626.HFCL1IqSTxgThMF7Ob5KChBF7CML559kvkcR1pYqRlI@z>
 
-On Sun, Apr 28, 2019 at 08:47:26AM +0200, Philippe Mathieu-Daudé wrote:
-> Move the IPMI stub file to the stubs/ directory to simplify the
-> hw/acpi Makefile.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-I'm not sure of the overall view of this, but this is ok from an
-IPMI point of view in my view.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Acked-by: Corey Minyard <cminyard@mvista.com>
-
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  MAINTAINERS                         | 1 +
->  hw/acpi/Makefile.objs               | 3 +--
->  stubs/Makefile.objs                 | 1 +
->  hw/acpi/ipmi-stub.c => stubs/ipmi.c | 0
->  4 files changed, 3 insertions(+), 2 deletions(-)
->  rename hw/acpi/ipmi-stub.c => stubs/ipmi.c (100%)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 23db6f8408a..e1681eca5cb 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1309,6 +1309,7 @@ S: Maintained
->  F: include/hw/ipmi/*
->  F: hw/ipmi/*
->  F: hw/smbios/smbios_type_38.c
-> +F: stubs/ipmi.c
->  F: tests/ipmi*
->  T: git https://github.com/cminyard/qemu.git master-ipmi-rebase
->  
-> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-> index 2d46e3789ae..4e302feb885 100644
-> --- a/hw/acpi/Makefile.objs
-> +++ b/hw/acpi/Makefile.objs
-> @@ -14,8 +14,7 @@ common-obj-y += aml-build.o
->  common-obj-$(CONFIG_TPM) += tpm.o
->  
->  common-obj-$(CONFIG_IPMI) += ipmi.o
-> -common-obj-$(call lnot,$(CONFIG_IPMI)) += ipmi-stub.o
->  else
->  common-obj-y += acpi-stub.o
->  endif
-> -common-obj-$(CONFIG_ALL) += acpi-stub.o ipmi-stub.o
-> +common-obj-$(CONFIG_ALL) += acpi-stub.o
-> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> index 269dfa58326..36bb9ff0b1d 100644
-> --- a/stubs/Makefile.objs
-> +++ b/stubs/Makefile.objs
-> @@ -9,6 +9,7 @@ stub-obj-y += error-printf.o
->  stub-obj-y += fdset.o
->  stub-obj-y += gdbstub.o
->  stub-obj-y += get-vm-name.o
-> +stub-obj-y += ipmi.o
->  stub-obj-y += iothread.o
->  stub-obj-y += iothread-lock.o
->  stub-obj-y += is-daemonized.o
-> diff --git a/hw/acpi/ipmi-stub.c b/stubs/ipmi.c
-> similarity index 100%
-> rename from hw/acpi/ipmi-stub.c
-> rename to stubs/ipmi.c
-> -- 
-> 2.20.1
-> 
+>  tcg/aarch64/tcg-target.inc.c | 38 ++++++++++++++++++++++++++++++++++--
+>  1 file changed, 36 insertions(+), 2 deletions(-)
+>
+> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+> index 4a3cfa778a..411fb463ac 100644
+> --- a/tcg/aarch64/tcg-target.inc.c
+> +++ b/tcg/aarch64/tcg-target.inc.c
+> @@ -381,6 +381,9 @@ typedef enum {
+>      I3207_BLR       =3D 0xd63f0000,
+>      I3207_RET       =3D 0xd65f0000,
+>
+> +    /* AdvSIMD load/store single structure.  */
+> +    I3303_LD1R      =3D 0x0d40c000,
+> +
+
+I can't recall where these magic numbers come from again? The (moving)
+section numbers of the ARM ARM?
+
+I was hoping the XML had a bit more guidance on the encoding names but
+we get:
+
+    <iclass name=3D"No offset" oneof=3D"2" id=3D"LD1R_asisdlso_R1" no_encod=
+ings=3D"1" isa=3D"A64">
+and
+    <iclass name=3D"Post-index" oneof=3D"2" id=3D"as_post_index" no_encodin=
+gs=3D"2" isa=3D"A64">
+
+Although the instruction does have:
+
+   <instructionsection id=3D"LD1R_advsimd" title=3D"LD1R -- A64" type=3D"in=
+struction">
+
+
+>      /* Load literal for loading the address at pc-relative offset */
+>      I3305_LDR       =3D 0x58000000,
+>      I3305_LDR_v64   =3D 0x5c000000,
+> @@ -414,6 +417,8 @@ typedef enum {
+>      I3312_LDRVQ     =3D 0x3c000000 | 3 << 22 | 0 << 30,
+>      I3312_STRVQ     =3D 0x3c000000 | 2 << 22 | 0 << 30,
+>
+> +
+> +
+>      I3312_TO_I3310  =3D 0x00200800,
+>      I3312_TO_I3313  =3D 0x01000000,
+>
+> @@ -566,7 +571,14 @@ static inline uint32_t tcg_in32(TCGContext *s)
+>  #define tcg_out_insn(S, FMT, OP, ...) \
+>      glue(tcg_out_insn_,FMT)(S, glue(glue(glue(I,FMT),_),OP), ##
+> __VA_ARGS__)
+
+The above is basically a winge as to what do we really get out of this
+"type checking"?
+
+>
+> -static void tcg_out_insn_3305(TCGContext *s, AArch64Insn insn, int imm19=
+, TCGReg rt)
+> +static void tcg_out_insn_3303(TCGContext *s, AArch64Insn insn, bool q,
+> +                              TCGReg rt, TCGReg rn, unsigned size)
+> +{
+> +    tcg_out32(s, insn | (rt & 0x1f) | (rn << 5) | (size << 10) | (q << 3=
+0));
+> +}
+> +
+> +static void tcg_out_insn_3305(TCGContext *s, AArch64Insn insn,
+> +                              int imm19, TCGReg rt)
+>  {
+>      tcg_out32(s, insn | (imm19 & 0x7ffff) << 5 | rt);
+>  }
+> @@ -825,7 +837,29 @@ static bool tcg_out_dup_vec(TCGContext *s, TCGType t=
+ype, unsigned vece,
+>  static bool tcg_out_dupm_vec(TCGContext *s, TCGType type, unsigned vece,
+>                               TCGReg r, TCGReg base, intptr_t offset)
+>  {
+> -    return false;
+> +    if (offset !=3D 0) {
+> +        AArch64Insn add_insn =3D I3401_ADDI;
+> +        TCGReg temp =3D TCG_REG_TMP;
+> +
+> +        if (offset < 0) {
+> +            add_insn =3D I3401_SUBI;
+> +            offset =3D -offset;
+> +        }
+> +        if (offset <=3D 0xfff) {
+> +            tcg_out_insn_3401(s, add_insn, 1, temp, base, offset);
+> +        } else if (offset <=3D 0xffffff) {
+> +            tcg_out_insn_3401(s, add_insn, 1, temp, base, offset & 0xfff=
+000);
+> +            if (offset & 0xfff) {
+> +                tcg_out_insn_3401(s, add_insn, 1, temp, base, offset & 0=
+xfff);
+> +            }
+> +        } else {
+> +            tcg_out_movi(s, TCG_TYPE_PTR, temp, offset);
+> +            tcg_out_insn(s, 3502, ADD, 1, temp, temp, base);
+> +        }
+> +        base =3D temp;
+> +    }
+> +    tcg_out_insn(s, 3303, LD1R, type =3D=3D TCG_TYPE_V128, r, base, vece=
+);
+> +    return true;
+>  }
+>
+>  static void tcg_out_movi(TCGContext *s, TCGType type, TCGReg rd,
+
+
+--
+Alex Benn=C3=A9e
 
