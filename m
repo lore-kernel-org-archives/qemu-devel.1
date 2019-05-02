@@ -2,166 +2,81 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D9AAC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 02:16:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6105FC43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 03:31:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B76A3208E4
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 02:16:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="DvvdKL4K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B76A3208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 2F8CC2075E
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 03:31:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F8CC2075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43949 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44489 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM1H6-0005Q4-MP
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 22:16:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51207)
+	id 1hM2Rw-0004PH-3b
+	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 23:31:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1hM1GJ-0004T1-Cj
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 22:15:52 -0400
+	(envelope-from <philmd@redhat.com>) id 1hM2RB-00048G-9t
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 23:31:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1hM1GH-0008CN-G6
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 22:15:51 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:45674)
+	(envelope-from <philmd@redhat.com>) id 1hM2R9-0004zY-SA
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 23:31:09 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42114)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1hM1GG-00087U-EY
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 22:15:49 -0400
-Received: by mail-pf1-x442.google.com with SMTP id e24so329913pfi.12
-	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 19:15:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
-	h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
-	:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=FgBs/HAAq0g17Wj9OHfRQ9EkAySwXasAoyAOW7AGwAo=;
-	b=DvvdKL4Kyad0i9XId1Ha1TwFe6j46XJRvdlDpKKw2LABTjk9Jfk0j060Y0C40kSROA
-	vjECpFhMPOggnbhrny5A0MOoZ/5hdB1kkHnm2I9rckw8YI3amCUnyW2n5AwJBGyS0hFk
-	HzMk/IbRT2SHxgHjgVGFFdAB9HNUE84DG91+agNeSJJF8dekSLh11dI4bsVO62TwLg6v
-	C4WE4qYc2n4KpKYhWHDarT7IhDLqExz7CoCNxUBJ9ETbIHxcLvvc32Vc0srbC4i2NQ2r
-	ky59UmjsWOfIqH1WMCQteiP2xBrpU7s1q/yM5hzotQAkro2eEfmTLVaET+uqmDEbtOMe
-	xL3Q==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hM2R9-0004D2-J2
+	for qemu-devel@nongnu.org; Wed, 01 May 2019 23:31:07 -0400
+Received: by mail-wr1-f65.google.com with SMTP id l2so1121720wrb.9
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 20:29:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
-	:message-id:date:user-agent:mime-version:in-reply-to
-	:content-language:content-transfer-encoding;
-	bh=FgBs/HAAq0g17Wj9OHfRQ9EkAySwXasAoyAOW7AGwAo=;
-	b=HOv7f3I09uRChf03i4cw74spc8DTAHGj70yXYQkgFMYUxbdUBa+iTDxeIypiWNRuzU
-	P1ZV6qNIZygCeyG+RziUznkpFsXt+SIGY3A3pGIMtdeX3JV4U3uAahUAFVaSjz8R5S1x
-	15XJ07rNdgLob6FYwqRmqi5lomy7SQejUEmJ5OqAnfFMVzHzKpU8s0sX1U3Ng1zcTlF7
-	7Hr6+u/SixwaxHwhRrnb7sq+dgp/RxvbiPkg6JzGGjM2R3+IEzjGkWJj+LKgO1C/g3vC
-	4IAzNFSa+ST3eR6b3YFHDwbSGGgRA16+euHFFct00y8rnSUEGoo8emQUuS4E5NUQtLLc
-	8sGw==
-X-Gm-Message-State: APjAAAXxn3b8ePoi86btes+VDzDGNGeXA13hmQP/kdl8f3g1U17nT4OH
-	QJajsJUjDojav6HeuoApkIZE6A==
-X-Google-Smtp-Source: APXvYqxp4t2znns05PRg9e9pWutbcH6lQXglcOnrgGbgky7YM2uL+N3KMJcZKMxbHJikT1At3QG+6A==
-X-Received: by 2002:a63:6841:: with SMTP id d62mr1266895pgc.17.1556763346360; 
-	Wed, 01 May 2019 19:15:46 -0700 (PDT)
-Received: from [10.61.2.175] ([122.99.82.10]) by smtp.gmail.com with ESMTPSA id
-	i3sm70938970pgl.57.2019.05.01.19.15.42
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 01 May 2019 19:15:44 -0700 (PDT)
-To: David Gibson <david@gibson.dropbear.id.au>,
-	Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-References: <20190501053522.10967-1-sjitindarsingh@gmail.com>
-	<20190502004420.GD13618@umbus.fritz.box>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Openpgp: preference=signencrypt
-Autocrypt: addr=aik@ozlabs.ru; keydata=
-	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
-Message-ID: <2f1ec028-0bfd-d571-6a34-b8f3adc35a13@ozlabs.ru>
-Date: Thu, 2 May 2019 12:15:40 +1000
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=PqM83i6/Me1T/RJcawSQAsaO+U8vHGIpd9Qe6tOZgWk=;
+	b=q0WUFHuGzOvxtCbm2DFCYWjtr4mPphVIiHdyZIOHQjxuYzd0quNlhVnZVsudrZ1YUL
+	wNrs9ObZzq4IYUPdsb4YQf8rSPIJoIJm5KayJOM90W6QXWecSxRyQoSQTCm2wEo3oAFY
+	o5+Z6m1oC8P3TujLDNbFcHnqzEqYiJbZD2G+7uZJ6nvmUTR4/7YLK7p7sFlYhaRe+h6R
+	dc9nEt2jab/edIqjHLc98vRfoubuoyR8UCM2CYfp6oLvoaYISdK4OgDo1GRmfTbrAPpE
+	IT8hxrqJp45LTR83f47GeaJb8YRVaB2XKmkcDtWZg0TqNNTF/e2P2OHvjA6sD4mKUciD
+	HPTg==
+X-Gm-Message-State: APjAAAVUJoLbMtWGeff9NA6utdEGllJ6Qun4o1ATwUMtKH+i3h7xASk/
+	LAupv06WQj6MAIUOx5A9MnIHug==
+X-Google-Smtp-Source: APXvYqwJbmDsLcwWDkCsYQuVRc9v8UqdAsiFX5p5FPLr4MItur2cJUzYhHUpTfhXBbW7/O4DiAXRqA==
+X-Received: by 2002:adf:ef8c:: with SMTP id d12mr947703wro.320.1556767764989; 
+	Wed, 01 May 2019 20:29:24 -0700 (PDT)
+Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193])
+	by smtp.gmail.com with ESMTPSA id o6sm3886938wrh.55.2019.05.01.20.29.23
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Wed, 01 May 2019 20:29:23 -0700 (PDT)
+To: Stefan Hajnoczi <stefanha@redhat.com>,
+	=?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+References: <20190425145420.8888-1-stefanha@redhat.com>
+	<CAJ+F1CLYjF8SQv0v8c-hfbPcFYgZdg1P-MVeB8nS_AXTy4eMDA@mail.gmail.com>
+	<20190501170647.GC22391@stefanha-x1.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <7d652656-121a-ca3d-0bc8-31638f0144ac@redhat.com>
+Date: Thu, 2 May 2019 05:29:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190502004420.GD13618@umbus.fritz.box>
+In-Reply-To: <20190501170647.GC22391@stefanha-x1.localdomain>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/2] monitor: Add dump-stack
- command
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH v2] gitmodules: use qemu.org git mirrors
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -173,162 +88,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, armbru@redhat.com, dgilbert@redhat.com,
-	qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502021540.hKUlehaTnjXulgj95nJGMrOli5ce7ad50j3BB3jDQ78@z>
+Message-ID: <20190502032922.djVkAJkKZRC72GzBkacnrBYfPCEx2_n6BEkSlRAWXNQ@z>
 
-
-
-On 02/05/2019 10:44, David Gibson wrote:
-> On Wed, May 01, 2019 at 03:35:21PM +1000, Suraj Jitindar Singh wrote:
->> Add a monitor command "dump-stack" to be used to dump the stack for the
->> current cpu.
-> 
-> So, you can already get guest backtraces by using the gdbstub
-
-Not in the field - this requires QEMU to run with -s which is not
-usually the case.
-
-But since we almost always deal with QEMUs run by libvirt and HMP/QMP is
-always available, one could write a script doing QMP's
-"human-monitor-command x/16g" or "virsh qemu-monitor-command --hmp
-x/16g" to read the guest memory and MSR:LE and dump the stack with the
-exception frame.
-
-
-> functionality.  I can see some benefit in allowing this more easily
-> through hmp, but whether it's worth the code size, I'm less certain.
-
-It still seems easier than running an external script talking to HMP/QMP
-as you would not want to write such script in bash but rather in a
-better language which might not be installed on the client machine (like
-missing python3 on many RHEL :) ). Thanks,
-
-
-
+On 5/1/19 7:06 PM, Stefan Hajnoczi wrote:
+> On Tue, Apr 30, 2019 at 04:53:08PM +0200, Marc-André Lureau wrote:
+>> Hi
 >>
->> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
->> ---
->>  hmp-commands.hx   | 13 +++++++++++++
->>  hmp.h             |  1 +
->>  include/qom/cpu.h | 10 ++++++++++
->>  monitor.c         | 12 ++++++++++++
->>  qom/cpu.c         | 10 ++++++++++
->>  5 files changed, 46 insertions(+)
+>> On Thu, Apr 25, 2019 at 4:54 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>>>
+>>> qemu.org hosts git repository mirrors of all submodules.  Update
+>>> .gitmodules to use the mirrors and not the upstream repositories.
+>>>
+>>> Mirroring upstream repositories ensures that QEMU continues to build
+>>> even when upstream repositories are deleted or temporarily offline.
+>>>
+>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 >>
->> diff --git a/hmp-commands.hx b/hmp-commands.hx
->> index 9b4035965c..965ccdea28 100644
->> --- a/hmp-commands.hx
->> +++ b/hmp-commands.hx
->> @@ -862,6 +862,19 @@ ETEXI
->>      },
->>  
->>  STEXI
->> +@item dump-stack
->> +@findex dump-stack
->> +dump stack of the cpu
->> +ETEXI
->> +    {
->> +        .name           = "dump-stack",
->> +        .args_type      = "",
->> +        .params         = "",
->> +        .help           = "dump stack",
->> +        .cmd            = hmp_dumpstack,
->> +    },
->> +
->> +STEXI
->>  @item pmemsave @var{addr} @var{size} @var{file}
->>  @findex pmemsave
->>  save to disk physical memory dump starting at @var{addr} of size @var{size}.
->> diff --git a/hmp.h b/hmp.h
->> index 43617f2646..e6edf1215c 100644
->> --- a/hmp.h
->> +++ b/hmp.h
->> @@ -51,6 +51,7 @@ void hmp_announce_self(Monitor *mon, const QDict *qdict);
->>  void hmp_cpu(Monitor *mon, const QDict *qdict);
->>  void hmp_memsave(Monitor *mon, const QDict *qdict);
->>  void hmp_pmemsave(Monitor *mon, const QDict *qdict);
->> +void hmp_dumpstack(Monitor *mon, const QDict *qdict);
->>  void hmp_ringbuf_write(Monitor *mon, const QDict *qdict);
->>  void hmp_ringbuf_read(Monitor *mon, const QDict *qdict);
->>  void hmp_cont(Monitor *mon, const QDict *qdict);
->> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
->> index 08abcbd3fe..f2e83e9918 100644
->> --- a/include/qom/cpu.h
->> +++ b/include/qom/cpu.h
->> @@ -181,6 +181,7 @@ typedef struct CPUClass {
->>      int (*memory_rw_debug)(CPUState *cpu, vaddr addr,
->>                             uint8_t *buf, int len, bool is_write);
->>      void (*dump_state)(CPUState *cpu, FILE *, int flags);
->> +    void (*dump_stack)(CPUState *cpu, FILE *f);
->>      GuestPanicInformation* (*get_crash_info)(CPUState *cpu);
->>      void (*dump_statistics)(CPUState *cpu, int flags);
->>      int64_t (*get_arch_id)(CPUState *cpu);
->> @@ -568,6 +569,15 @@ enum CPUDumpFlags {
->>  void cpu_dump_state(CPUState *cpu, FILE *f, int flags);
->>  
->>  /**
->> + * cpu_dump_stack:
->> + * @cpu: The CPU whose stack is to be dumped.
->> + * @f: If non-null, dump to this stream, else to current print sink.
->> + *
->> + * Dumps CPU stack.
->> + */
->> +void cpu_dump_stack(CPUState *cpu, FILE *f);
->> +
->> +/**
->>   * cpu_dump_statistics:
->>   * @cpu: The CPU whose state is to be dumped.
->>   * @flags: Flags what to dump.
->> diff --git a/monitor.c b/monitor.c
->> index 9b5f10b475..dbec2e4376 100644
->> --- a/monitor.c
->> +++ b/monitor.c
->> @@ -1299,6 +1299,18 @@ static void hmp_info_registers(Monitor *mon, const QDict *qdict)
->>      }
->>  }
->>  
->> +void hmp_dumpstack(Monitor *mon, const QDict *qdict)
->> +{
->> +    CPUState *cs = mon_get_cpu();
->> +
->> +    if (!cs) {
->> +        monitor_printf(mon, "No CPU available\n");
->> +        return;
->> +    }
->> +
->> +    cpu_dump_stack(cs, NULL);
->> +}
->> +
->>  #ifdef CONFIG_TCG
->>  static void hmp_info_jit(Monitor *mon, const QDict *qdict)
->>  {
->> diff --git a/qom/cpu.c b/qom/cpu.c
->> index 3c5493c96c..0dc10004f4 100644
->> --- a/qom/cpu.c
->> +++ b/qom/cpu.c
->> @@ -230,6 +230,16 @@ void cpu_dump_state(CPUState *cpu, FILE *f, int flags)
->>      }
->>  }
->>  
->> +void cpu_dump_stack(CPUState *cpu, FILE *f)
->> +{
->> +    CPUClass *cc = CPU_GET_CLASS(cpu);
->> +
->> +    if (cc->dump_stack) {
->> +        cpu_synchronize_state(cpu);
->> +        cc->dump_stack(cpu, f);
->> +    }
->> +}
->> +
->>  void cpu_dump_statistics(CPUState *cpu, int flags)
->>  {
->>      CPUClass *cc = CPU_GET_CLASS(cpu);
+>> Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+>>
+>> Stefan, do you prepare a pullreq?
 > 
+> This patch isn't within the scope of my block or tracing trees.
 
--- 
-Alexey
+Peter often applies those patches directly, see:
+https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg02073.html
+
+> 
+> Perhaps Peter is willing to apply it?
+> 
+> Stefan
+> 
 
