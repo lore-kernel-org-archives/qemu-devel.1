@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39039)
+Received: from eggs.gnu.org ([209.51.188.92]:40192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hM8b3-0004bW-4F
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 06:05:46 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hM8gb-0006Eb-AY
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 06:11:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hM8b2-0000Q4-7T
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 06:05:45 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:43043)
+	(envelope-from <peter.maydell@linaro.org>) id 1hM8gZ-0004Up-9v
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 06:11:29 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:42227)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hM8b2-0000OU-23
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 06:05:44 -0400
-Received: by mail-oi1-x242.google.com with SMTP id j9so469605oie.10
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 03:05:42 -0700 (PDT)
+	id 1hM8gY-0004Sg-M8
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 06:11:27 -0400
+Received: by mail-oi1-x244.google.com with SMTP id k9so1168163oig.9
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 03:11:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1556515687.git.alistair@alistair23.me>
-	<PSXP216MB02771957D4B9C5A15914D05FDD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
-	<CAFEAcA86i3aZx-h2ys5kmc35AMqzd6k=JrfVXObdbcppnn-J8w@mail.gmail.com>
-	<CAKmqyKMM0QHgdS3Z9Fd13XjeFsiG1UnZYz5brdjJgnbHXmxBrQ@mail.gmail.com>
-In-Reply-To: <CAKmqyKMM0QHgdS3Z9Fd13XjeFsiG1UnZYz5brdjJgnbHXmxBrQ@mail.gmail.com>
+References: <20190425145420.8888-1-stefanha@redhat.com>
+	<20190501162055.GB21155@stefanha-x1.localdomain>
+In-Reply-To: <20190501162055.GB21155@stefanha-x1.localdomain>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 2 May 2019 11:05:31 +0100
-Message-ID: <CAFEAcA-dZ5qdh58QCmX+t2RpJim8Fu9FY0UBY1tMpQOHkG06mA@mail.gmail.com>
+Date: Thu, 2 May 2019 11:11:14 +0100
+Message-ID: <CAFEAcA8Go-8Ux9AGzw5CGiU3wDyAQSrV1HOb0gbZP8+b06-EPQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 5/5] hw/arm: Add the Netduino Plus 2
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] gitmodules: use qemu.org git mirrors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: Alistair Francis <alistair@alistair23.me>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 
-On Tue, 30 Apr 2019 at 21:29, Alistair Francis <alistair23@gmail.com> wrote:
+On Wed, 1 May 2019 at 17:20, Stefan Hajnoczi <stefanha@gmail.com> wrote:
 >
-> On Tue, Apr 30, 2019 at 9:02 AM Peter Maydell <peter.maydell@linaro.org> wrote:
-> > Can you explain the purpose of the reset code? None of the other
-> > v7m boards seem to need to do a manual qemu_register_reset().
+> On Thu, Apr 25, 2019 at 03:54:20PM +0100, Stefan Hajnoczi wrote:
+> > qemu.org hosts git repository mirrors of all submodules.  Update
+> > .gitmodules to use the mirrors and not the upstream repositories.
+> >
+> > Mirroring upstream repositories ensures that QEMU continues to build
+> > even when upstream repositories are deleted or temporarily offline.
+> >
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > ---
+> >  .gitmodules | 10 +++++-----
+> >  1 file changed, 5 insertions(+), 5 deletions(-)
 >
-> The reset code allows the machine to work with the -kernel option.
-> Without the reset override using -kernel results in the guest starting
-> at the wrong address. We can use the -device loader option without the
-> reset code though.
+> Ping?
+>
+> > diff --git a/.gitmodules b/.gitmodules
+> > index aa77ce6f50..2857eec763 100644
+> > --- a/.gitmodules
+> > +++ b/.gitmodules
+> > @@ -39,19 +39,19 @@
+> >       url =3D https://git.qemu.org/git/capstone.git
+> >  [submodule "roms/seabios-hppa"]
+> >       path =3D roms/seabios-hppa
+> > -     url =3D https://github.com/hdeller/seabios-hppa.git
+> > +     url =3D https://git.qemu.org/git/seabios-hppa.git
+> >  [submodule "roms/u-boot-sam460ex"]
+> >       path =3D roms/u-boot-sam460ex
+> >       url =3D https://git.qemu.org/git/u-boot-sam460ex.git
+> >  [submodule "tests/fp/berkeley-testfloat-3"]
+> >       path =3D tests/fp/berkeley-testfloat-3
+> > -     url =3D https://github.com/cota/berkeley-testfloat-3
+> > +     url =3D https://git.qemu.org/git/berkeley-testfloat-3.git
+> >  [submodule "tests/fp/berkeley-softfloat-3"]
+> >       path =3D tests/fp/berkeley-softfloat-3
+> > -     url =3D https://github.com/cota/berkeley-softfloat-3
+> > +     url =3D https://git.qemu.org/git/berkeley-softfloat-3.git
+> >  [submodule "roms/edk2"]
+> >       path =3D roms/edk2
+> > -     url =3D https://github.com/tianocore/edk2.git
+> > +     url =3D https://git.qemu.org/git/edk2.git
+> >  [submodule "slirp"]
+> >       path =3D slirp
+> > -     url =3D https://gitlab.freedesktop.org/slirp/libslirp.git
+> > +     url =3D https://git.qemu.org/git/libslirp.git
+> > --
 
-That sounds in line with how -kernel works on the other armv7m
-boards -- the expectation is that your image file includes a
-full vector table and the CPU will read the PC and SP from it
-when it resets. If you want "honour the entry point" you can
-use -device loader, as you say.
-
-Ignoring the entry point for -kernel ELF files is certainly
-a bit confusing, but I think if we want to change this we should
-do it globally, rather than having one board which behaves
-differently to the rest. Changing it does have some awkwardness:
- * possibility of breaking previously working images
- * we can get the initial PC from the ELF entrypoint, but if
-   we do this what do we do about the initial SP value ?
+This won't apply because currently master's .gitmodules
+has no [submodule "slirp"] entry. I was assuming you'd
+ping or repost once the slirp changes went in.
 
 thanks
 -- PMM
