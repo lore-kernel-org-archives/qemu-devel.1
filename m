@@ -2,77 +2,65 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4467C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 03:59:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA239C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 04:07:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 830CD2085A
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 03:59:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 830CD2085A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id AEC3F2075E
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 04:07:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="FfM0jRXK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEC3F2075E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44674 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44753 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM2sL-00029e-H0
-	for qemu-devel@archiver.kernel.org; Wed, 01 May 2019 23:59:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55382)
+	id 1hM30X-0004BC-Tz
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 00:07:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hM2rZ-0001s7-Td
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 23:58:26 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hM2zd-0003oP-FY
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:06:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hM2r9-0004Ot-Jf
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 23:58:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36054)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hM2qt-000385-Cr
-	for qemu-devel@nongnu.org; Wed, 01 May 2019 23:57:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hM2ot-0000MZ-Dg
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 03:55:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 627942E805D
-	for <qemu-devel@nongnu.org>; Thu,  2 May 2019 03:55:39 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1hM2zY-0002Al-FG
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:06:43 -0400
+Received: from ozlabs.org ([203.11.71.1]:54311)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+	id 1hM2zO-0000v1-9X; Thu, 02 May 2019 00:06:35 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 44vhVn0Zp8z9s9T; Thu,  2 May 2019 14:05:04 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1556769905;
+	bh=u94F8fysm25VSfvlhD6GL9BEo6gxzy8yT305rWvtPag=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FfM0jRXKXX+SAJ8Z0hxg29eDx/lgha/o94pNdqkO8QaAsH0anKcQuQI76QLXtc8H8
+	8Q2cm6LRnaBk65M9j0k7ouyzqcY2ajHBdSw2YlTpGpcF9NVreBRO47jeT1bCubUvPR
+	XdaXR5crXCSy7DlxA1+S12yEwte9OS9xlmAJByIA=
+Date: Thu, 2 May 2019 14:04:59 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20190502040459.GE13618@umbus.fritz.box>
+References: <20190501223819.8584-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 May 2019 03:47:21 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1809291@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
-	assignee=f4bug@amsat.org; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: kcwang philmd pmaydell
-X-Launchpad-Bug-Reporter: k.c. Wang (kcwang)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
-	=?utf-8?q?=29?=
-References: <154532874183.18487.10011391612831676105.malonedeb@gac.canonical.com>
-Message-Id:
- <155676884172.7126.9630836176931912332.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18928";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 1044f17d4fe70f9a7e5792d5ec3ae9eb0e6a658e
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="9l24NVCWtSuIVIod"
+Content-Disposition: inline
+In-Reply-To: <20190501223819.8584-1-richard.henderson@linaro.org>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1809291] Re: SD Card not working in Ubuntu 18.10
- (CMD 2,
- 3 timeout). The device worked fine in Ubuntu 18.04 and earlier versions but
- not in Ubuntu 18.10
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH 0/2] configure: Fix make check-tcg for
+ ppc64le
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,59 +69,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1809291 <1809291@bugs.launchpad.net>
+Cc: qemu-ppc@nongnu.org, mark.cave-ayland@ilande.co.uk, alex.bennee@linaro.org,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502034721.o5hVaL1gSfY0aAm5WA6zunisgceLG6zY9DE1ZFRNj6E@z>
+Message-ID: <20190502040459.I9StIknqQQX9zw3cXAyIM7eA1yZ0iQEQI74-g0ABZCI@z>
 
-The offending code is:
 
-$ git diff -w 4e5cc6756586e967993187657dfcdde4e00288d9~..4e5cc6756586e96799=
-3187657dfcdde4e00288d9
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -1537,7 +1537,7 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
-             }
-         }
- =
+--9l24NVCWtSuIVIod
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--        if (req.arg & ACMD41_ENQUIRY_MASK) {
-+        if (FIELD_EX32(sd->ocr & req.arg, OCR, VDD_VOLTAGE_WINDOW)) {
-             /* We accept any voltage.  10000 V is nothing.
-              *
-              * Once we're powered up, we advance straight to ready state
+On Wed, May 01, 2019 at 03:38:17PM -0700, Richard Henderson wrote:
+> At present make check-tcg will produce errors like
+>=20
+>   RUN     tests for ppc64
+>   TEST    test-mmap (default) on ppc64
+> test-mmap: Invalid ELF image for this architecture
+> make[2]: *** [run-test-mmap] Error 255
+> make[1]: *** [run-guest-tests] Error 2
+> make: *** [run-tcg-tests-ppc64-linux-user] Error 2
+>=20
+> which is caused by the use of the host ppc64le compiler
+> in building guest ppc64(be) executables.
 
--- =
+Thanks for looking at this.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1809291
+I've staged this tentatively in ppc-for-4.1.  However while it removes
+the "Invalid ELF image" message I still get:
 
-Title:
-  SD Card not working in Ubuntu 18.10 (CMD 2,3 timeout).  The device
-  worked fine in Ubuntu 18.04 and earlier versions but not in Ubuntu
-  18.10
+  TEST    test-mmap (4096 byte pages) on ppc64le
+test-mmap: Invalid argument
+make[2]: *** [/home/dwg/qemu/tests/tcg/multiarch/Makefile.target:35: run-te=
+st-mmap-4096] Error 255
+make[2]: Target 'run' not remade because of errors.
+make[1]: *** [/home/dwg/qemu/tests/tcg/Makefile.include:71: run-guest-tests=
+] Error 2
+make: *** [/home/dwg/qemu/tests/Makefile.include:1079: run-tcg-tests-ppc64l=
+e-linux-user] Error 2
 
-Status in QEMU:
-  Confirmed
+Running on a POWER9 host.  Do you see that as well?
 
-Bug description:
-  ARM PL181 MMC card no longer working in qemu-system-arm in Ubuntu 18.10
-  The MMC driver code worked fine in Ubuntu 15.10 to 18.04.
-  The command to run qemu-system-arm is
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-      qemu-system-arm -M versatilepb -m 256M -sd sdimage -kernel t.bin
-  -serial mon:stdio
+--9l24NVCWtSuIVIod
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  During SDC initialization, SDC commands 2, 3, 9, 13, 7, 16 all timeout, =
+-----BEGIN PGP SIGNATURE-----
 
-  which cause subsequent read/write commands 17/24 to fail also.
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzKbGgACgkQbDjKyiDZ
+s5L24w//REl6xvTe5wVXIqtnzSHNRg5ICnV0AyZDD9M93o4Z6M0njqy6fEICrNTh
+HOXJcExnDl9Mvn50zhYfeHghSYRyZi6PgbMfs3vVc2TBM7eOIJo9+m1suSA3V0WM
+Q+yuCwaA+6+Ff2mvczd3sbFlXKPsOLieMcI9qup3ajhDp+wlHL6VtlysRh/z2P1r
+JjL+Zu3M+VhUg28y1lUiAS8bnVXBjNW1YbFGm/rs0Znfr7eHYBrfpAuCA4CYd8EB
+0qerJ6QuEw7AD9QTWgckXAfsSmSxPXXQ+s3he2otFg9txr9hbEpfYuXpuJlVemIv
+U0kw9NkqkDEhRZlcWCj5S4nWjgnueoYreV02McPqH6NlC/bsWKz6DlCWOwVE8syB
+fvHm1IT2coSTh9pQM1rgRg7VTSOAxJq8dYRqJX7hKhUP7/ddrkKUJi+gRBSpPvq3
+/7daim5YQBgqoLatqY8ML1gFYlrG9LFdArew/y/Jv7RM+yE9B9m2nZx4l2ZGjiBp
+z6oIupCb+P9wMCjtlpaiFotgcH0Ob8NoIK78f+6JeSi4f5oYWuF9EXwuYJVfoZkR
+i2mqp05SE4ZbrYn7efQUGwttRkYr5dcA55kVnY3GuEmNbMq7JVvWTupB+9BNvtLe
+jIxK5OngiFIqC0h76OZ20jh1pqVgbfjHDFH+xoVO1hKxx0cnugo=
+=4hKQ
+-----END PGP SIGNATURE-----
 
-  Tried both ARM versatilepb and realview-pb-a8, realview-pbx-a9 boards:
-  all the same.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1809291/+subscriptions
+--9l24NVCWtSuIVIod--
 
