@@ -2,67 +2,70 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1DFDC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 18:39:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7D9BC43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 19:01:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87930204FD
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 18:39:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87930204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B8EBB20645
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 19:01:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8EBB20645
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57089 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57363 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMGbz-0008Ur-S0
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 14:39:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60541)
+	id 1hMGxC-0004eI-Pv
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 15:01:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hMGb8-0008Do-JC
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:38:23 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hMGvM-0003UE-Ua
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:59:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hMGb7-0005FL-Ie
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:38:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56870)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hMGb7-0005F2-B7
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:38:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7D42230715CA;
-	Thu,  2 May 2019 18:38:20 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-207.rdu2.redhat.com
-	[10.10.120.207])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6DBF4608A5;
-	Thu,  2 May 2019 18:38:13 +0000 (UTC)
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <1556808723-226478-1-git-send-email-imammedo@redhat.com>
-	<1556808723-226478-14-git-send-email-imammedo@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <33b6a2be-fb11-58ac-812b-798267696e16@redhat.com>
-Date: Thu, 2 May 2019 20:38:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.9.1
+	(envelope-from <laurent@vivier.eu>) id 1hMGvM-0002vv-1f
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 14:59:16 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:48011)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
+	id 1hMGvL-0002u6-Ou; Thu, 02 May 2019 14:59:15 -0400
+Received: from localhost.localdomain ([78.238.229.36]) by
+	mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA
+	(Nemesis)
+	id 1Mrggc-1h1SDp3B6i-00njoP; Thu, 02 May 2019 20:58:46 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Date: Thu,  2 May 2019 20:58:23 +0200
+Message-Id: <20190502185835.15185-2-laurent@vivier.eu>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190502185835.15185-1-laurent@vivier.eu>
+References: <20190502185835.15185-1-laurent@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <1556808723-226478-14-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Thu, 02 May 2019 18:38:20 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:oR1ObyDzheuCsJYSoWaCS0YXv/NblZRyYkeYRMY0/IHirEPRzri
+	GQXfKFKKG9YdybfH3SpL6eYzYkK9mFXumKxJQTv0q1cQBaqrQMhyktlVL0s6VwPUDSU4MhJ
+	1Jd9SZjuV/y7XvD0yCzxIjxCyvxmFjN//Pt+pbNlYTaUwO8tz5J6hIjOk6/p+wo80kXInYu
+	WfDwKuUR287HlzGOE9AWg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:q4IYYtPfPiw=:Px5YNL/p0EsP4zXvcDDciV
+	AoULs0Vh4aeJ/26Qj0VVpEfiUngffXUGM23tfJS5Oe1ft7K4zfiLCGtZrypNwA2JcT5n4faXC
+	ve3+TZUl9vtbpg3Yb/bekle9nDMRqgMVsh6UwHl4K5TQsI42JalrI/E0OHej/KO9Akkkvl/rE
+	h7EkKsXZiFPmNIgmo4HBmr20/PlLHfKcAsQoUNJnYafwZDiyzNPucyQ49udPFwtBo+qE4cNoa
+	uvaEAcYzrWiTB3U9sgMkTzranaE0yUagJeiYa4g50l83PmK4hxy8X2R75UNzY0EbTGNOWvnM7
+	8lDn3s1OyuOtwpqKsltat+tExVkRnLsL346jgPfShShezryWKzoNff2leq/2rrRyaiIVlSRPF
+	UvldwMAXcqIRFnmB4u5hkTE1oGhUNs7o6WFYRV1SJMGk5iGDPBmD3lLr+WAaV/BHjhGoTqwjZ
+	ASDk9U5HLB19xv5WfKdItVb5CbW4zsGQl9YxGUB42T3Sai0jm996RS4ODAlIJa57fHmMdoP8Z
+	B6wNfZas+mKD7PB072oGRmM1gMe5kf0xqNBCkmUnREIKmtbWNEbbXewinlNq9j2bo5b9kajVN
+	1S2OBtEmvcMXHfZASvyeCavoznqkVfHUQAA9mCngja0w5aof6gslv/oZQtiO4kWhwe5Kz+s3B
+	5drosIK3ErzNOaMcMMiUNqPV3wbca1MS/BPLgUWr5KKIu/1Le/ha22sx1cw7IvlUTvVG6wn6v
+	v2DctFfxZkzhU4JhaSJi3wrqENTBawkKN2J/LTqft6+t2uR9b62wIoff9wo=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 13/15] tests: acpi: add simple arm/virt
- testcase
+X-Received-From: 212.227.17.24
+Subject: [Qemu-devel] [PULL 01/13] hw/net/pcnet: Use
+ qemu_log_mask(GUEST_ERROR) instead of printf
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,107 +77,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jones <drjones@redhat.com>, Ben Warren <ben@skyportsystems.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, linuxarm@huawei.com,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Shannon Zhao <shannon.zhaosl@gmail.com>, Gonglei <arei.gonglei@huawei.com>,
-	Wei Yang <richardw.yang@linux.intel.com>, xuwei5@huawei.com,
-	xuwei5@hisilicon.com,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+	Michael Tokarev <mjt@tls.msk.ru>,
+	Gerd Hoffmann <kraxel@redhat.com>, qemu-trivial@nongnu.org,
+	Michael Roth <mdroth@linux.vnet.ibm.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Artyom Tarasenko <atar4qemu@gmail.com>,
+	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	Fabien Chouteau <chouteau@adacore.com>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Richard Henderson <rth@twiddle.net>,
+	Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
+	Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502183812.ONFoVdn92O3qXLTrBsbUY4MoWekv56o8TXznbWY79kU@z>
+Message-ID: <20190502185823.6BLJEy1721b-3TE-rxuSYak-6UkMfYyZz-vajcUz_Nk@z>
 
-On 05/02/19 16:52, Igor Mammedov wrote:
-> adds simple arm/virt test case that starts guest with
-> bios-tables-test.aarch64.iso.qcow2 boot image which
-> initializes UefiTestSupport* structure in RAM once
-> guest is booted.
->=20
->  * see commit: tests: acpi: add acpi_find_rsdp_address_uefi() helper
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> v4:
->   * force test to use TCG accelerator
-> v3:
->   * use firmware blobs directly from pc-bios directory
->   * use bios-tables-test.aarch64.iso.qcow2 as test boot image
->   * drop leftover qtest-uefi-images-aarch64 iMakefile rule from
->     previos version (Laszlo)
->   * add Makefile rule to include bios-tables-test into
->     check-qtest-aarch64 target
-> v2:
->   * specify in test_data where board's RAM starts and RAM size
->=20
-> fixup! tests: acpi: add simple arm/virt testcase
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  tests/Makefile.include   |  1 +
->  tests/bios-tables-test.c | 18 ++++++++++++++++++
->  2 files changed, 19 insertions(+)
->=20
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index e2432d5..983c8b1 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -267,6 +267,7 @@ check-qtest-arm-y +=3D tests/hexloader-test$(EXESUF=
-)
->  check-qtest-aarch64-y =3D tests/numa-test$(EXESUF)
->  check-qtest-aarch64-y +=3D tests/boot-serial-test$(EXESUF)
->  check-qtest-aarch64-y +=3D tests/migration-test$(EXESUF)
-> +check-qtest-aarch64-y +=3D tests/bios-tables-test$(EXESUF)
-> =20
->  check-qtest-microblazeel-y +=3D $(check-qtest-microblaze-y)
-> =20
-> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> index 39c1e24..eaa1b0c 100644
-> --- a/tests/bios-tables-test.c
-> +++ b/tests/bios-tables-test.c
-> @@ -810,6 +810,22 @@ static void test_acpi_piix4_tcg_dimm_pxm(void)
->      test_acpi_tcg_dimm_pxm(MACHINE_PC);
->  }
-> =20
-> +static void test_acpi_virt_tcg(void)
-> +{
-> +    test_data data =3D {
-> +        .machine =3D "virt",
-> +        .accel =3D "tcg",
-> +        .uefi_fl1 =3D "pc-bios/edk2-aarch64-code.fd",
-> +        .uefi_fl2 =3D "pc-bios/edk2-arm-vars.fd",
-> +        .cd =3D "tests/data/uefi-boot-images/bios-tables-test.aarch64.=
-iso.qcow2",
-> +        .ram_start =3D 0x40000000ULL,
-> +        .scan_len =3D 128ULL * 1024 * 1024,
-> +    };
-> +
-> +    test_acpi_one("-cpu cortex-a57", &data);
-> +    free_test_data(&data);
-> +}
-> +
->  int main(int argc, char *argv[])
->  {
->      const char *arch =3D qtest_get_arch();
-> @@ -838,6 +854,8 @@ int main(int argc, char *argv[])
->          qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
->          qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_=
-pxm);
->          qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm)=
-;
-> +    } else if (strcmp(arch, "aarch64") =3D=3D 0) {
-> +        qtest_add_func("acpi/virt", test_acpi_virt_tcg);
->      }
->      ret =3D g_test_run();
->      boot_sector_cleanup(disk);
->=20
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-my R-b stands
+Avoid to clutter stdout until explicitly requested
+(with -d guest_errors):
 
-thanks
-Laszlo
+  $ qemu-system-mips -M malta -m 512 -kernel vmlinux-3.2.0-4-4kc-malta
+  Bad SWSTYLE=0x04
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20190311102712.8572-1-philmd@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ hw/net/pcnet.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
+index d9ba04bdfc62..16683091c939 100644
+--- a/hw/net/pcnet.c
++++ b/hw/net/pcnet.c
+@@ -36,6 +36,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/log.h"
+ #include "hw/qdev.h"
+ #include "net/net.h"
+ #include "net/eth.h"
+@@ -1501,7 +1502,8 @@ static void pcnet_bcr_writew(PCNetState *s, uint32_t rap, uint32_t val)
+             val |= 0x0300;
+             break;
+         default:
+-            printf("Bad SWSTYLE=0x%02x\n", val & 0xff);
++            qemu_log_mask(LOG_GUEST_ERROR, "pcnet: Bad SWSTYLE=0x%02x\n",
++                          val & 0xff);
+             val = 0x0200;
+             break;
+         }
+-- 
+2.20.1
+
 
