@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43335)
+Received: from eggs.gnu.org ([209.51.188.92]:43809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hMEL8-0004Ky-WC
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:13:44 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hMEM9-0005Mo-4g
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:14:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hMEL6-0002NH-Au
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:13:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56448)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hMEL6-0002Mi-3C
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:13:40 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  2 May 2019 18:13:10 +0200
-Message-Id: <20190502161310.15624-9-thuth@redhat.com>
-In-Reply-To: <20190502161310.15624-1-thuth@redhat.com>
-References: <20190502161310.15624-1-thuth@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1hMEM8-0002vS-4v
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:14:45 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:59689)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hMEM7-0002uy-Sf
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:14:44 -0400
+References: <877eb86hcf.fsf@zen.linaroharston>
+	<20190502145846.26226-1-alex.bennee@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <765fa2ab-2803-1945-61ea-2e80b2da6072@vivier.eu>
+Date: Thu, 2 May 2019 18:14:32 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 8/8] hw/pci-host: Use object_initialize_child
- for correct reference counting
+In-Reply-To: <20190502145846.26226-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: avoid treading on gprof's
+ SIGPROF signals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Helge Deller <deller@gmx.de>, Eduardo Otubo <otubo@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
-Both functions, object_initialize() and object_property_add_child() incre=
-ase
-the reference counter of the new object, so one of the references has to =
-be
-dropped afterwards to get the reference counting right. Otherwise the chi=
-ld
-object might not be properly cleaned up when the parent gets destroyed.
-Some functions of the pci-host devices miss to drop one of the references=
-.
-Fix it by using object_initialize_child() instead, which takes care of
-calling object_initialize(), object_property_add_child() and object_unref=
-()
-in the right order.
+On 02/05/2019 16:58, Alex Bennée wrote:
+> The guest tends to get confused when it receives signals it doesn't
+> know about. Given the gprof magic has also set up it's own handler we
+> would do well to avoid stomping on it as well.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  linux-user/signal.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/linux-user/signal.c b/linux-user/signal.c
+> index e2c0b37173..44b2d3b35a 100644
+> --- a/linux-user/signal.c
+> +++ b/linux-user/signal.c
+> @@ -508,6 +508,11 @@ void signal_init(void)
+>      act.sa_flags = SA_SIGINFO;
+>      act.sa_sigaction = host_signal_handler;
+>      for(i = 1; i <= TARGET_NSIG; i++) {
+> +#ifdef TARGET_GPROF
+> +        if (i == SIGPROF) {
+> +            continue;
+> +        }
+> +#endif
+>          host_sig = target_to_host_signal(i);
+>          sigaction(host_sig, NULL, &oact);
+>          if (oact.sa_sigaction == (void *)SIG_IGN) {
+> 
 
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20190430191552.4027-1-thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/pci-host/designware.c  | 4 ++--
- hw/pci-host/gpex.c        | 5 +++--
- hw/pci-host/q35.c         | 4 ++--
- hw/pci-host/xilinx-pcie.c | 4 ++--
- 4 files changed, 9 insertions(+), 8 deletions(-)
+Perhaps merge this with the previous one and send a v2: it will ease
+bisecting.
 
-diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c
-index 29ea313798..64ad21d295 100644
---- a/hw/pci-host/designware.c
-+++ b/hw/pci-host/designware.c
-@@ -721,8 +721,8 @@ static void designware_pcie_host_init(Object *obj)
-     DesignwarePCIEHost *s =3D DESIGNWARE_PCIE_HOST(obj);
-     DesignwarePCIERoot *root =3D &s->root;
-=20
--    object_initialize(root, sizeof(*root), TYPE_DESIGNWARE_PCIE_ROOT);
--    object_property_add_child(obj, "root", OBJECT(root), NULL);
-+    object_initialize_child(obj, "root",  root, sizeof(*root),
-+                            TYPE_DESIGNWARE_PCIE_ROOT, &error_abort, NUL=
-L);
-     qdev_prop_set_int32(DEVICE(root), "addr", PCI_DEVFN(0, 0));
-     qdev_prop_set_bit(DEVICE(root), "multifunction", false);
- }
-diff --git a/hw/pci-host/gpex.c b/hw/pci-host/gpex.c
-index 2583b151a4..1bafffcc34 100644
---- a/hw/pci-host/gpex.c
-+++ b/hw/pci-host/gpex.c
-@@ -29,6 +29,7 @@
-  * http://www.firmware.org/1275/practice/imap/imap0_9d.pdf
-  */
- #include "qemu/osdep.h"
-+#include "qapi/error.h"
- #include "hw/hw.h"
- #include "hw/pci-host/gpex.h"
-=20
-@@ -120,8 +121,8 @@ static void gpex_host_initfn(Object *obj)
-     GPEXHost *s =3D GPEX_HOST(obj);
-     GPEXRootState *root =3D &s->gpex_root;
-=20
--    object_initialize(root, sizeof(*root), TYPE_GPEX_ROOT_DEVICE);
--    object_property_add_child(obj, "gpex_root", OBJECT(root), NULL);
-+    object_initialize_child(obj, "gpex_root",  root, sizeof(*root),
-+                            TYPE_GPEX_ROOT_DEVICE, &error_abort, NULL);
-     qdev_prop_set_int32(DEVICE(root), "addr", PCI_DEVFN(0, 0));
-     qdev_prop_set_bit(DEVICE(root), "multifunction", false);
- }
-diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-index 7b871b5734..960939f5ed 100644
---- a/hw/pci-host/q35.c
-+++ b/hw/pci-host/q35.c
-@@ -216,8 +216,8 @@ static void q35_host_initfn(Object *obj)
-     memory_region_init_io(&phb->data_mem, obj, &pci_host_data_le_ops, ph=
-b,
-                           "pci-conf-data", 4);
-=20
--    object_initialize(&s->mch, sizeof(s->mch), TYPE_MCH_PCI_DEVICE);
--    object_property_add_child(OBJECT(s), "mch", OBJECT(&s->mch), NULL);
-+    object_initialize_child(OBJECT(s), "mch",  &s->mch, sizeof(s->mch),
-+                            TYPE_MCH_PCI_DEVICE, &error_abort, NULL);
-     qdev_prop_set_int32(DEVICE(&s->mch), "addr", PCI_DEVFN(0, 0));
-     qdev_prop_set_bit(DEVICE(&s->mch), "multifunction", false);
-     /* mch's object_initialize resets the default value, set it again */
-diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
-index 60309afe9e..ceb00e23e6 100644
---- a/hw/pci-host/xilinx-pcie.c
-+++ b/hw/pci-host/xilinx-pcie.c
-@@ -149,8 +149,8 @@ static void xilinx_pcie_host_init(Object *obj)
-     XilinxPCIEHost *s =3D XILINX_PCIE_HOST(obj);
-     XilinxPCIERoot *root =3D &s->root;
-=20
--    object_initialize(root, sizeof(*root), TYPE_XILINX_PCIE_ROOT);
--    object_property_add_child(obj, "root", OBJECT(root), NULL);
-+    object_initialize_child(obj, "root",  root, sizeof(*root),
-+                            TYPE_XILINX_PCIE_ROOT, &error_abort, NULL);
-     qdev_prop_set_int32(DEVICE(root), "addr", PCI_DEVFN(0, 0));
-     qdev_prop_set_bit(DEVICE(root), "multifunction", false);
- }
---=20
-2.21.0
+Thanks,
+Laurent
