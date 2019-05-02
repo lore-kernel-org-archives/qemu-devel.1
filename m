@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43257)
+Received: from eggs.gnu.org ([209.51.188.92]:43274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hMEKx-0004Ay-NN
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:13:32 -0400
+	(envelope-from <thuth@redhat.com>) id 1hMEKz-0004Ck-RC
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:13:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hMEKw-0002KT-Rn
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:13:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56400)
+	(envelope-from <thuth@redhat.com>) id 1hMEKy-0002LA-VM
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:13:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50546)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hMEKw-0002KA-Mp
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:13:30 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hMEKy-0002L2-Q0
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:13:32 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  2 May 2019 18:13:05 +0200
-Message-Id: <20190502161310.15624-4-thuth@redhat.com>
+Date: Thu,  2 May 2019 18:13:06 +0200
+Message-Id: <20190502161310.15624-5-thuth@redhat.com>
 In-Reply-To: <20190502161310.15624-1-thuth@redhat.com>
 References: <20190502161310.15624-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/8] qtest: Don't compile qtest accel on
- non-POSIX systems
+Subject: [Qemu-devel] [PULL 4/8] accel: Remove unused AccelClass::available
+ field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,64 +32,47 @@ Cc: Eduardo Habkost <ehabkost@redhat.com>, Helge Deller <deller@gmx.de>, Eduardo
 
 From: Eduardo Habkost <ehabkost@redhat.com>
 
-qtest_available() will always return 0 on non-POSIX systems.
-It's simpler to just not compile the accelerator code on those
-systems instead of relying on the AccelClass::available function.
+The field is not used anymore, we can remove it.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20190422210448.2488-3-ehabkost@redhat.com>
+Message-Id: <20190422210448.2488-4-ehabkost@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> [on mingw64]
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- accel/Makefile.objs    | 2 +-
- accel/qtest.c          | 1 -
- include/sysemu/qtest.h | 9 ---------
- 3 files changed, 1 insertion(+), 11 deletions(-)
+ accel/accel.c          | 5 -----
+ include/sysemu/accel.h | 1 -
+ 2 files changed, 6 deletions(-)
 
-diff --git a/accel/Makefile.objs b/accel/Makefile.objs
-index 2a5ed46940..8b498d39d8 100644
---- a/accel/Makefile.objs
-+++ b/accel/Makefile.objs
-@@ -1,5 +1,5 @@
- obj-$(CONFIG_SOFTMMU) +=3D accel.o
--obj-$(CONFIG_SOFTMMU) +=3D qtest.o
-+obj-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_POSIX)) +=3D qtest.o
- obj-$(CONFIG_KVM) +=3D kvm/
- obj-$(CONFIG_TCG) +=3D tcg/
- obj-y +=3D stubs/
-diff --git a/accel/qtest.c b/accel/qtest.c
-index a02b3c26c7..5b88f55921 100644
---- a/accel/qtest.c
-+++ b/accel/qtest.c
-@@ -34,7 +34,6 @@ static void qtest_accel_class_init(ObjectClass *oc, voi=
-d *data)
- {
-     AccelClass *ac =3D ACCEL_CLASS(oc);
-     ac->name =3D "QTest";
--    ac->available =3D qtest_available;
-     ac->init_machine =3D qtest_init_accel;
-     ac->allowed =3D &qtest_allowed;
- }
-diff --git a/include/sysemu/qtest.h b/include/sysemu/qtest.h
-index 70aa40aa72..096ddfc20c 100644
---- a/include/sysemu/qtest.h
-+++ b/include/sysemu/qtest.h
-@@ -27,13 +27,4 @@ bool qtest_driver(void);
+diff --git a/accel/accel.c b/accel/accel.c
+index 454fef9d92..5fa31717b4 100644
+--- a/accel/accel.c
++++ b/accel/accel.c
+@@ -107,11 +107,6 @@ void configure_accelerator(MachineState *ms, const c=
+har *progname)
+         if (!acc) {
+             continue;
+         }
+-        if (acc->available && !acc->available()) {
+-            printf("%s not supported for this target\n",
+-                   acc->name);
+-            continue;
+-        }
+         ret =3D accel_init_machine(acc, ms);
+         if (ret < 0) {
+             init_failed =3D true;
+diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+index 5565e00a96..70e9e2f2a1 100644
+--- a/include/sysemu/accel.h
++++ b/include/sysemu/accel.h
+@@ -38,7 +38,6 @@ typedef struct AccelClass {
 =20
- void qtest_init(const char *qtest_chrdev, const char *qtest_log, Error *=
-*errp);
-=20
--static inline int qtest_available(void)
--{
--#ifdef CONFIG_POSIX
--    return 1;
--#else
--    return 0;
--#endif
--}
--
- #endif
+     const char *opt_name;
+     const char *name;
+-    int (*available)(void);
+     int (*init_machine)(MachineState *ms);
+     void (*setup_post)(MachineState *ms, AccelState *accel);
+     bool *allowed;
 --=20
 2.21.0
