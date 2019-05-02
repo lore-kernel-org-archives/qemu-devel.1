@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60666)
+Received: from eggs.gnu.org ([209.51.188.92]:44618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMEen-0002bY-An
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:34:02 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hMFTx-0004dK-Ir
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 13:26:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMEem-0008H3-9P
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:34:01 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:41323)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hMEel-0008GL-59
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:34:00 -0400
-References: <877eb86hcf.fsf@zen.linaroharston>
-	<20190502145846.26226-1-alex.bennee@linaro.org>
-	<765fa2ab-2803-1945-61ea-2e80b2da6072@vivier.eu>
-	<CABoDooM+DtCbTTsoYdvAJOOKuybgKUAR1yYmckM1b=dGA10=NA@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <280c5642-725a-ba94-076b-f0bb3b778dec@vivier.eu>
-Date: Thu, 2 May 2019 18:33:48 +0200
+	(envelope-from <alistair23@gmail.com>) id 1hMFTw-00028q-II
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 13:26:53 -0400
 MIME-Version: 1.0
-In-Reply-To: <CABoDooM+DtCbTTsoYdvAJOOKuybgKUAR1yYmckM1b=dGA10=NA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: avoid treading on gprof's
- SIGPROF signals
+References: <cover.1556666645.git.alistair.francis@wdc.com>
+	<14aab381eaa678eca875d0b8bd456feb22a21bd8.1556666645.git.alistair.francis@wdc.com>
+	<503a1f5f-7dad-1e4e-e1b1-aaeeeac9739f@vivier.eu>
+	<af19377f-4874-0374-99b6-ee9ab5b0f446@redhat.com>
+In-Reply-To: <af19377f-4874-0374-99b6-ee9ab5b0f446@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 2 May 2019 10:24:53 -0700
+Message-ID: <CAKmqyKP+o6MfqBQfkOmSXvoj-BX43KJD+ayzxZA6t-N-DucD5w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] linux-user/uname: Fix GCC 9 build
+ warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +26,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Desnogues <laurent.desnogues@gmail.com>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
+To: Eric Blake <eblake@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "kraxel@redhat.com" <kraxel@redhat.com>
 
-On 02/05/2019 18:27, Laurent Desnogues wrote:
-> On Thu, May 2, 2019 at 6:17 PM Laurent Vivier <laurent@vivier.eu> wrote:
->>
->> On 02/05/2019 16:58, Alex Bennée wrote:
->>> The guest tends to get confused when it receives signals it doesn't
->>> know about. Given the gprof magic has also set up it's own handler we
->>> would do well to avoid stomping on it as well.
->>>
->>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>> ---
->>>  linux-user/signal.c | 5 +++++
->>>  1 file changed, 5 insertions(+)
->>>
->>> diff --git a/linux-user/signal.c b/linux-user/signal.c
->>> index e2c0b37173..44b2d3b35a 100644
->>> --- a/linux-user/signal.c
->>> +++ b/linux-user/signal.c
->>> @@ -508,6 +508,11 @@ void signal_init(void)
->>>      act.sa_flags = SA_SIGINFO;
->>>      act.sa_sigaction = host_signal_handler;
->>>      for(i = 1; i <= TARGET_NSIG; i++) {
->>> +#ifdef TARGET_GPROF
->>> +        if (i == SIGPROF) {
->>> +            continue;
->>> +        }
->>> +#endif
->>>          host_sig = target_to_host_signal(i);
->>>          sigaction(host_sig, NULL, &oact);
->>>          if (oact.sa_sigaction == (void *)SIG_IGN) {
->>>
->>
->> Perhaps merge this with the previous one and send a v2: it will ease
->> bisecting.
-> 
-> I agree it would be better, though it should be noted that the signal
-> issue has existed for at least 8 years (that's when I had to add a
-> specific patch in my private repository).
+On Wed, May 1, 2019 at 5:00 AM Eric Blake <eblake@redhat.com> wrote:
+>
+> On 5/1/19 4:40 AM, Laurent Vivier wrote:
+> > On 01/05/2019 01:28, Alistair Francis wrote:
+> >> Fix this warning when building with GCC9 on Fedora 30:
+> >> In function =E2=80=98strncpy=E2=80=99,
+> >>     inlined from =E2=80=98sys_uname=E2=80=99 at /home/alistair/qemu/li=
+nux-user/uname.c:94:3:
+> >> /usr/include/bits/string_fortified.h:106:10: error: =E2=80=98__builtin=
+_strncpy=E2=80=99 output may be truncated copying 64 bytes from a string of=
+ length 64 [-Werror=3Dstringop-truncation]
+> >>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos =
+(__dest));
+> >>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~~~~
+> >>
+> >> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 
-I can also apply the second first, and the first then...
+I'm dropping this patch in favour of the other one.
 
-Thanks,
-Laurent
+Alistair
+
+> >> ---
+> >>  linux-user/uname.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/linux-user/uname.c b/linux-user/uname.c
+> >> index 313b79dbad..2fc6096a5b 100644
+> >> --- a/linux-user/uname.c
+> >> +++ b/linux-user/uname.c
+> >> @@ -73,7 +73,7 @@ const char *cpu_to_uname_machine(void *cpu_env)
+> >>  #define COPY_UTSNAME_FIELD(dest, src) \
+> >>    do { \
+> >>        /* __NEW_UTS_LEN doesn't include terminating null */ \
+> >> -      (void) strncpy((dest), (src), __NEW_UTS_LEN); \
+> >> +      (void) memcpy((dest), (src), MIN(strlen(src), __NEW_UTS_LEN)); =
+\
+> >
+> > You should use MIN(strlen(src) + 1, __NEW_UTS_LEN) to copy the NUL
+> > character if it is present and fit in __NEW_UTS_LEN.
+>
+> No, the NUL character is already present, due to the memset() prior to
+> any use of COPY_UTSNAME_FIELD().  However, the commit message should
+> call that out, as it is not part of the default 3-line diff.
+>
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+>
