@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50596)
+Received: from eggs.gnu.org ([209.51.188.92]:50591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hM7MB-0004XR-Gy
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:46:20 -0400
+	(envelope-from <thuth@redhat.com>) id 1hM7MB-0004XN-FG
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:46:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hM7M7-0003kv-OO
+	(envelope-from <thuth@redhat.com>) id 1hM7M7-0003l6-So
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:46:18 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  2 May 2019 10:45:00 +0200
-Message-Id: <20190502084506.8009-2-thuth@redhat.com>
+Date: Thu,  2 May 2019 10:45:02 +0200
+Message-Id: <20190502084506.8009-4-thuth@redhat.com>
 In-Reply-To: <20190502084506.8009-1-thuth@redhat.com>
 References: <20190502084506.8009-1-thuth@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 1/7] tests/qemu-iotests/005: Add a sanity
- check for large sparse file support
+Subject: [Qemu-devel] [PATCH v3 3/7] tests/qemu-iotests: Do not hard-code
+ the path to bash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +26,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, Christophe Fergeau <cfergeau@redhat.com>, Ed Maste <emaste@freebsd.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-"check -raw 005" fails when running on certain filesystems - these do not
-support such large sparse files. Use the same check as in test 220 to
-skip the test in this case.
+bash is installed in a different directory on non-Linux systems like
+FreeBSD. Do not hard-code /bin/bash here so that the tests can run
+there, too.
 
-Suggested-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/qemu-iotests/005 | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ tests/qemu-iotests/239 | 2 +-
+ tests/qemu-iotests/240 | 2 +-
+ tests/qemu-iotests/241 | 2 +-
+ tests/qemu-iotests/243 | 2 +-
+ tests/qemu-iotests/244 | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/tests/qemu-iotests/005 b/tests/qemu-iotests/005
-index 2fef63af88..9c7681c19b 100755
---- a/tests/qemu-iotests/005
-+++ b/tests/qemu-iotests/005
-@@ -55,6 +55,15 @@ if [ "$IMGPROTO" =3D "sheepdog" ]; then
-     _notrun "image protocol $IMGPROTO does not support large image sizes=
-"
- fi
-=20
-+# Sanity check: For raw, we require a file system that permits the creat=
-ion
-+# of a HUGE (but very sparse) file. Check we can create it before contin=
-uing.
-+if [ "$IMGFMT" =3D "raw" ]; then
-+    if ! truncate --size=3D5T "$TEST_IMG"; then
-+        _notrun "file system on $TEST_DIR does not support large enough =
-files"
-+    fi
-+    rm "$TEST_IMG"
-+fi
-+
- echo
- echo "creating large image"
- _make_test_img 5000G
+diff --git a/tests/qemu-iotests/239 b/tests/qemu-iotests/239
+index 6f085d573d..b0991ffe59 100755
+--- a/tests/qemu-iotests/239
++++ b/tests/qemu-iotests/239
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Test case for dmg
+ #
+diff --git a/tests/qemu-iotests/240 b/tests/qemu-iotests/240
+index 65cc3b39b1..d3e663ed65 100755
+--- a/tests/qemu-iotests/240
++++ b/tests/qemu-iotests/240
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Test hot plugging and unplugging with iothreads
+ #
+diff --git a/tests/qemu-iotests/241 b/tests/qemu-iotests/241
+index 017a736aab..58b64ebf41 100755
+--- a/tests/qemu-iotests/241
++++ b/tests/qemu-iotests/241
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Test qemu-nbd vs. unaligned images
+ #
+diff --git a/tests/qemu-iotests/243 b/tests/qemu-iotests/243
+index 5838c6e89c..e563761307 100755
+--- a/tests/qemu-iotests/243
++++ b/tests/qemu-iotests/243
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Test qcow2 preallocation
+ #
+diff --git a/tests/qemu-iotests/244 b/tests/qemu-iotests/244
+index d8e7122305..13978f93d2 100755
+--- a/tests/qemu-iotests/244
++++ b/tests/qemu-iotests/244
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+ #
+ # Test qcow2 with external data files
+ #
 --=20
 2.21.0
