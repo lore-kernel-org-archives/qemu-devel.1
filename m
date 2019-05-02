@@ -2,54 +2,61 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2596AC43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:53:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABFF3C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:55:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE92C20652
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:53:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE92C20652
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id 817BB20652
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:55:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 817BB20652
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52491 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52511 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMD5e-0005xl-5v
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:53:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44834)
+	id 1hMD7B-0007Bu-MY
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:55:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCnC-0003WS-Oh
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:35 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hMD3r-0004pl-7w
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:51:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCnB-0008QD-M2
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:34 -0400
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:41261)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCnB-0008PP-BT
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:33 -0400
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.vps.ablenet.jp
-	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
-	by mail02.asahi-net.or.jp (Postfix) with ESMTPA id B46A73BC84;
-	Thu,  2 May 2019 23:34:27 +0900 (JST)
-Received: from ysato.dip.jp (ZM005235.ppp.dion.ne.jp [222.8.5.235])
-	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 6F0F7240085; 
-	Thu,  2 May 2019 23:34:27 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
+	(envelope-from <imammedo@redhat.com>) id 1hMD3o-0002d8-HN
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:51:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45886)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hMD3o-0002cf-9X
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:51:44 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7A9653082AF4;
+	Thu,  2 May 2019 14:51:43 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+	(dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 68E1671C80;
+	Thu,  2 May 2019 14:51:36 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu,  2 May 2019 23:34:08 +0900
-Message-Id: <20190502143409.59600-12-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20190502143409.59600-1-ysato@users.sourceforge.jp>
-References: <20190502143409.59600-1-ysato@users.sourceforge.jp>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 202.224.55.14
-Subject: [Qemu-devel] [PATCH RFC v8 11/12] MAINTAINERS: Add RX
+Date: Thu,  2 May 2019 16:51:48 +0200
+Message-Id: <1556808723-226478-1-git-send-email-imammedo@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Thu, 02 May 2019 14:51:43 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v4 00/15] tests: acpi: add UEFI (ARM) testing
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -61,57 +68,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
-	Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: Andrew Jones <drjones@redhat.com>, Ben Warren <ben@skyportsystems.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Laszlo Ersek <lersek@redhat.com>, linuxarm@huawei.com,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Shannon Zhao <shannon.zhaosl@gmail.com>, Gonglei <arei.gonglei@huawei.com>,
+	Wei Yang <richardw.yang@linux.intel.com>, xuwei5@huawei.com,
+	xuwei5@hisilicon.com,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190502143408.TUjzXI_TrE7B9yI6tyuC1brGB7XTdWdnPTYI14Vgo54@z>
+Message-ID: <20190502145148.IrsJtZZeHhzp__Q6cJtvWqPzmH6E1T1wjP62IPzUpHM@z>
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
----
- MAINTAINERS | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+Changelog:
+  - from v3:
+      * reshaffle patch order a bit
+      * move out acpi_parse_rsdp_table() hunk to
+          "tests: acpi: make pointer to RSDP  64bit"
+        where it belongs
+      * move acpi_fetch_rsdp_table(s/uint32_t addr/uint64_t addr/) to
+        this patch where it belongs from:
+           "tests: acpi: make RSDT test routine handle XSDT"
+      * dropping Reviewed-bys due to acpi_fetch_table() change
+        introduced by earlier patch:
+          "tests: acpi: make acpi_fetch_table() take size of fetched tabl=
+e pointer"
+      * update [8/15] commit message to point to commit which introduced
+        signature_guid value.
+      * get rid of test_acpi_rsdp_address() in [9/15]
+      * added new patch
+         tests: acpi: allow to override default accelerator
+      * force arm/virt test to use TCG accelerator
+  - from v2:
+      * rebase on top current master (with UEFI blobs merged)
+      * added a Makefile rule to include bios-tables-test to aarch64 test=
+s by
+        default into 11/13 (kept Reviewed-bys)
+      * other trivial fixes and cleanups (see per patch changelogs)
+  =20
+  - from v1:
+      * rebase on top
+         (1) [PATCH for-4.1 v3 00/12] bundle edk2 platform firmware  with=
+ QEMU
+        let me to drop edk2 images and drop Makefile magic to unpack them=
+,
+        Laszlo's series conveniently does it all for me.
+      * use new path/names for firmware images as supplied by [1]
+      * reorder patches a bit so that UEFI parts would go after generic c=
+hanges
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 7dd71e0a2d..e9430b6c0b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -272,6 +272,13 @@ F: include/hw/riscv/
- F: linux-user/host/riscv32/
- F: linux-user/host/riscv64/
- 
-+RENESAS RX
-+M: Yoshinori Sato <ysato@users.sourceforge.jp>
-+S: Maintained
-+F: target/rx/
-+F: hw/rx/
-+F: include/hw/rx/
-+
- S390
- M: Richard Henderson <rth@twiddle.net>
- M: David Hildenbrand <david@redhat.com>
-@@ -1106,6 +1113,18 @@ F: pc-bios/canyonlands.dt[sb]
- F: pc-bios/u-boot-sam460ex-20100605.bin
- F: roms/u-boot-sam460ex
- 
-+RX Machines
-+-----------
-+RX-QEMU
-+M: Yoshinori Sato <ysato@users.sourceforge.jp>
-+S: Maintained
-+F: hw/rx/rxqemu.c
-+F: hw/intc/rx_icu.c
-+F: hw/timer/renesas_*.c
-+F: hw/char/renesas_sci.c
-+F: include/hw/timer/renesas_*.h
-+F: include/hw/char/renesas_sci.h
-+
- SH4 Machines
- ------------
- R2D
--- 
-2.11.0
+Series adds support for ACPI tables located above 4G. It adds 64-bit hand=
+ling
+necessary for testing arm/virt board (i.e. might be not complete wrt spec=
+) and
+uses recently merged UEFI (AVMF) firmware/test disk image which provides
+an entry point[1] for fetching ACPI tables (RSDP pointer).
+
+Git tree for testing:
+   https://github.com/imammedo/qemu.git acpi_arm_tests_v4
+
+Ref to previos vesrsion:
+   [PATCH v3 00/13] tests: acpi: add UEFI (ARM) testing support
+   https://www.mail-archive.com/qemu-devel@nongnu.org/msg612679.html
+
+CC: Laszlo Ersek <lersek@redhat.com>
+CC: "Michael S. Tsirkin" <mst@redhat.com>
+CC: Gonglei <arei.gonglei@huawei.com>
+CC: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+CC: Shannon Zhao <shannon.zhaosl@gmail.com>
+CC: Wei Yang <richardw.yang@linux.intel.com>
+CC: Andrew Jones <drjones@redhat.com>
+CC: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+CC: Ben Warren <ben@skyportsystems.com>
+CC: <xuwei5@hisilicon.com>
+CC: <xuwei5@huawei.com>
+CC: <shameerali.kolothum.thodi@huawei.com>
+CC: <linuxarm@huawei.com>
+
+Igor Mammedov (15):
+  tests: acpi: rename acpi_parse_rsdp_table() into
+    acpi_fetch_rsdp_table()
+  tests: acpi: make acpi_fetch_table() take size of fetched table
+    pointer
+  tests: acpi: make RSDT test routine handle XSDT
+  tests: acpi: make pointer to RSDP 64bit
+  tests: acpi: fetch X_DSDT if pointer to DSDT is 0
+  tests: acpi: skip FACS table if board uses hw reduced ACPI profile
+  tests: acpi: move boot_sector_init() into x86 tests branch
+  tests: acpi: add acpi_find_rsdp_address_uefi() helper
+  tests: acpi: add a way to start tests with UEFI firmware
+  tests: acpi: ignore SMBIOS tests when UEFI firmware is used
+  tests: acpi: allow to override default accelerator
+  tests: add expected ACPI tables for arm/virt board
+  tests: acpi: add simple arm/virt testcase
+  tests: acpi: refactor rebuild-expected-aml.sh to dump ACPI tables for
+    a specified list of targets
+  tests: acpi: print error unable to dump ACPI table during rebuild
+
+ tests/acpi-utils.h                      |   7 +-
+ tests/Makefile.include                  |   1 +
+ tests/acpi-utils.c                      |  68 +++++++++++----
+ tests/bios-tables-test.c                | 148 +++++++++++++++++++++++---=
+------
+ tests/data/acpi/rebuild-expected-aml.sh |  23 +++--
+ tests/data/acpi/virt/APIC               | Bin 0 -> 168 bytes
+ tests/data/acpi/virt/DSDT               | Bin 0 -> 18476 bytes
+ tests/data/acpi/virt/FACP               | Bin 0 -> 268 bytes
+ tests/data/acpi/virt/GTDT               | Bin 0 -> 96 bytes
+ tests/data/acpi/virt/MCFG               | Bin 0 -> 60 bytes
+ tests/data/acpi/virt/SPCR               | Bin 0 -> 80 bytes
+ tests/vmgenid-test.c                    |   6 +-
+ 12 files changed, 178 insertions(+), 75 deletions(-)
+ create mode 100644 tests/data/acpi/virt/APIC
+ create mode 100644 tests/data/acpi/virt/DSDT
+ create mode 100644 tests/data/acpi/virt/FACP
+ create mode 100644 tests/data/acpi/virt/GTDT
+ create mode 100644 tests/data/acpi/virt/MCFG
+ create mode 100644 tests/data/acpi/virt/SPCR
+
+--=20
+2.7.4
 
 
