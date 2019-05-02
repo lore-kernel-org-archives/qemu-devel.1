@@ -2,68 +2,91 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24927C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 06:45:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 213A8C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 06:50:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E706E208C4
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 06:45:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E706E208C4
+	by mail.kernel.org (Postfix) with ESMTPS id E3A7B2080C
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 06:50:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3A7B2080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46078 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46153 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM5Sp-0000Ha-9g
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 02:45:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50083)
+	id 1hM5YJ-0001u8-85
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 02:50:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hM5S5-0008RZ-Bo
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:44:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1hM5XI-0001Nq-Hw
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:49:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hM5S1-0005WT-QE
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:44:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41102)
+	(envelope-from <eblake@redhat.com>) id 1hM5XG-0008N8-Mp
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:49:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49952)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hM5Rv-0005Ry-GE
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 02:44:11 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hM5XF-0008G9-Eg; Thu, 02 May 2019 02:49:38 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 52DA7307D935;
-	Thu,  2 May 2019 06:44:01 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-45.ams2.redhat.com
-	[10.36.116.45])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 034F51001DCF;
-	Thu,  2 May 2019 06:44:01 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 3C5D211AAF; Thu,  2 May 2019 08:44:00 +0200 (CEST)
-Date: Thu, 2 May 2019 08:44:00 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190502064400.cvfkul7aelyyfme5@sirius.home.kraxel.org>
-References: <20190412121626.19829-1-berrange@redhat.com>
-	<20190412121626.19829-5-berrange@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 8F96E308424E;
+	Thu,  2 May 2019 06:49:26 +0000 (UTC)
+Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B98780F7;
+	Thu,  2 May 2019 06:49:25 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190501223819.8584-1-richard.henderson@linaro.org>
+	<20190501223819.8584-3-richard.henderson@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <9e4a2f00-7652-c1dc-e45e-7407810ce4d2@redhat.com>
+Date: Thu, 2 May 2019 01:49:19 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190501223819.8584-3-richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190412121626.19829-5-berrange@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Thu, 02 May 2019 06:44:01 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.40]);
+	Thu, 02 May 2019 06:49:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] hw/usb: avoid format truncation
- warning when formatting port name
+Subject: Re: [Qemu-devel] [PATCH 2/2] configure: Use quotes around uses of
+ $CPU_CFLAGS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,40 +98,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
-	Laurent Vivier <laurent@vivier.eu>
+Cc: alex.bennee@linaro.org, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org,
+	david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502064400.RNLzMO4Jr6NdleN2I8jIuWHx7BU5cTj1py4fkulDXZU@z>
+Message-ID: <20190502064919.brwc1WqZPabV5MwD2vKbbo6dKoWLCpdr_xNTySMsA8c@z>
 
-On Fri, Apr 12, 2019 at 01:16:25PM +0100, Daniel P. Berrang=C3=A9 wrote:
-> hw/usb/hcd-xhci.c: In function =E2=80=98usb_xhci_realize=E2=80=99:
-> hw/usb/hcd-xhci.c:3339:66: warning: =E2=80=98%d=E2=80=99 directive outp=
-ut may be truncated writing between 1 and 10 bytes into a region of size =
-5 [-Wformat-trunca\
-> tion=3D]
->  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port=
- #%d", i+1);
->       |                                                                =
-  ^~
-> hw/usb/hcd-xhci.c:3339:54: note: directive argument in the range [1, 21=
-47483647]
->  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port=
- #%d", i+1);
->       |                                                      ^~~~~~~~~~=
-~~~~~
->=20
-> The xhci code formats the port name into a fixed length
-> buffer which is only large enough to hold port numbers
-> upto 5 digits in decimal representation. We're never
-> going to have a port number that large, so aserting the
-> port number is sensible is sufficient to tell GCC the
-> formatted string won't be truncated.
+On 5/1/19 5:38 PM, Richard Henderson wrote:
+> About half of the values to which CPU_CFLAGS is set
+> have multiple space separated arguments.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  configure | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 234cb929ca..16bd4375d1 100755
+> --- a/configure
+> +++ b/configure
+> @@ -1543,37 +1543,37 @@ case "$cpu" in
+>             CPU_CFLAGS="-m64"
+>             LDFLAGS="-m64 $LDFLAGS"
+>             cross_cc_ppc64=$cc
+> -           cross_cc_cflags_ppc64=$CPU_CFLAGS
+> +           cross_cc_cflags_ppc64="$CPU_CFLAGS"
 
-Picked into the usb queue.
+Makes no difference semantically (bare variable assignments are not
+subject to word splitting or globbing, so the quotes don't change the
+result); the only reason to change this is for consistency (using quotes
+everywhere is easier to remember, whether or not they are in a context
+that matter).
 
-thanks,
-  Gerd
+So I'm okay whether this patch goes in or is omitted.
 
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
