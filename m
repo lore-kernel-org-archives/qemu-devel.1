@@ -3,62 +3,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2056C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 16:23:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75560C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 16:25:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82A5D20645
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 16:23:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82A5D20645
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4187C20645
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 16:25:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4187C20645
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54135 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54229 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMEUL-0004KY-Rt
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 12:23:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43335)
+	id 1hMEW8-0005UK-G7
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 12:25:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hMEL8-0004Ky-WC
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:13:44 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hMER6-0001ss-F8
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:20:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hMEL6-0002NH-Au
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:13:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56448)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hMEL6-0002Mi-3C
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:13:40 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5F3CD356F6;
-	Thu,  2 May 2019 16:13:39 +0000 (UTC)
-Received: from thuth.com (ovpn-116-131.ams2.redhat.com [10.36.116.131])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id DCD7A17D58;
-	Thu,  2 May 2019 16:13:37 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
+	(envelope-from <laurent@vivier.eu>) id 1hMEQu-0006DG-7u
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:19:51 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:34349)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hMEQt-0005Rt-Pv
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 12:19:40 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1Mr8SG-1h0wd23yn0-00oI0P; Thu, 02 May 2019 18:18:35 +0200
+To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>,
 	qemu-devel@nongnu.org
-Date: Thu,  2 May 2019 18:13:10 +0200
-Message-Id: <20190502161310.15624-9-thuth@redhat.com>
-In-Reply-To: <20190502161310.15624-1-thuth@redhat.com>
-References: <20190502161310.15624-1-thuth@redhat.com>
+References: <20190412121626.19829-1-berrange@redhat.com>
+	<20190412121626.19829-4-berrange@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <819471a3-44de-91d8-d21e-887769d6e3a3@vivier.eu>
+Date: Thu, 2 May 2019 18:18:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
 MIME-Version: 1.0
+In-Reply-To: <20190412121626.19829-4-berrange@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Thu, 02 May 2019 16:13:39 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:Pwhkw+J4kbkJMYOKrtrElij71QGvELktyrGrZcySi977ZOJcdZv
+	1gupS7jQkMMjLxZpcSYhjilekfrWivotBUcCnrtiUnn4THYfCH5uODWPPlSkbE/PB8yczpn
+	HC3myZ5IdsyeGwsaitVzJP0xOfKolGGNYlCGpHHKCxZ+Etue9o9By5PrTSAGw72ZxaOmXcB
+	pi0HebHoaN8zQM6eFyeCw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:lA6wn0XuDq8=:f7k2A023DhLcLQ2r3bkfwA
+	khkbL3KgXx0Rz2YFPQGesZhUOJYysf4tEtH9vaOE/hOSv0xbPquhO3I9yhwDrqCVwpHp1+Ts5
+	tpJntu/hl+VUI1dCr+cOXksyjIUEd2tea/gzIYJ9I7q7MiB6BQOjjuXxvLBDBgUiGCQCgQ7Li
+	tMeWqskNgZ2VcJDkbTJzV3c2RDdnU6OEhkQAAbdwuxB8hEjWO+KCZSLkOLTe1F5PVeqYhUV12
+	KnCHJxDYQvSgLh3VF065Izx+7haFY4YM4K3X6Jrj0b/Vp+pNs6qREjmrjdVB0on+hL13z8N+f
+	Gg1lDcAR8SR/pUYH33/kbsjar3EhfmMzyBlTPpnU3cqEzl7QplZsDYolt4QDOrKGfKIPDXf/a
+	zkFPs6stLRBxMvFDXAHGYiiAry4heHxKeyucrQANLxRCRZxP8UyztMKflh5sTHss0Uv494+xW
+	PHal5u8vfT6v3H0XBvCNFpDlXznSenaJuJnHXedESk74nwMPhc8ITTAABB0MPAPT7a5rGUgiQ
+	Oi6cfiojWmqmIvqG4qnG/rlSgUGNT8+hSZMiQQSMlOTma2S8n7rNGknhpcNlg29S6wBFAoWyM
+	C9O0aM3Zdq+LotK+6OdbV9V6SFR2GwCcIsEVSKxxn3cx1Inmw3Nn8DxSwkwMg427/IjpeaabH
+	ghl0XrTdQfLRN5wV+r3/4zvpxePmA+OAi6jL4x6BxwmSq0jYvPpXak4pq2lvSPWCZZN2aI4ND
+	HhmPvYSrrBVNvPb//ACIrzgbLnjrLyD6GMVH6q0ACbOB4H+JUdNZ/y4dE4k=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 8/8] hw/pci-host: Use object_initialize_child
- for correct reference counting
+X-Received-From: 217.72.192.73
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] sockets: avoid string truncation
+ warnings when copying UNIX path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,110 +80,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Otubo <otubo@redhat.com>, Helge Deller <deller@gmx.de>,
-	Eduardo Habkost <ehabkost@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502161310.1DE7R_kgXv70jHKEoW69otHf2so_7EywSoPtXoN_RxY@z>
+Message-ID: <20190502161833.6WvFbodlg71hayV2kkpvIf3Rf1h1ADOVrKxG0R47zOs@z>
 
-Both functions, object_initialize() and object_property_add_child() incre=
-ase
-the reference counter of the new object, so one of the references has to =
-be
-dropped afterwards to get the reference counting right. Otherwise the chi=
-ld
-object might not be properly cleaned up when the parent gets destroyed.
-Some functions of the pci-host devices miss to drop one of the references=
-.
-Fix it by using object_initialize_child() instead, which takes care of
-calling object_initialize(), object_property_add_child() and object_unref=
-()
-in the right order.
+On 12/04/2019 14:16, Daniel P. Berrangé wrote:
+> In file included from /usr/include/string.h:494,
+>                  from include/qemu/osdep.h:101,
+>                  from util/qemu-sockets.c:18:
+> In function ‘strncpy’,
+>     inlined from ‘unix_connect_saddr.isra.0’ at util/qemu-sockets.c:925:5:
+> /usr/include/bits/string_fortified.h:106:10: warning: ‘__builtin_strncpy’ specified bound 108 equals destination size [-Wstringop-truncation]
+>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
+>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> In function ‘strncpy’,
+>     inlined from ‘unix_listen_saddr.isra.0’ at util/qemu-sockets.c:880:5:
+> /usr/include/bits/string_fortified.h:106:10: warning: ‘__builtin_strncpy’ specified bound 108 equals destination size [-Wstringop-truncation]
+>   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
+>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> We are already validating the UNIX socket path length earlier in
+> the functions. If we save this string length when we first check
+> it, then we can simply use memcpy instead of strcpy later, avoiding
+> the gcc truncation warnings.
+> 
+> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> ---
+>  util/qemu-sockets.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+> index 9705051690..ba6335e71a 100644
+> --- a/util/qemu-sockets.c
+> +++ b/util/qemu-sockets.c
+> @@ -830,6 +830,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+>      int sock, fd;
+>      char *pathbuf = NULL;
+>      const char *path;
+> +    size_t pathlen;
+>  
+>      sock = qemu_socket(PF_UNIX, SOCK_STREAM, 0);
+>      if (sock < 0) {
+> @@ -845,7 +846,8 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+>          path = pathbuf = g_strdup_printf("%s/qemu-socket-XXXXXX", tmpdir);
+>      }
+>  
+> -    if (strlen(path) > sizeof(un.sun_path)) {
+> +    pathlen = strlen(path);
+> +    if (pathlen > sizeof(un.sun_path)) {
+>          error_setg(errp, "UNIX socket path '%s' is too long", path);
+>          error_append_hint(errp, "Path must be less than %zu bytes\n",
+>                            sizeof(un.sun_path));
+> @@ -877,7 +879,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+>  
+>      memset(&un, 0, sizeof(un));
+>      un.sun_family = AF_UNIX;
+> -    strncpy(un.sun_path, path, sizeof(un.sun_path));
+> +    memcpy(un.sun_path, path, pathlen);
+>  
+>      if (bind(sock, (struct sockaddr*) &un, sizeof(un)) < 0) {
+>          error_setg_errno(errp, errno, "Failed to bind socket to %s", path);
+> @@ -901,6 +903,7 @@ static int unix_connect_saddr(UnixSocketAddress *saddr, Error **errp)
+>  {
+>      struct sockaddr_un un;
+>      int sock, rc;
+> +    size_t pathlen;
+>  
+>      if (saddr->path == NULL) {
+>          error_setg(errp, "unix connect: no path specified");
+> @@ -913,7 +916,8 @@ static int unix_connect_saddr(UnixSocketAddress *saddr, Error **errp)
+>          return -1;
+>      }
+>  
+> -    if (strlen(saddr->path) > sizeof(un.sun_path)) {
+> +    pathlen = strlen(saddr->path);
+> +    if (pathlen > sizeof(un.sun_path)) {
+>          error_setg(errp, "UNIX socket path '%s' is too long", saddr->path);
+>          error_append_hint(errp, "Path must be less than %zu bytes\n",
+>                            sizeof(un.sun_path));
+> @@ -922,7 +926,7 @@ static int unix_connect_saddr(UnixSocketAddress *saddr, Error **errp)
+>  
+>      memset(&un, 0, sizeof(un));
+>      un.sun_family = AF_UNIX;
+> -    strncpy(un.sun_path, saddr->path, sizeof(un.sun_path));
+> +    memcpy(un.sun_path, saddr->path, pathlen);
+>  
+>      /* connect to peer */
+>      do {
+> 
 
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20190430191552.4027-1-thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/pci-host/designware.c  | 4 ++--
- hw/pci-host/gpex.c        | 5 +++--
- hw/pci-host/q35.c         | 4 ++--
- hw/pci-host/xilinx-pcie.c | 4 ++--
- 4 files changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c
-index 29ea313798..64ad21d295 100644
---- a/hw/pci-host/designware.c
-+++ b/hw/pci-host/designware.c
-@@ -721,8 +721,8 @@ static void designware_pcie_host_init(Object *obj)
-     DesignwarePCIEHost *s =3D DESIGNWARE_PCIE_HOST(obj);
-     DesignwarePCIERoot *root =3D &s->root;
-=20
--    object_initialize(root, sizeof(*root), TYPE_DESIGNWARE_PCIE_ROOT);
--    object_property_add_child(obj, "root", OBJECT(root), NULL);
-+    object_initialize_child(obj, "root",  root, sizeof(*root),
-+                            TYPE_DESIGNWARE_PCIE_ROOT, &error_abort, NUL=
-L);
-     qdev_prop_set_int32(DEVICE(root), "addr", PCI_DEVFN(0, 0));
-     qdev_prop_set_bit(DEVICE(root), "multifunction", false);
- }
-diff --git a/hw/pci-host/gpex.c b/hw/pci-host/gpex.c
-index 2583b151a4..1bafffcc34 100644
---- a/hw/pci-host/gpex.c
-+++ b/hw/pci-host/gpex.c
-@@ -29,6 +29,7 @@
-  * http://www.firmware.org/1275/practice/imap/imap0_9d.pdf
-  */
- #include "qemu/osdep.h"
-+#include "qapi/error.h"
- #include "hw/hw.h"
- #include "hw/pci-host/gpex.h"
-=20
-@@ -120,8 +121,8 @@ static void gpex_host_initfn(Object *obj)
-     GPEXHost *s =3D GPEX_HOST(obj);
-     GPEXRootState *root =3D &s->gpex_root;
-=20
--    object_initialize(root, sizeof(*root), TYPE_GPEX_ROOT_DEVICE);
--    object_property_add_child(obj, "gpex_root", OBJECT(root), NULL);
-+    object_initialize_child(obj, "gpex_root",  root, sizeof(*root),
-+                            TYPE_GPEX_ROOT_DEVICE, &error_abort, NULL);
-     qdev_prop_set_int32(DEVICE(root), "addr", PCI_DEVFN(0, 0));
-     qdev_prop_set_bit(DEVICE(root), "multifunction", false);
- }
-diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-index 7b871b5734..960939f5ed 100644
---- a/hw/pci-host/q35.c
-+++ b/hw/pci-host/q35.c
-@@ -216,8 +216,8 @@ static void q35_host_initfn(Object *obj)
-     memory_region_init_io(&phb->data_mem, obj, &pci_host_data_le_ops, ph=
-b,
-                           "pci-conf-data", 4);
-=20
--    object_initialize(&s->mch, sizeof(s->mch), TYPE_MCH_PCI_DEVICE);
--    object_property_add_child(OBJECT(s), "mch", OBJECT(&s->mch), NULL);
-+    object_initialize_child(OBJECT(s), "mch",  &s->mch, sizeof(s->mch),
-+                            TYPE_MCH_PCI_DEVICE, &error_abort, NULL);
-     qdev_prop_set_int32(DEVICE(&s->mch), "addr", PCI_DEVFN(0, 0));
-     qdev_prop_set_bit(DEVICE(&s->mch), "multifunction", false);
-     /* mch's object_initialize resets the default value, set it again */
-diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
-index 60309afe9e..ceb00e23e6 100644
---- a/hw/pci-host/xilinx-pcie.c
-+++ b/hw/pci-host/xilinx-pcie.c
-@@ -149,8 +149,8 @@ static void xilinx_pcie_host_init(Object *obj)
-     XilinxPCIEHost *s =3D XILINX_PCIE_HOST(obj);
-     XilinxPCIERoot *root =3D &s->root;
-=20
--    object_initialize(root, sizeof(*root), TYPE_XILINX_PCIE_ROOT);
--    object_property_add_child(obj, "root", OBJECT(root), NULL);
-+    object_initialize_child(obj, "root",  root, sizeof(*root),
-+                            TYPE_XILINX_PCIE_ROOT, &error_abort, NULL);
-     qdev_prop_set_int32(DEVICE(root), "addr", PCI_DEVFN(0, 0));
-     qdev_prop_set_bit(DEVICE(root), "multifunction", false);
- }
---=20
-2.21.0
+Applied to my trivial-patches branch.
 
+Thanks,
+Laurent
 
