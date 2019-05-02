@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42891)
+Received: from eggs.gnu.org ([209.51.188.92]:42812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6ti-0003aB-RU
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:56 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6th-0008Nm-8k
+	(envelope-from <arilou@gmail.com>) id 1hM6tg-0003Y9-W1
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:54 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51691)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6te-0007Ma-VM
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <arilou@gmail.com>) id 1hM6te-000835-Cq
 	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:52 -0400
-Received: by mail-wm1-x344.google.com with SMTP id t76so1484525wmt.1
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:21 -0700 (PDT)
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50251)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6ta-0007Sx-CN
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:48 -0400
+Received: by mail-wm1-x341.google.com with SMTP id p21so1485702wmc.0
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:25 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
-Date: Thu,  2 May 2019 11:15:35 +0300
-Message-Id: <20190502081554.5521-9-arilou@gmail.com>
+Date: Thu,  2 May 2019 11:15:38 +0300
+Message-Id: <20190502081554.5521-12-arilou@gmail.com>
 In-Reply-To: <20190502081554.5521-1-arilou@gmail.com>
 References: <20190502081554.5521-1-arilou@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v9 08/27] gdbstub: Implement remove breakpoint
- (z pkt) with new infra
+Subject: [Qemu-devel] [PATCH v9 11/27] gdbstub: Implement write memory (M
+ pkt) with new infra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,75 +33,77 @@ Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 49 ++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 32 insertions(+), 17 deletions(-)
+ gdbstub.c | 51 +++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 33 insertions(+), 18 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 36c7353a22..b42425b24c 100644
+index e9a3d0c2bc..8dc2e1d507 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1611,6 +1611,29 @@ static void handle_insert_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, "E22");
+@@ -1685,6 +1685,31 @@ static void handle_get_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, gdb_ctx->str_buf);
  }
  
-+static void handle_remove_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
++static void handle_write_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    int res;
-+
 +    if (gdb_ctx->num_params < 3) {
 +        put_packet(gdb_ctx->s, "E22");
 +        return;
 +    }
 +
-+    res = gdb_breakpoint_remove(gdb_ctx->params[1].val_ull,
-+                                gdb_ctx->params[2].val_ull,
-+                                gdb_ctx->params[0].val_ul);
-+    if (res >= 0) {
-+        put_packet(gdb_ctx->s, "OK");
-+        return;
-+    } else if (res == -ENOSYS) {
-+        put_packet(gdb_ctx->s, "");
++    /* hextomem() reads 2*len bytes */
++    if (gdb_ctx->params[1].val_ull > strlen(gdb_ctx->params[2].data) / 2) {
++        put_packet(gdb_ctx->s, "E22");
 +        return;
 +    }
 +
-+    put_packet(gdb_ctx->s, "E22");
++    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[2].data,
++             gdb_ctx->params[1].val_ull);
++    if (target_memory_rw_debug(gdb_ctx->s->g_cpu, gdb_ctx->params[0].val_ull,
++                               gdb_ctx->mem_buf,
++                               gdb_ctx->params[1].val_ull, true)) {
++        put_packet(gdb_ctx->s, "E14");
++        return;
++    }
++
++    put_packet(gdb_ctx->s, "OK");
 +}
 +
  static int gdb_handle_packet(GDBState *s, const char *line_buf)
  {
      CPUState *cpu;
-@@ -1877,23 +1900,15 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+@@ -1893,24 +1918,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
          }
          break;
-     case 'z':
--        type = strtoul(p, (char **)&p, 16);
--        if (*p == ',')
--            p++;
+     case 'M':
 -        addr = strtoull(p, (char **)&p, 16);
 -        if (*p == ',')
 -            p++;
 -        len = strtoull(p, (char **)&p, 16);
--        if (ch == 'Z')
--            res = gdb_breakpoint_insert(addr, len, type);
--        else
--            res = gdb_breakpoint_remove(addr, len, type);
--        if (res >= 0)
--             put_packet(s, "OK");
--        else if (res == -ENOSYS)
--            put_packet(s, "");
--        else
--            put_packet(s, "E22");
+-        if (*p == ':')
+-            p++;
+-
+-        /* hextomem() reads 2*len bytes */
+-        if (len > strlen(p) / 2) {
+-            put_packet (s, "E22");
+-            break;
+-        }
+-        hextomem(mem_buf, p, len);
+-        if (target_memory_rw_debug(s->g_cpu, addr, mem_buf, len,
+-                                   true) != 0) {
+-            put_packet(s, "E14");
+-        } else {
+-            put_packet(s, "OK");
 +        {
-+            static const GdbCmdParseEntry remove_bp_cmd_desc = {
-+                .handler = handle_remove_bp,
-+                .cmd = "z",
++            static const GdbCmdParseEntry write_mem_cmd_desc = {
++                .handler = handle_write_mem,
++                .cmd = "M",
 +                .cmd_startswith = 1,
-+                .schema = "l?L?L0"
++                .schema = "L,L:s0"
 +            };
-+            cmd_parser = &remove_bp_cmd_desc;
-+        }
++            cmd_parser = &write_mem_cmd_desc;
+         }
          break;
-     case 'H':
-         {
+     case 'p':
 -- 
 2.20.1
