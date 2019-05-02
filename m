@@ -2,69 +2,54 @@ Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34155C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:49:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69D76C43219
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:49:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05E7020656
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:49:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05E7020656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3066B20656
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 14:49:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3066B20656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52407 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52413 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMD1H-0002MD-AS
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:49:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46951)
+	id 1hMD26-0002zf-CP
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 10:49:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hMCv9-0003Xz-Ss
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:42:49 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCn9-0003Vb-Hn
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hMCv8-0001UR-9b
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:42:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39738)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hMCv7-0001Qd-Uc
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:42:46 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7303789C3F;
-	Thu,  2 May 2019 14:42:44 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-207.rdu2.redhat.com
-	[10.10.120.207])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6E1B7100200A;
-	Thu,  2 May 2019 14:42:37 +0000 (UTC)
-To: Igor Mammedov <imammedo@redhat.com>
-References: <1556170489-131927-1-git-send-email-imammedo@redhat.com>
-	<1556170489-131927-12-git-send-email-imammedo@redhat.com>
-	<0676f7d1-5d75-8ff8-a75b-a9ce01a65741@redhat.com>
-	<20190502162749.3379a69f@Igors-MacBook-Pro>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <237c3841-8127-fad7-f706-529083686235@redhat.com>
-Date: Thu, 2 May 2019 16:42:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.9.1
-MIME-Version: 1.0
-In-Reply-To: <20190502162749.3379a69f@Igors-MacBook-Pro>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Thu, 02 May 2019 14:42:44 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 11/13] tests: acpi: add simple arm/virt
- testcase
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCn7-0008Ma-OD
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:31 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:41245)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hMCn7-0008Jl-9i
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 10:34:29 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.vps.ablenet.jp
+	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+	by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 3045F3BC6D;
+	Thu,  2 May 2019 23:34:25 +0900 (JST)
+Received: from ysato.dip.jp (ZM005235.ppp.dion.ne.jp [222.8.5.235])
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id D81E3240085; 
+	Thu,  2 May 2019 23:34:24 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Date: Thu,  2 May 2019 23:34:02 +0900
+Message-Id: <20190502143409.59600-6-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20190502143409.59600-1-ysato@users.sourceforge.jp>
+References: <20190502143409.59600-1-ysato@users.sourceforge.jp>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 202.224.55.14
+Subject: [Qemu-devel] [PATCH RFC v8 05/12] target/rx: Miscellaneous files
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,133 +61,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jones <drjones@redhat.com>, Ben Warren <ben@skyportsystems.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Shannon Zhao <shannon.zhaosl@gmail.com>, Gonglei <arei.gonglei@huawei.com>,
-	Wei Yang <richardw.yang@linux.intel.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+	Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190502144233.aBLY6M3YJBUu2jFqn8NnEkTzemi3iLHHjFDLJ9cOlak@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190502143402.hwFhmIKFpWprXmRzAZSqhxksONhADj8Jt5aTUQKDIug@z>
 
-On 05/02/19 16:27, Igor Mammedov wrote:
-> On Fri, 26 Apr 2019 19:11:50 +0200
-> Laszlo Ersek <lersek@redhat.com> wrote:
->=20
->> On 04/25/19 07:34, Igor Mammedov wrote:
->>> adds simple arm/virt test case that starts guest with
->>> bios-tables-test.aarch64.iso.qcow2 boot image which
->>> initializes UefiTestSupport* structure in RAM once
->>> guest is booted.
->>>
->>>  * see commit: tests: acpi: add acpi_find_rsdp_address_uefi() helper
->>>
->>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->>> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
->>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>> ---
->>> v3:
->>>   * use firmware blobs directly from pc-bios directory
->>>   * use bios-tables-test.aarch64.iso.qcow2 as test boot image
->>>   * drop leftover qtest-uefi-images-aarch64 iMakefile rule from
->>>     previos version (Laszlo)
->>>   * add Makefile rule to include bios-tables-test into
->>>     check-qtest-aarch64 target
->>> v2:
->>>   * specify in test_data where board's RAM starts and RAM size
->>> ---
->>>  tests/Makefile.include   |  1 +
->>>  tests/bios-tables-test.c | 17 +++++++++++++++++
->>>  2 files changed, 18 insertions(+)
->>>
->>> diff --git a/tests/Makefile.include b/tests/Makefile.include
->>> index e2432d5..983c8b1 100644
->>> --- a/tests/Makefile.include
->>> +++ b/tests/Makefile.include
->>> @@ -267,6 +267,7 @@ check-qtest-arm-y +=3D tests/hexloader-test$(EXES=
-UF)
->>>  check-qtest-aarch64-y =3D tests/numa-test$(EXESUF)
->>>  check-qtest-aarch64-y +=3D tests/boot-serial-test$(EXESUF)
->>>  check-qtest-aarch64-y +=3D tests/migration-test$(EXESUF)
->>> +check-qtest-aarch64-y +=3D tests/bios-tables-test$(EXESUF)
->>> =20
->>>  check-qtest-microblazeel-y +=3D $(check-qtest-microblaze-y)
->>> =20
->>> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
->>> index 1be55a1..f117461 100644
->>> --- a/tests/bios-tables-test.c
->>> +++ b/tests/bios-tables-test.c
->>> @@ -812,6 +812,21 @@ static void test_acpi_piix4_tcg_dimm_pxm(void)
->>>      test_acpi_tcg_dimm_pxm(MACHINE_PC);
->>>  }
->>> =20
->>> +static void test_acpi_virt_tcg(void)
->>> +{
->>> +    test_data data =3D {
->>> +        .machine =3D "virt",
->>> +        .uefi_fl1 =3D "pc-bios/edk2-aarch64-code.fd",
->>> +        .uefi_fl2 =3D "pc-bios/edk2-arm-vars.fd",
->>> +        .cd =3D "tests/data/uefi-boot-images/bios-tables-test.aarch6=
-4.iso.qcow2",
->>> +        .ram_start =3D 0x40000000ULL,
->>> +        .scan_len =3D 128ULL * 1024 * 1024,
->>> +    };
->>> +
->>> +    test_acpi_one("-cpu cortex-a57 ", &data);
->>> +    free_test_data(&data);
->>> +}
->>> +
->>>  int main(int argc, char *argv[])
->>>  {
->>>      const char *arch =3D qtest_get_arch();
->>> @@ -840,6 +855,8 @@ int main(int argc, char *argv[])
->>>          qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem=
-);
->>>          qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dim=
-m_pxm);
->>>          qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_px=
-m);
->>> +    } else if (strcmp(arch, "aarch64") =3D=3D 0) {
->>> +        qtest_add_func("acpi/virt", test_acpi_virt_tcg);
->>>      }
->>>      ret =3D g_test_run();
->>>      boot_sector_cleanup(disk);
->>>
->>
->> Looks good, my R-b stands.
->>
->> (Please let me know if you want me to look at other patches in the
->> series... struggling again with email bankruptcy...)
->>
->> Thanks!
->> Laszlo
->>
->=20
-> on respin there will be a new patch added
->=20
->   [PATCH v4 11/15] tests: acpi: allow to override default accelerator
->=20
-> and change to this patch will be forcing TCG accelerator:
->=20
-> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> index 6cb8b16..385e1ab 100644
-> --- a/tests/bios-tables-test.c
-> +++ b/tests/bios-tables-test.c
-> @@ -817,7 +817,6 @@ static void test_acpi_virt_tcg(void)
->  {
->      test_data data =3D {
->          .machine =3D "virt",
-> +        .accel =3D "tcg",
->          .uefi_fl1 =3D "pc-bios/edk2-aarch64-code.fd",
->          .uefi_fl2 =3D "pc-bios/edk2-arm-vars.fd",
->          .cd =3D "tests/data/uefi-boot-images/bios-tables-test.aarch64.=
-iso.qcow2",
->=20
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+---
+ target/rx/gdbstub.c     | 112 ++++++++++++++++++++++++++++++++++++++++++++++++
+ target/rx/monitor.c     |  38 ++++++++++++++++
+ target/rx/Makefile.objs |  11 +++++
+ 3 files changed, 161 insertions(+)
+ create mode 100644 target/rx/gdbstub.c
+ create mode 100644 target/rx/monitor.c
+ create mode 100644 target/rx/Makefile.objs
 
-You can keep my R-b with that update.
+diff --git a/target/rx/gdbstub.c b/target/rx/gdbstub.c
+new file mode 100644
+index 0000000000..d76ca52e82
+--- /dev/null
++++ b/target/rx/gdbstub.c
+@@ -0,0 +1,112 @@
++/*
++ * RX gdb server stub
++ *
++ * Copyright (c) 2019 Yoshinori Sato
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "exec/gdbstub.h"
++
++int rx_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
++{
++    RXCPU *cpu = RXCPU(cs);
++    CPURXState *env = &cpu->env;
++
++    switch (n) {
++    case 0 ... 15:
++        return gdb_get_regl(mem_buf, env->regs[n]);
++    case 16:
++        return gdb_get_regl(mem_buf, (env->psw_u) ? env->regs[0] : env->usp);
++    case 17:
++        return gdb_get_regl(mem_buf, (!env->psw_u) ? env->regs[0] : env->isp);
++    case 18:
++        return gdb_get_regl(mem_buf, rx_cpu_pack_psw(env));
++    case 19:
++        return gdb_get_regl(mem_buf, env->pc);
++    case 20:
++        return gdb_get_regl(mem_buf, env->intb);
++    case 21:
++        return gdb_get_regl(mem_buf, env->bpsw);
++    case 22:
++        return gdb_get_regl(mem_buf, env->bpc);
++    case 23:
++        return gdb_get_regl(mem_buf, env->fintv);
++    case 24:
++        return gdb_get_regl(mem_buf, env->fpsw);
++    case 25:
++        return 0;
++    }
++    return 0;
++}
++
++int rx_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
++{
++    RXCPU *cpu = RXCPU(cs);
++    CPURXState *env = &cpu->env;
++    uint32_t psw;
++    switch (n) {
++    case 0 ... 15:
++        env->regs[n] = ldl_p(mem_buf);
++        if (n == 0) {
++            if (env->psw_u) {
++                env->usp = env->regs[0];
++            } else {
++                env->isp = env->regs[0];
++            }
++        }
++        break;
++    case 16:
++        env->usp = ldl_p(mem_buf);
++        if (env->psw_u) {
++            env->regs[0] = ldl_p(mem_buf);
++        }
++        break;
++    case 17:
++        env->isp = ldl_p(mem_buf);
++        if (!env->psw_u) {
++            env->regs[0] = ldl_p(mem_buf);
++        }
++        break;
++    case 18:
++        psw = ldl_p(mem_buf);
++        rx_cpu_unpack_psw(env, psw, 1);
++        break;
++    case 19:
++        env->pc = ldl_p(mem_buf);
++        break;
++    case 20:
++        env->intb = ldl_p(mem_buf);
++        break;
++    case 21:
++        env->bpsw = ldl_p(mem_buf);
++        break;
++    case 22:
++        env->bpc = ldl_p(mem_buf);
++        break;
++    case 23:
++        env->fintv = ldl_p(mem_buf);
++        break;
++    case 24:
++        env->fpsw = ldl_p(mem_buf);
++        break;
++    case 25:
++        return 8;
++    default:
++        return 0;
++    }
++
++    return 4;
++}
+diff --git a/target/rx/monitor.c b/target/rx/monitor.c
+new file mode 100644
+index 0000000000..5d7a1e58b5
+--- /dev/null
++++ b/target/rx/monitor.c
+@@ -0,0 +1,38 @@
++/*
++ * QEMU monitor
++ *
++ * Copyright (c) 2003-2004 Fabrice Bellard
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++#include "qemu/osdep.h"
++#include "cpu.h"
++#include "monitor/monitor.h"
++#include "monitor/hmp-target.h"
++#include "hmp.h"
++
++void hmp_info_tlb(Monitor *mon, const QDict *qdict)
++{
++    CPUArchState *env = mon_get_cpu_env();
++
++    if (!env) {
++        monitor_printf(mon, "No CPU available\n");
++        return;
++    }
++}
+diff --git a/target/rx/Makefile.objs b/target/rx/Makefile.objs
+new file mode 100644
+index 0000000000..f63e1ca43f
+--- /dev/null
++++ b/target/rx/Makefile.objs
+@@ -0,0 +1,11 @@
++obj-y += translate.o op_helper.o helper.o cpu.o gdbstub.o disas.o
++obj-$(CONFIG_SOFTMMU) += monitor.o
++
++DECODETREE = $(SRC_PATH)/scripts/decodetree.py
++
++target/rx/decode.inc.c: \
++  $(SRC_PATH)/target/rx/insns.decode $(DECODETREE)
++	$(call quiet-command,\
++	  $(PYTHON) $(DECODETREE) --varinsnwidth 32 -o $@ $<, "GEN", $(TARGET_DIR)$@)
++
++target/rx/translate.o: target/rx/decode.inc.c
+-- 
+2.11.0
 
-Thanks!
-Laszlo
 
