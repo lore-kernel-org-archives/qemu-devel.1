@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34261)
+Received: from eggs.gnu.org ([209.51.188.92]:35665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hM3I5-0008CU-Ix
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:25:50 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hM3LM-0000yk-8J
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:29:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hM3Hi-00072T-5B
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:25:34 -0400
-Resent-Message-Id: <E1hM3Hi-00072T-5B@eggs.gnu.org>
-Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21914)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hM3Hd-0006Mg-0P
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:25:21 -0400
-In-Reply-To: <20190430034412.12935-1-richardw.yang@linux.intel.com>
-Message-ID: <155677104475.10667.17544832182226944733@c2072b67cc0c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <alistair23@gmail.com>) id 1hM3LK-0001cj-Q4
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:29:11 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:45462)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hM3LK-0001Rm-Df
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 00:29:10 -0400
+Received: by mail-lf1-x141.google.com with SMTP id t11so814177lfl.12
+	for <qemu-devel@nongnu.org>; Wed, 01 May 2019 21:29:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 1 May 2019 21:24:06 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/3] Cleanup migration/ram.c
+References: <cover.1556515687.git.alistair@alistair23.me>
+	<PSXP216MB0277D0653D098FF32C5DC07DDD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+	<CAFEAcA_T7-+de9=V=hnku9f0BXdpLfz6wLFFZYp9LyYDx2KLCw@mail.gmail.com>
+In-Reply-To: <CAFEAcA_T7-+de9=V=hnku9f0BXdpLfz6wLFFZYp9LyYDx2KLCw@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 1 May 2019 21:28:37 -0700
+Message-ID: <CAKmqyKN2hDm_v7B81=V9HKOKMs4=3qXsNz-UyidmNktYdMACSw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 3/5] hw/misc: Add the STM32F4xx EXTI
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +31,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richardw.yang@linux.intel.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair@alistair23.me>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDQzMDAzNDQxMi4xMjkz
-NS0xLXJpY2hhcmR3LnlhbmdAbGludXguaW50ZWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
-aWxlZCB0aGUgYXNhbiBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5k
-cyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5
-b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhIFRB
-UkdFVF9MSVNUPXg4Nl82NC1zb2Z0bW11IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgogIENPUFkgICAgUlVOTkVSCiAgICBSVU4gdGVzdC1kZWJ1ZyBpbiBxZW11OmZlZG9y
-YSAKY29udGFpbmVyX2xpbnV4LmdvOjI0Nzogc3RhcnRpbmcgY29udGFpbmVyIHByb2Nlc3MgY2F1
-c2VkICJwcm9jZXNzX2xpbnV4LmdvOjI1ODogYXBwbHlpbmcgY2dyb3VwIGNvbmZpZ3VyYXRpb24g
-Zm9yIHByb2Nlc3MgY2F1c2VkIFwiVGhlIG1heGltdW0gbnVtYmVyIG9mIGFjdGl2ZSBjb25uZWN0
-aW9ucyBmb3IgVUlEIDAgaGFzIGJlZW4gcmVhY2hlZFwiIgovdXNyL2Jpbi9kb2NrZXItY3VycmVu
-dDogRXJyb3IgcmVzcG9uc2UgZnJvbSBkYWVtb246IG9jaSBydW50aW1lIGVycm9yOiBUaGUgbWF4
-aW11bSBudW1iZXIgb2YgYWN0aXZlIGNvbm5lY3Rpb25zIGZvciBVSUQgMCBoYXMgYmVlbiByZWFj
-aGVkLgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9k
-b2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2MTUsIGluIDxtb2R1bGU+CiAgICBzeXMuZXhpdChtYWlu
-KCkpCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
-cy8yMDE5MDQzMDAzNDQxMi4xMjkzNS0xLXJpY2hhcmR3LnlhbmdAbGludXguaW50ZWwuY29tL3Rl
-c3RpbmcuYXNhbi8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
-bHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
-ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Tue, Apr 30, 2019 at 8:48 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Mon, 29 Apr 2019 at 06:37, Alistair Francis <alistair@alistair23.me> wrote:
+> >
+> > Signed-off-by: Alistair Francis <alistair@alistair23.me>
+> > ---
+> >  default-configs/arm-softmmu.mak  |   1 +
+> >  hw/misc/Kconfig                  |   3 +
+> >  hw/misc/Makefile.objs            |   1 +
+> >  hw/misc/stm32f4xx_exti.c         | 175 +++++++++++++++++++++++++++++++
+> >  include/hw/misc/stm32f4xx_exti.h |  57 ++++++++++
+> >  5 files changed, 237 insertions(+)
+> >  create mode 100644 hw/misc/stm32f4xx_exti.c
+> >  create mode 100644 include/hw/misc/stm32f4xx_exti.h
+>
+> Minor comments here only.
+>
+> (If Thomas's kconfig patchset gets into master before this
+> there might be some minor fixups required to the kconfig
+> stuff, but it shouldn't be too hard to adapt.)
+
+Yep, I'm happy to rebase on top of his work.
+
+>
+> > +#include "qemu/osdep.h"
+> > +#include "hw/sysbus.h"
+> > +#include "qemu/log.h"
+> > +#include "hw/misc/stm32f4xx_exti.h"
+> > +
+> > +#ifndef STM_EXTI_ERR_DEBUG
+> > +#define STM_EXTI_ERR_DEBUG 0
+> > +#endif
+> > +
+> > +#define DB_PRINT_L(lvl, fmt, args...) do { \
+> > +    if (STM_EXTI_ERR_DEBUG >= lvl) { \
+> > +        qemu_log("%s: " fmt, __func__, ## args); \
+> > +    } \
+> > +} while (0)
+> > +
+> > +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
+>
+> Could we use a tracepoint instead?
+
+Yep, fixed in both patches.
+
+>
+> > +
+> > +#define NUM_GPIO_EVENT_IN_LINES 16
+> > +#define NUM_INTERRUPT_OUT_LINES 16
+> > +
+> > +static void stm32f4xx_exti_reset(DeviceState *dev)
+> > +{
+> > +    STM32F4xxExtiState *s = STM32F4XX_EXTI(dev);
+> > +
+> > +    s->exti_imr = 0x00000000;
+> > +    s->exti_emr = 0x00000000;
+> > +    s->exti_rtsr = 0x00000000;
+> > +    s->exti_ftsr = 0x00000000;
+> > +    s->exti_swier = 0x00000000;
+> > +    s->exti_pr = 0x00000000;
+> > +}
+> > +
+> > +static void stm32f4xx_exti_set_irq(void *opaque, int irq, int level)
+> > +{
+> > +    STM32F4xxExtiState *s = opaque;
+> > +
+> > +    DB_PRINT("Set EXTI: %d to %d\n", irq, level);
+> > +
+> > +    if (level) {
+> > +        qemu_irq_pulse(s->irq[irq]);
+> > +        s->exti_pr |= 1 << irq;
+> > +    }
+> > +}
+>
+> Just to check -- this should definitely be a pulse? I'm always
+> a little bit wary of uses of qemu_irq_pulse(), though some
+> hardware does pulse IRQ lines rather than holding them until
+> dismissed.
+
+The datasheet seems to specify pulse:
+"When the selected edge occurs on the event line, an event pulse is generated"
+
+>
+> > +static void stm32f4xx_exti_init(Object *obj)
+> > +{
+> > +    STM32F4xxExtiState *s = STM32F4XX_EXTI(obj);
+> > +    int i;
+> > +
+> > +    s->irq = g_new0(qemu_irq, NUM_INTERRUPT_OUT_LINES);
+>
+> You could just have the array be inline in the
+> STM32F4xxExtiState rather than allocating it separately,
+> right?
+
+Yep.
+
+>
+> > +    for (i = 0; i < NUM_INTERRUPT_OUT_LINES; i++) {
+> > +        sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq[i]);
+> > +    }
+> > +
+> > +    memory_region_init_io(&s->mmio, obj, &stm32f4xx_exti_ops, s,
+> > +                          TYPE_STM32F4XX_EXTI, 0x400);
+> > +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
+> > +
+> > +    qdev_init_gpio_in(DEVICE(obj), stm32f4xx_exti_set_irq,
+> > +                      NUM_GPIO_EVENT_IN_LINES);
+> > +}
+> > +
+> > +static void stm32f4xx_exti_class_init(ObjectClass *klass, void *data)
+> > +{
+> > +    DeviceClass *dc = DEVICE_CLASS(klass);
+> > +
+> > +    dc->reset = stm32f4xx_exti_reset;
+>
+> This one's missing vmstate too.
+
+Fixed in both.
+
+Alistair
+
+>
+> > +}
+> > +
+> > +static const TypeInfo stm32f4xx_exti_info = {
+> > +    .name          = TYPE_STM32F4XX_EXTI,
+> > +    .parent        = TYPE_SYS_BUS_DEVICE,
+> > +    .instance_size = sizeof(STM32F4xxExtiState),
+> > +    .instance_init = stm32f4xx_exti_init,
+> > +    .class_init    = stm32f4xx_exti_class_init,
+> > +};
+> > +
+> > +static void stm32f4xx_exti_register_types(void)
+> > +{
+> > +    type_register_static(&stm32f4xx_exti_info);
+> > +}
+> > +
+>
+> thanks
+> -- PMM
