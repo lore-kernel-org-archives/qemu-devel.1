@@ -2,70 +2,70 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72443C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:33:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA56C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:33:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 032AF2075C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:33:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 032AF2075C
+	by mail.kernel.org (Postfix) with ESMTPS id 0F0A62075C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:33:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F0A62075C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38552 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38554 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMWRI-0003yT-U3
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 07:33:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59866)
+	id 1hMWRS-000476-6L
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 07:33:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMWEw-0000XO-KK
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:20:33 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hMWGa-00022v-VV
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:22:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMWEv-0002LL-Kg
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:20:30 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:36083)
+	(envelope-from <laurent@vivier.eu>) id 1hMWGZ-0004wZ-VP
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:22:12 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:47709)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hMWEv-0002KB-C9; Fri, 03 May 2019 07:20:29 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
-	mrelayeu.kundenserver.de (mreue108 [212.227.15.183]) with ESMTPSA
-	(Nemesis)
-	id 1N2m3G-1gbPDa3EFg-01346I; Fri, 03 May 2019 13:20:11 +0200
-From: Laurent Vivier <laurent@vivier.eu>
+	id 1hMWGZ-0004uk-LO; Fri, 03 May 2019 07:22:11 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1Mt71D-1gU0vy43WT-00tTDe; Fri, 03 May 2019 13:21:56 +0200
 To: qemu-devel@nongnu.org
-Date: Fri,  3 May 2019 13:19:49 +0200
-Message-Id: <20190503111958.30825-4-laurent@vivier.eu>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190503111958.30825-1-laurent@vivier.eu>
-References: <20190503111958.30825-1-laurent@vivier.eu>
+References: <20190503111832.30316-1-laurent@vivier.eu>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <c2a39c3c-c9df-12d1-7dac-5ffe14a64ad7@vivier.eu>
+Date: Fri, 3 May 2019 13:21:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
 MIME-Version: 1.0
+In-Reply-To: <20190503111832.30316-1-laurent@vivier.eu>
 Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:pKsN4+cluC+r1rmhDvMgjMvs/XYsPlaoMp8SyHySKqZejIZkDA9
-	TYrZgIRGOhIV2jswJ2BAEajyAJk1hFDUJwGnCv801u/lOk4zyAQmBQDTYm04ZqNL5mDE90p
-	m0clE4IdV3ENr/FvsYb6bsNyCXupboqIKsovooVmp9WAn+lvziFm1aZYcRPLT4X04UGxyZG
-	0bkXBO0oD4i9d822EZ9lQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7pjqB3X4dFY=:NWCUEDvJCZHyzQSMg2SBiw
-	1fHilwJ/onNDhoF/rwSx1l1z/P567pSI+cwGVzmgxRdXvhrcNSvygoltiHLbuRAqKDdNP5eDL
-	MLnhKRqIa5GwuwG3dXJuEpekGxJ2N6UzleCY6iH4WRlVty09IoGK4itn4mqV/FaOd91suI7Fn
-	JsZ8SBnkM5nRQVxKRT1NGkybNQHvYTrZlX87Jh5e3nLPTMKdYYbk3tmxHbNUoYLJafcVZgbjC
-	3Oz7qduSEX4yGqRoEfrN6mNrPVbmIcisseDZpaeg5kETLxX5wQ4LvPKf8Drv0CISzjLRnKa7m
-	mdAmSJ0g2ZhxjXomdnlBoWSScEapTfkwJxwMXPOTXAL6V+B26GlEavceTIIB0SprgHdr+Ft05
-	Gd7JeqIBz3kp5dMDEp1cEI/M/lhRveWpAGNTlWE5MDARBQVOPtkOpHzppw/5b3y6wQFpSkO3r
-	L9EjJ6KXlMpTcZGE6RINu7xj6ohsQGps7/kVSHIXTv3R6Ii4+I6HVMuZAuVNb6VLIDf9yEIzQ
-	QnohH1T4f7ZYGp1a/xkILd+2AsfjsrOzcXooOKOO8+IQLeveLrDznSsin6gpXjbOJ4xGJN4mM
-	tmdlqjsK/4szs6pc2DM3Z6LpNskLefU6acleGU6DSjBowymGK2FK2MIv7/OIcnxD8usPi19Gi
-	hqqF/qtr+hUHl1b1aSoGzAm+jWBt00EHA+OKRjqhxSEex0bssSiSNe1D4pOMJSyCVTCsYehaF
-	mfO8lJAJkflSpTHK6+d59JCtDto0dbt+Gvf3KWirpLrXXBL+PiN3FJ/2+vY=
+X-Provags-ID: V03:K1:AFfU9T91hKdlrA3ZReUoWPrNPRd01sMOK9UNtrHjeM4nkg4tDtR
+	kE/AwdBKodOwr4+/BFJ9OAhcBj5XPi8uI9nCFulmFBIR1yj0j6MuZJXMbmyAs/VepUAqLwl
+	XR46je7pmTvmRuJbRJGUK3F+oTzvJjhXYPdYwg2N1l4eV58qjSe2jTC33vA/kUx1xbEts4i
+	+OJQc/QCsXIHLqfMB2Hkg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:DdzfAstBuoc=:BpAm9TND6rYC0RqcacCmw8
+	iVqKHjbK4i+npwyE3yOdFDZ79qBR7A2akhOvV25y2bdoPz5MGpwzg7pn+y2mtBNHZ4mP22hv/
+	AHpejVR/11TUcVT1lATXORLdROzzy1yXnb2SGdUFVCrB5OUj3VCwQnDS9BvboFt7f4ak3JBQB
+	DOF56ZWAJ3xsN9vBy+4kiQfa1LP/2YvbUPpqDAIZRJ4IkGu5J4Pd9mX0N/zIpsOQOrb4QQMxK
+	0J/2lL6h2A84csBDhjnJtyBh0ntGG1SLC1y5zVTwd84/0YCjG6WTi4TuMR7ldzd2VqH9IqKXU
+	XGbxJfxBXQJf4MTI4wqG3Lc43bVRKjw/97seMT6sJ8rzoR1aGaZTwjXRZTrpvJsginFM82LS8
+	Ld8le1eiTlswwVHAphMzfljHD0IoCiX1DfUjVwPsmqVUpIdDCdqF63FktUU6dW975caM6nRMK
+	Q3z3HG2tkBr8Gv7ABSWoIAIoL01eEurDTWS9fTbCehZn84OWPR6evrpplFnEF5eLMzbhcYDSq
+	ey8TmLElnRSKGGrAj6KND2HGAt2JUQUKfekQZscuNVwLprUw5CGOOXuQGUeEh5bLfrKK/rEEB
+	ORZ7QgrNkTVnjzbn5BhNwKTmJbrJ2yn0BQ51XNm4OmIdDf3bhnneuwB5BX0mh6pdQmKeNtw2r
+	W1lZ8DGIDvgZwis+ja5NtR2nE1W2v2DB8ZKbAzYWWS3G8u8T2IeXQI0JXdGj3icntbFbVv44F
+	l/WyvAsj5ORWMj6w0Q1DmiPKLtUCGhFHQUaLh9u/hPR9IKH7I6C3hIhYU+0=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
-Subject: [Qemu-devel] [PULL v2 03/12] CODING_STYLE: indent example code as
- all others
+X-Received-From: 212.227.17.24
+Subject: Re: [Qemu-devel] [PULL v2 00/12] Trivial branch patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,59 +78,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	Jason Wang <jasowang@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
-	Fabien Chouteau <chouteau@adacore.com>,
+	Jason Wang <jasowang@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
 	Michael Roth <mdroth@linux.vnet.ibm.com>,
-	Wei Yang <richardw.yang@linux.intel.com>,
-	Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+	Fabien Chouteau <chouteau@adacore.com>, Gerd Hoffmann <kraxel@redhat.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	=?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>,
+	=?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>,
 	Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503111949.fsjYBijqeq3gCDG5TCgdxlPuMYFECfafsjDLwvB5dEY@z>
+Message-ID: <20190503112154.Agf6T1TKLu56jzVQtneo8pQKrGxVXh223yFMrva9pP0@z>
 
-From: Wei Yang <richardw.yang@linux.intel.com>
+On 03/05/2019 13:18, Laurent Vivier wrote:
+> The following changes since commit 8482ff2eb3bb95020eb2f370a9b3ea26511e41df:
+> 
+>   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-05-02 12:04:51 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   git://github.com/vivier/qemu.git tags/trivial-branch-pull-request
+> 
+> for you to fetch changes up to 2d2023c3b99edb33ad4bb9791f70456ea1a1c049:
+> 
+>   sockets: avoid string truncation warnings when copying UNIX path (2019-05-03 13:03:04 +0200)
+> 
+> ----------------------------------------------------------------
+> Pull request trivial branch 2019-05-03
+> 
+> ----------------------------------------------------------------
+> 
+> Aruna Jayasena (1):
+>   Header cleanups
+> 
+> Daniel P. Berrangé (1):
+>   sockets: avoid string truncation warnings when copying UNIX path
+> 
+> Dr. David Alan Gilbert (1):
+>   configure: fix pam test warning
+> 
+> Marc-André Lureau (1):
+>   doc: fix the configuration path
+> 
+> Philippe Mathieu-Daudé (3):
+>   hw/net/pcnet: Use qemu_log_mask(GUEST_ERROR) instead of printf
+>   Makefile: Let the 'clean' rule remove qemu-ga.exe on Windows hosts
+>   hw/sparc/leon3: Allow load of uImage firmwares
+> 
+> Stefan Weil (1):
+>   Update configure
+> 
+> Thomas Huth (1):
+>   net: Print output of "-net nic, model=help" to stdout instead of
+>     stderr
+> 
+> Wei Yang (3):
+>   CODING_STYLE: specify the indent rule for multiline code
+>   CODING_STYLE: indent example code as all others
+>   qom: use object_new_with_type in object_new_with_propv
+> 
+>  qemu-ga.texi              |  4 ++--
+>  configure                 |  5 ++---
+>  Makefile                  | 11 +++++----
+>  include/exec/cpu-common.h |  3 ---
+>  hw/net/pcnet.c            |  4 +++-
+>  hw/sparc/leon3.c          |  4 ++++
+>  net/net.c                 |  7 +++---
+>  qom/object.c              |  2 +-
+>  util/qemu-sockets.c       | 12 ++++++----
+>  CODING_STYLE              | 47 +++++++++++++++++++++++++++++++++++----
+>  10 files changed, 74 insertions(+), 25 deletions(-)
+> 
 
-All the example code are indented with four spaces except this one.
+Forget this series, the send has been aborted for an unknown reason.
 
-Fix this by adding four spaces here.
-
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Message-Id: <20190304071631.27567-3-richardw.yang@linux.intel.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- CODING_STYLE | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/CODING_STYLE b/CODING_STYLE
-index 90321e9c2821..cb8edcbb3692 100644
---- a/CODING_STYLE
-+++ b/CODING_STYLE
-@@ -147,10 +147,10 @@ block to a separate function altogether.
- When comparing a variable for (in)equality with a constant, list the
- constant on the right, as in:
- 
--if (a == 1) {
--    /* Reads like: "If a equals 1" */
--    do_something();
--}
-+    if (a == 1) {
-+        /* Reads like: "If a equals 1" */
-+        do_something();
-+    }
- 
- Rationale: Yoda conditions (as in 'if (1 == a)') are awkward to read.
- Besides, good compilers already warn users when '==' is mis-typed as '=',
--- 
-2.20.1
-
+Thanks,
+Laurent
 
