@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56965)
+Received: from eggs.gnu.org ([209.51.188.92]:58390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1hMTjU-0005oO-R2
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 04:39:53 -0400
+	(envelope-from <liboxuan@connect.hku.hk>) id 1hMTqq-0007Xo-6g
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 04:47:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1hMTjT-0001N8-Pj
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 04:39:52 -0400
-Received: from mel.act-europe.fr ([194.98.77.210]:44247
-	helo=smtp.eu.adacore.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1hMTjT-0001Mb-Js
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 04:39:51 -0400
-References: <1556194715-24427-1-git-send-email-frederic.konrad@adacore.com>
-	<5eb69d4e-1d3c-805f-fc79-fce42febf959@ilande.co.uk>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <d18933f2-bea5-e613-fd9a-c7c156a15cb2@adacore.com>
-Date: Fri, 3 May 2019 10:39:48 +0200
-MIME-Version: 1.0
-In-Reply-To: <5eb69d4e-1d3c-805f-fc79-fce42febf959@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] Leon3 patches
+	(envelope-from <liboxuan@connect.hku.hk>) id 1hMTqo-0005Ck-AP
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 04:47:27 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:46745)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liboxuan@connect.hku.hk>)
+	id 1hMTql-0005BO-0X
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 04:47:24 -0400
+Received: by mail-pf1-x441.google.com with SMTP id j11so2543536pff.13
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 01:47:22 -0700 (PDT)
+From: Boxuan Li <liboxuan@connect.hku.hk>
+Date: Fri,  3 May 2019 16:46:54 +0800
+Message-Id: <20190503084654.18413-1-liboxuan@connect.hku.hk>
+Subject: [Qemu-devel] [PATCH v3] hw/virtio/virtio-mmio: Convert DPRINTF to
+ trace and log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +25,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, chouteau@adacore.com, philmd@redhat.com, atar4qemu@gmail.com
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, eblake@redhat.com, philmd@redhat.com, yuval.shaia@oracle.com, alex.bennee@linaro.org, Boxuan Li <liboxuan@connect.hku.hk>, "Michael S. Tsirkin" <mst@redhat.com>
 
+Use traces for debug message and qemu_log_mask for errors.
 
+Signed-off-by: Boxuan Li <liboxuan@connect.hku.hk>
+---
+v1: https://patchew.org/QEMU/20190428110258.86681-1-liboxuan@connect.hku.hk/
+v2: https://patchew.org/QEMU/20190501081039.58938-1-liboxuan@connect.hku.hk/
+v3: Use qemu_log_mask for errors
+---
+ hw/virtio/trace-events  |  7 +++++++
+ hw/virtio/virtio-mmio.c | 44 +++++++++++++++++++++-----------------------
+ 2 files changed, 28 insertions(+), 23 deletions(-)
 
-Le 5/3/19 =C3=A0 10:19 AM, Mark Cave-Ayland a =C3=A9crit=C2=A0:
-> On 25/04/2019 13:18, KONRAD Frederic wrote:
->=20
->> Hi all,
->>
->> Those are some little fixes for the leon3 machine:
->>    * The first part initializes the uart and the timer when no bios ar=
-e
->>      provided.
->>    * The second part adds AHB and APB plug and play devices to allow t=
-o boot
->>      linux.
->>    * The third part adds myself to the MAINTAINERS for this board.
->>
->> The test images are available here: https://www.gaisler.com/anonftp/li=
-nux/lin
->> ux-2.6/images/leon-linux-4.9/leon-linux-4.9-1.0/up/
->>
->> Tested with:
->>    qemu-system-sparc -M leon3_generic --nographic --kernel image.ram
->>
->> V1 -> V2:
->>    * minor fixes in the first patch suggested by Philippe.
->>
->> Regards,
->> Fred
->>
->> KONRAD Frederic (3):
->>    leon3: add a little bootloader
->>    leon3: introduce the plug and play mecanism
->>    MAINTAINERS: add myself for leon3
->>
->>   MAINTAINERS                         |   1 +
->>   hw/misc/Makefile.objs               |   2 +
->>   hw/misc/grlib_ahb_apb_pnp.c         | 269 ++++++++++++++++++++++++++=
-++++++++++
->>   hw/sparc/leon3.c                    | 114 +++++++++++++--
->>   include/hw/misc/grlib_ahb_apb_pnp.h |  60 ++++++++
->>   include/hw/sparc/grlib.h            |  35 +++--
->>   6 files changed, 455 insertions(+), 26 deletions(-)
->>   create mode 100644 hw/misc/grlib_ahb_apb_pnp.c
->>   create mode 100644 include/hw/misc/grlib_ahb_apb_pnp.h
->=20
-> Hi Frederic,
->=20
-> I've now had a chance to review this - I think it basically looks good,=
- it just needs
-> a few minor tweaks. I can also confirm that using the test images at th=
-e URL above, I
-> can boot to a userspace shell.
->=20
-> I'm happy to take this through my qemu-sparc branch once everything is =
-ready to go.
->=20
->=20
-> ATB,
->=20
-> Mark.
->=20
-
-Hi Mark,
-
-Thanks for the review.
-
-Regards,
-Fred
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 60c649c4bc..81cbe1c4b2 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -46,3 +46,10 @@ virtio_balloon_handle_output(const char *name, uint64_t gpa) "section name: %s g
+ virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_pages: %d actual: %d"
+ virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: %d oldactual: %d"
+ virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon target: 0x%"PRIx64" num_pages: %d"
++
++# virtio-mmio.c
++virtio_mmio_read(int offset) "virtio_mmio_read offset 0x%x"
++virtio_mmio_write_offset(int offset, uint64_t value) "virtio_mmio_write offset 0x%x value 0x%" PRIx64
++virtio_mmio_guest_page(uint64_t size, int shift) "guest page size 0x%" PRIx64 " shift %d"
++virtio_mmio_queue_write(int value, int max_size) "mmio_queue write %d max %d"
++virtio_mmio_setting_irq(int level) "virtio_mmio setting IRQ %d"
+diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+index 5807aa87fe..c8a9d974b3 100644
+--- a/hw/virtio/virtio-mmio.c
++++ b/hw/virtio/virtio-mmio.c
+@@ -27,16 +27,8 @@
+ #include "sysemu/kvm.h"
+ #include "hw/virtio/virtio-bus.h"
+ #include "qemu/error-report.h"
+-
+-/* #define DEBUG_VIRTIO_MMIO */
+-
+-#ifdef DEBUG_VIRTIO_MMIO
+-
+-#define DPRINTF(fmt, ...) \
+-do { printf("virtio_mmio: " fmt , ## __VA_ARGS__); } while (0)
+-#else
+-#define DPRINTF(fmt, ...) do {} while (0)
+-#endif
++#include "qemu/log.h"
++#include "trace.h"
+ 
+ /* QOM macros */
+ /* virtio-mmio-bus */
+@@ -107,7 +99,7 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
+     VirtIOMMIOProxy *proxy = (VirtIOMMIOProxy *)opaque;
+     VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
+ 
+-    DPRINTF("virtio_mmio_read offset 0x%x\n", (int)offset);
++    trace_virtio_mmio_read((int)offset);
+ 
+     if (!vdev) {
+         /* If no backend is present, we treat most registers as
+@@ -144,7 +136,9 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
+         }
+     }
+     if (size != 4) {
+-        DPRINTF("wrong size access to register!\n");
++        qemu_log_mask(LOG_GUEST_ERROR,
++                "%s: wrong size access to register!\n",
++                __func__);
+         return 0;
+     }
+     switch (offset) {
+@@ -182,10 +176,12 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
+     case VIRTIO_MMIO_QUEUE_ALIGN:
+     case VIRTIO_MMIO_QUEUE_NOTIFY:
+     case VIRTIO_MMIO_INTERRUPT_ACK:
+-        DPRINTF("read of write-only register\n");
++        qemu_log_mask(LOG_GUEST_ERROR,
++                "%s: read of write-only register\n",
++                __func__);
+         return 0;
+     default:
+-        DPRINTF("bad register offset\n");
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad register offset\n", __func__);
+         return 0;
+     }
+     return 0;
+@@ -197,8 +193,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
+     VirtIOMMIOProxy *proxy = (VirtIOMMIOProxy *)opaque;
+     VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
+ 
+-    DPRINTF("virtio_mmio_write offset 0x%x value 0x%" PRIx64 "\n",
+-            (int)offset, value);
++    trace_virtio_mmio_write_offset((int)offset, value);
+ 
+     if (!vdev) {
+         /* If no backend is present, we just make all registers
+@@ -226,7 +221,9 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
+         return;
+     }
+     if (size != 4) {
+-        DPRINTF("wrong size access to register!\n");
++        qemu_log_mask(LOG_GUEST_ERROR,
++                "%s: wrong size access to register!\n",
++                __func__);
+         return;
+     }
+     switch (offset) {
+@@ -246,8 +243,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
+         if (proxy->guest_page_shift > 31) {
+             proxy->guest_page_shift = 0;
+         }
+-        DPRINTF("guest page size %" PRIx64 " shift %d\n", value,
+-                proxy->guest_page_shift);
++        trace_virtio_mmio_guest_page(value, proxy->guest_page_shift);
+         break;
+     case VIRTIO_MMIO_QUEUE_SEL:
+         if (value < VIRTIO_QUEUE_MAX) {
+@@ -255,7 +251,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
+         }
+         break;
+     case VIRTIO_MMIO_QUEUE_NUM:
+-        DPRINTF("mmio_queue write %d max %d\n", (int)value, VIRTQUEUE_MAX_SIZE);
++        trace_virtio_mmio_queue_write((int)value, VIRTQUEUE_MAX_SIZE);
+         virtio_queue_set_num(vdev, vdev->queue_sel, value);
+         /* Note: only call this function for legacy devices */
+         virtio_queue_update_rings(vdev, vdev->queue_sel);
+@@ -303,11 +299,13 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
+     case VIRTIO_MMIO_DEVICE_FEATURES:
+     case VIRTIO_MMIO_QUEUE_NUM_MAX:
+     case VIRTIO_MMIO_INTERRUPT_STATUS:
+-        DPRINTF("write to readonly register\n");
++        qemu_log_mask(LOG_GUEST_ERROR,
++                "%s: write to readonly register\n",
++                __func__);
+         break;
+ 
+     default:
+-        DPRINTF("bad register offset\n");
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad register offset\n", __func__);
+     }
+ }
+ 
+@@ -327,7 +325,7 @@ static void virtio_mmio_update_irq(DeviceState *opaque, uint16_t vector)
+         return;
+     }
+     level = (atomic_read(&vdev->isr) != 0);
+-    DPRINTF("virtio_mmio setting IRQ %d\n", level);
++    trace_virtio_mmio_setting_irq(level);
+     qemu_set_irq(proxy->irq, level);
+ }
+ 
+-- 
+2.13.2
