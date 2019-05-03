@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3ABFC43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:53:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2419EC43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:53:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C78002081C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:53:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C78002081C
+	by mail.kernel.org (Postfix) with ESMTPS id EE50F2081C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:53:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE50F2081C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45363 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45365 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMcMw-0002Vk-01
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 13:53:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41904)
+	id 1hMcNM-0002uB-5J
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 13:53:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMcLA-0001TN-S2
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:21 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMcLZ-0001lJ-VT
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMcL9-0007pF-RN
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:20 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56216 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMcLY-0008Vp-3C
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:45 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56287 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hMcL9-0007mX-LB
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:19 -0400
+	id 1hMcLW-0008U8-QV
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:44 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 895CD1A200D;
-	Fri,  3 May 2019 19:51:18 +0200 (CEST)
+	by mail.rt-rk.com (Postfix) with ESMTP id 58D831A200D;
+	Fri,  3 May 2019 19:51:41 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
 	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 6AF841A1F9B;
-	Fri,  3 May 2019 19:51:18 +0200 (CEST)
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 2E5121A1F9B;
+	Fri,  3 May 2019 19:51:41 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  3 May 2019 19:50:43 +0200
-Message-Id: <1556905846-14074-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri,  3 May 2019 19:50:45 +0200
+Message-Id: <1556905846-14074-5-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1556905846-14074-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1556905846-14074-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v4 2/5] linux-user: Add support for the
- SIOCSPGRP ioctl for all targets
+Subject: [Qemu-devel] [PATCH v4 4/5] linux-user: Add support for
+ setsockopt() options IPV6_<ADD|DROP>_MEMBERSHIP
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,66 +71,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190503175043.Nw1pAy4eBQO4Y827zway7cEvvG6tJRHpeHiay_vn5yI@z>
+Message-ID: <20190503175045.N_rs8_jOjEkR9q7uA4S3iUBs82zXk9UleR3kdM2Ad-w@z>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Neng Chen <nchen@wavecomp.com>
 
-Add support for setting the process (or process group) to receive SIGIO
-or SIGURG signals when I/O becomes possible or urgent data is available,
-using SIOCSPGRP ioctl.
+Add support for options IPV6_ADD_MEMBERSHIP and IPV6_DROP_MEMPEMBERSHIP
+of the syscall setsockopt(). These options control membership in
+multicast groups. Their argument is a pointer to a struct ipv6_mreq,
+which is in turn defined as:
 
-The ioctl numeric values for SIOCSPGRP are platform-dependent and are
-determined by following files in Linux kernel source tree:
+struct ipv6_mreq {
+    /* IPv6 multicast address of group */
+    struct in6_addr  ipv6mr_multiaddr;
+    /* local IPv6 address of interface */
+    int              ipv6mr_interface;
+};
 
-arch/ia64/include/uapi/asm/sockios.h:#define SIOCSPGRP    0x8902
-arch/mips/include/uapi/asm/sockios.h:#define SIOCSPGRP    _IOW('s', 8, pid_t)
-arch/parisc/include/uapi/asm/sockios.h:#define SIOCSPGRP  0x8902
-arch/sh/include/uapi/asm/sockios.h:#define SIOCSPGRP      _IOW('s', 8, pid_t)
-arch/xtensa/include/uapi/asm/sockios.h:#define SIOCSPGRP  _IOW('s', 8, pid_t)
-arch/alpha/include/uapi/asm/sockios.h:#define SIOCSPGRP   _IOW('s', 8, pid_t)
-arch/sparc/include/uapi/asm/sockios.h:#define SIOCSPGRP   0x8902
-include/uapi/asm-generic/sockios.h:#define SIOCSPGRP      0x8902
+The in6_addr structure consists of fields that are always big-endian
+(on host of any endian), so the ipv6_mreq's field ipv6mr_multiaddr
+doesn't need any endian conversion, whereas ipv6mr_interface does.
 
-Hence the different definition for alpha, mips, sh4, and xtensa.
-
-Reviewed-by: Max Filippov <jcmvbkbc@gmail.com>
+Signed-off-by: Neng Chen <nchen@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- linux-user/ioctls.h       | 1 +
- linux-user/syscall_defs.h | 3 +++
- 2 files changed, 4 insertions(+)
+ linux-user/syscall.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index ae89516..c37adc5 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -218,6 +218,7 @@
-   IOCTL(SIOCSRARP, IOC_W, MK_PTR(MK_STRUCT(STRUCT_arpreq)))
-   IOCTL(SIOCGRARP, IOC_R, MK_PTR(MK_STRUCT(STRUCT_arpreq)))
-   IOCTL(SIOCGIWNAME, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_char_ifreq)))
-+  IOCTL(SIOCSPGRP, IOC_W, MK_PTR(TYPE_INT)) /* pid_t */
-   IOCTL(SIOCGPGRP, IOC_R, MK_PTR(TYPE_INT)) /* pid_t */
-   IOCTL(SIOCGSTAMP, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timeval)))
-   IOCTL(SIOCGSTAMPNS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timespec)))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 1e86fb9..2941231 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -739,11 +739,14 @@ struct target_pollfd {
- #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
-        defined(TARGET_XTENSA)
- #define TARGET_SIOCATMARK      TARGET_IOR('s', 7, int)
-+#define TARGET_SIOCSPGRP       TARGET_IOW('s', 8, pid_t)
- #define TARGET_SIOCGPGRP       TARGET_IOR('s', 9, pid_t)
- #else
- #define TARGET_SIOCATMARK      0x8905
-+#define TARGET_SIOCSPGRP       0x8902
- #define TARGET_SIOCGPGRP       0x8904
- #endif
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 96cd4bf..b7eb4b7 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -1892,6 +1892,25 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+                                        &pki, sizeof(pki)));
+             break;
+         }
++        case IPV6_ADD_MEMBERSHIP:
++        case IPV6_DROP_MEMBERSHIP:
++        {
++            struct ipv6_mreq ipv6mreq;
 +
- #define TARGET_SIOCGSTAMP      0x8906          /* Get stamp (timeval) */
- #define TARGET_SIOCGSTAMPNS    0x8907          /* Get stamp (timespec) */
- 
++            if (optlen < sizeof(ipv6mreq)) {
++                return -TARGET_EINVAL;
++            }
++
++            if (copy_from_user(&ipv6mreq, optval_addr, sizeof(ipv6mreq))) {
++                return -TARGET_EFAULT;
++            }
++
++            ipv6mreq.ipv6mr_interface = tswap32(ipv6mreq.ipv6mr_interface);
++
++            ret = get_errno(setsockopt(sockfd, level, optname,
++                                       &ipv6mreq, sizeof(ipv6mreq)));
++            break;
++        }
+         default:
+             goto unimplemented;
+         }
 -- 
 2.7.4
 
