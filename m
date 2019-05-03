@@ -2,81 +2,91 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D526C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:05:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EED0C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:07:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED2A92087F
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:05:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A64E2075E
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:07:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QQzpLuqo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED2A92087F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SAWpR6SY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A64E2075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42980 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43000 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMah2-0004nl-36
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 12:05:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40272)
+	id 1hMaiq-0005nN-5i
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 12:07:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMac4-0000Rn-Us
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:00:42 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hMai1-0005UF-SF
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:06:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMac2-0003Ad-Tz
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:00:40 -0400
-Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:41637)
+	(envelope-from <alex.bennee@linaro.org>) id 1hMahz-0001wk-Uf
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:06:49 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42118)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hMac1-00038c-8D
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:00:38 -0400
-Received: by mail-oi1-x22e.google.com with SMTP id v23so4795655oif.8
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 09:00:36 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hMahz-0001vc-Lh
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:06:47 -0400
+Received: by mail-wr1-x444.google.com with SMTP id l2so8530911wrb.9
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 09:06:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=UryPuS+KNZtgHQBCrWBR74q8kdkTnuRZE+e5Ns822Pg=;
-	b=QQzpLuqo2xP+Gk/ZNBmJ5URCiJPPjjnPJ+Q5zziIhJPbC5JcHaSeA3ta87udIG1xZW
-	3X8KkkkmdSc8iAMkx4dJoSjzyd9N3B8gU8tJIzFbnfKxdMlcOyzDjtPrQL/kKQbb6eTv
-	MkGZBVxumkmRno/bdQndGesV/QKHz4zSiAK1fW6utkAaUqTdDjwTvIDjxePoS3ICMAb4
-	gxQxVRMWlYQaHrt5f+XsGzDN/irPmvQMocG5bo9lsC4/ua8wE9R05gyqspn+Sd6mxEmZ
-	OWqWqdp/WR1wHtNoi8r6cx8Rb/8D3aT7Y63wOODS6vkrsUn1FscWlGr6004XSUECkmvc
-	OWMA==
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=Fh2yFaW6fF1B6IQwQvMb+9i1sRDjEer1p6eheg/w5Q0=;
+	b=SAWpR6SYPT3wXUMW9mguTNgEISLw/qMMgmqFwUR3Iu3IpEHWJq1RH76YIARRNJdIO3
+	Le7FW3TdZura146jCzI7SnTKgZ/ifHkgbFL1AVpvm60cigmXB89y08JHLuOlHhq9dsIR
+	xR2a9tpchEJt0mpeU/bZtDC1nN4cjTp67jEAE/fRhOJ9M/ef5NbM8D82FzLgpfS78qGG
+	7C9MvvmiPJjEB+VNhBdIIJnD5xzozTgFjr6ikk1/oNfbR355HijjjIaT4BItNKaWS7YE
+	l147MR7gQZHV0yV0hKaBNG7A8QVXHr5ow79ExjGKlr2hFRY4h6l3+vIyO24RcCPXlIIf
+	4Muw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=UryPuS+KNZtgHQBCrWBR74q8kdkTnuRZE+e5Ns822Pg=;
-	b=AaEQEBhW0ir/siYSG13wvjh7mW5dGxZeccnN4kwjqK/LAiqbh6wmqzIWR+PTHo+KY7
-	m7+gqAOzM/7Jd3rkS6NaAhMej2zMv3V4PsZG0jFBY+JsIZ0un8LrSYba7u/r1NyfpSsx
-	KDSkbCa62pHR08mxLoT7i6TkXiBvmO6kdSDnwxZyXe9m9LVk9mtTS3IH8GfTXpi8JkOU
-	8KMZ+k+Xta6TEYDm5b4mT/I+V8OIMgSibO7sKTwrkFqD3uMEbAng146l8xV+6F8jRAYL
-	A575elIaYhBYUwAD82wWHfabWmP//GeH/2sXAMq/5fC9scq12rG4iJ05PfoAwbgTcwBd
-	fc5w==
-X-Gm-Message-State: APjAAAVBH3n3xHKjTCQt2oAx8eaZZK3ChiLzvvRkVYkv4Gs0Cpqa+8Yp
-	mWvxm96Xg5WxSSAa80FWC+I6/SdAB1CipF98qeQRKQ==
-X-Google-Smtp-Source: APXvYqzpDhA1bWyTuaiq+2EvkEPZoKL93YJ446+61eGUH5vaCellCtfWvKXHaHFrx9z8OOIUx8asSldr2ZdbmVf+PwU=
-X-Received: by 2002:aca:ab12:: with SMTP id u18mr5951214oie.48.1556899235809; 
-	Fri, 03 May 2019 09:00:35 -0700 (PDT)
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=Fh2yFaW6fF1B6IQwQvMb+9i1sRDjEer1p6eheg/w5Q0=;
+	b=p+wycnaLaAkw4AvDHW5PsRM7K+aCIj5Nqhr1+kl84o0yoA9kLXRMr+6uWZe2nrSfu+
+	f7S6IJKn6pwCPGaHSBW6KfqYhDXir4gLp3NDQPHaR/wjeAFzqW0yks0iB4qdsdnmJvgm
+	HSa8bfqtgs5DLfgg+F8L6eUFNbtjDhBGTML1Ag4AwRGwGyFVk1MrRy1GCw+VgxUUult8
+	blSVEX4TOJHcwjdc/om5KpNm0gIon9KmpYsPn0ovE/XqvaI45naQZrOymY2HaiPrDDIF
+	IsY0hhZRZPNDNft0PUZDwzDLzNlDm9092iaM6sWR5CYIGPhcOToSDroHgn454hxVC3d5
+	NskA==
+X-Gm-Message-State: APjAAAXRq+DtH7K+cZlq7rPQ7NCs8YCCim9wBqJIZwhG+r3/5nK3TLfT
+	0FPd1JTVkEtj9/1M0SCVar+7EnZvZe8=
+X-Google-Smtp-Source: APXvYqw5ylqSypuMCpQpR3uAnpSPbP72upirYtjrX9Ln5X4DwbUGI7YJs5DCyYjYsEujL/1h7SnQvQ==
+X-Received: by 2002:a5d:530c:: with SMTP id e12mr2095643wrv.290.1556899605337; 
+	Fri, 03 May 2019 09:06:45 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	t81sm3167205wmb.47.2019.05.03.09.06.44
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Fri, 03 May 2019 09:06:44 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 52B591FF87;
+	Fri,  3 May 2019 17:06:44 +0100 (BST)
+References: <20190502143409.59600-1-ysato@users.sourceforge.jp>
+	<20190502143409.59600-6-ysato@users.sourceforge.jp>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190502143409.59600-6-ysato@users.sourceforge.jp>
+Date: Fri, 03 May 2019 17:06:44 +0100
+Message-ID: <87ftpv4j57.fsf@zen.linaroharston>
 MIME-Version: 1.0
-References: <cover.1553510737.git.damien.hedde@greensocs.com>
-	<bf7dcbc7-5dc6-6269-87e9-44f027946cd9@greensocs.com>
-	<CAFEAcA8e9Ua8p4LQ=VFkZE69_vr+-EW-bjKX9W-LmgZmvho7Sw@mail.gmail.com>
-In-Reply-To: <CAFEAcA8e9Ua8p4LQ=VFkZE69_vr+-EW-bjKX9W-LmgZmvho7Sw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 May 2019 17:00:24 +0100
-Message-ID:
- <CAFEAcA-TrYPeESbxOjpd49F+iZHWSrwwpRwai21_jhmZJ0Xonw@mail.gmail.com>
-To: Damien Hedde <damien.hedde@greensocs.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::22e
-Subject: Re: [Qemu-devel] [RFC 00/17] multi-phase reset mechanism
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH RFC v8 05/12] target/rx: Miscellaneous files
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,55 +98,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Edgar Iglesias <edgar.iglesias@xilinx.com>,
-	Mark Burton <mark.burton@greensocs.com>,
-	QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
-	Luc Michel <luc.michel@greensocs.com>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+	Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503160024.QvURv5o80y9EbyRdV-4EnWGipdog4_x9mNBMKcUejCY@z>
+Message-ID: <20190503160644.5CmCHwFbQyl7Y0TD-0yAOPXw4poxZyBt-X9g0OMXf24@z>
 
-On Mon, 29 Apr 2019 at 10:41, Peter Maydell <peter.maydell@linaro.org> wrote:
+
+Yoshinori Sato <ysato@users.sourceforge.jp> writes:
+
+> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> ---
+>  target/rx/gdbstub.c     | 112 ++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  target/rx/monitor.c     |  38 ++++++++++++++++
+>  target/rx/Makefile.objs |  11 +++++
+>  3 files changed, 161 insertions(+)
+>  create mode 100644 target/rx/gdbstub.c
+>  create mode 100644 target/rx/monitor.c
+>  create mode 100644 target/rx/Makefile.objs
 >
-> On Mon, 29 Apr 2019 at 10:36, Damien Hedde <damien.hedde@greensocs.com> wrote:
-> >
-> > Hi All,
-> >
-> > Any comment about this ?
->
-> Sorry we haven't got to this yet. This is on my to-review list,
-> but so are 23 other series, and I've been on holiday for the
-> past week or so. I will try to get to it this week.
+> diff --git a/target/rx/gdbstub.c b/target/rx/gdbstub.c
+> new file mode 100644
+> index 0000000000..d76ca52e82
+> --- /dev/null
+> +++ b/target/rx/gdbstub.c
+> @@ -0,0 +1,112 @@
+> +/*
+> + * RX gdb server stub
+> + *
+> + * Copyright (c) 2019 Yoshinori Sato
+> + *
+> + * This program is free software; you can redistribute it and/or modify =
+it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
+ for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License alo=
+ng with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "cpu.h"
+> +#include "exec/gdbstub.h"
+> +
+> +int rx_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+> +{
+> +    RXCPU *cpu =3D RXCPU(cs);
+> +    CPURXState *env =3D &cpu->env;
+> +
+> +    switch (n) {
+> +    case 0 ... 15:
+> +        return gdb_get_regl(mem_buf, env->regs[n]);
+> +    case 16:
+> +        return gdb_get_regl(mem_buf, (env->psw_u) ? env->regs[0] : env->=
+usp);
+> +    case 17:
+> +        return gdb_get_regl(mem_buf, (!env->psw_u) ? env->regs[0] : env-=
+>isp);
+> +    case 18:
+> +        return gdb_get_regl(mem_buf, rx_cpu_pack_psw(env));
+> +    case 19:
+> +        return gdb_get_regl(mem_buf, env->pc);
+> +    case 20:
+> +        return gdb_get_regl(mem_buf, env->intb);
+> +    case 21:
+> +        return gdb_get_regl(mem_buf, env->bpsw);
+> +    case 22:
+> +        return gdb_get_regl(mem_buf, env->bpc);
+> +    case 23:
+> +        return gdb_get_regl(mem_buf, env->fintv);
+> +    case 24:
+> +        return gdb_get_regl(mem_buf, env->fpsw);
+> +    case 25:
+> +        return 0;
+> +    }
+> +    return 0;
+> +}
+> +
+> +int rx_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+> +{
+> +    RXCPU *cpu =3D RXCPU(cs);
+> +    CPURXState *env =3D &cpu->env;
+> +    uint32_t psw;
+> +    switch (n) {
+> +    case 0 ... 15:
+> +        env->regs[n] =3D ldl_p(mem_buf);
+> +        if (n =3D=3D 0) {
+> +            if (env->psw_u) {
+> +                env->usp =3D env->regs[0];
+> +            } else {
+> +                env->isp =3D env->regs[0];
+> +            }
+> +        }
+> +        break;
+> +    case 16:
+> +        env->usp =3D ldl_p(mem_buf);
+> +        if (env->psw_u) {
+> +            env->regs[0] =3D ldl_p(mem_buf);
+> +        }
+> +        break;
+> +    case 17:
+> +        env->isp =3D ldl_p(mem_buf);
+> +        if (!env->psw_u) {
+> +            env->regs[0] =3D ldl_p(mem_buf);
+> +        }
+> +        break;
+> +    case 18:
+> +        psw =3D ldl_p(mem_buf);
+> +        rx_cpu_unpack_psw(env, psw, 1);
+> +        break;
+> +    case 19:
+> +        env->pc =3D ldl_p(mem_buf);
+> +        break;
+> +    case 20:
+> +        env->intb =3D ldl_p(mem_buf);
+> +        break;
+> +    case 21:
+> +        env->bpsw =3D ldl_p(mem_buf);
+> +        break;
+> +    case 22:
+> +        env->bpc =3D ldl_p(mem_buf);
+> +        break;
+> +    case 23:
+> +        env->fintv =3D ldl_p(mem_buf);
+> +        break;
+> +    case 24:
+> +        env->fpsw =3D ldl_p(mem_buf);
+> +        break;
+> +    case 25:
+> +        return 8;
+> +    default:
+> +        return 0;
+> +    }
+> +
+> +    return 4;
+> +}
+> diff --git a/target/rx/monitor.c b/target/rx/monitor.c
+> new file mode 100644
+> index 0000000000..5d7a1e58b5
+> --- /dev/null
+> +++ b/target/rx/monitor.c
+> @@ -0,0 +1,38 @@
+> +/*
+> + * QEMU monitor
+> + *
+> + * Copyright (c) 2003-2004 Fabrice Bellard
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+> + * of this software and associated documentation files (the "Software"),=
+ to deal
+> + * in the Software without restriction, including without limitation the=
+ rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be includ=
+ed in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+> + * THE SOFTWARE.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "cpu.h"
+> +#include "monitor/monitor.h"
+> +#include "monitor/hmp-target.h"
+> +#include "hmp.h"
+> +
+> +void hmp_info_tlb(Monitor *mon, const QDict *qdict)
+> +{
+> +    CPUArchState *env =3D mon_get_cpu_env();
+> +
+> +    if (!env) {
+> +        monitor_printf(mon, "No CPU available\n");
+> +        return;
+> +    }
+> +}
+> diff --git a/target/rx/Makefile.objs b/target/rx/Makefile.objs
+> new file mode 100644
+> index 0000000000..f63e1ca43f
+> --- /dev/null
+> +++ b/target/rx/Makefile.objs
+> @@ -0,0 +1,11 @@
+> +obj-y +=3D translate.o op_helper.o helper.o cpu.o gdbstub.o disas.o
+> +obj-$(CONFIG_SOFTMMU) +=3D monitor.o
+> +
+> +DECODETREE =3D $(SRC_PATH)/scripts/decodetree.py
+> +
+> +target/rx/decode.inc.c: \
+> +  $(SRC_PATH)/target/rx/insns.decode $(DECODETREE)
+> +	$(call quiet-command,\
+> +	  $(PYTHON) $(DECODETREE) --varinsnwidth 32 -o $@ $<, "GEN",
+> $(TARGET_DIR)$@)
 
-I made a start on this, but it's going to take me some time
-to wrap my head around the design and the issues you raise
-in the cover letter. Given the bank holiday on Monday and
-some other commitments I have on Tuesday I think it's going
-to be the second half of next week at best before I can
-do a proper response.
+This doesn't work for me:
 
-In general I like the code (though as you say we may not
-have got the interface quite right -- I had not appreciated
-some of the nested-reset cases when I proposed it I think).
+  GEN     rx-softmmu/target/rx/decode.inc.c
+error: (GetoptError('option --varinsnwidth not recognized', 'varinsnwidth')=
+,)
 
-I think we could use a document (which would eventually live
-in docs/devel) that describes the reset system and provides some
-how-to style documentation for
- * what you need to do if you're writing a device
- * what you need to do if you are an external user of
-   a device model and you want to reset it
-plus some notes on whatever we still have left over as
-remnants of the old reset scheme and any intended transitions
-to try to remove those remnants. I'll have a go at writing
-something because I think that will help me personally in
-trying to understand the problem domain and what the new
-design is doing.
+So are you decode.inc.c stale from some work in progress version of
+decodetree?
 
-thanks
--- PMM
+Also this stanza will be need to be introduced in patch 04 as the
+disassembler needs its files.
+
+> +
+> +target/rx/translate.o: target/rx/decode.inc.c
+
+
+--
+Alex Benn=C3=A9e
 
