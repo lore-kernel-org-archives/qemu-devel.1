@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60740)
+Received: from eggs.gnu.org ([209.51.188.92]:60742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMbfY-0001TH-78
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMbfY-0001TP-AW
 	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:08:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMbfX-0003DW-7S
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMbfX-0003Dy-Es
 	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:08:20 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:46165 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:46178 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hMbfX-0001gb-0w
+	id 1hMbfX-0001hD-7v
 	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:08:19 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri,  3 May 2019 19:06:46 +0200
-Message-Id: <1556903209-6036-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri,  3 May 2019 19:06:48 +0200
+Message-Id: <1556903209-6036-5-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1556903209-6036-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1556903209-6036-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v3 2/5] linux-user: Add support for the
- SIOCSPGRP ioctl
+Subject: [Qemu-devel] [PATCH v3 4/5] linux-user: Add support for
+ setsockopt() options IPV6_<ADD|DROP>_MEMBERSHIP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +28,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com, nchen@wavecomp.com, daniel.santos@pobox.com, jcmvbkbc@gmail.com, lvivier@redhat.com, thuth@redhat.com, philmd@redhat.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Neng Chen <nchen@wavecomp.com>
 
-Add support for setting the process (or process group) to receive SIGIO
-or SIGURG signals when I/O becomes possible or urgent data is available,
-using SIOCSPGRP ioctl.
+Add support for options IPV6_ADD_MEMBERSHIP and IPV6_ADD_MEMBERSHIP
+of the syscall setsockopt(). These options control membership in
+multicast groups. Their argument is a pointer to a struct ipv6_mreq,
+which is in turn defined as:
 
-The ioctl numeric values for SIOCSPGRP are platform-dependent and are
-determined by following files in Linux kernel source tree:
+struct ipv6_mreq {
+    /* IPv6 multicast address of group */
+    struct in6_addr  ipv6mr_multiaddr;
+    /* local IPv6 address of interface */
+    int              ipv6mr_interface;
+};
 
-arch/ia64/include/uapi/asm/sockios.h:#define SIOCSPGRP    0x8902
-arch/mips/include/uapi/asm/sockios.h:#define SIOCSPGRP    _IOW('s', 8, pid_t)
-arch/parisc/include/uapi/asm/sockios.h:#define SIOCSPGRP  0x8902
-arch/sh/include/uapi/asm/sockios.h:#define SIOCSPGRP      _IOW('s', 8, pid_t)
-arch/xtensa/include/uapi/asm/sockios.h:#define SIOCSPGRP  _IOW('s', 8, pid_t)
-arch/alpha/include/uapi/asm/sockios.h:#define SIOCSPGRP   _IOW('s', 8, pid_t)
-arch/sparc/include/uapi/asm/sockios.h:#define SIOCSPGRP   0x8902
-include/uapi/asm-generic/sockios.h:#define SIOCSPGRP      0x8902
+The in6_addr structure consists of fields that are always big-endian
+(on any host), so the ipv6_mreq's field ipv6mr_multiaddr doesn't need
+any endian conversion, whereas ipv6mr_interface does.
 
-Hence the different definition for alpha, mips, sh4, and xtensa.
-
-Reviewed-by: Max Filippov <jcmvbkbc@gmail.com>
+Signed-off-by: Neng Chen <nchen@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- linux-user/ioctls.h       | 1 +
- linux-user/syscall_defs.h | 3 +++
- 2 files changed, 4 insertions(+)
+ linux-user/syscall.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index ae89516..c37adc5 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -218,6 +218,7 @@
-   IOCTL(SIOCSRARP, IOC_W, MK_PTR(MK_STRUCT(STRUCT_arpreq)))
-   IOCTL(SIOCGRARP, IOC_R, MK_PTR(MK_STRUCT(STRUCT_arpreq)))
-   IOCTL(SIOCGIWNAME, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_char_ifreq)))
-+  IOCTL(SIOCSPGRP, IOC_W, MK_PTR(TYPE_INT)) /* pid_t */
-   IOCTL(SIOCGPGRP, IOC_R, MK_PTR(TYPE_INT)) /* pid_t */
-   IOCTL(SIOCGSTAMP, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timeval)))
-   IOCTL(SIOCGSTAMPNS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timespec)))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 1e86fb9..2941231 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -739,11 +739,14 @@ struct target_pollfd {
- #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
-        defined(TARGET_XTENSA)
- #define TARGET_SIOCATMARK      TARGET_IOR('s', 7, int)
-+#define TARGET_SIOCSPGRP       TARGET_IOW('s', 8, pid_t)
- #define TARGET_SIOCGPGRP       TARGET_IOR('s', 9, pid_t)
- #else
- #define TARGET_SIOCATMARK      0x8905
-+#define TARGET_SIOCSPGRP       0x8902
- #define TARGET_SIOCGPGRP       0x8904
- #endif
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 96cd4bf..b7eb4b7 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -1892,6 +1892,25 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+                                        &pki, sizeof(pki)));
+             break;
+         }
++        case IPV6_ADD_MEMBERSHIP:
++        case IPV6_DROP_MEMBERSHIP:
++        {
++            struct ipv6_mreq ipv6mreq;
 +
- #define TARGET_SIOCGSTAMP      0x8906          /* Get stamp (timeval) */
- #define TARGET_SIOCGSTAMPNS    0x8907          /* Get stamp (timespec) */
- 
++            if (optlen < sizeof(ipv6mreq)) {
++                return -TARGET_EINVAL;
++            }
++
++            if (copy_from_user(&ipv6mreq, optval_addr, sizeof(ipv6mreq))) {
++                return -TARGET_EFAULT;
++            }
++
++            ipv6mreq.ipv6mr_interface = tswap32(ipv6mreq.ipv6mr_interface);
++
++            ret = get_errno(setsockopt(sockfd, level, optname,
++                                       &ipv6mreq, sizeof(ipv6mreq)));
++            break;
++        }
+         default:
+             goto unimplemented;
+         }
 -- 
 2.7.4
