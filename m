@@ -2,92 +2,62 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 390D3C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 06:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB96AC43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 07:02:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2F292081C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 06:09:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M2lHAsnh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2F292081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A3014205F4
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 07:02:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3014205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35182 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35637 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMRNb-0000jX-A7
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 02:09:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55322)
+	id 1hMSD0-0005l1-Jz
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 03:02:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hMRB4-0007aT-QR
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:56:11 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hMSAq-0003n3-T9
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:00:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hMRB2-0004Xr-AB
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:56:10 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:36079)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hMRB1-0004Wb-Iy
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:56:07 -0400
-Received: by mail-pf1-x442.google.com with SMTP id v80so2355799pfa.3
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 22:56:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=4YrkDVKmxHtFqA60VIn/PG0c8fg2cbdOpv1OMwRi+A4=;
-	b=M2lHAsnhE2CTYfc3BkDkHIQLwBbf9E/6otet5W18Af8WJWSHKTSlnpg6aPYHMUc53h
-	1qyQj8CsmBp8CsxcumcM1IaEVgKXhX/Wq5ZNp2rjQth8f/xFLr+TR2GdXbzLMqEbdGdv
-	ECHyEsPgAk8xFf8M4GPrhJJfdsfnbWuI5/YpfNDV1A8XYcfPSWx01/BDC8fSbt5ce/9+
-	KPVmip49mIWXvapCtEmkIJzHLKt6iBhfuoyI07T+I5Ce5MFi3R3Ed4V+vnChI0ZMabQq
-	6c3+PTFX5EYccDJGddOFWlxEg3hz0oZsQHTQHLF9dz/lzV2jM0Mo3t/CW6q15ktAheSG
-	Li9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=4YrkDVKmxHtFqA60VIn/PG0c8fg2cbdOpv1OMwRi+A4=;
-	b=MYyG5Ze5KMLoOJrbbE0FroNKWqVjb79igAXy08WnWWmbFABQjhYEi5fxmgb9NWUmdD
-	W1a8HoWEs9WhKFix1L2NR4cFol0p8Cyf64lJ8ZAvskQYNYc2wBawV9bgsqtYDyioTctP
-	qWG9l9pOxTmQwfjfwVEQEeGaDa2YMlnWUTqvD3Elxl5bj0DXSzKMjtFJW6hXnEa0DVH7
-	JR5kiWftKQqJozNk1zVGzKzwE4rLoy3x40oUCZ2QO/r9i2rr1xImRlRhaeLBF7LPMSHt
-	b+BN9bD2dPGzeJSitOMqC4CPbMLo5rEgcIhDfm0ni6Sz9mCMFaIZp3L0L1dROKUh4FxQ
-	8DHA==
-X-Gm-Message-State: APjAAAUOo0REW3eIxdLKrveXiz737E0vkwDrVTkc6dSu+oysWKAQUvCO
-	uhfWB/1qJY7UYg2eNjjydVT4tw==
-X-Google-Smtp-Source: APXvYqwskCII5oV+dR5Fama6bxpt/5e3/m38csr7Elb5VvwQ7b4iRjglSeaNoxNXN2SDls5kIrHnjw==
-X-Received: by 2002:a63:6cc7:: with SMTP id h190mr7968606pgc.350.1556862966278;
-	Thu, 02 May 2019 22:56:06 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-189-189.tukw.qwest.net. [97.113.189.189])
-	by smtp.gmail.com with ESMTPSA id
-	b20sm1463889pff.118.2019.05.02.22.56.04
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 02 May 2019 22:56:05 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190502141019.6385-1-david@redhat.com>
-	<20190502141019.6385-31-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <2d2fd239-092c-1ad3-4ff3-eca138ca3ba8@linaro.org>
-Date: Thu, 2 May 2019 22:56:02 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <kraxel@redhat.com>) id 1hMSAp-0006EU-Mp
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:00:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50118)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hMSAp-0006Dr-F9
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 02:59:59 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D82483172D72;
+	Fri,  3 May 2019 06:59:57 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-45.ams2.redhat.com
+	[10.36.116.45])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3A9E8608AC;
+	Fri,  3 May 2019 06:59:54 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id 156F416E0A; Fri,  3 May 2019 08:59:54 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri,  3 May 2019 08:59:47 +0200
+Message-Id: <20190503065954.17069-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190502141019.6385-31-david@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH v3 30/40] s390x/tcg: Implement VECTOR SHIFT
- LEFT DOUBLE BY BYTE
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.41]);
+	Fri, 03 May 2019 06:59:57 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 0/7] Usb 20190503 v2 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,24 +69,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503055602.bOZnq0UNyKZr3dh2TulAlZnLzWGjy3bLYBXlbHV0f6g@z>
+Message-ID: <20190503065947.2rI52YwLqV0BqTs91gKLVv90dkqXe38HiByCFdBXF90@z>
 
-On 5/2/19 7:10 AM, David Hildenbrand wrote:
-> Inline expansion courtesy of Richard H.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/insn-data.def      |  2 ++
->  target/s390x/translate_vx.inc.c | 29 +++++++++++++++++++++++++++++
->  2 files changed, 31 insertions(+)
+The following changes since commit f75d15231e56cb0f2bafe19faf1229c459a607=
+31:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into sta=
+ging (2019-04-30 17:06:57 +0100)
 
-r~
+are available in the Git repository at:
+
+  git://git.kraxel.org/qemu tags/usb-20190503-v2-pull-request
+
+for you to fetch changes up to ccb799313a5926a6aa49018bbc67fe6165fad7f3:
+
+  hw/usb: avoid format truncation warning when formatting port name (2019=
+-05-03 08:56:58 +0200)
+
+----------------------------------------------------------------
+usb: bugfixes for mtp and xhci, split ohci-pci.
+
+----------------------------------------------------------------
+
+Bandan Das (1):
+  usb-mtp: change default to success for usb_mtp_update_object
+
+Daniel P. Berrang=C3=A9 (3):
+  usb-mtp: fix string length for filename when writing metadata
+  usb-mtp: fix alignment of access of ObjectInfo filename field
+  hw/usb: avoid format truncation warning when formatting port name
+
+Longpeng (1):
+  usb/xhci: avoid trigger assertion if guest write wrong epid
+
+Thomas Huth (2):
+  hw/usb/hcd-ohci: Do not use PCI functions with sysbus devices in
+    ohci_die()
+  hw/usb/hcd-ohci: Move PCI-related code into a separate file
+
+ hw/usb/hcd-ohci.h     | 104 ++++++++++++++++++++
+ hw/usb/dev-mtp.c      |  10 +-
+ hw/usb/hcd-ohci-pci.c | 163 +++++++++++++++++++++++++++++++
+ hw/usb/hcd-ohci.c     | 219 ++++--------------------------------------
+ hw/usb/hcd-xhci.c     |   6 +-
+ hw/sh4/Kconfig        |   2 +-
+ hw/usb/Kconfig        |   6 +-
+ hw/usb/Makefile.objs  |   1 +
+ 8 files changed, 302 insertions(+), 209 deletions(-)
+ create mode 100644 hw/usb/hcd-ohci.h
+ create mode 100644 hw/usb/hcd-ohci-pci.c
+
+--=20
+2.18.1
 
 
