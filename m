@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47124)
+Received: from eggs.gnu.org ([209.51.188.92]:48513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hMZEo-0001tc-Il
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:32:35 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hMZLE-0003cM-D0
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:39:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hMZEn-0001nD-CE
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:32:34 -0400
-References: <af928e13-bde2-a9ae-de74-853d9bfc5e65@redhat.com>
-	<20190502130822.46858-1-shmuel.eiderman@oracle.com>
-	<20190502130822.46858-2-shmuel.eiderman@oracle.com>
-	<8d201096-ab9d-82e0-93cb-74bd23d93dbe@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a44ffb98-4cc2-47b9-2c9e-eeeda445a0a0@redhat.com>
-Date: Fri, 3 May 2019 16:32:25 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1hMZLD-00075B-4g
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:39:12 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35504)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hMZLC-00071s-QY
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:39:11 -0400
+Received: by mail-wm1-x342.google.com with SMTP id y197so7034540wmd.0
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 07:39:10 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri,  3 May 2019 15:39:04 +0100
+Message-Id: <20190503143904.31211-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <8d201096-ab9d-82e0-93cb-74bd23d93dbe@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nkFuwTVZPcc8jVP1uvtA5W2aNCiBINu0P"
-Subject: Re: [Qemu-devel] [PATCH v2] vmdk: Set vmdk parent backing_format to
- vmdk
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH] tests/qemu-iotests: re-format output to
+ for make check-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,163 +28,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, fam@euphon.net, eblake@redhat.com
-Cc: arbel.moshe@oracle.com
+To: thuth@redhat.com
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nkFuwTVZPcc8jVP1uvtA5W2aNCiBINu0P
-From: Max Reitz <mreitz@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, Sam Eiderman
- <shmuel.eiderman@oracle.com>, kwolf@redhat.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, fam@euphon.net, eblake@redhat.com
-Cc: arbel.moshe@oracle.com
-Message-ID: <a44ffb98-4cc2-47b9-2c9e-eeeda445a0a0@redhat.com>
-Subject: Re: [PATCH v2] vmdk: Set vmdk parent backing_format to vmdk
-References: <af928e13-bde2-a9ae-de74-853d9bfc5e65@redhat.com>
- <20190502130822.46858-1-shmuel.eiderman@oracle.com>
- <20190502130822.46858-2-shmuel.eiderman@oracle.com>
- <8d201096-ab9d-82e0-93cb-74bd23d93dbe@redhat.com>
-In-Reply-To: <8d201096-ab9d-82e0-93cb-74bd23d93dbe@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This attempts to clean-up the output to better match the output of the
+rest of the QEMU check system. This includes:
 
-On 03.05.19 13:34, Thomas Huth wrote:
->  Hi Sam,
->=20
-> On 02/05/2019 15.08, Sam Eiderman wrote:
->> Commit b69864e ("vmdk: Support version=3D3 in VMDK descriptor files")
->> fixed the probe function to correctly guess vmdk descriptors with
->> version=3D3.
->>
->> This solves the issue where vmdk snapshot with parent vmdk descriptor
->> containing "version=3D3" would be treated as raw instead vmdk.
->>
->> In the future case where a new vmdk version is introduced, we will aga=
-in
->> experience this issue, even if the user will provide "-f vmdk" it will=
+  - formatting as "  TEST    iotest: nnn"
+  - calculating time diff at the end
+  - only dumping config on failure
 
->> only apply to the tip image and not to the underlying "misprobed" pare=
-nt
->> image.
->>
->> The code in vmdk.c already assumes that the backing file of vmdk must =
-be
->> vmdk (see vmdk_is_cid_valid which returns 0 if backing file is not
->> vmdk).
->>
->> So let's make it official by supplying the backing_format as vmdk.
->>
->> Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
->> Reviewed-By: Liran Alon <liran.alon@oracle.com>
->> Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
->> Signed-off-by: Shmuel Eiderman <shmuel.eiderman@oracle.com>
->> ---
->>  block/vmdk.c           | 2 ++
->>  tests/qemu-iotests/110 | 6 +++---
->>  tests/qemu-iotests/126 | 4 ++--
->>  3 files changed, 7 insertions(+), 5 deletions(-)
->>
->> diff --git a/block/vmdk.c b/block/vmdk.c
->> index 8dec6ef767..de8cb859f8 100644
->> --- a/block/vmdk.c
->> +++ b/block/vmdk.c
->> @@ -397,6 +397,8 @@ static int vmdk_parent_open(BlockDriverState *bs)
->>          pstrcpy(bs->auto_backing_file, end_name - p_name + 1, p_name)=
-;
->>          pstrcpy(bs->backing_file, sizeof(bs->backing_file),
->>                  bs->auto_backing_file);
->> +        pstrcpy(bs->backing_format, sizeof(bs->backing_format),
->> +                "vmdk");
->>      }
->=20
-> Your patch with this change has already been merged into the QEMU maste=
-r
-> branch...
->=20
->> diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
->> index fad672c1ae..982569dbc5 100755
->> --- a/tests/qemu-iotests/110
->> +++ b/tests/qemu-iotests/110
->> @@ -54,7 +54,7 @@ _make_test_img -b "$TEST_IMG_REL.base" 64M
->>  # qemu should be able to reconstruct the filename, so relative backin=
-g names
->>  # should work
->>  TEST_IMG=3D"json:{'driver':'$IMGFMT','file':{'driver':'file','filenam=
-e':'$TEST_IMG'}}" \
->> -    _img_info | _filter_img_info
->> +    _img_info | _filter_img_info | grep -v "backing file format"
->> =20
->>  echo
->>  echo '=3D=3D=3D Non-reconstructable filename =3D=3D=3D'
->> @@ -78,7 +78,7 @@ TEST_IMG=3D"json:{
->>              }
->>          ]
->>      }
->> -}" _img_info | _filter_img_info
->> +}" _img_info | _filter_img_info | grep -v "backing file format"
->> =20
->>  echo
->>  echo '=3D=3D=3D Backing name is always relative to the backed image =3D=
-=3D=3D'
->> @@ -110,7 +110,7 @@ TEST_IMG=3D"json:{
->>              }
->>          ]
->>      }
->> -}" _img_info | _filter_img_info
->> +}" _img_info | _filter_img_info | grep -v "backing file format"
->> =20
->> =20
->>  # success, all done
->> diff --git a/tests/qemu-iotests/126 b/tests/qemu-iotests/126
->> index 96dc048d59..1f7618c8a5 100755
->> --- a/tests/qemu-iotests/126
->> +++ b/tests/qemu-iotests/126
->> @@ -63,7 +63,7 @@ TEST_IMG=3D$BASE_IMG _make_test_img 64M
->>  TEST_IMG=3D$TOP_IMG _make_test_img -b ./image:base.$IMGFMT
->> =20
->>  # The default cluster size depends on the image format
->> -TEST_IMG=3D$TOP_IMG _img_info | grep -v 'cluster_size'
->> +TEST_IMG=3D$TOP_IMG _img_info | grep -v 'cluster_size\|backing file f=
-ormat'
->> =20
->>  _rm_test_img "$BASE_IMG"
->>  _rm_test_img "$TOP_IMG"
->> @@ -79,7 +79,7 @@ TOP_IMG=3D"file:image:top.$IMGFMT"
->>  TEST_IMG=3D$BASE_IMG _make_test_img 64M
->>  TEST_IMG=3D$TOP_IMG _make_test_img -b "$BASE_IMG"
->> =20
->> -TEST_IMG=3D$TOP_IMG _img_info | grep -v 'cluster_size'
->> +TEST_IMG=3D$TOP_IMG _img_info | grep -v 'cluster_size\|backing file f=
-ormat'
->> =20
->>  _rm_test_img "$BASE_IMG"
->>  _rm_test_img "image:top.$IMGFMT"
->>
->=20
-> ... so please just send a patch with these fixes!
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/qemu-iotests/check | 71 +++++++++++++++++++---------------------
+ 1 file changed, 34 insertions(+), 37 deletions(-)
 
-I already did, it's here:
-
-http://lists.nongnu.org/archive/html/qemu-block/2019-04/msg00442.html
-
-Max
-
-
---nkFuwTVZPcc8jVP1uvtA5W2aNCiBINu0P
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzMUPkACgkQ9AfbAGHV
-z0DuzAf/bKKuVTHw8V9qpcG3s00cp0IhtNbFMHCmIObVrZDd/JOXKVS2Vxt8BLYY
-wNBaYa6fovohjPG/Av74cGW7cAymBZOX1E6CD3eWvTZDD7j9sIgoETOTyDHomjBK
-dearq+ctWz7EuKC2PYR5WWBTgklW5D7w/PLLkIGWsP+sKIPIbNd/+FZ9w3iFOiWB
-fSwPXQeorHGZ5k8ods+rBQ2Ktbqe9M6euNlrqEWBCf+Otl0p1tXFVNgNrHT+nqhN
-mKfaVJxP1vLSdEvQthmxGtE0hHw9RszAUiBIs/HrBmL1IwLEKky9k/1DhyfVuU0v
-C76VC0u+D+rNoHHU/sS9xwoIKbmUwQ==
-=tX6n
------END PGP SIGNATURE-----
-
---nkFuwTVZPcc8jVP1uvtA5W2aNCiBINu0P--
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index 922c5d1d3d..2ffc14113e 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -633,12 +633,6 @@ _wallclock()
+     date "+%H %M %S" | awk '{ print $1*3600 + $2*60 + $3 }'
+ }
+ 
+-_timestamp()
+-{
+-    now=$(date "+%T")
+-    printf %s " [$now]"
+-}
+-
+ _wrapup()
+ {
+     if $showme
+@@ -709,19 +703,6 @@ trap "_wrapup; exit \$status" 0 1 2 3 15
+ FULL_IMGFMT_DETAILS=$(_full_imgfmt_details)
+ FULL_HOST_DETAILS=$(_full_platform_details)
+ 
+-cat <<EOF
+-QEMU          -- "$QEMU_PROG" $QEMU_OPTIONS
+-QEMU_IMG      -- "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS
+-QEMU_IO       -- "$QEMU_IO_PROG" $QEMU_IO_OPTIONS
+-QEMU_NBD      -- "$QEMU_NBD_PROG" $QEMU_NBD_OPTIONS
+-IMGFMT        -- $FULL_IMGFMT_DETAILS
+-IMGPROTO      -- $IMGPROTO
+-PLATFORM      -- $FULL_HOST_DETAILS
+-TEST_DIR      -- $TEST_DIR
+-SOCKET_SCM_HELPER -- $SOCKET_SCM_HELPER
+-
+-EOF
+-
+ seq="check"
+ 
+ [ -n "$TESTS_REMAINING_LOG" ] && echo $list > $TESTS_REMAINING_LOG
+@@ -729,7 +710,9 @@ seq="check"
+ for seq in $list
+ do
+     err=false
+-    printf %s "$seq"
++    reason=""
++    times=""
++
+     if [ -n "$TESTS_REMAINING_LOG" ] ; then
+         sed -e "s/$seq//" -e 's/  / /' -e 's/^ *//' $TESTS_REMAINING_LOG > $TESTS_REMAINING_LOG.tmp
+         mv $TESTS_REMAINING_LOG.tmp $TESTS_REMAINING_LOG
+@@ -738,7 +721,7 @@ do
+ 
+     if $showme
+     then
+-        echo
++        echo "  TEST    iotest: $seq (not actually run)"
+         continue
+     elif [ -f expunged ] && $expunge && egrep "^$seq([         ]|\$)" expunged >/dev/null
+     then
+@@ -753,17 +736,11 @@ do
+         # really going to try and run this one
+         #
+         rm -f $seq.out.bad
+-        lasttime=$(sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE)
+-        if [ "X$lasttime" != X ]; then
+-                printf %s " ${lasttime}s ..."
+-        else
+-                printf "        "        # prettier output with timestamps.
+-        fi
+         rm -f core $seq.notrun
+         rm -f $seq.casenotrun
+ 
+         start=$(_wallclock)
+-        $timestamp && printf %s "        [$(date "+%T")]"
++        $timestamp && times="[$(date "+%T")]"
+ 
+         if [ "$(head -n 1 "$source_iotests/$seq")" == "#!/usr/bin/env python" ]; then
+             run_command="$PYTHON $seq"
+@@ -781,26 +758,26 @@ do
+                     $run_command >$tmp.out 2>&1)
+         fi
+         sts=$?
+-        $timestamp && _timestamp
++        $timestamp && times="$times -> [$(date "+%T")]"
+         stop=$(_wallclock)
+ 
+         if [ -f core ]
+         then
+-            printf " [dumped core]"
+             mv core $seq.core
++            reason="dumped core $seq.core"
+             err=true
+         fi
+ 
+         if [ -f $seq.notrun ]
+         then
+-            $timestamp || printf " [not run] "
+-            $timestamp && echo " [not run]" && printf %s "        $seq -- "
++            $timestamp || reason="[not run]"
++            $timestamp && reason="[not run] $seq -- "
+             cat $seq.notrun
+             notrun="$notrun $seq"
+         else
+             if [ $sts -ne 0 ]
+             then
+-                printf %s " [failed, exit status $sts]"
++                reason=$(printf %s "[failed, exit status $sts]")
+                 err=true
+             fi
+ 
+@@ -821,22 +798,27 @@ do
+ 
+             if [ ! -f "$reference" ]
+             then
+-                echo " - no qualified output"
++                reason=" - no qualified output"
+                 err=true
+             else
+                 if diff -w "$reference" $tmp.out >/dev/null 2>&1
+                 then
+-                    echo ""
+                     if $err
+                     then
+                         :
+                     else
+-                        echo "$seq $(expr $stop - $start)" >>$tmp.time
++                        lasttime=$(sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE)
++                        thistime=$(expr $stop - $start)
++                        echo "$seq $thistime" >>$tmp.time
++
++                        if [ "X$lasttime" != X ]; then
++                            times="$times ${thistime}s (last ${lasttime}s)"
++                        fi
+                     fi
+                 else
+-                    echo " - output mismatch (see $seq.out.bad)"
+                     mv $tmp.out $seq.out.bad
+                     $diff -w "$reference" "$PWD"/$seq.out.bad
++                    reason=" - output mismatch (see $seq.out.bad)"
+                     err=true
+                 fi
+             fi
+@@ -852,9 +834,24 @@ do
+     #
+     if $err
+     then
++        echo "  TEST    iotest: $seq FAILED $reason"
++        cat <<EOF
++QEMU          -- "$QEMU_PROG" $QEMU_OPTIONS
++QEMU_IMG      -- "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS
++QEMU_IO       -- "$QEMU_IO_PROG" $QEMU_IO_OPTIONS
++QEMU_NBD      -- "$QEMU_NBD_PROG" $QEMU_NBD_OPTIONS
++IMGFMT        -- $FULL_IMGFMT_DETAILS
++IMGPROTO      -- $IMGPROTO
++PLATFORM      -- $FULL_HOST_DETAILS
++TEST_DIR      -- $TEST_DIR
++SOCKET_SCM_HELPER -- $SOCKET_SCM_HELPER
++
++EOF
+         bad="$bad $seq"
+         n_bad=$(expr $n_bad + 1)
+         quick=false
++    else
++        echo "  TEST    iotest: $seq $times"
+     fi
+     [ -f $seq.notrun ] || try=$(expr $try + 1)
+ 
+-- 
+2.20.1
