@@ -2,64 +2,91 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 243A0C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 18:36:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1394C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 18:38:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF80920C01
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 18:36:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF80920C01
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BBCA72081C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 18:38:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X+k8C5z4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBCA72081C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45821 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45837 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMd2g-0002PR-3t
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 14:36:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50406)
+	id 1hMd4t-0003ob-2Y
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 14:38:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hMd1s-00020w-2k
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 14:35:29 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hMd42-0003VT-5Q
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 14:37:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hMd1r-0003z1-05
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 14:35:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52064)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hMd1q-0003yU-Qb
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 14:35:26 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B1B8081E0F;
-	Fri,  3 May 2019 18:35:25 +0000 (UTC)
-Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 29181608A5;
-	Fri,  3 May 2019 18:35:22 +0000 (UTC)
-Date: Fri, 3 May 2019 15:35:21 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190503183521.GT28722@habkost.net>
-References: <20190427135642.16464-1-philmd@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hMd3y-000660-FH
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 14:37:41 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:46044)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hMd3x-00061z-EL
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 14:37:38 -0400
+Received: by mail-pg1-x544.google.com with SMTP id i21so3098572pgi.12
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 11:37:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=V6v1H4veMezA7U8koUrcn/PB5xP12Lqjn2u3RScSDBA=;
+	b=X+k8C5z4EABbxz+ATD9bg/jWRa36dDNyhXqYWeE3T2XP3FmdXOxEPspJqGiQhVScDa
+	O15jYS1wT7y8HvphWhETuJgbsS8E8OROc69v6ikaoT+qtMujOKH+8J9BDSUUs8aTrrLb
+	yOwNpUYvhg0jLIG6H/1QkAWhHogeusyZOHy0dBOAypDC90M5H3a1vkvNEwNdvR8Yg8ip
+	SyQvVdtcFXkXpD7MMbs7y/Pf4CmptyihK91ZliQp04MBr/FdSHzN/WJFAs8KeaTTuA6m
+	0aMKkGJx4lKHMmXAOYzWilawvjXlRa9Wsy1aF1hVGbtcVNN8GbmPSuxJlZeta6p4cKnF
+	omfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=V6v1H4veMezA7U8koUrcn/PB5xP12Lqjn2u3RScSDBA=;
+	b=kILXAgfQ1A+NyNRDdKC6f+2cba8mezah1fd/tDGgplDs3XTwQrVqrsJIWxj8vS6C8r
+	twkmPorun3eXhGjKud/V63YUOYgv+oX35tU4u408jfSSunVtHoy2Rma7VnjOOV6U8KgA
+	ltlOGP12Wq9jYZ7ynGHffhphmzzwzQL+1JfnohHAiZcKgy1vDUhvBSs4onIK+dJWTO/R
+	Cpdvs2NILvFQA3P4GE8PuYavchqxTr487+qwVxj1azx+3ZS5J4eaGdB9UUZ9euatDdsQ
+	NHzGsBN+f2CzlomUeKGlW+b+UUXBEYqLFOJYagV0b//Ndz/bd28dHjtdfrzvncAGvTkk
+	KBgQ==
+X-Gm-Message-State: APjAAAVrzRTEBcNSryKhRSXyiStNFdDHuz3XVKKMP6uYY+RLv4sSRf6p
+	ZM1Cq/E37UOYV3zIGBp0ffQVow==
+X-Google-Smtp-Source: APXvYqx6+MhAPJEhm4p6F0nKiV3DLX6RrQhTUUVjBto0G2cZC/oIiOIW6OMuL+JBbs5FTOvRH6L1Fw==
+X-Received: by 2002:a63:4c1a:: with SMTP id z26mr12483222pga.324.1556908653866;
+	Fri, 03 May 2019 11:37:33 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-189-189.tukw.qwest.net. [97.113.189.189])
+	by smtp.gmail.com with ESMTPSA id
+	e62sm4397501pfa.50.2019.05.03.11.37.32
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 03 May 2019 11:37:33 -0700 (PDT)
+To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
+References: <20190502143409.59600-1-ysato@users.sourceforge.jp>
+	<20190502143409.59600-5-ysato@users.sourceforge.jp>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <fc9eb698-c408-86eb-2c8e-7a2b7e9f7e97@linaro.org>
+Date: Fri, 3 May 2019 11:37:30 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190502143409.59600-5-ysato@users.sourceforge.jp>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190427135642.16464-1-philmd@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Fri, 03 May 2019 18:35:25 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] qom/object: Display more helpful message
- when an object type is missing
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::544
+Subject: Re: [Qemu-devel] [PATCH RFC v8 04/12] target/rx: RX disassembler
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,62 +98,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
-	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503183521.h_CHqOTQGNS9yASu0i8N_JbyLisQv48qH_DlaDDHZ6I@z>
+Message-ID: <20190503183730.-hwg6xBeXMhXvqMtBopvyiwt4YAGxuv47N4UQr01MlY@z>
 
-On Sat, Apr 27, 2019 at 03:56:42PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> When writing a new board, adding device which uses other devices
-> (container) or simply refactoring, one can discover the hard way
-> his machine misses some devices. In the case of containers, the
-> error is not obvious:
->=20
->   $ qemu-system-microblaze -M xlnx-zynqmp-pmu
->   **
->   ERROR:/source/qemu/qom/object.c:454:object_initialize_with_type: asse=
-rtion failed: (type !=3D NULL)
->   Aborted (core dumped)
->=20
-> And we have to look at the coredump to figure the error:
->=20
->   (gdb) bt
->   #1  0x00007f84773cf895 in abort () at /lib64/libc.so.6
->   #2  0x00007f847961fb53 in  () at /lib64/libglib-2.0.so.0
->   #3  0x00007f847967a4de in g_assertion_message_expr () at /lib64/libgl=
-ib-2.0.so.0
->   #4  0x000055c4bcac6c11 in object_initialize_with_type (data=3Ddata@en=
-try=3D0x55c4bdf239e0, size=3Dsize@entry=3D2464, type=3D<optimized out>) a=
-t /source/qemu/qom/object.c:454
->   #5  0x000055c4bcac6e6d in object_initialize (data=3Ddata@entry=3D0x55=
-c4bdf239e0, size=3Dsize@entry=3D2464, typename=3Dtypename@entry=3D0x55c4b=
-cc7c643 "xlnx.zynqmp_ipi") at /source/qemu/qom/object.c:474
->   #6  0x000055c4bc9ea474 in xlnx_zynqmp_pmu_init (machine=3D0x55c4bdd46=
-000) at /source/qemu/hw/microblaze/xlnx-zynqmp-pmu.c:176
->   #7  0x000055c4bca3b6cb in machine_run_board_init (machine=3D0x55c4bdd=
-46000) at /source/qemu/hw/core/machine.c:1030
->   #8  0x000055c4bc95f6d2 in main (argc=3D<optimized out>, argv=3D<optim=
-ized out>, envp=3D<optimized out>) at /source/qemu/vl.c:4479
->=20
-> Since the caller knows the type name requested, we can simply display i=
-t
-> to ease development.
->=20
-> With this patch applied we get:
->=20
->   $ qemu-system-microblaze -M xlnx-zynqmp-pmu
->   qemu-system-microblaze: missing object type 'xlnx.zynqmp_ipi'
->   Aborted (core dumped)
->=20
-> Since the assert(type) check in object_initialize_with_type() is
-> now impossible, remove it.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+On 5/2/19 7:34 AM, Yoshinori Sato wrote:
+> +static int32_t li(DisasContext *ctx, int sz)
+> +{
+> +    int32_t addr;
+> +    bfd_byte buf[4];
+> +    addr = ctx->addr;
+> +
+> +    switch (sz) {
+> +    case 1:
+> +        ctx->addr += 1;
+> +        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
+> +        return buf[0];
+> +    case 2:
+> +        ctx->addr += 2;
+> +        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
+> +        return buf[1] << 8 | buf[0];
+> +    case 3:
+> +        ctx->addr += 3;
+> +        ctx->dis->read_memory_func(addr, buf, 3, ctx->dis);
+> +        return buf[2] << 16 | buf[1] << 8 | buf[0];
+> +    case 0:
+> +        ctx->addr += 4;
+> +        ctx->dis->read_memory_func(addr, buf, 4, ctx->dis);
+> +        return buf[3] << 24 | buf[2] << 16 | buf[1] << 8 | buf[0];
+> +    default:
+> +        g_assert_not_reached();
+> +    }
+> +}
 
-Queued, thanks!
+These should be computing signed values.  This is already correct over in
+translate.c.  Also, we can make use of some endian-specific unaligned load
+functions from <qemu/bswap.h>.  So for the 4 cases:
 
---=20
-Eduardo
+  return (int8_t)buf[0];
+
+  return ldsw_le_p(buf);
+
+  return (int8_t)buf[2] << 16 | buf[1] << 8 | buf[0];
+
+  return ldl_le_p(buf);
+
+
+r~
 
