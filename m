@@ -2,108 +2,91 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31BBAC43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:15:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C41D1C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:22:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06045205ED
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:15:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06045205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7F3172075C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:22:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j1FM/Cw3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F3172075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42098 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42161 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMZuf-0002E8-BL
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 11:15:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57680)
+	id 1hMa0j-0004kQ-H1
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 11:22:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hMZtm-0001hf-A4
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:14:55 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hMZzc-0004AT-UQ
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:20:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hMZtl-0003Oc-BT
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:14:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60992)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hMZtg-0003L0-PM; Fri, 03 May 2019 11:14:48 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 74A7F327F7D8;
-	Fri,  3 May 2019 15:14:47 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-70.ams2.redhat.com [10.36.116.70])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 36D055D960;
-	Fri,  3 May 2019 15:14:33 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190430071405.16714-1-thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <3619e259-7256-9199-2cdb-53f980f64c34@redhat.com>
-Date: Fri, 3 May 2019 17:14:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <alex.bennee@linaro.org>) id 1hMZzb-0001FZ-1x
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:20:56 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39958)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hMZzX-0001C7-Fa
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:20:53 -0400
+Received: by mail-wm1-x344.google.com with SMTP id h11so7172446wmb.5
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 08:20:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=8cofsdI0D3BKnafH10mMGa7Dew1Fouf551PnzFlHzmE=;
+	b=j1FM/Cw3PzD00uzm44JUCjHMJS/q6qaJi5QfHa4OCsz6Ox40aK0VONRX4LIRyI6JME
+	WVO1XiivXVQ7XKZHsmHi9tJ1SpQXpqaI1XIIxvR3sCx+3SWOhroGm4y7l5yUGUmYBB4G
+	WWIPki74RCOSyU4aXgfqyrHXo3SbsYhOosiw1/AzdeK4rFvFtO0MEfW2ElAFeQuIBEpg
+	b5RZ1O5t1fR+im/m6IjAaxcwK153zF1Wpq5RlIn1xyA0CcIycNzLVEHBH3MmuvgfmIOv
+	wotH/iFvt+sypcwqQ++cg+bUT8xsPss0tHaXEjnoFwU1/lVovy0PB3rdsm+cwLHvTZeb
+	ctpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=8cofsdI0D3BKnafH10mMGa7Dew1Fouf551PnzFlHzmE=;
+	b=PKD5OIG5i76VAD41Rnp1C9Er0SaJhZGQuZwWDKrbDngj5m9Uwq+iWIU09lyxxuJbN2
+	fyNE8Oj5T3f15pnJ0ZdFWsv4hXt7bZB3E4KmopMuSRv1Y4Pd4yoKsZl8hQSzabtE4GzA
+	gdEN2L7MqFNqHXOajrRBJwj5VzElQGSS8cHcgB1N79I0NpqYRCBp/C69PNsqwTuor83h
+	h33OJPLrL9Nfp4gUTmY2wAScjduHk6SyOLAKMNhmSZO612diohfsOt0Yd+jH+RSgzo0D
+	4UsNh90PZfSbTZmsxro0JF/pZeHUPBAhMK3z1dEHfaAVTWEyA7kzon8pW+Pj/aesYyL4
+	GKSA==
+X-Gm-Message-State: APjAAAXwZgamaiA3JjezkxADoZok/OpYEqTsgrOPToJ4LiJY7S5NQt+N
+	m2MOIfLUGWh4GKV0vruhyYg5Ng==
+X-Google-Smtp-Source: APXvYqwv26VHPiUNHJFacjTHiKgOsO4vRTwryBCtAYFTMRPlg5gC/ARTHmarEDUkklXqrAbqGScEUg==
+X-Received: by 2002:a1c:1fc3:: with SMTP id f186mr6725097wmf.27.1556896848322; 
+	Fri, 03 May 2019 08:20:48 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id w2sm1480114wrm.74.2019.05.03.08.20.47
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Fri, 03 May 2019 08:20:47 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 3BAA61FF87;
+	Fri,  3 May 2019 16:20:47 +0100 (BST)
+References: <20190502143409.59600-1-ysato@users.sourceforge.jp>
+	<20190502143409.59600-8-ysato@users.sourceforge.jp>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190502143409.59600-8-ysato@users.sourceforge.jp>
+Date: Fri, 03 May 2019 16:20:47 +0100
+Message-ID: <87pnoz4l9s.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <20190430071405.16714-1-thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Fri, 03 May 2019 15:14:47 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 00/30] Kconfig dependencies for ARM
- machines
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH RFC v8 07/12] hw/timer: RX62N internal
+ timer modules
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -115,38 +98,374 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
-	qemu-devel@nongnu.org, Philippe Mathieu-Daude <f4bug@amsat.org>,
-	qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
-	pbonzini@redhat.com, John Snow <jsnow@redhat.com>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+	Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503151432.ChTyALtPsi_9AUw6nbuPNbi3WSq4AvpS97ZeEu1hu88@z>
+Message-ID: <20190503152047.ys_Xg3DEJkWkKLzTWkLAFPMwMTZS37BtNQNn-IpYldw@z>
 
-On 30/04/2019 09.13, Thomas Huth wrote:
-> This series reworks the default-configs/arm-softmmu.mak and
-> default-configs/aarch64-softmmu.mak files to use the new Kconfig-style
-> dependencies instead.
->=20
-> Some of the patches are slightly based on the work by =C3=81kos Kov=C3=A1=
-cs:
->=20
->  https://lists.nongnu.org/archive/html/qemu-devel/2013-08/msg03730.html
->=20
-> The other patches have been created by looking at the sources and findi=
-ng
-> out the dependencies the hard way via trial-and-error (i.e. by enabling
-> only one machine at a time and checking whether it can be compiled and
-> started).
 
- Hi Peter,
+Yoshinori Sato <ysato@users.sourceforge.jp> writes:
 
-the two usb-ohci patches have now been merged to master via Gerd's tree
-already, the pci patch has an Ack from Michael and the AHCI patch one
-from John. All patches have been reviewed and/or tested ... so I think
-this series should now be good to go. Could you take it through your Arm
-tree? Or shall I send a separate PULL request for this?
+> renesas_tmr: 8bit timer modules.
+> renesas_cmt: 16bit compare match timer modules.
+> This part use many renesas's CPU.
+> Hardware manual.
+> https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033=
+ej0140_rx62n.pdf
+>
+> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> ---
+>  include/hw/timer/renesas_cmt.h |  33 +++
+>  include/hw/timer/renesas_tmr.h |  46 +++++
+>  hw/timer/renesas_cmt.c         | 277 +++++++++++++++++++++++++
+>  hw/timer/renesas_tmr.c         | 458 +++++++++++++++++++++++++++++++++++=
+++++++
+>  hw/timer/Kconfig               |   6 +
+>  hw/timer/Makefile.objs         |   3 +
+>  6 files changed, 823 insertions(+)
+>  create mode 100644 include/hw/timer/renesas_cmt.h
+>  create mode 100644 include/hw/timer/renesas_tmr.h
+>  create mode 100644 hw/timer/renesas_cmt.c
+>  create mode 100644 hw/timer/renesas_tmr.c
+>
+> diff --git a/include/hw/timer/renesas_cmt.h b/include/hw/timer/renesas_cm=
+t.h
+> new file mode 100644
+> index 0000000000..7e393d7ad3
+> --- /dev/null
+> +++ b/include/hw/timer/renesas_cmt.h
+> @@ -0,0 +1,33 @@
+> +/*
+> + * Renesas Compare-match timer Object
+> + *
+> + * Copyright (c) 2019 Yoshinori Sato
+> + *
+> + * This code is licensed under the GPL version 2 or later.
+> + *
+> + */
+> +
+> +#ifndef HW_RENESAS_CMT_H
+> +#define HW_RENESAS_CMT_H
+> +
+> +#include "hw/sysbus.h"
+> +
+> +#define TYPE_RENESAS_CMT "renesas-cmt"
+> +#define RCMT(obj) OBJECT_CHECK(RCMTState, (obj), TYPE_RENESAS_CMT)
+> +
+> +typedef struct RCMTState {
+> +    SysBusDevice parent_obj;
+> +
+> +    uint64_t input_freq;
+> +    MemoryRegion memory;
+> +
+> +    uint16_t cmstr;
+> +    uint16_t cmcr[2];
+> +    uint16_t cmcnt[2];
+> +    uint16_t cmcor[2];
+> +    int64_t tick[2];
+> +    qemu_irq cmi[2];
+> +    QEMUTimer *timer[2];
+> +} RCMTState;
+> +
+> +#endif
+> diff --git a/include/hw/timer/renesas_tmr.h b/include/hw/timer/renesas_tm=
+r.h
+> new file mode 100644
+> index 0000000000..718d9dc4ff
+> --- /dev/null
+> +++ b/include/hw/timer/renesas_tmr.h
+> @@ -0,0 +1,46 @@
+> +/*
+> + * Renesas 8bit timer Object
+> + *
+> + * Copyright (c) 2018 Yoshinori Sato
+> + *
+> + * This code is licensed under the GPL version 2 or later.
+> + *
+> + */
+> +
+> +#ifndef HW_RENESAS_TMR_H
+> +#define HW_RENESAS_TMR_H
+> +
+> +#include "hw/sysbus.h"
+> +
+> +#define TYPE_RENESAS_TMR "renesas-tmr"
+> +#define RTMR(obj) OBJECT_CHECK(RTMRState, (obj), TYPE_RENESAS_TMR)
+> +
+> +enum timer_event {cmia =3D 0,
+> +                  cmib =3D 1,
+> +                  ovi =3D 2,
+> +                  none =3D 3,
+> +                  TMR_NR_EVENTS =3D 4};
+> +enum {CH =3D 2};
+> +typedef struct RTMRState {
+> +    SysBusDevice parent_obj;
+> +
+> +    uint64_t input_freq;
+> +    MemoryRegion memory;
+> +
+> +    uint8_t tcnt[CH];
+> +    uint8_t tcora[CH];
+> +    uint8_t tcorb[CH];
+> +    uint8_t tcr[CH];
+> +    uint8_t tccr[CH];
+> +    uint8_t tcor[CH];
+> +    uint8_t tcsr[CH];
+> +    int64_t tick;
+> +    int64_t div_round[CH];
+> +    enum timer_event next[CH];
+> +    qemu_irq cmia[CH];
+> +    qemu_irq cmib[CH];
+> +    qemu_irq ovi[CH];
+> +    QEMUTimer *timer[CH];
+> +} RTMRState;
+> +
+> +#endif
+> diff --git a/hw/timer/renesas_cmt.c b/hw/timer/renesas_cmt.c
+> new file mode 100644
+> index 0000000000..b82250dbc2
+> --- /dev/null
+> +++ b/hw/timer/renesas_cmt.c
+> @@ -0,0 +1,277 @@
+> +/*
+> + * Renesas 16bit Compare-match timer
+> + *
+> + * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
+> + * (Rev.1.40 R01UH0033EJ0140)
+> + *
+> + * Copyright (c) 2019 Yoshinori Sato
+> + *
+> + * This program is free software; you can redistribute it and/or modify =
+it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
+ for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License alo=
+ng with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "qemu/log.h"
+> +#include "qapi/error.h"
+> +#include "qemu/timer.h"
+> +#include "cpu.h"
+> +#include "hw/hw.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/registerfields.h"
+> +#include "hw/timer/renesas_cmt.h"
+> +#include "qemu/error-report.h"
+> +
+> +/*
+> + *  +0 CMSTR - common control
+> + *  +2 CMCR  - ch0
+> + *  +4 CMCNT - ch0
+> + *  +6 CMCOR - ch0
+> + *  +8 CMCR  - ch1
+> + * +10 CMCNT - ch1
+> + * +12 CMCOR - ch1
+> + * If we think that the address of CH 0 has an offset of +2,
+> + * we can treat it with the same address as CH 1, so define it like that.
+> + */
+> +REG16(CMSTR, 0)
+> +  FIELD(CMSTR, STR0, 0, 1)
+> +  FIELD(CMSTR, STR1, 1, 1)
+> +  FIELD(CMSTR, STR,  0, 2)
+> +/* This addeess is channel offset */
+> +REG16(CMCR, 0)
+> +  FIELD(CMCR, CKS, 0, 2)
+> +  FIELD(CMCR, CMIE, 6, 1)
+> +REG16(CMCNT, 2)
+> +REG16(CMCOR, 4)
+> +
+> +static void update_events(RCMTState *cmt, int ch)
+> +{
+> +    int64_t next_time;
+> +
+> +    if ((cmt->cmstr & (1 << ch)) =3D=3D 0) {
+> +        /* count disable, so not happened next event. */
+> +        return ;
+> +    }
+> +    next_time =3D cmt->cmcor[ch] - cmt->cmcnt[ch];
+> +    next_time *=3D NANOSECONDS_PER_SECOND;
+> +    next_time /=3D cmt->input_freq;
+> +    /*
+> +     * CKS -> div rate
+> +     *  0 -> 8 (1 << 3)
+> +     *  1 -> 32 (1 << 5)
+> +     *  2 -> 128 (1 << 7)
+> +     *  3 -> 512 (1 << 9)
+> +     */
+> +    next_time *=3D 1 << (3 + FIELD_EX16(cmt->cmcr[ch], CMCR, CKS) * 2);
+> +    next_time +=3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> +    timer_mod(cmt->timer[ch], next_time);
+> +}
+> +
+> +static int64_t read_cmcnt(RCMTState *cmt, int ch)
+> +{
+> +    int64_t delta, now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> +
+> +    if (cmt->cmstr & (1 << ch)) {
+> +        delta =3D (now - cmt->tick[ch]);
+> +        delta /=3D NANOSECONDS_PER_SECOND;
+> +        delta /=3D cmt->input_freq;
+> +        delta /=3D 1 << (3 + FIELD_EX16(cmt->cmcr[ch], CMCR, CKS) * 2);
+> +        cmt->tick[ch] =3D now;
+> +        return cmt->cmcnt[ch] + delta;
+> +    } else {
+> +        return cmt->cmcnt[ch];
+> +    }
+> +}
+> +
+> +static uint64_t cmt_read(void *opaque, hwaddr addr, unsigned size)
+> +{
+> +    hwaddr offset =3D addr & 0x0f;
+> +    RCMTState *cmt =3D opaque;
+> +    int ch =3D offset / 0x08;
+> +    uint64_t ret;
+> +
+> +    if (offset =3D=3D A_CMSTR) {
+> +        ret =3D 0;
+> +        ret =3D FIELD_DP16(ret, CMSTR, STR,
+> +                         FIELD_EX16(cmt->cmstr, CMSTR, STR));
+> +        return ret;
+> +    } else {
+> +        offset &=3D 0x07;
+> +        if (ch =3D=3D 0) {
+> +            offset -=3D 0x02;
+> +        }
+> +        switch (offset) {
+> +        case A_CMCR:
+> +            ret =3D 0;
+> +            ret =3D FIELD_DP16(ret, CMCR, CKS,
+> +                             FIELD_EX16(cmt->cmstr, CMCR, CKS));
+> +            ret =3D FIELD_DP16(ret, CMCR, CMIE,
+> +                             FIELD_EX16(cmt->cmstr, CMCR, CMIE));
+> +            return ret;
+> +        case A_CMCNT:
+> +            return read_cmcnt(cmt, ch);
+> +        case A_CMCOR:
+> +            return cmt->cmcor[ch];
+> +        }
+> +    }
+> +    qemu_log_mask(LOG_UNIMP,
+> +                  "renesas_cmt: Register %08lx not implemented\n",
+> +                  offset);
+> +    return 0xffffffffffffffffUL;
+> +}
+> +
+> +static void start_stop(RCMTState *cmt, int ch, int st)
+> +{
+> +    if (st) {
+> +        update_events(cmt, ch);
+> +    } else {
+> +        timer_del(cmt->timer[ch]);
+> +    }
+> +}
+> +
+> +static void cmt_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
+size)
+> +{
+> +    hwaddr offset =3D addr & 0x0f;
+> +    RCMTState *cmt =3D opaque;
+> +    int ch =3D offset / 0x08;
+> +
+> +    if (offset =3D=3D A_CMSTR) {
+> +        cmt->cmstr =3D FIELD_EX16(val, CMSTR, STR);
+> +        start_stop(cmt, 0, FIELD_EX16(cmt->cmstr, CMSTR, STR0));
+> +        start_stop(cmt, 1, FIELD_EX16(cmt->cmstr, CMSTR, STR1));
+> +    } else {
+> +        offset &=3D 0x07;
+> +        if (ch =3D=3D 0) {
+> +            offset -=3D 0x02;
+> +        }
+> +        switch (offset) {
+> +        case A_CMCR:
+> +            cmt->cmcr[ch] =3D FIELD_DP16(cmt->cmcr[ch], CMCR, CKS,
+> +                                       FIELD_EX16(val, CMCR, CKS));
+> +            cmt->cmcr[ch] =3D FIELD_DP16(cmt->cmcr[ch], CMCR, CMIE,
+> +                                       FIELD_EX16(val, CMCR, CMIE));
+> +            break;
+> +        case 2:
+> +            cmt->cmcnt[ch] =3D val;
+> +            break;
+> +        case 4:
+> +            cmt->cmcor[ch] =3D val;
+> +            break;
+> +        default:
+> +            qemu_log_mask(LOG_UNIMP,
+> +                          "renesas_cmt: Register %08lx not implemented\n=
+",
+> +                          offset);
+> +            return;
+> +        }
+> +        if (FIELD_EX16(cmt->cmstr, CMSTR, STR) & (1 << ch)) {
+> +            update_events(cmt, ch);
+> +        }
+> +    }
+> +}
+> +
+> +static const MemoryRegionOps cmt_ops =3D {
+> +    .write =3D cmt_write,
+> +    .read  =3D cmt_read,
+> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> +    .impl =3D {
+> +        .min_access_size =3D 2,
+> +        .max_access_size =3D 2,
+> +    },
+> +};
+> +
+> +static void timer_events(RCMTState *cmt, int ch)
+> +{
+> +    cmt->cmcnt[ch] =3D 0;
+> +    cmt->tick[ch] =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> +    update_events(cmt, ch);
+> +    if (FIELD_EX16(cmt->cmcr[ch], CMCR, CMIE)) {
+> +        qemu_irq_pulse(cmt->cmi[ch]);
+> +    }
+> +}
+> +
+> +static void timer_event0(void *opaque)
+> +{
+> +    RCMTState *cmt =3D opaque;
+> +
+> +    timer_events(cmt, 0);
+> +}
+> +
+> +static void timer_event1(void *opaque)
+> +{
+> +    RCMTState *cmt =3D opaque;
+> +
+> +    timer_events(cmt, 1);
+> +}
 
- Thomas
+I guess there is enough shared state RCMTState that you couldn't have an
+array of channel structures and just pass that when you setup the
+timers:
+
+> +static void rcmt_init(Object *obj)
+> +{
+<snip>
+> +    cmt->timer[0] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, timer_event0, cmt=
+);
+> +    cmt->timer[1] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, timer_event1,
+> cmt);
+
+here?
+
+Anyway:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--
+Alex Benn=C3=A9e
 
