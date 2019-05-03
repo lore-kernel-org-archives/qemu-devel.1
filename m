@@ -2,80 +2,91 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C20C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:01:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83057C004C9
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:01:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B15A206C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:01:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B15A206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 37A5F2075E
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:01:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="asgfMBOt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37A5F2075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44723 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44725 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMbZL-0006sl-2b
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 13:01:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59099)
+	id 1hMbZN-0006vw-0d
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 13:01:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hMbXv-0005mO-Ge
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:00:28 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hMbXx-0005oR-1Z
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:00:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hMbXu-0002CW-F5
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:00:27 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:34845)
+	(envelope-from <alex.bennee@linaro.org>) id 1hMbXw-0002F8-0A
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:00:28 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37250)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hMbXu-00027t-80
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:00:26 -0400
-Received: by mail-wr1-f65.google.com with SMTP id h15so3024790wrb.2
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 10:00:23 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hMbXv-0002DC-Np
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:00:27 -0400
+Received: by mail-wr1-x443.google.com with SMTP id d22so1605854wrb.4
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 10:00:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=EIi4K2dkSBbuhfS2t70Kzgd4m/ZSCWhAQBd5+AA+hJM=;
+	b=asgfMBOtomdN8aCDKZAOO2DEUwKq6iVGJhawyklo26ErrHVll+FJ2+FRuBNNkVXEGB
+	sU3QFqn3uUQoDWtagpo+UJhXTXRIt88XswZWOAay+ZuGxQyYvmq83smE5X1yBHIKXkB7
+	BO2wzFFhJpcSMsuC6FpzS/DZmgTykz6+hAuyzWYbsH8N1pokdlha1FrTigJVMxm3R199
+	1JdZgYPv9SNVfEy3WG3cXe2jW34hHZeK+Ixg4KHrymekq7nrYa9Xl6wZbNkagLzftekh
+	rADFpkxonWLnYTs4o/K71pgPajX7UdPCk0WLsxAkBPGWlVhk1IzauXK4Qc+FemG/em8x
+	hTAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=ebNZju2Wi3RVNXpbg06Iu1r9sZixLioOjoS0f6IionE=;
-	b=HnEkVW1NPH6X4xHfYR5YeYBPTg1ikVp6EzpT0Ezv6rwWSMWPiBvDkGDekVZSXDdEYI
-	QLHjqjUjxQffhs21L7O1PE4uZAKaUkGsG6CagdqRiqvXeKAp1cFnNpYLVG2Q0kSxH6yP
-	pplrlo32vaoZ3qEMCMWTCPNsNFGlDIc/tQrao3yk018vOe/vrq6Z5TBlywWbt0JKy6W7
-	AOJslQBeb9x7mC4+Qr93znwQ24Pg896XJTI52uM7pGq/g7aGhxJRF/Ct0o8rFvYO7T6V
-	Kqokj2fMTth5LzprnuoE2otkbeu1UVT1MXjwc2xHPM/VnJEBwXteYBDnCNf1BNt0UnHm
-	8vIA==
-X-Gm-Message-State: APjAAAXPii75SDUGMB0QBfnOP+u1kmIFcuYv5PVU1m5chEQRiDHWsfZ9
-	VITvEalHTnWsKi3xl5FrbYbMgw==
-X-Google-Smtp-Source: APXvYqxizMOIFH/nKZZlwNzniJNdni+awwa+OAtGlB4zjo0tTSEai6sVr5HW7AfERTepX13+rHC5QQ==
-X-Received: by 2002:a5d:548d:: with SMTP id h13mr8121765wrv.218.1556902822827; 
-	Fri, 03 May 2019 10:00:22 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	a20sm5267749wrf.37.2019.05.03.10.00.21
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Fri, 03 May 2019 10:00:22 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Gerd Hoffmann <kraxel@redhat.com>
-References: <20190503070241.24786-1-kraxel@redhat.com>
-	<87a7g34hhn.fsf@zen.linaroharston>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <6f291a03-0ff4-1c61-1a29-bd334e502564@redhat.com>
-Date: Fri, 3 May 2019 19:00:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=EIi4K2dkSBbuhfS2t70Kzgd4m/ZSCWhAQBd5+AA+hJM=;
+	b=K2C+SD9CqqQsRcpM6Bqy/jXf3y6BtWMpUh83D7mxk8gFmuzt44srttTk/pFS3rq2td
+	/q3yb/BKNBE9FQnCr71yAGx58HLgTcg1N8GgzXzmPZRX8Em7Z+Y++qdRF223Ig195XjA
+	M5ZWtqQrG9fxAAMIrafePHSbcw60CAbOuBVVKRuuJmgoN10WX1vmokJqiHveMLhD3WSy
+	syfEajngqHmAwjozXZIAsSrpmlVtOXZYU7Z7UrNATBaRsx5YWQbKXPAeZyQC8/mubWrh
+	Yf8H1wcgHklBt1mAWWksFBaaFNuJcLQ4H8Ew4E3uoU0vxu1rbmPE7VF0Yl1cwTnMoiLg
+	Xh+A==
+X-Gm-Message-State: APjAAAUtM+byfaQcd1OH3wzdQRG+qvYyfAeWV0ECIiVJgQIXqgVa5aI1
+	Vm5LBDVuoAliB9dqI4yOdSE1sg==
+X-Google-Smtp-Source: APXvYqxB3Erbn6n5CoH9GnWhM9Q3MK2m5U0VE1h4JogAF+x0D2VP4DpbSNtj3FYRo/dcJJpZF5Y6nQ==
+X-Received: by 2002:adf:e74b:: with SMTP id c11mr1351828wrn.221.1556902826282; 
+	Fri, 03 May 2019 10:00:26 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id t67sm3935497wmg.0.2019.05.03.10.00.25
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Fri, 03 May 2019 10:00:25 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 5DDBD1FF87;
+	Fri,  3 May 2019 18:00:25 +0100 (BST)
+References: <20190503154424.73933-1-liboxuan@connect.hku.hk>
+	<87bm0j4im0.fsf@zen.linaroharston>
+	<CALM0=-=b+z2aW-cuM=hmk3_oKG7w3ianMo_ZA7gj8zMgCOfC3g@mail.gmail.com>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: "LI\, BO XUAN" <liboxuan@connect.hku.hk>
+In-reply-to: <CALM0=-=b+z2aW-cuM=hmk3_oKG7w3ianMo_ZA7gj8zMgCOfC3g@mail.gmail.com>
+Date: Fri, 03 May 2019 18:00:25 +0100
+Message-ID: <878svn4gnq.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <87a7g34hhn.fsf@zen.linaroharston>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH] tests/docker: add ubuntu 18.04
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH v4] hw/virtio/virtio-mmio: Convert DPRINTF
+ to trace and log
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,102 +98,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
+	qemu-devel@nongnu.org, Yuval Shaia <yuval.shaia@oracle.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503170021.jrjP5ziD1VLS-zFLIgWhOsVPfncFKHbbBqs9Qja9Qg8@z>
+Message-ID: <20190503170025.nviJ1pl7_Ga4Q38ZSwgqpNBzc3lRz8DZ3gIQOgoEDIA@z>
 
-On 5/3/19 6:42 PM, Alex Bennée wrote:
-> 
-> Gerd Hoffmann <kraxel@redhat.com> writes:
-> 
->> Based on the ubuntu.docker file.
->> Used to reproduce the build failure Peter was seeing.
->> Others might find this useful too ;)
->>
->> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->> ---
->>  tests/docker/dockerfiles/ubuntu1804.docker | 57 ++++++++++++++++++++++
->>  1 file changed, 57 insertions(+)
->>  create mode 100644 tests/docker/dockerfiles/ubuntu1804.docker
->>
->> diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/dockerfiles/ubuntu1804.docker
->> new file mode 100644
->> index 000000000000..2e2900150b09
->> --- /dev/null
->> +++ b/tests/docker/dockerfiles/ubuntu1804.docker
->> @@ -0,0 +1,57 @@
->> +FROM ubuntu:18.04
->> +ENV PACKAGES flex bison \
->> +    ccache \
->> +    clang \
->> +    gcc \
->> +    gettext \
->> +    git \
->> +    glusterfs-common \
->> +    libaio-dev \
->> +    libattr1-dev \
->> +    libbluetooth-dev \
->> +    libbrlapi-dev \
->> +    libbz2-dev \
->> +    libcacard-dev \
->> +    libcap-dev \
->> +    libcap-ng-dev \
->> +    libcurl4-gnutls-dev \
->> +    libdrm-dev \
->> +    libepoxy-dev \
->> +    libfdt-dev \
->> +    libgbm-dev \
->> +    libgtk-3-dev \
->> +    libibverbs-dev \
->> +    libiscsi-dev \
->> +    libjemalloc-dev \
->> +    libjpeg-turbo8-dev \
->> +    liblzo2-dev \
->> +    libncurses5-dev \
->> +    libncursesw5-dev \
->> +    libnfs-dev \
->> +    libnss3-dev \
->> +    libnuma-dev \
->> +    libpixman-1-dev \
->> +    librados-dev \
->> +    librbd-dev \
->> +    librdmacm-dev \
->> +    libsasl2-dev \
->> +    libsdl2-dev \
->> +    libseccomp-dev \
->> +    libsnappy-dev \
->> +    libspice-protocol-dev \
->> +    libspice-server-dev \
->> +    libssh2-1-dev \
->> +    libusb-1.0-0-dev \
->> +    libusbredirhost-dev \
->> +    libvdeplug-dev \
->> +    libvte-2.91-dev \
->> +    libxen-dev \
->> +    make \
->> +    python-yaml \
->> +    sparse \
->> +    texinfo \
->> +    xfslibs-dev
->> +RUN apt-get update && \
->> +    apt-get -y install $PACKAGES
->> +RUN dpkg -l $PACKAGES | sort > /packages.txt
->> +ENV FEATURES clang pyyaml sdl2
-> 
-> Queued to testing/next, thanks.
 
-Just finished builds, so if it's not too late:
+LI, BO XUAN <liboxuan@connect.hku.hk> writes:
 
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Hi Alex,
+>
+> Sorry about that, I am still trying to get familiar with the patch
+> submission process. Since my patch has been changed from your last review,
+> I thought it would be safe to not include the r-b tag from last time. Will
+> take care next time!
 
-I'm not sure whichever {ubuntu1804/ubuntu18.04}.docker is better,
-anyway:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+That's ok. As a general rule as long as you haven't substantially
+changed a patch it's safe to keep previous r-b tags. You can always
+mention it in your cover letter if you are unsure.
 
-> 
-> --
-> Alex Bennée
-> 
+--
+Alex Benn=C3=A9e
 
