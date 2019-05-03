@@ -6,66 +6,65 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C623C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:43:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76F52C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:44:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30A2D2075E
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:43:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30A2D2075E
+	by mail.kernel.org (Postfix) with ESMTPS id 4B0382075E
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:44:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B0382075E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38761 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38763 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMWba-0006Nu-H1
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 07:43:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34103)
+	id 1hMWcG-0006sa-IZ
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 07:44:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMWLt-0007yS-8X
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:27:42 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hMWLb-0007fy-9Q
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:27:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMWLr-0003Zy-UT
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:27:41 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:51901)
+	(envelope-from <laurent@vivier.eu>) id 1hMWLa-0003Gq-Aw
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:27:23 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:47175)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hMWLr-0003Yq-IV; Fri, 03 May 2019 07:27:39 -0400
+	id 1hMWLX-0003CW-Ua; Fri, 03 May 2019 07:27:20 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA
 	(Nemesis)
-	id 1Mmhs6-1gvfmw3Cty-00jruY; Fri, 03 May 2019 13:27:13 +0200
+	id 1MAchM-1hT5vZ258q-00B4K0; Fri, 03 May 2019 13:27:01 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Fri,  3 May 2019 13:26:53 +0200
-Message-Id: <20190503112654.4393-12-laurent@vivier.eu>
+Date: Fri,  3 May 2019 13:26:44 +0200
+Message-Id: <20190503112654.4393-3-laurent@vivier.eu>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190503112654.4393-1-laurent@vivier.eu>
 References: <20190503112654.4393-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Yr6N8DVUuZAek6d2wIuyKkCulINgbzvSwJs77413ZEOeSlYO+1k
-	DhJEgZCCHuvHdyBsNqrx1P7P+RuElo0e3mL8i15Gd1gLR73wZ9+dbABkcKjIm/y9DZbjDk6
-	cxlNzWYvaigJwrL5xY83Z8Kl5AZP8jQV5ezLDuZytdBFhnvgSE+YVWos1DHHCmbjLFRpkrt
-	FKJ26tniVeGz9Q8zqWKRg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ldkHbtITqlE=:CCU2hx6y84NcCvOwpyx2jG
-	4M188hiX8HxLd5cscIXGiAcRVb7K+pGc7NCfKl378rJJKji7i4aG5474D+MymO9llCeM8c7vT
-	JLcLvJeHs4edYHxmiRreylmYnDQx8uqLZ9mGubxZAdWwhkpmPP00Rrd6woM/GVaq8NQ/k/fnt
-	mYJoSvLe1h8Ftrmc4lqdCfH9TH+AcCBo8HUpvk+Qq7wCZmqu+ZNAEO37wmBj2IW21rN2RUr9S
-	o9iF9ncZnjDPuuL0bqSlguMPJrmoyRyWNggS7CX8R6nD/r0/N4VplToVv2+VW9CvE9cj33DLX
-	7IQYFjQgOb6/lQsziYcfF/cxzvAKN/UAMICurHFY/tskF2mnvfYAqFU9mp8SCIYeTa1L7yeYQ
-	wOPO13LK+y8gt8n+tppZDUCEqeokJrZAFD/lXglGzedDFhObbO9ayfnT5yTze9gunxVxOevCJ
-	uNr6YYm8XY10y5esEVD1kB8yFT8N6KWt7Si4xQ83Qp76KrPTtCabMkQ22GHLiB2FKdTHErGfc
-	qJpbJqSRiEwffFtvaufk9EE/CPYTF/CMS3IMLAlgHy/9U04yN5aCSMGJjWVDxta6N2SWb7/kM
-	bV+SLp7U3MlR4RBcFALNxBpkM8pZaSes+GdYjrm6SXxUYk1az6I9BYPHFrQyOh2iA74HPKCK2
-	JkfFc9vI/+N9w1pOGJJjjU5G0ena3XVK16NwkLwYVynVl1SCfL5Vy7Rrbc7JU3haazOxccJLV
-	uPp0n7d2R1HqR205EH9x/RVM4YnbYYE+No/1ANO5D4ySLcZpbR4cPtuBN8g=
+X-Provags-ID: V03:K1:8SpV5q+wuYzAk9ypmqbApsD5yPUlesepmLhhH0Wesf46hT4PjrH
+	63DLXxROIpeIrnMMLvoic81JGuRHJDvZlKR+5HC8M1kwZCojtpG57sTrkELWILiisw3B8OZ
+	0KIr81YsL10QL3OeOqFB6s+A7ZQ3VgPKdd6tHdhpJFSZrspCqG50XTccLkO5hWw85IqCsYG
+	uNlPx6EMD0m9yp9sK44bw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:CNCT3k0LTiE=:mRpjnw/f8AHTlQR1hwcNBO
+	MwCJvMSwg6eqJa2lx7mm+mwKmJgLbzq7v/rEx2NJk5sANBAUMpJ7RkEBIFW/pkCRzzRTnsN9G
+	khOLByfBfaT2OeTsCNNZA1+mrdGEGpuuadS5dpK44VFWUrQlQTSfMfa92YwzMVzxBPTh0aF9R
+	pYKBFjqLDhBs0sb5o3OCHamnVoslq2bxbdj055enId7ny5/Bzi4yWoGc1NgcKEP0m0Ax2hC4A
+	cZhC9uBfNIRCf1X+wriaIn4yj46orU6hsvKXnD9RZ/3h1VfmmSnY9cbgLoVVp09XxxK7/RQWA
+	XGClr6A1NQ2vkw5ZetMENXpoIQVFiwftVgS3TTu+qAEV/Q2LoS/sGk7/KjQvGpaetn6+Jl6fp
+	h19Ht6f/Fa05cccuVN4PFIjxwMEmvfvrAfxt8xEHuldYyNsLV4g+CmS0qbWpydNx7MkHoSt9V
+	vfm3ZWByn3QS8AOt5DAzGDZAJIDt8w1K20TOY7ERbRFQ1rqGiEVD1LgKGnNcx+/kj6/GaSuo+
+	HHQ5kKeh8fu2f2jn1gnR4v1ZDKefc+ApUwh4rnQSjehbvnc8oqHvlJ1y1jxP9QwyJ8+SmXVjh
+	6KlF5j2xUi/SJCAHjS2n0mHOghIpY0+UbkzeKo8l87CBeSqxk6Nj7Ag20Jw6xelmZ3qmcfFmO
+	p72l8U+/2p6OTdg8nsyT87LTRRyTdAO9Z+xyOgtzaJjjVu8gobj/NLOUPMvxZl8VxDOr721F/
+	hmMMBAMbKSYEXKBa0uvwJzYnU2qQe8jYFuxNBg==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
-Subject: [Qemu-devel] [PULL v2 11/12] hw/sparc/leon3: Allow load of uImage
- firmwares
+X-Received-From: 212.227.126.131
+Subject: [Qemu-devel] [PULL v2 02/12] CODING_STYLE: specify the indent rule
+ for multiline code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,78 +76,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-	qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+Cc: qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
 	Jason Wang <jasowang@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
 	Laurent Vivier <laurent@vivier.eu>, Fabien Chouteau <chouteau@adacore.com>,
 	Michael Roth <mdroth@linux.vnet.ibm.com>,
-	KONRAD Frederic <frederic.konrad@adacore.com>,
-	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Wei Yang <richardw.yang@linux.intel.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
 	=?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>,
 	Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503112653.TfqnQ8FR26cU_XMsJ-YqmekEJXNmwx0i3hsB_oMzCoI@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190503112644.ntXOG9GMBRsvVr8PdFLXpZUaugJF7XQmjSCAwROQ9vo@z>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-Currently the Leon3 machine doesn't allow to load legacy u-boot images:
+We didn't specify the indent rule for multiline code here, which may
+mislead users. And in current code, the code use various styles.
 
-  $ qemu-system-sparc -M leon3_generic -d in_asm \
-      -kernel HelenOS-0.6.0-sparc32-leon3.bin
-  qemu-system-sparc: could not load kernel 'HelenOS-0.6.0-sparc32-leon3.bin'
+Add this rule in CODING_STYLE to make sure this is clear to every one.
 
-  $ file HelenOS-0.6.0-sparc32-leon3.bin
-  HelenOS-0.6.0-sparc32-leon3.bin: u-boot legacy uImage, HelenOS-0.6.0,\
-    Linux/ARM, OS Kernel Image (Not compressed), 2424229 bytes,\
-    Sun Dec 21 19:18:09 2014,\
-    Load Address: 0x40000000, Entry Point: 0x40000000,\
-    Header CRC: 0x8BCFA236, Data CRC: 0x37AD87DF
-
-Since QEMU can load uImages, add the necessary code,
-so the Leon3 machine can load these images:
-
-  $ qemu-system-sparc -M leon3_generic -d in_asm \
-      -kernel HelenOS-0.6.0-sparc32-leon3.bin
-  ----------------
-  IN:
-  0x40000000:  b  0x400007a8
-  0x40000004:  nop
-  ----------------
-  IN:
-  0x400007a8:  save  %sp, -136, %sp
-  0x400007ac:  call  0x40000020
-  0x400007b0:  sethi  %hi(0x4000b800), %i1
-  ...
-
-Tested with the following firmware:
-http://www.helenos.org/releases/HelenOS-0.6.0-sparc32-leon3.bin
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
-Tested-by: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-Id: <20190427162922.4207-1-f4bug@amsat.org>
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Message-Id: <20190304071631.27567-2-richardw.yang@linux.intel.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/sparc/leon3.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ CODING_STYLE | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index 774639af3393..0383b17c298f 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -193,6 +193,10 @@ static void leon3_generic_hw_init(MachineState *machine)
-         kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
-                                &entry, NULL, NULL,
-                                1 /* big endian */, EM_SPARC, 0, 0);
-+        if (kernel_size < 0) {
-+            kernel_size = load_uimage(kernel_filename, NULL, &entry,
-+                                      NULL, NULL, NULL);
-+        }
-         if (kernel_size < 0) {
-             error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
+diff --git a/CODING_STYLE b/CODING_STYLE
+index ec075dedc4a8..90321e9c2821 100644
+--- a/CODING_STYLE
++++ b/CODING_STYLE
+@@ -29,6 +29,45 @@ Spaces of course are superior to tabs because:
+ 
+ Do not leave whitespace dangling off the ends of lines.
+ 
++1.1 Multiline Indent
++
++There are several places where indent is necessary:
++
++ - if/else
++ - while/for
++ - function definition & call
++
++When breaking up a long line to fit within line width, we need a proper indent
++for the following lines.
++
++In case of if/else, while/for, align the secondary lines just after the
++opening parenthesis of the first.
++
++For example:
++
++    if (a == 1 &&
++        b == 2) {
++
++    while (a == 1 &&
++           b == 2) {
++
++In case of function, there are several variants:
++
++    * 4 spaces indent from the beginning
++    * align the secondary lines just after the opening parenthesis of the
++      first
++
++For example:
++
++    do_something(x, y,
++        z);
++
++    do_something(x, y,
++                 z);
++
++    do_something(x, do_another(y,
++                               z));
++
+ 2. Line width
+ 
+ Lines should be 80 characters; try not to make them longer.
 -- 
 2.20.1
 
