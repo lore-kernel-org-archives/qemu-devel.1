@@ -6,61 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6750C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 07:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 363ADC43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 07:08:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D9C4205F4
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 07:06:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D9C4205F4
+	by mail.kernel.org (Postfix) with ESMTPS id 0A32F2075C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 07:08:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A32F2075C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35712 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35723 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMSHW-0000vg-Su
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 03:06:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38166)
+	id 1hMSIl-0001jN-Bh
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 03:08:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hMSAr-0003nO-MC
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:00:02 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hMSAt-0003nw-Bn
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:00:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hMSAq-0006Ep-7g
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:00:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54280)
+	(envelope-from <kraxel@redhat.com>) id 1hMSAs-0006Gp-DQ
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:00:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54288)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hMSAp-0006EF-Vj
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:00:00 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hMSAs-0006GU-8M
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:00:02 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E48B630C0210;
-	Fri,  3 May 2019 06:59:58 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1B92C30C021A;
+	Fri,  3 May 2019 07:00:00 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-45.ams2.redhat.com
 	[10.36.116.45])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 66CF4629DC;
-	Fri,  3 May 2019 06:59:58 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0203179B5;
+	Fri,  3 May 2019 06:59:54 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 43DAA17538; Fri,  3 May 2019 08:59:54 +0200 (CEST)
+	id 332A717535; Fri,  3 May 2019 08:59:54 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  3 May 2019 08:59:52 +0200
-Message-Id: <20190503065954.17069-6-kraxel@redhat.com>
+Date: Fri,  3 May 2019 08:59:50 +0200
+Message-Id: <20190503065954.17069-4-kraxel@redhat.com>
 In-Reply-To: <20190503065954.17069-1-kraxel@redhat.com>
 References: <20190503065954.17069-1-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
 	(mx1.redhat.com [10.5.110.46]);
-	Fri, 03 May 2019 06:59:58 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	Fri, 03 May 2019 07:00:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 5/7] hw/usb/hcd-ohci: Do not use PCI functions
- with sysbus devices in ohci_die()
+Subject: [Qemu-devel] [PULL 3/7] usb-mtp: change default to success for
+ usb_mtp_update_object
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,141 +69,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+Cc: Bandan Das <bsd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
 	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503065952.RYJL3513JZ-8FvN7rh9WJ3soBWU05MattKoJW4WUQrM@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190503065950.IdwsePbnK8lrrqANoHcbotJrMqzFcK2FHmby7RybCas@z>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Bandan Das <bsd@redhat.com>
 
-The ohci_die() function always assumes to be running with a PCI OHCI
-controller and calls the PCI-specific functions pci_set_word(). However,
-this function might also get called for the sysbus OHCI devices, so it
-likely fails in that case. To fix this issue, change the code now, so tha=
-t
-there are two implementations now, one for sysbus and one for PCI, and
-use the right function via a function pointer in the OHCIState structure.
+Commit c5ead51f90cf (usb-mtp: return incomplete transfer on a lstat
+failure) checks if lstat succeeded when updating attributes of a
+file. However, it also changed behavior to return an error by
+default. This is incorrect because for smaller file sizes, Qemu
+will attempt to write the file in one go and there won't be
+an object for it.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-id: 20190419075625.24251-2-thuth@redhat.com
+Fixes: c5ead51f90cf
+Signed-off-by: Bandan Das <bsd@redhat.com>
+Message-id: jpgwojv9pwv.fsf@linux.bootlegged.copy
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/hcd-ohci.c | 39 +++++++++++++++++++++++++++------------
- 1 file changed, 27 insertions(+), 12 deletions(-)
+ hw/usb/dev-mtp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
-index 81cf5ab7a5a7..6d3f556989fb 100644
---- a/hw/usb/hcd-ohci.c
-+++ b/hw/usb/hcd-ohci.c
-@@ -52,7 +52,7 @@ typedef struct OHCIPort {
-     uint32_t ctrl;
- } OHCIPort;
-=20
--typedef struct {
-+typedef struct OHCIState {
-     USBBus bus;
-     qemu_irq irq;
-     MemoryRegion mem;
-@@ -108,6 +108,7 @@ typedef struct {
-     uint32_t async_td;
-     bool async_complete;
-=20
-+    void (*ohci_die)(struct OHCIState *ohci);
- } OHCIState;
-=20
- /* Host Controller Communications Area */
-@@ -302,7 +303,10 @@ struct ohci_iso_td {
-=20
- #define OHCI_HRESET_FSBIR       (1 << 0)
-=20
--static void ohci_die(OHCIState *ohci);
-+static void ohci_die(OHCIState *ohci)
-+{
-+    ohci->ohci_die(ohci);
-+}
-=20
- /* Update IRQ levels */
- static inline void ohci_intr_update(OHCIState *ohci)
-@@ -1854,13 +1858,14 @@ static USBBusOps ohci_bus_ops =3D {
-=20
- static void usb_ohci_init(OHCIState *ohci, DeviceState *dev,
-                           uint32_t num_ports, dma_addr_t localmem_base,
--                          char *masterbus, uint32_t firstport,
--                          AddressSpace *as, Error **errp)
-+                          char *masterbus, uint32_t firstport, AddressSp=
-ace *as,
-+                          void (*ohci_die_fn)(struct OHCIState *), Error=
- **errp)
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index 963449ec7de8..d90b336d53f4 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -1587,7 +1587,7 @@ done:
+ 
+ static int usb_mtp_update_object(MTPObject *parent, char *name)
  {
-     Error *err =3D NULL;
-     int i;
-=20
-     ohci->as =3D as;
-+    ohci->ohci_die =3D ohci_die_fn;
-=20
-     if (num_ports > OHCI_MAX_PORTS) {
-         error_setg(errp, "OHCI num-ports=3D%u is too big (limit is %u po=
-rts)",
-@@ -1933,18 +1938,28 @@ typedef struct {
-     uint32_t firstport;
- } OHCIPCIState;
-=20
--/** A typical O/EHCI will stop operating, set itself into error state
-- * (which can be queried by MMIO) and will set PERR in its config
-- * space to signal that it got an error
-+/**
-+ * A typical OHCI will stop operating and set itself into error state
-+ * (which can be queried by MMIO) to signal that it got an error.
-  */
--static void ohci_die(OHCIState *ohci)
-+static void ohci_sysbus_die(struct OHCIState *ohci)
- {
--    OHCIPCIState *dev =3D container_of(ohci, OHCIPCIState, state);
--
-     trace_usb_ohci_die();
-=20
-     ohci_set_interrupt(ohci, OHCI_INTR_UE);
-     ohci_bus_stop(ohci);
-+}
-+
-+/**
-+ * A typical PCI OHCI will additionally set PERR in its configspace to
-+ * signal that it got an error.
-+ */
-+static void ohci_pci_die(struct OHCIState *ohci)
-+{
-+    OHCIPCIState *dev =3D container_of(ohci, OHCIPCIState, state);
-+
-+    ohci_sysbus_die(ohci);
-+
-     pci_set_word(dev->parent_obj.config + PCI_STATUS,
-                  PCI_STATUS_DETECTED_PARITY);
- }
-@@ -1959,7 +1974,7 @@ static void usb_ohci_realize_pci(PCIDevice *dev, Er=
-ror **errp)
-=20
-     usb_ohci_init(&ohci->state, DEVICE(dev), ohci->num_ports, 0,
-                   ohci->masterbus, ohci->firstport,
--                  pci_get_address_space(dev), &err);
-+                  pci_get_address_space(dev), ohci_pci_die, &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-@@ -2023,7 +2038,7 @@ static void ohci_realize_pxa(DeviceState *dev, Erro=
-r **errp)
-=20
-     usb_ohci_init(&s->ohci, dev, s->num_ports, s->dma_offset,
-                   s->masterbus, s->firstport,
--                  &address_space_memory, &err);
-+                  &address_space_memory, ohci_sysbus_die, &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
---=20
+-    int ret = -1;
++    int ret = 0;
+ 
+     MTPObject *o =
+         usb_mtp_object_lookup_name(parent, name, strlen(name));
+-- 
 2.18.1
 
 
