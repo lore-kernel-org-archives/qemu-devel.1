@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34526)
+Received: from eggs.gnu.org ([209.51.188.92]:36291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hMOwZ-0007aL-D8
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 23:33:04 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hMP96-0001ru-Uj
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 23:46:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hMOwX-0004cB-NG
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 23:33:03 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37612)
+	(envelope-from <richard.henderson@linaro.org>) id 1hMP96-0003iv-1b
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 23:46:00 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:40115)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hMOwX-0004bv-HQ
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 23:33:01 -0400
-Received: by mail-pf1-x443.google.com with SMTP id g3so2181977pfi.4
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 20:33:01 -0700 (PDT)
-References: <20190503002206.9751-1-driver1998@foxmail.com>
-	<20190503003650.10137-1-driver1998@foxmail.com>
+	id 1hMP95-0003iO-Q5
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 23:45:59 -0400
+Received: by mail-pl1-x641.google.com with SMTP id b3so2026500plr.7
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 20:45:59 -0700 (PDT)
+References: <20190502141019.6385-1-david@redhat.com>
+	<20190502141019.6385-3-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <45252654-7451-69ed-326e-9807f529de16@linaro.org>
-Date: Thu, 2 May 2019 20:32:57 -0700
+Message-ID: <69b8508d-9586-ab11-3318-83d21ddd4d25@linaro.org>
+Date: Thu, 2 May 2019 20:45:55 -0700
 MIME-Version: 1.0
-In-Reply-To: <20190503003650.10137-1-driver1998@foxmail.com>
+In-Reply-To: <20190502141019.6385-3-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] qga: Fix mingw compilation warnings
- on enum conversion
+Subject: Re: [Qemu-devel] [PATCH v3 02/40] s390x/tcg: Implement VECTOR ADD
+ COMPUTE CARRY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +32,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cao Jiaxi <driver1998@foxmail.com>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 5/2/19 5:36 PM, Cao Jiaxi wrote:
-> The win2qemu[] is supposed to be the conversion table to convert between
-> STORAGE_BUS_TYPE in Windows SDK and GuestDiskBusType in qga.
+On 5/2/19 7:09 AM, David Hildenbrand wrote:
+> 128-bit handling courtesy of Richard H.
 > 
-> But it was incorrectly written that it forces to set a GuestDiskBusType
-> value to STORAGE_BUS_TYPE, which generates an enum conversion warning in clang.
-> 
-> Signed-off-by: Cao Jiaxi <driver1998@foxmail.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  qga/commands-win32.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-> index d40d61f605..6b67f16faf 100644
-> --- a/qga/commands-win32.c
-> +++ b/qga/commands-win32.c
-> @@ -457,7 +457,7 @@ void qmp_guest_file_flush(int64_t handle, Error **errp)
->  
->  #ifdef CONFIG_QGA_NTDDSCSI
->  
-> -static STORAGE_BUS_TYPE win2qemu[] = {
-> +static GuestDiskBusType win2qemu[] = {
->      [BusTypeUnknown] = GUEST_DISK_BUS_TYPE_UNKNOWN,
->      [BusTypeScsi] = GUEST_DISK_BUS_TYPE_SCSI,
->      [BusTypeAtapi] = GUEST_DISK_BUS_TYPE_IDE,
-> 
-
+>  target/s390x/insn-data.def      |  2 +
+>  target/s390x/translate_vx.inc.c | 94 +++++++++++++++++++++++++++++++++
+>  2 files changed, 96 insertions(+)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+> +static void gen_acc(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b, uint8_t es)
+> +{
+> +    const uint8_t msb_bit_nr = NUM_VEC_ELEMENT_BITS(es) - 1;
+> +    TCGv_i64 msb_mask = tcg_const_i64(dup_const(es, 1ull << msb_bit_nr));
+> +    TCGv_i64 t1 = tcg_temp_new_i64();
+> +    TCGv_i64 t2 = tcg_temp_new_i64();
+> +    TCGv_i64 t3 = tcg_temp_new_i64();
+> +
+> +    /* Calculate the carry into the MSB, ignoring the old MSBs */
+> +    tcg_gen_andc_i64(t1, a, msb_mask);
+> +    tcg_gen_andc_i64(t2, b, msb_mask);
+> +    tcg_gen_add_i64(t1, t1, t2);
+> +    /* Calculate the MSB without any carry into it */
+> +    tcg_gen_xor_i64(t3, a, b);
+> +    /* Calculate the carry out of the MSB in the MSB bit position */
+> +    tcg_gen_and_i64(d, a, b);
+> +    tcg_gen_and_i64(t1, t1, t3);
+> +    tcg_gen_or_i64(d, d, t1);
+> +    /* Isolate and shift the carry into position */
+> +    tcg_gen_and_i64(d, d, msb_mask);
+> +    tcg_gen_shri_i64(d, d, msb_bit_nr);
+> +
+> +    tcg_temp_free_i64(t1);
+> +    tcg_temp_free_i64(t2);
+> +    tcg_temp_free_i64(t3);
+> +}
+...> +static void gen_acc32_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
+> +{
+> +    gen_acc(d, a, b, ES_32);
+> +}
+> +
+> +static void gen_acc_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
+> +{
+> +    TCGv_i64 t = tcg_temp_new_i64();
+> +
+> +    tcg_gen_add_i64(t, a, b);
+> +    tcg_gen_setcond_i64(TCG_COND_LTU, d, t, b);
+> +    tcg_temp_free_i64(t);
+> +}
+
+As an aside, I think the 32-bit version should use 32-bit ops, as per
+gen_acc_i64.  That would be 4 * 2 operations instead of 2 * 9 over the 128-bit
+vector.
+
 
 r~
