@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33820)
+Received: from eggs.gnu.org ([209.51.188.92]:33835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMWLb-0007fy-9Q
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:27:24 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hMWLd-0007ht-GK
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:27:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMWLa-0003Gq-Aw
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:27:23 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hMWLc-0003IG-Lb
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:27:25 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri,  3 May 2019 13:26:44 +0200
-Message-Id: <20190503112654.4393-3-laurent@vivier.eu>
+Date: Fri,  3 May 2019 13:26:49 +0200
+Message-Id: <20190503112654.4393-8-laurent@vivier.eu>
 In-Reply-To: <20190503112654.4393-1-laurent@vivier.eu>
 References: <20190503112654.4393-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 02/12] CODING_STYLE: specify the indent rule
- for multiline code
+Subject: [Qemu-devel] [PULL v2 07/12] Update configure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,74 +23,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, qemu-trivial@nongnu.org, Richard Henderson <rth@twiddle.net>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Michael Tokarev <mjt@tls.msk.ru>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Wei Yang <richardw.yang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, qemu-trivial@nongnu.org, Richard Henderson <rth@twiddle.net>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Michael Tokarev <mjt@tls.msk.ru>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Stefan Weil <sw@weilnetz.de>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-From: Wei Yang <richardw.yang@linux.intel.com>
+From: Stefan Weil <sw@weilnetz.de>
 
-We didn't specify the indent rule for multiline code here, which may
-mislead users. And in current code, the code use various styles.
+The last *.aml file was removed in commit 13b1881aacc7e5018773bd545bbaf8d5476699ee.
 
-Add this rule in CODING_STYLE to make sure this is clear to every one.
-
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Message-Id: <20190304071631.27567-2-richardw.yang@linux.intel.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190409053320.14612-1-sw@weilnetz.de>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- CODING_STYLE | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ configure | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/CODING_STYLE b/CODING_STYLE
-index ec075dedc4a8..90321e9c2821 100644
---- a/CODING_STYLE
-+++ b/CODING_STYLE
-@@ -29,6 +29,45 @@ Spaces of course are superior to tabs because:
- 
- Do not leave whitespace dangling off the ends of lines.
- 
-+1.1 Multiline Indent
-+
-+There are several places where indent is necessary:
-+
-+ - if/else
-+ - while/for
-+ - function definition & call
-+
-+When breaking up a long line to fit within line width, we need a proper indent
-+for the following lines.
-+
-+In case of if/else, while/for, align the secondary lines just after the
-+opening parenthesis of the first.
-+
-+For example:
-+
-+    if (a == 1 &&
-+        b == 2) {
-+
-+    while (a == 1 &&
-+           b == 2) {
-+
-+In case of function, there are several variants:
-+
-+    * 4 spaces indent from the beginning
-+    * align the secondary lines just after the opening parenthesis of the
-+      first
-+
-+For example:
-+
-+    do_something(x, y,
-+        z);
-+
-+    do_something(x, y,
-+                 z);
-+
-+    do_something(x, do_another(y,
-+                               z));
-+
- 2. Line width
- 
- Lines should be 80 characters; try not to make them longer.
+diff --git a/configure b/configure
+index a2607afb3408..14f02452f9d4 100755
+--- a/configure
++++ b/configure
+@@ -7880,7 +7880,6 @@ LINKS="$LINKS python"
+ for bios_file in \
+     $source_path/pc-bios/*.bin \
+     $source_path/pc-bios/*.lid \
+-    $source_path/pc-bios/*.aml \
+     $source_path/pc-bios/*.rom \
+     $source_path/pc-bios/*.dtb \
+     $source_path/pc-bios/*.img \
 -- 
 2.20.1
