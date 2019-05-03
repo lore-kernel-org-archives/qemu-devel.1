@@ -2,91 +2,68 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50700C04AAA
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 08:27:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82775C04AAA
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 08:28:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24F6B205F4
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 08:27:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24F6B205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 4F2842087F
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 08:28:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ao2.it header.i=@ao2.it header.b="v8Iky5DF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F2842087F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ao2.it
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36513 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36523 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMTX9-0000eG-E7
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 04:27:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54717)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hMTWS-0000NG-HP
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 04:26:25 -0400
+	id 1hMTYj-0001Jx-Ic
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 04:28:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55086)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <ao2@ao2.it>)
+	id 1hMTXu-0000yg-SN
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 04:27:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hMTWR-00062f-Mv
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 04:26:24 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:34636
-	helo=mail.default.ilande.uk0.bigv.io)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hMTWP-00061V-R0
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 04:26:23 -0400
-Received: from host109-149-60-255.range109-149.btcentralplus.com
-	([109.149.60.255] helo=[192.168.1.65])
-	by mail.default.ilande.uk0.bigv.io with esmtpsa
-	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hMTTi-0005pB-TN; Fri, 03 May 2019 09:23:35 +0100
-To: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org
-References: <1556194715-24427-1-git-send-email-frederic.konrad@adacore.com>
-	<1556194715-24427-2-git-send-email-frederic.konrad@adacore.com>
-	<c1ba4bd6-0790-9d41-eb6b-4a21fa17ec10@ilande.co.uk>
-	<05b496be-408a-50b5-7b38-c402b172c962@ilande.co.uk>
-	<8ebd3335-188d-a5ff-e15e-cdf22b955660@adacore.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
-	mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
-	3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
-	E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
-	PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
-	PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
-	AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
-	OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
-	NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
-	mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
-	z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
-	T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
-	DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
-	y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
-	2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
-	14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
-	YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
-	Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
-	BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
-	opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
-	NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
-	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
-	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
-	imgcU9TTGC5qd9g=
-Message-ID: <e9a62641-0a35-5adb-f305-178ff93db3f9@ilande.co.uk>
-Date: Fri, 3 May 2019 09:24:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <ao2@ao2.it>) id 1hMTXt-0006vt-Pz
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 04:27:54 -0400
+Received: from mail.ao2.it ([2001:4b98:dc0:41:216:3eff:fe7c:639b]:39650
+	helo=ao2.it)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ao2@ao2.it>) id 1hMTXt-0006uv-EB
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 04:27:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=ao2.it;
+	s=20180927; 
+	h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
+	bh=O/x1pmBYyHhH6YBHV9mpou5EYK1MlQCzx8xBUn4MzGw=; 
+	b=v8Iky5DF6I55sWTtvOWAGdxtxKUyzD+k2H6V5wowpf0cboKr1rLThiHtpCBErJa/GpXh8fOg76W9R9VVNjbVuGyTsDBpUcXDFhZ70USUSpKplFLnaeYlTuC96xihubgZUn+TsImz11oVxssVL32UXg8jM0iy7hoG3RpXqPQh3qyS+S1NJ0ZqLHIPSUP6/SSxYRhhTP6KaIO6vRZyyIAm7k7YfAsQIP+j3tp/ERrYuXa/eevJK7j7TpGk49o6+fL7rEyqAR65kPdC/7HmgI8hGFx1oLEjVJ0pAevZfMIh5b0Fc/P3VocexHMTBYHBcNUTOElyAYrEG9nmi5vbxGlpgQ==;
+Received: from localhost ([::1] helo=jcn)
+	by ao2.it with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.84_2) (envelope-from <ao2@ao2.it>)
+	id 1hMTXl-0001Ll-K1; Fri, 03 May 2019 10:27:45 +0200
+Received: from ao2 by jcn with local (Exim 4.92) (envelope-from <ao2@ao2.it>)
+	id 1hMTXm-0004Ig-Eq; Fri, 03 May 2019 10:27:46 +0200
+From: Antonio Ospite <ao2@ao2.it>
+To: qemu-devel@nongnu.org
+Date: Fri,  3 May 2019 10:27:27 +0200
+Message-Id: <20190503082728.16485-2-ao2@ao2.it>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190503082728.16485-1-ao2@ao2.it>
+References: <20190503082728.16485-1-ao2@ao2.it>
 MIME-Version: 1.0
-In-Reply-To: <8ebd3335-188d-a5ff-e15e-cdf22b955660@adacore.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-GB
+X-Face: z*RaLf`X<@C75u6Ig9}{oW$H; 1_\2t5)({*|jhM<pyWR#k60!#=#>/Vb;
+	]yA5<GWI5`6u&+ ; 6b'@y|8w"wB;
+	4/e!7wYYrcqdJFY,~%Gk_4]cq$Ei/7<j&N3ah(m`ku?pX.&+~:_/wC~dwn^)MizBG
+	!pE^+iDQQ1yC6^,)YDKkxDd!T>\I~93>J<_`<4)A{':UrE
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 109.149.60.255
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] leon3: add a little bootloader
+X-Received-From: 2001:4b98:dc0:41:216:3eff:fe7c:639b
+Subject: [Qemu-devel] [PATCH v2 1/2] configure: set source_path only once
+ and make its definition more robust
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,40 +75,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, philmd@redhat.com, chouteau@adacore.com,
-	atar4qemu@gmail.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Antonio Ospite <ao2@ao2.it>,
+	Antonio Ospite <antonio.ospite@collabora.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503082407.v3bqbwue-zAaNjC5yzIGF3Wv_bPLywDBGhppoXXQpGw@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190503082727.sy2Vx2Qd9R7M4XDyeywwA97HmHTlNucEmQYYuqH3mYA@z>
 
-On 03/05/2019 09:18, KONRAD Frederic wrote:
+From: Antonio Ospite <antonio.ospite@collabora.com>
 
-> Hi Mark,
-> 
->>>>       }
->>>
->>> I think this patch is basically okay, however if you don't supply both a kernel and
->>> bios then you get the slightly enigmatic message below:
->>>
->>> $ ./qemu-system-sparc -M leon3_generic
->>> qemu-system-sparc: Can't read bios image (null)
->>>
->>> Perhaps add a define for LEON3_BIOS_FILENAME and return that if filename == NULL to
->>> give a better error message?
->>
->> Okay I see there is already a PROM_FILENAME that exists and can be used here.
-> 
-> I think we already have this behavior without this patch. Should this be fixed
-> in an other patch?
+Since commit 79d77bcd36 (configure: Remove --source-path option,
+2019-04-29) source_path cannot be overridden anymore, move it out of the
+"default parameters" block since the word "default" may suggest that the
+value can change, while in fact it does not.
 
-Hi Frederic,
+While at it, only set source_path once and separate the positional
+argument of basename with "--" to more robustly cover the case of path
+names starting with a dash.
 
-Yes, that probably makes sense here since it will make rebases slightly easier, plus
-gives people the option to backport if required.
+Signed-off-by: Antonio Ospite <antonio.ospite@collabora.com>
+---
+ configure | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/configure b/configure
+index 60719ddcc5..9832cbca5c 100755
+--- a/configure
++++ b/configure
+@@ -276,10 +276,10 @@ ld_has() {
+     $ld --help 2>/dev/null | grep ".$1" >/dev/null 2>&1
+ }
+ 
+-# default parameters
+-source_path=$(dirname "$0")
+ # make source path absolute
+-source_path=$(cd "$source_path"; pwd)
++source_path=$(cd "$(dirname -- "$0")"; pwd)
++
++# default parameters
+ cpu=""
+ iasl="iasl"
+ interp_prefix="/usr/gnemul/qemu-%M"
+-- 
+2.20.1
 
-ATB,
-
-Mark.
 
