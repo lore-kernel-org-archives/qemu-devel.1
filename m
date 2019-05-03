@@ -2,81 +2,82 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA0CCC43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A06C6C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:06:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8468B2070B
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:05:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zEDK/eaw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8468B2070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 768B62070B
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:06:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 768B62070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41906 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41936 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMZkT-00042B-T3
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 11:05:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54092)
+	id 1hMZlY-0004m6-L7
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 11:06:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMZi5-0002Pf-4T
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:02:53 -0400
+	(envelope-from <philmd@redhat.com>) id 1hMZkd-0004Jv-Qb
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:05:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMZi0-0008Si-UY
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:02:47 -0400
-Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:44625)
+	(envelope-from <philmd@redhat.com>) id 1hMZkb-0001ub-Tj
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:05:27 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43867)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hMZhx-0008Oa-EW
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:02:43 -0400
-Received: by mail-ot1-x32d.google.com with SMTP id d10so452056otp.11
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 08:02:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=G0fIRemkfFntSQ7/A0AdRDDSInJ+9Vrfm9muU0cuwSo=;
-	b=zEDK/eawqpvc7oa8PRGJZ/ub9FyFcTfUGKW46nVBQUJJjYv7P21Ba4VzZlCSpb9O23
-	f3KZoF8fT/oi3EhK0tN+/Xsm88D8kvZlr4kiZ19QqJjFebV8mlNCMIxFIMZP59CW78HC
-	1B4ypEmezAapzCSDUjT8ovYi+7gw+vTPjmLHR2WhX6ZaZDMBwaud5QOgeuzqHDrTrD7e
-	8wxAro+5FsB76cxbcxHeMJhrgegqv/n2zr7EoW5W220maowmzthgmF5zlBCn3KOi5MiR
-	dOwKcUewAKTRjCsbKyL8ovr+snIZORujxOFdTtOF+9pyVolqzAjp+VsXOXiJqJW2ZR+k
-	vpNA==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hMZka-0001tT-8f
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:05:25 -0400
+Received: by mail-wr1-f65.google.com with SMTP id a12so8282746wrq.10
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 08:05:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=G0fIRemkfFntSQ7/A0AdRDDSInJ+9Vrfm9muU0cuwSo=;
-	b=V8qc1J57bJZ52xyh1hRNkeY/i1FGh4mxK/n7vHDZtg9CiGsU3gvQKrl7zwkr2klK1W
-	6hovjw8axy36ryIJKgdNBbSQTpRmZd0bMzSelA8/jC58rVGMQOEtQBzn2shij0ZAE1Ai
-	DwutMlnhxeaPtINcvYdWtxO8jY7yFFnNLi3k52wPZqOinz8yzkooC/QDimWiCJ7WfP0w
-	1QYgSBxPmqB7ZENhlNsJJ7mXPuBpFHX1cD12SivB3x+TGhi8uFpDrhkug5YOXMlJj0ug
-	utGRgfGV1+RhayN2a2Cb4jRoadWoxjiVuE59NpMqrhk9ihc0rxOTP3y+l28OkPdGvVbJ
-	DOWQ==
-X-Gm-Message-State: APjAAAUKbYh7Fg0VFV7GLUdLBeN7pQlpxk2YFwe1tIC1A/Q2saX4+iSy
-	nelVJbPffBjFCg2lanni3u2xkknq7qEUkmeuVl/PJw==
-X-Google-Smtp-Source: APXvYqySTMgO52ukSox2oWL0i3Mcoc1YeRbqvl3v3PLR/+TAadufBMYYvWxZJPgvctZCDmDtwYK1AMboChoOYWZ1JMg=
-X-Received: by 2002:a9d:6d19:: with SMTP id o25mr6282493otp.151.1556895755562; 
-	Fri, 03 May 2019 08:02:35 -0700 (PDT)
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=fx/CEaqulF8jXdEU1EEgRgqXdt6pDvUapQcagCObCMc=;
+	b=KwX5UgwLG2brn//wxEBvvqZcz0X+IS9B6mMc0ssIjq6zPFhtkdvfnmbufMstlA0jG1
+	Jrgm7RUS006jz07/IqRvbULIBsmYVTtc/lYGzdOq+IARKNxQwo2G/G83BaG4bdPkoKrZ
+	TnUwcae2zq4bucy2Jjv5HA5Zps56tM/HWgqqdcOKQcNvIKUNibZhhV1MHaJY1EGyREkL
+	GZKdP3Fn4V5aJibOou6IhQJhHeqbyw0ct0+EeHCc28viqVFjhywHNnbMA7IFF0XNJqou
+	JFv34ESmZOEE593OGSaMy5lvq+VD///bOE3aq4qKLMKwFnaljmfIEt/Qp11YY5Q6ORuo
+	kUVQ==
+X-Gm-Message-State: APjAAAX7Lyy+kY64U1TBaLoA0u5rSV6H+V9ZCxhnbfRRyWmeXYVNfxSd
+	dNtriYJm6y9gGLxM8CzIUbvsXQ==
+X-Google-Smtp-Source: APXvYqysjg8dUSCcBolOa0ppWC9wj3wUbPP8xgLlOFaAQ876eDK5S/6dGVFJKsFMwD045lNhFSv3/w==
+X-Received: by 2002:adf:f051:: with SMTP id t17mr6960449wro.73.1556895923051; 
+	Fri, 03 May 2019 08:05:23 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	a11sm1627275wmm.35.2019.05.03.08.05.21
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Fri, 03 May 2019 08:05:22 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>,
+	Samuel Thibault <samuel.thibault@ens-lyon.org>,
+	=?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+References: <20190502223007.29494-1-samuel.thibault@ens-lyon.org>
+	<CAFEAcA-eVOZhXj+OLB+VvxXZTniny_sMCFaeWsv+2uEErM-=zA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <b70484a8-b408-7c2b-7fd7-27f1c1d98f4d@redhat.com>
+Date: Fri, 3 May 2019 17:05:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190503004130.8285-1-ehabkost@redhat.com>
-In-Reply-To: <20190503004130.8285-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 May 2019 16:02:24 +0100
-Message-ID:
- <CAFEAcA81mqN6gDcyW1vzsnER-7CMzsdWreZ93X8Z6b2vCL_2pQ@mail.gmail.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
+In-Reply-To: <CAFEAcA-eVOZhXj+OLB+VvxXZTniny_sMCFaeWsv+2uEErM-=zA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::32d
-Subject: Re: [Qemu-devel] [PULL 00/19] Python queue, 2019-05-02
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PULL 0/2] slirp: move slirp as git submodule
+ project
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,47 +89,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	Jan Kiszka <jan.kiszka@siemens.com>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503150224.uy5NM8v2GC0u6v81gnV_dimIBlTtX7HZVyf2WCyuLxM@z>
+Message-ID: <20190503150521.97YTg129SAHXMVqycius57nNxScBzOQ-IQGXISBVyCE@z>
 
-On Fri, 3 May 2019 at 01:41, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> The following changes since commit 8482ff2eb3bb95020eb2f370a9b3ea26511e41=
-df:
->
->   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request'=
- into staging (2019-05-02 12:04:51 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
->
-> for you to fetch changes up to faf441429adfe5767be52c5dcdb8bc03161d064f:
->
->   configure: automatically pick python3 is available (2019-05-02 21:33:27=
- -0300)
->
-> ----------------------------------------------------------------
-> Python queue, 2019-05-02
->
-> * configure: automatically pick python3 is available
->   (Daniel P. Berrang=C3=A9)
->
-> * tests/acceptance (Cleber Rosa, Philippe Mathieu-Daud=C3=A9):
->   * Multi-architecture test support
->   * Multiple arch-specific boot_linux_console test cases
->   * Increase verbosity of avocado by default
->   * docstring improvements
->
+On 5/3/19 2:54 PM, Peter Maydell wrote:
+> On Thu, 2 May 2019 at 23:30, Samuel Thibault
+> <samuel.thibault@ens-lyon.org> wrote:
+>>
+>> The following changes since commit 8482ff2eb3bb95020eb2f370a9b3ea26511e41df:
+>>
+>>   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-05-02 12:04:51 +0100)
+>>
+>> are available in the Git repository at:
+>>
+>>   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+>>
+>> for you to fetch changes up to 7c57bdd82026ba03f3158bbcd841afde7c2dc43a:
+>>
+>>   build-sys: move slirp as git submodule project (2019-05-03 00:15:37 +0200)
+>>
+>> ----------------------------------------------------------------
+>> slirp: move slirp as git submodule project
+>>
+>> Marc-André Lureau (2):
+>>   build-sys: pass CFLAGS & LDFLAGS to subdir-slirp
+>>   build-sys: move slirp as git submodule project
+>>
+>> ----------------------------------------------------------------
+>> Marc-André Lureau (2):
+>>       build-sys: pass CFLAGS & LDFLAGS to subdir-slirp
+>>       build-sys: move slirp as git submodule project
+>>
+> 
+> 
+> Applied, thanks.
 
+TL;DR: You might need to run 'git submodule deinit --force slirp' if ou
+get errors after merging this.
 
-Applied, thanks.
+--
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
+FYI I was running MinGW tests with "make docker-test-mingw@fedora
+SHOW_ENV=1 J=8 NETWORK=1" and ran "git pull" to refresh my local repo,
+and got:
 
--- PMM
+$ make docker-test-mingw@fedora SHOW_ENV=1 J=8 NETWORK=1
+make[1]: Entering directory '/home/phil/source/qemu'
+  GEN
+/home/phil/source/qemu/docker-src.2019-05-03-16.55.51.7157/qemu.tar
+slirp: unmerged (59a1b1f165458c2acb7ff0525b543945f7416225)
+fatal: git-write-tree: error building trees
+Cannot save the current index state
+Cloning into
+'/home/phil/source/qemu/docker-src.2019-05-03-16.55.51.7157/qemu.tar.vroot'...
+done.
+error: pathspec 'slirp:' did not match any file(s) known to git.
+error: pathspec 'needs' did not match any file(s) known to git.
+error: pathspec 'merge' did not match any file(s) known to git.
+failed to checkout slirp: needs merge revision
+tar: /var/tmp/qemu/qemu.tar: Cannot open: No such file or directory
+tar: Error is not recoverable: exiting now
+Failed to untar source
+tests/docker/Makefile.include:203: recipe for target 'docker-run' failed
+make[1]: *** [docker-run] Error 1
+
+I don't run builds on this host (no tools installed) but everything via
+Docker, so (re-)running ./configure is not an option.
+
+$ git status
+Unmerged paths:
+  (use "git reset HEAD <file>..." to unstage)
+  (use "git add <file>..." to mark resolution)
+
+        added by us:     slirp
+
+$ ls -la slirp/
+total 8
+drwxr-xr-x  2 phil phil 4096 May  3 16:49 .
+drwxr-xr-x 56 phil phil 4096 May  3 16:55 ..
+
+$ git submodule status slirp
+U0000000000000000000000000000000000000000 slirp
+
+Daniel suggested on IRC to run:
+
+$ git submodule deinit --force slirp
+
+It worked fine after running it.
+
+Regards,
+
+Phil.
 
