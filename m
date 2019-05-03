@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37933)
+Received: from eggs.gnu.org ([209.51.188.92]:37995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hMMHQ-0004A3-RZ
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:42:26 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hMMHV-0004F0-NV
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:42:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hMMHP-00072F-Hm
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:42:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38006)
+	(envelope-from <ehabkost@redhat.com>) id 1hMMHU-000754-Hz
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:42:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60988)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hMMHN-00070c-G3
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:42:21 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hMMHU-00074q-AX
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:42:28 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu,  2 May 2019 21:41:25 -0300
-Message-Id: <20190503004130.8285-15-ehabkost@redhat.com>
+Date: Thu,  2 May 2019 21:41:29 -0300
+Message-Id: <20190503004130.8285-19-ehabkost@redhat.com>
 In-Reply-To: <20190503004130.8285-1-ehabkost@redhat.com>
 References: <20190503004130.8285-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 14/19] tests/boot_linux_console: add a test for
- mips64el + malta
+Subject: [Qemu-devel] [PULL 18/19] tests/boot_linux_console: add a test for
+ alpha + clipper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +32,30 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Cleber Rosa
 From: Cleber Rosa <crosa@redhat.com>
 
 Similar to the x86_64 + pc test, it boots a Linux kernel on a Malta
-board and verify the serial is working.
+board and verify the serial is working.  One extra command added to
+the QEMU command line is '-vga std', because the kernel used is
+known to crash without it.
 
-If mips64el is a target being built, "make check-acceptance" will
-automatically include this test by the use of the "arch:mips64el"
-tags.
+If alpha is a target being built, "make check-acceptance" will
+automatically include this test by the use of the "arch:alpha" tags.
 
 Alternatively, this test can be run using:
 
-    $ avocado run -t arch:mips64el tests/acceptance
-    $ avocado run -t machine:malta tests/acceptance
+    $ avocado run -t arch:alpha tests/acceptance
+    $ avocado run -t machine:clipper tests/acceptance
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <20190312171824.5134-15-crosa@redhat.com>
+Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+Message-Id: <20190312171824.5134-21-crosa@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
  .travis.yml                            |  2 +-
- tests/acceptance/boot_linux_console.py | 33 ++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+), 1 deletion(-)
+ tests/acceptance/boot_linux_console.py | 22 ++++++++++++++++++++++
+ 2 files changed, 23 insertions(+), 1 deletion(-)
 
 diff --git a/.travis.yml b/.travis.yml
-index f6f5d39aca..cb46098972 100644
+index 9b271b963d..66448d99d6 100644
 --- a/.travis.yml
 +++ b/.travis.yml
 @@ -223,7 +223,7 @@ matrix:
@@ -62,55 +63,46 @@ index f6f5d39aca..cb46098972 100644
      # Acceptance (Functional) tests
      - env:
 -        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
-oftmmu,mips-softmmu"
+oftmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-so=
+ftmmu"
 +        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
-oftmmu,mips-softmmu,mips64el-softmmu"
+oftmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-so=
+ftmmu,alpha-softmmu"
          - TEST_CMD=3D"make check-acceptance"
        addons:
          apt:
 diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
 ot_linux_console.py
-index 028fefd7ee..38b33b25f7 100644
+index 7c1099e5c8..d5c500ea30 100644
 --- a/tests/acceptance/boot_linux_console.py
 +++ b/tests/acceptance/boot_linux_console.py
-@@ -101,3 +101,36 @@ class BootLinuxConsole(Test):
+@@ -195,3 +195,25 @@ class BootLinuxConsole(Test):
          self.vm.launch()
          console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
 ine
          self.wait_for_console_pattern(console_pattern)
 +
-+    def test_mips64el_malta(self):
++    def test_alpha_clipper(self):
 +        """
-+        This test requires the ar tool to extract "data.tar.gz" from
-+        the Debian package.
-+
-+        The kernel can be rebuilt using this Debian kernel source [1] an=
-d
-+        following the instructions on [2].
-+
-+        [1] http://snapshot.debian.org/package/linux-2.6/2.6.32-48/
-+            #linux-source-2.6.32_2.6.32-48
-+        [2] https://kernel-team.pages.debian.net/kernel-handbook/
-+            ch-common-tasks.html#s-common-official
-+
-+        :avocado: tags=3Darch:mips64el
-+        :avocado: tags=3Dmachine:malta
++        :avocado: tags=3Darch:alpha
++        :avocado: tags=3Dmachine:clipper
 +        """
-+        deb_url =3D ('http://snapshot.debian.org/archive/debian/'
-+                   '20130217T032700Z/pool/main/l/linux-2.6/'
-+                   'linux-image-2.6.32-5-5kc-malta_2.6.32-48_mipsel.deb'=
-)
-+        deb_hash =3D '1aaec92083bf22fda31e0d27fa8d9a388e5fc3d5'
-+        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
-+        kernel_path =3D self.extract_from_deb(deb_path,
-+                                            '/boot/vmlinux-2.6.32-5-5kc-=
-malta')
++        kernel_url =3D ('http://archive.debian.org/debian/dists/lenny/ma=
+in/'
++                      'installer-alpha/current/images/cdrom/vmlinuz')
++        kernel_hash =3D '3a943149335529e2ed3e74d0d787b85fb5671ba3'
++        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
+_hash)
 +
-+        self.vm.set_machine('malta')
++        uncompressed_kernel =3D archive.uncompress(kernel_path, self.wor=
+kdir)
++
++        self.vm.set_machine('clipper')
 +        self.vm.set_console()
 +        kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE + 'conso=
 le=3DttyS0'
-+        self.vm.add_args('-kernel', kernel_path,
++        self.vm.add_args('-vga', 'std',
++                         '-kernel', uncompressed_kernel,
 +                         '-append', kernel_command_line)
 +        self.vm.launch()
 +        console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
