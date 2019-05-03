@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55876)
+Received: from eggs.gnu.org ([209.51.188.92]:38136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1hMRDH-00019D-2U
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:58:28 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hMSAq-0003n3-T9
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:00:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1hMRDF-0005qa-UD
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:58:27 -0400
-Message-ID: <1556863097.1887.4.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Fri, 03 May 2019 15:58:17 +1000
-In-Reply-To: <20190503055316.6441-1-sjitindarsingh@gmail.com>
-References: <20190503055316.6441-1-sjitindarsingh@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH 00/13] target/ppc: Implement KVM
- support under TCG
+	(envelope-from <kraxel@redhat.com>) id 1hMSAp-0006EU-Mp
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:00:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50118)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hMSAp-0006Dr-F9
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 02:59:59 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri,  3 May 2019 08:59:47 +0200
+Message-Id: <20190503065954.17069-1-kraxel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/7] Usb 20190503 v2 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,76 +25,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, clg@kaod.org, groug@kaod.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Fri, 2019-05-03 at 15:53 +1000, Suraj Jitindar Singh wrote:
-> This patch series adds the necessary parts so that a tcg guest is
-> able to use
-> kvm facilities. That is a tcg guest can boot its own kvm guests.
-> 
-> The main requirements for this were a few registers and instructions
-> as well as
-> some hcalls and the addition of partition scoped translation in the
-> radix mmu
-> emulation.
-> 
-> This can be used to boot a kvm guest under a pseries tcg guest:
-> Use power9_v2.2 cpu and add -machine cap-nested-hv=on for the first
-> guest.
-> Then inside that guest boot a kvm guest as normal.
-> This takes advantage of the new hcalls with qemu emulating them as a
-> normal
-> hypervisor would on a real machine.
-> 
-> This can also be used to boot a kvm guest under a powernv tcg guest:
-> Use any power9 cpu type.
-> This takes advantage of the new hv register access added.
-> Note that for powernv there is no xive interrupt excalation for KVM
-> which means
-> that while the guest will boot, it won't receive any interrupts.
+The following changes since commit f75d15231e56cb0f2bafe19faf1229c459a607=
+31:
 
-Ah so I'm suddenly aware I based this on the wrong tree so it won't
-apply to your dwg-ppc-for-4.1 David.
+  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into sta=
+ging (2019-04-30 17:06:57 +0100)
 
-Consider this a RFC and I'll rebase and resend when required.
+are available in the Git repository at:
 
-> 
-> Suraj Jitindar Singh (13):
->   target/ppc: Implement the VTB for HV access
->   target/ppc: Work [S]PURR implementation and add HV support
->   target/ppc: Add SPR ASDR
->   target/ppc: Add SPR TBU40
->   target/ppc: Add privileged message send facilities
->   target/ppc: Enforce that the root page directory size must be at
-> least
->     5
->   target/ppc: Handle partition scoped radix tree translation
->   target/ppc: Implement hcall H_SET_PARTITION_TABLE
->   target/ppc: Implement hcall H_ENTER_NESTED
->   target/ppc: Implement hcall H_TLB_INVALIDATE
->   target/ppc: Implement hcall H_COPY_TOFROM_GUEST
->   target/ppc: Introduce POWER9 DD2.2 cpu type
->   target/ppc: Enable SPAPR_CAP_NESTED_KVM_HV under tcg
-> 
->  hw/ppc/ppc.c                    |  46 ++++-
->  hw/ppc/spapr_caps.c             |  22 ++-
->  hw/ppc/spapr_cpu_core.c         |   1 +
->  hw/ppc/spapr_hcall.c            | 409
-> +++++++++++++++++++++++++++++++++++++++
->  include/hw/ppc/ppc.h            |   4 +-
->  include/hw/ppc/spapr.h          |   7 +-
->  linux-user/ppc/cpu_loop.c       |   5 +
->  target/ppc/cpu-models.c         |   2 +
->  target/ppc/cpu-models.h         |   1 +
->  target/ppc/cpu.h                |  70 +++++++
->  target/ppc/excp_helper.c        |  79 +++++++-
->  target/ppc/helper.h             |   9 +
->  target/ppc/misc_helper.c        |  46 +++++
->  target/ppc/mmu-radix64.c        | 412 ++++++++++++++++++++++++++++
-> ------------
->  target/ppc/mmu-radix64.h        |   4 +
->  target/ppc/timebase_helper.c    |  20 ++
->  target/ppc/translate.c          |  28 +++
->  target/ppc/translate_init.inc.c | 107 +++++++++--
->  18 files changed, 1115 insertions(+), 157 deletions(-)
-> 
+  git://git.kraxel.org/qemu tags/usb-20190503-v2-pull-request
+
+for you to fetch changes up to ccb799313a5926a6aa49018bbc67fe6165fad7f3:
+
+  hw/usb: avoid format truncation warning when formatting port name (2019=
+-05-03 08:56:58 +0200)
+
+----------------------------------------------------------------
+usb: bugfixes for mtp and xhci, split ohci-pci.
+
+----------------------------------------------------------------
+
+Bandan Das (1):
+  usb-mtp: change default to success for usb_mtp_update_object
+
+Daniel P. Berrang=C3=A9 (3):
+  usb-mtp: fix string length for filename when writing metadata
+  usb-mtp: fix alignment of access of ObjectInfo filename field
+  hw/usb: avoid format truncation warning when formatting port name
+
+Longpeng (1):
+  usb/xhci: avoid trigger assertion if guest write wrong epid
+
+Thomas Huth (2):
+  hw/usb/hcd-ohci: Do not use PCI functions with sysbus devices in
+    ohci_die()
+  hw/usb/hcd-ohci: Move PCI-related code into a separate file
+
+ hw/usb/hcd-ohci.h     | 104 ++++++++++++++++++++
+ hw/usb/dev-mtp.c      |  10 +-
+ hw/usb/hcd-ohci-pci.c | 163 +++++++++++++++++++++++++++++++
+ hw/usb/hcd-ohci.c     | 219 ++++--------------------------------------
+ hw/usb/hcd-xhci.c     |   6 +-
+ hw/sh4/Kconfig        |   2 +-
+ hw/usb/Kconfig        |   6 +-
+ hw/usb/Makefile.objs  |   1 +
+ 8 files changed, 302 insertions(+), 209 deletions(-)
+ create mode 100644 hw/usb/hcd-ohci.h
+ create mode 100644 hw/usb/hcd-ohci-pci.c
+
+--=20
+2.18.1
