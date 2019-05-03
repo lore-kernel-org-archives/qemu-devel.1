@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4AC8C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:12:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29969C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:12:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5739F20651
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:12:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5739F20651
+	by mail.kernel.org (Postfix) with ESMTPS id F27DF20651
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:12:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F27DF20651
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44852 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44854 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMbj6-0004Ne-Dk
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 13:12:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60746)
+	id 1hMbjE-0004Tq-4i
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 13:12:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMbfY-0001Ta-IW
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMbfY-0001TP-AW
 	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:08:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMbfX-0003Ds-EC
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMbfX-0003Dy-Es
 	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:08:20 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:46172 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:46178 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hMbfX-0001h5-7C
+	id 1hMbfX-0001hD-7v
 	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:08:19 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 3C7FB1A21EF;
+	by mail.rt-rk.com (Postfix) with ESMTP id 4A7D81A2203;
 	Fri,  3 May 2019 19:07:17 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
 	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 16A581A2203;
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 246E71A1E19;
 	Fri,  3 May 2019 19:07:17 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  3 May 2019 19:06:47 +0200
-Message-Id: <1556903209-6036-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri,  3 May 2019 19:06:48 +0200
+Message-Id: <1556903209-6036-5-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1556903209-6036-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1556903209-6036-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v3 3/5] linux-user: Add support the
- SIOCSIFPFLAGS and SIOCGIFPFLAGS ioctls
+Subject: [Qemu-devel] [PATCH v3 4/5] linux-user: Add support for
+ setsockopt() options IPV6_<ADD|DROP>_MEMBERSHIP
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,56 +71,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190503170647.urYo6BnKtZUygJQzCXiqf5wgDm1vtPFDoeukWykWc5o@z>
+Message-ID: <20190503170648.ZC1UML2fxpCZcV_c36W3e1X-PgFHsn-EddkBZibay_0@z>
 
 From: Neng Chen <nchen@wavecomp.com>
 
-Add support for setting and getting extended (private) flags of a
-network device via SIOCSIFPFLAGS and SIOCGIFPFLAGS ioctls.
+Add support for options IPV6_ADD_MEMBERSHIP and IPV6_ADD_MEMBERSHIP
+of the syscall setsockopt(). These options control membership in
+multicast groups. Their argument is a pointer to a struct ipv6_mreq,
+which is in turn defined as:
 
-The ioctl numeric value is platform-independent and determined by
-the file include/uapi/linux/sockios.h in Linux kernel source code:
+struct ipv6_mreq {
+    /* IPv6 multicast address of group */
+    struct in6_addr  ipv6mr_multiaddr;
+    /* local IPv6 address of interface */
+    int              ipv6mr_interface;
+};
 
-  #define SIOCSIFPFLAGS 0x8934
-
-The ioctls set and get field ifr_flags of type short in the structure
-ifreq. Such functionality in QEMU is achieved using MK_STRUCT() and
-MK_PTR() macros with an appropriate argument.
+The in6_addr structure consists of fields that are always big-endian
+(on any host), so the ipv6_mreq's field ipv6mr_multiaddr doesn't need
+any endian conversion, whereas ipv6mr_interface does.
 
 Signed-off-by: Neng Chen <nchen@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <1554839486-3527-1-git-send-email-aleksandar.markovic@rt-rk.com>
 ---
- linux-user/ioctls.h       | 2 ++
- linux-user/syscall_defs.h | 2 ++
- 2 files changed, 4 insertions(+)
+ linux-user/syscall.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index c37adc5..76375df 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -206,6 +206,8 @@
-   IOCTL(SIOCADDMULTI, IOC_W, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
-   IOCTL(SIOCDELMULTI, IOC_W, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
-   IOCTL(SIOCGIFINDEX, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
-+  IOCTL(SIOCSIFPFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
-+  IOCTL(SIOCGIFPFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
-   IOCTL(SIOCSIFLINK, 0, TYPE_NULL)
-   IOCTL_SPECIAL(SIOCGIFCONF, IOC_W | IOC_R, do_ioctl_ifconf,
-                 MK_PTR(MK_STRUCT(STRUCT_ifconf)))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 2941231..8904d35 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -781,6 +781,8 @@ struct target_pollfd {
- #define TARGET_SIOCADDMULTI    0x8931          /* Multicast address lists      */
- #define TARGET_SIOCDELMULTI    0x8932
- #define TARGET_SIOCGIFINDEX    0x8933
-+#define TARGET_SIOCSIFPFLAGS   0x8934          /* set extended flags          */
-+#define TARGET_SIOCGIFPFLAGS   0x8935          /* get extended flags          */
- 
- /* Bridging control calls */
- #define TARGET_SIOCGIFBR       0x8940          /* Bridging support             */
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 96cd4bf..b7eb4b7 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -1892,6 +1892,25 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+                                        &pki, sizeof(pki)));
+             break;
+         }
++        case IPV6_ADD_MEMBERSHIP:
++        case IPV6_DROP_MEMBERSHIP:
++        {
++            struct ipv6_mreq ipv6mreq;
++
++            if (optlen < sizeof(ipv6mreq)) {
++                return -TARGET_EINVAL;
++            }
++
++            if (copy_from_user(&ipv6mreq, optval_addr, sizeof(ipv6mreq))) {
++                return -TARGET_EFAULT;
++            }
++
++            ipv6mreq.ipv6mr_interface = tswap32(ipv6mreq.ipv6mr_interface);
++
++            ret = get_errno(setsockopt(sockfd, level, optname,
++                                       &ipv6mreq, sizeof(ipv6mreq)));
++            break;
++        }
+         default:
+             goto unimplemented;
+         }
 -- 
 2.7.4
 
