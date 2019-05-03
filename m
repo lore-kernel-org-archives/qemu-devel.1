@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39107)
+Received: from eggs.gnu.org ([209.51.188.92]:41814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hMc63-00041f-Hd
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:35:44 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMcKr-0001Dz-9x
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hMc5w-0004En-SJ
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:35:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49648)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hMc5u-0004Cv-5Y
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:35:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hMc5s-00019Q-Iv
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 17:35:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8E4E72E80CB
-	for <qemu-devel@nongnu.org>; Fri,  3 May 2019 17:35:32 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 May 2019 17:26:30 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1817345 <1817345@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <155085278488.30597.14551761138419562879.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155690439068.32165.1664289279704715772.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1817345] Re: configure script breaks when
- $source_path contains white spaces
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMcKp-0007Pu-JD
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:00 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:54736 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1hMcKp-0007MZ-D3
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:50:59 -0400
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Fri,  3 May 2019 19:50:41 +0200
+Message-Id: <1556905846-14074-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v4 0/5] linux-user: A set of miscellaneous
+ patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,81 +24,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com, nchen@wavecomp.com, daniel.santos@pobox.com, jcmvbkbc@gmail.com, lvivier@redhat.com, thuth@redhat.com, philmd@redhat.com
 
-Antonio has submitted a patchset here:
-https://patchew.org/QEMU/20190503082728.16485-1-ao2@ao2.it/
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
+This is a collection of misc patches for Linux user that I recently
+accumulated from variuous sources. All of them originate from problems
+observed on mips target. However, these changes actually affect and fix
+problems on multiple targets.
 
-** Changed in: qemu
-       Status: New =3D> In Progress
+v3->v4:
 
--- =
+  - improved commit messages (fixed some typos, improved relevance)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1817345
+v2->v3:
 
-Title:
-  configure script breaks when $source_path contains white spaces
+  - updated and improved commit messages
+  - added IPV6_DROP_MEMBERSHIP support to the patch on setsockopt()'s
+    option
 
-Status in QEMU:
-  In Progress
+v1->v2:
 
-Bug description:
-  Hi,
+  - added the patch on setsockopt()'s option IPV6_ADD_MEMBERSHIP
+  - improved the commit message of interp_info sanitizing patch
 
-  I noticed that the configure script breaks when the qemu source
-  directory is in a path containing white spaces, in particular the list
-  of targets is not correctly generated when calling "./configure
-  --help".
+Aleksandar Markovic (2):
+  linux-user: Fix support for the SIOCATMARK and SIOCGPGRP ioctls for
+    xtensa
+  linux-user: Add support for the SIOCSPGRP ioctl for all targets
 
-  Steps to reproduce the problem:
+Daniel Santos (1):
+  linux-user: Sanitize interp_info and, for mips only, init field fp_abi
 
-  $ mkdir "dir with spaces"
-  $ cd dir\ with\ spaces/
-  $ git clone https://git.qemu.org/git/qemu.git
-  $ cd qemu/
-  $ ./configure --help | grep -A3 target-list
+Neng Chen (2):
+  linux-user: Add support the SIOC<G|S>IFPFLAGS ioctls for all targets
+  linux-user: Add support for setsockopt() options
+    IPV6_<ADD|DROP>_MEMBERSHIP
 
-  =
+ linux-user/elfload.c      |  5 +++++
+ linux-user/ioctls.h       |  3 +++
+ linux-user/syscall.c      | 19 +++++++++++++++++++
+ linux-user/syscall_defs.h |  8 +++++++-
+ 4 files changed, 34 insertions(+), 1 deletion(-)
 
-  Actual result:
-
-    --target-list=3DLIST       set target list (default: build everything)
-                             Available targets: dir with *-softmmu dir with =
-
-                             *-linux-user
-
-  =
-
-  Expected result:
-
-    --target-list=3DLIST       set target list (default: build everything)
-                             Available targets: aarch64-softmmu alpha-softm=
-mu =
-
-                             arm-softmmu cris-softmmu hppa-softmmu i386-sof=
-tmmu =
-
-                             lm32-softmmu m68k-softmmu microblaze-softmmu =
-
-
-  =
-
-  This happens because the $mak_wilds variable uses spaces to separate diff=
-erent paths, maybe newlines may be used, which are less likely to be in dir=
-ectory names.
-
-  BTW "shellcheck" may help finding some other problems.
-
-  Qemu version:
-
-  $ git describe =
-
-  v3.1.0-1960-ga05838cb2a
-
-  Thanks,
-     Antonio
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1817345/+subscriptions
+-- 
+2.7.4
