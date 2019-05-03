@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42659)
+Received: from eggs.gnu.org ([209.51.188.92]:42974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMYr9-0001E4-Py
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:08:08 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hMYs0-0001gl-6m
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:09:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMYr8-00052e-OP
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:08:07 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40998)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hMYr8-0004yy-Hw
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:08:06 -0400
-Received: by mail-ot1-x341.google.com with SMTP id g8so5374554otl.8
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 07:08:06 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1hMYrz-0006W0-4k
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:09:00 -0400
+References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
+	<20190402153730.54145-8-vsementsov@virtuozzo.com>
+	<44be7ef0-9a4f-4c44-44eb-81f341ca7ea6@redhat.com>
+	<66de1a9a-e9fd-b853-377d-f5acfe51737a@virtuozzo.com>
+	<35da9a3a-32e2-5db2-1342-ce8d48531709@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <52acdba2-a13a-5323-a804-9cc6b680f2fb@redhat.com>
+Date: Fri, 3 May 2019 16:08:49 +0200
 MIME-Version: 1.0
-References: <20190503002206.9751-1-driver1998@foxmail.com>
-	<39b71c2a-9630-5a56-17c7-d74625f97d55@redhat.com>
-In-Reply-To: <39b71c2a-9630-5a56-17c7-d74625f97d55@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 May 2019 15:07:53 +0100
-Message-ID: <CAFEAcA_o1tF6VEiEZCeFeKB67bDtCGTEHvE0cMAWxicTDfRUOg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Initial Windows on ARM (AArch64
- 64-Bit) host support
+In-Reply-To: <35da9a3a-32e2-5db2-1342-ce8d48531709@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ZppAl84phsH03XPiN6meRlOuYLnzJPjyN"
+Subject: Re: [Qemu-devel] [PATCH v5 07/10] qcow2: qcow2_co_preadv: improve
+ locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +28,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Cao Jiaxi <driver1998@foxmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berrange@redhat.com" <berrange@redhat.com>
 
-On Fri, 3 May 2019 at 11:20, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
-> wrote:
->
-> On 5/3/19 2:22 AM, Cao Jiaxi wrote:
-> > Initial Windows on ARM (AArch64 64-Bit) host support
-> >
-> > This series of patches is for initial support of Windows 10 on ARM as a=
- QEMU host.
-> > Currently only TCG intepreter is working correctly, it crashes when TCG=
- JIT is enabled.
-> >
-> > For now we assume it is built using the clang aarch64-w64-mingw32 toolc=
-hain,
-> > you can get a prebuilt toolchain at https://github.com/mstorsjo/llvm-mi=
-ngw.
-> >
->
-> I'm a bit confused since those patches appear 2 times in my mailbox.
-> Assuming this is a git send-email setup mistake, please consider adding
-> my Reviewed-by/Tested-by here too.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ZppAl84phsH03XPiN6meRlOuYLnzJPjyN
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "berto@igalia.com"
+ <berto@igalia.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ Denis Lunev <den@virtuozzo.com>, "berrange@redhat.com" <berrange@redhat.com>
+Message-ID: <52acdba2-a13a-5323-a804-9cc6b680f2fb@redhat.com>
+Subject: Re: [PATCH v5 07/10] qcow2: qcow2_co_preadv: improve locking
+References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
+ <20190402153730.54145-8-vsementsov@virtuozzo.com>
+ <44be7ef0-9a4f-4c44-44eb-81f341ca7ea6@redhat.com>
+ <66de1a9a-e9fd-b853-377d-f5acfe51737a@virtuozzo.com>
+ <35da9a3a-32e2-5db2-1342-ce8d48531709@virtuozzo.com>
+In-Reply-To: <35da9a3a-32e2-5db2-1342-ce8d48531709@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thanks -- I've applied these patches to target-arm.next, and have
-consolidated the various tags that people have applied to the
-two sets of emails (and checked that they actually are the same
-patches and not different code :-))
+On 30.04.19 11:44, Vladimir Sementsov-Ogievskiy wrote:
+> 30.04.2019 11:38, Vladimir Sementsov-Ogievskiy wrote:
+>> 29.04.2019 19:37, Max Reitz wrote:
+>>> On 02.04.19 17:37, Vladimir Sementsov-Ogievskiy wrote:
+>>>> Background: decryption will be done in threads, to take benefit of i=
+t,
+>>>> we should move it out of the lock first.
+>>>
+>>> ...which is safe after your commit c972fa123c73501b4, I presume.
+>>>
+>>> (At first glance, the patched looked a bit weird to me because it
+>>> doesn't give a reason why dropping the lock around
+>>> qcrypto_block_decrypt() would be OK.)
+>>>
+>>>> But let's go further: it turns out, that for locking around switch
+>>>> cases we have only two variants: when we just do memset(0) not
+>>>> releasing the lock (it is useless) and when we actually can handle t=
+he
+>>>> whole case out of the lock. So, refactor the whole thing to reduce
+>>>> locked code region and make it clean.
+>>>>
+>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
+m>
+>>>> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>>>> ---
+>>>> =C2=A0 block/qcow2.c | 46 ++++++++++++++++++++++--------------------=
+----
+>>>> =C2=A0 1 file changed, 22 insertions(+), 24 deletions(-)
+>>>>
+>>>> diff --git a/block/qcow2.c b/block/qcow2.c
+>>>> index 46e8e39da5..fcf92a7eb6 100644
+>>>> --- a/block/qcow2.c
+>>>> +++ b/block/qcow2.c
+>>>> @@ -1983,6 +1983,7 @@ static coroutine_fn int qcow2_co_preadv(BlockD=
+riverState *bs, uint64_t offset,
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D qcow2=
+_get_cluster_offset(bs, offset, &cur_bytes, &cluster_offset);
+>>>
+>>> Isn't this the only function in the loop that actually needs the lock=
+?
+>>> Wouldn't it make more sense to just take it around this call?
+>>>
+>>
+>> Hmm, looks correct, I'll resend.
+>>
+>>
+>=20
+> Or not, actually, we may have several qcow2_get_data_offset calls under=
+ one lock,
+> if clusters are different kinds of ZERO. So, I think better to keep it =
+as is for now.
 
--- PMM
+Hm, but how is this relevant?  For one thing, if that was a problem if
+some other party concurrently changes the image, then that would be a
+problem in general.  Keeping the lock would hide it for different kinds
+of read-as-zero clusters, but it would still appear if data clusters and
+other clusters are interleaved, wouldn=E2=80=99t it?
+
+Also, this is a coroutine.  As long as nothing yields, nothing gets
+concurrent access.  I don=E2=80=99t see anything outside of
+qcow2_get_cluster_offset() that could yield as long as we only see
+read-as-zero clusters.
+
+Max
+
+
+--ZppAl84phsH03XPiN6meRlOuYLnzJPjyN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzMS3EACgkQ9AfbAGHV
+z0BCGAgAgkgtEKuwKn2/BRPFl9bw8gk3AKwlVquIcDKq8vvzQFpPydbsSqloFEhA
+Ysm/Oxq7kUx+nyT5okf0kG2riJ2muKS3YVMsgmeKcSRrfi9iEgfztfYF3qIwrIiz
+veA9rji6xIWYTdBSIprKQ8QJuRmCE28ahUfzFVpTBFed8F1iSgnbyI06VbHjnBxo
+3QaRgRzw43ktIaEAXYGzB6PbOxXOEz1zeI6QnJSjcUgBZ8AFj3/mbqF4bNv4M1dd
+vglUAF8a8KepBRj/sum3kqaA64BIHmCzEj778pQK471PB+Hq2XxKW5dROK6rcYzt
+D5jkjjc+2Vn4uE8PGRoCFY5f/yV47A==
+=uQu1
+-----END PGP SIGNATURE-----
+
+--ZppAl84phsH03XPiN6meRlOuYLnzJPjyN--
