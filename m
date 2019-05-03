@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51130)
+Received: from eggs.gnu.org ([209.51.188.92]:56199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hMVXb-0004d6-NH
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 06:35:44 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hMVxH-0002LC-9z
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:02:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hMVXa-0002V5-Ni
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 06:35:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52016)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hMVXa-0002Sa-IG
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 06:35:42 -0400
-Date: Fri, 3 May 2019 11:35:29 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190503103529.GD17905@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190425133503.30847-1-stefanha@redhat.com>
-	<20190503101921.GC17905@redhat.com>
-	<CAFEAcA_CkUBHe1fWg9wy-+HLw8WBZrp3M_oBksCN1GQc1qp4hg@mail.gmail.com>
+	(envelope-from <sgarzare@redhat.com>) id 1hMVxG-0002hs-CK
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:02:15 -0400
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Fri,  3 May 2019 13:02:06 +0200
+Message-Id: <20190503110206.42811-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_CkUBHe1fWg9wy-+HLw8WBZrp3M_oBksCN1GQc1qp4hg@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] security.rst: add Security Guide to
- developer docs
+Subject: [Qemu-devel] [PATCH] block/rbd: implement
+ .bdrv_get_allocated_file_size callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +20,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Otubo <otubo@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Jason Dillaman <jdillama@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>, qemu-block@nongnu.org
 
-On Fri, May 03, 2019 at 11:28:53AM +0100, Peter Maydell wrote:
-> On Fri, 3 May 2019 at 11:19, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om> wrote:
-> > Everything above here is useful to QEMU devs, app devs & end users an=
-d
-> > should be made part of the main QEMU doc - convert it to texi and @in=
-clude
-> > it from qemu-doc.texi, as we do for other stuff under docs/
->=20
-> If we convert it to texi we'll have to convert it back again
-> as/when we migrate properly from texi to sphinx... (I would
-> like to make further moves in that direction during this
-> release cycle -- just need to find the time to work on it.)
+This patch allows 'qemu-img info' to show the 'disk size' for
+rbd images. We use the rbd_diff_iterate2() API to calculate the
+allocated size for the image.
 
-Yes, but we're only talking about 100-150 lines of simple text with
-minimal markup needs. Won't be a noticable extra burden compared to
-the pre-existing 4700 lines of texi markup for qemu-doc.texi and its
-includes.
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ block/rbd.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-Regards,
-Daniel
+diff --git a/block/rbd.c b/block/rbd.c
+index 0c549c9935..61447bc0cb 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -1046,6 +1046,38 @@ static int64_t qemu_rbd_getlength(BlockDriverState=
+ *bs)
+     return info.size;
+ }
+=20
++static int rbd_allocated_size_cb(uint64_t offset, size_t len, int exists=
+,
++                                 void *arg)
++{
++    int64_t *alloc_size =3D (int64_t *) arg;
++
++    if (exists) {
++        (*alloc_size) +=3D len;
++    }
++
++    return 0;
++}
++
++static int64_t qemu_rbd_get_allocated_file_size(BlockDriverState *bs)
++{
++    BDRVRBDState *s =3D bs->opaque;
++    int64_t alloc_size =3D 0;
++    int r;
++
++    /*
++     * rbd_diff_iterate2(), if the source snapshot name is NULL, invokes
++     * the callback on all allocated regions of the image.
++     */
++    r =3D rbd_diff_iterate2(s->image, NULL, 0,
++                          bs->total_sectors * BDRV_SECTOR_SIZE, 0, 1,
++                          &rbd_allocated_size_cb, &alloc_size);
++    if (r < 0) {
++        return r;
++    }
++
++    return alloc_size;
++}
++
+ static int coroutine_fn qemu_rbd_co_truncate(BlockDriverState *bs,
+                                              int64_t offset,
+                                              PreallocMode prealloc,
+@@ -1254,6 +1286,7 @@ static BlockDriver bdrv_rbd =3D {
+     .bdrv_get_info          =3D qemu_rbd_getinfo,
+     .create_opts            =3D &qemu_rbd_create_opts,
+     .bdrv_getlength         =3D qemu_rbd_getlength,
++    .bdrv_get_allocated_file_size =3D qemu_rbd_get_allocated_file_size,
+     .bdrv_co_truncate       =3D qemu_rbd_co_truncate,
+     .protocol_name          =3D "rbd",
+=20
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+2.20.1
