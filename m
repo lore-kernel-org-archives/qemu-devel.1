@@ -3,70 +3,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88C19C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 07:06:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6750C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 07:06:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EAD3205F4
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 07:06:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EAD3205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 9D9C4205F4
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 07:06:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D9C4205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35708 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35712 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMSHC-0000lx-Lw
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 03:06:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39407)
+	id 1hMSHW-0000vg-Su
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 03:06:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMSFg-000843-7y
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:05:03 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hMSAr-0003nO-MC
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:00:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMSFf-0008GY-4t
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:05:00 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:53491)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hMSFZ-0008Cq-Gl; Fri, 03 May 2019 03:04:54 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1N4hBx-1geV4o1ggR-011f2F; Fri, 03 May 2019 09:04:33 +0200
-To: Alistair Francis <Alistair.Francis@wdc.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190503004021.13814-1-alistair.francis@wdc.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <4252bb07-1d22-ed2f-61af-67fd164e0656@vivier.eu>
-Date: Fri, 3 May 2019 09:04:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <kraxel@redhat.com>) id 1hMSAq-0006Ep-7g
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:00:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54280)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hMSAp-0006EF-Vj
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:00:00 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E48B630C0210;
+	Fri,  3 May 2019 06:59:58 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-45.ams2.redhat.com
+	[10.36.116.45])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 66CF4629DC;
+	Fri,  3 May 2019 06:59:58 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id 43DAA17538; Fri,  3 May 2019 08:59:54 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri,  3 May 2019 08:59:52 +0200
+Message-Id: <20190503065954.17069-6-kraxel@redhat.com>
+In-Reply-To: <20190503065954.17069-1-kraxel@redhat.com>
+References: <20190503065954.17069-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190503004021.13814-1-alistair.francis@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ljJC1pCFcAUv7aUonHTrxNtmHCEciugDIZLwW7gNkEtRTJtZkE+
-	nQTIH9Mhf/A0Zlunu/vweFIuO+ovBLPJpAxTjAx261f6D/WPpE9k546q0ggqZhG0A9K7Mgn
-	5rqlpp7APFqq5V/+oeiKduVuEYh0q13pxYhukC+oh/PEYEiGEBFD3KD1PB8gKiHPtw+6R6h
-	ePvQJ3Aq16H2a1OVe7vtA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:e6t1Vf0dl9s=:WXActOQEmxifxAuID+IpRM
-	kzve7hKldfCdezviDHkgOQWw554olQw1FS0XiIaAtL1zpc+IXnVPaQ8pL3BHDp0Z11ZxxSIRW
-	igI4pAjVVOMvXNTz4C+jZ7bt8Oa4UG22SFKi02lUhT1QZ2dfG3BmF2rPOzAPL/HnFSW8CfeBM
-	tO3Q7tBI+T199I2xBeWUjSMvD+LQZrUkNFAptEDK3e9ZDiw0ACb6uafyhqQ0xVz/EORA7syUG
-	UFzGoMHOt93XOHfppEMzjTiVabcETmsI+LQYmK2Tldbca8y08euHbUT/kob+RSj6TDbBzUj3a
-	hYMdQtQhKeLuxA6rxRMbKsGeKXaEnUefbh1act/CDH6r3nBb8Et116/JQvEuPFCkE06CyGdK0
-	hDOUn9NhmD8HX9rpYcE+JS07442LumWNQwiUcz8m0v0i1ljVXkvCqp/mNsBba2BWxP4BUeXop
-	8Kw17FmZkqV0oIROgSTqO/YPO7yS3ysC3pTHUCkLdZ+Tlf757O8B7BfFalSvfNAekPf6AUuVM
-	snps3xlL3z96cTl1DZCfofw9p8nkCFyMfL95bn4/MJnnc0ZjvG9o/I8SddYlvIkMu427WXBEY
-	6aAvhpME+YSo1UQWyG/8fFfE1QblarCFqNxcTI+Wjzvm6zZb7GWD7LKFNcr8PNXEwbeB6IpR1
-	Sx5K6CXTHEmmzO5Ibhmkv3aAWvDUdBwC4mtpCpNgXUHOrm4Ns8gmZzbtV7BkE+mU5gUY5XvaC
-	s/DSKDlCLecILpRg6xZ2+7imQki2JPDk9tF4XCVPMQ8e+LSWmYyzxJn7U0s=
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Fri, 03 May 2019 06:59:58 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.75
-Subject: Re: [Qemu-devel] [PATCH v3] hw/usb/hcd-xhci: Fix GCC 9 build warning
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 5/7] hw/usb/hcd-ohci: Do not use PCI functions
+ with sysbus devices in ohci_die()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,59 +72,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
-	"riku.voipio@iki.fi" <riku.voipio@iki.fi>,
-	"kraxel@redhat.com" <kraxel@redhat.com>,
-	"alistair23@gmail.com" <alistair23@gmail.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503070431.XEd7FcigQENSUo-Q2uaZ97_5BYrT0dZzm71sbGBusHQ@z>
+Message-ID: <20190503065952.RYJL3513JZ-8FvN7rh9WJ3soBWU05MattKoJW4WUQrM@z>
 
-On 03/05/2019 02:42, Alistair Francis wrote:
-> Fix this build warning with GCC 9 on Fedora 30:
-> hw/usb/hcd-xhci.c:3339:66: error: ‘%d’ directive output may be truncated writing between 1 and 10 bytes into a region of size 5 [-Werror=format-truncation=]
->  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port #%d", i+1);
->       |                                                                  ^~
-> hw/usb/hcd-xhci.c:3339:54: note: directive argument in the range [1, 2147483647]
->  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port #%d", i+1);
->       |                                                      ^~~~~~~~~~~~~~~
-> In file included from /usr/include/stdio.h:867,
->                  from /home/alistair/qemu/include/qemu/osdep.h:99,
->                  from hw/usb/hcd-xhci.c:21:
-> /usr/include/bits/stdio2.h:67:10: note: ‘__builtin___snprintf_chk’ output between 13 and 22 bytes into a destination of size 16
->    67 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    68 |        __bos (__s), __fmt, __va_arg_pack ());
->       |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-> Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> This is the onl patch left if my original series "Fix some GCC 9 build
-> warnings" that hasn't either been accepeted into a maintainers tree or
-> fixed by someone else.
-> 
->  hw/usb/hcd-xhci.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-> index ec28bee319..a15b103b65 100644
-> --- a/hw/usb/hcd-xhci.c
-> +++ b/hw/usb/hcd-xhci.c
-> @@ -3321,6 +3321,8 @@ static void usb_xhci_init(XHCIState *xhci)
->  
->      usb_bus_new(&xhci->bus, sizeof(xhci->bus), &xhci_bus_ops, dev);
->  
-> +    g_assert(usbports <= MAX(MAXPORTS_2, MAXPORTS_3));
-> +
->      for (i = 0; i < usbports; i++) {
->          speedmask = 0;
->          if (i < xhci->numports_2) {
-> 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+From: Thomas Huth <thuth@redhat.com>
+
+The ohci_die() function always assumes to be running with a PCI OHCI
+controller and calls the PCI-specific functions pci_set_word(). However,
+this function might also get called for the sysbus OHCI devices, so it
+likely fails in that case. To fix this issue, change the code now, so tha=
+t
+there are two implementations now, one for sysbus and one for PCI, and
+use the right function via a function pointer in the OHCIState structure.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-id: 20190419075625.24251-2-thuth@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/usb/hcd-ohci.c | 39 +++++++++++++++++++++++++++------------
+ 1 file changed, 27 insertions(+), 12 deletions(-)
+
+diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
+index 81cf5ab7a5a7..6d3f556989fb 100644
+--- a/hw/usb/hcd-ohci.c
++++ b/hw/usb/hcd-ohci.c
+@@ -52,7 +52,7 @@ typedef struct OHCIPort {
+     uint32_t ctrl;
+ } OHCIPort;
+=20
+-typedef struct {
++typedef struct OHCIState {
+     USBBus bus;
+     qemu_irq irq;
+     MemoryRegion mem;
+@@ -108,6 +108,7 @@ typedef struct {
+     uint32_t async_td;
+     bool async_complete;
+=20
++    void (*ohci_die)(struct OHCIState *ohci);
+ } OHCIState;
+=20
+ /* Host Controller Communications Area */
+@@ -302,7 +303,10 @@ struct ohci_iso_td {
+=20
+ #define OHCI_HRESET_FSBIR       (1 << 0)
+=20
+-static void ohci_die(OHCIState *ohci);
++static void ohci_die(OHCIState *ohci)
++{
++    ohci->ohci_die(ohci);
++}
+=20
+ /* Update IRQ levels */
+ static inline void ohci_intr_update(OHCIState *ohci)
+@@ -1854,13 +1858,14 @@ static USBBusOps ohci_bus_ops =3D {
+=20
+ static void usb_ohci_init(OHCIState *ohci, DeviceState *dev,
+                           uint32_t num_ports, dma_addr_t localmem_base,
+-                          char *masterbus, uint32_t firstport,
+-                          AddressSpace *as, Error **errp)
++                          char *masterbus, uint32_t firstport, AddressSp=
+ace *as,
++                          void (*ohci_die_fn)(struct OHCIState *), Error=
+ **errp)
+ {
+     Error *err =3D NULL;
+     int i;
+=20
+     ohci->as =3D as;
++    ohci->ohci_die =3D ohci_die_fn;
+=20
+     if (num_ports > OHCI_MAX_PORTS) {
+         error_setg(errp, "OHCI num-ports=3D%u is too big (limit is %u po=
+rts)",
+@@ -1933,18 +1938,28 @@ typedef struct {
+     uint32_t firstport;
+ } OHCIPCIState;
+=20
+-/** A typical O/EHCI will stop operating, set itself into error state
+- * (which can be queried by MMIO) and will set PERR in its config
+- * space to signal that it got an error
++/**
++ * A typical OHCI will stop operating and set itself into error state
++ * (which can be queried by MMIO) to signal that it got an error.
+  */
+-static void ohci_die(OHCIState *ohci)
++static void ohci_sysbus_die(struct OHCIState *ohci)
+ {
+-    OHCIPCIState *dev =3D container_of(ohci, OHCIPCIState, state);
+-
+     trace_usb_ohci_die();
+=20
+     ohci_set_interrupt(ohci, OHCI_INTR_UE);
+     ohci_bus_stop(ohci);
++}
++
++/**
++ * A typical PCI OHCI will additionally set PERR in its configspace to
++ * signal that it got an error.
++ */
++static void ohci_pci_die(struct OHCIState *ohci)
++{
++    OHCIPCIState *dev =3D container_of(ohci, OHCIPCIState, state);
++
++    ohci_sysbus_die(ohci);
++
+     pci_set_word(dev->parent_obj.config + PCI_STATUS,
+                  PCI_STATUS_DETECTED_PARITY);
+ }
+@@ -1959,7 +1974,7 @@ static void usb_ohci_realize_pci(PCIDevice *dev, Er=
+ror **errp)
+=20
+     usb_ohci_init(&ohci->state, DEVICE(dev), ohci->num_ports, 0,
+                   ohci->masterbus, ohci->firstport,
+-                  pci_get_address_space(dev), &err);
++                  pci_get_address_space(dev), ohci_pci_die, &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
+@@ -2023,7 +2038,7 @@ static void ohci_realize_pxa(DeviceState *dev, Erro=
+r **errp)
+=20
+     usb_ohci_init(&s->ohci, dev, s->num_ports, s->dma_offset,
+                   s->masterbus, s->firstport,
+-                  &address_space_memory, &err);
++                  &address_space_memory, ohci_sysbus_die, &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
+--=20
+2.18.1
 
 
