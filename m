@@ -2,89 +2,90 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCA1CC43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:14:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC8F5C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:16:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85A9520651
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:14:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 94CAF20651
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:16:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j45t+Aea"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85A9520651
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GXrB/cm8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94CAF20651
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43144 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43235 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMapC-0008IO-Md
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 12:14:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42574)
+	id 1hMarL-000188-TI
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 12:16:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMamt-0006eq-QR
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:11:52 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hMaqN-0000jB-F0
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:15:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMams-0005Oy-Pd
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:11:51 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44478)
+	(envelope-from <alex.bennee@linaro.org>) id 1hMaqM-0000Et-JP
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:15:27 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35212)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hMams-0005OH-IR
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:11:50 -0400
-Received: by mail-wr1-x444.google.com with SMTP id c5so8526211wrs.11
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 09:11:50 -0700 (PDT)
+	id 1hMaqM-0000DR-Bk
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:15:26 -0400
+Received: by mail-wr1-x442.google.com with SMTP id h15so2871560wrb.2
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 09:15:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=references:user-agent:from:to:cc:subject:in-reply-to:date
 	:message-id:mime-version:content-transfer-encoding;
-	bh=RsbaU/qSHBLSdbY0VXpWlSIxl4BnyahNu6U+YDIcOho=;
-	b=j45t+AeaL4j+xzl0qluqQVcr5zD81N6R//u2/YLw5RkM4GDOveNiSSmSuztxG5xwc+
-	E9XCwV+pVWPjhfMcMjSBj1IkNt5ZHEny80fDlCWHZW4hX/XLf7JmGuJDg5hf5Z9cYyjW
-	/LiNziVTT9j0DE0SIVHAusUQlOtorgyJUjob111FlfLBJ7kRQHh0dliSAYVcJlT8righ
-	CotQWin99iMu2teYiQ+BiyKaXgJxKu4YczthCkIUpEP76YQmNss51hi2681uo23loAi+
-	S0oo5hT7/zMdR1ipiRABT96OUDDsamzvL4tiYABM8dn4SPUQJdVM6F1xjRkV7D5IjtDo
-	nv1w==
+	bh=ftJbzGUvg1FbdYGhWPO6M3zPgFc7vhBM90T5GZNFruA=;
+	b=GXrB/cm8IzSudoySkedgGKkpByfqDn30hCYc3G5hB7FNQROciLfuMssJV2adhTYS2S
+	ulvSF07RHzsIbTESCjB0rd9Dd3jQh/UbQmremGRLoFKp0XDa/plG+WJnj/qxPv99nB/K
+	NBTXEwQ+4u/t/YFbINPE5tH9ZiebLVEXs97BN2b702tELCz6Pl54LGcMrm2sVIH9Ezkq
+	7yyKRmNhdEKxrEz+l6RPy1kRG4bLpI1qfiYc7utq8PB/2lVocJCKpr9YaIDcUZRPNiNs
+	0V3NOJv8y1gd8zwOABbSYCkj+pxk5nZW8O0aSp3l4ErC7Nx3zc6B2Zcmg4UuPvLaHklx
+	ph4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:references:user-agent:from:to:cc:subject
 	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=RsbaU/qSHBLSdbY0VXpWlSIxl4BnyahNu6U+YDIcOho=;
-	b=EwnKJ5yGntgsenNCiqFExogGGpkZ2VEHegaTIO2b9z+KUaF3n/lES1Uf8fumn4mqPc
-	JeZCZpgHtm5uNVzgsm188Dih1gPj2YhFEheJVEjFqhehjbcEQDtGdFKO12x7poNuCs8L
-	6NqhlW8MhZskFwyb0SlKU5py1MAXeGTJX98qVzGbSY81UcvTYoGUghogafLQFalHqIwe
-	0/9pHxb8O4nMrZINGFH0wp3uxiSNJvK7EGjUBKkfPAiJSMCMZNc5jip+GAQ9AeLlDT4k
-	kNfjeqYkijEe+jyoKeFHZRWPq9b9s/e/YXKM5LXeDFgi6ph+KOX2m3ekGkTV8wa6u2Gj
-	NKWA==
-X-Gm-Message-State: APjAAAUIGEWhtGm/S6hkK4T2hTJtfrW9ICRANAaAQiRAeFIGk+AsCtvc
-	KQe0TYsLxYa8dvJ6c1o6j9bYKw==
-X-Google-Smtp-Source: APXvYqzCZFVB//yX72guqk+EMv25COaGHuz/jY1tay1HKcrHF3WVjJnAn3itHx2H29gSDs1PdawkJg==
-X-Received: by 2002:a5d:4a81:: with SMTP id o1mr7522804wrq.183.1556899909221; 
-	Fri, 03 May 2019 09:11:49 -0700 (PDT)
+	bh=ftJbzGUvg1FbdYGhWPO6M3zPgFc7vhBM90T5GZNFruA=;
+	b=X/GTrTa0wvthV5/1dp2VCesXRNRXCPS19slE+Se54kS9Wg/3zMgaozwkp/qfbzzhHE
+	ObGz5nW5HLWO8Inf2rZMskG8Frnd+Lg5SVSgbDR/Q9e1NcsQvY6+ojgFCFPRmro1BK3n
+	9ZMxOMt7p7P/XW6Xqep2IxFVeXMsJltOz6aMGg60yHWYjJZ0zTyWTgrOOUpd0waPfB/V
+	maIebzpSVHX7Dple5wyiXnwLKx6ZWG2L77tWaua4RI6+mAzoTLy/7GB8KxyVqx3ZDeLu
+	9svO1uNWPIFnQpD3+CDL1GvuiFUf0IMZ74saD71MDdELilRawPRbd5lkLTwVNk0M96hB
+	DwDA==
+X-Gm-Message-State: APjAAAUXn3VBn16YUKY4yAYrhDUDom7dFhEgd1CV9uDBZgzrwQYyyQou
+	LQ4fvPB9z6CTB9CCPAKfCjNw7A==
+X-Google-Smtp-Source: APXvYqzILbXqIdLhWzBKMn4Cw9jH0BLByrpvwUyVV18HBpCEHKO54iKnUGDpb2MEt2rC3jzt+GABOw==
+X-Received: by 2002:adf:dc82:: with SMTP id r2mr6314301wrj.205.1556900124980; 
+	Fri, 03 May 2019 09:15:24 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	h24sm3451217wmb.40.2019.05.03.09.11.48
+	by smtp.gmail.com with ESMTPSA id t6sm2880463wmt.8.2019.05.03.09.15.24
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 03 May 2019 09:11:48 -0700 (PDT)
+	Fri, 03 May 2019 09:15:24 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 44C7A1FF87;
-	Fri,  3 May 2019 17:11:48 +0100 (BST)
-References: <20190502143409.59600-1-ysato@users.sourceforge.jp>
+	by zen.linaroharston (Postfix) with ESMTP id E1DE81FF87;
+	Fri,  3 May 2019 17:15:23 +0100 (BST)
+References: <20190503143904.31211-1-alex.bennee@linaro.org>
+	<98cd84db-2aed-4aa1-1f2d-eaa7ac63b72b@redhat.com>
 User-agent: mu4e 1.3.1; emacs 26.1
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190502143409.59600-1-ysato@users.sourceforge.jp>
-Date: Fri, 03 May 2019 17:11:48 +0100
-Message-ID: <87ef5f4iwr.fsf@zen.linaroharston>
+To: Thomas Huth <thuth@redhat.com>
+In-reply-to: <98cd84db-2aed-4aa1-1f2d-eaa7ac63b72b@redhat.com>
+Date: Fri, 03 May 2019 17:15:23 +0100
+Message-ID: <87d0kz4iqs.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH RFC v8 00/12] Add RX archtecture support
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [RFC PATCH] tests/qemu-iotests: re-format output
+ to for make check-block
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,28 +97,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
-	Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	qemu-devel@nongnu.org,
+	"open list:Block layer core" <qemu-block@nongnu.org>,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503161148.ckxlg6NyvPopNvKh1MUHD1_e3TGvbCnVuMo31rKA6Zc@z>
+Message-ID: <20190503161523.b_4a3m-_2-GBFjZO5kmMk9xjWyB3cYFktaSanwh9oco@z>
 
 
-Yoshinori Sato <ysato@users.sourceforge.jp> writes:
+Thomas Huth <thuth@redhat.com> writes:
 
-> Hello.
-> This patch series is added Renesas RX target emulation.
+> On 03/05/2019 16.39, Alex Benn=C3=A9e wrote:
+>> This attempts to clean-up the output to better match the output of the
+>> rest of the QEMU check system. This includes:
+>>
+>>   - formatting as "  TEST    iotest: nnn"
+>>   - calculating time diff at the end
+>>   - only dumping config on failure
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  tests/qemu-iotests/check | 71 +++++++++++++++++++---------------------
+>>  1 file changed, 34 insertions(+), 37 deletions(-)
+>
+> Thanks for tackling this! The output now looks nicer indeed if you run
+> "make check-qtest check-block -j8". However, if you add a "V=3D1" at the
+> end of the command line, the outputs look quite different again...
+>
+> That's why I thought that having a TAP mode for the check script could
+> be a good idea, too. Then we could pipe the output through the
+> tap-driver.pl script, too, so we get uniform output for all tests...?
 
-I think the series is almost there - it's mostly just nits and clean
-build fixes to sort out now. If you run the branch through CI you will
-see where things fail to build.
+That would probably be a cleaner approach. What would be even better is
+somehow expanding the list of tests at make time so you could run your
+tests in parallel.
 
-However once that is all sorted it should be good for merging. I guess
-Richard would merge it until we can get your key signed so you can
-submit your own PRs:
+I did wonder how useful the timing stuff was to developers.
 
-  https://wiki.qemu.org/KeySigningParty
+>
+>  Thomas
+
 
 --
 Alex Benn=C3=A9e
