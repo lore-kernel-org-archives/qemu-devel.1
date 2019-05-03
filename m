@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43298)
+Received: from eggs.gnu.org ([209.51.188.92]:49396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMSVi-0006u3-Id
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:21:35 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hMT2p-0004Ul-AX
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:55:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMSVe-0004sQ-SY
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:21:32 -0400
-References: <20190419154041.77802-1-stephen.checkoway@oberlin.edu>
-	<45e6247e-cddb-2185-7f7b-503be00bd453@vivier.eu>
-	<f61fc519-da75-5b41-21d0-508cf89016f2@redhat.com>
-	<fc4a45ba-08d0-59ba-80eb-10a08cda3b7d@ilande.co.uk>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <af92f288-7159-b7ad-3360-5c2bb9b392f6@vivier.eu>
-Date: Fri, 3 May 2019 09:21:16 +0200
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hMT2n-0005Z2-Uq
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:55:47 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:34496
+	helo=mail.default.ilande.uk0.bigv.io)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hMT2n-0005Xa-Nq
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 03:55:45 -0400
+References: <1556194715-24427-1-git-send-email-frederic.konrad@adacore.com>
+	<1556194715-24427-2-git-send-email-frederic.konrad@adacore.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <c1ba4bd6-0790-9d41-eb6b-4a21fa17ec10@ilande.co.uk>
+Date: Fri, 3 May 2019 08:53:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <fc4a45ba-08d0-59ba-80eb-10a08cda3b7d@ilande.co.uk>
+In-Reply-To: <1556194715-24427-2-git-send-email-frederic.konrad@adacore.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v3] hw/char/escc: Lower irq
- when transmit buffer is filled
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] leon3: add a little bootloader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,86 +30,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Stephen Checkoway <stephen.checkoway@oberlin.edu>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Artyom Tarasenko <atar4qemu@gmail.com>, qemu-trivial@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, chouteau@adacore.com, philmd@redhat.com, atar4qemu@gmail.com
 
-On 03/05/2019 09:14, Mark Cave-Ayland wrote:
-> On 02/05/2019 13:11, Philippe Mathieu-Daudé wrote:
+On 25/04/2019 13:18, KONRAD Frederic wrote:
+
+> This adds a little bootloader to the leon3_machine when a ram image is
+> given through the kernel parameter and no bios are provided:
+>   * The UART transmiter is enabled.
+>   * The TIMER is initialized.
 > 
->> On 5/2/19 11:04 AM, Laurent Vivier wrote:
->>> On 19/04/2019 17:40, Stephen Checkoway wrote:
->>>> The SCC/ESCC will briefly stop asserting an interrupt when the
->>>> transmit FIFO is filled.
->>>>
->>>> This code doesn't model the transmit FIFO/shift register so the
->>>> pending transmit interrupt is never deasserted which means that an
->>>> edge-triggered interrupt controller will never see the low-to-high
->>>> transition it needs to raise another interrupt. The practical
->>>> consequence of this is that guest firmware with an interrupt service
->>>> routine for the ESCC that does not send all of the data it has
->>>> immediately will stop sending data if the following sequence of
->>>> events occurs:
->>>> 1. Disable processor interrupts
->>>> 2. Write a character to the ESCC
->>>> 3. Add additional characters to a buffer which is drained by the ISR
->>>> 4. Enable processor interrupts
->>>>
->>>> In this case, the first character will be sent, the interrupt will
->>>> fire and the ISR will output the second character. Since the pending
->>>> transmit interrupt remains asserted, no additional interrupts will
->>>> ever fire.
->>>>
->>>> This behavior was triggered by firmware for an embedded system with a
->>>> Z85C30 which necessitated this patch.
->>>>
->>>> This patch fixes that situation by explicitly lowering the IRQ when a
->>>> character is written to the buffer and no other interrupts are currently
->>>> pending.
->>>>
->>>> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
->>>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>>> ---
->>>>
->>>> I added a sentence about the Z85C30 necessitating this to the commit message.
->>>>
->>>>  hw/char/escc.c | 7 +++++++
->>>>  1 file changed, 7 insertions(+)
->>>>
->>>> diff --git a/hw/char/escc.c b/hw/char/escc.c
->>>> index 628f5f81f7..c5b05a63f1 100644
->>>> --- a/hw/char/escc.c
->>>> +++ b/hw/char/escc.c
->>>> @@ -509,6 +509,13 @@ static void escc_mem_write(void *opaque, hwaddr addr,
->>>>          break;
->>>>      case SERIAL_DATA:
->>>>          trace_escc_mem_writeb_data(CHN_C(s), val);
->>>> +        /*
->>>> +         * Lower the irq when data is written to the Tx buffer and no other
->>>> +         * interrupts are currently pending. The irq will be raised again once
->>>> +         * the Tx buffer becomes empty below.
->>>> +         */
->>>> +        s->txint = 0;
->>>> +        escc_update_irq(s);
->>>>          s->tx = val;
->>>>          if (s->wregs[W_TXCTRL2] & TXCTRL2_TXEN) { // tx enabled
->>>>              if (qemu_chr_fe_backend_connected(&s->chr)) {
->>>>
->>>
->>>
->>> Applied to my trivial-patches branch.
->>
->> Mark, Artyom, are you OK with this patch?
+> Reviewed-by: Fabien Chouteau <chouteau@adacore.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+> ---
+>  hw/sparc/leon3.c | 84 +++++++++++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 74 insertions(+), 10 deletions(-)
 > 
-> I started testing this with my OpenBIOS test images at the start of the week, but
-> unfortunately got distracted by real life :)
-> 
-> I've now finished and confirmed there are no regressions in my local tests, so I'll
-> include this in the PR I am planning to send shortly containing the leon3 updates.
+> diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+> index 774639a..f25432c 100644
+> --- a/hw/sparc/leon3.c
+> +++ b/hw/sparc/leon3.c
+> @@ -1,7 +1,7 @@
+>  /*
+>   * QEMU Leon3 System Emulator
+>   *
+> - * Copyright (c) 2010-2011 AdaCore
+> + * Copyright (c) 2010-2019 AdaCore
+>   *
+>   * Permission is hereby granted, free of charge, to any person obtaining a copy
+>   * of this software and associated documentation files (the "Software"), to deal
+> @@ -44,6 +44,8 @@
+>  #define CPU_CLK (40 * 1000 * 1000)
+>  
+>  #define PROM_FILENAME        "u-boot.bin"
+> +#define LEON3_PROM_OFFSET    (0x00000000)
+> +#define LEON3_RAM_OFFSET     (0x40000000)
+>  
+>  #define MAX_PILS 16
+>  
+> @@ -53,6 +55,59 @@ typedef struct ResetData {
+>      target_ulong sp;            /* initial stack pointer */
+>  } ResetData;
+>  
+> +static uint32_t *gen_store_u32(uint32_t *code, hwaddr addr, uint32_t val)
+> +{
+> +    stl_p(code++, 0x82100000); /* mov %g0, %g1                */
+> +    stl_p(code++, 0x84100000); /* mov %g0, %g2                */
+> +    stl_p(code++, 0x03000000 +
+> +      extract32(addr, 10, 22));
+> +                               /* sethi %hi(addr), %g1        */
+> +    stl_p(code++, 0x82106000 +
+> +      extract32(addr, 0, 10));
+> +                               /* or %g1, addr, %g1           */
+> +    stl_p(code++, 0x05000000 +
+> +      extract32(val, 10, 22));
+> +                               /* sethi %hi(val), %g2         */
+> +    stl_p(code++, 0x8410a000 +
+> +      extract32(val, 0, 10));
+> +                               /* or %g2, val, %g2            */
+> +    stl_p(code++, 0xc4204000); /* st %g2, [ %g1 ]             */
+> +
+> +    return code;
+> +}
+> +
+> +/*
+> + * When loading a kernel in RAM the machine is expected to be in a different
+> + * state (eg: initialized by the bootloader). This little code reproduces
+> + * this behavior.
+> + */
+> +static void write_bootloader(CPUSPARCState *env, uint8_t *base,
+> +                             hwaddr kernel_addr)
+> +{
+> +    uint32_t *p = (uint32_t *) base;
+> +
+> +    /* Initialize the UARTs                                        */
+> +    /* *UART_CONTROL = UART_RECEIVE_ENABLE | UART_TRANSMIT_ENABLE; */
+> +    p = gen_store_u32(p, 0x80000108, 3);
+> +
+> +    /* Initialize the TIMER 0                                      */
+> +    /* *GPTIMER_SCALER_RELOAD = 40 - 1;                            */
+> +    p = gen_store_u32(p, 0x80000304, 39);
+> +    /* *GPTIMER0_COUNTER_RELOAD = 0xFFFE;                          */
+> +    p = gen_store_u32(p, 0x80000314, 0xFFFFFFFE);
+> +    /* *GPTIMER0_CONFIG = GPTIMER_ENABLE | GPTIMER_RESTART;        */
+> +    p = gen_store_u32(p, 0x80000318, 3);
+> +
+> +    /* JUMP to the entry point                                     */
+> +    stl_p(p++, 0x82100000); /* mov %g0, %g1 */
+> +    stl_p(p++, 0x03000000 + extract32(kernel_addr, 10, 22));
+> +                            /* sethi %hi(kernel_addr), %g1 */
+> +    stl_p(p++, 0x82106000 + extract32(kernel_addr, 0, 10));
+> +                            /* or kernel_addr, %g1 */
+> +    stl_p(p++, 0x81c04000); /* jmp  %g1 */
+> +    stl_p(p++, 0x01000000); /* nop */
+> +}
+> +
+>  static void main_cpu_reset(void *opaque)
+>  {
+>      ResetData *s   = (ResetData *)opaque;
+> @@ -131,11 +186,12 @@ static void leon3_generic_hw_init(MachineState *machine)
+>      /* Reset data */
+>      reset_info        = g_malloc0(sizeof(ResetData));
+>      reset_info->cpu   = cpu;
+> -    reset_info->sp    = 0x40000000 + ram_size;
+> +    reset_info->sp    = LEON3_RAM_OFFSET + ram_size;
+>      qemu_register_reset(main_cpu_reset, reset_info);
+>  
+>      /* Allocate IRQ manager */
+> -    grlib_irqmp_create(0x80000200, env, &cpu_irqs, MAX_PILS, &leon3_set_pil_in);
+> +    grlib_irqmp_create(0x80000200, env, &cpu_irqs, MAX_PILS,
+> +                       &leon3_set_pil_in);
+>  
+>      env->qemu_irq_ack = leon3_irq_manager;
+>  
+> @@ -148,13 +204,13 @@ static void leon3_generic_hw_init(MachineState *machine)
+>      }
+>  
+>      memory_region_allocate_system_memory(ram, NULL, "leon3.ram", ram_size);
+> -    memory_region_add_subregion(address_space_mem, 0x40000000, ram);
+> +    memory_region_add_subregion(address_space_mem, LEON3_RAM_OFFSET, ram);
+>  
+>      /* Allocate BIOS */
+>      prom_size = 8 * MiB;
+>      memory_region_init_ram(prom, NULL, "Leon3.bios", prom_size, &error_fatal);
+>      memory_region_set_readonly(prom, true);
+> -    memory_region_add_subregion(address_space_mem, 0x00000000, prom);
+> +    memory_region_add_subregion(address_space_mem, LEON3_PROM_OFFSET, prom);
+>  
+>      /* Load boot prom */
+>      if (bios_name == NULL) {
+> @@ -174,7 +230,7 @@ static void leon3_generic_hw_init(MachineState *machine)
+>      }
+>  
+>      if (bios_size > 0) {
+> -        ret = load_image_targphys(filename, 0x00000000, bios_size);
+> +        ret = load_image_targphys(filename, LEON3_PROM_OFFSET, bios_size);
+>          if (ret < 0 || ret > prom_size) {
+>              error_report("could not load prom '%s'", filename);
+>              exit(1);
+> @@ -198,10 +254,18 @@ static void leon3_generic_hw_init(MachineState *machine)
+>              exit(1);
+>          }
+>          if (bios_size <= 0) {
+> -            /* If there is no bios/monitor, start the application.  */
+> -            env->pc = entry;
+> -            env->npc = entry + 4;
+> -            reset_info->entry = entry;
+> +            /*
+> +             * If there is no bios/monitor just start the application but put
+> +             * the machine in an initialized state through a little
+> +             * bootloader.
+> +             */
+> +            uint8_t *bootloader_entry;
+> +
+> +            bootloader_entry = memory_region_get_ram_ptr(prom);
+> +            write_bootloader(env, bootloader_entry, entry);
+> +            env->pc = LEON3_PROM_OFFSET;
+> +            env->npc = LEON3_PROM_OFFSET + 4;
+> +            reset_info->entry = LEON3_PROM_OFFSET;
+>          }
+>      }
 
-Hi Mark,
+I think this patch is basically okay, however if you don't supply both a kernel and
+bios then you get the slightly enigmatic message below:
 
-I've already included a leon3 patch ("hw/sparc/leon3: Allow load of
-uImage firmwares") in the PR I sent yesterday for the trivial branch.
-I've removed from my PR this patch about the ESCC, so you can take it.
+$ ./qemu-system-sparc -M leon3_generic
+qemu-system-sparc: Can't read bios image (null)
 
-Thanks,
-Laurent
+Perhaps add a define for LEON3_BIOS_FILENAME and return that if filename == NULL to
+give a better error message?
+
+
+ATB,
+
+Mark.
