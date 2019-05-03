@@ -2,112 +2,89 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC3EEC43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:45:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25C3DC43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:47:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEE1B2075C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:45:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEE1B2075C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DEEE8206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:47:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WhLhhnNh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEEE8206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44425 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44494 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMbJQ-0005T3-OO
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 12:45:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53977)
+	id 1hMbLW-00071C-44
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 12:47:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hMbFw-0002uD-NE
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:41:53 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hMbGa-0003UO-5T
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:42:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hMbFv-0001s6-He
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:41:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51786)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hMbFt-0001mm-FF
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:41:51 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4015B58E3E;
-	Fri,  3 May 2019 16:41:47 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-70.ams2.redhat.com [10.36.116.70])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2C3C61001944;
-	Fri,  3 May 2019 16:41:44 +0000 (UTC)
-To: Eduardo Habkost <ehabkost@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
-	Cleber Rosa <crosa@redhat.com>
-References: <20190503004130.8285-1-ehabkost@redhat.com>
-	<20190503004130.8285-20-ehabkost@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <40c4d236-ed76-e433-51d5-c9feabb4374a@redhat.com>
-Date: Fri, 3 May 2019 18:41:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <alex.bennee@linaro.org>) id 1hMbGZ-0002Tu-1f
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:42:32 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33298)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hMbGY-0002Sy-Oo
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:42:30 -0400
+Received: by mail-wr1-x441.google.com with SMTP id e28so8700542wra.0
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 09:42:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=jMN8PPXNkPbwtv72oUPK/tYaPoAYZ62qhOQCcBRcXcw=;
+	b=WhLhhnNhrUq07LmkGNJa4OCV9Q/W85ib2TA5W1XjitJdEsGJzexoG5ktYdEJPFtNdA
+	8c31hy9EVgdCOfBp0cRR0WvUKxnMrmQH7ZiHmGws3CS/xYSAYaYYqmPGInSjVVOLpF+4
+	iGcTKN+Ej0doDsyzqTbr8Zkrj/FZWCoB0hEMmhAuBdmGeViZbuMpMrtzXPe7cI87wov1
+	xPk8pIf/hBM+Z24dGQQeEUaVXHONHmQZL4gX/xOsN518uBaPoVkKaSaJPfsBPcjTq4We
+	fIPdm+eO/yzE2lHSyTxNdT0LIbn6sIxu773qjWlb+VAvoyCzKrTwJRIx26j17vLM1hPL
+	XoUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=jMN8PPXNkPbwtv72oUPK/tYaPoAYZ62qhOQCcBRcXcw=;
+	b=SK0FVywujaYx3bNcTMAbsgl5OrrDnH39pP58lJiREuhqJB5ctKACoFW/ZbjgwQc5PS
+	BmFA/GqFzkHkW7EONhQyubcgYSI6BUfu+nTczF1qNkI3fM3zZuHgHsE8625Q4TCZPbhq
+	luGH7pf1+lQLR1GHR5LU4x6+fKTFXQqdfB7ONVRb8TAErgm7Fc111RgVDbo3J2mk8Can
+	t5gtceSL76NmScKSglaDNphQ/vBzZFB7J/FoLHa6HqnxM+P3cbumSFnnzxcDG1fxyuAt
+	ij4ouOyO/ECo8x3QomqZok0w6VmHi4TB+bizj+cA2iAc0RWXzrDPL23q27L/UUZRR+G2
+	gG9A==
+X-Gm-Message-State: APjAAAV5QKdP2aojcvJ/DMFUfwUBZWUeowPnlWT/qXMFH8S63JlJ9Xaa
+	NSQcdVe4GvD032d4GMHj0CNjNg==
+X-Google-Smtp-Source: APXvYqwyBGt3AqnhKqN+/J7lvmEZ1LzHx/lnreCanWUncEYMFllbl/S2j2c7/eT/AWjkMzNReSfb6Q==
+X-Received: by 2002:a5d:5108:: with SMTP id s8mr7045872wrt.99.1556901749369;
+	Fri, 03 May 2019 09:42:29 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	c10sm5552103wrd.69.2019.05.03.09.42.28
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Fri, 03 May 2019 09:42:28 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 7F6261FF87;
+	Fri,  3 May 2019 17:42:28 +0100 (BST)
+References: <20190503070241.24786-1-kraxel@redhat.com>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+In-reply-to: <20190503070241.24786-1-kraxel@redhat.com>
+Date: Fri, 03 May 2019 17:42:28 +0100
+Message-ID: <87a7g34hhn.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <20190503004130.8285-20-ehabkost@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Fri, 03 May 2019 16:41:47 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 19/19] configure: automatically pick python3
- is available
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH] tests/docker: add ubuntu 18.04
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -119,53 +96,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503164143.IamBGLECOmPnvZ5EL0qXpZEmPj607dPFkLm0efN8pes@z>
+Message-ID: <20190503164228.vUW4o5Yv5curygQ5Sg8KuWciKkL0HUEXIhFLwnizwi4@z>
 
-On 03/05/2019 02.41, Eduardo Habkost wrote:
-> From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->=20
-> Unless overridden via an env var or configure arg, QEMU will only look
-> for the 'python' binary in $PATH. This is unhelpful on distros which
-> are only shipping Python 3.x (eg Fedora) in their default install as,
-> if they comply with PEP 394, the bare 'python' binary won't exist.
->=20
-> This changes configure so that by default it will search for all three
-> common python binaries, preferring to find Python 3.x versions.
->=20
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Message-Id: <20190327170701.23798-1-berrange@redhat.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+
+Gerd Hoffmann <kraxel@redhat.com> writes:
+
+> Based on the ubuntu.docker file.
+> Used to reproduce the build failure Peter was seeing.
+> Others might find this useful too ;)
+>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  configure | 18 +++++++++++++++---
->  1 file changed, 15 insertions(+), 3 deletions(-)
+>  tests/docker/dockerfiles/ubuntu1804.docker | 57 ++++++++++++++++++++++
+>  1 file changed, 57 insertions(+)
+>  create mode 100644 tests/docker/dockerfiles/ubuntu1804.docker
+>
+> diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/do=
+ckerfiles/ubuntu1804.docker
+> new file mode 100644
+> index 000000000000..2e2900150b09
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/ubuntu1804.docker
+> @@ -0,0 +1,57 @@
+> +FROM ubuntu:18.04
+> +ENV PACKAGES flex bison \
+> +    ccache \
+> +    clang \
+> +    gcc \
+> +    gettext \
+> +    git \
+> +    glusterfs-common \
+> +    libaio-dev \
+> +    libattr1-dev \
+> +    libbluetooth-dev \
+> +    libbrlapi-dev \
+> +    libbz2-dev \
+> +    libcacard-dev \
+> +    libcap-dev \
+> +    libcap-ng-dev \
+> +    libcurl4-gnutls-dev \
+> +    libdrm-dev \
+> +    libepoxy-dev \
+> +    libfdt-dev \
+> +    libgbm-dev \
+> +    libgtk-3-dev \
+> +    libibverbs-dev \
+> +    libiscsi-dev \
+> +    libjemalloc-dev \
+> +    libjpeg-turbo8-dev \
+> +    liblzo2-dev \
+> +    libncurses5-dev \
+> +    libncursesw5-dev \
+> +    libnfs-dev \
+> +    libnss3-dev \
+> +    libnuma-dev \
+> +    libpixman-1-dev \
+> +    librados-dev \
+> +    librbd-dev \
+> +    librdmacm-dev \
+> +    libsasl2-dev \
+> +    libsdl2-dev \
+> +    libseccomp-dev \
+> +    libsnappy-dev \
+> +    libspice-protocol-dev \
+> +    libspice-server-dev \
+> +    libssh2-1-dev \
+> +    libusb-1.0-0-dev \
+> +    libusbredirhost-dev \
+> +    libvdeplug-dev \
+> +    libvte-2.91-dev \
+> +    libxen-dev \
+> +    make \
+> +    python-yaml \
+> +    sparse \
+> +    texinfo \
+> +    xfslibs-dev
+> +RUN apt-get update && \
+> +    apt-get -y install $PACKAGES
+> +RUN dpkg -l $PACKAGES | sort > /packages.txt
+> +ENV FEATURES clang pyyaml sdl2
 
-I haven't bisected it, but I think this patch here broke the gitlab-ci te=
-sts:
+Queued to testing/next, thanks.
 
- https://gitlab.com/huth/qemu/-/jobs/206806257
-
-Seems like the test is now failing when you don't have an UTF-8 locale:
-
- LANG=3DC make check-qapi-schema
- [...]
- TEST    tests/qapi-schema/union-base-empty.out
- --- /builds/huth/qemu/tests/qapi-schema/unicode-str.err	2019-05-03 15:21=
-:39.000000000 +0000
- +++ -	2019-05-03 15:42:01.561762978 +0000
- @@ -1 +1 @@
- -tests/qapi-schema/unicode-str.json:2: 'command' uses invalid name '=C3=A9=
-'
- +tests/qapi-schema/unicode-str.json:2: 'command' uses invalid name '\xe9=
-'
- /builds/huth/qemu/tests/Makefile.include:1105: recipe for target 'check-=
-tests/qapi-schema/unicode-str.json' failed
- make: *** [check-tests/qapi-schema/unicode-str.json] Error 1
-
-Any ideas how to fix this?
-
- Thomas
+--
+Alex Benn=C3=A9e
 
