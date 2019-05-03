@@ -2,83 +2,68 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-13.4 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05DE6C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 21:32:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8408C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 21:36:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1F052075C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 21:32:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JRJ4sTE2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1F052075C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 841E9206E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 21:36:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 841E9206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47490 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47532 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMfnc-0005Ig-Ih
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 17:32:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56460)
+	id 1hMfqw-0006Mx-P7
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 17:36:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1hMfmh-0004x3-3i
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 17:32:03 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hMfq6-0005uT-FW
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 17:35:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1hMfmf-0007jS-Oo
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 17:31:59 -0400
-Received: from mail-io1-xd2b.google.com ([2607:f8b0:4864:20::d2b]:35772)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nirsof@gmail.com>)
-	id 1hMfmc-0007gE-BD; Fri, 03 May 2019 17:31:54 -0400
-Received: by mail-io1-xd2b.google.com with SMTP id r18so6427843ioh.2;
-	Fri, 03 May 2019 14:31:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=Y1feQyjbF6q0PvWmothWPG3aN5M9Ex4xX7B4acd/kNg=;
-	b=JRJ4sTE2mLlnEOw8KPPa6f848xBjuaWXyhhSvoscOCAQwPwNnNzRBfk0BmJ8WayLRQ
-	hNExR/8IR9CgfG2ivF1PiqAteVf99KRvhqDZRROLBUp+OGKGNKXLEG/Fu8yMetr/6Nqt
-	MRMBSIPH67LNOHA5N/KfNB+uuXujY8Dz+zkq6z+gRjo/+gUhicKc6cT1cNCL9TLCwIN9
-	4phq/gBplbU9fmziqvsSchyXoGc5MC+ZKaNhS0TAljELs1rl083MbE6g8gh/QFc8NmxR
-	AVJhtyiHK6xhwyE/+wuF15nDlhf2SI/AsxzzGELwrRvYQz4Zmo4y1iB9WcBD4x1+reNP
-	AePQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=Y1feQyjbF6q0PvWmothWPG3aN5M9Ex4xX7B4acd/kNg=;
-	b=iVFmTTZ3SACqUXGHHfLjmhmytJnc67vM82Pu7go4vsSCo0TDjtmpIcbm4EKpVxMqc3
-	PkiPjx/IQWH1Lfn1HDDUCB+RLdNqhzoi4knRAgnINbceRSxx13i4GJ//Tw59Oeta+RM8
-	H+kStUsTqUr/ZH7SCSLYTcdhXXS4nWsV1NbT2P1urnP2mB0Nqq0xa4+p2voKqZ515Ws5
-	9qTGgEIc72EJdt8eBcSt2Z6qis0+wQgYORz5tvtub4udcbH04ET6hcccLiScbfWz+nwi
-	tAojL+nb2BOsO2ut614lABF+cul4dwwe8vKAkX4W5UCyamEN5vK2eMx55hpydfhcGaf8
-	iyew==
-X-Gm-Message-State: APjAAAVfgHNlE8/PU7nxAPIwkG/4ObkmK2sCO19GVuFvO37aQVt8ZBEh
-	KtNq4x+l0Lg+0DxODip/6b0xLNYC+hSlm8NSSco=
-X-Google-Smtp-Source: APXvYqwqO6YVfFywFqPd8HpJ4KnQufA5Oshg5M9mCzzjJafEu3F4PHVLZEvMudtGeakOxdPTgQRHJW7C/o63tgR+XB8=
-X-Received: by 2002:a5d:9b96:: with SMTP id r22mr8845995iom.74.1556919111777; 
-	Fri, 03 May 2019 14:31:51 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1hMfq5-0001Zh-2z
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 17:35:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56672)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hMfq2-0001Y8-EB
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 17:35:27 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D390A46288;
+	Fri,  3 May 2019 21:35:24 +0000 (UTC)
+Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3FD2C5C70A;
+	Fri,  3 May 2019 21:34:59 +0000 (UTC)
+Date: Fri, 3 May 2019 18:34:57 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Message-ID: <20190503213457.GX28722@habkost.net>
+References: <20190503004130.8285-1-ehabkost@redhat.com>
+	<20190503004130.8285-20-ehabkost@redhat.com>
+	<40c4d236-ed76-e433-51d5-c9feabb4374a@redhat.com>
+	<20190503210011.GW28722@habkost.net>
 MIME-Version: 1.0
-References: <68cc5bbc-ed6f-e001-e376-ccd986683b88@redhat.com>
-	<f1dfe2c3-2d61-e477-ac3d-37ad26d9236d@redhat.com>
-	<61685a48-b84e-c379-7193-f456e82635ba@redhat.com>
-	<67a38513-89af-7f54-2fc8-05b5777983ca@redhat.com>
-In-Reply-To: <67a38513-89af-7f54-2fc8-05b5777983ca@redhat.com>
-From: Nir Soffer <nirsof@gmail.com>
-Date: Sat, 4 May 2019 00:31:38 +0300
-Message-ID:
- <CAMr-obv28mp9bABmm906tnwfkBp93ATeEsuaUt-o=Ti75N_1DQ@mail.gmail.com>
-To: Eric Blake <eblake@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::d2b
 Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] Failing QEMU iotest 175
+Content-Disposition: inline
+In-Reply-To: <20190503210011.GW28722@habkost.net>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.29]);
+	Fri, 03 May 2019 21:35:24 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL 19/19] configure: automatically pick python3
+ is available
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,80 +75,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+	Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503213138.rbWNF0itUcdmfnpBSTZVGoZcmxZl0dKDyODL193s-AI@z>
+Message-ID: <20190503213457.-wdaW4RVDJvIAIZzvkd-8Rz7R1AVeFFtKA0BoX2xnXk@z>
 
-On Fri, May 3, 2019, 23:21 Eric Blake <eblake@redhat.com> wrote:
+On Fri, May 03, 2019 at 06:00:11PM -0300, Eduardo Habkost wrote:
+> On Fri, May 03, 2019 at 06:41:43PM +0200, Thomas Huth wrote:
+> > On 03/05/2019 02.41, Eduardo Habkost wrote:
+> > > From: Daniel P. Berrang=E9 <berrange@redhat.com>
+> > >=20
+> > > Unless overridden via an env var or configure arg, QEMU will only l=
+ook
+> > > for the 'python' binary in $PATH. This is unhelpful on distros whic=
+h
+> > > are only shipping Python 3.x (eg Fedora) in their default install a=
+s,
+> > > if they comply with PEP 394, the bare 'python' binary won't exist.
+> > >=20
+> > > This changes configure so that by default it will search for all th=
+ree
+> > > common python binaries, preferring to find Python 3.x versions.
+> > >=20
+> > > Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+> > > Message-Id: <20190327170701.23798-1-berrange@redhat.com>
+> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > > ---
+> > >  configure | 18 +++++++++++++++---
+> > >  1 file changed, 15 insertions(+), 3 deletions(-)
+> >=20
+> > I haven't bisected it, but I think this patch here broke the gitlab-c=
+i tests:
+> >=20
+> >  https://gitlab.com/huth/qemu/-/jobs/206806257
+> >=20
+> > Seems like the test is now failing when you don't have an UTF-8 local=
+e:
+> >=20
+> >  LANG=3DC make check-qapi-schema
+>=20
+> I couldn't reproduce it this way, probably because I'm running Python 3=
+.7 which
+> implements PEP 538 ("Coercing the legacy C locale to a UTF-8 based loca=
+le").
+>=20
+> But I can force it to break using:
+>=20
+>   PYTHONIOENCODING=3Dascii make check-qapi-schema
+>=20
+> >  [...]
+> >  TEST    tests/qapi-schema/union-base-empty.out
+> >  --- /builds/huth/qemu/tests/qapi-schema/unicode-str.err	2019-05-03 1=
+5:21:39.000000000 +0000
+> >  +++ -	2019-05-03 15:42:01.561762978 +0000
+> >  @@ -1 +1 @@
+> >  -tests/qapi-schema/unicode-str.json:2: 'command' uses invalid name '=
+=E9'
+> >  +tests/qapi-schema/unicode-str.json:2: 'command' uses invalid name '=
+\xe9'
+> >  /builds/huth/qemu/tests/Makefile.include:1105: recipe for target 'ch=
+eck-tests/qapi-schema/unicode-str.json' failed
+> >  make: *** [check-tests/qapi-schema/unicode-str.json] Error 1
+> >=20
+> > Any ideas how to fix this?
+>=20
+> Probably we just need to specify an explicit encoding at the statement =
+that
+> prints the error message to stderr.  I will give it a try.
 
-> On 5/2/19 11:37 PM, Thomas Huth wrote:
-> > On 02/05/2019 23.56, Eric Blake wrote:
-> >> On 4/28/19 10:18 AM, Thomas Huth wrote:
-> >>> QEMU iotest 175 is failing for me when I run it with -raw:
-> >>>
-> >>
-> >>>  == creating image with default preallocation ==
-> >>>  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-> >>> -size=1048576, blocks=0
-> >>> +size=1048576, blocks=2
-> >>
-> >> What filesystem?
-> >
-> > ext4
-> >
->
-> Hmm, it's passing for me on ext4, but that probably means we have
-> different configuration parameters. I'm not sure how to easily show what
-> parameters a particular ext4 partition uses to compare the differences
-> between your setup and mine (mine is tuned to whatever defaults Fedora's
-> installer chose on my behalf), so maybe someone else can chime in.
->
-> >> It should be fairly obvious that 'stat -c blocks=%b' is
-> >> file-system dependent (some allocate slightly more or less space, based
-> >> on granularities and on predictions of future use), so we may need to
-> >> update the test to apply a filter or otherwise allow a bit of fuzz in
-> >> the answer. But 0/2 is definitely different than...
-> >>>
-> >>>  == creating image with preallocation off ==
-> >>>  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-> preallocation=off
-> >>> -size=1048576, blocks=0
-> >>> +size=1048576, blocks=2
-> >>>
-> >>>  == creating image with preallocation full ==
-> >>>  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-> preallocation=full
-> >>> -size=1048576, blocks=2048
-> >>> +size=1048576, blocks=2050
-> >>
-> >> 2048/2050, so we DO have some indication of whether the file is sparse
-> >> or fully allocated.
-> >
-> > Maybe we could check that the value after "blocks=" is a single digit in
-> > the first case, and matches "blocks=20.." in the second case?
->
-> I wonder if 'qemu-img map --output=json $TEST_IMG' might be any more
-> reliable (at least for ignoring any extra block allocations associated
-> with the file, if it is some journaling option or xattr or other reason
-> why your files seem to occupy more disk sectors than just the size of
-> the file would imply).
->
+Forcing a specific encoding inside test-qapi.py would very easy
+on Python 3.7+ (sys.stderr.reconfigure(...)), but tricky on older
+versions.  I believe this is the simplest way to fix the problem
+on Python 3.5 and 3.6.
 
-I think it should work better and is more correct, testing actual sparsness
-instead of underlying file system implementation.
+Can somebody confirm this really fixes the problem on gitlab-ci?
 
-I can send a fix next week.
+---
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 7c8b9c84b2..af88ab6f8b 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -1103,7 +1103,7 @@ check-tests/qemu-iotests-quick.sh: tests/qemu-iotes=
+ts-quick.sh qemu-img$(EXESUF)
+ .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
+ $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SRC_PATH=
+)/%.json
+ 	$(call quiet-command, PYTHONPATH=3D$(SRC_PATH)/scripts \
+-		$(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py \
++		PYTHONIOENCODING=3Dutf-8 $(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-=
+qapi.py \
+ 		$^ >$*.test.out 2>$*.test.err; \
+ 		echo $$? >$*.test.exit, \
+ 		"TEST","$*.out")
 
-Nir
+--=20
+Eduardo
 
-
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
->
->
