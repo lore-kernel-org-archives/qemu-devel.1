@@ -2,89 +2,59 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8FC5C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:09:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61895C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:09:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D34420651
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:09:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Zj4nHm98"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D34420651
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3741520651
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:09:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3741520651
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44795 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44797 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMbgF-0001lq-Oy
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 13:09:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60439)
+	id 1hMbgu-0002IZ-9v
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 13:09:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMber-0000z2-EB
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:07:39 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMbfR-0001M6-UQ
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:08:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMbep-00025E-Gx
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:07:37 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44799)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hMbem-0001rs-1I
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:07:35 -0400
-Received: by mail-wr1-x442.google.com with SMTP id c5so8717058wrs.11
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 10:07:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=640yTpQyTJ6A1WlzMu+USjKWpz1WZMKR4+VA0ZzvUEY=;
-	b=Zj4nHm98F6vMDope8x8LtCJaIb1nKfjRAisxQ040bhIu4Ei4LeUku/AGaWJTZQO3/W
-	t/bYctjwsC09mJNOj2LGqqAo+wCtC39Eq17tudS3EYXSyk3IchPVe6Nz5/USDFSlc9tq
-	U7i0MXkxKb6QyatjDW4sZN1Z3UbD+0EY8ruMcSJOWUicDZfH7MdnZnaD63KJr4FXWEbB
-	U1St3r4h7Tfo6t9jr5/yU4yDOxxALGQzYDxMonAlcX4Gf+PDkIVh9uYzowbHHsAmfHdd
-	qqDoHsnwhtMoKaT+Sa/ecWVokTsrO6FymHeON0akilwPaLoJWpACukxkweS5nDXZj92r
-	uftw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=640yTpQyTJ6A1WlzMu+USjKWpz1WZMKR4+VA0ZzvUEY=;
-	b=ilrQ7qSpEvNhkTgkTHD5rCcUPqy/fFqcmc2qCOXlUgZwI4sIYAinaCRoZNa6ifRdN4
-	0IFNpYswg9Gg8vCgnL21ten+y5D9IhJfR/RC1xLZBERt9rH6131tmT4FOEBcjCRBJTLU
-	2E5OAOiHKjL9uYXkwUp+4OIzTprtG1EZOfsle6kYGcHI7aa+owqu0BGDCNsR+qh8EIVq
-	Wb0Xh+Vi7GiCY1oojS0hdBi8qQTPYeV9laCYipnmdjQWTCRNFUjM7lUbBiciGl67uz6H
-	lFuMWxQjhRXRAIAmXMG26JysgaDAJVUcG/bibxWavSILZqvw+2XVXpoLt84cROHCuFwa
-	Tk8g==
-X-Gm-Message-State: APjAAAVNBjdcvl1WWswAJVx3kV3sReROAp1J5FxOudICzinXmbOECR83
-	wBpzndtk/XbjAGaoTyeLFmK1nA==
-X-Google-Smtp-Source: APXvYqzUTRFOnY3lVx4eQ393BZuuhhXJrkBDfX1QsGEFT349a8iYGZpPxdgozptaALIay+QnVonRMg==
-X-Received: by 2002:adf:e88b:: with SMTP id d11mr7983316wrm.327.1556903245863; 
-	Fri, 03 May 2019 10:07:25 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	l127sm3473296wml.40.2019.05.03.10.07.25
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 03 May 2019 10:07:25 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id C6EE91FF87;
-	Fri,  3 May 2019 18:07:24 +0100 (BST)
-References: <20190501184306.15208-1-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-In-reply-to: <20190501184306.15208-1-richard.henderson@linaro.org>
-Date: Fri, 03 May 2019 18:07:24 +0100
-Message-ID: <877eb74gc3.fsf@zen.linaroharston>
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMbfQ-00035m-QD
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:08:13 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:46286 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1hMbfQ-00034o-JT
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:08:12 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rt-rk.com (Postfix) with ESMTP id 57E6C1A1E19;
+	Fri,  3 May 2019 19:07:17 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+	[10.10.13.43])
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 3456D1A2206;
+	Fri,  3 May 2019 19:07:17 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Date: Fri,  3 May 2019 19:06:49 +0200
+Message-Id: <1556903209-6036-6-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1556903209-6036-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1556903209-6036-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH] tests/tcg/alpha: add system boot.S
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH v3 5/5] linux-user: Sanitize interp_info and,
+ for mips only, init field fp_abi
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,632 +66,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, thuth@redhat.com, jcmvbkbc@gmail.com,
+	arikalo@wavecomp.com, daniel.santos@pobox.com,
+	amarkovic@wavecomp.com, nchen@wavecomp.com, philmd@redhat.com,
+	aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503170724.VrnVDYMXwNWSQGOqFrcOooLcjuTEaAJXkDLj1d1IiYo@z>
+Message-ID: <20190503170649.GxcizIcirfdtAFy-LEbB1GzYuRf15oksa1JeE9dZN9U@z>
 
+From: Daniel Santos <daniel.santos@pobox.com>
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Sanitize interp_info structure in load_elf_binary() and, for MIPS only,
+init its field fp_abi to MIPS_ABI_FP_UNKNOWN. This fixes appearances of
+"Unexpected FPU mode" message in some MIPS use cases. Currently, this
+bug is a complete stopper for some MIPS binaries.
 
-> This provides the bootstrap and low level helper functions for an
-> alpha kernel.  We use direct access to the DP264 serial port for
-> test output, and hard machine halt to exit the emulation.
+In load_elf_binary(), struct image_info interp_info is used without
+being properly initialized. One result is that when the ELF's program
+header doesn't contain an entry for the ABI flags, then the value of
+the struct image_info's fp_abi field is set to whatever happened to
+be in stack memory at the time.
 
-Queued to testing/next, thanks.
+Backporting to 4.0 and, if possible, to 3.1 is recommended.
 
-I've also added tests/tcg/alpha/system/ to MAINTAINERS
+Fixes: https://bugs.launchpad.net/qemu/+bug/1825002
 
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  tests/tcg/alpha/Makefile.softmmu-target |  32 ++
->  tests/tcg/alpha/system/boot.S           | 511 ++++++++++++++++++++++++
->  tests/tcg/alpha/system/kernel.ld        |  30 ++
->  3 files changed, 573 insertions(+)
->  create mode 100644 tests/tcg/alpha/Makefile.softmmu-target
->  create mode 100644 tests/tcg/alpha/system/boot.S
->  create mode 100644 tests/tcg/alpha/system/kernel.ld
->
-> diff --git a/tests/tcg/alpha/Makefile.softmmu-target b/tests/tcg/alpha/Ma=
-kefile.softmmu-target
-> new file mode 100644
-> index 0000000000..9f4b199258
-> --- /dev/null
-> +++ b/tests/tcg/alpha/Makefile.softmmu-target
-> @@ -0,0 +1,32 @@
-> +#
-> +# Alpha system tests
-> +#
-> +
-> +ALPHA_SYSTEM_SRC=3D$(SRC_PATH)/tests/tcg/alpha/system
-> +VPATH+=3D$(ALPHA_SYSTEM_SRC)
-> +
-> +# These objects provide the basic boot code and helper functions for all=
- tests
-> +CRT_OBJS=3Dboot.o
-> +
-> +ALPHA_TEST_SRCS=3D$(wildcard $(ALPHA_SYSTEM_SRC)/*.c)
-> +ALPHA_TESTS =3D $(patsubst $(ALPHA_SYSTEM_SRC)/%.c, %, $(ALPHA_TEST_SRCS=
-))
-> +
-> +CRT_PATH=3D$(ALPHA_SYSTEM_SRC)
-> +LINK_SCRIPT=3D$(ALPHA_SYSTEM_SRC)/kernel.ld
-> +LDFLAGS=3D-Wl,-T$(LINK_SCRIPT)
-> +TESTS+=3D$(ALPHA_TESTS) $(MULTIARCH_TESTS)
-> +CFLAGS+=3D-nostdlib -g -O1 -mcpu=3Dev6 $(MINILIB_INC)
-> +LDFLAGS+=3D-static -nostdlib $(CRT_OBJS) $(MINILIB_OBJS) -lgcc
-> +
-> +# building head blobs
-> +.PRECIOUS: $(CRT_OBJS)
-> +
-> +%.o: $(CRT_PATH)/%.S
-> +	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $@
-> +
-> +# Build and link the tests
-> +%: %.c $(LINK_SCRIPT) $(CRT_OBJS) $(MINILIB_OBJS)
-> +	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
-> +
-> +# Running
-> +QEMU_OPTS+=3D-serial chardev:output -kernel
-> diff --git a/tests/tcg/alpha/system/boot.S b/tests/tcg/alpha/system/boot.S
-> new file mode 100644
-> index 0000000000..6d7fb36e17
-> --- /dev/null
-> +++ b/tests/tcg/alpha/system/boot.S
-> @@ -0,0 +1,511 @@
-> +/*
-> + * Minimal Alpha system boot code.
-> + *
-> + * Copyright Linaro Ltd 2019
-> + */
-> +
-> +	.set	noat
-> +	.set	nomacro
-> +	.arch	ev6
-> +	.text
-> +
-> +.macro load_pci_io reg
-> +	/* For typhoon, this is
-> +	 *   0xfffffc0000000000  -- kseg identity map
-> +	 * +      0x10000000000  -- typhoon pio base
-> +	 * +        0x1fc000000  -- typhoon pchip0 pci base
-> +	 * =3D 0xfffffd01fc000000
-> +	 */
-> +	ldah	\reg, -3		/* ff..fd0000 */
-> +	lda	\reg, 0x1fc(\reg)	/* ff..fd01fc */
-> +	sll	\reg, 24, \reg
-> +.endm
-> +
-> +#define com1Rbr 0x3f8
-> +#define com1Thr 0x3f8
-> +#define com1Ier 0x3f9
-> +#define com1Iir 0x3fa
-> +#define com1Lcr 0x3fb
-> +#define com1Mcr 0x3fc
-> +#define com1Lsr 0x3fd
-> +#define com1Msr 0x3fe
-> +#define com1Scr 0x3ff
-> +#define com1Dll 0x3f8
-> +#define com1Dlm 0x3f9
-> +
-> +#define PAL_halt    0
-> +#define PAL_wrent  52
-> +#define PAL_wrkgp  55
-> +
-> +	.text
-> +	.p2align 4
-> +	.globl	_start
-> +	.ent	_start
-> +_start:
-> +	br	$gp, .+4
-> +	ldah	$gp, 0($gp)		!gpdisp!1
-> +	lda	$gp, 0($gp)		!gpdisp!1
-> +
-> +	ldah	$sp, $stack_end($gp)	!gprelhigh
-> +	lda	$sp, $stack_end($gp)	!gprellow
-> +
-> +	/* Install kernel gp for exception handlers.  */
-> +	mov	$gp, $16
-> +	call_pal PAL_wrkgp
-> +
-> +	/* Install exception handlers.  */
-> +	ldah	$16, entInt($gp)	!gprelhigh
-> +	lda	$16, entInt($16)	!gprellow
-> +	lda	$17, 0
-> +	call_pal PAL_wrent
-> +
-> +	ldah	$16, entArith($gp)	!gprelhigh
-> +	lda	$16, entArith($16)	!gprellow
-> +	lda	$17, 1
-> +	call_pal PAL_wrent
-> +
-> +	ldah	$16, entMM($gp)		!gprelhigh
-> +	lda	$16, entMM($16)		!gprellow
-> +	lda	$17, 2
-> +	call_pal PAL_wrent
-> +
-> +	ldah	$16, entIF($gp)		!gprelhigh
-> +	lda	$16, entIF($16)		!gprellow
-> +	lda	$17, 3
-> +	call_pal PAL_wrent
-> +
-> +	ldah	$16, entUna($gp)	!gprelhigh
-> +	lda	$16, entUna($16)	!gprellow
-> +	lda	$17, 4
-> +	call_pal PAL_wrent
-> +
-> +	ldah	$16, entSys($gp)	!gprelhigh
-> +	lda	$16, entSys($16)	!gprellow
-> +	lda	$17, 5
-> +	call_pal PAL_wrent
-> +
-> +	/*
-> +	 * Initialize COM1.
-> +	 */
-> +	load_pci_io $1
-> +	lda	$2, 0x87		/* outb(0x87, com1Lcr); */
-> +	stb	$2, com1Lcr($1)
-> +	stb	$31, com1Dlm($1)	/* outb(0, com1Dlm); */
-> +	lda	$2, 3			/* baudconst 3 =3D> 56000 */
-> +	stb	$2, com1Dll($1)		/* outb(baudconst, com1Dll); */
-> +	lda	$2, 0x07
-> +	stb	$2, com1Lcr($1)		/* outb(0x07, com1Lcr) */
-> +	lda	$2, 0x0f
-> +	stb	$2, com1Mcr($1)		/* outb(0x0f, com1Mcr) */
-> +
-> +	bsr	$26, main		!samegp
-> +
-> +	/* fall through to _exit */
-> +	.end	_start
-> +
-> +	.globl	_exit
-> +	.ent	_exit
-> +_exit:
-> +	.frame	$sp, 0, $26, 0
-> +	.prologue 0
-> +
-> +	/* We cannot return an error code.  */
-> +	call_pal PAL_halt
-> +	.end	_exit
-> +
-> +/*
-> + * We have received an exception that we don't handle.  Log and exit.
-> + */
-> +	.ent	log_exit
-> +log_exit:
-> +entInt:
-> +entArith:
-> +entMM:
-> +entIF:
-> +entUna:
-> +entSys:
-> +	ldah	$16, $errormsg($gp)	!gprelhigh
-> +	lda	$16, $errormsg($16)	!gprellow
-> +	bsr	$26, __sys_outs		!samegp
-> +	bsr	$26, _exit		!samegp
-> +	.end	log_exit
-> +
-> +	.section .rodata
-> +$errormsg:
-> +	.string "Terminated by exception.\n"
-> +	.previous
-> +
-> +	/*
-> +	 * Helper Functions
-> +	 */
-> +
-> +	/* Output a single character to serial port */
-> +	.global __sys_outc
-> +	.ent	__sys_outc
-> +__sys_outc:
-> +	.frame	$sp, 0, $26, 0
-> +	.prologue 0
-> +
-> +	load_pci_io $1
-> +
-> +	/*
-> +	 * while ((inb(com1Lsr) & 0x20) =3D=3D 0)
-> +	 *       continue;
-> +	 */
-> +1:	ldbu	$0, com1Lsr($1)
-> +	and	$0, 0x20, $0
-> +	beq	$0, 1b
-> +
-> +	/* outb(c, com1Thr); */
-> +	stb	$16, com1Thr($1)
-> +	ret
-> +	.end	__sys_outc
-> +
-> +	/* Output a nul-terminated string to serial port */
-> +	.global	__sys_outs
-> +	.ent	__sys_outs
-> +__sys_outs:
-> +	.frame	$sp, 0, $26, 0
-> +	.prologue 0
-> +
-> +	load_pci_io $1
-> +
-> +	ldbu	$2, 0($16)
-> +	beq	$2, 9f
-> +
-> +	/*
-> +	 * while ((inb(com1Lsr) & 0x20) =3D=3D 0)
-> +	 *       continue;
-> +	 */
-> +1:	ldbu	$0, com1Lsr($1)
-> +	and	$0, 0x20, $0
-> +	beq	$0, 1b
-> +
-> +	/* outb(c, com1Thr); */
-> +	stb	$2, com1Thr($1)
-> +
-> +	addq	$16, 1, $16
-> +	ldbu	$2, 0($16)
-> +	bne	$2, 1b
-> +
-> +9:	ret
-> +	.end	__sys_outs
-> +
-> +/*
-> + * Division routines that are normally in libc.
-> + *
-> + * These do not follow the C calling convention.  Arguments are in $24+$=
-25,
-> + * the result is in $27.  Register $28 may be clobbered; everything else
-> + * must be saved.
-> + *
-> + * We store the remainder in $28, so that we can share code.
-> + *
-> + * We do not signal divide by zero.
-> + */
-> +
-> +/*
-> + * Unsigned 64-bit division.
-> + */
-> +
-> +	.globl	__divqu
-> +	.ent	__divqu
-> +__divqu:
-> +	.frame	$sp, 48, $23
-> +	subq	$sp, 48, $sp
-> +	stq	$0, 0($sp)
-> +	stq	$1, 8($sp)
-> +	stq	$2, 16($sp)
-> +	stq	$3, 24($sp)
-> +	stq	$4, 32($sp)
-> +	.prologue 0
-> +
-> +#define mask     $0
-> +#define divisor  $1
-> +#define compare  $2
-> +#define tmp1     $3
-> +#define tmp2     $4
-> +#define quotient $27
-> +#define modulus  $28
-> +
-> +	mov	$24, modulus
-> +	mov	$25, divisor
-> +	mov	$31, quotient
-> +	mov	1, mask
-> +	beq	$25, 9f
-> +
-> +	/* Shift left until divisor >=3D modulus.  */
-> +1:	cmpult	divisor, modulus, compare
-> +	blt	divisor, 2f
-> +	addq	divisor, divisor, divisor
-> +	addq	mask, mask, mask
-> +	bne	compare, 1b
-> +
-> +2:	addq	quotient, mask, tmp2
-> +	srl	mask, 1, mask
-> +	cmpule	divisor, modulus, compare
-> +	subq	modulus, divisor, tmp1
-> +	cmovne	compare, tmp2, quotient
-> +	srl	divisor, 1, divisor
-> +	cmovne	compare, tmp1, modulus
-> +	bne	mask, 2b
-> +
-> +9:	ldq	$0, 0($sp)
-> +	ldq	$1, 8($sp)
-> +	ldq	$2, 16($sp)
-> +	ldq	$3, 24($sp)
-> +	ldq	$4, 32($sp)
-> +	addq	$sp, 48, $sp
-> +	ret	$31, ($23), 1
-> +
-> +#undef mask
-> +#undef divisor
-> +#undef compare
-> +#undef tmp1
-> +#undef tmp2
-> +#undef quotient
-> +#undef modulus
-> +
-> +	.end	__divqu
-> +
-> +/*
-> + * Unsigned 64-bit remainder.
-> + * Note that __divqu above leaves the result in $28.
-> + */
-> +
-> +	.globl	__remqu
-> +	.ent	__remqu
-> +__remqu:
-> +	.frame	$sp, 16, $23
-> +	subq	$sp, 16, $sp
-> +	stq	$23, 0($sp)
-> +	.prologue 0
-> +
-> +	bsr	$23, __divqu
-> +
-> +	ldq	$23, 0($sp)
-> +	mov	$28, $27
-> +	addq	$sp, 16, $sp
-> +	ret	$31, ($23), 1
-> +	.end	__remqu
-> +
-> +/*
-> + * Signed 64-bit division.
-> + */
-> +
-> +	.globl	__divqs
-> +	.ent	__divqs
-> +__divqs:
-> +	.prologue 0
-> +
-> +	/* Common case: both arguments are positive.  */
-> +	bis	$24, $25, $28
-> +	bge	$28, __divqu
-> +
-> +	/* At least one argument is negative.  */
-> +	subq	$sp, 32, $sp
-> +	stq	$23, 0($sp)
-> +	stq	$24, 8($sp)
-> +	stq	$25, 16($sp)
-> +
-> +	/* Compute absolute values.  */
-> +	subq	$31, $24, $28
-> +	cmovlt	$24, $28, $24
-> +	subq	$31, $25, $28
-> +	cmovlt	$25, $28, $25
-> +
-> +	bsr	$23, __divqu
-> +
-> +	ldq	$24, 8($sp)
-> +	ldq	$25, 16($sp)
-> +
-> +	/* -a / b =3D a / -b =3D -(a / b) */
-> +	subq	$31, $27, $23
-> +	xor	$24, $25, $28
-> +	cmovlt	$28, $23, $27
-> +
-> +	ldq	$23, 0($sp)
-> +	addq	$sp, 32, $sp
-> +	ret	$31, ($23), 1
-> +	.end	__divqs
-> +
-> +/*
-> + * Signed 64-bit remainder.
-> + */
-> +
-> +	.globl	__remqs
-> +	.ent	__remqs
-> +__remqs:
-> +	.prologue 0
-> +
-> +	/* Common case: both arguments are positive.  */
-> +	bis	$24, $25, $28
-> +	bge	$28, __remqu
-> +
-> +	/* At least one argument is negative.  */
-> +	subq	$sp, 32, $sp
-> +	stq	$23, 0($sp)
-> +	stq	$24, 8($sp)
-> +	stq	$25, 16($sp)
-> +
-> +	/* Compute absolute values.  */
-> +	subq	$31, $24, $28
-> +	cmovlt	$24, $28, $24
-> +	subq	$31, $25, $28
-> +	cmovlt	$25, $28, $25
-> +
-> +	bsr	$23, __divqu
-> +
-> +	ldq	$23, 0($sp)
-> +	ldq	$24, 8($sp)
-> +	ldq	$25, 16($sp)
-> +
-> +	/* -a % b =3D -(a % b); a % -b =3D a % b.  */
-> +	subq	$31, $28, $27
-> +	cmovge	$24, $28, $27
-> +
-> +	addq	$sp, 32, $sp
-> +	ret	$31, ($23), 1
-> +	.end	__remqs
-> +
-> +/*
-> + * Unsigned 32-bit division.
-> + */
-> +
-> +	.globl	__divlu
-> +	.ent	__divlu
-> +__divlu:
-> +	.frame	$sp, 32, $23
-> +	subq	$sp, 32, $sp
-> +	stq	$23, 0($sp)
-> +	stq	$24, 8($sp)
-> +	stq	$25, 16($sp)
-> +	.prologue 0
-> +
-> +	/* Zero extend and use the 64-bit routine.  */
-> +	zap	$24, 0xf0, $24
-> +	zap	$25, 0xf0, $25
-> +	bsr	$23, __divqu
-> +
-> +	addl	$27, 0, $27
-> +	ldq	$23, 0($sp)
-> +	ldq	$24, 8($sp)
-> +	ldq	$25, 16($sp)
-> +	addq	$sp, 32, $sp
-> +	ret	$31, ($23), 1
-> +	.end	__divlu
-> +
-> +/*
-> + * Unsigned 32-bit remainder.
-> + */
-> +
-> +	.globl	__remlu
-> +	.ent	__remlu
-> +__remlu:
-> +	.frame	$sp, 32, $23
-> +	subq	$sp, 32, $sp
-> +	stq	$23, 0($sp)
-> +	stq	$24, 8($sp)
-> +	stq	$25, 16($sp)
-> +	.prologue 0
-> +
-> +	/* Zero extend and use the 64-bit routine.  */
-> +	zap	$24, 0xf0, $24
-> +	zap	$25, 0xf0, $25
-> +	bsr	$23, __divqu
-> +
-> +	/* Recall that the remainder is returned in $28.  */
-> +	addl	$28, 0, $27
-> +	ldq	$23, 0($sp)
-> +	ldq	$24, 8($sp)
-> +	ldq	$25, 16($sp)
-> +	addq	$sp, 32, $sp
-> +	ret	$31, ($23), 1
-> +	.end	__remlu
-> +
-> +/*
-> + * Signed 32-bit division.
-> + */
-> +
-> +	.globl	__divls
-> +	.ent	__divls
-> +__divls:
-> +	.frame	$sp, 32, $23
-> +	subq	$sp, 32, $sp
-> +	stq	$23, 0($sp)
-> +	stq	$24, 8($sp)
-> +	stq	$25, 16($sp)
-> +	.prologue 0
-> +
-> +	/* Sign extend.  */
-> +	addl	$24, 0, $24
-> +	addl	$25, 0, $25
-> +
-> +	/* Compute absolute values.  */
-> +	subq	$31, $24, $28
-> +	cmovlt	$24, $28, $24
-> +	subq	$31, $25, $28
-> +	cmovlt	$25, $28, $25
-> +
-> +	bsr	$23, __divqu
-> +
-> +	ldq	$24, 8($sp)
-> +	ldq	$25, 16($sp)
-> +
-> +	/* Negate the unsigned result, if necessary.  */
-> +	xor	$24, $25, $28
-> +	subl	$31, $27, $23
-> +	addl	$27, 0, $27
-> +	addl	$28, 0, $28
-> +	cmovlt	$28, $23, $27
-> +
-> +	ldq	$23, 0($sp)
-> +	addq	$sp, 32, $sp
-> +	ret	$31, ($23), 1
-> +	.end	__divls
-> +
-> +/*
-> + * Signed 32-bit remainder.
-> + */
-> +
-> +	.globl	__remls
-> +	.ent	__remls
-> +__remls:
-> +	.frame	$sp, 32, $23
-> +	subq	$sp, 32, $sp
-> +	stq	$23, 0($sp)
-> +	stq	$24, 8($sp)
-> +	stq	$25, 16($sp)
-> +	.prologue 0
-> +
-> +	/* Sign extend.  */
-> +	addl	$24, 0, $24
-> +	addl	$25, 0, $25
-> +
-> +	/* Compute absolute values.  */
-> +	subq	$31, $24, $28
-> +	cmovlt	$24, $28, $24
-> +	subq	$31, $25, $28
-> +	cmovlt	$25, $28, $25
-> +
-> +	bsr	$23, __divqu
-> +
-> +	ldq	$23, 0($sp)
-> +	ldq	$24, 8($sp)
-> +	ldq	$25, 16($sp)
-> +
-> +	/* Negate the unsigned result, if necessary.  */
-> +	subl	$31, $28, $27
-> +	addl	$28, 0, $28
-> +	cmovge	$24, $28, $27
-> +
-> +	addq	$sp, 32, $sp
-> +	ret	$31, ($23), 1
-> +	.end	__remls
-> +
-> +	.data
-> +	.p2align 4
-> +stack:
-> +	.skip	65536
-> +$stack_end:
-> +	.type	stack,@object
-> +	.size	stack, . - stack
-> diff --git a/tests/tcg/alpha/system/kernel.ld b/tests/tcg/alpha/system/ke=
-rnel.ld
-> new file mode 100644
-> index 0000000000..d2ac6ecfeb
-> --- /dev/null
-> +++ b/tests/tcg/alpha/system/kernel.ld
-> @@ -0,0 +1,30 @@
-> +ENTRY(_start)
-> +
-> +SECTIONS
-> +{
-> +    /* Linux kernel legacy start address.  */
-> +    . =3D 0xfffffc0000310000;
-> +    _text =3D .;
-> +    .text : {
-> +        *(.text)
-> +    }
-> +    .rodata : {
-> +        *(.rodata)
-> +    }
-> +    _etext =3D .;
-> +
-> +    . =3D ALIGN(8192);
-> +    _data =3D .;
-> +    .got : {
-> +        *(.got)
-> +    }
-> +    .data : {
-> +	*(.sdata)
-> +        *(.data)
-> +    }
-> +    _edata =3D .;
-> +    .bss : {
-> +        *(.bss)
-> +    }
-> +    _end =3D .;
-> +}
+Signed-off-by: Daniel Santos <daniel.santos@pobox.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ linux-user/elfload.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index c1a2602..7f09d57 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -2698,6 +2698,11 @@ int load_elf_binary(struct linux_binprm *bprm, str=
+uct image_info *info)
+     char *elf_interpreter =3D NULL;
+     char *scratch;
+=20
++    memset(&interp_info, 0, sizeof(interp_info));
++#ifdef TARGET_MIPS
++    interp_info.fp_abi =3D MIPS_ABI_FP_UNKNOWN;
++#endif
++
+     info->start_mmap =3D (abi_ulong)ELF_START_MMAP;
+=20
+     load_elf_image(bprm->filename, bprm->fd, info,
+--=20
+2.7.4
 
---
-Alex Benn=C3=A9e
 
