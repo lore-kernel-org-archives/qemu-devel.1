@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 835C9C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 05:10:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A80EC43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 05:11:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42AA62075C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 05:10:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42AA62075C
+	by mail.kernel.org (Postfix) with ESMTPS id 0B8162075C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 05:11:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B8162075C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34539 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34573 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMQSg-0001ld-F5
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 01:10:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47548)
+	id 1hMQU4-0002uQ-9O
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 01:11:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hMQRq-0001PB-JK
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:09:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1hMQSv-000264-FL
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:10:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hMQRp-00057V-LZ
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:09:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45770)
+	(envelope-from <thuth@redhat.com>) id 1hMQSu-0006iY-M0
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:10:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59818)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hMQRp-00057Q-DW; Fri, 03 May 2019 01:09:25 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	id 1hMQSs-0006gO-Kj; Fri, 03 May 2019 01:10:30 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A99853092649;
-	Fri,  3 May 2019 05:09:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C5FD83082E8E;
+	Fri,  3 May 2019 05:10:29 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-70.ams2.redhat.com [10.36.116.70])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 726AC600C5;
-	Fri,  3 May 2019 05:09:23 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BE3395D9C4;
+	Fri,  3 May 2019 05:10:28 +0000 (UTC)
 To: Cao Jiaxi <driver1998@foxmail.com>, qemu-devel@nongnu.org
 References: <20190503002206.9751-1-driver1998@foxmail.com>
-	<20190503003650.10137-1-driver1998@foxmail.com>
+	<20190503003707.10185-1-driver1998@foxmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -89,23 +89,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <c3d707ff-0fa6-7f2a-014b-97946c00fd9d@redhat.com>
-Date: Fri, 3 May 2019 07:09:22 +0200
+Message-ID: <35fd656a-aef3-04a5-0a11-2bcfcf897440@redhat.com>
+Date: Fri, 3 May 2019 07:10:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190503003650.10137-1-driver1998@foxmail.com>
+In-Reply-To: <20190503003707.10185-1-driver1998@foxmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Fri, 03 May 2019 05:09:24 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.46]);
+	Fri, 03 May 2019 05:10:29 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] qga: Fix mingw compilation warnings
- on enum conversion
+Subject: Re: [Qemu-devel] [PATCH v3 3/4] util/cacheinfo: Use uint64_t on
+ LLP64 model to satisfy Windows ARM64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -117,38 +117,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Stefan Weil <sw@weilnetz.de>,
-	Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503050922.RxJJmciCXLM2yFMUE-g1aMLEYMoizbHeGVe0II2UusQ@z>
+Message-ID: <20190503051027._SbJbkvZzoTWtqzlnB-XhqV_W2HHNWLHUlXs5UOIQLQ@z>
 
-On 03/05/2019 02.36, Cao Jiaxi wrote:
-> The win2qemu[] is supposed to be the conversion table to convert between
-> STORAGE_BUS_TYPE in Windows SDK and GuestDiskBusType in qga.
-> 
-> But it was incorrectly written that it forces to set a GuestDiskBusType
-> value to STORAGE_BUS_TYPE, which generates an enum conversion warning in clang.
+On 03/05/2019 02.37, Cao Jiaxi wrote:
+> Windows ARM64 uses LLP64 model, which breaks current assumptions.
 > 
 > Signed-off-by: Cao Jiaxi <driver1998@foxmail.com>
 > ---
->  qga/commands-win32.c | 2 +-
+>  util/cacheinfo.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-> index d40d61f605..6b67f16faf 100644
-> --- a/qga/commands-win32.c
-> +++ b/qga/commands-win32.c
-> @@ -457,7 +457,7 @@ void qmp_guest_file_flush(int64_t handle, Error **errp)
+> diff --git a/util/cacheinfo.c b/util/cacheinfo.c
+> index 3cd080b83d..eebe1ce9c5 100644
+> --- a/util/cacheinfo.c
+> +++ b/util/cacheinfo.c
+> @@ -107,7 +107,7 @@ static void sys_cache_info(int *isize, int *dsize)
+>  static void arch_cache_info(int *isize, int *dsize)
+>  {
+>      if (*isize == 0 || *dsize == 0) {
+> -        unsigned long ctr;
+> +        uint64_t ctr;
 >  
->  #ifdef CONFIG_QGA_NTDDSCSI
->  
-> -static STORAGE_BUS_TYPE win2qemu[] = {
-> +static GuestDiskBusType win2qemu[] = {
->      [BusTypeUnknown] = GUEST_DISK_BUS_TYPE_UNKNOWN,
->      [BusTypeScsi] = GUEST_DISK_BUS_TYPE_SCSI,
->      [BusTypeAtapi] = GUEST_DISK_BUS_TYPE_IDE,
+>          /* The real cache geometry is in CCSIDR_EL1/CLIDR_EL1/CSSELR_EL1,
+>             but (at least under Linux) these are marked protected by the
+> 
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
