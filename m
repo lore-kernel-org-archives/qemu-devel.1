@@ -2,97 +2,70 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82087C004C9
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:37:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBBB8C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:38:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46DC82075C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:37:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46DC82075C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id B67BF2075E
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:38:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B67BF2075E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38624 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38634 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMWUu-0007TR-Jp
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 07:37:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60628)
+	id 1hMWVt-0000CA-VA
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 07:38:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hMWGe-00025w-5o
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:22:19 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hMWLr-0007w7-B1
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:27:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hMWGc-00051V-QT
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:22:16 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:34918
-	helo=mail.default.ilande.uk0.bigv.io)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hMWGa-0004ul-Gq; Fri, 03 May 2019 07:22:12 -0400
-Received: from host109-149-60-255.range109-149.btcentralplus.com
-	([109.149.60.255] helo=[192.168.1.65])
-	by mail.default.ilande.uk0.bigv.io with esmtpsa
-	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hMWG0-0006ex-GY; Fri, 03 May 2019 12:21:36 +0100
-To: Laurent Vivier <laurent@vivier.eu>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Stephen Checkoway <stephen.checkoway@oberlin.edu>,
-	Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers
-	<qemu-devel@nongnu.org>, Artyom Tarasenko <atar4qemu@gmail.com>,
-	qemu-trivial@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?=
-	<marcandre.lureau@redhat.com>
-References: <20190419154041.77802-1-stephen.checkoway@oberlin.edu>
-	<45e6247e-cddb-2185-7f7b-503be00bd453@vivier.eu>
-	<f61fc519-da75-5b41-21d0-508cf89016f2@redhat.com>
-	<fc4a45ba-08d0-59ba-80eb-10a08cda3b7d@ilande.co.uk>
-	<af92f288-7159-b7ad-3360-5c2bb9b392f6@vivier.eu>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
-	mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
-	3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
-	E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
-	PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
-	PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
-	AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
-	OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
-	NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
-	mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
-	z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
-	T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
-	DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
-	y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
-	2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
-	14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
-	YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
-	Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
-	BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
-	opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
-	NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
-	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
-	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
-	imgcU9TTGC5qd9g=
-Message-ID: <9920c883-741a-76e9-8d97-f68b65dbcff6@ilande.co.uk>
-Date: Fri, 3 May 2019 12:22:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <laurent@vivier.eu>) id 1hMWLq-0003YR-BO
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:27:39 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:43839)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
+	id 1hMWLq-0003Xd-2g; Fri, 03 May 2019 07:27:38 -0400
+Received: from localhost.localdomain ([78.238.229.36]) by
+	mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA
+	(Nemesis)
+	id 1Mtxxk-1gSdOt1Hps-00uGzk; Fri, 03 May 2019 13:27:11 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Date: Fri,  3 May 2019 13:26:52 +0200
+Message-Id: <20190503112654.4393-11-laurent@vivier.eu>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190503112654.4393-1-laurent@vivier.eu>
+References: <20190503112654.4393-1-laurent@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <af92f288-7159-b7ad-3360-5c2bb9b392f6@vivier.eu>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 109.149.60.255
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:qP3adIP8oXcIdsE+hQ0KIyGDDIVh4OUeNCt5i1VwQjrqCox6CcY
+	3gsM6PwyJza9PLzSMPGSpBDXxmO56aj/o61VkOE/lqJiKmMBxmtr2hucOE8MIZuwdfTKHKC
+	ic6ic/KICzhDxtb4AHxR73Chpbqy8tQUGr9NkYBoA0Hdy0SRXVuQZ6NOWo1Ev2J2m8A6tQE
+	610C/XiyL+ayDbH733YAA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:njiNo2w2ei4=:/yYLlsDIBnnpFbCiD5f051
+	sgsumgGjoB0Nc2oGtXH+BZJ9pzSf3YGBxT4C/LPJAIa0Sjh8AAnvomf6InLWghSrrCc2GG2n+
+	10K7gWeWjHik7cxwKLVsf/k0Pmk6omn8M/m1HlNX1cT7eNGFCG4RP0EXyCebXY7FA9+1rImG9
+	lL/dckIAfN23Mu8qJCOHMCLPY0lE9fXZ56cAW8tPZroB6dOy6HWMjDnuOswYaAoAvJ+LJOgKM
+	X0L3czCB2hjHKgF1b4w7oFhm4gTkrw5csqMcSzJLyXKxkPIjMNFsm3CIJpRZM+MiGwCmQpTv5
+	+ug6rTS2d9Vst3hE46ZYoxKemyeMWjkLhLREfpO8+rzB6bxiyS3ck6sBgznAzKw1x2W8cSJEP
+	6llsSGB6YuILslXoCDH3fKRFUN7Hq2u3nI651G5MkOw626JuJzPd/8SforuTYimW4QYjRCJD7
+	qp+W9Bv1bYivolfI8h+vYvRGMKnkjX73rbdZvMRctvstFLaycc1U72qQgAObwUsGxettb4llQ
+	5GkQ8Qwn222LATD2GKR0UNxqw2lXHNTf9LnluSh1sQzMJIm0mMSnIU26iedpZGIzx+WbgP5h8
+	SzwhPazQK128M903GrpTefKyeuu/wB9dF8iWghhoaUkb7vwIK58RNV4TV1Q1rJrrri7mEkEkU
+	Eq4pLYrRfJAdhWhDZuPF76yCnq9oWUa07qErAxFwsLPHEkks5P93YaFaNgcphg+oZPAoObOA/
+	5YQUgR9Ecy5KU/wmSo3lP0mt0oVVQ1a4qoYtHrufNkYLBtZR22sCLK7BHsY=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v3] hw/char/escc: Lower irq
- when transmit buffer is filled
+X-Received-From: 212.227.126.131
+Subject: [Qemu-devel] [PULL v2 10/12] Makefile: Let the 'clean' rule remove
+ qemu-ga.exe on Windows hosts
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -104,34 +77,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	Jason Wang <jasowang@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+	Laurent Vivier <laurent@vivier.eu>, Fabien Chouteau <chouteau@adacore.com>,
+	Michael Roth <mdroth@linux.vnet.ibm.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	=?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>,
+	Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503112208.vQIyLZ-ai0gfnCsJ8IhxSz7z1O06lGqV7AqNyprOlsM@z>
+Message-ID: <20190503112652.RPXnzeTTdZ3DTwxPFT7C0CLBINDNdeBCBHDG99kFlcc@z>
 
-On 03/05/2019 08:21, Laurent Vivier wrote:
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
->>> Mark, Artyom, are you OK with this patch?
->>
->> I started testing this with my OpenBIOS test images at the start of the week, but
->> unfortunately got distracted by real life :)
->>
->> I've now finished and confirmed there are no regressions in my local tests, so I'll
->> include this in the PR I am planning to send shortly containing the leon3 updates.
-> 
-> Hi Mark,
-> 
-> I've already included a leon3 patch ("hw/sparc/leon3: Allow load of
-> uImage firmwares") in the PR I sent yesterday for the trivial branch.
-> I've removed from my PR this patch about the ESCC, so you can take it.
+Commit 48ff7a625b36 added the QEMU Guest Agent tool with the
+optional ".exe" suffix for Windows hosts, but forgot to use
+this suffix in the 'clean' rule. Calling this rule let a dangling
+executable in the build directory.
+Correct this by using the proper optional suffix.
 
-Hi Laurent,
+Fixes: 48ff7a625b36
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Stefan Weil <sw@weilnetz.de>
+Message-Id: <20190427161322.24642-1-philmd@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Understood, and thanks for looking out for the patch. My first week back has been
-quite busy so I'm still playing catch-up here...
+diff --git a/Makefile b/Makefile
+index 43a7a047b452..e223bfe2a3a1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -639,7 +639,7 @@ clean:
+ 		! -path ./roms/edk2/BaseTools/Source/Python/UPT/Dll/sqlite3.dll \
+ 		-exec rm {} +
+ 	rm -f $(edk2-decompressed)
+-	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TAGS cscope.* *.pod *~ */*~
++	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga$(EXESUF) TAGS cscope.* *.pod *~ */*~
+ 	rm -f fsdev/*.pod scsi/*.pod
+ 	rm -f qemu-img-cmds.h
+ 	rm -f ui/shader/*-vert.h ui/shader/*-frag.h
+-- 
+2.20.1
 
-
-ATB,
-
-Mark.
 
