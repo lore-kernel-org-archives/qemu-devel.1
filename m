@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34148)
+Received: from eggs.gnu.org ([209.51.188.92]:34247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMbkx-0006cs-Bm
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:13:56 -0400
+	(envelope-from <liboxuan@connect.hku.hk>) id 1hMblN-0007D1-Rh
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:14:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMbkv-00015A-R9
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:13:55 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55960)
+	(envelope-from <liboxuan@connect.hku.hk>) id 1hMblM-0001RQ-UJ
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:14:21 -0400
+Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:37685)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hMbkv-00014Z-K6
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:13:53 -0400
-Received: by mail-wm1-x343.google.com with SMTP id y2so7629180wmi.5
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 10:13:53 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  3 May 2019 18:13:47 +0100
-Message-Id: <20190503171347.13747-3-peter.maydell@linaro.org>
-In-Reply-To: <20190503171347.13747-1-peter.maydell@linaro.org>
-References: <20190503171347.13747-1-peter.maydell@linaro.org>
+	(Exim 4.71) (envelope-from <liboxuan@connect.hku.hk>)
+	id 1hMblM-0001QL-Io
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:14:20 -0400
+Received: by mail-yw1-xc44.google.com with SMTP id l8so1956801ywm.4
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 10:14:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 2/2] hw/arm/boot: Honour image size field in
- AArch64 Image format kernels
+References: <20190503154424.73933-1-liboxuan@connect.hku.hk>
+	<87bm0j4im0.fsf@zen.linaroharston>
+	<CALM0=-=b+z2aW-cuM=hmk3_oKG7w3ianMo_ZA7gj8zMgCOfC3g@mail.gmail.com>
+	<878svn4gnq.fsf@zen.linaroharston>
+In-Reply-To: <878svn4gnq.fsf@zen.linaroharston>
+From: "LI, BO XUAN" <liboxuan@connect.hku.hk>
+Date: Sat, 4 May 2019 01:13:43 +0800
+Message-ID: <CALM0=-m0Vd1YMn6s36oRbsqFCwjPwdga5Q0XRoO41dq6iw1Lzg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4] hw/virtio/virtio-mmio: Convert DPRINTF
+ to trace and log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Mark Rutland <mark.rutland@arm.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Yuval Shaia <yuval.shaia@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Since Linux v3.17, the kernel's Image header includes a field image_size,
-which gives the total size of the kernel including unpopulated data
-sections such as the BSS). If this is present, then return it from
-load_aarch64_image() as the true size of the kernel rather than
-just using the size of the Image file itself. This allows the code
-which calculates where to put the initrd to avoid putting it in
-the kernel's BSS area.
+Gotcha, thanks for the tip!
 
-This means that we should be able to reliably load kernel images
-which are larger than 128MB without accidentally putting the
-initrd or dtb in locations that clash with the kernel itself.
+Best regards,
+Boxuan Li
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1823998
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/arm/boot.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+On Sat, May 4, 2019 at 1:00 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
+ote:
 
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index 7c978fedde4..34bdd151df8 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -910,6 +910,7 @@ static uint64_t load_aarch64_image(const char *filename, hwaddr mem_base,
-                                    hwaddr *entry, AddressSpace *as)
- {
-     hwaddr kernel_load_offset = KERNEL64_LOAD_ADDR;
-+    uint64_t kernel_size = 0;
-     uint8_t *buffer;
-     int size;
- 
-@@ -937,7 +938,10 @@ static uint64_t load_aarch64_image(const char *filename, hwaddr mem_base,
-          * is only valid if the image_size is non-zero.
-          */
-         memcpy(&hdrvals, buffer + ARM64_TEXT_OFFSET_OFFSET, sizeof(hdrvals));
--        if (hdrvals[1] != 0) {
-+
-+        kernel_size = le64_to_cpu(hdrvals[1]);
-+
-+        if (kernel_size != 0) {
-             kernel_load_offset = le64_to_cpu(hdrvals[0]);
- 
-             /*
-@@ -955,12 +959,21 @@ static uint64_t load_aarch64_image(const char *filename, hwaddr mem_base,
-         }
-     }
- 
-+    /*
-+     * Kernels before v3.17 don't populate the image_size field, and
-+     * raw images have no header. For those our best guess at the size
-+     * is the size of the Image file itself.
-+     */
-+    if (kernel_size == 0) {
-+        kernel_size = size;
-+    }
-+
-     *entry = mem_base + kernel_load_offset;
-     rom_add_blob_fixed_as(filename, buffer, size, *entry, as);
- 
-     g_free(buffer);
- 
--    return size;
-+    return kernel_size;
- }
- 
- static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
--- 
-2.20.1
+>
+> LI, BO XUAN <liboxuan@connect.hku.hk> writes:
+>
+> > Hi Alex,
+> >
+> > Sorry about that, I am still trying to get familiar with the patch
+> > submission process. Since my patch has been changed from your last
+> review,
+> > I thought it would be safe to not include the r-b tag from last time.
+> Will
+> > take care next time!
+>
+> That's ok. As a general rule as long as you haven't substantially
+> changed a patch it's safe to keep previous r-b tags. You can always
+> mention it in your cover letter if you are unsure.
+>
+> --
+> Alex Benn=C3=A9e
+>
