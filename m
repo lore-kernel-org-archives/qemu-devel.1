@@ -6,65 +6,66 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76F52C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:44:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4171C004C9
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:46:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B0382075E
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:44:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B0382075E
+	by mail.kernel.org (Postfix) with ESMTPS id 7886C2075E
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:46:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7886C2075E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38763 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38848 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMWcG-0006sa-IZ
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 07:44:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33820)
+	id 1hMWeL-0008Ki-Qw
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 07:46:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMWLb-0007fy-9Q
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:27:24 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hMWLk-0007or-4y
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMWLa-0003Gq-Aw
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:27:23 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:47175)
+	(envelope-from <laurent@vivier.eu>) id 1hMWLj-0003Se-5G
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:27:32 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:45683)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hMWLX-0003CW-Ua; Fri, 03 May 2019 07:27:20 -0400
+	id 1hMWLi-0003Rp-SO; Fri, 03 May 2019 07:27:31 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA
 	(Nemesis)
-	id 1MAchM-1hT5vZ258q-00B4K0; Fri, 03 May 2019 13:27:01 +0200
+	id 1MYtoe-1hIAms0Zai-00UpC4; Fri, 03 May 2019 13:27:10 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Fri,  3 May 2019 13:26:44 +0200
-Message-Id: <20190503112654.4393-3-laurent@vivier.eu>
+Date: Fri,  3 May 2019 13:26:51 +0200
+Message-Id: <20190503112654.4393-10-laurent@vivier.eu>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190503112654.4393-1-laurent@vivier.eu>
 References: <20190503112654.4393-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:8SpV5q+wuYzAk9ypmqbApsD5yPUlesepmLhhH0Wesf46hT4PjrH
-	63DLXxROIpeIrnMMLvoic81JGuRHJDvZlKR+5HC8M1kwZCojtpG57sTrkELWILiisw3B8OZ
-	0KIr81YsL10QL3OeOqFB6s+A7ZQ3VgPKdd6tHdhpJFSZrspCqG50XTccLkO5hWw85IqCsYG
-	uNlPx6EMD0m9yp9sK44bw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:CNCT3k0LTiE=:mRpjnw/f8AHTlQR1hwcNBO
-	MwCJvMSwg6eqJa2lx7mm+mwKmJgLbzq7v/rEx2NJk5sANBAUMpJ7RkEBIFW/pkCRzzRTnsN9G
-	khOLByfBfaT2OeTsCNNZA1+mrdGEGpuuadS5dpK44VFWUrQlQTSfMfa92YwzMVzxBPTh0aF9R
-	pYKBFjqLDhBs0sb5o3OCHamnVoslq2bxbdj055enId7ny5/Bzi4yWoGc1NgcKEP0m0Ax2hC4A
-	cZhC9uBfNIRCf1X+wriaIn4yj46orU6hsvKXnD9RZ/3h1VfmmSnY9cbgLoVVp09XxxK7/RQWA
-	XGClr6A1NQ2vkw5ZetMENXpoIQVFiwftVgS3TTu+qAEV/Q2LoS/sGk7/KjQvGpaetn6+Jl6fp
-	h19Ht6f/Fa05cccuVN4PFIjxwMEmvfvrAfxt8xEHuldYyNsLV4g+CmS0qbWpydNx7MkHoSt9V
-	vfm3ZWByn3QS8AOt5DAzGDZAJIDt8w1K20TOY7ERbRFQ1rqGiEVD1LgKGnNcx+/kj6/GaSuo+
-	HHQ5kKeh8fu2f2jn1gnR4v1ZDKefc+ApUwh4rnQSjehbvnc8oqHvlJ1y1jxP9QwyJ8+SmXVjh
-	6KlF5j2xUi/SJCAHjS2n0mHOghIpY0+UbkzeKo8l87CBeSqxk6Nj7Ag20Jw6xelmZ3qmcfFmO
-	p72l8U+/2p6OTdg8nsyT87LTRRyTdAO9Z+xyOgtzaJjjVu8gobj/NLOUPMvxZl8VxDOr721F/
-	hmMMBAMbKSYEXKBa0uvwJzYnU2qQe8jYFuxNBg==
+X-Provags-ID: V03:K1:eT9HzwyNXoucdZC+9VuanHN27GG8yYzj5tbE4MzFM1Sv6nyLmeW
+	NaUWW3SLen2u1LX28oLxarUTJTW84U5ZObiZlQ6HRr2pQYjZq1UW8InDVDfuW18vDPpI77W
+	/rUiaaQaVro1nJFx4MgHTTET3q2WvmFhSbBc5rH6LXWi4CDY3LJZfsOncubs20/EHnVTALD
+	fx4m4kniL8XsdBHryUScQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:aXEYOKnYNf8=:mfY8Yx0AAFMQDEZNUmXc1C
+	D/VyT5IUHNJWJir8s+Enw4syIlWSwVOEAdj4d5KilzQf3wMCC5Cfba5jRaLtrafmNs9lfrfTO
+	RVpmc2RI+5KQWSY6Ynxg/ERft9cL3wKabjB2eMQygReNuMZitgrewJH8W5hKhTPvOGn8kEyYn
+	ss+1irPm2jLPJI//LfOozJUBLWgOugWtxuvsdfTUXLDcqErpG1761+tSHFJb4fBZ9EsatsSxq
+	4csig/0X9s+uBBYE1PDyeHkimilfh5WDIbSwzdcUJQ/0H0urgZaWrCbG20edeN5pEXIwnHOSk
+	5nlIH7yVaT5I9jULOC6PXEaWFRpg006ckDQyDTJ43VwuDIK7I5dtDM5QLxXczQVLCRIRvALzP
+	LZ5MoNEHaliz59UWfUpzwPuK0Lt8XyX1l+iQY6at6NywvNOQ6AGD/J4bNQG6o7jbZ3e7YdMis
+	2jIpfUKsRBs9n+0HbkzXRrhfo8XiIShIvgbXtwxm0Y+j1Ao9SR+kTAL8E6uJq133tmtuqZ5rk
+	5cXezTdOAlR5NGeOXBiwZOI6o80BWC30sGMiWJd2tr+/ZXY//oBI0oo78TJTs3UNcBURZtS2Z
+	7wJ7hiTQg3flsyAd044+3r3LrgQWvF5bsyp1nYKViUrNdzoIK7N1LVFs7ok8IaYFXtvsDTEPF
+	G4zzcNMCHfBozRS+pWdaIHHLx4oiv1vtSh3W73gMDBMalZ0W9HN4GtLrWiQueK5qqHHgZb1Lx
+	Cz3M1mCA9tybBGCQaEyJzExV0naFsAP+CwhfDL8BOdOYn9WkHItfhflIFY8=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
-Subject: [Qemu-devel] [PULL v2 02/12] CODING_STYLE: specify the indent rule
- for multiline code
+X-Received-From: 212.227.126.130
+Subject: [Qemu-devel] [PULL v2 09/12] net: Print output of "-net nic,
+ model=help" to stdout instead of stderr
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,89 +77,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	Jason Wang <jasowang@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
-	Laurent Vivier <laurent@vivier.eu>, Fabien Chouteau <chouteau@adacore.com>,
+Cc: Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	Jason Wang <jasowang@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+	Fabien Chouteau <chouteau@adacore.com>,
 	Michael Roth <mdroth@linux.vnet.ibm.com>,
-	Wei Yang <richardw.yang@linux.intel.com>,
-	Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>,
 	Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190503112644.ntXOG9GMBRsvVr8PdFLXpZUaugJF7XQmjSCAwROQ9vo@z>
+Message-ID: <20190503112651.8_pemniWv05eC6w4Awy8UxnFuDvHdb6CQG92qD3icQU@z>
 
-From: Wei Yang <richardw.yang@linux.intel.com>
+From: Thomas Huth <thuth@redhat.com>
 
-We didn't specify the indent rule for multiline code here, which may
-mislead users. And in current code, the code use various styles.
+We are printing all other help output to stdout already (e.g. "-help",
+"-cpu help" and "-machine help" output). So the "-net nic,model=help"
+output should go to stdout instead of stderr, too. And while we're at
+it, also print the NICs line by line, like we do it e.g. with the
+"-cpu help" or "-M help" output, too.
 
-Add this rule in CODING_STYLE to make sure this is clear to every one.
-
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Message-Id: <20190304071631.27567-2-richardw.yang@linux.intel.com>
+Buglink: https://bugs.launchpad.net/qemu/+bug/1574327
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190423160608.7519-1-thuth@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- CODING_STYLE | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ net/net.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/CODING_STYLE b/CODING_STYLE
-index ec075dedc4a8..90321e9c2821 100644
---- a/CODING_STYLE
-+++ b/CODING_STYLE
-@@ -29,6 +29,45 @@ Spaces of course are superior to tabs because:
+diff --git a/net/net.c b/net/net.c
+index f3a3c5444cc3..2cf5e7646997 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -837,9 +837,10 @@ int qemu_show_nic_models(const char *arg, const char *const *models)
+         return 0;
+     }
  
- Do not leave whitespace dangling off the ends of lines.
+-    fprintf(stderr, "qemu: Supported NIC models: ");
+-    for (i = 0 ; models[i]; i++)
+-        fprintf(stderr, "%s%c", models[i], models[i+1] ? ',' : '\n');
++    printf("Supported NIC models:\n");
++    for (i = 0 ; models[i]; i++) {
++        printf("%s\n", models[i]);
++    }
+     return 1;
+ }
  
-+1.1 Multiline Indent
-+
-+There are several places where indent is necessary:
-+
-+ - if/else
-+ - while/for
-+ - function definition & call
-+
-+When breaking up a long line to fit within line width, we need a proper indent
-+for the following lines.
-+
-+In case of if/else, while/for, align the secondary lines just after the
-+opening parenthesis of the first.
-+
-+For example:
-+
-+    if (a == 1 &&
-+        b == 2) {
-+
-+    while (a == 1 &&
-+           b == 2) {
-+
-+In case of function, there are several variants:
-+
-+    * 4 spaces indent from the beginning
-+    * align the secondary lines just after the opening parenthesis of the
-+      first
-+
-+For example:
-+
-+    do_something(x, y,
-+        z);
-+
-+    do_something(x, y,
-+                 z);
-+
-+    do_something(x, do_another(y,
-+                               z));
-+
- 2. Line width
- 
- Lines should be 80 characters; try not to make them longer.
 -- 
 2.20.1
 
