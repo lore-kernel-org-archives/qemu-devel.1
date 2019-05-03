@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55045)
+Received: from eggs.gnu.org ([209.51.188.92]:56004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hMZkd-0004Jv-Qb
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:05:29 -0400
+	(envelope-from <philmd@redhat.com>) id 1hMZml-0005JR-Et
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:07:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hMZkb-0001ub-Tj
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:05:27 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:43867)
+	(envelope-from <philmd@redhat.com>) id 1hMZmk-0004BH-3Q
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:07:39 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:51161)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hMZka-0001tT-8f
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:05:25 -0400
-Received: by mail-wr1-f65.google.com with SMTP id a12so8282746wrq.10
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 08:05:24 -0700 (PDT)
-References: <20190502223007.29494-1-samuel.thibault@ens-lyon.org>
-	<CAFEAcA-eVOZhXj+OLB+VvxXZTniny_sMCFaeWsv+2uEErM-=zA@mail.gmail.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hMZmj-0004Aa-Tn
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:07:38 -0400
+Received: by mail-wm1-f68.google.com with SMTP id p21so7503507wmc.0
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 08:07:37 -0700 (PDT)
+References: <20190503022958.1394-1-joel@jms.id.au>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b70484a8-b408-7c2b-7fd7-27f1c1d98f4d@redhat.com>
-Date: Fri, 3 May 2019 17:05:21 +0200
+Message-ID: <1f32879b-63ac-5cf2-2f1e-6bcc4da99220@redhat.com>
+Date: Fri, 3 May 2019 17:07:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-eVOZhXj+OLB+VvxXZTniny_sMCFaeWsv+2uEErM-=zA@mail.gmail.com>
+In-Reply-To: <20190503022958.1394-1-joel@jms.id.au>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 0/2] slirp: move slirp as git submodule
- project
+Subject: Re: [Qemu-devel] [PATCH v2] arm: aspeed: Set SDRAM size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,94 +29,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Joel Stanley <joel@jms.id.au>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-On 5/3/19 2:54 PM, Peter Maydell wrote:
-> On Thu, 2 May 2019 at 23:30, Samuel Thibault
-> <samuel.thibault@ens-lyon.org> wrote:
->>
->> The following changes since commit 8482ff2eb3bb95020eb2f370a9b3ea26511e41df:
->>
->>   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-05-02 12:04:51 +0100)
->>
->> are available in the Git repository at:
->>
->>   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
->>
->> for you to fetch changes up to 7c57bdd82026ba03f3158bbcd841afde7c2dc43a:
->>
->>   build-sys: move slirp as git submodule project (2019-05-03 00:15:37 +0200)
->>
->> ----------------------------------------------------------------
->> slirp: move slirp as git submodule project
->>
->> Marc-André Lureau (2):
->>   build-sys: pass CFLAGS & LDFLAGS to subdir-slirp
->>   build-sys: move slirp as git submodule project
->>
->> ----------------------------------------------------------------
->> Marc-André Lureau (2):
->>       build-sys: pass CFLAGS & LDFLAGS to subdir-slirp
->>       build-sys: move slirp as git submodule project
->>
+On 5/3/19 4:29 AM, Joel Stanley wrote:
+> We currently use Qemu's default of 128MB. As we know how much ram each
+> machine ships with, make it easier on users by setting a default.
 > 
+> It can still be overridden with -m on the command line.
 > 
-> Applied, thanks.
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
+> Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-TL;DR: You might need to run 'git submodule deinit --force slirp' if ou
-get errors after merging this.
+I did review this patch:
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg00109.html
 
---
+So:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-FYI I was running MinGW tests with "make docker-test-mingw@fedora
-SHOW_ENV=1 J=8 NETWORK=1" and ran "git pull" to refresh my local repo,
-and got:
-
-$ make docker-test-mingw@fedora SHOW_ENV=1 J=8 NETWORK=1
-make[1]: Entering directory '/home/phil/source/qemu'
-  GEN
-/home/phil/source/qemu/docker-src.2019-05-03-16.55.51.7157/qemu.tar
-slirp: unmerged (59a1b1f165458c2acb7ff0525b543945f7416225)
-fatal: git-write-tree: error building trees
-Cannot save the current index state
-Cloning into
-'/home/phil/source/qemu/docker-src.2019-05-03-16.55.51.7157/qemu.tar.vroot'...
-done.
-error: pathspec 'slirp:' did not match any file(s) known to git.
-error: pathspec 'needs' did not match any file(s) known to git.
-error: pathspec 'merge' did not match any file(s) known to git.
-failed to checkout slirp: needs merge revision
-tar: /var/tmp/qemu/qemu.tar: Cannot open: No such file or directory
-tar: Error is not recoverable: exiting now
-Failed to untar source
-tests/docker/Makefile.include:203: recipe for target 'docker-run' failed
-make[1]: *** [docker-run] Error 1
-
-I don't run builds on this host (no tools installed) but everything via
-Docker, so (re-)running ./configure is not an option.
-
-$ git status
-Unmerged paths:
-  (use "git reset HEAD <file>..." to unstage)
-  (use "git add <file>..." to mark resolution)
-
-        added by us:     slirp
-
-$ ls -la slirp/
-total 8
-drwxr-xr-x  2 phil phil 4096 May  3 16:49 .
-drwxr-xr-x 56 phil phil 4096 May  3 16:55 ..
-
-$ git submodule status slirp
-U0000000000000000000000000000000000000000 slirp
-
-Daniel suggested on IRC to run:
-
-$ git submodule deinit --force slirp
-
-It worked fine after running it.
-
-Regards,
-
-Phil.
+> ---
+> v2:
+>  - Fix 'if' style issue. Thanks patchew
+>  - Use units.h defines
+> 
+>  hw/arm/aspeed.c         | 8 ++++++++
+>  include/hw/arm/aspeed.h | 1 +
+>  2 files changed, 9 insertions(+)
+> 
+> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+> index 1c23ebd99252..29d225ed1405 100644
+> --- a/hw/arm/aspeed.c
+> +++ b/hw/arm/aspeed.c
+> @@ -25,6 +25,7 @@
+>  #include "sysemu/block-backend.h"
+>  #include "hw/loader.h"
+>  #include "qemu/error-report.h"
+> +#include "qemu/units.h"
+>  
+>  static struct arm_boot_info aspeed_board_binfo = {
+>      .board_id = -1, /* device-tree-only board */
+> @@ -331,6 +332,9 @@ static void aspeed_machine_class_init(ObjectClass *oc, void *data)
+>      mc->no_floppy = 1;
+>      mc->no_cdrom = 1;
+>      mc->no_parallel = 1;
+> +    if (board->ram) {
+> +        mc->default_ram_size = board->ram;
+> +    }
+>      amc->board = board;
+>  }
+>  
+> @@ -352,6 +356,7 @@ static const AspeedBoardConfig aspeed_boards[] = {
+>          .spi_model = "mx25l25635e",
+>          .num_cs    = 1,
+>          .i2c_init  = palmetto_bmc_i2c_init,
+> +        .ram       = 256 * MiB,
+>      }, {
+>          .name      = MACHINE_TYPE_NAME("ast2500-evb"),
+>          .desc      = "Aspeed AST2500 EVB (ARM1176)",
+> @@ -361,6 +366,7 @@ static const AspeedBoardConfig aspeed_boards[] = {
+>          .spi_model = "mx25l25635e",
+>          .num_cs    = 1,
+>          .i2c_init  = ast2500_evb_i2c_init,
+> +        .ram       = 512 * MiB,
+>      }, {
+>          .name      = MACHINE_TYPE_NAME("romulus-bmc"),
+>          .desc      = "OpenPOWER Romulus BMC (ARM1176)",
+> @@ -370,6 +376,7 @@ static const AspeedBoardConfig aspeed_boards[] = {
+>          .spi_model = "mx66l1g45g",
+>          .num_cs    = 2,
+>          .i2c_init  = romulus_bmc_i2c_init,
+> +        .ram       = 512 * MiB,
+>      }, {
+>          .name      = MACHINE_TYPE_NAME("witherspoon-bmc"),
+>          .desc      = "OpenPOWER Witherspoon BMC (ARM1176)",
+> @@ -379,6 +386,7 @@ static const AspeedBoardConfig aspeed_boards[] = {
+>          .spi_model = "mx66l1g45g",
+>          .num_cs    = 2,
+>          .i2c_init  = witherspoon_bmc_i2c_init,
+> +        .ram       = 512 * MiB,
+>      },
+>  };
+>  
+> diff --git a/include/hw/arm/aspeed.h b/include/hw/arm/aspeed.h
+> index 325c091d09e4..02073a6b4d61 100644
+> --- a/include/hw/arm/aspeed.h
+> +++ b/include/hw/arm/aspeed.h
+> @@ -22,6 +22,7 @@ typedef struct AspeedBoardConfig {
+>      const char *spi_model;
+>      uint32_t num_cs;
+>      void (*i2c_init)(AspeedBoardState *bmc);
+> +    uint32_t ram;
+>  } AspeedBoardConfig;
+>  
+>  #define TYPE_ASPEED_MACHINE       MACHINE_TYPE_NAME("aspeed")
+> 
