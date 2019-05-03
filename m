@@ -2,93 +2,114 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3A88C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 05:26:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0D37C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 05:29:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92F942081C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 05:26:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gdx1QRUv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92F942081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id ADC7B2081C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 05:29:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADC7B2081C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34720 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34734 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMQiU-00073X-Tc
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 01:26:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49831)
+	id 1hMQlT-00087i-V2
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 01:29:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hMQhd-0006fF-2E
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:25:46 -0400
+	(envelope-from <sw@weilnetz.de>) id 1hMQkM-0007Xm-DJ
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:28:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hMQhc-0007B0-7x
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:25:45 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:38922)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hMQhc-0007AT-2P
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:25:44 -0400
-Received: by mail-pl1-x643.google.com with SMTP id e92so2146602plb.6
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 22:25:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=cMWf48gKOnpuygEjClebHSb2yIIM6RBJy8edpkAGOfg=;
-	b=Gdx1QRUvlYlNvnSCm8aObJaFBkF/q2b6nfQlXgLN95Ig5Yyl0YqYsblBJwxVayPYe7
-	TYZr5AywcgvaZHTyTVar/W/4oHLbr4LM6l75Id3diwWfADIOUROmMZ82xCu+mCXJTTZ6
-	JxyneMEKEsz2YoqEYutV1HNVwCGhrZwH0CfNfaUhETweEPzLY2HBQ4giZWdYe5XCMwZL
-	HyIUwEth7wQ6CsH0BX+E2eDmyIqfnBijxeOeXh8hogykXEDF1pr6UXlx2u84F//g1f5g
-	Tupv1IPybAF0a565PfKV38odQn8rxBMou1i4i1BrxoOHhwf55Ut2Hu04K+m3z5kqGQzK
-	hWQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=cMWf48gKOnpuygEjClebHSb2yIIM6RBJy8edpkAGOfg=;
-	b=X79NNU0wHtuM6c3Afm/ghvqXl8Kf1i7rshF1nSLjBytwNLdTax/cQzmKQLINpX0Cu/
-	tBnrSUcu2LLBPazBfrA/73o1jwA83qiegGewaohXtTfoPRHPZek0sy+fFnLpYJE3JgXe
-	i8rn5cvIgrkwCLNDGTaYzfZ2iB6Wo9kont5TSbi68OqmgMzz7pdpx8QwqNfo4mnsgWGJ
-	QVColyOIQtTomjK8Hm8pjnpDioz680aY5wdITGGnZw1nahOUC+5ZZKVwlnD2S50vfIJ7
-	6P+u/LMvMRkWbvcVpjPD3Hb3jFr4Kh7FCFTc900xrVDiiPHcjsedcPrj2u7TYAuq/qrW
-	W1rA==
-X-Gm-Message-State: APjAAAUiF9LHR8GGG9MH/xPOlJLiOm2aHSC3HrUtFsDFZ5pGs559s2oT
-	qEeRlPRbfX9EeMNQOW2iK7XOvQ==
-X-Google-Smtp-Source: APXvYqyDa0YmilrWZ1k8tKNoYyfg07X+WQiMaOM85O/8hynxuJKefiqbAJKINhDKM0ifZBVuCYQohQ==
-X-Received: by 2002:a17:902:7c90:: with SMTP id
-	y16mr8086846pll.309.1556861142842; 
-	Thu, 02 May 2019 22:25:42 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-189-189.tukw.qwest.net. [97.113.189.189])
-	by smtp.gmail.com with ESMTPSA id
-	j22sm1101218pfi.139.2019.05.02.22.25.41
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 02 May 2019 22:25:41 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190502141019.6385-1-david@redhat.com>
-	<20190502141019.6385-28-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
+	(envelope-from <sw@weilnetz.de>) id 1hMQkL-0000fK-Cy
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:28:34 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:51346
+	helo=v2201612906741603.powersrv.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>)
+	id 1hMQkL-0000eC-2o; Fri, 03 May 2019 01:28:33 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by v2201612906741603.powersrv.de (Postfix) with ESMTP id F287CDB6250;
+	Fri,  3 May 2019 07:28:30 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
+Received: from v2201612906741603.powersrv.de ([127.0.0.1])
+	by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
+	port 10024)
+	with ESMTP id Yv3w1FEJ0mOs; Fri,  3 May 2019 07:28:29 +0200 (CEST)
+Received: from [192.168.178.24] (p57B42786.dip0.t-ipconnect.de [87.180.39.134])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	key-exchange X25519 server-signature RSA-PSS (2048 bits))
+	(No client certificate requested)
+	by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id BFC6DDB6163; 
+	Fri,  3 May 2019 07:28:29 +0200 (CEST)
+To: Thomas Huth <thuth@redhat.com>, Cao Jiaxi <driver1998@foxmail.com>,
+	qemu-devel@nongnu.org
+References: <20190503002206.9751-1-driver1998@foxmail.com>
+	<20190503003719.10233-1-driver1998@foxmail.com>
+	<db80e5ca-ab98-9c0b-a8c5-8e0c88c58638@redhat.com>
+From: Stefan Weil <sw@weilnetz.de>
 Openpgp: preference=signencrypt
-Message-ID: <9161ba93-fad8-c74b-3f49-71659f9f6017@linaro.org>
-Date: Thu, 2 May 2019 22:25:39 -0700
+Autocrypt: addr=sw@weilnetz.de; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <8b04e42b-fdf7-4a9a-b36c-8a60bace27fe@weilnetz.de>
+Date: Fri, 3 May 2019 07:28:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190502141019.6385-28-david@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::643
-Subject: Re: [Qemu-devel] [PATCH v3 27/40] s390x/tcg: Implement VECTOR
- ELEMENT ROTATE AND INSERT UNDER MASK
+In-Reply-To: <db80e5ca-ab98-9c0b-a8c5-8e0c88c58638@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="79E37so4yXGw8zLXAQ8jl8XTF3dybt9eo"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 37.120.169.71
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] osdep: Fix mingw compilation
+ regarding stdio formats
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,26 +121,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503052539.3eaNI2ph79p-PBeRhLmI0-sEKTOYkJvCG3mA3zpNRUY@z>
+Message-ID: <20190503052821.TmBlhKC_CLuxEk0ZrbpCsdbnQIJbTE78Tj6320ZIKeU@z>
 
-On 5/2/19 7:10 AM, David Hildenbrand wrote:
-> Use the new vector expansion for GVecGen3i.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/helper.h           |  2 ++
->  target/s390x/insn-data.def      |  2 ++
->  target/s390x/translate_vx.inc.c | 51 +++++++++++++++++++++++++++++++++
->  target/s390x/vec_int_helper.c   | 20 +++++++++++++
->  4 files changed, 75 insertions(+)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--79E37so4yXGw8zLXAQ8jl8XTF3dybt9eo
+From: Stefan Weil <sw@weilnetz.de>
+To: Thomas Huth <thuth@redhat.com>, Cao Jiaxi <driver1998@foxmail.com>,
+ qemu-devel@nongnu.org
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>
+Message-ID: <8b04e42b-fdf7-4a9a-b36c-8a60bace27fe@weilnetz.de>
+Subject: Re: [Qemu-devel] [PATCH v3 4/4] osdep: Fix mingw compilation
+ regarding stdio formats
+References: <20190503002206.9751-1-driver1998@foxmail.com>
+ <20190503003719.10233-1-driver1998@foxmail.com>
+ <db80e5ca-ab98-9c0b-a8c5-8e0c88c58638@redhat.com>
+In-Reply-To: <db80e5ca-ab98-9c0b-a8c5-8e0c88c58638@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On 03.05.19 07:11, Thomas Huth wrote:
+> On 03/05/2019 02.37, Cao Jiaxi wrote:
+>> I encountered the following compilation error on mingw:
+>>
+>> /mnt/d/qemu/include/qemu/osdep.h:97:9: error: '__USE_MINGW_ANSI_STDIO'=
+ macro redefined [-Werror,-Wmacro-redefined]
+>>  #define __USE_MINGW_ANSI_STDIO 1
+>>         ^
+>> /mnt/d/llvm-mingw/aarch64-w64-mingw32/include/_mingw.h:433:9: note: pr=
+evious definition is here
+>>  #define __USE_MINGW_ANSI_STDIO 0      /* was not defined so it should=
+ be 0 */
+>>
+>> It turns out that __USE_MINGW_ANSI_STDIO must be set before any
+>> system headers are included, not just before stdio.h.
+>>
+>> Signed-off-by: Cao Jiaxi <driver1998@foxmail.com>
+>> ---
+>>  include/qemu/osdep.h | 10 +++++-----
+>>  1 file changed, 5 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+>> index 303d315c5d..af2b91f0b8 100644
+>> --- a/include/qemu/osdep.h
+>> +++ b/include/qemu/osdep.h
+>> @@ -85,17 +85,17 @@ extern int daemon(int, int);
+>>  #endif
+>>  #endif
+>> =20
+>> +/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or lat=
+er) */
+>> +#ifdef __MINGW32__
+>> +#define __USE_MINGW_ANSI_STDIO 1
+>> +#endif
+>> +
+>>  #include <stdarg.h>
+>>  #include <stddef.h>
+>>  #include <stdbool.h>
+>>  #include <stdint.h>
+>>  #include <sys/types.h>
+>>  #include <stdlib.h>
+>> -
+>> -/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or lat=
+er) */
+>> -#ifdef __MINGW32__
+>> -#define __USE_MINGW_ANSI_STDIO 1
+>> -#endif
+>>  #include <stdio.h>
+>> =20
+>>  #include <string.h>
+>>
+>=20
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-r~
+Reviewed-by: Stefan Weil <sw@weilnetz.de>
 
+
+--79E37so4yXGw8zLXAQ8jl8XTF3dybt9eo
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEESSNv6nXJXWmOwreK4Iwh1Wd0UK0FAlzL0X0ACgkQ4Iwh1Wd0
+UK2R9g/9Gw+96R8Ut9N214NusnvjhbwqVDflZV3Js0pTz8ny1kM6wGP5aZEtqR8d
+A1CZlA7rwLeGmF0Bz9uTwd/d4amsxvLLz5qM3XVAr6vqcyiyYiKk4fJ8ATv6IQID
+rL0U3u1dgP3IFl8J4GCJsv9kX/BZyiOTJZ1Y+xX9ZJosOlrQG/Zx8D5cdNtz/svQ
+vczbe+dU2buYUpvYNnMr4zB5lPrXqapDJYeFbdTYofrFn6UVZYiUAqXRPabk6c5X
+R/UJHpYq8DkPpupAFwRSAvlfaeKgSCq3uNBt/i0UJ7cuSZjjdn+i1eREdps7bbBg
+aowCio8GzN6q2P6GFatYe+N65pMRCfS5kd3e0fJN29DdeAL69sQHF056M0djOqV2
++wJCYQwbiLLmWR4JFuF+8owayq/BZTqxlYqv3MuY/Ho2Oh+OcZ6NVtITjP5OYWHM
+xkLAo+cHIl7mN1pfCcQUs2FEoxbo8n0zhAP4swPkqqtbdT2S9zQXlYfOOcz99aDW
+nMkKtSY6gHQqP5gBWBOHQwQFa2AYL4clDqVJeAx5KqRRgWluiyjsXm30kEqw0FWn
+YzZboYa8PaBmDdIacTOGQ6XCkPgDAR+L0aPuEAIZ2UohAXTDyLEHO83xkDa7985H
+9UbUfrM5v86ftcnUfELb2q++ohRFLysaDKO6gRIxEGHE7RfqPbQ=
+=1+BK
+-----END PGP SIGNATURE-----
+
+--79E37so4yXGw8zLXAQ8jl8XTF3dybt9eo--
 
