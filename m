@@ -6,55 +6,52 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26901C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:55:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 295E8C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:55:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2F332081C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:55:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2F332081C
+	by mail.kernel.org (Postfix) with ESMTPS id 02BE52081C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:55:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02BE52081C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45386 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45399 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMcOo-0004RX-AZ
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 13:55:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42046)
+	id 1hMcP5-0004eF-Af
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 13:55:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMcLk-0001uk-Gf
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:57 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMcLR-0001h0-7d
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMcLh-0000Ar-Vh
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:56 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56325 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMcLQ-0008PG-4m
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:37 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56245 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hMcLg-00008B-2Q
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:52 -0400
+	id 1hMcLP-0008Mr-Uf
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:36 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 2DC711A2050;
-	Fri,  3 May 2019 19:51:49 +0200 (CEST)
+	by mail.rt-rk.com (Postfix) with ESMTP id E4A7A1A2050;
+	Fri,  3 May 2019 19:51:34 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
 	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 1077A1A1F9B;
-	Fri,  3 May 2019 19:51:49 +0200 (CEST)
+	by mail.rt-rk.com (Postfix) with ESMTPSA id C5BA61A200D;
+	Fri,  3 May 2019 19:51:34 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  3 May 2019 19:50:46 +0200
-Message-Id: <1556905846-14074-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri,  3 May 2019 19:50:44 +0200
+Message-Id: <1556905846-14074-4-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1556905846-14074-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1556905846-14074-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v4 5/5] linux-user: Sanitize interp_info and,
- for mips only, init field fp_abi
+Subject: [Qemu-devel] [PATCH v4 3/5] linux-user: Add support the
+ SIOC<G|S>IFPFLAGS ioctls for all targets
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,50 +70,60 @@ Cc: lvivier@redhat.com, thuth@redhat.com, jcmvbkbc@gmail.com,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503175046.FFpmadWwSfGI5PSVoC909fncrsDIY65yoloM2lVLh9I@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190503175044.1HNw_GlkM3cB82Sb5OkVyYn6LgXEP7R0Fw3xS-QKDH8@z>
 
-From: Daniel Santos <daniel.santos@pobox.com>
+From: Neng Chen <nchen@wavecomp.com>
 
-Sanitize interp_info structure in load_elf_binary() and, for MIPS only,
-init its field fp_abi to MIPS_ABI_FP_UNKNOWN. This fixes appearances of
-"Unexpected FPU mode" message in some MIPS use cases. Currently, this
-bug is a complete stopper for some MIPS binaries.
+Add support for getting and setting extended private flags of a
+network device via SIOCSIFPFLAGS and SIOCGIFPFLAGS ioctls.
 
-In load_elf_binary(), struct image_info interp_info is used without
-being properly initialized. One result is that when the ELF's program
-header doesn't contain an entry for the ABI flags, then the value of
-the struct image_info's fp_abi field is set to whatever happened to
-be in stack memory at the time.
+The ioctl numeric values are platform-independent and determined by
+the file include/uapi/linux/sockios.h in Linux kernel source code:
 
-Backporting to 4.0 and, if possible, to 3.1 is recommended.
+  #define SIOCSIFPFLAGS 0x8934
+  #define SIOCGIFPFLAGS	0x8935
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1825002
+These ioctls get (or set) the field ifr_flags of type short in the
+structure ifreq. Such functionality is achieved in QEMU by using
+MK_STRUCT() and MK_PTR() macros with an appropriate argument, as
+it was done for existing similar cases.
 
-Signed-off-by: Daniel Santos <daniel.santos@pobox.com>
+Signed-off-by: Neng Chen <nchen@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <1554839486-3527-1-git-send-email-aleksandar.markovic@rt-rk.com>
 ---
- linux-user/elfload.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ linux-user/ioctls.h       | 2 ++
+ linux-user/syscall_defs.h | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index c1a2602..7f09d57 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2698,6 +2698,11 @@ int load_elf_binary(struct linux_binprm *bprm, str=
-uct image_info *info)
-     char *elf_interpreter =3D NULL;
-     char *scratch;
-=20
-+    memset(&interp_info, 0, sizeof(interp_info));
-+#ifdef TARGET_MIPS
-+    interp_info.fp_abi =3D MIPS_ABI_FP_UNKNOWN;
-+#endif
-+
-     info->start_mmap =3D (abi_ulong)ELF_START_MMAP;
-=20
-     load_elf_image(bprm->filename, bprm->fd, info,
---=20
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index c37adc5..76375df 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -206,6 +206,8 @@
+   IOCTL(SIOCADDMULTI, IOC_W, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
+   IOCTL(SIOCDELMULTI, IOC_W, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
+   IOCTL(SIOCGIFINDEX, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
++  IOCTL(SIOCSIFPFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
++  IOCTL(SIOCGIFPFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+   IOCTL(SIOCSIFLINK, 0, TYPE_NULL)
+   IOCTL_SPECIAL(SIOCGIFCONF, IOC_W | IOC_R, do_ioctl_ifconf,
+                 MK_PTR(MK_STRUCT(STRUCT_ifconf)))
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 2941231..8904d35 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -781,6 +781,8 @@ struct target_pollfd {
+ #define TARGET_SIOCADDMULTI    0x8931          /* Multicast address lists      */
+ #define TARGET_SIOCDELMULTI    0x8932
+ #define TARGET_SIOCGIFINDEX    0x8933
++#define TARGET_SIOCSIFPFLAGS   0x8934          /* set extended flags          */
++#define TARGET_SIOCGIFPFLAGS   0x8935          /* get extended flags          */
+ 
+ /* Bridging control calls */
+ #define TARGET_SIOCGIFBR       0x8940          /* Bridging support             */
+-- 
 2.7.4
 
 
