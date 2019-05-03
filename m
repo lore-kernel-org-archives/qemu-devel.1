@@ -2,81 +2,85 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7176EC43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 02:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75BB1C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 02:31:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2ECF8206C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 02:05:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 189D92070B
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 02:31:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="LicIv+M/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ECF8206C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qB+bd1Tg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 189D92070B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33008 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33206 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMNZi-0007Q2-2G
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 22:05:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50509)
+	id 1hMNyi-0004ce-1I
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 22:31:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1hMNYo-000758-So
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 22:04:27 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1hMNxk-0004Aw-IE
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 22:30:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1hMNYn-0002zM-M4
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 22:04:26 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:42105)
+	(envelope-from <joel.stan@gmail.com>) id 1hMNxj-0004Y8-GR
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 22:30:12 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:41862)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <joel.stan@gmail.com>)
-	id 1hMNYm-0002y4-I2; Thu, 02 May 2019 22:04:25 -0400
-Received: by mail-qt1-x842.google.com with SMTP id p20so5058108qtc.9;
-	Thu, 02 May 2019 19:04:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=iLCJFceTJq9C8V46rQKva2rGkVweODOBqpcEY5lfNaU=;
-	b=LicIv+M/WKUOYy0NB5TKYwFba2rAh9rsR6ops03H18mzjQSoOqyNn4eF3B0SY/KFOK
-	fantdGGu62HyLnDk4/Elm2lVb2e1vZ5HzvV5P29TM/s3eOmrfTzSwnViGlV7beHhJMuS
-	Aj2WQQw2Q3pEwbrOllwTLeT9gHCV8vefErTWs=
+	id 1hMNxg-0004WJ-Ry; Thu, 02 May 2019 22:30:09 -0400
+Received: by mail-pf1-x444.google.com with SMTP id 188so2098873pfd.8;
+	Thu, 02 May 2019 19:30:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=sender:from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=ImFcpEK++OdN2NYNnGGENQUJu5nKLClznJohWQ/wzxg=;
+	b=qB+bd1TgqAjM7SFH+Xp8Fc3sBEeemrNRxcysNjEgKXS7Zn0qkTlJniIKtlR61PiVE2
+	TtvWOPaUitfiiCAn/s0UOSfjzOhy1gbiyonJBQZSREEZTyv8/uWLhQYra1k5mEduimu+
+	w7LH8rMXV1bHVc3Mql4+6slRcdUWJsC4EQsB2XfIRVfB0poH8V/K96jww8Et5zYbnaul
+	WS3ne7g8LGcD9PdAOA224bt5RvgleigZM/CaMkuNQtENddmnsNUvCScbpkMNMHxgmbbr
+	mHlswBk74NNscdRVLz0/gvodcTUonOe04QUO5pFn1kNFyKQ5UXK6EaOyv/oSvuoZYBF5
+	W+Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=iLCJFceTJq9C8V46rQKva2rGkVweODOBqpcEY5lfNaU=;
-	b=AnU/e54H7n5iCXYIkv2K1MWxN0oWXuppxDGoEu2ESLiB7v+uIwP6yg4BI1p6sCCCgJ
-	wIitRN4BlyPyGEfK3Bkh4QHGzJqbrUlAubFL8VDt/nHzc4PTlncK9fZ6LgWEL9OMgEdW
-	xiUMZCrB8Tu+NMpDxzMYrO0RDKH0X9DmQiRr3eHMukvqgKJjn/aF8Msl87WgrpFak9yb
-	VTHHyz2h93sBJRklKO+PVdR8Qv2IVH3A03DbrpJwOdZ+ZYO840H/Gl3lty7S74/NYRbQ
-	taSm5zG0DNw+20Hv7qhkvo2GqLbQdsrbblUx0AnTkevUzNKm512PRWg+3oMhqIUQdjSi
-	2pfQ==
-X-Gm-Message-State: APjAAAU8eohuWzz6OCkGplloOGnvUU7QReI9XrnfptOLsrENBwYtetOt
-	FfG8GI5XtOEDL+ef7UeXfoaKagHxeMwKpxfY7YE=
-X-Google-Smtp-Source: APXvYqyZk/wKiSz8jm8RZKTb5dRyWnqYoFoVNOCaVSrd7cRXh+AVeTf28lijNBAoW2tcl7CSBgMeTXUT1Alc8fyJ+6U=
-X-Received: by 2002:ac8:2565:: with SMTP id 34mr6370365qtn.37.1556849062957;
-	Thu, 02 May 2019 19:04:22 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190103144124.18917-1-stefanha@redhat.com>
-	<CAFEAcA-B_T9E3ezWFXg-wp3RotMjv3-z3qY7hSJZEoqFBqCWnQ@mail.gmail.com>
-	<62b29bc1-cc78-cd64-4377-fc4007ba7189@redhat.com>
-	<20190426091702.GA2071@stefanha-x1.localdomain>
-	<CACPK8Xc5KgiaYCTs=8ceRu_hV=vC3M6pGV0=7jJNsbuz2a6LDA@mail.gmail.com>
-	<20190501162316.GD21155@stefanha-x1.localdomain>
-In-Reply-To: <20190501162316.GD21155@stefanha-x1.localdomain>
+	h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+	:mime-version:content-transfer-encoding;
+	bh=ImFcpEK++OdN2NYNnGGENQUJu5nKLClznJohWQ/wzxg=;
+	b=QJqtk4zog4K4Qk76waXNLd8VmZXPRPTmbi4Dcv5MUM7EFnWzV5wH07Gh9/tBh6kUx9
+	vYOQABiBzK/7fZ3Ms+3bczSTsrmsmKsEqVytWIUs5O9GgOeWkSbfdm8+PNkeD1B76Rcj
+	T/7VtbzeANZKvnKohuJS1M9Q+h+lLmaE7dinBvOZ6dW+eMUVezndgAl4vP5MrTP1UibI
+	zunhslfernxn0QrTugGlfqnvnEU/ll21GWkhdqYStrvN7tkJGy9kK7RUfPcyHDBPT4lf
+	AHYivHaWiBmqIcJv6mmvpxQUyMczNDvpUcjAJ6xYz2g9ALaDJWrYjoRhqiQGiqPwSq+y
+	sh0Q==
+X-Gm-Message-State: APjAAAU8C/7cg7xan4eGX/xhEAr35yZMQAUxMtXRUHJNTjSoPImqrNbW
+	BKVWjWojYLMcGhcC/ll4JrY=
+X-Google-Smtp-Source: APXvYqxoITmXnnDOx5xofKCXBEsD0wXqMA6SM14nNKoAehaoA6FG03zDzbqzaAe008KBxL8gbeA4FA==
+X-Received: by 2002:aa7:8186:: with SMTP id g6mr7921827pfi.126.1556850606977; 
+	Thu, 02 May 2019 19:30:06 -0700 (PDT)
+Received: from voyager.jms.id.au ([36.255.48.244])
+	by smtp.gmail.com with ESMTPSA id m16sm723566pfi.29.2019.05.02.19.30.03
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 02 May 2019 19:30:06 -0700 (PDT)
+Received: by voyager.jms.id.au (sSMTP sendmail emulation);
+	Fri, 03 May 2019 11:59:59 +0930
 From: Joel Stanley <joel@jms.id.au>
-Date: Fri, 3 May 2019 02:04:11 +0000
-Message-ID:
- <CACPK8Xc-7MOCMDKi=by0DVZrUW2vPL0QVT_G2NTuhi_fvwU1Aw@mail.gmail.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+To: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+	Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  3 May 2019 11:59:57 +0930
+Message-Id: <20190503022958.1394-1-joel@jms.id.au>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::842
-Subject: Re: [Qemu-devel] [PATCH] Revert "armv7m: Guard against no -kernel
- argument"
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: [Qemu-devel] [PATCH v2] arm: aspeed: Set SDRAM size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,39 +92,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
-	Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm <qemu-arm@nongnu.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
+	Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503020411.hb2eR_YjKi9ia1h0vdCrKlLBANsGeVkTri-O6fbgP-s@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190503022957.uPcBcYSEluS4r9hKYmrCPwJpqr9ygU-SNgX2sdKIxtE@z>
 
-On Wed, 1 May 2019 at 16:23, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->
-> On Mon, Apr 29, 2019 at 12:53:48PM +0000, Joel Stanley wrote:
-> > On Fri, 26 Apr 2019 at 09:17, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > >
-> > > A user-friendly error message is needed here.  The check for -kernel was
-> > > too specific and is not desirable for microbit where we use -device
-> > > loader.
-> > >
-> > > Old boards probably want to continue using -kernel.  New boards like
-> > > microbit may use just -device loader.  Perhaps there is even a group
-> > > that wants both options.
-> >
-> > FWIW, I used -kernel exclusively when working on the microbit model.
-> > Other users may chose to use the device loader/hex file.
-> >
-> > I am all for usability, but getting rid of the ability to use -kernel
-> > on some machine types would be a step in the wrong direction.
->
-> -kernel doesn't support the .hex file format that is most commonly used
-> for micro:bit programs.  Are you loading ELFs?
+We currently use Qemu's default of 128MB. As we know how much ram each
+machine ships with, make it easier on users by setting a default.
 
-Yes, I am loading ELFs.
+It can still be overridden with -m on the command line.
+
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+v2:
+ - Fix 'if' style issue. Thanks patchew
+ - Use units.h defines
+
+ hw/arm/aspeed.c         | 8 ++++++++
+ include/hw/arm/aspeed.h | 1 +
+ 2 files changed, 9 insertions(+)
+
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index 1c23ebd99252..29d225ed1405 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -25,6 +25,7 @@
+ #include "sysemu/block-backend.h"
+ #include "hw/loader.h"
+ #include "qemu/error-report.h"
++#include "qemu/units.h"
+ 
+ static struct arm_boot_info aspeed_board_binfo = {
+     .board_id = -1, /* device-tree-only board */
+@@ -331,6 +332,9 @@ static void aspeed_machine_class_init(ObjectClass *oc, void *data)
+     mc->no_floppy = 1;
+     mc->no_cdrom = 1;
+     mc->no_parallel = 1;
++    if (board->ram) {
++        mc->default_ram_size = board->ram;
++    }
+     amc->board = board;
+ }
+ 
+@@ -352,6 +356,7 @@ static const AspeedBoardConfig aspeed_boards[] = {
+         .spi_model = "mx25l25635e",
+         .num_cs    = 1,
+         .i2c_init  = palmetto_bmc_i2c_init,
++        .ram       = 256 * MiB,
+     }, {
+         .name      = MACHINE_TYPE_NAME("ast2500-evb"),
+         .desc      = "Aspeed AST2500 EVB (ARM1176)",
+@@ -361,6 +366,7 @@ static const AspeedBoardConfig aspeed_boards[] = {
+         .spi_model = "mx25l25635e",
+         .num_cs    = 1,
+         .i2c_init  = ast2500_evb_i2c_init,
++        .ram       = 512 * MiB,
+     }, {
+         .name      = MACHINE_TYPE_NAME("romulus-bmc"),
+         .desc      = "OpenPOWER Romulus BMC (ARM1176)",
+@@ -370,6 +376,7 @@ static const AspeedBoardConfig aspeed_boards[] = {
+         .spi_model = "mx66l1g45g",
+         .num_cs    = 2,
+         .i2c_init  = romulus_bmc_i2c_init,
++        .ram       = 512 * MiB,
+     }, {
+         .name      = MACHINE_TYPE_NAME("witherspoon-bmc"),
+         .desc      = "OpenPOWER Witherspoon BMC (ARM1176)",
+@@ -379,6 +386,7 @@ static const AspeedBoardConfig aspeed_boards[] = {
+         .spi_model = "mx66l1g45g",
+         .num_cs    = 2,
+         .i2c_init  = witherspoon_bmc_i2c_init,
++        .ram       = 512 * MiB,
+     },
+ };
+ 
+diff --git a/include/hw/arm/aspeed.h b/include/hw/arm/aspeed.h
+index 325c091d09e4..02073a6b4d61 100644
+--- a/include/hw/arm/aspeed.h
++++ b/include/hw/arm/aspeed.h
+@@ -22,6 +22,7 @@ typedef struct AspeedBoardConfig {
+     const char *spi_model;
+     uint32_t num_cs;
+     void (*i2c_init)(AspeedBoardState *bmc);
++    uint32_t ram;
+ } AspeedBoardConfig;
+ 
+ #define TYPE_ASPEED_MACHINE       MACHINE_TYPE_NAME("aspeed")
+-- 
+2.20.1
+
 
