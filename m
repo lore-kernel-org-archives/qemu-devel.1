@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46588)
+Received: from eggs.gnu.org ([209.51.188.92]:33789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hMKHE-0007FY-Gh
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 18:34:05 -0400
+	(envelope-from <driver1998@foxmail.com>) id 1hMLyT-0003Tl-EO
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:22:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hMKHD-00074h-6U
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 18:34:04 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:47083)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
-	id 1hMKHC-00072e-Vz
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 18:34:03 -0400
-Received: by mail-ed1-x544.google.com with SMTP id f37so3696646edb.13
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 15:34:02 -0700 (PDT)
-Date: Thu, 2 May 2019 22:34:00 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-Message-ID: <20190502223400.kr57ek4fogabniin@master>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-References: <20190430034412.12935-1-richardw.yang@linux.intel.com>
-	<155677104475.10667.17544832182226944733@c2072b67cc0c>
-	<20190502053207.ix637eb6v7umujas@master>
-	<20190502083550.GA2853@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190502083550.GA2853@work-vm>
-Subject: Re: [Qemu-devel] [PATCH 0/3] Cleanup migration/ram.c
+	(envelope-from <driver1998@foxmail.com>) id 1hMLyS-0001WG-BO
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:22:49 -0400
+Received: from smtpbgeu2.qq.com ([18.194.254.142]:50598)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <driver1998@foxmail.com>)
+	id 1hMLyR-0001T0-Cr
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:22:48 -0400
+From: Cao Jiaxi <driver1998@foxmail.com>
+Date: Fri,  3 May 2019 08:22:06 +0800
+Message-Id: <20190503002206.9751-1-driver1998@foxmail.com>
+Subject: [Qemu-devel] [PATCH v3 0/4] Initial Windows on ARM (AArch64 64-Bit)
+ host support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,59 +23,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Wei Yang <richard.weiyang@gmail.com>, qemu-devel@nongnu.org, richardw.yang@linux.intel.com, fam@euphon.net, quintela@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Cao Jiaxi <driver1998@foxmail.com>
 
-On Thu, May 02, 2019 at 09:35:50AM +0100, Dr. David Alan Gilbert wrote:
->* Wei Yang (richard.weiyang@gmail.com) wrote:
->> On Wed, May 01, 2019 at 09:24:06PM -0700, no-reply@patchew.org wrote:
->> >Patchew URL: https://patchew.org/QEMU/20190430034412.12935-1-richardw.yang@linux.intel.com/
->> >
->> >
->> >
->> >Hi,
->> >
->> >This series failed the asan build test. Please find the testing commands and
->> >their output below. If you have Docker installed, you can probably reproduce it
->> >locally.
->> >
->> >=== TEST SCRIPT BEGIN ===
->> >#!/bin/bash
->> >time make docker-test-debug@fedora TARGET_LIST=x86_64-softmmu J=14 NETWORK=1
->> >=== TEST SCRIPT END ===
->> >
->> >  COPY    RUNNER
->> >    RUN test-debug in qemu:fedora 
->> >container_linux.go:247: starting container process caused "process_linux.go:258: applying cgroup configuration for process caused \"The maximum number of active connections for UID 0 has been reached\""
->> >/usr/bin/docker-current: Error response from daemon: oci runtime error: The maximum number of active connections for UID 0 has been reached.
->> >Traceback (most recent call last):
->> >  File "./tests/docker/docker.py", line 615, in <module>
->> >    sys.exit(main())
->> >
->> 
->> May I ask how I can reproduce this?
->
->To me this just looks like patchew having a problem, I don't think it's
->a real qemu bug.
+Initial Windows on ARM (AArch64 64-Bit) host support
 
-Ah, thanks. 
+This series of patches is for initial support of Windows 10 on ARM as a QEMU host.
+Currently only TCG intepreter is working correctly, it crashes when TCG JIT is enabled.
 
->
->Dave
->
->> >
->> >The full log is available at
->> >http://patchew.org/logs/20190430034412.12935-1-richardw.yang@linux.intel.com/testing.asan/?type=message.
->> >---
->> >Email generated automatically by Patchew [https://patchew.org/].
->> >Please send your feedback to patchew-devel@redhat.com
->> 
->> -- 
->> Wei Yang
->> Help you, Help me
->--
->Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+For now we assume it is built using the clang aarch64-w64-mingw32 toolchain,
+you can get a prebuilt toolchain at https://github.com/mstorsjo/llvm-mingw.
+
+Cao Jiaxi (4):
+  QEMU_PACKED: Remove gcc_struct attribute in Windows non x86 targets
+  qga: Fix mingw compilation warnings on enum conversion
+  util/cacheinfo: Use uint64_t on LLP64 model to satisfy Windows ARM64
+  osdep: Fix mingw compilation regarding stdio formats
+
+ contrib/libvhost-user/libvhost-user.h |  2 +-
+ include/qemu/compiler.h               |  2 +-
+ include/qemu/osdep.h                  | 10 +++++-----
+ qga/commands-win32.c                  |  2 +-
+ scripts/cocci-macro-file.h            |  7 ++++++-
+ slirp/src/util.h                      |  2 +-
+ util/cacheinfo.c                      |  2 +-
+ 7 files changed, 16 insertions(+), 11 deletions(-)
 
 -- 
-Wei Yang
-Help you, Help me
+2.17.1
