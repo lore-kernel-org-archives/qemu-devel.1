@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50017)
+Received: from eggs.gnu.org ([209.51.188.92]:51012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thatlemon@gmail.com>) id 1hMVSU-0002gA-45
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 06:30:28 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hMVX1-0004El-8D
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 06:35:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thatlemon@gmail.com>) id 1hMVSS-0004bK-Au
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 06:30:26 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34358)
+	(envelope-from <peter.maydell@linaro.org>) id 1hMVX0-0001RG-88
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 06:35:07 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:44003)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <thatlemon@gmail.com>) id 1hMVSS-0004YK-4C
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 06:30:24 -0400
-Received: by mail-wm1-x342.google.com with SMTP id b67so8531855wmg.1
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 03:30:21 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hMVX0-0001Oa-0P
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 06:35:06 -0400
+Received: by mail-oi1-x243.google.com with SMTP id j9so3292292oie.10
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 03:35:05 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190418153631.rl3lgadzrqqof72p@debian>
-In-Reply-To: <20190418153631.rl3lgadzrqqof72p@debian>
-From: Giuseppe Musacchio <thatlemon@gmail.com>
-Date: Fri, 3 May 2019 12:29:42 +0200
-Message-ID: <CA+pVVBLt4t3dzmE9fgMzWVM4mbuepVyK6ggog8c+QHbtB=Q4Dg@mail.gmail.com>
+References: <20190502185835.15185-1-laurent@vivier.eu>
+In-Reply-To: <20190502185835.15185-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 May 2019 11:34:53 +0100
+Message-ID: <CAFEAcA9-hAU5dxUmSWtbvrPEXE-nCP1uLvLbOby-_EXZ27o+8g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] linux-user: elf: Map empty PT_LOAD sections
+Subject: Re: [Qemu-devel] [PULL 00/13] Trivial branch patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Riku Voipio <riku.voipio@iki.fi>
-Cc: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Viktor Prutyanov <viktor.prutyanov@phystech.edu>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Jason Wang <jasowang@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Friendly inactivity ping.
+On Thu, 2 May 2019 at 19:58, Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> The following changes since commit 8482ff2eb3bb95020eb2f370a9b3ea26511e41df:
+>
+>   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-05-02 12:04:51 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu.git tags/trivial-branch-pull-request
+>
+> for you to fetch changes up to f7c03a68b814254df414977ff299468fbf0fa1c0:
+>
+>   sockets: avoid string truncation warnings when copying UNIX path (2019-05-02 20:50:47 +0200)
+>
+> ----------------------------------------------------------------
+> Pull request trivial branch 2019-05-02
+>
+> ----------------------------------------------------------------
 
-On Thu, 18 Apr 2019 at 17:42, Giuseppe Musacchio <thatlemon@gmail.com> wrote:
->
-> Some PT_LOAD sections may be completely zeroed out and their p_filesize
-> is zero, in that case the loader should just allocate a page that's at
-> least p_memsz bytes large (plus eventual alignment padding).
->
-> Calling zero_bss does this job for us, all we have to do is make sure we
-> don't try to mmap a zero-length page.
->
-> Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
-> ---
->  linux-user/elfload.c | 16 +++++++++++-----
->  1 file changed, 11 insertions(+), 5 deletions(-)
->
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index c1a2602..e9a0951 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -2366,11 +2366,17 @@ static void load_elf_image(const char *image_name, int image_fd,
->              vaddr_ps = TARGET_ELF_PAGESTART(vaddr);
->              vaddr_len = TARGET_ELF_PAGELENGTH(eppnt->p_filesz + vaddr_po);
->
-> -            error = target_mmap(vaddr_ps, vaddr_len,
-> -                                elf_prot, MAP_PRIVATE | MAP_FIXED,
-> -                                image_fd, eppnt->p_offset - vaddr_po);
-> -            if (error == -1) {
-> -                goto exit_perror;
-> +            /* Some sections may be completely empty without any backing file
-> +             * segment, in that case just let zero_bss allocate an empty buffer
-> +             * for it. */
-> +            if (eppnt->p_filesz != 0) {
-> +                error = target_mmap(vaddr_ps, vaddr_len, elf_prot,
-> +                                    MAP_PRIVATE | MAP_FIXED,
-> +                                    image_fd, eppnt->p_offset - vaddr_po);
-> +
-> +                if (error == -1) {
-> +                    goto exit_perror;
-> +                }
->              }
->
->              vaddr_ef = vaddr + eppnt->p_filesz;
-> --
-> 2.20.1
->
+Markus's "Clean up includes" patch breaks 'make check' on
+big-endian hosts:
+cd /home/pm215/qemu/build/all/tests/fp && ./fp-test -s -l 1 -r all  i32_to_f16 i
+64_to_f16 i32_to_f32 i64_to_f32 i32_to_f64 i64_to_f64 i32_to_f128 i64_to_f128 >
+ int-to-float.out 2>&1 || (cat  int-to-float.out && exit 1;)
+>> Testing i32_to_f16, rounding near_even
+^M372 tests total.
+^M372 tests performed.
+In 372 tests, no errors found in i32_to_f16, rounding near_even.
+>> Testing i32_to_f16, rounding minMag
+[...]
+^MErrors found in i32_to_f128:
+1006FFFF  => +0000.000000000000401B006FFFF00000 .....
+        expected +401B.006FFFF000000000000000000000 .....
+^M0001DDEB  => +0000.000000000000400FDDEB00000000 .....
+        expected +400F.DDEB000000000000000000000000 .....
+^MFFF6FFFC  => +0000.000000000000C012200080000000 .....
+        expected -4012.2000800000000000000000000000 .....
+^MFFFFFFF8  => +0000.000000000000C002000000000000 .....
+        expected -4002.0000000000000000000000000000 .....
+[etc]
+
+(I had to bounce Markus' own pullreq from a week or
+so back because it had this patch in too and also failed
+for this reason.)
+
+thanks
+-- PMM
