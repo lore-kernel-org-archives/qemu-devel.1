@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37103)
+Received: from eggs.gnu.org ([209.51.188.92]:38937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hMUQo-0003Sa-8c
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:24:39 -0400
+	(envelope-from <lersek@redhat.com>) id 1hMUXQ-0006ZN-1R
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:31:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hMUQm-0008L9-Uz
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:24:38 -0400
-Date: Fri, 3 May 2019 10:24:24 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190503092424.GB17905@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190503004021.13814-1-alistair.francis@wdc.com>
+	(envelope-from <lersek@redhat.com>) id 1hMUXO-0006ph-TX
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:31:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40014)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hMUXO-0006iw-OD
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:31:26 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 67243307D989
+	for <qemu-devel@nongnu.org>; Fri,  3 May 2019 09:31:24 +0000 (UTC)
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Fri,  3 May 2019 11:31:16 +0200
+Message-Id: <20190503093118.15700-1-lersek@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190503004021.13814-1-alistair.francis@wdc.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] hw/usb/hcd-xhci: Fix GCC 9 build warning
+Subject: [Qemu-devel] [PULL 0/2] tests/uefi-test-tools: report the SMBIOS
+ entry point structures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +31,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <Alistair.Francis@wdc.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alistair23@gmail.com" <alistair23@gmail.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "laurent@vivier.eu" <laurent@vivier.eu>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu devel list <qemu-devel@nongnu.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Fri, May 03, 2019 at 12:42:04AM +0000, Alistair Francis wrote:
-> Fix this build warning with GCC 9 on Fedora 30:
-> hw/usb/hcd-xhci.c:3339:66: error: =E2=80=98%d=E2=80=99 directive output=
- may be truncated writing between 1 and 10 bytes into a region of size 5 =
-[-Werror=3Dformat-truncation=3D]
->  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port=
- #%d", i+1);
->       |                                                                =
-  ^~
-> hw/usb/hcd-xhci.c:3339:54: note: directive argument in the range [1, 21=
-47483647]
->  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port=
- #%d", i+1);
->       |                                                      ^~~~~~~~~~=
-~~~~~
-> In file included from /usr/include/stdio.h:867,
->                  from /home/alistair/qemu/include/qemu/osdep.h:99,
->                  from hw/usb/hcd-xhci.c:21:
-> /usr/include/bits/stdio2.h:67:10: note: =E2=80=98__builtin___snprintf_c=
-hk=E2=80=99 output between 13 and 22 bytes into a destination of size 16
->    67 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVE=
-L - 1,
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~
->    68 |        __bos (__s), __fmt, __va_arg_pack ());
->       |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->=20
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> This is the onl patch left if my original series "Fix some GCC 9 build
-> warnings" that hasn't either been accepeted into a maintainers tree or
-> fixed by someone else.
->=20
->  hw/usb/hcd-xhci.c | 2 ++
->  1 file changed, 2 insertions(+)
->=20
-> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-> index ec28bee319..a15b103b65 100644
-> --- a/hw/usb/hcd-xhci.c
-> +++ b/hw/usb/hcd-xhci.c
-> @@ -3321,6 +3321,8 @@ static void usb_xhci_init(XHCIState *xhci)
-> =20
->      usb_bus_new(&xhci->bus, sizeof(xhci->bus), &xhci_bus_ops, dev);
-> =20
-> +    g_assert(usbports <=3D MAX(MAXPORTS_2, MAXPORTS_3));
-> +
->      for (i =3D 0; i < usbports; i++) {
->          speedmask =3D 0;
->          if (i < xhci->numports_2) {
+No changes relative to the original posting at
+<http://mid.mail-archive.com/20190425104326.12835-1-lersek@redhat.com>,
+except for picking up the review/testing tags (also noted separately on
+each patch).
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Cc: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
 
-but it looks like Gerd already sent a pull request with my patch for
-this from a few weeks back
+Thanks
+Laszlo
 
-https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg00543.html
+The following changes since commit 8482ff2eb3bb95020eb2f370a9b3ea26511e41=
+df:
 
-Regards,
-Daniel
+  Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request'=
+ into staging (2019-05-02 12:04:51 +0100)
+
+are available in the Git repository at:
+
+  https://github.com/lersek/qemu.git tags/smbios_lp_1821884_20190503
+
+for you to fetch changes up to 24496b8d27d95c4b317039e2c48f262cfd40fb4d:
+
+  tests/uefi-boot-images: report the SMBIOS entry point structures (2019-=
+05-03 10:52:27 +0200)
+
+----------------------------------------------------------------
+Fix <https://bugs.launchpad.net/qemu/+bug/1821884>:
+"Extend uefi-test-tools to report SMBIOS location".
+
+----------------------------------------------------------------
+Laszlo Ersek (2):
+  tests/uefi-test-tools: report the SMBIOS entry point structures
+  tests/uefi-boot-images: report the SMBIOS entry point structures
+
+ tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h    =
+ |  25 +++++++++++++++-----
+ tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.inf=
+ |   2 ++
+ tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.c  =
+ |  23 ++++++++++++++----
+ tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2          =
+ | Bin 11776 -> 12288 bytes
+ tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2              =
+ | Bin 11776 -> 11776 bytes
+ tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2             =
+ | Bin 12800 -> 13312 bytes
+ tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2           =
+ | Bin 13312 -> 13312 bytes
+ 7 files changed, 40 insertions(+), 10 deletions(-)
+
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+2.19.1.3.g30247aa5d201
