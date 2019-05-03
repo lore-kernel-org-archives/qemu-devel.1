@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38937)
+Received: from eggs.gnu.org ([209.51.188.92]:38958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hMUXQ-0006ZN-1R
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:31:29 -0400
+	(envelope-from <lersek@redhat.com>) id 1hMUXR-0006aB-AZ
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:31:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hMUXO-0006ph-TX
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:31:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40014)
+	(envelope-from <lersek@redhat.com>) id 1hMUXQ-0006wl-8T
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:31:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43628)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hMUXO-0006iw-OD
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:31:26 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hMUXQ-0006tq-34
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:31:28 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 67243307D989
-	for <qemu-devel@nongnu.org>; Fri,  3 May 2019 09:31:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 709D9C058CB4
+	for <qemu-devel@nongnu.org>; Fri,  3 May 2019 09:31:27 +0000 (UTC)
 From: Laszlo Ersek <lersek@redhat.com>
-Date: Fri,  3 May 2019 11:31:16 +0200
-Message-Id: <20190503093118.15700-1-lersek@redhat.com>
+Date: Fri,  3 May 2019 11:31:18 +0200
+Message-Id: <20190503093118.15700-3-lersek@redhat.com>
+In-Reply-To: <20190503093118.15700-1-lersek@redhat.com>
+References: <20190503093118.15700-1-lersek@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/2] tests/uefi-test-tools: report the SMBIOS
+Subject: [Qemu-devel] [PULL 2/2] tests/uefi-boot-images: report the SMBIOS
  entry point structures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,56 +36,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu devel list <qemu-devel@nongnu.org>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-No changes relative to the original posting at
-<http://mid.mail-archive.com/20190425104326.12835-1-lersek@redhat.com>,
-except for picking up the review/testing tags (also noted separately on
-each patch).
+Rebuild the "bios-tables-test" UEFI boot images with the SMBIOS entry
+point reporting that has been added in the previous patch.
 
 Cc: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
 Cc: Igor Mammedov <imammedo@redhat.com>
+Launchpad: https://bugs.launchpad.net/qemu/+bug/1821884
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Igor Mammedov <imammedo@redhat.com>
+---
 
-Thanks
-Laszlo
+Notes:
+    pull:
+   =20
+    - pick up T-b from Phil & Igor
 
-The following changes since commit 8482ff2eb3bb95020eb2f370a9b3ea26511e41=
-df:
+ tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2 | Bin 117=
+76 -> 12288 bytes
+ tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2     | Bin 117=
+76 -> 11776 bytes
+ tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2    | Bin 128=
+00 -> 13312 bytes
+ tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2  | Bin 133=
+12 -> 13312 bytes
+ 4 files changed, 0 insertions(+), 0 deletions(-)
 
-  Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request'=
- into staging (2019-05-02 12:04:51 +0100)
-
-are available in the Git repository at:
-
-  https://github.com/lersek/qemu.git tags/smbios_lp_1821884_20190503
-
-for you to fetch changes up to 24496b8d27d95c4b317039e2c48f262cfd40fb4d:
-
-  tests/uefi-boot-images: report the SMBIOS entry point structures (2019-=
-05-03 10:52:27 +0200)
-
-----------------------------------------------------------------
-Fix <https://bugs.launchpad.net/qemu/+bug/1821884>:
-"Extend uefi-test-tools to report SMBIOS location".
-
-----------------------------------------------------------------
-Laszlo Ersek (2):
-  tests/uefi-test-tools: report the SMBIOS entry point structures
-  tests/uefi-boot-images: report the SMBIOS entry point structures
-
- tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h    =
- |  25 +++++++++++++++-----
- tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.inf=
- |   2 ++
- tests/uefi-test-tools/UefiTestToolsPkg/BiosTablesTest/BiosTablesTest.c  =
- |  23 ++++++++++++++----
- tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2          =
- | Bin 11776 -> 12288 bytes
- tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2              =
- | Bin 11776 -> 11776 bytes
- tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2             =
- | Bin 12800 -> 13312 bytes
- tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2           =
- | Bin 13312 -> 13312 bytes
- 7 files changed, 40 insertions(+), 10 deletions(-)
-
+diff --git a/tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qco=
+w2 b/tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2
+index ac0b7b1b8f89..d588cf3ebd7d 100644
+Binary files a/tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.q=
+cow2 and b/tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2=
+ differ
+diff --git a/tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2 b=
+/tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2
+index d20fa7c81925..552c7a7ddce6 100644
+Binary files a/tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2=
+ and b/tests/data/uefi-boot-images/bios-tables-test.arm.iso.qcow2 differ
+diff --git a/tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2 =
+b/tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2
+index 26c882baeaba..c66ad155196d 100644
+Binary files a/tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow=
+2 and b/tests/data/uefi-boot-images/bios-tables-test.i386.iso.qcow2 diffe=
+r
+diff --git a/tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow=
+2 b/tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2
+index 9ec3c1f20bb2..f59e07c85415 100644
+Binary files a/tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qc=
+ow2 and b/tests/data/uefi-boot-images/bios-tables-test.x86_64.iso.qcow2 d=
+iffer
 --=20
 2.19.1.3.g30247aa5d201
