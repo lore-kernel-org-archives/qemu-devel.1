@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50371)
+Received: from eggs.gnu.org ([209.51.188.92]:53372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hMQkM-0007Xm-DJ
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:28:35 -0400
+	(envelope-from <liboxuan@connect.hku.hk>) id 1hMR2Z-00036A-J5
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:47:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1hMQkL-0000fK-Cy
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:28:34 -0400
-References: <20190503002206.9751-1-driver1998@foxmail.com>
-	<20190503003719.10233-1-driver1998@foxmail.com>
-	<db80e5ca-ab98-9c0b-a8c5-8e0c88c58638@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <8b04e42b-fdf7-4a9a-b36c-8a60bace27fe@weilnetz.de>
-Date: Fri, 3 May 2019 07:28:21 +0200
+	(envelope-from <liboxuan@connect.hku.hk>) id 1hMR2X-0006r0-GE
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:47:23 -0400
+Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:41007)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liboxuan@connect.hku.hk>)
+	id 1hMR2V-0006lw-Hv
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:47:20 -0400
+Received: by mail-yw1-xc44.google.com with SMTP id o65so1669410ywd.8
+	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 22:47:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <db80e5ca-ab98-9c0b-a8c5-8e0c88c58638@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="79E37so4yXGw8zLXAQ8jl8XTF3dybt9eo"
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] osdep: Fix mingw compilation
- regarding stdio formats
+References: <20190501081039.58938-1-liboxuan@connect.hku.hk>
+	<20190501085805.GA8174@lap1>
+	<CALM0=-=cbHTajGz8R4Who9eKh=sfa19H_nMuH4PFO8vVq2=drQ@mail.gmail.com>
+	<20190501135807.GA11932@lap1> <87y33q5hmw.fsf@zen.linaroharston>
+In-Reply-To: <87y33q5hmw.fsf@zen.linaroharston>
+From: "LI, BO XUAN" <liboxuan@connect.hku.hk>
+Date: Fri, 3 May 2019 13:46:40 +0800
+Message-ID: <CALM0=-m9y31XHuqzi=36AuxQmM7YBCXc_AW2fc=xAF-LV5Tofg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] hw/virtio/virtio-mmio: Convert DPRINTF
+ to traces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,102 +33,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cao Jiaxi <driver1998@foxmail.com>, qemu-devel@nongnu.org
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-trivial@nongnu.org, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Yuval Shaia <yuval.shaia@oracle.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---79E37so4yXGw8zLXAQ8jl8XTF3dybt9eo
-From: Stefan Weil <sw@weilnetz.de>
-To: Thomas Huth <thuth@redhat.com>, Cao Jiaxi <driver1998@foxmail.com>,
- qemu-devel@nongnu.org
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>
-Message-ID: <8b04e42b-fdf7-4a9a-b36c-8a60bace27fe@weilnetz.de>
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] osdep: Fix mingw compilation
- regarding stdio formats
-References: <20190503002206.9751-1-driver1998@foxmail.com>
- <20190503003719.10233-1-driver1998@foxmail.com>
- <db80e5ca-ab98-9c0b-a8c5-8e0c88c58638@redhat.com>
-In-Reply-To: <db80e5ca-ab98-9c0b-a8c5-8e0c88c58638@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Yuval and Alex,
 
-On 03.05.19 07:11, Thomas Huth wrote:
-> On 03/05/2019 02.37, Cao Jiaxi wrote:
->> I encountered the following compilation error on mingw:
->>
->> /mnt/d/qemu/include/qemu/osdep.h:97:9: error: '__USE_MINGW_ANSI_STDIO'=
- macro redefined [-Werror,-Wmacro-redefined]
->>  #define __USE_MINGW_ANSI_STDIO 1
->>         ^
->> /mnt/d/llvm-mingw/aarch64-w64-mingw32/include/_mingw.h:433:9: note: pr=
-evious definition is here
->>  #define __USE_MINGW_ANSI_STDIO 0      /* was not defined so it should=
- be 0 */
->>
->> It turns out that __USE_MINGW_ANSI_STDIO must be set before any
->> system headers are included, not just before stdio.h.
->>
->> Signed-off-by: Cao Jiaxi <driver1998@foxmail.com>
->> ---
->>  include/qemu/osdep.h | 10 +++++-----
->>  1 file changed, 5 insertions(+), 5 deletions(-)
->>
->> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
->> index 303d315c5d..af2b91f0b8 100644
->> --- a/include/qemu/osdep.h
->> +++ b/include/qemu/osdep.h
->> @@ -85,17 +85,17 @@ extern int daemon(int, int);
->>  #endif
->>  #endif
->> =20
->> +/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or lat=
-er) */
->> +#ifdef __MINGW32__
->> +#define __USE_MINGW_ANSI_STDIO 1
->> +#endif
->> +
->>  #include <stdarg.h>
->>  #include <stddef.h>
->>  #include <stdbool.h>
->>  #include <stdint.h>
->>  #include <sys/types.h>
->>  #include <stdlib.h>
->> -
->> -/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or lat=
-er) */
->> -#ifdef __MINGW32__
->> -#define __USE_MINGW_ANSI_STDIO 1
->> -#endif
->>  #include <stdio.h>
->> =20
->>  #include <string.h>
->>
->=20
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+Thanks for the suggestions. I'll update and send a patch v3 soon.
 
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
+Best regards,
+Boxuan Li
 
+On Wed, May 1, 2019 at 11:17 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
 
---79E37so4yXGw8zLXAQ8jl8XTF3dybt9eo
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEESSNv6nXJXWmOwreK4Iwh1Wd0UK0FAlzL0X0ACgkQ4Iwh1Wd0
-UK2R9g/9Gw+96R8Ut9N214NusnvjhbwqVDflZV3Js0pTz8ny1kM6wGP5aZEtqR8d
-A1CZlA7rwLeGmF0Bz9uTwd/d4amsxvLLz5qM3XVAr6vqcyiyYiKk4fJ8ATv6IQID
-rL0U3u1dgP3IFl8J4GCJsv9kX/BZyiOTJZ1Y+xX9ZJosOlrQG/Zx8D5cdNtz/svQ
-vczbe+dU2buYUpvYNnMr4zB5lPrXqapDJYeFbdTYofrFn6UVZYiUAqXRPabk6c5X
-R/UJHpYq8DkPpupAFwRSAvlfaeKgSCq3uNBt/i0UJ7cuSZjjdn+i1eREdps7bbBg
-aowCio8GzN6q2P6GFatYe+N65pMRCfS5kd3e0fJN29DdeAL69sQHF056M0djOqV2
-+wJCYQwbiLLmWR4JFuF+8owayq/BZTqxlYqv3MuY/Ho2Oh+OcZ6NVtITjP5OYWHM
-xkLAo+cHIl7mN1pfCcQUs2FEoxbo8n0zhAP4swPkqqtbdT2S9zQXlYfOOcz99aDW
-nMkKtSY6gHQqP5gBWBOHQwQFa2AYL4clDqVJeAx5KqRRgWluiyjsXm30kEqw0FWn
-YzZboYa8PaBmDdIacTOGQ6XCkPgDAR+L0aPuEAIZ2UohAXTDyLEHO83xkDa7985H
-9UbUfrM5v86ftcnUfELb2q++ohRFLysaDKO6gRIxEGHE7RfqPbQ=
-=1+BK
------END PGP SIGNATURE-----
-
---79E37so4yXGw8zLXAQ8jl8XTF3dybt9eo--
+>
+> Yuval Shaia <yuval.shaia@oracle.com> writes:
+>
+> > On Wed, May 01, 2019 at 08:42:35PM +0800, LI, BO XUAN wrote:
+> >>    On Wed, May 1, 2019 at 4:58 PM Yuval Shaia <[1]
+> yuval.shaia@oracle.com>
+> >>    wrote:
+> >>
+> >>      On Wed, May 01, 2019 at 04:10:39PM +0800, Boxuan Li wrote:
+> >>      > Signed-off-by: Boxuan Li <[2]liboxuan@connect.hku.hk>
+> >>      > ---
+> >>      > v2: Instead of using conditional debugs, convert DPRINTF to
+> traces
+> >>      > ---
+> >>      >  hw/virtio/trace-events  | 13 +++++++++++++
+> >>      >  hw/virtio/virtio-mmio.c | 35 ++++++++++++---------------------=
+--
+> >>      >  2 files changed, 25 insertions(+), 23 deletions(-)
+> >>      >
+> >>      > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> >>      > index 60c649c4bc..37c781b487 100644
+> >>      > --- a/hw/virtio/trace-events
+> >>      > +++ b/hw/virtio/trace-events
+> >>      > @@ -46,3 +46,16 @@ virtio_balloon_handle_output(const char *nam=
+e,
+> >>      uint64_t gpa) "section name: %s g
+> >>      >  virtio_balloon_get_config(uint32_t num_pages, uint32_t actual)
+> >>      "num_pages: %d actual: %d"
+> >>      >  virtio_balloon_set_config(uint32_t actual, uint32_t oldactual)
+> >>      "actual: %d oldactual: %d"
+> >>      >  virtio_balloon_to_target(uint64_t target, uint32_t num_pages)
+> >>      "balloon target: 0x%"PRIx64" num_pages: %d"
+> >>      > +
+> >>      > +# virtio-mmio.c
+> >>      > +virtio_mmio_read(int offset) "virtio_mmio_read offset 0x%x"
+> >>      > +virtio_mmio_wrong_size_read(void) "wrong size access to
+> >>      register!"
+> >>      > +virtio_mmio_read_interrupt(void) "read of write-only register"
+> >>      > +virtio_mmio_bad_read_offset(void) "bad register offset"
+> >>      > +virtio_mmio_write_offset(int offset, uint64_t value)
+> >>      "virtio_mmio_write offset 0x%x value 0x%" PRIx64
+> >>      > +virtio_mmio_wrong_size_write(void) "wrong size access to
+> >>      register!"
+> >>      > +virtio_mmio_guest_page(uint64_t size, int shift) "guest page
+> size
+> >>      0x%" PRIx64 " shift %d"
+> >>      > +virtio_mmio_queue_write(int value, int max_size) "mmio_queue
+> >>      write %d max %d"
+> >>      > +virtio_mmio_write_interrupt(void) "write to readonly register"
+> >>      > +virtio_mmio_bad_write_offset(void) "bad register offset"
+> >>      > +virtio_mmio_setting_irq(int level) "virtio_mmio setting IRQ %d=
+"
+> >>      > diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+> >>      > index 5807aa87fe..4251df399d 100644
+> >>      > --- a/hw/virtio/virtio-mmio.c
+> >>      > +++ b/hw/virtio/virtio-mmio.c
+> >>      > @@ -27,16 +27,7 @@
+> >>      >  #include "sysemu/kvm.h"
+> >>      >  #include "hw/virtio/virtio-bus.h"
+> >>      >  #include "qemu/error-report.h"
+> >>      > -
+> >>      > -/* #define DEBUG_VIRTIO_MMIO */
+> >>      > -
+> >>      > -#ifdef DEBUG_VIRTIO_MMIO
+> >>      > -
+> >>      > -#define DPRINTF(fmt, ...) \
+> >>      > -do { printf("virtio_mmio: " fmt , ## __VA_ARGS__); } while (0)
+> >>      > -#else
+> >>      > -#define DPRINTF(fmt, ...) do {} while (0)
+> >>      > -#endif
+> >>      > +#include "trace.h"
+> >>      >
+> >>      >  /* QOM macros */
+> >>      >  /* virtio-mmio-bus */
+> >>      > @@ -107,7 +98,7 @@ static uint64_t virtio_mmio_read(void *opaqu=
+e,
+> >>      hwaddr offset, unsigned size)
+> >>      >      VirtIOMMIOProxy *proxy =3D (VirtIOMMIOProxy *)opaque;
+> >>      >      VirtIODevice *vdev =3D virtio_bus_get_device(&proxy->bus);
+> >>      >
+> >>      > -    DPRINTF("virtio_mmio_read offset 0x%x\n", (int)offset);
+> >>      > +    trace_virtio_mmio_read((int)offset);
+> >>      >
+> >>      >      if (!vdev) {
+> >>      >          /* If no backend is present, we treat most registers a=
+s
+> >>      > @@ -144,7 +135,7 @@ static uint64_t virtio_mmio_read(void
+> *opaque,
+> >>      hwaddr offset, unsigned size)
+> >>      >          }
+> >>      >      }
+> >>      >      if (size !=3D 4) {
+> >>      > -        DPRINTF("wrong size access to register!\n");
+> >>      > +        trace_virtio_mmio_wrong_size_read();
+> >>      Have you considered using qemu_error_report to report such errors=
+?
+> >>
+> >>    Thanks for the suggestion. I am a newcomer here so my question migh=
+t
+> be
+> >>    a bit dumb: I thought they are warnings instead of errors since
+> return
+> >>    values are 0. Do you suggest using error_report function and changi=
+ng
+> >>    return values from 0 to -1?
+> >>    Best regards,
+> >>    Boxuan Li
+> >
+> > I think that when driver store invalid data in device register it is an
+> > error but the best is to check what other devices do.
+>
+> We could have:
+>
+>         qemu_log_mask(LOG_GUEST_ERROR, "%s: wrong size access to
+> register!\n". __func__);
+>
+> --
+> Alex Benn=C3=A9e
+>
