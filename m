@@ -2,91 +2,83 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7296C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 06:02:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4160C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 06:03:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B10F9206DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 06:02:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7EEBD206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 06:03:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c0Tu9DAR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B10F9206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Af6Axvyq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EEBD206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35083 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35091 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMRHU-0004jY-0R
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 02:02:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55706)
+	id 1hMRIH-0005JF-Mz
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 02:03:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hMRCr-0000m4-UR
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:58:02 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1hMR9D-0005S0-W2
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:54:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hMRCr-0005Oy-1W
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:58:01 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:46072)
+	(envelope-from <sjitindarsingh@gmail.com>) id 1hMR9C-00032k-A2
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:54:15 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:36068)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hMRCq-0005Oo-QS
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:58:00 -0400
-Received: by mail-pg1-x543.google.com with SMTP id i21so2184424pgi.12
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 22:58:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=W7r8JobTZB+LldUPKgEU8ZWssw9bAU5TxjjMtVMzfEc=;
-	b=c0Tu9DARppiGVx6OWo8XhdigMVnLMcVRXgqNykEH26rTszJp1ty047uR82goReqNur
-	a7lLAuc72eIypZjKZSyKgYVlOPqZeUwy5MDIU0N8J7al1xbsbh1vWHIRvegm/9vrqZ23
-	E1btcTuKLW9IFNRHpoMm/AxCxClBKI1orDikqdx2+tmuaL1Zb7eAzzeaR7NP6XyGgHjt
-	ZTdXML3ng4Cw6TOBUdyXMx0GtfNTYMAMag+KraX718HEG3PFlBmwMjXFVHLsr3KGe/Z7
-	jG+q5x0GRW8/dsaXlm4YQ/evh5Mr5d4EBaW7RsQ9zhBVJRWkopKaIUJt4WD/Rn0myCFD
-	fDsQ==
+	(Exim 4.71) (envelope-from <sjitindarsingh@gmail.com>)
+	id 1hMR9C-0002zZ-0e; Fri, 03 May 2019 01:54:14 -0400
+Received: by mail-pf1-x442.google.com with SMTP id v80so2353483pfa.3;
+	Thu, 02 May 2019 22:54:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=wUZAXOTwdw2I/hZuC5jS4/OqNN0mBHOWVDEizVGw6GQ=;
+	b=Af6AxvyqyVqgdx5sR9vt6CetSMY498qPkmWf3OjJNGMDcg2ddNIfbPZzyq332xmqsh
+	NBeya8BT1uEgWonEwLsDp0/ne3QtR6PIDAj7nXYqtdPCPT2iablRFHZPdA4jSbVOJ2DC
+	lxS9KGmLzAx2wgO+Q6jrlzyczAAU18o8BnwqvswvsjMRvOGV9ga1aPLZPWxIHv15f9pC
+	2Gh/X9ZyQDVS2ObIlOzM+pdcwbjAlrp+tSH2+BKG4wRgZK+9ziayr1LhDM67RFvQM4d5
+	tCxrigMfEz85CBu9Y+RotUlGLdpLo92zY5I09Bq/Uo6/BzeLicQXP9tj/f5HYKTCD9Tt
+	F/4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=W7r8JobTZB+LldUPKgEU8ZWssw9bAU5TxjjMtVMzfEc=;
-	b=o9s9WJ9QEZwu9EcAdyCCBXf/SgkEx77p9deq96NY3qw6tT8atjr8sqxTCWWDMElZtv
-	2JhOIpGOSRRJNHpJHYcmXkmoRscQGn1tgFNBxBDyd5dZoVIVdX2IvopQ5vp00gqfh2SO
-	+5VgJyLqyp0oLVKWs+YQ5NFbF0LJ+5JSLLg3WDcc1Q1DLVugPWxohg33A4apcc1Ispf7
-	PEQY/ILTMLT9MEw85XcmaEKahTtWD3OIyqff7Hx8AtE0sY2V/hAFK692n3rHt3Dc3WFK
-	VZQXhlDLWs2LjeO5LSpWHwe3B0ytaK5CQWx/zIH07KRi+ThqmbZrHxHRpt7HPKRWNpsV
-	geTw==
-X-Gm-Message-State: APjAAAXXAhnZqv4tTx8PY9BKSq2GH+wg4fNqZJO4yPoykjbWKNgB83Cd
-	bjvUhxm4FV3rtGX5nrueSL3uPw==
-X-Google-Smtp-Source: APXvYqyMXXIxdkDESi8MWE3v+jTfhVb9M0kruPbwCjbtkkcxXLtJww52FKOabjelBlxTi16pXXOjVw==
-X-Received: by 2002:a65:6541:: with SMTP id a1mr7862050pgw.233.1556863079646; 
-	Thu, 02 May 2019 22:57:59 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-189-189.tukw.qwest.net. [97.113.189.189])
-	by smtp.gmail.com with ESMTPSA id 9sm1727459pgv.5.2019.05.02.22.57.58
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 02 May 2019 22:57:58 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190502141019.6385-1-david@redhat.com>
-	<20190502141019.6385-35-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <a2d14b29-e162-54f2-a44f-09630212c63b@linaro.org>
-Date: Thu, 2 May 2019 22:57:56 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190502141019.6385-35-david@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=wUZAXOTwdw2I/hZuC5jS4/OqNN0mBHOWVDEizVGw6GQ=;
+	b=tDC2aLc5XRJPV3Jq9kFocopDf2qSU6B58UDEgLkFGOsXQfnISbsIC7MS+sPC8Tl3RB
+	kdwwnaSwaysD70ge++46GKTHyhhTrZaKi6HwGcbXAerZ6HlBFfvQcmzPPGP7I1Ncuh8k
+	aQ+Zjrl7Eqek7U/ptw82z4MR7f4QqetwGUrJMAanWB0McFjsKahXjRRe+Ny/iYrpkxgy
+	WqmyJLGcJGCAx6BpW6qm3kdNuX3+XzMHFA/Foovk7VyepejbBWmkwHwUIxtTEnsT+2g3
+	gcEKsYIgiTikPR9GeqM9n+JHdw/q3j11uBNMUMD0pA38L08aBZkcJ3vzzr0AS/vpo4GY
+	l0Vw==
+X-Gm-Message-State: APjAAAWb0xajo2J7SYoLLSpl2s4C0UBPfLxngs1kpIxUCfJVWHeF9p+B
+	oAitc5WK8cO9WUfnl3VQvEbSKENOCpA=
+X-Google-Smtp-Source: APXvYqxPUPVhxF4jxE8BFdmppxcc+9qa8+6brNnYwfd4qF10qVOD5UY8ZyVwxrLGWVAt/gTJ4VchIQ==
+X-Received: by 2002:a63:9541:: with SMTP id t1mr4336289pgn.97.1556862848390;
+	Thu, 02 May 2019 22:54:08 -0700 (PDT)
+Received: from localhost.ibm.com ([1.129.142.217])
+	by smtp.gmail.com with ESMTPSA id
+	h187sm1292983pfc.52.2019.05.02.22.54.02
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 02 May 2019 22:54:07 -0700 (PDT)
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Fri,  3 May 2019 15:53:09 +1000
+Message-Id: <20190503055316.6441-7-sjitindarsingh@gmail.com>
+X-Mailer: git-send-email 2.13.6
+In-Reply-To: <20190503055316.6441-1-sjitindarsingh@gmail.com>
+References: <20190503055316.6441-1-sjitindarsingh@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::543
-Subject: Re: [Qemu-devel] [PATCH v3 34/40] s390x/tcg: Implement VECTOR
- SUBTRACT COMPUTE BORROW INDICATION
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH 06/13] target/ppc: Enforce that the
+ root page directory size must be at least 5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,28 +90,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
+	Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
+	david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503055756.J3oLPSZt2Ele4EIhFJVq2oZ0cOsETbY3Kt0oAtdN3Tk@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190503055309.stLO5UEPWdq6vD4yte8Lyo8u8dTgwREKWdvY6gw8CAY@z>
 
-On 5/2/19 7:10 AM, David Hildenbrand wrote:
-> Let's keep it simple for now and handle 8/16 bit elements via helpers.
-> Especially for 8/16, we could come up with some bit tricks.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/helper.h           |  2 ++
->  target/s390x/insn-data.def      |  2 ++
->  target/s390x/translate_vx.inc.c | 52 +++++++++++++++++++++++++++++++++
->  target/s390x/vec_int_helper.c   | 16 ++++++++++
->  4 files changed, 72 insertions(+)
+According to the ISA the root page directory size of a radix tree for
+either process or partition scoped translation must be >= 5.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Thus add this to the list of conditions checked when validating the
+partition table entry in validate_pate();
 
-r~
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+---
+ target/ppc/mmu-radix64.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
+index a6ab290323..afa5ba506a 100644
+--- a/target/ppc/mmu-radix64.c
++++ b/target/ppc/mmu-radix64.c
+@@ -249,6 +249,8 @@ static bool validate_pate(PowerPCCPU *cpu, uint64_t lpid, ppc_v3_pate_t *pate)
+     if (lpid == 0 && !msr_hv) {
+         return false;
+     }
++    if ((pate->dw0 & PATE1_R_PRTS) < 5)
++        return false;
+     /* More checks ... */
+     return true;
+ }
+-- 
+2.13.6
 
 
