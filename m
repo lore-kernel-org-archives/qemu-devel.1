@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60628)
+Received: from eggs.gnu.org ([209.51.188.92]:60701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hMWGe-00025w-5o
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:22:19 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hMWGy-0002OH-N3
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:22:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hMWGc-00051V-QT
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:22:16 -0400
-References: <20190419154041.77802-1-stephen.checkoway@oberlin.edu>
-	<45e6247e-cddb-2185-7f7b-503be00bd453@vivier.eu>
-	<f61fc519-da75-5b41-21d0-508cf89016f2@redhat.com>
-	<fc4a45ba-08d0-59ba-80eb-10a08cda3b7d@ilande.co.uk>
-	<af92f288-7159-b7ad-3360-5c2bb9b392f6@vivier.eu>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <9920c883-741a-76e9-8d97-f68b65dbcff6@ilande.co.uk>
-Date: Fri, 3 May 2019 12:22:08 +0100
+	(envelope-from <laurent@vivier.eu>) id 1hMWGw-0005cs-J8
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:22:36 -0400
+References: <20190503111958.30825-1-laurent@vivier.eu>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <ae6af5a5-e007-c7b3-4d52-e40a1b5ce9bd@vivier.eu>
+Date: Fri, 3 May 2019 13:22:15 +0200
 MIME-Version: 1.0
-In-Reply-To: <af92f288-7159-b7ad-3360-5c2bb9b392f6@vivier.eu>
+In-Reply-To: <20190503111958.30825-1-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v3] hw/char/escc: Lower irq
- when transmit buffer is filled
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL v2 00/12] Trivial branch patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +23,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Stephen Checkoway <stephen.checkoway@oberlin.edu>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Artyom Tarasenko <atar4qemu@gmail.com>, qemu-trivial@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, qemu-trivial@nongnu.org, Richard Henderson <rth@twiddle.net>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Michael Tokarev <mjt@tls.msk.ru>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On 03/05/2019 08:21, Laurent Vivier wrote:
-
->>> Mark, Artyom, are you OK with this patch?
->>
->> I started testing this with my OpenBIOS test images at the start of the week, but
->> unfortunately got distracted by real life :)
->>
->> I've now finished and confirmed there are no regressions in my local tests, so I'll
->> include this in the PR I am planning to send shortly containing the leon3 updates.
+On 03/05/2019 13:19, Laurent Vivier wrote:
+> The following changes since commit 8482ff2eb3bb95020eb2f370a9b3ea26511e41df:
 > 
-> Hi Mark,
+>   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-05-02 12:04:51 +0100)
 > 
-> I've already included a leon3 patch ("hw/sparc/leon3: Allow load of
-> uImage firmwares") in the PR I sent yesterday for the trivial branch.
-> I've removed from my PR this patch about the ESCC, so you can take it.
+> are available in the Git repository at:
+> 
+>   git://github.com/vivier/qemu.git tags/trivial-branch-pull-request
+> 
+> for you to fetch changes up to 2d2023c3b99edb33ad4bb9791f70456ea1a1c049:
+> 
+>   sockets: avoid string truncation warnings when copying UNIX path (2019-05-03 13:03:04 +0200)
+> 
+> ----------------------------------------------------------------
+> Pull request trivial branch 2019-05-03
+> 
+> ----------------------------------------------------------------
+> 
+> Aruna Jayasena (1):
+>   Header cleanups
+> 
+> Daniel P. Berrangé (1):
+>   sockets: avoid string truncation warnings when copying UNIX path
+> 
+> Dr. David Alan Gilbert (1):
+>   configure: fix pam test warning
+> 
+> Marc-André Lureau (1):
+>   doc: fix the configuration path
+> 
+> Philippe Mathieu-Daudé (3):
+>   hw/net/pcnet: Use qemu_log_mask(GUEST_ERROR) instead of printf
+>   Makefile: Let the 'clean' rule remove qemu-ga.exe on Windows hosts
+>   hw/sparc/leon3: Allow load of uImage firmwares
+> 
+> Stefan Weil (1):
+>   Update configure
+> 
+> Thomas Huth (1):
+>   net: Print output of "-net nic, model=help" to stdout instead of
+>     stderr
+> 
+> Wei Yang (3):
+>   CODING_STYLE: specify the indent rule for multiline code
+>   CODING_STYLE: indent example code as all others
+>   qom: use object_new_with_type in object_new_with_propv
+> 
+>  qemu-ga.texi              |  4 ++--
+>  configure                 |  5 ++---
+>  Makefile                  | 11 +++++----
+>  include/exec/cpu-common.h |  3 ---
+>  hw/net/pcnet.c            |  4 +++-
+>  hw/sparc/leon3.c          |  4 ++++
+>  net/net.c                 |  7 +++---
+>  qom/object.c              |  2 +-
+>  util/qemu-sockets.c       | 12 ++++++----
+>  CODING_STYLE              | 47 +++++++++++++++++++++++++++++++++++----
+>  10 files changed, 74 insertions(+), 25 deletions(-)
+> 
 
-Hi Laurent,
 
-Understood, and thanks for looking out for the patch. My first week back has been
-quite busy so I'm still playing catch-up here...
+Forget this series, the send has been aborted for an unknown reason.
 
-
-ATB,
-
-Mark.
+Thanks,
+Laurent
