@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37893)
+Received: from eggs.gnu.org ([209.51.188.92]:37936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=0191b4fb4=Alistair.Francis@wdc.com>)
-	id 1hMMHN-00046r-ED
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:42:22 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hMMHQ-0004A9-Uj
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:42:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=0191b4fb4=Alistair.Francis@wdc.com>)
-	id 1hMMHJ-0006zo-LI
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:42:19 -0400
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Fri, 3 May 2019 00:42:04 +0000
-Message-ID: <20190503004021.13814-1-alistair.francis@wdc.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <75BE263937E2B44880102891AF9D9B29@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v3] hw/usb/hcd-xhci: Fix GCC 9 build warning
+	(envelope-from <ehabkost@redhat.com>) id 1hMMHP-00072j-So
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:42:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49514)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hMMHP-00071Y-NN
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:42:23 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Thu,  2 May 2019 21:41:26 -0300
+Message-Id: <20190503004130.8285-16-ehabkost@redhat.com>
+In-Reply-To: <20190503004130.8285-1-ehabkost@redhat.com>
+References: <20190503004130.8285-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PULL 15/19] tests/boot_linux_console: add a test for
+ aarch64 + virt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +24,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "kraxel@redhat.com" <kraxel@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "laurent@vivier.eu" <laurent@vivier.eu>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, Alistair Francis <Alistair.Francis@wdc.com>, =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
 
-Rml4IHRoaXMgYnVpbGQgd2FybmluZyB3aXRoIEdDQyA5IG9uIEZlZG9yYSAzMDoNCmh3L3VzYi9o
-Y2QteGhjaS5jOjMzMzk6NjY6IGVycm9yOiDigJglZOKAmSBkaXJlY3RpdmUgb3V0cHV0IG1heSBi
-ZSB0cnVuY2F0ZWQgd3JpdGluZyBiZXR3ZWVuIDEgYW5kIDEwIGJ5dGVzIGludG8gYSByZWdpb24g
-b2Ygc2l6ZSA1IFstV2Vycm9yPWZvcm1hdC10cnVuY2F0aW9uPV0NCiAzMzM5IHwgICAgICAgICAg
-ICAgc25wcmludGYocG9ydC0+bmFtZSwgc2l6ZW9mKHBvcnQtPm5hbWUpLCAidXNiMiBwb3J0ICMl
-ZCIsIGkrMSk7DQogICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgXn4NCmh3L3VzYi9oY2QteGhjaS5jOjMzMzk6NTQ6
-IG5vdGU6IGRpcmVjdGl2ZSBhcmd1bWVudCBpbiB0aGUgcmFuZ2UgWzEsIDIxNDc0ODM2NDddDQog
-MzMzOSB8ICAgICAgICAgICAgIHNucHJpbnRmKHBvcnQtPm5hbWUsIHNpemVvZihwb3J0LT5uYW1l
-KSwgInVzYjIgcG9ydCAjJWQiLCBpKzEpOw0KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fg0KSW4gZmlsZSBp
-bmNsdWRlZCBmcm9tIC91c3IvaW5jbHVkZS9zdGRpby5oOjg2NywNCiAgICAgICAgICAgICAgICAg
-ZnJvbSAvaG9tZS9hbGlzdGFpci9xZW11L2luY2x1ZGUvcWVtdS9vc2RlcC5oOjk5LA0KICAgICAg
-ICAgICAgICAgICBmcm9tIGh3L3VzYi9oY2QteGhjaS5jOjIxOg0KL3Vzci9pbmNsdWRlL2JpdHMv
-c3RkaW8yLmg6Njc6MTA6IG5vdGU6IOKAmF9fYnVpbHRpbl9fX3NucHJpbnRmX2Noa+KAmSBvdXRw
-dXQgYmV0d2VlbiAxMyBhbmQgMjIgYnl0ZXMgaW50byBhIGRlc3RpbmF0aW9uIG9mIHNpemUgMTYN
-CiAgIDY3IHwgICByZXR1cm4gX19idWlsdGluX19fc25wcmludGZfY2hrIChfX3MsIF9fbiwgX19V
-U0VfRk9SVElGWV9MRVZFTCAtIDEsDQogICAgICB8ICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fg0KICAgNjggfCAgICAg
-ICAgX19ib3MgKF9fcyksIF9fZm10LCBfX3ZhX2FyZ19wYWNrICgpKTsNCiAgICAgIHwgICAgICAg
-IH5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4NCg0KU2lnbmVkLW9mZi1ieTog
-QWxpc3RhaXIgRnJhbmNpcyA8YWxpc3RhaXIuZnJhbmNpc0B3ZGMuY29tPg0KUmV2aWV3ZWQtYnk6
-IExhdXJlbnQgVml2aWVyIDxsYXVyZW50QHZpdmllci5ldT4NClJldmlld2VkLWJ5OiBEYW5pZWwg
-UC4gQmVycmFuZ8OpIDxiZXJyYW5nZUByZWRoYXQuY29tPg0KUmV2aWV3ZWQtYnk6IFBoaWxpcHBl
-IE1hdGhpZXUtRGF1ZMOpIDxwaGlsbWRAcmVkaGF0LmNvbT4NCi0tLQ0KVGhpcyBpcyB0aGUgb25s
-IHBhdGNoIGxlZnQgaWYgbXkgb3JpZ2luYWwgc2VyaWVzICJGaXggc29tZSBHQ0MgOSBidWlsZA0K
-d2FybmluZ3MiIHRoYXQgaGFzbid0IGVpdGhlciBiZWVuIGFjY2VwZXRlZCBpbnRvIGEgbWFpbnRh
-aW5lcnMgdHJlZSBvcg0KZml4ZWQgYnkgc29tZW9uZSBlbHNlLg0KDQogaHcvdXNiL2hjZC14aGNp
-LmMgfCAyICsrDQogMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKQ0KDQpkaWZmIC0tZ2l0
-IGEvaHcvdXNiL2hjZC14aGNpLmMgYi9ody91c2IvaGNkLXhoY2kuYw0KaW5kZXggZWMyOGJlZTMx
-OS4uYTE1YjEwM2I2NSAxMDA2NDQNCi0tLSBhL2h3L3VzYi9oY2QteGhjaS5jDQorKysgYi9ody91
-c2IvaGNkLXhoY2kuYw0KQEAgLTMzMjEsNiArMzMyMSw4IEBAIHN0YXRpYyB2b2lkIHVzYl94aGNp
-X2luaXQoWEhDSVN0YXRlICp4aGNpKQ0KIA0KICAgICB1c2JfYnVzX25ldygmeGhjaS0+YnVzLCBz
-aXplb2YoeGhjaS0+YnVzKSwgJnhoY2lfYnVzX29wcywgZGV2KTsNCiANCisgICAgZ19hc3NlcnQo
-dXNicG9ydHMgPD0gTUFYKE1BWFBPUlRTXzIsIE1BWFBPUlRTXzMpKTsNCisNCiAgICAgZm9yIChp
-ID0gMDsgaSA8IHVzYnBvcnRzOyBpKyspIHsNCiAgICAgICAgIHNwZWVkbWFzayA9IDA7DQogICAg
-ICAgICBpZiAoaSA8IHhoY2ktPm51bXBvcnRzXzIpIHsNCi0tIA0KMi4yMS4wDQoNCg==
+From: Cleber Rosa <crosa@redhat.com>
+
+Just like the previous tests, boots a Linux kernel on a aarch64 target
+using the virt machine.
+
+One special option added is the CPU type, given that the kernel
+selected fails to boot on the virt machine's default CPU (cortex-a15).
+
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+Message-Id: <20190312171824.5134-18-crosa@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ .travis.yml                            |  2 +-
+ tests/acceptance/boot_linux_console.py | 21 +++++++++++++++++++++
+ 2 files changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/.travis.yml b/.travis.yml
+index cb46098972..753e40a115 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -223,7 +223,7 @@ matrix:
+ 
+     # Acceptance (Functional) tests
+     - env:
+-        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu"
++        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu"
+         - TEST_CMD="make check-acceptance"
+       addons:
+         apt:
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index 38b33b25f7..6d9362922f 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -134,3 +134,24 @@ class BootLinuxConsole(Test):
+         self.vm.launch()
+         console_pattern = 'Kernel command line: %s' % kernel_command_line
+         self.wait_for_console_pattern(console_pattern)
++
++    def test_aarch64_virt(self):
++        """
++        :avocado: tags=arch:aarch64
++        :avocado: tags=machine:virt
++        """
++        kernel_url = ('https://download.fedoraproject.org/pub/fedora/linux/'
++                      'releases/29/Everything/aarch64/os/images/pxeboot/vmlinuz')
++        kernel_hash = '8c73e469fc6ea06a58dc83a628fc695b693b8493'
++        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
++
++        self.vm.set_machine('virt')
++        self.vm.set_console()
++        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
++                               'console=ttyAMA0')
++        self.vm.add_args('-cpu', 'cortex-a53',
++                         '-kernel', kernel_path,
++                         '-append', kernel_command_line)
++        self.vm.launch()
++        console_pattern = 'Kernel command line: %s' % kernel_command_line
++        self.wait_for_console_pattern(console_pattern)
+-- 
+2.18.0.rc1.1.g3f1ff2140
