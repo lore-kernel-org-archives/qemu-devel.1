@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52199)
+Received: from eggs.gnu.org ([209.51.188.92]:53644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hMd9c-0007fy-6Y
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 14:43:29 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1hMdEm-0001ib-QX
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 14:48:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hMd9b-00033E-Bp
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 14:43:28 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:46074)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hMd9b-000322-51
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 14:43:27 -0400
-Received: by mail-pg1-x541.google.com with SMTP id i21so3105335pgi.12
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 11:43:26 -0700 (PDT)
-References: <20190502143409.59600-1-ysato@users.sourceforge.jp>
-	<20190502143409.59600-2-ysato@users.sourceforge.jp>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <3de96999-eba5-fa88-0c4d-a7b27d916081@linaro.org>
-Date: Fri, 3 May 2019 11:43:23 -0700
-MIME-Version: 1.0
-In-Reply-To: <20190502143409.59600-2-ysato@users.sourceforge.jp>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1hMdEl-0001sI-9j
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 14:48:48 -0400
+Received: from mail-eopbgr740107.outbound.protection.outlook.com
+	([40.107.74.107]:9575
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1hMdEj-0001gQ-Hw
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 14:48:46 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 3 May 2019 18:48:37 +0000
+Message-ID: <BN6PR2201MB12510885B97E6D4312580C24C6350@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <20190423110034.1260142-1-jakub.jermar@kernkonzept.com>
+	<ab4b6d04-74f9-2f12-829d-9df8c1b1c4ca@redhat.com>
+	<6ae8d347-149d-e7eb-bb02-90aba44c5bbd@kernkonzept.com>,
+	<1e9a8595-4653-4900-b747-236f9888b893@kernkonzept.com>
+In-Reply-To: <1e9a8595-4653-4900-b747-236f9888b893@kernkonzept.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC v8 01/12] target/rx: TCG translation
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2] mips: Decide to map PAGE_EXEC in
+ map_address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +34,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Jakub Jermar <jakub.jermar@kernkonzept.com>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, Leon Alrae <leon.alrae@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 5/2/19 7:33 AM, Yoshinori Sato wrote:
-> +/* conditional branch helper */
-> +static void rx_bcnd_main(DisasContext *ctx, int cd, int dst)
-> +{
-> +    DisasCompare dc;
-> +    TCGLabel *t, *done;
-> +
-> +    switch (cd) {
-> +    case 0 ... 13:
-> +        dc.temp = tcg_temp_new();
-> +        psw_cond(&dc, cd);
-> +        t = gen_new_label();
-> +        done = gen_new_label();
-> +        tcg_gen_brcondi_i32(dc.cond, dc.value, 0, t);
-> +        gen_goto_tb(ctx, 0, ctx->base.pc_next);
-> +        tcg_gen_br(done);
-> +        gen_set_label(t);
-> +        gen_goto_tb(ctx, 1, ctx->pc + dst);
-> +        gen_set_label(done);
-> +        tcg_temp_free(dc.temp);
-> +        break;
-> +    case 14:
-> +        /* always true case */
-> +        gen_goto_tb(ctx, 0, ctx->pc + dst);
-> +        break;
-> +    case 15:
-> +        /* always false case */
-> +        /* Nothing do */
-> +        break;
-> +    }
-> +    ctx->base.is_jmp = DISAS_JUMP;
-> +}
+> (ping)
+>=20
+> Is there anything else I can do to help to get this merged?
+>=20
+> https://patchew.org/QEMU/20190423110034.1260142-1-jakub.jermar@kernkonzep=
+t.com/
 
-Do not set is_jmp to DISAS_JUMP here.  We have already set is_jmp to
-DISAS_NORETURN in gen_goto_tb.  For case 15, we do not need to exit the TB in
-order to treat the never-taken branch as a nop.
+Hello, Jakub.
 
-This assignment means that we will emit *another* exit from the TB in
-rx_tr_tb_stop, which will be unreachable code.
+I will be reviewing your patch next week, please be patient. In any case, t=
+hanks for
+your involving in solving this issue!
 
-This is the only bug I see in this revision.  Thanks for your patience!
-
-
-r~
+Aleksandar=
