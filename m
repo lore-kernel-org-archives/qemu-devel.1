@@ -2,59 +2,71 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ABB2C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:03:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 206CBC43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:05:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C7482075E
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:03:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C7482075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D87192075E
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 11:05:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D87192075E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38122 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38147 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMVyC-0002hF-44
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 07:03:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56199)
+	id 1hMW0J-0003VM-Ug
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 07:05:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hMVxH-0002LC-9z
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:02:16 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hMVzM-00034t-3h
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:04:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hMVxG-0002hs-CK
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:02:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37232)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>)
-	id 1hMVxE-0002gT-7h; Fri, 03 May 2019 07:02:12 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 94C0D3082E91;
-	Fri,  3 May 2019 11:02:09 +0000 (UTC)
-Received: from steredhat.redhat.com (unknown [10.36.118.31])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B3CB45D9C4;
-	Fri,  3 May 2019 11:02:07 +0000 (UTC)
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri,  3 May 2019 13:02:06 +0200
-Message-Id: <20190503110206.42811-1-sgarzare@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1hMVzK-0003qE-2s
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 07:04:23 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:45527)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
+	id 1hMVzI-0003ou-1F; Fri, 03 May 2019 07:04:20 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1N0G5h-1ga4h026z9-00xLJq; Fri, 03 May 2019 13:03:41 +0200
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190502185835.15185-1-laurent@vivier.eu>
+	<CAFEAcA9-hAU5dxUmSWtbvrPEXE-nCP1uLvLbOby-_EXZ27o+8g@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <ed0ddde0-3c6d-0afe-be9e-b56ecc479d18@vivier.eu>
+Date: Fri, 3 May 2019 13:03:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Fri, 03 May 2019 11:02:09 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAFEAcA9-hAU5dxUmSWtbvrPEXE-nCP1uLvLbOby-_EXZ27o+8g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:d6VNxPl74O+FeqkNcY+APfdyceHeK32Ch0K6N/Xl2avriyS4NSd
+	XL7HvX5q9rPFG1EI9fKExwrb+NPLGprZ7qiFt7Jr70uXaC5/fCv33FxkNWlkFiw3nqD8LoO
+	XFVYvu8pXA5jEhhkb6tSlY/T0OKKCPy7Z8BPk9Ec5pzLINktDDjp7GRGVp8GSGLmRbQRRLr
+	CDDXUhft72j5YqQD6wD3Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:77UeGtvuvDc=:n8vYbINaju24fu0az+Pwmw
+	SA7Og7oUkIGrMy6cfclzTXIQe5kpj7m/bFTpRtjjyzJypjsu2/a75Z7DQCh8mpgTV3hTnSKek
+	SeAMpihKm39UdcH02yinuZvPotmO1f2pzKEYvXheG/7g6YCQAUP5lR685o4Yc14hdBktzeQr8
+	8iEf/HBmuNRYV4XAm4lWAn55dmmmEo3GWaiWrpPY6SjmEd4jzadom0e6+jpcMFYRkWJuoAjOl
+	3MLeanOko/U3MLCIgTnkfEUg8tywX65Ci/C5h3Nol69RK+eF17kdXHN/C8eh2XSQp0wNbuXhw
+	lvWGlGFVV/MgAEgQuylx6LWhVBenazSPvvT5EhQWIN5e2zeOziC2NVtFcrrLbi8YB+IlTWMmQ
+	8UawmRl4pIF5B8iI1zOKKSPYtA5u0st1eLdwd/nO66LbBOijJh/1eMKfy4JyrYdz+tAyGuXw9
+	xYtLxSIQaRqj7tV979pbOMztMABaBPpiiXtHKnaNpQwkjhs3zJTQ0zyBd0errmVGBoLKLRgUj
+	Qp0cAHwUiUSJJcpaEabdggBpvsRqBtAo373TicKjd0Ph+BBD+AHt7/B+4qEMNrBKpVhq5+uLf
+	OPszTyHulMV1pn0cWDxaKO7fkmhOJHimpTD3LCzddXnBAafgcjVjg9FhXhzeXL7aEhBqeOdaA
+	cJz9CQ40WWdIBPPEX9AEmXAQmGk0qhh8SkODhdducWd5D2f4th3UWz7rWi5VngXejOseDp3TG
+	Sv4N2ecfOxwH1onSkR0bbq2TM32jmpXFqQ2+azoYz4pyI3FxMGJ2LFm7jJo=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] block/rbd: implement
- .bdrv_get_allocated_file_size callback
+X-Received-From: 212.227.17.24
+Subject: Re: [Qemu-devel] [PULL 00/13] Trivial branch patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,78 +78,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
-	Jason Dillaman <jdillama@redhat.com>, qemu-block@nongnu.org,
-	Max Reitz <mreitz@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
+	QEMU Trivial <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>,
+	Jason Wang <jasowang@redhat.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Fabien Chouteau <chouteau@adacore.com>,
+	Michael Roth <mdroth@linux.vnet.ibm.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	=?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>,
+	Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190503110206.Vm84nuD3pYMSwPjvE9uFiVoeUdpN2NUOJ4-jwRliyPg@z>
+Message-ID: <20190503110335.FXoFU7T76urhXIxFvQX1NY71uTpRcKepLmLR9kaFirI@z>
 
-This patch allows 'qemu-img info' to show the 'disk size' for
-rbd images. We use the rbd_diff_iterate2() API to calculate the
-allocated size for the image.
+On 03/05/2019 12:34, Peter Maydell wrote:
+> On Thu, 2 May 2019 at 19:58, Laurent Vivier <laurent@vivier.eu> wrote:
+>>
+>> The following changes since commit 8482ff2eb3bb95020eb2f370a9b3ea26511e41df:
+>>
+>>   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-05-02 12:04:51 +0100)
+>>
+>> are available in the Git repository at:
+>>
+>>   git://github.com/vivier/qemu.git tags/trivial-branch-pull-request
+>>
+>> for you to fetch changes up to f7c03a68b814254df414977ff299468fbf0fa1c0:
+>>
+>>   sockets: avoid string truncation warnings when copying UNIX path (2019-05-02 20:50:47 +0200)
+>>
+>> ----------------------------------------------------------------
+>> Pull request trivial branch 2019-05-02
+>>
+>> ----------------------------------------------------------------
+> 
+> Markus's "Clean up includes" patch breaks 'make check' on
+> big-endian hosts:
+> cd /home/pm215/qemu/build/all/tests/fp && ./fp-test -s -l 1 -r all  i32_to_f16 i
+> 64_to_f16 i32_to_f32 i64_to_f32 i32_to_f64 i64_to_f64 i32_to_f128 i64_to_f128 >
+>  int-to-float.out 2>&1 || (cat  int-to-float.out && exit 1;)
+>>> Testing i32_to_f16, rounding near_even
+> ^M372 tests total.
+> ^M372 tests performed.
+> In 372 tests, no errors found in i32_to_f16, rounding near_even.
+>>> Testing i32_to_f16, rounding minMag
+> [...]
+> ^MErrors found in i32_to_f128:
+> 1006FFFF  => +0000.000000000000401B006FFFF00000 .....
+>         expected +401B.006FFFF000000000000000000000 .....
+> ^M0001DDEB  => +0000.000000000000400FDDEB00000000 .....
+>         expected +400F.DDEB000000000000000000000000 .....
+> ^MFFF6FFFC  => +0000.000000000000C012200080000000 .....
+>         expected -4012.2000800000000000000000000000 .....
+> ^MFFFFFFF8  => +0000.000000000000C002000000000000 .....
+>         expected -4002.0000000000000000000000000000 .....
+> [etc]
+> 
+> (I had to bounce Markus' own pullreq from a week or
+> so back because it had this patch in too and also failed
+> for this reason.)
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- block/rbd.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ok, I remove it and re-send the PR.
 
-diff --git a/block/rbd.c b/block/rbd.c
-index 0c549c9935..61447bc0cb 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -1046,6 +1046,38 @@ static int64_t qemu_rbd_getlength(BlockDriverState=
- *bs)
-     return info.size;
- }
-=20
-+static int rbd_allocated_size_cb(uint64_t offset, size_t len, int exists=
-,
-+                                 void *arg)
-+{
-+    int64_t *alloc_size =3D (int64_t *) arg;
-+
-+    if (exists) {
-+        (*alloc_size) +=3D len;
-+    }
-+
-+    return 0;
-+}
-+
-+static int64_t qemu_rbd_get_allocated_file_size(BlockDriverState *bs)
-+{
-+    BDRVRBDState *s =3D bs->opaque;
-+    int64_t alloc_size =3D 0;
-+    int r;
-+
-+    /*
-+     * rbd_diff_iterate2(), if the source snapshot name is NULL, invokes
-+     * the callback on all allocated regions of the image.
-+     */
-+    r =3D rbd_diff_iterate2(s->image, NULL, 0,
-+                          bs->total_sectors * BDRV_SECTOR_SIZE, 0, 1,
-+                          &rbd_allocated_size_cb, &alloc_size);
-+    if (r < 0) {
-+        return r;
-+    }
-+
-+    return alloc_size;
-+}
-+
- static int coroutine_fn qemu_rbd_co_truncate(BlockDriverState *bs,
-                                              int64_t offset,
-                                              PreallocMode prealloc,
-@@ -1254,6 +1286,7 @@ static BlockDriver bdrv_rbd =3D {
-     .bdrv_get_info          =3D qemu_rbd_getinfo,
-     .create_opts            =3D &qemu_rbd_create_opts,
-     .bdrv_getlength         =3D qemu_rbd_getlength,
-+    .bdrv_get_allocated_file_size =3D qemu_rbd_get_allocated_file_size,
-     .bdrv_co_truncate       =3D qemu_rbd_co_truncate,
-     .protocol_name          =3D "rbd",
-=20
---=20
-2.20.1
+Thanks,
+Laurent
 
 
