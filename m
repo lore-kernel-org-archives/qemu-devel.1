@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42974)
+Received: from eggs.gnu.org ([209.51.188.92]:43957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hMYs0-0001gl-6m
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:09:01 -0400
+	(envelope-from <lersek@redhat.com>) id 1hMYwf-0003x8-DM
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:13:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hMYrz-0006W0-4k
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:09:00 -0400
-References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
-	<20190402153730.54145-8-vsementsov@virtuozzo.com>
-	<44be7ef0-9a4f-4c44-44eb-81f341ca7ea6@redhat.com>
-	<66de1a9a-e9fd-b853-377d-f5acfe51737a@virtuozzo.com>
-	<35da9a3a-32e2-5db2-1342-ce8d48531709@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <52acdba2-a13a-5323-a804-9cc6b680f2fb@redhat.com>
-Date: Fri, 3 May 2019 16:08:49 +0200
+	(envelope-from <lersek@redhat.com>) id 1hMYwe-0002CR-02
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:13:49 -0400
+References: <20190409102935.28292-1-shameerali.kolothum.thodi@huawei.com>
+	<20190409102935.28292-9-shameerali.kolothum.thodi@huawei.com>
+	<4f3df83f-8d45-09d0-ec9e-0ddf843fd3a4@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA83935D360@lhreml524-mbs.china.huawei.com>
+	<5FC3163CFD30C246ABAA99954A238FA83F1B0B26@lhreml524-mbs.china.huawei.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <005dde0c-807d-5466-d5b7-971117564279@redhat.com>
+Date: Fri, 3 May 2019 16:13:36 +0200
 MIME-Version: 1.0
-In-Reply-To: <35da9a3a-32e2-5db2-1342-ce8d48531709@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ZppAl84phsH03XPiN6meRlOuYLnzJPjyN"
-Subject: Re: [Qemu-devel] [PATCH v5 07/10] qcow2: qcow2_co_preadv: improve
- locking
+In-Reply-To: <5FC3163CFD30C246ABAA99954A238FA83F1B0B26@lhreml524-mbs.china.huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 8/8] hw/arm/boot: Expose the PC-DIMM
+ nodes in the DT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,110 +28,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berrange@redhat.com" <berrange@redhat.com>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "sameo@linux.intel.com" <sameo@linux.intel.com>, "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>, Linuxarm <linuxarm@huawei.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>, "xuwei (O)" <xuwei5@huawei.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZppAl84phsH03XPiN6meRlOuYLnzJPjyN
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "berto@igalia.com"
- <berto@igalia.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- Denis Lunev <den@virtuozzo.com>, "berrange@redhat.com" <berrange@redhat.com>
-Message-ID: <52acdba2-a13a-5323-a804-9cc6b680f2fb@redhat.com>
-Subject: Re: [PATCH v5 07/10] qcow2: qcow2_co_preadv: improve locking
-References: <20190402153730.54145-1-vsementsov@virtuozzo.com>
- <20190402153730.54145-8-vsementsov@virtuozzo.com>
- <44be7ef0-9a4f-4c44-44eb-81f341ca7ea6@redhat.com>
- <66de1a9a-e9fd-b853-377d-f5acfe51737a@virtuozzo.com>
- <35da9a3a-32e2-5db2-1342-ce8d48531709@virtuozzo.com>
-In-Reply-To: <35da9a3a-32e2-5db2-1342-ce8d48531709@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Shameer,
 
-On 30.04.19 11:44, Vladimir Sementsov-Ogievskiy wrote:
-> 30.04.2019 11:38, Vladimir Sementsov-Ogievskiy wrote:
->> 29.04.2019 19:37, Max Reitz wrote:
->>> On 02.04.19 17:37, Vladimir Sementsov-Ogievskiy wrote:
->>>> Background: decryption will be done in threads, to take benefit of i=
-t,
->>>> we should move it out of the lock first.
+On 05/03/19 15:35, Shameerali Kolothum Thodi wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: Linuxarm [mailto:linuxarm-bounces@huawei.com] On Behalf Of
+>> Shameerali Kolothum Thodi
+>> Sent: 10 April 2019 09:49
+>> To: Laszlo Ersek <lersek@redhat.com>; qemu-devel@nongnu.org;
+>> qemu-arm@nongnu.org; eric.auger@redhat.com; imammedo@redhat.com
+>> Cc: peter.maydell@linaro.org; sameo@linux.intel.com;
+>> ard.biesheuvel@linaro.org; Linuxarm <linuxarm@huawei.com>;
+>> shannon.zhaosl@gmail.com; sebastien.boeuf@intel.com; xuwei (O)
+>> <xuwei5@huawei.com>
+>> Subject: RE: [PATCH v4 8/8] hw/arm/boot: Expose the PC-DIMM nodes in the
+>> DT
+>>
+>>
+>>> -----Original Message-----
+>>> From: Laszlo Ersek [mailto:lersek@redhat.com]
+>>> Sent: 09 April 2019 16:09
+>>> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+>>> qemu-devel@nongnu.org; qemu-arm@nongnu.org; eric.auger@redhat.com;
+>>> imammedo@redhat.com
+>>> Cc: peter.maydell@linaro.org; shannon.zhaosl@gmail.com;
+>>> sameo@linux.intel.com; sebastien.boeuf@intel.com; xuwei (O)
+>>> <xuwei5@huawei.com>; ard.biesheuvel@linaro.org; Linuxarm
+>>> <linuxarm@huawei.com>
+>>> Subject: Re: [PATCH v4 8/8] hw/arm/boot: Expose the PC-DIMM nodes in the
+>>> DT
 >>>
->>> ...which is safe after your commit c972fa123c73501b4, I presume.
->>>
->>> (At first glance, the patched looked a bit weird to me because it
->>> doesn't give a reason why dropping the lock around
->>> qcrypto_block_decrypt() would be OK.)
->>>
->>>> But let's go further: it turns out, that for locking around switch
->>>> cases we have only two variants: when we just do memset(0) not
->>>> releasing the lock (it is useless) and when we actually can handle t=
-he
->>>> whole case out of the lock. So, refactor the whole thing to reduce
->>>> locked code region and make it clean.
+>>> On 04/09/19 12:29, Shameer Kolothum wrote:
+>>>> This patch adds memory nodes corresponding to PC-DIMM regions.
+>>>> This will enable support for cold plugged device memory for Guests
+>>>> with DT boot.
 >>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
-m>
->>>> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>>>> Signed-off-by: Shameer Kolothum
+>> <shameerali.kolothum.thodi@huawei.com>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >>>> ---
->>>> =C2=A0 block/qcow2.c | 46 ++++++++++++++++++++++--------------------=
-----
->>>> =C2=A0 1 file changed, 22 insertions(+), 24 deletions(-)
+>>>>  hw/arm/boot.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+>>>>  1 file changed, 42 insertions(+)
 >>>>
->>>> diff --git a/block/qcow2.c b/block/qcow2.c
->>>> index 46e8e39da5..fcf92a7eb6 100644
->>>> --- a/block/qcow2.c
->>>> +++ b/block/qcow2.c
->>>> @@ -1983,6 +1983,7 @@ static coroutine_fn int qcow2_co_preadv(BlockD=
-riverState *bs, uint64_t offset,
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D qcow2=
-_get_cluster_offset(bs, offset, &cur_bytes, &cluster_offset);
+>>>> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+>>>> index 8c840ba..150e1ed 100644
+>>>> --- a/hw/arm/boot.c
+>>>> +++ b/hw/arm/boot.c
+>>>> @@ -19,6 +19,7 @@
+>>>>  #include "sysemu/numa.h"
+>>>>  #include "hw/boards.h"
+>>>>  #include "hw/loader.h"
+>>>> +#include "hw/mem/memory-device.h"
+>>>>  #include "elf.h"
+>>>>  #include "sysemu/device_tree.h"
+>>>>  #include "qemu/config-file.h"
+>>>> @@ -538,6 +539,41 @@ static void fdt_add_psci_node(void *fdt)
+>>>>      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
+>>>>  }
+>>>>
+>>>> +static int fdt_add_hotpluggable_memory_nodes(void *fdt,
+>>>> +                                             uint32_t acells,
+>>> uint32_t scells) {
+>>>> +    MemoryDeviceInfoList *info, *info_list = qmp_memory_device_list();
+>>>> +    MemoryDeviceInfo *mi;
+>>>> +    int ret = 0;
+>>>> +
+>>>> +    for (info = info_list; info != NULL; info = info->next) {
+>>>> +        mi = info->value;
+>>>> +        switch (mi->type) {
+>>>> +        case MEMORY_DEVICE_INFO_KIND_DIMM:
+>>>> +        {
+>>>> +            PCDIMMDeviceInfo *di = mi->u.dimm.data;
+>>>> +
+>>>> +            ret = fdt_add_memory_node(fdt, acells, di->addr, scells,
+>>>> +                                      di->size, di->node, true);
+>>>> +            if (ret) {
+>>>> +                fprintf(stderr,
+>>>> +                        "couldn't add PCDIMM
+>> /memory@%"PRIx64"
+>>> node\n",
+>>>> +                        di->addr);
+>>>> +                goto out;
+>>>> +            }
+>>>> +            break;
+>>>> +        }
+>>>> +        default:
+>>>> +            fprintf(stderr, "%s memory nodes are not yet supported\n",
+>>>> +                    MemoryDeviceInfoKind_str(mi->type));
+>>>> +            ret = -ENOENT;
+>>>> +            goto out;
+>>>> +        }
+>>>> +    }
+>>>> +out:
+>>>> +    qapi_free_MemoryDeviceInfoList(info_list);
+>>>> +    return ret;
+>>>> +}
+>>>> +
+>>>>  int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+>>>>                   hwaddr addr_limit, AddressSpace *as)
+>>>>  {
+>>>> @@ -637,6 +673,12 @@ int arm_load_dtb(hwaddr addr, const struct
+>>> arm_boot_info *binfo,
+>>>>          }
+>>>>      }
+>>>>
+>>>> +    rc = fdt_add_hotpluggable_memory_nodes(fdt, acells, scells);
+>>>> +    if (rc < 0) {
+>>>> +        fprintf(stderr, "couldn't add hotpluggable memory nodes\n");
+>>>> +        goto fail;
+>>>> +    }
+>>>> +
+>>>>      rc = fdt_path_offset(fdt, "/chosen");
+>>>>      if (rc < 0) {
+>>>>          qemu_fdt_add_subnode(fdt, "/chosen");
+>>>>
 >>>
->>> Isn't this the only function in the loop that actually needs the lock=
-?
->>> Wouldn't it make more sense to just take it around this call?
 >>>
+>>> Given patches #7 and #8, as I understand them, the firmware cannot
+>>> distinguish hotpluggable & present, from hotpluggable & absent. The
+>> firmware
+>>> can only skip both hotpluggable cases. That's fine in that the firmware will
+>> hog
+>>> neither type -- but is that OK for the OS as well, for both ACPI boot and DT
+>>> boot?
 >>
->> Hmm, looks correct, I'll resend.
+>> Right. This only handles the hotpluggable-and-present condition.
 >>
+>>> Consider in particular the "hotpluggable & present, ACPI boot" case.
+>> Assuming
+>>> we modify the firmware to skip "hotpluggable" altogether, the UEFI memmap
+>>> will not include the range despite it being present at boot. Presumably, ACPI
+>>> will refer to the range somehow, however. Will that not confuse the OS?
 >>
->=20
-> Or not, actually, we may have several qcow2_get_data_offset calls under=
- one lock,
-> if clusters are different kinds of ZERO. So, I think better to keep it =
-as is for now.
+>> From my testing so far, without patches #7 and #8(ie, no UEFI memmap entry),
+>> ACPI boots fine. I think ACPI only relies on aml and SRAT.
+>>
+>>> When Igor raised this earlier, I suggested that hotpluggable-and-present
+>>> should be added by the firmware, but also allocated immediately, as
+>>> EfiBootServicesData type memory. This will prevent other drivers in the
+>>> firmware from allocating AcpiNVS or Reserved chunks from the same memory
+>>> range, the UEFI memmap will contain the range as EfiBootServicesData, and
+>>> then the OS can release that allocation in one go early during boot.
+>>
+>> Ok. Agree that hotpluggable-and-present case it may make sense to make use
+>> of
+>> that memory rather than just hiding it altogether.
+>>
+>> On another note, Does hotpluggable-and-absent case make any valid use case
+>> for
+>> a DT boot? I am not sure how we can hot-add memory in the case of DT boot
+>> later.
+>> I have not verified the sysfs probe interface yet and there are discussions of
+>> dropping
+>> that interface altogether.
+>>
+>>> But this really has to be clarified from the Linux kernel's expectations. Please
+>>> formalize all of the following cases:
+>>
+>> Sure. I will wait for suggestions here and work on it.
+> 
+> To continue the discussion on this, this is my proposal,
+> 
+> [...]
 
-Hm, but how is this relevant?  For one thing, if that was a problem if
-some other party concurrently changes the image, then that would be a
-problem in general.  Keeping the lock would hide it for different kinds
-of read-as-zero clusters, but it would still appear if data clusters and
-other clusters are interleaved, wouldn=E2=80=99t it?
+I didn't miss your last update, on 10 April. The reason I didn't respond
+then was that, the table that you create here, needs to be approved by
+Linux developers. In other words, the table should summarize how Linux
+expects DT/ACPI to look, for the given use cases. It's not something
+that I can comment on. The requirements come from Linux, and we should
+attempt (in QEMU and the fw) to satisfy them.
 
-Also, this is a coroutine.  As long as nothing yields, nothing gets
-concurrent access.  I don=E2=80=99t see anything outside of
-qcow2_get_cluster_offset() that could yield as long as we only see
-read-as-zero clusters.
+If those use cases / requirements haven't been *designed* in Linux, in
+the first place, then the discussion belongs even more on a kernel
+development list. (I really can't say what Linux *should* expect, and
+even if I had input on that, discussing it *just* on qemu-devel would be
+futile.)
 
-Max
+I mean, considering ACPI and the UEFI memmap at least, can we take
+examples from the physical world (I guess x86 too)? What does Linux (and
+maybe Windows) expect wrt. hotpluggable memory areas, in ACPI and in the
+UEFI memmap?
 
+I find it hard to believe that these are such use cases that we have to
+*invent* now. It seems more likely that OSes already handle these use
+cases, they have expectations, and we should *collect* them.
 
---ZppAl84phsH03XPiN6meRlOuYLnzJPjyN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzMS3EACgkQ9AfbAGHV
-z0BCGAgAgkgtEKuwKn2/BRPFl9bw8gk3AKwlVquIcDKq8vvzQFpPydbsSqloFEhA
-Ysm/Oxq7kUx+nyT5okf0kG2riJ2muKS3YVMsgmeKcSRrfi9iEgfztfYF3qIwrIiz
-veA9rji6xIWYTdBSIprKQ8QJuRmCE28ahUfzFVpTBFed8F1iSgnbyI06VbHjnBxo
-3QaRgRzw43ktIaEAXYGzB6PbOxXOEz1zeI6QnJSjcUgBZ8AFj3/mbqF4bNv4M1dd
-vglUAF8a8KepBRj/sum3kqaA64BIHmCzEj778pQK471PB+Hq2XxKW5dROK6rcYzt
-D5jkjjc+2Vn4uE8PGRoCFY5f/yV47A==
-=uQu1
------END PGP SIGNATURE-----
-
---ZppAl84phsH03XPiN6meRlOuYLnzJPjyN--
+Thanks
+Laszlo
