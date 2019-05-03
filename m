@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59613)
+Received: from eggs.gnu.org ([209.51.188.92]:60429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMa37-0006nY-E3
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:24:34 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hMa62-0000RA-Dk
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:27:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMa36-0003km-8W
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:24:33 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43695)
+	(envelope-from <alex.bennee@linaro.org>) id 1hMa60-0006oz-Tu
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:27:34 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41159)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hMa36-0003jp-22
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:24:32 -0400
-Received: by mail-oi1-x243.google.com with SMTP id j9so3955276oie.10
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 08:24:32 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hMa60-0006m1-LE
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:27:32 -0400
+Received: by mail-wr1-x442.google.com with SMTP id c12so8384426wrt.8
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 08:27:31 -0700 (PDT)
+References: <20190502143409.59600-1-ysato@users.sourceforge.jp>
+	<20190502143409.59600-13-ysato@users.sourceforge.jp>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190502143409.59600-13-ysato@users.sourceforge.jp>
+Date: Fri, 03 May 2019 16:27:29 +0100
+Message-ID: <87muk34kym.fsf@zen.linaroharston>
 MIME-Version: 1.0
-References: <20190430071405.16714-1-thuth@redhat.com>
-	<3619e259-7256-9199-2cdb-53f980f64c34@redhat.com>
-In-Reply-To: <3619e259-7256-9199-2cdb-53f980f64c34@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 May 2019 16:24:20 +0100
-Message-ID: <CAFEAcA_70xU7_Z7vEs+NHuG6L9jZTp7_r2yORn91caqV4LknPQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v6 00/30] Kconfig dependencies
- for ARM machines
+Subject: Re: [Qemu-devel] [PATCH RFC v8 12/12] hw/registerfields.h: Add 8bit
+ and 16bit register macros.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,36 +31,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Philippe Mathieu-Daude <f4bug@amsat.org>, qemu-arm <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, Yoshinori Sato <ysato@users.sourceforge.jp>
 
-On Fri, 3 May 2019 at 16:15, Thomas Huth <thuth@redhat.com> wrote:
->
-> On 30/04/2019 09.13, Thomas Huth wrote:
-> > This series reworks the default-configs/arm-softmmu.mak and
-> > default-configs/aarch64-softmmu.mak files to use the new Kconfig-style
-> > dependencies instead.
-> >
-> > Some of the patches are slightly based on the work by =C3=81kos Kov=C3=
-=A1cs:
-> >
-> >  https://lists.nongnu.org/archive/html/qemu-devel/2013-08/msg03730.html
-> >
-> > The other patches have been created by looking at the sources and findi=
-ng
-> > out the dependencies the hard way via trial-and-error (i.e. by enabling
-> > only one machine at a time and checking whether it can be compiled and
-> > started).
->
->  Hi Peter,
->
-> the two usb-ohci patches have now been merged to master via Gerd's tree
-> already, the pci patch has an Ack from Michael and the AHCI patch one
-> from John. All patches have been reviewed and/or tested ... so I think
-> this series should now be good to go. Could you take it through your Arm
-> tree? Or shall I send a separate PULL request for this?
 
-I think it will be easier for me if you just send a pullreq for it.
+Yoshinori Sato <ysato@users.sourceforge.jp> writes:
 
-thanks
--- PMM
+> Some RX peripheral using 8bit and 16bit registers.
+> Added 8bit and 16bit APIs.
+
+Doesn't this mean the build breaks at some point? Features used by other
+patches should be introduced first so the build remains bisectable.
+
+>
+> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> ---
+>  include/hw/registerfields.h | 28 +++++++++++++++++++++++++++-
+>  1 file changed, 27 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
+> index 2659a58737..51bfd0cf67 100644
+> --- a/include/hw/registerfields.h
+> +++ b/include/hw/registerfields.h
+> @@ -22,6 +22,14 @@
+>      enum { A_ ## reg =3D (addr) };                                      =
+    \
+>      enum { R_ ## reg =3D (addr) / 4 };
+>
+> +#define REG8(reg, addr)                                                 =
+ \
+> +    enum { A_ ## reg =3D (addr) };                                      =
+    \
+> +    enum { R_ ## reg =3D (addr) };
+> +
+> +#define REG16(reg, addr)                                                =
+  \
+> +    enum { A_ ## reg =3D (addr) };                                      =
+    \
+> +    enum { R_ ## reg =3D (addr) / 2 };
+> +
+>  /* Define SHIFT, LENGTH and MASK constants for a field within a register=
+ */
+>
+>  /* This macro will define R_FOO_BAR_MASK, R_FOO_BAR_SHIFT and R_FOO_BAR_=
+LENGTH
+> @@ -40,6 +48,8 @@
+>  #define FIELD_EX64(storage, reg, field)                                 =
+  \
+>      extract64((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
+  \
+>                R_ ## reg ## _ ## field ## _LENGTH)
+> +#define FIELD_EX8  FIELD_EX32
+> +#define FIELD_EX16 FIELD_EX32
+
+Hmm maybe we should be defining extract16/extract8 in bitops so things
+are a) properly types and b) bounds checked to catch errors.
+
+>
+>  /* Extract a field from an array of registers */
+>  #define ARRAY_FIELD_EX32(regs, reg, field)                              =
+  \
+> @@ -49,6 +59,22 @@
+>   * Assigning values larger then the target field will result in
+>   * compilation warnings.
+>   */
+> +#define FIELD_DP8(storage, reg, field, val) ({                          =
+  \
+> +    struct {                                                            =
+  \
+> +        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
+> +    } v =3D { .v =3D val };                                             =
+      \
+> +    uint8_t d;                                                          =
+  \
+> +    d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
+    \
+> +                  R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
+  \
+> +    d; })
+> +#define FIELD_DP16(storage, reg, field, val) ({                         =
+  \
+> +    struct {                                                            =
+  \
+> +        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
+> +    } v =3D { .v =3D val };                                             =
+      \
+> +    uint16_t d;                                                         =
+  \
+> +    d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
+    \
+> +                  R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
+  \
+> +    d; })
+>  #define FIELD_DP32(storage, reg, field, val) ({                         =
+  \
+>      struct {                                                            =
+  \
+>          unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
+> @@ -57,7 +83,7 @@
+>      d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
+    \
+>                    R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
+  \
+>      d; })
+> -#define FIELD_DP64(storage, reg, field, val) ({                         =
+  \
+> +#define FIELD_DP64(storage, reg, field, val) ({                         \
+>      struct {                                                            =
+  \
+>          unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
+>      } v =3D { .v =3D val };                                             =
+      \
+
+
+--
+Alex Benn=C3=A9e
