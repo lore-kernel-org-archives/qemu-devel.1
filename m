@@ -2,80 +2,82 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CB0DC43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 12:55:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD26C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 12:56:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDE3A2075C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 12:55:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 582E12075C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 12:56:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Bx0A+Smb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDE3A2075C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UvHymc9W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 582E12075C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40329 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40367 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMXiY-0001mg-Tu
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 08:55:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54726)
+	id 1hMXjn-0003Pz-Mv
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 08:56:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMXhk-0000yT-2P
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:54:21 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hMXiB-0001Ov-HG
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:54:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMXhi-0002ds-TW
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:54:20 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45285)
+	(envelope-from <peter.maydell@linaro.org>) id 1hMXiA-0002rP-Gp
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:54:47 -0400
+Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:35309)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hMXhi-0002d1-N9
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:54:18 -0400
-Received: by mail-oi1-x241.google.com with SMTP id t189so4237001oih.12
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 05:54:18 -0700 (PDT)
+	id 1hMXiA-0002r8-AD
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:54:46 -0400
+Received: by mail-oi1-x231.google.com with SMTP id w197so4342466oia.2
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 05:54:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=g9mlfHF7Sb62amx3l7Viw5gV2k0wjucsZ3XlnnzGDW8=;
-	b=Bx0A+Smb9jv5LXCQucK1r8N/L2WoHuzqxOOH8y6ezRVMpjGq3oV9RR0e0L7rhXUFzx
-	RuD/DhEvPj8Zk1yvAONQ/bP4VnS4xbwlttz2dJPplmkwrfAGFhRIBvMQArpEwnXz3DMw
-	f6CTszPbCyYY+ulYmsKmuE51584ip4A8kOnH+0aTcOebFXjxq2AdelSWvr5vnGOQ6mmD
-	T2HgveFAVMzr98ayu/O5yuhJ2hd3LnYL/MRDmWz5DXQ4CB2hyr3+minQczwnc/0Bf7fa
-	8eIuxvMtKQI1N4yOuxOJp+Jtz6fJ3xCkk0n0OqjTJ1TcNMiyjvMqmDe+SnQ9ewK4vPPw
-	AEJQ==
+	:cc:content-transfer-encoding;
+	bh=850eNT9xES4ZiYhtXNtnwHmh/iOFhHVfhZDEtmPQGVE=;
+	b=UvHymc9WqcglLx+yeDtjDiQ23iAD45GBqOrqiZ1/gW1jpcBZbJKIW8quSk4TXYxUtk
+	G3loqTP/R3cFE0SChT8s6OMZdmw8WI4UteLHN89Gmf7Rpz91Be969Um/71CSVMppjLkl
+	66YqXDtu3PYP2uaIlhbPO04YUIKPjSmOMv0OX772a4RsO3CD7X+sQ7EEjhQ/+Pa4Ts42
+	CGUIxbVVct6FySHKdy34ip9Wq3KVuzeI84QfqznAkYEsIIMWNm4cZJRSI2LYE2OG7a71
+	XbAfrSHn5EjcdyGTlrF6xDrjHmG4CV9km5UzTuHdXaMRQiDiRVXd52EVs4UlGvkKEiJH
+	V0FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=g9mlfHF7Sb62amx3l7Viw5gV2k0wjucsZ3XlnnzGDW8=;
-	b=jVQgWoG0FOaqWrB2dJhgszUWTMwTQpHGcqZXMqy0a6hYwTfc33pqukuCvkDGk7FUzm
-	L2rsvWteLNOqKPfR1xIpFEqBOax5yGjY5YsuHD6A2LqSY1QrWVynK+SHJB4jy7+0CNHf
-	tJ40+oIBhmqsP09nX/MWhwIxuMRagrY9IpDr+wE0fibc+iB+XPuNkD5KjIKTSfT70Ttb
-	aBa4veUagMgKUsdT4bfoZ6/zetP/Xe0de8iaxA+Jgo0ivwxyx9Bo5I16Enh2wzBzS/Fb
-	UeWTUCYOulHHCN8U9BePbuAAvLXX+ZNng0F1SkQO+1b44XoNsDN5CWIuWp2fVJSpNfSi
-	idIw==
-X-Gm-Message-State: APjAAAVZ4B24rE6n3iBSm4vRaBk+Jj9Xyi3NOz1bqvevvUX1e6pV3RTh
-	FE9LAtqCGRBQcv0aq81dkGNgHPF1cTWs52r8qMfLYw==
-X-Google-Smtp-Source: APXvYqxMcsjtoy3rNEnP27bT3NAh99dCapCHyxHCx/cqlriW0iHEY83xu9J8RGeQF0Xjy4TWiAmua3Sb9ab7NL5aarE=
-X-Received: by 2002:aca:4b04:: with SMTP id y4mr5850491oia.170.1556888057549; 
-	Fri, 03 May 2019 05:54:17 -0700 (PDT)
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=850eNT9xES4ZiYhtXNtnwHmh/iOFhHVfhZDEtmPQGVE=;
+	b=g1eSvn80WqvaA6ItKTbLHximBrwCeJXX6jxngn823zxszSeJ8GFh6i8mjjb92lzkDI
+	KceT7RX6/7WQFfE2mN0yaCx59ZjmqgDG4ZYR0rU9v7zzxM1kGnrV5AEOCWCojfmOPUu4
+	zH5nO3erVmnP3nq31zE/XnHWJzjUU4EHemsxxwhKSaoAW+oqdtrTlyl2wlXHFtc590Sq
+	6wr/tH5u+tCSUElU7YSZZHT2pjbWmkae/SwWkKfBIZDfypL4/7gG99puh31N15v3OExy
+	hSyrw29Z33to7gX/l4LlY5LOj35uljEEI9AQCb9MvsS33pCdTmby2RFKIGww6PCXfcDr
+	+gWw==
+X-Gm-Message-State: APjAAAVuixfSy1mRxyJIJxzhz69LTkhJ/UWlR8D6wQtlDQnRz0PQshwD
+	P4OLkD+Nvu3CCy6A7Ae9fPyV839NSMfDbc+uDz7NBlqRUQ8=
+X-Google-Smtp-Source: APXvYqxj+wyHsc2bSNFBE34gyapC0hSZEbGUifo2APUSw2LP3FpyxzUkPEuG5N/wdotetN2+9J9phNGUF4tdSuSHXEs=
+X-Received: by 2002:aca:ab12:: with SMTP id u18mr5417881oie.48.1556888085656; 
+	Fri, 03 May 2019 05:54:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <4EAA64FC-AA22-4B01-8BC4-49DAC694963B@me.com>
-In-Reply-To: <4EAA64FC-AA22-4B01-8BC4-49DAC694963B@me.com>
+References: <20190502223007.29494-1-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20190502223007.29494-1-samuel.thibault@ens-lyon.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 May 2019 13:54:06 +0100
+Date: Fri, 3 May 2019 13:54:34 +0100
 Message-ID:
- <CAFEAcA_BvMq08k5s+aFFXdsf_Hy88zH_C=riC_4R3nDJyMYKjA@mail.gmail.com>
-To: Chen Zhang <tgfbeta@me.com>
+ <CAFEAcA-eVOZhXj+OLB+VvxXZTniny_sMCFaeWsv+2uEErM-=zA@mail.gmail.com>
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH RESEND 0/2] ui/cocoa: Fix absolute and
- relative input issues on Mojave
+X-Received-From: 2607:f8b0:4864:20::231
+Subject: Re: [Qemu-devel] [PULL 0/2] slirp: move slirp as git submodule
+ project
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,37 +89,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Jan Kiszka <jan.kiszka@siemens.com>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503125406.oP6DR92Rq5z1yS1kWJV_mk2aFc2ko75XmzdR4HuSl_I@z>
+Message-ID: <20190503125434.fJj-19FjRIx6fr6M5y0jQtVwOtg41eiUiPcey4XOQJU@z>
 
-On Sun, 28 Apr 2019 at 04:30, Chen Zhang <tgfbeta@me.com> wrote:
+On Thu, 2 May 2019 at 23:30, Samuel Thibault
+<samuel.thibault@ens-lyon.org> wrote:
 >
-> The following patches fixed absolute and relative input device issues on macOS Mojave.
+> The following changes since commit 8482ff2eb3bb95020eb2f370a9b3ea26511e41=
+df:
 >
-> Chen Zhang (2):
->   ui/cocoa: Fix absolute input device grabbing issue on Mojave
->   ui/cocoa: Fix mouse grabbing in fullscreen mode for relative input
->     device
+>   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request'=
+ into staging (2019-05-02 12:04:51 +0100)
 >
->  ui/cocoa.m | 50 +++++++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 47 insertions(+), 3 deletions(-)
+> are available in the Git repository at:
+>
+>   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+>
+> for you to fetch changes up to 7c57bdd82026ba03f3158bbcd841afde7c2dc43a:
+>
+>   build-sys: move slirp as git submodule project (2019-05-03 00:15:37 +02=
+00)
+>
+> ----------------------------------------------------------------
+> slirp: move slirp as git submodule project
+>
+> Marc-Andr=C3=A9 Lureau (2):
+>   build-sys: pass CFLAGS & LDFLAGS to subdir-slirp
+>   build-sys: move slirp as git submodule project
+>
+> ----------------------------------------------------------------
+> Marc-Andr=C3=A9 Lureau (2):
+>       build-sys: pass CFLAGS & LDFLAGS to subdir-slirp
+>       build-sys: move slirp as git submodule project
+>
 
-Hi -- unfortunately your email client seems to have sent
-these patches in a way that has confused our patch
-handling systems (eg
-https://patchwork.kernel.org/patch/10920623/ has
-only half of the patch as actual patch, so it doesn't
-apply properly, and the 'patches' program has been confused too.
 
-Looking at the headers, your mail client is trying to send the
-patches as multipart/alternative with a combined text and HTML
-version. You could try configuring it to just send plain text,
-which is definitely the preferred format for public mailing lists.
-Or alternatively you could try using git-send-email instead.
+Applied, thanks.
 
-thanks
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
+
 -- PMM
 
