@@ -2,113 +2,97 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6473C04AAA
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 14:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43DB4C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 14:33:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A13F32087F
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 14:26:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="DkFvteB+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A13F32087F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	by mail.kernel.org (Postfix) with ESMTPS id 078C1205ED
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 14:33:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 078C1205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41432 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41513 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMZ8u-0000Y6-P3
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 10:26:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45667)
+	id 1hMZFn-0002FX-VI
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 10:33:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hMZ7f-0007nv-BL
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:25:13 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hMZEo-0001tc-Il
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:32:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1hMZ7d-0006ke-TZ
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:25:11 -0400
-Received: from mail-eopbgr700073.outbound.protection.outlook.com
-	([40.107.70.73]:32097
-	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1hMZ7d-0006ig-JU
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:25:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=amdcloud.onmicrosoft.com; s=selector1-amd-com;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=I4drUt1VxrgnzYb+GAwCOyHv7//ZJxO2Rp3FfZlCtCg=;
-	b=DkFvteB+aWmCTNmyllLhkZnow2Lr0xFLr5CBw127etknlaSBrv3ndEDH2aalvJZtZNxvkccEMMFx7ToNI2i0m9KP9JErJI1CIXJsAvIyr3pc+VRnMP2AoxTSTk5qxOgxodh+JcLGswZeyT18+IYEGmK/mn0gjVMHAzeDaBgSzT4=
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.116.31) by
-	DM6PR12MB2777.namprd12.prod.outlook.com (20.176.114.89) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1856.10; Fri, 3 May 2019 14:25:06 +0000
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com
-	([fe80::9183:846f:a93e:9a43]) by
-	DM6PR12MB2682.namprd12.prod.outlook.com
-	([fe80::9183:846f:a93e:9a43%5]) with mapi id 15.20.1835.016;
-	Fri, 3 May 2019 14:25:06 +0000
-From: "Singh, Brijesh" <brijesh.singh@amd.com>
-To: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>
-Thread-Topic: [RFC PATCH v1 08/10] KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS
-	hypercall
-Thread-Index: AQHU+rgwAA7BoThJdki7pfNbyU+1kKZO+6UAgAqG2wA=
-Date: Fri, 3 May 2019 14:25:04 +0000
-Message-ID: <0f120899-c4fb-724a-00f9-997c362efd37@amd.com>
-References: <20190424160942.13567-1-brijesh.singh@amd.com>
-	<20190424160942.13567-9-brijesh.singh@amd.com>
-	<d31531fe-f01c-817b-06e5-f06b5968b266@amd.com>
-In-Reply-To: <d31531fe-f01c-817b-06e5-f06b5968b266@amd.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN6PR05CA0032.namprd05.prod.outlook.com
-	(2603:10b6:805:de::45) To DM6PR12MB2682.namprd12.prod.outlook.com
-	(2603:10b6:5:4a::31)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=brijesh.singh@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [165.204.77.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c592c6d1-381d-4b49-a489-08d6cfd32267
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);
-	SRVR:DM6PR12MB2777; 
-x-ms-traffictypediagnostic: DM6PR12MB2777:
-x-microsoft-antispam-prvs: <DM6PR12MB27777013C2F0934414392017E5350@DM6PR12MB2777.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2449;
-x-forefront-prvs: 0026334A56
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10009020)(366004)(346002)(396003)(136003)(39860400002)(376002)(199004)(189003)(99286004)(229853002)(53936002)(6506007)(2616005)(31686004)(486006)(4326008)(36756003)(66476007)(386003)(256004)(26005)(446003)(186003)(66946007)(64756008)(66446008)(316002)(6486002)(66556008)(73956011)(2501003)(14454004)(476003)(102836004)(53546011)(6436002)(6246003)(52116002)(11346002)(68736007)(14444005)(5660300002)(478600001)(66574012)(76176011)(25786009)(86362001)(110136005)(66066001)(71190400001)(6116002)(8676002)(81156014)(6512007)(8936002)(2906002)(7416002)(3846002)(71200400001)(81166006)(31696002)(54906003)(7736002)(305945005);
-	DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR12MB2777;
-	H:DM6PR12MB2682.namprd12.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: amd.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 3YMN5xoWKc5TcyYPQNYRHK49k2lurs9lhFpGqHxvWY1S2V8A5Tz9uWW/ZC+WOscBMwYGO5BXKNphZTBOWiT2fwIzyG5VlqRcwym5VlyrIeJbb7GAwv1kkoQnXUIdeiCG6urcyTQWZShI4A3997FNIt1hZM+kN+As/euJ/NxeIh91mWEPEOWqvX979gVTsNMdPsCSJP11JMswdgBOnyHaT7EsnIgc/KXL5nR8srNsrAvGn4Qf+hr1TC/xabKNlNPwCoG5REs4i1CgA9NI42tQvsI25ZMxXJXT8AXrOoBugIFx7uibumfzVAutjwVIPpzYApu/QGqRjg12abfJvVMHf9K82tVuk4uaruoR93BxXD2cfbkX2jUTEq/9ZQVOs0l/sILilL+O0h25eVgPPwwyNjCL+uT0+E1tTv7AUX7yX6c=
-Content-Type: text/plain; charset="UTF-8"
-Content-ID: <0A2799A19F203348B517F04FC0A240B8@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <mreitz@redhat.com>) id 1hMZEn-0001nD-CE
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 10:32:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34672)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hMZEk-0001m1-Ex; Fri, 03 May 2019 10:32:30 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 865A359440;
+	Fri,  3 May 2019 14:32:29 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-131.brq.redhat.com
+	[10.40.204.131])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E4F25C582;
+	Fri,  3 May 2019 14:32:27 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, Sam Eiderman
+	<shmuel.eiderman@oracle.com>, kwolf@redhat.com, qemu-block@nongnu.org, 
+	qemu-devel@nongnu.org, fam@euphon.net, eblake@redhat.com
+References: <af928e13-bde2-a9ae-de74-853d9bfc5e65@redhat.com>
+	<20190502130822.46858-1-shmuel.eiderman@oracle.com>
+	<20190502130822.46858-2-shmuel.eiderman@oracle.com>
+	<8d201096-ab9d-82e0-93cb-74bd23d93dbe@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <a44ffb98-4cc2-47b9-2c9e-eeeda445a0a0@redhat.com>
+Date: Fri, 3 May 2019 16:32:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c592c6d1-381d-4b49-a489-08d6cfd32267
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 May 2019 14:25:06.0323 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2777
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.70.73
-Subject: Re: [Qemu-devel] [RFC PATCH v1 08/10] KVM: X86: Introduce
- KVM_HC_PAGE_ENC_STATUS hypercall
+In-Reply-To: <8d201096-ab9d-82e0-93cb-74bd23d93dbe@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nkFuwTVZPcc8jVP1uvtA5W2aNCiBINu0P"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.39]);
+	Fri, 03 May 2019 14:32:29 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2] vmdk: Set vmdk parent backing_format to
+ vmdk
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -120,119 +104,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Singh, Brijesh" <brijesh.singh@amd.com>,
-	=?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>, "x86@kernel.org" <x86@kernel.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
-	Borislav Petkov <bp@suse.de>
+Cc: arbel.moshe@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503142504.1pf1LEo3MATyjgLd5e_ucSBn7ApP7m188G2co0_70Uc@z>
+Message-ID: <20190503143225.dWISkxZoSNPlBiU_fopUvgq7wvQj5HfHfy9SoVaORAk@z>
 
-DQoNCk9uIDQvMjYvMTkgNDozOSBQTSwgTGVuZGFja3ksIFRob21hcyB3cm90ZToNCj4gT24gNC8y
-NC8xOSAxMToxMCBBTSwgU2luZ2gsIEJyaWplc2ggd3JvdGU6DQo+PiBUaGUgaHlwZXJjYWxsIGNh
-biBiZSB1c2VkIGJ5IHRoZSBTRVYgZ3Vlc3QgdG8gbm90aWZ5IHRoZSBwYWdlIGVuY3J5cHRpb24N
-Cj4gDQo+IFRoaXMgaHllcmNhbGwgaXMgdXNlZCBieSB0aGUgU0VWIGd1ZXN0IHRvIG5vdGlmeSBh
-IGNoYW5nZSBpbiB0aGUgcGFnZS4uLg0KPiANCj4+IHN0YXR1cyB0byB0aGUgaHlwZXJ2aXNvci4g
-VGhlIGh5cGVyY2FsbCBzaG91bGQgYmUgaW52b2tlZCBvbmx5IHdoZW4NCj4+IHRoZSBlbmNyeXB0
-aW9uIGF0dHJpYnV0ZSBpcyBjaGFuZ2VkIGZyb20gZW5jcnlwdGVkIC0+IGRlY3J5cHRlZCBhbmQg
-dmljZQ0KPj4gdmVyc2EuIEJ5IGRlZmF1bHQgYWxsIHRoZSBndWVzdCBwYWdlcyBzaG91bGQgYmUg
-Y29uc2lkZXJlZCBlbmNyeXB0ZWQuDQo+IA0KPiBCeSBkZWZhdWx0IGFsbCBndWVzdCBwYWdlIGFy
-ZSBjb25zaWRlcmVkDQo+IA0KPj4NCj4+IENjOiBUaG9tYXMgR2xlaXhuZXIgPHRnbHhAbGludXRy
-b25peC5kZT4NCj4+IENjOiBJbmdvIE1vbG5hciA8bWluZ29AcmVkaGF0LmNvbT4NCj4+IENjOiAi
-SC4gUGV0ZXIgQW52aW4iIDxocGFAenl0b3IuY29tPg0KPj4gQ2M6IFBhb2xvIEJvbnppbmkgPHBi
-b256aW5pQHJlZGhhdC5jb20+DQo+PiBDYzogIlJhZGltIEtyxI1tw6HFmSIgPHJrcmNtYXJAcmVk
-aGF0LmNvbT4NCj4+IENjOiBKb2VyZyBSb2VkZWwgPGpvcm9AOGJ5dGVzLm9yZz4NCj4+IENjOiBC
-b3Jpc2xhdiBQZXRrb3YgPGJwQHN1c2UuZGU+DQo+PiBDYzogVG9tIExlbmRhY2t5IDx0aG9tYXMu
-bGVuZGFja3lAYW1kLmNvbT4NCj4+IENjOiB4ODZAa2VybmVsLm9yZw0KPj4gQ2M6IGt2bUB2Z2Vy
-Lmtlcm5lbC5vcmcNCj4+IENjOiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnDQo+PiBTaWdu
-ZWQtb2ZmLWJ5OiBCcmlqZXNoIFNpbmdoIDxicmlqZXNoLnNpbmdoQGFtZC5jb20+DQo+PiAtLS0N
-Cj4+ICAgRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9oeXBlcmNhbGxzLnR4dCB8IDE0ICsrKysr
-DQo+PiAgIGFyY2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggICAgICAgICAgfCAgMiArDQo+
-PiAgIGFyY2gveDg2L2t2bS9zdm0uYyAgICAgICAgICAgICAgICAgICAgICAgfCA2OSArKysrKysr
-KysrKysrKysrKysrKysrKysNCj4+ICAgYXJjaC94ODYva3ZtL3ZteC92bXguYyAgICAgICAgICAg
-ICAgICAgICB8ICAxICsNCj4+ICAgYXJjaC94ODYva3ZtL3g4Ni5jICAgICAgICAgICAgICAgICAg
-ICAgICB8ICA1ICsrDQo+PiAgIGluY2x1ZGUvdWFwaS9saW51eC9rdm1fcGFyYS5oICAgICAgICAg
-ICAgfCAgMSArDQo+PiAgIDYgZmlsZXMgY2hhbmdlZCwgOTIgaW5zZXJ0aW9ucygrKQ0KPj4NCj4+
-IGRpZmYgLS1naXQgYS9Eb2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL2h5cGVyY2FsbHMudHh0IGIv
-RG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9oeXBlcmNhbGxzLnR4dA0KPj4gaW5kZXggZGEyNGMx
-MzhjOGQxLi5lY2Q0NGU0ODg2NzkgMTAwNjQ0DQo+PiAtLS0gYS9Eb2N1bWVudGF0aW9uL3ZpcnR1
-YWwva3ZtL2h5cGVyY2FsbHMudHh0DQo+PiArKysgYi9Eb2N1bWVudGF0aW9uL3ZpcnR1YWwva3Zt
-L2h5cGVyY2FsbHMudHh0DQo+PiBAQCAtMTQxLDMgKzE0MSwxNyBAQCBhMCBjb3JyZXNwb25kcyB0
-byB0aGUgQVBJQyBJRCBpbiB0aGUgdGhpcmQgYXJndW1lbnQgKGEyKSwgYml0IDENCj4+ICAgY29y
-cmVzcG9uZHMgdG8gdGhlIEFQSUMgSUQgYTIrMSwgYW5kIHNvIG9uLg0KPj4gICANCj4+ICAgUmV0
-dXJucyB0aGUgbnVtYmVyIG9mIENQVXMgdG8gd2hpY2ggdGhlIElQSXMgd2VyZSBkZWxpdmVyZWQg
-c3VjY2Vzc2Z1bGx5Lg0KPj4gKw0KPj4gKzcuIEtWTV9IQ19QQUdFX0VOQ19TVEFUVVMNCj4+ICst
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+PiArQXJjaGl0ZWN0dXJlOiB4ODYNCj4+ICtTdGF0
-dXM6IGFjdGl2ZQ0KPj4gK1B1cnBvc2U6IE5vdGlmeSB0aGUgZW5jcnlwdGlvbiBzdGF0dXMgY2hh
-bmdlcyBpbiBndWVzdCBwYWdlIHRhYmxlIChTRVYgZ3Vlc3QpDQo+PiArDQo+PiArYTA6IHRoZSBn
-dWVzdCBwaHlzaWNhbCBhZGRyZXNzIG9mIHRoZSBzdGFydCBwYWdlDQo+PiArYTE6IHRoZSBudW1i
-ZXIgb2YgcGFnZXMNCj4+ICthMjogc2V0IG9yIGNsZWFyIHRoZSBlbmNyeXB0aW9uIGF0dHJpYnV0
-ZQ0KPiANCj4gYTI6IGVuY3J5cHRpb24gYXR0cmlidXRlDQo+IA0KPj4gKw0KPj4gKyAgIFdoZXJl
-Og0KPj4gKwkqIDE6IEVuY3J5cHRpb24gYXR0cmlidXRlIGlzIHNldA0KPj4gKwkqIDA6IEVuY3J5
-cHRpb24gYXR0cmlidXRlIGlzIGNsZWFyZWQNCj4+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9pbmNs
-dWRlL2FzbS9rdm1faG9zdC5oIGIvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaA0KPj4g
-aW5kZXggYTlkMDNhZjM0MDMwLi5hZGIwY2EwMzViOTcgMTAwNjQ0DQo+PiAtLS0gYS9hcmNoL3g4
-Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oDQo+PiArKysgYi9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9r
-dm1faG9zdC5oDQo+PiBAQCAtMTE5Niw2ICsxMTk2LDggQEAgc3RydWN0IGt2bV94ODZfb3BzIHsN
-Cj4+ICAgCXVpbnQxNl90ICgqbmVzdGVkX2dldF9ldm1jc192ZXJzaW9uKShzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUpOw0KPj4gICANCj4+ICAgCWJvb2wgKCpuZWVkX2VtdWxhdGlvbl9vbl9wYWdlX2Zh
-dWx0KShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOw0KPj4gKwlpbnQgKCpwYWdlX2VuY19zdGF0dXNf
-aGMpKHN0cnVjdCBrdm0gKmt2bSwgdW5zaWduZWQgbG9uZyBncGEsDQo+PiArCQkJCSAgdW5zaWdu
-ZWQgbG9uZyBzeiwgdW5zaWduZWQgbG9uZyBtb2RlKTsNCj4+ICAgfTsNCj4+ICAgDQo+PiAgIHN0
-cnVjdCBrdm1fYXJjaF9hc3luY19wZiB7DQo+PiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL3N2
-bS5jIGIvYXJjaC94ODYva3ZtL3N2bS5jDQo+PiBpbmRleCA3NGI1N2FiNzQyYWQuLmYwMjRmMjA4
-YjA1MiAxMDA2NDQNCj4+IC0tLSBhL2FyY2gveDg2L2t2bS9zdm0uYw0KPj4gKysrIGIvYXJjaC94
-ODYva3ZtL3N2bS5jDQo+PiBAQCAtMTM4LDYgKzEzOCw4IEBAIHN0cnVjdCBrdm1fc2V2X2luZm8g
-ew0KPj4gICAJaW50IGZkOwkJCS8qIFNFViBkZXZpY2UgZmQgKi8NCj4+ICAgCXVuc2lnbmVkIGxv
-bmcgcGFnZXNfbG9ja2VkOyAvKiBOdW1iZXIgb2YgcGFnZXMgbG9ja2VkICovDQo+PiAgIAlzdHJ1
-Y3QgbGlzdF9oZWFkIHJlZ2lvbnNfbGlzdDsgIC8qIExpc3Qgb2YgcmVnaXN0ZXJlZCByZWdpb25z
-ICovDQo+PiArCXVuc2lnbmVkIGxvbmcgKnBhZ2VfZW5jX2JtYXA7DQo+PiArCXVuc2lnbmVkIGxv
-bmcgcGFnZV9lbmNfYm1hcF9zaXplOw0KPj4gICB9Ow0KPj4gICANCj4+ICAgc3RydWN0IGt2bV9z
-dm0gew0KPj4gQEAgLTE5MTEsNiArMTkxMyw4IEBAIHN0YXRpYyB2b2lkIHNldl92bV9kZXN0cm95
-KHN0cnVjdCBrdm0gKmt2bSkNCj4+ICAgDQo+PiAgIAlzZXZfdW5iaW5kX2FzaWQoa3ZtLCBzZXYt
-PmhhbmRsZSk7DQo+PiAgIAlzZXZfYXNpZF9mcmVlKGt2bSk7DQo+PiArDQo+PiArCWt2ZnJlZShz
-ZXYtPnBhZ2VfZW5jX2JtYXApOw0KPj4gICB9DQo+PiAgIA0KPj4gICBzdGF0aWMgdm9pZCBhdmlj
-X3ZtX2Rlc3Ryb3koc3RydWN0IGt2bSAqa3ZtKQ0KPj4gQEAgLTczNzAsNiArNzM3NCw2OSBAQCBz
-dGF0aWMgaW50IHNldl9yZWNlaXZlX2ZpbmlzaChzdHJ1Y3Qga3ZtICprdm0sIHN0cnVjdCBrdm1f
-c2V2X2NtZCAqYXJncCkNCj4+ICAgCXJldHVybiByZXQ7DQo+PiAgIH0NCj4+ICAgDQo+PiArc3Rh
-dGljIGludCBzZXZfcmVzaXplX3BhZ2VfZW5jX2JpdG1hcChzdHJ1Y3Qga3ZtICprdm0sIHVuc2ln
-bmVkIGxvbmcgbmV3X3NpemUpDQo+PiArew0KPj4gKwlzdHJ1Y3Qga3ZtX3Nldl9pbmZvICpzZXYg
-PSAmdG9fa3ZtX3N2bShrdm0pLT5zZXZfaW5mbzsNCj4+ICsJdW5zaWduZWQgbG9uZyAqbWFwOw0K
-Pj4gKwl1bnNpZ25lZCBsb25nIHN6Ow0KPj4gKw0KPj4gKwlpZiAoc2V2LT5wYWdlX2VuY19ibWFw
-X3NpemUgPj0gbmV3X3NpemUpDQo+PiArCQlyZXR1cm4gMDsNCj4+ICsNCj4+ICsJc3ogPSBBTElH
-TihuZXdfc2l6ZSwgQklUU19QRVJfTE9ORykgLyA4Ow0KPj4gKw0KPj4gKwlpZiAoc3ogPiBQQUdF
-X1NJWkUpDQo+PiArCQltYXAgPSB2bWFsbG9jKHN6KTsNCj4+ICsJZWxzZQ0KPj4gKwkJbWFwID0g
-a21hbGxvYyhzeiwgR0ZQX0tFUk5FTCk7DQo+IA0KPiBBbnkgcmVhc29uIHRoaXMgY2FuJ3QgYWx3
-YXlzIGJlIHZtYWxsb2MoKT8NCj4gDQoNClllcywgd2UgY2FuIHVzZSB2bWFsbG9jKCkgdW5jb25k
-aXRpb25hbGx5LiBUaGUgYml0bWFwIHNpemUgd2lsbCBiZQ0KbW9zdGx5IGdyZWF0ZXIgdGhhbiBQ
-QUdFX1NJWkUgaGVuY2UgdGhlIGFib3ZlIGlzIHVzZWxlc3MgYW55d2F5Lg0KDQoNCj4+ICsNCj4+
-ICsJaWYgKCFtYXApIHsNCj4+ICsJCXByX2Vycl9vbmNlKCJGYWlsZWQgdG8gYWxsb2NhdGUgZGVj
-cnlwdGVkIGJpdG1hcCBzaXplICVseFxuIiwgc3opOw0KPj4gKwkJcmV0dXJuIDE7DQo+IA0KPiBT
-aG91bGQgdGhpcyBiZSAtRU5PTUVNPw0KPiANCj4+ICsJfQ0KPj4gKw0KPj4gKwkvKiBtYXJrIHRo
-ZSBwYWdlIGVuY3J5cHRlZCAoYnkgZGVmYXVsdCkgKi8NCj4+ICsJbWVtc2V0KG1hcCwgMHhmZiwg
-c3opOw0KPj4gKw0KPj4gKwliaXRtYXBfY29weShtYXAsIHNldi0+cGFnZV9lbmNfYm1hcCwgc2V2
-LT5wYWdlX2VuY19ibWFwX3NpemUpOw0KPj4gKwlrdmZyZWUoc2V2LT5wYWdlX2VuY19ibWFwKTsN
-Cj4+ICsNCj4+ICsJc2V2LT5wYWdlX2VuY19ibWFwID0gbWFwOw0KPj4gKwlzZXYtPnBhZ2VfZW5j
-X2JtYXBfc2l6ZSA9IG5ld19zaXplOw0KPj4gKw0KPj4gKwlyZXR1cm4gMDsNCj4+ICt9DQo+PiAr
-DQo+PiArc3RhdGljIGludCBzdm1fcGFnZV9lbmNfc3RhdHVzX2hjKHN0cnVjdCBrdm0gKmt2bSwg
-dW5zaWduZWQgbG9uZyBncGEsDQo+PiArCQkJCSAgdW5zaWduZWQgbG9uZyBucGFnZXMsIHVuc2ln
-bmVkIGxvbmcgZW5jKQ0KPj4gK3sNCj4+ICsJc3RydWN0IGt2bV9zZXZfaW5mbyAqc2V2ID0gJnRv
-X2t2bV9zdm0oa3ZtKS0+c2V2X2luZm87DQo+PiArCWdmbl90IGdmbl9zdGFydCwgZ2ZuX2VuZDsN
-Cj4+ICsJaW50IHI7DQo+IA0KPiBpbnQgcmV0OyA/ICAiciIgYXQgZmlyc3QgY29uZnVzZWQgbWUu
-DQoNCg0KSSB3aWxsIGZpeCBpdCBpbiBuZXh0IHJldi4NCg0KDQo+IA0KPj4gKw0KPj4gKwlpZiAo
-IW5wYWdlcykNCj4+ICsJCXJldHVybiAwOw0KPj4gKw0KPj4gKwlnZm5fc3RhcnQgPSBncGFfdG9f
-Z2ZuKGdwYSk7DQo+PiArCWdmbl9lbmQgPSBnZm5fc3RhcnQgKyBucGFnZXM7DQo+PiArDQo+PiAr
-CW11dGV4X2xvY2soJmt2bS0+bG9jayk7DQo+PiArDQo+PiArCXIgPSAxOw0KPj4gKwlpZiAoc2V2
-X3Jlc2l6ZV9wYWdlX2VuY19iaXRtYXAoa3ZtLCBnZm5fZW5kKSkNCj4gDQo+IHJldCA9IHNldl9y
-ZXNpemVfLi4uDQo+IGlmIChyZXQpDQo+IA0KPj4gKwkJZ290byB1bmxvY2s7DQo+PiArDQo+PiAr
-CWlmIChlbmMpDQo+PiArCQlfX2JpdG1hcF9zZXQoc2V2LT5wYWdlX2VuY19ibWFwLCBnZm5fc3Rh
-cnQsIGdmbl9lbmQgLSBnZm5fc3RhcnQpOw0KPj4gKwllbHNlDQo+PiArCQlfX2JpdG1hcF9jbGVh
-cihzZXYtPnBhZ2VfZW5jX2JtYXAsIGdmbl9zdGFydCwgZ2ZuX2VuZCAtIGdmbl9zdGFydCk7DQo+
-PiArDQo+PiArCXIgPSAwOw0KPiANCj4gSWYgeW91IGRvIHRoZSBhYm92ZSwgdGhpcyBpcyBub3Qg
-bmVlZGVkLg0KPiANCg0KWWVzIGFncmVlZC4gdGhhbmtzDQo=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nkFuwTVZPcc8jVP1uvtA5W2aNCiBINu0P
+From: Max Reitz <mreitz@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Sam Eiderman
+ <shmuel.eiderman@oracle.com>, kwolf@redhat.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, fam@euphon.net, eblake@redhat.com
+Cc: arbel.moshe@oracle.com
+Message-ID: <a44ffb98-4cc2-47b9-2c9e-eeeda445a0a0@redhat.com>
+Subject: Re: [PATCH v2] vmdk: Set vmdk parent backing_format to vmdk
+References: <af928e13-bde2-a9ae-de74-853d9bfc5e65@redhat.com>
+ <20190502130822.46858-1-shmuel.eiderman@oracle.com>
+ <20190502130822.46858-2-shmuel.eiderman@oracle.com>
+ <8d201096-ab9d-82e0-93cb-74bd23d93dbe@redhat.com>
+In-Reply-To: <8d201096-ab9d-82e0-93cb-74bd23d93dbe@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 03.05.19 13:34, Thomas Huth wrote:
+>  Hi Sam,
+>=20
+> On 02/05/2019 15.08, Sam Eiderman wrote:
+>> Commit b69864e ("vmdk: Support version=3D3 in VMDK descriptor files")
+>> fixed the probe function to correctly guess vmdk descriptors with
+>> version=3D3.
+>>
+>> This solves the issue where vmdk snapshot with parent vmdk descriptor
+>> containing "version=3D3" would be treated as raw instead vmdk.
+>>
+>> In the future case where a new vmdk version is introduced, we will aga=
+in
+>> experience this issue, even if the user will provide "-f vmdk" it will=
+
+>> only apply to the tip image and not to the underlying "misprobed" pare=
+nt
+>> image.
+>>
+>> The code in vmdk.c already assumes that the backing file of vmdk must =
+be
+>> vmdk (see vmdk_is_cid_valid which returns 0 if backing file is not
+>> vmdk).
+>>
+>> So let's make it official by supplying the backing_format as vmdk.
+>>
+>> Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
+>> Reviewed-By: Liran Alon <liran.alon@oracle.com>
+>> Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
+>> Signed-off-by: Shmuel Eiderman <shmuel.eiderman@oracle.com>
+>> ---
+>>  block/vmdk.c           | 2 ++
+>>  tests/qemu-iotests/110 | 6 +++---
+>>  tests/qemu-iotests/126 | 4 ++--
+>>  3 files changed, 7 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/block/vmdk.c b/block/vmdk.c
+>> index 8dec6ef767..de8cb859f8 100644
+>> --- a/block/vmdk.c
+>> +++ b/block/vmdk.c
+>> @@ -397,6 +397,8 @@ static int vmdk_parent_open(BlockDriverState *bs)
+>>          pstrcpy(bs->auto_backing_file, end_name - p_name + 1, p_name)=
+;
+>>          pstrcpy(bs->backing_file, sizeof(bs->backing_file),
+>>                  bs->auto_backing_file);
+>> +        pstrcpy(bs->backing_format, sizeof(bs->backing_format),
+>> +                "vmdk");
+>>      }
+>=20
+> Your patch with this change has already been merged into the QEMU maste=
+r
+> branch...
+>=20
+>> diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
+>> index fad672c1ae..982569dbc5 100755
+>> --- a/tests/qemu-iotests/110
+>> +++ b/tests/qemu-iotests/110
+>> @@ -54,7 +54,7 @@ _make_test_img -b "$TEST_IMG_REL.base" 64M
+>>  # qemu should be able to reconstruct the filename, so relative backin=
+g names
+>>  # should work
+>>  TEST_IMG=3D"json:{'driver':'$IMGFMT','file':{'driver':'file','filenam=
+e':'$TEST_IMG'}}" \
+>> -    _img_info | _filter_img_info
+>> +    _img_info | _filter_img_info | grep -v "backing file format"
+>> =20
+>>  echo
+>>  echo '=3D=3D=3D Non-reconstructable filename =3D=3D=3D'
+>> @@ -78,7 +78,7 @@ TEST_IMG=3D"json:{
+>>              }
+>>          ]
+>>      }
+>> -}" _img_info | _filter_img_info
+>> +}" _img_info | _filter_img_info | grep -v "backing file format"
+>> =20
+>>  echo
+>>  echo '=3D=3D=3D Backing name is always relative to the backed image =3D=
+=3D=3D'
+>> @@ -110,7 +110,7 @@ TEST_IMG=3D"json:{
+>>              }
+>>          ]
+>>      }
+>> -}" _img_info | _filter_img_info
+>> +}" _img_info | _filter_img_info | grep -v "backing file format"
+>> =20
+>> =20
+>>  # success, all done
+>> diff --git a/tests/qemu-iotests/126 b/tests/qemu-iotests/126
+>> index 96dc048d59..1f7618c8a5 100755
+>> --- a/tests/qemu-iotests/126
+>> +++ b/tests/qemu-iotests/126
+>> @@ -63,7 +63,7 @@ TEST_IMG=3D$BASE_IMG _make_test_img 64M
+>>  TEST_IMG=3D$TOP_IMG _make_test_img -b ./image:base.$IMGFMT
+>> =20
+>>  # The default cluster size depends on the image format
+>> -TEST_IMG=3D$TOP_IMG _img_info | grep -v 'cluster_size'
+>> +TEST_IMG=3D$TOP_IMG _img_info | grep -v 'cluster_size\|backing file f=
+ormat'
+>> =20
+>>  _rm_test_img "$BASE_IMG"
+>>  _rm_test_img "$TOP_IMG"
+>> @@ -79,7 +79,7 @@ TOP_IMG=3D"file:image:top.$IMGFMT"
+>>  TEST_IMG=3D$BASE_IMG _make_test_img 64M
+>>  TEST_IMG=3D$TOP_IMG _make_test_img -b "$BASE_IMG"
+>> =20
+>> -TEST_IMG=3D$TOP_IMG _img_info | grep -v 'cluster_size'
+>> +TEST_IMG=3D$TOP_IMG _img_info | grep -v 'cluster_size\|backing file f=
+ormat'
+>> =20
+>>  _rm_test_img "$BASE_IMG"
+>>  _rm_test_img "image:top.$IMGFMT"
+>>
+>=20
+> ... so please just send a patch with these fixes!
+
+I already did, it's here:
+
+http://lists.nongnu.org/archive/html/qemu-block/2019-04/msg00442.html
+
+Max
+
+
+--nkFuwTVZPcc8jVP1uvtA5W2aNCiBINu0P
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzMUPkACgkQ9AfbAGHV
+z0DuzAf/bKKuVTHw8V9qpcG3s00cp0IhtNbFMHCmIObVrZDd/JOXKVS2Vxt8BLYY
+wNBaYa6fovohjPG/Av74cGW7cAymBZOX1E6CD3eWvTZDD7j9sIgoETOTyDHomjBK
+dearq+ctWz7EuKC2PYR5WWBTgklW5D7w/PLLkIGWsP+sKIPIbNd/+FZ9w3iFOiWB
+fSwPXQeorHGZ5k8ods+rBQ2Ktbqe9M6euNlrqEWBCf+Otl0p1tXFVNgNrHT+nqhN
+mKfaVJxP1vLSdEvQthmxGtE0hHw9RszAUiBIs/HrBmL1IwLEKky9k/1DhyfVuU0v
+C76VC0u+D+rNoHHU/sS9xwoIKbmUwQ==
+=tX6n
+-----END PGP SIGNATURE-----
+
+--nkFuwTVZPcc8jVP1uvtA5W2aNCiBINu0P--
 
