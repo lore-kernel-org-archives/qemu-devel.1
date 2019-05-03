@@ -2,75 +2,74 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8679DC43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:47:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E86E2C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:52:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BBB8206DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:47:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BBB8206DF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id BCE05206C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:52:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCE05206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44496 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44589 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMbLW-00071M-K2
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 12:47:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56106)
+	id 1hMbQ2-0001FI-1W
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 12:52:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMbK6-0006Pu-6B
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:46:11 -0400
+	(envelope-from <bounces@canonical.com>) id 1hMbOd-0008LY-01
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:50:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hMbK4-0006YS-Ud
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:46:10 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:58213)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hMbK4-0006UK-Jz
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:46:08 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1N17cq-1gd01U0yOg-012VeT; Fri, 03 May 2019 18:46:06 +0200
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20181210165636.28366-1-peter.maydell@linaro.org>
-	<20181210165636.28366-3-peter.maydell@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <57e90be8-0652-8204-cc9e-1ce347e446d8@vivier.eu>
-Date: Fri, 3 May 2019 18:46:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <bounces@canonical.com>) id 1hMbOb-0002E1-Mw
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:50:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35120)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hMbOb-0002D3-HG
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:50:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hMbOZ-0003KI-Bj
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 16:50:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 18AFC2E80CC
+	for <qemu-devel@nongnu.org>; Fri,  3 May 2019 16:50:47 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20181210165636.28366-3-peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:Al/j7ttYiWfKrYgTZJ+MV+Q5SUOwHb0UnmVTFq1EKlxjff5k/qJ
-	8dmCN9AI6kRa+y/NeuFpbZd3hBJiHnCvp60zONgAHtGBxmEVAjcKEawTDfNJZLFu5hP7kjg
-	i3+jj2NbpcQRLvuC6bDBM2ha3ZK366QjigYV20xPNFdPROxcOwimY4L7LHCDN9TExIIxjM3
-	Fp0o6a1KizYIohq4LTuNQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:0Y+nsCBFAaA=:CpXWtxD8N/9/ZK8vBBwvGi
-	sgJdC30UKI3rPf6eeorenUzzTWF1top7dXQGNNQxU1kwKQHgv6E1Bzc6woBmaYrck5xO6bMSS
-	pE1XpgUauCf+xCx4y2aeVNTGff02QGQFRhQh4/73lXRDntJQkca9LbPTsqT6ct3eyI5EweFEE
-	mS9gY7NIaDyN5VUWRLrSxQYSe6xy+tBphPm2nE3V1Nf5LhiCbJB6+pHfrEv5TvHyXyV4Hjbvo
-	88OahxBY56WNre/71AV+QFanswcsfK/uCUv7nu+ssr2QqWvA+XetDIroTvdSVeXkTYio9b+IP
-	oKE2YCtttVyHNUi9LQceGtBeqU1j/ADaeJr2cVYpKTc8iprJm0V27hNPg5BGT2UGUbQoxo334
-	jQ6yn6uOegtehnKGVKV2u0AHOenrNBXAPqiBjk4agAkBU2MSYMP4rFkxH1enhRWnAuiH8u9CL
-	n48E1/ldISvM0RqPEdErIZcOZ50hk4M/080/NuMwp+eU8Rche3y4Xww9Za0sxmw99KvIM7rZS
-	1vCK4ILNyTqN0t6J+GJui5YtfCTpXoOgy9flYshe1pJ3a3FEG5lCeO7+IzqiWyeYWNUdUAyQ+
-	FeJNzlMEVca/Za2i3xZVDawt5qXkWgG0lUNvcEx2d0SoOJcvNurBIm9I/vkDpscMtXA44LT6n
-	mBOxi+qyTehO9EEH+PzUYeNoBEuIafr50RHg+sq90RPSYj2tgBXg2DPjL/Y6V2BAVIUXEQnAY
-	cwHZVCiWbRyV/+sD1E+62uLcgsQx9Z+MJLVnZrqJQAjb43A83/2Uc9KPyrg=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 03 May 2019 16:36:51 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm feature-request
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: mark-rutland
+X-Launchpad-Bug-Reporter: Mark Rutland (mark-rutland)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <155483243569.8652.5979441352991477638.malonedeb@wampee.canonical.com>
+Message-Id:
+ <155690141223.19580.17385068954807494182.launchpad@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18953";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 78f05d97a8a5469bc3a66422daa6de6a427e5d71
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
-Subject: Re: [Qemu-devel] [RFC 2/3] target/m68k: In get_physical_address()
- check for memory access failures
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1823998] Re: qemu-system-aarch64: support kernels
+ bigger than 128MiB
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,152 +78,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, patches@linaro.org
+Reply-To: Bug 1823998 <1823998@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503164605.r-H7O78cyAGRoJSwCNrLCWBRLvSetnZ_ZJGK66_5GEg@z>
+Message-ID: <20190503163651.Q-gcom5hEm0277x6P6mX69_aoiv8TwXHBMqiZ_x5j6c@z>
 
-On 10/12/2018 17:56, Peter Maydell wrote:
-> In get_physical_address(), use address_space_ldl() and
-> address_space_stl() instead of ldl_phys() and stl_phys().
-> This allows us to check whether the memory access failed.
-> For the moment, we simply return -1 in this case;
-> add a TODO comment that we should ideally generate the
-> appropriate kind of fault.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->   target/m68k/helper.c | 62 +++++++++++++++++++++++++++++++++++++-------
->   1 file changed, 52 insertions(+), 10 deletions(-)
-> 
-> diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-> index 374e4861886..b5fa2f8056d 100644
-> --- a/target/m68k/helper.c
-> +++ b/target/m68k/helper.c
-> @@ -660,6 +660,7 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
->       bool debug = access_type & ACCESS_DEBUG;
->       int page_bits;
->       int i;
-> +    MemTxResult txres;
->   
->       /* Transparent Translation (physical = logical) */
->       for (i = 0; i < M68K_MAX_TTR; i++) {
-> @@ -689,12 +690,19 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
->       /* Root Index */
->       entry = M68K_POINTER_BASE(next) | M68K_ROOT_INDEX(address);
->   
-> -    next = ldl_phys(cs->as, entry);
-> +    next = address_space_ldl(cs->as, entry, MEMTXATTRS_UNSPECIFIED, &txres);
-> +    if (txres != MEMTX_OK) {
-> +        goto txfail;
-> +    }
->       if (!M68K_UDT_VALID(next)) {
->           return -1;
->       }
->       if (!(next & M68K_DESC_USED) && !debug) {
-> -        stl_phys(cs->as, entry, next | M68K_DESC_USED);
-> +        address_space_stl(cs->as, entry, next | M68K_DESC_USED,
-> +                          MEMTXATTRS_UNSPECIFIED, &txres);
-> +        if (txres != MEMTX_OK) {
-> +            goto txfail;
-> +        }
->       }
->       if (next & M68K_DESC_WRITEPROT) {
->           if (access_type & ACCESS_PTEST) {
-> @@ -709,12 +717,19 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
->       /* Pointer Index */
->       entry = M68K_POINTER_BASE(next) | M68K_POINTER_INDEX(address);
->   
-> -    next = ldl_phys(cs->as, entry);
-> +    next = address_space_ldl(cs->as, entry, MEMTXATTRS_UNSPECIFIED, &txres);
-> +    if (txres != MEMTX_OK) {
-> +        goto txfail;
-> +    }
->       if (!M68K_UDT_VALID(next)) {
->           return -1;
->       }
->       if (!(next & M68K_DESC_USED) && !debug) {
-> -        stl_phys(cs->as, entry, next | M68K_DESC_USED);
-> +        address_space_stl(cs->as, entry, next | M68K_DESC_USED,
-> +                          MEMTXATTRS_UNSPECIFIED, &txres);
-> +        if (txres != MEMTX_OK) {
-> +            goto txfail;
-> +        }
->       }
->       if (next & M68K_DESC_WRITEPROT) {
->           if (access_type & ACCESS_PTEST) {
-> @@ -733,27 +748,46 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
->           entry = M68K_4K_PAGE_BASE(next) | M68K_4K_PAGE_INDEX(address);
->       }
->   
-> -    next = ldl_phys(cs->as, entry);
-> +    next = address_space_ldl(cs->as, entry, MEMTXATTRS_UNSPECIFIED, &txres);
-> +    if (txres != MEMTX_OK) {
-> +        goto txfail;
-> +    }
->   
->       if (!M68K_PDT_VALID(next)) {
->           return -1;
->       }
->       if (M68K_PDT_INDIRECT(next)) {
-> -        next = ldl_phys(cs->as, M68K_INDIRECT_POINTER(next));
-> +        next = address_space_ldl(cs->as, M68K_INDIRECT_POINTER(next),
-> +                                 MEMTXATTRS_UNSPECIFIED, &txres);
-> +        if (txres != MEMTX_OK) {
-> +            goto txfail;
-> +        }
->       }
->       if (access_type & ACCESS_STORE) {
->           if (next & M68K_DESC_WRITEPROT) {
->               if (!(next & M68K_DESC_USED) && !debug) {
-> -                stl_phys(cs->as, entry, next | M68K_DESC_USED);
-> +                address_space_stl(cs->as, entry, next | M68K_DESC_USED,
-> +                                  MEMTXATTRS_UNSPECIFIED, &txres);
-> +                if (txres != MEMTX_OK) {
-> +                    goto txfail;
-> +                }
->               }
->           } else if ((next & (M68K_DESC_MODIFIED | M68K_DESC_USED)) !=
->                              (M68K_DESC_MODIFIED | M68K_DESC_USED) && !debug) {
-> -                stl_phys(cs->as, entry,
-> -                         next | (M68K_DESC_MODIFIED | M68K_DESC_USED));
-> +            address_space_stl(cs->as, entry,
-> +                              next | (M68K_DESC_MODIFIED | M68K_DESC_USED),
-> +                              MEMTXATTRS_UNSPECIFIED, &txres);
-> +            if (txres != MEMTX_OK) {
-> +                goto txfail;
-> +            }
->           }
->       } else {
->           if (!(next & M68K_DESC_USED) && !debug) {
-> -            stl_phys(cs->as, entry, next | M68K_DESC_USED);
-> +            address_space_stl(cs->as, entry, next | M68K_DESC_USED,
-> +                              MEMTXATTRS_UNSPECIFIED, &txres);
-> +            if (txres != MEMTX_OK) {
-> +                goto txfail;
-> +            }
->           }
->       }
->   
-> @@ -785,6 +819,14 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
->       }
->   
->       return 0;
-> +
-> +txfail:
-> +    /*
-> +     * A page table load/store failed. TODO: we should really raise a
-> +     * suitable guest fault here if this is not a debug access.
-> +     * For now just return that the translation failed.
-> +     */
-> +    return -1;
->   }
->   
->   hwaddr m68k_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-> 
+** Tags added: arm
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1823998
 
+Title:
+  qemu-system-aarch64: support kernels bigger than 128MiB
+
+Status in QEMU:
+  New
+
+Bug description:
+  Presently QEMU reserves up to 128MiB of space for an arm64 Linux
+  kernel, placing the initrd following this, and the dtb following the
+  initrd.
+
+  This is not sufficient for some debug configurations of the kernel,
+  which can be larger than 128MiB. Depending on the relative size of the
+  kernel Image and unpopulated BSS, the dtb (or kernel) will be
+  clobbered by the other, resulting in a silent boot failure.
+
+  Since v3.17, the kernel Image header exposes a field called
+  image_size, which describes the entire size of the kernel (including
+  unpopulated sections such as the BSS) as a 64-bit little-endian value.
+  For kernels prior to v3.17, this field is zero. This is documented at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/D=
+ocumentation/arm64/booting.txt?h=3Dv5.0#n68
+
+  It would be great if QEMU could take the image_size field into account
+  when placing the initrd and dtb to avoid overlap with the kernel.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1823998/+subscriptions
 
