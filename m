@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33702)
+Received: from eggs.gnu.org ([209.51.188.92]:34168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMYIU-0000qD-As
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 09:32:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hMYKU-0001y5-BD
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 09:34:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMYIT-0007Z0-BL
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 09:32:18 -0400
-Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:35532)
+	(envelope-from <peter.maydell@linaro.org>) id 1hMYKR-0002TJ-M8
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 09:34:21 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42078)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hMYIT-0007Wq-5g
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 09:32:17 -0400
-Received: by mail-oi1-x229.google.com with SMTP id w197so4435089oia.2
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 06:32:16 -0700 (PDT)
+	id 1hMYKP-0002Ji-0E
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 09:34:17 -0400
+Received: by mail-ot1-x342.google.com with SMTP id f23so5269560otl.9
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 06:34:14 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190503022958.1394-1-joel@jms.id.au>
-In-Reply-To: <20190503022958.1394-1-joel@jms.id.au>
+References: <20190430044036.1144-1-joel@jms.id.au>
+	<20190430044036.1144-2-joel@jms.id.au>
+In-Reply-To: <20190430044036.1144-2-joel@jms.id.au>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 May 2019 14:32:04 +0100
-Message-ID: <CAFEAcA_yYvV-WmeicEo_EYBFp=0987fFORaqcv3tucX=Db=Hbg@mail.gmail.com>
+Date: Fri, 3 May 2019 14:34:02 +0100
+Message-ID: <CAFEAcA-A-2RYAibPMRxKM6RPabxiOH-DLAzyRu8s5c3Vz+KFgQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] arm: aspeed: Set SDRAM size
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] hw: timer: Add ASPEED RTC device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +30,21 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Joel Stanley <joel@jms.id.au>
-Cc: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>, Richard Henderson <richard.henderson@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, 3 May 2019 at 03:30, Joel Stanley <joel@jms.id.au> wrote:
+On Tue, 30 Apr 2019 at 05:40, Joel Stanley <joel@jms.id.au> wrote:
 >
-> We currently use Qemu's default of 128MB. As we know how much ram each
-> machine ships with, make it easier on users by setting a default.
+> The RTC is modeled to provide time and date functionality. It is
+> initialised at zero to match the hardware.
 >
-> It can still be overridden with -m on the command line.
+> There is no modelling of the alarm functionality, which includes the IRQ
+> line. As there is no guest code to exercise this function that is
+> acceptable for now.
 >
 > Signed-off-by: Joel Stanley <joel@jms.id.au>
-> Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
 
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Applied to target-arm.next, thanks.
-
+thanks
 -- PMM
