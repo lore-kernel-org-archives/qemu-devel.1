@@ -2,75 +2,84 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 998C3C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 12:11:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EFABC43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 12:13:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EC1B2075C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 12:11:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EC1B2075C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2987D2075C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 12:13:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="daBevHAB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2987D2075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39743 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39751 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMX2c-0003EC-OM
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 08:11:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45522)
+	id 1hMX41-0003tt-Cv
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 08:13:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hMX1b-0002Yx-0G
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:10:48 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hMX3B-0003Z3-Fe
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:12:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hMX1a-0005am-0M
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:10:47 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:33880)
+	(envelope-from <peter.maydell@linaro.org>) id 1hMX3A-0006cI-IL
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:12:25 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:38005)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hMX1Z-0005Zt-QM
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:10:45 -0400
-Received: by mail-wr1-f68.google.com with SMTP id e9so7622120wrc.1
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 05:10:45 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hMX3A-0006bn-CH
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:12:24 -0400
+Received: by mail-oi1-x242.google.com with SMTP id t70so4231363oif.5
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 05:12:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=xY4c6NQjMMrKGjoUgDqOaSKuTDDWLkPb/all4IGS2jc=;
+	b=daBevHABE5he1oZESthBSkjMDnCRJBbZo94xf+lOhRKR6NY0UGoc10nv1/LzuM+ThS
+	Uv9iM3QxiTtacaUJD9n8cjEntG9uQX8gzAOEP/co3Xqw5p35p87ZHYuA4WrrwjU30Huk
+	lqqM0T8hYeRSwTFZf7h8XTvehPXGC3EYLUhyHTj/6KvcXTPDJfVGAqKqCZ3xs2bDsd9N
+	yunlEgG0yLTAdy3ox/5epC8yzPqRdu37jOzbJBpeR37dDS+k9rMGtL0cn0TuGn1CWbzN
+	RNDl4FNEBT3PBXRm7agD5Z0op1Oc8Ra5XjOgZTT37yr1t7WQbxTMhkBzSpULFUZGch0D
+	c91w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=DkUMttNVdxz0c3JF8OlLekJiVR9g2zu4/RIIRsDY4U0=;
-	b=cYUt+3ENb0pfDN08swneckE0dcBrDSfk3CbxVBDE+sqpdWA1i0sPYVJiV5DUOueS/N
-	HJNtuFj5kl9g0iuwGGmofe5GpIDNy/IITFI5HNYhn7km8rG/FjNN/1kIkL3sWWtpyPRP
-	427hMWGWLgJqHMnTt4nvrqBobPLhy/LZwtBZjlXA//BpCov2L5KhaVFn9NNW7hoY9ky+
-	AZG/mFDC5Z3oH/UYP6qtMnlgLPXS/n7JWFvaOx990eXveWkHP4HZPvD3IbURKFteSgfX
-	8IvCy8P5hLD1hNo/TZmAm1uX5el9YE0NKT7aB8oTIT26LAxWGApse+/DYzF2UDJANBDl
-	STxQ==
-X-Gm-Message-State: APjAAAVgclhzsxeBDI477rNZuAmE81Skf2L/pJpG+QHZCVu9ZSDP2ZlN
-	UNm0pjm6sMPoi23dz+3YqdkS0A==
-X-Google-Smtp-Source: APXvYqzLWjhcGK8SMu1zptLMIMFxHjUI6Lp/cLfpv7z5NqP11d3AGPHKkqvkwqRmGcEQ6PZipu7WRg==
-X-Received: by 2002:a5d:508f:: with SMTP id a15mr6885580wrt.273.1556885444637; 
-	Fri, 03 May 2019 05:10:44 -0700 (PDT)
-Received: from steredhat (host103-125-dynamic.46-79-r.retail.telecomitalia.it.
-	[79.46.125.103]) by smtp.gmail.com with ESMTPSA id
-	h16sm3472038wrb.31.2019.05.03.05.10.43
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 03 May 2019 05:10:43 -0700 (PDT)
-Date: Fri, 3 May 2019 14:10:41 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: dillaman@redhat.com
-Message-ID: <20190503121041.xjmg6yygfujohqod@steredhat>
-References: <20190503110206.42811-1-sgarzare@redhat.com>
-	<CA+aFP1DBc_NdswPJLGGHq3H-uU+LqXON7SLQ16K3H3jAt_02HQ@mail.gmail.com>
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=xY4c6NQjMMrKGjoUgDqOaSKuTDDWLkPb/all4IGS2jc=;
+	b=Wsc6N/DhkHkX0BZzqM/Oz0vmP2hsBC3B4/BYVn8NdfTMhen/2l/536DM2KLNsAhVq/
+	V7cEBxrh6ax4sLXwhMmMZaF05V+93208iQ53WonPiU6m9SIPccKDT1qSU16O1hAlO23P
+	oAvyjvyNSuifs9RCKJQnSa3mYBjb0s44/01pnSN0rFCSWbU1M6MYK9KbMRLivMrSDqg5
+	VP+WalbqxRSBtCHxbrK9uuwutchfP2cLqg/ec+ku2QTYqY5KC9ErwvQCsC5Z7Q5S2MDy
+	rJTm34QiOWuGsw16r4B2kzA0Qa9imrysgnDPJJvdzars/E2OnG/YjEI0VVqIRRW4uPEY
+	GL4g==
+X-Gm-Message-State: APjAAAUdDiKlrl3RzT3+5V/f9OVJm4EiaOOBk3844CYQ0aw0gvbP9eJU
+	He8qqw87iYnLaQNWMZxCDtr9Q1gicjF9RkIq+6HHjA==
+X-Google-Smtp-Source: APXvYqznBDqv2ujVNsqrz4w/CrWOOXV5WBLhCQncNPWtsD8CQe6/ps/pNkqEtiLCs4xG0CXi6iG1l+zkseXdL4bwvLo=
+X-Received: by 2002:aca:ab12:: with SMTP id u18mr5314971oie.48.1556885542950; 
+	Fri, 03 May 2019 05:12:22 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190315143057.20165-1-peter.maydell@linaro.org>
+	<87sgvkw4vp.fsf@zen.linaroharston>
+	<CAFEAcA_n2MvRfCdydianR9EgDxdP093+Fi-Co2WRa0ncAF=Pgg@mail.gmail.com>
+In-Reply-To: <CAFEAcA_n2MvRfCdydianR9EgDxdP093+Fi-Co2WRa0ncAF=Pgg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 May 2019 13:12:11 +0100
+Message-ID:
+ <CAFEAcA88dHzePhpOBdKFXr4HpF3J40FqY6qdwFpNhyBgxbehkQ@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <CA+aFP1DBc_NdswPJLGGHq3H-uU+LqXON7SLQ16K3H3jAt_02HQ@mail.gmail.com>
-User-Agent: NeoMutt/20180716
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH] block/rbd: implement
- .bdrv_get_allocated_file_size callback
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::242
+Subject: Re: [Qemu-devel] [PATCH for-4.0?] arm: Allow system registers for
+ KVM guests to be changed by QEMU code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,74 +91,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
-	qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>,
-	Max Reitz <mreitz@redhat.com>
+Cc: Dongjiu Geng <gengdongjiu@huawei.com>, Eric Auger <eric.auger@redhat.com>,
+	qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+	"patches@linaro.org" <patches@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503121041.4WcOYv1tXkWaeE8uJrNWcHK0BzpSVlnL8HqW_Ik5fM0@z>
+Message-ID: <20190503121211.qu0y1Jh9hE8WY56sSlPWGi6fBLgafmqUS9gyQHZitdk@z>
 
-On Fri, May 03, 2019 at 07:55:01AM -0400, Jason Dillaman wrote:
-> On Fri, May 3, 2019 at 7:02 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+On Mon, 25 Mar 2019 at 10:25, Peter Maydell <peter.maydell@linaro.org> wrot=
+e:
+>
+> On Mon, 18 Mar 2019 at 15:59, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
 > >
-> > This patch allows 'qemu-img info' to show the 'disk size' for
-> > rbd images. We use the rbd_diff_iterate2() API to calculate the
-> > allocated size for the image.
 > >
-> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > ---
-> >  block/rbd.c | 33 +++++++++++++++++++++++++++++++++
-> >  1 file changed, 33 insertions(+)
-> >
-> > diff --git a/block/rbd.c b/block/rbd.c
-> > index 0c549c9935..61447bc0cb 100644
-> > --- a/block/rbd.c
-> > +++ b/block/rbd.c
-> > @@ -1046,6 +1046,38 @@ static int64_t qemu_rbd_getlength(BlockDriverState *bs)
-> >      return info.size;
-> >  }
-> >
-> > +static int rbd_allocated_size_cb(uint64_t offset, size_t len, int exists,
-> > +                                 void *arg)
-> > +{
-> > +    int64_t *alloc_size = (int64_t *) arg;
-> > +
-> > +    if (exists) {
-> > +        (*alloc_size) += len;
-> > +    }
-> > +
-> > +    return 0;
-> > +}
-> > +
-> > +static int64_t qemu_rbd_get_allocated_file_size(BlockDriverState *bs)
-> > +{
-> > +    BDRVRBDState *s = bs->opaque;
-> > +    int64_t alloc_size = 0;
-> > +    int r;
-> > +
-> > +    /*
-> > +     * rbd_diff_iterate2(), if the source snapshot name is NULL, invokes
-> > +     * the callback on all allocated regions of the image.
-> > +     */
-> > +    r = rbd_diff_iterate2(s->image, NULL, 0,
-> > +                          bs->total_sectors * BDRV_SECTOR_SIZE, 0, 1,
-> > +                          &rbd_allocated_size_cb, &alloc_size);
-> 
-> Is there any concern that running this on very large images will take
-> a very long time since it needs to iterate through each individual
-> 4MiB (by default) backing object in the image? In libvirt, it only
-> attempts to calculate the actual usage if the fast-diff feature is
-> enabled, and recently it also got a new control to optionally disable
-> the functionality entirely since even with fast-diff it's can be very
-> slow to compute over hundreds of images in a libvirt storage pool.
-> 
+> > Peter Maydell <peter.maydell@linaro.org> writes:
+[...]
+> > > Support this by making kvm_arch_put_registers() synchronize
+> > > CPU state back into the list. We sync only those registers
+> > > where the initial write succeeds, which should be sufficient.
+> > >
+> > > This commit is the same as commit 823e1b3818f9b10b824ddc which we
+> > > had to revert in commit 942f99c825fc94c8b1a4, except that the bug
+> > > which was preventing EDK2 guest firmware running has been fixed:
+> > > kvm_arm_reset_vcpu() now calls write_list_to_cpustate().
 
-Thank you for pointing that out to me. I'll add check on fast-diff feature
-on v2.
-Since we only have one image here, do you think it would be reasonable to add
-this feature or is it useless?
+> > > Should we try to put this in for rc1? Not sure... Testing
+> > > definitely appreciated.
+>
+> > Hmm so running my testcase:
+> >
+> >  * gdbstub enabled with an active sw or hw breakpoint
+> >  * run userspace program in guest:
+> >    - sw breakpoint works fine
+> >    - hw breakpoint never triggers because guest segs
+>
+> Further testing from Alex suggests this is some unrelated
+> bug or regression (ie not caused by this patch), but:
+> since the only in-tree use for this patch is to get nested
+> debugging working and it would be broken for this other
+> reason even with this patch, I'm going to postpone applying
+> this patch until the start of the 4.1 cycle.
 
-Thanks,
-Stefano
+Since we're now in the 4.1 cycle I'm going to apply this
+patch, as I suggested above -- I'm putting it into my
+target-arm.next queue to go in in my next pullreq.
+
+We should make sure we investigate the debugging-KVM
+breakage Alex described at some point this cycle too.
+
+thanks
+-- PMM
 
