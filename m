@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4160C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 06:03:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50A4CC43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 06:04:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EEBD206DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 06:03:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BFC7206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 06:04:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Af6Axvyq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EEBD206DF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J6MWrrGN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BFC7206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35091 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35099 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMRIH-0005JF-Mz
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 02:03:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54623)
+	id 1hMRJB-0005yp-BN
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 02:04:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1hMR9D-0005S0-W2
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:54:16 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1hMR9e-0005tB-Jh
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:54:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1hMR9C-00032k-A2
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:54:15 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:36068)
+	(envelope-from <sjitindarsingh@gmail.com>) id 1hMR9d-0003UC-IB
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:54:42 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:33476)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <sjitindarsingh@gmail.com>)
-	id 1hMR9C-0002zZ-0e; Fri, 03 May 2019 01:54:14 -0400
-Received: by mail-pf1-x442.google.com with SMTP id v80so2353483pfa.3;
-	Thu, 02 May 2019 22:54:09 -0700 (PDT)
+	id 1hMR9d-0003Tu-Cd; Fri, 03 May 2019 01:54:41 -0400
+Received: by mail-pf1-x443.google.com with SMTP id z28so2361384pfk.0;
+	Thu, 02 May 2019 22:54:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=wUZAXOTwdw2I/hZuC5jS4/OqNN0mBHOWVDEizVGw6GQ=;
-	b=Af6AxvyqyVqgdx5sR9vt6CetSMY498qPkmWf3OjJNGMDcg2ddNIfbPZzyq332xmqsh
-	NBeya8BT1uEgWonEwLsDp0/ne3QtR6PIDAj7nXYqtdPCPT2iablRFHZPdA4jSbVOJ2DC
-	lxS9KGmLzAx2wgO+Q6jrlzyczAAU18o8BnwqvswvsjMRvOGV9ga1aPLZPWxIHv15f9pC
-	2Gh/X9ZyQDVS2ObIlOzM+pdcwbjAlrp+tSH2+BKG4wRgZK+9ziayr1LhDM67RFvQM4d5
-	tCxrigMfEz85CBu9Y+RotUlGLdpLo92zY5I09Bq/Uo6/BzeLicQXP9tj/f5HYKTCD9Tt
-	F/4Q==
+	bh=iRgrjuJWAeNPPmfwJhAiW5ZkTsvnUdrbfqd5lYY/Gao=;
+	b=J6MWrrGNtXMEAyyLNtz2wxWmsJYN/EMNmQKK1zxdLiWWWgRhchYdhypyJtZ/enyrGf
+	uYcpvK058DCyLnICTItewfkVEqMQRVRuquA130/1MX2JRWtfpDGVXTEArm8MZcj/5nyV
+	iHwWhafVbP92A195FnIK0H+286k5n5oB4Pi6KQodPR649zElWuG0EZEH2ZAvJcQgA4F3
+	C804Yjr3WruWdO25WyY8wDPhYY1JyBFqSXLrHYdvvvp+u7v7LZmD4xaBkt2ZmmkY67uZ
+	GaSwc4jqDV+HX7cLb+OOHluaIhz52yyQP0m5hO41pD+tLm00jtyacWOE5Q56CuH/FSPK
+	OcGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=wUZAXOTwdw2I/hZuC5jS4/OqNN0mBHOWVDEizVGw6GQ=;
-	b=tDC2aLc5XRJPV3Jq9kFocopDf2qSU6B58UDEgLkFGOsXQfnISbsIC7MS+sPC8Tl3RB
-	kdwwnaSwaysD70ge++46GKTHyhhTrZaKi6HwGcbXAerZ6HlBFfvQcmzPPGP7I1Ncuh8k
-	aQ+Zjrl7Eqek7U/ptw82z4MR7f4QqetwGUrJMAanWB0McFjsKahXjRRe+Ny/iYrpkxgy
-	WqmyJLGcJGCAx6BpW6qm3kdNuX3+XzMHFA/Foovk7VyepejbBWmkwHwUIxtTEnsT+2g3
-	gcEKsYIgiTikPR9GeqM9n+JHdw/q3j11uBNMUMD0pA38L08aBZkcJ3vzzr0AS/vpo4GY
-	l0Vw==
-X-Gm-Message-State: APjAAAWb0xajo2J7SYoLLSpl2s4C0UBPfLxngs1kpIxUCfJVWHeF9p+B
-	oAitc5WK8cO9WUfnl3VQvEbSKENOCpA=
-X-Google-Smtp-Source: APXvYqxPUPVhxF4jxE8BFdmppxcc+9qa8+6brNnYwfd4qF10qVOD5UY8ZyVwxrLGWVAt/gTJ4VchIQ==
-X-Received: by 2002:a63:9541:: with SMTP id t1mr4336289pgn.97.1556862848390;
-	Thu, 02 May 2019 22:54:08 -0700 (PDT)
+	bh=iRgrjuJWAeNPPmfwJhAiW5ZkTsvnUdrbfqd5lYY/Gao=;
+	b=hXAnRPMoWL2MVLKNsqPf7boComPXSJUyj4IspBMEypjpcMhE1Gaad2JaRQ8JEVYB+Y
+	6as9k6uMpZEnKsfuFPh4luRw1+hvB+YFuhIgBxk8rAGRiEmMaFo0LFFw/aqj8WXlBagU
+	zn1EbtVshZuqT5qCv7TAuOIX7NMKoC2efMsqcsteBW/+ZHlZ/6if5dHw2BykAvyTu1kc
+	Xd6r1eLIqgIh7B3RSV1wRWRaKL3NUzp83gsktOrJtko5UtZyEpkAgz02ZVYqw0djZPrZ
+	sATIPbnLbB6M1C6tJ2joRHo4GI/NZndt6HaPmP5lPfL5hnFIbeCguTFSOW1+tXKrYeoD
+	dgUg==
+X-Gm-Message-State: APjAAAWtrQPKkUpjCgQDo9VyYPMR4jsRbrfwsp4cc/uiL/6uhWu/hdjG
+	QX5B1Ba7vv9/Q4zM2WW7KwZkybsxMjI=
+X-Google-Smtp-Source: APXvYqxFzLNfjlVGTT7FMlUfUDWgfYOsYKnCqqiXjmNRzcwjZTwOyRF298YUrILqk/ft8qsmqCWGIg==
+X-Received: by 2002:a63:1d4f:: with SMTP id d15mr7840690pgm.347.1556862880285; 
+	Thu, 02 May 2019 22:54:40 -0700 (PDT)
 Received: from localhost.ibm.com ([1.129.142.217])
 	by smtp.gmail.com with ESMTPSA id
-	h187sm1292983pfc.52.2019.05.02.22.54.02
+	h187sm1292983pfc.52.2019.05.02.22.54.36
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 02 May 2019 22:54:07 -0700 (PDT)
+	Thu, 02 May 2019 22:54:39 -0700 (PDT)
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  3 May 2019 15:53:09 +1000
-Message-Id: <20190503055316.6441-7-sjitindarsingh@gmail.com>
+Date: Fri,  3 May 2019 15:53:16 +1000
+Message-Id: <20190503055316.6441-14-sjitindarsingh@gmail.com>
 X-Mailer: git-send-email 2.13.6
 In-Reply-To: <20190503055316.6441-1-sjitindarsingh@gmail.com>
 References: <20190503055316.6441-1-sjitindarsingh@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH 06/13] target/ppc: Enforce that the
- root page directory size must be at least 5
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH 13/13] target/ppc: Enable
+ SPAPR_CAP_NESTED_KVM_HV under tcg
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,32 +97,97 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190503055309.stLO5UEPWdq6vD4yte8Lyo8u8dTgwREKWdvY6gw8CAY@z>
+Message-ID: <20190503055316.xWpwPLVFeuonEeeuvIEkp1O7NrWpVHdi90lvLlYWlyw@z>
 
-According to the ISA the root page directory size of a radix tree for
-either process or partition scoped translation must be >= 5.
+It is now possible to use nested kvm-hv under tcg, thus allow for it to
+be enabled.
 
-Thus add this to the list of conditions checked when validating the
-partition table entry in validate_pate();
+Note that nested kvm-hv requires that rc updates to ptes be done by
+software, otherwise the page tables get out of sync. So disable hardware
+rc updates when nested kvm-hv is enabled.
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- target/ppc/mmu-radix64.c | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/ppc/spapr_caps.c      | 22 ++++++++++++++++++----
+ target/ppc/cpu.h         |  1 +
+ target/ppc/mmu-radix64.c |  4 ++--
+ 3 files changed, 21 insertions(+), 6 deletions(-)
 
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 3278c09b0f..7fe07d83dd 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -389,10 +389,7 @@ static void cap_nested_kvm_hv_apply(SpaprMachineState *spapr,
+         return;
+     }
+ 
+-    if (tcg_enabled()) {
+-        error_setg(errp,
+-                   "No Nested KVM-HV support in tcg, try cap-nested-hv=off");
+-    } else if (kvm_enabled()) {
++    if (kvm_enabled()) {
+         if (!kvmppc_has_cap_nested_kvm_hv()) {
+             error_setg(errp,
+ "KVM implementation does not support Nested KVM-HV, try cap-nested-hv=off");
+@@ -400,6 +397,22 @@ static void cap_nested_kvm_hv_apply(SpaprMachineState *spapr,
+                 error_setg(errp,
+ "Error enabling cap-nested-hv with KVM, try cap-nested-hv=off");
+         }
++    } /* else { nothing required for tcg } */
++}
++
++static void cap_nested_kvm_hv_cpu_apply(SpaprMachineState *spapr,
++                                        PowerPCCPU *cpu,
++                                        uint8_t val, Error **errp)
++{
++    CPUPPCState *env = &cpu->env;
++
++    if (tcg_enabled() && val) {
++        if (env->spr[SPR_PVR] != 0x004E1202) {
++            error_setg(errp, "Nested KVM-HV only supported on POWER9 DD2.2, "
++                             "try cap-nested-hv=off or -cpu power9_v2.2");
++            return;
++        }
++        env->disable_hw_rc_updates = true;
+     }
+ }
+ 
+@@ -544,6 +557,7 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+         .set = spapr_cap_set_bool,
+         .type = "bool",
+         .apply = cap_nested_kvm_hv_apply,
++        .cpu_apply = cap_nested_kvm_hv_cpu_apply,
+     },
+     [SPAPR_CAP_LARGE_DECREMENTER] = {
+         .name = "large-decr",
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 426015c9cd..6502e0de82 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1237,6 +1237,7 @@ struct CPUPPCState {
+     target_ulong hv_ptr, regs_ptr;
+     struct hv_guest_state l2_hv, l1_saved_hv;
+     struct pt_regs l2_regs, l1_saved_regs;
++    bool disable_hw_rc_updates;
+ };
+ 
+ #define SET_FIT_PERIOD(a_, b_, c_, d_)          \
 diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
-index a6ab290323..afa5ba506a 100644
+index 2a8147fc38..cc06967dbe 100644
 --- a/target/ppc/mmu-radix64.c
 +++ b/target/ppc/mmu-radix64.c
-@@ -249,6 +249,8 @@ static bool validate_pate(PowerPCCPU *cpu, uint64_t lpid, ppc_v3_pate_t *pate)
-     if (lpid == 0 && !msr_hv) {
-         return false;
-     }
-+    if ((pate->dw0 & PATE1_R_PRTS) < 5)
-+        return false;
-     /* More checks ... */
-     return true;
+@@ -31,9 +31,9 @@
+ static inline bool ppc_radix64_hw_rc_updates(CPUPPCState *env)
+ {
+ #ifdef CONFIG_ATOMIC64
+-    return true;
++    return !env->disable_hw_rc_updates;
+ #else
+-    return !qemu_tcg_mttcg_enabled();
++    return !qemu_tcg_mttcg_enabled() && !env->disable_hw_rc_updates;
+ #endif
  }
+ 
 -- 
 2.13.6
 
