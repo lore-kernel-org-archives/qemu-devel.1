@@ -2,90 +2,79 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F339EC43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:19:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90BADC43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:21:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE80420651
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:19:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K9hD8CDo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE80420651
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5401E20651
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 16:21:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5401E20651
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43245 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43285 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMauN-0002QT-P7
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 12:19:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44614)
+	id 1hMaw4-0003eU-H6
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 12:21:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMat9-00022Q-KY
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:18:21 -0400
+	(envelope-from <philmd@redhat.com>) id 1hMatk-0002II-BF
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:18:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMat8-0002L0-63
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:18:19 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39757)
+	(envelope-from <philmd@redhat.com>) id 1hMati-0002ls-V5
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:18:56 -0400
+Received: from mail-wm1-f50.google.com ([209.85.128.50]:39739)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hMat7-0002Ij-Rj
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:18:18 -0400
-Received: by mail-wm1-x341.google.com with SMTP id n25so7362189wmk.4
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 09:18:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=2DeXh+ySkhyX5ae4OuxCScEKbvVQrdzbdCChYD5iPBs=;
-	b=K9hD8CDoIcOFKkYFXBSsdqwl/UPBDfeeZSRjl0sVVa9H7HdWxac58TFJ+fHQYydgL/
-	AWnMcmouMgGORA6xyYDIdsZL4brChT4WH1+Pxd09BGG0Lwv0Snmw17tc8xDvF4JAWKCu
-	Bt0EkCi75B6ogrampcz/kkD70mn9i1TEBJ60cVdLnwyHJWBeo1G4B19Gs0kKEvpaZ3Qe
-	xFc7oYW0DwNHeq9MCzXAjoiPHMMR3danYoL//FiF6jB86ofl64izBxVKP+Cr/udd+8bh
-	Q6e+XsgH3rrenygbigmOuifC+962vnK3v1kfROt03Uxg76Z77J0akCYz/Y1lAnzGud06
-	nPvQ==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hMati-0002kn-Ob
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:18:54 -0400
+Received: by mail-wm1-f50.google.com with SMTP id n25so7364068wmk.4
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 09:18:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=2DeXh+ySkhyX5ae4OuxCScEKbvVQrdzbdCChYD5iPBs=;
-	b=VN2c2uXczDG1MPcC+HPwOfRjSrjDJ+YanNVz09UMQ4v9GeJzraAKacdESCjTQP+hro
-	vQYz3Jr2NkurxkAO3chADfG3fh+CZe0b6GhMny6Eaw0puEbVnQ3oXvSHKWn+Z9US4QbO
-	j9Wq8nuDdVnR/l//MSe8I5OU6duGiojCsqt7NKfLlVgy9URN1IV7zOFPH5pyRuI2jag7
-	wgqLAZsH2KTewaLvz+6Wc0asdd6cu+ekowwOyu2EQGReT4Mqlz4Y4FEOlFWDHnwQZmDy
-	s2mx5bkEckN01RphA5WVdGbPV8wT/kVIoSjmm2oxGtJX7aqN5h1U6Z+GV7rNzVU53g5B
-	zS2w==
-X-Gm-Message-State: APjAAAWGCqaydjcnPEAzJOHMk9p3SEun/ukkI/bjX04vh3h+QCJoplk8
-	Vn/Srtzl/xQ9ImB9HD0bkYLmCg==
-X-Google-Smtp-Source: APXvYqwkQ9dLXhi9CRVI1GdfOZvAMJzQrgM63tOwe2GtF1XWLk0FZBLaWeV4z8G3murfI1Pog/kYlQ==
-X-Received: by 2002:a1c:eb03:: with SMTP id j3mr7002534wmh.15.1556900296311;
-	Fri, 03 May 2019 09:18:16 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	c10sm5441316wrd.69.2019.05.03.09.18.15
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 03 May 2019 09:18:15 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 22C8C1FF87;
-	Fri,  3 May 2019 17:18:15 +0100 (BST)
-References: <20190503154424.73933-1-liboxuan@connect.hku.hk>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Boxuan Li <liboxuan@connect.hku.hk>
-In-reply-to: <20190503154424.73933-1-liboxuan@connect.hku.hk>
-Date: Fri, 03 May 2019 17:18:15 +0100
-Message-ID: <87bm0j4im0.fsf@zen.linaroharston>
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=bgTsB/c6JGm6i14qJ7qpAxzcx6gZZqLpITWSGLkf6CY=;
+	b=kRSUgKeKvQIRzVczdyzJSFs6HAiE+RaVg2bwr7Xj9lwKnQXhJn+O7srH7VhdI9GhGa
+	yjsprsFVkFR1LP+7C+57H/W8kfi//hCfJV8/isfSyMvS16DQQXcsfl7Vxd+1fJixpMXq
+	qftN19At2zx+sEyyfMmTcV1HKtUQVRicYr4gs5209sgAdKTsyjBuK2WDdSlX/gcoUFGf
+	Q2I7ZKT6k2TRep2O0/u7uMZXuBHAtMhnFwiJKsGpbTH+JkQ62HsGb1iq/4ayGRbLyDM3
+	GRP4xRAiGTTzV6V4RkJAgd3g1jeHdewxMBuf7r0eRgLhLt07T/y6nFGoFUa2XdQflBYa
+	8kDw==
+X-Gm-Message-State: APjAAAWb12f5syjfbIcljob73Z4tFtzXAYIV5vn+1n5Pg7qsSFA9OeKk
+	BhfBjo1Lc32eEt4EmI3501oSmw==
+X-Google-Smtp-Source: APXvYqwWmXNjKOuO+aOIPeb4JbhoHRlZ3Ook5E+0Wv4/1+WjKaJxMwXnQlIyykhPP2cTiB0Nz1tquA==
+X-Received: by 2002:a1c:c7c8:: with SMTP id x191mr6838230wmf.146.1556900332844;
+	Fri, 03 May 2019 09:18:52 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	w15sm4050102wrg.43.2019.05.03.09.18.52
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Fri, 03 May 2019 09:18:52 -0700 (PDT)
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+	qemu-devel@nongnu.org
+References: <20190408201203.28924-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <79e7fd04-8cd5-0a67-c1d0-17d50423c69e@redhat.com>
+Date: Fri, 3 May 2019 18:18:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190408201203.28924-1-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v4] hw/virtio/virtio-mmio: Convert DPRINTF
- to trace and log
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.128.50
+Subject: Re: [Qemu-devel] [PATCH] qxl: fix -Waddress-of-packed-member
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,195 +86,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
-	qemu-devel@nongnu.org, yuval.shaia@oracle.com, philmd@redhat.com
+Cc: kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503161815.jqkgr85qF36_iAdSi2cuQLbr_WIsQSBm2eHp7ytcNbg@z>
+Message-ID: <20190503161851.PqblrwtaOKG5BSZQ79j6FPS7YoCVLAXbFjc9O37PnDc@z>
 
+On 4/8/19 10:12 PM, Marc-André Lureau wrote:
+> The GCC9 compiler complains about QXL code that takes the address of
+> members of the 'struct QXLReleaseRing' which is marked packed:
+> 
+>   CC      hw/display/qxl.o
+> /home/elmarco/src/qemu/hw/display/qxl.c: In function ‘init_qxl_ram’:
+> /home/elmarco/src/qemu/hw/display/qxl.c:50:19: warning: taking address of packed member of ‘struct QXLReleaseRing_ring_el’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+>    50 |             ret = &(r)->items[prod].el;                                 \
+>       |                   ^~~~~~~~~~~~~~~~~~~~
+> /home/elmarco/src/qemu/hw/display/qxl.c:429:5: note: in expansion of macro ‘SPICE_RING_PROD_ITEM’
+>   429 |     SPICE_RING_PROD_ITEM(d, &d->ram->release_ring, item);
+>       |     ^~~~~~~~~~~~~~~~~~~~
+> /home/elmarco/src/qemu/hw/display/qxl.c: In function ‘qxl_push_free_res’:
+> /home/elmarco/src/qemu/hw/display/qxl.c:50:19: warning: taking address of packed member of ‘struct QXLReleaseRing_ring_el’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+>    50 |             ret = &(r)->items[prod].el;                                 \
+>       |                   ^~~~~~~~~~~~~~~~~~~~
+> /home/elmarco/src/qemu/hw/display/qxl.c:762:5: note: in expansion of macro ‘SPICE_RING_PROD_ITEM’
+>   762 |     SPICE_RING_PROD_ITEM(d, ring, item);
+>       |     ^~~~~~~~~~~~~~~~~~~~
+> /home/elmarco/src/qemu/hw/display/qxl.c: In function ‘interface_release_resource’:
+> /home/elmarco/src/qemu/hw/display/qxl.c:50:19: warning: taking address of packed member of ‘struct QXLReleaseRing_ring_el’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+>    50 |             ret = &(r)->items[prod].el;                                 \
+>       |                   ^~~~~~~~~~~~~~~~~~~~
+> /home/elmarco/src/qemu/hw/display/qxl.c:795:5: note: in expansion of macro ‘SPICE_RING_PROD_ITEM’
+>   795 |     SPICE_RING_PROD_ITEM(qxl, ring, item);
+>       |     ^~~~~~~~~~~~~~~~~~~~
+> 
+> Replace pointer usage by direct structure/array access instead.
+> 
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Boxuan Li <liboxuan@connect.hku.hk> writes:
-
-> Use traces for debug message and qemu_log_mask for errors.
->
-> Signed-off-by: Boxuan Li <liboxuan@connect.hku.hk>
-
-You didn't add my r-b tags from last time. Anyway:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > ---
-> v1: https://patchew.org/QEMU/20190428110258.86681-1-liboxuan@connect.hku.=
-hk/
-> v2: https://patchew.org/QEMU/20190501081039.58938-1-liboxuan@connect.hku.=
-hk/
-> v3: https://patchew.org/QEMU/20190503084654.18413-1-liboxuan@connect.hku.=
-hk/
-> v4: Fix indentation and do not convert uint64_t to int
-> ---
->  hw/virtio/trace-events  |  7 +++++++
->  hw/virtio/virtio-mmio.c | 44 +++++++++++++++++++++-----------------------
->  2 files changed, 28 insertions(+), 23 deletions(-)
->
-> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> index 60c649c4bc..e28ba48da6 100644
-> --- a/hw/virtio/trace-events
-> +++ b/hw/virtio/trace-events
-> @@ -46,3 +46,10 @@ virtio_balloon_handle_output(const char *name, uint64_=
-t gpa) "section name: %s g
->  virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_page=
-s: %d actual: %d"
->  virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: =
-%d oldactual: %d"
->  virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon t=
-arget: 0x%"PRIx64" num_pages: %d"
+>  hw/display/qxl.c | 83 +++++++++++++++++++++++++++++-------------------
+>  1 file changed, 50 insertions(+), 33 deletions(-)
+> 
+> diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+> index c8ce5781e0..12d83dd6f1 100644
+> --- a/hw/display/qxl.c
+> +++ b/hw/display/qxl.c
+> @@ -39,29 +39,49 @@
+>   * abort we just qxl_set_guest_bug and set the return to NULL. Still
+>   * it may happen as a result of emulator bug as well.
+>   */
+> -#undef SPICE_RING_PROD_ITEM
+> -#define SPICE_RING_PROD_ITEM(qxl, r, ret) {                             \
+> -        uint32_t prod = (r)->prod & SPICE_RING_INDEX_MASK(r);           \
+> -        if (prod >= ARRAY_SIZE((r)->items)) {                           \
+> -            qxl_set_guest_bug(qxl, "SPICE_RING_PROD_ITEM indices mismatch " \
+> -                          "%u >= %zu", prod, ARRAY_SIZE((r)->items));   \
+> -            ret = NULL;                                                 \
+> -        } else {                                                        \
+> -            ret = &(r)->items[prod].el;                                 \
+> -        }                                                               \
+> +#define SPICE_RING_GET_CHECK(qxl, r, field) ({                          \
+> +    field = (r)->field & SPICE_RING_INDEX_MASK(r);                      \
+> +    bool mismatch = field >= ARRAY_SIZE((r)->items);                    \
+> +    if (mismatch) {                                                     \
+> +        qxl_set_guest_bug(qxl, "SPICE_RING_GET %s indices mismatch "    \
+> +                          "%u >= %zu", stringify(field), field,         \
+> +                          ARRAY_SIZE((r)->items));                      \
+> +    }                                                                   \
+> +    !mismatch;                                                          \
+> +})
 > +
-> +# virtio-mmio.c
-> +virtio_mmio_read(uint64_t offset) "virtio_mmio_read offset 0x%" PRIx64
-> +virtio_mmio_write_offset(uint64_t offset, uint64_t value) "virtio_mmio_w=
-rite offset 0x%" PRIx64 " value 0x%" PRIx64
-> +virtio_mmio_guest_page(uint64_t size, int shift) "guest page size 0x%" P=
-RIx64 " shift %d"
-> +virtio_mmio_queue_write(uint64_t value, int max_size) "mmio_queue write =
-0x%" PRIx64 " max %d"
-> +virtio_mmio_setting_irq(int level) "virtio_mmio setting IRQ %d"
-> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
-> index 5807aa87fe..96c762f0bf 100644
-> --- a/hw/virtio/virtio-mmio.c
-> +++ b/hw/virtio/virtio-mmio.c
-> @@ -27,16 +27,8 @@
->  #include "sysemu/kvm.h"
->  #include "hw/virtio/virtio-bus.h"
->  #include "qemu/error-report.h"
-> -
-> -/* #define DEBUG_VIRTIO_MMIO */
-> -
-> -#ifdef DEBUG_VIRTIO_MMIO
-> -
-> -#define DPRINTF(fmt, ...) \
-> -do { printf("virtio_mmio: " fmt , ## __VA_ARGS__); } while (0)
-> -#else
-> -#define DPRINTF(fmt, ...) do {} while (0)
-> -#endif
-> +#include "qemu/log.h"
-> +#include "trace.h"
->
->  /* QOM macros */
->  /* virtio-mmio-bus */
-> @@ -107,7 +99,7 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr =
-offset, unsigned size)
->      VirtIOMMIOProxy *proxy =3D (VirtIOMMIOProxy *)opaque;
->      VirtIODevice *vdev =3D virtio_bus_get_device(&proxy->bus);
->
-> -    DPRINTF("virtio_mmio_read offset 0x%x\n", (int)offset);
-> +    trace_virtio_mmio_read(offset);
->
->      if (!vdev) {
->          /* If no backend is present, we treat most registers as
-> @@ -144,7 +136,9 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr=
- offset, unsigned size)
->          }
+> +static inline uint64_t
+> +qxl_release_ring_get_prod(PCIQXLDevice *qxl)
+> +{
+> +    struct QXLReleaseRing *ring = &qxl->ram->release_ring;
+> +    uint32_t prod;
+> +    bool ok = SPICE_RING_GET_CHECK(qxl, ring, prod);
+> +    assert(ok);
+> +
+> +    return ring->items[prod].el;
+> +}
+> +
+> +static inline bool
+> +qxl_release_ring_set_prod(PCIQXLDevice *qxl, uint64_t val)
+> +{
+> +    struct QXLReleaseRing *ring = &qxl->ram->release_ring;
+> +    uint32_t prod;
+> +    bool ok = SPICE_RING_GET_CHECK(qxl, ring, prod);
+> +    if (ok) {
+> +        ring->items[prod].el = val;
 >      }
->      if (size !=3D 4) {
-> -        DPRINTF("wrong size access to register!\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: wrong size access to register!\n",
-> +                      __func__);
->          return 0;
->      }
->      switch (offset) {
-> @@ -182,10 +176,12 @@ static uint64_t virtio_mmio_read(void *opaque, hwad=
-dr offset, unsigned size)
->      case VIRTIO_MMIO_QUEUE_ALIGN:
->      case VIRTIO_MMIO_QUEUE_NOTIFY:
->      case VIRTIO_MMIO_INTERRUPT_ACK:
-> -        DPRINTF("read of write-only register\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: read of write-only register\n",
-> +                      __func__);
->          return 0;
->      default:
-> -        DPRINTF("bad register offset\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad register offset\n", __fu=
-nc__);
->          return 0;
->      }
->      return 0;
-> @@ -197,8 +193,7 @@ static void virtio_mmio_write(void *opaque, hwaddr of=
-fset, uint64_t value,
->      VirtIOMMIOProxy *proxy =3D (VirtIOMMIOProxy *)opaque;
->      VirtIODevice *vdev =3D virtio_bus_get_device(&proxy->bus);
->
-> -    DPRINTF("virtio_mmio_write offset 0x%x value 0x%" PRIx64 "\n",
-> -            (int)offset, value);
-> +    trace_virtio_mmio_write_offset(offset, value);
->
->      if (!vdev) {
->          /* If no backend is present, we just make all registers
-> @@ -226,7 +221,9 @@ static void virtio_mmio_write(void *opaque, hwaddr of=
-fset, uint64_t value,
->          return;
->      }
->      if (size !=3D 4) {
-> -        DPRINTF("wrong size access to register!\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: wrong size access to register!\n",
-> +                      __func__);
->          return;
->      }
->      switch (offset) {
-> @@ -246,8 +243,7 @@ static void virtio_mmio_write(void *opaque, hwaddr of=
-fset, uint64_t value,
->          if (proxy->guest_page_shift > 31) {
->              proxy->guest_page_shift =3D 0;
->          }
-> -        DPRINTF("guest page size %" PRIx64 " shift %d\n", value,
-> -                proxy->guest_page_shift);
-> +        trace_virtio_mmio_guest_page(value, proxy->guest_page_shift);
->          break;
->      case VIRTIO_MMIO_QUEUE_SEL:
->          if (value < VIRTIO_QUEUE_MAX) {
-> @@ -255,7 +251,7 @@ static void virtio_mmio_write(void *opaque, hwaddr of=
-fset, uint64_t value,
->          }
->          break;
->      case VIRTIO_MMIO_QUEUE_NUM:
-> -        DPRINTF("mmio_queue write %d max %d\n", (int)value, VIRTQUEUE_MA=
-X_SIZE);
-> +        trace_virtio_mmio_queue_write(value, VIRTQUEUE_MAX_SIZE);
->          virtio_queue_set_num(vdev, vdev->queue_sel, value);
->          /* Note: only call this function for legacy devices */
->          virtio_queue_update_rings(vdev, vdev->queue_sel);
-> @@ -303,11 +299,13 @@ static void virtio_mmio_write(void *opaque, hwaddr =
-offset, uint64_t value,
->      case VIRTIO_MMIO_DEVICE_FEATURES:
->      case VIRTIO_MMIO_QUEUE_NUM_MAX:
->      case VIRTIO_MMIO_INTERRUPT_STATUS:
-> -        DPRINTF("write to readonly register\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: write to readonly register\n",
-> +                      __func__);
->          break;
->
->      default:
-> -        DPRINTF("bad register offset\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad register offset\n", __fu=
-nc__);
->      }
+> +    return ok;
+> +}
+>  
+>  #undef SPICE_RING_CONS_ITEM
+> -#define SPICE_RING_CONS_ITEM(qxl, r, ret) {                             \
+> -        uint32_t cons = (r)->cons & SPICE_RING_INDEX_MASK(r);           \
+> -        if (cons >= ARRAY_SIZE((r)->items)) {                           \
+> -            qxl_set_guest_bug(qxl, "SPICE_RING_CONS_ITEM indices mismatch " \
+> -                          "%u >= %zu", cons, ARRAY_SIZE((r)->items));   \
+> -            ret = NULL;                                                 \
+> -        } else {                                                        \
+> -            ret = &(r)->items[cons].el;                                 \
+> -        }                                                               \
+> -    }
+> +#define SPICE_RING_CONS_ITEM(qxl, r, ret) {     \
+> +    uint32_t cons;                              \
+> +    if (!SPICE_RING_GET_CHECK(qxl, r, cons)) {  \
+> +        ret = NULL;                             \
+> +    } else {                                    \
+> +        ret = &(r)->items[cons].el;             \
+> +    }                                           \
+> +}
+>  
+>  #undef ALIGN
+>  #define ALIGN(a, b) (((a) + ((b) - 1)) & ~((b) - 1))
+> @@ -414,7 +434,6 @@ static void init_qxl_rom(PCIQXLDevice *d)
+>  static void init_qxl_ram(PCIQXLDevice *d)
+>  {
+>      uint8_t *buf;
+> -    uint64_t *item;
+>  
+>      buf = d->vga.vram_ptr;
+>      d->ram = (QXLRam *)(buf + le32_to_cpu(d->shadow_rom.ram_header_offset));
+> @@ -426,9 +445,9 @@ static void init_qxl_ram(PCIQXLDevice *d)
+>      SPICE_RING_INIT(&d->ram->cmd_ring);
+>      SPICE_RING_INIT(&d->ram->cursor_ring);
+>      SPICE_RING_INIT(&d->ram->release_ring);
+> -    SPICE_RING_PROD_ITEM(d, &d->ram->release_ring, item);
+> -    assert(item);
+> -    *item = 0;
+> +    if (!qxl_release_ring_set_prod(d, 0)) {
+> +        g_assert_not_reached();
+> +    }
+>      qxl_ring_set_dirty(d);
 >  }
->
-> @@ -327,7 +325,7 @@ static void virtio_mmio_update_irq(DeviceState *opaqu=
-e, uint16_t vector)
+>  
+> @@ -732,7 +751,6 @@ static int interface_req_cmd_notification(QXLInstance *sin)
+>  static inline void qxl_push_free_res(PCIQXLDevice *d, int flush)
+>  {
+>      QXLReleaseRing *ring = &d->ram->release_ring;
+> -    uint64_t *item;
+>      int notify;
+>  
+>  #define QXL_FREE_BUNCH_SIZE 32
+> @@ -759,11 +777,9 @@ static inline void qxl_push_free_res(PCIQXLDevice *d, int flush)
+>      if (notify) {
+>          qxl_send_events(d, QXL_INTERRUPT_DISPLAY);
+>      }
+> -    SPICE_RING_PROD_ITEM(d, ring, item);
+> -    if (!item) {
+> +    if (!qxl_release_ring_set_prod(d, 0)) {
 >          return;
 >      }
->      level =3D (atomic_read(&vdev->isr) !=3D 0);
-> -    DPRINTF("virtio_mmio setting IRQ %d\n", level);
-> +    trace_virtio_mmio_setting_irq(level);
->      qemu_set_irq(proxy->irq, level);
->  }
-
-
---
-Alex Benn=C3=A9e
+> -    *item = 0;
+>      d->num_free_res = 0;
+>      d->last_release = NULL;
+>      qxl_ring_set_dirty(d);
+> @@ -775,7 +791,8 @@ static void interface_release_resource(QXLInstance *sin,
+>  {
+>      PCIQXLDevice *qxl = container_of(sin, PCIQXLDevice, ssd.qxl);
+>      QXLReleaseRing *ring;
+> -    uint64_t *item, id;
+> +    uint32_t prod;
+> +    uint64_t id;
+>  
+>      if (ext.group_id == MEMSLOT_GROUP_HOST) {
+>          /* host group -> vga mode update request */
+> @@ -792,16 +809,16 @@ static void interface_release_resource(QXLInstance *sin,
+>       * pci bar 0, $command.release_info
+>       */
+>      ring = &qxl->ram->release_ring;
+> -    SPICE_RING_PROD_ITEM(qxl, ring, item);
+> -    if (!item) {
+> +
+> +    if (!SPICE_RING_GET_CHECK(qxl, ring, prod)) {
+>          return;
+>      }
+> -    if (*item == 0) {
+> +    if (qxl_release_ring_get_prod(qxl) == 0) {
+>          /* stick head into the ring */
+>          id = ext.info->id;
+>          ext.info->next = 0;
+>          qxl_ram_set_dirty(qxl, &ext.info->next);
+> -        *item = id;
+> +        qxl_release_ring_set_prod(qxl, id);
+>          qxl_ring_set_dirty(qxl);
+>      } else {
+>          /* append item to the list */
+> 
 
