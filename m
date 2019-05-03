@@ -3,59 +3,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 450EDC43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 00:45:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE30FC43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 00:46:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FD332070B
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 00:45:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FD332070B
+	by mail.kernel.org (Postfix) with ESMTPS id 9298A2070B
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 00:46:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9298A2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60507 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60509 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMMKs-00070X-64
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 20:45:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37700)
+	id 1hMMKu-00071r-Qf
+	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 20:46:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hMMGr-0003a5-Sl
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:41:51 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hMMGn-0003WV-BC
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:41:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hMMGq-0006lE-NZ
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:41:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45252)
+	(envelope-from <ehabkost@redhat.com>) id 1hMMGm-0006jB-FS
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:41:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38460)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hMMGq-0006kt-Db
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:41:48 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hMMGm-0006it-9l
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:41:44 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B906C3082E60;
-	Fri,  3 May 2019 00:41:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 90E0330917AA;
+	Fri,  3 May 2019 00:41:43 +0000 (UTC)
 Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 45DF35D9C4;
-	Fri,  3 May 2019 00:41:47 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2507D5C26A;
+	Fri,  3 May 2019 00:41:42 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
 	Cleber Rosa <crosa@redhat.com>
-Date: Thu,  2 May 2019 21:41:16 -0300
-Message-Id: <20190503004130.8285-6-ehabkost@redhat.com>
+Date: Thu,  2 May 2019 21:41:14 -0300
+Message-Id: <20190503004130.8285-4-ehabkost@redhat.com>
 In-Reply-To: <20190503004130.8285-1-ehabkost@redhat.com>
 References: <20190503004130.8285-1-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Fri, 03 May 2019 00:41:47 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Fri, 03 May 2019 00:41:43 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 05/19] tests/acceptance: use "arch:" tag to
- filter target specific tests
+Subject: [Qemu-devel] [PULL 03/19] tests/acceptance: fix doc reference to
+ avocado_qemu directory
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,106 +73,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190503004116.zZULGwOlnaCCD2R3QBndXQRFIiF1JT-A05ED_Go7qLc@z>
+Message-ID: <20190503004114.MBQVUCOoOcHWEeWj2q_5Kft9gWr_Smhg5jFd5kDK6jg@z>
 
 From: Cleber Rosa <crosa@redhat.com>
 
-Currently, some tests contains target architecture information, in the
-form of a "x86_64" tag.  But that tag is not respected in the default
-execution, that is, "make check-acceptance" doesn't do anything with
-it.
+The "this directory" reference is misleading and confusing, it's a
+leftover from when this text was proposed in a README file inside
+the "tests/acceptance/avocado_qemu" directory.
 
-That said, even the target architecture handling currently present in
-the "avocado_qemu.Test" class is pretty limited.  For instance, by
-default, it chooses a target based on the host architecture.
-
-Because the original implementation of the tags feature in Avocado did
-not include any time of namespace or "key:val" mechanism, no tag has
-relation to another tag.  The new implementation of the tags feature
-from version 67.0 onwards, allows "key:val" tags, and because of that,
-a test can be classified with a tag in a given key.  For instance, the
-new proposed version of the "boot_linux_console.py" test, which
-downloads and attempts to run a x86_64 kernel, is now tagged as:
-
-  :avocado: tags=arch:x86_64
-
-This means that it can be filtered (out) when no x86_64 target is
-available.  At the same time, tests that don't have a "arch:" tag,
-will not be filtered out.
+When that text was moved to the top level docs directory, the
+reference was not updated.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20190312171824.5134-6-crosa@redhat.com>
+Message-Id: <20190312171824.5134-4-crosa@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- tests/Makefile.include                 | 3 +++
- tests/acceptance/boot_linux_console.py | 2 +-
- tests/acceptance/linux_initrd.py       | 2 +-
- tests/acceptance/virtio_version.py     | 2 +-
- 4 files changed, 6 insertions(+), 3 deletions(-)
+ docs/devel/testing.rst | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 445aa0bb12..7c8b9c84b2 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -1134,6 +1134,7 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
- # Any number of command separated loggers are accepted.  For more
- # information please refer to "avocado --help".
- AVOCADO_SHOW=app
-+AVOCADO_TAGS=$(patsubst %-softmmu,-t arch:%, $(filter %-softmmu,$(TARGET_DIRS)))
- 
- ifneq ($(findstring v2,"v$(PYTHON_VERSION)"),v2)
- $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
-@@ -1159,6 +1160,8 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
- 	$(call quiet-command, \
-             $(TESTS_VENV_DIR)/bin/python -m avocado \
-             --show=$(AVOCADO_SHOW) run --job-results-dir=$(TESTS_RESULTS_DIR) \
-+            --filter-by-tags-include-empty --filter-by-tags-include-empty-key \
-+            $(AVOCADO_TAGS) \
-             --failfast=on $(SRC_PATH)/tests/acceptance, \
-             "AVOCADO", "tests/acceptance")
- 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index beeb1e59e8..fa4594f612 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -18,7 +18,7 @@ class BootLinuxConsole(Test):
-     Boots a x86_64 Linux kernel and checks that the console is operational
-     and the kernel command line is properly passed from QEMU to the kernel
- 
--    :avocado: tags=x86_64
-+    :avocado: tags=arch:x86_64
-     """
- 
-     timeout = 60
-diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_initrd.py
-index fbdb48e43f..23be5a63aa 100644
---- a/tests/acceptance/linux_initrd.py
-+++ b/tests/acceptance/linux_initrd.py
-@@ -19,7 +19,7 @@ class LinuxInitrd(Test):
-     """
-     Checks QEMU evaluates correctly the initrd file passed as -initrd option.
- 
--    :avocado: tags=x86_64
-+    :avocado: tags=arch:x86_64
-     """
- 
-     timeout = 300
-diff --git a/tests/acceptance/virtio_version.py b/tests/acceptance/virtio_version.py
-index 37fc01ea18..8b97453ff8 100644
---- a/tests/acceptance/virtio_version.py
-+++ b/tests/acceptance/virtio_version.py
-@@ -61,7 +61,7 @@ class VirtioVersionCheck(Test):
-     same device tree created by `disable-modern` and
-     `disable-legacy`.
- 
--    :avocado: tags=x86_64
-+    :avocado: tags=arch:x86_64
-     """
- 
-     # just in case there are failures, show larger diff:
--- 
+diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+index 60f897d915..7c1b199323 100644
+--- a/docs/devel/testing.rst
++++ b/docs/devel/testing.rst
+@@ -590,8 +590,9 @@ Alternatively, follow the instructions on this link:
+ Overview
+ --------
+=20
+-This directory provides the ``avocado_qemu`` Python module, containing
+-the ``avocado_qemu.Test`` class.  Here's a simple usage example:
++The ``tests/acceptance/avocado_qemu`` directory provides the
++``avocado_qemu`` Python module, containing the ``avocado_qemu.Test``
++class.  Here's a simple usage example:
+=20
+ .. code::
+=20
+--=20
 2.18.0.rc1.1.g3f1ff2140
 
 
