@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54092)
+Received: from eggs.gnu.org ([209.51.188.92]:55045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMZi5-0002Pf-4T
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:02:53 -0400
+	(envelope-from <philmd@redhat.com>) id 1hMZkd-0004Jv-Qb
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:05:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMZi0-0008Si-UY
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:02:47 -0400
-Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:44625)
+	(envelope-from <philmd@redhat.com>) id 1hMZkb-0001ub-Tj
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:05:27 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43867)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hMZhx-0008Oa-EW
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:02:43 -0400
-Received: by mail-ot1-x32d.google.com with SMTP id d10so452056otp.11
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 08:02:36 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hMZka-0001tT-8f
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:05:25 -0400
+Received: by mail-wr1-f65.google.com with SMTP id a12so8282746wrq.10
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 08:05:24 -0700 (PDT)
+References: <20190502223007.29494-1-samuel.thibault@ens-lyon.org>
+	<CAFEAcA-eVOZhXj+OLB+VvxXZTniny_sMCFaeWsv+2uEErM-=zA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <b70484a8-b408-7c2b-7fd7-27f1c1d98f4d@redhat.com>
+Date: Fri, 3 May 2019 17:05:21 +0200
 MIME-Version: 1.0
-References: <20190503004130.8285-1-ehabkost@redhat.com>
-In-Reply-To: <20190503004130.8285-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 May 2019 16:02:24 +0100
-Message-ID: <CAFEAcA81mqN6gDcyW1vzsnER-7CMzsdWreZ93X8Z6b2vCL_2pQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/19] Python queue, 2019-05-02
+In-Reply-To: <CAFEAcA-eVOZhXj+OLB+VvxXZTniny_sMCFaeWsv+2uEErM-=zA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 0/2] slirp: move slirp as git submodule
+ project
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +31,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: Jan Kiszka <jan.kiszka@siemens.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On Fri, 3 May 2019 at 01:41, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> The following changes since commit 8482ff2eb3bb95020eb2f370a9b3ea26511e41=
-df:
->
->   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request'=
- into staging (2019-05-02 12:04:51 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
->
-> for you to fetch changes up to faf441429adfe5767be52c5dcdb8bc03161d064f:
->
->   configure: automatically pick python3 is available (2019-05-02 21:33:27=
- -0300)
->
-> ----------------------------------------------------------------
-> Python queue, 2019-05-02
->
-> * configure: automatically pick python3 is available
->   (Daniel P. Berrang=C3=A9)
->
-> * tests/acceptance (Cleber Rosa, Philippe Mathieu-Daud=C3=A9):
->   * Multi-architecture test support
->   * Multiple arch-specific boot_linux_console test cases
->   * Increase verbosity of avocado by default
->   * docstring improvements
->
+On 5/3/19 2:54 PM, Peter Maydell wrote:
+> On Thu, 2 May 2019 at 23:30, Samuel Thibault
+> <samuel.thibault@ens-lyon.org> wrote:
+>>
+>> The following changes since commit 8482ff2eb3bb95020eb2f370a9b3ea26511e41df:
+>>
+>>   Merge remote-tracking branch 'remotes/jnsnow/tags/bitmaps-pull-request' into staging (2019-05-02 12:04:51 +0100)
+>>
+>> are available in the Git repository at:
+>>
+>>   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+>>
+>> for you to fetch changes up to 7c57bdd82026ba03f3158bbcd841afde7c2dc43a:
+>>
+>>   build-sys: move slirp as git submodule project (2019-05-03 00:15:37 +0200)
+>>
+>> ----------------------------------------------------------------
+>> slirp: move slirp as git submodule project
+>>
+>> Marc-André Lureau (2):
+>>   build-sys: pass CFLAGS & LDFLAGS to subdir-slirp
+>>   build-sys: move slirp as git submodule project
+>>
+>> ----------------------------------------------------------------
+>> Marc-André Lureau (2):
+>>       build-sys: pass CFLAGS & LDFLAGS to subdir-slirp
+>>       build-sys: move slirp as git submodule project
+>>
+> 
+> 
+> Applied, thanks.
 
+TL;DR: You might need to run 'git submodule deinit --force slirp' if ou
+get errors after merging this.
 
-Applied, thanks.
+--
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
+FYI I was running MinGW tests with "make docker-test-mingw@fedora
+SHOW_ENV=1 J=8 NETWORK=1" and ran "git pull" to refresh my local repo,
+and got:
 
--- PMM
+$ make docker-test-mingw@fedora SHOW_ENV=1 J=8 NETWORK=1
+make[1]: Entering directory '/home/phil/source/qemu'
+  GEN
+/home/phil/source/qemu/docker-src.2019-05-03-16.55.51.7157/qemu.tar
+slirp: unmerged (59a1b1f165458c2acb7ff0525b543945f7416225)
+fatal: git-write-tree: error building trees
+Cannot save the current index state
+Cloning into
+'/home/phil/source/qemu/docker-src.2019-05-03-16.55.51.7157/qemu.tar.vroot'...
+done.
+error: pathspec 'slirp:' did not match any file(s) known to git.
+error: pathspec 'needs' did not match any file(s) known to git.
+error: pathspec 'merge' did not match any file(s) known to git.
+failed to checkout slirp: needs merge revision
+tar: /var/tmp/qemu/qemu.tar: Cannot open: No such file or directory
+tar: Error is not recoverable: exiting now
+Failed to untar source
+tests/docker/Makefile.include:203: recipe for target 'docker-run' failed
+make[1]: *** [docker-run] Error 1
+
+I don't run builds on this host (no tools installed) but everything via
+Docker, so (re-)running ./configure is not an option.
+
+$ git status
+Unmerged paths:
+  (use "git reset HEAD <file>..." to unstage)
+  (use "git add <file>..." to mark resolution)
+
+        added by us:     slirp
+
+$ ls -la slirp/
+total 8
+drwxr-xr-x  2 phil phil 4096 May  3 16:49 .
+drwxr-xr-x 56 phil phil 4096 May  3 16:55 ..
+
+$ git submodule status slirp
+U0000000000000000000000000000000000000000 slirp
+
+Daniel suggested on IRC to run:
+
+$ git submodule deinit --force slirp
+
+It worked fine after running it.
+
+Regards,
+
+Phil.
