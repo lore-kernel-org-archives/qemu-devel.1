@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37716)
+Received: from eggs.gnu.org ([209.51.188.92]:37728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hMMGu-0003cQ-8m
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:41:53 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hMMGw-0003eQ-C9
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:41:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hMMGt-0006m8-6Y
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:41:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42592)
+	(envelope-from <ehabkost@redhat.com>) id 1hMMGv-0006ms-7S
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:41:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49428)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hMMGs-0006lr-Ux
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:41:51 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hMMGv-0006me-1r
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:41:53 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu,  2 May 2019 21:41:17 -0300
-Message-Id: <20190503004130.8285-7-ehabkost@redhat.com>
+Date: Thu,  2 May 2019 21:41:18 -0300
+Message-Id: <20190503004130.8285-8-ehabkost@redhat.com>
 In-Reply-To: <20190503004130.8285-1-ehabkost@redhat.com>
 References: <20190503004130.8285-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 06/19] tests/acceptance: look for target
- architecture in test tags first
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 07/19] tests/boot_linux_console: rename the
+ x86_64 after the arch and machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +31,50 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Cleber Rosa
 
 From: Cleber Rosa <crosa@redhat.com>
 
-A test can, optionally, be tagged for one or many architectures.  If a
-test has been tagged for a single architecture, there's a high chance
-that the test won't run on other architectures.  This changes the
-default order of choosing a default target architecture to use based
-on the 'arch' tag value first.
-
-The precedence order is for choosing a QEMU binary to use for a test
-is now:
-
- * qemu_bin parameter
- * arch parameter
- * arch tag value (for example, x86_64 if ":avocado: tags=arch:x86_64
-   is used)
-
-This means that if one runs:
-
- $ avocado run -p qemu_bin=/usr/bin/qemu-system-x86_64 test.py
-
-No arch parameter or tag will influence the selection of the QEMU
-target binary.  If one runs:
-
- $ avocado run -p arch=ppc64 test.py
-
-The target binary selection mechanism will attempt to find a binary
-such as "ppc64-softmmu/qemu-system-ppc64".  And finally, if one runs
-a test that is tagged (in its docstring) with "arch:aarch64":
-
- $ avocado run aarch64.py
-
-The target binary selection mechanism will attempt to find a binary
-such as "aarch64-softmmu/qemu-system-aarch64".
-
-At this time, no provision is made to cancel the execution of tests if
-the arch parameter given (manually) does not match the test "arch"
-tag, but it may be a useful default behavior to be added in the
-future.
+Given that the test is specific to x86_64 and pc, and new tests are
+going to be added to the same class, let's rename it accordingly.
+Also, let's make the class documentation not architecture specific.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20190312171824.5134-7-crosa@redhat.com>
+Message-Id: <20190312171824.5134-8-crosa@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- docs/devel/testing.rst                    | 4 +++-
- tests/acceptance/avocado_qemu/__init__.py | 7 ++++++-
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ tests/acceptance/boot_linux_console.py | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index 83bf9f09ac..da2d0fc964 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -740,7 +740,9 @@ A test may, for instance, use the same value when selecting the
- architecture of a kernel or disk image to boot a VM with.
- 
- The ``arch`` attribute will be set to the test parameter of the same
--name, and if one is not given explicitly, it will be set to ``None``.
-+name.  If one is not given explicitly, it will either be set to
-+``None``, or, if the test is tagged with one (and only one)
-+``:avocado: tags=arch:VALUE`` tag, it will be set to ``VALUE``.
- 
- qemu_bin
- ~~~~~~~~
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
-index 688a0746a2..2b236a1cf0 100644
---- a/tests/acceptance/avocado_qemu/__init__.py
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -53,7 +53,12 @@ def pick_default_qemu_bin(arch=None):
- class Test(avocado.Test):
-     def setUp(self):
-         self._vms = {}
--        self.arch = self.params.get('arch')
-+        arches = self.tags.get('arch', [])
-+        if len(arches) == 1:
-+            arch = arches.pop()
-+        else:
-+            arch = None
-+        self.arch = self.params.get('arch', default=arch)
-         default_qemu_bin = pick_default_qemu_bin(arch=self.arch)
-         self.qemu_bin = self.params.get('qemu_bin',
-                                         default=default_qemu_bin)
--- 
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
+ot_linux_console.py
+index fa4594f612..4d57741bd8 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -15,15 +15,17 @@ from avocado_qemu import Test
+=20
+ class BootLinuxConsole(Test):
+     """
+-    Boots a x86_64 Linux kernel and checks that the console is operation=
+al
+-    and the kernel command line is properly passed from QEMU to the kern=
+el
+-
+-    :avocado: tags=3Darch:x86_64
++    Boots a Linux kernel and checks that the console is operational and =
+the
++    kernel command line is properly passed from QEMU to the kernel
+     """
+=20
+     timeout =3D 60
+=20
+-    def test(self):
++    def test_x86_64_pc(self):
++        """
++        :avocado: tags=3Darch:x86_64
++        :avocado: tags=3Dmachine:pc
++        """
+         kernel_url =3D ('https://mirrors.kernel.org/fedora/releases/28/'
+                       'Everything/x86_64/os/images/pxeboot/vmlinuz')
+         kernel_hash =3D '238e083e114c48200f80d889f7e32eeb2793e02a'
+--=20
 2.18.0.rc1.1.g3f1ff2140
