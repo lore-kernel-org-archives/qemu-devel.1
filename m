@@ -2,84 +2,83 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFE5AC43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:24:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BF89C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:25:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC3E42075E
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:24:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC9962075E
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:25:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kZfWUY6F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC3E42075E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Fq1HxMDl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC9962075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42183 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42227 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMa34-0006U3-Ur
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 11:24:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59277)
+	id 1hMa4N-0007Tf-2t
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 11:25:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMa1t-0005Vg-Cz
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:23:18 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hMa37-0006nY-E3
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:24:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMa1s-0002rk-Aq
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:23:17 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45673)
+	(envelope-from <peter.maydell@linaro.org>) id 1hMa36-0003km-8W
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:24:33 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43695)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hMa1q-0002pS-AQ
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:23:16 -0400
-Received: by mail-ot1-x344.google.com with SMTP id a10so5597759otl.12
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 08:23:13 -0700 (PDT)
+	id 1hMa36-0003jp-22
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:24:32 -0400
+Received: by mail-oi1-x243.google.com with SMTP id j9so3955276oie.10
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 08:24:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
 	:cc:content-transfer-encoding;
-	bh=MM3r1FelcMy7Ge5cg7T3YTSEvPOSts9EPRJNBOPlTmg=;
-	b=kZfWUY6FnY+FRcBI9clf0qi/U3MRWXsTd6iRehwoAxXqS+nO4afv5fYqekk4AYIGAM
-	EooPwYKjydTNWwyaqKJs8k2cYqN7FXOtDHW63hAJ+1pSIAQVN/zG7MS5FR3avHQOdELi
-	aPyPM2ml3Ljz+qnRzKuX8fTSvzOAb5IGZJ5DN9yVihsfBY5nZR4UGbgyyFrMZU2v3Ghy
-	QqFWv7ieVdzk8pzogrfkGqdFmyNwQi0ije1OKoBtn4lg43zGBjxgPDS+5Dd72DPFjoTR
-	FpGI1CpaZHk4ft5azaoZJQI7N4YEFUc01uqLVSogC7pnR2s6FyakbhCAu8lu72jWYNiD
-	XdOA==
+	bh=R5EUZbX0veMkQ/tTDrUkgxg/WxlZ4V6jrgweu1aHHFw=;
+	b=Fq1HxMDl3UVPQyCHs5kCf6vjjb1ebXAjXa1FKW8v+hYo7c1U5Unp5Zeouy99OC6QpT
+	jNU4xWyQC3pwVzjhYGd895HmygtCN87GV/9uoddyCYUbP2Qjz/NXaxIkIDrzJbas5tCa
+	DMAg7Yn360+LT0DAmGO+5UkMbAPIIY+DtNMselXoBkgXQ73SuJ+friUM2v29jdBqCQ5q
+	iZ0yrZEugXdriHNXQz6jFTQltygfccVUoVMDY31DdTYDxwzjF+RFrEwygM3tR7YpJCN3
+	5Ht3t75tTU0LmzKiMPISd2JtMiNrhyvjhpJFcezIBhNfDwSjyN1DJpNxX2TReKjjcvUu
+	COBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=MM3r1FelcMy7Ge5cg7T3YTSEvPOSts9EPRJNBOPlTmg=;
-	b=B2lOUpsoiKPOBIK1aB9ShapbuTalnEnLQhvdAi9CwM8F5eIeireLsjRUtwnSdwZApI
-	37SeQ8926jUuMtHfr/I3V9HvVTKLbl2Z69FKpp1Rkrer/HuIuZOgB2dk1wqBwhXkqY0O
-	HbxKukQMhPv/mZ1qqdFtk65/rjefSiw7onfI/ynHS8iyeqrUJ4SDjKwv5yXA52mH/O7x
-	hJmTTTlTyc8d7Z5cAOip8A+xb90LIhlbnJuySSlvZWddhZBXJT2ThWG5ERjEVqL0sup4
-	YhzQl8vRCHOPIsoTftRlCW8QgshYgbABzS9T5SJJkNo1TmZaiQSxlPDVjUVz4gBtcEyF
-	5iWw==
-X-Gm-Message-State: APjAAAWdC3KmRGiTl88bWoerSz1HhQzrL8lUQPxK5pDzi93eWnkd8G7M
-	gimr9ABbIXRh7dL/NFMsQYTk9YSVMZomnuRWtEh8ZQ==
-X-Google-Smtp-Source: APXvYqzzvTNktCTxIr0vU40qrF958g7SdvBaGaRJTHuyn7+Hx0TwfbMXpiqSO55yp4iUKrOl6+AOyPbZBG6HZAz09UM=
-X-Received: by 2002:a9d:6d19:: with SMTP id o25mr6355124otp.151.1556896992360; 
-	Fri, 03 May 2019 08:23:12 -0700 (PDT)
+	bh=R5EUZbX0veMkQ/tTDrUkgxg/WxlZ4V6jrgweu1aHHFw=;
+	b=fqBZY3pTqByPBdWERNiXVBagJG3wDqMMQaYqO/1NDayu8CwwlsoYX0IX0DMPPRKH/M
+	89A8x9yLbppIh3uZJ2ZQ4h5lQVwfWE3TrqXNzc5t1sO4cii1UcvyqJnqyWC3ry1tWdOS
+	08qDxwPAbWA/TZj1ZSm3RYRd/W9WJfa8Unuwrni+auHdgxZ18fbEgb1uodgAJYqEPYy/
+	11ZxqRLrx4CAlNnqMgTP9L8IOMWWQEsdntP0NT0AnSjgxbGnx2OngzrdXvmz4ZHOJmiw
+	CivfMWKnWWoOaCLGeAPoXDEFMNszGTIO9C6RlVXjvFN5ihFf1LggXK5TlPW+ciZYBp15
+	xhjg==
+X-Gm-Message-State: APjAAAXS5lsmDTpYcUR+3KtiYHNmqxwMJ6s3y/COXja1qm0DT7T/Qjdu
+	OJlDHUhs+ydiA8fZ4CEF9r0AWkATIRbque5yKFJKHw==
+X-Google-Smtp-Source: APXvYqwDAehgVhxV1JoU12q+bgVNn5tAsTrGhCO7Zltg1kAlL0Jyz0biXGiVZcU83q2q8paRWbkz32RS2uztHnl5TdA=
+X-Received: by 2002:aca:b3c2:: with SMTP id c185mr6601892oif.98.1556897071133; 
+	Fri, 03 May 2019 08:24:31 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190503002206.9751-1-driver1998@foxmail.com>
-	<20190503003618.10089-1-driver1998@foxmail.com>
-	<aa0dce0b-1be0-7247-8f81-c4f265ba0009@redhat.com>
-In-Reply-To: <aa0dce0b-1be0-7247-8f81-c4f265ba0009@redhat.com>
+References: <20190430071405.16714-1-thuth@redhat.com>
+	<3619e259-7256-9199-2cdb-53f980f64c34@redhat.com>
+In-Reply-To: <3619e259-7256-9199-2cdb-53f980f64c34@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 May 2019 16:23:01 +0100
+Date: Fri, 3 May 2019 16:24:20 +0100
 Message-ID:
- <CAFEAcA9a8oQHe+cbSotO+BR2-iqgKOBV5Pg4n1aOBY7_tnvqFg@mail.gmail.com>
+ <CAFEAcA_70xU7_Z7vEs+NHuG6L9jZTp7_r2yORn91caqV4LknPQ@mail.gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] QEMU_PACKED: Remove gcc_struct
- attribute in Windows non x86 targets
+X-Received-From: 2607:f8b0:4864:20::243
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v6 00/30] Kconfig dependencies
+ for ARM machines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,59 +90,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Stefan Weil <sw@weilnetz.de>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Cao Jiaxi <driver1998@foxmail.com>,
-	=?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-	Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: Qemu-block <qemu-block@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+	Philippe Mathieu-Daude <f4bug@amsat.org>,
+	QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503152301.C4W-vbG37x4zFiVlKLf1uqu9ok1OUQS4Lv8zJHBTmgs@z>
+Message-ID: <20190503152420.mbF-mA5qnhpIRjFclDj6lbodFepW1laKb8ZWVI8ZCMM@z>
 
-On Fri, 3 May 2019 at 06:07, Thomas Huth <thuth@redhat.com> wrote:
+On Fri, 3 May 2019 at 16:15, Thomas Huth <thuth@redhat.com> wrote:
 >
-> On 03/05/2019 02.36, Cao Jiaxi wrote:
-> > gcc_struct is for x86 only, and it generates an warning on ARM64 Clang/=
-MinGW targets.
+> On 30/04/2019 09.13, Thomas Huth wrote:
+> > This series reworks the default-configs/arm-softmmu.mak and
+> > default-configs/aarch64-softmmu.mak files to use the new Kconfig-style
+> > dependencies instead.
 > >
-> > Signed-off-by: Cao Jiaxi <driver1998@foxmail.com>
-> > ---
-> >  contrib/libvhost-user/libvhost-user.h | 2 +-
-> >  include/qemu/compiler.h               | 2 +-
-> >  scripts/cocci-macro-file.h            | 7 ++++++-
-> >  slirp/src/util.h                      | 2 +-
-> >  4 files changed, 9 insertions(+), 4 deletions(-)
-
-> > diff --git a/slirp/src/util.h b/slirp/src/util.h
-> > index 01f1e0e068..278828fe3f 100644
-> > --- a/slirp/src/util.h
-> > +++ b/slirp/src/util.h
-> > @@ -43,7 +43,7 @@
-> >  #include <netinet/in.h>
-> >  #endif
+> > Some of the patches are slightly based on the work by =C3=81kos Kov=C3=
+=A1cs:
 > >
-> > -#if defined(_WIN32)
-> > +#if defined(_WIN32) && (defined(__x86_64__) || defined(__i386__))
-> >  # define SLIRP_PACKED __attribute__((gcc_struct, packed))
-> >  #else
-> >  # define SLIRP_PACKED __attribute__((packed))
+> >  https://lists.nongnu.org/archive/html/qemu-devel/2013-08/msg03730.html
 > >
+> > The other patches have been created by looking at the sources and findi=
+ng
+> > out the dependencies the hard way via trial-and-error (i.e. by enabling
+> > only one machine at a time and checking whether it can be compiled and
+> > started).
 >
-> The slirp code is currently on its way into a separate module, so you
-> might need to provide that hunk to the libslirp folks again... I'm
-> putting the slirp maintainers on CC:, maybe they can pick it up from here=
-.
+>  Hi Peter,
+>
+> the two usb-ohci patches have now been merged to master via Gerd's tree
+> already, the pci patch has an Ack from Michael and the AHCI patch one
+> from John. All patches have been reviewed and/or tested ... so I think
+> this series should now be good to go. Could you take it through your Arm
+> tree? Or shall I send a separate PULL request for this?
 
-Yes, the slirp module has now landed in master, so this patch
-definitely needs to be split into two. I've kept in my
-target-arm.next tree the parts which are applicable to
-the QEMU repo itself (ie everything except the slirp/ change),
-so we just need a new patch for the slirp submodule part.
-
-Marc-Andr=C3=A9, Samuel -- what's the process for submitting and
-getting reviewed changes to the slirp submodule now it's a
-separate project ?
+I think it will be easier for me if you just send a pullreq for it.
 
 thanks
 -- PMM
