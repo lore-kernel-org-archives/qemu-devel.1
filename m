@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48780)
+Received: from eggs.gnu.org ([209.51.188.92]:53428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hMb51-0003Ln-6V
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:30:36 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hMbEm-0001r5-Dt
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:40:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hMb50-0005Iv-9D
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:30:35 -0400
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Fri,  3 May 2019 18:30:28 +0200
-Message-Id: <20190503163028.213823-1-sgarzare@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1hMbEk-0000g0-RO
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:40:40 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:50897)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hMbEk-0000dg-HM
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:40:38 -0400
+References: <20181210165636.28366-1-peter.maydell@linaro.org>
+	<20181210165636.28366-2-peter.maydell@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <845ed993-5433-53ea-2d29-81450da95d1f@vivier.eu>
+Date: Fri, 3 May 2019 18:40:33 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] block/rbd: increase dynamically the image
- size
+In-Reply-To: <20181210165636.28366-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 1/3] target/m68k: In dump_address_map() check
+ for memory access failures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,60 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Josh Durgin <jdurgin@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-RBD APIs don't allow us to write more than the size set with
-rbd_create() or rbd_resize().
-In order to support growing images (eg. qcow2), we resize the
-image before write operations that exceed the current size.
+On 10/12/2018 17:56, Peter Maydell wrote:
+> In dump_address_map(), use address_space_ldl() instead of ldl_phys().
+> This allows us to check whether the memory access failed.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>   target/m68k/helper.c | 22 +++++++++++++++-------
+>   1 file changed, 15 insertions(+), 7 deletions(-)
+> 
+> diff --git a/target/m68k/helper.c b/target/m68k/helper.c
+> index 917d46efcc3..374e4861886 100644
+> --- a/target/m68k/helper.c
+> +++ b/target/m68k/helper.c
+> @@ -411,6 +411,7 @@ static void dump_address_map(FILE *f, fprintf_function cpu_fprintf,
+>       int last_attr = -1, attr = -1;
+>       M68kCPU *cpu = m68k_env_get_cpu(env);
+>       CPUState *cs = CPU(cpu);
+> +    MemTxResult txres;
+>   
+>       if (env->mmu.tcr & M68K_TCR_PAGE_8K) {
+>           /* 8k page */
+> @@ -424,22 +425,29 @@ static void dump_address_map(FILE *f, fprintf_function cpu_fprintf,
+>           tib_mask = M68K_4K_PAGE_MASK;
+>       }
+>       for (i = 0; i < M68K_ROOT_POINTER_ENTRIES; i++) {
+> -        tia = ldl_phys(cs->as, M68K_POINTER_BASE(root_pointer) + i * 4);
+> -        if (!M68K_UDT_VALID(tia)) {
+> +        tia = address_space_ldl(cs->as, M68K_POINTER_BASE(root_pointer) + i * 4,
+> +                                MEMTXATTRS_UNSPECIFIED, &txres);
+> +        if (txres != MEMTX_OK || !M68K_UDT_VALID(tia)) {
+>               continue;
+>           }
+>           for (j = 0; j < M68K_ROOT_POINTER_ENTRIES; j++) {
+> -            tib = ldl_phys(cs->as, M68K_POINTER_BASE(tia) + j * 4);
+> -            if (!M68K_UDT_VALID(tib)) {
+> +            tib = address_space_ldl(cs->as, M68K_POINTER_BASE(tia) + j * 4,
+> +                                    MEMTXATTRS_UNSPECIFIED, &txres);
+> +            if (txres != MEMTX_OK || !M68K_UDT_VALID(tib)) {
+>                   continue;
+>               }
+>               for (k = 0; k < tic_size; k++) {
+> -                tic = ldl_phys(cs->as, (tib & tib_mask) + k * 4);
+> -                if (!M68K_PDT_VALID(tic)) {
+> +                tic = address_space_ldl(cs->as, (tib & tib_mask) + k * 4,
+> +                                        MEMTXATTRS_UNSPECIFIED, &txres);
+> +                if (txres != MEMTX_OK || !M68K_PDT_VALID(tic)) {
+>                       continue;
+>                   }
+>                   if (M68K_PDT_INDIRECT(tic)) {
+> -                    tic = ldl_phys(cs->as, M68K_INDIRECT_POINTER(tic));
+> +                    tic = address_space_ldl(cs->as, M68K_INDIRECT_POINTER(tic),
+> +                                            MEMTXATTRS_UNSPECIFIED, &txres);
+> +                    if (txres != MEMTX_OK) {
+> +                        continue;
+> +                    }
+>                   }
+>   
+>                   last_logical = logical;
+> 
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
-v2:
-  - use bs->total_sectors instead of adding a new field [Kevin]
-  - resize the image only during write operation [Kevin]
-    for read operation, the bdrv_aligned_preadv() already handles reads
-    that exceed the length returned by bdrv_getlength(), so IMHO we can
-    avoid to handle it in the rbd driver
----
- block/rbd.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
-
-diff --git a/block/rbd.c b/block/rbd.c
-index 0c549c9935..613e8f4982 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -934,13 +934,25 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *=
-bs,
-     }
-=20
-     switch (cmd) {
--    case RBD_AIO_WRITE:
-+    case RBD_AIO_WRITE: {
-+        /*
-+         * RBD APIs don't allow us to write more than actual size, so in=
- order
-+         * to support growing images, we resize the image before write
-+         * operations that exceed the current size.
-+         */
-+        if (off + size > bs->total_sectors * BDRV_SECTOR_SIZE) {
-+            r =3D rbd_resize(s->image, off + size);
-+            if (r < 0) {
-+                goto failed_completion;
-+            }
-+        }
- #ifdef LIBRBD_SUPPORTS_IOVEC
-             r =3D rbd_aio_writev(s->image, qiov->iov, qiov->niov, off, c=
-);
- #else
-             r =3D rbd_aio_write(s->image, off, size, rcb->buf, c);
- #endif
-         break;
-+    }
-     case RBD_AIO_READ:
- #ifdef LIBRBD_SUPPORTS_IOVEC
-             r =3D rbd_aio_readv(s->image, qiov->iov, qiov->niov, off, c)=
-;
---=20
-2.20.1
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
