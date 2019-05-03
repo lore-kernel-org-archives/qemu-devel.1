@@ -2,84 +2,108 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49BB1C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:13:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31BBAC43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:15:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14B82205ED
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:13:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XsqCK92a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14B82205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 06045205ED
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:15:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06045205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42029 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42098 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMZs8-0000gf-Ba
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 11:13:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57076)
+	id 1hMZuf-0002E8-BL
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 11:15:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMZrG-0008Hf-2j
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:12:19 -0400
+	(envelope-from <thuth@redhat.com>) id 1hMZtm-0001hf-A4
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:14:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMZrF-0008HU-3f
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:12:18 -0400
-Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:38457)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hMZrE-0008C5-QL
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:12:17 -0400
-Received: by mail-ot1-x331.google.com with SMTP id b1so5604700otp.5
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 08:12:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=lecofhz2CfZc6Fh5iPYhjVa72mCbZtogkkS//icHXOU=;
-	b=XsqCK92a2pgb12Nu88f/XJ/+K/0PREHdGiPBoVOi4CsO9NfeZU3sH1sV+4jV0N2N7q
-	oK5fgj945l2+t7wOe1luo2B6ZskAvuqtwnbvsmJ1qYIprBODa132F3qxdMOwk9KdJQra
-	W0n3JJ/KRHUROCbQFkcUzT1bzsV+1ADfe4P1uBxjGb1a4rQYbVDbMwNh3hwxYsR8HLs7
-	A0D1SYSIxAMRErMR64dSPhxxh1J8ClaZnKgbmZ6X0k14bcAkK0BPzlP0sR2uDoqr79T3
-	zDTtQKZZrfVjCeI+OZ6wgkhwKZWUS8F35o/X22p2ZwQ/Cal4YEGl5Yqztf+omRlU4B/D
-	7jhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=lecofhz2CfZc6Fh5iPYhjVa72mCbZtogkkS//icHXOU=;
-	b=rR6scjk4joybBXA0HkxhyY/fdlO6NdqpCYOquX6h8F41I8L0GovqFWqGZJyr9pLyo0
-	RZPoy9RmUbGa/3hYhEN7Tc/shpJTg7abxiyetGU1HMt2ea71Gm8fYkPJ5QhojTeGNoym
-	Ho9+CzLkeMUo/PCzkbvQJVwgbMxKNn0axtS3ntzrUmrrr8mNqqhlGSeSxsCU8oqmDL6U
-	Ar/0QL5BulDj8ipK5hcTmth99oGDDqNnBl8t0LHvTlFGC4knzPTyxaQTssutmVzVrfBg
-	OwmRWQBQtChDu2u1FI+9suY7/JlPBNZ5yvUFW7hp/zHFZQD0vRSQy442wsIHPpeXVhTz
-	C/Sw==
-X-Gm-Message-State: APjAAAVjq8O3Dc7HSG0rPAa1xGu5or835UU/UJkMUwHvucPfkjKKPG+/
-	E02qVqGBN1qvBvx7KkmqQw0b1uUQEezB1fT6WHbs1w==
-X-Google-Smtp-Source: APXvYqzzAyL6GoJWmB0aDZJ6CPp9Sp+6IccZxC22mpTx/XorQ1nAhq4UXpxWFrKmmoI7RFfE3051P7HcZio2sgE/zxA=
-X-Received: by 2002:a9d:6d19:: with SMTP id o25mr6318358otp.151.1556896335741; 
-	Fri, 03 May 2019 08:12:15 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1hMZtl-0003Oc-BT
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:14:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60992)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hMZtg-0003L0-PM; Fri, 03 May 2019 11:14:48 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 74A7F327F7D8;
+	Fri,  3 May 2019 15:14:47 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-70.ams2.redhat.com [10.36.116.70])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 36D055D960;
+	Fri,  3 May 2019 15:14:33 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190430071405.16714-1-thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <3619e259-7256-9199-2cdb-53f980f64c34@redhat.com>
+Date: Fri, 3 May 2019 17:14:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190502223007.29494-1-samuel.thibault@ens-lyon.org>
-	<CAFEAcA-eVOZhXj+OLB+VvxXZTniny_sMCFaeWsv+2uEErM-=zA@mail.gmail.com>
-	<b70484a8-b408-7c2b-7fd7-27f1c1d98f4d@redhat.com>
-In-Reply-To: <b70484a8-b408-7c2b-7fd7-27f1c1d98f4d@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 May 2019 16:12:04 +0100
-Message-ID:
- <CAFEAcA9iHz6At=siOPyc76HvNm=PQpBmTLqyPPBTgeoPDKx7qw@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+In-Reply-To: <20190430071405.16714-1-thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.44]);
+	Fri, 03 May 2019 15:14:47 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::331
-Subject: Re: [Qemu-devel] [PULL 0/2] slirp: move slirp as git submodule
- project
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v6 00/30] Kconfig dependencies for ARM
+ machines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,66 +115,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jan Kiszka <jan.kiszka@siemens.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	=?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-	Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+	qemu-devel@nongnu.org, Philippe Mathieu-Daude <f4bug@amsat.org>,
+	qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+	pbonzini@redhat.com, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503151204.f3gU2IUT4JYzjWKF_Mf79Y3nLJms-UNWGfUMiKe50jg@z>
+Message-ID: <20190503151432.ChTyALtPsi_9AUw6nbuPNbi3WSq4AvpS97ZeEu1hu88@z>
 
-On Fri, 3 May 2019 at 16:05, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
-> wrote:
-> FYI I was running MinGW tests with "make docker-test-mingw@fedora
-> SHOW_ENV=3D1 J=3D8 NETWORK=3D1" and ran "git pull" to refresh my local re=
-po,
-> and got:
->
-> $ make docker-test-mingw@fedora SHOW_ENV=3D1 J=3D8 NETWORK=3D1
-> make[1]: Entering directory '/home/phil/source/qemu'
->   GEN
-> /home/phil/source/qemu/docker-src.2019-05-03-16.55.51.7157/qemu.tar
-> slirp: unmerged (59a1b1f165458c2acb7ff0525b543945f7416225)
-> fatal: git-write-tree: error building trees
-> Cannot save the current index state
-> Cloning into
-> '/home/phil/source/qemu/docker-src.2019-05-03-16.55.51.7157/qemu.tar.vroo=
-t'...
-> done.
-> error: pathspec 'slirp:' did not match any file(s) known to git.
-> error: pathspec 'needs' did not match any file(s) known to git.
-> error: pathspec 'merge' did not match any file(s) known to git.
-> failed to checkout slirp: needs merge revision
-> tar: /var/tmp/qemu/qemu.tar: Cannot open: No such file or directory
-> tar: Error is not recoverable: exiting now
-> Failed to untar source
-> tests/docker/Makefile.include:203: recipe for target 'docker-run' failed
-> make[1]: *** [docker-run] Error 1
+On 30/04/2019 09.13, Thomas Huth wrote:
+> This series reworks the default-configs/arm-softmmu.mak and
+> default-configs/aarch64-softmmu.mak files to use the new Kconfig-style
+> dependencies instead.
+>=20
+> Some of the patches are slightly based on the work by =C3=81kos Kov=C3=A1=
+cs:
+>=20
+>  https://lists.nongnu.org/archive/html/qemu-devel/2013-08/msg03730.html
+>=20
+> The other patches have been created by looking at the sources and findi=
+ng
+> out the dependencies the hard way via trial-and-error (i.e. by enabling
+> only one machine at a time and checking whether it can be compiled and
+> started).
 
-This weird set of errors is demonstrating a bug in
-scripts/archive-source.sh where it is not checking
-for errors from git. Specifically it does:
+ Hi Peter,
 
-if git diff-index --quiet HEAD -- &>/dev/null
-then
-    HEAD=3DHEAD
-else
-    HEAD=3D$(git stash create)
-fi
+the two usb-ohci patches have now been merged to master via Gerd's tree
+already, the pci patch has an Ack from Michael and the AHCI patch one
+from John. All patches have been reviewed and/or tested ... so I think
+this series should now be good to go. Could you take it through your Arm
+tree? Or shall I send a separate PULL request for this?
 
-and git prints "slirp: needs merge revision", which we
-blindly put into the HEAD variable, and then later do:
-
-git checkout $HEAD
-
-which is what's causing the weird pathspec errors, because
-(a) we're trying to check out an error message and (b) our
-shell quoting is nonexistent and so we don't even treat it
-as a single argument...
-
-thanks
--- PMM
+ Thomas
 
