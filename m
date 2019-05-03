@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44424)
+Received: from eggs.gnu.org ([209.51.188.92]:45027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMWvu-0007k8-Ku
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:04:57 -0400
+	(envelope-from <berrange@redhat.com>) id 1hMWz5-00019H-78
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:08:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMWvt-0008HE-Je
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:04:54 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38980)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hMWvt-0008D2-Ck
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:04:53 -0400
-Received: by mail-wr1-x442.google.com with SMTP id a9so7566889wrp.6
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 05:04:53 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  3 May 2019 13:04:48 +0100
-Message-Id: <20190503120448.13385-1-peter.maydell@linaro.org>
+	(envelope-from <berrange@redhat.com>) id 1hMWz3-0003bR-Jr
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:08:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57514)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hMWz2-0003a7-Il
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:08:08 -0400
+Date: Fri, 3 May 2019 13:08:02 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190503120802.GF17905@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <8C02D03E-96CD-414F-BC2C-C59972B26F94@kernelobjects.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2] target/arm: Stop using variable length
- array in dc_zva
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8C02D03E-96CD-414F-BC2C-C59972B26F94@kernelobjects.org>
+Subject: Re: [Qemu-devel] Request for comment - dynamic VNC keyboard mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +27,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Mario <ml@kernelobjects.org>
+Cc: qemu-devel@nongnu.org
 
-Currently the dc_zva helper function uses a variable length
-array. In fact we know (as the comment above remarks) that
-the length of this array is bounded because the architecture
-limits the block size and QEMU limits the target page size.
-Use a fixed array size and assert that we don't run off it.
+On Fri, May 03, 2019 at 01:47:15PM +0200, Mario wrote:
+> Hi all,
+> 
+> I have a question related to the VNC server keyboard settings. Currently
+> the user of qemu has to decide before VM startup which language is used
+> for VNC keyboard mapping. If no keyboard is configured, the en-us keyboard
+> will be loaded for keysym to scancode conversion. A later reconfiguration
+> of the keyboard is not possible at present.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Changes v1->v2:
- * use ARRAY_SIZE() instead of sizeof()
- * add a comment to make it a bit clearer that the
-   expected size of hostaddr[] is only 2 entries
----
- target/arm/helper.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+That isn't actually correct. In fact best practice is to *not* set and
+"-k keymap" arg when launching QEMU.
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 81a92ab4911..10444d12b18 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -1,4 +1,5 @@
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "target/arm/idau.h"
- #include "trace.h"
- #include "cpu.h"
-@@ -13099,14 +13100,17 @@ void HELPER(dc_zva)(CPUARMState *env, uint64_t vaddr_in)
-          * We know that in fact for any v8 CPU the page size is at least 4K
-          * and the block size must be 2K or less, but TARGET_PAGE_SIZE is only
-          * 1K as an artefact of legacy v5 subpage support being present in the
--         * same QEMU executable.
-+         * same QEMU executable. So in practice the hostaddr[] array has
-+         * two entries, given the current setting of TARGET_PAGE_BITS_MIN.
-          */
-         int maxidx = DIV_ROUND_UP(blocklen, TARGET_PAGE_SIZE);
--        void *hostaddr[maxidx];
-+        void *hostaddr[DIV_ROUND_UP(2 * KiB, 1 << TARGET_PAGE_BITS_MIN)];
-         int try, i;
-         unsigned mmu_idx = cpu_mmu_index(env, false);
-         TCGMemOpIdx oi = make_memop_idx(MO_UB, mmu_idx);
- 
-+        assert(maxidx <= ARRAY_SIZE(hostaddr));
-+
-         for (try = 0; try < 2; try++) {
- 
-             for (i = 0; i < maxidx; i++) {
+Any kind of keysym to scancode conversion done by QEMU is inherantly
+lossy and fragile as it requires a 100% matching keymap between QEMU
+and the guest OS. QEMU keymaps are much better than the past, but
+they're never going to be guaranteed to match what the guest OS is
+using because they're potentialy using completely different data
+sources.
+
+By not setting "-k", you let the QEMU VNC server activate its keyboard
+scancode VNC protocol extension. With this active, a compatible VNC
+client will then send raw hardware scancodes to QEMU alongside keysyms.
+
+QEMU will thus ignore the keysyms and send the scancodes straight to
+the guest with no keymap conversion performed at all. 
+
+With this working you can just dynamically change your guest OS keymap
+as needed to match your VNC client machine's keyboard and QEMU stays
+out of the way entirely. 
+
+Obviously the important thing here is to have a VNC client that supports
+this scancode extension. This was originally done in the GTK-VNC widget,
+and thus virt-viewer, remote-viewer, vinagre, virt-manager, GNOME Boxes
+all support this.  More recently the TigerVNC client app also supports
+this, as does the in browser noVNC client.
+
+> So here is my idea:
+> 
+> The VNC Display context stores a list of loaded keyboards (like
+> vs->vd->kbds). If no keyboard was specified, at least the default
+> will be added to the list ("en-us"?). If a client connects, a copy
+> of the (latest configured) pointer will be stored within the
+> VncState structure. For any keys sent by this client the own
+> keyboard reference will be used.
+> 
+> As (in theory) every VNC client may have a differen keyboard layout,
+> in my point of view it makes sense to attach the keyboard used for
+> keysym2scancode() to the client context rather to the VNC server
+> context. However as (most likely) all clients do have the same
+> keyboard mapping it would be an overhead to parse and store the
+> mapping list each time the client connects.
+> 
+> Now in my idea two mechanisms may change the behavior of the client
+> keyboard.
+> 
+> 1.) a qmp command was sent, that sets /configures for a particular/
+>     default keyboard.
+> 2.) within the VNC protocol a "VNC_MSG_CLIENT_QEMU/
+>     VNC_MSG_CLIENT_QEMU_EXT_KEYBOARD_LAYOUT" message arrives
+> 
+> If the new keyboard was not already loaded and stored inside
+> vs->vd->kbds , qemu initializes the new mapping. The affected VNC
+> client (VncState) again stores the reference only.
+> 
+> This enables switching the keyboard layout during runtime as well
+> as using multiple different keyboard layouts at atime.
+> 
+> Together with a corresponding patch I would also add a patch for
+> libvncclient to have a reference implmentation for the integrated
+> keyboard layout switching.
+> 
+> What are your thoughts about this kind of improvement?
+
+I don't think it is worth creating a new VNC protocol extension for this,
+since any kind of keymap conversion done on the server is inherantly
+lossy so can never be bug free. Since a new extension requires modifying
+VNC clients regardless, it is better to just modify them to support the
+raw scancode extension instead.
+
+Regards,
+Daniel
 -- 
-2.20.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
