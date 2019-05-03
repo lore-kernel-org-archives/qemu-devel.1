@@ -2,92 +2,109 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01A88C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:03:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8FCCC43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:04:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFDB32070B
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:03:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CDkAyxhh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFDB32070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9DE682087F
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:04:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DE682087F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41878 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41892 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMZiL-00026w-Ql
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 11:03:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53883)
+	id 1hMZjF-0003RA-UJ
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 11:04:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMZhH-0001aX-3j
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:02:01 -0400
+	(envelope-from <thuth@redhat.com>) id 1hMZi0-0002Cv-Um
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:02:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMZhF-000844-3N
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:01:59 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40844)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hMZhE-00081o-Df
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:01:56 -0400
-Received: by mail-wm1-x344.google.com with SMTP id h11so7099683wmb.5
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 08:01:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=4Zeq7+uEtVuQMuO7gPEtPNTYlfXms8gWH/m/iXzCw/M=;
-	b=CDkAyxhhYXpKuI+Mtq1ICO3ya35XaQxD3FLDSprenmafTYz9Mc/nvMx2Mo/jlFEmyn
-	t43KBi21VnDSmCRNMxtQByXq+CvFttHpObUCJcVS0eS2PM0pkQKTi0XKXxXJeiwTGKtT
-	umY1Mp/9sJxVvldzaiOMN5RVK3H3t/mqwWxfcKd6jWkAnfxh8p3sszgnya88TVND7Gew
-	CqdwYhDxfPfzHDFBu2iijvuniDPBNlCzrEXgHX7X6YFUI5NtEqE6jlbmdrpwIXygdBFR
-	MZcigOZ8fcK7HrKjEcAwdgihsvJwf+YhE72N58oCrF5mgRzcPgjLjoFcGuuuBY6Qt8uB
-	0GwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=4Zeq7+uEtVuQMuO7gPEtPNTYlfXms8gWH/m/iXzCw/M=;
-	b=CSkcES0FkeeaRIH1dFgwqMLddq1/03U+hI9MyxvEU4V/EL4+BF7LGfTWOjmoSXaeIQ
-	BreNl8iwyb7Qx350n2sen43lryiAqVx1dHBJtCY4jS5Wu0rPz7+K5KhEoywUmSsbCofX
-	sF84gF4LKKEyTUi69u68mJkpFIyga/hcuNcNKiJ/nskV0N7Z4oWdNT2aW4C8UMFuahBc
-	7mVd5jKDIoHe64lzyHm4Mh6Ns9tuLmwk4PpsWZ8qX/WL5I6+V14RGtssNCgr2zdHKUBQ
-	NG4YfkYi6lKIvatAIE3SAQuS5oTc0pDtXQQPbviyOm5qIX7WQEq8Db7EefN+eCJfaWF/
-	wFnw==
-X-Gm-Message-State: APjAAAWPFACJx6Pd6JAODK7K4GYmlJZ+/8dVTuk5FwPmhlaL2YIV0A3V
-	c5aN7Z0Diz+A175CicMqLAWEWQ==
-X-Google-Smtp-Source: APXvYqy4O6nZxGI58+dN33BQeY9rsQEtsDW+2uRL2HMODERRjLSsgOnqIY3BeOHv30bVtXAMCoLYuQ==
-X-Received: by 2002:a05:600c:2208:: with SMTP id
-	z8mr6385254wml.89.1556895709712; 
-	Fri, 03 May 2019 08:01:49 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	y197sm1694543wmd.34.2019.05.03.08.01.48
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 03 May 2019 08:01:48 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 40A9E1FF87;
-	Fri,  3 May 2019 16:01:48 +0100 (BST)
-References: <20190502143409.59600-1-ysato@users.sourceforge.jp>
-	<20190502143409.59600-7-ysato@users.sourceforge.jp>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190502143409.59600-7-ysato@users.sourceforge.jp>
-Date: Fri, 03 May 2019 16:01:48 +0100
-Message-ID: <87r29f4m5f.fsf@zen.linaroharston>
+	(envelope-from <thuth@redhat.com>) id 1hMZhx-0008QU-9T
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:02:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41192)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hMZhl-0008GX-99; Fri, 03 May 2019 11:02:29 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5A40F30F661D;
+	Fri,  3 May 2019 15:02:17 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-70.ams2.redhat.com [10.36.116.70])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 21F075C6DB;
+	Fri,  3 May 2019 15:02:11 +0000 (UTC)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20190503143904.31211-1-alex.bennee@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <98cd84db-2aed-4aa1-1f2d-eaa7ac63b72b@redhat.com>
+Date: Fri, 3 May 2019 17:02:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190503143904.31211-1-alex.bennee@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Fri, 03 May 2019 15:02:19 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH RFC v8 06/12] hw/intc: RX62N interrupt
- controller (ICUa)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC PATCH] tests/qemu-iotests: re-format output
+ to for make check-block
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,488 +116,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
-	Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	qemu-devel@nongnu.org,
+	"open list:Block layer core" <qemu-block@nongnu.org>,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503150148.eRR33lN2EO4ulNn-KBaeN3BGdWAWI8toYA80yDG9P0w@z>
+Message-ID: <20190503150211.2BC9B3XKCseqlZPJ3cPde80nuo9IAGAadlbnZ_wVFy8@z>
 
-
-Yoshinori Sato <ysato@users.sourceforge.jp> writes:
-
-> This implementation supported only ICUa.
-> Hardware manual.
-> https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033=
-ej0140_rx62n.pdf
->
-> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-
-Without going into detail matching up to documented behaviour to the
-code the structure and layout looks fine to me:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+On 03/05/2019 16.39, Alex Benn=C3=A9e wrote:
+> This attempts to clean-up the output to better match the output of the
+> rest of the QEMU check system. This includes:
+>=20
+>   - formatting as "  TEST    iotest: nnn"
+>   - calculating time diff at the end
+>   - only dumping config on failure
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > ---
->  include/hw/intc/rx_icu.h |  49 +++++++
->  hw/intc/rx_icu.c         | 373 +++++++++++++++++++++++++++++++++++++++++=
-++++++
->  hw/intc/Makefile.objs    |   1 +
->  3 files changed, 423 insertions(+)
->  create mode 100644 include/hw/intc/rx_icu.h
->  create mode 100644 hw/intc/rx_icu.c
->
-> diff --git a/include/hw/intc/rx_icu.h b/include/hw/intc/rx_icu.h
-> new file mode 100644
-> index 0000000000..bc46b3079b
-> --- /dev/null
-> +++ b/include/hw/intc/rx_icu.h
-> @@ -0,0 +1,49 @@
-> +#ifndef RX_ICU_H
-> +#define RX_ICU_H
-> +
-> +#include "qemu-common.h"
-> +#include "hw/irq.h"
-> +
-> +struct IRQSource {
-> +    int sense;
-> +    int level;
-> +};
-> +
-> +struct RXICUState {
-> +    SysBusDevice parent_obj;
-> +
-> +    MemoryRegion memory;
-> +    struct IRQSource src[256];
-> +    char *icutype;
-> +    uint32_t nr_irqs;
-> +    uint32_t *map;
-> +    uint32_t nr_sense;
-> +    uint32_t *init_sense;
-> +
-> +    uint8_t ir[256];
-> +    uint8_t dtcer[256];
-> +    uint8_t ier[32];
-> +    uint8_t ipr[142];
-> +    uint8_t dmasr[4];
-> +    uint16_t fir;
-> +    uint8_t nmisr;
-> +    uint8_t nmier;
-> +    uint8_t nmiclr;
-> +    uint8_t nmicr;
-> +    int req_irq;
-> +    qemu_irq _irq;
-> +    qemu_irq _fir;
-> +    qemu_irq _swi;
-> +};
-> +typedef struct RXICUState RXICUState;
-> +
-> +#define TYPE_RXICU "rxicu"
-> +#define RXICU(obj) OBJECT_CHECK(RXICUState, (obj), TYPE_RXICU)
-> +
-> +#define SWI 27
-> +#define TRG_LEVEL 0
-> +#define TRG_NEDGE 1
-> +#define TRG_PEDGE 2
-> +#define TRG_BEDGE 3
-> +
-> +#endif /* RX_ICU_H */
-> diff --git a/hw/intc/rx_icu.c b/hw/intc/rx_icu.c
-> new file mode 100644
-> index 0000000000..7c7336960d
-> --- /dev/null
-> +++ b/hw/intc/rx_icu.c
-> @@ -0,0 +1,373 @@
-> +/*
-> + * RX Interrupt control unit
-> + *
-> + * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-> + * (Rev.1.40 R01UH0033EJ0140)
-> + *
-> + * Copyright (c) 2019 Yoshinori Sato
-> + *
-> + * This program is free software; you can redistribute it and/or modify =
-it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License alo=
-ng with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "qemu/log.h"
-> +#include "qapi/error.h"
-> +#include "cpu.h"
-> +#include "hw/hw.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/registerfields.h"
-> +#include "hw/intc/rx_icu.h"
-> +#include "qemu/error-report.h"
-> +
-> +REG8(IR, 0)
-> +  FIELD(IR, IR,  0, 1)
-> +REG8(DTCER, 0x100)
-> +  FIELD(DTCER, DTCE,  0, 1)
-> +REG8(IER, 0x200)
-> +REG8(SWINTR, 0x2e0)
-> +  FIELD(SWINTR, SWINT, 0, 1)
-> +REG16(FIR, 0x2f0)
-> +  FIELD(FIR, FVCT, 0, 8)
-> +  FIELD(FIR, FIEN, 15, 1)
-> +REG8(IPR, 0x300)
-> +  FIELD(IPR, IPR, 0, 4)
-> +REG8(DMRSR, 0x400)
-> +REG8(IRQCR, 0x500)
-> +  FIELD(IRQCR, IRQMD, 2, 2)
-> +REG8(NMISR, 0x580)
-> +  FIELD(NMISR, NMIST, 0, 1)
-> +  FIELD(NMISR, LVDST, 1, 1)
-> +  FIELD(NMISR, OSTST, 2, 1)
-> +REG8(NMIER, 0x581)
-> +  FIELD(NMIER, NMIEN, 0, 1)
-> +  FIELD(NMIER, LVDEN, 1, 1)
-> +  FIELD(NMIER, OSTEN, 2, 1)
-> +REG8(NMICLR, 0x582)
-> +  FIELD(NMICLR, NMICLR, 0, 1)
-> +  FIELD(NMICLR, OSTCLR, 2, 1)
-> +REG8(NMICR, 0x583)
-> +  FIELD(NMICR, NMIMD, 3, 1)
-> +
-> +#define request(icu, n) (icu->ipr[icu->map[n]] << 8 | n)
-> +
-> +static qemu_irq *rxicu_pin(RXICUState *icu, int n_IRQ)
-> +{
-> +    if ((icu->fir & R_FIR_FIEN_MASK) &&
-> +        (icu->fir & R_FIR_FVCT_MASK) =3D=3D n_IRQ) {
-> +        return &icu->_fir;
-> +    } else {
-> +        return &icu->_irq;
-> +    }
-> +}
-> +
-> +static void rxicu_request(RXICUState *icu, int n_IRQ)
-> +{
-> +    int enable;
-> +
-> +    enable =3D icu->ier[n_IRQ / 8] & (1 << (n_IRQ & 7));
-> +    if (n_IRQ > 0 && enable !=3D 0 && atomic_read(&icu->req_irq) < 0) {
-> +        atomic_set(&icu->req_irq, n_IRQ);
-> +        qemu_set_irq(*rxicu_pin(icu, n_IRQ), request(icu, n_IRQ));
-> +    }
-> +}
-> +
-> +static void rxicu_set_irq(void *opaque, int n_IRQ, int level)
-> +{
-> +    RXICUState *icu =3D opaque;
-> +    struct IRQSource *src;
-> +    int issue;
-> +
-> +    if (n_IRQ >=3D 256) {
-> +        error_report("%s: IRQ %d out of range", __func__, n_IRQ);
-> +        return;
-> +    }
-> +
-> +    src =3D &icu->src[n_IRQ];
-> +
-> +    level =3D (level !=3D 0);
-> +    switch (src->sense) {
-> +    case TRG_LEVEL:
-> +        /* level-sensitive irq */
-> +        issue =3D level;
-> +        src->level =3D level;
-> +        break;
-> +    case TRG_NEDGE:
-> +        issue =3D (level =3D=3D 0 && src->level =3D=3D 1);
-> +        src->level =3D level;
-> +        break;
-> +    case TRG_PEDGE:
-> +        issue =3D (level =3D=3D 1 && src->level =3D=3D 0);
-> +        src->level =3D level;
-> +        break;
-> +    case TRG_BEDGE:
-> +        issue =3D ((level ^ src->level) & 1);
-> +        src->level =3D level;
-> +        break;
-> +    }
-> +    if (issue =3D=3D 0 && src->sense =3D=3D TRG_LEVEL) {
-> +        icu->ir[n_IRQ] =3D 0;
-> +        if (atomic_read(&icu->req_irq) =3D=3D n_IRQ) {
-> +            /* clear request */
-> +            qemu_set_irq(*rxicu_pin(icu, n_IRQ), 0);
-> +            atomic_set(&icu->req_irq, -1);
-> +        }
-> +        return;
-> +    }
-> +    if (issue) {
-> +        icu->ir[n_IRQ] =3D 1;
-> +        rxicu_request(icu, n_IRQ);
-> +    }
-> +}
-> +
-> +static void rxicu_ack_irq(void *opaque, int no, int level)
-> +{
-> +    RXICUState *icu =3D opaque;
-> +    int i;
-> +    int n_IRQ;
-> +    int max_pri;
-> +
-> +    n_IRQ =3D atomic_read(&icu->req_irq);
-> +    if (n_IRQ < 0) {
-> +        return;
-> +    }
-> +    atomic_set(&icu->req_irq, -1);
-> +    if (icu->src[n_IRQ].sense !=3D TRG_LEVEL) {
-> +        icu->ir[n_IRQ] =3D 0;
-> +    }
-> +
-> +    max_pri =3D 0;
-> +    n_IRQ =3D -1;
-> +    for (i =3D 0; i < 256; i++) {
-> +        if (icu->ir[i]) {
-> +            if (max_pri < icu->ipr[icu->map[i]]) {
-> +                n_IRQ =3D i;
-> +                max_pri =3D icu->ipr[icu->map[i]];
-> +            }
-> +        }
-> +    }
-> +
-> +    if (n_IRQ >=3D 0) {
-> +        rxicu_request(icu, n_IRQ);
-> +    }
-> +}
-> +
-> +static uint64_t icu_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    hwaddr offset =3D addr & 0xfff;
-> +    RXICUState *icu =3D opaque;
-> +    int reg =3D addr & 0xff;
-> +
-> +    if ((offset !=3D A_FIR && size !=3D 1) ||
-> +        (offset =3D=3D A_FIR && size !=3D 2)) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "rx_icu: Invalid read size %08lx.\n", offset);
-> +        return 0xffffffffffffffffULL;
-> +    }
-> +    switch (offset) {
-> +    case A_IR ... A_IR + 0xff:
-> +        return icu->ir[reg] & R_IR_IR_MASK;
-> +    case A_DTCER ... A_DTCER + 0xff:
-> +        return icu->dtcer[reg] & R_DTCER_DTCE_MASK;
-> +    case A_IER ... A_IER + 0x1f:
-> +        return icu->ier[reg];
-> +    case A_SWINTR:
-> +        return 0;
-> +    case A_FIR:
-> +        return icu->fir & (R_FIR_FIEN_MASK | R_FIR_FVCT_MASK);
-> +    case A_IPR ... A_IPR + 0x8f:
-> +        return icu->ipr[reg] & R_IPR_IPR_MASK;
-> +    case A_DMRSR:
-> +    case A_DMRSR + 4:
-> +    case A_DMRSR + 8:
-> +    case A_DMRSR + 12:
-> +        return icu->dmasr[reg >> 2];
-> +    case A_IRQCR ... A_IRQCR + 0x1f:
-> +        return icu->src[64 + reg].sense << R_IRQCR_IRQMD_SHIFT;
-> +    case A_NMISR:
-> +    case A_NMICLR:
-> +        return 0;
-> +    case A_NMIER:
-> +        return icu->nmier;
-> +    case A_NMICR:
-> +        return icu->nmicr;
-> +    default:
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "rx_icu: Register %08lx not implemented\n", offset=
-);
-> +        break;
-> +    }
-> +    return 0xffffffffffffffffULL;
-> +}
-> +
-> +static void icu_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
-size)
-> +{
-> +    hwaddr offset =3D addr & 0xfff;
-> +    RXICUState *icu =3D opaque;
-> +    int reg =3D addr & 0xff;
-> +
-> +    if ((offset !=3D A_FIR && size !=3D 1) ||
-> +        (offset =3D=3D A_FIR && size !=3D 2)) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "rx_icu: Invalid write size at %08lx.\n", offset);
-> +        return;
-> +    }
-> +    switch (offset) {
-> +    case A_IR ... A_IR + 0xff:
-> +        if (icu->src[reg].sense !=3D TRG_LEVEL && val =3D=3D 0) {
-> +            icu->ir[reg] =3D 0;
-> +        }
-> +        break;
-> +    case A_DTCER ... A_DTCER + 0xff:
-> +        icu->dtcer[reg] =3D val & R_DTCER_DTCE_MASK;
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "rx_icu: DTC not implemented\n");
-> +        break;
-> +    case A_IER ... A_IER + 0x1f:
-> +        icu->ier[reg] =3D val;
-> +        break;
-> +    case A_SWINTR:
-> +        if (val & R_SWINTR_SWINT_MASK) {
-> +            qemu_irq_pulse(icu->_swi);
-> +        }
-> +        break;
-> +    case A_FIR:
-> +        icu->fir =3D val & (R_FIR_FIEN_MASK | R_FIR_FVCT_MASK);
-> +        break;
-> +    case A_IPR ... A_IPR + 0x8f:
-> +        icu->ipr[reg] =3D val & R_IPR_IPR_MASK;
-> +        break;
-> +    case A_DMRSR:
-> +    case A_DMRSR + 4:
-> +    case A_DMRSR + 8:
-> +    case A_DMRSR + 12:
-> +        icu->dmasr[reg >> 2] =3D val;
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "rx_icu: DMAC not implemented\n");
-> +        break;
-> +    case A_IRQCR ... A_IRQCR + 0x1f:
-> +        icu->src[64 + reg].sense =3D val >> R_IRQCR_IRQMD_SHIFT;
-> +        break;
-> +    case A_NMICLR:
-> +        break;
-> +    case A_NMIER:
-> +        icu->nmier |=3D val & (R_NMIER_NMIEN_MASK |
-> +                             R_NMIER_LVDEN_MASK |
-> +                             R_NMIER_OSTEN_MASK);
-> +            break;
-> +    case A_NMICR:
-> +        if ((icu->nmier & R_NMIER_NMIEN_MASK) =3D=3D 0) {
-> +            icu->nmicr =3D val & R_NMICR_NMIMD_MASK;
-> +        }
-> +        break;
-> +    default:
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "rx_icu: Register %08lx not implemented\n", offset=
-);
-> +        break;
-> +    }
-> +}
-> +
-> +static const MemoryRegionOps icu_ops =3D {
-> +    .write =3D icu_write,
-> +    .read  =3D icu_read,
-> +    .endianness =3D DEVICE_LITTLE_ENDIAN,
-> +    .impl =3D {
-> +        .max_access_size =3D 2,
-> +    },
-> +};
-> +
-> +static void rxicu_realize(DeviceState *dev, Error **errp)
-> +{
-> +    RXICUState *icu =3D RXICU(dev);
-> +    int i, j;
-> +
-> +    if (icu->init_sense =3D=3D NULL) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "rx_icu: trigger-level property must be set.");
-> +        return;
-> +    }
-> +    for (i =3D j =3D 0; i < 256; i++) {
-> +        if (icu->init_sense[j] =3D=3D i) {
-> +            icu->src[i].sense =3D TRG_LEVEL;
-> +            if (j < icu->nr_sense) {
-> +                j++;
-> +            }
-> +        } else
-> +            icu->src[i].sense =3D TRG_PEDGE;
-> +    }
-> +    icu->req_irq =3D -1;
-> +}
-> +
-> +static void rxicu_init(Object *obj)
-> +{
-> +    SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
-> +    RXICUState *icu =3D RXICU(obj);
-> +
-> +    memory_region_init_io(&icu->memory, OBJECT(icu), &icu_ops,
-> +                          icu, "rx-icu", 0x600);
-> +    sysbus_init_mmio(d, &icu->memory);
-> +
-> +    qdev_init_gpio_in(DEVICE(d), rxicu_set_irq, 256);
-> +    qdev_init_gpio_in_named(DEVICE(d), rxicu_ack_irq, "ack", 1);
-> +    sysbus_init_irq(d, &icu->_irq);
-> +    sysbus_init_irq(d, &icu->_fir);
-> +    sysbus_init_irq(d, &icu->_swi);
-> +}
-> +
-> +static void rxicu_fini(Object *obj)
-> +{
-> +    RXICUState *icu =3D RXICU(obj);
-> +    g_free(icu->map);
-> +    g_free(icu->init_sense);
-> +}
-> +
-> +static const VMStateDescription vmstate_rxicu =3D {
-> +    .name =3D "rx-icu",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static Property rxicu_properties[] =3D {
-> +    DEFINE_PROP_ARRAY("ipr-map", RXICUState, nr_irqs, map,
-> +                      qdev_prop_uint32, uint32_t),
-> +    DEFINE_PROP_ARRAY("trigger-level", RXICUState, nr_sense, init_sense,
-> +                      qdev_prop_uint32, uint32_t),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void rxicu_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +
-> +    dc->realize =3D rxicu_realize;
-> +    dc->props =3D rxicu_properties;
-> +    dc->vmsd =3D &vmstate_rxicu;
-> +}
-> +
-> +static const TypeInfo rxicu_info =3D {
-> +    .name       =3D TYPE_RXICU,
-> +    .parent     =3D TYPE_SYS_BUS_DEVICE,
-> +    .instance_size =3D sizeof(RXICUState),
-> +    .instance_init =3D rxicu_init,
-> +    .instance_finalize =3D rxicu_fini,
-> +    .class_init =3D rxicu_class_init,
-> +};
-> +
-> +static void rxicu_register_types(void)
-> +{
-> +    type_register_static(&rxicu_info);
-> +}
-> +
-> +type_init(rxicu_register_types)
-> diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-> index df712c3e6c..b54b09b12e 100644
-> --- a/hw/intc/Makefile.objs
-> +++ b/hw/intc/Makefile.objs
-> @@ -48,3 +48,4 @@ obj-$(CONFIG_ARM_GIC) +=3D arm_gicv3_cpuif.o
->  obj-$(CONFIG_MIPS_CPS) +=3D mips_gic.o
->  obj-$(CONFIG_NIOS2) +=3D nios2_iic.o
->  obj-$(CONFIG_OMPIC) +=3D ompic.o
-> +obj-$(CONFIG_RX) +=3D rx_icu.o
+>  tests/qemu-iotests/check | 71 +++++++++++++++++++---------------------
+>  1 file changed, 34 insertions(+), 37 deletions(-)
 
+Thanks for tackling this! The output now looks nicer indeed if you run
+"make check-qtest check-block -j8". However, if you add a "V=3D1" at the
+end of the command line, the outputs look quite different again...
 
---
-Alex Benn=C3=A9e
+That's why I thought that having a TAP mode for the check script could
+be a good idea, too. Then we could pipe the output through the
+tap-driver.pl script, too, so we get uniform output for all tests...?
+
+ Thomas
 
