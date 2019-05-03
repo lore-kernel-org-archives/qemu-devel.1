@@ -2,91 +2,86 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AE5AC04AAA
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:55:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3748FC43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:58:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB42B2075C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:55:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 011582075C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 15:58:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vwrAMRuT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB42B2075C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KIqV4vqM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 011582075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42594 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42636 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMaWb-0005NT-23
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 11:55:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38324)
+	id 1hMaZc-0006z9-9g
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 11:58:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMaVk-00054c-CC
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:54:09 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hMaYk-0006bY-CJ
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:57:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMaVi-0006Jz-P4
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:54:08 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39567)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hMaYj-0000Bw-0d
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:57:14 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44380)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hMaVi-0006Hu-GD
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 11:54:06 -0400
-Received: by mail-wr1-x442.google.com with SMTP id a9so8488846wrp.6
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 08:54:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=phvQdGPDrTv40hatsvI2zYnn1lXqke4gviF65+Xb/ao=;
-	b=vwrAMRuTBwCewcaUXSYhOcWXWOEw2RPj2knUzpvubkfTUGRduJOPelYx9fl9OCucA9
-	6gP7//9N6jl8t0hwiVUl3CUtG4nfYh/vMtvz/TXxr4I9HidJRagPxVgREHfNXs8nCBSH
-	EP0jwfrbTuGdKC8wZm4kojmUd4AawFi5ZxUgjTiJIUd9bH4vrvPDI7NMPBeWN1sC0EMp
-	wa+BIjOExMLvum7daO6/zhGSp56ovIdFys5ubXh5Guc4/+EFTjN99Ejb4BonGTNyv+ql
-	3WsdUs/VQIijDKEHLq1vjtD8Nnt4rPKh4VgazqX0vU43Y4bqJPuZG7NQCZ/JtEd5Mf5C
-	HpuQ==
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hMaYf-00007x-SN; Fri, 03 May 2019 11:57:10 -0400
+Received: by mail-wr1-x444.google.com with SMTP id c5so8469221wrs.11;
+	Fri, 03 May 2019 08:57:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=UflN6O/cC2oAHvB7oVstYZTEynT12/71bOY2BTbtmTc=;
+	b=KIqV4vqMqRfwL2WVXdvocBRmA86tIwefo5Jbsu/d+st77CwTOXC2xtYFjmHd1NVGl+
+	3vZ9WpYh7hvf76WPYnkval1tRdIidfkv+OSyb8qVmYBo6R9V7FK+S0olf2ptTIF/ZW3V
+	8T3C9TDM6E0zUGnyWJWRhNsrsRO4dyWsUDTtiXncm/d2FWcIXipTsv/Xiq8KHZaJ7Llt
+	yqCcCBO3LjNInHPO8sZeBCMczZtmc27fE4Qyu3KF9Tg11XfspAax0fkSAM005l5atsgP
+	qWHfL/t4/73iKL94hurwrZXrtahqoca+JSVR8lWwkz3PVzmIJj5ldFsr2RQ8ExtKyQLm
+	yVTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=phvQdGPDrTv40hatsvI2zYnn1lXqke4gviF65+Xb/ao=;
-	b=a6I2ZXYRXfFEkCatG2rP6tWdzOg0fSTwHCsjH+9wjjIPixQlrhKxXh98AI+48ctOzo
-	owMLFmO4E7AMdEV+mv0tS6ZtvEWbkn7h3maN9yfZicVBnYNxFgPSVTpuWo8wYEb3SNfS
-	sDVcPA6k+S9FGl6c5iP2EgdqPVNHclI3d7pQQ+sq3zPlkLSETpOf1Jj2SeIX5hJdu0fn
-	BctweKARIRI+xsOoQKatj6tMAaXpRLeJkIJlyI/P4q8QcrSF2IHZxufY9lAGw2p0M1xm
-	NDPsMmEVB0mU7B4/BRH8exKo8dmT26Kf/QvCh8+YBAu5tko+1YxMSeDEc3urNXzPiZ9p
-	jGLQ==
-X-Gm-Message-State: APjAAAXxqkofbGVbIUKeZyKgNkafAuOSIjQzf/Ux1pTjhETT83Dp9beK
-	HGJ+wTzLauEfxTsdmYYkErkg3Q==
-X-Google-Smtp-Source: APXvYqy7kJ7zd9osUbkZoRmFm9X5s4MhVBO7djcgXKzc8n8EXInVe63mDsVOQtZSveF+eVs4spoE6w==
-X-Received: by 2002:a5d:4348:: with SMTP id u8mr7921956wrr.129.1556898844892; 
-	Fri, 03 May 2019 08:54:04 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	h81sm6033602wmf.33.2019.05.03.08.54.04
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 03 May 2019 08:54:04 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id D6BDB1FF87;
-	Fri,  3 May 2019 16:54:03 +0100 (BST)
-References: <20190502143409.59600-1-ysato@users.sourceforge.jp>
-	<20190502143409.59600-5-ysato@users.sourceforge.jp>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190502143409.59600-5-ysato@users.sourceforge.jp>
-Date: Fri, 03 May 2019 16:54:03 +0100
-Message-ID: <87h8ab4jqc.fsf@zen.linaroharston>
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=UflN6O/cC2oAHvB7oVstYZTEynT12/71bOY2BTbtmTc=;
+	b=lzP1N9fwMVOcNHdhmup/aTCrJvx4qQssknz/MyyvYpjNfVuNgizvQFnFtB6OcCbEO1
+	SKbfOPo/MLuH4bz3mcINlrX/SZpVMVbTDy6wSNgd7gR4u4dKUNDkFcsH/JHI2bZyI2Lf
+	iwpCdIWIucMN21+X0huf7LcbjHLL6nVbon9P1s6z7mZBlxpctIck5KOOvXfS/moGvFeL
+	Kei6MTLc9uqLRvOwdAFDjQ3fmZOATx1J+OPIw/hwFSItpK/eSTxEYS4coWiUJpr6O0FA
+	JdXM6sIeoslQI8jijgwZ66CgQG8Q1cXKFlswC72xH9c6sW04l6K/jhqZRaA4rkUa2Tm/
+	wDjQ==
+X-Gm-Message-State: APjAAAWUhz4WzOUaN56LHvQupcCIjwgHQ0F0p6STx8smLukX4VkMvdgt
+	TR/cjfVK8hHcQnq+oBIa+P4QtJGYefWhd1/6pHc=
+X-Google-Smtp-Source: APXvYqwaYQ0DRJMGMlkKGP6YFUcp4DlWhsKQTYgYhSG0nWPNqHbNbLmnmuQocvWs/c+OQGR1NIOdshT/YW9BsEQPYBE=
+X-Received: by 2002:adf:b641:: with SMTP id i1mr7517545wre.288.1556899028217; 
+	Fri, 03 May 2019 08:57:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <20190503002206.9751-1-driver1998@foxmail.com>
+	<20190503003618.10089-1-driver1998@foxmail.com>
+	<aa0dce0b-1be0-7247-8f81-c4f265ba0009@redhat.com>
+	<CAFEAcA9a8oQHe+cbSotO+BR2-iqgKOBV5Pg4n1aOBY7_tnvqFg@mail.gmail.com>
+In-Reply-To: <CAFEAcA9a8oQHe+cbSotO+BR2-iqgKOBV5Pg4n1aOBY7_tnvqFg@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 3 May 2019 17:56:56 +0200
+Message-ID:
+ <CAJ+F1CL+2YGHMZteU74y9a61rW6fXLDxcb4KGzPBEAL6878Ujg@mail.gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH RFC v8 04/12] target/rx: RX disassembler
+X-Received-From: 2a00:1450:4864:20::444
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] QEMU_PACKED: Remove gcc_struct
+ attribute in Windows non x86 targets
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,152 +93,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
-	Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: Thomas Huth <thuth@redhat.com>, qemu trival <qemu-trivial@nongnu.org>,
+	Stefan Weil <sw@weilnetz.de>, QEMU Developers <qemu-devel@nongnu.org>,
+	Cao Jiaxi <driver1998@foxmail.com>,
+	Samuel Thibault <samuel.thibault@ens-lyon.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503155403.ES8YVW_J3R0jLK6E1Z0yylq9-g2og-Xt9OygLmcFJC0@z>
+Message-ID: <20190503155656.q8jdealYQVVl_IQeCxRsPOoeFhdNBYUwOmuROhagQJk@z>
 
+Hi
 
-Yoshinori Sato <ysato@users.sourceforge.jp> writes:
+Le ven. 3 mai 2019 =C3=A0 17:23, Peter Maydell <peter.maydell@linaro.org> a
+=C3=A9crit :
 
-> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-> ---
->  include/disas/dis-asm.h |    5 +
->  target/rx/disas.c       | 1481 +++++++++++++++++++++++++++++++++++++++++=
-++++++
->  2 files changed, 1486 insertions(+)
->  create mode 100644 target/rx/disas.c
+> On Fri, 3 May 2019 at 06:07, Thomas Huth <thuth@redhat.com> wrote:
+> >
+> > On 03/05/2019 02.36, Cao Jiaxi wrote:
+> > > gcc_struct is for x86 only, and it generates an warning on ARM64
+> Clang/MinGW targets.
+> > >
+> > > Signed-off-by: Cao Jiaxi <driver1998@foxmail.com>
+> > > ---
+> > >  contrib/libvhost-user/libvhost-user.h | 2 +-
+> > >  include/qemu/compiler.h               | 2 +-
+> > >  scripts/cocci-macro-file.h            | 7 ++++++-
+> > >  slirp/src/util.h                      | 2 +-
+> > >  4 files changed, 9 insertions(+), 4 deletions(-)
 >
-> diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-> index 9240ec32c2..de17792e88 100644
-> --- a/include/disas/dis-asm.h
-> +++ b/include/disas/dis-asm.h
-> @@ -226,6 +226,10 @@ enum bfd_architecture
->  #define bfd_mach_nios2r2        2
->    bfd_arch_lm32,       /* Lattice Mico32 */
->  #define bfd_mach_lm32 1
-> +  bfd_arch_rx,       /* Renesas RX */
-> +#define bfd_mach_rx            0x75
-> +#define bfd_mach_rx_v2         0x76
-> +#define bfd_mach_rx_v3         0x77
->    bfd_arch_last
->    };
->  #define bfd_mach_s390_31 31
-> @@ -433,6 +437,7 @@ int print_insn_little_nios2     (bfd_vma, disassemble=
-_info*);
->  int print_insn_xtensa           (bfd_vma, disassemble_info*);
->  int print_insn_riscv32          (bfd_vma, disassemble_info*);
->  int print_insn_riscv64          (bfd_vma, disassemble_info*);
-> +int print_insn_rx(bfd_vma, disassemble_info *);
+> > > diff --git a/slirp/src/util.h b/slirp/src/util.h
+> > > index 01f1e0e068..278828fe3f 100644
+> > > --- a/slirp/src/util.h
+> > > +++ b/slirp/src/util.h
+> > > @@ -43,7 +43,7 @@
+> > >  #include <netinet/in.h>
+> > >  #endif
+> > >
+> > > -#if defined(_WIN32)
+> > > +#if defined(_WIN32) && (defined(__x86_64__) || defined(__i386__))
+> > >  # define SLIRP_PACKED __attribute__((gcc_struct, packed))
+> > >  #else
+> > >  # define SLIRP_PACKED __attribute__((packed))
+> > >
+> >
+> > The slirp code is currently on its way into a separate module, so you
+> > might need to provide that hunk to the libslirp folks again... I'm
+> > putting the slirp maintainers on CC:, maybe they can pick it up from
+> here.
 >
->  #if 0
->  /* Fetch the disassembler for a given BFD, if that support is available.=
-  */
-> diff --git a/target/rx/disas.c b/target/rx/disas.c
-> new file mode 100644
-> index 0000000000..014fadfca3
-> --- /dev/null
-> +++ b/target/rx/disas.c
-> @@ -0,0 +1,1481 @@
-> +/*
-> + * Renesas RX Disassembler
-> + *
-> + * Copyright (c) 2019 Yoshinori Sato <ysato@users.sourceforge.jp>
-> + *
-> + * This program is free software; you can redistribute it and/or modify =
-it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License alo=
-ng with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "disas/dis-asm.h"
-> +#include "qemu/bitops.h"
-> +#include "cpu.h"
-> +
-> +typedef struct DisasContext {
-> +    disassemble_info *dis;
-> +    uint32_t addr;
-> +    uint32_t pc;
-> +} DisasContext;
-> +
-> +
-> +static uint32_t decode_load_bytes(DisasContext *ctx, uint32_t insn,
-> +                           int i, int n)
-> +{
-> +    bfd_byte buf;
-> +    while (++i <=3D n) {
-> +        ctx->dis->read_memory_func(ctx->addr++, &buf, 1, ctx->dis);
-> +        insn |=3D buf << (32 - i * 8);
-> +    }
-> +    return insn;
-> +}
-> +
-> +static int32_t li(DisasContext *ctx, int sz)
-> +{
-> +    int32_t addr;
-> +    bfd_byte buf[4];
-> +    addr =3D ctx->addr;
-> +
-> +    switch (sz) {
-> +    case 1:
-> +        ctx->addr +=3D 1;
-> +        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
-> +        return buf[0];
-> +    case 2:
-> +        ctx->addr +=3D 2;
-> +        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
-> +        return buf[1] << 8 | buf[0];
-> +    case 3:
-> +        ctx->addr +=3D 3;
-> +        ctx->dis->read_memory_func(addr, buf, 3, ctx->dis);
-> +        return buf[2] << 16 | buf[1] << 8 | buf[0];
-> +    case 0:
-> +        ctx->addr +=3D 4;
-> +        ctx->dis->read_memory_func(addr, buf, 4, ctx->dis);
-> +        return buf[3] << 24 | buf[2] << 16 | buf[1] << 8 | buf[0];
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +}
-> +
-> +static int bdsp_s(DisasContext *ctx, int d)
-> +{
-> +    /*
-> +     * 0 -> 8
-> +     * 1 -> 9
-> +     * 2 -> 10
-> +     * 3 -> 3
-> +     * :
-> +     * 7 -> 7
-> +     */
-> +    if (d < 3) {
-> +        d +=3D 8;
-> +    }
-> +    return d;
-> +}
-> +
-> +/* Include the auto-generated decoder.  */
-> +#include "decode.inc.c"
+> Yes, the slirp module has now landed in master, so this patch
+> definitely needs to be split into two. I've kept in my
+> target-arm.next tree the parts which are applicable to
+> the QEMU repo itself (ie everything except the slirp/ change),
+> so we just need a new patch for the slirp submodule part.
+>
+> Marc-Andr=C3=A9, Samuel -- what's the process for submitting and
+> getting reviewed changes to the slirp submodule now it's a
+> separate project ?
+>
 
-This introduces a dependency on a generated file so you'll need:
+It's hosted on gitlab.freedesktop.org, with some CI. It's fine to send
+patches on qemu devel, as long as Samuel or I are in CC. But in the long
+term, I think gitlab MR will be favoured (after a while using it, I think
+gitlab is better than ML for patches & bug tracking tbh)
 
-target/rx/disas.o: target/rx/decode.inc.c
-
-in Makefile.objs
-
---
-Alex Benn=C3=A9e
-
+>
