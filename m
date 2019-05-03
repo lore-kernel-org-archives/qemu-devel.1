@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41814)
+Received: from eggs.gnu.org ([209.51.188.92]:41861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMcKr-0001Dz-9x
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:02 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMcKy-0001GT-DT
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMcKp-0007Pu-JD
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:00 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:54736 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hMcKx-0007aQ-9r
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:08 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:55531 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hMcKp-0007MZ-D3
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:50:59 -0400
+	id 1hMcKx-0007Z0-2Z
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:51:07 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri,  3 May 2019 19:50:41 +0200
-Message-Id: <1556905846-14074-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v4 0/5] linux-user: A set of miscellaneous
- patches
+Date: Fri,  3 May 2019 19:50:42 +0200
+Message-Id: <1556905846-14074-2-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1556905846-14074-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1556905846-14074-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v4 1/5] linux-user: Fix support for the
+ SIOCATMARK and SIOCGPGRP ioctls for xtensa
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +30,54 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, arikalo@wavecomp.com, nchen@wa
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-This is a collection of misc patches for Linux user that I recently
-accumulated from variuous sources. All of them originate from problems
-observed on mips target. However, these changes actually affect and fix
-problems on multiple targets.
+Fix support for the SIOCATMARK and SIOCGPGRP ioctls for xtensa by
+correcting corresponding macro definition.
 
-v3->v4:
+Values for TARGET_SIOCATMARK and TARGET_SIOCGPGRP are determined by
+Linux kernel. Following relevant lines (obtained by grep) are from
+the kernel source tree:
 
-  - improved commit messages (fixed some typos, improved relevance)
+arch/ia64/include/uapi/asm/sockios.h:#define SIOCATMARK    0x8905
+arch/mips/include/uapi/asm/sockios.h:#define SIOCATMARK    _IOR('s', 7, int)
+arch/parisc/include/uapi/asm/sockios.h:#define SIOCATMARK  0x8905
+arch/sh/include/uapi/asm/sockios.h:#define SIOCATMARK      _IOR('s', 7, int)
+arch/xtensa/include/uapi/asm/sockios.h:#define SIOCATMARK  _IOR('s', 7, int)
+arch/alpha/include/uapi/asm/sockios.h:#define SIOCATMARK   _IOR('s', 7, int)
+arch/sparc/include/uapi/asm/sockios.h:#define SIOCATMARK   0x8905
+include/uapi/asm-generic/sockios.h:#define SIOCATMARK	   0x8905
 
-v2->v3:
+arch/ia64/include/uapi/asm/sockios.h:#define SIOCGPGRP     0x8904
+arch/mips/include/uapi/asm/sockios.h:#define SIOCGPGRP     _IOR('s', 9, pid_t)
+arch/parisc/include/uapi/asm/sockios.h:#define SIOCGPGRP   0x8904
+arch/sh/include/uapi/asm/sockios.h:#define SIOCGPGRP       _IOR('s', 9, pid_t)
+arch/xtensa/include/uapi/asm/sockios.h:#define SIOCGPGRP   _IOR('s', 9, pid_t)
+arch/alpha/include/uapi/asm/sockios.h:#define SIOCGPGRP    _IOR('s', 9, pid_t)
+arch/sparc/include/uapi/asm/sockios.h:#define SIOCGPGRP    0x8904
+include/uapi/asm-generic/sockios.h:#define SIOCGPGRP       0x8904
 
-  - updated and improved commit messages
-  - added IPV6_DROP_MEMBERSHIP support to the patch on setsockopt()'s
-    option
+It is visible from above that xtensa should have the same definitions
+as alpha, mips and sh4 already do. This patch brings QEMU to the accurate
+state wrt these two ioctls.
 
-v1->v2:
+Acked-by: Max Filippov <jcmvbkbc@gmail.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ linux-user/syscall_defs.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-  - added the patch on setsockopt()'s option IPV6_ADD_MEMBERSHIP
-  - improved the commit message of interp_info sanitizing patch
-
-Aleksandar Markovic (2):
-  linux-user: Fix support for the SIOCATMARK and SIOCGPGRP ioctls for
-    xtensa
-  linux-user: Add support for the SIOCSPGRP ioctl for all targets
-
-Daniel Santos (1):
-  linux-user: Sanitize interp_info and, for mips only, init field fp_abi
-
-Neng Chen (2):
-  linux-user: Add support the SIOC<G|S>IFPFLAGS ioctls for all targets
-  linux-user: Add support for setsockopt() options
-    IPV6_<ADD|DROP>_MEMBERSHIP
-
- linux-user/elfload.c      |  5 +++++
- linux-user/ioctls.h       |  3 +++
- linux-user/syscall.c      | 19 +++++++++++++++++++
- linux-user/syscall_defs.h |  8 +++++++-
- 4 files changed, 34 insertions(+), 1 deletion(-)
-
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 12c8407..1e86fb9 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -736,7 +736,8 @@ struct target_pollfd {
+ #define TARGET_KDSETLED        0x4B32	/* set led state [lights, not flags] */
+ #define TARGET_KDSIGACCEPT     0x4B4E
+ 
+-#if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4)
++#if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
++       defined(TARGET_XTENSA)
+ #define TARGET_SIOCATMARK      TARGET_IOR('s', 7, int)
+ #define TARGET_SIOCGPGRP       TARGET_IOR('s', 9, pid_t)
+ #else
 -- 
 2.7.4
