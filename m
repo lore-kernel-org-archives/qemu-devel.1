@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45866)
+Received: from eggs.gnu.org ([209.51.188.92]:47036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMX3B-0003Z3-Fe
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:12:26 -0400
+	(envelope-from <thatlemon@gmail.com>) id 1hMXAi-0004rp-UJ
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:20:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hMX3A-0006cI-IL
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:12:25 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:38005)
+	(envelope-from <thatlemon@gmail.com>) id 1hMXAi-0006BV-2M
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:20:12 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40825)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hMX3A-0006bn-CH
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:12:24 -0400
-Received: by mail-oi1-x242.google.com with SMTP id t70so4231363oif.5
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 05:12:23 -0700 (PDT)
+	(Exim 4.71) (envelope-from <thatlemon@gmail.com>) id 1hMXAh-0006An-SR
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 08:20:12 -0400
+Received: by mail-wm1-x343.google.com with SMTP id h11so6492804wmb.5
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 05:20:11 -0700 (PDT)
+Date: Fri, 3 May 2019 14:20:07 +0200
+From: Giuseppe Musacchio <thatlemon@gmail.com>
+Message-ID: <20190503122007.lkjsvztgt4ycovac@debian>
 MIME-Version: 1.0
-References: <20190315143057.20165-1-peter.maydell@linaro.org>
-	<87sgvkw4vp.fsf@zen.linaroharston>
-	<CAFEAcA_n2MvRfCdydianR9EgDxdP093+Fi-Co2WRa0ncAF=Pgg@mail.gmail.com>
-In-Reply-To: <CAFEAcA_n2MvRfCdydianR9EgDxdP093+Fi-Co2WRa0ncAF=Pgg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 May 2019 13:12:11 +0100
-Message-ID: <CAFEAcA88dHzePhpOBdKFXr4HpF3J40FqY6qdwFpNhyBgxbehkQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0?] arm: Allow system registers for
- KVM guests to be changed by QEMU code
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH v2] linux-user: elf: Map empty PT_LOAD segments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +26,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Dongjiu Geng <gengdongjiu@huawei.com>, Eric Auger <eric.auger@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, laurent@vivier.eu, peter.maydell@linaro.org
 
-On Mon, 25 Mar 2019 at 10:25, Peter Maydell <peter.maydell@linaro.org> wrot=
-e:
->
-> On Mon, 18 Mar 2019 at 15:59, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
-> >
-> >
-> > Peter Maydell <peter.maydell@linaro.org> writes:
-[...]
-> > > Support this by making kvm_arch_put_registers() synchronize
-> > > CPU state back into the list. We sync only those registers
-> > > where the initial write succeeds, which should be sufficient.
-> > >
-> > > This commit is the same as commit 823e1b3818f9b10b824ddc which we
-> > > had to revert in commit 942f99c825fc94c8b1a4, except that the bug
-> > > which was preventing EDK2 guest firmware running has been fixed:
-> > > kvm_arm_reset_vcpu() now calls write_list_to_cpustate().
+Some PT_LOAD segments may be completely zeroed out and their p_filesize
+is zero, in that case the loader should just allocate a page that's at
+least p_memsz bytes large (plus eventual alignment padding).
 
-> > > Should we try to put this in for rc1? Not sure... Testing
-> > > definitely appreciated.
->
-> > Hmm so running my testcase:
-> >
-> >  * gdbstub enabled with an active sw or hw breakpoint
-> >  * run userspace program in guest:
-> >    - sw breakpoint works fine
-> >    - hw breakpoint never triggers because guest segs
->
-> Further testing from Alex suggests this is some unrelated
-> bug or regression (ie not caused by this patch), but:
-> since the only in-tree use for this patch is to get nested
-> debugging working and it would be broken for this other
-> reason even with this patch, I'm going to postpone applying
-> this patch until the start of the 4.1 cycle.
+Calling zero_bss does this job for us, all we have to do is make sure we
+don't try to mmap a zero-length page.
 
-Since we're now in the 4.1 cycle I'm going to apply this
-patch, as I suggested above -- I'm putting it into my
-target-arm.next queue to go in in my next pullreq.
+Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ linux-user/elfload.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-We should make sure we investigate the debugging-KVM
-breakage Alex described at some point this cycle too.
-
-thanks
--- PMM
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index c1a2602..138735b 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -2366,11 +2366,19 @@ static void load_elf_image(const char *image_name, int image_fd,
+             vaddr_ps = TARGET_ELF_PAGESTART(vaddr);
+             vaddr_len = TARGET_ELF_PAGELENGTH(eppnt->p_filesz + vaddr_po);
+ 
+-            error = target_mmap(vaddr_ps, vaddr_len,
+-                                elf_prot, MAP_PRIVATE | MAP_FIXED,
+-                                image_fd, eppnt->p_offset - vaddr_po);
+-            if (error == -1) {
+-                goto exit_perror;
++            /*
++             * Some segments may be completely empty without any backing file
++             * segment, in that case just let zero_bss allocate an empty buffer
++             * for it.
++             */
++            if (eppnt->p_filesz != 0) {
++                error = target_mmap(vaddr_ps, vaddr_len, elf_prot,
++                                    MAP_PRIVATE | MAP_FIXED,
++                                    image_fd, eppnt->p_offset - vaddr_po);
++
++                if (error == -1) {
++                    goto exit_perror;
++                }
+             }
+ 
+             vaddr_ef = vaddr + eppnt->p_filesz;
+-- 
+2.20.1
