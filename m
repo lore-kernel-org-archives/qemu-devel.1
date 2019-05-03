@@ -2,91 +2,84 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83057C004C9
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:01:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD716C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:05:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37A5F2075E
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:01:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="asgfMBOt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37A5F2075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B298C206C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 17:05:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B298C206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44725 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44741 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMbZN-0006vw-0d
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 13:01:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59130)
+	id 1hMbcR-0008OX-Vb
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 13:05:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMbXx-0005oR-1Z
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:00:29 -0400
+	(envelope-from <philmd@redhat.com>) id 1hMbbX-00084o-KH
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:04:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMbXw-0002F8-0A
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:00:28 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37250)
+	(envelope-from <philmd@redhat.com>) id 1hMbbW-0006RX-BM
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:04:11 -0400
+Received: from mail-wm1-f51.google.com ([209.85.128.51]:34003)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hMbXv-0002DC-Np
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:00:27 -0400
-Received: by mail-wr1-x443.google.com with SMTP id d22so1605854wrb.4
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 10:00:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=EIi4K2dkSBbuhfS2t70Kzgd4m/ZSCWhAQBd5+AA+hJM=;
-	b=asgfMBOtomdN8aCDKZAOO2DEUwKq6iVGJhawyklo26ErrHVll+FJ2+FRuBNNkVXEGB
-	sU3QFqn3uUQoDWtagpo+UJhXTXRIt88XswZWOAay+ZuGxQyYvmq83smE5X1yBHIKXkB7
-	BO2wzFFhJpcSMsuC6FpzS/DZmgTykz6+hAuyzWYbsH8N1pokdlha1FrTigJVMxm3R199
-	1JdZgYPv9SNVfEy3WG3cXe2jW34hHZeK+Ixg4KHrymekq7nrYa9Xl6wZbNkagLzftekh
-	rADFpkxonWLnYTs4o/K71pgPajX7UdPCk0WLsxAkBPGWlVhk1IzauXK4Qc+FemG/em8x
-	hTAA==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hMbbW-0006QK-5T
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 13:04:10 -0400
+Received: by mail-wm1-f51.google.com with SMTP id m20so347537wmg.1
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 10:04:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=EIi4K2dkSBbuhfS2t70Kzgd4m/ZSCWhAQBd5+AA+hJM=;
-	b=K2C+SD9CqqQsRcpM6Bqy/jXf3y6BtWMpUh83D7mxk8gFmuzt44srttTk/pFS3rq2td
-	/q3yb/BKNBE9FQnCr71yAGx58HLgTcg1N8GgzXzmPZRX8Em7Z+Y++qdRF223Ig195XjA
-	M5ZWtqQrG9fxAAMIrafePHSbcw60CAbOuBVVKRuuJmgoN10WX1vmokJqiHveMLhD3WSy
-	syfEajngqHmAwjozXZIAsSrpmlVtOXZYU7Z7UrNATBaRsx5YWQbKXPAeZyQC8/mubWrh
-	Yf8H1wcgHklBt1mAWWksFBaaFNuJcLQ4H8Ew4E3uoU0vxu1rbmPE7VF0Yl1cwTnMoiLg
-	Xh+A==
-X-Gm-Message-State: APjAAAUtM+byfaQcd1OH3wzdQRG+qvYyfAeWV0ECIiVJgQIXqgVa5aI1
-	Vm5LBDVuoAliB9dqI4yOdSE1sg==
-X-Google-Smtp-Source: APXvYqxB3Erbn6n5CoH9GnWhM9Q3MK2m5U0VE1h4JogAF+x0D2VP4DpbSNtj3FYRo/dcJJpZF5Y6nQ==
-X-Received: by 2002:adf:e74b:: with SMTP id c11mr1351828wrn.221.1556902826282; 
-	Fri, 03 May 2019 10:00:26 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id t67sm3935497wmg.0.2019.05.03.10.00.25
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 03 May 2019 10:00:25 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 5DDBD1FF87;
-	Fri,  3 May 2019 18:00:25 +0100 (BST)
-References: <20190503154424.73933-1-liboxuan@connect.hku.hk>
-	<87bm0j4im0.fsf@zen.linaroharston>
-	<CALM0=-=b+z2aW-cuM=hmk3_oKG7w3ianMo_ZA7gj8zMgCOfC3g@mail.gmail.com>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: "LI\, BO XUAN" <liboxuan@connect.hku.hk>
-In-reply-to: <CALM0=-=b+z2aW-cuM=hmk3_oKG7w3ianMo_ZA7gj8zMgCOfC3g@mail.gmail.com>
-Date: Fri, 03 May 2019 18:00:25 +0100
-Message-ID: <878svn4gnq.fsf@zen.linaroharston>
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=pHqpHDBluSnJ+bv7SK9GfHe57lbayMO6jW0qLFbpkLM=;
+	b=f0JFiAkOJtbDo1GMtaVEsxWPGISJ4/TWoRgq/zfoiXidnv4300flN0RJcc04RTWbd6
+	51+5ldHFBK7X8QfvmOdcDT72x/+HMi1qflQUs4ZxjRxTi6hpXgyzGcDfb0iEDCOshnsQ
+	/aPLXkBSZ0qcceFgjqHB/dbJTiBlSDadBBn9zBCNaFvXYPe8vd809D1Qas8yWsPuXWHf
+	TFXabSAuoiTPbSgOnfBvociDb8HEUeYkZRT1OeSU/sslLvYxAVzrbsMAK4Pe6pvmY1Gj
+	gJSAr487o/2VCBv6yajLh3d73IcSNuIgMEOu7Ro9+ZZPeQFXjHBV2YgyOAus9Qza15NO
+	UFeQ==
+X-Gm-Message-State: APjAAAV+hL34i2SStydoXNeIkBeWeptdwUkHGQcreIejFCcnetHUznJX
+	GuqhwWBOpp0Lz4A7TkorJfQuIA==
+X-Google-Smtp-Source: APXvYqw+iQ+LsDhtBxeQty8yudBdI2Rqo3n7VIto3halmE3uHrauc1vwiR6aLbu9+fiyA6s61qJDgg==
+X-Received: by 2002:a1c:ed18:: with SMTP id l24mr7052095wmh.8.1556903049023;
+	Fri, 03 May 2019 10:04:09 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193])
+	by smtp.gmail.com with ESMTPSA id i8sm4107325wrb.5.2019.05.03.10.04.07
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Fri, 03 May 2019 10:04:08 -0700 (PDT)
+To: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+	Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20190503004130.8285-1-ehabkost@redhat.com>
+	<20190503004130.8285-20-ehabkost@redhat.com>
+	<40c4d236-ed76-e433-51d5-c9feabb4374a@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <b6e70863-4ec9-0209-46b0-b74eb1453fcf@redhat.com>
+Date: Fri, 3 May 2019 19:04:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <40c4d236-ed76-e433-51d5-c9feabb4374a@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH v4] hw/virtio/virtio-mmio: Convert DPRINTF
- to trace and log
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.128.51
+Subject: Re: [Qemu-devel] [PULL 19/19] configure: automatically pick python3
+ is available
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,28 +91,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
-	qemu-devel@nongnu.org, Yuval Shaia <yuval.shaia@oracle.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503170025.nviJ1pl7_Ga4Q38ZSwgqpNBzc3lRz8DZ3gIQOgoEDIA@z>
+Message-ID: <20190503170407.CXLfnrhb3D__8Y8V3xb0lOnP3B7HzYPbrGXolgtt4dk@z>
 
+On 5/3/19 6:41 PM, Thomas Huth wrote:
+> On 03/05/2019 02.41, Eduardo Habkost wrote:
+>> From: Daniel P. Berrangé <berrange@redhat.com>
+>>
+>> Unless overridden via an env var or configure arg, QEMU will only look
+>> for the 'python' binary in $PATH. This is unhelpful on distros which
+>> are only shipping Python 3.x (eg Fedora) in their default install as,
+>> if they comply with PEP 394, the bare 'python' binary won't exist.
+>>
+>> This changes configure so that by default it will search for all three
+>> common python binaries, preferring to find Python 3.x versions.
+>>
+>> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+>> Message-Id: <20190327170701.23798-1-berrange@redhat.com>
+>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>> ---
+>>  configure | 18 +++++++++++++++---
+>>  1 file changed, 15 insertions(+), 3 deletions(-)
+> 
+> I haven't bisected it, but I think this patch here broke the gitlab-ci tests:
+> 
+>  https://gitlab.com/huth/qemu/-/jobs/206806257
 
-LI, BO XUAN <liboxuan@connect.hku.hk> writes:
+What's the easier way to notice that automatically?
 
-> Hi Alex,
->
-> Sorry about that, I am still trying to get familiar with the patch
-> submission process. Since my patch has been changed from your last review,
-> I thought it would be safe to not include the r-b tag from last time. Will
-> take care next time!
+The quicker fix I have is Peter setup'ing a GitLab account mirroring his
+repo:staging branch, and warn him, but that won't scale much.
 
-That's ok. As a general rule as long as you haven't substantially
-changed a patch it's safe to keep previous r-b tags. You can always
-mention it in your cover letter if you are unsure.
-
---
-Alex Benn=C3=A9e
+> Seems like the test is now failing when you don't have an UTF-8 locale:
+> 
+>  LANG=C make check-qapi-schema
+>  [...]
+>  TEST    tests/qapi-schema/union-base-empty.out
+>  --- /builds/huth/qemu/tests/qapi-schema/unicode-str.err	2019-05-03 15:21:39.000000000 +0000
+>  +++ -	2019-05-03 15:42:01.561762978 +0000
+>  @@ -1 +1 @@
+>  -tests/qapi-schema/unicode-str.json:2: 'command' uses invalid name 'é'
+>  +tests/qapi-schema/unicode-str.json:2: 'command' uses invalid name '\xe9'
+>  /builds/huth/qemu/tests/Makefile.include:1105: recipe for target 'check-tests/qapi-schema/unicode-str.json' failed
+>  make: *** [check-tests/qapi-schema/unicode-str.json] Error 1
+> 
+> Any ideas how to fix this?
+> 
+>  Thomas
+> 
 
