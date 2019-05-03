@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76641C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 13:02:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C39C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 13:02:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 487F22087F
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 13:02:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 487F22087F
+	by mail.kernel.org (Postfix) with ESMTPS id 9B5152081C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 13:02:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B5152081C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40476 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40478 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMXpx-0006pA-EN
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 09:02:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56077)
+	id 1hMXpz-0006sk-TZ
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 09:02:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hMXo4-0005A8-Gu
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 09:00:53 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hMXo7-0005CI-E1
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 09:00:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hMXnz-0000B3-PU
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 09:00:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56458)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hMXo4-0000DL-M6
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 09:00:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1hMXnz-0000Ab-8k
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 09:00:47 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	id 1hMXo4-0000CQ-GF
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 09:00:52 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 843F2307AD14
-	for <qemu-devel@nongnu.org>; Fri,  3 May 2019 13:00:46 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id CCC3C300413C
+	for <qemu-devel@nongnu.org>; Fri,  3 May 2019 13:00:50 +0000 (UTC)
 Received: from localhost (ovpn-112-51.ams2.redhat.com [10.36.112.51])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8D93326373;
-	Fri,  3 May 2019 13:00:41 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 179455DA5B;
+	Fri,  3 May 2019 13:00:47 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  3 May 2019 15:00:29 +0200
-Message-Id: <20190503130034.24916-2-marcandre.lureau@redhat.com>
+Date: Fri,  3 May 2019 15:00:30 +0200
+Message-Id: <20190503130034.24916-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20190503130034.24916-1-marcandre.lureau@redhat.com>
 References: <20190503130034.24916-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
 	(mx1.redhat.com [10.5.110.46]);
-	Fri, 03 May 2019 13:00:46 +0000 (UTC)
+	Fri, 03 May 2019 13:00:50 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 1/6] libvhost-user: fix
- -Waddress-of-packed-member
+Subject: [Qemu-devel] [PATCH v2 2/6] libvhost-user: add PROTOCOL_F_CONFIG if
+ {set, get}_config
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,67 +74,33 @@ Cc: kraxel@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503130029.SZeR23KJhxKVTYABKM79i9lGmuz6uC748dFOQ8yOFRA@z>
+Message-ID: <20190503130030.IBPQ6pW3sIDhdC2uPjtDPNEnwg8eEZXMpn8gkEwZz-4@z>
 
-/home/elmarco/src/qemu/contrib/libvhost-user/libvhost-user.c: In function=
- =E2=80=98vu_set_mem_table_exec_postcopy=E2=80=99:
-/home/elmarco/src/qemu/contrib/libvhost-user/libvhost-user.c:546:31: warn=
-ing: taking address of packed member of =E2=80=98struct VhostUserMsg=E2=80=
-=99 may result in an unaligned pointer value [-Waddress-of-packed-member]
-  546 |     VhostUserMemory *memory =3D &vmsg->payload.memory;
-      |                               ^~~~~~~~~~~~~~~~~~~~~
-/home/elmarco/src/qemu/contrib/libvhost-user/libvhost-user.c: In function=
- =E2=80=98vu_set_mem_table_exec=E2=80=99:
-/home/elmarco/src/qemu/contrib/libvhost-user/libvhost-user.c:688:31: warn=
-ing: taking address of packed member of =E2=80=98struct VhostUserMsg=E2=80=
-=99 may result in an unaligned pointer value [-Waddress-of-packed-member]
-  688 |     VhostUserMemory *memory =3D &vmsg->payload.memory;
-      |                               ^~~~~~~~~~~~~~~~~~~~~
-/home/elmarco/src/qemu/contrib/libvhost-user/libvhost-user.c: In function=
- =E2=80=98vu_set_vring_addr_exec=E2=80=99:
-/home/elmarco/src/qemu/contrib/libvhost-user/libvhost-user.c:817:36: warn=
-ing: taking address of packed member of =E2=80=98struct VhostUserMsg=E2=80=
-=99 may result in an unaligned pointer value [-Waddress-of-packed-member]
-  817 |     struct vhost_vring_addr *vra =3D &vmsg->payload.addr;
-      |                                    ^~~~~~~~~~~~~~~~~~~
+Add the config protocol feature bit if the set_config & get_config
+callbacks are implemented.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ contrib/libvhost-user/libvhost-user.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
 r/libvhost-user.c
-index e08d6c7b97..dcf4a969f2 100644
+index dcf4a969f2..74d42177c5 100644
 --- a/contrib/libvhost-user/libvhost-user.c
 +++ b/contrib/libvhost-user/libvhost-user.c
-@@ -542,7 +542,7 @@ static bool
- vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
- {
-     int i;
--    VhostUserMemory *memory =3D &vmsg->payload.memory;
-+    VhostUserMemory m =3D vmsg->payload.memory, *memory =3D &m;
-     dev->nregions =3D memory->nregions;
+@@ -1157,6 +1157,10 @@ vu_get_protocol_features_exec(VuDev *dev, VhostUse=
+rMsg *vmsg)
+         features |=3D 1ULL << VHOST_USER_PROTOCOL_F_PAGEFAULT;
+     }
 =20
-     DPRINT("Nregions: %d\n", memory->nregions);
-@@ -684,7 +684,7 @@ static bool
- vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)
- {
-     int i;
--    VhostUserMemory *memory =3D &vmsg->payload.memory;
-+    VhostUserMemory m =3D vmsg->payload.memory, *memory =3D &m;
-=20
-     for (i =3D 0; i < dev->nregions; i++) {
-         VuDevRegion *r =3D &dev->regions[i];
-@@ -813,7 +813,7 @@ vu_set_vring_num_exec(VuDev *dev, VhostUserMsg *vmsg)
- static bool
- vu_set_vring_addr_exec(VuDev *dev, VhostUserMsg *vmsg)
- {
--    struct vhost_vring_addr *vra =3D &vmsg->payload.addr;
-+    struct vhost_vring_addr addr =3D vmsg->payload.addr, *vra =3D &addr;
-     unsigned int index =3D vra->index;
-     VuVirtq *vq =3D &dev->vq[index];
-=20
++    if (dev->iface->get_config && dev->iface->set_config) {
++        features |=3D 1ULL << VHOST_USER_PROTOCOL_F_CONFIG;
++    }
++
+     if (dev->iface->get_protocol_features) {
+         features |=3D dev->iface->get_protocol_features(dev);
+     }
 --=20
 2.21.0.777.g83232e3864
 
