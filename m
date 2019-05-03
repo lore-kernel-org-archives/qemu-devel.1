@@ -2,80 +2,121 @@ Return-Path: <SRS0=LbB6=TD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A70AAC43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 09:14:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2D65C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 09:14:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67ABD206C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 09:14:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67ABD206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B6FDD206C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 09:14:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6FDD206C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36996 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36998 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMUGv-0008Pt-Lb
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 05:14:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34303)
+	id 1hMUH2-0008Vo-TE
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 05:14:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hMUFQ-0006gP-Ea
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:12:54 -0400
+	(envelope-from <jirislaby@gmail.com>) id 1hMUFX-0006u5-CS
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:13:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hMUFM-0001XT-Kl
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:12:52 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:43255)
+	(envelope-from <jirislaby@gmail.com>) id 1hMUFV-0001fk-H8
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:12:59 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:46161)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hMUFK-0001Uu-QP
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:12:48 -0400
-Received: by mail-wr1-f68.google.com with SMTP id a12so6869951wrq.10
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 02:12:46 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jirislaby@gmail.com>) id 1hMUFT-0001cv-Jf
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 05:12:57 -0400
+Received: by mail-wr1-f65.google.com with SMTP id r7so6844164wrr.13
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 02:12:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=cvPtOPw9YxktAJUOL2BVkA8tFegrY7sfIT9D/4XFm90=;
-	b=Dj80D/QyAYib72zOO7+VloaMIn5Be4MLdqj322+AKyEb1IjxA26HFnfbVW4b7sivtF
-	DGXdLK4SLmLNRDCYs02kGaYwdTSUJvIM8EmdUXgkssUiPAd68dqzfpDTIz6Fu6OguiiR
-	87uL0zuNL5gnRSHX4ozSqKqtriOmTfwpaVmJVgKPoSIP9DppOSDhfVncyWuFzrtZm1gU
-	8aWXgsc1w2UEp5g1+t/ztHCccwyrDeYypmAT1DQ0yk+XEZ0qJMZrE9E7vFXjmBpzBCdb
-	ogHlsI8Kefl8mKAwXFdipZ8XgqryKp57dTO1jJ+ny6ZZi3fpGu+IMuFEMaA5YPpt/Xa0
-	yX0Q==
-X-Gm-Message-State: APjAAAU/myq6Vp7R+2/HEUfYxtX920GMstCRv7nw2YBAlThN7XOdl0xJ
-	RYL9g6loomX9cFPyh92mE+AaBQ==
-X-Google-Smtp-Source: APXvYqxLOYkzTmnXanhtyQ4AIxt5YP7duEMqil/UVEVKXBQU+9sIqLc3CYXecUCD3XvGgUSJM5RAHg==
-X-Received: by 2002:a5d:5092:: with SMTP id a18mr6541357wrt.112.1556874765019; 
-	Fri, 03 May 2019 02:12:45 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	l127sm1883211wml.40.2019.05.03.02.12.44
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Fri, 03 May 2019 02:12:44 -0700 (PDT)
-To: Boxuan Li <liboxuan@connect.hku.hk>, qemu-devel@nongnu.org
-References: <20190503084654.18413-1-liboxuan@connect.hku.hk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <0f731e62-b716-8f90-4505-019f731bd072@redhat.com>
-Date: Fri, 3 May 2019 11:12:43 +0200
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+	:message-id:date:user-agent:mime-version:in-reply-to
+	:content-language:content-transfer-encoding;
+	bh=s1Ll7Ad35mIeE/XCIllWGErniEvHM6iiNL91UV910NA=;
+	b=dV/qLXTj50hCfZz7ad1NA0eF1xfvtC8mreK/bkbXZXwaq+uqrA/exAPL+0bjEig6Vs
+	jAwWl+mcK0WqaEjMuL2veTMMDgjoExgIok3/cLn0oGhXfokXr47rOrQVijx/h+9QC55z
+	mPfVciIFBQ1FnnDhI45xVPxLPRlv7QSxuLD5lleHiemayQRPvwDKJ6RRnPChakCRexTm
+	h1pBibNFmvLYHz8FKSWDX2bSxrA8UIbp73ShktxccEcWvXkGDU6ew24xO0iaY9KVYHO3
+	+c8OZBoVTfVlLCQRxxeDCe7A1vWPgERVytYOoyQHfI0XnxznE8JnnEm/TuTdov7DvVrl
+	HHCQ==
+X-Gm-Message-State: APjAAAVJ8aChTD/GHyx+JCn5CEOsFVlJ8HTuuw9MpipLgxoiQY/mJh6x
+	JQB/S8iXOaenc1bVNYWHTyHNIh1C
+X-Google-Smtp-Source: APXvYqzfuxOMNK0OeFAvYQZi6Bx2YXG3c036cfkR75oOrMPjiJic+AIsytYSeRulZVN8SeEwq7zJBg==
+X-Received: by 2002:a05:6000:ca:: with SMTP id
+	q10mr6041014wrx.148.1556874774253; 
+	Fri, 03 May 2019 02:12:54 -0700 (PDT)
+Received: from ?IPv6:2a0b:e7c0:0:107::49? ([2a0b:e7c0:0:107::49])
+	by smtp.gmail.com with ESMTPSA id d4sm2568352wrf.7.2019.05.03.02.12.53
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 03 May 2019 02:12:53 -0700 (PDT)
+To: Li Qiang <liq3ea@163.com>, pbonzini@redhat.com
+References: <20190422141156.15746-1-liq3ea@163.com>
+	<20190422141156.15746-3-liq3ea@163.com>
+From: Jiri Slaby <jslaby@suse.cz>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jslaby@suse.cz; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <77127529-fc4b-b8af-64c5-a40d2f322c35@suse.cz>
+Date: Fri, 3 May 2019 11:12:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190503084654.18413-1-liboxuan@connect.hku.hk>
+In-Reply-To: <20190422141156.15746-3-liq3ea@163.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH v3] hw/virtio/virtio-mmio: Convert DPRINTF
- to trace and log
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] edu: mmio: allow 64-bit access in
+ read dispatch
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,182 +128,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, alex.bennee@linaro.org, yuval.shaia@oracle.com,
-	"Michael S. Tsirkin" <mst@redhat.com>
+Cc: philmd@redhat.com, liq3ea@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190503091243.PEQt5DTTZxbbMmhdxwc2SXxA45p_-RFDUTu1JNKhd1M@z>
+Message-ID: <20190503091252.0lbYKYOfaJvpaVd9n80wtXXVt3amXnjPqxDqy78aubM@z>
 
-Hi Li,
-
-On 5/3/19 10:46 AM, Boxuan Li wrote:
-> Use traces for debug message and qemu_log_mask for errors.
+On 22. 04. 19, 16:11, Li Qiang wrote:
+> The edu spec says when address >= 0x80, the MMIO area can
+> be accessed by 64-bit.
 > 
-> Signed-off-by: Boxuan Li <liboxuan@connect.hku.hk>
+> Signed-off-by: Li Qiang <liq3ea@163.com>
 > ---
-> v1: https://patchew.org/QEMU/20190428110258.86681-1-liboxuan@connect.hku.hk/
-> v2: https://patchew.org/QEMU/20190501081039.58938-1-liboxuan@connect.hku.hk/
-> v3: Use qemu_log_mask for errors
-> ---
->  hw/virtio/trace-events  |  7 +++++++
->  hw/virtio/virtio-mmio.c | 44 +++++++++++++++++++++-----------------------
->  2 files changed, 28 insertions(+), 23 deletions(-)
+> Change since v2:
+> Fix an error per Phillippe's advice
 > 
-> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> index 60c649c4bc..81cbe1c4b2 100644
-> --- a/hw/virtio/trace-events
-> +++ b/hw/virtio/trace-events
-> @@ -46,3 +46,10 @@ virtio_balloon_handle_output(const char *name, uint64_t gpa) "section name: %s g
->  virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_pages: %d actual: %d"
->  virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: %d oldactual: %d"
->  virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon target: 0x%"PRIx64" num_pages: %d"
+>  hw/misc/edu.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/misc/edu.c b/hw/misc/edu.c
+> index 65fc32b928..33de05141f 100644
+> --- a/hw/misc/edu.c
+> +++ b/hw/misc/edu.c
+> @@ -185,7 +185,11 @@ static uint64_t edu_mmio_read(void *opaque, hwaddr addr, unsigned size)
+>      EduState *edu = opaque;
+>      uint64_t val = ~0ULL;
+>  
+> -    if (size != 4) {
+> +    if (addr < 0x80 && size != 4) {
+> +        return val;
+> +    }
 > +
-> +# virtio-mmio.c
-> +virtio_mmio_read(int offset) "virtio_mmio_read offset 0x%x"
-> +virtio_mmio_write_offset(int offset, uint64_t value) "virtio_mmio_write offset 0x%x value 0x%" PRIx64
-
-If possible, use uint64_t/PRIx64 for offset (to avoid casting to int).
-
-> +virtio_mmio_guest_page(uint64_t size, int shift) "guest page size 0x%" PRIx64 " shift %d"
-> +virtio_mmio_queue_write(int value, int max_size) "mmio_queue write %d max %d"
-> +virtio_mmio_setting_irq(int level) "virtio_mmio setting IRQ %d"
-> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
-> index 5807aa87fe..c8a9d974b3 100644
-> --- a/hw/virtio/virtio-mmio.c
-> +++ b/hw/virtio/virtio-mmio.c
-> @@ -27,16 +27,8 @@
->  #include "sysemu/kvm.h"
->  #include "hw/virtio/virtio-bus.h"
->  #include "qemu/error-report.h"
-> -
-> -/* #define DEBUG_VIRTIO_MMIO */
-> -
-> -#ifdef DEBUG_VIRTIO_MMIO
-> -
-> -#define DPRINTF(fmt, ...) \
-> -do { printf("virtio_mmio: " fmt , ## __VA_ARGS__); } while (0)
-> -#else
-> -#define DPRINTF(fmt, ...) do {} while (0)
-> -#endif
-> +#include "qemu/log.h"
-> +#include "trace.h"
->  
->  /* QOM macros */
->  /* virtio-mmio-bus */
-> @@ -107,7 +99,7 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
->      VirtIOMMIOProxy *proxy = (VirtIOMMIOProxy *)opaque;
->      VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
->  
-> -    DPRINTF("virtio_mmio_read offset 0x%x\n", (int)offset);
-> +    trace_virtio_mmio_read((int)offset);
->  
->      if (!vdev) {
->          /* If no backend is present, we treat most registers as
-> @@ -144,7 +136,9 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
->          }
+> +    if (addr >= 0x80 && size != 4 && size != 8) {
+>          return val;
 >      }
->      if (size != 4) {
-> -        DPRINTF("wrong size access to register!\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                "%s: wrong size access to register!\n",
-> +                __func__);
 
-QEMU codying style is to indent the arguments aligned, after the caller
-parenthesis:
+Good catch, thanks.
 
-        qemu_log_mask(LOG_GUEST_ERROR,
-                      "%s: wrong size access to register!\n",
-                      __func__);
-
-That said:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-Thanks for the cleanup!
-
->          return 0;
->      }
->      switch (offset) {
-> @@ -182,10 +176,12 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
->      case VIRTIO_MMIO_QUEUE_ALIGN:
->      case VIRTIO_MMIO_QUEUE_NOTIFY:
->      case VIRTIO_MMIO_INTERRUPT_ACK:
-> -        DPRINTF("read of write-only register\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                "%s: read of write-only register\n",
-> +                __func__);
->          return 0;
->      default:
-> -        DPRINTF("bad register offset\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad register offset\n", __func__);
->          return 0;
->      }
->      return 0;
-> @@ -197,8 +193,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
->      VirtIOMMIOProxy *proxy = (VirtIOMMIOProxy *)opaque;
->      VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
->  
-> -    DPRINTF("virtio_mmio_write offset 0x%x value 0x%" PRIx64 "\n",
-> -            (int)offset, value);
-> +    trace_virtio_mmio_write_offset((int)offset, value);
->  
->      if (!vdev) {
->          /* If no backend is present, we just make all registers
-> @@ -226,7 +221,9 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
->          return;
->      }
->      if (size != 4) {
-> -        DPRINTF("wrong size access to register!\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                "%s: wrong size access to register!\n",
-> +                __func__);
->          return;
->      }
->      switch (offset) {
-> @@ -246,8 +243,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
->          if (proxy->guest_page_shift > 31) {
->              proxy->guest_page_shift = 0;
->          }
-> -        DPRINTF("guest page size %" PRIx64 " shift %d\n", value,
-> -                proxy->guest_page_shift);
-> +        trace_virtio_mmio_guest_page(value, proxy->guest_page_shift);
->          break;
->      case VIRTIO_MMIO_QUEUE_SEL:
->          if (value < VIRTIO_QUEUE_MAX) {
-> @@ -255,7 +251,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
->          }
->          break;
->      case VIRTIO_MMIO_QUEUE_NUM:
-> -        DPRINTF("mmio_queue write %d max %d\n", (int)value, VIRTQUEUE_MAX_SIZE);
-> +        trace_virtio_mmio_queue_write((int)value, VIRTQUEUE_MAX_SIZE);
->          virtio_queue_set_num(vdev, vdev->queue_sel, value);
->          /* Note: only call this function for legacy devices */
->          virtio_queue_update_rings(vdev, vdev->queue_sel);
-> @@ -303,11 +299,13 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
->      case VIRTIO_MMIO_DEVICE_FEATURES:
->      case VIRTIO_MMIO_QUEUE_NUM_MAX:
->      case VIRTIO_MMIO_INTERRUPT_STATUS:
-> -        DPRINTF("write to readonly register\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                "%s: write to readonly register\n",
-> +                __func__);
->          break;
->  
->      default:
-> -        DPRINTF("bad register offset\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad register offset\n", __func__);
->      }
->  }
->  
-> @@ -327,7 +325,7 @@ static void virtio_mmio_update_irq(DeviceState *opaque, uint16_t vector)
->          return;
->      }
->      level = (atomic_read(&vdev->isr) != 0);
-> -    DPRINTF("virtio_mmio setting IRQ %d\n", level);
-> +    trace_virtio_mmio_setting_irq(level);
->      qemu_set_irq(proxy->irq, level);
->  }
->  
-> 
+-- 
+js
+suse labs
 
