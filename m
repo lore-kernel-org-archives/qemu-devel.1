@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38014)
+Received: from eggs.gnu.org ([209.51.188.92]:42312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hMMHX-0004GW-L2
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:42:32 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hMMa0-0002ja-W8
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 21:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hMMHW-00075z-OY
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:42:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48510)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hMMHW-00075a-Jc
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 20:42:30 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hMMZw-0005na-7I
+	for qemu-devel@nongnu.org; Thu, 02 May 2019 21:01:35 -0400
+Date: Thu, 2 May 2019 22:01:27 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu,  2 May 2019 21:41:30 -0300
-Message-Id: <20190503004130.8285-20-ehabkost@redhat.com>
-In-Reply-To: <20190503004130.8285-1-ehabkost@redhat.com>
-References: <20190503004130.8285-1-ehabkost@redhat.com>
+Message-ID: <20190503010127.GP28722@habkost.net>
+References: <1553849325-44201-1-git-send-email-like.xu@linux.intel.com>
+	<1553849325-44201-3-git-send-email-like.xu@linux.intel.com>
+	<20190404162555.0a2267ee@redhat.com>
+	<a765e3ac-45e6-310e-aa66-7036b5717a26@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 19/19] configure: automatically pick python3 is
- available
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a765e3ac-45e6-310e-aa66-7036b5717a26@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH 2/9] cpu/topology: add general support for
+ machine properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +26,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+To: Like Xu <like.xu@linux.intel.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, like.xu@intel.com, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+On Tue, Apr 30, 2019 at 03:30:31PM +0800, Like Xu wrote:
+> On 2019/4/4 22:25, Igor Mammedov wrote:
+> > On Fri, 29 Mar 2019 16:48:38 +0800
+> > Like Xu <like.xu@linux.intel.com> wrote:
+> > 
+> 
+> <snipp>
+> > 
+> > > diff --git a/cpus.c b/cpus.c
+> > > index e83f72b..834a697 100644
+> > > --- a/cpus.c
+> > > +++ b/cpus.c
+> > > @@ -2067,6 +2067,10 @@ static void qemu_dummy_start_vcpu(CPUState *cpu)
+> > >   void qemu_init_vcpu(CPUState *cpu)
+> > >   {
+> > > +    MachineState *ms = MACHINE(qdev_get_machine());
+> > > +    unsigned int smp_cores = ms->topo.smp_cores;
+> > > +    unsigned int smp_threads = ms->topo.smp_threads;
+> > 
+> > (***)
+> > for once it probably will crash *-user builds
 
-Unless overridden via an env var or configure arg, QEMU will only look
-for the 'python' binary in $PATH. This is unhelpful on distros which
-are only shipping Python 3.x (eg Fedora) in their default install as,
-if they comply with PEP 394, the bare 'python' binary won't exist.
+Will it?  cpus.o is compiled only on CONFIG_SOFTMMU.
 
-This changes configure so that by default it will search for all three
-common python binaries, preferring to find Python 3.x versions.
+> > and secondly the purpose of getting rid of smp_foo globals
+> > is disentangle layer violations and not replace it with another global
+> > (qdev_get_machine()).
+> 
+> I am happy to follow this rule on cpu-topo refactoring work, but sometimes
+> calling qdev_get_machine() is inevitable.
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Message-Id: <20190327170701.23798-1-berrange@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- configure | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+I agree with Igor's goal, but let's do it one step at a time.
+Replacing the smp_* globals with qdev_get_machine() is a step in
+the right direction, IMO.
 
-diff --git a/configure b/configure
-index 60719ddcc5..f88011b94d 100755
---- a/configure
-+++ b/configure
-@@ -899,7 +899,18 @@ fi
-=20
- : ${make=3D${MAKE-make}}
- : ${install=3D${INSTALL-install}}
--: ${python=3D${PYTHON-python}}
-+# We prefer python 3.x. A bare 'python' is traditionally
-+# python 2.x, but some distros have it as python 3.x, so
-+# we check that before python2
-+python=3D
-+for binary in "${PYTHON-python3}" python python2
-+do
-+    if has "$binary"
-+    then
-+        python=3D"$binary"
-+        break
-+    fi
-+done
- : ${smbd=3D${SMBD-/usr/sbin/smbd}}
-=20
- # Default objcc to clang if available, otherwise use CC
-@@ -1818,8 +1829,9 @@ EOF
- exit 0
- fi
-=20
--if ! has $python; then
--  error_exit "Python not found. Use --python=3D/path/to/python"
-+if test -z "$python"
-+then
-+    error_exit "Python not found. Use --python=3D/path/to/python"
- fi
-=20
- # Note that if the Python conditional here evaluates True we will exit
---=20
-2.18.0.rc1.1.g3f1ff2140
+
+> 
+> > 
+> > What should be done is to make a properties of nr_cores/nr_threads and set
+> > them from the parent object that creates CPUs. The point is CPUs shouldn't
+> > reach out outside itself to fish out data bits it needs, it's responsibility
+> > of creator to feed to being create CPU needed properties.
+> > 
+> > This kind of refactoring probably deserves its own series and should precede
+> > -smp refactoring as it doesn't depend on CpuTopology at all.
+
+I don't see why it should precede -smp refactoring.
+
+We have a very specific user-visible goal here: making one extra
+CPU topology option (CPU dies) available on PC only.  Asking the
+author to refactor some code while implementing that is
+reasonable.  Requiring the author to touch every single place
+where a CPU object is created in QEMU just to avoid a
+qdev_get_machine() call doesn't seem reasonable.
+
+
+> > 
+> 
+> The division of responsibility for this case (refactoring qemu_init_vcpu)
+> seems to be a poisonous apple.
+> 
+> The prerequisite for setting cpu-> nr_cores / nr_threads from the parent is
+> that the CPU has been created, so if any process during initialization needs
+> this topo information, it will use the default values form
+> cpu_common_initfn() instead of user-configured parameters.
+> 
+> We may not want to repeat those assignment operations using the new values
+> and what do you think, Igor?
+
+I believe we need a better CPU creation API that all machines can
+use, otherwise all of them will have to duplicate the same code
+between object_new() and object_propert_set_bool("realized", true).
+
+But I really don't think designing and implementing this new API
+should be a requirement to get useful work done.
+
+-- 
+Eduardo
