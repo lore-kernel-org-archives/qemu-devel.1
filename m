@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44614)
+Received: from eggs.gnu.org ([209.51.188.92]:44736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMat9-00022Q-KY
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:18:21 -0400
+	(envelope-from <philmd@redhat.com>) id 1hMatk-0002II-BF
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:18:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMat8-0002L0-63
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:18:19 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39757)
+	(envelope-from <philmd@redhat.com>) id 1hMati-0002ls-V5
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:18:56 -0400
+Received: from mail-wm1-f50.google.com ([209.85.128.50]:39739)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hMat7-0002Ij-Rj
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:18:18 -0400
-Received: by mail-wm1-x341.google.com with SMTP id n25so7362189wmk.4
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 09:18:17 -0700 (PDT)
-References: <20190503154424.73933-1-liboxuan@connect.hku.hk>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190503154424.73933-1-liboxuan@connect.hku.hk>
-Date: Fri, 03 May 2019 17:18:15 +0100
-Message-ID: <87bm0j4im0.fsf@zen.linaroharston>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hMati-0002kn-Ob
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:18:54 -0400
+Received: by mail-wm1-f50.google.com with SMTP id n25so7364068wmk.4
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 09:18:53 -0700 (PDT)
+References: <20190408201203.28924-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <79e7fd04-8cd5-0a67-c1d0-17d50423c69e@redhat.com>
+Date: Fri, 3 May 2019 18:18:51 +0200
 MIME-Version: 1.0
+In-Reply-To: <20190408201203.28924-1-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4] hw/virtio/virtio-mmio: Convert DPRINTF
- to trace and log
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] qxl: fix -Waddress-of-packed-member
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,190 +29,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Boxuan Li <liboxuan@connect.hku.hk>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, eblake@redhat.com, philmd@redhat.com, yuval.shaia@oracle.com, "Michael S. Tsirkin" <mst@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
+On 4/8/19 10:12 PM, Marc-André Lureau wrote:
+> The GCC9 compiler complains about QXL code that takes the address of
+> members of the 'struct QXLReleaseRing' which is marked packed:
+> 
+>   CC      hw/display/qxl.o
+> /home/elmarco/src/qemu/hw/display/qxl.c: In function ‘init_qxl_ram’:
+> /home/elmarco/src/qemu/hw/display/qxl.c:50:19: warning: taking address of packed member of ‘struct QXLReleaseRing_ring_el’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+>    50 |             ret = &(r)->items[prod].el;                                 \
+>       |                   ^~~~~~~~~~~~~~~~~~~~
+> /home/elmarco/src/qemu/hw/display/qxl.c:429:5: note: in expansion of macro ‘SPICE_RING_PROD_ITEM’
+>   429 |     SPICE_RING_PROD_ITEM(d, &d->ram->release_ring, item);
+>       |     ^~~~~~~~~~~~~~~~~~~~
+> /home/elmarco/src/qemu/hw/display/qxl.c: In function ‘qxl_push_free_res’:
+> /home/elmarco/src/qemu/hw/display/qxl.c:50:19: warning: taking address of packed member of ‘struct QXLReleaseRing_ring_el’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+>    50 |             ret = &(r)->items[prod].el;                                 \
+>       |                   ^~~~~~~~~~~~~~~~~~~~
+> /home/elmarco/src/qemu/hw/display/qxl.c:762:5: note: in expansion of macro ‘SPICE_RING_PROD_ITEM’
+>   762 |     SPICE_RING_PROD_ITEM(d, ring, item);
+>       |     ^~~~~~~~~~~~~~~~~~~~
+> /home/elmarco/src/qemu/hw/display/qxl.c: In function ‘interface_release_resource’:
+> /home/elmarco/src/qemu/hw/display/qxl.c:50:19: warning: taking address of packed member of ‘struct QXLReleaseRing_ring_el’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+>    50 |             ret = &(r)->items[prod].el;                                 \
+>       |                   ^~~~~~~~~~~~~~~~~~~~
+> /home/elmarco/src/qemu/hw/display/qxl.c:795:5: note: in expansion of macro ‘SPICE_RING_PROD_ITEM’
+>   795 |     SPICE_RING_PROD_ITEM(qxl, ring, item);
+>       |     ^~~~~~~~~~~~~~~~~~~~
+> 
+> Replace pointer usage by direct structure/array access instead.
+> 
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Boxuan Li <liboxuan@connect.hku.hk> writes:
-
-> Use traces for debug message and qemu_log_mask for errors.
->
-> Signed-off-by: Boxuan Li <liboxuan@connect.hku.hk>
-
-You didn't add my r-b tags from last time. Anyway:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > ---
-> v1: https://patchew.org/QEMU/20190428110258.86681-1-liboxuan@connect.hku.=
-hk/
-> v2: https://patchew.org/QEMU/20190501081039.58938-1-liboxuan@connect.hku.=
-hk/
-> v3: https://patchew.org/QEMU/20190503084654.18413-1-liboxuan@connect.hku.=
-hk/
-> v4: Fix indentation and do not convert uint64_t to int
-> ---
->  hw/virtio/trace-events  |  7 +++++++
->  hw/virtio/virtio-mmio.c | 44 +++++++++++++++++++++-----------------------
->  2 files changed, 28 insertions(+), 23 deletions(-)
->
-> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> index 60c649c4bc..e28ba48da6 100644
-> --- a/hw/virtio/trace-events
-> +++ b/hw/virtio/trace-events
-> @@ -46,3 +46,10 @@ virtio_balloon_handle_output(const char *name, uint64_=
-t gpa) "section name: %s g
->  virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_page=
-s: %d actual: %d"
->  virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: =
-%d oldactual: %d"
->  virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon t=
-arget: 0x%"PRIx64" num_pages: %d"
+>  hw/display/qxl.c | 83 +++++++++++++++++++++++++++++-------------------
+>  1 file changed, 50 insertions(+), 33 deletions(-)
+> 
+> diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+> index c8ce5781e0..12d83dd6f1 100644
+> --- a/hw/display/qxl.c
+> +++ b/hw/display/qxl.c
+> @@ -39,29 +39,49 @@
+>   * abort we just qxl_set_guest_bug and set the return to NULL. Still
+>   * it may happen as a result of emulator bug as well.
+>   */
+> -#undef SPICE_RING_PROD_ITEM
+> -#define SPICE_RING_PROD_ITEM(qxl, r, ret) {                             \
+> -        uint32_t prod = (r)->prod & SPICE_RING_INDEX_MASK(r);           \
+> -        if (prod >= ARRAY_SIZE((r)->items)) {                           \
+> -            qxl_set_guest_bug(qxl, "SPICE_RING_PROD_ITEM indices mismatch " \
+> -                          "%u >= %zu", prod, ARRAY_SIZE((r)->items));   \
+> -            ret = NULL;                                                 \
+> -        } else {                                                        \
+> -            ret = &(r)->items[prod].el;                                 \
+> -        }                                                               \
+> +#define SPICE_RING_GET_CHECK(qxl, r, field) ({                          \
+> +    field = (r)->field & SPICE_RING_INDEX_MASK(r);                      \
+> +    bool mismatch = field >= ARRAY_SIZE((r)->items);                    \
+> +    if (mismatch) {                                                     \
+> +        qxl_set_guest_bug(qxl, "SPICE_RING_GET %s indices mismatch "    \
+> +                          "%u >= %zu", stringify(field), field,         \
+> +                          ARRAY_SIZE((r)->items));                      \
+> +    }                                                                   \
+> +    !mismatch;                                                          \
+> +})
 > +
-> +# virtio-mmio.c
-> +virtio_mmio_read(uint64_t offset) "virtio_mmio_read offset 0x%" PRIx64
-> +virtio_mmio_write_offset(uint64_t offset, uint64_t value) "virtio_mmio_w=
-rite offset 0x%" PRIx64 " value 0x%" PRIx64
-> +virtio_mmio_guest_page(uint64_t size, int shift) "guest page size 0x%" P=
-RIx64 " shift %d"
-> +virtio_mmio_queue_write(uint64_t value, int max_size) "mmio_queue write =
-0x%" PRIx64 " max %d"
-> +virtio_mmio_setting_irq(int level) "virtio_mmio setting IRQ %d"
-> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
-> index 5807aa87fe..96c762f0bf 100644
-> --- a/hw/virtio/virtio-mmio.c
-> +++ b/hw/virtio/virtio-mmio.c
-> @@ -27,16 +27,8 @@
->  #include "sysemu/kvm.h"
->  #include "hw/virtio/virtio-bus.h"
->  #include "qemu/error-report.h"
-> -
-> -/* #define DEBUG_VIRTIO_MMIO */
-> -
-> -#ifdef DEBUG_VIRTIO_MMIO
-> -
-> -#define DPRINTF(fmt, ...) \
-> -do { printf("virtio_mmio: " fmt , ## __VA_ARGS__); } while (0)
-> -#else
-> -#define DPRINTF(fmt, ...) do {} while (0)
-> -#endif
-> +#include "qemu/log.h"
-> +#include "trace.h"
->
->  /* QOM macros */
->  /* virtio-mmio-bus */
-> @@ -107,7 +99,7 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr =
-offset, unsigned size)
->      VirtIOMMIOProxy *proxy =3D (VirtIOMMIOProxy *)opaque;
->      VirtIODevice *vdev =3D virtio_bus_get_device(&proxy->bus);
->
-> -    DPRINTF("virtio_mmio_read offset 0x%x\n", (int)offset);
-> +    trace_virtio_mmio_read(offset);
->
->      if (!vdev) {
->          /* If no backend is present, we treat most registers as
-> @@ -144,7 +136,9 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr=
- offset, unsigned size)
->          }
+> +static inline uint64_t
+> +qxl_release_ring_get_prod(PCIQXLDevice *qxl)
+> +{
+> +    struct QXLReleaseRing *ring = &qxl->ram->release_ring;
+> +    uint32_t prod;
+> +    bool ok = SPICE_RING_GET_CHECK(qxl, ring, prod);
+> +    assert(ok);
+> +
+> +    return ring->items[prod].el;
+> +}
+> +
+> +static inline bool
+> +qxl_release_ring_set_prod(PCIQXLDevice *qxl, uint64_t val)
+> +{
+> +    struct QXLReleaseRing *ring = &qxl->ram->release_ring;
+> +    uint32_t prod;
+> +    bool ok = SPICE_RING_GET_CHECK(qxl, ring, prod);
+> +    if (ok) {
+> +        ring->items[prod].el = val;
 >      }
->      if (size !=3D 4) {
-> -        DPRINTF("wrong size access to register!\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: wrong size access to register!\n",
-> +                      __func__);
->          return 0;
->      }
->      switch (offset) {
-> @@ -182,10 +176,12 @@ static uint64_t virtio_mmio_read(void *opaque, hwad=
-dr offset, unsigned size)
->      case VIRTIO_MMIO_QUEUE_ALIGN:
->      case VIRTIO_MMIO_QUEUE_NOTIFY:
->      case VIRTIO_MMIO_INTERRUPT_ACK:
-> -        DPRINTF("read of write-only register\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: read of write-only register\n",
-> +                      __func__);
->          return 0;
->      default:
-> -        DPRINTF("bad register offset\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad register offset\n", __fu=
-nc__);
->          return 0;
->      }
->      return 0;
-> @@ -197,8 +193,7 @@ static void virtio_mmio_write(void *opaque, hwaddr of=
-fset, uint64_t value,
->      VirtIOMMIOProxy *proxy =3D (VirtIOMMIOProxy *)opaque;
->      VirtIODevice *vdev =3D virtio_bus_get_device(&proxy->bus);
->
-> -    DPRINTF("virtio_mmio_write offset 0x%x value 0x%" PRIx64 "\n",
-> -            (int)offset, value);
-> +    trace_virtio_mmio_write_offset(offset, value);
->
->      if (!vdev) {
->          /* If no backend is present, we just make all registers
-> @@ -226,7 +221,9 @@ static void virtio_mmio_write(void *opaque, hwaddr of=
-fset, uint64_t value,
->          return;
->      }
->      if (size !=3D 4) {
-> -        DPRINTF("wrong size access to register!\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: wrong size access to register!\n",
-> +                      __func__);
->          return;
->      }
->      switch (offset) {
-> @@ -246,8 +243,7 @@ static void virtio_mmio_write(void *opaque, hwaddr of=
-fset, uint64_t value,
->          if (proxy->guest_page_shift > 31) {
->              proxy->guest_page_shift =3D 0;
->          }
-> -        DPRINTF("guest page size %" PRIx64 " shift %d\n", value,
-> -                proxy->guest_page_shift);
-> +        trace_virtio_mmio_guest_page(value, proxy->guest_page_shift);
->          break;
->      case VIRTIO_MMIO_QUEUE_SEL:
->          if (value < VIRTIO_QUEUE_MAX) {
-> @@ -255,7 +251,7 @@ static void virtio_mmio_write(void *opaque, hwaddr of=
-fset, uint64_t value,
->          }
->          break;
->      case VIRTIO_MMIO_QUEUE_NUM:
-> -        DPRINTF("mmio_queue write %d max %d\n", (int)value, VIRTQUEUE_MA=
-X_SIZE);
-> +        trace_virtio_mmio_queue_write(value, VIRTQUEUE_MAX_SIZE);
->          virtio_queue_set_num(vdev, vdev->queue_sel, value);
->          /* Note: only call this function for legacy devices */
->          virtio_queue_update_rings(vdev, vdev->queue_sel);
-> @@ -303,11 +299,13 @@ static void virtio_mmio_write(void *opaque, hwaddr =
-offset, uint64_t value,
->      case VIRTIO_MMIO_DEVICE_FEATURES:
->      case VIRTIO_MMIO_QUEUE_NUM_MAX:
->      case VIRTIO_MMIO_INTERRUPT_STATUS:
-> -        DPRINTF("write to readonly register\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: write to readonly register\n",
-> +                      __func__);
->          break;
->
->      default:
-> -        DPRINTF("bad register offset\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad register offset\n", __fu=
-nc__);
->      }
+> +    return ok;
+> +}
+>  
+>  #undef SPICE_RING_CONS_ITEM
+> -#define SPICE_RING_CONS_ITEM(qxl, r, ret) {                             \
+> -        uint32_t cons = (r)->cons & SPICE_RING_INDEX_MASK(r);           \
+> -        if (cons >= ARRAY_SIZE((r)->items)) {                           \
+> -            qxl_set_guest_bug(qxl, "SPICE_RING_CONS_ITEM indices mismatch " \
+> -                          "%u >= %zu", cons, ARRAY_SIZE((r)->items));   \
+> -            ret = NULL;                                                 \
+> -        } else {                                                        \
+> -            ret = &(r)->items[cons].el;                                 \
+> -        }                                                               \
+> -    }
+> +#define SPICE_RING_CONS_ITEM(qxl, r, ret) {     \
+> +    uint32_t cons;                              \
+> +    if (!SPICE_RING_GET_CHECK(qxl, r, cons)) {  \
+> +        ret = NULL;                             \
+> +    } else {                                    \
+> +        ret = &(r)->items[cons].el;             \
+> +    }                                           \
+> +}
+>  
+>  #undef ALIGN
+>  #define ALIGN(a, b) (((a) + ((b) - 1)) & ~((b) - 1))
+> @@ -414,7 +434,6 @@ static void init_qxl_rom(PCIQXLDevice *d)
+>  static void init_qxl_ram(PCIQXLDevice *d)
+>  {
+>      uint8_t *buf;
+> -    uint64_t *item;
+>  
+>      buf = d->vga.vram_ptr;
+>      d->ram = (QXLRam *)(buf + le32_to_cpu(d->shadow_rom.ram_header_offset));
+> @@ -426,9 +445,9 @@ static void init_qxl_ram(PCIQXLDevice *d)
+>      SPICE_RING_INIT(&d->ram->cmd_ring);
+>      SPICE_RING_INIT(&d->ram->cursor_ring);
+>      SPICE_RING_INIT(&d->ram->release_ring);
+> -    SPICE_RING_PROD_ITEM(d, &d->ram->release_ring, item);
+> -    assert(item);
+> -    *item = 0;
+> +    if (!qxl_release_ring_set_prod(d, 0)) {
+> +        g_assert_not_reached();
+> +    }
+>      qxl_ring_set_dirty(d);
 >  }
->
-> @@ -327,7 +325,7 @@ static void virtio_mmio_update_irq(DeviceState *opaqu=
-e, uint16_t vector)
+>  
+> @@ -732,7 +751,6 @@ static int interface_req_cmd_notification(QXLInstance *sin)
+>  static inline void qxl_push_free_res(PCIQXLDevice *d, int flush)
+>  {
+>      QXLReleaseRing *ring = &d->ram->release_ring;
+> -    uint64_t *item;
+>      int notify;
+>  
+>  #define QXL_FREE_BUNCH_SIZE 32
+> @@ -759,11 +777,9 @@ static inline void qxl_push_free_res(PCIQXLDevice *d, int flush)
+>      if (notify) {
+>          qxl_send_events(d, QXL_INTERRUPT_DISPLAY);
+>      }
+> -    SPICE_RING_PROD_ITEM(d, ring, item);
+> -    if (!item) {
+> +    if (!qxl_release_ring_set_prod(d, 0)) {
 >          return;
 >      }
->      level =3D (atomic_read(&vdev->isr) !=3D 0);
-> -    DPRINTF("virtio_mmio setting IRQ %d\n", level);
-> +    trace_virtio_mmio_setting_irq(level);
->      qemu_set_irq(proxy->irq, level);
->  }
-
-
---
-Alex Benn=C3=A9e
+> -    *item = 0;
+>      d->num_free_res = 0;
+>      d->last_release = NULL;
+>      qxl_ring_set_dirty(d);
+> @@ -775,7 +791,8 @@ static void interface_release_resource(QXLInstance *sin,
+>  {
+>      PCIQXLDevice *qxl = container_of(sin, PCIQXLDevice, ssd.qxl);
+>      QXLReleaseRing *ring;
+> -    uint64_t *item, id;
+> +    uint32_t prod;
+> +    uint64_t id;
+>  
+>      if (ext.group_id == MEMSLOT_GROUP_HOST) {
+>          /* host group -> vga mode update request */
+> @@ -792,16 +809,16 @@ static void interface_release_resource(QXLInstance *sin,
+>       * pci bar 0, $command.release_info
+>       */
+>      ring = &qxl->ram->release_ring;
+> -    SPICE_RING_PROD_ITEM(qxl, ring, item);
+> -    if (!item) {
+> +
+> +    if (!SPICE_RING_GET_CHECK(qxl, ring, prod)) {
+>          return;
+>      }
+> -    if (*item == 0) {
+> +    if (qxl_release_ring_get_prod(qxl) == 0) {
+>          /* stick head into the ring */
+>          id = ext.info->id;
+>          ext.info->next = 0;
+>          qxl_ram_set_dirty(qxl, &ext.info->next);
+> -        *item = id;
+> +        qxl_release_ring_set_prod(qxl, id);
+>          qxl_ring_set_dirty(qxl);
+>      } else {
+>          /* append item to the list */
+> 
