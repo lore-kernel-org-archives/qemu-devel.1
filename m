@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14D6FC43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 05:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A2FDC43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 05:55:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C48BB2075C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 05:55:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45E9B2075C
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 05:55:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kCX3enej"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C48BB2075C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="deu3rIMd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45E9B2075C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34944 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34957 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMRAT-0006CR-0W
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 01:55:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54388)
+	id 1hMRAf-0006UI-Gj
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 01:55:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1hMR8l-00054v-9Z
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:53:48 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1hMR8t-0005BW-9f
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:53:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1hMR8j-0002nZ-VC
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:53:47 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:34528)
+	(envelope-from <sjitindarsingh@gmail.com>) id 1hMR8s-0002rl-CR
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:53:55 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:33750)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <sjitindarsingh@gmail.com>)
-	id 1hMR8i-0002mb-LR; Fri, 03 May 2019 01:53:45 -0400
-Received: by mail-pl1-x642.google.com with SMTP id ck18so2191449plb.1;
-	Thu, 02 May 2019 22:53:44 -0700 (PDT)
+	id 1hMR8r-0002rF-NE; Fri, 03 May 2019 01:53:53 -0400
+Received: by mail-pl1-x641.google.com with SMTP id y3so2188555plp.0;
+	Thu, 02 May 2019 22:53:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=XkCV3eLxqyBlikFgPtJ27XXNEcQJUOtpk+hewO4Cx4s=;
-	b=kCX3enejx7PdantJYDPknyfvc7AVOwr/P6XPSajQAGbrmsGpSbIPmhe6zxv4IbQHQw
-	pXbggSCaaCEgGP1qU1fOzq1fJomKtU+drMz6FiqRUqwemRPnbUg+6tq+YdaQSiT0GsXj
-	KNfZJ73cOGEH3otTUz80Zk2Th7rIk1eR+DFPXCEAB18J/Oy5zbLNup3lrmJLg1mZORtB
-	xXulI3yKHgAJPR8fGrskj5M20QN8wLfxXeXmqzJBYP2fbl308wl56j5rclRVdomkamLe
-	alIl4ZTJsPfTY8wHdysnGQsIQMarqJGhxKE69s79UTW9DALXlUAM15OLpUJwow9SBAsm
-	TOkQ==
+	bh=uTEnt+RwoXTMSi/BpLCLpLWRLd685MOhFLDweZ3zqHQ=;
+	b=deu3rIMdLtquHaUSHxUqfqfcx2R4qmvGtDPO3T7n7VJO5ILXuxCPLWSPT5WUT5nymW
+	uTn9lxC4AkuOAf8ugOF6jTXFMqGtOqSaMtjmWCM3EWUsy7W5xMgjyhS9m1TSKTc6ZGsC
+	/UVvJ7DebhcX+rPXJ82mxuYcfA0Elij2Ax3F9xMH76b+F+tv05x9UjN7RXFz49yNmoRL
+	s0hSz5nxIh+sKGq2ZtavJCW5I45x7CiYCjmIRIhvZeZpyoEOnnk53IFU6eu/hQhHxJAa
+	dB6TGlurnSgRWULkXZqGY39OU1tSkojjsx294s+RfSf3ZYpDlkUXig5aJ61xMubnKZ9T
+	rmJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=XkCV3eLxqyBlikFgPtJ27XXNEcQJUOtpk+hewO4Cx4s=;
-	b=f8PANXNRKYAzdQLeXSxQ0wRs1OiBJyHEU7TvLygaPeAFWGVRjz1zt0fKQGfo6pO/j9
-	N2e3hXecZAWA0GqACNZIX/KajS3ct7qDI7sGOKC4vzF/g9e5TJGAIikzN03clnq4bMm3
-	IuEs6FyoBNIn+skGIhmvfDPYexX6kR34EOgRijd6LFuNjg+OCk+mHh21FhgtnOCIC6+w
-	hvP5PgLD5QMQa1RUxkPEQbOuVXkTZ0+Y24hTa0ztJSZdTkd4Uc2xumBTIeIZxv2wMkv5
-	yg4KaCrIag1MfSXu67xMc0XlYH5GpZci+cQE45JmCYs2GFozmbCimCTInEKiKa2uAiCe
-	Ta/A==
-X-Gm-Message-State: APjAAAU9xkqVSadCz7imA72gho5b6SQEHQeQ7heyPoTn5ThJvndEQAka
-	hysumvw7iIvgb15YYHOb+j47aSJn+78=
-X-Google-Smtp-Source: APXvYqx7Fydcr5rifxG32JbrejJsjyCE3oqSWnLzqvx7pN/wcSgkr/MMheEc4GHfEUfElv7KYLC55g==
-X-Received: by 2002:a17:902:704c:: with SMTP id
-	h12mr8096746plt.270.1556862823206; 
-	Thu, 02 May 2019 22:53:43 -0700 (PDT)
+	bh=uTEnt+RwoXTMSi/BpLCLpLWRLd685MOhFLDweZ3zqHQ=;
+	b=kao0wAO4rQ52SavDYrIJCKzfeEBuhTNILfknVKz98hq3VgRAw/Xzja6QFkwyuFYdYv
+	hUC6pMvMl9XqaoTLcMzgVqZKx29NXFj8iZBBp3zufqII2+soCbHms1rBpCbPkcVl+W03
+	TCiLXyDCSpNg3bpR0+txaT9mXQhJcVSKo4ntf1Cb0nHbmLCYRgjxbKl3q3gQ2c0TwyCz
+	6hc/yu18pYC/WSSIK28eH0vHng78vRhS6pOF2hEnPnV86UYNeOI5tF9is7VTDtU7t1lx
+	5r0QGGfLEDMpoTpZWS7zlw/uMmUk7BZnltW0VNqAf4h2u+J2xTWC8dhqjk4cRtHlWWv3
+	AkPQ==
+X-Gm-Message-State: APjAAAXi8ar8JW+hJ/3oNCU3iRxb7bJQ1WR4dqHCBf2Odsb7jPy0G5rZ
+	tzJHQdZ6qy0/nRia3dElmMehbgG8keQ=
+X-Google-Smtp-Source: APXvYqzXKO2z5d17jS/s3LAplDet1MmTkrbaX1wDz5fqRMZWZCGcqX1czsq0bAQ+7P5sM96/syBycg==
+X-Received: by 2002:a17:902:76c5:: with SMTP id
+	j5mr8137857plt.337.1556862832667; 
+	Thu, 02 May 2019 22:53:52 -0700 (PDT)
 Received: from localhost.ibm.com ([1.129.142.217])
 	by smtp.gmail.com with ESMTPSA id
-	h187sm1292983pfc.52.2019.05.02.22.53.37
+	h187sm1292983pfc.52.2019.05.02.22.53.48
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 02 May 2019 22:53:42 -0700 (PDT)
+	Thu, 02 May 2019 22:53:52 -0700 (PDT)
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  3 May 2019 15:53:04 +1000
-Message-Id: <20190503055316.6441-2-sjitindarsingh@gmail.com>
+Date: Fri,  3 May 2019 15:53:06 +1000
+Message-Id: <20190503055316.6441-4-sjitindarsingh@gmail.com>
 X-Mailer: git-send-email 2.13.6
 In-Reply-To: <20190503055316.6441-1-sjitindarsingh@gmail.com>
 References: <20190503055316.6441-1-sjitindarsingh@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::642
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH 01/13] target/ppc: Implement the VTB
- for HV access
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH 03/13] target/ppc: Add SPR ASDR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,186 +97,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190503055304.1py1UfBQ6G-yU6PO6sod4KQOkqJKK8tmxHg9uMsfgqQ@z>
+Message-ID: <20190503055306.z1afoBKikSFpAkIzgaERJlNTZQ27njG7a2JtkP7ySrA@z>
 
-The virtual timebase register (VTB) is a 64-bit register which
-increments at the same rate as the timebase register, present on POWER8
-and later processors.
+The Access Segment Descriptor Register (ASDR) provides information about
+the storage element when taking a hypervisor storage interrupt. When
+performing nested radix address translation, this is normally the guest
+real address. This register is present on POWER9 processors and later.
 
-The register is able to be read/written by the hypervisor and read by
-the supervisor. All other accesses are illegal.
-
-Currently the VTB is just an alias for the timebase (TB) register.
-
-Implement the VTB so that is can be read/written independent of the TB.
-Make use of the existing method for accessing timebase facilities where
-by the compensation is stored and used to compute the value on reads/is
-updated on writes.
+Implement the ADSR, note read and write access is limited to the
+hypervisor.
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- hw/ppc/ppc.c                    | 16 ++++++++++++++++
- include/hw/ppc/ppc.h            |  1 +
- linux-user/ppc/cpu_loop.c       |  5 +++++
- target/ppc/cpu.h                |  2 ++
- target/ppc/helper.h             |  2 ++
- target/ppc/timebase_helper.c    | 10 ++++++++++
- target/ppc/translate_init.inc.c | 19 +++++++++++++++----
- 7 files changed, 51 insertions(+), 4 deletions(-)
+ target/ppc/cpu.h                | 1 +
+ target/ppc/translate_init.inc.c | 6 ++++++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
-index b2ff99ec66..a57ca64626 100644
---- a/hw/ppc/ppc.c
-+++ b/hw/ppc/ppc.c
-@@ -694,6 +694,22 @@ void cpu_ppc_store_atbu (CPUPPCState *env, uint32_t value)
-                      &tb_env->atb_offset, ((uint64_t)value << 32) | tb);
- }
- 
-+uint64_t cpu_ppc_load_vtb(CPUPPCState *env)
-+{
-+    ppc_tb_t *tb_env = env->tb_env;
-+
-+    return cpu_ppc_get_tb(tb_env, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-+                          tb_env->vtb_offset);
-+}
-+
-+void cpu_ppc_store_vtb(CPUPPCState *env, uint64_t value)
-+{
-+    ppc_tb_t *tb_env = env->tb_env;
-+
-+    cpu_ppc_store_tb(tb_env, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-+                     &tb_env->vtb_offset, value);
-+}
-+
- static void cpu_ppc_tb_stop (CPUPPCState *env)
- {
-     ppc_tb_t *tb_env = env->tb_env;
-diff --git a/include/hw/ppc/ppc.h b/include/hw/ppc/ppc.h
-index 4bdcb8bacd..205150e6b4 100644
---- a/include/hw/ppc/ppc.h
-+++ b/include/hw/ppc/ppc.h
-@@ -23,6 +23,7 @@ struct ppc_tb_t {
-     /* Time base management */
-     int64_t  tb_offset;    /* Compensation                    */
-     int64_t  atb_offset;   /* Compensation                    */
-+    int64_t  vtb_offset;
-     uint32_t tb_freq;      /* TB frequency                    */
-     /* Decrementer management */
-     uint64_t decr_next;    /* Tick for next decr interrupt    */
-diff --git a/linux-user/ppc/cpu_loop.c b/linux-user/ppc/cpu_loop.c
-index 801f5ace29..c715861804 100644
---- a/linux-user/ppc/cpu_loop.c
-+++ b/linux-user/ppc/cpu_loop.c
-@@ -46,6 +46,11 @@ uint32_t cpu_ppc_load_atbu(CPUPPCState *env)
-     return cpu_ppc_get_tb(env) >> 32;
- }
- 
-+uint64_t cpu_ppc_load_vtb(CPUPPCState *env)
-+{
-+    return cpu_ppc_get_tb(env);
-+}
-+
- uint32_t cpu_ppc601_load_rtcu(CPUPPCState *env)
- __attribute__ (( alias ("cpu_ppc_load_tbu") ));
- 
 diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index fe93cf0555..70167bae22 100644
+index 19b3e1de0e..8d66265e5a 100644
 --- a/target/ppc/cpu.h
 +++ b/target/ppc/cpu.h
-@@ -1327,6 +1327,8 @@ uint64_t cpu_ppc_load_atbl (CPUPPCState *env);
- uint32_t cpu_ppc_load_atbu (CPUPPCState *env);
- void cpu_ppc_store_atbl (CPUPPCState *env, uint32_t value);
- void cpu_ppc_store_atbu (CPUPPCState *env, uint32_t value);
-+uint64_t cpu_ppc_load_vtb(CPUPPCState *env);
-+void cpu_ppc_store_vtb(CPUPPCState *env, uint64_t value);
- bool ppc_decr_clear_on_delivery(CPUPPCState *env);
- target_ulong cpu_ppc_load_decr (CPUPPCState *env);
- void cpu_ppc_store_decr (CPUPPCState *env, target_ulong value);
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 69cbf7922f..3701bcbf1b 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -680,6 +680,7 @@ DEF_HELPER_FLAGS_1(load_tbl, TCG_CALL_NO_RWG, tl, env)
- DEF_HELPER_FLAGS_1(load_tbu, TCG_CALL_NO_RWG, tl, env)
- DEF_HELPER_FLAGS_1(load_atbl, TCG_CALL_NO_RWG, tl, env)
- DEF_HELPER_FLAGS_1(load_atbu, TCG_CALL_NO_RWG, tl, env)
-+DEF_HELPER_FLAGS_1(load_vtb, TCG_CALL_NO_RWG, tl, env)
- DEF_HELPER_FLAGS_1(load_601_rtcl, TCG_CALL_NO_RWG, tl, env)
- DEF_HELPER_FLAGS_1(load_601_rtcu, TCG_CALL_NO_RWG, tl, env)
- #if !defined(CONFIG_USER_ONLY)
-@@ -700,6 +701,7 @@ DEF_HELPER_FLAGS_1(load_decr, TCG_CALL_NO_RWG, tl, env)
- DEF_HELPER_FLAGS_2(store_decr, TCG_CALL_NO_RWG, void, env, tl)
- DEF_HELPER_FLAGS_1(load_hdecr, TCG_CALL_NO_RWG, tl, env)
- DEF_HELPER_FLAGS_2(store_hdecr, TCG_CALL_NO_RWG, void, env, tl)
-+DEF_HELPER_FLAGS_2(store_vtb, TCG_CALL_NO_RWG, void, env, tl)
- DEF_HELPER_2(store_hid0_601, void, env, tl)
- DEF_HELPER_3(store_403_pbr, void, env, i32, tl)
- DEF_HELPER_FLAGS_1(load_40x_pit, TCG_CALL_NO_RWG, tl, env)
-diff --git a/target/ppc/timebase_helper.c b/target/ppc/timebase_helper.c
-index 73363e08ae..8c3c2fe67c 100644
---- a/target/ppc/timebase_helper.c
-+++ b/target/ppc/timebase_helper.c
-@@ -45,6 +45,11 @@ target_ulong helper_load_atbu(CPUPPCState *env)
-     return cpu_ppc_load_atbu(env);
- }
- 
-+target_ulong helper_load_vtb(CPUPPCState *env)
-+{
-+    return cpu_ppc_load_vtb(env);
-+}
-+
- #if defined(TARGET_PPC64) && !defined(CONFIG_USER_ONLY)
- target_ulong helper_load_purr(CPUPPCState *env)
- {
-@@ -113,6 +118,11 @@ void helper_store_hdecr(CPUPPCState *env, target_ulong val)
-     cpu_ppc_store_hdecr(env, val);
- }
- 
-+void helper_store_vtb(CPUPPCState *env, target_ulong val)
-+{
-+    cpu_ppc_store_vtb(env, val);
-+}
-+
- target_ulong helper_load_40x_pit(CPUPPCState *env)
- {
-     return load_40x_pit(env);
+@@ -1797,6 +1797,7 @@ void ppc_compat_add_property(Object *obj, const char *name,
+ #define SPR_MPC_MD_DBRAM1     (0x32A)
+ #define SPR_RCPU_L2U_RA3      (0x32B)
+ #define SPR_TAR               (0x32F)
++#define SPR_ASDR              (0x330)
+ #define SPR_IC                (0x350)
+ #define SPR_VTB               (0x351)
+ #define SPR_MMCRC             (0x353)
 diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index 0bd555eb19..e3f941800b 100644
+index 9cd33e79ef..a0cae58e19 100644
 --- a/target/ppc/translate_init.inc.c
 +++ b/target/ppc/translate_init.inc.c
-@@ -310,6 +310,16 @@ static void spr_write_hdecr(DisasContext *ctx, int sprn, int gprn)
-     }
+@@ -8243,6 +8243,12 @@ static void gen_spr_power9_mmu(CPUPPCState *env)
+                         SPR_NOACCESS, SPR_NOACCESS,
+                         &spr_read_generic, &spr_write_ptcr,
+                         KVM_REG_PPC_PTCR, 0x00000000);
++    /* Address Segment Descriptor Register */
++    spr_register_hv(env, SPR_ASDR, "ASDR",
++                    SPR_NOACCESS, SPR_NOACCESS,
++                    SPR_NOACCESS, SPR_NOACCESS,
++                    &spr_read_generic, &spr_write_generic,
++                    0x0000000000000000);
+ #endif
  }
  
-+static void spr_read_vtb(DisasContext *ctx, int gprn, int sprn)
-+{
-+    gen_helper_load_vtb(cpu_gpr[gprn], cpu_env);
-+}
-+
-+static void spr_write_vtb(DisasContext *ctx, int sprn, int gprn)
-+{
-+    gen_helper_store_vtb(cpu_env, cpu_gpr[gprn]);
-+}
-+
- #endif
- #endif
- 
-@@ -8133,10 +8143,11 @@ static void gen_spr_power8_ebb(CPUPPCState *env)
- /* Virtual Time Base */
- static void gen_spr_vtb(CPUPPCState *env)
- {
--    spr_register_kvm(env, SPR_VTB, "VTB",
--                 SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_tbl, SPR_NOACCESS,
--                 KVM_REG_PPC_VTB, 0x00000000);
-+    spr_register_kvm_hv(env, SPR_VTB, "VTB",
-+                        SPR_NOACCESS, SPR_NOACCESS,
-+                        &spr_read_vtb, SPR_NOACCESS,
-+                        &spr_read_vtb, &spr_write_vtb,
-+                        KVM_REG_PPC_VTB, 0x00000000);
- }
- 
- static void gen_spr_power8_fscr(CPUPPCState *env)
 -- 
 2.13.6
 
