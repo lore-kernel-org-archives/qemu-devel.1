@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A18D8C43219
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 05:58:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15A67C43219
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 05:58:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B721206DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 05:58:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D40D8206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 May 2019 05:58:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ru1FpV+s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B721206DF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ud9kmGZb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D40D8206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35003 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35005 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMRDH-0000kQ-JG
-	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 01:58:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54542)
+	id 1hMRDk-0001Br-3U
+	for qemu-devel@archiver.kernel.org; Fri, 03 May 2019 01:58:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1hMR8y-0005Gd-9V
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:54:01 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1hMR9a-0005oY-4K
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:54:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1hMR8w-0002tg-Mv
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:54:00 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:44376)
+	(envelope-from <sjitindarsingh@gmail.com>) id 1hMR9Z-0003Sq-7O
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 01:54:38 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:38775)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <sjitindarsingh@gmail.com>)
-	id 1hMR8w-0002t7-GM; Fri, 03 May 2019 01:53:58 -0400
-Received: by mail-pg1-x544.google.com with SMTP id z16so2183042pgv.11;
-	Thu, 02 May 2019 22:53:58 -0700 (PDT)
+	id 1hMR9Z-0003Sd-1t; Fri, 03 May 2019 01:54:37 -0400
+Received: by mail-pf1-x444.google.com with SMTP id 10so2350712pfo.5;
+	Thu, 02 May 2019 22:54:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=tDDmbBxXcuGX6xPjl7n2FpWe9iGxr+XHYg3A3IEDeRE=;
-	b=Ru1FpV+sCVwjXKccpVkwDVU5vr4I6vyAJkU+r0jkDy0fgGpvYwHbAXGUz5iel6l/51
-	F2M+sK1mNW3jaRJd16BuW5cTVZHstDxAQij+Sp454QviEJsky3mg9J9zie6NTRJ3duWK
-	wuMb/fuB7zdhkAAZVKI/5RWmJLXYpkiLRUZtCdSaGiZ0Hf3z4W+gwjW9TiYK3RIajJA3
-	t8ZZd8bIVryexibeMNkEtuKYPia6zThp0kUSiQvyAo0op67MsbXI4XjLRylde6jaJKR6
-	1hJUcGAPD7Ctv80UnSNZgP1auzOKyRdxi6ZMuCTMU7wS22ul4vmM4WRuPOTbDY03H2vr
-	kTTg==
+	bh=PRRyyHPMZqJcq6mFtbX00mmQicMI/diLMW9xGgUxrSg=;
+	b=ud9kmGZbKa7dfS2B58RkF+XraKDxgZYjM5EM54Qor7TJioEcSFgOpPQ0nqvIY1fGpa
+	m9PQmb7BESi7M6PSVFEbGsNyX5g94NVzGRhPRYFjd3KSZQ9Rp+k0iw94Jr6vNx7h0FX8
+	9DGxDE5aHX3Rryu60nYckKrtHdVX2D8HFDLkFV6PSQrey+ZyfPl60EAqiCsUFcgrnd3w
+	ItAqBpVjr/gubwdF18TCDUCSn2OtTi0jo0sBFxSWc8PdA4jS9q4TjEppbUI0Q2MIsm48
+	fOfZkQ/1NgNGRecd3o6EJvaf0kKfFY1LQM7DMP8h30fmcXGaz1pZKNtniZuT6JZYBgj/
+	u5EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=tDDmbBxXcuGX6xPjl7n2FpWe9iGxr+XHYg3A3IEDeRE=;
-	b=iAxb/w+eHegjLPXql/R5gZDDUXA0EsaL02075dpoiwtnt4fAwISnXm+RC9pAkUz0/F
-	kFp4v/WoU5ebmNZUzT6fKiF3L3tMvEGpdQhsJXALs6dSIhbSjusX978SAjnjBeoMtbC8
-	duSeJ2NiMbSXJF1+KsPLzUllHBqNk8rNraLqiJ/NN62a/LIxLTWhgCNL1V8T53ou4KAT
-	fTxYTeDlr8NFkv/ZCWitZvOYAS4RZrVvQbsaYO/tM9+ltXlZpSl6FM+TF3ZrywDWfoph
-	WIKXiulHLF7B0bahtNoUu9xr56rac3VFT0vqMtOUW5Vhn262tssU0VDidcukNdNbdV0R
-	R5cQ==
-X-Gm-Message-State: APjAAAUTKWOMlmaYE8442LRYK/LbXwA+G9kEc2Pis9xfON6+PlMpYmLT
-	73TBoIPeYO0UfbfIKZ5NBwRtCGgCaLg=
-X-Google-Smtp-Source: APXvYqwUV4Qrj0iDW8hsIgn58cUNKyGdKqPYol4h6dCMdKfpOhaKKqvt0Jf0Cc7NnlYiQfxO7GrXsg==
-X-Received: by 2002:a62:14d6:: with SMTP id 205mr8540100pfu.4.1556862837325;
-	Thu, 02 May 2019 22:53:57 -0700 (PDT)
+	bh=PRRyyHPMZqJcq6mFtbX00mmQicMI/diLMW9xGgUxrSg=;
+	b=fst1pb4HW5vscCJG/dRpfRNs9gVNh2Uz+w7CQ4jdGcSKEKlGXMeDXJLf076bEXdJiR
+	3EGHlsj+yIwpxbrUduEZ0QJ52sayfB7LjXeB8nLUlt3Q6YrZNY1MDWj0uEwSH8OaxP73
+	gUZd3Co1hpkANDVeOaTGI5Cy365AwR3/WcJGz9Igem8Rr8DHVoYh3mqrbVBFE6mwBw2V
+	sNpW4B4HuPwZfZUf7/phTw2xbj7p5r5I8sAweThnBhpwqQJKxIW1OU3GgBj6m24j9NuF
+	uA5vfSsvtpRV5qjHz3Bcp3NcUTjmdjpGhJbwaCwcVBm086fjgV6mTRqL3LYe8gCZkYos
+	2KsQ==
+X-Gm-Message-State: APjAAAXvCZvagq0fnOTmFyEU0UKm34JHRwCmcUQIVVv4l7huVQ2AwvdW
+	FEe+3KloQnAVfjqPpvvKD9DeNvKduOU=
+X-Google-Smtp-Source: APXvYqy6Nh/VwdZ+tSpaHJgSes/MFeGOhabe3zf2d4zfs2kMxncBOXt5eeEctAvIng9hv2bcNTqmKg==
+X-Received: by 2002:a63:f809:: with SMTP id n9mr7941670pgh.201.1556862875973; 
+	Thu, 02 May 2019 22:54:35 -0700 (PDT)
 Received: from localhost.ibm.com ([1.129.142.217])
 	by smtp.gmail.com with ESMTPSA id
-	h187sm1292983pfc.52.2019.05.02.22.53.53
+	h187sm1292983pfc.52.2019.05.02.22.54.32
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 02 May 2019 22:53:56 -0700 (PDT)
+	Thu, 02 May 2019 22:54:35 -0700 (PDT)
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  3 May 2019 15:53:07 +1000
-Message-Id: <20190503055316.6441-5-sjitindarsingh@gmail.com>
+Date: Fri,  3 May 2019 15:53:15 +1000
+Message-Id: <20190503055316.6441-13-sjitindarsingh@gmail.com>
 X-Mailer: git-send-email 2.13.6
 In-Reply-To: <20190503055316.6441-1-sjitindarsingh@gmail.com>
 References: <20190503055316.6441-1-sjitindarsingh@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH 04/13] target/ppc: Add SPR TBU40
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH 12/13] target/ppc: Introduce POWER9
+ DD2.2 cpu type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,151 +97,58 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190503055307.LOVpEZ3DTClhZVx56SmTsS4ENkDbcCRPf5fH9WGplyg@z>
+Message-ID: <20190503055315.E-88thSWHPrnoHAz_c-oJJGw2o8bo5Iw3IbJdqIn4_w@z>
 
-The spr TBU40 is used to set the upper 40 bits of the timebase
-register, present on POWER5+ and later processors.
+Introduce a POWER9 DD2.2 cpu type with pvr 0x004E1202.
 
-This register can only be written by the hypervisor, and cannot be read.
+A DD2.2 POWER9 cpu type is needed to enable kvm for pseries tcg guests
+since it means they will use the H_ENTER_NESTED hcall to run a guest
+rather than trying the generic entry path which will fail.
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- hw/ppc/ppc.c                    | 13 +++++++++++++
- target/ppc/cpu.h                |  1 +
- target/ppc/helper.h             |  1 +
- target/ppc/timebase_helper.c    |  5 +++++
- target/ppc/translate_init.inc.c | 19 +++++++++++++++++++
- 5 files changed, 39 insertions(+)
+ hw/ppc/spapr_cpu_core.c | 1 +
+ target/ppc/cpu-models.c | 2 ++
+ target/ppc/cpu-models.h | 1 +
+ 3 files changed, 4 insertions(+)
 
-diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
-index b567156f97..b618c6f615 100644
---- a/hw/ppc/ppc.c
-+++ b/hw/ppc/ppc.c
-@@ -710,6 +710,19 @@ void cpu_ppc_store_vtb(CPUPPCState *env, uint64_t value)
-                      &tb_env->vtb_offset, value);
- }
- 
-+void cpu_ppc_store_tbu40(CPUPPCState *env, uint64_t value)
-+{
-+    ppc_tb_t *tb_env = env->tb_env;
-+    uint64_t tb;
-+
-+    tb = cpu_ppc_get_tb(tb_env, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-+                        tb_env->tb_offset);
-+    tb &= 0xFFFFFFUL;
-+    tb |= (value & ~0xFFFFFFUL);
-+    cpu_ppc_store_tb(tb_env, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-+                     &tb_env->tb_offset, tb);
-+}
-+
- static void cpu_ppc_tb_stop (CPUPPCState *env)
- {
-     ppc_tb_t *tb_env = env->tb_env;
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 8d66265e5a..e324064111 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1334,6 +1334,7 @@ target_ulong cpu_ppc_load_decr (CPUPPCState *env);
- void cpu_ppc_store_decr (CPUPPCState *env, target_ulong value);
- target_ulong cpu_ppc_load_hdecr (CPUPPCState *env);
- void cpu_ppc_store_hdecr (CPUPPCState *env, target_ulong value);
-+void cpu_ppc_store_tbu40(CPUPPCState *env, uint64_t value);
- uint64_t cpu_ppc_load_purr (CPUPPCState *env);
- void cpu_ppc_store_purr(CPUPPCState *env, uint64_t value);
- uint32_t cpu_ppc601_load_rtcl (CPUPPCState *env);
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 336e7802fb..6aee195528 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -703,6 +703,7 @@ DEF_HELPER_FLAGS_2(store_decr, TCG_CALL_NO_RWG, void, env, tl)
- DEF_HELPER_FLAGS_1(load_hdecr, TCG_CALL_NO_RWG, tl, env)
- DEF_HELPER_FLAGS_2(store_hdecr, TCG_CALL_NO_RWG, void, env, tl)
- DEF_HELPER_FLAGS_2(store_vtb, TCG_CALL_NO_RWG, void, env, tl)
-+DEF_HELPER_FLAGS_2(store_tbu40, TCG_CALL_NO_RWG, void, env, tl)
- DEF_HELPER_2(store_hid0_601, void, env, tl)
- DEF_HELPER_3(store_403_pbr, void, env, i32, tl)
- DEF_HELPER_FLAGS_1(load_40x_pit, TCG_CALL_NO_RWG, tl, env)
-diff --git a/target/ppc/timebase_helper.c b/target/ppc/timebase_helper.c
-index 2395295b77..703bd9ed18 100644
---- a/target/ppc/timebase_helper.c
-+++ b/target/ppc/timebase_helper.c
-@@ -128,6 +128,11 @@ void helper_store_vtb(CPUPPCState *env, target_ulong val)
-     cpu_ppc_store_vtb(env, val);
- }
- 
-+void helper_store_tbu40(CPUPPCState *env, target_ulong val)
-+{
-+    cpu_ppc_store_tbu40(env, val);
-+}
-+
- target_ulong helper_load_40x_pit(CPUPPCState *env)
- {
-     return load_40x_pit(env);
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index a0cae58e19..8e287066e5 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -325,6 +325,11 @@ static void spr_write_vtb(DisasContext *ctx, int sprn, int gprn)
-     gen_helper_store_vtb(cpu_env, cpu_gpr[gprn]);
- }
- 
-+static void spr_write_tbu40(DisasContext *ctx, int sprn, int gprn)
-+{
-+    gen_helper_store_tbu40(cpu_env, cpu_gpr[gprn]);
-+}
-+
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 40e7010cf0..98d46c6edb 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -399,6 +399,7 @@ static const TypeInfo spapr_cpu_core_type_infos[] = {
+     DEFINE_SPAPR_CPU_CORE_TYPE("power8nvl_v1.0"),
+     DEFINE_SPAPR_CPU_CORE_TYPE("power9_v1.0"),
+     DEFINE_SPAPR_CPU_CORE_TYPE("power9_v2.0"),
++    DEFINE_SPAPR_CPU_CORE_TYPE("power9_v2.2"),
+ #ifdef CONFIG_KVM
+     DEFINE_SPAPR_CPU_CORE_TYPE("host"),
  #endif
- #endif
+diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
+index 7c75963e3c..603ae7f5b4 100644
+--- a/target/ppc/cpu-models.c
++++ b/target/ppc/cpu-models.c
+@@ -773,6 +773,8 @@
+                 "POWER9 v1.0")
+     POWERPC_DEF("power9_v2.0",   CPU_POWERPC_POWER9_DD20,            POWER9,
+                 "POWER9 v2.0")
++    POWERPC_DEF("power9_v2.2",   CPU_POWERPC_POWER9_DD22,            POWER9,
++                "POWER9 v2.2")
+ #endif /* defined (TARGET_PPC64) */
  
-@@ -7812,6 +7817,16 @@ static void gen_spr_power5p_ear(CPUPPCState *env)
-                  0x00000000);
- }
- 
-+static void gen_spr_power5p_tb(CPUPPCState *env)
-+{
-+    /* TBU40 (High 40 bits of the Timebase register */
-+    spr_register_hv(env, SPR_TBU40, "TBU40",
-+                    SPR_NOACCESS, SPR_NOACCESS,
-+                    SPR_NOACCESS, SPR_NOACCESS,
-+                    SPR_NOACCESS, &spr_write_tbu40,
-+                    0x00000000);
-+}
-+
- #if !defined(CONFIG_USER_ONLY)
- static void spr_write_hmer(DisasContext *ctx, int sprn, int gprn)
- {
-@@ -8352,6 +8367,7 @@ static void init_proc_power5plus(CPUPPCState *env)
-     gen_spr_power5p_common(env);
-     gen_spr_power5p_lpar(env);
-     gen_spr_power5p_ear(env);
-+    gen_spr_power5p_tb(env);
- 
-     /* env variables */
-     env->dcache_line_size = 128;
-@@ -8464,6 +8480,7 @@ static void init_proc_POWER7(CPUPPCState *env)
-     gen_spr_power5p_common(env);
-     gen_spr_power5p_lpar(env);
-     gen_spr_power5p_ear(env);
-+    gen_spr_power5p_tb(env);
-     gen_spr_power6_common(env);
-     gen_spr_power6_dbg(env);
-     gen_spr_power7_book4(env);
-@@ -8605,6 +8622,7 @@ static void init_proc_POWER8(CPUPPCState *env)
-     gen_spr_power5p_common(env);
-     gen_spr_power5p_lpar(env);
-     gen_spr_power5p_ear(env);
-+    gen_spr_power5p_tb(env);
-     gen_spr_power6_common(env);
-     gen_spr_power6_dbg(env);
-     gen_spr_power8_tce_address_control(env);
-@@ -8793,6 +8811,7 @@ static void init_proc_POWER9(CPUPPCState *env)
-     gen_spr_power5p_common(env);
-     gen_spr_power5p_lpar(env);
-     gen_spr_power5p_ear(env);
-+    gen_spr_power5p_tb(env);
-     gen_spr_power6_common(env);
-     gen_spr_power6_dbg(env);
-     gen_spr_power8_tce_address_control(env);
+ /***************************************************************************/
+diff --git a/target/ppc/cpu-models.h b/target/ppc/cpu-models.h
+index efdb2fa53c..820e94b0c8 100644
+--- a/target/ppc/cpu-models.h
++++ b/target/ppc/cpu-models.h
+@@ -373,6 +373,7 @@ enum {
+     CPU_POWERPC_POWER9_BASE        = 0x004E0000,
+     CPU_POWERPC_POWER9_DD1         = 0x004E0100,
+     CPU_POWERPC_POWER9_DD20        = 0x004E1200,
++    CPU_POWERPC_POWER9_DD22        = 0x004E1202,
+     CPU_POWERPC_970_v22            = 0x00390202,
+     CPU_POWERPC_970FX_v10          = 0x00391100,
+     CPU_POWERPC_970FX_v20          = 0x003C0200,
 -- 
 2.13.6
 
