@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53530)
+Received: from eggs.gnu.org ([209.51.188.92]:53722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hMbEy-0001wm-8J
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:40:53 -0400
+	(envelope-from <bounces@canonical.com>) id 1hMbFN-0002LY-AS
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:41:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hMbEx-0000sc-3M
-	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:40:52 -0400
+	(envelope-from <bounces@canonical.com>) id 1hMbFL-0001JP-Sm
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:41:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60310)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hMbFL-0001Ho-IF
+	for qemu-devel@nongnu.org; Fri, 03 May 2019 12:41:15 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hMbFJ-0002TS-V4
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 16:41:13 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E102E2E80CB
+	for <qemu-devel@nongnu.org>; Fri,  3 May 2019 16:41:13 +0000 (UTC)
 MIME-Version: 1.0
-References: <20190503004021.13814-1-alistair.francis@wdc.com>
-	<20190503092424.GB17905@redhat.com>
-In-Reply-To: <20190503092424.GB17905@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 3 May 2019 09:38:50 -0700
-Message-ID: <CAKmqyKO5Mhb5RyA13isjMJY2a6uUOLCmPtcK_HRt3uyWgm9XGw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] hw/usb/hcd-xhci: Fix GCC 9 build warning
+Date: Fri, 03 May 2019 16:33:12 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1825359 <1825359@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <155558881987.7164.1099557133760519082.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155690119300.31827.14054751613410082453.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1825359] Re: cpu_ld*_code() triggers
+ MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,83 +37,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kraxel@redhat.com" <kraxel@redhat.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "laurent@vivier.eu" <laurent@vivier.eu>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Fri, May 3, 2019 at 2:24 AM Daniel P. Berrang=C3=A9 <berrange@redhat.com=
-> wrote:
->
-> On Fri, May 03, 2019 at 12:42:04AM +0000, Alistair Francis wrote:
-> > Fix this build warning with GCC 9 on Fedora 30:
-> > hw/usb/hcd-xhci.c:3339:66: error: =E2=80=98%d=E2=80=99 directive output=
- may be truncated writing between 1 and 10 bytes into a region of size 5 [-=
-Werror=3Dformat-truncation=3D]
-> >  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port=
- #%d", i+1);
-> >       |                                                                =
-  ^~
-> > hw/usb/hcd-xhci.c:3339:54: note: directive argument in the range [1, 21=
-47483647]
-> >  3339 |             snprintf(port->name, sizeof(port->name), "usb2 port=
- #%d", i+1);
-> >       |                                                      ^~~~~~~~~~=
-~~~~~
-> > In file included from /usr/include/stdio.h:867,
-> >                  from /home/alistair/qemu/include/qemu/osdep.h:99,
-> >                  from hw/usb/hcd-xhci.c:21:
-> > /usr/include/bits/stdio2.h:67:10: note: =E2=80=98__builtin___snprintf_c=
-hk=E2=80=99 output between 13 and 22 bytes into a destination of size 16
-> >    67 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVE=
-L - 1,
-> >       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~
-> >    68 |        __bos (__s), __fmt, __va_arg_pack ());
-> >       |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >
-> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-> > Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > ---
-> > This is the onl patch left if my original series "Fix some GCC 9 build
-> > warnings" that hasn't either been accepeted into a maintainers tree or
-> > fixed by someone else.
-> >
-> >  hw/usb/hcd-xhci.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >
-> > diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-> > index ec28bee319..a15b103b65 100644
-> > --- a/hw/usb/hcd-xhci.c
-> > +++ b/hw/usb/hcd-xhci.c
-> > @@ -3321,6 +3321,8 @@ static void usb_xhci_init(XHCIState *xhci)
-> >
-> >      usb_bus_new(&xhci->bus, sizeof(xhci->bus), &xhci_bus_ops, dev);
-> >
-> > +    g_assert(usbports <=3D MAX(MAXPORTS_2, MAXPORTS_3));
-> > +
-> >      for (i =3D 0; i < usbports; i++) {
-> >          speedmask =3D 0;
-> >          if (i < xhci->numports_2) {
->
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->
-> but it looks like Gerd already sent a pull request with my patch for
-> this from a few weeks back
->
-> https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg00543.html
+Your patch is now in git master as commit ef5dae6805cce7b59d129 --
+thanks!
 
-No worries, I'm just glad it's fixed.
 
-Alistair
+** Changed in: qemu
+       Status: Confirmed =3D> Fix Committed
 
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1825359
+
+Title:
+  cpu_ld*_code() triggers MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  commit 377b155bde451d5ac545fbdcdfbf6ca17a4228f5
+  Merge: c876180938 328eb60dc1
+  Author: Peter Maydell <peter.x@x.x>        ; masked for anti-spamming pur=
+poses
+  Date:   Mon Mar 11 18:26:37 2019 +0000
+  https://github.com/qemu/qemu/commit/377b155bde451d5ac545fbdcdfbf6ca17a422=
+8f5
+  --------------------------------------------------
+
+  cpu_ld*_code() is used for loading code data as the name suggests. Althou=
+gh, it begins accessing memory with MMU_INST_FETCH access type, somewhere d=
+own
+  the road, when the "io_readx(..., access_type=3DMMU_INST_FETCH, ...)" is
+  called, it is ignoring this "access_type" while calling the "tlb_fill()"
+  with a _hardcoded_ MMU_DATA_LOAD:
+
+  cputlb.c
+  --------
+  static uint64_t io_readx(..., MMUAccessType access_type, ...)
+  {
+
+  =C2=A0=C2=A0=C2=A0=C2=A0if (recheck) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0CPUTLBEntry *entry;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0target_ulong tlb_addr;
+
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tlb_fill(cpu, addr, size,=
+ MMU_DATA_LOAD, mmu_idx, retaddr);
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
+  }
+  --------
+
+  This is an issue, because there can exist _small_ regions of memory (smal=
+ler
+  than the TARGET_PAGE_SIZE) that are only executable and not readable.
+
+  TL;DR
+
+  What happens is at first, a "tlb_fill(..., access_type=3DMMU_INST_FETCH, =
+...)"
+  is triggered by "tb_lookup_cpu_state()". To be precise, this is the call
+  stack which is good behavior:
+  ---
+  #0  tlb_fill (cs=3D..., vaddr=3D684, size=3D0, access_type=3DMMU_INST_FET=
+CH, mmu_idx=3D0, retaddr=3D0) at target/arc/mmu.c:602
+  #1  get_page_addr_code (env=3D..., addr=3D684) at accel/tcg/cputlb.c:1045
+  #2  tb_htable_lookup (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cf_mas=
+k=3D4278190080) at accel/tcg/cpu-exec.c:337
+  #3  tb_lookup__cpu_state (cpu=3D..., pc=3D..., cs_base=3D..., flags=3D...=
+, cf_mask=3D4278190080) at include/exec/tb-lookup.h:43
+  #4  tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
+0, cf_mask=3D0) at accel/tcg/cpu-exec.c:404
+  #5  cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
+  #6  tcg_cpu_exec (cpu=3D...) at cpus.c:1430
+  #7  qemu_tcg_rr_cpu_thread_fn (arg=3D...) at cpus.c:1531
+  #8  qemu_thread_start (args=3D...) at util/qemu-thread-posix.c:502
+  ---
+
+  After this call, TLB is filled with an entry that its size field is small,
+  say 32 bytes. This causes a TLB_RECHECK for consequent memory accesses, w=
+hich =
+
+  is logical. However, in our decoder, we use cpu_lduw_code() to read the
+  instructions and decode them. As mentioned, in the beginning, the
+  access_type=3DMMU_INST_FETCH is lost in "io_readx()" while calling tlb_fi=
+ll()",
+  and now THIS CAUSES A GUEST EXCEPTION BECAUSE THAT REGION IS NOT ALLOWED =
+TO
+  BE READ. Here, comes that trace call of the _bad_ behavior:
+  ---
+  #0  tlb_fill (..., access_type=3DMMU_DATA_LOAD, ...) at target/arc/mmu.c:=
+605
+  #1  io_readx (..., access_type=3DMMU_INST_FETCH, size=3D2) at accel/tcg/c=
+putlb.c:881
+  #2  io_readw (..., access_type=3DMMU_INST_FETCH) at accel/tcg/softmmu_tem=
+plate.h:106
+  #3  helper_le_ldw_cmmu (..., oi=3D16, retaddr=3D0) at accel/tcg/softmmu_t=
+emplate.h:146
+  #4  cpu_lduw_code_ra (env=3D..., ptr=3D684, retaddr=3D0) at include/exec/=
+cpu_ldst_template.h:102
+  #5  cpu_lduw_code (env=3D..., ptr=3D684) at include/exec/cpu_ldst_templat=
+e.h:114
+  #6  read_and_decode_context (ctx=3D..., opcode_p=3D...) at target/arc/arc=
+-decoder.c:1479
+  #7  arc_decode (ctx=3D...) at target/arc/arc-decoder.c:1736
+  #8  decode_opc (env=3D..., ctx=3D...) at target/arc/translate.c:313
+  #9  arc_tr_translate_insn (dcbase=3D..., cpu=3D...) at target/arc/transla=
+te.c:335
+  #10 translator_loop (.. <code_gen_buffer+18131>) at accel/tcg/translator.=
+c:107
+  #11 gen_intermediate_code (cpu=3D..., tb=3D... <code_gen_buffer+18131>) a=
+t target/arc/translate.c:413
+  #12 tb_gen_code (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cflags=3D-1=
+6711679) at accel/tcg/translate-all.c:1723
+  #13 tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
+0, cf_mask=3D0) at accel/tcg/cpu-exec.c:407
+  #14 cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
+  #15 tcg_cpu_exec (cpu=3D...) at cpus.c:1430
+
+  ---
+
+  Do you confirm if this is an issue? Maybe there are other ways to read
+  an instruction with MMU_INST_FETCH access that I don't know about.
+
+  Last but not least, although this is not a security issue for QEMU per
+  se, but it is hindering a security feature for the guest.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1825359/+subscriptions
