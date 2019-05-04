@@ -2,50 +2,52 @@ Return-Path: <SRS0=Uyhh=TE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91601C43219
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 06:52:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE9E3C43219
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 07:18:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F104206BB
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 06:52:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F104206BB
+	by mail.kernel.org (Postfix) with ESMTPS id 7F24A2084A
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 07:18:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F24A2084A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52265 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52482 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMoX2-0008Eo-7H
-	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 02:52:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53628)
+	id 1hMowW-0005X6-Ek
+	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 03:18:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hMoWE-0007ut-Jc
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 02:51:35 -0400
+	(envelope-from <thuth@redhat.com>) id 1hMovi-00055j-M7
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 03:17:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hMoWD-0006kS-JR
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 02:51:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36790)
+	(envelope-from <thuth@redhat.com>) id 1hMovh-0000Mc-DF
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 03:17:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40770)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hMoWB-0006jg-7N; Sat, 04 May 2019 02:51:31 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hMovh-0000MJ-5l
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 03:17:53 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 27C513001803;
-	Sat,  4 May 2019 06:51:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 03DDC308A958;
+	Sat,  4 May 2019 07:17:52 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-38.ams2.redhat.com [10.36.116.38])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 14C60798D;
-	Sat,  4 May 2019 06:51:25 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
-	QEMU Developers <qemu-devel@nongnu.org>
-References: <68cc5bbc-ed6f-e001-e376-ccd986683b88@redhat.com>
-	<f1dfe2c3-2d61-e477-ac3d-37ad26d9236d@redhat.com>
-	<61685a48-b84e-c379-7193-f456e82635ba@redhat.com>
-	<67a38513-89af-7f54-2fc8-05b5777983ca@redhat.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C179F39BD;
+	Sat,  4 May 2019 07:17:50 +0000 (UTC)
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20190503004130.8285-1-ehabkost@redhat.com>
+	<20190503004130.8285-20-ehabkost@redhat.com>
+	<40c4d236-ed76-e433-51d5-c9feabb4374a@redhat.com>
+	<20190503210011.GW28722@habkost.net>
+	<20190503213457.GX28722@habkost.net>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -91,22 +93,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <22933e94-18da-257c-7931-da511bc5a602@redhat.com>
-Date: Sat, 4 May 2019 08:51:17 +0200
+Message-ID: <b86fd845-ba4b-6e27-73ac-50b2c8810fe8@redhat.com>
+Date: Sat, 4 May 2019 09:17:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <67a38513-89af-7f54-2fc8-05b5777983ca@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="Ox40LrtCe0BDFeiIAOsfnFjr9nVpQ1yus"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20190503213457.GX28722@habkost.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Sat, 04 May 2019 06:51:30 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Sat, 04 May 2019 07:17:52 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Failing QEMU iotest 175
+Subject: Re: [Qemu-devel] [PULL 19/19] configure: automatically pick python3
+ is available
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -118,119 +121,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
-	Nir Soffer <nirsof@gmail.com>, Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+	Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190504065117.wsuWrAn7qdlt7eieq371Ox6xjhGLCRj4fWDaVWqjsJM@z>
+Message-ID: <20190504071749.mSXAT9imt5hV0yMSiazkmypK879fLsGAbjLwmfMRu8Q@z>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ox40LrtCe0BDFeiIAOsfnFjr9nVpQ1yus
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 03/05/2019 22.21, Eric Blake wrote:
-> On 5/2/19 11:37 PM, Thomas Huth wrote:
->> On 02/05/2019 23.56, Eric Blake wrote:
->>> On 4/28/19 10:18 AM, Thomas Huth wrote:
->>>> QEMU iotest 175 is failing for me when I run it with -raw:
+On 03/05/2019 23.34, Eduardo Habkost wrote:
+> On Fri, May 03, 2019 at 06:00:11PM -0300, Eduardo Habkost wrote:
+>> On Fri, May 03, 2019 at 06:41:43PM +0200, Thomas Huth wrote:
+>>> On 03/05/2019 02.41, Eduardo Habkost wrote:
+>>>> From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 >>>>
->>>>  =3D=3D creating image with default preallocation =3D=3D
->>>>  Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576
->>>> -size=3D1048576, blocks=3D0
->>>> +size=3D1048576, blocks=3D2
+>>>> Unless overridden via an env var or configure arg, QEMU will only lo=
+ok
+>>>> for the 'python' binary in $PATH. This is unhelpful on distros which
+>>>> are only shipping Python 3.x (eg Fedora) in their default install as=
+,
+>>>> if they comply with PEP 394, the bare 'python' binary won't exist.
+>>>>
+>>>> This changes configure so that by default it will search for all thr=
+ee
+>>>> common python binaries, preferring to find Python 3.x versions.
+>>>>
+>>>> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>>>> Message-Id: <20190327170701.23798-1-berrange@redhat.com>
+>>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>>>> ---
+>>>>  configure | 18 +++++++++++++++---
+>>>>  1 file changed, 15 insertions(+), 3 deletions(-)
 >>>
->>> What filesystem?
+>>> I haven't bisected it, but I think this patch here broke the gitlab-c=
+i tests:
+>>>
+>>>  https://gitlab.com/huth/qemu/-/jobs/206806257
+>>>
+>>> Seems like the test is now failing when you don't have an UTF-8 local=
+e:
+>>>
+>>>  LANG=3DC make check-qapi-schema
 >>
->> ext4
+>> I couldn't reproduce it this way, probably because I'm running Python =
+3.7 which
+>> implements PEP 538 ("Coercing the legacy C locale to a UTF-8 based loc=
+ale").
+>>
+>> But I can force it to break using:
+>>
+>>   PYTHONIOENCODING=3Dascii make check-qapi-schema
+>>
+>>>  [...]
+>>>  TEST    tests/qapi-schema/union-base-empty.out
+>>>  --- /builds/huth/qemu/tests/qapi-schema/unicode-str.err	2019-05-03 1=
+5:21:39.000000000 +0000
+>>>  +++ -	2019-05-03 15:42:01.561762978 +0000
+>>>  @@ -1 +1 @@
+>>>  -tests/qapi-schema/unicode-str.json:2: 'command' uses invalid name '=
+=C3=A9'
+>>>  +tests/qapi-schema/unicode-str.json:2: 'command' uses invalid name '=
+\xe9'
+>>>  /builds/huth/qemu/tests/Makefile.include:1105: recipe for target 'ch=
+eck-tests/qapi-schema/unicode-str.json' failed
+>>>  make: *** [check-tests/qapi-schema/unicode-str.json] Error 1
+>>>
+>>> Any ideas how to fix this?
+>>
+>> Probably we just need to specify an explicit encoding at the statement=
+ that
+>> prints the error message to stderr.  I will give it a try.
 >=20
-> Hmm, it's passing for me on ext4, but that probably means we have
-> different configuration parameters. I'm not sure how to easily show wha=
-t
-> parameters a particular ext4 partition uses to compare the differences
-> between your setup and mine (mine is tuned to whatever defaults Fedora'=
-s
-> installer chose on my behalf), so maybe someone else can chime in.
+> Forcing a specific encoding inside test-qapi.py would very easy
+> on Python 3.7+ (sys.stderr.reconfigure(...)), but tricky on older
+> versions.  I believe this is the simplest way to fix the problem
+> on Python 3.5 and 3.6.
+>=20
+> Can somebody confirm this really fixes the problem on gitlab-ci?
+>=20
+> ---
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 7c8b9c84b2..af88ab6f8b 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -1103,7 +1103,7 @@ check-tests/qemu-iotests-quick.sh: tests/qemu-iot=
+ests-quick.sh qemu-img$(EXESUF)
+>  .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
+>  $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SRC_PA=
+TH)/%.json
+>  	$(call quiet-command, PYTHONPATH=3D$(SRC_PATH)/scripts \
+> -		$(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py \
+> +		PYTHONIOENCODING=3Dutf-8 $(PYTHON) $(SRC_PATH)/tests/qapi-schema/tes=
+t-qapi.py \
+>  		$^ >$*.test.out 2>$*.test.err; \
+>  		echo $$? >$*.test.exit, \
+>  		"TEST","$*.out")
 
-$ sudo tune2fs -l /dev/mapper/Home
-tune2fs 1.42.9 (28-Dec-2013)
-Filesystem volume name:   <none>
-Last mounted on:          /home
-Filesystem magic number:  0xEF53
-Filesystem revision #:    1 (dynamic)
-Filesystem features:      has_journal ext_attr dir_index filetype
-needs_recovery meta_bg extent 64bit flex_bg sparse_super large_file
-huge_file uninit_bg dir_nlink extra_isize
-Filesystem flags:         signed_directory_hash
-Default mount options:    user_xattr acl
-Filesystem state:         clean
-Errors behavior:          Continue
-Filesystem OS type:       Linux
-Inode count:              36700160
-Block count:              146800640
-Reserved block count:     5873663
-Free blocks:              56266267
-Free inodes:              35403275
-First block:              1
-Block size:               1024
-Fragment size:            1024
-Group descriptor size:    64
-Blocks per group:         8192
-Fragments per group:      8192
-Inodes per group:         2048
-Inode blocks per group:   256
-First meta block group:   258
-Flex block group size:    16
-Filesystem created:       Thu Apr 19 18:34:33 2018
-Last mount time:          Sat May  4 08:20:36 2019
-Last write time:          Sat May  4 08:20:36 2019
-Mount count:              224
-Maximum mount count:      -1
-Last checked:             Thu Apr 19 18:34:33 2018
-Check interval:           0 (<none>)
-Lifetime writes:          1826 GB
-Reserved blocks uid:      0 (user root)
-Reserved blocks gid:      0 (group root)
-First inode:              11
-Inode size:	          128
-Journal inode:            8
-First orphan inode:       11076944
-Default directory hash:   half_md4
-Directory Hash Seed:      08e1be04-c3a3-4c37-a059-cf54af5c4bc0
-Journal backup:           inode blocks
+Yes, thanks, this seems to fix this issue:
 
-IIRC I talked to stefanha on IRC about this some weeks ago already, and
-he was able to reproduce the problem when using a certain parameter to
-create the file system. However, I fail to remember which parameter it
-was. Maybe Stefan still remembers...
+ https://gitlab.com/huth/qemu/-/jobs/207041381
+
+It also works on my laptop now (which uses Python 3.6).
 
  Thomas
-
-
---Ox40LrtCe0BDFeiIAOsfnFjr9nVpQ1yus
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJczTZsAAoJEC7Z13T+cC210uUP/j0eCLA1uN9mjY31JYjw05Ic
-ZWpRb0HBvCoghim2mkUf/3vuYYYzJWKdvGcuhNZrIx91IdTcPiqde54Qg7TPDMP7
-LcjgbwkffEjDXBfdETCPyTJX1Mvmcq7++wjoNsEd2s+rgoRQt/7NB/Rc+K8aH1Wz
-53CI2uFluVNcNtkUJ7J0Nku889uZVShrEwIAsqcT/Non5CwssTW5t7ZXdpAbxqLF
-YU00b6FyeiY7c0BKz13wVw4RBp5VLdTSTrfIGD1E3O2br/0SNg6KlCPUhkWmpMvQ
-0CpGvGbjPitDSZBSXDGcWNL9yJ/nfpUb7CPOwVlm3ndpbLqPognBj8nKmQqAKRsQ
-XSaA/FzeeAVDSwMSyy5mF6uvc4ImHbcQHI4bfPXW3XzBFXYLEoo4vuXpem2cJ3Hb
-p6lspR1szcEEC3TP2brtb5HKcdmxi/UZwr91got73MAWjfbL06Ykrn4wXHZHRBe7
-g8TL8k3lEd40YKbAbxLzTOvKUqywSm+W/3zujefojDl2u7Q6IbGINqoWnTyFhOCR
-5u3tyoflA+jxG7WdzOE+aAkRE1egIAq5bDJNREtOOmGTlEoBIzpGTFwvKMoDSwyZ
-ANhfaV4YpI5n9o8Jd2TIuLRM5tGaxRUxeWOHh+bJc5YQgAgCpaX8XgjE6S2V9WS1
-Mch+mjOpZ45Q55m/jINw
-=QOhU
------END PGP SIGNATURE-----
-
---Ox40LrtCe0BDFeiIAOsfnFjr9nVpQ1yus--
 
