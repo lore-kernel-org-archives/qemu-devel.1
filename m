@@ -2,83 +2,110 @@ Return-Path: <SRS0=Uyhh=TE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C46C43219
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 13:50:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EA2FC43219
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 14:11:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD026206DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 13:50:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ULQ/FiHm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD026206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 56131206BB
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 14:11:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56131206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56979 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57183 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMv3V-0004wP-11
-	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 09:50:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44018)
+	id 1hMvO6-0003Yn-Cm
+	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 10:11:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hMuz0-00023S-4L
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 09:45:43 -0400
+	(envelope-from <thuth@redhat.com>) id 1hMvM8-0001tt-6L
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 10:09:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hMuyy-0002Mf-Jz
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 09:45:42 -0400
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:35896)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1hMuyy-0002ML-BY
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 09:45:40 -0400
-Received: by mail-wr1-x42f.google.com with SMTP id o4so11331166wra.3
-	for <qemu-devel@nongnu.org>; Sat, 04 May 2019 06:45:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=yBDZEMFabFIVF/5cxjG+KE5nHuYNnufiwwMl9tL4nuc=;
-	b=ULQ/FiHmLGKDfuOw/93eaxHFp2yoD9qTT2XphfaU1t/zNY+sJ98TzDTKUVNJoLSp/p
-	dvFiPZPoM+2cnKbq6mr4RcgFM2us024gGnWwNpu2L8sLZ0xku/4vQeXIqqBhAOfXBzXZ
-	vR+ffMCUQ41S85N7fwxeIa6CvaceXpBPHNgFO/ERzis4hWYw1xDFxLbEO7Tl1qPgdnOh
-	EqxGKimslFuaiDKX0GimRpLdPHvly57sbtiAayOhfe8vXHj43iOZwJevb8tPR0rPkqT1
-	gIfbf1hjYizo6d4fk1g5BBthuzYDAFNtkgSRnW04zk+cpWrdUPQpPVKWhu0ZnosMPtcp
-	3bkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=yBDZEMFabFIVF/5cxjG+KE5nHuYNnufiwwMl9tL4nuc=;
-	b=Mw7ZS8VgMy7UKm3umhvlRUKHiYFPAjjCYo/x3RF/W8bty7kNQ/5WrYEQKu9MgW33Lt
-	2G24i7DBgGclQe2mB6npR07if0o9JrWg9g5N5dxAhsC1TufKXaWF9gHO6W3Z8Bib9LYu
-	48CWo4nS9WSZvu8IvyCypfqFNgsR2/w6ySnXpBwLX1FxIY13Wf4LN3FS0GL/PoIIFpp3
-	o85szLuZ1oKIdiGPI1XJaMVzafLlGuGDo/8aUg+JRYMGzTH2Pi2zPWKb5RoS3XWliRAE
-	AbY0R8QAndokqDHEOlVYr6G/RHztmtQxMNzWvMb5zoneoNLYglKl6uICjU8zZNopegFw
-	joAw==
-X-Gm-Message-State: APjAAAVjUS6WMJ2mHVqECrkwZEXI001SVW9xXYaoKL/7HlaTBm1272kp
-	GYjX7RcUTcWpOe/ChGmwa5+CIPe3
-X-Google-Smtp-Source: APXvYqybTnw6c81EfqctPbqETtLwS98kY0Nx7D9RJVvdL+UVClMiYkkHAmTCUA3bWGHWzrakm4IPQQ==
-X-Received: by 2002:adf:f2c9:: with SMTP id d9mr11419829wrp.36.1556977538936; 
-	Sat, 04 May 2019 06:45:38 -0700 (PDT)
-Received: from localhost.localdomain ([37.142.144.27])
-	by smtp.gmail.com with ESMTPSA id t1sm5095610wro.34.2019.05.04.06.45.37
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Sat, 04 May 2019 06:45:38 -0700 (PDT)
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-To: qemu-devel@nongnu.org,
-	peter.maydell@linaro.org
-Date: Sat,  4 May 2019 16:45:29 +0300
-Message-Id: <20190504134529.4755-5-marcel.apfelbaum@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190504134529.4755-1-marcel.apfelbaum@gmail.com>
-References: <20190504134529.4755-1-marcel.apfelbaum@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::42f
-Subject: [Qemu-devel]  [PATCH PULL 4/4] hw/pvrdma: Add support for SRQ
+	(envelope-from <thuth@redhat.com>) id 1hMvM7-00078b-C0
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 10:09:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57356)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hMvM7-00077u-4r; Sat, 04 May 2019 10:09:35 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A776F37F46;
+	Sat,  4 May 2019 14:09:32 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-76.ams2.redhat.com [10.36.116.76])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E713519C4F;
+	Sat,  4 May 2019 14:09:28 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org
+References: <20190504123538.14952-1-philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <ffe3d73d-b9a2-a0e3-6dee-222a3d87cc28@redhat.com>
+Date: Sat, 4 May 2019 16:09:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190504123538.14952-1-philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.29]);
+	Sat, 04 May 2019 14:09:32 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] hw/net/ne2000: Extract the PCI device from
+ the chipset common code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,318 +117,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kamalheib1@gmail.com, yuval.shaia@oracle.com
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jason Wang <jasowang@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190504134529.9AaMcIBUxEAcXkUK7EWcSbl6k9_Ri0UP_DaSDZV16iU@z>
+Message-ID: <20190504140927.pYsNeDk31vf_ejk2Y0yBCvn3EuvLohO7yeuf8ZEUi9w@z>
 
-From: Kamal Heib <kamalheib1@gmail.com>
+On 04/05/2019 14.35, Philippe Mathieu-Daud=C3=A9 wrote:
+> The ne2000.c file contains functions common the the ISA and PCI
+> devices. To allow to build with one or another, extract the PCI
+> specific part into a new file.
+>=20
+> This fix an issue where the NE2000_ISA Kconfig had to pull the
+> full PCI core objects.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/net/Kconfig       |   7 ++-
+>  hw/net/Makefile.objs |   3 +-
+>  hw/net/ne2000-pci.c  | 132 +++++++++++++++++++++++++++++++++++++++++++
+>  hw/net/ne2000.c      | 105 ----------------------------------
+>  4 files changed, 139 insertions(+), 108 deletions(-)
+>  create mode 100644 hw/net/ne2000-pci.c
+>=20
+> diff --git a/hw/net/Kconfig b/hw/net/Kconfig
+> index 7d7bbc5d7c9..4ef86dc3a53 100644
+> --- a/hw/net/Kconfig
+> +++ b/hw/net/Kconfig
+> @@ -1,10 +1,14 @@
+>  config DP8393X
+>      bool
+> =20
+> +config NE2000_COMMON
+> +    bool
 
-Implement the pvrdma device commands for supporting SRQ
+I'd maybe rather simply name it "NE2000" instead of "NE2000_COMMON", but
+that's just a matter of taste.
 
-Signed-off-by: Kamal Heib <kamalheib1@gmail.com>
-Message-Id: <20190403113343.26384-5-kamalheib1@gmail.com>
-Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
-Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
----
- hw/rdma/vmw/pvrdma_cmd.c    | 147 ++++++++++++++++++++++++++++++++++++
- hw/rdma/vmw/pvrdma_main.c   |  16 ++++
- hw/rdma/vmw/pvrdma_qp_ops.c |  46 ++++++++++-
- hw/rdma/vmw/pvrdma_qp_ops.h |   1 +
- 4 files changed, 209 insertions(+), 1 deletion(-)
-
-diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-index b931bb6dc9..8d70c0d23d 100644
---- a/hw/rdma/vmw/pvrdma_cmd.c
-+++ b/hw/rdma/vmw/pvrdma_cmd.c
-@@ -609,6 +609,149 @@ static int destroy_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
-     return 0;
- }
- 
-+static int create_srq_ring(PCIDevice *pci_dev, PvrdmaRing **ring,
-+                           uint64_t pdir_dma, uint32_t max_wr,
-+                           uint32_t max_sge, uint32_t nchunks)
-+{
-+    uint64_t *dir = NULL, *tbl = NULL;
-+    PvrdmaRing *r;
-+    int rc = -EINVAL;
-+    char ring_name[MAX_RING_NAME_SZ];
-+    uint32_t wqe_sz;
-+
-+    if (!nchunks || nchunks > PVRDMA_MAX_FAST_REG_PAGES) {
-+        rdma_error_report("Got invalid page count for SRQ ring: %d",
-+                          nchunks);
-+        return rc;
-+    }
-+
-+    dir = rdma_pci_dma_map(pci_dev, pdir_dma, TARGET_PAGE_SIZE);
-+    if (!dir) {
-+        rdma_error_report("Failed to map to SRQ page directory");
-+        goto out;
-+    }
-+
-+    tbl = rdma_pci_dma_map(pci_dev, dir[0], TARGET_PAGE_SIZE);
-+    if (!tbl) {
-+        rdma_error_report("Failed to map to SRQ page table");
-+        goto out;
-+    }
-+
-+    r = g_malloc(sizeof(*r));
-+    *ring = r;
-+
-+    r->ring_state = (struct pvrdma_ring *)
-+            rdma_pci_dma_map(pci_dev, tbl[0], TARGET_PAGE_SIZE);
-+    if (!r->ring_state) {
-+        rdma_error_report("Failed to map tp SRQ ring state");
-+        goto out_free_ring_mem;
-+    }
-+
-+    wqe_sz = pow2ceil(sizeof(struct pvrdma_rq_wqe_hdr) +
-+                      sizeof(struct pvrdma_sge) * max_sge - 1);
-+    sprintf(ring_name, "srq_ring_%" PRIx64, pdir_dma);
-+    rc = pvrdma_ring_init(r, ring_name, pci_dev, &r->ring_state[1], max_wr,
-+                          wqe_sz, (dma_addr_t *)&tbl[1], nchunks - 1);
-+    if (rc) {
-+        goto out_unmap_ring_state;
-+    }
-+
-+    goto out;
-+
-+out_unmap_ring_state:
-+    rdma_pci_dma_unmap(pci_dev, r->ring_state, TARGET_PAGE_SIZE);
-+
-+out_free_ring_mem:
-+    g_free(r);
-+
-+out:
-+    rdma_pci_dma_unmap(pci_dev, tbl, TARGET_PAGE_SIZE);
-+    rdma_pci_dma_unmap(pci_dev, dir, TARGET_PAGE_SIZE);
-+
-+    return rc;
-+}
-+
-+static void destroy_srq_ring(PvrdmaRing *ring)
-+{
-+    pvrdma_ring_free(ring);
-+    rdma_pci_dma_unmap(ring->dev, ring->ring_state, TARGET_PAGE_SIZE);
-+    g_free(ring);
-+}
-+
-+static int create_srq(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                      union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_create_srq *cmd = &req->create_srq;
-+    struct pvrdma_cmd_create_srq_resp *resp = &rsp->create_srq_resp;
-+    PvrdmaRing *ring = NULL;
-+    int rc;
-+
-+    memset(resp, 0, sizeof(*resp));
-+
-+    rc = create_srq_ring(PCI_DEVICE(dev), &ring, cmd->pdir_dma,
-+                         cmd->attrs.max_wr, cmd->attrs.max_sge,
-+                         cmd->nchunks);
-+    if (rc) {
-+        return rc;
-+    }
-+
-+    rc = rdma_rm_alloc_srq(&dev->rdma_dev_res, cmd->pd_handle,
-+                           cmd->attrs.max_wr, cmd->attrs.max_sge,
-+                           cmd->attrs.srq_limit, &resp->srqn, ring);
-+    if (rc) {
-+        destroy_srq_ring(ring);
-+        return rc;
-+    }
-+
-+    return 0;
-+}
-+
-+static int query_srq(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                     union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_query_srq *cmd = &req->query_srq;
-+    struct pvrdma_cmd_query_srq_resp *resp = &rsp->query_srq_resp;
-+
-+    memset(resp, 0, sizeof(*resp));
-+
-+    return rdma_rm_query_srq(&dev->rdma_dev_res, cmd->srq_handle,
-+                             (struct ibv_srq_attr *)&resp->attrs);
-+}
-+
-+static int modify_srq(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                      union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_modify_srq *cmd = &req->modify_srq;
-+
-+    /* Only support SRQ limit */
-+    if (!(cmd->attr_mask & IBV_SRQ_LIMIT) ||
-+        (cmd->attr_mask & IBV_SRQ_MAX_WR))
-+            return -EINVAL;
-+
-+    return rdma_rm_modify_srq(&dev->rdma_dev_res, cmd->srq_handle,
-+                              (struct ibv_srq_attr *)&cmd->attrs,
-+                              cmd->attr_mask);
-+}
-+
-+static int destroy_srq(PVRDMADev *dev, union pvrdma_cmd_req *req,
-+                       union pvrdma_cmd_resp *rsp)
-+{
-+    struct pvrdma_cmd_destroy_srq *cmd = &req->destroy_srq;
-+    RdmaRmSRQ *srq;
-+    PvrdmaRing *ring;
-+
-+    srq = rdma_rm_get_srq(&dev->rdma_dev_res, cmd->srq_handle);
-+    if (!srq) {
-+        return -EINVAL;
-+    }
-+
-+    ring = (PvrdmaRing *)srq->opaque;
-+    destroy_srq_ring(ring);
-+    rdma_rm_dealloc_srq(&dev->rdma_dev_res, cmd->srq_handle);
-+
-+    return 0;
-+}
-+
- struct cmd_handler {
-     uint32_t cmd;
-     uint32_t ack;
-@@ -634,6 +777,10 @@ static struct cmd_handler cmd_handlers[] = {
-     {PVRDMA_CMD_DESTROY_UC,   PVRDMA_CMD_DESTROY_UC_RESP_NOOP,   destroy_uc},
-     {PVRDMA_CMD_CREATE_BIND,  PVRDMA_CMD_CREATE_BIND_RESP_NOOP,  create_bind},
-     {PVRDMA_CMD_DESTROY_BIND, PVRDMA_CMD_DESTROY_BIND_RESP_NOOP, destroy_bind},
-+    {PVRDMA_CMD_CREATE_SRQ,   PVRDMA_CMD_CREATE_SRQ_RESP,        create_srq},
-+    {PVRDMA_CMD_QUERY_SRQ,    PVRDMA_CMD_QUERY_SRQ_RESP,         query_srq},
-+    {PVRDMA_CMD_MODIFY_SRQ,   PVRDMA_CMD_MODIFY_SRQ_RESP,        modify_srq},
-+    {PVRDMA_CMD_DESTROY_SRQ,  PVRDMA_CMD_DESTROY_SRQ_RESP,       destroy_srq},
- };
- 
- int pvrdma_exec_cmd(PVRDMADev *dev)
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index 0b46561bad..769f7990f8 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -53,6 +53,7 @@ static Property pvrdma_dev_properties[] = {
-     DEFINE_PROP_INT32("dev-caps-max-qp-init-rd-atom", PVRDMADev,
-                       dev_attr.max_qp_init_rd_atom, MAX_QP_INIT_RD_ATOM),
-     DEFINE_PROP_INT32("dev-caps-max-ah", PVRDMADev, dev_attr.max_ah, MAX_AH),
-+    DEFINE_PROP_INT32("dev-caps-max-srq", PVRDMADev, dev_attr.max_srq, MAX_SRQ),
-     DEFINE_PROP_CHR("mad-chardev", PVRDMADev, mad_chr),
-     DEFINE_PROP_END_OF_LIST(),
- };
-@@ -261,6 +262,9 @@ static void init_dsr_dev_caps(PVRDMADev *dev)
-     dsr->caps.max_mr = dev->dev_attr.max_mr;
-     dsr->caps.max_pd = dev->dev_attr.max_pd;
-     dsr->caps.max_ah = dev->dev_attr.max_ah;
-+    dsr->caps.max_srq = dev->dev_attr.max_srq;
-+    dsr->caps.max_srq_wr = dev->dev_attr.max_srq_wr;
-+    dsr->caps.max_srq_sge = dev->dev_attr.max_srq_sge;
-     dsr->caps.gid_tbl_len = MAX_GIDS;
-     dsr->caps.sys_image_guid = 0;
-     dsr->caps.node_guid = dev->node_guid;
-@@ -485,6 +489,13 @@ static void pvrdma_uar_write(void *opaque, hwaddr addr, uint64_t val,
-             pvrdma_cq_poll(&dev->rdma_dev_res, val & PVRDMA_UAR_HANDLE_MASK);
-         }
-         break;
-+    case PVRDMA_UAR_SRQ_OFFSET:
-+        if (val & PVRDMA_UAR_SRQ_RECV) {
-+            trace_pvrdma_uar_write(addr, val, "QP", "SRQ",
-+                                   val & PVRDMA_UAR_HANDLE_MASK, 0);
-+            pvrdma_srq_recv(dev, val & PVRDMA_UAR_HANDLE_MASK);
-+        }
-+        break;
-     default:
-         rdma_error_report("Unsupported command, addr=0x%"PRIx64", val=0x%"PRIx64,
-                           addr, val);
-@@ -554,6 +565,11 @@ static void init_dev_caps(PVRDMADev *dev)
- 
-     dev->dev_attr.max_cqe = pg_tbl_bytes / sizeof(struct pvrdma_cqe) -
-                             TARGET_PAGE_SIZE; /* First page is ring state */
-+
-+    dev->dev_attr.max_srq_wr = pg_tbl_bytes /
-+                                ((sizeof(struct pvrdma_rq_wqe_hdr) +
-+                                sizeof(struct pvrdma_sge)) *
-+                                dev->dev_attr.max_sge) - TARGET_PAGE_SIZE;
- }
- 
- static int pvrdma_check_ram_shared(Object *obj, void *opaque)
-diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-index 5b9786efbe..bd6db858de 100644
---- a/hw/rdma/vmw/pvrdma_qp_ops.c
-+++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-@@ -70,7 +70,7 @@ static int pvrdma_post_cqe(PVRDMADev *dev, uint32_t cq_handle,
- 
-     memset(cqe1, 0, sizeof(*cqe1));
-     cqe1->wr_id = cqe->wr_id;
--    cqe1->qp = cqe->qp;
-+    cqe1->qp = cqe->qp ? cqe->qp : wc->qp_num;
-     cqe1->opcode = cqe->opcode;
-     cqe1->status = wc->status;
-     cqe1->byte_len = wc->byte_len;
-@@ -241,6 +241,50 @@ void pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle)
-     }
- }
- 
-+void pvrdma_srq_recv(PVRDMADev *dev, uint32_t srq_handle)
-+{
-+    RdmaRmSRQ *srq;
-+    PvrdmaRqWqe *wqe;
-+    PvrdmaRing *ring;
-+
-+    srq = rdma_rm_get_srq(&dev->rdma_dev_res, srq_handle);
-+    if (unlikely(!srq)) {
-+        return;
-+    }
-+
-+    ring = (PvrdmaRing *)srq->opaque;
-+
-+    wqe = (struct PvrdmaRqWqe *)pvrdma_ring_next_elem_read(ring);
-+    while (wqe) {
-+        CompHandlerCtx *comp_ctx;
-+
-+        /* Prepare CQE */
-+        comp_ctx = g_malloc(sizeof(CompHandlerCtx));
-+        comp_ctx->dev = dev;
-+        comp_ctx->cq_handle = srq->recv_cq_handle;
-+        comp_ctx->cqe.wr_id = wqe->hdr.wr_id;
-+        comp_ctx->cqe.qp = 0;
-+        comp_ctx->cqe.opcode = IBV_WC_RECV;
-+
-+        if (wqe->hdr.num_sge > dev->dev_attr.max_sge) {
-+            rdma_error_report("Invalid num_sge=%d (max %d)", wqe->hdr.num_sge,
-+                              dev->dev_attr.max_sge);
-+            complete_with_error(VENDOR_ERR_INV_NUM_SGE, comp_ctx);
-+            continue;
-+        }
-+
-+        rdma_backend_post_srq_recv(&dev->backend_dev, &srq->backend_srq,
-+                                   (struct ibv_sge *)&wqe->sge[0],
-+                                   wqe->hdr.num_sge,
-+                                   comp_ctx);
-+
-+        pvrdma_ring_read_inc(ring);
-+
-+        wqe = pvrdma_ring_next_elem_read(ring);
-+    }
-+
-+}
-+
- void pvrdma_cq_poll(RdmaDeviceResources *dev_res, uint32_t cq_handle)
- {
-     RdmaRmCQ *cq;
-diff --git a/hw/rdma/vmw/pvrdma_qp_ops.h b/hw/rdma/vmw/pvrdma_qp_ops.h
-index 31cb48ba29..82e720a76f 100644
---- a/hw/rdma/vmw/pvrdma_qp_ops.h
-+++ b/hw/rdma/vmw/pvrdma_qp_ops.h
-@@ -22,6 +22,7 @@ int pvrdma_qp_ops_init(void);
- void pvrdma_qp_ops_fini(void);
- void pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle);
- void pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle);
-+void pvrdma_srq_recv(PVRDMADev *dev, uint32_t srq_handle);
- void pvrdma_cq_poll(RdmaDeviceResources *dev_res, uint32_t cq_handle);
- 
- #endif
--- 
-2.17.1
-
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
