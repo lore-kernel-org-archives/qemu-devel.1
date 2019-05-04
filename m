@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44358)
+Received: from eggs.gnu.org ([209.51.188.92]:44368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <S.E.Harris@kent.ac.uk>) id 1hMqDP-0007XK-Ib
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 04:40:17 -0400
+	(envelope-from <S.E.Harris@kent.ac.uk>) id 1hMqDQ-0007Xe-2H
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 04:40:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <S.E.Harris@kent.ac.uk>) id 1hMqDM-0002wO-Vy
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 04:40:15 -0400
-Received: from mx0.kent.ac.uk ([129.12.21.32]:48936)
+	(envelope-from <S.E.Harris@kent.ac.uk>) id 1hMqDN-0002wU-12
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 04:40:16 -0400
+Received: from mx0.kent.ac.uk ([129.12.21.32]:43691)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <S.E.Harris@kent.ac.uk>)
-	id 1hMqDM-0002uc-NE
+	id 1hMqDM-0002uX-NC
 	for qemu-devel@nongnu.org; Sat, 04 May 2019 04:40:12 -0400
 From: Sarah Harris <S.E.Harris@kent.ac.uk>
-Date: Sat,  4 May 2019 09:36:34 +0100
-Message-Id: <20190504083638.13380-5-S.E.Harris@kent.ac.uk>
+Date: Sat,  4 May 2019 09:36:31 +0100
+Message-Id: <20190504083638.13380-2-S.E.Harris@kent.ac.uk>
 In-Reply-To: <20190504083638.13380-1-S.E.Harris@kent.ac.uk>
 References: <20190504083638.13380-1-S.E.Harris@kent.ac.uk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 4/8] target/avr: Add instruction helpers
+Subject: [Qemu-devel] [PATCH v1 1/8] target/avr: Add instruction decoder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,401 +29,539 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: S.E.Harris@kent.ac.uk, A.M.King@kent.ac.uk, E.J.C.Robbins@kent.ac.uk, mrolnik@gmail.com
 
-Stubs for unimplemented instructions and helpers for instructions that need to interact with QEMU.
-SPM and WDR are unimplemented because they require emulation of complex peripherals.
-The implementation of SLEEP is very limited due to the lack of peripherals to generate wake interrupts.
-Memory access instructions are implemented here because some address ranges actually refer to CPU registers.
+This utility module builds a decision tree to decode instructions, starting from a human readable list of instruction bit patterns.
+Automatic tree generation will hopefully be more efficient and more maintainable than a hand-designed opcode parser.
+
+Tree generation happens at startup because this seemed simpler to implement than adding a new build step.
 
 Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 ---
- target/avr/helper.c | 343 ++++++++++++++++++++++++++++++++++++++++++++
- target/avr/helper.h |  28 ++++
- 2 files changed, 371 insertions(+)
- create mode 100644 target/avr/helper.c
- create mode 100644 target/avr/helper.h
+ target/avr/decode.c | 441 ++++++++++++++++++++++++++++++++++++++++++++
+ target/avr/decode.h |  68 +++++++
+ 2 files changed, 509 insertions(+)
+ create mode 100644 target/avr/decode.c
+ create mode 100644 target/avr/decode.h
 
-diff --git a/target/avr/helper.c b/target/avr/helper.c
+diff --git a/target/avr/decode.c b/target/avr/decode.c
 new file mode 100644
-index 0000000000..29b8bfce02
+index 0000000000..a984806d96
 --- /dev/null
-+++ b/target/avr/helper.c
-@@ -0,0 +1,343 @@
++++ b/target/avr/decode.c
+@@ -0,0 +1,441 @@
 +/*
-+ * QEMU AVR CPU
++ * AVR instruction decoder.
 + *
-+ * Copyright (c) 2016 Michael Rolnik
++ * Copyright (c) 2019 University of Kent
++ * Author: Sarah Harris
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
 + *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
 + *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
 + */
 +
++/*
++ * # Why is this here?
++ * This decoder takes a list of human readable descriptions of instructions
++ * and uses it to build a binary decision tree used to choose translation
++ * functions for opcodes.
++ * It's built like this because figuring out the structure of AVR instructions
++ * was too hard and writing a Big Nested Switch by hand seemed too painful.
++ * This seems to be the simplest answer that doesn't use loads (>0.5MB) of RAM.
++ *
++ * # How does it work?
++ * This is based J. R. Quinlan's ID3 algorithm, tweaked to add weights to each
++ * instruction.
++ * Having a binary tree branch on opcode bits seems obvious, but the awkward
++ * part is deciding which order to test the bits.
++ * Getting the order right means that redundant bits can be ignored and fewer
++ * branches are needed; i.e. less memory and faster lookups.
++ * Here, the tests are ordered by an estimate of information gain based on
++ * Shannon Entropy.
++ * In short, we guess how much each bit tells us and pick the one that gives
++ * us most progress toward knowing which instruction we're seeing.
++ * The weights are currently only used to prioritise legal opcodes over
++ * illegal opcodes, which significantly reduces the tree size.
++ *
++ * # Why are you doing this at run time?
++ * It was easier than building and running a special purpose tool during
++ * QEMU's build process.
++ * The tree is only built once, during startup, and hopefully doesn't take long
++ * enough to be noticeable.
++ */
++
++#include <math.h>
 +#include "qemu/osdep.h"
-+
-+#include "cpu.h"
-+#include "hw/irq.h"
-+#include "hw/sysbus.h"
-+#include "sysemu/sysemu.h"
-+#include "exec/exec-all.h"
-+#include "exec/cpu_ldst.h"
-+#include "exec/helper-proto.h"
-+#include "exec/ioport.h"
-+#include "qemu/host-utils.h"
++#include "qemu/bitops.h"
 +#include "qemu/error-report.h"
++#include "decode.h"
 +
-+bool avr_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
++/* #define DEBUG_DECODER */
++
++/* Wide enough for the largest AVR instruction. */
++#define OPCODE_T uint16_t
++#define OPCODE_SIZE 16
++
++/*
++ * Probability estimate for each instruction.
++ * Larger values mean higher priority.
++ */
++#define WEIGHT_T uint64_t
++#define WEIGHT_LEGAL (1 << 16)
++#define WEIGHT_ILLEGAL 1
++
++typedef union Tree Tree;
++
++typedef struct {
++    bool is_leaf;
++    /* Bit to test */
++    uint bit;
++    const Tree *zero;
++    const Tree *one;
++} Branch;
++
++typedef struct {
++    bool is_leaf;
++    TranslateFn decoder;
++    /* Instruction length in bits */
++    uint32_t length;
++    const char *name;
++} Leaf;
++
++union Tree {
++    bool is_leaf;
++    Branch branch;
++    Leaf leaf;
++};
++
++/* Additional (generated) instruction data */
++typedef struct {
++    const Instruction *instruction;
++    /* Instruction length in bits */
++    uint32_t length;
++    WEIGHT_T weight;
++    /*
++     * Bit pattern matched in opcodes.
++     * For each 1 in mask, the same bit in the opcode must match that from bits.
++     */
++    OPCODE_T bits;
++    OPCODE_T mask;
++} Pattern;
++
++/* Cached decoding tree */
++Tree *cache;
++
++/* Return calculated bit pattern and length for an instruction */
++static Pattern get_info(const Instruction *instruction)
 +{
-+    bool ret = false;
-+    CPUClass *cc = CPU_GET_CLASS(cs);
-+    AVRCPU *cpu = AVR_CPU(cs);
-+    CPUAVRState *env = &cpu->env;
-+
-+    if (interrupt_request & CPU_INTERRUPT_RESET) {
-+        if (cpu_interrupts_enabled(env)) {
-+            cs->exception_index = EXCP_RESET;
-+            cc->do_interrupt(cs);
-+
-+            cs->interrupt_request &= ~CPU_INTERRUPT_RESET;
-+
-+            ret = true;
++    OPCODE_T bit = 1 << (OPCODE_SIZE - 1);
++    OPCODE_T bits = 0;
++    OPCODE_T mask = 0;
++    uint32_t length = 0;
++    const char *c = instruction->pattern;
++    while (*c != '\0') {
++        switch (*c) {
++        case '0':
++            mask |= bit;
++            bit >>= 1;
++            length++;
++            break;
++        case '1':
++            bits |= bit;
++            mask |= bit;
++            bit >>= 1;
++            length++;
++            break;
++        case '*':
++            bit >>= 1;
++            length++;
++            break;
++        case '_':
++            /* NOP */
++            break;
++        default:
++            assert(0);
 +        }
++        c++;
 +    }
-+    if (interrupt_request & CPU_INTERRUPT_HARD) {
-+        if (cpu_interrupts_enabled(env) && env->intsrc != 0) {
-+            int index = ctz32(env->intsrc);
-+            cs->exception_index = EXCP_INT(index);
-+            cc->do_interrupt(cs);
-+
-+            env->intsrc &= env->intsrc - 1; /* clear the interrupt */
-+            cs->interrupt_request &= ~CPU_INTERRUPT_HARD;
-+
-+            ret = true;
-+        }
-+    }
-+    return ret;
++    const Pattern pattern = {
++        .instruction = instruction,
++        .length = length,
++        .weight = WEIGHT_LEGAL,
++        .bits = bits,
++        .mask = mask
++    };
++    return pattern;
 +}
 +
-+void avr_cpu_do_interrupt(CPUState *cs)
++/* Return true if an instruction matches a pattern of known/unknown bits */
++static bool matches(const Pattern *const pattern, const OPCODE_T bits,
++    const OPCODE_T mask)
 +{
-+    AVRCPU *cpu = AVR_CPU(cs);
-+    CPUAVRState *env = &cpu->env;
++    OPCODE_T overlap = pattern->mask & mask;
++    return (pattern->bits & overlap) == (bits & overlap);
++}
 +
-+    uint32_t ret = env->pc_w;
-+    int vector = 0;
-+    int size = avr_feature(env, AVR_FEATURE_JMP_CALL) ? 2 : 1;
-+    int base = 0;
++/* Return number of instructions that match a pattern of known/unknown bits */
++static size_t count_legal(const Pattern *patterns, const size_t size,
++    const OPCODE_T bits, const OPCODE_T mask)
++{
++    size_t sum = 0;
++    size_t i;
++    for (i = 0; i < size; i++) {
++        if (matches(&patterns[i], bits, mask)) {
++            sum++;
++        }
++    }
++    return sum;
++}
 +
-+    if (cs->exception_index == EXCP_RESET) {
-+        vector = 0;
-+    } else if (env->intsrc != 0) {
-+        vector = ctz32(env->intsrc) + 1;
++/* Return the number of opcodes that could match a bit pattern */
++static uint64_t count_opcodes(const OPCODE_T _bits, OPCODE_T mask)
++{
++    uint64_t matches = 1;
++    int i;
++    assert(sizeof(matches) * 8 > OPCODE_SIZE);
++    for (i = 0; i < OPCODE_SIZE; i++) {
++        if (!(mask & 1)) {
++            matches <<= 1;
++        }
++        mask >>= 1;
++    }
++    return matches;
++}
++
++/*
++ * Return a known/unknown bit pattern that only matches opcodes matched by both
++ * of the given patterns.
++ */
++static void intersection(const OPCODE_T a_bits, const OPCODE_T a_mask,
++    const OPCODE_T b_bits, const OPCODE_T b_mask,
++    OPCODE_T *const out_bits, OPCODE_T *const out_mask)
++{
++    const OPCODE_T overlap = a_mask & b_mask;
++    /* The two patterns mustn't have conflicting requirements */
++    assert((a_bits & overlap) == (b_bits & overlap));
++    *out_bits = (a_bits & a_mask) | (b_bits & b_mask);
++    *out_mask = a_mask | b_mask;
++}
++
++/*
++ * Return one if any opcode allowed by a pattern of known/unknown bits is
++ * illegal.
++ */
++static size_t count_illegal(const Pattern *patterns, const size_t size,
++    const OPCODE_T bits, const OPCODE_T mask)
++{
++    size_t i;
++    const uint64_t no_opcodes = count_opcodes(bits, mask);
++    uint64_t no_legal = 0;
++
++    /* Count opcodes that match instructions */
++    for (i = 0; i < size; i++) {
++        const Pattern *pattern = &patterns[i];
++        if (matches(pattern, bits, mask)) {
++            OPCODE_T both_bits, both_mask;
++            intersection(
++                bits, mask,
++                pattern->bits, pattern->mask,
++                &both_bits, &both_mask
++            );
++            no_legal += count_opcodes(both_bits, both_mask);
++        }
 +    }
 +
-+    if (avr_feature(env, AVR_FEATURE_3_BYTE_PC)) {
-+        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
-+        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
-+        cpu_stb_data(env, env->sp--, (ret & 0xff0000) >> 16);
-+    } else if (avr_feature(env, AVR_FEATURE_2_BYTE_PC)) {
-+        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
-+        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
++    assert(no_legal <= no_opcodes);
++    if (no_legal == no_opcodes) {
++        return 0;
 +    } else {
-+        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
++        return 1;
 +    }
-+
-+    env->pc_w = base + vector * size;
-+    env->sregI = 0; /* clear Global Interrupt Flag */
-+
-+    cs->exception_index = -1;
 +}
 +
-+int avr_cpu_memory_rw_debug(CPUState *cs, vaddr addr, uint8_t *buf,
-+                                int len, bool is_write)
++/* Return the first matching instruction for a pattern of known/unknown bits */
++static const Pattern *find_match(const Pattern *patterns, const size_t size,
++    const OPCODE_T bits, const OPCODE_T mask)
 +{
-+    return cpu_memory_rw_debug(cs, addr, buf, len, is_write);
-+}
-+
-+hwaddr avr_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-+{
-+    return addr; /* I assume 1:1 address correspondance */
-+}
-+
-+int avr_cpu_handle_mmu_fault(
-+    CPUState *cs, vaddr address, int size, int rw, int mmu_idx)
-+{
-+    /* currently it's assumed that this will never happen */
-+    cs->exception_index = EXCP_DEBUG;
-+    cpu_dump_state(cs, stderr, 0);
-+    return 1;
-+}
-+
-+void tlb_fill(CPUState *cs, target_ulong vaddr, int size,
-+              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
-+{
-+    int prot = 0;
-+    MemTxAttrs attrs = {};
-+    uint32_t paddr;
-+
-+    vaddr &= TARGET_PAGE_MASK;
-+
-+    if (mmu_idx == MMU_CODE_IDX) {
-+        /* access to code in flash */
-+        paddr = OFFSET_CODE + vaddr;
-+        prot = PAGE_READ | PAGE_EXEC;
-+        if (paddr + TARGET_PAGE_SIZE > OFFSET_DATA) {
-+            error_report("execution left flash memory");
-+            exit(1);
++    size_t i;
++    for (i = 0; i < size; i++) {
++        if (matches(&patterns[i], bits, mask)) {
++            return &patterns[i];
 +        }
-+    } else if (vaddr < NO_CPU_REGISTERS + NO_IO_REGISTERS) {
-+        /*
-+         * access to CPU registers, exit and rebuilt this TB to use full access
-+         * incase it touches specially handled registers like SREG or SP
-+         */
-+        AVRCPU *cpu = AVR_CPU(cs);
-+        CPUAVRState *env = &cpu->env;
-+        env->fullacc = 1;
-+        cpu_loop_exit_restore(cs, retaddr);
-+    } else {
-+        /* access to memory. nothing special */
-+        paddr = OFFSET_DATA + vaddr;
-+        prot = PAGE_READ | PAGE_WRITE;
++    }
++    return NULL;
++}
++
++/* Return sum of weights of instructions that match a bit pattern */
++static WEIGHT_T weigh_matches(const Pattern *patterns, const size_t size,
++    const OPCODE_T bits, const OPCODE_T mask)
++{
++    size_t i;
++    WEIGHT_T illegal = (WEIGHT_T)count_illegal(patterns, size, bits, mask)
++        * WEIGHT_ILLEGAL;
++    WEIGHT_T legal = 0;
++    for (i = 0; i < size; i++) {
++        if (matches(&patterns[i], bits, mask)) {
++            legal += patterns[i].weight;
++        }
++    }
++    return legal + illegal;
++}
++
++/*
++ * Return "effort" (estimated information needed) to decide tree outcome.
++ * bits and mask give the opcode bits already decided by the parent tree.
++ * parent_weight gives the sum of the weights of instructions that the
++ * parent tree matches.
++ */
++static float subtree_effort(const Pattern *patterns, const size_t size,
++    const OPCODE_T bits, const OPCODE_T mask, const WEIGHT_T parent_weight)
++{
++    const WEIGHT_T weight = weigh_matches(patterns, size, bits, mask);
++    float entropy_legal, entropy_illegal, probability;
++    size_t i;
++
++    /* Sum information needed to decide legal instructions */
++    entropy_legal = 0.0;
++    for (i = 0; i < size; i++) {
++        const Pattern *const pattern = &patterns[i];
++        if (matches(pattern, bits, mask)) {
++            probability = (float)pattern->weight / (float)weight;
++            entropy_legal += -probability * log2(probability);
++        }
 +    }
 +
-+    tlb_set_page_with_attrs(
-+        cs, vaddr, paddr, attrs, prot, mmu_idx, TARGET_PAGE_SIZE);
++    /* Sum information needed to decide illegal instructions */
++    probability = (float)WEIGHT_ILLEGAL / (float)weight;
++    entropy_illegal = -probability * log2(probability) *
++        (float)count_illegal(patterns, size, bits, mask);
++
++    return ((float)weight / (float)parent_weight) *
++        (entropy_legal + entropy_illegal);
 +}
 +
-+void helper_sleep(CPUAVRState *env)
++/* Return recursively built binary tree for decoding an opcode to instruction */
++static Tree *build_tree(const Pattern *patterns, const size_t size,
++    OPCODE_T bits, OPCODE_T mask)
 +{
-+    CPUState *cs = CPU(avr_env_get_cpu(env));
++    /* Check if we've reached a leaf */
++    size_t matching_illegal = count_illegal(patterns, size, bits, mask);
++    size_t matching_legal = count_legal(patterns, size, bits, mask);
++    size_t matching = matching_illegal + matching_legal;
++    assert(matching > 0); /* At last an illegal instruction should match */
++    if (matching_legal == 0) {
++        /* Illegal instruction */
++        Leaf *leaf = g_new0(Leaf, 1);
++        leaf->is_leaf = true;
++        leaf->decoder = NULL;
++        leaf->length = 16;
++        leaf->name = "illegal";
++        return (Tree *)leaf;
++    }
++    if (matching_legal == 1 && matching_illegal == 0) {
++        /* Legal instruction */
++        const Pattern *pattern = find_match(patterns, size, bits, mask);
++        assert(pattern != NULL);
++        const Instruction *const instruction = pattern->instruction;
++        Leaf *leaf = g_new0(Leaf, 1);
++        leaf->is_leaf = true;
++        leaf->decoder = instruction->decoder;
++        leaf->length = pattern->length;
++        leaf->name = instruction->name;
++        return (Tree *)leaf;
++    }
 +
-+    cs->exception_index = EXCP_HLT;
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_unsupported(CPUAVRState *env)
-+{
-+    CPUState *cs = CPU(avr_env_get_cpu(env));
++    /* Work out which bit to branch on */
++    const WEIGHT_T tree_weight = weigh_matches(patterns, size, bits, mask);
++    float min_effort = 0.0;
++    ssize_t min_bit = -1;
++    size_t i;
++    for (i = 0; i < OPCODE_SIZE; i++) {
++        float effort;
++        const OPCODE_T bit = 1 << i;
++        if (mask & bit) {
++            /* This bit already branched on, skip */
++            continue;
++        }
++        effort = subtree_effort(patterns, size, bits, mask | bit, tree_weight) +
++            subtree_effort(patterns, size, bits | bit, mask | bit, tree_weight);
++        if (min_bit < 0 || effort < min_effort) {
++            min_bit = i;
++            min_effort = effort;
++        }
++    }
 +
 +    /*
-+     *  I count not find what happens on the real platform, so
-+     *  it's EXCP_DEBUG for meanwhile
++     * Setup branch on bit that gives most information gain.
++     * (AKA minimum information/effort needed to decide remaining branches.
 +     */
-+    cs->exception_index = EXCP_DEBUG;
-+    if (qemu_loglevel_mask(LOG_UNIMP)) {
-+        qemu_log("UNSUPPORTED\n");
-+        cpu_dump_state(cs, qemu_logfile, 0);
++    assert(min_bit >= 0); /* Probably multiple instructions match one opcode */
++    const OPCODE_T bit = 1 << min_bit;
++    const Tree *zero = build_tree(patterns, size, bits, mask | bit);
++    const Tree *one = build_tree(patterns, size, bits | bit, mask | bit);
++    Branch *branch = g_new0(Branch, 1);
++    branch->is_leaf = false;
++    branch->bit = min_bit;
++    branch->zero = zero;
++    branch->one = one;
++    return (Tree *)branch;
++}
++
++#ifdef DEBUG_DECODER
++static size_t depth(const Tree *const tree);
++static size_t depth(const Tree *const tree)
++{
++    if (tree->is_leaf) {
++        return 1;
 +    }
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_debug(CPUAVRState *env)
-+{
-+    CPUState *cs = CPU(avr_env_get_cpu(env));
-+
-+    cs->exception_index = EXCP_DEBUG;
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_wdr(CPUAVRState *env)
-+{
-+    CPUState *cs = CPU(avr_env_get_cpu(env));
-+
-+    /* WD is not implemented yet, placeholder */
-+    cs->exception_index = EXCP_DEBUG;
-+    cpu_loop_exit(cs);
-+}
-+
-+/*
-+ * This function implements IN instruction
-+ *
-+ * It does the following
-+ * a.  if an IO register belongs to CPU, its value is read and returned
-+ * b.  otherwise io address is translated to mem address and physical memory
-+ *     is read.
-+ * c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementation
-+ *
-+ */
-+target_ulong helper_inb(CPUAVRState *env, uint32_t port)
-+{
-+    target_ulong data = 0;
-+
-+    switch (port) {
-+    case 0x38: /* RAMPD */
-+        data = 0xff & (env->rampD >> 16);
-+        break;
-+    case 0x39: /* RAMPX */
-+        data = 0xff & (env->rampX >> 16);
-+        break;
-+    case 0x3a: /* RAMPY */
-+        data = 0xff & (env->rampY >> 16);
-+        break;
-+    case 0x3b: /* RAMPZ */
-+        data = 0xff & (env->rampZ >> 16);
-+        break;
-+    case 0x3c: /* EIND */
-+        data = 0xff & (env->eind >> 16);
-+        break;
-+    case 0x3d: /* SPL */
-+        data = env->sp & 0x00ff;
-+        break;
-+    case 0x3e: /* SPH */
-+        data = env->sp >> 8;
-+        break;
-+    case 0x3f: /* SREG */
-+        data = cpu_get_sreg(env);
-+        break;
-+    default:
-+        /* not a special register, pass to normal memory access */
-+        cpu_physical_memory_read(OFFSET_IO_REGISTERS + port, &data, 1);
++    size_t zero = depth(tree->branch.zero);
++    size_t one = depth(tree->branch.one);
++    if (zero > one) {
++        return zero + 1;
 +    }
++    return one + 1;
++}
++static size_t count(const Tree *const tree);
++static size_t count(const Tree *const tree)
++{
++    if (tree->is_leaf) {
++        return 1;
++    }
++    return 1 + count(tree->branch.zero) + count(tree->branch.one);
++}
++#endif
 +
-+    return data;
++void avr_decoder_init(const Instruction instructions[], const size_t size)
++{
++    assert(cache == NULL); /* Shouldn't be initialised more than once */
++    Pattern *const patterns = g_new0(Pattern, size);
++    size_t i;
++    for (i = 0; i < size; i++) {
++        patterns[i] = get_info(&instructions[i]);
++    }
++    cache = build_tree(patterns, size, 0, 0);
++    g_free(patterns);
++#ifdef DEBUG_DECODER
++    printf("AVR decoder init, depth=%lu, size=%lu\n",
++        depth(cache), count(cache));
++#endif
 +}
 +
-+/*
-+ *  This function implements OUT instruction
-+ *
-+ *  It does the following
-+ *  a.  if an IO register belongs to CPU, its value is written into the register
-+ *  b.  otherwise io address is translated to mem address and physical memory
-+ *      is written.
-+ *  c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementation
-+ *
-+ */
-+void helper_outb(CPUAVRState *env, uint32_t port, uint32_t data)
++TranslateFn avr_decode(const uint32_t opcode, uint32_t *const length_out)
 +{
-+    data &= 0x000000ff;
-+
-+    switch (port) {
-+    case 0x38: /* RAMPD */
-+        if (avr_feature(env, AVR_FEATURE_RAMPD)) {
-+            env->rampD = (data & 0xff) << 16;
++    assert(cache != NULL); /* Must be initialised */
++    const Tree *node = cache;
++    while (1) {
++        assert(node != NULL);
++        if (node->is_leaf) {
++            const Leaf *const leaf = &node->leaf;
++            if (leaf->decoder == NULL) {
++                /* Illegal instruction */
++                error_report("Illegal AVR instruction");
++                exit(1);
++            }
++#ifdef DEBUG_DECODER
++            printf("AVR decoder: %s\n", leaf->name);
++#endif
++            *length_out = leaf->length;
++            return leaf->decoder;
++        } else {
++            const Branch *const branch = &node->branch;
++            const OPCODE_T mask = 1 << branch->bit;
++            if (opcode & mask) {
++                node = branch->one;
++            } else {
++                node = branch->zero;
++            }
 +        }
-+        break;
-+    case 0x39: /* RAMPX */
-+        if (avr_feature(env, AVR_FEATURE_RAMPX)) {
-+            env->rampX = (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x3a: /* RAMPY */
-+        if (avr_feature(env, AVR_FEATURE_RAMPY)) {
-+            env->rampY = (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x3b: /* RAMPZ */
-+        if (avr_feature(env, AVR_FEATURE_RAMPZ)) {
-+            env->rampZ = (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x3c: /* EIDN */
-+        env->eind = (data & 0xff) << 16;
-+        break;
-+    case 0x3d: /* SPL */
-+        env->sp = (env->sp & 0xff00) | (data);
-+        break;
-+    case 0x3e: /* SPH */
-+        if (avr_feature(env, AVR_FEATURE_2_BYTE_SP)) {
-+            env->sp = (env->sp & 0x00ff) | (data << 8);
-+        }
-+        break;
-+    case 0x3f: /* SREG */
-+        cpu_set_sreg(env, data);
-+        break;
-+    default:
-+        /* not a special register, pass to normal memory access */
-+        cpu_physical_memory_write(OFFSET_IO_REGISTERS + port, &data, 1);
 +    }
 +}
-+
-+/*
-+ *  this function implements LD instruction when there is a posibility to read
-+ *  from a CPU register
-+ */
-+target_ulong helper_fullrd(CPUAVRState *env, uint32_t addr)
-+{
-+    uint8_t data;
-+
-+    env->fullacc = false;
-+
-+    if (addr < NO_CPU_REGISTERS) {
-+        /* CPU registers */
-+        data = env->r[addr];
-+    } else if (addr < NO_CPU_REGISTERS + NO_IO_REGISTERS) {
-+        /* IO registers */
-+        data = helper_inb(env, addr - NO_CPU_REGISTERS);
-+    } else {
-+        /* memory */
-+        cpu_physical_memory_read(OFFSET_DATA + addr, &data, 1);
-+    }
-+    return data;
-+}
-+
-+/*
-+ *  this function implements ST instruction when there is a posibility to write
-+ *  into a CPU register
-+ */
-+void helper_fullwr(CPUAVRState *env, uint32_t data, uint32_t addr)
-+{
-+    env->fullacc = false;
-+
-+    /* Following logic assumes this: */
-+    assert(OFFSET_CPU_REGISTERS == OFFSET_DATA);
-+    assert(OFFSET_IO_REGISTERS == OFFSET_CPU_REGISTERS + NO_CPU_REGISTERS);
-+
-+    if (addr < NO_CPU_REGISTERS) {
-+        /* CPU registers */
-+        env->r[addr] = data;
-+    } else if (addr < NO_CPU_REGISTERS + NO_IO_REGISTERS) {
-+        /* IO registers */
-+        helper_outb(env, addr - NO_CPU_REGISTERS, data);
-+    } else {
-+        /* memory */
-+        cpu_physical_memory_write(OFFSET_DATA + addr, &data, 1);
-+    }
-+}
-diff --git a/target/avr/helper.h b/target/avr/helper.h
+diff --git a/target/avr/decode.h b/target/avr/decode.h
 new file mode 100644
-index 0000000000..603631520a
+index 0000000000..415406544a
 --- /dev/null
-+++ b/target/avr/helper.h
-@@ -0,0 +1,28 @@
++++ b/target/avr/decode.h
+@@ -0,0 +1,68 @@
 +/*
-+ * QEMU AVR CPU
++ * AVR instruction decoder.
 + *
-+ * Copyright (c) 2016 Michael Rolnik
++ * Copyright (c) 2019 University of Kent
++ * Author: Sarah Harris
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
 + *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
 + *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
 + */
 +
-+DEF_HELPER_1(wdr, void, env)
-+DEF_HELPER_1(debug, void, env)
-+DEF_HELPER_1(sleep, void, env)
-+DEF_HELPER_1(unsupported, void, env)
-+DEF_HELPER_3(outb, void, env, i32, i32)
-+DEF_HELPER_2(inb, tl, env, i32)
-+DEF_HELPER_3(fullwr, void, env, i32, i32)
-+DEF_HELPER_2(fullrd, tl, env, i32)
++#ifndef AVR_DECODER_H
++#define AVR_DECODER_H
++
++/* Pointer to functions used to do final decoding step from opcode to TCG. */
++typedef struct DisasContext DisasContext;
++typedef int (*TranslateFn)(DisasContext *ctx, uint32_t opcode);
++
++/*
++ * Human readable instruction descriptions used to generate decoder.
++ * Doing this at runtime avoids a complicated new build step.
++ */
++typedef struct {
++    /* Instruction mnemonic for debugging */
++    const char *name;
++    /*
++     * Bit pattern describing the instruction's opcode.
++     * Each character represents a bit:
++     * - '1' means bit must be set
++     * - '0' means bit must be cleared
++     * - '*' means don't care
++     * - '_' is ignored (i.e. whitespace), please use to aid readability
++     */
++    const char *pattern;
++    /* Function used to translate this instruction to TCG */
++    TranslateFn decoder;
++} Instruction;
++
++/*
++ * Converts a list of instruction descriptions to a decoding tree
++ * and caches it.
++ * Must only be called once.
++ * `size` is the number of instructions in the given list.
++ */
++void avr_decoder_init(const Instruction instructions[], const size_t size);
++
++/*
++ * Returns the translation function and length of an instruction, given
++ * the opcode.
++ * avr_decoder_init() must be called first to build the decoding tree.
++ */
++TranslateFn avr_decode(const uint32_t opcode, uint32_t *const length_out);
++
++#endif /* AVR_DECODER_H */
 -- 
 2.21.0
