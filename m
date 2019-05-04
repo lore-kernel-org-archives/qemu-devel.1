@@ -6,72 +6,71 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0725DC43219
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 12:12:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3C5EC43219
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 12:12:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6BF0206DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 12:12:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A129206DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 12:12:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DlhuQB22"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6BF0206DF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JW3l2DuS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A129206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55750 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55752 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMtX5-0004W1-Vx
-	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 08:12:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50406)
+	id 1hMtXG-0004eh-Ka
+	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 08:12:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hMtQD-0007BQ-Sl
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 08:05:43 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hMtQN-0007Kj-Ee
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 08:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hMtQA-0001Dd-EB
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 08:05:40 -0400
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:35930)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hMtQL-0001Hv-BN
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 08:05:51 -0400
+Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:44209)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1hMtQ8-0001CW-Ko; Sat, 04 May 2019 08:05:37 -0400
-Received: by mail-ot1-x32b.google.com with SMTP id b18so7642080otq.3;
-	Sat, 04 May 2019 05:05:35 -0700 (PDT)
+	id 1hMtQJ-0001Em-Nx; Sat, 04 May 2019 08:05:47 -0400
+Received: by mail-oi1-x230.google.com with SMTP id t184so6328736oie.11;
+	Sat, 04 May 2019 05:05:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=ahvxSVh2QRrmKy4BCWONH7xM6dTvjNFat384VGW5p48=;
-	b=DlhuQB22RV1+3Fd5TonZaG+STyJJDViJefRG+GqcluWwvMh3UG8r7XIjHMr4QibUuM
-	QkA0I+WfdBOGDRFfXFeuKbYFL0LgkhKhXw/Nb/7dshKXPTgaKwI7CWcyUh46wFsXOrSV
-	bD2o5tJTReYJWdXZgpjbfJz22wBrqzaN/P5mQSaFYyFc7FaP3/7ozq9sCzULtPjY6hK9
-	KShiX2Az+87XsIREe6bu30FshS31mOe6P7Z+4IxxBCvQSLscz5qC7W983wwifbUvJCp0
-	jcS6utiq5+YVGR//dQPLx221dr14hlPG8yD7G7aQweKqpEGeGWFffn3bhi93Ys5NajHm
-	xTUw==
+	bh=Dst2FGMsCs9IpcjAwFYM6Y8XoVeXqqnJoYTrIPSeVd0=;
+	b=JW3l2DuS8al+vh91Gj35Ygr5a5YHO8l5AVOFvhk/tSTNYpnnqfbYIfnMXv2eaPe0vK
+	uCw+5cMP0owamtPcOdV59P6mIQJp3DTIRrni85DJWNODjYIF0OHKf2ZMC5BmPeyZG2/6
+	rzJeu7WD2n56VNCpniQ3r2WS2QHPZOv4iIKYdgbc4OwXeL2RMp03/ayjqg1Ysmbnqwg+
+	0sYtYpXo9I0SVk6ko/lSYfYrJNTXRPb5Qa1Zst8oOQg+N3uFYFzP+KX9YjAqJRz8Xszs
+	ZdDUK9vZ2pa6KJ2LmRW5j63qryNXSWDXdsem77s39aanwR7C6Xo3uDQXDtRJL4QaRGd8
+	x/Ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
 	:in-reply-to:references:mime-version:content-transfer-encoding;
-	bh=ahvxSVh2QRrmKy4BCWONH7xM6dTvjNFat384VGW5p48=;
-	b=l21mOjprKJPDceTuz3tAzaRyRNDsbyq2BDO1ee02wo4wG4AFzISA3ZRVbBEH5cEM49
-	grgfzkHXewE23MR4HuDB3f9fqisDA2M4Zj3ugUYYZLEnJxTD2S+Lsjo8mtK/6eQnMQZE
-	re6QkxZCIb0ZJjw9PGa257mOkg4XuDIYV4oZcIOiqO8O92DH55h/SwM1MoqMm+EywYH0
-	8PMVxb/OkwhWcQjrvEcJ+XAds2fFM5yyl8UXJo6JyoioPPBN4dcrZDre7jhGD2dsy/Jy
-	JGothV/Pjrtm5K4wZ3560psKnaWPays0I+HL+Lw0hoUWN0WhxgUcswxAzInufzp1PxJb
-	XXQQ==
-X-Gm-Message-State: APjAAAX874+jL/7EhvL1p7cijLGCsExTMo9gKY7VmPiHqCQJMHayNB4z
-	TuF5XHVUbd4Z0KblZScQy1YLLjwx
-X-Google-Smtp-Source: APXvYqzQKTNLeqe5MBi7n5ye0an2mSuXMLB7grlxz4GH47D5Z4jl7b8X8VWuM06BHcDbDOP0V+Zj9A==
-X-Received: by 2002:a05:6830:16ce:: with SMTP id
-	l14mr9987365otr.108.1556971534966; 
-	Sat, 04 May 2019 05:05:34 -0700 (PDT)
+	bh=Dst2FGMsCs9IpcjAwFYM6Y8XoVeXqqnJoYTrIPSeVd0=;
+	b=HBEnjUxr4rLgUhU1sc0voac/p3vCWnQthVWPEeOknrABSvXE2SB01LPKUQa3zb0+qn
+	49vaCNzLcyLNLJMx8fAA/WANJaVjL8EmTobt+bxnWFkFofPogQPt5m8yH0ujtABF2Bmv
+	jkQc/czc1Ycu768eRURUfq52TbmvmRLRqWvocAe1XYzhJ2FGY/RyNeLYUgQlixAn8WdL
+	lwIeBhPP0HV6KrGk/gAyfcMfjc5OTAE3xzAkxLREq1HcNeKrh9bcWs/qwUN6QI39qfev
+	UOah4nGc/Y2OBh8DKA8Y4xkSww+D2YpuVIuzzbXYXrXNiWGZKDng/5hXB3QxaBPP+l9I
+	JTTg==
+X-Gm-Message-State: APjAAAUjuSI7cbvA1CvbAPv9YN0i3cTCC2FlcT+FjfHjUDjNd47PyKhm
+	lPCP0NELmJs7syhCn1nOV2xEkiI4
+X-Google-Smtp-Source: APXvYqwI+5y0uYDXcmd5U57FMj+sd0pER5XnICRZV76BvAjg4kj9QCRY6nJKYKJkFZv7uWxhN4tioA==
+X-Received: by 2002:aca:d7d5:: with SMTP id o204mr2355825oig.23.1556971540786; 
+	Sat, 04 May 2019 05:05:40 -0700 (PDT)
 Received: from localhost.localdomain ([198.59.53.9])
 	by smtp.gmail.com with ESMTPSA id
-	s26sm1844978otk.24.2019.05.04.05.05.33
+	s26sm1844978otk.24.2019.05.04.05.05.39
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Sat, 04 May 2019 05:05:34 -0700 (PDT)
+	Sat, 04 May 2019 05:05:40 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Sat,  4 May 2019 06:05:22 -0600
-Message-Id: <20190504120528.6389-5-pbonzini@redhat.com>
+Date: Sat,  4 May 2019 06:05:28 -0600
+Message-Id: <20190504120528.6389-11-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190504120528.6389-1-pbonzini@redhat.com>
 References: <20190504120528.6389-1-pbonzini@redhat.com>
@@ -79,9 +78,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::32b
-Subject: [Qemu-devel] [PATCH 4/9] coroutine: add host specific coroutine
- backend for 64-bit ARM
+X-Received-From: 2607:f8b0:4864:20::230
+Subject: [Qemu-devel] [PATCH 10/9] coroutine-asm: add x86 CET shadow stack
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,127 +98,207 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190504120522.YKPNMednFkpoqajoh4XXmZTINGaFc-U1fsianzJqbPI@z>
+Message-ID: <20190504120528.GAkZA8Ryz8SQKwkIoIFOpY53tgsbo8zXYjiwX2tu7_4@z>
 
-The speedup is similar to x86, 120 ns vs 180 ns on an APM Mustang.
+Note that the ABI is not yet part of Linux; this patch is
+not intended to be committed until that is approved.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure                        |  2 +-
- scripts/qemugdb/coroutine_asm.py |  6 ++++-
- util/Makefile.objs               |  2 ++
- util/coroutine-asm.c             | 45 ++++++++++++++++++++++++++++++++
- 4 files changed, 53 insertions(+), 2 deletions(-)
+ configure            | 14 ++++++++
+ util/Makefile.objs   |  2 ++
+ util/coroutine-asm.c | 82 ++++++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 96 insertions(+), 2 deletions(-)
 
 diff --git a/configure b/configure
-index c01f57a3ae..26e62a4ab1 100755
+index c02a5f4b79..8e81d08ef1 100755
 --- a/configure
 +++ b/configure
-@@ -5200,7 +5200,7 @@ fi
- if test "$coroutine" = ""; then
-   if test "$mingw32" = "yes"; then
-     coroutine=win32
--  elif test "$cpu" = "x86_64"; then
-+  elif test "$cpu" = "x86_64" || test "$cpu" = "aarch64"; then
-      coroutine=asm
-   elif test "$ucontext_works" = "yes"; then
-     coroutine=ucontext
-diff --git a/scripts/qemugdb/coroutine_asm.py b/scripts/qemugdb/coroutine_asm.py
-index b4ac1291db..181b77287b 100644
---- a/scripts/qemugdb/coroutine_asm.py
-+++ b/scripts/qemugdb/coroutine_asm.py
-@@ -17,4 +17,8 @@ U64_PTR = gdb.lookup_type('uint64_t').pointer()
- def get_coroutine_regs(addr):
-     addr = addr.cast(gdb.lookup_type('CoroutineAsm').pointer())
-     rsp = addr['sp'].cast(U64_PTR)
--    return {'sp': rsp, 'pc': rsp.dereference()}
-+    arch = gdb.selected_frame().architecture.name().split(':'):
-+    if arch[0] == 'i386' and arch[1] == 'x86-64':
-+        return {'rsp': rsp, 'pc': rsp.dereference()}
-+    else:
-+        return {'sp': rsp, 'pc': addr['scratch'].cast(U64_PTR) }
+@@ -5192,6 +5192,20 @@ if test "$cf_protection" != no; then
+       feature_not_found "cf_protection" 'Control-flow protection is not supported by your toolchain'
+     fi
+     cf_protection=no
++  else
++    if test $cpu = x86_64; then
++      # only needed by coroutine-asm.c, however it should be rare to have
++      # CET support in the compiler but not in binutils
++      cat > $TMPC << EOF
++int main(void) { asm("rdsspq %%rax" : : : "rax"); }
++EOF
++      if ! compile_prog "" "" ; then
++        if test "$cf_protection" = yes; then
++          feature_not_found "cf_protection" 'CET is not supported by your toolchain'
++        fi
++        cf_protection=no
++      fi
++    fi
+   fi
+ fi
+ if test "$cf_protection" = ""; then
 diff --git a/util/Makefile.objs b/util/Makefile.objs
-index 41a10539cf..2167ffc862 100644
+index d7add70b63..cf08b4d1c4 100644
 --- a/util/Makefile.objs
 +++ b/util/Makefile.objs
-@@ -39,7 +39,9 @@ util-obj-$(CONFIG_MEMBARRIER) += sys_membarrier.o
- util-obj-y += qemu-coroutine.o qemu-coroutine-lock.o qemu-coroutine-io.o
- util-obj-y += qemu-coroutine-sleep.o
- util-obj-y += coroutine-$(CONFIG_COROUTINE_BACKEND).o
-+ifeq ($(ARCH),x86_64)
- coroutine-asm.o-cflags := -mno-red-zone
+@@ -45,8 +45,10 @@ endif
+ ifeq ($(CONFIG_CF_PROTECTION),y)
+ coroutine-sigaltstack.o-cflags := -fcf-protection=branch
+ coroutine-ucontext.o-cflags := -fcf-protection=branch
++ifneq ($(ARCH),x86_64)
+ coroutine-asm.o-cflags += -fcf-protection=branch
+ endif
 +endif
  util-obj-y += buffer.o
  util-obj-y += timed-average.o
  util-obj-y += base64.o
 diff --git a/util/coroutine-asm.c b/util/coroutine-asm.c
-index a06ecbcb0a..de68e98622 100644
+index a9a80e9c71..01875acfc4 100644
 --- a/util/coroutine-asm.c
 +++ b/util/coroutine-asm.c
-@@ -40,6 +40,11 @@ typedef struct {
-     Coroutine base;
-     void *sp;
- 
-+    /*
-+     * aarch64: instruction pointer
-+     */
-+    void *scratch;
+@@ -22,6 +22,13 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "qemu/coroutine_int.h"
++#include "qemu/error-report.h"
 +
++#ifdef CONFIG_CF_PROTECTION
++#include <asm/prctl.h>
++#include <sys/prctl.h>
++int arch_prctl(int code, unsigned long addr);
++#endif
+ 
+ #ifdef CONFIG_VALGRIND_H
+ #include <valgrind/valgrind.h>
+@@ -42,12 +49,16 @@ typedef struct {
+ 
+     /*
+      * aarch64, s390x: instruction pointer
++     * x86: shadow stack pointer
+      */
+     void *scratch;
+ 
      void *stack;
      size_t stack_size;
  
-@@ -116,6 +121,49 @@ static void start_switch_fiber(void **fake_stack_save,
- /* Use "call" to ensure the stack  is aligned correctly.  */
- #define CO_SWITCH_NEW(from, to) CO_SWITCH(from, to, 0, "call coroutine_trampoline")
- #define CO_SWITCH_RET(from, to, action) CO_SWITCH(from, to, action, "ret")
++    /* x86: CET shadow stack */
++    void *sstack;
++    size_t sstack_size;
+ #ifdef CONFIG_VALGRIND_H
+     unsigned int valgrind_stack_id;
+ #endif
+@@ -82,6 +93,35 @@ static void start_switch_fiber(void **fake_stack_save,
+ #endif
+ }
+ 
++static bool have_sstack(void)
++{
++#if defined CONFIG_CF_PROTECTION && defined __x86_64__
++    uint64_t ssp;
++    asm ("xor %0, %0; rdsspq %0\n" : "=r" (ssp));
++    return !!ssp;
++#else
++    return 0;
++#endif
++}
 +
-+#elif defined __aarch64__
-+/*
-+ * GCC does not support clobbering the frame pointer, so we save it ourselves.
-+ * Saving the link register as well generates slightly better code because then
-+ * qemu_coroutine_switch can be treated as a leaf procedure.
-+ */
-+#define CO_SWITCH_RET(from, to, action) ({                                            \
-+    register uintptr_t action_ __asm__("x0") = action;                                \
-+    register void *from_ __asm__("x16") = from;                                       \
-+    register void *to_ __asm__("x1") = to;                                            \
-+    asm volatile(                                                                     \
-+        ".cfi_remember_state\n"                                                       \
-+        "stp x29, x30, [sp, #-16]!\n"    /* GCC does not save it, do it ourselves */  \
-+        ".cfi_adjust_cfa_offset 16\n"                                                 \
-+        ".cfi_def_cfa_register sp\n"                                                  \
-+        "adr x30, 2f\n"                  /* source PC will be after the BR */         \
-+        "str x30, [x16, %[SCRATCH]]\n"   /* save it */                                \
-+        "mov x30, sp\n"                  /* save source SP */                         \
-+        "str x30, [x16, %[SP]]\n"                                                     \
-+        "ldr x30, [x1, %[SCRATCH]]\n"    /* load destination PC */                    \
-+        "ldr x1, [x1, %[SP]]\n"          /* load destination SP */                    \
-+        "mov sp, x1\n"                                                                \
-+        "br x30\n"                                                                    \
-+        "2: \n"                                                                       \
-+        "ldp x29, x30, [sp], #16\n"                                                   \
-+        ".cfi_restore_state\n"                                                        \
-+        : "+r" (action_), "+r" (from_), "+r" (to_)                                    \
++static void *alloc_sstack(size_t sz)
++{
++#if defined CONFIG_CF_PROTECTION && defined __x86_64__
++#ifndef ARCH_X86_CET_ALLOC_SHSTK
++#define ARCH_X86_CET_ALLOC_SHSTK 0x3004
++#endif
++
++    uint64_t arg = sz;
++    if (arch_prctl(ARCH_X86_CET_ALLOC_SHSTK, (unsigned long) &arg) < 0) {
++        abort();
++    }
++
++    return (void *)arg;
++#else
++    abort();
++#endif
++}
++
+ #ifdef __x86_64__
+ /*
+  * We hardcode all operands to specific registers so that we can write down all the
+@@ -93,6 +133,26 @@ static void start_switch_fiber(void **fake_stack_save,
+  * Note that push and call would clobber the red zone.  Makefile.objs compiles this
+  * file with -mno-red-zone.  The alternative is to subtract/add 128 bytes from rsp
+  * around the switch, with slightly lower cache performance.
++ *
++ * The RSTORSSP and SAVEPREVSSP instructions are intricate.  In a nutshell they are:
++ *
++ *      RSTORSSP(mem):    oldSSP = SSP
++ *                        SSP = mem
++ *                        *SSP = oldSSP
++ *
++ *      SAVEPREVSSP:      oldSSP = shadow_stack_pop()
++ *                        *(oldSSP - 8) = oldSSP       # "push" to old shadow stack
++ *
++ * Therefore, RSTORSSP(mem) followed by SAVEPREVSSP is the same as
++ *
++ *     shadow_stack_push(SSP)
++ *     SSP = mem
++ *     shadow_stack_pop()
++ *
++ * From the simplified description you can see that co->ssp, being stored before
++ * the RSTORSSP+SAVEPREVSSP sequence, points to the top actual entry of the shadow
++ * stack, not to the restore token.  Hence we use an offset of -8 in the operand
++ * of rstorssp.
+  */
+ #define CO_SWITCH(from, to, action, jump) ({                                          \
+     int action_ = action;                                                             \
+@@ -105,7 +165,15 @@ static void start_switch_fiber(void **fake_stack_save,
+         "jmp 2f\n"                          /* switch back continues at label 2 */    \
+                                                                                       \
+         "1: .cfi_adjust_cfa_offset 8\n"                                               \
+-        "movq %%rsp, %c[SP](%[FROM])\n"     /* save source SP */                      \
++        "xor %%rbp, %%rbp\n"                /* use old frame pointer as scratch reg */ \
++        "rdsspq %%rbp\n"                                                              \
++        "test %%rbp, %%rbp\n"               /* if CET is enabled... */                \
++        "jz 9f\n"                                                                     \
++        "movq %%rbp, %c[SCRATCH](%[FROM])\n" /* ... save source shadow SP, */         \
++        "movq %c[SCRATCH](%[TO]), %%rbp\n"   /* restore destination shadow stack, */  \
++        "rstorssp -8(%%rbp)\n"                                                        \
++        "saveprevssp\n"                     /* and save source shadow SP token */     \
++        "9: movq %%rsp, %c[SP](%[FROM])\n"  /* save source SP */                      \
+         "movq %c[SP](%[TO]), %%rsp\n"       /* load destination SP */                 \
+         jump "\n"                           /* coroutine switch */                    \
+                                                                                       \
+@@ -113,7 +181,8 @@ static void start_switch_fiber(void **fake_stack_save,
+         "popq %%rbp\n"                                                                \
+         ".cfi_adjust_cfa_offset -8\n"                                                 \
+         : "+a" (action_), [FROM] "+b" (from_), [TO] "+D" (to_)                        \
+-        : [SP] "i" (offsetof(CoroutineAsm, sp))                                       \
 +        : [SP] "i" (offsetof(CoroutineAsm, sp)),                                      \
 +          [SCRATCH] "i" (offsetof(CoroutineAsm, scratch))                             \
-+        : "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12",        \
-+          "x13", "x14", "x15", "x17", "x18", "x19", "x20", "x21", "x22", "x23",       \
-+          "x24", "x25", "x26", "x27", "x28",                                          \
-+          "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11",   \
-+          "v12", "v13", "v14", "v15", v16", "v17", "v18", "v19", "v20", "v21", "v22", \
-+          "v23", "v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31", "memory",    \
-+    action_;                                                                          \
-+})
+         : "rcx", "rdx", "rsi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15",  \
+           "memory");                                                                  \
+     action_;                                                                          \
+@@ -220,6 +289,12 @@ Coroutine *qemu_coroutine_new(void)
+     co->stack = qemu_alloc_stack(&co->stack_size);
+     co->sp = co->stack + co->stack_size;
+ 
++    if (have_sstack()) {
++        co->sstack_size = COROUTINE_SHADOW_STACK_SIZE;
++        co->sstack = alloc_sstack(co->sstack_size);
++        co->scratch = co->sstack + co->sstack_size;
++    }
 +
-+#define CO_SWITCH_NEW(from, to) do {                                                  \
-+  (to)->scratch = (void *) coroutine_trampoline;                                      \
-+  (void) CO_SWITCH_RET(from, to, (uintptr_t) to);                                     \
-+} while(0)
- #else
- #error coroutine-asm.c not ported to this architecture.
+ #ifdef CONFIG_VALGRIND_H
+     co->valgrind_stack_id =
+         VALGRIND_STACK_REGISTER(co->stack, co->stack + co->stack_size);
+@@ -265,6 +340,9 @@ void qemu_coroutine_delete(Coroutine *co_)
  #endif
+ 
+     qemu_free_stack(co->stack, co->stack_size);
++    if (co->sstack) {
++        munmap(co->sstack, co->sstack_size);
++    }
+     g_free(co);
+ }
+ 
 -- 
 2.21.0
-
 
 
