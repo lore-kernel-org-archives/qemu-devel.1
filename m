@@ -2,75 +2,88 @@ Return-Path: <SRS0=Uyhh=TE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EF30C43219
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 14:47:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC2C7C43219
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 18:09:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C78D620859
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 14:47:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C78D620859
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 9244C204EC
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 18:09:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QibxuX6S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9244C204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57528 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59635 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMvwO-0006sj-Rf
-	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 10:47:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56402)
+	id 1hMz62-0004v6-Lv
+	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 14:09:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hMvv0-00065p-At
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 10:45:39 -0400
+	(envelope-from <eroken1@gmail.com>) id 1hMz55-0004Xf-Vs
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 14:08:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hMvuz-0007GX-2O
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 10:45:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39848)
+	(envelope-from <eroken1@gmail.com>) id 1hMz54-0003pv-Bt
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 14:08:15 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41726)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hMvuy-0007Ff-TN
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 10:45:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hMvuw-0000i3-9R
-	for <qemu-devel@nongnu.org>; Sat, 04 May 2019 14:45:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 429B52E802D
-	for <qemu-devel@nongnu.org>; Sat,  4 May 2019 14:45:34 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 04 May 2019 14:39:15 -0000
-From: Shahab Vahedi <1825359@bugs.launchpad.net>
+	(Exim 4.71) (envelope-from <eroken1@gmail.com>) id 1hMz54-0003pU-1q
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 14:08:14 -0400
+Received: by mail-wr1-x441.google.com with SMTP id c12so11848822wrt.8
+	for <qemu-devel@nongnu.org>; Sat, 04 May 2019 11:08:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+	:user-agent; bh=/6+m16FeyOhouSIUu6XZSWd17z0T5ZhpeUXBrM0VPiA=;
+	b=QibxuX6SYvcqjyNgWRcNDzudTZAhD0fWzwsZ3Pwtkyebdr76oukiyTYu7HjRqHjJzy
+	sZhkykPPDgbt/8o+ss2hWZGG6jwL0xUDBCzWvYPm2qRdXmbjtfnK6sQuCnmoQPAo1BW1
+	CmmYS9eigquutXlJPIAHqR+1g0teIBCDbEUAydQJ78S5N8b907s9mcJ0sS2aiEESEhUs
+	jU/DH27ZqK4rhLYMPWCi1Pbxttbc0xYr1zijc8g7T4/aDow7W0P6dx0qS7+DveD6ikJF
+	FoZV/tS1CtMbu+/Gm2eYlt6rWfVWi8NS6r0KErvBUjEkJdKqGxO6glXmaXHyjlV7jPg1
+	ljcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+	:content-disposition:user-agent;
+	bh=/6+m16FeyOhouSIUu6XZSWd17z0T5ZhpeUXBrM0VPiA=;
+	b=owfDDfGF6JhCTrGyOwBpyw42Q+vXxG4KloKQ8RbtJK8HXvJ+N9TWTapyUM+AsrPf3V
+	DnwJ1OckEQy0dq2wSwPB9RSML9yqPjpzwBx63iRO4+T/itKEgehrkJPvx0HIVep6hq72
+	kHkogzXezoLMmnf7sadAyetMdry8Kjh+6h2ZESTNo/w8ELSrCzuzkFjS50hujyquGdDb
+	8EF+xYm69vUPH/tG0vPy/+1qDhCpGnn8l//vUV8UK9SOrfG+uh2ZJcQsLIFOIc5DGMzJ
+	+tffYShHsIdY3O6HuRRaKHDNYYBz7Z9kAbESGoH+JULtS0Akoysc/5U8UXjYIDSVG1hl
+	qeOA==
+X-Gm-Message-State: APjAAAX9AKjrOtzfQDgP8fzp6u9lsDGjtTZr2tz8POBzQqR3rKkoKPUS
+	2iQx3aCNLrkeh1g8KIQu7ef8LB2mLDw=
+X-Google-Smtp-Source: APXvYqybjLjZEXayIowTDWBGoYjyVaWQmAvBIaYcgIX3gi44/sN72Tbgg8CpY+AWjJSTVduQBt74Fw==
+X-Received: by 2002:adf:db05:: with SMTP id s5mr11621616wri.247.1556993292035; 
+	Sat, 04 May 2019 11:08:12 -0700 (PDT)
+Received: from erokenlabserver ([41.203.78.113])
+	by smtp.gmail.com with ESMTPSA id i9sm1526485wmb.4.2019.05.04.11.08.07
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Sat, 04 May 2019 11:08:11 -0700 (PDT)
+Date: Sat, 4 May 2019 19:11:19 +0100
+From: Ernest Esene <eroken1@gmail.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
-	assignee=shahab.vahedi@gmail.com; 
-X-Launchpad-Bug-Tags: fetch mmu mpu
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: pmaydell shahab-vahedi
-X-Launchpad-Bug-Reporter: Shahab Vahedi (shahab-vahedi)
-X-Launchpad-Bug-Modifier: Shahab Vahedi (shahab-vahedi)
-References: <155558881987.7164.1099557133760519082.malonedeb@chaenomeles.canonical.com>
-Message-Id:
- <155698075588.6855.13828109913019155377.malone@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18953";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 4482caf67e08ed6487e7cd1d12d21332faa43823
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1825359] Re: cpu_ld*_code() triggers
- MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
+Message-ID: <20190504181119.GA3317@erokenlabserver>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="82I3+IH0IqGh5yIs"
+Content-Disposition: inline
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PATCH v2] chardev/char-i2c: Implement Linux I2C
+ character device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,133 +92,365 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1825359 <1825359@bugs.launchpad.net>
+Cc: Markus Armbruster <armbru@redhat.com>,
+	=?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Ernest Esene <eroken1@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190504143915.4Ow1azs0y0nKQxNwMSgW9mr62sF2NxtMljHhdpkmnLQ@z>
+Message-ID: <20190504181119._q9UejxBzJqYSC0rD8Rq9g-6t2s2JzU6rNw6kZm_0_A@z>
 
-Thank YOU for all the supports along the way :)
 
--- =
+--82I3+IH0IqGh5yIs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1825359
+Add support for Linux I2C character device for I2C device passthrough
+For example:
+-chardev linux-i2c,address=3D0x46,path=3D/dev/i2c-N,id=3Di2c-chardev
 
-Title:
-  cpu_ld*_code() triggers MMU_DATA_LOAD i.s.o. MMU_INST_FETCH
+Signed-off-by: Ernest Esene <eroken1@gmail.com>
 
-Status in QEMU:
-  Fix Committed
+---
+v2:
+  * Fix errors
+  * update "MAINTAINERS" file.
+---
+ MAINTAINERS                |   6 ++
+ chardev/Makefile.objs      |   1 +
+ chardev/char-i2c.c         | 140 +++++++++++++++++++++++++++++++++++++++++=
+++++
+ chardev/char.c             |   3 +
+ include/chardev/char-i2c.h |  35 ++++++++++++
+ include/chardev/char.h     |   1 +
+ qapi/char.json             |  18 ++++++
+ 7 files changed, 204 insertions(+)
+ create mode 100644 chardev/char-i2c.c
+ create mode 100644 include/chardev/char-i2c.h
 
-Bug description:
-  commit 377b155bde451d5ac545fbdcdfbf6ca17a4228f5
-  Merge: c876180938 328eb60dc1
-  Author: Peter Maydell <peter.x@x.x>        ; masked for anti-spamming pur=
-poses
-  Date:   Mon Mar 11 18:26:37 2019 +0000
-  https://github.com/qemu/qemu/commit/377b155bde451d5ac545fbdcdfbf6ca17a422=
-8f5
-  --------------------------------------------------
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 7dd71e0a2d..b79d9b8edf 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1801,6 +1801,12 @@ M: Samuel Thibault <samuel.thibault@ens-lyon.org>
+ S: Maintained
+ F: chardev/baum.c
+=20
++Character Devices (Linux I2C)
++M: Ernest Esene <eroken1@gmail.com>
++S: Maintained
++F: chardev/char-i2c.c
++F: include/chardev/char-i2c.h
++
+ Command line option argument parsing
+ M: Markus Armbruster <armbru@redhat.com>
+ S: Supported
+diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
+index d68e1347f9..6c96b9a353 100644
+--- a/chardev/Makefile.objs
++++ b/chardev/Makefile.objs
+@@ -16,6 +16,7 @@ chardev-obj-y +=3D char-stdio.o
+ chardev-obj-y +=3D char-udp.o
+ chardev-obj-$(CONFIG_WIN32) +=3D char-win.o
+ chardev-obj-$(CONFIG_WIN32) +=3D char-win-stdio.o
++chardev-obj-$(CONFIG_POSIX) +=3Dchar-i2c.o
+=20
+ common-obj-y +=3D msmouse.o wctablet.o testdev.o
+ common-obj-$(CONFIG_BRLAPI) +=3D baum.o
+diff --git a/chardev/char-i2c.c b/chardev/char-i2c.c
+new file mode 100644
+index 0000000000..4b068b0124
+--- /dev/null
++++ b/chardev/char-i2c.c
+@@ -0,0 +1,140 @@
++/*
++ * QEMU System Emulator
++ *
++ * Copyright (c) 2019 Ernest Esene <eroken1@gmail.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a=
+ copy
++ * of this software and associated documentation files (the "Software"), t=
+o deal
++ * in the Software without restriction, including without limitation the r=
+ights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
+ll
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included=
+ in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS=
+ OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
+HER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
+ FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
+IN
++ * THE SOFTWARE.
++ */
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu/option.h"
++#include "qemu-common.h"
++#include "io/channel-file.h"
++#include "qemu/cutils.h"
++
++#include "chardev/char-fd.h"
++#include "chardev/char-i2c.h"
++#include "chardev/char.h"
++
++#include <sys/ioctl.h>
++#include <linux/i2c-dev.h>
++
++static int i2c_ioctl(Chardev *chr, int cmd, void *arg)
++{
++    FDChardev *fd_chr =3D FD_CHARDEV(chr);
++    QIOChannelFile *floc =3D QIO_CHANNEL_FILE(fd_chr->ioc_in);
++    int fd =3D floc->fd;
++    int addr;
++
++    switch (cmd) {
++    case CHR_IOCTL_I2C_SET_ADDR:
++        addr =3D (int) (long) arg;
++
++        if (addr > CHR_I2C_ADDR_7BIT_MAX) {
++            /*
++             * TODO: check if adapter support 10-bit addr
++             * I2C_FUNC_10BIT_ADDR
++             */
++            if (ioctl(fd, I2C_TENBIT, addr) < 0) {
++                goto err;
++            }
++        } else {
++            if (ioctl(fd, I2C_SLAVE, addr) < 0) {
++                goto err;
++            }
++        }
++        break;
++
++    default:
++        return -ENOTSUP;
++    }
++    return 0;
++err:
++    return -ENOTSUP;
++}
++
++static void qmp_chardev_open_i2c(Chardev *chr, ChardevBackend *backend,
++                                 bool *be_opened, Error **errp)
++{
++    ChardevI2c *i2c =3D backend->u.i2c.data;
++    void *addr;
++    int fd;
++
++    fd =3D qmp_chardev_open_file_source(i2c->device, O_RDWR | O_NONBLOCK,
++                                      errp);
++    if (fd < 0) {
++        return;
++    }
++    qemu_set_block(fd);
++    qemu_chr_open_fd(chr, fd, fd);
++    addr =3D (void *) (long) i2c->address;
++    i2c_ioctl(chr, CHR_IOCTL_I2C_SET_ADDR, addr);
++}
++
++static void qemu_chr_parse_i2c(QemuOpts *opts, ChardevBackend *backend,
++                               Error **errp)
++{
++    const char *device =3D qemu_opt_get(opts, "path");
++    const char *addr =3D qemu_opt_get(opts, "address");
++    long address;
++    ChardevI2c *i2c;
++    if (device =3D=3D NULL) {
++        error_setg(errp, "chardev: linux-i2c: no device path given");
++        return;
++    }
++    if (addr =3D=3D NULL) {
++        error_setg(errp, "chardev: linux-i2c: no device address given");
++        return;
++    }
++    if (qemu_strtol(addr, NULL, 0, &address) !=3D 0) {
++        error_setg(errp, "chardev: linux-i2c: invalid device address given=
+");
++        return;
++    }
++    if (address < 0 || address > CHR_I2C_ADDR_10BIT_MAX) {
++        error_setg(errp, "chardev: linux-i2c: device address out of range"=
+);
++        return;
++    }
++    backend->type =3D CHARDEV_BACKEND_KIND_I2C;
++    i2c =3D backend->u.i2c.data =3D g_new0(ChardevI2c, 1);
++    qemu_chr_parse_common(opts, qapi_ChardevI2c_base(i2c));
++    i2c->device =3D g_strdup(device);
++    i2c->address =3D (int16_t) address;
++}
++
++static void char_i2c_class_init(ObjectClass *oc, void *data)
++{
++    ChardevClass *cc =3D CHARDEV_CLASS(oc);
++
++    cc->parse =3D qemu_chr_parse_i2c;
++    cc->open =3D  qmp_chardev_open_i2c;
++    cc->chr_ioctl =3D i2c_ioctl;
++}
++
++static const TypeInfo char_i2c_type_info =3D {
++    .name =3D TYPE_CHARDEV_I2C,
++    .parent =3D TYPE_CHARDEV_FD,
++    .class_init =3D char_i2c_class_init,
++};
++
++static void register_types(void)
++{
++    type_register_static(&char_i2c_type_info);
++}
++
++type_init(register_types);
+diff --git a/chardev/char.c b/chardev/char.c
+index 54724a56b1..93732a9909 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -926,6 +926,9 @@ QemuOptsList qemu_chardev_opts =3D {
+         },{
+             .name =3D "logappend",
+             .type =3D QEMU_OPT_BOOL,
++        },{
++            .name =3D "address",
++            .type =3D QEMU_OPT_STRING,
+         },
+         { /* end of list */ }
+     },
+diff --git a/include/chardev/char-i2c.h b/include/chardev/char-i2c.h
+new file mode 100644
+index 0000000000..81e97b7556
+--- /dev/null
++++ b/include/chardev/char-i2c.h
+@@ -0,0 +1,35 @@
++
++/*
++ * QEMU System Emulator
++ *
++ * Copyright (c) 2019 Ernest Esene <eroken1@gmail.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a=
+ copy
++ * of this software and associated documentation files (the "Software"), t=
+o deal
++ * in the Software without restriction, including without limitation the r=
+ights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
+ll
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included=
+ in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS=
+ OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
+HER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
+ FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
+IN
++ * THE SOFTWARE.
++ */
++#ifndef CHAR_I2C_H
++#define CHAR_I2C_H
++
++#define CHR_IOCTL_I2C_SET_ADDR 1
++
++#define CHR_I2C_ADDR_10BIT_MAX 1023
++#define CHR_I2C_ADDR_7BIT_MAX 127
++
++void qemu_set_block(int fd);
++
++#endif /* ifndef CHAR_I2C_H */
+diff --git a/include/chardev/char.h b/include/chardev/char.h
+index c0b57f7685..880614391f 100644
+--- a/include/chardev/char.h
++++ b/include/chardev/char.h
+@@ -245,6 +245,7 @@ int qemu_chr_wait_connected(Chardev *chr, Error **errp);
+ #define TYPE_CHARDEV_SERIAL "chardev-serial"
+ #define TYPE_CHARDEV_SOCKET "chardev-socket"
+ #define TYPE_CHARDEV_UDP "chardev-udp"
++#define TYPE_CHARDEV_I2C "chardev-linux-i2c"
+=20
+ #define CHARDEV_IS_RINGBUF(chr) \
+     object_dynamic_cast(OBJECT(chr), TYPE_CHARDEV_RINGBUF)
+diff --git a/qapi/char.json b/qapi/char.json
+index a6e81ac7bc..2c05d6a93e 100644
+--- a/qapi/char.json
++++ b/qapi/char.json
+@@ -240,6 +240,23 @@
+   'data': { 'device': 'str' },
+   'base': 'ChardevCommon' }
+=20
++##
++# @ChardevI2c:
++#
++# Configuration info for i2c chardev.
++#
++# @device: The name of the special file for the device,
++#          i.e. /dev/i2c-0 on linux
++# @address: The address of the i2c device on the host.
++#
++# Since: 4.1
++##
++{ 'struct': 'ChardevI2c',
++  'data': { 'device': 'str',
++            'address': 'int16'},
++  'base': 'ChardevCommon',
++  'if': 'defined(CONFIG_LINUX)'}
++
+ ##
+ # @ChardevSocket:
+ #
+@@ -398,6 +415,7 @@
+   'data': { 'file': 'ChardevFile',
+             'serial': 'ChardevHostdev',
+             'parallel': 'ChardevHostdev',
++            'i2c': 'ChardevI2c',
+             'pipe': 'ChardevHostdev',
+             'socket': 'ChardevSocket',
+             'udp': 'ChardevUdp',
+--=20
+2.14.2
 
-  cpu_ld*_code() is used for loading code data as the name suggests. Althou=
-gh, it begins accessing memory with MMU_INST_FETCH access type, somewhere d=
-own
-  the road, when the "io_readx(..., access_type=3DMMU_INST_FETCH, ...)" is
-  called, it is ignoring this "access_type" while calling the "tlb_fill()"
-  with a _hardcoded_ MMU_DATA_LOAD:
 
-  cputlb.c
-  --------
-  static uint64_t io_readx(..., MMUAccessType access_type, ...)
-  {
+--82I3+IH0IqGh5yIs
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  =C2=A0=C2=A0=C2=A0=C2=A0if (recheck) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0CPUTLBEntry *entry;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0target_ulong tlb_addr;
+-----BEGIN PGP SIGNATURE-----
 
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tlb_fill(cpu, addr, size,=
- MMU_DATA_LOAD, mmu_idx, retaddr);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
-  }
-  --------
+iQIzBAABCAAdFiEEFkNmxXgplc+HqgQGJZ4JoaCvxKoFAlzN1cAACgkQJZ4JoaCv
+xKot6xAAl09u3fwE+DYuDqMD0GSm28efhRwjflyWyAflzsUrx9RZbBTUn6bZojLZ
+/2fY66R36CtFhj9oqQTQhbE2gaiO1zutMBdKHJ1OPM+6WBuuBb+9ha7m2UTE0Fd9
+JZpxl0z9G72broHg/kahlYhqDKxSIdCXGFhnRzp/+9jtozzfnOTrVNdEcxxYdxy8
+vp4SFSFMQGvg7UXLsGhnpZVpCV050cIrNVn45xtFDPBAiC+lJtLjB8HuH9hkh+ih
+a+O+FkGf9WeR0e63xlC9OH+k95+UNyhBj96bnOXldC63gsWqWBz8eU3oqYhjmuTb
+j2cZfnADg1/nm4wXsi3yhMsQFJYiqjbxpN89+aQhZkeNHgfaXf7dd1qiWSLinuNc
+3qzl8eBesImbgxibbcsIgLXtEoFwa7zzxnDJ0OzROLiIutlnoG8LU5rGunXquTwu
+jUvKfnR3V0JF7uNjQtkNskWhY2xLtmkLmCXbL0qZV9Lq8/DS8e89SUJiW6OXBzdw
+qgwlIt2yG4wIGxVGy46rK3PfgiAOKHuhY7UiEi80aNxSHTEHYacxnpBYXZfkjNTn
+8Jcu8QI2hlXjezp+Ez5sJE1Q9knCmSQ+vF1QSTC9UhlLi0yuP4zves03E2eR4z4c
+vOliJV5BN27ryI6EQ3i91T+o4dnvKAMxfBheFLirSEo8O3u/A8E=
+=26XW
+-----END PGP SIGNATURE-----
 
-  This is an issue, because there can exist _small_ regions of memory (smal=
-ler
-  than the TARGET_PAGE_SIZE) that are only executable and not readable.
-
-  TL;DR
-
-  What happens is at first, a "tlb_fill(..., access_type=3DMMU_INST_FETCH, =
-...)"
-  is triggered by "tb_lookup_cpu_state()". To be precise, this is the call
-  stack which is good behavior:
-  ---
-  #0  tlb_fill (cs=3D..., vaddr=3D684, size=3D0, access_type=3DMMU_INST_FET=
-CH, mmu_idx=3D0, retaddr=3D0) at target/arc/mmu.c:602
-  #1  get_page_addr_code (env=3D..., addr=3D684) at accel/tcg/cputlb.c:1045
-  #2  tb_htable_lookup (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cf_mas=
-k=3D4278190080) at accel/tcg/cpu-exec.c:337
-  #3  tb_lookup__cpu_state (cpu=3D..., pc=3D..., cs_base=3D..., flags=3D...=
-, cf_mask=3D4278190080) at include/exec/tb-lookup.h:43
-  #4  tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
-0, cf_mask=3D0) at accel/tcg/cpu-exec.c:404
-  #5  cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
-  #6  tcg_cpu_exec (cpu=3D...) at cpus.c:1430
-  #7  qemu_tcg_rr_cpu_thread_fn (arg=3D...) at cpus.c:1531
-  #8  qemu_thread_start (args=3D...) at util/qemu-thread-posix.c:502
-  ---
-
-  After this call, TLB is filled with an entry that its size field is small,
-  say 32 bytes. This causes a TLB_RECHECK for consequent memory accesses, w=
-hich =
-
-  is logical. However, in our decoder, we use cpu_lduw_code() to read the
-  instructions and decode them. As mentioned, in the beginning, the
-  access_type=3DMMU_INST_FETCH is lost in "io_readx()" while calling tlb_fi=
-ll()",
-  and now THIS CAUSES A GUEST EXCEPTION BECAUSE THAT REGION IS NOT ALLOWED =
-TO
-  BE READ. Here, comes that trace call of the _bad_ behavior:
-  ---
-  #0  tlb_fill (..., access_type=3DMMU_DATA_LOAD, ...) at target/arc/mmu.c:=
-605
-  #1  io_readx (..., access_type=3DMMU_INST_FETCH, size=3D2) at accel/tcg/c=
-putlb.c:881
-  #2  io_readw (..., access_type=3DMMU_INST_FETCH) at accel/tcg/softmmu_tem=
-plate.h:106
-  #3  helper_le_ldw_cmmu (..., oi=3D16, retaddr=3D0) at accel/tcg/softmmu_t=
-emplate.h:146
-  #4  cpu_lduw_code_ra (env=3D..., ptr=3D684, retaddr=3D0) at include/exec/=
-cpu_ldst_template.h:102
-  #5  cpu_lduw_code (env=3D..., ptr=3D684) at include/exec/cpu_ldst_templat=
-e.h:114
-  #6  read_and_decode_context (ctx=3D..., opcode_p=3D...) at target/arc/arc=
--decoder.c:1479
-  #7  arc_decode (ctx=3D...) at target/arc/arc-decoder.c:1736
-  #8  decode_opc (env=3D..., ctx=3D...) at target/arc/translate.c:313
-  #9  arc_tr_translate_insn (dcbase=3D..., cpu=3D...) at target/arc/transla=
-te.c:335
-  #10 translator_loop (.. <code_gen_buffer+18131>) at accel/tcg/translator.=
-c:107
-  #11 gen_intermediate_code (cpu=3D..., tb=3D... <code_gen_buffer+18131>) a=
-t target/arc/translate.c:413
-  #12 tb_gen_code (cpu=3D..., pc=3D684, cs_base=3D0, flags=3D0, cflags=3D-1=
-6711679) at accel/tcg/translate-all.c:1723
-  #13 tb_find (cpu=3D..., last_tb=3D... <code_gen_buffer+17811>, tb_exit=3D=
-0, cf_mask=3D0) at accel/tcg/cpu-exec.c:407
-  #14 cpu_exec (cpu=3D...) at accel/tcg/cpu-exec.c:729
-  #15 tcg_cpu_exec (cpu=3D...) at cpus.c:1430
-
-  ---
-
-  Do you confirm if this is an issue? Maybe there are other ways to read
-  an instruction with MMU_INST_FETCH access that I don't know about.
-
-  Last but not least, although this is not a security issue for QEMU per
-  se, but it is hindering a security feature for the guest.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1825359/+subscriptions
+--82I3+IH0IqGh5yIs--
 
