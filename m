@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44352)
+Received: from eggs.gnu.org ([209.51.188.92]:44358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <S.E.Harris@kent.ac.uk>) id 1hMqDP-0007X0-4A
+	(envelope-from <S.E.Harris@kent.ac.uk>) id 1hMqDP-0007XK-Ib
 	for qemu-devel@nongnu.org; Sat, 04 May 2019 04:40:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <S.E.Harris@kent.ac.uk>) id 1hMqDM-0002wD-Ty
+	(envelope-from <S.E.Harris@kent.ac.uk>) id 1hMqDM-0002wO-Vy
 	for qemu-devel@nongnu.org; Sat, 04 May 2019 04:40:15 -0400
-Received: from mx0.kent.ac.uk ([129.12.21.32]:50456)
+Received: from mx0.kent.ac.uk ([129.12.21.32]:48936)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <S.E.Harris@kent.ac.uk>)
-	id 1hMqDM-0002uq-NC
+	id 1hMqDM-0002uc-NE
 	for qemu-devel@nongnu.org; Sat, 04 May 2019 04:40:12 -0400
 From: Sarah Harris <S.E.Harris@kent.ac.uk>
-Date: Sat,  4 May 2019 09:36:37 +0100
-Message-Id: <20190504083638.13380-8-S.E.Harris@kent.ac.uk>
+Date: Sat,  4 May 2019 09:36:34 +0100
+Message-Id: <20190504083638.13380-5-S.E.Harris@kent.ac.uk>
 In-Reply-To: <20190504083638.13380-1-S.E.Harris@kent.ac.uk>
 References: <20190504083638.13380-1-S.E.Harris@kent.ac.uk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 7/8] target/avr: Add example board
- configuration
+Subject: [Qemu-devel] [PATCH v1 4/8] target/avr: Add instruction helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +29,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: S.E.Harris@kent.ac.uk, A.M.King@kent.ac.uk, E.J.C.Robbins@kent.ac.uk, mrolnik@gmail.com
 
-A simple board setup that configures an AVR CPU to run a given firmware image.
-This is all that's useful to implement without peripheral emulation as AVR CPUs include a lot of on-board peripherals.
+Stubs for unimplemented instructions and helpers for instructions that need to interact with QEMU.
+SPM and WDR are unimplemented because they require emulation of complex peripherals.
+The implementation of SLEEP is very limited due to the lack of peripherals to generate wake interrupts.
+Memory access instructions are implemented here because some address ranges actually refer to CPU registers.
 
 Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 ---
- hw/Kconfig           |   1 +
- hw/avr/Kconfig       |   4 +
- hw/avr/Makefile.objs |   1 +
- hw/avr/sample.c      | 177 +++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 183 insertions(+)
- create mode 100644 hw/avr/Kconfig
- create mode 100644 hw/avr/Makefile.objs
- create mode 100644 hw/avr/sample.c
+ target/avr/helper.c | 343 ++++++++++++++++++++++++++++++++++++++++++++
+ target/avr/helper.h |  28 ++++
+ 2 files changed, 371 insertions(+)
+ create mode 100644 target/avr/helper.c
+ create mode 100644 target/avr/helper.h
 
-diff --git a/hw/Kconfig b/hw/Kconfig
-index 88b9f15007..dc5eb7a038 100644
---- a/hw/Kconfig
-+++ b/hw/Kconfig
-@@ -41,6 +41,7 @@ source watchdog/Kconfig
- # arch Kconfig
- source arm/Kconfig
- source alpha/Kconfig
-+source avr/Kconfig
- source cris/Kconfig
- source hppa/Kconfig
- source i386/Kconfig
-diff --git a/hw/avr/Kconfig b/hw/avr/Kconfig
+diff --git a/target/avr/helper.c b/target/avr/helper.c
 new file mode 100644
-index 0000000000..c6ca8fe775
+index 0000000000..29b8bfce02
 --- /dev/null
-+++ b/hw/avr/Kconfig
-@@ -0,0 +1,4 @@
-+config AVR_SAMPLE
-+    bool
-+    select AVR_TIMER16
-+    select AVR_USART
-diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
-new file mode 100644
-index 0000000000..626b7064b3
---- /dev/null
-+++ b/hw/avr/Makefile.objs
-@@ -0,0 +1 @@
-+obj-y += sample.o
-diff --git a/hw/avr/sample.c b/hw/avr/sample.c
-new file mode 100644
-index 0000000000..21b384b3b3
---- /dev/null
-+++ b/hw/avr/sample.c
-@@ -0,0 +1,177 @@
++++ b/target/avr/helper.c
+@@ -0,0 +1,343 @@
 +/*
 + * QEMU AVR CPU
 + *
@@ -99,162 +68,362 @@ index 0000000000..21b384b3b3
 + * <http://www.gnu.org/licenses/lgpl-2.1.html>
 + */
 +
-+/*
-+ *  NOTE:
-+ *      This is not a real AVR board, this is an example!
-+ *      The CPU is an approximation of an ATmega2560, but is missing various
-+ *      built-in peripherals.
-+ *
-+ *      This example board loads provided binary file into flash memory and
-+ *      executes it from 0x00000000 address in the code memory space.
-+ *
-+ *      Currently used for AVR CPU validation
-+ *
-+ */
-+
 +#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
++
 +#include "cpu.h"
-+#include "hw/hw.h"
++#include "hw/irq.h"
++#include "hw/sysbus.h"
 +#include "sysemu/sysemu.h"
-+#include "sysemu/qtest.h"
-+#include "ui/console.h"
-+#include "hw/boards.h"
-+#include "hw/loader.h"
++#include "exec/exec-all.h"
++#include "exec/cpu_ldst.h"
++#include "exec/helper-proto.h"
++#include "exec/ioport.h"
++#include "qemu/host-utils.h"
 +#include "qemu/error-report.h"
-+#include "exec/address-spaces.h"
-+#include "include/hw/sysbus.h"
-+#include "include/hw/char/avr_usart.h"
-+#include "include/hw/timer/avr_timer16.h"
-+#include "elf.h"
 +
-+#define SIZE_FLASH 0x00040000
-+#define SIZE_SRAM 0x00002200
-+/*
-+ * Size of additional "external" memory, as if the AVR were configured to use
-+ * an external RAM chip.
-+ * Note that the configuration registers that normally enable this feature are
-+ * unimplemented.
-+ */
-+#define SIZE_EXMEM 0x00000000
-+
-+/* Offsets of periphals in emulated memory space (i.e. not host addresses)  */
-+#define PRR0 0x64
-+#define PRR1 0x65
-+#define USART_BASE 0xc0
-+#define USART_PRR PRR0
-+#define USART_PRR_MASK 0b00000010
-+#define TIMER1_BASE 0x80
-+#define TIMER1_IMSK_BASE 0x6f
-+#define TIMER1_IFR_BASE 0x36
-+#define TIMER1_PRR PRR0
-+#define TIMER1_PRR_MASK 0b01000000
-+
-+/* Interrupt numbers used by peripherals */
-+#define TIMER1_CAPT_IRQ 15
-+#define TIMER1_COMPA_IRQ 16
-+#define TIMER1_COMPB_IRQ 17
-+#define TIMER1_COMPC_IRQ 18
-+#define TIMER1_OVF_IRQ 19
-+
-+static void sample_init(MachineState *machine)
++bool avr_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
 +{
-+    MemoryRegion *address_space_mem;
-+    MemoryRegion *ram;
-+    MemoryRegion *flash;
-+    AVRCPU *cpu_avr;
-+    const char *firmware = NULL;
-+    const char *filename;
-+    int bytes_loaded;
-+    AVRUsartState *usart0;
-+    AVRTimer16State *timer1;
-+    SysBusDevice *busdev;
++    bool ret = false;
++    CPUClass *cc = CPU_GET_CLASS(cs);
++    AVRCPU *cpu = AVR_CPU(cs);
++    CPUAVRState *env = &cpu->env;
 +
-+    address_space_mem = get_system_memory();
-+    ram = g_new(MemoryRegion, 1);
-+    flash = g_new(MemoryRegion, 1);
++    if (interrupt_request & CPU_INTERRUPT_RESET) {
++        if (cpu_interrupts_enabled(env)) {
++            cs->exception_index = EXCP_RESET;
++            cc->do_interrupt(cs);
 +
-+    /* ATmega2560. */
-+    cpu_avr = AVR_CPU(cpu_create("avr6-avr"));
++            cs->interrupt_request &= ~CPU_INTERRUPT_RESET;
 +
-+    memory_region_allocate_system_memory(
-+        ram, NULL, "avr.ram", SIZE_SRAM + SIZE_EXMEM);
-+    memory_region_add_subregion(address_space_mem, OFFSET_DATA, ram);
++            ret = true;
++        }
++    }
++    if (interrupt_request & CPU_INTERRUPT_HARD) {
++        if (cpu_interrupts_enabled(env) && env->intsrc != 0) {
++            int index = ctz32(env->intsrc);
++            cs->exception_index = EXCP_INT(index);
++            cc->do_interrupt(cs);
 +
-+    memory_region_init_rom(flash, NULL, "avr.flash", SIZE_FLASH, &error_fatal);
-+    memory_region_add_subregion(address_space_mem, OFFSET_CODE, flash);
++            env->intsrc &= env->intsrc - 1; /* clear the interrupt */
++            cs->interrupt_request &= ~CPU_INTERRUPT_HARD;
 +
-+    /* USART 0 built-in peripheral */
-+    usart0 = AVR_USART(object_new(TYPE_AVR_USART));
-+    busdev = SYS_BUS_DEVICE(usart0);
-+    sysbus_mmio_map(busdev, 0, OFFSET_DATA + USART_BASE);
++            ret = true;
++        }
++    }
++    return ret;
++}
++
++void avr_cpu_do_interrupt(CPUState *cs)
++{
++    AVRCPU *cpu = AVR_CPU(cs);
++    CPUAVRState *env = &cpu->env;
++
++    uint32_t ret = env->pc_w;
++    int vector = 0;
++    int size = avr_feature(env, AVR_FEATURE_JMP_CALL) ? 2 : 1;
++    int base = 0;
++
++    if (cs->exception_index == EXCP_RESET) {
++        vector = 0;
++    } else if (env->intsrc != 0) {
++        vector = ctz32(env->intsrc) + 1;
++    }
++
++    if (avr_feature(env, AVR_FEATURE_3_BYTE_PC)) {
++        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
++        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
++        cpu_stb_data(env, env->sp--, (ret & 0xff0000) >> 16);
++    } else if (avr_feature(env, AVR_FEATURE_2_BYTE_PC)) {
++        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
++        cpu_stb_data(env, env->sp--, (ret & 0x00ff00) >> 8);
++    } else {
++        cpu_stb_data(env, env->sp--, (ret & 0x0000ff));
++    }
++
++    env->pc_w = base + vector * size;
++    env->sregI = 0; /* clear Global Interrupt Flag */
++
++    cs->exception_index = -1;
++}
++
++int avr_cpu_memory_rw_debug(CPUState *cs, vaddr addr, uint8_t *buf,
++                                int len, bool is_write)
++{
++    return cpu_memory_rw_debug(cs, addr, buf, len, is_write);
++}
++
++hwaddr avr_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
++{
++    return addr; /* I assume 1:1 address correspondance */
++}
++
++int avr_cpu_handle_mmu_fault(
++    CPUState *cs, vaddr address, int size, int rw, int mmu_idx)
++{
++    /* currently it's assumed that this will never happen */
++    cs->exception_index = EXCP_DEBUG;
++    cpu_dump_state(cs, stderr, 0);
++    return 1;
++}
++
++void tlb_fill(CPUState *cs, target_ulong vaddr, int size,
++              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
++{
++    int prot = 0;
++    MemTxAttrs attrs = {};
++    uint32_t paddr;
++
++    vaddr &= TARGET_PAGE_MASK;
++
++    if (mmu_idx == MMU_CODE_IDX) {
++        /* access to code in flash */
++        paddr = OFFSET_CODE + vaddr;
++        prot = PAGE_READ | PAGE_EXEC;
++        if (paddr + TARGET_PAGE_SIZE > OFFSET_DATA) {
++            error_report("execution left flash memory");
++            exit(1);
++        }
++    } else if (vaddr < NO_CPU_REGISTERS + NO_IO_REGISTERS) {
++        /*
++         * access to CPU registers, exit and rebuilt this TB to use full access
++         * incase it touches specially handled registers like SREG or SP
++         */
++        AVRCPU *cpu = AVR_CPU(cs);
++        CPUAVRState *env = &cpu->env;
++        env->fullacc = 1;
++        cpu_loop_exit_restore(cs, retaddr);
++    } else {
++        /* access to memory. nothing special */
++        paddr = OFFSET_DATA + vaddr;
++        prot = PAGE_READ | PAGE_WRITE;
++    }
++
++    tlb_set_page_with_attrs(
++        cs, vaddr, paddr, attrs, prot, mmu_idx, TARGET_PAGE_SIZE);
++}
++
++void helper_sleep(CPUAVRState *env)
++{
++    CPUState *cs = CPU(avr_env_get_cpu(env));
++
++    cs->exception_index = EXCP_HLT;
++    cpu_loop_exit(cs);
++}
++
++void helper_unsupported(CPUAVRState *env)
++{
++    CPUState *cs = CPU(avr_env_get_cpu(env));
++
 +    /*
-+     * These IRQ numbers don't match the datasheet because we're counting from
-+     * zero and not including reset.
++     *  I count not find what happens on the real platform, so
++     *  it's EXCP_DEBUG for meanwhile
 +     */
-+    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(cpu_avr), 24));
-+    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(DEVICE(cpu_avr), 25));
-+    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(DEVICE(cpu_avr), 26));
-+    usart0->prr_address = OFFSET_DATA + PRR0;
-+    usart0->prr_mask = USART_PRR_MASK;
-+    qdev_prop_set_chr(DEVICE(usart0), "chardev", serial_hd(0));
-+    object_property_set_bool(OBJECT(usart0), true, "realized", &error_fatal);
++    cs->exception_index = EXCP_DEBUG;
++    if (qemu_loglevel_mask(LOG_UNIMP)) {
++        qemu_log("UNSUPPORTED\n");
++        cpu_dump_state(cs, qemu_logfile, 0);
++    }
++    cpu_loop_exit(cs);
++}
 +
-+    /* Timer 1 built-in periphal */
-+    timer1 = AVR_TIMER16(object_new(TYPE_AVR_TIMER16));
-+    busdev = SYS_BUS_DEVICE(timer1);
-+    sysbus_mmio_map(busdev, 0, OFFSET_DATA + TIMER1_BASE);
-+    sysbus_mmio_map(busdev, 1, OFFSET_DATA + TIMER1_IMSK_BASE);
-+    sysbus_mmio_map(busdev, 2, OFFSET_DATA + TIMER1_IFR_BASE);
-+    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(
-+        DEVICE(cpu_avr), TIMER1_CAPT_IRQ));
-+    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(
-+        DEVICE(cpu_avr), TIMER1_COMPA_IRQ));
-+    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(
-+        DEVICE(cpu_avr), TIMER1_COMPB_IRQ));
-+    sysbus_connect_irq(busdev, 3, qdev_get_gpio_in(
-+        DEVICE(cpu_avr), TIMER1_COMPC_IRQ));
-+    sysbus_connect_irq(busdev, 4, qdev_get_gpio_in(
-+        DEVICE(cpu_avr), TIMER1_OVF_IRQ));
-+    timer1->prr_address = OFFSET_DATA + TIMER1_PRR;
-+    timer1->prr_mask = TIMER1_PRR_MASK;
-+    object_property_set_bool(OBJECT(timer1), true, "realized", &error_fatal);
++void helper_debug(CPUAVRState *env)
++{
++    CPUState *cs = CPU(avr_env_get_cpu(env));
 +
-+    /* Load firmware (contents of flash) trying to auto-detect format */
-+    firmware = machine->firmware;
-+    if (firmware != NULL) {
-+        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
-+        if (filename == NULL) {
-+            error_report("Unable to find %s", firmware);
-+            exit(1);
-+        }
++    cs->exception_index = EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
 +
-+        bytes_loaded = load_elf(
-+            filename, NULL, NULL, NULL, NULL, NULL, NULL, 0, EM_NONE, 0, 0);
-+        if (bytes_loaded < 0) {
-+            error_report(
-+                "Unable to load %s as ELF, trying again as raw binary",
-+                firmware);
-+            bytes_loaded = load_image_targphys(
-+                filename, OFFSET_CODE, SIZE_FLASH);
++void helper_wdr(CPUAVRState *env)
++{
++    CPUState *cs = CPU(avr_env_get_cpu(env));
++
++    /* WD is not implemented yet, placeholder */
++    cs->exception_index = EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++/*
++ * This function implements IN instruction
++ *
++ * It does the following
++ * a.  if an IO register belongs to CPU, its value is read and returned
++ * b.  otherwise io address is translated to mem address and physical memory
++ *     is read.
++ * c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementation
++ *
++ */
++target_ulong helper_inb(CPUAVRState *env, uint32_t port)
++{
++    target_ulong data = 0;
++
++    switch (port) {
++    case 0x38: /* RAMPD */
++        data = 0xff & (env->rampD >> 16);
++        break;
++    case 0x39: /* RAMPX */
++        data = 0xff & (env->rampX >> 16);
++        break;
++    case 0x3a: /* RAMPY */
++        data = 0xff & (env->rampY >> 16);
++        break;
++    case 0x3b: /* RAMPZ */
++        data = 0xff & (env->rampZ >> 16);
++        break;
++    case 0x3c: /* EIND */
++        data = 0xff & (env->eind >> 16);
++        break;
++    case 0x3d: /* SPL */
++        data = env->sp & 0x00ff;
++        break;
++    case 0x3e: /* SPH */
++        data = env->sp >> 8;
++        break;
++    case 0x3f: /* SREG */
++        data = cpu_get_sreg(env);
++        break;
++    default:
++        /* not a special register, pass to normal memory access */
++        cpu_physical_memory_read(OFFSET_IO_REGISTERS + port, &data, 1);
++    }
++
++    return data;
++}
++
++/*
++ *  This function implements OUT instruction
++ *
++ *  It does the following
++ *  a.  if an IO register belongs to CPU, its value is written into the register
++ *  b.  otherwise io address is translated to mem address and physical memory
++ *      is written.
++ *  c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementation
++ *
++ */
++void helper_outb(CPUAVRState *env, uint32_t port, uint32_t data)
++{
++    data &= 0x000000ff;
++
++    switch (port) {
++    case 0x38: /* RAMPD */
++        if (avr_feature(env, AVR_FEATURE_RAMPD)) {
++            env->rampD = (data & 0xff) << 16;
 +        }
-+        if (bytes_loaded < 0) {
-+            error_report(
-+                "Unable to load firmware image %s as ELF or raw binary",
-+                firmware);
-+            exit(1);
++        break;
++    case 0x39: /* RAMPX */
++        if (avr_feature(env, AVR_FEATURE_RAMPX)) {
++            env->rampX = (data & 0xff) << 16;
 +        }
++        break;
++    case 0x3a: /* RAMPY */
++        if (avr_feature(env, AVR_FEATURE_RAMPY)) {
++            env->rampY = (data & 0xff) << 16;
++        }
++        break;
++    case 0x3b: /* RAMPZ */
++        if (avr_feature(env, AVR_FEATURE_RAMPZ)) {
++            env->rampZ = (data & 0xff) << 16;
++        }
++        break;
++    case 0x3c: /* EIDN */
++        env->eind = (data & 0xff) << 16;
++        break;
++    case 0x3d: /* SPL */
++        env->sp = (env->sp & 0xff00) | (data);
++        break;
++    case 0x3e: /* SPH */
++        if (avr_feature(env, AVR_FEATURE_2_BYTE_SP)) {
++            env->sp = (env->sp & 0x00ff) | (data << 8);
++        }
++        break;
++    case 0x3f: /* SREG */
++        cpu_set_sreg(env, data);
++        break;
++    default:
++        /* not a special register, pass to normal memory access */
++        cpu_physical_memory_write(OFFSET_IO_REGISTERS + port, &data, 1);
 +    }
 +}
 +
-+static void sample_machine_init(MachineClass *mc)
++/*
++ *  this function implements LD instruction when there is a posibility to read
++ *  from a CPU register
++ */
++target_ulong helper_fullrd(CPUAVRState *env, uint32_t addr)
 +{
-+    mc->desc = "AVR sample/example board";
-+    mc->init = sample_init;
-+    mc->is_default = 1;
++    uint8_t data;
++
++    env->fullacc = false;
++
++    if (addr < NO_CPU_REGISTERS) {
++        /* CPU registers */
++        data = env->r[addr];
++    } else if (addr < NO_CPU_REGISTERS + NO_IO_REGISTERS) {
++        /* IO registers */
++        data = helper_inb(env, addr - NO_CPU_REGISTERS);
++    } else {
++        /* memory */
++        cpu_physical_memory_read(OFFSET_DATA + addr, &data, 1);
++    }
++    return data;
 +}
 +
-+DEFINE_MACHINE("sample", sample_machine_init)
++/*
++ *  this function implements ST instruction when there is a posibility to write
++ *  into a CPU register
++ */
++void helper_fullwr(CPUAVRState *env, uint32_t data, uint32_t addr)
++{
++    env->fullacc = false;
++
++    /* Following logic assumes this: */
++    assert(OFFSET_CPU_REGISTERS == OFFSET_DATA);
++    assert(OFFSET_IO_REGISTERS == OFFSET_CPU_REGISTERS + NO_CPU_REGISTERS);
++
++    if (addr < NO_CPU_REGISTERS) {
++        /* CPU registers */
++        env->r[addr] = data;
++    } else if (addr < NO_CPU_REGISTERS + NO_IO_REGISTERS) {
++        /* IO registers */
++        helper_outb(env, addr - NO_CPU_REGISTERS, data);
++    } else {
++        /* memory */
++        cpu_physical_memory_write(OFFSET_DATA + addr, &data, 1);
++    }
++}
+diff --git a/target/avr/helper.h b/target/avr/helper.h
+new file mode 100644
+index 0000000000..603631520a
+--- /dev/null
++++ b/target/avr/helper.h
+@@ -0,0 +1,28 @@
++/*
++ * QEMU AVR CPU
++ *
++ * Copyright (c) 2016 Michael Rolnik
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++DEF_HELPER_1(wdr, void, env)
++DEF_HELPER_1(debug, void, env)
++DEF_HELPER_1(sleep, void, env)
++DEF_HELPER_1(unsupported, void, env)
++DEF_HELPER_3(outb, void, env, i32, i32)
++DEF_HELPER_2(inb, tl, env, i32)
++DEF_HELPER_3(fullwr, void, env, i32, i32)
++DEF_HELPER_2(fullrd, tl, env, i32)
 -- 
 2.21.0
