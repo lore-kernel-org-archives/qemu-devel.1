@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40244)
+Received: from eggs.gnu.org ([209.51.188.92]:41632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hMnSQ-0004s8-AG
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 01:43:35 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hMnbf-0007eT-5L
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 01:53:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hMnSP-0007u2-BN
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 01:43:34 -0400
-Received: from mga06.intel.com ([134.134.136.31]:56092)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hMnSP-0007rR-2A
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 01:43:33 -0400
-From: Wei Yang <richardw.yang@linux.intel.com>
-Date: Sat,  4 May 2019 13:42:55 +0800
-Message-Id: <20190504054255.8610-1-richardw.yang@linux.intel.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hMnbd-0003yn-7q
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 01:53:07 -0400
+Received: from mail-pg1-x52e.google.com ([2607:f8b0:4864:20::52e]:42248)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hMnbc-0003xc-Cx
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 01:53:05 -0400
+Received: by mail-pg1-x52e.google.com with SMTP id p6so3756918pgh.9
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 22:53:04 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri,  3 May 2019 22:52:29 -0700
+Message-Id: <20190504055300.18426-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] migration: don't set MIGRATION dirty range for
- ignored block
+Subject: [Qemu-devel] [PATCH v3 00/31] tcg vector improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,71 +28,105 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: rth@twiddle.net, pbonzini@redhat.com, quintela@redhat.com, dgilbert@redhat.com, wei.w.wang@intel.com, Wei Yang <richardw.yang@linux.intel.com>
+Cc: alex.bennee@linaro.org, david@redhat.com
 
-The ignored blocks are not migrated and those ranges are not used.
+Changes since v2 (stsquad review):
+  * Split out a tcg/arm/ change to tcg_out_mov.
+  * Add some additional commentary for tcg_reg_alloc_foo.
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
----
- exec.c                  | 4 +++-
- include/exec/ram_addr.h | 2 ++
- migration/ram.c         | 2 +-
- 3 files changed, 6 insertions(+), 2 deletions(-)
+Patches missing ack/review:
 
-diff --git a/exec.c b/exec.c
-index 86a38d3b3b..97da155c12 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2192,6 +2192,8 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
-     RAMBlock *last_block = NULL;
-     ram_addr_t old_ram_size, new_ram_size;
-     Error *err = NULL;
-+    uint8_t dirty_memory_clients = ramblock_is_ignored(new_block) ?
-+                         DIRTY_CLIENTS_NOMIG : DIRTY_CLIENTS_ALL;
- 
-     old_ram_size = last_ram_page();
- 
-@@ -2252,7 +2254,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
- 
-     cpu_physical_memory_set_dirty_range(new_block->offset,
-                                         new_block->used_length,
--                                        DIRTY_CLIENTS_ALL);
-+                                        dirty_memory_clients);
- 
-     if (new_block->host) {
-         qemu_ram_setup_dump(new_block->host, new_block->max_length);
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index a7c81bdb32..4765435fb8 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -72,6 +72,7 @@ static inline unsigned long int ramblock_recv_bitmap_offset(void *host_addr,
- }
- 
- bool ramblock_is_pmem(RAMBlock *rb);
-+bool ramblock_is_ignored(RAMBlock *rb);
- 
- long qemu_getrampagesize(void);
- 
-@@ -117,6 +118,7 @@ int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp);
- 
- #define DIRTY_CLIENTS_ALL     ((1 << DIRTY_MEMORY_NUM) - 1)
- #define DIRTY_CLIENTS_NOCODE  (DIRTY_CLIENTS_ALL & ~(1 << DIRTY_MEMORY_CODE))
-+#define DIRTY_CLIENTS_NOMIG   (DIRTY_CLIENTS_ALL & ~(1 << DIRTY_MEMORY_MIGRATION))
- 
- void tb_invalidate_phys_range(ram_addr_t start, ram_addr_t end);
- 
-diff --git a/migration/ram.c b/migration/ram.c
-index 1def8122e9..44525e3816 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -159,7 +159,7 @@ out:
-     return ret;
- }
- 
--static bool ramblock_is_ignored(RAMBlock *block)
-+bool ramblock_is_ignored(RAMBlock *block)
- {
-     return !qemu_ram_is_migratable(block) ||
-            (migrate_ignore_shared() && qemu_ram_is_shared(block));
+0006-tcg-arm-Use-tcg_out_mov_reg-in-tcg_out_mov.patch (new)
+0010-tcg-Manually-expand-INDEX_op_dup_vec.patch
+0011-tcg-Add-tcg_out_dupm_vec-to-the-backend-interface.patch
+0012-tcg-i386-Implement-tcg_out_dupm_vec.patch
+0013-tcg-aarch64-Implement-tcg_out_dupm_vec.patch
+0016-tcg-i386-Support-vector-variable-shift-opcodes.patch
+0018-tcg-Add-gvec-expanders-for-vector-shift-by-scalar.patch
+0019-tcg-i386-Support-vector-scalar-shift-opcodes.patch
+0022-tcg-i386-Support-vector-absolute-value.patch
+0025-target-cris-Use-tcg_gen_abs_tl.patch
+0027-target-ppc-Use-tcg_gen_abs_tl.patch
+0031-tcg-aarch64-Do-not-advertise-minmax-for-MO_64.patch (new)
+
+
+r~
+
+
+David Hildenbrand (1):
+  tcg: Implement tcg_gen_gvec_3i()
+
+Philippe Mathieu-Daudé (2):
+  target/ppc: Use tcg_gen_abs_i32
+  target/tricore: Use tcg_gen_abs_tl
+
+Richard Henderson (28):
+  tcg: Do not recreate INDEX_op_neg_vec unless supported
+  tcg: Allow add_vec, sub_vec, neg_vec, not_vec to be expanded
+  tcg: Specify optional vector requirements with a list
+  tcg: Assert fixed_reg is read-only
+  tcg/arm: Use tcg_out_mov_reg in tcg_out_mov
+  tcg: Return bool success from tcg_out_mov
+  tcg: Support cross-class moves without instruction support
+  tcg: Promote tcg_out_{dup,dupi}_vec to backend interface
+  tcg: Manually expand INDEX_op_dup_vec
+  tcg: Add tcg_out_dupm_vec to the backend interface
+  tcg/i386: Implement tcg_out_dupm_vec
+  tcg/aarch64: Implement tcg_out_dupm_vec
+  tcg: Add INDEX_op_dupm_vec
+  tcg: Add gvec expanders for variable shift
+  tcg/i386: Support vector variable shift opcodes
+  tcg/aarch64: Support vector variable shift opcodes
+  tcg: Add gvec expanders for vector shift by scalar
+  tcg/i386: Support vector scalar shift opcodes
+  tcg: Add support for integer absolute value
+  tcg: Add support for vector absolute value
+  tcg/i386: Support vector absolute value
+  tcg/aarch64: Support vector absolute value
+  target/arm: Use tcg_gen_abs_i64 and tcg_gen_gvec_abs
+  target/cris: Use tcg_gen_abs_tl
+  target/ppc: Use tcg_gen_abs_tl
+  target/s390x: Use tcg_gen_abs_i64
+  target/xtensa: Use tcg_gen_abs_i32
+  tcg/aarch64: Do not advertise minmax for MO_64
+
+ accel/tcg/tcg-runtime.h             |  20 +
+ target/arm/helper.h                 |   2 -
+ tcg/aarch64/tcg-target.h            |   3 +-
+ tcg/aarch64/tcg-target.opc.h        |   2 +
+ tcg/i386/tcg-target.h               |   5 +-
+ tcg/tcg-op-gvec.h                   |  64 +-
+ tcg/tcg-op.h                        |  14 +
+ tcg/tcg-opc.h                       |   2 +
+ tcg/tcg.h                           |  21 +
+ accel/tcg/tcg-runtime-gvec.c        | 192 ++++++
+ target/arm/neon_helper.c            |   5 -
+ target/arm/translate-a64.c          |  41 +-
+ target/arm/translate-sve.c          |   9 +-
+ target/arm/translate.c              | 144 +++--
+ target/cris/translate.c             |   9 +-
+ target/ppc/translate.c              |  68 +-
+ target/ppc/translate/spe-impl.inc.c |  14 +-
+ target/ppc/translate/vmx-impl.inc.c |   7 +-
+ target/s390x/translate.c            |   8 +-
+ target/tricore/translate.c          |  27 +-
+ target/xtensa/translate.c           |   9 +-
+ tcg/aarch64/tcg-target.inc.c        | 120 +++-
+ tcg/arm/tcg-target.inc.c            |   5 +-
+ tcg/i386/tcg-target.inc.c           | 163 ++++-
+ tcg/mips/tcg-target.inc.c           |   3 +-
+ tcg/optimize.c                      |   8 +-
+ tcg/ppc/tcg-target.inc.c            |   3 +-
+ tcg/riscv/tcg-target.inc.c          |   5 +-
+ tcg/s390/tcg-target.inc.c           |   3 +-
+ tcg/sparc/tcg-target.inc.c          |   3 +-
+ tcg/tcg-op-gvec.c                   | 945 +++++++++++++++++++++++-----
+ tcg/tcg-op-vec.c                    | 270 +++++++-
+ tcg/tcg-op.c                        |  20 +
+ tcg/tcg.c                           | 271 ++++++--
+ tcg/tci/tcg-target.inc.c            |   3 +-
+ tcg/README                          |   4 +
+ 36 files changed, 2019 insertions(+), 473 deletions(-)
+
 -- 
-2.19.1
+2.17.1
