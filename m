@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50353)
+Received: from eggs.gnu.org ([209.51.188.92]:50354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hMtQ8-00078z-Km
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hMtQ8-000790-Kn
 	for qemu-devel@nongnu.org; Sat, 04 May 2019 08:05:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hMtQ6-0001C1-TA
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hMtQ6-0001CE-V4
 	for qemu-devel@nongnu.org; Sat, 04 May 2019 08:05:36 -0400
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat,  4 May 2019 06:05:18 -0600
-Message-Id: <20190504120528.6389-1-pbonzini@redhat.com>
+Date: Sat,  4 May 2019 06:05:20 -0600
+Message-Id: <20190504120528.6389-3-pbonzini@redhat.com>
+In-Reply-To: <20190504120528.6389-1-pbonzini@redhat.com>
+References: <20190504120528.6389-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 0/9] Assembly coroutine backend and x86 CET
- support
+Subject: [Qemu-devel] [PATCH 2/9] qemugdb: allow adding support for other
+ architectures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +26,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, peter.maydell@linaro.org, cohuck@redhat.com, richard.henderson@linaro.org
 
-*** BLURB HERE ***
+$sp and $pc are standard register names that are available
+on most machines, use them instead of $rsp and $rip so that
+other architectures can use qemu_coroutine_sp and
+qemu_coroutine_pc.
 
-Paolo Bonzini (10):
-  qemugdb: allow adding support for other coroutine backends
-  qemugdb: allow adding support for other architectures
-  coroutine: add host specific coroutine backend for 64-bit x86
-  coroutine: add host specific coroutine backend for 64-bit ARM
-  coroutine: add host specific coroutine backend for 64-bit s390
-  configure: add control-flow protection support
-  tcg: add tcg_out_start
-  tcg/i386: add support for IBT
-  linux-user: add IBT support to x86 safe-syscall.S
-  coroutine-asm: add x86 CET shadow stack support
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ scripts/qemugdb/coroutine.py          | 4 ++--
+ scripts/qemugdb/coroutine_ucontext.py | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
- Makefile.target                           |   5 +
- configure                                 |  62 ++++
- include/qemu/cpuid.h                      |   5 +
- linux-user/host/i386/safe-syscall.inc.S   |  19 ++
- linux-user/host/x86_64/safe-syscall.inc.S |  19 ++
- scripts/qemugdb/coroutine.py              | 107 ++----
- scripts/qemugdb/coroutine_asm.py          |  24 ++
- scripts/qemugdb/coroutine_ucontext.py     |  69 ++++
- tcg/aarch64/tcg-target.inc.c              |   4 +
- tcg/arm/tcg-target.inc.c                  |   4 +
- tcg/i386/tcg-target.inc.c                 |  23 ++
- tcg/mips/tcg-target.inc.c                 |   4 +
- tcg/ppc/tcg-target.inc.c                  |   4 +
- tcg/riscv/tcg-target.inc.c                |   4 +
- tcg/s390/tcg-target.inc.c                 |   4 +
- tcg/sparc/tcg-target.inc.c                |   4 +
- tcg/tcg.c                                 |   2 +
- tcg/tci/tcg-target.inc.c                  |   4 +
- util/Makefile.objs                        |  10 +
- util/coroutine-asm.c                      | 387 ++++++++++++++++++++++
- 20 files changed, 689 insertions(+), 75 deletions(-)
- create mode 100644 scripts/qemugdb/coroutine_asm.py
- create mode 100644 scripts/qemugdb/coroutine_ucontext.py
- create mode 100644 util/coroutine-asm.c
-
+diff --git a/scripts/qemugdb/coroutine.py b/scripts/qemugdb/coroutine.py
+index db2753d949..076f6808ab 100644
+--- a/scripts/qemugdb/coroutine.py
++++ b/scripts/qemugdb/coroutine.py
+@@ -62,11 +62,11 @@ class CoroutineSPFunction(gdb.Function):
+         gdb.Function.__init__(self, 'qemu_coroutine_sp')
+ 
+     def invoke(self, addr):
+-        return coroutine_backend().get_coroutine_regs(addr)['rsp'].cast(VOID_PTR)
++        return coroutine_backend().get_coroutine_regs(addr)['sp'].cast(VOID_PTR)
+ 
+ class CoroutinePCFunction(gdb.Function):
+     def __init__(self):
+         gdb.Function.__init__(self, 'qemu_coroutine_pc')
+ 
+     def invoke(self, addr):
+-        return coroutine_backend().get_coroutine_regs(addr)['rip'].cast(VOID_PTR)
++        return coroutine_backend().get_coroutine_regs(addr)['pc'].cast(VOID_PTR)
+diff --git a/scripts/qemugdb/coroutine_ucontext.py b/scripts/qemugdb/coroutine_ucontext.py
+index a2f8c1dbbf..eed095be22 100644
+--- a/scripts/qemugdb/coroutine_ucontext.py
++++ b/scripts/qemugdb/coroutine_ucontext.py
+@@ -57,12 +57,12 @@ def get_jmpbuf_regs(jmpbuf):
+     pointer_guard = get_glibc_pointer_guard()
+     return {'rbx': jmpbuf[JB_RBX],
+         'rbp': glibc_ptr_demangle(jmpbuf[JB_RBP], pointer_guard),
+-        'rsp': glibc_ptr_demangle(jmpbuf[JB_RSP], pointer_guard),
++        'sp': glibc_ptr_demangle(jmpbuf[JB_RSP], pointer_guard),
+         'r12': jmpbuf[JB_R12],
+         'r13': jmpbuf[JB_R13],
+         'r14': jmpbuf[JB_R14],
+         'r15': jmpbuf[JB_R15],
+-        'rip': glibc_ptr_demangle(jmpbuf[JB_PC], pointer_guard) }
++        'pc': glibc_ptr_demangle(jmpbuf[JB_PC], pointer_guard) }
+ 
+ def get_coroutine_regs(addr):
+     co = addr.cast(gdb.lookup_type('CoroutineUContext').pointer())
 -- 
 2.21.0
