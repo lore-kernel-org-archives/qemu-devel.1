@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59315)
+Received: from eggs.gnu.org ([209.51.188.92]:44352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shmuel.eiderman@oracle.com>) id 1hMu1F-0001HW-6p
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 08:43:58 -0400
+	(envelope-from <S.E.Harris@kent.ac.uk>) id 1hMqDP-0007X0-4A
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 04:40:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shmuel.eiderman@oracle.com>) id 1hMu1D-0007iv-HZ
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 08:43:57 -0400
-From: Sam <shmuel.eiderman@oracle.com>
-Message-Id: <75AB1BD6-546D-4103-8A44-BEEC2FD3FF63@oracle.com>
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Date: Sat, 4 May 2019 15:43:25 +0300
-In-Reply-To: <a44ffb98-4cc2-47b9-2c9e-eeeda445a0a0@redhat.com>
-References: <af928e13-bde2-a9ae-de74-853d9bfc5e65@redhat.com>
-	<20190502130822.46858-1-shmuel.eiderman@oracle.com>
-	<20190502130822.46858-2-shmuel.eiderman@oracle.com>
-	<8d201096-ab9d-82e0-93cb-74bd23d93dbe@redhat.com>
-	<a44ffb98-4cc2-47b9-2c9e-eeeda445a0a0@redhat.com>
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] vmdk: Set vmdk parent backing_format to
- vmdk
+	(envelope-from <S.E.Harris@kent.ac.uk>) id 1hMqDM-0002wD-Ty
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 04:40:15 -0400
+Received: from mx0.kent.ac.uk ([129.12.21.32]:50456)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <S.E.Harris@kent.ac.uk>)
+	id 1hMqDM-0002uq-NC
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 04:40:12 -0400
+From: Sarah Harris <S.E.Harris@kent.ac.uk>
+Date: Sat,  4 May 2019 09:36:37 +0100
+Message-Id: <20190504083638.13380-8-S.E.Harris@kent.ac.uk>
+In-Reply-To: <20190504083638.13380-1-S.E.Harris@kent.ac.uk>
+References: <20190504083638.13380-1-S.E.Harris@kent.ac.uk>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v1 7/8] target/avr: Add example board
+ configuration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,146 +27,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, fam@euphon.net, Eric Blake <eblake@redhat.com>, Arbel Moshe <arbel.moshe@oracle.com>
+To: qemu-devel@nongnu.org
+Cc: S.E.Harris@kent.ac.uk, A.M.King@kent.ac.uk, E.J.C.Robbins@kent.ac.uk, mrolnik@gmail.com
 
-Thanks Thomas, Thanks Max
+A simple board setup that configures an AVR CPU to run a given firmware image.
+This is all that's useful to implement without peripheral emulation as AVR CPUs include a lot of on-board peripherals.
 
-So how do you want to proceed?
+Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+---
+ hw/Kconfig           |   1 +
+ hw/avr/Kconfig       |   4 +
+ hw/avr/Makefile.objs |   1 +
+ hw/avr/sample.c      | 177 +++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 183 insertions(+)
+ create mode 100644 hw/avr/Kconfig
+ create mode 100644 hw/avr/Makefile.objs
+ create mode 100644 hw/avr/sample.c
 
-Apply Max=E2=80=99s RFC from here =
-(http://lists.nongnu.org/archive/html/qemu-block/2019-04/msg00442.html =
-<http://lists.nongnu.org/archive/html/qemu-block/2019-04/msg00442.html>) =
-and add the commit id which is stable now?
-Or should I resubmit my fix (which is very similar to what Max did) =
-without the original change?
-
-Sam
-
-> On 3 May 2019, at 17:32, Max Reitz <mreitz@redhat.com> wrote:
->=20
-> On 03.05.19 13:34, Thomas Huth wrote:
->> Hi Sam,
->>=20
->> On 02/05/2019 15.08, Sam Eiderman wrote:
->>> Commit b69864e ("vmdk: Support version=3D3 in VMDK descriptor =
-files")
->>> fixed the probe function to correctly guess vmdk descriptors with
->>> version=3D3.
->>>=20
->>> This solves the issue where vmdk snapshot with parent vmdk =
-descriptor
->>> containing "version=3D3" would be treated as raw instead vmdk.
->>>=20
->>> In the future case where a new vmdk version is introduced, we will =
-again
->>> experience this issue, even if the user will provide "-f vmdk" it =
-will
->>> only apply to the tip image and not to the underlying "misprobed" =
-parent
->>> image.
->>>=20
->>> The code in vmdk.c already assumes that the backing file of vmdk =
-must be
->>> vmdk (see vmdk_is_cid_valid which returns 0 if backing file is not
->>> vmdk).
->>>=20
->>> So let's make it official by supplying the backing_format as vmdk.
->>>=20
->>> Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
->>> Reviewed-By: Liran Alon <liran.alon@oracle.com>
->>> Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
->>> Signed-off-by: Shmuel Eiderman <shmuel.eiderman@oracle.com>
->>> ---
->>> block/vmdk.c           | 2 ++
->>> tests/qemu-iotests/110 | 6 +++---
->>> tests/qemu-iotests/126 | 4 ++--
->>> 3 files changed, 7 insertions(+), 5 deletions(-)
->>>=20
->>> diff --git a/block/vmdk.c b/block/vmdk.c
->>> index 8dec6ef767..de8cb859f8 100644
->>> --- a/block/vmdk.c
->>> +++ b/block/vmdk.c
->>> @@ -397,6 +397,8 @@ static int vmdk_parent_open(BlockDriverState =
-*bs)
->>>         pstrcpy(bs->auto_backing_file, end_name - p_name + 1, =
-p_name);
->>>         pstrcpy(bs->backing_file, sizeof(bs->backing_file),
->>>                 bs->auto_backing_file);
->>> +        pstrcpy(bs->backing_format, sizeof(bs->backing_format),
->>> +                "vmdk");
->>>     }
->>=20
->> Your patch with this change has already been merged into the QEMU =
-master
->> branch...
->>=20
->>> diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
->>> index fad672c1ae..982569dbc5 100755
->>> --- a/tests/qemu-iotests/110
->>> +++ b/tests/qemu-iotests/110
->>> @@ -54,7 +54,7 @@ _make_test_img -b "$TEST_IMG_REL.base" 64M
->>> # qemu should be able to reconstruct the filename, so relative =
-backing names
->>> # should work
->>> =
-TEST_IMG=3D"json:{'driver':'$IMGFMT','file':{'driver':'file','filename':'$=
-TEST_IMG'}}" \
->>> -    _img_info | _filter_img_info
->>> +    _img_info | _filter_img_info | grep -v "backing file format"
->>>=20
->>> echo
->>> echo '=3D=3D=3D Non-reconstructable filename =3D=3D=3D'
->>> @@ -78,7 +78,7 @@ TEST_IMG=3D"json:{
->>>             }
->>>         ]
->>>     }
->>> -}" _img_info | _filter_img_info
->>> +}" _img_info | _filter_img_info | grep -v "backing file format"
->>>=20
->>> echo
->>> echo '=3D=3D=3D Backing name is always relative to the backed image =
-=3D=3D=3D'
->>> @@ -110,7 +110,7 @@ TEST_IMG=3D"json:{
->>>             }
->>>         ]
->>>     }
->>> -}" _img_info | _filter_img_info
->>> +}" _img_info | _filter_img_info | grep -v "backing file format"
->>>=20
->>>=20
->>> # success, all done
->>> diff --git a/tests/qemu-iotests/126 b/tests/qemu-iotests/126
->>> index 96dc048d59..1f7618c8a5 100755
->>> --- a/tests/qemu-iotests/126
->>> +++ b/tests/qemu-iotests/126
->>> @@ -63,7 +63,7 @@ TEST_IMG=3D$BASE_IMG _make_test_img 64M
->>> TEST_IMG=3D$TOP_IMG _make_test_img -b ./image:base.$IMGFMT
->>>=20
->>> # The default cluster size depends on the image format
->>> -TEST_IMG=3D$TOP_IMG _img_info | grep -v 'cluster_size'
->>> +TEST_IMG=3D$TOP_IMG _img_info | grep -v 'cluster_size\|backing file =
-format'
->>>=20
->>> _rm_test_img "$BASE_IMG"
->>> _rm_test_img "$TOP_IMG"
->>> @@ -79,7 +79,7 @@ TOP_IMG=3D"file:image:top.$IMGFMT"
->>> TEST_IMG=3D$BASE_IMG _make_test_img 64M
->>> TEST_IMG=3D$TOP_IMG _make_test_img -b "$BASE_IMG"
->>>=20
->>> -TEST_IMG=3D$TOP_IMG _img_info | grep -v 'cluster_size'
->>> +TEST_IMG=3D$TOP_IMG _img_info | grep -v 'cluster_size\|backing file =
-format'
->>>=20
->>> _rm_test_img "$BASE_IMG"
->>> _rm_test_img "image:top.$IMGFMT"
->>>=20
->>=20
->> ... so please just send a patch with these fixes!
->=20
-> I already did, it's here:
->=20
-> http://lists.nongnu.org/archive/html/qemu-block/2019-04/msg00442.html =
-<http://lists.nongnu.org/archive/html/qemu-block/2019-04/msg00442.html>
->=20
-> Max
+diff --git a/hw/Kconfig b/hw/Kconfig
+index 88b9f15007..dc5eb7a038 100644
+--- a/hw/Kconfig
++++ b/hw/Kconfig
+@@ -41,6 +41,7 @@ source watchdog/Kconfig
+ # arch Kconfig
+ source arm/Kconfig
+ source alpha/Kconfig
++source avr/Kconfig
+ source cris/Kconfig
+ source hppa/Kconfig
+ source i386/Kconfig
+diff --git a/hw/avr/Kconfig b/hw/avr/Kconfig
+new file mode 100644
+index 0000000000..c6ca8fe775
+--- /dev/null
++++ b/hw/avr/Kconfig
+@@ -0,0 +1,4 @@
++config AVR_SAMPLE
++    bool
++    select AVR_TIMER16
++    select AVR_USART
+diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
+new file mode 100644
+index 0000000000..626b7064b3
+--- /dev/null
++++ b/hw/avr/Makefile.objs
+@@ -0,0 +1 @@
++obj-y += sample.o
+diff --git a/hw/avr/sample.c b/hw/avr/sample.c
+new file mode 100644
+index 0000000000..21b384b3b3
+--- /dev/null
++++ b/hw/avr/sample.c
+@@ -0,0 +1,177 @@
++/*
++ * QEMU AVR CPU
++ *
++ * Copyright (c) 2016 Michael Rolnik
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++/*
++ *  NOTE:
++ *      This is not a real AVR board, this is an example!
++ *      The CPU is an approximation of an ATmega2560, but is missing various
++ *      built-in peripherals.
++ *
++ *      This example board loads provided binary file into flash memory and
++ *      executes it from 0x00000000 address in the code memory space.
++ *
++ *      Currently used for AVR CPU validation
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/qtest.h"
++#include "ui/console.h"
++#include "hw/boards.h"
++#include "hw/loader.h"
++#include "qemu/error-report.h"
++#include "exec/address-spaces.h"
++#include "include/hw/sysbus.h"
++#include "include/hw/char/avr_usart.h"
++#include "include/hw/timer/avr_timer16.h"
++#include "elf.h"
++
++#define SIZE_FLASH 0x00040000
++#define SIZE_SRAM 0x00002200
++/*
++ * Size of additional "external" memory, as if the AVR were configured to use
++ * an external RAM chip.
++ * Note that the configuration registers that normally enable this feature are
++ * unimplemented.
++ */
++#define SIZE_EXMEM 0x00000000
++
++/* Offsets of periphals in emulated memory space (i.e. not host addresses)  */
++#define PRR0 0x64
++#define PRR1 0x65
++#define USART_BASE 0xc0
++#define USART_PRR PRR0
++#define USART_PRR_MASK 0b00000010
++#define TIMER1_BASE 0x80
++#define TIMER1_IMSK_BASE 0x6f
++#define TIMER1_IFR_BASE 0x36
++#define TIMER1_PRR PRR0
++#define TIMER1_PRR_MASK 0b01000000
++
++/* Interrupt numbers used by peripherals */
++#define TIMER1_CAPT_IRQ 15
++#define TIMER1_COMPA_IRQ 16
++#define TIMER1_COMPB_IRQ 17
++#define TIMER1_COMPC_IRQ 18
++#define TIMER1_OVF_IRQ 19
++
++static void sample_init(MachineState *machine)
++{
++    MemoryRegion *address_space_mem;
++    MemoryRegion *ram;
++    MemoryRegion *flash;
++    AVRCPU *cpu_avr;
++    const char *firmware = NULL;
++    const char *filename;
++    int bytes_loaded;
++    AVRUsartState *usart0;
++    AVRTimer16State *timer1;
++    SysBusDevice *busdev;
++
++    address_space_mem = get_system_memory();
++    ram = g_new(MemoryRegion, 1);
++    flash = g_new(MemoryRegion, 1);
++
++    /* ATmega2560. */
++    cpu_avr = AVR_CPU(cpu_create("avr6-avr"));
++
++    memory_region_allocate_system_memory(
++        ram, NULL, "avr.ram", SIZE_SRAM + SIZE_EXMEM);
++    memory_region_add_subregion(address_space_mem, OFFSET_DATA, ram);
++
++    memory_region_init_rom(flash, NULL, "avr.flash", SIZE_FLASH, &error_fatal);
++    memory_region_add_subregion(address_space_mem, OFFSET_CODE, flash);
++
++    /* USART 0 built-in peripheral */
++    usart0 = AVR_USART(object_new(TYPE_AVR_USART));
++    busdev = SYS_BUS_DEVICE(usart0);
++    sysbus_mmio_map(busdev, 0, OFFSET_DATA + USART_BASE);
++    /*
++     * These IRQ numbers don't match the datasheet because we're counting from
++     * zero and not including reset.
++     */
++    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(cpu_avr), 24));
++    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(DEVICE(cpu_avr), 25));
++    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(DEVICE(cpu_avr), 26));
++    usart0->prr_address = OFFSET_DATA + PRR0;
++    usart0->prr_mask = USART_PRR_MASK;
++    qdev_prop_set_chr(DEVICE(usart0), "chardev", serial_hd(0));
++    object_property_set_bool(OBJECT(usart0), true, "realized", &error_fatal);
++
++    /* Timer 1 built-in periphal */
++    timer1 = AVR_TIMER16(object_new(TYPE_AVR_TIMER16));
++    busdev = SYS_BUS_DEVICE(timer1);
++    sysbus_mmio_map(busdev, 0, OFFSET_DATA + TIMER1_BASE);
++    sysbus_mmio_map(busdev, 1, OFFSET_DATA + TIMER1_IMSK_BASE);
++    sysbus_mmio_map(busdev, 2, OFFSET_DATA + TIMER1_IFR_BASE);
++    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(
++        DEVICE(cpu_avr), TIMER1_CAPT_IRQ));
++    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(
++        DEVICE(cpu_avr), TIMER1_COMPA_IRQ));
++    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(
++        DEVICE(cpu_avr), TIMER1_COMPB_IRQ));
++    sysbus_connect_irq(busdev, 3, qdev_get_gpio_in(
++        DEVICE(cpu_avr), TIMER1_COMPC_IRQ));
++    sysbus_connect_irq(busdev, 4, qdev_get_gpio_in(
++        DEVICE(cpu_avr), TIMER1_OVF_IRQ));
++    timer1->prr_address = OFFSET_DATA + TIMER1_PRR;
++    timer1->prr_mask = TIMER1_PRR_MASK;
++    object_property_set_bool(OBJECT(timer1), true, "realized", &error_fatal);
++
++    /* Load firmware (contents of flash) trying to auto-detect format */
++    firmware = machine->firmware;
++    if (firmware != NULL) {
++        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
++        if (filename == NULL) {
++            error_report("Unable to find %s", firmware);
++            exit(1);
++        }
++
++        bytes_loaded = load_elf(
++            filename, NULL, NULL, NULL, NULL, NULL, NULL, 0, EM_NONE, 0, 0);
++        if (bytes_loaded < 0) {
++            error_report(
++                "Unable to load %s as ELF, trying again as raw binary",
++                firmware);
++            bytes_loaded = load_image_targphys(
++                filename, OFFSET_CODE, SIZE_FLASH);
++        }
++        if (bytes_loaded < 0) {
++            error_report(
++                "Unable to load firmware image %s as ELF or raw binary",
++                firmware);
++            exit(1);
++        }
++    }
++}
++
++static void sample_machine_init(MachineClass *mc)
++{
++    mc->desc = "AVR sample/example board";
++    mc->init = sample_init;
++    mc->is_default = 1;
++}
++
++DEFINE_MACHINE("sample", sample_machine_init)
+-- 
+2.21.0
