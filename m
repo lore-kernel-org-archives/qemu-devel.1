@@ -2,90 +2,79 @@ Return-Path: <SRS0=Uyhh=TE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C2AC43219
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 09:39:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC82C43219
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 11:53:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC731206BB
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 09:39:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K5gykMCd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC731206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7850D206BB
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 11:53:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7850D206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53927 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55084 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMr8t-0004u6-VO
-	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 05:39:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53841)
+	id 1hMtEn-0003fL-9s
+	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 07:53:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMr88-0004TN-Id
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 05:38:53 -0400
+	(envelope-from <philmd@redhat.com>) id 1hMtDs-0003Gt-NA
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 07:52:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hMr87-0000MX-Pe
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 05:38:52 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54739)
+	(envelope-from <philmd@redhat.com>) id 1hMtDr-0003zD-LL
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 07:52:56 -0400
+Received: from mail-wr1-f49.google.com ([209.85.221.49]:42976)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hMr87-0000LW-I0
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 05:38:51 -0400
-Received: by mail-wm1-x342.google.com with SMTP id b10so9891219wmj.4
-	for <qemu-devel@nongnu.org>; Sat, 04 May 2019 02:38:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=PgxM4+Rgya3vjxxV5oLcZJZTuSPNombv15j6QC4x3TE=;
-	b=K5gykMCd7VlWnMgY25EsE1di5Bjoa3VDxUtrK1jQ1xTSUBbZAicAfTPs+PIm0HdsuM
-	hdPWNpudHONZOSd8ff/Euz989hKi8bKsRJ7Ahty1wCGcoPI3HZu7TGRMfpj18h5qBII+
-	jJUPQLwfBuV8wqQqKXrK0odjXCKxwczr5Oyuv149PoqowJQz1Tu8a0UQMpY2JQvemgWu
-	quL3iofAgIJLiJO8rwtmqGgQ7xr21a3hYA4V30kFWnlaEXvK1PAttb6sbWf9fMpfm0sK
-	kDBW/wj/QzosEX0458BG16F7ibajZ3gtQsS+PFaTANT614CBtBgadj1kUC85msamUKr9
-	atiw==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hMtDr-0003ym-FW
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 07:52:55 -0400
+Received: by mail-wr1-f49.google.com with SMTP id l2so11083215wrb.9
+	for <qemu-devel@nongnu.org>; Sat, 04 May 2019 04:52:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=PgxM4+Rgya3vjxxV5oLcZJZTuSPNombv15j6QC4x3TE=;
-	b=hc2RA2rXPhrWtGazn358UlRRAC98Jg4IRVp2RsOP/TyoP+uKuqmeErj8sHfa61sX4f
-	NUZq3emE8g/37mffs5fW8g+ZT6Xwl/kHnQdHbQgTlIFvnGwnxLNukM89SHAj3vIdi09+
-	eWGXYsNc6DXorkey2aWeNAjcbwEgrFeMxCKBPIKWVaOPCpSpZ2R7PtuNhnF7X9pOmZUG
-	sf0K1Y7mgnBzz2PCUe6VaveY2VlAookT0qNy7WAD3h+3aaf74LOwmY0DEgLbRa71yhcf
-	QsRKxLZEBmGrSPrzJJ8BGZ1cmsUO4hE12OYdwuFsPST7n7hyqnVaZXtPgaoqn1OhLECH
-	m+9A==
-X-Gm-Message-State: APjAAAW/v/oYhZ1WUgWUqYICQqdAeUfzrs4P1eDGYfz/M/oUPAvrJXgS
-	97GUUcONxZZKCE/9nkrjUt05Ow==
-X-Google-Smtp-Source: APXvYqwIFnmocz7wOWhHui2FppDba30RX/anyLnlgbJ29eHh47Cr3Q51qVWQpSQlNVpksyeB49mIpQ==
-X-Received: by 2002:a1c:a8ce:: with SMTP id r197mr7783615wme.66.1556962729745; 
-	Sat, 04 May 2019 02:38:49 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id c2sm3132480wrr.13.2019.05.04.02.38.48
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Sat, 04 May 2019 02:38:49 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id A01931FF87;
-	Sat,  4 May 2019 10:38:48 +0100 (BST)
-References: <20190501184306.15208-1-richard.henderson@linaro.org>
-	<877eb74gc3.fsf@zen.linaroharston>
-	<6206383e-d092-28cf-1549-ab01a306bb05@linaro.org>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-In-reply-to: <6206383e-d092-28cf-1549-ab01a306bb05@linaro.org>
-Date: Sat, 04 May 2019 10:38:48 +0100
-Message-ID: <87a7g2bluf.fsf@zen.linaroharston>
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=yWuzI25mfazZ9/4FDgDKKezBoaaReNKxvhm7fIUTb0M=;
+	b=ijFoIDIcXAMu7WXOyi5S3P53HzbZMQ4FVA+wwrEW0/Ktz8ir0DH+2+z8VAWQ0qcKFA
+	8z+WHajghym/uWkyAyklNwUoDy1h7CG7I3yTidTbDMbbga+7LnTIa07ZQNO7+r4fvO7G
+	cO+GxSqKzrPJeIYWzj45AO3GDUbZQ8ZUHMsVDZmgcAzt4Kar5GctF3c+rjHD2R05VW+Y
+	Y/oc+qeeWtcI3qJCLlZhodzZh+VDMx39g8fCwOHf2ziA5Q90q5tda6RS1yhfdv3uYZpu
+	AOC597wQCyVR+lAMuHSQ+loUwnlmcBffn5lcM6X2ZZMxlRtksa8iJfb8ZR7ZieLjZBW5
+	XErA==
+X-Gm-Message-State: APjAAAVHyyKTrsgIM6/MAMO0vu7LDoqhqFA6jSXvzNH7WXcA7SJotGEW
+	BeR09zeEqAKUguc2ljcXc+ffWg==
+X-Google-Smtp-Source: APXvYqx2NRBsiP8wWguOo8cPRyPQ4RDoca5M0IWtiMAZW3YGKXDGKSmXQMhkY7V2t1MUyYXwB4yFKQ==
+X-Received: by 2002:adf:e88b:: with SMTP id d11mr11025771wrm.327.1556970774134;
+	Sat, 04 May 2019 04:52:54 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193])
+	by smtp.gmail.com with ESMTPSA id f2sm13151053wmh.3.2019.05.04.04.52.51
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Sat, 04 May 2019 04:52:52 -0700 (PDT)
+To: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+References: <20190312234541.2887-1-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <d5d84efd-ef8c-4e0d-d48a-6996d91832e7@redhat.com>
+Date: Sat, 4 May 2019 13:52:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190312234541.2887-1-philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH] tests/tcg/alpha: add system boot.S
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.49
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Acceptance Tests: Test the
+ Raspberry Pi 2 board
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,27 +86,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org, Andrew Baumann <Andrew.Baumann@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190504093848.fSvdC9TjEZjOWYej3HcyO67jsElfKKgk568sDPARIsw@z>
+Message-ID: <20190504115251.eezgET06Xz3swV5oLd_kqOvsp3yzT7kU1chRUS0_vPQ@z>
 
+On 3/13/19 12:45 AM, Philippe Mathieu-Daudé wrote:
+> Add the raspi2 to the list of boards tested by the
+> boot_linux_console Avocado test.
+> 
+> Based on "Acceptance Tests: target architecture support" v5:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg04111.html
+> Based-on: <20190312171824.5134-1-crosa@redhat.com>
+> 
+> Philippe Mathieu-Daudé (2):
+>   BootLinuxConsoleTest: Let extract_from_deb handle various compressions
+>   Boot Linux Console Test: add a test for the Raspberry Pi 2
+> 
+>  tests/acceptance/boot_linux_console.py | 34 ++++++++++++++++++++++++--
+>  1 file changed, 32 insertions(+), 2 deletions(-)
 
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> On 5/3/19 10:07 AM, Alex Benn=C3=A9e wrote:
->> +	ldah	$sp, $stack_end($gp)	!gprelhigh
->> +	lda	$sp, $stack_end($gp)	!gprellow
->
-> Bah.                           ^^^^ $sp
->
-> As is, this works only because the test case is tiny, and this happens to
-> evaluate to the middle of the stack allocation.
-
-cool. that fixes the exception I was seeing while running the
-cleaned up memory test.
-
---
-Alex Benn=C3=A9e
+I was hoping this series would be included in "Acceptance Tests: target
+architecture support" by Eduardo (removing the 'print' debug line) but I
+just realized I forgot to Cc him :S
 
