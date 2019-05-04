@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41741)
+Received: from eggs.gnu.org ([209.51.188.92]:41763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hMnbn-0007jo-5Y
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 01:53:16 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hMnbo-0007kp-6q
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 01:53:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hMnbm-0004BK-4H
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 01:53:15 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:46400)
+	(envelope-from <richard.henderson@linaro.org>) id 1hMnbn-0004C2-1j
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 01:53:16 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:39679)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hMnbl-0004Ay-Uc
+	id 1hMnbm-0004BP-Rz
 	for qemu-devel@nongnu.org; Sat, 04 May 2019 01:53:14 -0400
-Received: by mail-pl1-x644.google.com with SMTP id bi2so3708742plb.13
-	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 22:53:13 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id e92so3730810plb.6
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 22:53:14 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  3 May 2019 22:52:37 -0700
-Message-Id: <20190504055300.18426-9-richard.henderson@linaro.org>
+Date: Fri,  3 May 2019 22:52:38 -0700
+Message-Id: <20190504055300.18426-10-richard.henderson@linaro.org>
 In-Reply-To: <20190504055300.18426-1-richard.henderson@linaro.org>
 References: <20190504055300.18426-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 08/31] tcg: Support cross-class moves
- without instruction support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 09/31] tcg: Promote tcg_out_{dup,
+ dupi}_vec to backend interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +33,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org, david@redhat.com
 
-PowerPC Altivec does not support direct moves between vector registers
-and general registers.  So when tcg_out_mov fails, we can use the
-backing memory for the temporary to perform the move.
+The i386 backend already has these functions, and the aarch64 backend
+could easily split out one.  Nothing is done with these functions yet,
+but this will aid register allocation of INDEX_op_dup_vec in a later patch.
 
-Acked-by: David Hildenbrand <david@redhat.com>
+Adjust the aarch64 tcg_out_dupi_vec signature to match the new interface.
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg.c | 31 ++++++++++++++++++++++++++++---
- 1 file changed, 28 insertions(+), 3 deletions(-)
+ tcg/aarch64/tcg-target.inc.c | 12 ++++++++++--
+ tcg/i386/tcg-target.inc.c    |  3 ++-
+ tcg/tcg.c                    | 14 ++++++++++++++
+ 3 files changed, 26 insertions(+), 3 deletions(-)
 
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index ee89734318..e443b5df23 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -799,7 +799,7 @@ static void tcg_out_logicali(TCGContext *s, AArch64Insn insn, TCGType ext,
+ }
+ 
+ static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+-                             TCGReg rd, uint64_t v64)
++                             TCGReg rd, tcg_target_long v64)
+ {
+     int op, cmode, imm8;
+ 
+@@ -814,6 +814,14 @@ static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+     }
+ }
+ 
++static bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
++                            TCGReg rd, TCGReg rs)
++{
++    int is_q = type - TCG_TYPE_V64;
++    tcg_out_insn(s, 3605, DUP, is_q, rd, rs, 1 << vece, 0);
++    return true;
++}
++
+ static void tcg_out_movi(TCGContext *s, TCGType type, TCGReg rd,
+                          tcg_target_long value)
+ {
+@@ -2201,7 +2209,7 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+         tcg_out_insn(s, 3617, NOT, is_q, 0, a0, a1);
+         break;
+     case INDEX_op_dup_vec:
+-        tcg_out_insn(s, 3605, DUP, is_q, a0, a1, 1 << vece, 0);
++        tcg_out_dup_vec(s, type, vece, a0, a1);
+         break;
+     case INDEX_op_shli_vec:
+         tcg_out_insn(s, 3614, SHL, is_q, a0, a1, a2 + (8 << vece));
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 1198c76392..0d621670c7 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -855,7 +855,7 @@ static bool tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
+     return true;
+ }
+ 
+-static void tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
++static bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
+                             TCGReg r, TCGReg a)
+ {
+     if (have_avx2) {
+@@ -888,6 +888,7 @@ static void tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
+             g_assert_not_reached();
+         }
+     }
++    return true;
+ }
+ 
+ static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
 diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 8ed7cb8654..68d86361e2 100644
+index 68d86361e2..3ef4d3478d 100644
 --- a/tcg/tcg.c
 +++ b/tcg/tcg.c
-@@ -3368,7 +3368,20 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOp *op)
-                                          ots->indirect_base);
-             }
-             if (!tcg_out_mov(s, otype, ots->reg, ts->reg)) {
--                abort();
-+                /*
-+                 * Cross register class move not supported.
-+                 * Store the source register into the destination slot
-+                 * and leave the destination temp as TEMP_VAL_MEM.
-+                 */
-+                assert(!ots->fixed_reg);
-+                if (!ts->mem_allocated) {
-+                    temp_allocate_frame(s, ots);
-+                }
-+                tcg_out_st(s, ts->type, ts->reg,
-+                           ots->mem_base->reg, ots->mem_offset);
-+                ots->mem_coherent = 1;
-+                temp_free_or_dead(s, ots, -1);
-+                return;
-             }
-         }
-         ots->val_type = TEMP_VAL_REG;
-@@ -3470,7 +3483,13 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
-             reg = tcg_reg_alloc(s, arg_ct->u.regs, i_allocated_regs,
-                                 o_preferred_regs, ts->indirect_base);
-             if (!tcg_out_mov(s, ts->type, reg, ts->reg)) {
--                abort();
-+                /*
-+                 * Cross register class move not supported.  Sync the
-+                 * temp back to its slot and load from there.
-+                 */
-+                temp_sync(s, ts, i_allocated_regs, 0, 0);
-+                tcg_out_ld(s, ts->type, reg,
-+                           ts->mem_base->reg, ts->mem_offset);
-             }
-         }
-         new_args[i] = reg;
-@@ -3631,7 +3650,13 @@ static void tcg_reg_alloc_call(TCGContext *s, TCGOp *op)
-                 if (ts->reg != reg) {
-                     tcg_reg_free(s, reg, allocated_regs);
-                     if (!tcg_out_mov(s, ts->type, reg, ts->reg)) {
--                        abort();
-+                        /*
-+                         * Cross register class move not supported.  Sync the
-+                         * temp back to its slot and load from there.
-+                         */
-+                        temp_sync(s, ts, allocated_regs, 0, 0);
-+                        tcg_out_ld(s, ts->type, reg,
-+                                   ts->mem_base->reg, ts->mem_offset);
-                     }
-                 }
-             } else {
+@@ -109,10 +109,24 @@ static void tcg_out_movi(TCGContext *s, TCGType type,
+ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
+                        const int *const_args);
+ #if TCG_TARGET_MAYBE_vec
++static bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
++                            TCGReg dst, TCGReg src);
++static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
++                             TCGReg dst, tcg_target_long arg);
+ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc, unsigned vecl,
+                            unsigned vece, const TCGArg *args,
+                            const int *const_args);
+ #else
++static inline bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
++                                   TCGReg dst, TCGReg src)
++{
++    g_assert_not_reached();
++}
++static inline void tcg_out_dupi_vec(TCGContext *s, TCGType type,
++                                    TCGReg dst, tcg_target_long arg)
++{
++    g_assert_not_reached();
++}
+ static inline void tcg_out_vec_op(TCGContext *s, TCGOpcode opc, unsigned vecl,
+                                   unsigned vece, const TCGArg *args,
+                                   const int *const_args)
 -- 
 2.17.1
