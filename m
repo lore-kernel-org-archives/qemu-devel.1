@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42353)
+Received: from eggs.gnu.org ([209.51.188.92]:42343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hN1oG-0003rm-3A
+	(envelope-from <atar4qemu@gmail.com>) id 1hN1oF-0003rl-Bo
 	for qemu-devel@nongnu.org; Sat, 04 May 2019 17:03:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hN1oF-0004ak-3T
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 17:03:04 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38442)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1hN1oE-0004a2-U2
+	(envelope-from <atar4qemu@gmail.com>) id 1hN1oE-0004Zy-Cb
 	for qemu-devel@nongnu.org; Sat, 04 May 2019 17:03:03 -0400
-Received: by mail-wr1-x441.google.com with SMTP id k16so12176440wrn.5
-	for <qemu-devel@nongnu.org>; Sat, 04 May 2019 14:03:02 -0700 (PDT)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35108)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1hN1oE-0004Yx-4t
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 17:03:02 -0400
+Received: by mail-wr1-x441.google.com with SMTP id h15so6466823wrb.2
+	for <qemu-devel@nongnu.org>; Sat, 04 May 2019 14:03:01 -0700 (PDT)
 From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Sat,  4 May 2019 23:02:32 +0200
-Message-Id: <1557003754-26473-2-git-send-email-atar4qemu@gmail.com>
-In-Reply-To: <1557003754-26473-1-git-send-email-atar4qemu@gmail.com>
-References: <1557003754-26473-1-git-send-email-atar4qemu@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] lsi53c895a: hide 53c895a registers in
- 53c810
+Date: Sat,  4 May 2019 23:02:31 +0200
+Message-Id: <1557003754-26473-1-git-send-email-atar4qemu@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 0/3] Improve 40p, make AIX 5.1 boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +27,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, hpoussin@reactos.org
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>
 
-AIX/PReP does access to the aliased IO registers of 53810.
-Implement aliasing to make the AIX driver work.
 
-Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
----
+This series makes various fixes for the -M 40p target.
+Particularly now it's possible to boot AIX 5.1 (both from a cdrom
+and a hard disk).
+
+The OFW image: 
+https://github.com/artyom-tarasenko/openfirmware/releases/download/20190406-AIX-boots/q40pofw-serial.rom
+
+The command line:
+qemu-system-ppc -M 40p -bios q40pofw-serial.rom -serial telnet::4441,server -hda aix-hdd.qcow2 -cdrom \
+/path/to/aix-5.1-cd1.iso  -vga none -nographic
+
+More info can be found here:
+https://tyom.blogspot.com/2019/04/aixprep-under-qemu-how-to.html
+
+Artyom Tarasenko (3):
+  lsi53c895a: hide 53c895a registers in 53c810
+  40p and prep: implement PCI bus mastering
+  hw/isa/i82378.c: use 1900 as a base year
+
+ hw/isa/i82378.c      |  4 +++-
+ hw/pci-host/prep.c   | 15 +++++++++++----
  hw/scsi/lsi53c895a.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ 3 files changed, 28 insertions(+), 8 deletions(-)
 
-diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index da7239d..6b95699 100644
---- a/hw/scsi/lsi53c895a.c
-+++ b/hw/scsi/lsi53c895a.c
-@@ -2271,6 +2271,9 @@ static void lsi_scsi_realize(PCIDevice *dev, Error **errp)
-     LSIState *s = LSI53C895A(dev);
-     DeviceState *d = DEVICE(dev);
-     uint8_t *pci_conf;
-+    uint64_t mmio_size;
-+    MemoryRegion *mr;
-+    uint16_t type = PCI_DEVICE_GET_CLASS(dev)->device_id;
- 
-     pci_conf = dev->config;
- 
-@@ -2279,13 +2282,21 @@ static void lsi_scsi_realize(PCIDevice *dev, Error **errp)
-     /* Interrupt pin A */
-     pci_conf[PCI_INTERRUPT_PIN] = 0x01;
- 
--    memory_region_init_io(&s->mmio_io, OBJECT(s), &lsi_mmio_ops, s,
--                          "lsi-mmio", 0x400);
-     memory_region_init_io(&s->ram_io, OBJECT(s), &lsi_ram_ops, s,
-                           "lsi-ram", 0x2000);
-     memory_region_init_io(&s->io_io, OBJECT(s), &lsi_io_ops, s,
-                           "lsi-io", 256);
--
-+    if (type == PCI_DEVICE_ID_LSI_53C895A) {
-+        mmio_size = 0x400;
-+    } else {
-+        mr = g_new(MemoryRegion, 1);
-+        memory_region_init_alias(mr, OBJECT(d), "lsi-io-alias", &s->io_io,
-+                                 0, 0x80);
-+        memory_region_add_subregion_overlap(&s->io_io, 0x80, mr, -1);
-+        mmio_size = 0x80;
-+    }
-+    memory_region_init_io(&s->mmio_io, OBJECT(s), &lsi_mmio_ops, s,
-+                          "lsi-mmio", mmio_size);
-     address_space_init(&s->pci_io_as, pci_address_space_io(dev), "lsi-pci-io");
-     qdev_init_gpio_out(d, &s->ext_irq, 1);
- 
 -- 
 2.7.2
