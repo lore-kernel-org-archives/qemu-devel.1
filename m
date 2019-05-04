@@ -2,47 +2,51 @@ Return-Path: <SRS0=Uyhh=TE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2021C43219
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 06:28:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85740C43219
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 06:42:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87532206DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 06:28:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87532206DF
+	by mail.kernel.org (Postfix) with ESMTPS id 5AAF520675
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 06:42:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AAF520675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52078 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52190 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hMo9t-0001y6-LL
-	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 02:28:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49665)
+	id 1hMoN4-00049k-BC
+	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 02:42:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hMo9C-0001d4-Si
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 02:27:47 -0400
+	(envelope-from <thuth@redhat.com>) id 1hMoME-0003ef-JL
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 02:41:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hMo9B-0007Q6-Tl
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 02:27:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40170)
+	(envelope-from <thuth@redhat.com>) id 1hMoMD-0001Bq-Hd
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 02:41:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50922)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hMo9B-0007Pf-Lh
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 02:27:45 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hMoMB-0001Ap-KK
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 02:41:12 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 652F2C0587F5;
-	Sat,  4 May 2019 06:27:44 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DBCD93680F;
+	Sat,  4 May 2019 06:41:09 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-38.ams2.redhat.com [10.36.116.38])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 77C8119C7E;
-	Sat,  4 May 2019 06:27:40 +0000 (UTC)
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-References: <20190503193721.18459-1-ehabkost@redhat.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B5FA05C23A;
+	Sat,  4 May 2019 06:41:04 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+References: <20190503004130.8285-1-ehabkost@redhat.com>
+	<20190503004130.8285-20-ehabkost@redhat.com>
+	<40c4d236-ed76-e433-51d5-c9feabb4374a@redhat.com>
+	<b6e70863-4ec9-0209-46b0-b74eb1453fcf@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -88,22 +92,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <787cda9d-3d53-74b5-c3b6-f038a9a1b242@redhat.com>
-Date: Sat, 4 May 2019 08:27:39 +0200
+Message-ID: <cf07eade-4377-0016-ac80-f7fbb5f05515@redhat.com>
+Date: Sat, 4 May 2019 08:41:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190503193721.18459-1-ehabkost@redhat.com>
+In-Reply-To: <b6e70863-4ec9-0209-46b0-b74eb1453fcf@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Sat, 04 May 2019 06:27:44 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.30]);
+	Sat, 04 May 2019 06:41:09 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] Deprecate Python 2 support
+Subject: Re: [Qemu-devel] [PULL 19/19] configure: automatically pick python3
+ is available
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -115,59 +120,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Cleber Rosa <crosa@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190504062739.EOmTpMBkVZ_EaZnSZ5lh_Fg0BuxL2wh_EqWeKiJQxpI@z>
+Message-ID: <20190504064103.lQ4V07LHUExC2lRzKboD1f-0kUkovI5ALbZ8Sb5GNJc@z>
 
-On 03/05/2019 21.37, Eduardo Habkost wrote:
-> Python 2 will reach end of life in January 1 2020.  Declare it as
-> deprecated.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  configure            | 8 ++++++++
->  qemu-deprecated.texi | 8 ++++++++
->  2 files changed, 16 insertions(+)
-> 
-> diff --git a/configure b/configure
-> index 5b183c2e39..50385061ed 100755
-> --- a/configure
-> +++ b/configure
-> @@ -6461,6 +6461,14 @@ if test "$supported_os" = "no"; then
->      echo "us upstream at qemu-devel@nongnu.org."
->  fi
->  
-> +# Note that if the Python conditional here evaluates True we will exit
-> +# with status 1 which is a shell 'false' value.
-> +if ! $python -c 'import sys; sys.exit(sys.version_info < (3,0))'; then
-> +  echo
-> +  echo "WARNING: Python 2 support is deprecated" >&2
-> +  echo "WARNING: Python 3 will be required for building future versions of QEMU" >&2
-> +fi
-> +
->  config_host_mak="config-host.mak"
->  
->  echo "# Automatically generated by configure - do not modify" >config-all-disas.mak
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 842e71b11d..2f2d9a3e95 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -206,3 +206,11 @@ Note that if you are exposing the export via /dev/nbd0, it is easier
->  to just export the entire image and then mount only /dev/nbd0p1 than
->  it is to reinvoke @command{qemu-nbd -c /dev/nbd0} limited to just a
->  subset of the image.
-> +
-> +@section Build system
-> +
-> +@subsection Python 2 support (since 4.1.0)
-> +
-> +In the future, QEMU will require Python 3 to be available at
-> +build time.  Support for Python 2 in scripts shipped with QEMU
-> +is deprecated.
+On 03/05/2019 19.04, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 5/3/19 6:41 PM, Thomas Huth wrote:
+>> On 03/05/2019 02.41, Eduardo Habkost wrote:
+>>> From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>>>
+>>> Unless overridden via an env var or configure arg, QEMU will only loo=
+k
+>>> for the 'python' binary in $PATH. This is unhelpful on distros which
+>>> are only shipping Python 3.x (eg Fedora) in their default install as,
+>>> if they comply with PEP 394, the bare 'python' binary won't exist.
+>>>
+>>> This changes configure so that by default it will search for all thre=
+e
+>>> common python binaries, preferring to find Python 3.x versions.
+>>>
+>>> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>>> Message-Id: <20190327170701.23798-1-berrange@redhat.com>
+>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>>> ---
+>>>  configure | 18 +++++++++++++++---
+>>>  1 file changed, 15 insertions(+), 3 deletions(-)
+>>
+>> I haven't bisected it, but I think this patch here broke the gitlab-ci=
+ tests:
+>>
+>>  https://gitlab.com/huth/qemu/-/jobs/206806257
+>=20
+> What's the easier way to notice that automatically?
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Maybe Peter could tweak one of his acceptance test environments to use a
+non-UTF-8 locale?
+
+ Thomas
 
