@@ -7,78 +7,81 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BBF8C04AA9
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 21:04:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1B54C43219
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 21:04:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E627820652
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 21:04:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 683A320652
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 21:04:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kWt6A9WW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E627820652
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bKYCBToE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 683A320652
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:32847 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:32849 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hN1pv-0004oF-3w
-	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 17:04:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42353)
+	id 1hN1px-0004qF-N9
+	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 17:04:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hN1oG-0003rm-3A
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 17:03:04 -0400
+	(envelope-from <atar4qemu@gmail.com>) id 1hN1oI-0003sM-9x
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 17:03:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hN1oF-0004ak-3T
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 17:03:04 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38442)
+	(envelope-from <atar4qemu@gmail.com>) id 1hN1oH-0004ce-Bp
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 17:03:06 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33931)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1hN1oE-0004a2-U2
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 17:03:03 -0400
-Received: by mail-wr1-x441.google.com with SMTP id k16so12176440wrn.5
-	for <qemu-devel@nongnu.org>; Sat, 04 May 2019 14:03:02 -0700 (PDT)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>)
+	id 1hN1oH-0004c0-5V; Sat, 04 May 2019 17:03:05 -0400
+Received: by mail-wr1-x443.google.com with SMTP id f7so1836911wrq.1;
+	Sat, 04 May 2019 14:03:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=+fYqCs5sUPiNHHzHDoxsSG+QXYH6mcG8D/Amsajt7mM=;
-	b=kWt6A9WWwlK0sO6LHCj83xye1QNGGZLFunKVHM2X7lQ1/9asHZiY4JVZtClm7dfk/P
-	enpaDw703G5EIzOGYBYN9znWSf+mYPa2TPy4BbGScF76oc3uGhqh2MprrQFcAq7dQvYt
-	j/ivqgVEs5IH9VreYmKK42TunCF6tL4JTmG1yqlvmUD1cQIJu4aBEPlaTuGjogCi58iJ
-	Sc5zMXnAitNoDQn/rDxv3N0cm1bEXZ2ALTfdndwkRRyXvDsEDTnIK5j+IUVgig5mdqfb
-	5OQcKgIYfTapafL4WQ97P14sIGLbSfaUWE+wXH7QUfXn40+xPKO+8jLPMr2+7IouQtea
-	dIxA==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=O8KrwKkFlyf9Fo/o8AuY7bvoRhwFJvmFsOOmHrvIPIM=;
+	b=bKYCBToEgd/UUd8dMqndb/J6K1pj+kX65YEdWJeX0fdIUzDO/SjvvrGFi8KteUudhq
+	wtqlu8ULd2AJIZ+NkgcP+mXGG7V3WpZX4AcoFasp66LMwBT/qSSNHU+djJXzxGRHPIgk
+	0ApyzxD78NsR7vniFZx3e3MiDbVSfjLINnBaXI99vPhf90HSH9clEObuxsdfjySnBWlJ
+	WI+LMrkGU0spMOpHIVKrQ+UvRY5tw9kmZAcQVxAt5JZ1+7n6zOGHdS7o98HJfStA/tYp
+	SoIYcXM5E+3tLWnZE61E/tgr0jOZcEnTNVRzUBVm7q5EIorXhAIugJtakAp0BolwYf8N
+	zpWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=+fYqCs5sUPiNHHzHDoxsSG+QXYH6mcG8D/Amsajt7mM=;
-	b=WTPjh9mkE/t0d9oemM0igH56hmPaArYCFlZJz+Ud+8P6fwKiDKp0QtAK26BNKVVGcu
-	dRYyJnASSAjHeeMUEf//ljbWIyzd2T2b0KkjB/Ddyt465fPiiDbYXBki1B+427bildVE
-	t+6/S5bFa+fXdhL/iwTK6W+9LQEg2ZEpO03brVrJkrP0Ddh6u9dNccF9DDY8vr420qtU
-	UuNiU6QHV7EUEl35Ap/KusMl+3mPaTN7IgNv3gJL19C7JCBp4r1U44cJHiLaZ/nUoF+1
-	wN7/KTIRc2qOxl7E8AANRQeV80cfPjjaJDI93eIrZ+yk35RF4Tx0eVjmlm7fVBvaKz/y
-	mRVA==
-X-Gm-Message-State: APjAAAUR/2YRf3GSVCmdhrqIHPPoT12yoG4UlBqaq+m1yd0+jzYwymK+
-	3qg3INav9d3Xlu5ctHuqPc/+h28h
-X-Google-Smtp-Source: APXvYqxreqz+an6Kx9RFFTcFX7fstY7tv7/vXXRpmbdC7sPmpD4h+3OJ0JytPEqcjcrTsIPO2rfGpw==
-X-Received: by 2002:adf:dd89:: with SMTP id x9mr11311355wrl.8.1557003781938;
-	Sat, 04 May 2019 14:03:01 -0700 (PDT)
-Received: from localhost ([46.114.6.7])
-	by smtp.gmail.com with ESMTPSA id d6sm4174060wrp.9.2019.05.04.14.03.00
+	:references:mime-version:content-transfer-encoding;
+	bh=O8KrwKkFlyf9Fo/o8AuY7bvoRhwFJvmFsOOmHrvIPIM=;
+	b=QAlsDDwDorlKU93wPCSTmCrzUhdj/+MLggo4W7KRCIsjT0w/blmEDMykuAyf3OJsVx
+	qAWdRTwuZ+ebKmMkHV39ZIcehJ+JcRMWvpNG0HPUZeaT6lKbrt/4B8WmpSIPZNzaIapf
+	WIEWLew0q+q4ivVEiMokm+lNroQlXq85yswxiEVfjmuxDcMf7zwbJ7JKd5Ny3fIMe7qH
+	F3zIXo75EpXKrnoWtCdnvpdGCXBVpBrr2wmKqtMuf4LnMeclQOtGZfGeRqno+QZmYEE8
+	6lTRrLG/ALkDQAdD1OlNB8Hl4KjTbeNY46Et71E84eoHbyjgWRA1bzhXEFahRqPjW6Yi
+	6ASA==
+X-Gm-Message-State: APjAAAXHixDlR3d2p8c9q9fT9IPLUEL+6lXJFo3cmBM0vombCm3SAdeu
+	BeoTWgKI/eq+1Dgzfy3XSH5gsQsg
+X-Google-Smtp-Source: APXvYqxpRvxTubySKUudZe21nP3YO7Mi9Rx5p4M1JIQdyJ3gId6EP29lbcuboicllpbDJTMizxpeXQ==
+X-Received: by 2002:adf:fb11:: with SMTP id c17mr11992209wrr.237.1557003783958;
+	Sat, 04 May 2019 14:03:03 -0700 (PDT)
+Received: from localhost ([46.114.6.7]) by smtp.gmail.com with ESMTPSA id
+	w10sm5436589wrv.90.2019.05.04.14.03.02
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sat, 04 May 2019 14:03:01 -0700 (PDT)
+	Sat, 04 May 2019 14:03:02 -0700 (PDT)
 From: Artyom Tarasenko <atar4qemu@gmail.com>
 To: qemu-devel@nongnu.org,
 	hpoussin@reactos.org
-Date: Sat,  4 May 2019 23:02:32 +0200
-Message-Id: <1557003754-26473-2-git-send-email-atar4qemu@gmail.com>
+Date: Sat,  4 May 2019 23:02:33 +0200
+Message-Id: <1557003754-26473-3-git-send-email-atar4qemu@gmail.com>
 X-Mailer: git-send-email 2.7.2
 In-Reply-To: <1557003754-26473-1-git-send-email-atar4qemu@gmail.com>
 References: <1557003754-26473-1-git-send-email-atar4qemu@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PATCH v2 1/3] lsi53c895a: hide 53c895a registers in
- 53c810
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH 2/3] 40p and prep: implement PCI bus mastering
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,61 +93,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+Cc: "open list:PReP" <qemu-ppc@nongnu.org>,
 	Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190504210232.MkYX718dvRMUrCXERU5GnpLhzlgyOt0e9gSNGU4e4rs@z>
-
-AIX/PReP does access to the aliased IO registers of 53810.
-Implement aliasing to make the AIX driver work.
+Message-ID: <20190504210233.GTeNWGoI58MtUa7zAV2b8Ur9yYxAL8BzG_5pFXbjidc@z>
 
 Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
- hw/scsi/lsi53c895a.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ hw/pci-host/prep.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index da7239d..6b95699 100644
---- a/hw/scsi/lsi53c895a.c
-+++ b/hw/scsi/lsi53c895a.c
-@@ -2271,6 +2271,9 @@ static void lsi_scsi_realize(PCIDevice *dev, Error **errp)
-     LSIState *s = LSI53C895A(dev);
-     DeviceState *d = DEVICE(dev);
-     uint8_t *pci_conf;
-+    uint64_t mmio_size;
-+    MemoryRegion *mr;
-+    uint16_t type = PCI_DEVICE_GET_CLASS(dev)->device_id;
+diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
+index 8b9e1fd..94b7465 100644
+--- a/hw/pci-host/prep.c
++++ b/hw/pci-host/prep.c
+@@ -62,6 +62,7 @@ typedef struct PRePPCIState {
+     AddressSpace pci_io_as;
+     MemoryRegion pci_io;
+     MemoryRegion pci_io_non_contiguous;
++    MemoryRegion pci_io_system;
+     MemoryRegion pci_memory;
+     MemoryRegion pci_intack;
+     MemoryRegion bm;
+@@ -146,7 +147,7 @@ static uint64_t raven_io_read(void *opaque, hwaddr addr,
+     uint8_t buf[4];
  
-     pci_conf = dev->config;
+     addr = raven_io_address(s, addr);
+-    address_space_read(&s->pci_io_as, addr + 0x80000000,
++    address_space_read(&s->pci_io_as, addr,
+                        MEMTXATTRS_UNSPECIFIED, buf, size);
  
-@@ -2279,13 +2282,21 @@ static void lsi_scsi_realize(PCIDevice *dev, Error **errp)
-     /* Interrupt pin A */
-     pci_conf[PCI_INTERRUPT_PIN] = 0x01;
+     if (size == 1) {
+@@ -178,7 +179,7 @@ static void raven_io_write(void *opaque, hwaddr addr,
+         g_assert_not_reached();
+     }
  
--    memory_region_init_io(&s->mmio_io, OBJECT(s), &lsi_mmio_ops, s,
--                          "lsi-mmio", 0x400);
-     memory_region_init_io(&s->ram_io, OBJECT(s), &lsi_ram_ops, s,
-                           "lsi-ram", 0x2000);
-     memory_region_init_io(&s->io_io, OBJECT(s), &lsi_io_ops, s,
-                           "lsi-io", 256);
--
-+    if (type == PCI_DEVICE_ID_LSI_53C895A) {
-+        mmio_size = 0x400;
-+    } else {
-+        mr = g_new(MemoryRegion, 1);
-+        memory_region_init_alias(mr, OBJECT(d), "lsi-io-alias", &s->io_io,
-+                                 0, 0x80);
-+        memory_region_add_subregion_overlap(&s->io_io, 0x80, mr, -1);
-+        mmio_size = 0x80;
-+    }
-+    memory_region_init_io(&s->mmio_io, OBJECT(s), &lsi_mmio_ops, s,
-+                          "lsi-mmio", mmio_size);
-     address_space_init(&s->pci_io_as, pci_address_space_io(dev), "lsi-pci-io");
-     qdev_init_gpio_out(d, &s->ext_irq, 1);
+-    address_space_write(&s->pci_io_as, addr + 0x80000000,
++    address_space_write(&s->pci_io_as, addr,
+                         MEMTXATTRS_UNSPECIFIED, buf, size);
+ }
  
+@@ -276,14 +277,21 @@ static void raven_pcihost_initfn(Object *obj)
+     MemoryRegion *address_space_mem = get_system_memory();
+     DeviceState *pci_dev;
+ 
+-    memory_region_init(&s->pci_io, obj, "pci-io", 0x3f800000);
++    memory_region_init(&s->pci_io, obj, "pci-io", UINT32_MAX);
+     memory_region_init_io(&s->pci_io_non_contiguous, obj, &raven_io_ops, s,
+                           "pci-io-non-contiguous", 0x00800000);
+     memory_region_init(&s->pci_memory, obj, "pci-memory", 0x3f000000);
+     address_space_init(&s->pci_io_as, &s->pci_io, "raven-io");
+ 
+     /* CPU address space */
+-    memory_region_add_subregion(address_space_mem, 0x80000000, &s->pci_io);
++    memory_region_add_subregion_overlap(address_space_mem, 0x0,
++                                        &s->pci_io, -1);
++
++    memory_region_init_alias(&s->pci_io_system,  obj, "pci-io-system",
++                             &s->pci_io, 0x0000000, 0x3f800000);
++
++    memory_region_add_subregion(address_space_mem, 0x80000000,
++                                &s->pci_io_system);
+     memory_region_add_subregion_overlap(address_space_mem, 0x80000000,
+                                         &s->pci_io_non_contiguous, 1);
+     memory_region_add_subregion(address_space_mem, 0xc0000000, &s->pci_memory);
 -- 
 2.7.2
 
