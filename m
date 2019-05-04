@@ -5,73 +5,74 @@ X-Spam-Level:
 X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1B54C43219
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 21:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8C98C43219
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 21:06:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 683A320652
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 21:04:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 66CA820652
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 21:06:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bKYCBToE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 683A320652
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L7w8RtS5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66CA820652
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:32849 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:32898 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hN1px-0004qF-N9
-	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 17:04:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42367)
+	id 1hN1ro-0006Sg-Np
+	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 17:06:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hN1oI-0003sM-9x
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 17:03:07 -0400
+	(envelope-from <atar4qemu@gmail.com>) id 1hN1oJ-0003tZ-Oj
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 17:03:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hN1oH-0004ce-Bp
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 17:03:06 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33931)
+	(envelope-from <atar4qemu@gmail.com>) id 1hN1oI-0004dw-PH
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 17:03:07 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33086)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>)
-	id 1hN1oH-0004c0-5V; Sat, 04 May 2019 17:03:05 -0400
-Received: by mail-wr1-x443.google.com with SMTP id f7so1836911wrq.1;
-	Sat, 04 May 2019 14:03:05 -0700 (PDT)
+	id 1hN1oI-0004d8-JW; Sat, 04 May 2019 17:03:06 -0400
+Received: by mail-wr1-x443.google.com with SMTP id e28so12211776wra.0;
+	Sat, 04 May 2019 14:03:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=O8KrwKkFlyf9Fo/o8AuY7bvoRhwFJvmFsOOmHrvIPIM=;
-	b=bKYCBToEgd/UUd8dMqndb/J6K1pj+kX65YEdWJeX0fdIUzDO/SjvvrGFi8KteUudhq
-	wtqlu8ULd2AJIZ+NkgcP+mXGG7V3WpZX4AcoFasp66LMwBT/qSSNHU+djJXzxGRHPIgk
-	0ApyzxD78NsR7vniFZx3e3MiDbVSfjLINnBaXI99vPhf90HSH9clEObuxsdfjySnBWlJ
-	WI+LMrkGU0spMOpHIVKrQ+UvRY5tw9kmZAcQVxAt5JZ1+7n6zOGHdS7o98HJfStA/tYp
-	SoIYcXM5E+3tLWnZE61E/tgr0jOZcEnTNVRzUBVm7q5EIorXhAIugJtakAp0BolwYf8N
-	zpWw==
+	bh=Yjawb15ilcgBDz3rr0CkGUbs4QxWlVrQBeuf1ek1VNA=;
+	b=L7w8RtS5d1HSXcKSoAYq2jtc1aPMkU3zl4j5gPuP84F4YQBfgO3PBYqHivfmG9Cj0N
+	VthgyJjKr5VXUchlNw12yBWUFfHaaQvxunweu68eITskG5pzo7K/ygVe24crBXQgMsQr
+	KDPnmYlBMchIoZEHvzyvToh/JjNYznhpqAbrCBk/0V2Cr7Ek/cbha3uwwrQ31+SlR+Th
+	+6Yf1CJCDA17Z/FDjjxr/OnDJEmevcYnSj/rX9bzQf4rML2vIkUNDQMhCOlhUu29e0sO
+	FOuxsnEmH3iFfLeTMhLCD7bzoLnEWlTHINPyVlYxSVX7Tb/ayeVCC+gCfVRJ9qdFfQNT
+	r0Kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=O8KrwKkFlyf9Fo/o8AuY7bvoRhwFJvmFsOOmHrvIPIM=;
-	b=QAlsDDwDorlKU93wPCSTmCrzUhdj/+MLggo4W7KRCIsjT0w/blmEDMykuAyf3OJsVx
-	qAWdRTwuZ+ebKmMkHV39ZIcehJ+JcRMWvpNG0HPUZeaT6lKbrt/4B8WmpSIPZNzaIapf
-	WIEWLew0q+q4ivVEiMokm+lNroQlXq85yswxiEVfjmuxDcMf7zwbJ7JKd5Ny3fIMe7qH
-	F3zIXo75EpXKrnoWtCdnvpdGCXBVpBrr2wmKqtMuf4LnMeclQOtGZfGeRqno+QZmYEE8
-	6lTRrLG/ALkDQAdD1OlNB8Hl4KjTbeNY46Et71E84eoHbyjgWRA1bzhXEFahRqPjW6Yi
-	6ASA==
-X-Gm-Message-State: APjAAAXHixDlR3d2p8c9q9fT9IPLUEL+6lXJFo3cmBM0vombCm3SAdeu
-	BeoTWgKI/eq+1Dgzfy3XSH5gsQsg
-X-Google-Smtp-Source: APXvYqxpRvxTubySKUudZe21nP3YO7Mi9Rx5p4M1JIQdyJ3gId6EP29lbcuboicllpbDJTMizxpeXQ==
-X-Received: by 2002:adf:fb11:: with SMTP id c17mr11992209wrr.237.1557003783958;
-	Sat, 04 May 2019 14:03:03 -0700 (PDT)
+	bh=Yjawb15ilcgBDz3rr0CkGUbs4QxWlVrQBeuf1ek1VNA=;
+	b=qjJCn+BUONJqmX5YipHQR06k+/3Y/kydsFQpaLxsbPCsrYLpl9aKoBxIVneN8EI4RJ
+	LwLXTKa9jOjiNEmwvVxW2ohFFTdIJ34fwxvMYo0/fBU0RmoLPYq337GKYLUuuJqWvcOo
+	WtoApGhQIW8SGm6BsH4m+nDyEX0dF8hHjBnp9V60RSsm/9NyWzWjjx52/Pm5SAxcOeOh
+	y454yvb8CQ/63lug3uWikA/oOumZh0r9J0bZ8lY2Vdk62CsD7XmcKVmbe0gO7V2WJw3k
+	N02yvbuMK6h+VKArTKN9ZI0VUSpkmC//UhF4wBVmQN+ZkhE+SIQd2KEZHkKRo8+6LsHv
+	Glwg==
+X-Gm-Message-State: APjAAAXxoaXe8jAaDMqsCHFyFnLVbxOwJZsqXS2hEN0FdlyAOO1ygTeO
+	SFlSHCbXFZ1PS0qT7X3ug7XQOrdC
+X-Google-Smtp-Source: APXvYqzyaD2WuOegJroeaVNSqkzOSiGv5b6YX4R2hRTuTgjLYIrrrHEYUMJ25cKW0iNm5hhaFxGtsQ==
+X-Received: by 2002:adf:f051:: with SMTP id t17mr11507304wro.73.1557003785613; 
+	Sat, 04 May 2019 14:03:05 -0700 (PDT)
 Received: from localhost ([46.114.6.7]) by smtp.gmail.com with ESMTPSA id
-	w10sm5436589wrv.90.2019.05.04.14.03.02
+	t24sm14856936wra.58.2019.05.04.14.03.04
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sat, 04 May 2019 14:03:02 -0700 (PDT)
+	Sat, 04 May 2019 14:03:04 -0700 (PDT)
 From: Artyom Tarasenko <atar4qemu@gmail.com>
 To: qemu-devel@nongnu.org,
 	hpoussin@reactos.org
-Date: Sat,  4 May 2019 23:02:33 +0200
-Message-Id: <1557003754-26473-3-git-send-email-atar4qemu@gmail.com>
+Date: Sat,  4 May 2019 23:02:34 +0200
+Message-Id: <1557003754-26473-4-git-send-email-atar4qemu@gmail.com>
 X-Mailer: git-send-email 2.7.2
 In-Reply-To: <1557003754-26473-1-git-send-email-atar4qemu@gmail.com>
 References: <1557003754-26473-1-git-send-email-atar4qemu@gmail.com>
@@ -81,7 +82,7 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PATCH 2/3] 40p and prep: implement PCI bus mastering
+Subject: [Qemu-devel] [PATCH v2 3/3] hw/isa/i82378.c: use 1900 as a base year
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,68 +99,31 @@ Cc: "open list:PReP" <qemu-ppc@nongnu.org>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190504210233.GTeNWGoI58MtUa7zAV2b8Ur9yYxAL8BzG_5pFXbjidc@z>
+Message-ID: <20190504210234.9SfLxcxmPXZN-_R54r0sdD3o9ceQWwM6SQscuf8mRe0@z>
+
+AIX 5.1 expects the base year to be 1900. Adjust accordingly.
 
 Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
 Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
- hw/pci-host/prep.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ hw/isa/i82378.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
-index 8b9e1fd..94b7465 100644
---- a/hw/pci-host/prep.c
-+++ b/hw/pci-host/prep.c
-@@ -62,6 +62,7 @@ typedef struct PRePPCIState {
-     AddressSpace pci_io_as;
-     MemoryRegion pci_io;
-     MemoryRegion pci_io_non_contiguous;
-+    MemoryRegion pci_io_system;
-     MemoryRegion pci_memory;
-     MemoryRegion pci_intack;
-     MemoryRegion bm;
-@@ -146,7 +147,7 @@ static uint64_t raven_io_read(void *opaque, hwaddr addr,
-     uint8_t buf[4];
+diff --git a/hw/isa/i82378.c b/hw/isa/i82378.c
+index a5d67bc..546c928 100644
+--- a/hw/isa/i82378.c
++++ b/hw/isa/i82378.c
+@@ -107,7 +107,9 @@ static void i82378_realize(PCIDevice *pci, Error **errp)
+     isa = isa_create_simple(isabus, "i82374");
  
-     addr = raven_io_address(s, addr);
--    address_space_read(&s->pci_io_as, addr + 0x80000000,
-+    address_space_read(&s->pci_io_as, addr,
-                        MEMTXATTRS_UNSPECIFIED, buf, size);
- 
-     if (size == 1) {
-@@ -178,7 +179,7 @@ static void raven_io_write(void *opaque, hwaddr addr,
-         g_assert_not_reached();
-     }
- 
--    address_space_write(&s->pci_io_as, addr + 0x80000000,
-+    address_space_write(&s->pci_io_as, addr,
-                         MEMTXATTRS_UNSPECIFIED, buf, size);
+     /* timer */
+-    isa_create_simple(isabus, TYPE_MC146818_RTC);
++    isa = isa_create(isabus, TYPE_MC146818_RTC);
++    qdev_prop_set_int32(DEVICE(isa), "base_year", 1900);
++    qdev_init_nofail(DEVICE(isa));
  }
  
-@@ -276,14 +277,21 @@ static void raven_pcihost_initfn(Object *obj)
-     MemoryRegion *address_space_mem = get_system_memory();
-     DeviceState *pci_dev;
- 
--    memory_region_init(&s->pci_io, obj, "pci-io", 0x3f800000);
-+    memory_region_init(&s->pci_io, obj, "pci-io", UINT32_MAX);
-     memory_region_init_io(&s->pci_io_non_contiguous, obj, &raven_io_ops, s,
-                           "pci-io-non-contiguous", 0x00800000);
-     memory_region_init(&s->pci_memory, obj, "pci-memory", 0x3f000000);
-     address_space_init(&s->pci_io_as, &s->pci_io, "raven-io");
- 
-     /* CPU address space */
--    memory_region_add_subregion(address_space_mem, 0x80000000, &s->pci_io);
-+    memory_region_add_subregion_overlap(address_space_mem, 0x0,
-+                                        &s->pci_io, -1);
-+
-+    memory_region_init_alias(&s->pci_io_system,  obj, "pci-io-system",
-+                             &s->pci_io, 0x0000000, 0x3f800000);
-+
-+    memory_region_add_subregion(address_space_mem, 0x80000000,
-+                                &s->pci_io_system);
-     memory_region_add_subregion_overlap(address_space_mem, 0x80000000,
-                                         &s->pci_io_non_contiguous, 1);
-     memory_region_add_subregion(address_space_mem, 0xc0000000, &s->pci_memory);
+ static void i82378_init(Object *obj)
 -- 
 2.7.2
 
