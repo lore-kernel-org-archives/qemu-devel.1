@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44495)
+Received: from eggs.gnu.org ([209.51.188.92]:47314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hMnm0-0007rM-NJ
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 02:03:49 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hMnxY-0002T8-Df
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 02:15:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hMnlz-0001vQ-M0
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 02:03:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57810)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hMnlz-0001vE-Fj
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 02:03:47 -0400
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Sat,  4 May 2019 08:03:36 +0200
-Message-Id: <20190504060336.21060-1-philmd@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hMnxX-0001WM-KF
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 02:15:44 -0400
+Received: from mail-pl1-x636.google.com ([2607:f8b0:4864:20::636]:38565)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hMnxX-0001Ta-Db
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 02:15:43 -0400
+Received: by mail-pl1-x636.google.com with SMTP id a59so3745093pla.5
+	for <qemu-devel@nongnu.org>; Fri, 03 May 2019 23:15:43 -0700 (PDT)
+References: <20190501184306.15208-1-richard.henderson@linaro.org>
+	<877eb74gc3.fsf@zen.linaroharston>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <6206383e-d092-28cf-1549-ab01a306bb05@linaro.org>
+Date: Fri, 3 May 2019 23:15:39 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] tests/docker: Update the Fedora image to
- Fedora 30
+In-Reply-To: <877eb74gc3.fsf@zen.linaroharston>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] tests/tcg/alpha: add system boot.S
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +31,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Thomas Huth <thuth@redhat.com>, Fam Zheng <fam@euphon.net>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-Fedora 30 got released:
+On 5/3/19 10:07 AM, Alex Bennée wrote:
+> +	ldah	$sp, $stack_end($gp)	!gprelhigh
+> +	lda	$sp, $stack_end($gp)	!gprellow
 
-  https://fedoramagazine.org/announcing-fedora-30/
+Bah.                           ^^^^ $sp
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-Based-on: <20190408201203.28924-1-marcandre.lureau@redhat.com>
-          qxl: fix -Waddress-of-packed-member
+As is, this works only because the test case is tiny, and this happens to
+evaluate to the middle of the stack allocation.
 
-Based-on: <20190503112654.4393-1-laurent@vivier.eu>
-          Pull request trivial branch 2019-05-03
----
- tests/docker/dockerfiles/fedora.docker | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/docker=
-files/fedora.docker
-index 69d4a7f5d75..1496b68ba15 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -1,4 +1,4 @@
--FROM fedora:29
-+FROM fedora:30
- ENV PACKAGES \
-     bc \
-     bison \
---=20
-2.20.1
+r~
