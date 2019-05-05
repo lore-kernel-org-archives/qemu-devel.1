@@ -1,35 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40213)
+Received: from eggs.gnu.org ([209.51.188.92]:41037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hNIcL-00059D-PE
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 10:59:54 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hNIfT-0007OS-AS
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:03:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hNIcK-0006YV-EG
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 10:59:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40040)
+	(envelope-from <richard.henderson@linaro.org>) id 1hNIfS-0000ZJ-Dz
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:03:07 -0400
+Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:42437)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hNIcK-0006YF-8Y
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 10:59:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hNIcI-0004uL-F9
-	for <qemu-devel@nongnu.org>; Sun, 05 May 2019 14:59:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6662E2E80CC
-	for <qemu-devel@nongnu.org>; Sun,  5 May 2019 14:59:50 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hNIfS-0000YX-55
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:03:06 -0400
+Received: by mail-pf1-x431.google.com with SMTP id 13so5051306pfw.9
+	for <qemu-devel@nongnu.org>; Sun, 05 May 2019 08:03:05 -0700 (PDT)
+References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
+	<20190428143845.11810-6-mark.cave-ayland@ilande.co.uk>
+	<784adbd2-0447-9d01-cff8-e7234f9d9679@linaro.org>
+	<ca2255e7-79cd-2ef1-5ddf-89edac2ba959@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <08ada731-8295-1295-a196-2f456f6de40f@linaro.org>
+Date: Sun, 5 May 2019 08:03:02 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 05 May 2019 14:46:48 -0000
-From: Thomas Huth <1583421@bugs.launchpad.net>
-Reply-To: Bug 1583421 <1583421@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160519041741.20886.94270.malonedeb@wampee.canonical.com>
-Message-Id: <155706760903.32129.2569064921897456589.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1583421] Re: Please provide an option to print
- the default hardware configuration as command-line options,
- to make -nodefaults easier to use
+In-Reply-To: <ca2255e7-79cd-2ef1-5ddf-89edac2ba959@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 05/14] target/ppc: introduce
+ GEN_VSX_HELPER_X2 macro to fpu_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,38 +34,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, gkurz@kaod.org
 
-** Changed in: qemu
-   Importance: Undecided =3D> Wishlist
+On 5/5/19 2:57 AM, Mark Cave-Ayland wrote:
+> For reference the culprits here is helper_xscvqpdp(). But again if you agree that it
+> makes sense to create separate gen/helper functions then I can remove the opcode
+> later on in the series.
 
--- =
+Yes.  Or indeed in a completely separate series.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1583421
 
-Title:
-  Please provide an option to print the default hardware configuration
-  as command-line options, to make -nodefaults easier to use
-
-Status in QEMU:
-  New
-
-Bug description:
-  For full customization of the default set of hardware qemu supports, a
-  user can pass -nodefaults and then manually specify each device they
-  want.  Many specific options document what they translate to in terms
-  of the full configuration model; however, the defaults for any given
-  platform don't.
-
-  I'd love to have documentation of the default hardware configuration,
-  in terms of qemu command-line options, to make it easy to run qemu
-  -nodefaults, paste in the default command-line, and edit it.
-
-  As this varies by emulated machine, perhaps qemu could have a command-
-  line option to print a specific machine (e.g. pc-i440fx-2.5) in the
-  form of qemu command-line options?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1583421/+subscriptions
+r~
