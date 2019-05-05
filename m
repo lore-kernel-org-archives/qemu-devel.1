@@ -3,48 +3,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E815C004C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 10:08:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02AFDC004C9
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 10:22:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54FFE208C0
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 10:08:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54FFE208C0
+	by mail.kernel.org (Postfix) with ESMTPS id C4317208C0
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 10:22:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4317208C0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38976 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39114 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNE4g-0000AC-La
-	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 06:08:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45532)
+	id 1hNEHX-0002nF-WE
+	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 06:22:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNE3o-0008Bw-Np
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:07:57 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNEGe-0002Rl-Sc
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:21:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNE3n-00032x-T7
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:07:56 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:37174
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNEGd-000516-Ae
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:21:12 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:37198
 	helo=mail.default.ilande.uk0.bigv.io)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hNE3l-00031T-Rp; Sun, 05 May 2019 06:07:53 -0400
+	id 1hNEGV-0004wz-Qo; Sun, 05 May 2019 06:21:04 -0400
 Received: from host109-149-60-255.range109-149.btcentralplus.com
 	([109.149.60.255] helo=[192.168.1.65])
 	by mail.default.ilande.uk0.bigv.io with esmtpsa
 	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
 	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hNE36-0002Zf-IY; Sun, 05 May 2019 11:07:14 +0100
+	id 1hNEFj-0002cT-Bq; Sun, 05 May 2019 11:20:15 +0100
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
 	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net,
 	gkurz@kaod.org
 References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
-	<20190428143845.11810-9-mark.cave-ayland@ilande.co.uk>
-	<4c8b7939-cd48-fd3f-8f3d-3f6fd18b6be2@linaro.org>
+	<20190428143845.11810-15-mark.cave-ayland@ilande.co.uk>
+	<3c05b552-a692-e439-fc28-90ad69767cf2@linaro.org>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
@@ -71,23 +70,23 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
 	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
 	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
 	imgcU9TTGC5qd9g=
-Message-ID: <443b8459-8ad8-275f-225f-84c78d5fd7cc@ilande.co.uk>
-Date: Sun, 5 May 2019 11:07:46 +0100
+Message-ID: <e8968236-5ab2-568f-fd32-e9208c0f2ebe@ilande.co.uk>
+Date: Sun, 5 May 2019 11:20:49 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <4c8b7939-cd48-fd3f-8f3d-3f6fd18b6be2@linaro.org>
+In-Reply-To: <3c05b552-a692-e439-fc28-90ad69767cf2@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 109.149.60.255
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH 08/14] target/ppc: introduce
- GEN_VSX_HELPER_R3 macro to fpu_helper.c
+Subject: Re: [Qemu-devel] [PATCH 14/14] target/ppc: improve VSX_FMADD with
+ new GEN_VSX_HELPER_VSX_MADD macro
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -102,32 +101,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505100746.pq7ZGmmJeojnmYHTcR8Cq7kRFzsWIscfhSjdtPk60FU@z>
+Message-ID: <20190505102049.KOPDMqt6ltOhfCC2ZToC_za4OZDSMh1j_ZstwhpF-FM@z>
 
-On 30/04/2019 17:47, Richard Henderson wrote:
+On 30/04/2019 18:00, Richard Henderson wrote:
 
 > On 4/28/19 7:38 AM, Mark Cave-Ayland wrote:
->> +#define GEN_VSX_HELPER_R3(name, op1, op2, inval, type)                        \
->> +static void gen_##name(DisasContext *ctx)                                     \
->> +{                                                                             \
->> +    TCGv_i32 opc;                                                             \
->> +    TCGv_ptr xt, xa, xb;                                                      \
->> +    if (unlikely(!ctx->vsx_enabled)) {                                        \
->> +        gen_exception(ctx, POWERPC_EXCP_VSXU);                                \
->> +        return;                                                               \
->> +    }                                                                         \
->> +    opc = tcg_const_i32(ctx->opcode);                                         \
->> +    xt = gen_vsr_ptr(rD(ctx->opcode) + 32);                                   \
->> +    xa = gen_vsr_ptr(rA(ctx->opcode) + 32);                                   \
->> +    xb = gen_vsr_ptr(rB(ctx->opcode) + 32);                                   \
->> +    gen_helper_##name(cpu_env, opc, xt, xa, xb);                              \
+>>  #define VSX_MADD(op, nels, tp, fld, maddflgs, afrm, sfprf, r2sp)              \
+>>  void helper_##op(CPUPPCState *env, uint32_t opcode,                           \
+>> -                 ppc_vsr_t *xt, ppc_vsr_t *xa, ppc_vsr_t *xb)                 \
+>> +                 ppc_vsr_t *xt, ppc_vsr_t *xa,                                \
+>> +                 ppc_vsr_t *b, ppc_vsr_t *c)                                  \
+>>  {                                                                             \
+>> -    ppc_vsr_t *b, *c;                                                         \
+>>      int i;                                                                    \
+>>                                                                                \
+>> -    if (afrm) { /* AxB + T */                                                 \
+>> -        b = xb;                                                               \
+>> -        c = xt;                                                               \
+>> -    } else { /* AxT + B */                                                    \
+>> -        b = xt;                                                               \
+>> -        c = xb;                                                               \
+>> -    }                                                                         \
 > 
-> Is opc still used here?  Otherwise,
+> The afrm argument is no longer used.
+> This also means that e.g.
 > 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> VSX_MADD(xsmaddadp, 1, float64, VsrD(0), MADD_FLGS, 1, 1, 0)
+> VSX_MADD(xsmaddmdp, 1, float64, VsrD(0), MADD_FLGS, 0, 1, 0)
+> 
+> are redundant.  Similarly with all of the other pairs.
 
-Yeah, looks like it's used for the rounding mode. I'll have a look and see how this
-compares with the previous case.
+Agreed. What do you think is the best solution here - maybe a double macro that looks
+something like this?
+
+#define VSX_MADD(op, prec, nels, tp, fld, maddflgs, sfprf, r2sp)
+_VSX_MADD(op##aprec, nels, tp, fld, maddflgs, sfprf, r2sp)
+_VSX_MADD(op##mprec, nels, tp, fld, maddflgs, sfprf, r2sp)
+
+VSX_MADD(xsmadd, dp, 1, float64, VsrD(0), MADD_FLGS, 1, 0)
 
 
 ATB,
