@@ -3,108 +3,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00108C004C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 16:05:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EEFCC004C9
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 16:08:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B836920578
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 16:05:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B836920578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0BED42082F
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 16:08:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BED42082F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43145 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43224 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNJe6-0002Lp-MN
-	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 12:05:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52110)
+	id 1hNJgs-00045Z-W8
+	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 12:08:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNJZn-0007pz-5T
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 12:01:20 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hNJfK-0003Jk-Cw
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 12:07:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNJZl-0002BM-7W
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 12:01:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46964)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hNJZf-000287-IO; Sun, 05 May 2019 12:01:11 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9CBCB3087928;
-	Sun,  5 May 2019 16:01:10 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-27.ams2.redhat.com [10.36.116.27])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 282E7100194A;
-	Sun,  5 May 2019 16:01:08 +0000 (UTC)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20190503143904.31211-1-alex.bennee@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <408aeb3a-efd9-68a7-c5f0-08993084ec09@redhat.com>
-Date: Sun, 5 May 2019 18:01:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190503143904.31211-1-alex.bennee@linaro.org>
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hNJfI-0006MG-Gq
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 12:07:02 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:52082)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hNJfI-0006LV-8c
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 12:07:00 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.vps.ablenet.jp
+	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+	by mail02.asahi-net.or.jp (Postfix) with ESMTPA id EB0C73B913;
+	Mon,  6 May 2019 01:06:58 +0900 (JST)
+Received: from yo-satoh-debian.ysato.ml (ZM005235.ppp.dion.ne.jp [222.8.5.235])
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id AA5A7240085; 
+	Mon,  6 May 2019 01:06:58 +0900 (JST)
+Date: Mon, 06 May 2019 01:06:58 +0900
+Message-ID: <87sgts51i5.wl-ysato@users.sourceforge.jp>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+In-Reply-To: <87pnoz4l9s.fsf@zen.linaroharston>
+References: <20190502143409.59600-1-ysato@users.sourceforge.jp>	<20190502143409.59600-8-ysato@users.sourceforge.jp>	<87pnoz4l9s.fsf@zen.linaroharston>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+	FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/25.1
+	(x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Sun, 05 May 2019 16:01:10 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH] tests/qemu-iotests: re-format output
- to for make check-block
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 202.224.55.14
+Subject: Re: [Qemu-devel] [PATCH RFC v8 07/12] hw/timer: RX62N internal
+ timer modules
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -116,209 +67,389 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
-	"open list:Block layer core" <qemu-block@nongnu.org>,
-	Max Reitz <mreitz@redhat.com>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505160108.YcGQyCcIjIXaDyRDnSzEdVakOvpe4bhhBt0v34NFqh4@z>
+Message-ID: <20190505160658.H4o6VpcP6mSrCKxSZ9TkIYbjsZvAWaOLvZiSH08qLn0@z>
 
-On 03/05/2019 16.39, Alex Benn=C3=A9e wrote:
-> This attempts to clean-up the output to better match the output of the
-> rest of the QEMU check system. This includes:
+On Sat, 04 May 2019 00:20:47 +0900,
+Alex Benn=E9e wrote:
 >=20
->   - formatting as "  TEST    iotest: nnn"
->   - calculating time diff at the end
->   - only dumping config on failure
 >=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  tests/qemu-iotests/check | 71 +++++++++++++++++++---------------------
->  1 file changed, 34 insertions(+), 37 deletions(-)
+> Yoshinori Sato <ysato@users.sourceforge.jp> writes:
 >=20
-> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-> index 922c5d1d3d..2ffc14113e 100755
-> --- a/tests/qemu-iotests/check
-> +++ b/tests/qemu-iotests/check
-> @@ -633,12 +633,6 @@ _wallclock()
->      date "+%H %M %S" | awk '{ print $1*3600 + $2*60 + $3 }'
->  }
-> =20
-> -_timestamp()
-> -{
-> -    now=3D$(date "+%T")
-> -    printf %s " [$now]"
-> -}
-> -
->  _wrapup()
->  {
->      if $showme
-> @@ -709,19 +703,6 @@ trap "_wrapup; exit \$status" 0 1 2 3 15
->  FULL_IMGFMT_DETAILS=3D$(_full_imgfmt_details)
->  FULL_HOST_DETAILS=3D$(_full_platform_details)
-> =20
-> -cat <<EOF
-> -QEMU          -- "$QEMU_PROG" $QEMU_OPTIONS
-> -QEMU_IMG      -- "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS
-> -QEMU_IO       -- "$QEMU_IO_PROG" $QEMU_IO_OPTIONS
-> -QEMU_NBD      -- "$QEMU_NBD_PROG" $QEMU_NBD_OPTIONS
-> -IMGFMT        -- $FULL_IMGFMT_DETAILS
-> -IMGPROTO      -- $IMGPROTO
-> -PLATFORM      -- $FULL_HOST_DETAILS
-> -TEST_DIR      -- $TEST_DIR
-> -SOCKET_SCM_HELPER -- $SOCKET_SCM_HELPER
-> -
-> -EOF
+> > renesas_tmr: 8bit timer modules.
+> > renesas_cmt: 16bit compare match timer modules.
+> > This part use many renesas's CPU.
+> > Hardware manual.
+> > https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh00=
+33ej0140_rx62n.pdf
+> >
+> > Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> > ---
+> >  include/hw/timer/renesas_cmt.h |  33 +++
+> >  include/hw/timer/renesas_tmr.h |  46 +++++
+> >  hw/timer/renesas_cmt.c         | 277 +++++++++++++++++++++++++
+> >  hw/timer/renesas_tmr.c         | 458 +++++++++++++++++++++++++++++++++=
+++++++++
+> >  hw/timer/Kconfig               |   6 +
+> >  hw/timer/Makefile.objs         |   3 +
+> >  6 files changed, 823 insertions(+)
+> >  create mode 100644 include/hw/timer/renesas_cmt.h
+> >  create mode 100644 include/hw/timer/renesas_tmr.h
+> >  create mode 100644 hw/timer/renesas_cmt.c
+> >  create mode 100644 hw/timer/renesas_tmr.c
+> >
+> > diff --git a/include/hw/timer/renesas_cmt.h b/include/hw/timer/renesas_=
+cmt.h
+> > new file mode 100644
+> > index 0000000000..7e393d7ad3
+> > --- /dev/null
+> > +++ b/include/hw/timer/renesas_cmt.h
+> > @@ -0,0 +1,33 @@
+> > +/*
+> > + * Renesas Compare-match timer Object
+> > + *
+> > + * Copyright (c) 2019 Yoshinori Sato
+> > + *
+> > + * This code is licensed under the GPL version 2 or later.
+> > + *
+> > + */
+> > +
+> > +#ifndef HW_RENESAS_CMT_H
+> > +#define HW_RENESAS_CMT_H
+> > +
+> > +#include "hw/sysbus.h"
+> > +
+> > +#define TYPE_RENESAS_CMT "renesas-cmt"
+> > +#define RCMT(obj) OBJECT_CHECK(RCMTState, (obj), TYPE_RENESAS_CMT)
+> > +
+> > +typedef struct RCMTState {
+> > +    SysBusDevice parent_obj;
+> > +
+> > +    uint64_t input_freq;
+> > +    MemoryRegion memory;
+> > +
+> > +    uint16_t cmstr;
+> > +    uint16_t cmcr[2];
+> > +    uint16_t cmcnt[2];
+> > +    uint16_t cmcor[2];
+> > +    int64_t tick[2];
+> > +    qemu_irq cmi[2];
+> > +    QEMUTimer *timer[2];
+> > +} RCMTState;
+> > +
+> > +#endif
+> > diff --git a/include/hw/timer/renesas_tmr.h b/include/hw/timer/renesas_=
+tmr.h
+> > new file mode 100644
+> > index 0000000000..718d9dc4ff
+> > --- /dev/null
+> > +++ b/include/hw/timer/renesas_tmr.h
+> > @@ -0,0 +1,46 @@
+> > +/*
+> > + * Renesas 8bit timer Object
+> > + *
+> > + * Copyright (c) 2018 Yoshinori Sato
+> > + *
+> > + * This code is licensed under the GPL version 2 or later.
+> > + *
+> > + */
+> > +
+> > +#ifndef HW_RENESAS_TMR_H
+> > +#define HW_RENESAS_TMR_H
+> > +
+> > +#include "hw/sysbus.h"
+> > +
+> > +#define TYPE_RENESAS_TMR "renesas-tmr"
+> > +#define RTMR(obj) OBJECT_CHECK(RTMRState, (obj), TYPE_RENESAS_TMR)
+> > +
+> > +enum timer_event {cmia =3D 0,
+> > +                  cmib =3D 1,
+> > +                  ovi =3D 2,
+> > +                  none =3D 3,
+> > +                  TMR_NR_EVENTS =3D 4};
+> > +enum {CH =3D 2};
+> > +typedef struct RTMRState {
+> > +    SysBusDevice parent_obj;
+> > +
+> > +    uint64_t input_freq;
+> > +    MemoryRegion memory;
+> > +
+> > +    uint8_t tcnt[CH];
+> > +    uint8_t tcora[CH];
+> > +    uint8_t tcorb[CH];
+> > +    uint8_t tcr[CH];
+> > +    uint8_t tccr[CH];
+> > +    uint8_t tcor[CH];
+> > +    uint8_t tcsr[CH];
+> > +    int64_t tick;
+> > +    int64_t div_round[CH];
+> > +    enum timer_event next[CH];
+> > +    qemu_irq cmia[CH];
+> > +    qemu_irq cmib[CH];
+> > +    qemu_irq ovi[CH];
+> > +    QEMUTimer *timer[CH];
+> > +} RTMRState;
+> > +
+> > +#endif
+> > diff --git a/hw/timer/renesas_cmt.c b/hw/timer/renesas_cmt.c
+> > new file mode 100644
+> > index 0000000000..b82250dbc2
+> > --- /dev/null
+> > +++ b/hw/timer/renesas_cmt.c
+> > @@ -0,0 +1,277 @@
+> > +/*
+> > + * Renesas 16bit Compare-match timer
+> > + *
+> > + * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
+> > + * (Rev.1.40 R01UH0033EJ0140)
+> > + *
+> > + * Copyright (c) 2019 Yoshinori Sato
+> > + *
+> > + * This program is free software; you can redistribute it and/or modif=
+y it
+> > + * under the terms and conditions of the GNU General Public License,
+> > + * version 2 or later, as published by the Free Software Foundation.
+> > + *
+> > + * This program is distributed in the hope it will be useful, but WITH=
+OUT
+> > + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY =
+or
+> > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public Licen=
+se for
+> > + * more details.
+> > + *
+> > + * You should have received a copy of the GNU General Public License a=
+long with
+> > + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "qemu-common.h"
+> > +#include "qemu/log.h"
+> > +#include "qapi/error.h"
+> > +#include "qemu/timer.h"
+> > +#include "cpu.h"
+> > +#include "hw/hw.h"
+> > +#include "hw/sysbus.h"
+> > +#include "hw/registerfields.h"
+> > +#include "hw/timer/renesas_cmt.h"
+> > +#include "qemu/error-report.h"
+> > +
+> > +/*
+> > + *  +0 CMSTR - common control
+> > + *  +2 CMCR  - ch0
+> > + *  +4 CMCNT - ch0
+> > + *  +6 CMCOR - ch0
+> > + *  +8 CMCR  - ch1
+> > + * +10 CMCNT - ch1
+> > + * +12 CMCOR - ch1
+> > + * If we think that the address of CH 0 has an offset of +2,
+> > + * we can treat it with the same address as CH 1, so define it like th=
+at.
+> > + */
+> > +REG16(CMSTR, 0)
+> > +  FIELD(CMSTR, STR0, 0, 1)
+> > +  FIELD(CMSTR, STR1, 1, 1)
+> > +  FIELD(CMSTR, STR,  0, 2)
+> > +/* This addeess is channel offset */
+> > +REG16(CMCR, 0)
+> > +  FIELD(CMCR, CKS, 0, 2)
+> > +  FIELD(CMCR, CMIE, 6, 1)
+> > +REG16(CMCNT, 2)
+> > +REG16(CMCOR, 4)
+> > +
+> > +static void update_events(RCMTState *cmt, int ch)
+> > +{
+> > +    int64_t next_time;
+> > +
+> > +    if ((cmt->cmstr & (1 << ch)) =3D=3D 0) {
+> > +        /* count disable, so not happened next event. */
+> > +        return ;
+> > +    }
+> > +    next_time =3D cmt->cmcor[ch] - cmt->cmcnt[ch];
+> > +    next_time *=3D NANOSECONDS_PER_SECOND;
+> > +    next_time /=3D cmt->input_freq;
+> > +    /*
+> > +     * CKS -> div rate
+> > +     *  0 -> 8 (1 << 3)
+> > +     *  1 -> 32 (1 << 5)
+> > +     *  2 -> 128 (1 << 7)
+> > +     *  3 -> 512 (1 << 9)
+> > +     */
+> > +    next_time *=3D 1 << (3 + FIELD_EX16(cmt->cmcr[ch], CMCR, CKS) * 2);
+> > +    next_time +=3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> > +    timer_mod(cmt->timer[ch], next_time);
+> > +}
+> > +
+> > +static int64_t read_cmcnt(RCMTState *cmt, int ch)
+> > +{
+> > +    int64_t delta, now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> > +
+> > +    if (cmt->cmstr & (1 << ch)) {
+> > +        delta =3D (now - cmt->tick[ch]);
+> > +        delta /=3D NANOSECONDS_PER_SECOND;
+> > +        delta /=3D cmt->input_freq;
+> > +        delta /=3D 1 << (3 + FIELD_EX16(cmt->cmcr[ch], CMCR, CKS) * 2);
+> > +        cmt->tick[ch] =3D now;
+> > +        return cmt->cmcnt[ch] + delta;
+> > +    } else {
+> > +        return cmt->cmcnt[ch];
+> > +    }
+> > +}
+> > +
+> > +static uint64_t cmt_read(void *opaque, hwaddr addr, unsigned size)
+> > +{
+> > +    hwaddr offset =3D addr & 0x0f;
+> > +    RCMTState *cmt =3D opaque;
+> > +    int ch =3D offset / 0x08;
+> > +    uint64_t ret;
+> > +
+> > +    if (offset =3D=3D A_CMSTR) {
+> > +        ret =3D 0;
+> > +        ret =3D FIELD_DP16(ret, CMSTR, STR,
+> > +                         FIELD_EX16(cmt->cmstr, CMSTR, STR));
+> > +        return ret;
+> > +    } else {
+> > +        offset &=3D 0x07;
+> > +        if (ch =3D=3D 0) {
+> > +            offset -=3D 0x02;
+> > +        }
+> > +        switch (offset) {
+> > +        case A_CMCR:
+> > +            ret =3D 0;
+> > +            ret =3D FIELD_DP16(ret, CMCR, CKS,
+> > +                             FIELD_EX16(cmt->cmstr, CMCR, CKS));
+> > +            ret =3D FIELD_DP16(ret, CMCR, CMIE,
+> > +                             FIELD_EX16(cmt->cmstr, CMCR, CMIE));
+> > +            return ret;
+> > +        case A_CMCNT:
+> > +            return read_cmcnt(cmt, ch);
+> > +        case A_CMCOR:
+> > +            return cmt->cmcor[ch];
+> > +        }
+> > +    }
+> > +    qemu_log_mask(LOG_UNIMP,
+> > +                  "renesas_cmt: Register %08lx not implemented\n",
+> > +                  offset);
+> > +    return 0xffffffffffffffffUL;
+> > +}
+> > +
+> > +static void start_stop(RCMTState *cmt, int ch, int st)
+> > +{
+> > +    if (st) {
+> > +        update_events(cmt, ch);
+> > +    } else {
+> > +        timer_del(cmt->timer[ch]);
+> > +    }
+> > +}
+> > +
+> > +static void cmt_write(void *opaque, hwaddr addr, uint64_t val, unsigne=
+d size)
+> > +{
+> > +    hwaddr offset =3D addr & 0x0f;
+> > +    RCMTState *cmt =3D opaque;
+> > +    int ch =3D offset / 0x08;
+> > +
+> > +    if (offset =3D=3D A_CMSTR) {
+> > +        cmt->cmstr =3D FIELD_EX16(val, CMSTR, STR);
+> > +        start_stop(cmt, 0, FIELD_EX16(cmt->cmstr, CMSTR, STR0));
+> > +        start_stop(cmt, 1, FIELD_EX16(cmt->cmstr, CMSTR, STR1));
+> > +    } else {
+> > +        offset &=3D 0x07;
+> > +        if (ch =3D=3D 0) {
+> > +            offset -=3D 0x02;
+> > +        }
+> > +        switch (offset) {
+> > +        case A_CMCR:
+> > +            cmt->cmcr[ch] =3D FIELD_DP16(cmt->cmcr[ch], CMCR, CKS,
+> > +                                       FIELD_EX16(val, CMCR, CKS));
+> > +            cmt->cmcr[ch] =3D FIELD_DP16(cmt->cmcr[ch], CMCR, CMIE,
+> > +                                       FIELD_EX16(val, CMCR, CMIE));
+> > +            break;
+> > +        case 2:
+> > +            cmt->cmcnt[ch] =3D val;
+> > +            break;
+> > +        case 4:
+> > +            cmt->cmcor[ch] =3D val;
+> > +            break;
+> > +        default:
+> > +            qemu_log_mask(LOG_UNIMP,
+> > +                          "renesas_cmt: Register %08lx not implemented=
+\n",
+> > +                          offset);
+> > +            return;
+> > +        }
+> > +        if (FIELD_EX16(cmt->cmstr, CMSTR, STR) & (1 << ch)) {
+> > +            update_events(cmt, ch);
+> > +        }
+> > +    }
+> > +}
+> > +
+> > +static const MemoryRegionOps cmt_ops =3D {
+> > +    .write =3D cmt_write,
+> > +    .read  =3D cmt_read,
+> > +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> > +    .impl =3D {
+> > +        .min_access_size =3D 2,
+> > +        .max_access_size =3D 2,
+> > +    },
+> > +};
+> > +
+> > +static void timer_events(RCMTState *cmt, int ch)
+> > +{
+> > +    cmt->cmcnt[ch] =3D 0;
+> > +    cmt->tick[ch] =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> > +    update_events(cmt, ch);
+> > +    if (FIELD_EX16(cmt->cmcr[ch], CMCR, CMIE)) {
+> > +        qemu_irq_pulse(cmt->cmi[ch]);
+> > +    }
+> > +}
+> > +
+> > +static void timer_event0(void *opaque)
+> > +{
+> > +    RCMTState *cmt =3D opaque;
+> > +
+> > +    timer_events(cmt, 0);
+> > +}
+> > +
+> > +static void timer_event1(void *opaque)
+> > +{
+> > +    RCMTState *cmt =3D opaque;
+> > +
+> > +    timer_events(cmt, 1);
+> > +}
+>=20
+> I guess there is enough shared state RCMTState that you couldn't have an
+> array of channel structures and just pass that when you setup the
+> timers:
+>=20
+> > +static void rcmt_init(Object *obj)
+> > +{
+> <snip>
+> > +    cmt->timer[0] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, timer_event0, c=
+mt);
+> > +    cmt->timer[1] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, timer_event1,
+> > cmt);
+>=20
+> here?
 
-Maybe turn it into a function instead, so that it could also always be
-printed when the script is run with the "-v" parameter?
+Yes.
+The shared part is only access from the CPU,
+so I don't think there will be a conflict in the timer's event.
+If problems occur, fix it to manage with one timer.
 
->  seq=3D"check"
-> =20
->  [ -n "$TESTS_REMAINING_LOG" ] && echo $list > $TESTS_REMAINING_LOG
-> @@ -729,7 +710,9 @@ seq=3D"check"
->  for seq in $list
->  do
->      err=3Dfalse
-> -    printf %s "$seq"
-> +    reason=3D""
-> +    times=3D""
-> +
->      if [ -n "$TESTS_REMAINING_LOG" ] ; then
->          sed -e "s/$seq//" -e 's/  / /' -e 's/^ *//' $TESTS_REMAINING_L=
-OG > $TESTS_REMAINING_LOG.tmp
->          mv $TESTS_REMAINING_LOG.tmp $TESTS_REMAINING_LOG
-> @@ -738,7 +721,7 @@ do
-> =20
->      if $showme
->      then
-> -        echo
-> +        echo "  TEST    iotest: $seq (not actually run)"
+> Anyway:
+>=20
+> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
+>=20
+> --
+> Alex Benn=E9e
+>=20
 
-I wonder whether some other scripts depend on the output of "check -n"
-... in that case, it make sense to only print the numbers, without the
-additional strings here.
-
->          continue
->      elif [ -f expunged ] && $expunge && egrep "^$seq([         ]|\$)" =
-expunged >/dev/null
->      then
-> @@ -753,17 +736,11 @@ do
->          # really going to try and run this one
->          #
->          rm -f $seq.out.bad
-> -        lasttime=3D$(sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE)
-> -        if [ "X$lasttime" !=3D X ]; then
-> -                printf %s " ${lasttime}s ..."
-> -        else
-> -                printf "        "        # prettier output with timest=
-amps.
-> -        fi
->          rm -f core $seq.notrun
->          rm -f $seq.casenotrun
-> =20
->          start=3D$(_wallclock)
-> -        $timestamp && printf %s "        [$(date "+%T")]"
-> +        $timestamp && times=3D"[$(date "+%T")]"
-> =20
->          if [ "$(head -n 1 "$source_iotests/$seq")" =3D=3D "#!/usr/bin/=
-env python" ]; then
->              run_command=3D"$PYTHON $seq"
-> @@ -781,26 +758,26 @@ do
->                      $run_command >$tmp.out 2>&1)
->          fi
->          sts=3D$?
-> -        $timestamp && _timestamp
-> +        $timestamp && times=3D"$times -> [$(date "+%T")]"
->          stop=3D$(_wallclock)
-> =20
->          if [ -f core ]
->          then
-> -            printf " [dumped core]"
->              mv core $seq.core
-> +            reason=3D"dumped core $seq.core"
->              err=3Dtrue
->          fi
-> =20
->          if [ -f $seq.notrun ]
->          then
-> -            $timestamp || printf " [not run] "
-> -            $timestamp && echo " [not run]" && printf %s "        $seq=
- -- "
-> +            $timestamp || reason=3D"[not run]"
-> +            $timestamp && reason=3D"[not run] $seq -- "
->              cat $seq.notrun
->              notrun=3D"$notrun $seq"
->          else
->              if [ $sts -ne 0 ]
->              then
-> -                printf %s " [failed, exit status $sts]"
-> +                reason=3D$(printf %s "[failed, exit status $sts]")
->                  err=3Dtrue
->              fi
-> =20
-> @@ -821,22 +798,27 @@ do
-> =20
->              if [ ! -f "$reference" ]
->              then
-> -                echo " - no qualified output"
-> +                reason=3D" - no qualified output"
->                  err=3Dtrue
->              else
->                  if diff -w "$reference" $tmp.out >/dev/null 2>&1
->                  then
-> -                    echo ""
->                      if $err
->                      then
->                          :
->                      else
-> -                        echo "$seq $(expr $stop - $start)" >>$tmp.time
-> +                        lasttime=3D$(sed -n -e "/^$seq /s/.* //p" <$TI=
-MESTAMP_FILE)
-> +                        thistime=3D$(expr $stop - $start)
-> +                        echo "$seq $thistime" >>$tmp.time
-> +
-> +                        if [ "X$lasttime" !=3D X ]; then
-> +                            times=3D"$times ${thistime}s (last ${lastt=
-ime}s)"
-> +                        fi
->                      fi
->                  else
-> -                    echo " - output mismatch (see $seq.out.bad)"
->                      mv $tmp.out $seq.out.bad
->                      $diff -w "$reference" "$PWD"/$seq.out.bad
-> +                    reason=3D" - output mismatch (see $seq.out.bad)"
->                      err=3Dtrue
->                  fi
->              fi
-> @@ -852,9 +834,24 @@ do
->      #
->      if $err
->      then
-> +        echo "  TEST    iotest: $seq FAILED $reason"
-> +        cat <<EOF
-> +QEMU          -- "$QEMU_PROG" $QEMU_OPTIONS
-> +QEMU_IMG      -- "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS
-> +QEMU_IO       -- "$QEMU_IO_PROG" $QEMU_IO_OPTIONS
-> +QEMU_NBD      -- "$QEMU_NBD_PROG" $QEMU_NBD_OPTIONS
-> +IMGFMT        -- $FULL_IMGFMT_DETAILS
-> +IMGPROTO      -- $IMGPROTO
-> +PLATFORM      -- $FULL_HOST_DETAILS
-> +TEST_DIR      -- $TEST_DIR
-> +SOCKET_SCM_HELPER -- $SOCKET_SCM_HELPER
-> +
-> +EOF
->          bad=3D"$bad $seq"
->          n_bad=3D$(expr $n_bad + 1)
->          quick=3Dfalse
-> +    else
-> +        echo "  TEST    iotest: $seq $times"
->      fi
->      [ -f $seq.notrun ] || try=3D$(expr $try + 1)
-
-Output is much nicer indeed (especially when this is running in parallel
-with the other tests), thus:
-
-Tested-by: Thomas Huth <thuth@redhat.com>
+--=20
+Yosinori Sato
 
