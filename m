@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56178)
+Received: from eggs.gnu.org ([209.51.188.92]:56248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNHeP-0004ZG-Vc
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:59 -0400
+	(envelope-from <thuth@redhat.com>) id 1hNHeT-0004dt-MB
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:58:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNHeO-0004zS-31
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:57 -0400
+	(envelope-from <thuth@redhat.com>) id 1hNHeS-00052Y-BS
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:58:01 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Sun,  5 May 2019 15:57:07 +0200
-Message-Id: <20190505135714.11277-22-thuth@redhat.com>
+Date: Sun,  5 May 2019 15:57:09 +0200
+Message-Id: <20190505135714.11277-24-thuth@redhat.com>
 In-Reply-To: <20190505135714.11277-1-thuth@redhat.com>
 References: <20190505135714.11277-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 21/28] hw/arm: Express dependencies of sabrelite
- with Kconfig
+Subject: [Qemu-devel] [PULL 23/28] hw/arm: Express dependencies of the
+ remaining IMX boards with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,92 +26,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 
-Add Kconfig dependencies for the Sabrelite / iMX6 machine.
+IMX25, IMX7 and IMX6UL were still missing the Kconfig dependencies.
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 4 +---
- hw/arm/Kconfig                  | 9 +++++++++
- hw/arm/Makefile.objs            | 3 ++-
- 3 files changed, 12 insertions(+), 4 deletions(-)
+ default-configs/arm-softmmu.mak |  2 --
+ hw/arm/Kconfig                  | 19 +++++++++++++++++++
+ 2 files changed, 19 insertions(+), 2 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
 u.mak
-index 76508e3910..ef7dd7156a 100644
+index 1455d083d8..6dc388c43e 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -33,6 +33,7 @@ CONFIG_NETDUINO2=3Dy
- CONFIG_MPS2=3Dy
- CONFIG_RASPI=3Dy
- CONFIG_DIGIC=3Dy
-+CONFIG_SABRELITE=3Dy
+@@ -37,7 +37,6 @@ CONFIG_SABRELITE=3Dy
+ CONFIG_EMCRAFT_SF2=3Dy
 =20
  CONFIG_VGA=3Dy
- CONFIG_SSI_M25P80=3Dy
-@@ -40,13 +41,10 @@ CONFIG_IMX_FEC=3Dy
+-CONFIG_IMX_FEC=3Dy
 =20
  CONFIG_NRF51_SOC=3Dy
 =20
--CONFIG_FSL_IMX6=3Dy
- CONFIG_FSL_IMX25=3Dy
- CONFIG_FSL_IMX7=3Dy
- CONFIG_FSL_IMX6UL=3Dy
-=20
--CONFIG_IMX_I2C=3Dy
--
- CONFIG_PCIE_PORT=3Dy
+@@ -49,4 +48,3 @@ CONFIG_PCIE_PORT=3Dy
  CONFIG_XIO3130=3Dy
  CONFIG_IOH3420=3Dy
+ CONFIG_I82801B11=3Dy
+-CONFIG_PCI_EXPRESS_DESIGNWARE=3Dy
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index abf2af0967..0a1eab568b 100644
+index 7af94a8184..4a14749792 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -177,6 +177,11 @@ config REALVIEW
-     select DS1338 # I2C RTC+NVRAM
-     select USB_OHCI
+@@ -285,6 +285,10 @@ config XLNX_VERSAL
 =20
-+config SABRELITE
-+    bool
-+    select FSL_IMX6
-+    select SSI_M25P80
-+
- config STELLARIS
+ config FSL_IMX25
      bool
-     select ARM_V7M
-@@ -290,6 +295,10 @@ config FSL_IMX31
-=20
- config FSL_IMX6
-     bool
-+    select A9MPCORE
 +    select IMX
 +    select IMX_FEC
 +    select IMX_I2C
++    select DS1338
+=20
+ config FSL_IMX31
+     bool
+@@ -299,6 +303,7 @@ config FSL_IMX6
+     select IMX
+     select IMX_FEC
+     select IMX_I2C
++    select SDHCI
 =20
  config ASPEED_SOC
      bool
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 4f591ca487..fadd69882c 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -22,6 +22,7 @@ obj-$(CONFIG_COLLIE) +=3D collie.o
- obj-$(CONFIG_VERSATILE) +=3D versatilepb.o
- obj-$(CONFIG_VEXPRESS) +=3D vexpress.o
- obj-$(CONFIG_ZYNQ) +=3D xilinx_zynq.o
-+obj-$(CONFIG_SABRELITE) +=3D sabrelite.o
+@@ -324,12 +329,26 @@ config MPS2
 =20
- obj-$(CONFIG_ARM_V7M) +=3D armv7m.o
- obj-$(CONFIG_EXYNOS4) +=3D exynos4210.o
-@@ -36,7 +37,7 @@ obj-$(CONFIG_XLNX_ZYNQMP_ARM) +=3D xlnx-zynqmp.o xlnx-z=
-cu102.o
- obj-$(CONFIG_XLNX_VERSAL) +=3D xlnx-versal.o xlnx-versal-virt.o
- obj-$(CONFIG_FSL_IMX25) +=3D fsl-imx25.o imx25_pdk.o
- obj-$(CONFIG_FSL_IMX31) +=3D fsl-imx31.o kzm.o
--obj-$(CONFIG_FSL_IMX6) +=3D fsl-imx6.o sabrelite.o
-+obj-$(CONFIG_FSL_IMX6) +=3D fsl-imx6.o
- obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_soc.o aspeed.o
- obj-$(CONFIG_MPS2) +=3D mps2.o
- obj-$(CONFIG_MPS2) +=3D mps2-tz.o
+ config FSL_IMX7
+     bool
++    imply PCI_DEVICES
++    imply TEST_DEVICES
++    select A15MPCORE
++    select PCI
++    select IMX
++    select IMX_FEC
++    select IMX_I2C
++    select PCI_EXPRESS_DESIGNWARE
++    select SDHCI
+=20
+ config ARM_SMMUV3
+     bool
+=20
+ config FSL_IMX6UL
+     bool
++    select A15MPCORE
++    select IMX
++    select IMX_FEC
++    select IMX_I2C
++    select SDHCI
+=20
+ config NRF51_SOC
+     bool
 --=20
 2.21.0
