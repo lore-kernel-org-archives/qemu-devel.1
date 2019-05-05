@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49350)
+Received: from eggs.gnu.org ([209.51.188.92]:49435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNJNs-0008LV-LX
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:49:01 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hNJOU-0000Oy-R0
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:49:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNJNr-0002U6-Pu
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:49:00 -0400
-References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
-	<20190428143845.11810-2-mark.cave-ayland@ilande.co.uk>
-	<fc4d6169-12d4-3fd8-f85a-262135a62b93@linaro.org>
-	<98ba8d01-dbab-ecde-ffbd-bb46efb29215@ilande.co.uk>
-	<9059f977-6ffa-e701-6c1b-2f8d8cca2c64@linaro.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <a818778c-6e37-a9ce-3e1c-0b3eb151682f@ilande.co.uk>
-Date: Sun, 5 May 2019 16:46:31 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1hNJOT-0003Eq-R1
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:49:38 -0400
+Received: from mail-pf1-x433.google.com ([2607:f8b0:4864:20::433]:42493)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hNJOT-0003Dv-Jw
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:49:37 -0400
+Received: by mail-pf1-x433.google.com with SMTP id 13so5081422pfw.9
+	for <qemu-devel@nongnu.org>; Sun, 05 May 2019 08:49:37 -0700 (PDT)
+References: <20190504083638.13380-1-S.E.Harris@kent.ac.uk>
+	<20190504083638.13380-2-S.E.Harris@kent.ac.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <772cbab8-49a2-8969-ba3e-55f190c886ff@linaro.org>
+Date: Sun, 5 May 2019 08:49:33 -0700
 MIME-Version: 1.0
-In-Reply-To: <9059f977-6ffa-e701-6c1b-2f8d8cca2c64@linaro.org>
+In-Reply-To: <20190504083638.13380-2-S.E.Harris@kent.ac.uk>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/14] target/ppc: remove getVSR()/putVSR()
- from fpu_helper.c
+Subject: Re: [Qemu-devel] [PATCH v1 1/8] target/avr: Add instruction decoder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +31,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, gkurz@kaod.org
+To: Sarah Harris <S.E.Harris@kent.ac.uk>, qemu-devel@nongnu.org
+Cc: mrolnik@gmail.com, A.M.King@kent.ac.uk, E.J.C.Robbins@kent.ac.uk
 
-On 05/05/2019 15:31, Richard Henderson wrote:
-
-> On 5/5/19 2:27 AM, Mark Cave-Ayland wrote:
->> I've spent a bit of time today going through the functions and it seems that all
->> functions which have an xt parameter, minus a couple of the TEST macros, require the
->> result to be calculated in a local variable first.
->>
->> I think the best solution is still to remove getVSR()/putVSR() but replace them with
->> macros for copying and zeroing like this:
->>
->>     #define VSRCPY(d, s) (memcpy(d, s, sizeof(ppc_vsr_t)))
->>     #define VSRZERO(d)   (memset(d, 0, sizeof(ppc_vsr_t)))
+On 5/4/19 1:36 AM, Sarah Harris wrote:
+> This utility module builds a decision tree to decode instructions, starting from a human readable list of instruction bit patterns.
+> Automatic tree generation will hopefully be more efficient and more maintainable than a hand-designed opcode parser.
 > 
-> Local variable, yes.  But I see no reason for macros.
-> 
->   ppc_vsr_t res = { };
->   ...
->   *xt = res;
+> Tree generation happens at startup because this seemed simpler to implement than adding a new build step.
 
-Ah thanks for the hint - I wasn't aware that this could be done in a consistent way
-for structs across all compilers. I'll implement this in the next version of the series.
+We have such a thing in qemu already, as a separate build step.
+
+See ./scripts/decodetree.py, and some of the uses in
+
+  target/{arm,hppa,riscv}/*.decode
+
+In addition to being able to select the instruction, it also
+extracts arguments from the instruction, so there's less
+repetition that you have for e.g.
+
+ > +static inline uint32_t MOVW_Rr(uint32_t opcode)
+> +{
+> +    return extract32(opcode, 0, 4);
+> +}
+...
+> +static inline uint32_t MULS_Rr(uint32_t opcode)
+> +{
+> +    return extract32(opcode, 0, 4);
+> +}
 
 
-ATB,
-
-Mark.
+r~
