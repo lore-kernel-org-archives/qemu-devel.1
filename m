@@ -3,61 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FDADC04AAA
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 01:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2546BC04AAA
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 01:29:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53EC620651
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 01:20:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53EC620651
+	by mail.kernel.org (Postfix) with ESMTPS id EF1FD206DF
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 01:29:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF1FD206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34854 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34932 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hN5p0-0008M9-Im
-	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 21:20:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51765)
+	id 1hN5y1-00031n-6i
+	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 21:29:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hN5no-00080T-Ly
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 21:18:53 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hN5xE-0002jq-D0
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 21:28:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hN5nn-0007Aj-M8
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 21:18:52 -0400
-Received: from mga09.intel.com ([134.134.136.24]:21931)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hN5x5-0003ji-K6
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 21:28:31 -0400
+Received: from mga09.intel.com ([134.134.136.24]:17056)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hN5nn-0007A6-Cy
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 21:18:51 -0400
+	id 1hN5wy-0003dy-Ah
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 21:28:22 -0400
 X-Amp-Result: UNSCANNABLE
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
 	by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	04 May 2019 18:18:49 -0700
+	04 May 2019 18:28:14 -0700
 X-ExtLoop1: 1
 Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by orsmga002.jf.intel.com with ESMTP; 04 May 2019 18:18:47 -0700
-Date: Sun, 5 May 2019 09:18:21 +0800
+	by orsmga002.jf.intel.com with ESMTP; 04 May 2019 18:28:11 -0700
+Date: Sun, 5 May 2019 09:27:45 +0800
 From: Wei Yang <richardw.yang@linux.intel.com>
 To: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190505011821.GC20071@richard>
+Message-ID: <20190505012745.GD20071@richard>
 References: <1556808723-226478-1-git-send-email-imammedo@redhat.com>
-	<1556808723-226478-5-git-send-email-imammedo@redhat.com>
+	<1556808723-226478-6-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1556808723-226478-5-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1556808723-226478-6-git-send-email-imammedo@redhat.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 134.134.136.24
-Subject: Re: [Qemu-devel] [PATCH v4 04/15] tests: acpi: make pointer to RSDP
- 64bit
+Subject: Re: [Qemu-devel] [PATCH v4 05/15] tests: acpi: fetch X_DSDT if
+ pointer to DSDT is 0
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,92 +82,67 @@ Cc: Andrew Jones <drjones@redhat.com>, Ben Warren <ben@skyportsystems.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505011821._nPesqAleLxFOCLGnIkCIsK8wZCF3uxfOs37IusjnNM@z>
+Message-ID: <20190505012745.ldCKVdM5yoEfhDLCY-LNCk5oPyxnj5df6LwVFb1eoE4@z>
 
-On Thu, May 02, 2019 at 04:51:52PM +0200, Igor Mammedov wrote:
->In case of UEFI, RSDP doesn't have to be located in lowmem,
->it could be placed at any address. Make sure that test won't
->break if it is placed above the first 4Gb of address space.
+On Thu, May 02, 2019 at 04:51:53PM +0200, Igor Mammedov wrote:
+>that way it would be possible to test a DSDT pointed by
+>64bit X_DSDT field in FADT.
 >
 >PS:
->While at it cleanup some local variables as we don't really
->need them.
+>it will allow to enable testing arm/virt board, which sets
+>only newer X_DSDT field.
 >
 >Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
-
 >---
 >v4:
-> - move acpi_fetch_rsdp_table(s/uint32_t addr/uint64_t addr/) to
->   this patch where it belongs from
->   "tests: acpi: make RSDT test routine handle XSDT"
->   (Wei Yang <richardw.yang@linux.intel.com>)
+> * dropping Reviewed-bys due to acpi_fetch_table() change
+>   introduced by earlier patch:
+>   "tests: acpi: make acpi_fetch_table() take size of fetched table pointer"
 >v2:
->  - s/In case of UEFI/In case of UEFI,/ (Laszlo Ersek <lersek@redhat.com>)
+>  add 'val = le32_to_cpu(val)' even if it doesn't necessary
+>  it works as reminder that value copied from table is in
+>  little-endian format (Philippe Mathieu-Daudé <philmd@redhat.com>)
 >---
-> tests/acpi-utils.h       |  2 +-
-> tests/acpi-utils.c       |  2 +-
-> tests/bios-tables-test.c | 10 ++++------
-> 3 files changed, 6 insertions(+), 8 deletions(-)
+> tests/bios-tables-test.c | 11 ++++++++++-
+> 1 file changed, 10 insertions(+), 1 deletion(-)
 >
->diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
->index f55ccf9..1da6c10 100644
->--- a/tests/acpi-utils.h
->+++ b/tests/acpi-utils.h
->@@ -46,7 +46,7 @@ typedef struct {
-> 
-> uint8_t acpi_calc_checksum(const uint8_t *data, int len);
-> uint32_t acpi_find_rsdp_address(QTestState *qts);
->-void acpi_fetch_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table);
->+void acpi_fetch_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table);
-> void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
->                       const uint8_t *addr_ptr, int addr_size, const char *sig,
->                       bool verify_checksum);
->diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
->index a0d49c4..c216b9e 100644
->--- a/tests/acpi-utils.c
->+++ b/tests/acpi-utils.c
->@@ -51,7 +51,7 @@ uint32_t acpi_find_rsdp_address(QTestState *qts)
->     return off;
-> }
-> 
->-void acpi_fetch_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table)
->+void acpi_fetch_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table)
-> {
->     uint8_t revision;
-> 
 >diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
->index d6ab121..a164d27 100644
+>index a164d27..d165a1b 100644
 >--- a/tests/bios-tables-test.c
 >+++ b/tests/bios-tables-test.c
->@@ -26,7 +26,7 @@
-> typedef struct {
->     const char *machine;
->     const char *variant;
->-    uint32_t rsdp_addr;
->+    uint64_t rsdp_addr;
->     uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
->     GArray *tables;
->     uint32_t smbios_ep_addr;
->@@ -86,13 +86,11 @@ static void test_acpi_rsdp_address(test_data *data)
+>@@ -140,6 +140,9 @@ static void test_acpi_fadt_table(test_data *data)
+>     AcpiSdtTable table = g_array_index(data->tables, typeof(table), 0);
+>     uint8_t *fadt_aml = table.aml;
+>     uint32_t fadt_len = table.aml_len;
+>+    uint32_t val;
+>+    int dsdt_offset = 40 /* DSDT */;
+>+    int dsdt_entry_size = 4;
 > 
-> static void test_acpi_rsdp_table(test_data *data)
-> {
->-    uint8_t *rsdp_table = data->rsdp_table, revision;
->-    uint32_t addr = data->rsdp_addr;
->+    uint8_t *rsdp_table = data->rsdp_table;
+>     g_assert(compare_signature(&table, "FACP"));
 > 
->-    acpi_fetch_rsdp_table(data->qts, addr, rsdp_table);
->-    revision = rsdp_table[15 /* Revision offset */];
->+    acpi_fetch_rsdp_table(data->qts, data->rsdp_addr, rsdp_table);
+>@@ -148,8 +151,14 @@ static void test_acpi_fadt_table(test_data *data)
+>                      fadt_aml + 36 /* FIRMWARE_CTRL */, 4, "FACS", false);
+>     g_array_append_val(data->tables, table);
 > 
->-    switch (revision) {
->+    switch (rsdp_table[15 /* Revision offset */]) {
->     case 0: /* ACPI 1.0 RSDP */
->         /* With rev 1, checksum is only for the first 20 bytes */
->         g_assert(!acpi_calc_checksum(rsdp_table,  20));
+>+    memcpy(&val, fadt_aml + dsdt_offset, 4);
+>+    val = le32_to_cpu(val);
+>+    if (!val) {
+>+        dsdt_offset = 140 /* X_DSDT */;
+
+In case we can point out where we get it, e.g. ACPI 5, Table 5-34 FADT Format.
+
+This may be more helpful for reviewing and maintaining.
+
+Do you think so?
+
+>+        dsdt_entry_size = 8;
+>+    }
+>     acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
+>-                     fadt_aml + 40 /* DSDT */, 4, "DSDT", true);
+>+                     fadt_aml + dsdt_offset, dsdt_entry_size, "DSDT", true);
+>     g_array_append_val(data->tables, table);
+> 
+>     memset(fadt_aml + 36, 0, 4); /* sanitize FIRMWARE_CTRL ptr */
 >-- 
 >2.7.4
 
