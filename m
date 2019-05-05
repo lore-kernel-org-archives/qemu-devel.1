@@ -3,93 +3,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02AFDC004C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 10:22:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A86EC004C9
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 10:26:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4317208C0
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 10:22:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4317208C0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 88B3F2087F
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 10:26:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88B3F2087F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39114 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39170 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNEHX-0002nF-WE
-	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 06:22:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47569)
+	id 1hNELy-0004JP-Bp
+	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 06:26:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNEGe-0002Rl-Sc
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:21:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1hNEL0-0003q2-B9
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:25:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNEGd-000516-Ae
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:21:12 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:37198
-	helo=mail.default.ilande.uk0.bigv.io)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hNEGV-0004wz-Qo; Sun, 05 May 2019 06:21:04 -0400
-Received: from host109-149-60-255.range109-149.btcentralplus.com
-	([109.149.60.255] helo=[192.168.1.65])
-	by mail.default.ilande.uk0.bigv.io with esmtpsa
-	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hNEFj-0002cT-Bq; Sun, 05 May 2019 11:20:15 +0100
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
-	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net,
-	gkurz@kaod.org
-References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
-	<20190428143845.11810-15-mark.cave-ayland@ilande.co.uk>
-	<3c05b552-a692-e439-fc28-90ad69767cf2@linaro.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
-	mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
-	3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
-	E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
-	PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
-	PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
-	AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
-	OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
-	NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
-	mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
-	z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
-	T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
-	DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
-	y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
-	2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
-	14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
-	YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
-	Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
-	BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
-	opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
-	NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
-	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
-	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
-	imgcU9TTGC5qd9g=
-Message-ID: <e8968236-5ab2-568f-fd32-e9208c0f2ebe@ilande.co.uk>
-Date: Sun, 5 May 2019 11:20:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <bounces@canonical.com>) id 1hNEKy-0007Bh-I1
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:25:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50392)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hNEKy-00079o-8t
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:25:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hNEKs-0006bw-0S
+	for <qemu-devel@nongnu.org>; Sun, 05 May 2019 10:25:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id ED7002E8052
+	for <qemu-devel@nongnu.org>; Sun,  5 May 2019 10:25:33 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <3c05b552-a692-e439-fc28-90ad69767cf2@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 109.149.60.255
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 05 May 2019 10:15:41 -0000
+From: Chen Zhang <1827772@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: gvt mdev rfc vfio
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: cuser2
+X-Launchpad-Bug-Reporter: Chen Zhang (cuser2)
+X-Launchpad-Bug-Modifier: Chen Zhang (cuser2)
+Message-Id:
+ <155705134117.31768.14250772954769525827.malonedeb@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18953";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: dcfd078c051a659e24d534e902c625d4cd110ec5
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH 14/14] target/ppc: improve VSX_FMADD with
- new GEN_VSX_HELPER_VSX_MADD macro
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1827772] [NEW] [RFC] dma buf: support sprite plane
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -98,50 +76,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1827772 <1827772@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505102049.KOPDMqt6ltOhfCC2ZToC_za4OZDSMh1j_ZstwhpF-FM@z>
+Message-ID: <20190505101541.Fa_Uh06SdlzRtPdjhKb7CXrURSPSNzYwL9YrUMVmrUI@z>
 
-On 30/04/2019 18:00, Richard Henderson wrote:
+Public bug reported:
 
-> On 4/28/19 7:38 AM, Mark Cave-Ayland wrote:
->>  #define VSX_MADD(op, nels, tp, fld, maddflgs, afrm, sfprf, r2sp)              \
->>  void helper_##op(CPUPPCState *env, uint32_t opcode,                           \
->> -                 ppc_vsr_t *xt, ppc_vsr_t *xa, ppc_vsr_t *xb)                 \
->> +                 ppc_vsr_t *xt, ppc_vsr_t *xa,                                \
->> +                 ppc_vsr_t *b, ppc_vsr_t *c)                                  \
->>  {                                                                             \
->> -    ppc_vsr_t *b, *c;                                                         \
->>      int i;                                                                    \
->>                                                                                \
->> -    if (afrm) { /* AxB + T */                                                 \
->> -        b = xb;                                                               \
->> -        c = xt;                                                               \
->> -    } else { /* AxT + B */                                                    \
->> -        b = xt;                                                               \
->> -        c = xb;                                                               \
->> -    }                                                                         \
-> 
-> The afrm argument is no longer used.
-> This also means that e.g.
-> 
-> VSX_MADD(xsmaddadp, 1, float64, VsrD(0), MADD_FLGS, 1, 1, 0)
-> VSX_MADD(xsmaddmdp, 1, float64, VsrD(0), MADD_FLGS, 0, 1, 0)
-> 
-> are redundant.  Similarly with all of the other pairs.
+QEMU does not support sprite/overlay in DMA-buf mode for Intel gvt
+vGPUs. Some use cases relies on sprite plane support, e.g. hw
+accelerated video playback in Windows 10 guest.
 
-Agreed. What do you think is the best solution here - maybe a double macro that looks
-something like this?
+To support this feature, functions in both kernel and QEMU should be
+implemented:
 
-#define VSX_MADD(op, prec, nels, tp, fld, maddflgs, sfprf, r2sp)
-_VSX_MADD(op##aprec, nels, tp, fld, maddflgs, sfprf, r2sp)
-_VSX_MADD(op##mprec, nels, tp, fld, maddflgs, sfprf, r2sp)
+- query support for plane info in kernel: =
 
-VSX_MADD(xsmadd, dp, 1, float64, VsrD(0), MADD_FLGS, 1, 0)
+  in vgpu_get_plane_info() of drm/i915/gvt/dmabuf.c, calls to intel_vgpu_de=
+code_sprite_plane() shall be made;
+
+- struct to hold VFIODMABuf object in QEMU:
+  in struct VFIODisplay of include/hw/vfio/vfio-common.h;
+- copying of data in QEMU:
+  in vfio_display_get_dmabuf() of hw/vfio/display.c;
+- drawing of sprite plane in QEMU:
+  in vfio_display_dmabuf_update() of hw/vfio/display.c;
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
 
-ATB,
+** Tags: gvt mdev rfc vfio
 
-Mark.
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1827772
+
+Title:
+  [RFC] dma buf: support sprite plane
+
+Status in QEMU:
+  New
+
+Bug description:
+  QEMU does not support sprite/overlay in DMA-buf mode for Intel gvt
+  vGPUs. Some use cases relies on sprite plane support, e.g. hw
+  accelerated video playback in Windows 10 guest.
+
+  To support this feature, functions in both kernel and QEMU should be
+  implemented:
+
+  - query support for plane info in kernel: =
+
+    in vgpu_get_plane_info() of drm/i915/gvt/dmabuf.c, calls to intel_vgpu_=
+decode_sprite_plane() shall be made;
+
+  - struct to hold VFIODMABuf object in QEMU:
+    in struct VFIODisplay of include/hw/vfio/vfio-common.h;
+  - copying of data in QEMU:
+    in vfio_display_get_dmabuf() of hw/vfio/display.c;
+  - drawing of sprite plane in QEMU:
+    in vfio_display_dmabuf_update() of hw/vfio/display.c;
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1827772/+subscriptions
 
