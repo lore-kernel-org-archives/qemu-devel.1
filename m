@@ -2,92 +2,61 @@ Return-Path: <SRS0=Huu6=TF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C15EBC004C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 17:16:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADE62C004C9
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 18:08:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8632520B7C
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 17:16:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MjhkLh2R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8632520B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 77CCF20675
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 18:08:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77CCF20675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43878 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44283 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNKkG-0002cU-My
-	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 13:16:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36843)
+	id 1hNLYp-00067y-PR
+	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 14:08:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hNKjA-00029H-0W
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 13:15:04 -0400
+	(envelope-from <philmd@redhat.com>) id 1hNLXz-0005nB-Aa
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 14:07:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hNKj9-0000Yp-80
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 13:15:03 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:43815)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hNKj8-0000Xo-W3
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 13:15:03 -0400
-Received: by mail-pl1-x641.google.com with SMTP id n8so5139984plp.10
-	for <qemu-devel@nongnu.org>; Sun, 05 May 2019 10:15:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=2uwI5LFTIk7eo6JAWTjnQMYFpzVzFaiKBrVJkCZiMMA=;
-	b=MjhkLh2RVZm+Ew66GzIizoJ4A4am5Fh4aeiCxyN8ZmRN+VKwvoZAHx/9rm2hUTUJI+
-	PfrUBquTdne4vbnQCcRGbjiwVq+xuMhX6b0KYr0k6osF5pP7jWEy7VPmOYoJYaE71K8F
-	u2XqfyrdXFBr6aI5mSaYGp1t2+Uk9tkvOGsJ6GyLkMtxwnyRmKC+L0kZi2g5JRaUJpjW
-	LCfdNu7N4wE3jL3aW6eiH5g45xuzOW+KXkiSXApU37wb3Zp+hEeYzcPoqA79E+nPu2m1
-	tL7Yp1H3R8bST2HcLA3NlF5qThJ7UCmcR+7T/CQxasLwlbmC0ugYNWI+iSuByT0HgPUO
-	Ylaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=2uwI5LFTIk7eo6JAWTjnQMYFpzVzFaiKBrVJkCZiMMA=;
-	b=SYngyvqxzDWShS5G/LusvHaZBU6goBoCjRc7dXBuN+sFfrWo21bmi1fe5TNS9dwzZT
-	gGVt6w8CwSGMMFfCXM2XWOuLs6l2icruIlTNpl4we3Huyk6HQCLCjJVqLV3FOoJBPjRH
-	+XG2YuMmwli8oFttxKNpE2+Na+Og6bju7yXZulx+4x71wnm1EyezrkUUz+pVCrBvUXCM
-	4Fv/K8TnuSumJjngLW0YTdkAoWT7RyXxqdiJa8SRNNirlEHibTK7TorWOC3kEODTf4nN
-	dwWrS5EXYnz+e8YI3lbYTSdL67GeJkxCCG5B12OuR58EVkaJRZjt3omr/HMlx/9gfoju
-	YtrA==
-X-Gm-Message-State: APjAAAXZ7AwvQ4g0HjAa42HUEJiu0r/BFsRIl1Izx/0HcWNMxCTHmxkZ
-	sPwuFqdkMIzz/pvCFbh/lthF3A==
-X-Google-Smtp-Source: APXvYqzD6y4k6n/0AQHHQoObuUf+0IRXQpIyT+LSIhYqCPyIZD6ehpKEfoT3jMsrFXgJns4/TpWL5g==
-X-Received: by 2002:a17:902:28e4:: with SMTP id
-	f91mr25977305plb.321.1557076501590; 
-	Sun, 05 May 2019 10:15:01 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-189-189.tukw.qwest.net. [97.113.189.189])
-	by smtp.gmail.com with ESMTPSA id
-	v19sm17692948pfa.138.2019.05.05.10.15.00
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sun, 05 May 2019 10:15:00 -0700 (PDT)
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20190504120528.6389-1-pbonzini@redhat.com>
-	<20190504120528.6389-9-pbonzini@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <ce18b2de-9518-d94e-758d-8d79db5c2f8c@linaro.org>
-Date: Sun, 5 May 2019 10:14:58 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <philmd@redhat.com>) id 1hNLXy-0002ZT-ER
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 14:07:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39734)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>)
+	id 1hNLXw-0002VP-8H; Sun, 05 May 2019 14:07:32 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C5F823086220;
+	Sun,  5 May 2019 18:07:30 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-58.brq.redhat.com [10.40.204.58])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B74B45C28D;
+	Sun,  5 May 2019 18:07:22 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>,
+	qemu-devel@nongnu.org
+Date: Sun,  5 May 2019 20:07:18 +0200
+Message-Id: <20190505180719.31913-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190504120528.6389-9-pbonzini@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: Re: [Qemu-devel] [PATCH 8/9] tcg/i386: add support for IBT
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Sun, 05 May 2019 18:07:30 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] hw/timer: Compile devices not target-dependent
+ as common objects
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,27 +68,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, cohuck@redhat.com, qemu-block@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Beniamino Galvani <b.galvani@gmail.com>,
+	Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm@nongnu.org,
+	Antony Pavlov <antonynpavlov@gmail.com>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505171458.cRMz8Fcy94x-8fQn2RHbXdi_avaE2fQ36mVl9NSxjoQ@z>
+Message-ID: <20190505180718.ft65KXxcn__KJa0joQBU91ORehEDePoLqa3L262oaMY@z>
 
-On 5/4/19 5:05 AM, Paolo Bonzini wrote:
-> Add endbr annotations before indirect branch targets.  This lets QEMU enable
-> IBT even for TCG-enabled builds.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  Makefile.target           |  2 ++
->  configure                 |  9 +++++++++
->  include/qemu/cpuid.h      |  5 +++++
->  tcg/i386/tcg-target.inc.c | 19 +++++++++++++++++++
->  4 files changed, 35 insertions(+)
+All these devices do not contain any target-specific code. While
+most of them are arch-specific, they are shared between different
+targets of the same arch family (ARM and AArch64, MIPS32/MIPS64,
+multiple endianess, ...).
+Put them into common-obj-y to compile them once for all targets.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/timer/Makefile.objs | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-
-r~
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index 0e9a4530f84..a92e22938cb 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -25,20 +25,20 @@ common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-sysctl.=
+o
+ common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-zynqmp-rtc.o
+ common-obj-$(CONFIG_NRF51_SOC) +=3D nrf51_timer.o
+=20
+-obj-$(CONFIG_ALTERA_TIMER) +=3D altera_timer.o
+-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_mct.o
+-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_pwm.o
+-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_rtc.o
+-obj-$(CONFIG_OMAP) +=3D omap_gptimer.o
+-obj-$(CONFIG_OMAP) +=3D omap_synctimer.o
+-obj-$(CONFIG_PXA2XX) +=3D pxa2xx_timer.o
+-obj-$(CONFIG_SH4) +=3D sh_timer.o
+-obj-$(CONFIG_DIGIC) +=3D digic-timer.o
+-obj-$(CONFIG_MIPS_CPS) +=3D mips_gictimer.o
++common-obj-$(CONFIG_ALTERA_TIMER) +=3D altera_timer.o
++common-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_mct.o
++common-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_pwm.o
++common-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_rtc.o
++common-obj-$(CONFIG_OMAP) +=3D omap_gptimer.o
++common-obj-$(CONFIG_OMAP) +=3D omap_synctimer.o
++common-obj-$(CONFIG_PXA2XX) +=3D pxa2xx_timer.o
++common-obj-$(CONFIG_SH4) +=3D sh_timer.o
++common-obj-$(CONFIG_DIGIC) +=3D digic-timer.o
++common-obj-$(CONFIG_MIPS_CPS) +=3D mips_gictimer.o
+=20
+ obj-$(CONFIG_MC146818RTC) +=3D mc146818rtc.o
+=20
+-obj-$(CONFIG_ALLWINNER_A10_PIT) +=3D allwinner-a10-pit.o
++common-obj-$(CONFIG_ALLWINNER_A10_PIT) +=3D allwinner-a10-pit.o
+=20
+ common-obj-$(CONFIG_STM32F2XX_TIMER) +=3D stm32f2xx_timer.o
+ common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_timer.o
+--=20
+2.20.1
 
 
