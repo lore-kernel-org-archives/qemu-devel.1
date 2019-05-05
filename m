@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45882)
+Received: from eggs.gnu.org ([209.51.188.92]:46997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNJ4Z-0008Qs-MM
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:29:04 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hNJ9c-0003co-4c
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:34:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNJ4Y-0003UO-Qf
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:29:03 -0400
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Sun,  5 May 2019 17:28:39 +0200
-Message-Id: <20190505152839.18650-4-philmd@redhat.com>
-In-Reply-To: <20190505152839.18650-1-philmd@redhat.com>
-References: <20190505152839.18650-1-philmd@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hNJ9b-0007BL-AI
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:34:16 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:46210)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hNJ9b-0007Ah-5o
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:34:15 -0400
+Received: by mail-ot1-x343.google.com with SMTP id v17so1299696otp.13
+	for <qemu-devel@nongnu.org>; Sun, 05 May 2019 08:34:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 3/3] hw/ppc/40p: use 1900 as a base year
+References: <cover.1556515687.git.alistair@alistair23.me>
+	<PSXP216MB02771957D4B9C5A15914D05FDD390@PSXP216MB0277.KORP216.PROD.OUTLOOK.COM>
+	<CAFEAcA86i3aZx-h2ys5kmc35AMqzd6k=JrfVXObdbcppnn-J8w@mail.gmail.com>
+	<CAKmqyKMM0QHgdS3Z9Fd13XjeFsiG1UnZYz5brdjJgnbHXmxBrQ@mail.gmail.com>
+	<CAFEAcA-dZ5qdh58QCmX+t2RpJim8Fu9FY0UBY1tMpQOHkG06mA@mail.gmail.com>
+	<97245929-a8b5-4b67-bfee-656db4438cd0@www.fastmail.com>
+	<CAKmqyKOhfjwO+8UBj+-RiZiYUHM7LeDeJk+cmXfuKd5psowP3A@mail.gmail.com>
+In-Reply-To: <CAKmqyKOhfjwO+8UBj+-RiZiYUHM7LeDeJk+cmXfuKd5psowP3A@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 5 May 2019 16:34:03 +0100
+Message-ID: <CAFEAcA_0NpQRJnMx-1vUCD_=e1GsfTBhO3z1rrz99CY+GNmGhA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 5/5] hw/arm: Add the Netduino Plus 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,33 +34,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Artyom Tarasenko <atar4qemu@gmail.com>, qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-ppc@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: Alistair <alistair@alistair23.me>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-From: Artyom Tarasenko <atar4qemu@gmail.com>
+On Sat, 4 May 2019 at 06:26, Alistair Francis <alistair23@gmail.com> wrote:
+> Ah, it seems like -device loader doesn't work, it looks like not
+> setting the thumb register causes this core dump:
+>
+> qemu: fatal: Lockup: can't escalate 3 to HardFault (current priority -1)
+>
+> R00=20000000 R01=00000574 R02=200015d0 R03=200015d0
+> R04=00000000 R05=00000000 R06=00000000 R07=00000000
+> R08=00000000 R09=00000000 R10=00000000 R11=00000000
+> R12=00000000 R13=ffffffe0 R14=fffffff9 R15=0800cba4
 
-AIX 5.1 expects the base year to be 1900. Adjust accordingly.
+Is the ELF file incorrectly setting the entry point address to not
+be a Thumb one (ie low bit set), or is the loader device not honouring
+that? (I thought that we'd fixed the latter of those recently...)
 
-Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/ppc/prep.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index 7a0d311d43c..2a8009e20b4 100644
---- a/hw/ppc/prep.c
-+++ b/hw/ppc/prep.c
-@@ -676,7 +676,9 @@ static void ibm_40p_init(MachineState *machine)
-     qdev_init_nofail(dev);
-=20
-     /* RTC */
--    isa_create_simple(isa_bus, TYPE_MC146818_RTC);
-+    dev =3D DEVICE(isa_create(isa_bus, TYPE_MC146818_RTC));
-+    qdev_prop_set_int32(dev, "base_year", 1900);
-+    qdev_init_nofail(dev);
-=20
-     /* initialize CMOS checksums */
-     cmos_checksum =3D 0x6aa9;
---=20
-2.20.1
+thanks
+-- PMM
