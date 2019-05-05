@@ -5,45 +5,45 @@ X-Spam-Level:
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7496FC004C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 09:36:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 682C6C004C9
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 09:37:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 307CA208C0
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 09:36:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 307CA208C0
+	by mail.kernel.org (Postfix) with ESMTPS id 3739D205ED
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 09:37:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3739D205ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38665 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38678 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNDZC-0005gI-5q
-	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 05:36:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38021)
+	id 1hNDaO-0006fI-G1
+	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 05:37:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNDXu-0004vr-NQ
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 05:34:59 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNDZ7-0005px-Od
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 05:36:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNDXt-0007xA-MZ
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 05:34:58 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:37066
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNDZ6-0001pi-LL
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 05:36:13 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:37082
 	helo=mail.default.ilande.uk0.bigv.io)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hNDXr-0007sp-7k; Sun, 05 May 2019 05:34:55 -0400
+	id 1hNDZ4-0001kA-JW; Sun, 05 May 2019 05:36:10 -0400
 Received: from host109-149-60-255.range109-149.btcentralplus.com
 	([109.149.60.255] helo=[192.168.1.65])
 	by mail.default.ilande.uk0.bigv.io with esmtpsa
 	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
 	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hNDXB-0002SJ-FC; Sun, 05 May 2019 10:34:13 +0100
+	id 1hNDYO-0002T2-BB; Sun, 05 May 2019 10:35:28 +0100
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
 	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net,
 	gkurz@kaod.org
 References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
-	<20190428143845.11810-3-mark.cave-ayland@ilande.co.uk>
-	<55204805-9275-2bc4-2c38-51dc87aa836d@linaro.org>
+	<20190428143845.11810-4-mark.cave-ayland@ilande.co.uk>
+	<3df9625c-2d66-82f8-119f-61af3bfc1f86@linaro.org>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
@@ -70,23 +70,23 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
 	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
 	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
 	imgcU9TTGC5qd9g=
-Message-ID: <7227a96f-ae59-3ed4-8b1f-9e92005b4a69@ilande.co.uk>
-Date: Sun, 5 May 2019 10:34:47 +0100
+Message-ID: <b758800d-d78f-f802-4c7d-21cc4f96cafd@ilande.co.uk>
+Date: Sun, 5 May 2019 10:36:02 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <55204805-9275-2bc4-2c38-51dc87aa836d@linaro.org>
+In-Reply-To: <3df9625c-2d66-82f8-119f-61af3bfc1f86@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-SA-Exim-Connect-IP: 109.149.60.255
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH 02/14] target/ppc: remove getVSR()/putVSR()
- from mem_helper.c
+Subject: Re: [Qemu-devel] [PATCH 03/14] target/ppc: remove getVSR()/putVSR()
+ from int_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,80 +101,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505093447.sCFtJW_fsvsrZP2msrZvTSfucvcQwL3qSb4txDPaiUE@z>
+Message-ID: <20190505093602.9PySDQ_bRJQo6Gial-MMC0ANgPSZUQZy5_JqC784lQo@z>
 
-On 30/04/2019 17:29, Richard Henderson wrote:
+On 30/04/2019 17:32, Richard Henderson wrote:
 
 > On 4/28/19 7:38 AM, Mark Cave-Ayland wrote:
->>  #define VSX_LXVL(name, lj)                                              \
->>  void helper_##name(CPUPPCState *env, target_ulong addr,                 \
->> -                   target_ulong xt_num, target_ulong rb)                \
->> +                   target_ulong xt, target_ulong rb)                    \
->>  {                                                                       \
->> +    ppc_vsr_t *r = &env->vsr[xt];                                       \
->> +    int nb = GET_NB(env->gpr[rb]);                                      \
->>      int i;                                                              \
->> -    ppc_vsr_t xt;                                                       \
->> -    uint64_t nb = GET_NB(rb);                                           \
->>                                                                          \
->> -    xt.s128 = int128_zero();                                            \
->> +    r->s128 = int128_zero();                                            \
->>      if (nb) {                                                           \
->>          nb = (nb >= 16) ? 16 : nb;                                      \
->>          if (msr_le && !lj) {                                            \
->>              for (i = 16; i > 16 - nb; i--) {                            \
->> -                xt.VsrB(i - 1) = cpu_ldub_data_ra(env, addr, GETPC());  \
->> +                r->VsrB(i - 1) = cpu_ldub_data_ra(env, addr, GETPC());  \
->>                  addr = addr_add(env, addr, 1);                          \
->>              }                                                           \
->>          } else {                                                        \
->>              for (i = 0; i < nb; i++) {                                  \
->> -                xt.VsrB(i) = cpu_ldub_data_ra(env, addr, GETPC());      \
->> +                r->VsrB(i) = cpu_ldub_data_ra(env, addr, GETPC());      \
->>                  addr = addr_add(env, addr, 1);                          \
->>              }                                                           \
->>          }                                                               \
->>      }                                                                   \
->> -    putVSR(xt_num, &xt, env);                                           \
->>  }
+>>  void helper_xxextractuw(CPUPPCState *env, target_ulong xtn,
+>>                          target_ulong xbn, uint32_t index)
+>>  {
+>> -    ppc_vsr_t xt, xb;
+>> +    ppc_vsr_t *xt = &env->vsr[xtn];
+>> +    ppc_vsr_t *xb = &env->vsr[xbn];
+>>      size_t es = sizeof(uint32_t);
+>>      uint32_t ext_index;
+>>      int i;
+>>  
+>> -    getVSR(xbn, &xb, env);
+>> -    memset(&xt, 0, sizeof(xt));
+>> +    memset(xt, 0, sizeof(ppc_vsr_t));
 > 
-> Similarly, this modifies env->vsr[xt] before all exceptions are recognized.
-
-Okay - if you're happy with my previous suggestion with the VSR* macros and the local
-variable then I can make the same change here too.
-
->> @@ -304,12 +304,14 @@ static void gen_##name(DisasContext *ctx)                       \
->>          }                                                       \
->>      }                                                           \
->>      EA = tcg_temp_new();                                        \
->> -    xt = tcg_const_tl(xT(ctx->opcode));                         \
->>      gen_set_access_type(ctx, ACCESS_INT);                       \
->>      gen_addr_register(ctx, EA);                                 \
->> -    gen_helper_##name(cpu_env, EA, xt, cpu_gpr[rB(ctx->opcode)]); \
->> +    xt = tcg_const_tl(xT(ctx->opcode));                         \
->> +    rb = tcg_const_tl(rB(ctx->opcode));                         \
->> +    gen_helper_##name(cpu_env, EA, xt, rb);                     \
->>      tcg_temp_free(EA);                                          \
->>      tcg_temp_free(xt);                                          \
->> +    tcg_temp_free(rb);                                          \
->>  }
+> This fails if xt == xb.
 > 
-> Why are you adjusting the function to pass the rB register number rather than
-> the contents of rB?  That seems the wrong way around...
+> Similarly for xxinsertw.
 
-I think what I was trying to do here was eliminate the cpu_gpr since it feels to me
-that with the vector patchsets and your negative offset patches that this should be
-the way to go for accessing CPUState rather than using TCG globals.
-
-Looking at this again I realise the solution is really the same as is currently used
-for gen_load_spr() so I can use something like this:
-
-    static inline void gen_load_gpr(TCGv t, int reg)
-    {
-        tcg_gen_ld_tl(t, cpu_env, offsetof(CPUPPCState, gpr[reg]));
-    }
-
-Does this seem reasonable as a solution?
+Yeah. Again I can easily fix this up with a local variable.
 
 
 ATB,
