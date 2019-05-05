@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50819)
+Received: from eggs.gnu.org ([209.51.188.92]:51638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNEaa-00013S-1A
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:41:48 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNEep-00029Y-Hr
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:46:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNEaY-000162-AB
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:41:47 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:37222
-	helo=mail.default.ilande.uk0.bigv.io)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hNEaY-00015P-4U
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:41:46 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNEeo-0003QV-Lw
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:46:11 -0400
 References: <1557003754-26473-1-git-send-email-atar4qemu@gmail.com>
-	<1557003754-26473-2-git-send-email-atar4qemu@gmail.com>
+	<1557003754-26473-4-git-send-email-atar4qemu@gmail.com>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <d28ed626-f7f8-53df-208a-cbf6c06e3cc9@ilande.co.uk>
-Date: Sun, 5 May 2019 11:41:20 +0100
+Message-ID: <7e282cd4-f402-c807-b9aa-7034d04031b6@ilande.co.uk>
+Date: Sun, 5 May 2019 11:46:03 +0100
 MIME-Version: 1.0
-In-Reply-To: <1557003754-26473-2-git-send-email-atar4qemu@gmail.com>
+In-Reply-To: <1557003754-26473-4-git-send-email-atar4qemu@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] lsi53c895a: hide 53c895a registers
- in 53c810
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] hw/isa/i82378.c: use 1900 as a base
+ year
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +26,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Artyom Tarasenko <atar4qemu@gmail.com>, qemu-devel@nongnu.org, hpoussin@reactos.org
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "open list:PReP" <qemu-ppc@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 
 On 04/05/2019 22:02, Artyom Tarasenko wrote:
 
-> AIX/PReP does access to the aliased IO registers of 53810.
-> Implement aliasing to make the AIX driver work.
+> AIX 5.1 expects the base year to be 1900. Adjust accordingly.
 > 
 > Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
+> Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 > ---
->  hw/scsi/lsi53c895a.c | 17 ++++++++++++++---
->  1 file changed, 14 insertions(+), 3 deletions(-)
+>  hw/isa/i82378.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-> index da7239d..6b95699 100644
-> --- a/hw/scsi/lsi53c895a.c
-> +++ b/hw/scsi/lsi53c895a.c
-> @@ -2271,6 +2271,9 @@ static void lsi_scsi_realize(PCIDevice *dev, Error **errp)
->      LSIState *s = LSI53C895A(dev);
->      DeviceState *d = DEVICE(dev);
->      uint8_t *pci_conf;
-> +    uint64_t mmio_size;
-> +    MemoryRegion *mr;
-> +    uint16_t type = PCI_DEVICE_GET_CLASS(dev)->device_id;
+> diff --git a/hw/isa/i82378.c b/hw/isa/i82378.c
+> index a5d67bc..546c928 100644
+> --- a/hw/isa/i82378.c
+> +++ b/hw/isa/i82378.c
+> @@ -107,7 +107,9 @@ static void i82378_realize(PCIDevice *pci, Error **errp)
+>      isa = isa_create_simple(isabus, "i82374");
 >  
->      pci_conf = dev->config;
+>      /* timer */
+> -    isa_create_simple(isabus, TYPE_MC146818_RTC);
+> +    isa = isa_create(isabus, TYPE_MC146818_RTC);
+> +    qdev_prop_set_int32(DEVICE(isa), "base_year", 1900);
+> +    qdev_init_nofail(DEVICE(isa));
+>  }
 >  
-> @@ -2279,13 +2282,21 @@ static void lsi_scsi_realize(PCIDevice *dev, Error **errp)
->      /* Interrupt pin A */
->      pci_conf[PCI_INTERRUPT_PIN] = 0x01;
->  
-> -    memory_region_init_io(&s->mmio_io, OBJECT(s), &lsi_mmio_ops, s,
-> -                          "lsi-mmio", 0x400);
->      memory_region_init_io(&s->ram_io, OBJECT(s), &lsi_ram_ops, s,
->                            "lsi-ram", 0x2000);
->      memory_region_init_io(&s->io_io, OBJECT(s), &lsi_io_ops, s,
->                            "lsi-io", 256);
-> -
-> +    if (type == PCI_DEVICE_ID_LSI_53C895A) {
-> +        mmio_size = 0x400;
-> +    } else {
-> +        mr = g_new(MemoryRegion, 1);
+>  static void i82378_init(Object *obj)
 
-In general these days it's worth keeping the reference to the MemoryRegion within
-LSIState since then its lifecycle is more clearly defined.
-
-> +        memory_region_init_alias(mr, OBJECT(d), "lsi-io-alias", &s->io_io,
-> +                                 0, 0x80);
-> +        memory_region_add_subregion_overlap(&s->io_io, 0x80, mr, -1);
-> +        mmio_size = 0x80;
-
-This feels a little strange - is it possible to see from the datasheets that the
-53C895A has 0x400 bytes MMIO whilst the 53C810 has 0x80 bytes MMIO? It's not clear to
-me where the aliasing is happening.
-
-> +    }
-> +    memory_region_init_io(&s->mmio_io, OBJECT(s), &lsi_mmio_ops, s,
-> +                          "lsi-mmio", mmio_size);
->      address_space_init(&s->pci_io_as, pci_address_space_io(dev), "lsi-pci-io");
->      qdev_init_gpio_out(d, &s->ext_irq, 1);
->  
-> 
+Is this true for the 82378 in general, or is it a particular quirk of the 40p
+machine/PReP specification?
 
 
 ATB,
