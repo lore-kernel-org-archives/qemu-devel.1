@@ -2,90 +2,96 @@ Return-Path: <SRS0=Huu6=TF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00910C004C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 10:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5890C004C9
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 10:54:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6962B205ED
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 10:47:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6962B205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 88F65208C0
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 10:54:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lRV0yCBg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88F65208C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39353 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39393 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNEg1-0002q5-5J
-	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 06:47:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51638)
+	id 1hNEmm-0004Lu-QE
+	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 06:54:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNEep-00029Y-Hr
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:46:12 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1hNElw-00045K-Mj
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:53:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNEeo-0003QV-Lw
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:46:11 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:37242
-	helo=mail.default.ilande.uk0.bigv.io)
+	(envelope-from <yuval.shaia@oracle.com>) id 1hNElv-00013d-Q9
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:53:32 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:46690)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hNEem-0003Jw-F3; Sun, 05 May 2019 06:46:08 -0400
-Received: from host109-149-60-255.range109-149.btcentralplus.com
-	([109.149.60.255] helo=[192.168.1.65])
-	by mail.default.ilande.uk0.bigv.io with esmtpsa
-	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hNEe9-0002ig-Dd; Sun, 05 May 2019 11:45:30 +0100
-To: Artyom Tarasenko <atar4qemu@gmail.com>, qemu-devel@nongnu.org,
-	hpoussin@reactos.org
-References: <1557003754-26473-1-git-send-email-atar4qemu@gmail.com>
-	<1557003754-26473-4-git-send-email-atar4qemu@gmail.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
-	mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
-	3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
-	E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
-	PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
-	PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
-	AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
-	OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
-	NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
-	mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
-	z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
-	T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
-	DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
-	y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
-	2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
-	14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
-	YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
-	Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
-	BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
-	opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
-	NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
-	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
-	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
-	imgcU9TTGC5qd9g=
-Message-ID: <7e282cd4-f402-c807-b9aa-7034d04031b6@ilande.co.uk>
-Date: Sun, 5 May 2019 11:46:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1hNElv-00012w-Fv
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:53:31 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+	by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x45AnOM8126153; Sun, 5 May 2019 10:53:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=from : to : cc :
+	subject : date : message-id : mime-version : content-transfer-encoding; 
+	s=corp-2018-07-02; bh=/d2rAYGT3w3bvZy938iecFcqOY9ki9FWRk1WE9coh8o=;
+	b=lRV0yCBgFXVLDDg1ClyVnVh8BDhFLvoYOwzyEWj8rkihdYnmv5iodGkFBsNGqMSmNCSm
+	SIqDdBOs9QgchDWwGZR2/iT0S69qElWd56mhWkrF32e9DmmkiIWRv/dH9RAMmM9kOKyt
+	e9cbRd++1ld67QllyWIg2oQAlGysR3Tl71o/OZ20iFpbf3rZkIl5g2EkqPvNqiAm5GOo
+	WpCXm+rTajRLajExPRVmBSU1VRUmukOsI+5QZpIckBHOShoFZPmsutD63R1BTAoXxRXV
+	sPAIalJnnAcLlwSMrvglUGfoQM4RzKcBOCUpRQBQDHCTybHAasz42+7d3E/kZwfTZg/s
+	PQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+	by userp2130.oracle.com with ESMTP id 2s94bfjnr2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 05 May 2019 10:53:27 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+	by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x45Ap6E0180174; Sun, 5 May 2019 10:51:26 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+	by aserp3020.oracle.com with ESMTP id 2s9aydy5g0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 05 May 2019 10:51:26 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+	by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x45ApP9t015232;
+	Sun, 5 May 2019 10:51:25 GMT
+Received: from host4.lan (/77.138.183.59)
+	by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Sun, 05 May 2019 10:51:25 +0000
+From: Yuval Shaia <yuval.shaia@oracle.com>
+To: marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
+Date: Sun,  5 May 2019 13:51:12 +0300
+Message-Id: <20190505105112.22691-1-yuval.shaia@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <1557003754-26473-4-git-send-email-atar4qemu@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 109.149.60.255
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] hw/isa/i82378.c: use 1900 as a base
- year
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9247
+	signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1905050098
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9247
+	signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1905050098
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.86
+Subject: [Qemu-devel] [PATCH] hw/rdma: Delete unused headers inclusion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,44 +103,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	"open list:PReP" <qemu-ppc@nongnu.org>
+Cc: Yuval Shaia <yuval.shaia@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505104603.Lb0Si33OAhmt60rMXODd0zY5z5EgVUlQT5T-6VlTTjo@z>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190505105112.YMr50GicBgGEvzAcydlhPHUeWenA00je8dwK96pyNg0@z>
 
-On 04/05/2019 22:02, Artyom Tarasenko wrote:
+This is a trivial cleanup patch.
 
-> AIX 5.1 expects the base year to be 1900. Adjust accordingly.
-> 
-> Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
-> Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
-> ---
->  hw/isa/i82378.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/isa/i82378.c b/hw/isa/i82378.c
-> index a5d67bc..546c928 100644
-> --- a/hw/isa/i82378.c
-> +++ b/hw/isa/i82378.c
-> @@ -107,7 +107,9 @@ static void i82378_realize(PCIDevice *pci, Error **errp)
->      isa = isa_create_simple(isabus, "i82374");
->  
->      /* timer */
-> -    isa_create_simple(isabus, TYPE_MC146818_RTC);
-> +    isa = isa_create(isabus, TYPE_MC146818_RTC);
-> +    qdev_prop_set_int32(DEVICE(isa), "base_year", 1900);
-> +    qdev_init_nofail(DEVICE(isa));
->  }
->  
->  static void i82378_init(Object *obj)
+Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+---
+ hw/rdma/rdma_backend.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-Is this true for the 82378 in general, or is it a particular quirk of the 40p
-machine/PReP specification?
+diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+index d1660b6474..05f6b03221 100644
+--- a/hw/rdma/rdma_backend.c
++++ b/hw/rdma/rdma_backend.c
+@@ -14,16 +14,9 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "sysemu/sysemu.h"
+-#include "qapi/error.h"
+-#include "qapi/qmp/qlist.h"
+-#include "qapi/qmp/qnum.h"
+ #include "qapi/qapi-events-rdma.h"
+ 
+ #include <infiniband/verbs.h>
+-#include <infiniband/umad_types.h>
+-#include <infiniband/umad.h>
+-#include <rdma/rdma_user_cm.h>
+ 
+ #include "contrib/rdmacm-mux/rdmacm-mux.h"
+ #include "trace.h"
+-- 
+2.20.1
 
-
-ATB,
-
-Mark.
 
