@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55668)
+Received: from eggs.gnu.org ([209.51.188.92]:55695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNHdv-00045E-9J
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:28 -0400
+	(envelope-from <thuth@redhat.com>) id 1hNHdw-00046k-EX
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNHdu-0004ak-9Z
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1hNHdv-0004bu-G1
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:28 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Sun,  5 May 2019 15:56:49 +0200
-Message-Id: <20190505135714.11277-4-thuth@redhat.com>
+Date: Sun,  5 May 2019 15:56:50 +0200
+Message-Id: <20190505135714.11277-5-thuth@redhat.com>
 In-Reply-To: <20190505135714.11277-1-thuth@redhat.com>
 References: <20190505135714.11277-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/28] hw/arm: Express dependencies of the
- exynos machines with Kconfig
+Subject: [Qemu-devel] [PULL 04/28] hw/arm: Express dependencies of the
+ highbank machines with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,8 +26,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 
-Add Kconfig dependencies for the Exynos-related boards (nuri and
-smdkc210).
+Add Kconfig dependencies for the highbank machine (and the midway
+machine).
 This patch is slightly based on earlier work by =C3=81kos Kov=C3=A1cs (i.=
 e.
 his "hw/arm/Kconfig: Add ARM Kconfig" patch).
@@ -36,116 +36,77 @@ Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 17 ++++++-----------
- hw/arm/Kconfig                  | 10 ++++++++++
- 2 files changed, 16 insertions(+), 11 deletions(-)
+ default-configs/arm-softmmu.mak |  9 +--------
+ hw/arm/Kconfig                  | 11 +++++++++++
+ 2 files changed, 12 insertions(+), 8 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
 u.mak
-index 613d19a06d..2a11e76cc7 100644
+index 2a11e76cc7..50a4be3cad 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -1,8 +1,14 @@
- # Default configuration for arm-softmmu
-=20
-+# TODO: ARM_V7M is currently always required - make this more flexible!
-+CONFIG_ARM_V7M=3Dy
-+
- CONFIG_PCI=3Dy
- CONFIG_PCI_DEVICES=3Dy
+@@ -8,6 +8,7 @@ CONFIG_PCI_DEVICES=3Dy
  CONFIG_PCI_TESTDEV=3Dy
-+
-+CONFIG_EXYNOS4=3Dy
-+
+=20
+ CONFIG_EXYNOS4=3Dy
++CONFIG_HIGHBANK=3Dy
+=20
  CONFIG_VGA=3Dy
  CONFIG_NAND=3Dy
- CONFIG_ECC=3Dy
-@@ -26,7 +32,6 @@ CONFIG_ADS7846=3Dy
- CONFIG_MAX111X=3Dy
- CONFIG_SSI_SD=3Dy
- CONFIG_SSI_M25P80=3Dy
--CONFIG_LAN9118=3Dy
- CONFIG_SMC91C111=3Dy
- CONFIG_ALLWINNER_EMAC=3Dy
- CONFIG_IMX_FEC=3Dy
-@@ -36,21 +41,15 @@ CONFIG_PFLASH_CFI01=3Dy
- CONFIG_PFLASH_CFI02=3Dy
- CONFIG_MICRODRIVE=3Dy
- CONFIG_USB_MUSB=3Dy
--CONFIG_USB_EHCI_SYSBUS=3Dy
- CONFIG_PLATFORM_BUS=3Dy
+@@ -45,24 +46,17 @@ CONFIG_PLATFORM_BUS=3Dy
  CONFIG_VIRTIO_MMIO=3Dy
 =20
  CONFIG_ARM11MPCORE=3Dy
--CONFIG_A9MPCORE=3Dy
- CONFIG_A15MPCORE=3Dy
+-CONFIG_A15MPCORE=3Dy
 =20
--CONFIG_ARM_V7M=3Dy
  CONFIG_NETDUINO2=3Dy
 =20
--CONFIG_ARM_GIC=3Dy
- CONFIG_ARM_TIMER=3Dy
--CONFIG_ARM_MPTIMER=3Dy
--CONFIG_A9_GTIMER=3Dy
- CONFIG_PL011=3Dy
- CONFIG_PL022=3Dy
- CONFIG_PL031=3Dy
-@@ -61,11 +60,9 @@ CONFIG_PL080=3Dy
+-CONFIG_ARM_TIMER=3Dy
+-CONFIG_PL011=3Dy
+-CONFIG_PL022=3Dy
+-CONFIG_PL031=3Dy
+ CONFIG_PL041=3Dy
+ CONFIG_PL050=3Dy
+-CONFIG_PL061=3Dy
+ CONFIG_PL080=3Dy
  CONFIG_PL110=3Dy
  CONFIG_PL181=3Dy
  CONFIG_PL190=3Dy
--CONFIG_PL310=3Dy
  CONFIG_PL330=3Dy
  CONFIG_CADENCE=3Dy
- CONFIG_XGMAC=3Dy
--CONFIG_EXYNOS4=3Dy
+-CONFIG_XGMAC=3Dy
  CONFIG_PXA2XX=3Dy
  CONFIG_BITBANG_I2C=3Dy
  CONFIG_FRAMEBUFFER=3Dy
-@@ -73,7 +70,6 @@ CONFIG_XILINX_SPIPS=3Dy
- CONFIG_ZYNQ_DEVCFG=3Dy
+@@ -150,7 +144,6 @@ CONFIG_XILINX_AXI=3Dy
+ CONFIG_PCI_EXPRESS_DESIGNWARE=3Dy
 =20
- CONFIG_ARM11SCU=3Dy
--CONFIG_A9SCU=3Dy
- CONFIG_DIGIC=3Dy
- CONFIG_MARVELL_88W8618=3Dy
- CONFIG_OMAP=3Dy
-@@ -123,7 +119,6 @@ CONFIG_VERSATILE_I2C=3Dy
- CONFIG_PCI_EXPRESS=3Dy
- CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=3Dy
+ CONFIG_STRONGARM=3Dy
+-CONFIG_HIGHBANK=3Dy
+ CONFIG_MUSICPAL=3Dy
 =20
--CONFIG_SDHCI=3Dy
- CONFIG_INTEGRATOR=3Dy
- CONFIG_INTEGRATOR_DEBUG=3Dy
-=20
+ # for realview and versatilepb
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index d298fbdc89..acd07b2add 100644
+index acd07b2add..0ba377ac18 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -8,7 +8,13 @@ config DIGIC
-=20
- config EXYNOS4
-     bool
-+    select A9MPCORE
-+    select I2C
-+    select LAN9118
-+    select PL310 # cache controller
-     select PTIMER
-+    select SDHCI
-+    select USB_EHCI_SYSBUS
+@@ -18,6 +18,17 @@ config EXYNOS4
 =20
  config HIGHBANK
      bool
-@@ -104,6 +110,10 @@ config ZAURUS
++    select A9MPCORE
++    select A15MPCORE
++    select AHCI
++    select ARM_TIMER # sp804
++    select ARM_V7M
++    select PL011 # UART
++    select PL022 # Serial port
++    select PL031 # RTC
++    select PL061 # GPIO
++    select PL310 # cache controller
++    select XGMAC # ethernet
 =20
- config A9MPCORE
-     bool
-+    select A9_GTIMER
-+    select A9SCU       # snoop control unit
-+    select ARM_GIC
-+    select ARM_MPTIMER
-=20
- config A15MPCORE
+ config INTEGRATOR
      bool
 --=20
 2.21.0
