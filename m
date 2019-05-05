@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49893)
+Received: from eggs.gnu.org ([209.51.188.92]:50411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNJQG-0001mn-Dh
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:51:29 -0400
+	(envelope-from <thuth@redhat.com>) id 1hNJSu-0002eu-Oe
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:54:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNJQF-0004MO-3q
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:51:28 -0400
-References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
-	<20190428143845.11810-3-mark.cave-ayland@ilande.co.uk>
-	<55204805-9275-2bc4-2c38-51dc87aa836d@linaro.org>
-	<7227a96f-ae59-3ed4-8b1f-9e92005b4a69@ilande.co.uk>
-	<626519f6-28c2-9870-0c6d-12869fbf57f1@linaro.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <cf86b84d-bf12-7b50-267d-cb2897cfd20d@ilande.co.uk>
-Date: Sun, 5 May 2019 16:49:11 +0100
+	(envelope-from <thuth@redhat.com>) id 1hNJSt-0005pU-NG
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:54:12 -0400
+References: <20190503143904.31211-1-alex.bennee@linaro.org>
+	<98cd84db-2aed-4aa1-1f2d-eaa7ac63b72b@redhat.com>
+	<87d0kz4iqs.fsf@zen.linaroharston>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0badc17e-90bc-1a09-89c1-20f88ff75d3b@redhat.com>
+Date: Sun, 5 May 2019 17:54:05 +0200
 MIME-Version: 1.0
-In-Reply-To: <626519f6-28c2-9870-0c6d-12869fbf57f1@linaro.org>
+In-Reply-To: <87d0kz4iqs.fsf@zen.linaroharston>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/14] target/ppc: remove getVSR()/putVSR()
- from mem_helper.c
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] tests/qemu-iotests: re-format output
+ to for make check-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, gkurz@kaod.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 05/05/2019 15:34, Richard Henderson wrote:
-
-> On 5/5/19 2:34 AM, Mark Cave-Ayland wrote:
->>>>      EA = tcg_temp_new();                                        \
->>>> -    xt = tcg_const_tl(xT(ctx->opcode));                         \
->>>>      gen_set_access_type(ctx, ACCESS_INT);                       \
->>>>      gen_addr_register(ctx, EA);                                 \
->>>> -    gen_helper_##name(cpu_env, EA, xt, cpu_gpr[rB(ctx->opcode)]); \
->>>> +    xt = tcg_const_tl(xT(ctx->opcode));                         \
->>>> +    rb = tcg_const_tl(rB(ctx->opcode));                         \
->>>> +    gen_helper_##name(cpu_env, EA, xt, rb);                     \
->>>>      tcg_temp_free(EA);                                          \
->>>>      tcg_temp_free(xt);                                          \
->>>> +    tcg_temp_free(rb);                                          \
->>>>  }
+On 03/05/2019 18.15, Alex Benn=C3=A9e wrote:
+>=20
+> Thomas Huth <thuth@redhat.com> writes:
+>=20
+>> On 03/05/2019 16.39, Alex Benn=C3=A9e wrote:
+>>> This attempts to clean-up the output to better match the output of th=
+e
+>>> rest of the QEMU check system. This includes:
 >>>
->>> Why are you adjusting the function to pass the rB register number rather than
->>> the contents of rB?  That seems the wrong way around...
+>>>   - formatting as "  TEST    iotest: nnn"
+>>>   - calculating time diff at the end
+>>>   - only dumping config on failure
+>>>
+>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>> ---
+>>>  tests/qemu-iotests/check | 71 +++++++++++++++++++-------------------=
+--
+>>>  1 file changed, 34 insertions(+), 37 deletions(-)
 >>
->> I think what I was trying to do here was eliminate the cpu_gpr since it
->> feels to me that with the vector patchsets and your negative offset patches
->> that this should be the way to go for accessing CPUState rather than using
->> TCG globals.
-> 
-> Not for the integer register set.
-> 
->> Looking at this again I realise the solution is really the same as is
->> currently used
->> for gen_load_spr() so I can use something like this:>
->>     static inline void gen_load_gpr(TCGv t, int reg)
->>     {
->>         tcg_gen_ld_tl(t, cpu_env, offsetof(CPUPPCState, gpr[reg]));
->>     }
+>> Thanks for tackling this! The output now looks nicer indeed if you run
+>> "make check-qtest check-block -j8". However, if you add a "V=3D1" at t=
+he
+>> end of the command line, the outputs look quite different again...
 >>
->> Does this seem reasonable as a solution?
-> 
-> No, this will fail quickly.
+>> That's why I thought that having a TAP mode for the check script could
+>> be a good idea, too. Then we could pipe the output through the
+>> tap-driver.pl script, too, so we get uniform output for all tests...?
+>=20
+> That would probably be a cleaner approach. What would be even better is
+> somehow expanding the list of tests at make time so you could run your
+> tests in parallel.
 
-Okay in that case I'll leave it as-is. So just to satisfy my curiosity here: is the
-problem here the mixing and matching of offsets and TCG globals, rather than the use
-of offsets as done for the VMX/VSX registers?
+I agree that this might be the ultimate solution ... but I'm not sure
+whether the iotests are really ready for being run in parallel yet, so
+it will likely take quite some while 'till we are at that point. With
+that in mind (and thus also not sure yet whether my TAP idea is really
+the right approach), your patch is certainly a good interim solution
+which we should try to get merged, too, when my "make check" series gets
+accepted?
 
+> I did wonder how useful the timing stuff was to developers.
 
-ATB,
+Yes, me too ... maybe the block layer folks can comment on that one...?
 
-Mark.
+ Thomas
