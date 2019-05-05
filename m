@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E662C004C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 22:27:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1EFFC004C9
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 22:27:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F75F205C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 22:27:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F75F205C9
+	by mail.kernel.org (Postfix) with ESMTPS id 75343205ED
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 22:27:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75343205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47078 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47080 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNPbH-0006Pz-Cq
-	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 18:27:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36351)
+	id 1hNPbT-0006Zw-My
+	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 18:27:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNPRP-0004rR-JB
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:17:04 -0400
+	(envelope-from <philmd@redhat.com>) id 1hNPR8-0004UM-P0
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:16:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNPRO-0000ci-O2
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:17:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45886)
+	(envelope-from <philmd@redhat.com>) id 1hNPR7-0000Dr-RL
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:16:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51400)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <philmd@redhat.com>)
-	id 1hNPRL-0000Xs-FJ; Sun, 05 May 2019 18:16:59 -0400
+	id 1hNPR4-000076-O2; Sun, 05 May 2019 18:16:42 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B062CB0AA6;
-	Sun,  5 May 2019 22:16:58 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DF19A85A07;
+	Sun,  5 May 2019 22:16:40 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-58.brq.redhat.com [10.40.204.58])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 06A535D739;
-	Sun,  5 May 2019 22:16:52 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A0F385D739;
+	Sun,  5 May 2019 22:16:37 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org,
 	Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Date: Mon,  6 May 2019 00:15:44 +0200
-Message-Id: <20190505221544.31568-14-philmd@redhat.com>
+Date: Mon,  6 May 2019 00:15:40 +0200
+Message-Id: <20190505221544.31568-10-philmd@redhat.com>
 In-Reply-To: <20190505221544.31568-1-philmd@redhat.com>
 References: <20190505221544.31568-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Sun, 05 May 2019 22:16:58 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.26]);
+	Sun, 05 May 2019 22:16:40 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 13/13] hw/block/pflash_cfi02: Use the chip
- erase time specified in the CFI table
+Subject: [Qemu-devel] [PATCH 09/13] hw/block/pflash_cfi02: Use the ldst API
+ in pflash_read()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,44 +80,66 @@ Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505221544.6SQVuHclrTYIP1HEFDdCuJLhE5Gve8shH71BLW2Jupw@z>
+Message-ID: <20190505221540.nn-7Lj7VFTKOr9orwPRJWZK4Cr8tXfOffu70UAEN804@z>
 
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-
-When erasing the chip, use the typical time specified in the CFI table
-rather than arbitrarily selecting 5 seconds.
-
-Since the currently unconfigurable value set in the table is 12, this
-means a chip erase takes 4096 ms so this isn't a big change in behavior.
+The load/store API eases code review.
 
 Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Message-Id: <20190426162624.55977-11-stephen.checkoway@oberlin.edu>
+Message-Id: <20190426162624.55977-3-stephen.checkoway@oberlin.edu>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-[PMD: Prepend 'hw/' in patch subject]
+[PMD: Extracted from bigger patch]
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/block/pflash_cfi02.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/block/pflash_cfi02.c | 26 ++++++--------------------
+ 1 file changed, 6 insertions(+), 20 deletions(-)
 
 diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 4c17dbf99f4..49cd9ed0f91 100644
+index 69e0086324e..2777167af11 100644
 --- a/hw/block/pflash_cfi02.c
 +++ b/hw/block/pflash_cfi02.c
-@@ -429,9 +429,9 @@ static void pflash_write(void *opaque, hwaddr offset,=
- uint64_t value,
-                 pflash_update(pfl, 0, pfl->chip_len);
-             }
-             set_dq7(pfl, 0x00);
--            /* Let's wait 5 seconds before chip erase is done */
-+            /* Wait the time specified at CFI address 0x22. */
-             timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)=
- +
--                      (NANOSECONDS_PER_SECOND * 5));
-+                      (1ULL << pfl->cfi_table[0x22]) * SCALE_MS);
+@@ -196,34 +196,20 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwadd=
+r offset,
+     case 0x00:
+     flash_read:
+         /* Flash area read */
+-        p =3D pfl->storage;
++        p =3D (uint8_t *)pfl->storage + offset;
++        if (pfl->be) {
++            ret =3D ldn_be_p(p, width);
++        } else {
++            ret =3D ldn_le_p(p, width);
++        }
+         switch (width) {
+         case 1:
+-            ret =3D p[offset];
+             trace_pflash_data_read8(offset, ret);
              break;
-         case 0x30:
-             /* Sector erase */
+         case 2:
+-            if (be) {
+-                ret =3D p[offset] << 8;
+-                ret |=3D p[offset + 1];
+-            } else {
+-                ret =3D p[offset];
+-                ret |=3D p[offset + 1] << 8;
+-            }
+             trace_pflash_data_read16(offset, ret);
+             break;
+         case 4:
+-            if (be) {
+-                ret =3D p[offset] << 24;
+-                ret |=3D p[offset + 1] << 16;
+-                ret |=3D p[offset + 2] << 8;
+-                ret |=3D p[offset + 3];
+-            } else {
+-                ret =3D p[offset];
+-                ret |=3D p[offset + 1] << 8;
+-                ret |=3D p[offset + 2] << 16;
+-                ret |=3D p[offset + 3] << 24;
+-            }
+             trace_pflash_data_read32(offset, ret);
+             break;
+         }
 --=20
 2.20.1
 
