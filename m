@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55788)
+Received: from eggs.gnu.org ([209.51.188.92]:55855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNHe0-0004B9-Hs
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:33 -0400
+	(envelope-from <thuth@redhat.com>) id 1hNHe3-0004Em-Oa
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNHdz-0004fr-HW
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:32 -0400
+	(envelope-from <thuth@redhat.com>) id 1hNHe2-0004j0-NE
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:35 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Sun,  5 May 2019 15:56:52 +0200
-Message-Id: <20190505135714.11277-7-thuth@redhat.com>
+Date: Sun,  5 May 2019 15:56:55 +0200
+Message-Id: <20190505135714.11277-10-thuth@redhat.com>
 In-Reply-To: <20190505135714.11277-1-thuth@redhat.com>
 References: <20190505135714.11277-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/28] hw/arm: Express dependencies of the
- fsl-imx31 machine with Kconfig
+Subject: [Qemu-devel] [PULL 09/28] hw/arm: Express dependencies of stellaris
+ with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,77 +26,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 
-Add Kconfig dependencies for the fsl-imx31 / kzm machine.
 This patch is slightly based on earlier work by =C3=81kos Kov=C3=A1cs (i.=
 e.
 his "hw/arm/Kconfig: Add ARM Kconfig" patch).
 
-Reviewed-by: Peter Chubb <peter.chubb@data61.csiro.au>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 3 +--
- hw/arm/Kconfig                  | 4 ++++
- hw/misc/Kconfig                 | 2 ++
- 3 files changed, 7 insertions(+), 2 deletions(-)
+ default-configs/arm-softmmu.mak |  7 +------
+ hw/arm/Kconfig                  | 11 +++++++++++
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
 u.mak
-index 6195b75f48..7f94811ccb 100644
+index b7ed3c530b..3f82d635e4 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -10,6 +10,7 @@ CONFIG_PCI_TESTDEV=3Dy
- CONFIG_EXYNOS4=3Dy
- CONFIG_HIGHBANK=3Dy
- CONFIG_INTEGRATOR=3Dy
-+CONFIG_FSL_IMX31=3Dy
+@@ -16,6 +16,7 @@ CONFIG_MUSCA=3Dy
+ CONFIG_CHEETAH=3Dy
+ CONFIG_SX1=3Dy
+ CONFIG_NSERIES=3Dy
++CONFIG_STELLARIS=3Dy
 =20
  CONFIG_VGA=3Dy
  CONFIG_NAND=3Dy
-@@ -68,7 +69,6 @@ CONFIG_TSC210X=3Dy
- CONFIG_BLIZZARD=3Dy
- CONFIG_ONENAND=3Dy
- CONFIG_TUSB6010=3Dy
--CONFIG_IMX=3Dy
- CONFIG_MAINSTONE=3Dy
- CONFIG_MPS2=3Dy
- CONFIG_MUSCA=3Dy
-@@ -115,7 +115,6 @@ CONFIG_ALLWINNER_A10_PIC=3Dy
- CONFIG_ALLWINNER_A10=3Dy
-=20
- CONFIG_FSL_IMX6=3Dy
--CONFIG_FSL_IMX31=3Dy
- CONFIG_FSL_IMX25=3Dy
- CONFIG_FSL_IMX7=3Dy
- CONFIG_FSL_IMX6UL=3Dy
+@@ -24,16 +25,10 @@ CONFIG_SERIAL=3Dy
+ CONFIG_MAX7310=3Dy
+ CONFIG_TMP421=3Dy
+ CONFIG_PCA9552=3Dy
+-CONFIG_STELLARIS=3Dy
+-CONFIG_STELLARIS_INPUT=3Dy
+-CONFIG_STELLARIS_ENET=3Dy
+-CONFIG_SSD0303=3Dy
+-CONFIG_SSD0323=3Dy
+ CONFIG_DDC=3Dy
+ CONFIG_SII9022=3Dy
+ CONFIG_ADS7846=3Dy
+ CONFIG_MAX111X=3Dy
+-CONFIG_SSI_SD=3Dy
+ CONFIG_SSI_M25P80=3Dy
+ CONFIG_ALLWINNER_EMAC=3Dy
+ CONFIG_IMX_FEC=3Dy
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index ad3b1f9b40..9087b7d714 100644
+index 71126254ff..e5a8ae5ef9 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -98,6 +98,10 @@ config FSL_IMX25
+@@ -91,6 +91,17 @@ config REALVIEW
 =20
- config FSL_IMX31
+ config STELLARIS
      bool
-+    select SERIAL
-+    select IMX
-+    select IMX_I2C
-+    select LAN9118
++    select ARM_V7M
++    select CMSDK_APB_WATCHDOG
++    select I2C
++    select PL011 # UART
++    select PL022 # Serial port
++    select PL061 # GPIO
++    select SSD0303 # OLED display
++    select SSD0323 # OLED display
++    select SSI_SD
++    select STELLARIS_INPUT
++    select STELLARIS_ENET # ethernet
 =20
- config FSL_IMX6
-     bool
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index 5f67d0d6d9..385e1b0cec 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -76,6 +76,8 @@ config ECCMEMCTL
- config IMX
-     bool
-     select PTIMER
-+    select SSI
-+    select USB_EHCI_SYSBUS
-=20
- config STM32F2XX_SYSCFG
+ config STRONGARM
      bool
 --=20
 2.21.0
