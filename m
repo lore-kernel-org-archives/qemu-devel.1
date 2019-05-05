@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50485)
+Received: from eggs.gnu.org ([209.51.188.92]:51257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNJTD-0002si-UI
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:54:32 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hNJVs-0005ON-BZ
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:57:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNJTD-0005zN-2k
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:54:31 -0400
-References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
-	<20190428143845.11810-15-mark.cave-ayland@ilande.co.uk>
-	<3c05b552-a692-e439-fc28-90ad69767cf2@linaro.org>
-	<e8968236-5ab2-568f-fd32-e9208c0f2ebe@ilande.co.uk>
-	<f0e80eda-9f10-f39f-708a-1dc08575bd9b@linaro.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <3ac1091b-dc00-d58a-4cd2-03feb6cf0fa9@ilande.co.uk>
-Date: Sun, 5 May 2019 16:54:21 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1hNJVr-0007rW-IT
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:57:16 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:40782)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hNJVr-0007qu-AZ
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:57:15 -0400
+Received: by mail-pf1-x444.google.com with SMTP id u17so5395535pfn.7
+	for <qemu-devel@nongnu.org>; Sun, 05 May 2019 08:57:15 -0700 (PDT)
+References: <20190504083638.13380-1-S.E.Harris@kent.ac.uk>
+	<20190504083638.13380-9-S.E.Harris@kent.ac.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <c05b4876-c55e-fd82-46d0-83be1b128cee@linaro.org>
+Date: Sun, 5 May 2019 08:57:11 -0700
 MIME-Version: 1.0
-In-Reply-To: <f0e80eda-9f10-f39f-708a-1dc08575bd9b@linaro.org>
+In-Reply-To: <20190504083638.13380-9-S.E.Harris@kent.ac.uk>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 14/14] target/ppc: improve VSX_FMADD with
- new GEN_VSX_HELPER_VSX_MADD macro
+Subject: Re: [Qemu-devel] [PATCH v1 8/8] target/avr: Register AVR support
+ with the rest of QEMU, the build system, and the MAINTAINERS file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, gkurz@kaod.org
+To: Sarah Harris <S.E.Harris@kent.ac.uk>, qemu-devel@nongnu.org
+Cc: mrolnik@gmail.com, A.M.King@kent.ac.uk, E.J.C.Robbins@kent.ac.uk
 
-On 05/05/2019 16:17, Richard Henderson wrote:
+On 5/4/19 1:36 AM, Sarah Harris wrote:
+> Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+...
+>  
+> +AVR
+> +M: Michael Rolnik <mrolnik@gmail.com>
+> +S: Odd Fixes
+> +F: target-avr/
+> +F: hw/avr/
+> +
 
-> On 5/5/19 3:20 AM, Mark Cave-Ayland wrote:
->>> The afrm argument is no longer used.
->>> This also means that e.g.
->>>
->>> VSX_MADD(xsmaddadp, 1, float64, VsrD(0), MADD_FLGS, 1, 1, 0)
->>> VSX_MADD(xsmaddmdp, 1, float64, VsrD(0), MADD_FLGS, 0, 1, 0)
->>>
->>> are redundant.  Similarly with all of the other pairs.
->>
->> Agreed. What do you think is the best solution here - maybe a double macro that looks
->> something like this?
->>
->> #define VSX_MADD(op, prec, nels, tp, fld, maddflgs, sfprf, r2sp)
->> _VSX_MADD(op##aprec, nels, tp, fld, maddflgs, sfprf, r2sp)
->> _VSX_MADD(op##mprec, nels, tp, fld, maddflgs, sfprf, r2sp)
->>
->> VSX_MADD(xsmadd, dp, 1, float64, VsrD(0), MADD_FLGS, 1, 0)
-> 
-> I have no idea what you're suggesting.
-> 
-> I am suggesting one function, xsmadddp, replacing xsmaddadp + xsmaddmdp, that
-> is used by both instructions.
+This is not how things work.  Michael wasn't up to maintaining the code 2 years
+ago; that's why it was never committed.
 
-Gotcha. I was thinking that the standard practice was to have a 1:1 correspondence
-between the gen function and helper function for instructions, but I'm happy to go
-with your suggestion above.
+You would need to maintain this yourself, and for more than "Odd Fixes".
 
 
-ATB,
-
-Mark.
+r~
