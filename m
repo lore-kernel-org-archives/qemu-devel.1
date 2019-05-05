@@ -2,63 +2,61 @@ Return-Path: <SRS0=Huu6=TF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 233A1C004C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 14:02:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26A2DC004C9
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 14:02:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B2AA208C0
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 14:02:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B2AA208C0
+	by mail.kernel.org (Postfix) with ESMTPS id F21B5208C0
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 14:02:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F21B5208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41438 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41442 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNHix-000060-8a
-	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 10:02:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55931)
+	id 1hNHjE-0000KP-5k
+	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 10:02:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNHe8-0004H1-EL
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:41 -0400
+	(envelope-from <thuth@redhat.com>) id 1hNHds-00041s-5W
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNHe7-0004nE-ED
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60368)
+	(envelope-from <thuth@redhat.com>) id 1hNHdr-0004Xw-00
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54914)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hNHe4-0004kS-Em; Sun, 05 May 2019 09:57:36 -0400
+	id 1hNHdo-0004Tx-Em; Sun, 05 May 2019 09:57:20 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C6262307D93E;
-	Sun,  5 May 2019 13:57:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EE9463001815;
+	Sun,  5 May 2019 13:57:18 +0000 (UTC)
 Received: from thuth.com (ovpn-116-27.ams2.redhat.com [10.36.116.27])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E0FA160C18;
-	Sun,  5 May 2019 13:57:34 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CAC8A60C43;
+	Sun,  5 May 2019 13:57:17 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Date: Sun,  5 May 2019 15:56:58 +0200
-Message-Id: <20190505135714.11277-13-thuth@redhat.com>
-In-Reply-To: <20190505135714.11277-1-thuth@redhat.com>
-References: <20190505135714.11277-1-thuth@redhat.com>
+Date: Sun,  5 May 2019 15:56:46 +0200
+Message-Id: <20190505135714.11277-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Sun, 05 May 2019 13:57:35 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Sun, 05 May 2019 13:57:19 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 12/28] hw/arm: Express dependencies of
- xilinx-zynq with Kconfig
+Subject: [Qemu-devel] [PULL 00/28] Kconfig for Arm machines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,83 +72,76 @@ Cc: qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505135658.L5pnfgBTz4dFueltqHUHaY5DOAE-1B_VlLZRAP3oRiY@z>
+Message-ID: <20190505135646.yiuGiOBCTFCz0VOYATHZGi-TxOWosdq863zO-138FVw@z>
 
-Add Kconfig dependencies for the xilinx-zynq-a9 board.
-This patch is based on earlier work by =C3=81kos Kov=C3=A1cs (i.e.
-his "hw/arm/Kconfig: Add ARM Kconfig" patch).
+ Hi Peter,
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- default-configs/arm-softmmu.mak |  7 +------
- hw/arm/Kconfig                  | 12 ++++++++++++
- 2 files changed, 13 insertions(+), 6 deletions(-)
+the following changes since commit a6ae23831b05a11880b40f7d58e332c45a6b04=
+f7:
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-index f39a854f2e..af78e7c892 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -19,6 +19,7 @@ CONFIG_STELLARIS=3Dy
- CONFIG_REALVIEW=3Dy
- CONFIG_VERSATILE=3Dy
- CONFIG_VEXPRESS=3Dy
-+CONFIG_ZYNQ=3Dy
- CONFIG_MAINSTONE=3Dy
- CONFIG_GUMSTIX=3Dy
- CONFIG_SPITZ=3Dy
-@@ -38,16 +39,11 @@ CONFIG_VIRTIO_MMIO=3Dy
-=20
- CONFIG_NETDUINO2=3Dy
-=20
--CONFIG_PL330=3Dy
--CONFIG_CADENCE=3Dy
- CONFIG_FRAMEBUFFER=3Dy
--CONFIG_XILINX_SPIPS=3Dy
--CONFIG_ZYNQ_DEVCFG=3Dy
-=20
- CONFIG_DIGIC=3Dy
- CONFIG_MPS2=3Dy
- CONFIG_RASPI=3Dy
--CONFIG_ZYNQ=3Dy
- CONFIG_STM32F2XX_TIMER=3Dy
- CONFIG_STM32F2XX_USART=3Dy
- CONFIG_STM32F2XX_SYSCFG=3Dy
-@@ -100,7 +96,6 @@ CONFIG_SMBUS_EEPROM=3Dy
- CONFIG_GPIO_KEY=3Dy
- CONFIG_MSF2=3Dy
- CONFIG_FW_CFG_DMA=3Dy
--CONFIG_XILINX_AXI=3Dy
- CONFIG_PCI_EXPRESS_DESIGNWARE=3Dy
-=20
- CONFIG_STRONGARM=3Dy
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 79706ed0ce..dfdc1b1fd6 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -202,6 +202,18 @@ config VEXPRESS
-=20
- config ZYNQ
-     bool
-+    select A9MPCORE
-+    select CADENCE # UART
-+    select PFLASH_CFI02
-+    select PL330
-+    select SDHCI
-+    select SSI_M25P80
-+    select USB_EHCI_SYSBUS
-+    select XILINX # UART
-+    select XILINX_AXI
-+    select XILINX_SPI
-+    select XILINX_SPIPS
-+    select ZYNQ_DEVCFG
-=20
- config ARM_V7M
-     bool
---=20
-2.21.0
+  Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-re=
+quest' into staging (2019-05-03 15:26:09 +0100)
 
+are available in the Git repository at:
+
+  https://gitlab.com/huth/qemu.git tags/pull-request-2019-05-05
+
+for you to fetch changes up to 55e5578fabf744e62038f7357369a68e460fe205:
+
+  hw/arm: Remove hard-enablement of the remaining PCI devices (2019-05-03=
+ 17:06:20 +0200)
+
+----------------------------------------------------------------
+Kconfig settings for the Arm machines
+----------------------------------------------------------------
+
+Thomas Huth (28):
+      hw/pci/pci-stub: Add msi_enabled() and msi_notify() to the pci stub=
+s
+      hw/ide/ahci: Add a Kconfig switch for the AHCI-ICH9 device
+      hw/arm: Express dependencies of the exynos machines with Kconfig
+      hw/arm: Express dependencies of the highbank machines with Kconfig
+      hw/arm: Express dependencies of integratorcp with Kconfig
+      hw/arm: Express dependencies of the fsl-imx31 machine with Kconfig
+      hw/arm: Express dependencies of musicpal with Kconfig
+      hw/arm: Express dependencies of the OMAP machines with Kconfig
+      hw/arm: Express dependencies of stellaris with Kconfig
+      hw/arm: Express dependencies of realview, versatile and vexpress wi=
+th Kconfig
+      hw/arm: Express dependencies of the PXA2xx machines with Kconfig
+      hw/arm: Express dependencies of xilinx-zynq with Kconfig
+      hw/arm: Express dependencies of collie with Kconfig
+      hw/arm: Express dependencies of the aspeed boards with Kconfig
+      hw/arm: Express dependencies of the virt machine with Kconfig
+      hw/arm: Express dependencies of netduino / stm32f2xx with Kconfig
+      hw/arm: Express dependencies of allwinner / cubieboard with Kconfig
+      hw/arm: Express dependencies of the MPS2 boards with Kconfig
+      hw/arm: Express dependencies of the raspi machines with Kconfig
+      hw/arm: Express dependencies of canon-a1100 with Kconfig
+      hw/arm: Express dependencies of sabrelite with Kconfig
+      hw/arm: Express dependencies of the MSF2 / EMCRAFT_SF2 machine with=
+ Kconfig
+      hw/arm: Express dependencies of the remaining IMX boards with Kconf=
+ig
+      hw/arm: Express dependencies of the microbit / nrf51 machine with K=
+config
+      hw/arm: Express dependencies of the ZynqMP zcu102 machine with Kcon=
+fig
+      hw/arm: Express dependencies of the xlnx-versal-virt machine with K=
+config
+      hw/arm: Express dependencies of the musca machines with Kconfig
+      hw/arm: Remove hard-enablement of the remaining PCI devices
+
+ default-configs/aarch64-softmmu.mak |   5 -
+ default-configs/arm-softmmu.mak     | 179 ++++----------------
+ hw/arm/Kconfig                      | 317 ++++++++++++++++++++++++++++++=
++++++-
+ hw/arm/Makefile.objs                |  25 ++-
+ hw/display/Kconfig                  |   3 +
+ hw/i2c/Kconfig                      |   2 +-
+ hw/ide/Kconfig                      |   6 +-
+ hw/ide/Makefile.objs                |   2 +-
+ hw/misc/Kconfig                     |   2 +
+ hw/pci/pci-stub.c                   |  11 ++
+ 10 files changed, 383 insertions(+), 169 deletions(-)
 
