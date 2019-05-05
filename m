@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB09FC004C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 14:13:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2451BC004C9
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 14:14:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFEE4206DF
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 14:13:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFEE4206DF
+	by mail.kernel.org (Postfix) with ESMTPS id EE1CE206DF
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 14:14:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE1CE206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41610 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41618 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNHtF-00019Y-UP
-	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 10:13:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55834)
+	id 1hNHty-0001kU-56
+	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 10:14:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNHe2-0004Dh-RG
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:35 -0400
+	(envelope-from <thuth@redhat.com>) id 1hNHeM-0004WK-Bw
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNHe1-0004i0-OO
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44490)
+	(envelope-from <thuth@redhat.com>) id 1hNHeK-0004w0-8U
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44686)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hNHdz-0004ey-1P; Sun, 05 May 2019 09:57:31 -0400
+	id 1hNHeE-0004rR-Ln; Sun, 05 May 2019 09:57:48 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 53420CA1FE;
-	Sun,  5 May 2019 13:57:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D753DC057E37;
+	Sun,  5 May 2019 13:57:44 +0000 (UTC)
 Received: from thuth.com (ovpn-116-27.ams2.redhat.com [10.36.116.27])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4692A60C67;
-	Sun,  5 May 2019 13:57:29 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CA70A60C18;
+	Sun,  5 May 2019 13:57:43 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Date: Sun,  5 May 2019 15:56:54 +0200
-Message-Id: <20190505135714.11277-9-thuth@redhat.com>
+Date: Sun,  5 May 2019 15:57:04 +0200
+Message-Id: <20190505135714.11277-19-thuth@redhat.com>
 In-Reply-To: <20190505135714.11277-1-thuth@redhat.com>
 References: <20190505135714.11277-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Sun, 05 May 2019 13:57:30 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.31]);
+	Sun, 05 May 2019 13:57:44 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 08/28] hw/arm: Express dependencies of the OMAP
- machines with Kconfig
+Subject: [Qemu-devel] [PULL 18/28] hw/arm: Express dependencies of the MPS2
+ boards with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,142 +74,97 @@ Cc: qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505135654.cT7SzwHDj4mppm_Zn-49QjwkuMNf9xeT5gmUVrs0H-I@z>
+Message-ID: <20190505135704.D9Rbh0fK_B8deANPxIIntdswzfaRJyNkd7EmwcDeamo@z>
 
-Add Kconfig dependencies for the OMAP machines (cheetah, n800, n810,
-sx1 and sx1-v1).
-This patch is slightly based on earlier work by =C3=81kos Kov=C3=A1cs (i.=
-e.
-his "hw/arm/Kconfig: Add ARM Kconfig" patch).
+Add Kconfig dependencies for the mps2-an* machines.
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 17 ++++-------------
- hw/arm/Kconfig                  | 25 +++++++++++++++++++++++++
- hw/arm/Makefile.objs            |  3 ++-
- 3 files changed, 31 insertions(+), 14 deletions(-)
+ default-configs/arm-softmmu.mak | 20 +-------------------
+ hw/arm/Kconfig                  | 19 +++++++++++++++++++
+ 2 files changed, 20 insertions(+), 19 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
 u.mak
-index 0a4d293f8a..b7ed3c530b 100644
+index a0b9016e3a..31d31d3f4a 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -12,16 +12,16 @@ CONFIG_HIGHBANK=3Dy
- CONFIG_INTEGRATOR=3Dy
- CONFIG_FSL_IMX31=3Dy
- CONFIG_MUSICPAL=3Dy
-+CONFIG_MUSCA=3Dy
-+CONFIG_CHEETAH=3Dy
-+CONFIG_SX1=3Dy
-+CONFIG_NSERIES=3Dy
+@@ -30,6 +30,7 @@ CONFIG_Z2=3Dy
+ CONFIG_COLLIE=3Dy
+ CONFIG_ASPEED_SOC=3Dy
+ CONFIG_NETDUINO2=3Dy
++CONFIG_MPS2=3Dy
 =20
  CONFIG_VGA=3Dy
- CONFIG_NAND=3Dy
- CONFIG_ECC=3Dy
- CONFIG_SERIAL=3Dy
- CONFIG_MAX7310=3Dy
--CONFIG_TWL92230=3Dy
--CONFIG_TSC2005=3Dy
--CONFIG_LM832X=3Dy
--CONFIG_TMP105=3Dy
- CONFIG_TMP421=3Dy
- CONFIG_PCA9552=3Dy
- CONFIG_STELLARIS=3Dy
-@@ -39,9 +39,7 @@ CONFIG_ALLWINNER_EMAC=3Dy
- CONFIG_IMX_FEC=3Dy
- CONFIG_FTGMAC100=3Dy
- CONFIG_DS1338=3Dy
--CONFIG_PFLASH_CFI01=3Dy
- CONFIG_MICRODRIVE=3Dy
--CONFIG_USB_MUSB=3Dy
- CONFIG_PLATFORM_BUS=3Dy
- CONFIG_VIRTIO_MMIO=3Dy
+ CONFIG_SSI_M25P80=3Dy
+@@ -38,28 +39,9 @@ CONFIG_IMX_FEC=3Dy
+ CONFIG_FRAMEBUFFER=3Dy
 =20
-@@ -61,15 +59,8 @@ CONFIG_ZYNQ_DEVCFG=3Dy
-=20
- CONFIG_ARM11SCU=3Dy
  CONFIG_DIGIC=3Dy
--CONFIG_OMAP=3Dy
--CONFIG_TSC210X=3Dy
--CONFIG_BLIZZARD=3Dy
--CONFIG_ONENAND=3Dy
--CONFIG_TUSB6010=3Dy
- CONFIG_MAINSTONE=3Dy
- CONFIG_MPS2=3Dy
--CONFIG_MUSCA=3Dy
--CONFIG_NSERIES=3Dy
+-CONFIG_MPS2=3Dy
  CONFIG_RASPI=3Dy
- CONFIG_REALVIEW=3Dy
- CONFIG_ZAURUS=3Dy
+ CONFIG_NRF51_SOC=3Dy
+=20
+-CONFIG_CMSDK_APB_TIMER=3Dy
+-CONFIG_CMSDK_APB_DUALTIMER=3Dy
+-CONFIG_CMSDK_APB_UART=3Dy
+-CONFIG_CMSDK_APB_WATCHDOG=3Dy
+-
+-CONFIG_MPS2_FPGAIO=3Dy
+-CONFIG_MPS2_SCC=3Dy
+-
+-CONFIG_TZ_MPC=3Dy
+-CONFIG_TZ_MSC=3Dy
+-CONFIG_TZ_PPC=3Dy
+-CONFIG_ARMSSE=3Dy
+-CONFIG_IOTKIT_SECCTL=3Dy
+-CONFIG_IOTKIT_SYSCTL=3Dy
+-CONFIG_IOTKIT_SYSINFO=3Dy
+-CONFIG_ARMSSE_CPUID=3Dy
+-CONFIG_ARMSSE_MHU=3Dy
+-
+ CONFIG_FSL_IMX6=3Dy
+ CONFIG_FSL_IMX25=3Dy
+ CONFIG_FSL_IMX7=3Dy
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index b9f3c3c232..71126254ff 100644
+index 0e89383f50..55f7e5bfce 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -2,6 +2,11 @@ config ARM_VIRT
-     bool
-     imply VFIO_PLATFORM
+@@ -302,6 +302,12 @@ config ASPEED_SOC
 =20
-+config CHEETAH
-+    bool
-+    select OMAP
-+    select TSC210X
-+
- config DIGIC
+ config MPS2
      bool
-     select PTIMER
-@@ -58,9 +63,25 @@ config NETDUINO2
++    select ARMSSE
++    select LAN9118
++    select MPS2_FPGAIO
++    select MPS2_SCC
++    select PL022    # Serial port
++    select PL080    # DMA controller
 =20
- config NSERIES
+ config FSL_IMX7
      bool
-+    select OMAP
-+    select TMP105   # tempature sensor
-+    select BLIZZARD # LCD/TV controller
-+    select ONENAND
-+    select TSC210X  # touchscreen/sensors/audio
-+    select TSC2005  # touchscreen/sensors/keypad
-+    select LM832X   # GPIO keyboard chip
-+    select TWL92230 # energy-management
-+    select TUSB6010
+@@ -341,6 +347,19 @@ config ARM11MPCORE
 =20
- config OMAP
+ config ARMSSE
      bool
-+    select FRAMEBUFFER
-+    select I2C
-+    select ECC
-+    select NAND
-+    select PFLASH_CFI01
-+    select SD
-+    select SERIAL
++    select ARM_V7M
++    select ARMSSE_CPUID
++    select ARMSSE_MHU
++    select CMSDK_APB_TIMER
++    select CMSDK_APB_DUALTIMER
++    select CMSDK_APB_UART
++    select CMSDK_APB_WATCHDOG
++    select IOTKIT_SECCTL
++    select IOTKIT_SYSCTL
++    select IOTKIT_SYSINFO
++    select TZ_MPC
++    select TZ_MSC
++    select TZ_PPC
 =20
- config PXA2XX
+ config ARMSSE_CPUID
      bool
-@@ -74,6 +95,10 @@ config STELLARIS
- config STRONGARM
-     bool
-=20
-+config SX1
-+    bool
-+    select OMAP
-+
- config VERSATILE
-     bool
-=20
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index fa57c7c770..8302b8df1d 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -9,7 +9,8 @@ obj-$(CONFIG_MAINSTONE) +=3D mainstone.o
- obj-$(CONFIG_MUSICPAL) +=3D musicpal.o
- obj-$(CONFIG_NETDUINO2) +=3D netduino2.o
- obj-$(CONFIG_NSERIES) +=3D nseries.o
--obj-$(CONFIG_OMAP) +=3D omap_sx1.o palm.o
-+obj-$(CONFIG_SX1) +=3D omap_sx1.o
-+obj-$(CONFIG_CHEETAH) +=3D palm.o
- obj-$(CONFIG_PXA2XX) +=3D gumstix.o spitz.o tosa.o z2.o
- obj-$(CONFIG_REALVIEW) +=3D realview.o
- obj-$(CONFIG_STELLARIS) +=3D stellaris.o
 --=20
 2.21.0
 
