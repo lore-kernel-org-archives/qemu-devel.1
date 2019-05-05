@@ -2,96 +2,83 @@ Return-Path: <SRS0=Huu6=TF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E44C004C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 15:18:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A84C004C9
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 15:20:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47DC2208C0
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 15:18:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z1pU2wwD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47DC2208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7106E208C0
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 15:20:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7106E208C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42456 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42500 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNIui-00047S-Hc
-	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 11:18:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43912)
+	id 1hNIwj-0006DI-Oc
+	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 11:20:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hNItE-0003OB-NN
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:17:23 -0400
+	(envelope-from <philmd@redhat.com>) id 1hNIvj-0005Hb-0y
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:19:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hNItD-0002es-SO
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:17:20 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:32813)
+	(envelope-from <philmd@redhat.com>) id 1hNIvh-0004oH-Tw
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:19:55 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:36520)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hNItD-0002dX-KL
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:17:19 -0400
-Received: by mail-pf1-x444.google.com with SMTP id z28so5385199pfk.0
-	for <qemu-devel@nongnu.org>; Sun, 05 May 2019 08:17:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=My8sDQvGu+Fg0iVvD8cvROlUTp1h1gAQL8ZBXONfrdE=;
-	b=z1pU2wwDq80nej6RFCBc/SVJD+JVgirPnGE39o0bDRhlWwYmgHM/J5/8nBFFysWYP3
-	SQirZkMjHJpnP96Kyg2F0lOpmYJO+oWZl9rnSl4El8ZUCd6asmfUUh25+4DAbFOgDeEs
-	kVVQj26i6WxeVjy+SgmKgmGavj/aGgnwx4Mmbcrmf8qKWTQc8KOL3KFIQOy/4WjSjXD3
-	qmmBqdDt766KTgWdkfF9+P2pkEajo0Z0os8H3b65KdaABqtGQb9/pe4dHl4svvp4NlUc
-	Ti0oAo1PBjLhgcLq+gRd/wmM6GjbblHjXSRhB+07ed+21aGTKXcONiq/SyQuNfnp1NPX
-	TsPw==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hNIvh-0004mm-NJ
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:19:53 -0400
+Received: by mail-wm1-f66.google.com with SMTP id w1so1979439wmi.1
+	for <qemu-devel@nongnu.org>; Sun, 05 May 2019 08:19:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=My8sDQvGu+Fg0iVvD8cvROlUTp1h1gAQL8ZBXONfrdE=;
-	b=dPYtU8BBVZ1mDeJEvEWH82YJrl37tX49JH7/7YdrFDpaKJbz6isXSIlgSXUKjLedZO
-	5TB6g9wlrAu6S3rmhhWbioSXzdEXMVRDaojIPqN5p8sQDDddVsMO8IAdUXqE58l0zSCe
-	N4YfHGqE1Pm7FQELCiP5QVWPEJQggKJoFifs4YW3ej9DRdxElUuzSH2XFuX+kv13NGHq
-	F5cTFJSI7lUhkhqWeY6YrNOckcf+udfehsK0NEmUlVOyFVDNi6PixNDgH6G7Qmz9VTHh
-	v8kMcVCfTWJaiOiLM0S9jiVeh1MuOEkrfhIvPi2v7rvUeJE2rzch2v9ynTfkCeFwL/ti
-	ePdw==
-X-Gm-Message-State: APjAAAUxrKncPLu28HL11/anMmJUb3+roAG6X8gNglHNXFnzicsEgwmm
-	NkyiG4gppL9L+0cwq2CzVlm5/A==
-X-Google-Smtp-Source: APXvYqwOcnXOm3RKcGsccIZqN4XuwFaqfeb+6N27OaMbkoVUY6zcCULW6v7Shmd/VM+Li+hlT/EJpw==
-X-Received: by 2002:a63:a54:: with SMTP id z20mr25444779pgk.27.1557069438253; 
-	Sun, 05 May 2019 08:17:18 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-189-189.tukw.qwest.net. [97.113.189.189])
-	by smtp.gmail.com with ESMTPSA id
-	h25sm4739503pfd.142.2019.05.05.08.17.17
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sun, 05 May 2019 08:17:17 -0700 (PDT)
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
-	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net,
-	gkurz@kaod.org
-References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
-	<20190428143845.11810-15-mark.cave-ayland@ilande.co.uk>
-	<3c05b552-a692-e439-fc28-90ad69767cf2@linaro.org>
-	<e8968236-5ab2-568f-fd32-e9208c0f2ebe@ilande.co.uk>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <f0e80eda-9f10-f39f-708a-1dc08575bd9b@linaro.org>
-Date: Sun, 5 May 2019 08:17:15 -0700
+	bh=/17JWLGq5wcUkT8EVkYTuHG6wOc4RBcy6zXEeGzXiL4=;
+	b=PJgUveIBGrCh98zOXu33impT+cpRI9fc1xwKioFUOmtXlAPohShu+0Y2Wz7OeeLRnB
+	VZN9vH9NP1bNYsmUZal3GwxOXDjsnEXm+dD3Iu/8z+xzXA/ZlsjY5RJUqm6+aR13ur0F
+	e5GydsOSC0iVBJEZc+0dDZghoGQUNMxmboSr9mMwQpoN6pKdIBlhIVNJ2rqrey0bXwL6
+	E8YIfHkpCaA9GYEYgnGRm3mT4s9a+xjOTGYArUjoy0AfIYFlPYjYdPPA+fQdGY42l4U8
+	hIcX7SFbyZcgxC+FcW+nOKTVLxtoyRHAGcSCLW7k7D0Prit8Qfp+WtRYDNBqQDGXkIbd
+	q+Hw==
+X-Gm-Message-State: APjAAAXQ0Osm1kGWodtMcKV15sK5MCezzapjKznz1lU/rePn8HcOzdTC
+	/L+N4Z1CzVUivkTbwOIS0qPfCA==
+X-Google-Smtp-Source: APXvYqw2uiYeO8adFoYrRlyFcwU/cwUhjta0iO0TX+IzeqLTrawzDCBHhOtwfr+ca0OAkGhi6iwTnA==
+X-Received: by 2002:a7b:c087:: with SMTP id r7mr14011242wmh.137.1557069591201; 
+	Sun, 05 May 2019 08:19:51 -0700 (PDT)
+Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193])
+	by smtp.gmail.com with ESMTPSA id k1sm5968156wmi.48.2019.05.05.08.19.50
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Sun, 05 May 2019 08:19:50 -0700 (PDT)
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	Artyom Tarasenko <atar4qemu@gmail.com>, qemu-devel@nongnu.org,
+	hpoussin@reactos.org
+References: <1557003754-26473-1-git-send-email-atar4qemu@gmail.com>
+	<1557003754-26473-4-git-send-email-atar4qemu@gmail.com>
+	<7e282cd4-f402-c807-b9aa-7034d04031b6@ilande.co.uk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <debd00a6-dcc0-83a0-b0a8-1184d6da6d9c@redhat.com>
+Date: Sun, 5 May 2019 17:19:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <e8968236-5ab2-568f-fd32-e9208c0f2ebe@ilande.co.uk>
+In-Reply-To: <7e282cd4-f402-c807-b9aa-7034d04031b6@ilande.co.uk>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH 14/14] target/ppc: improve VSX_FMADD with
- new GEN_VSX_HELPER_VSX_MADD macro
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] hw/isa/i82378.c: use 1900 as a base
+ year
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -103,34 +90,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "open list:PReP" <qemu-ppc@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505151715.a9KgMFZP4CUQ5_L6c_2-1ovhx0OWkR5h-huJWABLQ20@z>
+Message-ID: <20190505151949.IejuUtIwFnaPw1BKTick367gg6BMa5V1zQxwK2eVCkI@z>
 
-On 5/5/19 3:20 AM, Mark Cave-Ayland wrote:
->> The afrm argument is no longer used.
->> This also means that e.g.
+Hi Mark, Artyom.
+
+On 5/5/19 12:46 PM, Mark Cave-Ayland wrote:
+> On 04/05/2019 22:02, Artyom Tarasenko wrote:
+> 
+>> AIX 5.1 expects the base year to be 1900. Adjust accordingly.
 >>
->> VSX_MADD(xsmaddadp, 1, float64, VsrD(0), MADD_FLGS, 1, 1, 0)
->> VSX_MADD(xsmaddmdp, 1, float64, VsrD(0), MADD_FLGS, 0, 1, 0)
+>> Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
+>> Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
+>> ---
+>>  hw/isa/i82378.c | 4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
 >>
->> are redundant.  Similarly with all of the other pairs.
+>> diff --git a/hw/isa/i82378.c b/hw/isa/i82378.c
+>> index a5d67bc..546c928 100644
+>> --- a/hw/isa/i82378.c
+>> +++ b/hw/isa/i82378.c
+>> @@ -107,7 +107,9 @@ static void i82378_realize(PCIDevice *pci, Error **errp)
+>>      isa = isa_create_simple(isabus, "i82374");
+>>  
+>>      /* timer */
+>> -    isa_create_simple(isabus, TYPE_MC146818_RTC);
+>> +    isa = isa_create(isabus, TYPE_MC146818_RTC);
+>> +    qdev_prop_set_int32(DEVICE(isa), "base_year", 1900);
+>> +    qdev_init_nofail(DEVICE(isa));
+>>  }
+>>  
+>>  static void i82378_init(Object *obj)
 > 
-> Agreed. What do you think is the best solution here - maybe a double macro that looks
-> something like this?
-> 
-> #define VSX_MADD(op, prec, nels, tp, fld, maddflgs, sfprf, r2sp)
-> _VSX_MADD(op##aprec, nels, tp, fld, maddflgs, sfprf, r2sp)
-> _VSX_MADD(op##mprec, nels, tp, fld, maddflgs, sfprf, r2sp)
-> 
-> VSX_MADD(xsmadd, dp, 1, float64, VsrD(0), MADD_FLGS, 1, 0)
+> Is this true for the 82378 in general, or is it a particular quirk of the 40p
+> machine/PReP specification?
 
-I have no idea what you're suggesting.
+This is indeed incorrect (see
+https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg02452.html) so:
+Nack
 
-I am suggesting one function, xsmadddp, replacing xsmaddadp + xsmaddmdp, that
-is used by both instructions.
+Artyom: I did wrote the patch and included it in another series based on
+top of Joel Stanley's
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg00657.html
+which is also depending of another from Cédric, so I'll just extract it
+and send directly, sorry for the delay.
 
+Regards,
 
-r~
+Phil.
 
