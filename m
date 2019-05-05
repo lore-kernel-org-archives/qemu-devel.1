@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56106)
+Received: from eggs.gnu.org ([209.51.188.92]:56178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNHeM-0004WK-Bw
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:55 -0400
+	(envelope-from <thuth@redhat.com>) id 1hNHeP-0004ZG-Vc
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNHeK-0004w0-8U
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:54 -0400
+	(envelope-from <thuth@redhat.com>) id 1hNHeO-0004zS-31
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:57 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Sun,  5 May 2019 15:57:04 +0200
-Message-Id: <20190505135714.11277-19-thuth@redhat.com>
+Date: Sun,  5 May 2019 15:57:07 +0200
+Message-Id: <20190505135714.11277-22-thuth@redhat.com>
 In-Reply-To: <20190505135714.11277-1-thuth@redhat.com>
 References: <20190505135714.11277-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 18/28] hw/arm: Express dependencies of the MPS2
- boards with Kconfig
+Subject: [Qemu-devel] [PULL 21/28] hw/arm: Express dependencies of sabrelite
+ with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,94 +26,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 
-Add Kconfig dependencies for the mps2-an* machines.
+Add Kconfig dependencies for the Sabrelite / iMX6 machine.
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/arm-softmmu.mak | 20 +-------------------
- hw/arm/Kconfig                  | 19 +++++++++++++++++++
- 2 files changed, 20 insertions(+), 19 deletions(-)
+ default-configs/arm-softmmu.mak | 4 +---
+ hw/arm/Kconfig                  | 9 +++++++++
+ hw/arm/Makefile.objs            | 3 ++-
+ 3 files changed, 12 insertions(+), 4 deletions(-)
 
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
 u.mak
-index a0b9016e3a..31d31d3f4a 100644
+index 76508e3910..ef7dd7156a 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -30,6 +30,7 @@ CONFIG_Z2=3Dy
- CONFIG_COLLIE=3Dy
- CONFIG_ASPEED_SOC=3Dy
- CONFIG_NETDUINO2=3Dy
-+CONFIG_MPS2=3Dy
+@@ -33,6 +33,7 @@ CONFIG_NETDUINO2=3Dy
+ CONFIG_MPS2=3Dy
+ CONFIG_RASPI=3Dy
+ CONFIG_DIGIC=3Dy
++CONFIG_SABRELITE=3Dy
 =20
  CONFIG_VGA=3Dy
  CONFIG_SSI_M25P80=3Dy
-@@ -38,28 +39,9 @@ CONFIG_IMX_FEC=3Dy
- CONFIG_FRAMEBUFFER=3Dy
+@@ -40,13 +41,10 @@ CONFIG_IMX_FEC=3Dy
 =20
- CONFIG_DIGIC=3Dy
--CONFIG_MPS2=3Dy
- CONFIG_RASPI=3Dy
  CONFIG_NRF51_SOC=3Dy
 =20
--CONFIG_CMSDK_APB_TIMER=3Dy
--CONFIG_CMSDK_APB_DUALTIMER=3Dy
--CONFIG_CMSDK_APB_UART=3Dy
--CONFIG_CMSDK_APB_WATCHDOG=3Dy
--
--CONFIG_MPS2_FPGAIO=3Dy
--CONFIG_MPS2_SCC=3Dy
--
--CONFIG_TZ_MPC=3Dy
--CONFIG_TZ_MSC=3Dy
--CONFIG_TZ_PPC=3Dy
--CONFIG_ARMSSE=3Dy
--CONFIG_IOTKIT_SECCTL=3Dy
--CONFIG_IOTKIT_SYSCTL=3Dy
--CONFIG_IOTKIT_SYSINFO=3Dy
--CONFIG_ARMSSE_CPUID=3Dy
--CONFIG_ARMSSE_MHU=3Dy
--
- CONFIG_FSL_IMX6=3Dy
+-CONFIG_FSL_IMX6=3Dy
  CONFIG_FSL_IMX25=3Dy
  CONFIG_FSL_IMX7=3Dy
+ CONFIG_FSL_IMX6UL=3Dy
+=20
+-CONFIG_IMX_I2C=3Dy
+-
+ CONFIG_PCIE_PORT=3Dy
+ CONFIG_XIO3130=3Dy
+ CONFIG_IOH3420=3Dy
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 0e89383f50..55f7e5bfce 100644
+index abf2af0967..0a1eab568b 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -302,6 +302,12 @@ config ASPEED_SOC
+@@ -177,6 +177,11 @@ config REALVIEW
+     select DS1338 # I2C RTC+NVRAM
+     select USB_OHCI
 =20
- config MPS2
++config SABRELITE
++    bool
++    select FSL_IMX6
++    select SSI_M25P80
++
+ config STELLARIS
      bool
-+    select ARMSSE
-+    select LAN9118
-+    select MPS2_FPGAIO
-+    select MPS2_SCC
-+    select PL022    # Serial port
-+    select PL080    # DMA controller
+     select ARM_V7M
+@@ -290,6 +295,10 @@ config FSL_IMX31
 =20
- config FSL_IMX7
+ config FSL_IMX6
      bool
-@@ -341,6 +347,19 @@ config ARM11MPCORE
++    select A9MPCORE
++    select IMX
++    select IMX_FEC
++    select IMX_I2C
 =20
- config ARMSSE
+ config ASPEED_SOC
      bool
-+    select ARM_V7M
-+    select ARMSSE_CPUID
-+    select ARMSSE_MHU
-+    select CMSDK_APB_TIMER
-+    select CMSDK_APB_DUALTIMER
-+    select CMSDK_APB_UART
-+    select CMSDK_APB_WATCHDOG
-+    select IOTKIT_SECCTL
-+    select IOTKIT_SYSCTL
-+    select IOTKIT_SYSINFO
-+    select TZ_MPC
-+    select TZ_MSC
-+    select TZ_PPC
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index 4f591ca487..fadd69882c 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -22,6 +22,7 @@ obj-$(CONFIG_COLLIE) +=3D collie.o
+ obj-$(CONFIG_VERSATILE) +=3D versatilepb.o
+ obj-$(CONFIG_VEXPRESS) +=3D vexpress.o
+ obj-$(CONFIG_ZYNQ) +=3D xilinx_zynq.o
++obj-$(CONFIG_SABRELITE) +=3D sabrelite.o
 =20
- config ARMSSE_CPUID
-     bool
+ obj-$(CONFIG_ARM_V7M) +=3D armv7m.o
+ obj-$(CONFIG_EXYNOS4) +=3D exynos4210.o
+@@ -36,7 +37,7 @@ obj-$(CONFIG_XLNX_ZYNQMP_ARM) +=3D xlnx-zynqmp.o xlnx-z=
+cu102.o
+ obj-$(CONFIG_XLNX_VERSAL) +=3D xlnx-versal.o xlnx-versal-virt.o
+ obj-$(CONFIG_FSL_IMX25) +=3D fsl-imx25.o imx25_pdk.o
+ obj-$(CONFIG_FSL_IMX31) +=3D fsl-imx31.o kzm.o
+-obj-$(CONFIG_FSL_IMX6) +=3D fsl-imx6.o sabrelite.o
++obj-$(CONFIG_FSL_IMX6) +=3D fsl-imx6.o
+ obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_soc.o aspeed.o
+ obj-$(CONFIG_MPS2) +=3D mps2.o
+ obj-$(CONFIG_MPS2) +=3D mps2-tz.o
 --=20
 2.21.0
