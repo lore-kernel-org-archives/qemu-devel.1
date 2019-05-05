@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36203)
+Received: from eggs.gnu.org ([209.51.188.92]:35782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNPRA-0004XY-Hz
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:16:49 -0400
+	(envelope-from <philmd@redhat.com>) id 1hNPQp-00048h-Dv
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:16:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNPR9-0000Gv-Jx
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:16:48 -0400
+	(envelope-from <philmd@redhat.com>) id 1hNPQj-00080n-6S
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:16:23 -0400
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Mon,  6 May 2019 00:15:41 +0200
-Message-Id: <20190505221544.31568-11-philmd@redhat.com>
-In-Reply-To: <20190505221544.31568-1-philmd@redhat.com>
-References: <20190505221544.31568-1-philmd@redhat.com>
+Date: Mon,  6 May 2019 00:15:31 +0200
+Message-Id: <20190505221544.31568-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 10/13] hw/block/pflash_cfi02: Extract the
- pflash_data_read() function
+Subject: [Qemu-devel] [PATCH 00/13] hw/block/pflash_cfi02: Clean-up and fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,95 +23,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Stephen Checkoway <stephen.checkoway@oberlin.edu>
 Cc: Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-Extract the code block in a new function, remove a goto statement.
+Hi,
 
-Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Message-Id: <20190426162624.55977-3-stephen.checkoway@oberlin.edu>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-[PMD: Extracted from bigger patch, remove the XXX tracing comment]
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/block/pflash_cfi02.c | 44 ++++++++++++++++++++++-------------------
- 1 file changed, 24 insertions(+), 20 deletions(-)
+While reviewing Stephen Checkoway's v4 "Implement missing AMD
+pflash functionality" [*] I found it hard (for me) to digest,
+so I took step by step notes. This series is the result of
+those notes.
+Regarding Stephen's series, this series only contains the
+generic code movement and trivial cleanup. The other patches
+are rather dense and I need more time to study the specs.
 
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 2777167af11..adfa39f9b5e 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -164,12 +164,33 @@ static void pflash_timer (void *opaque)
-     pfl->cmd =3D 0;
- }
-=20
-+/*
-+ * Read data from flash.
-+ */
-+static uint64_t pflash_data_read(PFlashCFI02 *pfl, hwaddr offset,
-+                                 unsigned int width)
-+{
-+    uint8_t *p =3D (uint8_t *)pfl->storage + offset;
-+    uint64_t ret =3D pfl->be ? ldn_be_p(p, width) : ldn_le_p(p, width);
-+    switch (width) {
-+    case 1:
-+        trace_pflash_data_read8(offset, ret);
-+        break;
-+    case 2:
-+        trace_pflash_data_read16(offset, ret);
-+        break;
-+    case 4:
-+        trace_pflash_data_read32(offset, ret);
-+        break;
-+    }
-+    return ret;
-+}
-+
- static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
-                             int width, int be)
- {
-     hwaddr boff;
-     uint32_t ret;
--    uint8_t *p;
-=20
-     ret =3D -1;
-     trace_pflash_read(offset, pfl->cmd, width, pfl->wcycle);
-@@ -194,25 +215,8 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr=
- offset,
-     case 0x80:
-         /* We accept reads during second unlock sequence... */
-     case 0x00:
--    flash_read:
-         /* Flash area read */
--        p =3D (uint8_t *)pfl->storage + offset;
--        if (pfl->be) {
--            ret =3D ldn_be_p(p, width);
--        } else {
--            ret =3D ldn_le_p(p, width);
--        }
--        switch (width) {
--        case 1:
--            trace_pflash_data_read8(offset, ret);
--            break;
--        case 2:
--            trace_pflash_data_read16(offset, ret);
--            break;
--        case 4:
--            trace_pflash_data_read32(offset, ret);
--            break;
--        }
-+        ret =3D pflash_data_read(pfl, offset, width);
-         break;
-     case 0x90:
-         /* flash ID read */
-@@ -232,7 +236,7 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr =
-offset,
-             }
-             /* Fall through to data read. */
-         default:
--            goto flash_read;
-+            ret =3D pflash_data_read(pfl, offset, width);
-         }
-         DPRINTF("%s: ID " TARGET_FMT_plx " %" PRIx32 "\n", __func__, bof=
-f, ret);
-         break;
+Stephen: If you take out the patch #2 ("Use the GLib API"),
+you can rebase your series on top of this.
+I'd appreciate if you can adapt your tests to use the GLib
+functions, else I plan to do it later.
+
+Regards,
+
+Phil.
+
+[*] https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg04595.html
+
+Philippe Mathieu-Daud=C3=A9 (10):
+  tests/pflash-cfi02: Use the GLib API
+  tests/pflash-cfi02: Use IEC binary prefixes for size constants
+  hw/block/pflash_cfi02: Fix debug format string
+  hw/block/pflash_cfi02: Add an enum to define the write cycles
+  hw/block/pflash_cfi02: Add helpers to manipulate the status bits
+  hw/block/pflash_cfi02: Simplify a statement using fall through
+  hw/block/pflash_cfi02: Use the ldst API in pflash_write()
+  hw/block/pflash_cfi02: Use the ldst API in pflash_read()
+  hw/block/pflash_cfi02: Extract the pflash_data_read() function
+  hw/block/pflash_cfi02: Unify the MemoryRegionOps
+
+Stephen Checkoway (3):
+  tests/pflash-cfi02: Add test for supported CFI commands
+  hw/block/pflash_cfi02: Fix command address comparison
+  hw/block/pflash_cfi02: Use the chip erase time specified in the CFI
+    table
+
+ hw/block/pflash_cfi02.c   | 234 +++++++++++++++++---------------------
+ tests/Makefile.include    |   2 +
+ tests/pflash-cfi02-test.c | 232 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 339 insertions(+), 129 deletions(-)
+ create mode 100644 tests/pflash-cfi02-test.c
+
 --=20
 2.20.1
