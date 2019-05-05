@@ -1,17 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43257)
+Received: from eggs.gnu.org ([209.51.188.92]:33949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhengxiang9@huawei.com>) id 1hNBAZ-00066n-07
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 03:02:43 -0400
+	(envelope-from <peterx@redhat.com>) id 1hND6m-00059a-Ne
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 05:06:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhengxiang9@huawei.com>) id 1hNBAX-0006rb-Uj
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 03:02:42 -0400
-From: Xiang Zheng <zhengxiang9@huawei.com>
-Date: Sun, 5 May 2019 15:00:59 +0800
-Message-ID: <20190505070059.4664-1-zhengxiang9@huawei.com>
+	(envelope-from <peterx@redhat.com>) id 1hND6l-0007bW-QM
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 05:06:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40986)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hND6l-0007Ym-L1
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 05:06:55 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CB76AC051684
+	for <qemu-devel@nongnu.org>; Sun,  5 May 2019 09:06:52 +0000 (UTC)
+Date: Sun, 5 May 2019 17:06:43 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190505090643.GK29750@xz-x1>
+References: <20181220054037.24320-1-peterx@redhat.com>
+	<20181220054037.24320-2-peterx@redhat.com>
+	<20190426132744.2b594bf5@x1.home> <20190426150236.1af2ff08@x1.home>
+	<94415012.15677076.1556342950794.JavaMail.zimbra@redhat.com>
+	<daded638-42f1-9bc3-8c36-66b0fbba9438@redhat.com>
+	<20190429082106.4fd59e77@x1.home>
+	<20190429145556.GA28722@habkost.net>
+	<20190429092212.3b03e4bb@x1.home>
+	<20190503184206.GU28722@habkost.net>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] pflash: Only read non-zero parts of backend
- image
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190503184206.GU28722@habkost.net>
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] q35: set split kernel irqchip as
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,81 +41,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: wanghaibin.wang@huawei.com, peter.maydell@linaro.org, guoheyi@huawei.com, lersek@redhat.com, mreitz@redhat.com, armbru@redhat.com, kwolf@redhat.com, ard.biesheuvel@linaro.org, stefanha@redhat.com, Xiang Zheng <zhengxiang9@huawei.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 
-Currently we fill the memory space with two 64MB NOR images when
-using persistent UEFI variables on virt board. Actually we only use
-a very small(non-zero) part of the memory while the rest significant
-large(zero) part of memory is wasted.
+On Fri, May 03, 2019 at 03:42:06PM -0300, Eduardo Habkost wrote:
+> On Mon, Apr 29, 2019 at 09:22:12AM -0600, Alex Williamson wrote:
+> [...]
+> > > > What's a good 4.0.1 strategy to resolve this?  Re-instate KVM irqchip
+> > > > as the Q35 default?  I can't see that simply switching to current QEMU
+> > > > handling is a viable option for performance?  What about 4.1?  We could
+> > > > certainly improve EOI support in QEMU, there's essentially no support
+> > > > currently, but it seems like an uphill battle for an iothread based
+> > > > userspace ioapic to ever compare to KVM handling?  Thanks,  
+> > > 
+> > > irqchip=split and irqchip=kernel aren't guest ABI compatible, are
+> > > they?  That would make it impossible to fix this in pc-q35-4.0
+> > > for a 4.0.1 update.
+> > 
+> > I suppose it would require a pc-q35-4.0.1 machine type :-\  Thanks,
+> 
+> I wonder if it's possible to untangle this and make the irqchip
+> option stop affecting guest ABI on 4.1+ machine-types?  This way
+> QEMU could choose smarter defaults in the future without the
+> compatibility code hassle.
 
-So this patch checks the block status and only writes the non-zero part
-into memory. This requires pflash devices to use sparse files for
-backends.
+Hi, Eduardo,
 
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
----
- hw/block/block.c | 40 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 39 insertions(+), 1 deletion(-)
+Do you mean to enable IOMMU IR for kernel-irqchip=on?  If so, I would
+say it's not trivial...  The major issue is that we probably need to
+explicitly kick QEMU for every kernel IOAPIC setups since QEMU is the
+only one who knows everything about interrupt remapping, while KVM
+don't even have such a mechanism so far.
 
-diff --git a/hw/block/block.c b/hw/block/block.c
-index bf56c76..3cb9d4c 100644
---- a/hw/block/block.c
-+++ b/hw/block/block.c
-@@ -15,6 +15,44 @@
- #include "qapi/qapi-types-block.h"
- 
- /*
-+ * Read the non-zeroes parts of @blk into @buf
-+ * Reading all of the @blk is expensive if the zeroes parts of @blk
-+ * is large enough. Therefore check the block status and only write
-+ * the non-zeroes block into @buf.
-+ *
-+ * Return 0 on success, non-zero on error.
-+ */
-+static int blk_pread_nonzeroes(BlockBackend *blk, void *buf)
-+{
-+    int ret;
-+    int64_t target_size, bytes, offset = 0;
-+    BlockDriverState *bs = blk_bs(blk);
-+
-+    target_size = bdrv_getlength(bs);
-+    if (target_size < 0) {
-+        return target_size;
-+    }
-+
-+    for (;;) {
-+        bytes = MIN(target_size - offset, BDRV_REQUEST_MAX_SECTORS);
-+        if (bytes <= 0) {
-+            return 0;
-+        }
-+        ret = bdrv_block_status(bs, offset, bytes, &bytes, NULL, NULL);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+        if (!(ret & BDRV_BLOCK_ZERO)) {
-+            ret = bdrv_pread(bs->file, offset, (uint8_t *) buf + offset, bytes);
-+            if (ret < 0) {
-+                return ret;
-+            }
-+        }
-+        offset += bytes;
-+    }
-+}
-+
-+/*
-  * Read the entire contents of @blk into @buf.
-  * @blk's contents must be @size bytes, and @size must be at most
-  * BDRV_REQUEST_MAX_BYTES.
-@@ -53,7 +91,7 @@ bool blk_check_size_and_read_all(BlockBackend *blk, void *buf, hwaddr size,
-      * block device and read only on demand.
-      */
-     assert(size <= BDRV_REQUEST_MAX_BYTES);
--    ret = blk_pread(blk, 0, buf, size);
-+    ret = blk_pread_nonzeroes(blk, buf);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "can't read block backend");
-         return false;
+I'm thinking whether we should try to fix the functional problem first
+as proposed by Alex?  The problem is even if we switch the default
+mode for Q35 the user could still specify that in the command line and
+I feel like we'd better fix the functional issue first before we
+consider the possible performance regression?  The worst case I
+thought of is with the fix we offer a good QEMU 4.1/4.0.1 for users (I
+believe in most cases for individual users since this issue seems to
+not affect most enterprise users and with modern hardwares) then we
+also tell people to explicitly enable kernel-irqchip=on to avoid the
+potential performance degradation.
+
+(Sorry for the late chim-in, and of course sorry for breaking VFIO
+ from the very beginning...)
+
 -- 
-1.8.3.1
+Peter Xu
