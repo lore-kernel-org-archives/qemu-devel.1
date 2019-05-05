@@ -2,49 +2,49 @@ Return-Path: <SRS0=Huu6=TF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD460C004C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 16:11:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35158C004C9
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 16:11:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81BB72082F
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 16:11:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81BB72082F
+	by mail.kernel.org (Postfix) with ESMTPS id 0B1D12082F
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 16:11:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B1D12082F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43275 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43277 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNJjq-0006P5-O4
-	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 12:11:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53591)
+	id 1hNJjw-0006WN-8t
+	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 12:11:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hNJfw-0003jE-Vp
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 12:07:42 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hNJg5-0003op-Ea
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 12:07:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hNJfv-0006kl-Pi
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 12:07:40 -0400
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:40711)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hNJg4-0006ps-GV
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 12:07:49 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:52133)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hNJfv-0006kL-HF
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 12:07:39 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hNJg4-0006pZ-8N
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 12:07:48 -0400
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.vps.ablenet.jp
 	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
-	by mail03.asahi-net.or.jp (Postfix) with ESMTPA id E029C3F5AF;
-	Mon,  6 May 2019 01:07:38 +0900 (JST)
+	by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 90F0E3BBCB;
+	Mon,  6 May 2019 01:07:47 +0900 (JST)
 Received: from yo-satoh-debian.ysato.ml (ZM005235.ppp.dion.ne.jp [222.8.5.235])
-	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id A4E62240085; 
-	Mon,  6 May 2019 01:07:38 +0900 (JST)
-Date: Mon, 06 May 2019 01:07:38 +0900
-Message-ID: <87muk051h1.wl-ysato@users.sourceforge.jp>
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 50C9B240085; 
+	Mon,  6 May 2019 01:07:47 +0900 (JST)
+Date: Mon, 06 May 2019 01:07:46 +0900
+Message-ID: <87lfzk51gt.wl-ysato@users.sourceforge.jp>
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-In-Reply-To: <87muk34kym.fsf@zen.linaroharston>
-References: <20190502143409.59600-1-ysato@users.sourceforge.jp>	<20190502143409.59600-13-ysato@users.sourceforge.jp>	<87muk34kym.fsf@zen.linaroharston>
+In-Reply-To: <87ef5f4iwr.fsf@zen.linaroharston>
+References: <20190502143409.59600-1-ysato@users.sourceforge.jp>	<87ef5f4iwr.fsf@zen.linaroharston>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
 	FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/25.1
 	(x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -53,9 +53,8 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 202.224.55.15
-Subject: Re: [Qemu-devel] [PATCH RFC v8 12/12] hw/registerfields.h: Add 8bit
- and 16bit register macros.
+X-Received-From: 202.224.55.14
+Subject: Re: [Qemu-devel] [PATCH RFC v8 00/12] Add RX archtecture support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,132 +71,31 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505160738.gYd70c751pRkseltaDAi2_77guxCamJXS5oiZFuHjhs@z>
+Message-ID: <20190505160746.mF0XGFXXhTl-NVd24T6Bqf8HppiLq1-uaX2JHWmuH3g@z>
 
-On Sat, 04 May 2019 00:27:29 +0900,
+On Sat, 04 May 2019 01:11:48 +0900,
 Alex Benn=E9e wrote:
 >=20
 >=20
 > Yoshinori Sato <ysato@users.sourceforge.jp> writes:
 >=20
-> > Some RX peripheral using 8bit and 16bit registers.
-> > Added 8bit and 16bit APIs.
+> > Hello.
+> > This patch series is added Renesas RX target emulation.
 >=20
-> Doesn't this mean the build breaks at some point? Features used by other
-> patches should be introduced first so the build remains bisectable.
-
-Hmm, It changes only added new macros.
-So don't broken this changes.
-
-> >
-> > Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-> > ---
-> >  include/hw/registerfields.h | 28 +++++++++++++++++++++++++++-
-> >  1 file changed, 27 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
-> > index 2659a58737..51bfd0cf67 100644
-> > --- a/include/hw/registerfields.h
-> > +++ b/include/hw/registerfields.h
-> > @@ -22,6 +22,14 @@
-> >      enum { A_ ## reg =3D (addr) };                                    =
-      \
-> >      enum { R_ ## reg =3D (addr) / 4 };
-> >
-> > +#define REG8(reg, addr)                                               =
-   \
-> > +    enum { A_ ## reg =3D (addr) };                                    =
-      \
-> > +    enum { R_ ## reg =3D (addr) };
-> > +
-> > +#define REG16(reg, addr)                                              =
-    \
-> > +    enum { A_ ## reg =3D (addr) };                                    =
-      \
-> > +    enum { R_ ## reg =3D (addr) / 2 };
-> > +
-> >  /* Define SHIFT, LENGTH and MASK constants for a field within a regist=
-er */
-> >
-> >  /* This macro will define R_FOO_BAR_MASK, R_FOO_BAR_SHIFT and R_FOO_BA=
-R_LENGTH
-> > @@ -40,6 +48,8 @@
-> >  #define FIELD_EX64(storage, reg, field)                               =
-    \
-> >      extract64((storage), R_ ## reg ## _ ## field ## _SHIFT,           =
-    \
-> >                R_ ## reg ## _ ## field ## _LENGTH)
-> > +#define FIELD_EX8  FIELD_EX32
-> > +#define FIELD_EX16 FIELD_EX32
+> I think the series is almost there - it's mostly just nits and clean
+> build fixes to sort out now. If you run the branch through CI you will
+> see where things fail to build.
 >=20
-> Hmm maybe we should be defining extract16/extract8 in bitops so things
-> are a) properly types and b) bounds checked to catch errors.
-
-I think so.
-I will added extrat8 and extract16 in bitops.h.
-
-> >
-> >  /* Extract a field from an array of registers */
-> >  #define ARRAY_FIELD_EX32(regs, reg, field)                            =
-    \
-> > @@ -49,6 +59,22 @@
-> >   * Assigning values larger then the target field will result in
-> >   * compilation warnings.
-> >   */
-> > +#define FIELD_DP8(storage, reg, field, val) ({                        =
-    \
-> > +    struct {                                                          =
-    \
-> > +        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;            =
-    \
-> > +    } v =3D { .v =3D val };                                           =
-        \
-> > +    uint8_t d;                                                        =
-    \
-> > +    d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,     =
-      \
-> > +                  R_ ## reg ## _ ## field ## _LENGTH, v.v);           =
-    \
-> > +    d; })
-> > +#define FIELD_DP16(storage, reg, field, val) ({                       =
-    \
-> > +    struct {                                                          =
-    \
-> > +        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;            =
-    \
-> > +    } v =3D { .v =3D val };                                           =
-        \
-> > +    uint16_t d;                                                       =
-    \
-> > +    d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,     =
-      \
-> > +                  R_ ## reg ## _ ## field ## _LENGTH, v.v);           =
-    \
-> > +    d; })
-> >  #define FIELD_DP32(storage, reg, field, val) ({                       =
-    \
-> >      struct {                                                          =
-    \
-> >          unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;            =
-    \
-> > @@ -57,7 +83,7 @@
-> >      d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,     =
-      \
-> >                    R_ ## reg ## _ ## field ## _LENGTH, v.v);           =
-    \
-> >      d; })
-> > -#define FIELD_DP64(storage, reg, field, val) ({                       =
-    \
-> > +#define FIELD_DP64(storage, reg, field, val) ({                       =
-  \
-> >      struct {                                                          =
-    \
-> >          unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;            =
-    \
-> >      } v =3D { .v =3D val };                                           =
-        \
+> However once that is all sorted it should be good for merging. I guess
+> Richard would merge it until we can get your key signed so you can
+> submit your own PRs:
 >=20
->=20
+>   https://wiki.qemu.org/KeySigningParty
+>
+
+OK.
+Should I tag it with "git tag -s"?
+
 > --
 > Alex Benn=E9e
 >=20
