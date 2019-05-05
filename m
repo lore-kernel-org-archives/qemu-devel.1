@@ -2,48 +2,49 @@ Return-Path: <SRS0=Huu6=TF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E338C004C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 09:58:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 322EDC004C9
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 10:04:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC0C22082F
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 09:58:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC0C22082F
+	by mail.kernel.org (Postfix) with ESMTPS id EE4882082F
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 10:04:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE4882082F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38856 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38918 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNDuO-00044F-TS
-	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 05:58:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41859)
+	id 1hNE0o-0006Xq-12
+	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 06:04:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNDtS-0003ff-Az
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 05:57:15 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNDze-0005yQ-RU
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:03:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNDtR-0002Aa-BF
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 05:57:14 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:37122
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNDzd-0007pW-R2
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:03:38 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:37138
 	helo=mail.default.ilande.uk0.bigv.io)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hNDtO-00025U-R3; Sun, 05 May 2019 05:57:10 -0400
+	id 1hNDzb-0007nW-JY; Sun, 05 May 2019 06:03:35 -0400
 Received: from host109-149-60-255.range109-149.btcentralplus.com
 	([109.149.60.255] helo=[192.168.1.65])
 	by mail.default.ilande.uk0.bigv.io with esmtpsa
 	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
 	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hNDsj-0002X9-Vw; Sun, 05 May 2019 10:56:30 +0100
+	id 1hNDyv-0002YT-J1; Sun, 05 May 2019 11:02:53 +0100
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
 	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net,
 	gkurz@kaod.org
 References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
-	<20190428143845.11810-6-mark.cave-ayland@ilande.co.uk>
-	<784adbd2-0447-9d01-cff8-e7234f9d9679@linaro.org>
+	<20190428143845.11810-7-mark.cave-ayland@ilande.co.uk>
+	<5a60992b-d6db-4761-38fa-bb413f69d3ae@linaro.org>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
@@ -70,12 +71,12 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
 	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
 	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
 	imgcU9TTGC5qd9g=
-Message-ID: <ca2255e7-79cd-2ef1-5ddf-89edac2ba959@ilande.co.uk>
-Date: Sun, 5 May 2019 10:57:03 +0100
+Message-ID: <0bc1c469-5148-2594-4b14-c44542699ea9@ilande.co.uk>
+Date: Sun, 5 May 2019 11:03:27 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <784adbd2-0447-9d01-cff8-e7234f9d9679@linaro.org>
+In-Reply-To: <5a60992b-d6db-4761-38fa-bb413f69d3ae@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
@@ -85,8 +86,8 @@ X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH 05/14] target/ppc: introduce
- GEN_VSX_HELPER_X2 macro to fpu_helper.c
+Subject: Re: [Qemu-devel] [PATCH 06/14] target/ppc: introduce
+ GEN_VSX_HELPER_X2_AB macro to fpu_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,31 +102,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505095703.daOB5LT1Yr0Pqji_rgIEAEWT-Bd3rlX0wPr0fIliUzk@z>
+Message-ID: <20190505100327.bOPD2QtQnU8urxoSm2jOnjQT9E5jIIOiNMwMoB0qAcg@z>
 
-On 30/04/2019 17:38, Richard Henderson wrote:
+On 30/04/2019 17:41, Richard Henderson wrote:
+
 > On 4/28/19 7:38 AM, Mark Cave-Ayland wrote:
->> +#define GEN_VSX_HELPER_X2(name, op1, op2, inval, type)                        \
->> +static void gen_##name(DisasContext *ctx)                                     \
->> +{                                                                             \
->> +    TCGv_i32 opc;                                                             \
->> +    TCGv_ptr xt, xb;                                                          \
->> +    if (unlikely(!ctx->vsx_enabled)) {                                        \
->> +        gen_exception(ctx, POWERPC_EXCP_VSXU);                                \
->> +        return;                                                               \
->> +    }                                                                         \
->> +    opc = tcg_const_i32(ctx->opcode);                                         \
->> +    xt = gen_vsr_ptr(xT(ctx->opcode));                                        \
->> +    xb = gen_vsr_ptr(xB(ctx->opcode));                                        \
->> +    gen_helper_##name(cpu_env, opc, xt, xb);                                  \
+>> Rather than perform the VSR register decoding within the helper itself,
+>> introduce a new GEN_VSX_HELPER_X2_AB macro which performs the decode based
+>> upon xA and xB at translation time.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>>  target/ppc/fpu_helper.c             | 15 ++++++---------
+>>  target/ppc/helper.h                 | 12 ++++++------
+>>  target/ppc/translate/vsx-impl.inc.c | 30 ++++++++++++++++++++++++------
+>>  3 files changed, 36 insertions(+), 21 deletions(-)
 > 
-> Similarly wrt opc.  However,
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> This time I see VSX_TDIV right away as a place that still
+> uses opcode.  It can certainly be cleaned up, but that's
+> a different patch.
 
-For reference the culprits here is helper_xscvqpdp(). But again if you agree that it
-makes sense to create separate gen/helper functions then I can remove the opcode
-later on in the series.
+Right, and also helper_xscmpexpdp() and VSX_SCALAR_CMP() which is all of the helpers
+touched here. Perhaps one to think about since if this macro isn't used anywhere else
+after I've reworked the series to use separate gen/helper functions then probably it
+makes sense not to bother with this one.
 
 
 ATB,
