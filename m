@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45532)
+Received: from eggs.gnu.org ([209.51.188.92]:47569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNE3o-0008Bw-Np
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:07:57 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNEGe-0002Rl-Sc
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:21:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNE3n-00032x-T7
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:07:56 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNEGd-000516-Ae
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:21:12 -0400
 References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
-	<20190428143845.11810-9-mark.cave-ayland@ilande.co.uk>
-	<4c8b7939-cd48-fd3f-8f3d-3f6fd18b6be2@linaro.org>
+	<20190428143845.11810-15-mark.cave-ayland@ilande.co.uk>
+	<3c05b552-a692-e439-fc28-90ad69767cf2@linaro.org>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <443b8459-8ad8-275f-225f-84c78d5fd7cc@ilande.co.uk>
-Date: Sun, 5 May 2019 11:07:46 +0100
+Message-ID: <e8968236-5ab2-568f-fd32-e9208c0f2ebe@ilande.co.uk>
+Date: Sun, 5 May 2019 11:20:49 +0100
 MIME-Version: 1.0
-In-Reply-To: <4c8b7939-cd48-fd3f-8f3d-3f6fd18b6be2@linaro.org>
+In-Reply-To: <3c05b552-a692-e439-fc28-90ad69767cf2@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 08/14] target/ppc: introduce
- GEN_VSX_HELPER_R3 macro to fpu_helper.c
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 14/14] target/ppc: improve VSX_FMADD with
+ new GEN_VSX_HELPER_VSX_MADD macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +28,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, gkurz@kaod.org
 
-On 30/04/2019 17:47, Richard Henderson wrote:
+On 30/04/2019 18:00, Richard Henderson wrote:
 
 > On 4/28/19 7:38 AM, Mark Cave-Ayland wrote:
->> +#define GEN_VSX_HELPER_R3(name, op1, op2, inval, type)                        \
->> +static void gen_##name(DisasContext *ctx)                                     \
->> +{                                                                             \
->> +    TCGv_i32 opc;                                                             \
->> +    TCGv_ptr xt, xa, xb;                                                      \
->> +    if (unlikely(!ctx->vsx_enabled)) {                                        \
->> +        gen_exception(ctx, POWERPC_EXCP_VSXU);                                \
->> +        return;                                                               \
->> +    }                                                                         \
->> +    opc = tcg_const_i32(ctx->opcode);                                         \
->> +    xt = gen_vsr_ptr(rD(ctx->opcode) + 32);                                   \
->> +    xa = gen_vsr_ptr(rA(ctx->opcode) + 32);                                   \
->> +    xb = gen_vsr_ptr(rB(ctx->opcode) + 32);                                   \
->> +    gen_helper_##name(cpu_env, opc, xt, xa, xb);                              \
+>>  #define VSX_MADD(op, nels, tp, fld, maddflgs, afrm, sfprf, r2sp)              \
+>>  void helper_##op(CPUPPCState *env, uint32_t opcode,                           \
+>> -                 ppc_vsr_t *xt, ppc_vsr_t *xa, ppc_vsr_t *xb)                 \
+>> +                 ppc_vsr_t *xt, ppc_vsr_t *xa,                                \
+>> +                 ppc_vsr_t *b, ppc_vsr_t *c)                                  \
+>>  {                                                                             \
+>> -    ppc_vsr_t *b, *c;                                                         \
+>>      int i;                                                                    \
+>>                                                                                \
+>> -    if (afrm) { /* AxB + T */                                                 \
+>> -        b = xb;                                                               \
+>> -        c = xt;                                                               \
+>> -    } else { /* AxT + B */                                                    \
+>> -        b = xt;                                                               \
+>> -        c = xb;                                                               \
+>> -    }                                                                         \
 > 
-> Is opc still used here?  Otherwise,
+> The afrm argument is no longer used.
+> This also means that e.g.
 > 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> VSX_MADD(xsmaddadp, 1, float64, VsrD(0), MADD_FLGS, 1, 1, 0)
+> VSX_MADD(xsmaddmdp, 1, float64, VsrD(0), MADD_FLGS, 0, 1, 0)
+> 
+> are redundant.  Similarly with all of the other pairs.
 
-Yeah, looks like it's used for the rounding mode. I'll have a look and see how this
-compares with the previous case.
+Agreed. What do you think is the best solution here - maybe a double macro that looks
+something like this?
+
+#define VSX_MADD(op, prec, nels, tp, fld, maddflgs, sfprf, r2sp)
+_VSX_MADD(op##aprec, nels, tp, fld, maddflgs, sfprf, r2sp)
+_VSX_MADD(op##mprec, nels, tp, fld, maddflgs, sfprf, r2sp)
+
+VSX_MADD(xsmadd, dp, 1, float64, VsrD(0), MADD_FLGS, 1, 0)
 
 
 ATB,
