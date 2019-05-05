@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36084)
+Received: from eggs.gnu.org ([209.51.188.92]:35943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNPR4-0004Rq-Ni
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:16:45 -0400
+	(envelope-from <philmd@redhat.com>) id 1hNPQv-0004HU-8I
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:16:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNPR0-0008Ua-VG
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:16:40 -0400
+	(envelope-from <philmd@redhat.com>) id 1hNPQr-0008Ge-Ci
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:16:31 -0400
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Mon,  6 May 2019 00:15:37 +0200
-Message-Id: <20190505221544.31568-7-philmd@redhat.com>
+Date: Mon,  6 May 2019 00:15:33 +0200
+Message-Id: <20190505221544.31568-3-philmd@redhat.com>
 In-Reply-To: <20190505221544.31568-1-philmd@redhat.com>
 References: <20190505221544.31568-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 06/13] hw/block/pflash_cfi02: Add helpers to
- manipulate the status bits
+Subject: [Qemu-devel] [PATCH 02/13] tests/pflash-cfi02: Use the GLib API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,113 +25,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Stephen Checkoway <stephen.checkoway@oberlin.edu>
 Cc: Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-Pull out all of the code to modify the status into simple helper
-functions. Status handling becomes more complex once multiple
-chips are interleaved to produce a single device.
-
-No change in functionality is intended with this commit.
-
-Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-Message-Id: <20190426162624.55977-3-stephen.checkoway@oberlin.edu>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-[PMD: Extracted from bigger patch]
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/block/pflash_cfi02.c | 39 ++++++++++++++++++++++++++++++++++-----
- 1 file changed, 34 insertions(+), 5 deletions(-)
+ tests/pflash-cfi02-test.c | 28 +++++++++++++---------------
+ 1 file changed, 13 insertions(+), 15 deletions(-)
 
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index b27796d74d2..9673eee969f 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -100,6 +100,31 @@ struct PFlashCFI02 {
-     void *storage;
- };
+diff --git a/tests/pflash-cfi02-test.c b/tests/pflash-cfi02-test.c
+index 40af1bb523e..ff775618c02 100644
+--- a/tests/pflash-cfi02-test.c
++++ b/tests/pflash-cfi02-test.c
+@@ -35,8 +35,6 @@
+ #define UNLOCK_BYPASS_CMD 0x20
+ #define UNLOCK_BYPASS_RESET_CMD 0x00
 =20
-+/*
-+ * Toggle status bit DQ7.
-+ */
-+static inline void toggle_dq7(PFlashCFI02 *pfl)
-+{
-+    pfl->status ^=3D 0x80;
-+}
-+
-+/*
-+ * Set status bit DQ7 to bit 7 of value.
-+ */
-+static inline void set_dq7(PFlashCFI02 *pfl, uint8_t value)
-+{
-+    pfl->status &=3D 0x7F;
-+    pfl->status |=3D value & 0x80;
-+}
-+
-+/*
-+ * Toggle status bit DQ6.
-+ */
-+static inline void toggle_dq6(PFlashCFI02 *pfl)
-+{
-+    pfl->status ^=3D 0x40;
-+}
-+
- /*
-  * Set up replicated mappings of the same region.
-  */
-@@ -129,7 +154,7 @@ static void pflash_timer (void *opaque)
+-static char image_path[] =3D "/tmp/qtest.XXXXXX";
+-
+ static inline void flash_write(uint64_t byte_addr, uint16_t data)
+ {
+     qtest_writew(global_qtest, BASE_ADDR + byte_addr, data);
+@@ -103,8 +101,9 @@ static void chip_erase(void)
+     flash_write(UNLOCK0_ADDR, SECTOR_ERASE_CMD);
+ }
 =20
-     trace_pflash_timer_expired(pfl->cmd);
-     /* Reset flash */
--    pfl->status ^=3D 0x80;
-+    toggle_dq7(pfl);
-     if (pfl->bypass) {
-         pfl->wcycle =3D 2;
-     } else {
-@@ -232,7 +257,7 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr =
-offset,
-         ret =3D pfl->status;
-         DPRINTF("%s: status %" PRIx32 "\n", __func__, ret);
-         /* Toggle bit 6 */
--        pfl->status ^=3D 0x40;
-+        toggle_dq6(pfl);
-         break;
-     case 0x98:
-         /* CFI query mode */
-@@ -381,7 +406,11 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr of=
-fset,
-                     break;
-                 }
-             }
--            pfl->status =3D 0x00 | ~(value & 0x80);
-+            /*
-+             * While programming, status bit DQ7 should hold the opposit=
-e
-+             * value from how it was programmed.
-+             */
-+            set_dq7(pfl, ~value);
-             /* Let's pretend write is immediate */
-             if (pfl->bypass)
-                 goto do_bypass;
-@@ -429,7 +458,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr off=
-set,
-                 memset(pfl->storage, 0xFF, pfl->chip_len);
-                 pflash_update(pfl, 0, pfl->chip_len);
-             }
--            pfl->status =3D 0x00;
-+            set_dq7(pfl, 0x00);
-             /* Let's wait 5 seconds before chip erase is done */
-             timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)=
- +
-                       (NANOSECONDS_PER_SECOND * 5));
-@@ -444,7 +473,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr off=
-set,
-                 memset(p + offset, 0xFF, pfl->sector_len);
-                 pflash_update(pfl, offset, pfl->sector_len);
-             }
--            pfl->status =3D 0x00;
-+            set_dq7(pfl, 0x00);
-             /* Let's wait 1/2 second before sector erase is done */
-             timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)=
- +
-                       (NANOSECONDS_PER_SECOND / 2));
+-static void test_flash(void)
++static void test_flash(const void *opaque)
+ {
++    const char *image_path =3D opaque;
+     global_qtest =3D qtest_initf("-M musicpal,accel=3Dqtest "
+                                "-drive if=3Dpflash,file=3D%s,format=3Dra=
+w,copy-on-read",
+                                image_path);
+@@ -195,31 +194,30 @@ static void test_flash(void)
+=20
+ static void cleanup(void *opaque)
+ {
++    char *image_path =3D opaque;
+     unlink(image_path);
++    g_free(image_path);
+ }
+=20
+ int main(int argc, char **argv)
+ {
+-    int fd =3D mkstemp(image_path);
+-    if (fd =3D=3D -1) {
+-        g_printerr("Failed to create temporary file %s: %s\n", image_pat=
+h,
+-                   strerror(errno));
+-        exit(EXIT_FAILURE);
+-    }
++    GError *error =3D NULL;
++    char *image_path;
++    int fd =3D g_file_open_tmp("pflash-cfi02-XXXXXX.raw", &image_path, &=
+error);
++    g_assert_no_error(error);
+     if (ftruncate(fd, 8 * 1024 * 1024) < 0) {
+-        int error_code =3D errno;
++        g_printerr("Failed to truncate file %s to 8 MB: %s\n", image_pat=
+h,
++                   strerror(errno));
+         close(fd);
+         unlink(image_path);
+-        g_printerr("Failed to truncate file %s to 8 MB: %s\n", image_pat=
+h,
+-                   strerror(error_code));
+         exit(EXIT_FAILURE);
+     }
+     close(fd);
+=20
+-    qtest_add_abrt_handler(cleanup, NULL);
++    qtest_add_abrt_handler(cleanup, image_path);
+     g_test_init(&argc, &argv, NULL);
+-    qtest_add_func("pflash-cfi02", test_flash);
++    qtest_add_data_func("pflash-cfi02", image_path, test_flash);
+     int result =3D g_test_run();
+-    cleanup(NULL);
++    cleanup(image_path);
+     return result;
+ }
 --=20
 2.20.1
