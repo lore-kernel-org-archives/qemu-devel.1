@@ -1,88 +1,63 @@
-Return-Path: <SRS0=Uyhh=TE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=Huu6=TF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8C98C43219
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 21:06:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 684DDC04AAB
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 00:59:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66CA820652
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 May 2019 21:06:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L7w8RtS5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66CA820652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2F5A92063F
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 00:59:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F5A92063F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:32898 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34689 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hN1ro-0006Sg-Np
-	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 17:06:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42386)
+	id 1hN5Uy-0000Zo-DU
+	for qemu-devel@archiver.kernel.org; Sat, 04 May 2019 20:59:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hN1oJ-0003tZ-Oj
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 17:03:08 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hN5UA-0000Hc-VK
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 20:58:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hN1oI-0004dw-PH
-	for qemu-devel@nongnu.org; Sat, 04 May 2019 17:03:07 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33086)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>)
-	id 1hN1oI-0004d8-JW; Sat, 04 May 2019 17:03:06 -0400
-Received: by mail-wr1-x443.google.com with SMTP id e28so12211776wra.0;
-	Sat, 04 May 2019 14:03:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=Yjawb15ilcgBDz3rr0CkGUbs4QxWlVrQBeuf1ek1VNA=;
-	b=L7w8RtS5d1HSXcKSoAYq2jtc1aPMkU3zl4j5gPuP84F4YQBfgO3PBYqHivfmG9Cj0N
-	VthgyJjKr5VXUchlNw12yBWUFfHaaQvxunweu68eITskG5pzo7K/ygVe24crBXQgMsQr
-	KDPnmYlBMchIoZEHvzyvToh/JjNYznhpqAbrCBk/0V2Cr7Ek/cbha3uwwrQ31+SlR+Th
-	+6Yf1CJCDA17Z/FDjjxr/OnDJEmevcYnSj/rX9bzQf4rML2vIkUNDQMhCOlhUu29e0sO
-	FOuxsnEmH3iFfLeTMhLCD7bzoLnEWlTHINPyVlYxSVX7Tb/ayeVCC+gCfVRJ9qdFfQNT
-	r0Kw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=Yjawb15ilcgBDz3rr0CkGUbs4QxWlVrQBeuf1ek1VNA=;
-	b=qjJCn+BUONJqmX5YipHQR06k+/3Y/kydsFQpaLxsbPCsrYLpl9aKoBxIVneN8EI4RJ
-	LwLXTKa9jOjiNEmwvVxW2ohFFTdIJ34fwxvMYo0/fBU0RmoLPYq337GKYLUuuJqWvcOo
-	WtoApGhQIW8SGm6BsH4m+nDyEX0dF8hHjBnp9V60RSsm/9NyWzWjjx52/Pm5SAxcOeOh
-	y454yvb8CQ/63lug3uWikA/oOumZh0r9J0bZ8lY2Vdk62CsD7XmcKVmbe0gO7V2WJw3k
-	N02yvbuMK6h+VKArTKN9ZI0VUSpkmC//UhF4wBVmQN+ZkhE+SIQd2KEZHkKRo8+6LsHv
-	Glwg==
-X-Gm-Message-State: APjAAAXxoaXe8jAaDMqsCHFyFnLVbxOwJZsqXS2hEN0FdlyAOO1ygTeO
-	SFlSHCbXFZ1PS0qT7X3ug7XQOrdC
-X-Google-Smtp-Source: APXvYqzyaD2WuOegJroeaVNSqkzOSiGv5b6YX4R2hRTuTgjLYIrrrHEYUMJ25cKW0iNm5hhaFxGtsQ==
-X-Received: by 2002:adf:f051:: with SMTP id t17mr11507304wro.73.1557003785613; 
-	Sat, 04 May 2019 14:03:05 -0700 (PDT)
-Received: from localhost ([46.114.6.7]) by smtp.gmail.com with ESMTPSA id
-	t24sm14856936wra.58.2019.05.04.14.03.04
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sat, 04 May 2019 14:03:04 -0700 (PDT)
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-To: qemu-devel@nongnu.org,
-	hpoussin@reactos.org
-Date: Sat,  4 May 2019 23:02:34 +0200
-Message-Id: <1557003754-26473-4-git-send-email-atar4qemu@gmail.com>
-X-Mailer: git-send-email 2.7.2
-In-Reply-To: <1557003754-26473-1-git-send-email-atar4qemu@gmail.com>
-References: <1557003754-26473-1-git-send-email-atar4qemu@gmail.com>
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hN5U9-0002Tb-Ds
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 20:58:34 -0400
+Received: from mga02.intel.com ([134.134.136.20]:18134)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1hN5U9-0002Sj-5q
+	for qemu-devel@nongnu.org; Sat, 04 May 2019 20:58:33 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+	by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	04 May 2019 17:58:30 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,431,1549958400"; d="scan'208";a="321545524"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+	by orsmga005.jf.intel.com with ESMTP; 04 May 2019 17:58:27 -0700
+Date: Sun, 5 May 2019 08:58:01 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190505005801.GA20071@richard>
+References: <1556808723-226478-1-git-send-email-imammedo@redhat.com>
+	<1556808723-226478-3-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+In-Reply-To: <1556808723-226478-3-git-send-email-imammedo@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PATCH v2 3/3] hw/isa/i82378.c: use 1900 as a base year
+X-Received-From: 134.134.136.20
+Subject: Re: [Qemu-devel] [PATCH v4 02/15] tests: acpi: make
+ acpi_fetch_table() take size of fetched table pointer
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,37 +69,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:PReP" <qemu-ppc@nongnu.org>,
-	Artyom Tarasenko <atar4qemu@gmail.com>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: Andrew Jones <drjones@redhat.com>, Ben Warren <ben@skyportsystems.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	linuxarm@huawei.com, Shannon Zhao <shannon.zhaosl@gmail.com>,
+	Gonglei <arei.gonglei@huawei.com>,
+	Wei Yang <richardw.yang@linux.intel.com>, xuwei5@huawei.com,
+	xuwei5@hisilicon.com,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190504210234.9SfLxcxmPXZN-_R54r0sdD3o9ceQWwM6SQscuf8mRe0@z>
+Message-ID: <20190505005801.NsCNSbvNuAN17PuRO0TpsdjIjyNiEinQJJ5osrdl-4M@z>
 
-AIX 5.1 expects the base year to be 1900. Adjust accordingly.
+On Thu, May 02, 2019 at 04:51:50PM +0200, Igor Mammedov wrote:
+>Currently acpi_fetch_table() assumes 32 bit size of table pointer
+>in ACPI tables. However X_foo variants are 64 bit, prepare
+>acpi_fetch_table() to handle both by adding an argument
+>for addr_ptr pointed entry size. Follow up commits will use that
+>to read XSDT and X_foo entries in ACPI tables.
+>
+>Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
----
- hw/isa/i82378.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
 
-diff --git a/hw/isa/i82378.c b/hw/isa/i82378.c
-index a5d67bc..546c928 100644
---- a/hw/isa/i82378.c
-+++ b/hw/isa/i82378.c
-@@ -107,7 +107,9 @@ static void i82378_realize(PCIDevice *pci, Error **errp)
-     isa = isa_create_simple(isabus, "i82374");
- 
-     /* timer */
--    isa_create_simple(isabus, TYPE_MC146818_RTC);
-+    isa = isa_create(isabus, TYPE_MC146818_RTC);
-+    qdev_prop_set_int32(DEVICE(isa), "base_year", 1900);
-+    qdev_init_nofail(DEVICE(isa));
- }
- 
- static void i82378_init(Object *obj)
+>---
+> tests/acpi-utils.h       |  2 +-
+> tests/acpi-utils.c       | 10 ++++++----
+> tests/bios-tables-test.c |  8 ++++----
+> tests/vmgenid-test.c     |  4 ++--
+> 4 files changed, 13 insertions(+), 11 deletions(-)
+>
+>diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+>index 4cd5553..92285b7 100644
+>--- a/tests/acpi-utils.h
+>+++ b/tests/acpi-utils.h
+>@@ -49,7 +49,7 @@ uint32_t acpi_find_rsdp_address(QTestState *qts);
+> uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
+> void acpi_fetch_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table);
+> void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
+>-                      const uint8_t *addr_ptr, const char *sig,
+>+                      const uint8_t *addr_ptr, int addr_size, const char *sig,
+>                       bool verify_checksum);
+> 
+> #endif  /* TEST_ACPI_UTILS_H */
+>diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
+>index 633d8f5..644c87b 100644
+>--- a/tests/acpi-utils.c
+>+++ b/tests/acpi-utils.c
+>@@ -91,13 +91,15 @@ void acpi_fetch_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table)
+>  *  actual one.
+>  */
+> void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
+>-                      const uint8_t *addr_ptr, const char *sig,
+>+                      const uint8_t *addr_ptr, int addr_size, const char *sig,
+>                       bool verify_checksum)
+> {
+>-    uint32_t addr, len;
+>+    uint32_t len;
+>+    uint64_t addr = 0;
+> 
+>-    memcpy(&addr, addr_ptr , sizeof(addr));
+>-    addr = le32_to_cpu(addr);
+>+    g_assert(addr_size == 4 || addr_size == 8);
+>+    memcpy(&addr, addr_ptr , addr_size);
+>+    addr = le64_to_cpu(addr);
+>     qtest_memread(qts, addr + 4, &len, 4); /* Length of ACPI table */
+>     *aml_len = le32_to_cpu(len);
+>     *aml = g_malloc0(*aml_len);
+>diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+>index 6a678bf..86b592c 100644
+>--- a/tests/bios-tables-test.c
+>+++ b/tests/bios-tables-test.c
+>@@ -114,14 +114,14 @@ static void test_acpi_rsdt_table(test_data *data)
+> 
+>     /* read RSDT table */
+>     acpi_fetch_table(data->qts, &rsdt.aml, &rsdt.aml_len,
+>-                     &data->rsdp_table[16 /* RsdtAddress */], "RSDT", true);
+>+                     &data->rsdp_table[16 /* RsdtAddress */], 4, "RSDT", true);
+> 
+>     /* Load all tables and add to test list directly RSDT referenced tables */
+>     ACPI_FOREACH_RSDT_ENTRY(rsdt.aml, rsdt.aml_len, ent, 4 /* Entry size */) {
+>         AcpiSdtTable ssdt_table = {};
+> 
+>         acpi_fetch_table(data->qts, &ssdt_table.aml, &ssdt_table.aml_len, ent,
+>-                         NULL, true);
+>+                         4, NULL, true);
+>         /* Add table to ASL test tables list */
+>         g_array_append_val(data->tables, ssdt_table);
+>     }
+>@@ -139,11 +139,11 @@ static void test_acpi_fadt_table(test_data *data)
+> 
+>     /* Since DSDT/FACS isn't in RSDT, add them to ASL test list manually */
+>     acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
+>-                     fadt_aml + 36 /* FIRMWARE_CTRL */, "FACS", false);
+>+                     fadt_aml + 36 /* FIRMWARE_CTRL */, 4, "FACS", false);
+>     g_array_append_val(data->tables, table);
+> 
+>     acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
+>-                     fadt_aml + 40 /* DSDT */, "DSDT", true);
+>+                     fadt_aml + 40 /* DSDT */, 4, "DSDT", true);
+>     g_array_append_val(data->tables, table);
+> 
+>     memset(fadt_aml + 36, 0, 4); /* sanitize FIRMWARE_CTRL ptr */
+>diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+>index f400184..85d8e64 100644
+>--- a/tests/vmgenid-test.c
+>+++ b/tests/vmgenid-test.c
+>@@ -42,12 +42,12 @@ static uint32_t acpi_find_vgia(QTestState *qts)
+> 
+>     acpi_fetch_rsdp_table(qts, rsdp_offset, rsdp_table);
+>     acpi_fetch_table(qts, &rsdt, &rsdt_len, &rsdp_table[16 /* RsdtAddress */],
+>-                     "RSDT", true);
+>+                     4, "RSDT", true);
+> 
+>     ACPI_FOREACH_RSDT_ENTRY(rsdt, rsdt_len, ent, 4 /* Entry size */) {
+>         uint8_t *table_aml;
+> 
+>-        acpi_fetch_table(qts, &table_aml, &table_length, ent, NULL, true);
+>+        acpi_fetch_table(qts, &table_aml, &table_length, ent, 4, NULL, true);
+>         if (!memcmp(table_aml + 16 /* OEM Table ID */, "VMGENID", 7)) {
+>             uint32_t vgia_val;
+>             uint8_t *aml = &table_aml[36 /* AML byte-code start */];
+>-- 
+>2.7.4
+
 -- 
-2.7.2
-
+Wei Yang
+Help you, Help me
 
