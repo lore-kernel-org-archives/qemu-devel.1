@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50411)
+Received: from eggs.gnu.org ([209.51.188.92]:50485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNJSu-0002eu-Oe
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:54:13 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNJTD-0002si-UI
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:54:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNJSt-0005pU-NG
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:54:12 -0400
-References: <20190503143904.31211-1-alex.bennee@linaro.org>
-	<98cd84db-2aed-4aa1-1f2d-eaa7ac63b72b@redhat.com>
-	<87d0kz4iqs.fsf@zen.linaroharston>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <0badc17e-90bc-1a09-89c1-20f88ff75d3b@redhat.com>
-Date: Sun, 5 May 2019 17:54:05 +0200
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNJTD-0005zN-2k
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:54:31 -0400
+References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
+	<20190428143845.11810-15-mark.cave-ayland@ilande.co.uk>
+	<3c05b552-a692-e439-fc28-90ad69767cf2@linaro.org>
+	<e8968236-5ab2-568f-fd32-e9208c0f2ebe@ilande.co.uk>
+	<f0e80eda-9f10-f39f-708a-1dc08575bd9b@linaro.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <3ac1091b-dc00-d58a-4cd2-03feb6cf0fa9@ilande.co.uk>
+Date: Sun, 5 May 2019 16:54:21 +0100
 MIME-Version: 1.0
-In-Reply-To: <87d0kz4iqs.fsf@zen.linaroharston>
+In-Reply-To: <f0e80eda-9f10-f39f-708a-1dc08575bd9b@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] tests/qemu-iotests: re-format output
- to for make check-block
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 14/14] target/ppc: improve VSX_FMADD with
+ new GEN_VSX_HELPER_VSX_MADD macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,51 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, gkurz@kaod.org
 
-On 03/05/2019 18.15, Alex Benn=C3=A9e wrote:
->=20
-> Thomas Huth <thuth@redhat.com> writes:
->=20
->> On 03/05/2019 16.39, Alex Benn=C3=A9e wrote:
->>> This attempts to clean-up the output to better match the output of th=
-e
->>> rest of the QEMU check system. This includes:
+On 05/05/2019 16:17, Richard Henderson wrote:
+
+> On 5/5/19 3:20 AM, Mark Cave-Ayland wrote:
+>>> The afrm argument is no longer used.
+>>> This also means that e.g.
 >>>
->>>   - formatting as "  TEST    iotest: nnn"
->>>   - calculating time diff at the end
->>>   - only dumping config on failure
+>>> VSX_MADD(xsmaddadp, 1, float64, VsrD(0), MADD_FLGS, 1, 1, 0)
+>>> VSX_MADD(xsmaddmdp, 1, float64, VsrD(0), MADD_FLGS, 0, 1, 0)
 >>>
->>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>> ---
->>>  tests/qemu-iotests/check | 71 +++++++++++++++++++-------------------=
---
->>>  1 file changed, 34 insertions(+), 37 deletions(-)
+>>> are redundant.  Similarly with all of the other pairs.
 >>
->> Thanks for tackling this! The output now looks nicer indeed if you run
->> "make check-qtest check-block -j8". However, if you add a "V=3D1" at t=
-he
->> end of the command line, the outputs look quite different again...
+>> Agreed. What do you think is the best solution here - maybe a double macro that looks
+>> something like this?
 >>
->> That's why I thought that having a TAP mode for the check script could
->> be a good idea, too. Then we could pipe the output through the
->> tap-driver.pl script, too, so we get uniform output for all tests...?
->=20
-> That would probably be a cleaner approach. What would be even better is
-> somehow expanding the list of tests at make time so you could run your
-> tests in parallel.
+>> #define VSX_MADD(op, prec, nels, tp, fld, maddflgs, sfprf, r2sp)
+>> _VSX_MADD(op##aprec, nels, tp, fld, maddflgs, sfprf, r2sp)
+>> _VSX_MADD(op##mprec, nels, tp, fld, maddflgs, sfprf, r2sp)
+>>
+>> VSX_MADD(xsmadd, dp, 1, float64, VsrD(0), MADD_FLGS, 1, 0)
+> 
+> I have no idea what you're suggesting.
+> 
+> I am suggesting one function, xsmadddp, replacing xsmaddadp + xsmaddmdp, that
+> is used by both instructions.
 
-I agree that this might be the ultimate solution ... but I'm not sure
-whether the iotests are really ready for being run in parallel yet, so
-it will likely take quite some while 'till we are at that point. With
-that in mind (and thus also not sure yet whether my TAP idea is really
-the right approach), your patch is certainly a good interim solution
-which we should try to get merged, too, when my "make check" series gets
-accepted?
+Gotcha. I was thinking that the standard practice was to have a 1:1 correspondence
+between the gen function and helper function for instructions, but I'm happy to go
+with your suggestion above.
 
-> I did wonder how useful the timing stuff was to developers.
 
-Yes, me too ... maybe the block layer folks can comment on that one...?
+ATB,
 
- Thomas
+Mark.
