@@ -2,91 +2,93 @@ Return-Path: <SRS0=Huu6=TF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB2E6C004C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 15:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF076C04AAC
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 15:52:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85715206DF
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 15:50:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="stN+DI0d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85715206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id BFF47208C2
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 15:52:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFF47208C2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42809 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42826 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNJPl-0001A8-Rj
-	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 11:50:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49435)
+	id 1hNJRI-0002IM-2A
+	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 11:52:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hNJOU-0000Oy-R0
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:49:39 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNJQG-0001mn-Dh
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:51:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hNJOT-0003Eq-R1
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:49:38 -0400
-Received: from mail-pf1-x433.google.com ([2607:f8b0:4864:20::433]:42493)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hNJOT-0003Dv-Jw
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:49:37 -0400
-Received: by mail-pf1-x433.google.com with SMTP id 13so5081422pfw.9
-	for <qemu-devel@nongnu.org>; Sun, 05 May 2019 08:49:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=5pjwv8n0Juehh/RddZWZGqhvpPRD9QpoqJ31I7wHZio=;
-	b=stN+DI0dLjB4PEdS75gvUT0WgTE1OOjqfOyvrY2rfcCMufywundg+vxTCEr/X2Gaye
-	SQRSvfewSwTVrh0HcTB1aJt8OD6lfLxBVRHJi0oe6Udtdz0pYGcIj/H1T0IG6FShYM5q
-	UU26awvjRGYeqj+DEFgEhqaod13zvlK9kqCp2XbF6ChQS2beHahELchO26lv2w2rqGW/
-	PYGOWkGpZ2BbbXet5Hq6mRqFMq36uY007pazaDMwsy0FBDI7K/ezMCuBWSqEsl5j/NRW
-	TH2WbE/qBgUXta4gLYgOJWiQQvcvN/o/ofHEVfT56zfplt5R1Ba5Fho5ebmEYeQQjUT3
-	VwbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=5pjwv8n0Juehh/RddZWZGqhvpPRD9QpoqJ31I7wHZio=;
-	b=Ywy0CUejRJkACsON2px2GEH8gGhsuaxbNIX9dxoqMPtgg/2QZNa//fF0iTUAKCqwpK
-	kzgMEn5DyLzm3JT2P4U2kUoYWiXipkLi9SV+HcUGvm1Px6UyDp3gShJDfXJFjxzabViM
-	6mvRLdOWgflh2VCOr2nirI7qKFEtoH7DmpwX9rXc/xasd6IastP9Q0x3GJaee/UOBl3S
-	kAGUu/kumZRX8win4/zjMDBDkeCxRPlOwW1gqAWge2q+dTOnPCSv8vgKFRgrybe79CKU
-	RhiolMur11qPOnSZs9pKJxuKgdkkzlnMSD+TWuipCh98mPT5gpndYRLIh+pUJwly9keE
-	EOCg==
-X-Gm-Message-State: APjAAAWNQBMdJy/WUqAbPAChtoDvaBH3ovBZOxqQRpjX/4uHtnLfRo7b
-	l43n8VI5aH8zi8VqSLkNvkPX0A==
-X-Google-Smtp-Source: APXvYqzrbddPStY7KWGHLjZVxBKYW2qYlzjC8iAJqaqFhEhPM0Kkxe+Jx1k7wTXCc3V9iKs9eBFuTA==
-X-Received: by 2002:a65:5684:: with SMTP id v4mr16451725pgs.160.1557071376146; 
-	Sun, 05 May 2019 08:49:36 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-189-189.tukw.qwest.net. [97.113.189.189])
-	by smtp.gmail.com with ESMTPSA id
-	e23sm9619328pfi.159.2019.05.05.08.49.34
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sun, 05 May 2019 08:49:35 -0700 (PDT)
-To: Sarah Harris <S.E.Harris@kent.ac.uk>, qemu-devel@nongnu.org
-References: <20190504083638.13380-1-S.E.Harris@kent.ac.uk>
-	<20190504083638.13380-2-S.E.Harris@kent.ac.uk>
-From: Richard Henderson <richard.henderson@linaro.org>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNJQF-0004MO-3q
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 11:51:28 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:37576
+	helo=mail.default.ilande.uk0.bigv.io)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hNJQC-0004KR-F6; Sun, 05 May 2019 11:51:24 -0400
+Received: from host109-149-60-255.range109-149.btcentralplus.com
+	([109.149.60.255] helo=[192.168.1.65])
+	by mail.default.ilande.uk0.bigv.io with esmtpsa
+	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hNJNV-0003oH-2M; Sun, 05 May 2019 16:48:37 +0100
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net,
+	gkurz@kaod.org
+References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
+	<20190428143845.11810-3-mark.cave-ayland@ilande.co.uk>
+	<55204805-9275-2bc4-2c38-51dc87aa836d@linaro.org>
+	<7227a96f-ae59-3ed4-8b1f-9e92005b4a69@ilande.co.uk>
+	<626519f6-28c2-9870-0c6d-12869fbf57f1@linaro.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Openpgp: preference=signencrypt
-Message-ID: <772cbab8-49a2-8969-ba3e-55f190c886ff@linaro.org>
-Date: Sun, 5 May 2019 08:49:33 -0700
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+	mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+	3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+	E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+	PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+	PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+	AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+	OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+	NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+	mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+	z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+	T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+	DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+	y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+	2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+	14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+	YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+	Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+	BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+	opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+	NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+	imgcU9TTGC5qd9g=
+Message-ID: <cf86b84d-bf12-7b50-267d-cb2897cfd20d@ilande.co.uk>
+Date: Sun, 5 May 2019 16:49:11 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190504083638.13380-2-S.E.Harris@kent.ac.uk>
+In-Reply-To: <626519f6-28c2-9870-0c6d-12869fbf57f1@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Language: en-US
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::433
-Subject: Re: [Qemu-devel] [PATCH v1 1/8] target/avr: Add instruction decoder
+X-SA-Exim-Connect-IP: 109.149.60.255
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.43.2.167
+Subject: Re: [Qemu-devel] [PATCH 02/14] target/ppc: remove getVSR()/putVSR()
+ from mem_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,38 +100,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: A.M.King@kent.ac.uk, mrolnik@gmail.com, E.J.C.Robbins@kent.ac.uk
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505154933.AVmd2Ef_Nc5ASTSx8Xwbto9wtBR694xB6jxGxKRAmkU@z>
+Message-ID: <20190505154911.YZ2Gfxmo4hmQUELW6MIaiMsFPlH-n-D1MeBEqMP3vo8@z>
 
-On 5/4/19 1:36 AM, Sarah Harris wrote:
-> This utility module builds a decision tree to decode instructions, starting from a human readable list of instruction bit patterns.
-> Automatic tree generation will hopefully be more efficient and more maintainable than a hand-designed opcode parser.
+On 05/05/2019 15:34, Richard Henderson wrote:
+
+> On 5/5/19 2:34 AM, Mark Cave-Ayland wrote:
+>>>>      EA = tcg_temp_new();                                        \
+>>>> -    xt = tcg_const_tl(xT(ctx->opcode));                         \
+>>>>      gen_set_access_type(ctx, ACCESS_INT);                       \
+>>>>      gen_addr_register(ctx, EA);                                 \
+>>>> -    gen_helper_##name(cpu_env, EA, xt, cpu_gpr[rB(ctx->opcode)]); \
+>>>> +    xt = tcg_const_tl(xT(ctx->opcode));                         \
+>>>> +    rb = tcg_const_tl(rB(ctx->opcode));                         \
+>>>> +    gen_helper_##name(cpu_env, EA, xt, rb);                     \
+>>>>      tcg_temp_free(EA);                                          \
+>>>>      tcg_temp_free(xt);                                          \
+>>>> +    tcg_temp_free(rb);                                          \
+>>>>  }
+>>>
+>>> Why are you adjusting the function to pass the rB register number rather than
+>>> the contents of rB?  That seems the wrong way around...
+>>
+>> I think what I was trying to do here was eliminate the cpu_gpr since it
+>> feels to me that with the vector patchsets and your negative offset patches
+>> that this should be the way to go for accessing CPUState rather than using
+>> TCG globals.
 > 
-> Tree generation happens at startup because this seemed simpler to implement than adding a new build step.
+> Not for the integer register set.
+> 
+>> Looking at this again I realise the solution is really the same as is
+>> currently used
+>> for gen_load_spr() so I can use something like this:>
+>>     static inline void gen_load_gpr(TCGv t, int reg)
+>>     {
+>>         tcg_gen_ld_tl(t, cpu_env, offsetof(CPUPPCState, gpr[reg]));
+>>     }
+>>
+>> Does this seem reasonable as a solution?
+> 
+> No, this will fail quickly.
 
-We have such a thing in qemu already, as a separate build step.
-
-See ./scripts/decodetree.py, and some of the uses in
-
-  target/{arm,hppa,riscv}/*.decode
-
-In addition to being able to select the instruction, it also
-extracts arguments from the instruction, so there's less
-repetition that you have for e.g.
-
- > +static inline uint32_t MOVW_Rr(uint32_t opcode)
-> +{
-> +    return extract32(opcode, 0, 4);
-> +}
-...
-> +static inline uint32_t MULS_Rr(uint32_t opcode)
-> +{
-> +    return extract32(opcode, 0, 4);
-> +}
+Okay in that case I'll leave it as-is. So just to satisfy my curiosity here: is the
+problem here the mixing and matching of offsets and TCG globals, rather than the use
+of offsets as done for the VMX/VSX registers?
 
 
-r~
+ATB,
+
+Mark.
 
