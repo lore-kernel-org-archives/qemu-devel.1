@@ -2,99 +2,63 @@ Return-Path: <SRS0=Huu6=TF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 449CEC004C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 10:58:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE624C004C9
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 13:59:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF8E7208C0
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 10:58:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IuWm92dO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF8E7208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id A7F0F208C0
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 13:59:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7F0F208C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39437 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41366 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNEqc-0006Fv-B8
-	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 06:58:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53545)
+	id 1hNHft-0005TE-Lc
+	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 09:59:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hNEpk-0005uj-S2
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:57:30 -0400
+	(envelope-from <thuth@redhat.com>) id 1hNHdx-00048R-RU
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hNEpj-00036b-BY
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:57:28 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:32784)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1hNEpf-00034j-K4; Sun, 05 May 2019 06:57:23 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-	by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x45Asieu139170; Sun, 5 May 2019 10:57:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
-	h=date : from : to : cc
-	: subject : message-id : references : mime-version : content-type :
-	in-reply-to; s=corp-2018-07-02;
-	bh=0bWTbKfABVAr5N+twtd1oJ1+vchJ3rkejxd1DkXvgfY=;
-	b=IuWm92dOqIfXBwYGX73NbPHlzaCbyG2oTmL5uAbOP8io0kYEVwU0zofn+GrfXmO/Dkbs
-	WK7wZS66c+Y7JzY2TeLjNhBJuzlKErT8CqNF54DQdPLckvutHt6Tn61vz02ulklo2OZB
-	kNnCOmLTT9MkUzVRhSIIN7Xjr2Ng8YO3XimdN1P2yxG+nvoLJ6BuHl8RBDwH069zLLUa
-	KIAn7dhvXQm191eEjPk1kUtx3llwyHCDFj9T1u/q0bU7AlFf9aZhpXuoKsKltJ90SvFc
-	GBUQtHDmDvOp/RycgdJde0lUz8tKgDmAyWyCsAUBz5WYA2ck7ZwudvkMfmDJ7dO8IReL
-	kg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-	by aserp2130.oracle.com with ESMTP id 2s94b5jnxn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 05 May 2019 10:57:19 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-	by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x45Au2Ww144710; Sun, 5 May 2019 10:57:19 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-	by userp3030.oracle.com with ESMTP id 2s94aqt8ba-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 05 May 2019 10:57:18 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-	by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x45AvAX3017611;
-	Sun, 5 May 2019 10:57:10 GMT
-Received: from lap1 (/77.138.183.59) by default (Oracle Beehive Gateway v4.0)
-	with ESMTP ; Sun, 05 May 2019 10:57:10 +0000
-Date: Sun, 5 May 2019 13:57:04 +0300
-From: Yuval Shaia <yuval.shaia@oracle.com>
-To: Boxuan Li <liboxuan@connect.hku.hk>
-Message-ID: <20190505105703.GA9490@lap1>
-References: <20190503154424.73933-1-liboxuan@connect.hku.hk>
+	(envelope-from <thuth@redhat.com>) id 1hNHdw-0004dK-Tc
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43480)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hNHdu-0004ao-Q9; Sun, 05 May 2019 09:57:26 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2375446233;
+	Sun,  5 May 2019 13:57:26 +0000 (UTC)
+Received: from thuth.com (ovpn-116-27.ams2.redhat.com [10.36.116.27])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 16E2060C5F;
+	Sun,  5 May 2019 13:57:24 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+	qemu-devel@nongnu.org
+Date: Sun,  5 May 2019 15:56:51 +0200
+Message-Id: <20190505135714.11277-6-thuth@redhat.com>
+In-Reply-To: <20190505135714.11277-1-thuth@redhat.com>
+References: <20190505135714.11277-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190503154424.73933-1-liboxuan@connect.hku.hk>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9247
-	signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
-	malwarescore=0
-	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
-	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
-	engine=8.0.1-1810050000 definitions=main-1905050099
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9247
-	signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
-	priorityscore=1501 malwarescore=0
-	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
-	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
-	adultscore=0
-	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
-	definitions=main-1905050099
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.79
-Subject: Re: [Qemu-devel] [PATCH v4] hw/virtio/virtio-mmio: Convert DPRINTF
- to trace and log
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.29]);
+	Sun, 05 May 2019 13:57:26 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 05/28] hw/arm: Express dependencies of
+ integratorcp with Kconfig
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -106,169 +70,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
-	qemu-devel@nongnu.org, alex.bennee@linaro.org, philmd@redhat.com
+Cc: qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505105704.veXCpVoQmCBpIemDKUUqmXl-GvKBTDofC0Amxvf50y8@z>
+Message-ID: <20190505135651.06wU_8mGJ6aflmTLbxWjjjgO65mMnKPuAWa0I027Lec@z>
 
-On Fri, May 03, 2019 at 11:44:24PM +0800, Boxuan Li wrote:
-> Use traces for debug message and qemu_log_mask for errors.
-> 
-> Signed-off-by: Boxuan Li <liboxuan@connect.hku.hk>
-> ---
-> v1: https://patchew.org/QEMU/20190428110258.86681-1-liboxuan@connect.hku.hk/
-> v2: https://patchew.org/QEMU/20190501081039.58938-1-liboxuan@connect.hku.hk/
-> v3: https://patchew.org/QEMU/20190503084654.18413-1-liboxuan@connect.hku.hk/
-> v4: Fix indentation and do not convert uint64_t to int
-> ---
->  hw/virtio/trace-events  |  7 +++++++
->  hw/virtio/virtio-mmio.c | 44 +++++++++++++++++++++-----------------------
->  2 files changed, 28 insertions(+), 23 deletions(-)
-> 
-> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> index 60c649c4bc..e28ba48da6 100644
-> --- a/hw/virtio/trace-events
-> +++ b/hw/virtio/trace-events
-> @@ -46,3 +46,10 @@ virtio_balloon_handle_output(const char *name, uint64_t gpa) "section name: %s g
->  virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_pages: %d actual: %d"
->  virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: %d oldactual: %d"
->  virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon target: 0x%"PRIx64" num_pages: %d"
-> +
-> +# virtio-mmio.c
-> +virtio_mmio_read(uint64_t offset) "virtio_mmio_read offset 0x%" PRIx64
-> +virtio_mmio_write_offset(uint64_t offset, uint64_t value) "virtio_mmio_write offset 0x%" PRIx64 " value 0x%" PRIx64
-> +virtio_mmio_guest_page(uint64_t size, int shift) "guest page size 0x%" PRIx64 " shift %d"
-> +virtio_mmio_queue_write(uint64_t value, int max_size) "mmio_queue write 0x%" PRIx64 " max %d"
-> +virtio_mmio_setting_irq(int level) "virtio_mmio setting IRQ %d"
-> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
-> index 5807aa87fe..96c762f0bf 100644
-> --- a/hw/virtio/virtio-mmio.c
-> +++ b/hw/virtio/virtio-mmio.c
-> @@ -27,16 +27,8 @@
->  #include "sysemu/kvm.h"
->  #include "hw/virtio/virtio-bus.h"
->  #include "qemu/error-report.h"
-> -
-> -/* #define DEBUG_VIRTIO_MMIO */
-> -
-> -#ifdef DEBUG_VIRTIO_MMIO
-> -
-> -#define DPRINTF(fmt, ...) \
-> -do { printf("virtio_mmio: " fmt , ## __VA_ARGS__); } while (0)
-> -#else
-> -#define DPRINTF(fmt, ...) do {} while (0)
-> -#endif
-> +#include "qemu/log.h"
-> +#include "trace.h"
->  
->  /* QOM macros */
->  /* virtio-mmio-bus */
-> @@ -107,7 +99,7 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
->      VirtIOMMIOProxy *proxy = (VirtIOMMIOProxy *)opaque;
->      VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
->  
-> -    DPRINTF("virtio_mmio_read offset 0x%x\n", (int)offset);
-> +    trace_virtio_mmio_read(offset);
->  
->      if (!vdev) {
->          /* If no backend is present, we treat most registers as
-> @@ -144,7 +136,9 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
->          }
->      }
->      if (size != 4) {
-> -        DPRINTF("wrong size access to register!\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: wrong size access to register!\n",
-> +                      __func__);
->          return 0;
->      }
->      switch (offset) {
-> @@ -182,10 +176,12 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
->      case VIRTIO_MMIO_QUEUE_ALIGN:
->      case VIRTIO_MMIO_QUEUE_NOTIFY:
->      case VIRTIO_MMIO_INTERRUPT_ACK:
-> -        DPRINTF("read of write-only register\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: read of write-only register\n",
-> +                      __func__);
->          return 0;
->      default:
-> -        DPRINTF("bad register offset\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad register offset\n", __func__);
->          return 0;
->      }
->      return 0;
-> @@ -197,8 +193,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
->      VirtIOMMIOProxy *proxy = (VirtIOMMIOProxy *)opaque;
->      VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
->  
-> -    DPRINTF("virtio_mmio_write offset 0x%x value 0x%" PRIx64 "\n",
-> -            (int)offset, value);
-> +    trace_virtio_mmio_write_offset(offset, value);
->  
->      if (!vdev) {
->          /* If no backend is present, we just make all registers
-> @@ -226,7 +221,9 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
->          return;
->      }
->      if (size != 4) {
-> -        DPRINTF("wrong size access to register!\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: wrong size access to register!\n",
-> +                      __func__);
->          return;
->      }
->      switch (offset) {
-> @@ -246,8 +243,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
->          if (proxy->guest_page_shift > 31) {
->              proxy->guest_page_shift = 0;
->          }
-> -        DPRINTF("guest page size %" PRIx64 " shift %d\n", value,
-> -                proxy->guest_page_shift);
-> +        trace_virtio_mmio_guest_page(value, proxy->guest_page_shift);
->          break;
->      case VIRTIO_MMIO_QUEUE_SEL:
->          if (value < VIRTIO_QUEUE_MAX) {
-> @@ -255,7 +251,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
->          }
->          break;
->      case VIRTIO_MMIO_QUEUE_NUM:
-> -        DPRINTF("mmio_queue write %d max %d\n", (int)value, VIRTQUEUE_MAX_SIZE);
-> +        trace_virtio_mmio_queue_write(value, VIRTQUEUE_MAX_SIZE);
->          virtio_queue_set_num(vdev, vdev->queue_sel, value);
->          /* Note: only call this function for legacy devices */
->          virtio_queue_update_rings(vdev, vdev->queue_sel);
-> @@ -303,11 +299,13 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
->      case VIRTIO_MMIO_DEVICE_FEATURES:
->      case VIRTIO_MMIO_QUEUE_NUM_MAX:
->      case VIRTIO_MMIO_INTERRUPT_STATUS:
-> -        DPRINTF("write to readonly register\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: write to readonly register\n",
-> +                      __func__);
->          break;
->  
->      default:
-> -        DPRINTF("bad register offset\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad register offset\n", __func__);
->      }
->  }
->  
-> @@ -327,7 +325,7 @@ static void virtio_mmio_update_irq(DeviceState *opaque, uint16_t vector)
->          return;
->      }
->      level = (atomic_read(&vdev->isr) != 0);
-> -    DPRINTF("virtio_mmio setting IRQ %d\n", level);
-> +    trace_virtio_mmio_setting_irq(level);
->      qemu_set_irq(proxy->irq, level);
->  }
+This patch is slightly based on earlier work by =C3=81kos Kov=C3=A1cs (i.=
+e.
+his "hw/arm/Kconfig: Add ARM Kconfig" patch).
 
-Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ default-configs/arm-softmmu.mak | 8 +-------
+ hw/arm/Kconfig                  | 8 ++++++++
+ hw/display/Kconfig              | 1 +
+ 3 files changed, 10 insertions(+), 7 deletions(-)
 
->  
-> -- 
-> 2.13.2
-> 
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
+u.mak
+index 50a4be3cad..6195b75f48 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -9,6 +9,7 @@ CONFIG_PCI_TESTDEV=3Dy
+=20
+ CONFIG_EXYNOS4=3Dy
+ CONFIG_HIGHBANK=3Dy
++CONFIG_INTEGRATOR=3Dy
+=20
+ CONFIG_VGA=3Dy
+ CONFIG_NAND=3Dy
+@@ -33,7 +34,6 @@ CONFIG_ADS7846=3Dy
+ CONFIG_MAX111X=3Dy
+ CONFIG_SSI_SD=3Dy
+ CONFIG_SSI_M25P80=3Dy
+-CONFIG_SMC91C111=3Dy
+ CONFIG_ALLWINNER_EMAC=3Dy
+ CONFIG_IMX_FEC=3Dy
+ CONFIG_FTGMAC100=3Dy
+@@ -50,10 +50,7 @@ CONFIG_ARM11MPCORE=3Dy
+ CONFIG_NETDUINO2=3Dy
+=20
+ CONFIG_PL041=3Dy
+-CONFIG_PL050=3Dy
+ CONFIG_PL080=3Dy
+-CONFIG_PL110=3Dy
+-CONFIG_PL181=3Dy
+ CONFIG_PL190=3Dy
+ CONFIG_PL330=3Dy
+ CONFIG_CADENCE=3Dy
+@@ -113,9 +110,6 @@ CONFIG_VERSATILE_I2C=3Dy
+ CONFIG_PCI_EXPRESS=3Dy
+ CONFIG_PCI_EXPRESS_GENERIC_BRIDGE=3Dy
+=20
+-CONFIG_INTEGRATOR=3Dy
+-CONFIG_INTEGRATOR_DEBUG=3Dy
+-
+ CONFIG_ALLWINNER_A10_PIT=3Dy
+ CONFIG_ALLWINNER_A10_PIC=3Dy
+ CONFIG_ALLWINNER_A10=3Dy
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index 0ba377ac18..ad3b1f9b40 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -32,6 +32,14 @@ config HIGHBANK
+=20
+ config INTEGRATOR
+     bool
++    select ARM_TIMER
++    select INTEGRATOR_DEBUG
++    select PL011 # UART
++    select PL031 # RTC
++    select PL050 # keyboard/mouse
++    select PL110 # pl111 LCD controller
++    select PL181 # display
++    select SMC91C111
+=20
+ config MAINSTONE
+     bool
+diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+index 72be57a403..a11815c9af 100644
+--- a/hw/display/Kconfig
++++ b/hw/display/Kconfig
+@@ -21,6 +21,7 @@ config JAZZ_LED
+=20
+ config PL110
+     bool
++    select FRAMEBUFFER
+=20
+ config SII9022
+     bool
+--=20
+2.21.0
+
 
