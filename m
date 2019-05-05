@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53545)
+Received: from eggs.gnu.org ([209.51.188.92]:55608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hNEpk-0005uj-S2
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:57:30 -0400
+	(envelope-from <thuth@redhat.com>) id 1hNHdr-00041r-UL
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1hNEpj-00036b-BY
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 06:57:28 -0400
-Date: Sun, 5 May 2019 13:57:04 +0300
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20190505105703.GA9490@lap1>
-References: <20190503154424.73933-1-liboxuan@connect.hku.hk>
+	(envelope-from <thuth@redhat.com>) id 1hNHdr-0004Y7-2h
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 09:57:23 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Sun,  5 May 2019 15:56:47 +0200
+Message-Id: <20190505135714.11277-2-thuth@redhat.com>
+In-Reply-To: <20190505135714.11277-1-thuth@redhat.com>
+References: <20190505135714.11277-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190503154424.73933-1-liboxuan@connect.hku.hk>
-Subject: Re: [Qemu-devel] [PATCH v4] hw/virtio/virtio-mmio: Convert DPRINTF
- to trace and log
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 01/28] hw/pci/pci-stub: Add msi_enabled() and
+ msi_notify() to the pci stubs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,164 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Boxuan Li <liboxuan@connect.hku.hk>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, eblake@redhat.com, philmd@redhat.com, alex.bennee@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org
 
-On Fri, May 03, 2019 at 11:44:24PM +0800, Boxuan Li wrote:
-> Use traces for debug message and qemu_log_mask for errors.
-> 
-> Signed-off-by: Boxuan Li <liboxuan@connect.hku.hk>
-> ---
-> v1: https://patchew.org/QEMU/20190428110258.86681-1-liboxuan@connect.hku.hk/
-> v2: https://patchew.org/QEMU/20190501081039.58938-1-liboxuan@connect.hku.hk/
-> v3: https://patchew.org/QEMU/20190503084654.18413-1-liboxuan@connect.hku.hk/
-> v4: Fix indentation and do not convert uint64_t to int
-> ---
->  hw/virtio/trace-events  |  7 +++++++
->  hw/virtio/virtio-mmio.c | 44 +++++++++++++++++++++-----------------------
->  2 files changed, 28 insertions(+), 23 deletions(-)
-> 
-> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> index 60c649c4bc..e28ba48da6 100644
-> --- a/hw/virtio/trace-events
-> +++ b/hw/virtio/trace-events
-> @@ -46,3 +46,10 @@ virtio_balloon_handle_output(const char *name, uint64_t gpa) "section name: %s g
->  virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_pages: %d actual: %d"
->  virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: %d oldactual: %d"
->  virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon target: 0x%"PRIx64" num_pages: %d"
-> +
-> +# virtio-mmio.c
-> +virtio_mmio_read(uint64_t offset) "virtio_mmio_read offset 0x%" PRIx64
-> +virtio_mmio_write_offset(uint64_t offset, uint64_t value) "virtio_mmio_write offset 0x%" PRIx64 " value 0x%" PRIx64
-> +virtio_mmio_guest_page(uint64_t size, int shift) "guest page size 0x%" PRIx64 " shift %d"
-> +virtio_mmio_queue_write(uint64_t value, int max_size) "mmio_queue write 0x%" PRIx64 " max %d"
-> +virtio_mmio_setting_irq(int level) "virtio_mmio setting IRQ %d"
-> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
-> index 5807aa87fe..96c762f0bf 100644
-> --- a/hw/virtio/virtio-mmio.c
-> +++ b/hw/virtio/virtio-mmio.c
-> @@ -27,16 +27,8 @@
->  #include "sysemu/kvm.h"
->  #include "hw/virtio/virtio-bus.h"
->  #include "qemu/error-report.h"
-> -
-> -/* #define DEBUG_VIRTIO_MMIO */
-> -
-> -#ifdef DEBUG_VIRTIO_MMIO
-> -
-> -#define DPRINTF(fmt, ...) \
-> -do { printf("virtio_mmio: " fmt , ## __VA_ARGS__); } while (0)
-> -#else
-> -#define DPRINTF(fmt, ...) do {} while (0)
-> -#endif
-> +#include "qemu/log.h"
-> +#include "trace.h"
->  
->  /* QOM macros */
->  /* virtio-mmio-bus */
-> @@ -107,7 +99,7 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
->      VirtIOMMIOProxy *proxy = (VirtIOMMIOProxy *)opaque;
->      VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
->  
-> -    DPRINTF("virtio_mmio_read offset 0x%x\n", (int)offset);
-> +    trace_virtio_mmio_read(offset);
->  
->      if (!vdev) {
->          /* If no backend is present, we treat most registers as
-> @@ -144,7 +136,9 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
->          }
->      }
->      if (size != 4) {
-> -        DPRINTF("wrong size access to register!\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: wrong size access to register!\n",
-> +                      __func__);
->          return 0;
->      }
->      switch (offset) {
-> @@ -182,10 +176,12 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
->      case VIRTIO_MMIO_QUEUE_ALIGN:
->      case VIRTIO_MMIO_QUEUE_NOTIFY:
->      case VIRTIO_MMIO_INTERRUPT_ACK:
-> -        DPRINTF("read of write-only register\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: read of write-only register\n",
-> +                      __func__);
->          return 0;
->      default:
-> -        DPRINTF("bad register offset\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad register offset\n", __func__);
->          return 0;
->      }
->      return 0;
-> @@ -197,8 +193,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
->      VirtIOMMIOProxy *proxy = (VirtIOMMIOProxy *)opaque;
->      VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
->  
-> -    DPRINTF("virtio_mmio_write offset 0x%x value 0x%" PRIx64 "\n",
-> -            (int)offset, value);
-> +    trace_virtio_mmio_write_offset(offset, value);
->  
->      if (!vdev) {
->          /* If no backend is present, we just make all registers
-> @@ -226,7 +221,9 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
->          return;
->      }
->      if (size != 4) {
-> -        DPRINTF("wrong size access to register!\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: wrong size access to register!\n",
-> +                      __func__);
->          return;
->      }
->      switch (offset) {
-> @@ -246,8 +243,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
->          if (proxy->guest_page_shift > 31) {
->              proxy->guest_page_shift = 0;
->          }
-> -        DPRINTF("guest page size %" PRIx64 " shift %d\n", value,
-> -                proxy->guest_page_shift);
-> +        trace_virtio_mmio_guest_page(value, proxy->guest_page_shift);
->          break;
->      case VIRTIO_MMIO_QUEUE_SEL:
->          if (value < VIRTIO_QUEUE_MAX) {
-> @@ -255,7 +251,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
->          }
->          break;
->      case VIRTIO_MMIO_QUEUE_NUM:
-> -        DPRINTF("mmio_queue write %d max %d\n", (int)value, VIRTQUEUE_MAX_SIZE);
-> +        trace_virtio_mmio_queue_write(value, VIRTQUEUE_MAX_SIZE);
->          virtio_queue_set_num(vdev, vdev->queue_sel, value);
->          /* Note: only call this function for legacy devices */
->          virtio_queue_update_rings(vdev, vdev->queue_sel);
-> @@ -303,11 +299,13 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
->      case VIRTIO_MMIO_DEVICE_FEATURES:
->      case VIRTIO_MMIO_QUEUE_NUM_MAX:
->      case VIRTIO_MMIO_INTERRUPT_STATUS:
-> -        DPRINTF("write to readonly register\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: write to readonly register\n",
-> +                      __func__);
->          break;
->  
->      default:
-> -        DPRINTF("bad register offset\n");
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad register offset\n", __func__);
->      }
->  }
->  
-> @@ -327,7 +325,7 @@ static void virtio_mmio_update_irq(DeviceState *opaque, uint16_t vector)
->          return;
->      }
->      level = (atomic_read(&vdev->isr) != 0);
-> -    DPRINTF("virtio_mmio setting IRQ %d\n", level);
-> +    trace_virtio_mmio_setting_irq(level);
->      qemu_set_irq(proxy->irq, level);
->  }
+Some machines have an AHCI adapter, but no PCI. To be able to
+compile hw/ide/ahci.c without CONFIG_PCI, we still need the two
+functions msi_enabled() and msi_notify() for linking.
+This is required for the new Kconfig-like build system, if a user
+wants to compile a QEMU binary with just one machine that has AHCI,
+but no PCI, like the ARM "cubieboard" for example.
 
-Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/pci/pci-stub.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
->  
-> -- 
-> 2.13.2
-> 
+diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
+index b941a0e842..c04a5df651 100644
+--- a/hw/pci/pci-stub.c
++++ b/hw/pci/pci-stub.c
+@@ -53,3 +53,14 @@ uint16_t pci_requester_id(PCIDevice *dev)
+     g_assert(false);
+     return 0;
+ }
++
++/* Required by ahci.c */
++bool msi_enabled(const PCIDevice *dev)
++{
++    return false;
++}
++
++void msi_notify(PCIDevice *dev, unsigned int vector)
++{
++    g_assert_not_reached();
++}
+--=20
+2.21.0
