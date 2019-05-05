@@ -2,93 +2,60 @@ Return-Path: <SRS0=Huu6=TF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1ABFC004C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 21:19:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F6AC004C9
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 22:20:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89D3920675
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 21:19:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ykzrsV7a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89D3920675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 95B9C205C9
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 22:20:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95B9C205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45951 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46917 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNOXW-0006Hr-74
-	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 17:19:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52024)
+	id 1hNPUZ-00074y-I7
+	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 18:20:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hNOWj-00061A-9s
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 17:18:30 -0400
+	(envelope-from <philmd@redhat.com>) id 1hNPQp-00048h-Dv
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:16:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hNOWg-0003aq-71
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 17:18:28 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37586)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hNOWd-00036Z-0D
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 17:18:24 -0400
-Received: by mail-wr1-x443.google.com with SMTP id a12so4595511wrn.4
-	for <qemu-devel@nongnu.org>; Sun, 05 May 2019 14:18:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=JvzzaxwYLcZ26soax686E3OBUSdDDsgzlwNdfqH3BvM=;
-	b=ykzrsV7a9YNhkwQyu06P4jGqtCDU7tq1ZoDrWSAPmrcw5IJZ3qVbI8IJAjTqNDbyy7
-	NDQpv2ujjnYyxg54cncDWMzNsIjQKIEb37m47/OA7lOXAf7mr4jmAEKWtsCEAQ26y/uU
-	ckOMThXu+XUQLshGTKPqwNvv3KOCCSSNYFwoSaKK8PbloCHvRTOI7zB1In7TKz0m8kl9
-	FUgZ/VONC0jglK3/qtObYtlc7Subk1DJ8zMe23PgLWZz+mKEjRZ4PLAwXg1sJVEyPP0C
-	V0gdk9Nwqc0v8Ga70huXWt2E9qAHAvpSAq3bnKFN2QC/4Ft2hddQwavshLPARkBORcWB
-	ekhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=JvzzaxwYLcZ26soax686E3OBUSdDDsgzlwNdfqH3BvM=;
-	b=M8+yiiALCEbyVSrMiSa35UDjBUfTUZiItrN6JlSYdsJBNlSkbrUlI7hJwQWuwT11P+
-	tdS3vOZca6VoUraRD/tuunsqJKDGnQBdXLRAgC3cXe9EqrWleMhmJRvucGkaXvR0AJD1
-	f+yWGDRUEY3pkFFqgYpn23IeL/xRd4YQFQFHnAugRJstsLdueO9uySnS+QDTHWvS33s9
-	BoKGQkvzd/Om90mAvIuZW1l3wOysRiRFyFzqU4c8ZgPsUsGWNA6PusiAtGYeDtVMtcLT
-	aRIAAU9JOw4FleFkp2fjifV6v/lA14dzVaIdZdZTf/DseRjVVZUxaMn8MWMBjJhXIwuC
-	e0Qg==
-X-Gm-Message-State: APjAAAVmO2e4rjHRM9o3R8gR4KM/EnCQyzuS4Np2yvgrtZgi58f+FhIY
-	7OAuDOFk998d3Y5LnnHwOfPq2w==
-X-Google-Smtp-Source: APXvYqxScAFZCA1frM7c23snQeR5qFEHnqmN+Zk1K/61hHzBBWHB92PCjD//aojGrFtWdl2aDit87g==
-X-Received: by 2002:adf:9e86:: with SMTP id a6mr16536871wrf.178.1557091098274; 
-	Sun, 05 May 2019 14:18:18 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	o6sm15277211wrh.55.2019.05.05.14.18.17
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Sun, 05 May 2019 14:18:17 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 365201FF87;
-	Sun,  5 May 2019 22:18:17 +0100 (BST)
-References: <20190502143409.59600-1-ysato@users.sourceforge.jp>
-	<20190502143409.59600-13-ysato@users.sourceforge.jp>
-	<87muk34kym.fsf@zen.linaroharston>
-	<3d73dc0e-dd08-9900-481c-232ad303a6f0@linaro.org>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-In-reply-to: <3d73dc0e-dd08-9900-481c-232ad303a6f0@linaro.org>
-Date: Sun, 05 May 2019 22:18:17 +0100
-Message-ID: <875zqobnxi.fsf@zen.linaroharston>
+	(envelope-from <philmd@redhat.com>) id 1hNPQj-00080n-6S
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:16:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37564)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>)
+	id 1hNPQQ-000792-TA; Sun, 05 May 2019 18:16:03 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C509858E25;
+	Sun,  5 May 2019 22:15:54 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-58.brq.redhat.com [10.40.204.58])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id CE7467C38A;
+	Sun,  5 May 2019 22:15:47 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org,
+	Stephen Checkoway <stephen.checkoway@oberlin.edu>
+Date: Mon,  6 May 2019 00:15:31 +0200
+Message-Id: <20190505221544.31568-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.39]);
+	Sun, 05 May 2019 22:15:54 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH RFC v8 12/12] hw/registerfields.h: Add 8bit
- and 16bit register macros.
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 00/13] hw/block/pflash_cfi02: Clean-up and fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,34 +67,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org,
-	Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505211817.g3ffuQQteS9TbeDgXWLFiJpXINnD8FXtuTjgscbDy24@z>
+Message-ID: <20190505221531.VR5NsmQZunj_wBIujHIHvBD_2NdpiUXdM4IlbuBpQzw@z>
 
+Hi,
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+While reviewing Stephen Checkoway's v4 "Implement missing AMD
+pflash functionality" [*] I found it hard (for me) to digest,
+so I took step by step notes. This series is the result of
+those notes.
+Regarding Stephen's series, this series only contains the
+generic code movement and trivial cleanup. The other patches
+are rather dense and I need more time to study the specs.
 
-> On 5/3/19 8:27 AM, Alex Benn=C3=A9e wrote:
->>
->> Yoshinori Sato <ysato@users.sourceforge.jp> writes:
->>
->>> Some RX peripheral using 8bit and 16bit registers.
->>> Added 8bit and 16bit APIs.
->>
->> Doesn't this mean the build breaks at some point? Features used by other
->> patches should be introduced first so the build remains bisectable.
->
-> The only bug I would fix in the ordering is to make the change to configu=
-re
-> last, so that the target/rx is not enabled while the patches are
-> staging.
+Stephen: If you take out the patch #2 ("Use the GLib API"),
+you can rebase your series on top of this.
+I'd appreciate if you can adapt your tests to use the GLib
+functions, else I plan to do it later.
 
-That will do - the key thing is each interim position in the commit log
-can build on it's own.
+Regards,
 
---
-Alex Benn=C3=A9e
+Phil.
+
+[*] https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg04595.html
+
+Philippe Mathieu-Daud=C3=A9 (10):
+  tests/pflash-cfi02: Use the GLib API
+  tests/pflash-cfi02: Use IEC binary prefixes for size constants
+  hw/block/pflash_cfi02: Fix debug format string
+  hw/block/pflash_cfi02: Add an enum to define the write cycles
+  hw/block/pflash_cfi02: Add helpers to manipulate the status bits
+  hw/block/pflash_cfi02: Simplify a statement using fall through
+  hw/block/pflash_cfi02: Use the ldst API in pflash_write()
+  hw/block/pflash_cfi02: Use the ldst API in pflash_read()
+  hw/block/pflash_cfi02: Extract the pflash_data_read() function
+  hw/block/pflash_cfi02: Unify the MemoryRegionOps
+
+Stephen Checkoway (3):
+  tests/pflash-cfi02: Add test for supported CFI commands
+  hw/block/pflash_cfi02: Fix command address comparison
+  hw/block/pflash_cfi02: Use the chip erase time specified in the CFI
+    table
+
+ hw/block/pflash_cfi02.c   | 234 +++++++++++++++++---------------------
+ tests/Makefile.include    |   2 +
+ tests/pflash-cfi02-test.c | 232 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 339 insertions(+), 129 deletions(-)
+ create mode 100644 tests/pflash-cfi02-test.c
+
+--=20
+2.20.1
+
 
