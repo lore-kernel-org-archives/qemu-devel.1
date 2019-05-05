@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32777)
+Received: from eggs.gnu.org ([209.51.188.92]:34245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hNKNW-0003om-0a
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 12:52:43 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hNKVZ-0006cy-Hk
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 13:01:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hNKNV-0007mp-1m
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 12:52:41 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:36675)
+	(envelope-from <richard.henderson@linaro.org>) id 1hNKVX-0003XI-BY
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 13:01:01 -0400
+Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:44876)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hNKNU-0007kw-Ps
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 12:52:40 -0400
-Received: by mail-pf1-x442.google.com with SMTP id v80so5446103pfa.3
-	for <qemu-devel@nongnu.org>; Sun, 05 May 2019 09:52:40 -0700 (PDT)
+	id 1hNKVV-0003SG-HS
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 13:00:59 -0400
+Received: by mail-pg1-x532.google.com with SMTP id z16so5224567pgv.11
+	for <qemu-devel@nongnu.org>; Sun, 05 May 2019 10:00:54 -0700 (PDT)
 References: <20190504120528.6389-1-pbonzini@redhat.com>
-	<20190504120528.6389-4-pbonzini@redhat.com>
+	<20190504120528.6389-5-pbonzini@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <71bb0c2e-5298-16de-0c15-eb6f2b4d2f11@linaro.org>
-Date: Sun, 5 May 2019 09:52:36 -0700
+Message-ID: <c5f2f531-34ce-d7b2-a6d7-1a2399466cf5@linaro.org>
+Date: Sun, 5 May 2019 10:00:50 -0700
 MIME-Version: 1.0
-In-Reply-To: <20190504120528.6389-4-pbonzini@redhat.com>
+In-Reply-To: <20190504120528.6389-5-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/9] coroutine: add host specific coroutine
- backend for 64-bit x86
+Subject: Re: [Qemu-devel] [PATCH 4/9] coroutine: add host specific coroutine
+ backend for 64-bit ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,22 +36,26 @@ To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, peter.maydell@linaro.org, cohuck@redhat.com
 
 On 5/4/19 5:05 AM, Paolo Bonzini wrote:
-> This backend is faster (100ns vs 150ns per switch on my laptop), but
-> especially it will be possible to add CET support to it.  Most of the
-> code is actually not architecture specific.
+> The speedup is similar to x86, 120 ns vs 180 ns on an APM Mustang.
 > 
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  configure                        |  10 ++
->  scripts/qemugdb/coroutine.py     |   5 +-
->  scripts/qemugdb/coroutine_asm.py |  20 +++
->  util/Makefile.objs               |   1 +
->  util/coroutine-asm.c             | 230 +++++++++++++++++++++++++++++++
->  5 files changed, 264 insertions(+), 2 deletions(-)
->  create mode 100644 scripts/qemugdb/coroutine_asm.py
->  create mode 100644 util/coroutine-asm.c
+>  configure                        |  2 +-
+>  scripts/qemugdb/coroutine_asm.py |  6 ++++-
+>  util/Makefile.objs               |  2 ++
+>  util/coroutine-asm.c             | 45 ++++++++++++++++++++++++++++++++
+>  4 files changed, 53 insertions(+), 2 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+> +        "ldr x30, [x1, %[SCRATCH]]\n"    /* load destination PC */   \
+> +        "ldr x1, [x1, %[SP]]\n"          /* load destination SP */   \
+> +        "mov sp, x1\n"                                               \
+> +        "br x30\n"                                                   \
+> +        "2: \n"                                                      \
+
+For future reference, "bti j" (aka hint #36) goes here,
+for the aarch64 branch target identification extension.
 
 
 r~
