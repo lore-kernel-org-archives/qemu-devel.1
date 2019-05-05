@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36085)
+Received: from eggs.gnu.org ([209.51.188.92]:36168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNPR4-0004Rr-Nk
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:16:45 -0400
+	(envelope-from <philmd@redhat.com>) id 1hNPR8-0004UO-P6
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:16:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNPR0-0008UU-VC
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:16:40 -0400
+	(envelope-from <philmd@redhat.com>) id 1hNPR7-0000Dd-Pz
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 18:16:46 -0400
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Mon,  6 May 2019 00:15:36 +0200
-Message-Id: <20190505221544.31568-6-philmd@redhat.com>
+Date: Mon,  6 May 2019 00:15:39 +0200
+Message-Id: <20190505221544.31568-9-philmd@redhat.com>
 In-Reply-To: <20190505221544.31568-1-philmd@redhat.com>
 References: <20190505221544.31568-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 05/13] hw/block/pflash_cfi02: Add an enum to
- define the write cycles
+Subject: [Qemu-devel] [PATCH 08/13] hw/block/pflash_cfi02: Use the ldst API
+ in pflash_write()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,7 +26,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Stephen Checkoway <stephen.checkoway@oberlin.edu>
 Cc: Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-No change in functionality is intended with this commit.
+The load/store API eases code review.
 
 Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
 Message-Id: <20190426162624.55977-3-stephen.checkoway@oberlin.edu>
@@ -35,45 +35,61 @@ Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 [PMD: Extracted from bigger patch]
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/block/pflash_cfi02.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ hw/block/pflash_cfi02.c | 38 ++++++++------------------------------
+ 1 file changed, 8 insertions(+), 30 deletions(-)
 
 diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index f88e09cebaa..b27796d74d2 100644
+index 1e006e7bf3a..69e0086324e 100644
 --- a/hw/block/pflash_cfi02.c
 +++ b/hw/block/pflash_cfi02.c
-@@ -56,6 +56,11 @@ do {                                                  =
-     \
-=20
- #define PFLASH_LAZY_ROMD_THRESHOLD 42
-=20
-+/* Special write cycles for CFI queries. */
-+enum {
-+    WCYCLE_CFI          =3D 7,
-+};
-+
- struct PFlashCFI02 {
-     /*< private >*/
-     SysBusDevice parent_obj;
-@@ -293,7 +298,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr off=
-set,
-         if (boff =3D=3D 0x55 && cmd =3D=3D 0x98) {
-         enter_CFI_mode:
-             /* Enter CFI query mode */
--            pfl->wcycle =3D 7;
-+            pfl->wcycle =3D WCYCLE_CFI;
-             pfl->cmd =3D 0x98;
-             return;
-         }
-@@ -465,7 +470,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr off=
-set,
-             goto reset_flash;
-         }
-         break;
--    case 7: /* Special value for CFI queries */
-+    case WCYCLE_CFI: /* Special value for CFI queries */
-         DPRINTF("%s: invalid write in CFI query mode\n", __func__);
-         goto reset_flash;
-     default:
+@@ -373,38 +373,16 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr o=
+ffset,
+             goto check_unlock0;
+         case 0xA0:
+             trace_pflash_data_write(offset, value, width, 0);
+-            p =3D pfl->storage;
+             if (!pfl->ro) {
+-                switch (width) {
+-                case 1:
+-                    p[offset] &=3D value;
+-                    pflash_update(pfl, offset, 1);
+-                    break;
+-                case 2:
+-                    if (be) {
+-                        p[offset] &=3D value >> 8;
+-                        p[offset + 1] &=3D value;
+-                    } else {
+-                        p[offset] &=3D value;
+-                        p[offset + 1] &=3D value >> 8;
+-                    }
+-                    pflash_update(pfl, offset, 2);
+-                    break;
+-                case 4:
+-                    if (be) {
+-                        p[offset] &=3D value >> 24;
+-                        p[offset + 1] &=3D value >> 16;
+-                        p[offset + 2] &=3D value >> 8;
+-                        p[offset + 3] &=3D value;
+-                    } else {
+-                        p[offset] &=3D value;
+-                        p[offset + 1] &=3D value >> 8;
+-                        p[offset + 2] &=3D value >> 16;
+-                        p[offset + 3] &=3D value >> 24;
+-                    }
+-                    pflash_update(pfl, offset, 4);
+-                    break;
++                p =3D (uint8_t *)pfl->storage + offset;
++                if (pfl->be) {
++                    uint64_t current =3D ldn_be_p(p, width);
++                    stn_be_p(p, width, current & value);
++                } else {
++                    uint64_t current =3D ldn_le_p(p, width);
++                    stn_le_p(p, width, current & value);
+                 }
++                pflash_update(pfl, offset, width);
+             }
+             /*
+              * While programming, status bit DQ7 should hold the opposit=
+e
 --=20
 2.20.1
