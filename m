@@ -5,45 +5,45 @@ X-Spam-Level:
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE4E7C004C9
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 09:32:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7496FC004C9
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 09:36:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 861B62053B
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 09:32:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 861B62053B
+	by mail.kernel.org (Postfix) with ESMTPS id 307CA208C0
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 May 2019 09:36:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 307CA208C0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38611 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38665 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNDVh-00042j-K6
-	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 05:32:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37369)
+	id 1hNDZC-0005gI-5q
+	for qemu-devel@archiver.kernel.org; Sun, 05 May 2019 05:36:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNDTi-0002hG-W7
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 05:30:40 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNDXu-0004vr-NQ
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 05:34:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNDTh-0002Mu-2L
-	for qemu-devel@nongnu.org; Sun, 05 May 2019 05:30:38 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:37046
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hNDXt-0007xA-MZ
+	for qemu-devel@nongnu.org; Sun, 05 May 2019 05:34:58 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:37066
 	helo=mail.default.ilande.uk0.bigv.io)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hNDTd-0000x8-6j; Sun, 05 May 2019 05:30:33 -0400
+	id 1hNDXr-0007sp-7k; Sun, 05 May 2019 05:34:55 -0400
 Received: from host109-149-60-255.range109-149.btcentralplus.com
 	([109.149.60.255] helo=[192.168.1.65])
 	by mail.default.ilande.uk0.bigv.io with esmtpsa
 	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
 	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hNDPj-0002Pu-2v; Sun, 05 May 2019 10:26:31 +0100
+	id 1hNDXB-0002SJ-FC; Sun, 05 May 2019 10:34:13 +0100
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
 	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net,
 	gkurz@kaod.org
 References: <20190428143845.11810-1-mark.cave-ayland@ilande.co.uk>
-	<20190428143845.11810-2-mark.cave-ayland@ilande.co.uk>
-	<fc4d6169-12d4-3fd8-f85a-262135a62b93@linaro.org>
+	<20190428143845.11810-3-mark.cave-ayland@ilande.co.uk>
+	<55204805-9275-2bc4-2c38-51dc87aa836d@linaro.org>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
@@ -70,12 +70,12 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
 	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
 	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
 	imgcU9TTGC5qd9g=
-Message-ID: <98ba8d01-dbab-ecde-ffbd-bb46efb29215@ilande.co.uk>
-Date: Sun, 5 May 2019 10:27:02 +0100
+Message-ID: <7227a96f-ae59-3ed4-8b1f-9e92005b4a69@ilande.co.uk>
+Date: Sun, 5 May 2019 10:34:47 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <fc4d6169-12d4-3fd8-f85a-262135a62b93@linaro.org>
+In-Reply-To: <55204805-9275-2bc4-2c38-51dc87aa836d@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
@@ -85,8 +85,8 @@ X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH 01/14] target/ppc: remove getVSR()/putVSR()
- from fpu_helper.c
+Subject: Re: [Qemu-devel] [PATCH 02/14] target/ppc: remove getVSR()/putVSR()
+ from mem_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,104 +101,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190505092702.7NyxDznYhsfGa0tywpXkWs0htBfOjqgwzzwh86peOkA@z>
+Message-ID: <20190505093447.sCFtJW_fsvsrZP2msrZvTSfucvcQwL3qSb4txDPaiUE@z>
 
-On 30/04/2019 17:25, Richard Henderson wrote:
+On 30/04/2019 17:29, Richard Henderson wrote:
 
 > On 4/28/19 7:38 AM, Mark Cave-Ayland wrote:
->>  void helper_xsaddqp(CPUPPCState *env, uint32_t opcode)
->>  {
->> -    ppc_vsr_t xt, xa, xb;
->> +    ppc_vsr_t *xt = &env->vsr[rD(opcode) + 32];
->> +    ppc_vsr_t *xa = &env->vsr[rA(opcode) + 32];
->> +    ppc_vsr_t *xb = &env->vsr[rB(opcode) + 32];
->>      float_status tstat;
->>  
->> -    getVSR(rA(opcode) + 32, &xa, env);
->> -    getVSR(rB(opcode) + 32, &xb, env);
->> -    getVSR(rD(opcode) + 32, &xt, env);
->>      helper_reset_fpstatus(env);
->>  
->>      tstat = env->fp_status;
->> @@ -1860,18 +1857,17 @@ void helper_xsaddqp(CPUPPCState *env, uint32_t opcode)
->>      }
->>  
->>      set_float_exception_flags(0, &tstat);
->> -    xt.f128 = float128_add(xa.f128, xb.f128, &tstat);
->> +    xt->f128 = float128_add(xa->f128, xb->f128, &tstat);
->>      env->fp_status.float_exception_flags |= tstat.float_exception_flags;
->>  
->>      if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {
->>          float_invalid_op_addsub(env, 1, GETPC(),
->> -                                float128_classify(xa.f128) |
->> -                                float128_classify(xb.f128));
->> +                                float128_classify(xa->f128) |
->> +                                float128_classify(xb->f128));
+>>  #define VSX_LXVL(name, lj)                                              \
+>>  void helper_##name(CPUPPCState *env, target_ulong addr,                 \
+>> -                   target_ulong xt_num, target_ulong rb)                \
+>> +                   target_ulong xt, target_ulong rb)                    \
+>>  {                                                                       \
+>> +    ppc_vsr_t *r = &env->vsr[xt];                                       \
+>> +    int nb = GET_NB(env->gpr[rb]);                                      \
+>>      int i;                                                              \
+>> -    ppc_vsr_t xt;                                                       \
+>> -    uint64_t nb = GET_NB(rb);                                           \
+>>                                                                          \
+>> -    xt.s128 = int128_zero();                                            \
+>> +    r->s128 = int128_zero();                                            \
+>>      if (nb) {                                                           \
+>>          nb = (nb >= 16) ? 16 : nb;                                      \
+>>          if (msr_le && !lj) {                                            \
+>>              for (i = 16; i > 16 - nb; i--) {                            \
+>> -                xt.VsrB(i - 1) = cpu_ldub_data_ra(env, addr, GETPC());  \
+>> +                r->VsrB(i - 1) = cpu_ldub_data_ra(env, addr, GETPC());  \
+>>                  addr = addr_add(env, addr, 1);                          \
+>>              }                                                           \
+>>          } else {                                                        \
+>>              for (i = 0; i < nb; i++) {                                  \
+>> -                xt.VsrB(i) = cpu_ldub_data_ra(env, addr, GETPC());      \
+>> +                r->VsrB(i) = cpu_ldub_data_ra(env, addr, GETPC());      \
+>>                  addr = addr_add(env, addr, 1);                          \
+>>              }                                                           \
+>>          }                                                               \
+>>      }                                                                   \
+>> -    putVSR(xt_num, &xt, env);                                           \
+>>  }
 > 
-> These values are no longer valid, because you may have written over them with
-> the store to xt->f128.  You need to keep the result in a local variable until
-> the location of the putVSR in order to keep the current semantics.
+> Similarly, this modifies env->vsr[xt] before all exceptions are recognized.
+
+Okay - if you're happy with my previous suggestion with the VSR* macros and the local
+variable then I can make the same change here too.
+
+>> @@ -304,12 +304,14 @@ static void gen_##name(DisasContext *ctx)                       \
+>>          }                                                       \
+>>      }                                                           \
+>>      EA = tcg_temp_new();                                        \
+>> -    xt = tcg_const_tl(xT(ctx->opcode));                         \
+>>      gen_set_access_type(ctx, ACCESS_INT);                       \
+>>      gen_addr_register(ctx, EA);                                 \
+>> -    gen_helper_##name(cpu_env, EA, xt, cpu_gpr[rB(ctx->opcode)]); \
+>> +    xt = tcg_const_tl(xT(ctx->opcode));                         \
+>> +    rb = tcg_const_tl(rB(ctx->opcode));                         \
+>> +    gen_helper_##name(cpu_env, EA, xt, rb);                     \
+>>      tcg_temp_free(EA);                                          \
+>>      tcg_temp_free(xt);                                          \
+>> +    tcg_temp_free(rb);                                          \
+>>  }
 > 
-> (Although the current semantics probably need to be reviewed with respect to
-> how the exception is signaled vs the result is stored to the register file.  I
-> know there are current bugs in this area with respect to regular floating-point
-> operations, never mind the vector floating-point ones.)
-> 
->>  #define VSX_ADD_SUB(name, op, nels, tp, fld, sfprf, r2sp)                    \
->>  void helper_##name(CPUPPCState *env, uint32_t opcode)                        \
->>  {                                                                            \
->> -    ppc_vsr_t xt, xa, xb;                                                    \
->> +    ppc_vsr_t *xt = &env->vsr[xT(opcode)];                                   \
->> +    ppc_vsr_t *xa = &env->vsr[xA(opcode)];                                   \
->> +    ppc_vsr_t *xb = &env->vsr[xB(opcode)];                                   \
->>      int i;                                                                   \
->>                                                                               \
->> -    getVSR(xA(opcode), &xa, env);                                            \
->> -    getVSR(xB(opcode), &xb, env);                                            \
->> -    getVSR(xT(opcode), &xt, env);                                            \
->>      helper_reset_fpstatus(env);                                              \
->>                                                                               \
->>      for (i = 0; i < nels; i++) {                                             \
->>          float_status tstat = env->fp_status;                                 \
->>          set_float_exception_flags(0, &tstat);                                \
->> -        xt.fld = tp##_##op(xa.fld, xb.fld, &tstat);                          \
->> +        xt->fld = tp##_##op(xa->fld, xb->fld, &tstat);                       \
->>          env->fp_status.float_exception_flags |= tstat.float_exception_flags; \
->>                                                                               \
->>          if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {    \
->>              float_invalid_op_addsub(env, sfprf, GETPC(),                     \
->> -                                    tp##_classify(xa.fld) |                  \
->> -                                    tp##_classify(xb.fld));                  \
->> +                                    tp##_classify(xa->fld) |                 \
->> +                                    tp##_classify(xb->fld));                 \
->>          }                                                                    \
-> 
-> Similarly.  Only here it's more interesting in that element 0 is modified when
-> element 3 raises an exception.  To keep current semantics you need to keep xt
-> as a ppc_vsr_t local variable and write back at the end.
-> 
-> It looks like the same is true for every other function.
+> Why are you adjusting the function to pass the rB register number rather than
+> the contents of rB?  That seems the wrong way around...
 
-Meh, so I forgot about the case where src == dest and obviously it's not something
-that gets tickled by my test images :(
+I think what I was trying to do here was eliminate the cpu_gpr since it feels to me
+that with the vector patchsets and your negative offset patches that this should be
+the way to go for accessing CPUState rather than using TCG globals.
 
-I've spent a bit of time today going through the functions and it seems that all
-functions which have an xt parameter, minus a couple of the TEST macros, require the
-result to be calculated in a local variable first.
+Looking at this again I realise the solution is really the same as is currently used
+for gen_load_spr() so I can use something like this:
 
-I think the best solution is still to remove getVSR()/putVSR() but replace them with
-macros for copying and zeroing like this:
+    static inline void gen_load_gpr(TCGv t, int reg)
+    {
+        tcg_gen_ld_tl(t, cpu_env, offsetof(CPUPPCState, gpr[reg]));
+    }
 
-    #define VSRCPY(d, s) (memcpy(d, s, sizeof(ppc_vsr_t)))
-    #define VSRZERO(d)   (memset(d, 0, sizeof(ppc_vsr_t)))
-
-Even though we're still doing a copy of the result register I hope that not having to
-copy the 2 source registers, plus replacing the copies with a straight memcpy() will
-still be an advantage. Does that seem sensible to you?
-
-FWIW I agree that the exception handling seems inconsistent around the functions: for
-example it looks strange that the VSX_FMADD code blindly copies the result back even
-when an exception occurred.
+Does this seem reasonable as a solution?
 
 
 ATB,
