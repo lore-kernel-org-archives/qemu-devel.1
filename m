@@ -2,66 +2,68 @@ Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A38ACC04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 13:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5889EC04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 14:06:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7603C2054F
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 13:58:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7603C2054F
+	by mail.kernel.org (Postfix) with ESMTPS id 2E0382054F
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 14:06:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E0382054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56935 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57029 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNe88-0001p9-1Y
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 09:58:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42342)
+	id 1hNeG3-0003J3-5F
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 10:06:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hNe7F-0001UI-7B
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 09:57:15 -0400
+	(envelope-from <lersek@redhat.com>) id 1hNeF5-0002pb-75
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 10:05:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hNe7D-0006D0-Hd
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 09:57:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38268)
+	(envelope-from <lersek@redhat.com>) id 1hNeEz-0001q0-Pi
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 10:05:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43194)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hNe7A-0006B0-Uf; Mon, 06 May 2019 09:57:09 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <lersek@redhat.com>)
+	id 1hNeEz-0001nc-KY; Mon, 06 May 2019 10:05:13 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8E75A30833BE;
-	Mon,  6 May 2019 13:57:06 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-82.ams2.redhat.com
-	[10.36.117.82])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2817417152;
-	Mon,  6 May 2019 13:57:04 +0000 (UTC)
-Date: Mon, 6 May 2019 15:57:03 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Anton Kuchin <antonkuchin@yandex-team.ru>
-Message-ID: <20190506135703.GB6288@localhost.localdomain>
-References: <57c36dca-c4d6-9b70-7799-0be96325d7c5@yandex-team.ru>
-	<20190429103816.GE8492@localhost.localdomain>
-	<acda1900-6d9f-e551-6310-4192514be35a@yandex-team.ru>
+	by mx1.redhat.com (Postfix) with ESMTPS id C7766307C942;
+	Mon,  6 May 2019 14:05:00 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-124-221.rdu2.redhat.com
+	[10.10.124.221])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E85F4100194A;
+	Mon,  6 May 2019 14:04:52 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+References: <20190504133540.19758-1-philmd@redhat.com>
+	<20190504133540.19758-2-philmd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <d6f9cf07-daf5-273d-ca41-1b450b29b38d@redhat.com>
+Date: Mon, 6 May 2019 16:04:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <acda1900-6d9f-e551-6310-4192514be35a@yandex-team.ru>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20190504133540.19758-2-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Mon, 06 May 2019 13:57:06 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.46]);
+	Mon, 06 May 2019 14:05:06 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] aio context ownership during bdrv_close()
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] roms: Correct the
+ EDK2_BASETOOLS_OPTFLAGS variable description
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,122 +75,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yc-core =?utf-8?B?KNGA0LDRgdGB0YvQu9C60LAp?= <yc-core@yandex-team.ru>,
-	qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 06.05.2019 um 14:47 hat Anton Kuchin geschrieben:
-> On 29/04/2019 13:38, Kevin Wolf wrote:
-> > Am 26.04.2019 um 14:24 hat Anton Kuchin geschrieben:
-> > > I can't figure out ownership of aio context during bdrv_close().
-> > >=20
-> > > As far as I understand bdrv_unref() shold be called with acquired a=
-io
-> > > context to prevent concurrent operations (at least most usages in b=
-lockdev.c
-> > > explicitly acquire and release context, but not all).
-> > I think the theory is like this:
-> >=20
-> > 1. bdrv_unref() can only be called from the main thread
-> >=20
-> > 2. A block node for which bdrv_close() is called has no references. I=
-f
-> >     there are no more parents that keep it in a non-default iothread,
-> >     they should be in the main AioContext. So no locks need to be tak=
-en
-> >     during bdrv_close().
-> >=20
-> > In practice, 2. is not fully true today, even though block devices do
-> > stop their dataplane and move the block nodes back to the main
-> > AioContext on shutdown. I am currently working on some fixes related =
-to
-> > this, afterwards the situation should be better.
-> >=20
-> > > But if refcount reaches zero and bs is going to be deleted in bdrv_=
-close()
-> > > we need to ensure that drain is finished data is flushed and there =
-are no
-> > > more pending coroutines and bottomhalves, so drain and flush functi=
-ons can
-> > > enter coroutine and perform yield in several places. As a result co=
-ntrol
-> > > returns to coroutine caller that will release aio context and when
-> > > completion bh will continue cleanup process it will be executed wit=
-hout
-> > > ownership of context. Is this a valid situation?
-> > Do you have an example where this happens?
-> >=20
-> > Normally, leaving the coroutine means that the AioContext lock is
-> > released, but it is later reentered from the same AioContext, so the
-> > lock will be taken again.
-> I was wrong. Coroutines do acquire aio context when reentered.
-> >=20
-> > > Moreover if yield happens bs that is being deleted has zero refcoun=
-t but is
-> > > still present in lists graph_bdrv_states and all_bdrv_states and ca=
-n be
-> > > accidentally accessed. Shouldn't we remove it from these lists ASAP=
- when
-> > > deletion process starts as we do from monitor_bdrv_states?
-> > Hm, I think it should only disappear when the image file is actually
-> > closed. But in practice, it probably makes little difference either w=
-ay.
+On 05/04/19 15:35, Philippe Mathieu-Daud=C3=A9 wrote:
+> In commit 1cab464136b4 we incorrectly described the
+> EDK2_BASETOOLS_OPTFLAGS can pass CPPFLAGS and CFLAGS
+> options to the EDK2 build tools, but it only expands
+> the CFLAGS (not to the CPPFLAGS).
+> Update the description to be more accurate.
 >=20
-> I'm still worried about a period of time since coroutine yields and unt=
-il it
-> is reentered, looks like aio context can be grabbed by other code and b=
-s can
-> be treated as valid.
->=20
-> I have no example of such situation too but I see there bdrv_aio_flush =
-and
-> bdrv_co_flush_to_disk callbacks which are called during flush and can t=
-ake
-> unpredicable time to complete (e.g. raw_aio_flush in file-win32 uses th=
-read
-> pool inside to process request and RBD can also be affected but I didn'=
-t dig
-> deep enough to be sure).
->=20
-> If main loop starts processing next qmp command before completion is ca=
-lled
-> lists will be in inconsistent state and hard to debug use-after-free bu=
-gs
-> and crashes can happen.
-
-Hm, at the point of flush, bs is actually still valid, so e.g.
-query-block would just work. But I think we would indeed have a problem
-if a new reference to the node is created.
-
-> Fix seems trivial and shouldn't break any existing code.
->=20
+> Reported-by: Laszlo Ersek <lersek@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
+>  roms/Makefile | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >=20
-> diff --git a/block.c b/block.c
-> index 16615bc876..25c3b72520 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -4083,14 +4083,14 @@ static void bdrv_delete(BlockDriverState *bs)
-> =A0=A0=A0=A0 assert(bdrv_op_blocker_is_empty(bs));
-> =A0=A0=A0=A0 assert(!bs->refcnt);
->=20
-> -=A0=A0=A0 bdrv_close(bs);
-> -
-> =A0=A0=A0=A0 /* remove from list, if necessary */
-> =A0=A0=A0=A0 if (bs->node_name[0] !=3D '\0') {
-> =A0=A0=A0=A0=A0=A0=A0=A0 QTAILQ_REMOVE(&graph_bdrv_states, bs, node_lis=
-t);
-> =A0=A0=A0=A0 }
-> =A0=A0=A0=A0 QTAILQ_REMOVE(&all_bdrv_states, bs, bs_list);
->=20
-> +=A0=A0=A0 bdrv_close(bs);
-> +
-> =A0=A0=A0=A0 g_free(bs);
-> =A0}
+> diff --git a/roms/Makefile b/roms/Makefile
+> index 0ce84a45ad5..f020102c866 100644
+> --- a/roms/Makefile
+> +++ b/roms/Makefile
+> @@ -121,8 +121,8 @@ build-efi-roms: build-pxe-roms
+>  		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
+>  		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
+> =20
+> -# Build scripts can pass compiler/linker flags to the EDK2 build tools
+> -# via the EDK2_BASETOOLS_OPTFLAGS (CPPFLAGS and CFLAGS) and
+> +# Build scripts can pass compiler/linker flags to the EDK2
+> +# build  tools via the EDK2_BASETOOLS_OPTFLAGS (CFLAGS) and
 
-This looks reasonable enough to me.
+please 'tr -s " "' in the above.
 
-Kevin
+With that:
+
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+
+Thanks
+Laszlo
+
+>  # EDK2_BASETOOLS_LDFLAGS (LDFLAGS) environment variables.
+>  #
+>  # Example:
+>=20
+
 
