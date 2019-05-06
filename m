@@ -6,45 +6,44 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC99BC04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 05:55:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71E89C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 06:01:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABE0A2082F
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 05:55:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABE0A2082F
+	by mail.kernel.org (Postfix) with ESMTPS id 2E3C52082F
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 06:01:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E3C52082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50893 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50971 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNWad-0002Hx-VB
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 01:55:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51530)
+	id 1hNWgx-0004Sz-4c
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 02:01:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNWZT-0001lA-Th
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 01:53:55 -0400
+	(envelope-from <thuth@redhat.com>) id 1hNWfx-0003jP-8R
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 02:00:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNWZR-00054X-SN
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 01:53:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46530)
+	(envelope-from <thuth@redhat.com>) id 1hNWfo-0002ZO-8E
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 02:00:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:11520)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hNWZQ-00053Q-Q4; Mon, 06 May 2019 01:53:49 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1hNWfn-0002Xu-GQ; Mon, 06 May 2019 02:00:23 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EFFE93082200;
-	Mon,  6 May 2019 05:53:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id CE71B308FE8D;
+	Mon,  6 May 2019 06:00:21 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-74.ams2.redhat.com [10.36.116.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B77255C8A5;
-	Mon,  6 May 2019 05:53:46 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B896560851;
+	Mon,  6 May 2019 06:00:20 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org, Stafford Horne <shorne@gmail.com>,
-	Jia Liu <proljc@gmail.com>
-References: <1550073577-4248-1-git-send-email-thuth@redhat.com>
+To: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+References: <1550073530-4138-1-git-send-email-thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
 	xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -89,23 +88,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <ed9e9035-2bea-bcb7-c8ca-23486021d852@redhat.com>
-Date: Mon, 6 May 2019 07:53:45 +0200
+Message-ID: <47daa7c9-cce2-2621-133a-d2f390130ea3@redhat.com>
+Date: Mon, 6 May 2019 08:00:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <1550073577-4248-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <1550073530-4138-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Mon, 06 May 2019 05:53:48 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.49]);
+	Mon, 06 May 2019 06:00:22 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] target/openrisc: Fix LGPL information in
- the file headers
+Subject: Re: [Qemu-devel] [PATCH] target/sh4: Fix LGPL information in the
+ file headers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -122,32 +121,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/02/2019 16.59, Thomas Huth wrote:
+On 13/02/2019 16.58, Thomas Huth wrote:
 > It's either "GNU *Library* General Public License version 2" or "GNU
 > Lesser General Public License version *2.1*", but there was no "version
 > 2.0" of the "Lesser" license. So assume that version 2.1 is meant here.
 > 
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  hw/openrisc/cputimer.c               | 2 +-
->  hw/openrisc/openrisc_sim.c           | 2 +-
->  hw/openrisc/pic_cpu.c                | 2 +-
->  linux-user/openrisc/target_cpu.h     | 2 +-
->  linux-user/openrisc/target_structs.h | 2 +-
->  target/openrisc/cpu.h                | 2 +-
->  target/openrisc/exception.c          | 2 +-
->  target/openrisc/exception_helper.c   | 2 +-
->  target/openrisc/fpu_helper.c         | 2 +-
->  target/openrisc/insns.decode         | 2 +-
->  target/openrisc/interrupt.c          | 2 +-
->  target/openrisc/machine.c            | 2 +-
->  target/openrisc/mmu.c                | 2 +-
->  13 files changed, 13 insertions(+), 13 deletions(-)
+>  linux-user/sh4/target_cpu.h     | 2 +-
+>  linux-user/sh4/target_structs.h | 2 +-
+>  target/sh4/cpu.h                | 2 +-
+>  target/sh4/gdbstub.c            | 2 +-
+>  target/sh4/helper.c             | 2 +-
+>  target/sh4/op_helper.c          | 2 +-
+>  target/sh4/translate.c          | 2 +-
+>  7 files changed, 7 insertions(+), 7 deletions(-)
 > 
-> diff --git a/hw/openrisc/cputimer.c b/hw/openrisc/cputimer.c
-> index 850f887..fe95efc 100644
-> --- a/hw/openrisc/cputimer.c
-> +++ b/hw/openrisc/cputimer.c
+> diff --git a/linux-user/sh4/target_cpu.h b/linux-user/sh4/target_cpu.h
+> index 1a647dd..b0be9a2 100644
+> --- a/linux-user/sh4/target_cpu.h
+> +++ b/linux-user/sh4/target_cpu.h
+> @@ -6,7 +6,7 @@
+>   * This library is free software; you can redistribute it and/or
+>   * modify it under the terms of the GNU Lesser General Public
+>   * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> + * version 2.1 of the License, or (at your option) any later version.
+>   *
+>   * This library is distributed in the hope that it will be useful,
+>   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> diff --git a/linux-user/sh4/target_structs.h b/linux-user/sh4/target_structs.h
+> index 3e832bf..00ac394 100644
+> --- a/linux-user/sh4/target_structs.h
+> +++ b/linux-user/sh4/target_structs.h
+> @@ -6,7 +6,7 @@
+>   * This library is free software; you can redistribute it and/or
+>   * modify it under the terms of the GNU Lesser General Public
+>   * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> + * version 2.1 of the License, or (at your option) any later version.
+>   *
+>   * This library is distributed in the hope that it will be useful,
+>   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
+> index 775b574..02a9f74 100644
+> --- a/target/sh4/cpu.h
+> +++ b/target/sh4/cpu.h
+> @@ -6,7 +6,7 @@
+>   * This library is free software; you can redistribute it and/or
+>   * modify it under the terms of the GNU Lesser General Public
+>   * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> + * version 2.1 of the License, or (at your option) any later version.
+>   *
+>   * This library is distributed in the hope that it will be useful,
+>   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> diff --git a/target/sh4/gdbstub.c b/target/sh4/gdbstub.c
+> index 13bea00..54568e9 100644
+> --- a/target/sh4/gdbstub.c
+> +++ b/target/sh4/gdbstub.c
 > @@ -7,7 +7,7 @@
 >   * This library is free software; you can redistribute it and/or
 >   * modify it under the terms of the GNU Lesser General Public
@@ -157,36 +189,10 @@ On 13/02/2019 16.59, Thomas Huth wrote:
 >   *
 >   * This library is distributed in the hope that it will be useful,
 >   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
-> index 7d3b734..0a906d8 100644
-> --- a/hw/openrisc/openrisc_sim.c
-> +++ b/hw/openrisc/openrisc_sim.c
-> @@ -7,7 +7,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/hw/openrisc/pic_cpu.c b/hw/openrisc/pic_cpu.c
-> index 569b443..2f53cfc 100644
-> --- a/hw/openrisc/pic_cpu.c
-> +++ b/hw/openrisc/pic_cpu.c
-> @@ -7,7 +7,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/linux-user/openrisc/target_cpu.h b/linux-user/openrisc/target_cpu.h
-> index d1ea450..32ff135 100644
-> --- a/linux-user/openrisc/target_cpu.h
-> +++ b/linux-user/openrisc/target_cpu.h
+> diff --git a/target/sh4/helper.c b/target/sh4/helper.c
+> index 2ff0cf4..fa51269 100644
+> --- a/target/sh4/helper.c
+> +++ b/target/sh4/helper.c
 > @@ -6,7 +6,7 @@
 >   * This library is free software; you can redistribute it and/or
 >   * modify it under the terms of the GNU Lesser General Public
@@ -196,10 +202,10 @@ On 13/02/2019 16.59, Thomas Huth wrote:
 >   *
 >   * This library is distributed in the hope that it will be useful,
 >   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/linux-user/openrisc/target_structs.h b/linux-user/openrisc/target_structs.h
-> index afbb7ad..e98e2bc 100644
-> --- a/linux-user/openrisc/target_structs.h
-> +++ b/linux-user/openrisc/target_structs.h
+> diff --git a/target/sh4/op_helper.c b/target/sh4/op_helper.c
+> index 4f825ba..28027f9 100644
+> --- a/target/sh4/op_helper.c
+> +++ b/target/sh4/op_helper.c
 > @@ -6,7 +6,7 @@
 >   * This library is free software; you can redistribute it and/or
 >   * modify it under the terms of the GNU Lesser General Public
@@ -209,102 +215,11 @@ On 13/02/2019 16.59, Thomas Huth wrote:
 >   *
 >   * This library is distributed in the hope that it will be useful,
 >   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-> index f1b31bc..c104a4b 100644
-> --- a/target/openrisc/cpu.h
-> +++ b/target/openrisc/cpu.h
+> diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+> index ab254b0..631b576 100644
+> --- a/target/sh4/translate.c
+> +++ b/target/sh4/translate.c
 > @@ -6,7 +6,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/openrisc/exception.c b/target/openrisc/exception.c
-> index 49470be..28c1fce 100644
-> --- a/target/openrisc/exception.c
-> +++ b/target/openrisc/exception.c
-> @@ -6,7 +6,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/openrisc/exception_helper.c b/target/openrisc/exception_helper.c
-> index 6073a5b..0797cc9 100644
-> --- a/target/openrisc/exception_helper.c
-> +++ b/target/openrisc/exception_helper.c
-> @@ -6,7 +6,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/openrisc/fpu_helper.c b/target/openrisc/fpu_helper.c
-> index 265ce13..b9d2ebb 100644
-> --- a/target/openrisc/fpu_helper.c
-> +++ b/target/openrisc/fpu_helper.c
-> @@ -7,7 +7,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/openrisc/insns.decode b/target/openrisc/insns.decode
-> index dad68c8..7df81c1 100644
-> --- a/target/openrisc/insns.decode
-> +++ b/target/openrisc/insns.decode
-> @@ -6,7 +6,7 @@
->  # This library is free software; you can redistribute it and/or
->  # modify it under the terms of the GNU Lesser General Public
->  # License as published by the Free Software Foundation; either
-> -# version 2 of the License, or (at your option) any later version.
-> +# version 2.1 of the License, or (at your option) any later version.
->  #
->  # This library is distributed in the hope that it will be useful,
->  # but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/openrisc/interrupt.c b/target/openrisc/interrupt.c
-> index bbae956..ee280df 100644
-> --- a/target/openrisc/interrupt.c
-> +++ b/target/openrisc/interrupt.c
-> @@ -6,7 +6,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/openrisc/machine.c b/target/openrisc/machine.c
-> index 5d822f7..c9e0848 100644
-> --- a/target/openrisc/machine.c
-> +++ b/target/openrisc/machine.c
-> @@ -6,7 +6,7 @@
->   * This library is free software; you can redistribute it and/or
->   * modify it under the terms of the GNU Lesser General Public
->   * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> + * version 2.1 of the License, or (at your option) any later version.
->   *
->   * This library is distributed in the hope that it will be useful,
->   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> diff --git a/target/openrisc/mmu.c b/target/openrisc/mmu.c
-> index e7d5219..5dec68d 100644
-> --- a/target/openrisc/mmu.c
-> +++ b/target/openrisc/mmu.c
-> @@ -7,7 +7,7 @@
 >   * This library is free software; you can redistribute it and/or
 >   * modify it under the terms of the GNU Lesser General Public
 >   * License as published by the Free Software Foundation; either
@@ -318,4 +233,5 @@ On 13/02/2019 16.59, Thomas Huth wrote:
 Ping?
 
  Thomas
+
 
