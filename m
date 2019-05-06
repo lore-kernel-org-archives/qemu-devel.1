@@ -6,68 +6,62 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 725B6C04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 12:02:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D922C04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 12:18:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3476820830
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 12:02:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3476820830
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0261F206BF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 12:18:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0261F206BF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55677 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55801 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNcJq-0001TL-C2
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 08:02:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44852)
+	id 1hNcZr-0004wX-5C
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 08:18:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hNcIj-0000o1-5Q
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 08:01:02 -0400
+	(envelope-from <clg@kaod.org>) id 1hNcYn-0004Z9-GJ
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 08:17:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hNcIh-0005Ae-Jl
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 08:00:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50262)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hNcIh-0005AE-Db
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 08:00:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hNcIf-0001UC-MD
-	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 12:00:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6C2102E80D2
-	for <qemu-devel@nongnu.org>; Mon,  6 May 2019 12:00:53 +0000 (UTC)
+	(envelope-from <clg@kaod.org>) id 1hNcYm-0002Gv-Ju
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 08:17:33 -0400
+Received: from 10.mo3.mail-out.ovh.net ([87.98.165.232]:49473)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hNcYm-0002AG-Ek
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 08:17:32 -0400
+Received: from player729.ha.ovh.net (unknown [10.108.35.90])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id BB03E20A049
+	for <qemu-devel@nongnu.org>; Mon,  6 May 2019 14:17:22 +0200 (CEST)
+Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
+	(Authenticated sender: clg@kaod.org)
+	by player729.ha.ovh.net (Postfix) with ESMTPSA id 66B9559A73EE;
+	Mon,  6 May 2019 12:17:17 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>, Joel Stanley <joel@jms.id.au>
+References: <20190430044036.1144-1-joel@jms.id.au>
+	<CAFEAcA9qyzHiEY-OudwBUDzCia-jSQ7CkY_L7oC0t4Nu_665uA@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <d5f88bee-1873-d985-b926-17c159464e53@kaod.org>
+Date: Mon, 6 May 2019 14:17:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAFEAcA9qyzHiEY-OudwBUDzCia-jSQ7CkY_L7oC0t4Nu_665uA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 2725240725283769152
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrjeejgdehfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 May 2019 11:48:44 -0000
-From: felix <1827871@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: freeze reboot tcg
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: felix.von.s
-X-Launchpad-Bug-Reporter: felix (felix.von.s)
-X-Launchpad-Bug-Modifier: felix (felix.von.s)
-Message-Id: <155714332421.19976.6267811887776978448.malonedeb@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18953";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 6cef9570d148aff4c91ffff7aca712ef71703bca
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1827871] [NEW] Race condition when rebooting with
- the TCG backend
+X-Received-From: 87.98.165.232
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] arm: aspeed: Add RTC Model
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,154 +70,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1827871 <1827871@bugs.launchpad.net>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 5/3/19 3:36 PM, Peter Maydell wrote:
+> On Tue, 30 Apr 2019 at 05:40, Joel Stanley <joel@jms.id.au> wrote:
+>>
+>> v3: Add some commit messages, resend as v2 didn't send properly
+>> v2: Minor fixes, added vmstate and reset, and rebased on C=C3=A9dric's=
+ series
+>>
+>> Based-on: 20190411161013.4514-4-clg@kaod.org
+>> [PATCH 3/3] aspeed: use sysbus_init_child_obj() to initialize children
+>>
+>> A model for the ASPEED BMC real time clock (RTC). The model is suffici=
+ent
+>> for running the guest Linux kernel driver, and ticks in time with the
+>> host when programmed.
+>>
+>> It does not implement the alarm functionality, which includes the
+>> interrupt.
+>=20
+> Hi -- I've reviewed this series, but can't apply it yet as
+> it's based on Cedric's patchset which needs a respin. If
+> I forget to apply this when I apply the respin of that one,
+> please ping me...
 
-Reporting this as present in QEMU 3.1.0, although I don't see any commit
-in current git master (a6ae23831b05a11880b40f7d58e332c45a6b04f7) that
-would suggest this issue is fixed.
+I will work on a fix ASAP.
 
-    $ uname -a
-    Linux boole 4.19.0-4-686-pae #1 SMP Debian 4.19.28-2 (2019-03-15) i686 =
-GNU/Linux
-    $ qemu -version
-    QEMU emulator version 3.1.0 (Debian 1:3.1+dfsg-7)
-    Copyright (c) 2003-2018 Fabrice Bellard and the QEMU Project developers
+Thanks,
 
-Here's an excerpt from the code which handles reboot requests in SeaBIOS
-1.12, located in src/fw/shadow.c:
-
-    // Request a QEMU system reset.  Do the reset in this function as
-    // the BIOS code was overwritten above and not all BIOS
-    // functionality may be available.
-
-    // Attempt PCI style reset
-    outb(0x02, PORT_PCI_REBOOT);
-    outb(0x06, PORT_PCI_REBOOT);
-
-    // Next try triple faulting the CPU to force a reset
-    asm volatile("int3");
-
-This compiles to the following:
-
-    (qemu) x/10i 0xf1993
-    0x000f1993:  b0 02                    movb     $2, %al
-    0x000f1995:  ee                       outb     %al, %dx
-    0x000f1996:  b0 06                    movb     $6, %al
-    0x000f1998:  ee                       outb     %al, %dx
-    0x000f1999:  cc                       int3     =
-
-    0x000f199a:  80 3d 0d 53 0f 00 08     cmpb     $8, 0xf530d
-    0x000f19a1:  75 52                    jne      0xf19f5
-    0x000f19a3:  a1 10 53 0f 00           movl     0xf5310, %eax
-    0x000f19a8:  8b 15 14 53 0f 00        movl     0xf5314, %edx
-    0x000f19ae:  89 c3                    movl     %eax, %ebx
-
-Now, with the TCG backend, upon reaching the second outb instruction,
-the thread executing JIT-ed opcodes invokes
-qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET). This signals
-another thread to reset the guest CPU registers to their initial state.
-However, the execution thread is *not* stopped, which means it will keep
-executing already-translated instructions in the TCG buffer. In
-particular, the bootstrap value of the EIP register will be overwritten.
-On my machine, this usually results in the guest CPU finding itself in
-real mode, CS base 0xffff0000, EIP 0x0000199e, which in real mode
-disassembles to this:
-
-    (qemu) xp/1i 0xf199e
-    0x000f199e:  0f 00 08                 strw     0(%bx, %si)
-
-This instruction triggers a #UD exception, and given that SeaBIOS
-handles #UD by immediately returning, it manifests as the guest locking
-up with 100% CPU usage every other reboot.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: freeze reboot tcg
-
-** Tags removed: lockup
-** Tags added: freeze
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1827871
-
-Title:
-  Race condition when rebooting with the TCG backend
-
-Status in QEMU:
-  New
-
-Bug description:
-  Reporting this as present in QEMU 3.1.0, although I don't see any
-  commit in current git master
-  (a6ae23831b05a11880b40f7d58e332c45a6b04f7) that would suggest this
-  issue is fixed.
-
-      $ uname -a
-      Linux boole 4.19.0-4-686-pae #1 SMP Debian 4.19.28-2 (2019-03-15) i68=
-6 GNU/Linux
-      $ qemu -version
-      QEMU emulator version 3.1.0 (Debian 1:3.1+dfsg-7)
-      Copyright (c) 2003-2018 Fabrice Bellard and the QEMU Project develope=
-rs
-
-  Here's an excerpt from the code which handles reboot requests in
-  SeaBIOS 1.12, located in src/fw/shadow.c:
-
-      // Request a QEMU system reset.  Do the reset in this function as
-      // the BIOS code was overwritten above and not all BIOS
-      // functionality may be available.
-
-      // Attempt PCI style reset
-      outb(0x02, PORT_PCI_REBOOT);
-      outb(0x06, PORT_PCI_REBOOT);
-
-      // Next try triple faulting the CPU to force a reset
-      asm volatile("int3");
-
-  This compiles to the following:
-
-      (qemu) x/10i 0xf1993
-      0x000f1993:  b0 02                    movb     $2, %al
-      0x000f1995:  ee                       outb     %al, %dx
-      0x000f1996:  b0 06                    movb     $6, %al
-      0x000f1998:  ee                       outb     %al, %dx
-      0x000f1999:  cc                       int3     =
-
-      0x000f199a:  80 3d 0d 53 0f 00 08     cmpb     $8, 0xf530d
-      0x000f19a1:  75 52                    jne      0xf19f5
-      0x000f19a3:  a1 10 53 0f 00           movl     0xf5310, %eax
-      0x000f19a8:  8b 15 14 53 0f 00        movl     0xf5314, %edx
-      0x000f19ae:  89 c3                    movl     %eax, %ebx
-
-  Now, with the TCG backend, upon reaching the second outb instruction,
-  the thread executing JIT-ed opcodes invokes
-  qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET). This signals
-  another thread to reset the guest CPU registers to their initial
-  state. However, the execution thread is *not* stopped, which means it
-  will keep executing already-translated instructions in the TCG buffer.
-  In particular, the bootstrap value of the EIP register will be
-  overwritten. On my machine, this usually results in the guest CPU
-  finding itself in real mode, CS base 0xffff0000, EIP 0x0000199e, which
-  in real mode disassembles to this:
-
-      (qemu) xp/1i 0xf199e
-      0x000f199e:  0f 00 08                 strw     0(%bx, %si)
-
-  This instruction triggers a #UD exception, and given that SeaBIOS
-  handles #UD by immediately returning, it manifests as the guest
-  locking up with 100% CPU usage every other reboot.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1827871/+subscriptions
+C.
 
