@@ -2,100 +2,73 @@ Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 369ACC04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 18:00:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76AF4C04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 18:03:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02A9F20675
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 18:00:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02A9F20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 38D2220675
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 18:03:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38D2220675
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60278 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60346 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNhuT-0006DJ-9L
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 14:00:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41707)
+	id 1hNhxU-0008Om-Cs
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 14:03:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hNhaZ-0006P2-GQ
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:39:44 -0400
+	(envelope-from <bounces@canonical.com>) id 1hNhlO-0007ea-7N
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:50:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hNhaY-0004Vh-E0
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:39:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39340)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hNhaS-0004P2-J1; Mon, 06 May 2019 13:39:36 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E9452330260;
-	Mon,  6 May 2019 17:39:33 +0000 (UTC)
-Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 42667100200D;
-	Mon,  6 May 2019 17:39:31 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	Alberto Garcia <berto@igalia.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <cover.1556732434.git.berto@igalia.com>
-	<524e211cb818a20f521d6e271e782ab62b8e5e80.1556732434.git.berto@igalia.com>
-	<8bff27c1-a93c-d9f0-c95c-6d10d5700f91@virtuozzo.com>
-	<cd1d6df5-3540-910e-d39b-9074b94ffd38@redhat.com>
-	<4a09edd8-f89e-ec70-b56d-63e93396982b@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <0aebe48a-40e4-b473-9d0c-84d49f982596@redhat.com>
-Date: Mon, 6 May 2019 12:39:30 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <bounces@canonical.com>) id 1hNhlM-0005YT-FI
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:50:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44894)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hNhlM-0005Wv-8s
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:50:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hNhlJ-0001nO-PV
+	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 17:50:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BFD2A2E80CB
+	for <qemu-devel@nongnu.org>; Mon,  6 May 2019 17:50:49 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <4a09edd8-f89e-ec70-b56d-63e93396982b@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="NIUp88xI8UV7nDYIopYZcfu8Kx0DM1DuJ"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Mon, 06 May 2019 17:39:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 May 2019 17:40:05 -0000
+From: Waldemar Kozaczuk <1826393@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: sgarzare stefanha wkozaczuk
+X-Launchpad-Bug-Reporter: Waldemar Kozaczuk (wkozaczuk)
+X-Launchpad-Bug-Modifier: Waldemar Kozaczuk (wkozaczuk)
+References: <155619222209.13917.4120344041326080857.malonedeb@gac.canonical.com>
+	<155678383044.13902.634296520708639219.malone@wampee.canonical.com>
+Message-Id: <CAL9cFfOxjfmhx+E6Z8ha4ySk+o+dg6nHdY8KdHzbm6ttehBL0Q@mail.gmail.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18953";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 6135dd46049f156fa4df54ca37f0e1de0f283e57
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] vvfat: Replace bdrv_{read,
- write}() with bdrv_{pread, pwrite}()
+X-Received-From: 91.189.90.7
+Subject: Re: [Qemu-devel] [Bug 1826393] Re: QEMU 3.1.0 stuck waiting for
+ 800ms (5 times slower) in pre-bios phase
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -104,105 +77,262 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
-	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
-	Max Reitz <mreitz@redhat.com>
+Reply-To: Bug 1826393 <1826393@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NIUp88xI8UV7nDYIopYZcfu8Kx0DM1DuJ
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <0aebe48a-40e4-b473-9d0c-84d49f982596@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] vvfat: Replace bdrv_{read, write}()
- with bdrv_{pread, pwrite}()
-References: <cover.1556732434.git.berto@igalia.com>
- <524e211cb818a20f521d6e271e782ab62b8e5e80.1556732434.git.berto@igalia.com>
- <8bff27c1-a93c-d9f0-c95c-6d10d5700f91@virtuozzo.com>
- <cd1d6df5-3540-910e-d39b-9074b94ffd38@redhat.com>
- <4a09edd8-f89e-ec70-b56d-63e93396982b@virtuozzo.com>
-In-Reply-To: <4a09edd8-f89e-ec70-b56d-63e93396982b@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The last bios indeed helped. It knows runs under 200ms.
 
-On 5/6/19 12:19 PM, Vladimir Sementsov-Ogievskiy wrote:
+Do you anticipate doing minor release of 3.1.0 with updated bios to address
+this issue? Or users are expected to upgrade to QEMU 4.0.0?
 
->>>> +++ b/block/vvfat.c
->>>> @@ -1494,8 +1494,8 @@ static int vvfat_read(BlockDriverState *bs, in=
-t64_t sector_num,
->>>>                    DLOG(fprintf(stderr, "sectors %" PRId64 "+%" PRId=
-64
->>>>                                 " allocated\n", sector_num,
->>>>                                 n >> BDRV_SECTOR_BITS));
->>>> -                if (bdrv_read(s->qcow, sector_num, buf + i * 0x200,=
+Regards,
+Waldek
 
->>>> -                              n >> BDRV_SECTOR_BITS)) {
->>>> +                if (bdrv_pread(s->qcow, sector_num * BDRV_SECTOR_SI=
-ZE,
->>>> +                               buf + i * 0x200, n) < 0) {
->>>
->>> Shouldn't we use QEMU_ALIGN_DOWN(n, BDRV_SECTOR_SIZE) ?
->>
->> No, n should already be aligned, which makes align_down a no-op.
->>
->>> Could bdrv_is_allocated give unaligned n?
->>>
->>
->> Yes, bdrv_is_allocated can return unaligned n in some situations; I ha=
-d
->> a patch that didn't make 4.0 that would add bdrv_block_status_aligned
->> for cases where we need to guarantee that different alignment of a
->> backing chain doesn't bleed through to the specified alignment of the
->> current layer. But those situations are rare, and I need to revisit
->> those and send a v2; so I don't see a problem with this one going in
->> during the meantime as-is.
->>
->=20
-> Than, n is not already aligned, as it comes from bdrv_is_allocated.
+On Thu, May 2, 2019 at 4:05 AM Stefano Garzarella <
+1826393@bugs.launchpad.net> wrote:
 
-Note that whether bdrv_is_allocated can return data not aligned to 512
-depends on the driver. It is possible when querying file-posix.c, but
-only for a POSIX file that encounters EOF mid-sector. However, it is not
-possible for the qcow2 driver.  The patches I need to rework are worried
-more about cases where a block device with request_alignment of 4k can
-still see 512-alignment leak through from a backing file.  But since
-vvfat is grabbing alignment from a qcow2 image, and not a raw POSIX
-file, we should never see sub-sector alignment.
+> Oh sorry, you're using the 'pc' machine, so please try this bios:
+> https://github.com/qemu/qemu/blob/v4.0.0/pc-bios/bios.bin
+>
+> --
+> You received this bug notification because you are subscribed to the bug
+> report.
+> https://bugs.launchpad.net/bugs/1826393
+>
+> Title:
+>   QEMU 3.1.0 stuck waiting for 800ms (5 times slower) in pre-bios phase
+>
+> Status in QEMU:
+>   New
+>
+> Bug description:
+>   Yesterday I have upgraded my laptop from Ubuntu 18.10 to 19.04 and
+>   that way got newer QEMU 3.1.0 along vs QEMU 2.12.0 before. I have
+>   noticed that everytime I start QEMU to run OSv, QEMU seems to hand
+>   noticably longer (~1 second) before showing SeaBIOS output. I have
+>   tried all kind of combinations to get rid of that pause and nothing
+>   helped.
+>
+>   Here is my start command:
+>   time qemu-system-x86_64 -m 256M -smp 1 -nographic -nodefaults \
+>    -device virtio-blk-pci,id=3Dblk0,bootindex=3D0,drive=3Dhd0,scsi=3Doff \
+>    -drive file=3Dusr.img,if=3Dnone,id=3Dhd0,cache=3Dnone,aio=3Dthre\
+>    -enable-kvm \
+>    -cpu host,+x2apic -chardev stdio,mux=3Don,id=3Dstdio,signal=3Doff \
+>    -mon chardev=3Dstdio,mode=3Dreadline -device isa-serial,chardev=3Dstdio
+>
+>   It looks like qemu process starts, waits almost a second for something
+>   and then print SeaBIOS splashscreen and continues boot:
+>
+>   --> waits here
+>   SeaBIOS (version 1.12.0-1)
+>   Booting from Hard Disk..OSv v0.53.0-6-gc8395118
+>         disk read (real mode): 27.25ms, (+27.25ms)
+>         uncompress lzloader.elf: 46.22ms, (+18.97ms)
+>         TLS initialization: 46.79ms, (+0.57ms)
+>         .init functions: 47.82ms, (+1.03ms)
+>         SMP launched: 48.08ms, (+0.26ms)
+>         VFS initialized: 49.25ms, (+1.17ms)
+>         Network initialized: 49.48ms, (+0.24ms)
+>         pvpanic done: 49.57ms, (+0.08ms)
+>         pci enumerated: 52.42ms, (+2.85ms)
+>         drivers probe: 52.42ms, (+0.00ms)
+>         drivers loaded: 55.33ms, (+2.90ms)
+>         ROFS mounted: 56.37ms, (+1.04ms)
+>         Total time: 56.37ms, (+0.00ms)
+>   Found optarg
+>   dev  etc  hello  libenviron.so        libvdso.so  proc  tmp  tools  usr
+>
+>   real  0m0.935s
+>   user  0m0.426s
+>   sys   0m0.490s
+>
+>   With version 2.12.0 I used to see real below 200ms. So it seems qemu
+>   slowed down 5 times.
+>
+>   I ran strace -tt against it and I have noticed a pause here:
+>   ...
+>   07:31:41.848579 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 0
+>   07:31:41.848604 futex(0x55c4a2ff6308, FUTEX_WAIT_PRIVATE, 0, NULL) =3D 0
+>   07:31:41.848649 ioctl(10, KVM_SET_PIT2, 0x7ffdd272d1f0) =3D 0
+>   07:31:41.848674 ioctl(9, KVM_CHECK_EXTENSION, KVM_CAP_KVMCLOCK_CTRL) =
+=3D 1
+>   07:31:41.848699 ioctl(10, KVM_SET_CLOCK, 0x7ffdd272d230) =3D 0
+>   07:31:41.848724 futex(0x55c4a49a9a9c, FUTEX_WAKE_PRIVATE, 2147483647) =
+=3D 1
+>   07:31:41.848747 getpid()                =3D 5162
+>   07:31:41.848769 tgkill(5162, 5166, SIGUSR1) =3D 0
+>   07:31:41.848791 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 0
+>   07:31:41.848814 futex(0x55c4a49a9a98, FUTEX_WAKE_PRIVATE, 2147483647) =
+=3D 1
+>   07:31:41.848837 getpid()                =3D 5162
+>   07:31:41.848858 tgkill(5162, 5166, SIGUSR1) =3D 0
+>   07:31:41.848889 write(8, "\1\0\0\0\0\0\0\0", 8) =3D 8
+>   07:31:41.848919 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 1
+>   07:31:41.848943 ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D4, events=3DPOL=
+LIN},
+> {fd=3D5, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN},
+>   {fd=3D8, events=3DPOLLIN}], 5, {tv_sec=3D0, tv_nsec=3D0}, NULL, 8) =3D =
+1 ([{fd=3D8,
+> revents=3DPOLLIN}], left {tv_sec=3D0, tv_nsec=3D0
+>   })
+>   07:31:41.849003 futex(0x55c4a2fd34c0, FUTEX_WAIT_PRIVATE, 2, NULL) =3D =
+-1
+> EAGAIN (Resource temporarily unavailable)
+>   07:31:41.849031 read(8, "\5\0\0\0\0\0\0\0", 16) =3D 8
+>   07:31:41.849064 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 0
+>   07:31:41.849086 ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D4, events=3DPOL=
+LIN},
+> {fd=3D5, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN},
+>   {fd=3D8, events=3DPOLLIN}], 5, {tv_sec=3D0, tv_nsec=3D984624000}, NULL,=
+ 8) =3D 1
+> ([{fd=3D7, revents=3DPOLLIN}], left {tv_sec=3D0, t
+>   v_nsec=3D190532609})
+>
+>   --> waits for almost 800ms
+>
+>   07:31:42.643272 futex(0x55c4a2fd34c0, FUTEX_WAIT_PRIVATE, 2, NULL) =3D 0
+>   07:31:42.643522 read(7, "\1\0\0\0\0\0\0\0", 512) =3D 8
+>   07:31:42.643625 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 1
+>   07:31:42.643646 ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D4, events=3DPOL=
+LIN},
+> {fd=3D5, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN},
+>   {fd=3D8, events=3DPOLLIN}], 5, {tv_sec=3D0, tv_nsec=3D190066000}, NULL,=
+ 8) =3D 2
+> ([{fd=3D4, revents=3DPOLLIN}, {fd=3D8, revents=3DPOL
+>   LIN}], left {tv_sec=3D0, tv_nsec=3D189909632})
+>   07:31:42.643836 futex(0x55c4a2fd34c0, FUTEX_WAIT_PRIVATE, 2, NULL) =3D =
+-1
+> EAGAIN (Resource temporarily unavailable)
+>   07:31:42.643859 read(8, "\2\0\0\0\0\0\0\0", 16) =3D 8
+>   07:31:42.643880 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 1
+>
+>   ...
+>
+>   when I run same command using qemu 3.0.5 that I still happen to have
+>   on the same machine that I built directly from source I see total boot
+>   time at around 200ms. It seems like a regression.
+>
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1826393/+subscriptions
+>
 
-So my answers above were terse but correct: bdrv_is_allocated can return
-unaligned data in some cases, but vvfat should not be one of those
-cases. If you'd like to add an assert instead of a QEMU_ALIGN_DOWN, that
-should be reasonable.
+-- =
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1826393
 
+Title:
+  QEMU 3.1.0 stuck waiting for 800ms (5 times slower) in pre-bios phase
 
---NIUp88xI8UV7nDYIopYZcfu8Kx0DM1DuJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Status in QEMU:
+  New
 
------BEGIN PGP SIGNATURE-----
+Bug description:
+  Yesterday I have upgraded my laptop from Ubuntu 18.10 to 19.04 and
+  that way got newer QEMU 3.1.0 along vs QEMU 2.12.0 before. I have
+  noticed that everytime I start QEMU to run OSv, QEMU seems to hand
+  noticably longer (~1 second) before showing SeaBIOS output. I have
+  tried all kind of combinations to get rid of that pause and nothing
+  helped.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzQcVIACgkQp6FrSiUn
-Q2rewAf8DHZsyl6lkECLqs8+AzIjXwMqQM9QpMvtGoNuyV4NU2oYkmZC6mPJ6P10
-Pvsdgi2cfrUA+E06sidmENFGFwYyWPL4nBGvUdq9LYT5S5qHI64HJVcUj5Wb1Wru
-7wJXDCSwiZsyVKNTe1y7mJUToU0DVQdurLmlSVt5QiXedzNA5M1cE6sQ1i7Q1RZK
-9/V3hEE9V2XxitBD4iM1RJsf9Eeg+MsnGu4bCts33SU5Z1VAblNMLyJ+NkxqKY+s
-vd495CN6T++J2nH9Wnh5vRTqxa/vhk+/MANQSppBiOW+j/THqthvFJst4csex/5G
-CUXp24KumgAS6yg/iNTKsf8sldAU3A==
-=jHcT
------END PGP SIGNATURE-----
+  Here is my start command:
+  time qemu-system-x86_64 -m 256M -smp 1 -nographic -nodefaults \
+   -device virtio-blk-pci,id=3Dblk0,bootindex=3D0,drive=3Dhd0,scsi=3Doff \
+   -drive file=3Dusr.img,if=3Dnone,id=3Dhd0,cache=3Dnone,aio=3Dthre\
+   -enable-kvm \
+   -cpu host,+x2apic -chardev stdio,mux=3Don,id=3Dstdio,signal=3Doff \
+   -mon chardev=3Dstdio,mode=3Dreadline -device isa-serial,chardev=3Dstdio
 
---NIUp88xI8UV7nDYIopYZcfu8Kx0DM1DuJ--
+  It looks like qemu process starts, waits almost a second for something
+  and then print SeaBIOS splashscreen and continues boot:
+
+  --> waits here
+  SeaBIOS (version 1.12.0-1)
+  Booting from Hard Disk..OSv v0.53.0-6-gc8395118
+  	disk read (real mode): 27.25ms, (+27.25ms)
+  	uncompress lzloader.elf: 46.22ms, (+18.97ms)
+  	TLS initialization: 46.79ms, (+0.57ms)
+  	.init functions: 47.82ms, (+1.03ms)
+  	SMP launched: 48.08ms, (+0.26ms)
+  	VFS initialized: 49.25ms, (+1.17ms)
+  	Network initialized: 49.48ms, (+0.24ms)
+  	pvpanic done: 49.57ms, (+0.08ms)
+  	pci enumerated: 52.42ms, (+2.85ms)
+  	drivers probe: 52.42ms, (+0.00ms)
+  	drivers loaded: 55.33ms, (+2.90ms)
+  	ROFS mounted: 56.37ms, (+1.04ms)
+  	Total time: 56.37ms, (+0.00ms)
+  Found optarg
+  dev  etc  hello  libenviron.so	libvdso.so  proc  tmp  tools  usr
+
+  real	0m0.935s
+  user	0m0.426s
+  sys	0m0.490s
+
+  With version 2.12.0 I used to see real below 200ms. So it seems qemu
+  slowed down 5 times.
+
+  I ran strace -tt against it and I have noticed a pause here:
+  ...
+  07:31:41.848579 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 0
+  07:31:41.848604 futex(0x55c4a2ff6308, FUTEX_WAIT_PRIVATE, 0, NULL) =3D 0
+  07:31:41.848649 ioctl(10, KVM_SET_PIT2, 0x7ffdd272d1f0) =3D 0
+  07:31:41.848674 ioctl(9, KVM_CHECK_EXTENSION, KVM_CAP_KVMCLOCK_CTRL) =3D 1
+  07:31:41.848699 ioctl(10, KVM_SET_CLOCK, 0x7ffdd272d230) =3D 0
+  07:31:41.848724 futex(0x55c4a49a9a9c, FUTEX_WAKE_PRIVATE, 2147483647) =3D=
+ 1
+  07:31:41.848747 getpid()                =3D 5162
+  07:31:41.848769 tgkill(5162, 5166, SIGUSR1) =3D 0
+  07:31:41.848791 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 0
+  07:31:41.848814 futex(0x55c4a49a9a98, FUTEX_WAKE_PRIVATE, 2147483647) =3D=
+ 1
+  07:31:41.848837 getpid()                =3D 5162
+  07:31:41.848858 tgkill(5162, 5166, SIGUSR1) =3D 0
+  07:31:41.848889 write(8, "\1\0\0\0\0\0\0\0", 8) =3D 8
+  07:31:41.848919 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 1
+  07:31:41.848943 ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D4, events=3DPOLLI=
+N}, {fd=3D5, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN}, =
+
+  {fd=3D8, events=3DPOLLIN}], 5, {tv_sec=3D0, tv_nsec=3D0}, NULL, 8) =3D 1 =
+([{fd=3D8, revents=3DPOLLIN}], left {tv_sec=3D0, tv_nsec=3D0
+  })
+  07:31:41.849003 futex(0x55c4a2fd34c0, FUTEX_WAIT_PRIVATE, 2, NULL) =3D -1=
+ EAGAIN (Resource temporarily unavailable)
+  07:31:41.849031 read(8, "\5\0\0\0\0\0\0\0", 16) =3D 8
+  07:31:41.849064 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 0
+  07:31:41.849086 ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D4, events=3DPOLLI=
+N}, {fd=3D5, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN}, =
+
+  {fd=3D8, events=3DPOLLIN}], 5, {tv_sec=3D0, tv_nsec=3D984624000}, NULL, 8=
+) =3D 1 ([{fd=3D7, revents=3DPOLLIN}], left {tv_sec=3D0, t
+  v_nsec=3D190532609})
+
+  --> waits for almost 800ms
+
+  07:31:42.643272 futex(0x55c4a2fd34c0, FUTEX_WAIT_PRIVATE, 2, NULL) =3D 0
+  07:31:42.643522 read(7, "\1\0\0\0\0\0\0\0", 512) =3D 8
+  07:31:42.643625 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 1
+  07:31:42.643646 ppoll([{fd=3D0, events=3DPOLLIN}, {fd=3D4, events=3DPOLLI=
+N}, {fd=3D5, events=3DPOLLIN}, {fd=3D7, events=3DPOLLIN}, =
+
+  {fd=3D8, events=3DPOLLIN}], 5, {tv_sec=3D0, tv_nsec=3D190066000}, NULL, 8=
+) =3D 2 ([{fd=3D4, revents=3DPOLLIN}, {fd=3D8, revents=3DPOL
+  LIN}], left {tv_sec=3D0, tv_nsec=3D189909632})
+  07:31:42.643836 futex(0x55c4a2fd34c0, FUTEX_WAIT_PRIVATE, 2, NULL) =3D -1=
+ EAGAIN (Resource temporarily unavailable)
+  07:31:42.643859 read(8, "\2\0\0\0\0\0\0\0", 16) =3D 8
+  07:31:42.643880 futex(0x55c4a2fd34c0, FUTEX_WAKE_PRIVATE, 1) =3D 1
+
+  ...
+
+  when I run same command using qemu 3.0.5 that I still happen to have
+  on the same machine that I built directly from source I see total boot
+  time at around 200ms. It seems like a regression.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1826393/+subscriptions
 
