@@ -2,93 +2,49 @@ Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7920FC04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 15:34:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86C27C04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 15:36:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DD08205ED
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 15:34:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DD08205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5BD96205ED
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 15:36:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BD96205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58286 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58332 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNfcv-0006Zy-GZ
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 11:34:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37190)
+	id 1hNff2-0007vZ-Jl
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 11:36:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hNfbZ-0005ql-Go
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:32:38 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hNfdW-0006wC-RM
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:34:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hNfbY-0004LJ-LL
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:32:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52212)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hNfdV-0005wt-OJ
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:34:38 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48330)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hNfbP-0004B7-Ef; Mon, 06 May 2019 11:32:27 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 91A16C05D275;
-	Mon,  6 May 2019 15:32:23 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-185.brq.redhat.com
-	[10.40.204.185])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 91A4C18945;
-	Mon,  6 May 2019 15:32:22 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
-	qemu-devel@nongnu.org
-References: <20190501134127.21104-1-thuth@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <ff77f7bb-650d-4a95-42da-55d0c8b49a6a@redhat.com>
-Date: Mon, 6 May 2019 17:32:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190501134127.21104-1-thuth@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="KAwrddHV5CWp3TZTaREjVp0JfulBzkrI4"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Mon, 06 May 2019 15:32:23 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH] tests/qemu-iotests: Fix more reference
- output files due to recent qemu-io change
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hNfdV-0005vi-Gs; Mon, 06 May 2019 11:34:37 -0400
+Received: from [10.28.8.145] (helo=kvm.sw.ru)
+	by relay.sw.ru with esmtp (Exim 4.91)
+	(envelope-from <vsementsov@virtuozzo.com>)
+	id 1hNfdO-0004Z1-56; Mon, 06 May 2019 18:34:30 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Date: Mon,  6 May 2019 18:34:26 +0300
+Message-Id: <20190506153429.52737-1-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.18.0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH v6 0/3] block/stream: get rid of the base
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,60 +56,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+	berto@igalia.com, wencongyang2@huawei.com,
+	xiechanglong.d@gmail.com, mreitz@redhat.com, stefanha@redhat.com,
+	den@openvz.org, andrey.shinkevich@virtuozzo.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KAwrddHV5CWp3TZTaREjVp0JfulBzkrI4
-From: Max Reitz <mreitz@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
-Message-ID: <ff77f7bb-650d-4a95-42da-55d0c8b49a6a@redhat.com>
-Subject: Re: [PATCH] tests/qemu-iotests: Fix more reference output files due
- to recent qemu-io change
-References: <20190501134127.21104-1-thuth@redhat.com>
-In-Reply-To: <20190501134127.21104-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This series introduces a bottom intermediate node that eliminates the
+dependency on the base that may change while stream job is running.
+It happens when stream/commit parallel jobs are running on the same
+backing chain. The base node of the stream job may be a top node of
+the parallel commit job and can change before the stream job is
+completed. We avoid that dependency by introducing the bottom node.
 
-On 01.05.19 15:41, Thomas Huth wrote:
-> The output of qemu-io changed recently - most tests have been fixed in
-> commit 36b9986b08787019ef42 ("tests/qemu-iotests: Fix output of qemu-io=
+v6: [resend by Vladimir]
+  01: improve comment in block/io.c, suggested by Alberto
 
-> related tests") already, but the qcow1 and the vmdk test was still miss=
-ing.
->=20
-> Fixes: 99e98d7c9fc1a1639fad ("qemu-io: Use error_[gs]et_progname()")
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/qemu-iotests/059.out |  8 ++++----
->  tests/qemu-iotests/092.out | 24 ++++++++++++------------
->  2 files changed, 16 insertions(+), 16 deletions(-)
+v5: [resend by Vladimir]
+  01: use comment wording in block/io.c suggested by Alberto
+  Now the whole series are reviewed-by Alberto and me.
 
-Hmm, nbd's 083 is also broken.  Would you mind fixing that, too? O:-)
+v4:
+trace_stream_start reverted to the base.
+bdrv_is_allocated_above_inclusive() deleted and the new parameter
+'bool include_base' was added to the bdrv_is_allocated_above().
 
-Max
+Andrey Shinkevich (2):
+  block: include base when checking image chain for block allocation
+  block/stream: introduce a bottom node
 
+Vladimir Sementsov-Ogievskiy (1):
+  block/stream: refactor stream_run: drop goto
 
---KAwrddHV5CWp3TZTaREjVp0JfulBzkrI4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+ include/block/block.h  |  3 +-
+ block/commit.c         |  2 +-
+ block/io.c             | 20 ++++++++++----
+ block/mirror.c         |  2 +-
+ block/replication.c    |  2 +-
+ block/stream.c         | 62 ++++++++++++++++++++----------------------
+ tests/qemu-iotests/245 |  4 +--
+ 7 files changed, 50 insertions(+), 45 deletions(-)
 
------BEGIN PGP SIGNATURE-----
+-- 
+2.18.0
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzQU4QACgkQ9AfbAGHV
-z0DFkgf7BFWtPr0qDh1JO5KOBoHaiBSGSkyQzUph9sJ/nfhMmeQ3fksCglCGJ2E3
-6rL0mNLAbmDJQq6EW3FLW/ssZbrw8zXdr+rLpUTwIgS8AkByhSM/9bZ6HDcsCLQJ
-Y4HbwMzY/C6Q8n/P3fbp/ocTP9nqOJA3Sc731ly/VAHyqBhYNRPahLmLv3s4wjhc
-3NjdYmfUYEdQrkXwpOh++KYqUypGeYj0oKjTRUu1yxKLQCE15HWTRXPJqJx0GFcC
-9F0Tj5/0aEjWIp36Ie13ZpoHCFKDgvoJ15eiqaTlZVZUqDOQ4B5Zfj3631swUHPQ
-Lfk3YOfiFM6SYiz5P49ZUpmCqZ/MXg==
-=NTfc
------END PGP SIGNATURE-----
-
---KAwrddHV5CWp3TZTaREjVp0JfulBzkrI4--
 
