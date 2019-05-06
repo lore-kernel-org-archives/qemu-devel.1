@@ -2,88 +2,88 @@ Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,T_FUZZY_SPRM autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4934DC04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 23:44:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62499C04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 23:46:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1412320835
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 23:44:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E4C320835
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 23:46:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nVieuqQp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1412320835
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ajorpSfb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E4C320835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35459 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35499 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNnHk-0003MO-RG
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 19:44:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55485)
+	id 1hNnJa-0004H7-Hr
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 19:46:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1hNnGp-00031f-Fg
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 19:43:44 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1hNnIe-0003st-UC
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 19:45:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1hNnGo-0004ld-Hg
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 19:43:43 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:47010)
+	(envelope-from <sjitindarsingh@gmail.com>) id 1hNnId-0005ii-Pj
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 19:45:36 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:45258)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <sjitindarsingh@gmail.com>)
-	id 1hNnGm-0004kS-Cu; Mon, 06 May 2019 19:43:40 -0400
-Received: by mail-pf1-x444.google.com with SMTP id j11so7569173pff.13;
-	Mon, 06 May 2019 16:43:40 -0700 (PDT)
+	id 1hNnIb-0005gh-Qu; Mon, 06 May 2019 19:45:35 -0400
+Received: by mail-pf1-x441.google.com with SMTP id e24so7577815pfi.12;
+	Mon, 06 May 2019 16:45:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=message-id:subject:from:to:cc:date:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=QTTDdJDp/NVF6lNSbKsh7y74AuxkpcAS/Y7LLwzyp68=;
-	b=nVieuqQpKOX2eOOQhA/qAtmofweu1jf2PDA8EaBVOEyc+INK0SbZs91R5KuuPaaS4P
-	i0cX10s+y5+ImZvm4a79an2COkhttUp3m5J9qBTLeKqS+ZhlZUHZq1wdlxcet5qNHsFx
-	BEibgCPKLnYf7KfHpKsrQhFc2MDvDCOoniqU580DNM8Or/mg8HK6Wzgdl/e9TCFclNZ/
-	usDIEXS6PcMWorE0cFtyVm81KAgVjQNfpkEMUF0kmoqFom28ojwnVoYqIpRdP86hlp4J
-	pnlsXYX4GDwiF9VS4iFLMU5L9sdyfx1gr8Fra/qu/OIEw+cY9F6pZs8EoaFIBAfzfsWN
-	pbpQ==
+	bh=e2l5pJUPKknXNnVeHY0YKdAoD5TP9xyoisvplkCBUy8=;
+	b=ajorpSfbmoisKj/1ZSK//M5sgm9+9wag3l8ZT34fek4itCt9vKZMFBrqS9Kkq9pnzt
+	V2BhoS+QiluwCxePnLcjmVXGOb4EYDxh29a6uzyheYQjln9voR3/IrMRCq2kzc0hrtXT
+	qu/VPjzEBov+Se8hPOdu4yCpsDgDR+Jv8cJ91sKBtj5elm1vMU9ArjAsLgq7Gqm/xxhw
+	rxyDYebDzOdsy7d5FAUGQREML5V0VCUZc1uyK7rfoTt43l3QT+njfYrRZ6bzLFU5IzXj
+	bPuZEElpG8HKZgZmgllE7kuEFL8CJZDyDSQoVWBoMCTzqZ/P3i5SmM8hBnA9BYu80jbK
+	xwpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=QTTDdJDp/NVF6lNSbKsh7y74AuxkpcAS/Y7LLwzyp68=;
-	b=BlHeeNvmFB7+IJXvqY8/02dbw5Yp7rHyLOJIW2+k2tBbC3kSM2KUM2Lz87fpsWxf/O
-	E5xC+uk2WOC5CXTgfUHfNkMiTsLSTZ56T3+5NXdFDLs5ffw3vJuk3fCjR/Iku9evjnY/
-	PrCO8Pjn4eTEQPXb/K+H7eFElFQtFQwPd0RhtafOOo6TFxlhQD2pwr5LL+iJNUqLuV0r
-	M4eN7Z6H1zE/e2QHueA3b+8Qvfiz8XFEA8n6gPsZ4rl4A2h9yoaXPmA8ie1nf0rIyoz0
-	C+ZmsxtNszRNm2B40GEy23wjJZrORT5r6a/bAuoV9b650Y9lOj11pMsFREmlB4GsNC3E
-	MYgA==
-X-Gm-Message-State: APjAAAU2q2xmyH+J+zZhZLIcBFn/TDyzhGcUhfKj0bhjd6WklkGjhL9v
-	qsLj3PT8p2vonHTIcoLxzGQ=
-X-Google-Smtp-Source: APXvYqyslDf12FzV+rbebQONIDq245m7CXJiM+YiX6LlyXuEoOX/78XvkLwIOrb2mtPWadpKfkDaeA==
-X-Received: by 2002:a65:5bc3:: with SMTP id o3mr36672894pgr.40.1557186219044; 
-	Mon, 06 May 2019 16:43:39 -0700 (PDT)
+	bh=e2l5pJUPKknXNnVeHY0YKdAoD5TP9xyoisvplkCBUy8=;
+	b=Xij+y+hpcBZ84iQ3GXHgTim/bb6/oJB3oFXapnaQkqmGizqL/+p3AWL6fJQJS3+ycA
+	pxN7PQ3ZkD8xw39hUT5lycRKS4EXch24rnwAHdqlET+RLfUWkuTV0t3iyFJ5i9ie5y8f
+	ZcX+0Jg4yhn1S9HWG3KI1PLCmhcSTX0uLVjdUDXhPJia02ZxTm/xSEkJ2Raoln+I/m9C
+	fzLCQwxzJGdFYp6gXAs4K0CxoRh5BSC1FoHavE2Leuo5qDrZi/GWjFrdc6U8M/fn/BPQ
+	y8sXLneZP7AFQlF37v7umD7tztW8YhkpNEQu5Ky8idx2xF2RwJSmkfz6tsa9DONEhJFH
+	kjsw==
+X-Gm-Message-State: APjAAAWsZqcr5P3vC9YC/Rq6SQ5VwGo22Zwc8xZdl+RoN+BsqHwYbwVS
+	1aMSKkRnMv8zx8Dgr+wZ/C+Tg36V
+X-Google-Smtp-Source: APXvYqyssnp5TejzYTSQhHnBYUVa37JjQ99go1YmITQUD/sl7TThVO+w63tmb7MANDxfs4urqqV+XA==
+X-Received: by 2002:aa7:9203:: with SMTP id 3mr5187533pfo.123.1557186331321;
+	Mon, 06 May 2019 16:45:31 -0700 (PDT)
 Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
 	by smtp.googlemail.com with ESMTPSA id
-	p2sm7669585pgd.63.2019.05.06.16.43.36
+	w125sm18859739pfw.69.2019.05.06.16.45.28
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Mon, 06 May 2019 16:43:38 -0700 (PDT)
-Message-ID: <1557186214.6435.2.camel@gmail.com>
+	Mon, 06 May 2019 16:45:30 -0700 (PDT)
+Message-ID: <1557186326.6435.4.camel@gmail.com>
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 07 May 2019 09:43:34 +1000
-In-Reply-To: <20190506032304.GB6790@umbus.fritz.box>
-References: <20190506014803.21299-1-sjitindarsingh@gmail.com>
-	<20190506032304.GB6790@umbus.fritz.box>
+Date: Tue, 07 May 2019 09:45:26 +1000
+In-Reply-To: <20190506062023.GK6790@umbus.fritz.box>
+References: <20190503055316.6441-1-sjitindarsingh@gmail.com>
+	<20190506062023.GK6790@umbus.fritz.box>
 Content-Type: text/plain; charset="UTF-8"
 X-Mailer: Evolution 3.24.6 (3.24.6-1.fc26) 
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH] target/ppc: Add ibm,
- purr and ibm, spurr device-tree properties
+X-Received-From: 2607:f8b0:4864:20::441
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH 00/13] target/ppc: Implement KVM
+ support under TCG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,66 +95,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: paulus@ozlabs.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2019-05-06 at 13:23 +1000, David Gibson wrote:
-> On Mon, May 06, 2019 at 11:48:03AM +1000, Suraj Jitindar Singh wrote:
-> > The ibm,purr and ibm,spurr device tree properties are used to
-> > indicate
-> > that the processor implements the Processor Utilisation of
-> > Resources
-> > Register (PURR) and Scaled Processor Utilisation of Resources
-> > Registers
-> > (SPURR), respectively. Each property has a single value which
-> > represents
-> > the level of architecture supported. A value of 1 for ibm,purr
-> > means
-> > support for the version of the PURR defined in book 3 in version
-> > 2.02 of
-> > the architecture. A value of 1 for ibm,spurr means support for the
-> > version of the SPURR defined in version 2.05 of the architecture.
-> > 
-> > Add these properties for all processors for which the PURR and
-> > SPURR
-> > registers are generated.
+On Mon, 2019-05-06 at 16:20 +1000, David Gibson wrote:
+> On Fri, May 03, 2019 at 03:53:03PM +1000, Suraj Jitindar Singh wrote:
+> > This patch series adds the necessary parts so that a tcg guest is
+> > able to use
+> > kvm facilities. That is a tcg guest can boot its own kvm guests.
 > 
-> So.. what does the current empty property mean?  Is it just wrong by
-> spec, or does it actually mean something incorrect?
+> The topic line is a bit hard to parse.  IIUC there are basically two
+> things in this series:
+> 
+> 1) Implement / fix TCG emulation of TCG hypervisor facilities, so
+> that
+>    a TCG powernv machine can use them to run KVM guests.
+> 
+> 2) Have the pseries machine under TCG implement the paravirtualized
+>    interfaces to allow nested virtualizationm therefore allowing TCG
+>    pseries machines to run KVM guests
+> 
+> Is that right?
 
-Af far as I can tell, an empty property is invalid according to PAPR.
-A level value is required to communicate the level of purr implemented.
+That is correct.
 
-Should probably have:
+Patches 1-7 achieve 1) TCG emulation of hypervisor facilities
 
-Fixes: 0da6f3fef9a "spapr: Reorganize CPU dt generation code"
+Patches 8-13 achieve 2) emulation of paravirtualised KVM for pseries
+guest
 
 > 
+> > The main requirements for this were a few registers and
+> > instructions as well as
+> > some hcalls and the addition of partition scoped translation in the
+> > radix mmu
+> > emulation.
 > > 
-> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> > ---
-> >  hw/ppc/spapr.c | 5 ++++-
-> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > This can be used to boot a kvm guest under a pseries tcg guest:
+> > Use power9_v2.2 cpu and add -machine cap-nested-hv=on for the first
+> > guest.
+> > Then inside that guest boot a kvm guest as normal.
+> > This takes advantage of the new hcalls with qemu emulating them as
+> > a normal
+> > hypervisor would on a real machine.
 > > 
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 2ef3ce4362..8580a8dc67 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -500,7 +500,10 @@ static void spapr_populate_cpu_dt(CPUState
-> > *cs, void *fdt, int offset,
-> >      _FDT((fdt_setprop(fdt, offset, "64-bit", NULL, 0)));
-> >  
-> >      if (env->spr_cb[SPR_PURR].oea_read) {
-> > -        _FDT((fdt_setprop(fdt, offset, "ibm,purr", NULL, 0)));
-> > +        _FDT((fdt_setprop_cell(fdt, offset, "ibm,purr", 1)));
-> > +    }
-> > +    if (env->spr_cb[SPR_SPURR].oea_read) {
-> > +        _FDT((fdt_setprop_cell(fdt, offset, "ibm,spurr", 1)));
-> >      }
-> >  
-> >      if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)) {
+> > This can also be used to boot a kvm guest under a powernv tcg
+> > guest:
+> > Use any power9 cpu type.
+> > This takes advantage of the new hv register access added.
+> > Note that for powernv there is no xive interrupt excalation for KVM
+> > which means
+> > that while the guest will boot, it won't receive any interrupts.
+> > 
+> > Suraj Jitindar Singh (13):
+> >   target/ppc: Implement the VTB for HV access
+> >   target/ppc: Work [S]PURR implementation and add HV support
+> >   target/ppc: Add SPR ASDR
+> >   target/ppc: Add SPR TBU40
+> >   target/ppc: Add privileged message send facilities
+> >   target/ppc: Enforce that the root page directory size must be at
+> > least
+> >     5
+> >   target/ppc: Handle partition scoped radix tree translation
+> >   target/ppc: Implement hcall H_SET_PARTITION_TABLE
+> >   target/ppc: Implement hcall H_ENTER_NESTED
+> >   target/ppc: Implement hcall H_TLB_INVALIDATE
+> >   target/ppc: Implement hcall H_COPY_TOFROM_GUEST
+> >   target/ppc: Introduce POWER9 DD2.2 cpu type
+> >   target/ppc: Enable SPAPR_CAP_NESTED_KVM_HV under tcg
+> > 
+> >  hw/ppc/ppc.c                    |  46 ++++-
+> >  hw/ppc/spapr_caps.c             |  22 ++-
+> >  hw/ppc/spapr_cpu_core.c         |   1 +
+> >  hw/ppc/spapr_hcall.c            | 409
+> > +++++++++++++++++++++++++++++++++++++++
+> >  include/hw/ppc/ppc.h            |   4 +-
+> >  include/hw/ppc/spapr.h          |   7 +-
+> >  linux-user/ppc/cpu_loop.c       |   5 +
+> >  target/ppc/cpu-models.c         |   2 +
+> >  target/ppc/cpu-models.h         |   1 +
+> >  target/ppc/cpu.h                |  70 +++++++
+> >  target/ppc/excp_helper.c        |  79 +++++++-
+> >  target/ppc/helper.h             |   9 +
+> >  target/ppc/misc_helper.c        |  46 +++++
+> >  target/ppc/mmu-radix64.c        | 412
+> > ++++++++++++++++++++++++++++------------
+> >  target/ppc/mmu-radix64.h        |   4 +
+> >  target/ppc/timebase_helper.c    |  20 ++
+> >  target/ppc/translate.c          |  28 +++
+> >  target/ppc/translate_init.inc.c | 107 +++++++++--
+> >  18 files changed, 1115 insertions(+), 157 deletions(-)
+> > 
 > 
 > 
 
