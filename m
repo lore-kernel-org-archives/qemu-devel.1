@@ -3,57 +3,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64FF0C04AAA
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 08:39:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BD94C04AAA
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 08:39:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29A06205C9
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 08:39:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29A06205C9
+	by mail.kernel.org (Postfix) with ESMTPS id D5A52205C9
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 08:39:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5A52205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52523 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52525 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNZ9c-0006Uh-Dd
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 04:39:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52644)
+	id 1hNZ9h-0006Ya-2D
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 04:39:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hNZ5N-0002pZ-C2
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:34:59 -0400
+	(envelope-from <like.xu@linux.intel.com>) id 1hNZ5P-0002qP-Dg
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:35:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hNZ5K-0007IC-Ru
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:34:56 -0400
+	(envelope-from <like.xu@linux.intel.com>) id 1hNZ5L-0007Is-Rl
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:34:59 -0400
 Received: from mga14.intel.com ([192.55.52.115]:60066)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <like.xu@linux.intel.com>)
-	id 1hNZ5K-0007EJ-GM
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:34:54 -0400
+	id 1hNZ5L-0007EJ-8J
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:34:55 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
 	by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	06 May 2019 01:34:45 -0700
+	06 May 2019 01:34:47 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,437,1549958400"; d="scan'208";a="155407072"
+X-IronPort-AV: E=Sophos;i="5.60,437,1549958400"; d="scan'208";a="155407090"
 Received: from xulike-server.sh.intel.com ([10.239.48.134])
-	by FMSMGA003.fm.intel.com with ESMTP; 06 May 2019 01:34:43 -0700
+	by FMSMGA003.fm.intel.com with ESMTP; 06 May 2019 01:34:45 -0700
 From: Like Xu <like.xu@linux.intel.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  6 May 2019 16:33:08 +0800
-Message-Id: <1557131596-25403-3-git-send-email-like.xu@linux.intel.com>
+Date: Mon,  6 May 2019 16:33:09 +0800
+Message-Id: <1557131596-25403-4-git-send-email-like.xu@linux.intel.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1557131596-25403-1-git-send-email-like.xu@linux.intel.com>
 References: <1557131596-25403-1-git-send-email-like.xu@linux.intel.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 192.55.52.115
-Subject: [Qemu-devel] [PATCH v2 02/10] cpu/topology: related call chains
- refactoring to pass MachineState
+Subject: [Qemu-devel] [PATCH v2 03/10] cpu/topology: replace global smp
+ variables by MachineState in general path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,387 +79,306 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's recommended to access smp variables via MachineState
-as an incoming parameter. This approach applies on legacy
-smbios_*_tables*(), *_machine_reset(), *__hot_add_cpu()
-and related *_create_cpu() for later smp variables usages.
+Basically, the context could get the MachineState reference via call
+chains or unrecommend qdev_get_machine() in !CONFIG_USER_ONLY mode.
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
+A new variable of the same name would be introduced in the declaration
+phase out of less effort OR replace it on the spot if it's only used
+once in the context. No semantic changes.
+
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
- hw/arm/virt.c                |  2 +-
- hw/hppa/machine.c            |  2 +-
- hw/i386/pc.c                 |  9 ++++-----
- hw/mips/mips_malta.c         | 21 +++++++++++----------
- hw/ppc/pnv.c                 |  3 +--
- hw/ppc/spapr.c               |  3 +--
- hw/s390x/s390-virtio-ccw.c   |  6 +++---
- hw/smbios/smbios.c           | 26 +++++++++++++++-----------
- include/hw/boards.h          |  4 ++--
- include/hw/firmware/smbios.h |  5 +++--
- include/hw/i386/pc.h         |  2 +-
- qmp.c                        |  2 +-
- vl.c                         |  2 +-
- 13 files changed, 45 insertions(+), 42 deletions(-)
+ accel/kvm/kvm-all.c          |  4 ++--
+ backends/hostmem.c           |  6 ++++--
+ cpus.c                       |  6 ++++--
+ exec.c                       |  3 ++-
+ gdbstub.c                    |  4 ++++
+ hw/cpu/core.c                |  4 +++-
+ migration/postcopy-ram.c     |  8 +++++++-
+ numa.c                       |  1 +
+ target/openrisc/sys_helper.c |  6 +++++-
+ tcg/tcg.c                    | 13 ++++++++++++-
+ 10 files changed, 44 insertions(+), 11 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 16ba67f..1b02ba4 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1290,7 +1290,7 @@ static void virt_build_smbios(VirtMachineState *vms)
-                         vmc->smbios_old_sys_ver ? "1.0" : mc->name, false,
-                         true, SMBIOS_ENTRY_POINT_30);
- 
--    smbios_get_tables(NULL, 0, &smbios_tables, &smbios_tables_len,
-+    smbios_get_tables(MACHINE(vms), NULL, 0, &smbios_tables, &smbios_tables_len,
-                       &smbios_anchor, &smbios_anchor_len);
- 
-     if (smbios_anchor) {
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index d1b1d3c..416e67b 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -240,7 +240,7 @@ static void machine_hppa_init(MachineState *machine)
-     cpu[0]->env.gr[21] = smp_cpus;
- }
- 
--static void hppa_machine_reset(void)
-+static void hppa_machine_reset(MachineState *ms)
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 524c4dd..f8ef39d 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -1533,8 +1533,8 @@ static int kvm_init(MachineState *ms)
+         const char *name;
+         int num;
+     } num_cpus[] = {
+-        { "SMP",          smp_cpus },
+-        { "hotpluggable", max_cpus },
++        { "SMP",          ms->smp.cpus },
++        { "hotpluggable", ms->smp.max_cpus },
+         { NULL, }
+     }, *nc = num_cpus;
+     int soft_vcpus_limit, hard_vcpus_limit;
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index 04baf47..463102a 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -222,6 +222,7 @@ static void host_memory_backend_set_prealloc(Object *obj, bool value,
  {
-     int i;
- 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index d98b737..9bcd867 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -962,7 +962,7 @@ static void pc_build_smbios(PCMachineState *pcms)
-     /* tell smbios about cpuid version and features */
-     smbios_set_cpuid(cpu->env.cpuid_version, cpu->env.features[FEAT_1_EDX]);
- 
--    smbios_tables = smbios_get_table_legacy(&smbios_tables_len);
-+    smbios_tables = smbios_get_table_legacy(ms, &smbios_tables_len);
-     if (smbios_tables) {
-         fw_cfg_add_bytes(pcms->fw_cfg, FW_CFG_SMBIOS_ENTRIES,
-                          smbios_tables, smbios_tables_len);
-@@ -979,7 +979,7 @@ static void pc_build_smbios(PCMachineState *pcms)
-             array_count++;
-         }
-     }
--    smbios_get_tables(mem_array, array_count,
-+    smbios_get_tables(ms, mem_array, array_count,
-                       &smbios_tables, &smbios_tables_len,
-                       &smbios_anchor, &smbios_anchor_len);
-     g_free(mem_array);
-@@ -1534,9 +1534,8 @@ static void pc_new_cpu(const char *typename, int64_t apic_id, Error **errp)
-     error_propagate(errp, local_err);
- }
- 
--void pc_hot_add_cpu(const int64_t id, Error **errp)
-+void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp)
- {
--    MachineState *ms = MACHINE(qdev_get_machine());
-     int64_t apic_id = x86_cpu_apic_id_from_index(id);
      Error *local_err = NULL;
+     HostMemoryBackend *backend = MEMORY_BACKEND(obj);
++    MachineState *ms = MACHINE(qdev_get_machine());
  
-@@ -2622,7 +2621,7 @@ static void pc_machine_initfn(Object *obj)
-     pc_system_flash_create(pcms);
- }
+     if (backend->force_prealloc) {
+         if (value) {
+@@ -241,7 +242,7 @@ static void host_memory_backend_set_prealloc(Object *obj, bool value,
+         void *ptr = memory_region_get_ram_ptr(&backend->mr);
+         uint64_t sz = memory_region_size(&backend->mr);
  
--static void pc_machine_reset(void)
-+static void pc_machine_reset(MachineState *machine)
+-        os_mem_prealloc(fd, ptr, sz, smp_cpus, &local_err);
++        os_mem_prealloc(fd, ptr, sz, ms->smp.cpus, &local_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+             return;
+@@ -311,6 +312,7 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
  {
-     CPUState *cs;
-     X86CPU *cpu;
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 439665a..534e705 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -1124,14 +1124,14 @@ static void main_cpu_reset(void *opaque)
+     HostMemoryBackend *backend = MEMORY_BACKEND(uc);
+     HostMemoryBackendClass *bc = MEMORY_BACKEND_GET_CLASS(uc);
++    MachineState *ms = MACHINE(qdev_get_machine());
+     Error *local_err = NULL;
+     void *ptr;
+     uint64_t sz;
+@@ -375,7 +377,7 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
+          */
+         if (backend->prealloc) {
+             os_mem_prealloc(memory_region_get_fd(&backend->mr), ptr, sz,
+-                            smp_cpus, &local_err);
++                            ms->smp.cpus, &local_err);
+             if (local_err) {
+                 goto out;
+             }
+diff --git a/cpus.c b/cpus.c
+index e58e7ab..b49db36 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -2068,8 +2068,10 @@ static void qemu_dummy_start_vcpu(CPUState *cpu)
+ 
+ void qemu_init_vcpu(CPUState *cpu)
+ {
+-    cpu->nr_cores = smp_cores;
+-    cpu->nr_threads = smp_threads;
++    MachineState *ms = MACHINE(qdev_get_machine());
++
++    cpu->nr_cores = ms->smp.cores;
++    cpu->nr_threads =  ms->smp.threads;
+     cpu->stopped = true;
+ 
+     if (!cpu->as) {
+diff --git a/exec.c b/exec.c
+index 4e73477..2744df6 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1871,6 +1871,7 @@ static void *file_ram_alloc(RAMBlock *block,
+                             bool truncate,
+                             Error **errp)
+ {
++    MachineState *ms = MACHINE(qdev_get_machine());
+     void *area;
+ 
+     block->page_size = qemu_fd_getpagesize(fd);
+@@ -1927,7 +1928,7 @@ static void *file_ram_alloc(RAMBlock *block,
      }
+ 
+     if (mem_prealloc) {
+-        os_mem_prealloc(fd, area, memory, smp_cpus, errp);
++        os_mem_prealloc(fd, area, memory, ms->smp.cpus, errp);
+         if (errp && *errp) {
+             qemu_ram_munmap(fd, area, memory);
+             return NULL;
+diff --git a/gdbstub.c b/gdbstub.c
+index d54abd1..dba37df 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -30,6 +30,7 @@
+ #include "sysemu/sysemu.h"
+ #include "exec/gdbstub.h"
+ #include "hw/cpu/cluster.h"
++#include "hw/boards.h"
+ #endif
+ 
+ #define MAX_PACKET_LENGTH 4096
+@@ -1159,6 +1160,9 @@ static int gdb_handle_vcont(GDBState *s, const char *p)
+     CPU_FOREACH(cpu) {
+         max_cpus = max_cpus <= cpu->cpu_index ? cpu->cpu_index + 1 : max_cpus;
+     }
++#else
++    MachineState *ms = MACHINE(qdev_get_machine());
++    unsigned int max_cpus = ms->smp.max_cpus;
+ #endif
+     /* uninitialised CPUs stay 0 */
+     newstates = g_new0(char, max_cpus);
+diff --git a/hw/cpu/core.c b/hw/cpu/core.c
+index 7e42e2c..be2c7e1 100644
+--- a/hw/cpu/core.c
++++ b/hw/cpu/core.c
+@@ -11,6 +11,7 @@
+ #include "qapi/visitor.h"
+ #include "qapi/error.h"
+ #include "sysemu/cpus.h"
++#include "hw/boards.h"
+ 
+ static void core_prop_get_core_id(Object *obj, Visitor *v, const char *name,
+                                   void *opaque, Error **errp)
+@@ -69,13 +70,14 @@ static void core_prop_set_nr_threads(Object *obj, Visitor *v, const char *name,
+ 
+ static void cpu_core_instance_init(Object *obj)
+ {
++    MachineState *ms = MACHINE(qdev_get_machine());
+     CPUCore *core = CPU_CORE(obj);
+ 
+     object_property_add(obj, "core-id", "int", core_prop_get_core_id,
+                         core_prop_set_core_id, NULL, NULL, NULL);
+     object_property_add(obj, "nr-threads", "int", core_prop_get_nr_threads,
+                         core_prop_set_nr_threads, NULL, NULL, NULL);
+-    core->nr_threads = smp_threads;
++    core->nr_threads = ms->smp.threads;
  }
  
--static void create_cpu_without_cps(const char *cpu_type,
-+static void create_cpu_without_cps(MachineState *ms, const char *cpu_type,
-                                    qemu_irq *cbus_irq, qemu_irq *i8259_irq)
+ static void cpu_core_class_init(ObjectClass *oc, void *data)
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index e2aa57a..390e7ea 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -29,6 +29,7 @@
+ #include "sysemu/balloon.h"
+ #include "qemu/error-report.h"
+ #include "trace.h"
++#include "hw/boards.h"
+ 
+ /* Arbitrary limit on size of each discard command,
+  * keeps them around ~200 bytes
+@@ -128,6 +129,8 @@ static void migration_exit_cb(Notifier *n, void *data)
+ 
+ static struct PostcopyBlocktimeContext *blocktime_context_new(void)
  {
-     CPUMIPSState *env;
-     MIPSCPU *cpu;
++    MachineState *macs = MACHINE(qdev_get_machine());
++    unsigned int smp_cpus = macs->smp.cpus;
+     PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
+     ctx->page_fault_vcpu_time = g_new0(uint32_t, smp_cpus);
+     ctx->vcpu_addr = g_new0(uintptr_t, smp_cpus);
+@@ -141,10 +144,11 @@ static struct PostcopyBlocktimeContext *blocktime_context_new(void)
+ 
+ static uint32List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
+ {
++    MachineState *macs = MACHINE(qdev_get_machine());
+     uint32List *list = NULL, *entry = NULL;
      int i;
  
--    for (i = 0; i < smp_cpus; i++) {
-+    for (i = 0; i < ms->smp.cpus; i++) {
-         cpu = MIPS_CPU(cpu_create(cpu_type));
- 
-         /* Init internal devices */
-@@ -1146,7 +1146,7 @@ static void create_cpu_without_cps(const char *cpu_type,
-     *cbus_irq = env->irq[4];
- }
- 
--static void create_cps(MaltaState *s, const char *cpu_type,
-+static void create_cps(MachineState *ms, MaltaState *s, const char *cpu_type,
-                        qemu_irq *cbus_irq, qemu_irq *i8259_irq)
+-    for (i = smp_cpus - 1; i >= 0; i--) {
++    for (i = macs->smp.cpus - 1; i >= 0; i--) {
+         entry = g_new0(uint32List, 1);
+         entry->value = ctx->vcpu_blocktime[i];
+         entry->next = list;
+@@ -807,6 +811,8 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
  {
-     Error *err = NULL;
-@@ -1155,7 +1155,7 @@ static void create_cps(MaltaState *s, const char *cpu_type,
-     qdev_set_parent_bus(DEVICE(s->cps), sysbus_get_default());
+     MigrationIncomingState *mis = migration_incoming_get_current();
+     PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
++    MachineState *macs = MACHINE(qdev_get_machine());
++    unsigned int smp_cpus = macs->smp.cpus;
+     int i, affected_cpu = 0;
+     bool vcpu_total_blocktime = false;
+     uint32_t read_vcpu_time, low_time_offset;
+diff --git a/numa.c b/numa.c
+index 3875e1e..844be01 100644
+--- a/numa.c
++++ b/numa.c
+@@ -64,6 +64,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+     uint16_t nodenr;
+     uint16List *cpus = NULL;
+     MachineClass *mc = MACHINE_GET_CLASS(ms);
++    unsigned int max_cpus = ms->smp.max_cpus;
  
-     object_property_set_str(OBJECT(s->cps), cpu_type, "cpu-type", &err);
--    object_property_set_int(OBJECT(s->cps), smp_cpus, "num-vp", &err);
-+    object_property_set_int(OBJECT(s->cps), ms->smp.cpus, "num-vp", &err);
-     object_property_set_bool(OBJECT(s->cps), true, "realized", &err);
-     if (err != NULL) {
-         error_report("%s", error_get_pretty(err));
-@@ -1168,13 +1168,14 @@ static void create_cps(MaltaState *s, const char *cpu_type,
-     *cbus_irq = NULL;
- }
- 
--static void mips_create_cpu(MaltaState *s, const char *cpu_type,
--                            qemu_irq *cbus_irq, qemu_irq *i8259_irq)
-+static void mips_create_cpu(MachineState *ms, MaltaState *s,
-+                            const char *cpu_type, qemu_irq *cbus_irq,
-+                            qemu_irq *i8259_irq)
- {
--    if ((smp_cpus > 1) && cpu_supports_cps_smp(cpu_type)) {
--        create_cps(s, cpu_type, cbus_irq, i8259_irq);
-+    if ((ms->smp.cpus > 1) && cpu_supports_cps_smp(cpu_type)) {
-+        create_cps(ms, s, cpu_type, cbus_irq, i8259_irq);
-     } else {
--        create_cpu_without_cps(cpu_type, cbus_irq, i8259_irq);
-+        create_cpu_without_cps(ms, cpu_type, cbus_irq, i8259_irq);
-     }
- }
- 
-@@ -1218,7 +1219,7 @@ void mips_malta_init(MachineState *machine)
-     qdev_init_nofail(dev);
- 
-     /* create CPU */
--    mips_create_cpu(s, machine->cpu_type, &cbus_irq, &i8259_irq);
-+    mips_create_cpu(machine, s, machine->cpu_type, &cbus_irq, &i8259_irq);
- 
-     /* allocate RAM */
-     if (ram_size > 2 * GiB) {
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index dfb4ea5..1e8c505 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -520,9 +520,8 @@ static void pnv_powerdown_notify(Notifier *n, void *opaque)
-     }
- }
- 
--static void pnv_reset(void)
-+static void pnv_reset(MachineState *machine)
- {
--    MachineState *machine = MACHINE(qdev_get_machine());
-     PnvMachineState *pnv = PNV_MACHINE(machine);
-     void *fdt;
-     Object *obj;
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 2ef3ce4..7fb34de 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1689,9 +1689,8 @@ static int spapr_reset_drcs(Object *child, void *opaque)
-     return 0;
- }
- 
--static void spapr_machine_reset(void)
-+static void spapr_machine_reset(MachineState *machine)
- {
--    MachineState *machine = MACHINE(qdev_get_machine());
-     SpaprMachineState *spapr = SPAPR_MACHINE(machine);
-     PowerPCCPU *first_ppc_cpu;
-     uint32_t rtas_limit;
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index bbc6e8f..ed1fe7a 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -338,7 +338,7 @@ static inline void s390_do_cpu_ipl(CPUState *cs, run_on_cpu_data arg)
-     s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
- }
- 
--static void s390_machine_reset(void)
-+static void s390_machine_reset(MachineState *machine)
- {
-     enum s390_reset reset_type;
-     CPUState *cs, *t;
-@@ -439,9 +439,9 @@ static HotplugHandler *s390_get_hotplug_handler(MachineState *machine,
-     return NULL;
- }
- 
--static void s390_hot_add_cpu(const int64_t id, Error **errp)
-+static void s390_hot_add_cpu(MachineState *machine,
-+                             const int64_t id, Error **errp)
- {
--    MachineState *machine = MACHINE(qdev_get_machine());
-     ObjectClass *oc;
- 
-     g_assert(machine->possible_cpus->cpus[0].cpu);
-diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-index 47be907..0bf9a01 100644
---- a/hw/smbios/smbios.c
-+++ b/hw/smbios/smbios.c
-@@ -26,6 +26,7 @@
- #include "sysemu/cpus.h"
- #include "hw/firmware/smbios.h"
- #include "hw/loader.h"
+     if (node->has_nodeid) {
+         nodenr = node->nodeid;
+diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
+index 05f66c4..deae88f 100644
+--- a/target/openrisc/sys_helper.c
++++ b/target/openrisc/sys_helper.c
+@@ -24,6 +24,9 @@
+ #include "exec/helper-proto.h"
+ #include "exception.h"
+ #include "sysemu/sysemu.h"
++#ifndef CONFIG_USER_ONLY
 +#include "hw/boards.h"
++#endif
+ 
+ #define TO_SPR(group, number) (((group) << 11) + (number))
+ 
+@@ -194,6 +197,7 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
+                            target_ulong spr)
+ {
+ #ifndef CONFIG_USER_ONLY
++    MachineState *ms = MACHINE(qdev_get_machine());
+     OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
+     CPUState *cs = CPU(cpu);
+     int idx;
+@@ -241,7 +245,7 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
+         return cpu->parent_obj.cpu_index;
+ 
+     case TO_SPR(0, 129): /* NUMCORES */
+-        return max_cpus;
++        return ms->smp.max_cpus;
+ 
+     case TO_SPR(0, 1024) ... TO_SPR(0, 1024 + (16 * 32)): /* Shadow GPRs */
+         idx = (spr - 1024);
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index f7bef51..62f3770 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -45,6 +45,10 @@
  #include "exec/cpu-common.h"
- #include "smbios_build.h"
+ #include "exec/exec-all.h"
  
-@@ -340,9 +341,10 @@ static void smbios_register_config(void)
++#if !defined(CONFIG_USER_ONLY)
++#include "hw/boards.h"
++#endif
++
+ #include "tcg-op.h"
  
- opts_init(smbios_register_config);
+ #if UINTPTR_MAX == UINT32_MAX
+@@ -599,6 +603,10 @@ static size_t tcg_n_regions(void)
+     size_t i;
  
--static void smbios_validate_table(void)
-+static void smbios_validate_table(MachineState *ms)
+     /* Use a single region if all we have is one vCPU thread */
++#if !defined(CONFIG_USER_ONLY)
++    MachineState *ms = MACHINE(qdev_get_machine());
++    unsigned int max_cpus = ms->smp.max_cpus;
++#endif
+     if (max_cpus == 1 || !qemu_tcg_mttcg_enabled()) {
+         return 1;
+     }
+@@ -731,6 +739,7 @@ void tcg_register_thread(void)
+ #else
+ void tcg_register_thread(void)
  {
--    uint32_t expect_t4_count = smbios_legacy ? smp_cpus : smbios_smp_sockets;
-+    uint32_t expect_t4_count = smbios_legacy ?
-+                                        ms->smp.cpus : smbios_smp_sockets;
++    MachineState *ms = MACHINE(qdev_get_machine());
+     TCGContext *s = g_malloc(sizeof(*s));
+     unsigned int i, n;
+     bool err;
+@@ -748,7 +757,7 @@ void tcg_register_thread(void)
  
-     if (smbios_type4_count && smbios_type4_count != expect_t4_count) {
-         error_report("Expected %d SMBIOS Type 4 tables, got %d instead",
-@@ -427,7 +429,7 @@ static void smbios_build_type_1_fields(void)
-     }
- }
+     /* Claim an entry in tcg_ctxs */
+     n = atomic_fetch_inc(&n_tcg_ctxs);
+-    g_assert(n < max_cpus);
++    g_assert(n < ms->smp.max_cpus);
+     atomic_set(&tcg_ctxs[n], s);
  
--uint8_t *smbios_get_table_legacy(size_t *length)
-+uint8_t *smbios_get_table_legacy(MachineState *ms, size_t *length)
- {
-     if (!smbios_legacy) {
-         *length = 0;
-@@ -437,7 +439,7 @@ uint8_t *smbios_get_table_legacy(size_t *length)
-     if (!smbios_immutable) {
-         smbios_build_type_0_fields();
-         smbios_build_type_1_fields();
--        smbios_validate_table();
-+        smbios_validate_table(ms);
-         smbios_immutable = true;
-     }
-     *length = smbios_entries_len;
-@@ -569,7 +571,7 @@ static void smbios_build_type_3_table(void)
-     SMBIOS_BUILD_TABLE_POST;
- }
+     tcg_ctx = s;
+@@ -958,6 +967,8 @@ void tcg_context_init(TCGContext *s)
+     tcg_ctxs = &tcg_ctx;
+     n_tcg_ctxs = 1;
+ #else
++    MachineState *ms = MACHINE(qdev_get_machine());
++    unsigned int max_cpus = ms->smp.max_cpus;
+     tcg_ctxs = g_new(TCGContext *, max_cpus);
+ #endif
  
--static void smbios_build_type_4_table(unsigned instance)
-+static void smbios_build_type_4_table(MachineState *ms, unsigned instance)
- {
-     char sock_str[128];
- 
-@@ -596,8 +598,8 @@ static void smbios_build_type_4_table(unsigned instance)
-     SMBIOS_TABLE_SET_STR(4, serial_number_str, type4.serial);
-     SMBIOS_TABLE_SET_STR(4, asset_tag_number_str, type4.asset);
-     SMBIOS_TABLE_SET_STR(4, part_number_str, type4.part);
--    t->core_count = t->core_enabled = smp_cores;
--    t->thread_count = smp_threads;
-+    t->core_count = t->core_enabled = ms->smp.cores;
-+    t->thread_count = ms->smp.threads;
-     t->processor_characteristics = cpu_to_le16(0x02); /* Unknown */
-     t->processor_family2 = cpu_to_le16(0x01); /* Other */
- 
-@@ -838,7 +840,8 @@ static void smbios_entry_point_setup(void)
-     }
- }
- 
--void smbios_get_tables(const struct smbios_phys_mem_area *mem_array,
-+void smbios_get_tables(MachineState *ms,
-+                       const struct smbios_phys_mem_area *mem_array,
-                        const unsigned int mem_array_size,
-                        uint8_t **tables, size_t *tables_len,
-                        uint8_t **anchor, size_t *anchor_len)
-@@ -857,11 +860,12 @@ void smbios_get_tables(const struct smbios_phys_mem_area *mem_array,
-         smbios_build_type_2_table();
-         smbios_build_type_3_table();
- 
--        smbios_smp_sockets = DIV_ROUND_UP(smp_cpus, smp_cores * smp_threads);
-+        smbios_smp_sockets = DIV_ROUND_UP(ms->smp.cpus,
-+                                          ms->smp.cores * ms->smp.threads);
-         assert(smbios_smp_sockets >= 1);
- 
-         for (i = 0; i < smbios_smp_sockets; i++) {
--            smbios_build_type_4_table(i);
-+            smbios_build_type_4_table(ms, i);
-         }
- 
-         smbios_build_type_11_table();
-@@ -887,7 +891,7 @@ void smbios_get_tables(const struct smbios_phys_mem_area *mem_array,
-         smbios_build_type_38_table();
-         smbios_build_type_127_table();
- 
--        smbios_validate_table();
-+        smbios_validate_table(ms);
-         smbios_entry_point_setup();
-         smbios_immutable = true;
-     }
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index dc89c6d..a7eb0bf 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -171,8 +171,8 @@ struct MachineClass {
-     const char *deprecation_reason;
- 
-     void (*init)(MachineState *state);
--    void (*reset)(void);
--    void (*hot_add_cpu)(const int64_t id, Error **errp);
-+    void (*reset)(MachineState *state);
-+    void (*hot_add_cpu)(MachineState *state, const int64_t id, Error **errp);
-     int (*kvm_type)(MachineState *machine, const char *arg);
- 
-     BlockInterfaceType block_default_type;
-diff --git a/include/hw/firmware/smbios.h b/include/hw/firmware/smbios.h
-index 6fef32a..02a0ced 100644
---- a/include/hw/firmware/smbios.h
-+++ b/include/hw/firmware/smbios.h
-@@ -268,8 +268,9 @@ void smbios_set_cpuid(uint32_t version, uint32_t features);
- void smbios_set_defaults(const char *manufacturer, const char *product,
-                          const char *version, bool legacy_mode,
-                          bool uuid_encoded, SmbiosEntryPointType ep_type);
--uint8_t *smbios_get_table_legacy(size_t *length);
--void smbios_get_tables(const struct smbios_phys_mem_area *mem_array,
-+uint8_t *smbios_get_table_legacy(MachineState *ms, size_t *length);
-+void smbios_get_tables(MachineState *ms,
-+                       const struct smbios_phys_mem_area *mem_array,
-                        const unsigned int mem_array_size,
-                        uint8_t **tables, size_t *tables_len,
-                        uint8_t **anchor, size_t *anchor_len);
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 43df723..ce3c229 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -186,7 +186,7 @@ void pc_register_ferr_irq(qemu_irq irq);
- void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
- 
- void pc_cpus_init(PCMachineState *pcms);
--void pc_hot_add_cpu(const int64_t id, Error **errp);
-+void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp);
- 
- void pc_guest_info_init(PCMachineState *pcms);
- 
-diff --git a/qmp.c b/qmp.c
-index b92d62c..ba7aa04 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -123,7 +123,7 @@ void qmp_cpu_add(int64_t id, Error **errp)
- 
-     mc = MACHINE_GET_CLASS(current_machine);
-     if (mc->hot_add_cpu) {
--        mc->hot_add_cpu(id, errp);
-+        mc->hot_add_cpu(current_machine, id, errp);
-     } else {
-         error_setg(errp, "Not supported");
-     }
-diff --git a/vl.c b/vl.c
-index 43fd247..34f05b2 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1706,7 +1706,7 @@ void qemu_system_reset(ShutdownCause reason)
-     cpu_synchronize_all_states();
- 
-     if (mc && mc->reset) {
--        mc->reset();
-+        mc->reset(current_machine);
-     } else {
-         qemu_devices_reset();
-     }
 -- 
 1.8.3.1
 
