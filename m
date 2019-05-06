@@ -2,92 +2,59 @@ Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F191C04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:30:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20FD3C04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:31:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 248C320830
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:30:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 248C320830
+	by mail.kernel.org (Postfix) with ESMTPS id DC65020830
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:31:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC65020830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59813 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59849 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNhRP-0006v8-CD
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 13:30:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36023)
+	id 1hNhS9-0007WH-5D
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 13:31:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hNhLU-00023l-Kv
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:24:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1hNhIk-0007zl-5i
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:21:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hNhLQ-0001uk-Bo
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:24:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36818)
+	(envelope-from <eblake@redhat.com>) id 1hNhIj-0007bt-36
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:21:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54138)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hNhLN-0001cZ-PC
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:24:02 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hNhIg-0007Yw-II; Mon, 06 May 2019 13:21:14 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A2EEE309B14D;
-	Mon,  6 May 2019 17:23:56 +0000 (UTC)
-Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B5CFC5C1B5;
-	Mon,  6 May 2019 17:23:55 +0000 (UTC)
-To: Antonio Ospite <ao2@ao2.it>, qemu-devel@nongnu.org
-References: <20190503082728.16485-1-ao2@ao2.it>
-	<20190503082728.16485-2-ao2@ao2.it>
+	by mx1.redhat.com (Postfix) with ESMTPS id E241F3082E1E;
+	Mon,  6 May 2019 17:21:13 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-15.phx2.redhat.com [10.3.116.15])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5D1945C1B5;
+	Mon,  6 May 2019 17:21:13 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <6822ade4-2859-6d2a-d778-7fc115af5081@redhat.com>
-Date: Mon, 6 May 2019 12:23:53 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+To: qemu-devel@nongnu.org
+Date: Mon,  6 May 2019 12:21:11 -0500
+Message-Id: <20190506172111.31594-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190503082728.16485-2-ao2@ao2.it>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lA7UKGnyznKjIVMegEYCk5MViPF3I1xfy"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Mon, 06 May 2019 17:23:56 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.46]);
+	Mon, 06 May 2019 17:21:13 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] configure: set source_path only
- once and make its definition more robust
+Subject: [Qemu-devel] [PATCH] iotests: Tweak 221 sizing for different hole
+ granularities
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,71 +66,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Antonio Ospite <antonio.ospite@collabora.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, thuth@redhat.com, qemu-block@nongnu.org,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lA7UKGnyznKjIVMegEYCk5MViPF3I1xfy
-From: Eric Blake <eblake@redhat.com>
-To: Antonio Ospite <ao2@ao2.it>, qemu-devel@nongnu.org
-Cc: Antonio Ospite <antonio.ospite@collabora.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <6822ade4-2859-6d2a-d778-7fc115af5081@redhat.com>
-Subject: Re: [PATCH v2 1/2] configure: set source_path only once and make its
- definition more robust
-References: <20190503082728.16485-1-ao2@ao2.it>
- <20190503082728.16485-2-ao2@ao2.it>
-In-Reply-To: <20190503082728.16485-2-ao2@ao2.it>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+For some particular configurations of ext4, sizing an image to 84
+sectors + 1 byte causes test failures when the size of the hole is
+rounded to a 4k alignment. Let's instead size things to 128 sectors +
+1 byte, as the 64k boundary is more likely to work with various hole
+granularities.
 
-On 5/3/19 3:27 AM, Antonio Ospite wrote:
-> From: Antonio Ospite <antonio.ospite@collabora.com>
->=20
-> Since commit 79d77bcd36 (configure: Remove --source-path option,
-> 2019-04-29) source_path cannot be overridden anymore, move it out of th=
-e
-> "default parameters" block since the word "default" may suggest that th=
-e
-> value can change, while in fact it does not.
->=20
-> While at it, only set source_path once and separate the positional
-> argument of basename with "--" to more robustly cover the case of path
-> names starting with a dash.
->=20
-> Signed-off-by: Antonio Ospite <antonio.ospite@collabora.com>
-> ---
->  configure | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->=20
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+I have been unable to reproduce Thomas' failure, but suspect that this
+will address it. If I can get a Tested-by, then I'm happy to add it
+through my NBD tree, as I have a couple other iotest fixes ready for a
+pull request.
 
+ tests/qemu-iotests/221     | 10 +++++-----
+ tests/qemu-iotests/221.out | 20 ++++++++++----------
+ 2 files changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/tests/qemu-iotests/221 b/tests/qemu-iotests/221
+index 808cd9a289c..25dd47bcfe4 100755
+--- a/tests/qemu-iotests/221
++++ b/tests/qemu-iotests/221
+@@ -2,7 +2,7 @@
+ #
+ # Test qemu-img vs. unaligned images
+ #
+-# Copyright (C) 2018 Red Hat, Inc.
++# Copyright (C) 2018-2019 Red Hat, Inc.
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+@@ -41,16 +41,16 @@ echo
+ echo "=3D=3D=3D Check mapping of unaligned raw image =3D=3D=3D"
+ echo
+
+-_make_test_img 43009 # qemu-img create rounds size up
++_make_test_img 65537 # qemu-img create rounds size up
+ $QEMU_IMG map --output=3Djson "$TEST_IMG" | _filter_qemu_img_map
+
+-truncate --size=3D43009 "$TEST_IMG" # so we resize it and check again
++truncate --size=3D65537 "$TEST_IMG" # so we resize it and check again
+ $QEMU_IMG map --output=3Djson "$TEST_IMG" | _filter_qemu_img_map
+
+-$QEMU_IO -c 'w 43008 1' "$TEST_IMG" | _filter_qemu_io # writing also rou=
+nds up
++$QEMU_IO -c 'w 65536 1' "$TEST_IMG" | _filter_qemu_io # writing also rou=
+nds up
+ $QEMU_IMG map --output=3Djson "$TEST_IMG" | _filter_qemu_img_map
+
+-truncate --size=3D43009 "$TEST_IMG" # so we resize it and check again
++truncate --size=3D65537 "$TEST_IMG" # so we resize it and check again
+ $QEMU_IMG map --output=3Djson "$TEST_IMG" | _filter_qemu_img_map
+
+ # success, all done
+diff --git a/tests/qemu-iotests/221.out b/tests/qemu-iotests/221.out
+index a9c0190aadc..9f9dd52bb0b 100644
+--- a/tests/qemu-iotests/221.out
++++ b/tests/qemu-iotests/221.out
+@@ -2,15 +2,15 @@ QA output created by 221
+
+ =3D=3D=3D Check mapping of unaligned raw image =3D=3D=3D
+
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D43009
+-[{ "start": 0, "length": 43520, "depth": 0, "zero": true, "data": false,=
+ "offset": OFFSET}]
+-[{ "start": 0, "length": 43520, "depth": 0, "zero": true, "data": false,=
+ "offset": OFFSET}]
+-wrote 1/1 bytes at offset 43008
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D65537
++[{ "start": 0, "length": 66048, "depth": 0, "zero": true, "data": false,=
+ "offset": OFFSET}]
++[{ "start": 0, "length": 66048, "depth": 0, "zero": true, "data": false,=
+ "offset": OFFSET}]
++wrote 1/1 bytes at offset 65536
+ 1 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-[{ "start": 0, "length": 40960, "depth": 0, "zero": true, "data": false,=
+ "offset": OFFSET},
+-{ "start": 40960, "length": 2049, "depth": 0, "zero": false, "data": tru=
+e, "offset": OFFSET},
+-{ "start": 43009, "length": 511, "depth": 0, "zero": true, "data": false=
+, "offset": OFFSET}]
+-[{ "start": 0, "length": 40960, "depth": 0, "zero": true, "data": false,=
+ "offset": OFFSET},
+-{ "start": 40960, "length": 2049, "depth": 0, "zero": false, "data": tru=
+e, "offset": OFFSET},
+-{ "start": 43009, "length": 511, "depth": 0, "zero": true, "data": false=
+, "offset": OFFSET}]
++[{ "start": 0, "length": 65536, "depth": 0, "zero": true, "data": false,=
+ "offset": OFFSET},
++{ "start": 65536, "length": 1, "depth": 0, "zero": false, "data": true, =
+"offset": OFFSET},
++{ "start": 65537, "length": 511, "depth": 0, "zero": true, "data": false=
+, "offset": OFFSET}]
++[{ "start": 0, "length": 65536, "depth": 0, "zero": true, "data": false,=
+ "offset": OFFSET},
++{ "start": 65536, "length": 1, "depth": 0, "zero": false, "data": true, =
+"offset": OFFSET},
++{ "start": 65537, "length": 511, "depth": 0, "zero": true, "data": false=
+, "offset": OFFSET}]
+ *** done
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.20.1
 
-
---lA7UKGnyznKjIVMegEYCk5MViPF3I1xfy
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzQbakACgkQp6FrSiUn
-Q2q53ggAlb6Alj+piZ7r1nBHL3SPkdlWa+QpCgrm7RJ29TScWWxonpSqGkMzPyty
-WaZFHzdEkurAN19QlONLoysyJewCGOhG1Cok1uCRj5m3UbrjFDW9sp75Vt43A6c2
-q59C1FVWJudQZ1CYW3jydKVpvrjAOCYlpuoDJS5pXgibmfxn1MBrxGVDj8ag7WUn
-LBgfZXI1oixyQqUBbMfn8bLTotE3yoBXjC358xSSwv4/O3YNTtUpOZyr/Mw0uMkB
-5SSfe2div8aq4aDs1L9P9NW24CbPb7OGdDDl98B2GTa8xAPimYF7IS+YbaT651LN
-80Tb5Y3p5A2SJe0qbw2LS2GOxcyMaA==
-=7f6T
------END PGP SIGNATURE-----
-
---lA7UKGnyznKjIVMegEYCk5MViPF3I1xfy--
 
