@@ -2,77 +2,107 @@ Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F50C04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 13:00:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C86CC04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 13:04:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6770D2087F
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 13:00:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6770D2087F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 10C6A206BF
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 13:04:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10C6A206BF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56281 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56296 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNdEk-0006i1-3s
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 09:00:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57665)
+	id 1hNdIP-00083H-GY
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 09:04:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hNdDj-0006Ht-Eb
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 08:59:52 -0400
+	(envelope-from <jjherne@linux.ibm.com>) id 1hNdHM-0007VG-4I
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 09:03:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hNdDi-0001KW-7c
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 08:59:51 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:36487)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hNdDi-0001Ix-3d
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 08:59:50 -0400
-Received: by mail-qt1-f194.google.com with SMTP id a17so369317qth.3
-	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 05:59:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:content-transfer-encoding
-	:in-reply-to;
-	bh=k1nluuhk4/9VT0+QejuuyRxw3wMugb6QWirZCEX6Xuc=;
-	b=UJeCaK60LlDlfLcSdElG1XwhGkf03jeQdQ/Q/Xr7YvJa+RnGz+LcFzP9Tth9xJ3cFc
-	Mar0CktNwE+cJXgrcHuPIGuNblAwD1PhhxVr+Fig0laqu9KhMIevS6XqsuaLgDyIXu9B
-	l6HyLw5IUUIuVajX6oLcYTRjvsv9oSn6LdXB5k0MUVumQ2wzHT2sQrU7imIgjxOYfcbi
-	vuXDBhU4Y4qSogGpd3ntzaJEmIF76N6vbhWg8fGE37gM+KXW1Q96fvCgONrukWmbGG6h
-	wLDDeGeCELK3veZcctbBRXNSfu9B1JLaAQggOJXB928MuDXENQbvgOsOardLGJRtbXp4
-	5dGQ==
-X-Gm-Message-State: APjAAAV6I1UBmMmxrvcBD73i1P4Uep3zX9gxklnCyKxg+TbGLTm75IVu
-	ElhmbXrFiID58RGVvOVUfQroRA==
-X-Google-Smtp-Source: APXvYqyjPAOPyH5pbsJaXpTfN9XIt1ykpKipgdcjm2/NgsRD0TcnnA5uxbNevTwTR0aSSwFQjuLJYg==
-X-Received: by 2002:a0c:d2b2:: with SMTP id q47mr16784255qvh.167.1557147588124;
-	Mon, 06 May 2019 05:59:48 -0700 (PDT)
-Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
-	[173.76.105.71])
-	by smtp.gmail.com with ESMTPSA id t2sm6639944qkd.57.2019.05.06.05.59.46
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Mon, 06 May 2019 05:59:47 -0700 (PDT)
-Date: Mon, 6 May 2019 08:59:45 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190506085934-mutt-send-email-mst@kernel.org>
-References: <20190505224737.1028-1-philmd@redhat.com>
-	<20190505224737.1028-2-philmd@redhat.com>
+	(envelope-from <jjherne@linux.ibm.com>) id 1hNdHL-00033f-5y
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 09:03:36 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44834)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1hNdHK-00030c-Rn
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 09:03:35 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x46D2lCS028314
+	for <qemu-devel@nongnu.org>; Mon, 6 May 2019 09:03:30 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2sajd1fxd5-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 09:03:29 -0400
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Mon, 6 May 2019 14:03:27 +0100
+Received: from b03cxnp08026.gho.boulder.ibm.com (9.17.130.18)
+	by e36.co.us.ibm.com (192.168.1.136) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Mon, 6 May 2019 14:03:25 +0100
+Received: from b03ledav006.gho.boulder.ibm.com
+	(b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+	by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x46D3Nmn63897626
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Mon, 6 May 2019 13:03:24 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D4CA5C605D;
+	Mon,  6 May 2019 13:03:23 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7054AC6055;
+	Mon,  6 May 2019 13:03:23 +0000 (GMT)
+Received: from [9.60.75.221] (unknown [9.60.75.221])
+	by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+	Mon,  6 May 2019 13:03:23 +0000 (GMT)
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+	Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+	qemu-s390x@nongnu.org, cohuck@redhat.com, alifm@linux.ibm.com
+References: <1556543381-12671-1-git-send-email-jjherne@linux.ibm.com>
+	<2913f865-2119-f6cf-b2f8-b22d351fcca1@redhat.com>
+	<19c9edb6-fd85-564e-8342-80042e90ae3e@de.ibm.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Organization: IBM
+Date: Mon, 6 May 2019 09:03:23 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190505224737.1028-2-philmd@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.160.194
-Subject: Re: [Qemu-devel] [PATCH 1/1] MAINTAINERS: Add an entry for the
- Parallel NOR Flash devices
+In-Reply-To: <19c9edb6-fd85-564e-8342-80042e90ae3e@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19050613-0020-0000-0000-00000EE44D49
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011059; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000285; SDB=6.01199404; UDB=6.00629238;
+	IPR=6.00980281; 
+	MB=3.00026753; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-06 13:03:26
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19050613-0021-0000-0000-000065B719CB
+Message-Id: <7d728050-cc8f-e730-9bfe-845857251392@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-05-06_08:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1905060113
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [PATCH] s390-bios: Skip bootmap signature entries
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -84,54 +114,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
-	Stephen Checkoway <stephen.checkoway@oberlin.edu>,
-	Paul Burton <paul.burton@imgtec.com>,
-	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-	Jordan Justen <jordan.l.justen@intel.com>, qemu-devel@nongnu.org,
-	Laszlo Ersek <lersek@redhat.com>, Roy Franz <roy.franz@linaro.org>,
-	Michael Walle <michael@walle.cc>, Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Jan Kiszka <jan.kiszka@siemens.com>,
-	"Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
-	Stefan Weil <sw@weilnetz.de>,
-	Jean-Christophe PLAGNIOL-VILLARD <plagnoij@jcrosoft.com>,
-	David Engraf <david.engraf@sysgo.com>,
-	Markus Armbruster <armbru@redhat.com>
+Reply-To: jjherne@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 06, 2019 at 12:47:37AM +0200, Philippe Mathieu-Daudé wrote:
-> Step in to maintain it, since I have some familiarity with
-> the technology.
+On 5/6/19 4:08 AM, Christian Borntraeger wrote:
+> On 03.05.19 11:34, Thomas Huth wrote:
+>> On 29/04/2019 15.09, Jason J. Herne wrote:
+>>> Newer versions of zipl have the ability to write signature entries to the boot
+>>> script for secure boot. We don't yet support secure boot, but we need to skip
+>>> over signature entries while reading the boot script in order to maintain our
+>>> ability to boot guest operating systems that have a secure bootloader.
+>>>
+>>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+>>> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+>>> ---
+>>>   pc-bios/s390-ccw/bootmap.c | 19 +++++++++++++++++--
+>>>   pc-bios/s390-ccw/bootmap.h | 10 ++++++----
+>>>   2 files changed, 23 insertions(+), 6 deletions(-)
+>>
+>> Acked-by: Thomas Huth <thuth@redhat.com>
+>>
+>> Jason, Christian, do you have any other changes to the s390-ccw firmware
+>> currently pending that you plan to send out within the next week? If so,
+>> I'll wait a little bit longer with building a new binary for the
+>> repository ... if not, I'll pick this patch up next week.
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-> ---
->  MAINTAINERS | 7 +++++++
->  1 file changed, 7 insertions(+)
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 66ddbda9c95..633f6315536 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1391,6 +1391,13 @@ F: include/hw/net/
->  F: tests/virtio-net-test.c
->  T: git https://github.com/jasowang/qemu.git net
->  
-> +Parallel NOR Flash devices
-> +M: Philippe Mathieu-Daudé <philmd@redhat.com>
-> +T: git https://gitlab.com/philmd/qemu.git pflash-next
-> +S: Maintained
-> +F: hw/block/pflash_cfi*.c
-> +F: include/hw/block/flash.h
-> +
->  SCSI
->  M: Paolo Bonzini <pbonzini@redhat.com>
->  R: Fam Zheng <fam@euphon.net>
-> -- 
-> 2.20.1
+> I have nothing at the moment.
+> 
+
+I also have nothing right now.
+
+
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
+
 
