@@ -2,57 +2,85 @@ Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7912FC04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 07:17:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEB23C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 07:35:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BFA120830
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 07:17:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BFA120830
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id B11C52082F
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 07:35:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B11C52082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51659 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51834 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNXsL-000709-U4
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 03:17:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36816)
+	id 1hNYAE-0002ES-Le
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 03:35:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1hNXrT-0006i4-O7
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 03:16:33 -0400
+	(envelope-from <philmd@redhat.com>) id 1hNY96-0001FZ-8N
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 03:34:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1hNXrS-0006KX-4O
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 03:16:31 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:51164)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1hNXrR-0006Dx-Oi
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 03:16:30 -0400
-Received: from PASHAISP (unknown [85.142.117.226])
-	by mail.ispras.ru (Postfix) with ESMTPSA id 01751540BA7;
-	Mon,  6 May 2019 10:16:25 +0300 (MSK)
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-To: "'Pavel Dovgalyuk'" <pavel.dovgaluk@gmail.com>,
-	<qemu-devel@nongnu.org>
-References: <155593197705.21079.8238359471765771689.stgit@pasha-Precision-3630-Tower>
-In-Reply-To: <155593197705.21079.8238359471765771689.stgit@pasha-Precision-3630-Tower>
-Date: Mon, 6 May 2019 10:16:26 +0300
-Message-ID: <004401d503db$9e66b530$db341f90$@ru>
+	(envelope-from <philmd@redhat.com>) id 1hNY92-0007HH-FB
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 03:34:44 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:34599)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hNY90-0007G8-LS
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 03:34:39 -0400
+Received: by mail-wm1-f66.google.com with SMTP id m20so4790629wmg.1
+	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 00:34:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=wbGHMmQqTA1t/CsP9AVzh43f5ajvujLgQ1emU/HQIHs=;
+	b=qFkBbYmWidwKkVBEQYnmATfK4HGeRyKyAA6SpPdz1b38snnLUWLKpGw08TKUiuW95J
+	20x4xAevl/bGEBt3cOWJ7J9o9KD8ZCAt4hYxQl57VuHAci0XVYv63jHlLF4vG4ECnZ7P
+	v4oWueJi00CddlGpaGKz2XlRJc4b0nsQUIB6YdCF9vtpNpP+2KFuQJgViPQHVPoAN4Zy
+	hDCqCY7R3JAAMTx9RV1cOpcW/RqX3YBbmwcvOmYad38m9UFldYPcKcfOTxM1TN/M2mJi
+	YrV+kgkBbaHCJxmfJ10Ylkj9JUsMSukLjhUQWRNr3NpShRGOOV+Hhlsym4pUr91Offpb
+	MHpA==
+X-Gm-Message-State: APjAAAVU7p5mualuidBiA+l/nL+fiG8XEua4w0pff7AABTiGIrKgAbIP
+	HKrrn9eop/nMOK1yk9g7JkYCxw==
+X-Google-Smtp-Source: APXvYqwnzFoECiu+ACplnZxXcNzWB3UUFI76cElIt+/bmd5viMLyG4uw/Zs9tUWbUXZJCBjk9LEZqA==
+X-Received: by 2002:a7b:cc12:: with SMTP id f18mr15858358wmh.40.1557128077495; 
+	Mon, 06 May 2019 00:34:37 -0700 (PDT)
+Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	b12sm16882780wrf.21.2019.05.06.00.34.36
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Mon, 06 May 2019 00:34:36 -0700 (PDT)
+To: Stephen Checkoway <stephen.checkoway@oberlin.edu>,
+	QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>,
+	Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+	"open list:Block layer core" <qemu-block@nongnu.org>,
+	Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+	Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20190426162624.55977-1-stephen.checkoway@oberlin.edu>
+	<20190426162624.55977-3-stephen.checkoway@oberlin.edu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <7ae88ff9-aed2-15e1-8716-5ca674b16059@redhat.com>
+Date: Mon, 6 May 2019 09:34:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
+In-Reply-To: <20190426162624.55977-3-stephen.checkoway@oberlin.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Office Outlook 12.0
-thread-index: AdT4/UbelO/E45onRQ+0eHmkZ1rmkgK3khGw
-Content-Language: ru
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 83.149.199.45
-Subject: Re: [Qemu-devel] [PATCH for-4.1 00/24] Fix record/replay and add
- reverse debugging
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH v4 02/10] block/pflash_cfi02: Refactor,
+ NFC intended
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -64,230 +92,387 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com,
-	pavel.dovgaluk@ispras.ru, crosthwaite.peter@gmail.com,
-	ciro.santilli@gmail.com, jasowang@redhat.com,
-	quintela@redhat.com, armbru@redhat.com, mreitz@redhat.com,
-	alex.bennee@linaro.org, maria.klimushenkova@ispras.ru,
-	mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com,
-	thomas.dullien@googlemail.com, pbonzini@redhat.com,
-	artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping.
-Can anyone PULL these patches?
+On 4/26/19 6:26 PM, Stephen Checkoway wrote:
+> Simplify and refactor for upcoming commits. In particular, pull out all
+> of the code to modify the status into simple helper functions. Status
+> handling becomes more complex once multiple chips are interleaved to
+> produce a single device.
+> 
+> No change in functionality is intended with this commit.
 
-Pavel Dovgalyuk
+As this patch is hard to digest, I splitted it in various atomic changes
+in another series:
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg00975.html
 
-> -----Original Message-----
-> From: Pavel Dovgalyuk [mailto:pavel.dovgaluk@gmail.com]
-> Sent: Monday, April 22, 2019 2:20 PM
-> To: qemu-devel@nongnu.org
-> Cc: kwolf@redhat.com; peter.maydell@linaro.org; war2jordan@live.com;
-> crosthwaite.peter@gmail.com; boost.lists@gmail.com; artem.k.pisarenko@gmail.com;
-> quintela@redhat.com; ciro.santilli@gmail.com; jasowang@redhat.com; mst@redhat.com;
-> armbru@redhat.com; mreitz@redhat.com; maria.klimushenkova@ispras.ru; dovgaluk@ispras.ru;
-> kraxel@redhat.com; pavel.dovgaluk@ispras.ru; thomas.dullien@googlemail.com;
-> pbonzini@redhat.com; alex.bennee@linaro.org; dgilbert@redhat.com; rth@twiddle.net
-> Subject: [PATCH for-4.1 00/24] Fix record/replay and add reverse debugging
 > 
-> GDB remote protocol supports reverse debugging of the targets.
-> It includes 'reverse step' and 'reverse continue' operations.
-> The first one finds the previous step of the execution,
-> and the second one is intended to stop at the last breakpoint that
-> would happen when the program is executed normally.
-> 
-> Reverse debugging is possible in the replay mode, when at least
-> one snapshot was created at the record or replay phase.
-> QEMU can use these snapshots for travelling back in time with GDB.
-> 
-> Running the execution in replay mode allows using GDB reverse debugging
-> commands:
->  - reverse-stepi (or rsi): Steps one instruction to the past.
->    QEMU loads on of the prior snapshots and proceeds to the desired
->    instruction forward. When that step is reaches, execution stops.
->  - reverse-continue (or rc): Runs execution "backwards".
->    QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
->    and replaying the execution. Then QEMU loads snapshots again and
->    replays to the latest breakpoint. When there are no breakpoints in
->    the examined section of the execution, QEMU finds one more snapshot
->    and tries again. After the first snapshot is processed, execution
->    stops at this snapshot.
-> 
-> The set of patches include the following modifications:
->  - gdbstub update for reverse debugging support
->  - functions that automatically perform reverse step and reverse
->    continue operations
->  - hmp/qmp commands for manipulating the replay process
->  - improvement of the snapshotting for saving the execution step
->    in the snapshot parameters
->  - other record/replay fixes
-> 
-> The patches are available in the repository:
-> https://github.com/ispras/qemu/tree/rr-190419
-> 
-> v16 changes:
->  - rebased to 4.0
-> 
-> v15 changes:
->  - rebased to the new master
->  - removed obsolete rtc patch
->  - fixed misprint in the test
-> 
-> v14 changes:
->  - rebased to the new master
-> 
-> v13 changes:
->  - rebased to make QAPI stuff applicable
->  - minor reverse step/reverse continue fix
-> 
-> v12 changes:
->  - style fixes
-> 
-> v11 changes:
->  - added can_do_io resetting before jumping to the next block in the chain
->  - rebase to the latest master
-> 
-> v10 changes:
->  - added patch for correct deadline calculation with external timers
->  - updated icount-related documentation in json files
->    (suggested by Markus Armbruster)
->  - fixed replay shutdown
->  - renamed some functions and variables to make them consistent with
->    the documentation and displayed messages
->  - minor changes
-> 
-> v9 changes:
->  - moved rr qapi stuff to the separate file (suggested by Markus Armbruster)
->  - minor coding style fixes
-> 
-> v8 changes:
->  - rebased to the new master
->  - added missing fix for prior rr patch
->  - updated 'since' version number in json-related patches
-> 
-> v7 changes:
->  - rebased to the new master with upstreamed patches from the series
->  - several improvements in hmp/qmp commands handling (suggested by Markus Armbruster)
->  - fixed record/replay with '-rtc base' option enabled
->  - added document with virtual hardware requirements
-> 
-> v6 changes:
->  - rebased to the new version of master
->  - fixed build of linux-user configurations
->  - added new clock for slirp and vnc timers
-> 
-> v5 changes:
->  - multiple fixes of record/replay bugs appeared after QEMU core update
->  - changed reverse debugging to 'since 3.1'
-> 
-> v4 changes:
->  - changed 'since 2.13' to 'since 3.0' in json (as suggested by Eric Blake)
-> 
-> v3 changes:
->  - Fixed PS/2 bug with save/load vm, which caused failures of the replay.
->  - Rebased to the new code base.
->  - Minor fixes.
-> 
-> v2 changes:
->  - documented reverse debugging
->  - fixed start vmstate loading in record mode
->  - documented qcow2 changes (as suggested by Eric Blake)
->  - made icount SnapshotInfo field optional (as suggested by Eric Blake)
->  - renamed qmp commands (as suggested by Eric Blake)
->  - minor changes
-> 
+> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
 > ---
+>  hw/block/pflash_cfi02.c | 221 +++++++++++++++++-----------------------
+>  1 file changed, 95 insertions(+), 126 deletions(-)
 > 
-> Pavel Dovgalyuk (23):
->       block: implement bdrv_snapshot_goto for blkreplay
->       replay: disable default snapshot for record/replay
->       replay: update docs for record/replay with block devices
->       replay: don't drain/flush bdrv queue while RR is working
->       replay: finish record/replay before closing the disks
->       qcow2: introduce icount field for snapshots
->       migration: introduce icount field for snapshots
->       replay: provide an accessor for rr filename
->       qapi: introduce replay.json for record/replay-related stuff
->       replay: introduce info hmp/qmp command
->       replay: introduce breakpoint at the specified step
->       replay: implement replay-seek command
->       replay: refine replay-time module
->       replay: flush rr queue before loading the vmstate
->       gdbstub: add reverse step support in replay mode
->       gdbstub: add reverse continue support in replay mode
->       replay: describe reverse debugging in docs/replay.txt
->       replay: add BH oneshot event for block layer
->       replay: document development rules
->       util/qemu-timer: refactor deadline calculation for external timers
->       replay: fix replay shutdown
->       replay: rename step-related variables and functions
->       icount: clean up cpu_can_io before jumping to the next block
+> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+> index f2c6201f81..4b7af71806 100644
+> --- a/hw/block/pflash_cfi02.c
+> +++ b/hw/block/pflash_cfi02.c
+> @@ -46,18 +46,19 @@
+>  #include "hw/sysbus.h"
+>  #include "trace.h"
+>  
+> -//#define PFLASH_DEBUG
+> -#ifdef PFLASH_DEBUG
+> +#define PFLASH_DEBUG false
+>  #define DPRINTF(fmt, ...)                                  \
+>  do {                                                       \
+> -    fprintf(stderr, "PFLASH: " fmt , ## __VA_ARGS__);       \
+> +    if (PFLASH_DEBUG) {                                    \
+> +        fprintf(stderr, "PFLASH: " fmt, ## __VA_ARGS__);   \
+> +    }                                                      \
+>  } while (0)
+> -#else
+> -#define DPRINTF(fmt, ...) do { } while (0)
+> -#endif
+>  
+>  #define PFLASH_LAZY_ROMD_THRESHOLD 42
+>  
+> +/* Special write cycle for CFI queries. */
+> +#define WCYCLE_CFI 7
+> +
+>  struct PFlashCFI02 {
+>      /*< private >*/
+>      SysBusDevice parent_obj;
+> @@ -97,6 +98,31 @@ struct PFlashCFI02 {
+>      void *storage;
+>  };
+>  
+> +/*
+> + * Toggle status bit DQ7.
+> + */
+> +static inline void toggle_dq7(PFlashCFI02 *pfl)
+> +{
+> +    pfl->status ^= 0x80;
+> +}
+> +
+> +/*
+> + * Set status bit DQ7 to bit 7 of value.
+> + */
+> +static inline void set_dq7(PFlashCFI02 *pfl, uint8_t value)
+> +{
+> +    pfl->status &= 0x7F;
+> +    pfl->status |= value & 0x80;
+> +}
+> +
+> +/*
+> + * Toggle status bit DQ6.
+> + */
+> +static inline void toggle_dq6(PFlashCFI02 *pfl)
+> +{
+> +    pfl->status ^= 0x40;
+> +}
+> +
+>  /*
+>   * Set up replicated mappings of the same region.
+>   */
+> @@ -126,7 +152,7 @@ static void pflash_timer (void *opaque)
+>  
+>      trace_pflash_timer_expired(pfl->cmd);
+>      /* Reset flash */
+> -    pfl->status ^= 0x80;
+> +    toggle_dq7(pfl);
+>      if (pfl->bypass) {
+>          pfl->wcycle = 2;
+>      } else {
+> @@ -136,12 +162,34 @@ static void pflash_timer (void *opaque)
+>      pfl->cmd = 0;
+>  }
+>  
+> -static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
+> -                            int width, int be)
+> +/*
+> + * Read data from flash.
+> + */
+> +static uint64_t pflash_data_read(PFlashCFI02 *pfl, hwaddr offset,
+> +                                 unsigned int width)
+>  {
+> +    uint8_t *p = (uint8_t *)pfl->storage + offset;
+> +    uint64_t ret = pfl->be ? ldn_be_p(p, width) : ldn_le_p(p, width);
+> +    /* XXX: Need a trace_pflash_data_read(offset, ret, width) */
+> +    switch (width) {
+> +    case 1:
+> +        trace_pflash_data_read8(offset, ret);
+> +        break;
+> +    case 2:
+> +        trace_pflash_data_read16(offset, ret);
+> +        break;
+> +    case 4:
+> +        trace_pflash_data_read32(offset, ret);
+> +        break;
+> +    }
+> +    return ret;
+> +}
+> +
+> +static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int width)
+> +{
+> +    PFlashCFI02 *pfl = opaque;
+>      hwaddr boff;
+> -    uint32_t ret;
+> -    uint8_t *p;
+> +    uint64_t ret;
+>  
+>      ret = -1;
+>      trace_pflash_read(offset, pfl->cmd, width, pfl->wcycle);
+> @@ -166,39 +214,8 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
+>      case 0x80:
+>          /* We accept reads during second unlock sequence... */
+>      case 0x00:
+> -    flash_read:
+>          /* Flash area read */
+> -        p = pfl->storage;
+> -        switch (width) {
+> -        case 1:
+> -            ret = p[offset];
+> -            trace_pflash_data_read8(offset, ret);
+> -            break;
+> -        case 2:
+> -            if (be) {
+> -                ret = p[offset] << 8;
+> -                ret |= p[offset + 1];
+> -            } else {
+> -                ret = p[offset];
+> -                ret |= p[offset + 1] << 8;
+> -            }
+> -            trace_pflash_data_read16(offset, ret);
+> -            break;
+> -        case 4:
+> -            if (be) {
+> -                ret = p[offset] << 24;
+> -                ret |= p[offset + 1] << 16;
+> -                ret |= p[offset + 2] << 8;
+> -                ret |= p[offset + 3];
+> -            } else {
+> -                ret = p[offset];
+> -                ret |= p[offset + 1] << 8;
+> -                ret |= p[offset + 2] << 16;
+> -                ret |= p[offset + 3] << 24;
+> -            }
+> -            trace_pflash_data_read32(offset, ret);
+> -            break;
+> -        }
+> +        ret = pflash_data_read(pfl, offset, width);
+>          break;
+>      case 0x90:
+>          /* flash ID read */
+> @@ -213,23 +230,23 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
+>          case 0x0E:
+>          case 0x0F:
+>              ret = boff & 0x01 ? pfl->ident3 : pfl->ident2;
+> -            if (ret == (uint8_t)-1) {
+> -                goto flash_read;
+> +            if (ret != (uint8_t)-1) {
+> +                break;
+>              }
+> -            break;
+> +            /* Fall through to data read. */
+>          default:
+> -            goto flash_read;
+> +            ret = pflash_data_read(pfl, offset, width);
+>          }
+> -        DPRINTF("%s: ID " TARGET_FMT_plx " %x\n", __func__, boff, ret);
+> +        DPRINTF("%s: ID " TARGET_FMT_plx " %" PRIx64 "\n", __func__, boff, ret);
+>          break;
+>      case 0xA0:
+>      case 0x10:
+>      case 0x30:
+>          /* Status register read */
+>          ret = pfl->status;
+> -        DPRINTF("%s: status %x\n", __func__, ret);
+> +        DPRINTF("%s: status %" PRIx64 "\n", __func__, ret);
+>          /* Toggle bit 6 */
+> -        pfl->status ^= 0x40;
+> +        toggle_dq6(pfl);
+>          break;
+>      case 0x98:
+>          /* CFI query mode */
+> @@ -245,8 +262,7 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
+>  }
+>  
+>  /* update flash content on disk */
+> -static void pflash_update(PFlashCFI02 *pfl, int offset,
+> -                          int size)
+> +static void pflash_update(PFlashCFI02 *pfl, int offset, int size)
+>  {
+>      int offset_end;
+>      if (pfl->blk) {
+> @@ -259,9 +275,10 @@ static void pflash_update(PFlashCFI02 *pfl, int offset,
+>      }
+>  }
+>  
+> -static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
+> -                         uint32_t value, int width, int be)
+> +static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
+> +                         unsigned int width)
+>  {
+> +    PFlashCFI02 *pfl = opaque;
+>      hwaddr boff;
+>      uint8_t *p;
+>      uint8_t cmd;
+> @@ -277,7 +294,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
+>      trace_pflash_write(offset, value, width, pfl->wcycle);
+>      offset &= pfl->chip_len - 1;
+>  
+> -    DPRINTF("%s: offset " TARGET_FMT_plx " %08x %d\n", __func__,
+> +    DPRINTF("%s: offset " TARGET_FMT_plx " %08" PRIx64 " %d\n", __func__,
+>              offset, value, width);
+>      boff = offset & (pfl->sector_len - 1);
+>      if (pfl->width == 2)
+> @@ -295,7 +312,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
+>          if (boff == 0x55 && cmd == 0x98) {
+>          enter_CFI_mode:
+>              /* Enter CFI query mode */
+> -            pfl->wcycle = 7;
+> +            pfl->wcycle = WCYCLE_CFI;
+>              pfl->cmd = 0x98;
+>              return;
+>          }
+> @@ -345,40 +362,22 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
+>              goto check_unlock0;
+>          case 0xA0:
+>              trace_pflash_data_write(offset, value, width, 0);
+> -            p = pfl->storage;
+>              if (!pfl->ro) {
+> -                switch (width) {
+> -                case 1:
+> -                    p[offset] &= value;
+> -                    pflash_update(pfl, offset, 1);
+> -                    break;
+> -                case 2:
+> -                    if (be) {
+> -                        p[offset] &= value >> 8;
+> -                        p[offset + 1] &= value;
+> -                    } else {
+> -                        p[offset] &= value;
+> -                        p[offset + 1] &= value >> 8;
+> -                    }
+> -                    pflash_update(pfl, offset, 2);
+> -                    break;
+> -                case 4:
+> -                    if (be) {
+> -                        p[offset] &= value >> 24;
+> -                        p[offset + 1] &= value >> 16;
+> -                        p[offset + 2] &= value >> 8;
+> -                        p[offset + 3] &= value;
+> -                    } else {
+> -                        p[offset] &= value;
+> -                        p[offset + 1] &= value >> 8;
+> -                        p[offset + 2] &= value >> 16;
+> -                        p[offset + 3] &= value >> 24;
+> -                    }
+> -                    pflash_update(pfl, offset, 4);
+> -                    break;
+> +                p = (uint8_t *)pfl->storage + offset;
+> +                if (pfl->be) {
+> +                    uint64_t current = ldn_be_p(p, width);
+> +                    stn_be_p(p, width, current & value);
+> +                } else {
+> +                    uint64_t current = ldn_le_p(p, width);
+> +                    stn_le_p(p, width, current & value);
+>                  }
+> +                pflash_update(pfl, offset, width);
+>              }
+> -            pfl->status = 0x00 | ~(value & 0x80);
+> +            /*
+> +             * While programming, status bit DQ7 should hold the opposite
+> +             * value from how it was programmed.
+> +             */
+> +            set_dq7(pfl, ~value);
+>              /* Let's pretend write is immediate */
+>              if (pfl->bypass)
+>                  goto do_bypass;
+> @@ -426,7 +425,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
+>                  memset(pfl->storage, 0xFF, pfl->chip_len);
+>                  pflash_update(pfl, 0, pfl->chip_len);
+>              }
+> -            pfl->status = 0x00;
+> +            set_dq7(pfl, 0x00);
+>              /* Let's wait 5 seconds before chip erase is done */
+>              timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+>                        (NANOSECONDS_PER_SECOND * 5));
+> @@ -441,7 +440,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
+>                  memset(p + offset, 0xFF, pfl->sector_len);
+>                  pflash_update(pfl, offset, pfl->sector_len);
+>              }
+> -            pfl->status = 0x00;
+> +            set_dq7(pfl, 0x00);
+>              /* Let's wait 1/2 second before sector erase is done */
+>              timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+>                        (NANOSECONDS_PER_SECOND / 2));
+> @@ -467,7 +466,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
+>              goto reset_flash;
+>          }
+>          break;
+> -    case 7: /* Special value for CFI queries */
+> +    case WCYCLE_CFI: /* Special value for CFI queries */
+>          DPRINTF("%s: invalid write in CFI query mode\n", __func__);
+>          goto reset_flash;
+>      default:
+> @@ -492,39 +491,9 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
+>      pfl->cmd = 0;
+>  }
+>  
+> -static uint64_t pflash_be_readfn(void *opaque, hwaddr addr, unsigned size)
+> -{
+> -    return pflash_read(opaque, addr, size, 1);
+> -}
+> -
+> -static void pflash_be_writefn(void *opaque, hwaddr addr,
+> -                              uint64_t value, unsigned size)
+> -{
+> -    pflash_write(opaque, addr, value, size, 1);
+> -}
+> -
+> -static uint64_t pflash_le_readfn(void *opaque, hwaddr addr, unsigned size)
+> -{
+> -    return pflash_read(opaque, addr, size, 0);
+> -}
+> -
+> -static void pflash_le_writefn(void *opaque, hwaddr addr,
+> -                              uint64_t value, unsigned size)
+> -{
+> -    pflash_write(opaque, addr, value, size, 0);
+> -}
+> -
+> -static const MemoryRegionOps pflash_cfi02_ops_be = {
+> -    .read = pflash_be_readfn,
+> -    .write = pflash_be_writefn,
+> -    .valid.min_access_size = 1,
+> -    .valid.max_access_size = 4,
+> -    .endianness = DEVICE_NATIVE_ENDIAN,
+> -};
+> -
+> -static const MemoryRegionOps pflash_cfi02_ops_le = {
+> -    .read = pflash_le_readfn,
+> -    .write = pflash_le_writefn,
+> +static const MemoryRegionOps pflash_cfi02_ops = {
+> +    .read = pflash_read,
+> +    .write = pflash_write,
+>      .valid.min_access_size = 1,
+>      .valid.max_access_size = 4,
+>      .endianness = DEVICE_NATIVE_ENDIAN,
+> @@ -552,9 +521,9 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
+>  
+>      chip_len = pfl->sector_len * pfl->nb_blocs;
+>  
+> -    memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl), pfl->be ?
+> -                                  &pflash_cfi02_ops_be : &pflash_cfi02_ops_le,
+> -                                  pfl, pfl->name, chip_len, &local_err);
+> +    memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl),
+> +                                  &pflash_cfi02_ops, pfl, pfl->name,
+> +                                  chip_len, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+>          return;
 > 
-> pbonzini@redhat.com (1):
->       replay: add missing fix for internal function
-> 
-> 
->  MAINTAINERS               |    1
->  accel/tcg/tcg-runtime.c   |    2
->  accel/tcg/translator.c    |    1
->  block/blkreplay.c         |    8 +
->  block/block-backend.c     |    8 +
->  block/io.c                |   32 ++++
->  block/iscsi.c             |    5 -
->  block/nfs.c               |    5 -
->  block/null.c              |    4 -
->  block/nvme.c              |    6 +
->  block/qapi.c              |   18 ++
->  block/qcow2-snapshot.c    |    9 +
->  block/qcow2.h             |    2
->  block/rbd.c               |    5 -
->  block/vxhs.c              |    5 -
->  blockdev.c                |   10 +
->  cpus.c                    |   30 +++-
->  docs/devel/replay.txt     |   46 ++++++
->  docs/interop/qcow2.txt    |    4 +
->  docs/replay.txt           |   45 ++++++
->  exec.c                    |    8 +
->  gdbstub.c                 |   52 +++++++
->  hmp-commands-info.hx      |   14 ++
->  hmp-commands.hx           |   53 +++++++
->  hmp.h                     |    4 +
->  include/block/snapshot.h  |    1
->  include/qemu/timer.h      |    7 -
->  include/sysemu/replay.h   |   30 ++++
->  migration/savevm.c        |   11 ++
->  qapi/Makefile.objs        |    2
->  qapi/block-core.json      |    8 +
->  qapi/block.json           |    3
->  qapi/misc.json            |   18 --
->  qapi/qapi-schema.json     |    1
->  qapi/replay.json          |  121 +++++++++++++++++
->  qtest.c                   |    2
->  replay/Makefile.objs      |    3
->  replay/replay-debugging.c |  327 +++++++++++++++++++++++++++++++++++++++++++++
->  replay/replay-events.c    |   18 ++
->  replay/replay-internal.c  |   10 +
->  replay/replay-internal.h  |   17 +-
->  replay/replay-snapshot.c  |    6 -
->  replay/replay-time.c      |   36 ++---
->  replay/replay.c           |   56 ++++++--
->  stubs/Makefile.objs       |    1
->  stubs/replay-user.c       |    9 +
->  stubs/replay.c            |   10 +
->  tests/ptimer-test-stubs.c |    4 -
->  tests/ptimer-test.c       |    4 -
->  util/qemu-timer.c         |   41 +++++-
->  vl.c                      |   11 +-
->  51 files changed, 1003 insertions(+), 131 deletions(-)
->  create mode 100644 docs/devel/replay.txt
->  create mode 100644 qapi/replay.json
->  create mode 100644 replay/replay-debugging.c
->  create mode 100644 stubs/replay-user.c
-> 
-> --
-> Pavel Dovgalyuk
-
 
