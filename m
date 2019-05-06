@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E98C04AAA
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 08:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09B4FC04AAA
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 08:36:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE1032082F
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 08:36:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE1032082F
+	by mail.kernel.org (Postfix) with ESMTPS id C36FC2082F
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 08:36:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C36FC2082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52454 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52456 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNZ7E-0004SK-1L
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 04:36:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52673)
+	id 1hNZ7H-0004Wg-Ve
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 04:36:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hNZ5P-0002qL-Ca
+	(envelope-from <like.xu@linux.intel.com>) id 1hNZ5P-0002qO-DW
 	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:35:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hNZ5N-0007Jx-GD
+	(envelope-from <like.xu@linux.intel.com>) id 1hNZ5L-0007J0-Um
 	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:34:59 -0400
-Received: from mga14.intel.com ([192.55.52.115]:60066)
+Received: from mga14.intel.com ([192.55.52.115]:60065)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <like.xu@linux.intel.com>)
-	id 1hNZ5N-0007EJ-5v
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:34:57 -0400
+	id 1hNZ5L-0007DN-95
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:34:55 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
 	by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	06 May 2019 01:34:56 -0700
+	06 May 2019 01:34:49 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,437,1549958400"; d="scan'208";a="155407103"
+X-IronPort-AV: E=Sophos;i="5.60,437,1549958400"; d="scan'208";a="155407092"
 Received: from xulike-server.sh.intel.com ([10.239.48.134])
-	by FMSMGA003.fm.intel.com with ESMTP; 06 May 2019 01:34:54 -0700
+	by FMSMGA003.fm.intel.com with ESMTP; 06 May 2019 01:34:47 -0700
 From: Like Xu <like.xu@linux.intel.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  6 May 2019 16:33:13 +0800
-Message-Id: <1557131596-25403-8-git-send-email-like.xu@linux.intel.com>
+Date: Mon,  6 May 2019 16:33:10 +0800
+Message-Id: <1557131596-25403-5-git-send-email-like.xu@linux.intel.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1557131596-25403-1-git-send-email-like.xu@linux.intel.com>
 References: <1557131596-25403-1-git-send-email-like.xu@linux.intel.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 192.55.52.115
-Subject: [Qemu-devel] [PATCH v2 07/10] cpu/topology: add hw/s390x support
- for smp machine properties
+Subject: [Qemu-devel] [PATCH v2 04/10] cpu/topology: add uncommon arch
+ support for smp machine properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,95 +79,145 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Following the replace rules, the global smp variables in s390x
-are replaced with smp machine properties. No semantic changes.
+Following the replace rules, the global smp variables in hppa/mips/openrisc
+/sparc*/xtensa are replaced with smp machine properties. No semantic changes.
 
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
- hw/s390x/s390-virtio-ccw.c | 3 ++-
- hw/s390x/sclp.c            | 2 +-
- target/s390x/cpu.c         | 3 +++
- target/s390x/excp_helper.c | 5 +++++
- 4 files changed, 11 insertions(+), 2 deletions(-)
+ hw/alpha/dp264.c           | 1 +
+ hw/hppa/machine.c          | 2 ++
+ hw/mips/boston.c           | 2 +-
+ hw/mips/mips_malta.c       | 2 ++
+ hw/openrisc/openrisc_sim.c | 1 +
+ hw/sparc/sun4m.c           | 2 ++
+ hw/sparc64/sun4u.c         | 4 ++--
+ hw/xtensa/sim.c            | 2 +-
+ hw/xtensa/xtfpga.c         | 1 +
+ 9 files changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index ed1fe7a..692ad6e 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -83,7 +83,7 @@ static void s390_init_cpus(MachineState *machine)
-     /* initialize possible_cpus */
-     mc->possible_cpu_arch_ids(machine);
+diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+index 0347eb8..9dfb835 100644
+--- a/hw/alpha/dp264.c
++++ b/hw/alpha/dp264.c
+@@ -63,6 +63,7 @@ static void clipper_init(MachineState *machine)
+     char *palcode_filename;
+     uint64_t palcode_entry, palcode_low, palcode_high;
+     uint64_t kernel_entry, kernel_low, kernel_high;
++    unsigned int smp_cpus = machine->smp.cpus;
  
--    for (i = 0; i < smp_cpus; i++) {
-+    for (i = 0; i < machine->smp.cpus; i++) {
-         s390x_new_cpu(machine->cpu_type, i, &error_fatal);
-     }
- }
-@@ -410,6 +410,7 @@ static CpuInstanceProperties s390_cpu_index_to_props(MachineState *ms,
- static const CPUArchIdList *s390_possible_cpu_arch_ids(MachineState *ms)
+     /* Create up to 4 cpus.  */
+     memset(cpus, 0, sizeof(cpus));
+diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+index 416e67b..662838d 100644
+--- a/hw/hppa/machine.c
++++ b/hw/hppa/machine.c
+@@ -72,6 +72,7 @@ static void machine_hppa_init(MachineState *machine)
+     MemoryRegion *ram_region;
+     MemoryRegion *cpu_region;
+     long i;
++    unsigned int smp_cpus = machine->smp.cpus;
+ 
+     ram_size = machine->ram_size;
+ 
+@@ -242,6 +243,7 @@ static void machine_hppa_init(MachineState *machine)
+ 
+ static void hppa_machine_reset(MachineState *ms)
  {
++    unsigned int smp_cpus = ms->smp.cpus;
      int i;
-+    unsigned int max_cpus = ms->smp.max_cpus;
  
-     if (ms->possible_cpus) {
-         g_assert(ms->possible_cpus && ms->possible_cpus->len == max_cpus);
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index 4510a80..fac7c3b 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -64,7 +64,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
-     prepare_cpu_entries(sclp, read_info->entries, &cpu_count);
-     read_info->entries_cpu = cpu_to_be16(cpu_count);
-     read_info->offset_cpu = cpu_to_be16(offsetof(ReadInfo, entries));
--    read_info->highest_cpu = cpu_to_be16(max_cpus - 1);
-+    read_info->highest_cpu = cpu_to_be16(machine->smp.max_cpus - 1);
+     qemu_devices_reset();
+diff --git a/hw/mips/boston.c b/hw/mips/boston.c
+index a8b29f6..ccbfac5 100644
+--- a/hw/mips/boston.c
++++ b/hw/mips/boston.c
+@@ -460,7 +460,7 @@ static void boston_mach_init(MachineState *machine)
  
-     read_info->ibc_val = cpu_to_be32(s390_get_ibc_val());
+     object_property_set_str(OBJECT(s->cps), machine->cpu_type, "cpu-type",
+                             &err);
+-    object_property_set_int(OBJECT(s->cps), smp_cpus, "num-vp", &err);
++    object_property_set_int(OBJECT(s->cps), machine->smp.cpus, "num-vp", &err);
+     object_property_set_bool(OBJECT(s->cps), true, "realized", &err);
  
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index b58ef0a..0601c2e 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -37,6 +37,7 @@
- #include "hw/qdev-properties.h"
- #ifndef CONFIG_USER_ONLY
- #include "hw/hw.h"
-+#include "hw/boards.h"
- #include "sysemu/arch_init.h"
- #include "sysemu/sysemu.h"
- #endif
-@@ -193,6 +194,8 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
-     }
+     if (err != NULL) {
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 534e705..70ff98b 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -1095,6 +1095,8 @@ static int64_t load_kernel (void)
  
- #if !defined(CONFIG_USER_ONLY)
+ static void malta_mips_config(MIPSCPU *cpu)
+ {
 +    MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int max_cpus = ms->smp.max_cpus;
-     if (cpu->env.core_id >= max_cpus) {
-         error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
-                    ", maximum core-id: %d", cpu->env.core_id,
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index f84bfb1..77833e9 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -31,6 +31,7 @@
- #ifndef CONFIG_USER_ONLY
- #include "sysemu/sysemu.h"
- #include "hw/s390x/s390_flic.h"
-+#include "hw/boards.h"
- #endif
++    unsigned int smp_cpus = ms->smp.cpus;
+     CPUMIPSState *env = &cpu->env;
+     CPUState *cs = CPU(cpu);
  
- void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
-@@ -279,6 +280,10 @@ static void do_ext_interrupt(CPUS390XState *env)
-         g_assert(cpu_addr < S390_MAX_CPUS);
-         lowcore->cpu_addr = cpu_to_be16(cpu_addr);
-         clear_bit(cpu_addr, env->emergency_signals);
-+#ifndef CONFIG_USER_ONLY
-+        MachineState *ms = MACHINE(qdev_get_machine());
-+        unsigned int max_cpus = ms->smp.max_cpus;
-+#endif
-         if (bitmap_empty(env->emergency_signals, max_cpus)) {
-             env->pending_int &= ~INTERRUPT_EMERGENCY_SIGNAL;
-         }
+diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
+index 7d3b734..c84b9af 100644
+--- a/hw/openrisc/openrisc_sim.c
++++ b/hw/openrisc/openrisc_sim.c
+@@ -131,6 +131,7 @@ static void openrisc_sim_init(MachineState *machine)
+     qemu_irq *cpu_irqs[2];
+     qemu_irq serial_irq;
+     int n;
++    unsigned int smp_cpus = machine->smp.cpus;
+ 
+     for (n = 0; n < smp_cpus; n++) {
+         cpu = OPENRISC_CPU(cpu_create(machine->cpu_type));
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index ca1e382..43e3434 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -853,6 +853,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+     unsigned int num_vsimms;
+     DeviceState *dev;
+     SysBusDevice *s;
++    unsigned int smp_cpus = machine->smp.cpus;
++    unsigned int max_cpus = machine->smp.max_cpus;
+ 
+     /* init CPUs */
+     for(i = 0; i < smp_cpus; i++) {
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 399f2d7..0807f27 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -678,8 +678,8 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+                                 &FW_CFG_IO(dev)->comb_iomem);
+ 
+     fw_cfg = FW_CFG(dev);
+-    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
+-    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)max_cpus);
++    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)machine->smp.cpus);
++    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)machine->smp.max_cpus);
+     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
+     fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, hwdef->machine_id);
+     fw_cfg_add_i64(fw_cfg, FW_CFG_KERNEL_ADDR, kernel_entry);
+diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
+index 12c7437..a4eef76 100644
+--- a/hw/xtensa/sim.c
++++ b/hw/xtensa/sim.c
+@@ -60,7 +60,7 @@ static void xtensa_sim_init(MachineState *machine)
+     const char *kernel_filename = machine->kernel_filename;
+     int n;
+ 
+-    for (n = 0; n < smp_cpus; n++) {
++    for (n = 0; n < machine->smp.cpus; n++) {
+         cpu = XTENSA_CPU(cpu_create(machine->cpu_type));
+         env = &cpu->env;
+ 
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index e05ef75..f7f3e11 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -238,6 +238,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+     const unsigned system_io_size = 224 * MiB;
+     uint32_t freq = 10000000;
+     int n;
++    unsigned int smp_cpus = machine->smp.cpus;
+ 
+     if (smp_cpus > 1) {
+         mx_pic = xtensa_mx_pic_init(31);
 -- 
 1.8.3.1
 
