@@ -2,68 +2,97 @@ Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E25CBC04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 18:00:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 369ACC04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 18:00:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1C6720675
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 18:00:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="M0FbiC9o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1C6720675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 02A9F20675
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 18:00:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02A9F20675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60276 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60278 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNhuD-000628-Ry
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 14:00:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47907)
+	id 1hNhuT-0006DJ-9L
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 14:00:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <qemu_oss@crudebyte.com>) id 1hNht1-0005Pf-9q
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:58:48 -0400
+	(envelope-from <eblake@redhat.com>) id 1hNhaZ-0006P2-GQ
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:39:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <qemu_oss@crudebyte.com>) id 1hNhsz-0001wJ-V8
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:58:47 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:33521)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
-	id 1hNhsz-0001p0-Ec
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:58:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=aYNSfLI1EB2FwxwOFQBv+9wHMzs8UdhjczvSCyUcYS0=;
-	b=M0FbiC9oteJvA4hPm4dXm+hfPU
-	SUPOUNzMLQNQjPexs5z/BiCvvWCDvT1suG30CU2gXRnM/9na/7q6tE+wv1dPTbph4tMwZCUd1DfZJ
-	AhJ2upSod9PyrTYL9SeU5xWRa8gMDnCBUXSDmAjf+X8P4VBR5Q8MhyYTCDg69Tg5PyUph3+dupKE+
-	wv2AXRRczIMMpMxj6RhtIIdkP0A4qiqA3+mQtJH1a3cIKbPZnlYUnxJmSugZqILSV6JLFKz0WJjzI
-	ASmgfYtqyBKDr9brjWPZ/FLxzTWZTdmcJSnTIfYUUTNiDbXv18sj/4jva9iVlYadxWYknLiYpLczX
-	lRaFK+22MFTgJlLuffjhMa5zDRqRGubwyntqbbzJ9MxuJpRI9Hhq2X6Vh9VWxxiKkuWMbTD76F24p
-	dLTwXgTXdTEDSS5t8In4XfzfKIPOW7LM7Y448QG6+OcuyD7pB4/6tQLJWLIQuedME0BvXVSEwKfGR
-	Ppo0+LKAIiG/BeDGtyv9o/co2h/XLTenui040shm2pTI7O0wYkD6Hy5MKpbTtLLbuMq4BTggQX+9l
-	p1Zvho0FuZEOXtUoWtAFugW5iE5zDqqtepaxnpwVmTc6ltvL1b+lWmVcyeseopc0OnZBv5nCGaRbH
-	avIGoeeQhH1ycCIDzaKSeSSBQ6pB+vpCdvXllQhCk=;
-To: qemu-devel@nongnu.org
-Date: Mon, 06 May 2019 19:58:28 +0200
-Message-ID: <1895198.u98Sn5qOsY@silver>
-In-Reply-To: <590216e2666653bac21d950aaba98f87d0a53324.1557093245.git.qemu_oss@crudebyte.com>
-References: <590216e2666653bac21d950aaba98f87d0a53324.1557093245.git.qemu_oss@crudebyte.com>
+	(envelope-from <eblake@redhat.com>) id 1hNhaY-0004Vh-E0
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:39:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39340)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hNhaS-0004P2-J1; Mon, 06 May 2019 13:39:36 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E9452330260;
+	Mon,  6 May 2019 17:39:33 +0000 (UTC)
+Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 42667100200D;
+	Mon,  6 May 2019 17:39:31 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	Alberto Garcia <berto@igalia.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <cover.1556732434.git.berto@igalia.com>
+	<524e211cb818a20f521d6e271e782ab62b8e5e80.1556732434.git.berto@igalia.com>
+	<8bff27c1-a93c-d9f0-c95c-6d10d5700f91@virtuozzo.com>
+	<cd1d6df5-3540-910e-d39b-9074b94ffd38@redhat.com>
+	<4a09edd8-f89e-ec70-b56d-63e93396982b@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <0aebe48a-40e4-b473-9d0c-84d49f982596@redhat.com>
+Date: Mon, 6 May 2019 12:39:30 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <4a09edd8-f89e-ec70-b56d-63e93396982b@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NIUp88xI8UV7nDYIopYZcfu8Kx0DM1DuJ"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.29]);
+	Mon, 06 May 2019 17:39:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.189.157.229
-Subject: [Qemu-devel] [libvirt patch] qemu: adds support for virtfs 9p
- argument 'vii'
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] vvfat: Replace bdrv_{read,
+ write}() with bdrv_{pread, pwrite}()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,196 +104,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Cc: Greg Kurz <groug@kaod.org>, Antonios Motakis <antonios.motakis@huawei.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the counter part patch against latest libvirt git master head to
-support the 'vii' feature of patch 5, which introduces the XML config
-XML tag "important" on libvirt side.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NIUp88xI8UV7nDYIopYZcfu8Kx0DM1DuJ
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Alberto Garcia <berto@igalia.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <0aebe48a-40e4-b473-9d0c-84d49f982596@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] vvfat: Replace bdrv_{read, write}()
+ with bdrv_{pread, pwrite}()
+References: <cover.1556732434.git.berto@igalia.com>
+ <524e211cb818a20f521d6e271e782ab62b8e5e80.1556732434.git.berto@igalia.com>
+ <8bff27c1-a93c-d9f0-c95c-6d10d5700f91@virtuozzo.com>
+ <cd1d6df5-3540-910e-d39b-9074b94ffd38@redhat.com>
+ <4a09edd8-f89e-ec70-b56d-63e93396982b@virtuozzo.com>
+In-Reply-To: <4a09edd8-f89e-ec70-b56d-63e93396982b@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-To stick with the previous example mentioned with patch 5, likewise
-libvirt XML configuration might then look like this:
+On 5/6/19 12:19 PM, Vladimir Sementsov-Ogievskiy wrote:
 
-  <domain type='kvm'>
-    ...
-    <devices>
-      ...
-      <filesystem type='mount' accessmode='mapped'>
-        <source dir='/vm/fs'/>
-        <target dir='root'/>
-        <important path='/var/shares'/>
-        <important path='/tmp'/>
-      </filesystem>
-    </devices>
-  </domain>
+>>>> +++ b/block/vvfat.c
+>>>> @@ -1494,8 +1494,8 @@ static int vvfat_read(BlockDriverState *bs, in=
+t64_t sector_num,
+>>>>                    DLOG(fprintf(stderr, "sectors %" PRId64 "+%" PRId=
+64
+>>>>                                 " allocated\n", sector_num,
+>>>>                                 n >> BDRV_SECTOR_BITS));
+>>>> -                if (bdrv_read(s->qcow, sector_num, buf + i * 0x200,=
 
-Like with the vii qemu virtfs command line argument, the order of the
-"important" tag defines which one gets the highest inode namespace
-(smallest generated suffix) on guest side.
+>>>> -                              n >> BDRV_SECTOR_BITS)) {
+>>>> +                if (bdrv_pread(s->qcow, sector_num * BDRV_SECTOR_SI=
+ZE,
+>>>> +                               buf + i * 0x200, n) < 0) {
+>>>
+>>> Shouldn't we use QEMU_ALIGN_DOWN(n, BDRV_SECTOR_SIZE) ?
+>>
+>> No, n should already be aligned, which makes align_down a no-op.
+>>
+>>> Could bdrv_is_allocated give unaligned n?
+>>>
+>>
+>> Yes, bdrv_is_allocated can return unaligned n in some situations; I ha=
+d
+>> a patch that didn't make 4.0 that would add bdrv_block_status_aligned
+>> for cases where we need to guarantee that different alignment of a
+>> backing chain doesn't bleed through to the specified alignment of the
+>> current layer. But those situations are rare, and I need to revisit
+>> those and send a v2; so I don't see a problem with this one going in
+>> during the meantime as-is.
+>>
+>=20
+> Than, n is not already aligned, as it comes from bdrv_is_allocated.
 
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
----
- docs/schemas/domaincommon.rng |  6 ++++++
- src/conf/domain_conf.c        | 30 ++++++++++++++++++++++++++++++
- src/conf/domain_conf.h        |  3 +++
- src/qemu/qemu_command.c       | 10 ++++++++++
- 4 files changed, 49 insertions(+)
+Note that whether bdrv_is_allocated can return data not aligned to 512
+depends on the driver. It is possible when querying file-posix.c, but
+only for a POSIX file that encounters EOF mid-sector. However, it is not
+possible for the qcow2 driver.  The patches I need to rework are worried
+more about cases where a block device with request_alignment of 4k can
+still see 512-alignment leak through from a backing file.  But since
+vvfat is grabbing alignment from a qcow2 image, and not a raw POSIX
+file, we should never see sub-sector alignment.
 
-diff --git a/docs/schemas/domaincommon.rng b/docs/schemas/domaincommon.rng
-index 111b85c36f..c75edfc4d3 100644
---- a/docs/schemas/domaincommon.rng
-+++ b/docs/schemas/domaincommon.rng
-@@ -2515,6 +2515,12 @@
-             </choice>
-           </attribute>
-         </optional>
-+        <zeroOrMore>
-+          <element name='important'>
-+            <attribute name="path"/>
-+            <empty/>
-+          </element>
-+        </zeroOrMore>
-         <optional>
-           <element name='readonly'>
-             <empty/>
-diff --git a/src/conf/domain_conf.c b/src/conf/domain_conf.c
-index b4fb6cf981..cc75c6a7dd 100644
---- a/src/conf/domain_conf.c
-+++ b/src/conf/domain_conf.c
-@@ -2294,6 +2294,8 @@ virDomainFSDefNew(void)
- 
- void virDomainFSDefFree(virDomainFSDefPtr def)
- {
-+    size_t i;
-+
-     if (!def)
-         return;
- 
-@@ -2302,6 +2304,13 @@ void virDomainFSDefFree(virDomainFSDefPtr def)
-     virDomainDeviceInfoClear(&def->info);
-     VIR_FREE(def->virtio);
- 
-+    if (def->important) {
-+        for (i = 0; i < def->nimportant; i++)
-+            if (def->important[i])
-+                VIR_FREE(def->important[i]);
-+    }
-+    VIR_FREE(def->important);
-+
-     VIR_FREE(def);
- }
- 
-@@ -10953,6 +10962,7 @@ virDomainFSDefParseXML(virDomainXMLOptionPtr xmlopt,
-     VIR_AUTOFREE(char *) usage = NULL;
-     VIR_AUTOFREE(char *) units = NULL;
-     VIR_AUTOFREE(char *) model = NULL;
-+    long n;
- 
-     ctxt->node = node;
- 
-@@ -11001,6 +11011,12 @@ virDomainFSDefParseXML(virDomainXMLOptionPtr xmlopt,
-                                   1, ULLONG_MAX, false) < 0)
-         goto error;
- 
-+    n = virXMLChildElementCount(node);
-+    if (n > 0) {
-+        if (VIR_ALLOC_N(def->important, n) < 0)
-+            goto error;
-+    }
-+
-     cur = node->children;
-     while (cur != NULL) {
-         if (cur->type == XML_ELEMENT_NODE) {
-@@ -11039,6 +11055,8 @@ virDomainFSDefParseXML(virDomainXMLOptionPtr xmlopt,
- 
-                 if (virDomainVirtioOptionsParseXML(cur, &def->virtio) < 0)
-                     goto error;
-+            } else if (virXMLNodeNameEqual(cur, "important")) {
-+                def->important[def->nimportant++] = virXMLPropString(cur, "path");
-             }
-         }
-         cur = cur->next;
-@@ -11107,6 +11125,8 @@ virDomainFSDefParseXML(virDomainXMLOptionPtr xmlopt,
-         goto error;
- 
-  cleanup:
-+    if (def && def->important && !def->nimportant)
-+        VIR_FREE(def->important);
-     return def;
- 
-  error:
-@@ -24601,6 +24621,7 @@ virDomainFSDefFormat(virBufferPtr buf,
-     const char *src = def->src->path;
-     VIR_AUTOCLEAN(virBuffer) driverBuf = VIR_BUFFER_INITIALIZER;
-     int ret = -1;
-+    size_t i;
- 
-     if (!type) {
-         virReportError(VIR_ERR_INTERNAL_ERROR,
-@@ -24689,6 +24710,15 @@ virDomainFSDefFormat(virBufferPtr buf,
-     if (def->readonly)
-         virBufferAddLit(buf, "<readonly/>\n");
- 
-+    if (def->important) {
-+        for (i = 0; i < def->nimportant; ++i) {
-+            if (!def->important[i]) continue;
-+            virBufferAddLit(buf, "<important");
-+            virBufferEscapeString(buf, " path='%s'", def->important[i]);
-+            virBufferAddLit(buf, "/>\n");
-+        }
-+    }
-+
-     if (virDomainDeviceInfoFormat(buf, &def->info, flags) < 0)
-         goto cleanup;
- 
-diff --git a/src/conf/domain_conf.h b/src/conf/domain_conf.h
-index 01c22d8cc3..9bbd66d932 100644
---- a/src/conf/domain_conf.h
-+++ b/src/conf/domain_conf.h
-@@ -818,6 +818,9 @@ struct _virDomainFSDef {
-     unsigned long long space_soft_limit; /* in bytes */
-     bool symlinksResolved;
-     virDomainVirtioOptionsPtr virtio;
-+
-+    size_t nimportant;
-+    char **important;
- };
- 
- 
-diff --git a/src/qemu/qemu_command.c b/src/qemu/qemu_command.c
-index 50b4205267..2005ccadf8 100644
---- a/src/qemu/qemu_command.c
-+++ b/src/qemu/qemu_command.c
-@@ -2732,6 +2732,7 @@ qemuBuildFSStr(virDomainFSDefPtr fs)
-     virBuffer opt = VIR_BUFFER_INITIALIZER;
-     const char *driver = qemuDomainFSDriverTypeToString(fs->fsdriver);
-     const char *wrpolicy = virDomainFSWrpolicyTypeToString(fs->wrpolicy);
-+    size_t i;
- 
-     if (fs->type != VIR_DOMAIN_FS_TYPE_MOUNT) {
-         virReportError(VIR_ERR_CONFIG_UNSUPPORTED, "%s",
-@@ -2775,6 +2776,15 @@ qemuBuildFSStr(virDomainFSDefPtr fs)
-     if (fs->readonly)
-         virBufferAddLit(&opt, ",readonly");
- 
-+    if (fs->important) {
-+        for (i = 0; i < fs->nimportant; ++i) {
-+            if (i == 0)
-+                virBufferAsprintf(&opt, ",vii=%s", fs->important[i]);
-+            else
-+                virBufferAsprintf(&opt, ":%s", fs->important[i]);
-+        }
-+    }
-+
-     if (virBufferCheckError(&opt) < 0)
-         goto error;
- 
--- 
-2.11.0
+So my answers above were terse but correct: bdrv_is_allocated can return
+unaligned data in some cases, but vvfat should not be one of those
+cases. If you'd like to add an assert instead of a QEMU_ALIGN_DOWN, that
+should be reasonable.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
+--NIUp88xI8UV7nDYIopYZcfu8Kx0DM1DuJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzQcVIACgkQp6FrSiUn
+Q2rewAf8DHZsyl6lkECLqs8+AzIjXwMqQM9QpMvtGoNuyV4NU2oYkmZC6mPJ6P10
+Pvsdgi2cfrUA+E06sidmENFGFwYyWPL4nBGvUdq9LYT5S5qHI64HJVcUj5Wb1Wru
+7wJXDCSwiZsyVKNTe1y7mJUToU0DVQdurLmlSVt5QiXedzNA5M1cE6sQ1i7Q1RZK
+9/V3hEE9V2XxitBD4iM1RJsf9Eeg+MsnGu4bCts33SU5Z1VAblNMLyJ+NkxqKY+s
+vd495CN6T++J2nH9Wnh5vRTqxa/vhk+/MANQSppBiOW+j/THqthvFJst4csex/5G
+CUXp24KumgAS6yg/iNTKsf8sldAU3A==
+=jHcT
+-----END PGP SIGNATURE-----
+
+--NIUp88xI8UV7nDYIopYZcfu8Kx0DM1DuJ--
 
