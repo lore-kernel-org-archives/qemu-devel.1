@@ -2,145 +2,90 @@ Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FA23C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 08:20:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DCEDC04AAA
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 08:23:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D93C62082F
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 08:19:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D93C62082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id C368E2082F
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 08:23:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b/LDx8RA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C368E2082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52257 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52306 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNYqs-0006sh-Vc
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 04:19:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48979)
+	id 1hNYuF-0007tM-1C
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 04:23:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hNYpq-0006Uc-Ki
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:18:55 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hNYtQ-0007b6-Qt
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:22:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hNYpp-0005ji-Q2
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:18:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45198
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1hNYpp-0005jE-Lp
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:18:53 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x468GnlJ001445
-	for <qemu-devel@nongnu.org>; Mon, 6 May 2019 04:18:52 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2sag58u033-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 04:18:52 -0400
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 6 May 2019 09:08:38 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-	by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Mon, 6 May 2019 09:08:35 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
-	[9.149.105.58])
-	by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x4688YNC60883138
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Mon, 6 May 2019 08:08:34 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EBD1D4C04A;
-	Mon,  6 May 2019 08:08:33 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B275F4C044;
-	Mon,  6 May 2019 08:08:33 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.98.4])
-	by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-	Mon,  6 May 2019 08:08:33 +0000 (GMT)
-To: Thomas Huth <thuth@redhat.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, 
-	qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com,
-	alifm@linux.ibm.com
-References: <1556543381-12671-1-git-send-email-jjherne@linux.ibm.com>
-	<2913f865-2119-f6cf-b2f8-b22d351fcca1@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
-	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
-	syiRa+UVlsKmx1hsEg==
-Date: Mon, 6 May 2019 10:08:33 +0200
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hNYtP-0007xN-T5
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:22:36 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37700)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1hNYtP-0007ww-KY
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 04:22:35 -0400
+Received: by mail-wr1-x443.google.com with SMTP id a12so5951493wrn.4
+	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 01:22:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=subject:to:cc:references:from:message-id:date:user-agent
+	:mime-version:in-reply-to:content-transfer-encoding:content-language;
+	bh=YsWXJLKl1X2RfA7+OdQc43rrGPTF4EV/nOzUPiI+Dxk=;
+	b=b/LDx8RAlqFEitGBgpPSU/MzKL9GPcWoDRwlYltiZIG6D5hWw5hpFriz0Bfpu4niXv
+	TETgjVVcbWXazcFWVYSaVzx8Ag9NkMxil1vDDt30SaPsa0fo7BDcA+2QEc8Hh1LaVYU6
+	765Ow7H/GUR1BMn7LRyAcsdwJ/SjIvERFbC9tcvhg5tg7LYiudp+SZ/dUAuVeORIF2At
+	m85vOfIi+7e5sMvJYv/YST9CtKHbc1sx3eWaslc28Zx4Y4i1Cy9Ufgng9g7XqPbP/flH
+	sunQHZ03RpcTvYf9a1nOTg3zWPLYA6dWA6rwquZyKTju++iwx+JrJpB8eGHSm3flxqs9
+	Ai0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-transfer-encoding
+	:content-language;
+	bh=YsWXJLKl1X2RfA7+OdQc43rrGPTF4EV/nOzUPiI+Dxk=;
+	b=n+GHkNaCgJa6E6joUKtIFqfb3Us1XFUs8T1QmnI27eYsn1cZ4qQ378MAaYyc9qrEl3
+	Dg7U8Ptr26lzKGtnhgczx8KuSwv6VGZKD/n3a6UrU7Gj7AazryvJadu+dV04uwyyZpO6
+	S+It4IJ5c6b1rwqO3gZ+QLGcA4hNF4Zy9MrCgt+31u+VHzUmj8QU8wWFetNqmcw5AMw5
+	fcZkJYxw+6zoJDMV54OWc3eJzyy8h/LDi6+oLpxXeYjnJni510FDz4zJBjNgJgI5OAxv
+	bYZkle/eRSzW+8SXe1E4rh+NgqQZvtigGUU0yAh+/HUq9bjbWNgNrIWXZM3oeJTOxtQV
+	uOsQ==
+X-Gm-Message-State: APjAAAWlUNEvaHrxztDNajXhTUEwRnJ5CoBF8+WleUSFn6/HwzlyOqAb
+	oiFM0d6Z2A5W9H4VjgCcmasbhAeD
+X-Google-Smtp-Source: APXvYqzpIEdelsjJgXLmla6Ij072qnGDysDbLQjAEoPM9n3FVaL+3g1C+/zY8F4YCqX4moUoaP8vQA==
+X-Received: by 2002:adf:ea8e:: with SMTP id s14mr15948269wrm.4.1557130953556; 
+	Mon, 06 May 2019 01:22:33 -0700 (PDT)
+Received: from localhost.localdomain ([141.226.29.227])
+	by smtp.gmail.com with ESMTPSA id q7sm9958358wmc.11.2019.05.06.01.22.32
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Mon, 06 May 2019 01:22:32 -0700 (PDT)
+To: Hou Qiming <hqm03ster@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+References: <CABSdmrnNW6f=P64PviPP8CTJ5SVfYS8_6kmAtpw9yPObTEkpxg@mail.gmail.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <481d3407-4312-82f0-f355-d4f807e1e5be@gmail.com>
+Date: Mon, 6 May 2019 11:22:31 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <2913f865-2119-f6cf-b2f8-b22d351fcca1@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CABSdmrnNW6f=P64PviPP8CTJ5SVfYS8_6kmAtpw9yPObTEkpxg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19050608-0028-0000-0000-0000036ABDA0
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050608-0029-0000-0000-0000242A316F
-Message-Id: <19c9edb6-fd85-564e-8342-80042e90ae3e@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-06_05:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=992 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1905060073
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [PATCH] s390-bios: Skip bootmap signature entries
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] Patch: Precautionary glBindTexture in
+ surface_gl_update_texture
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -152,32 +97,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03.05.19 11:34, Thomas Huth wrote:
-> On 29/04/2019 15.09, Jason J. Herne wrote:
->> Newer versions of zipl have the ability to write signature entries to the boot
->> script for secure boot. We don't yet support secure boot, but we need to skip
->> over signature entries while reading the boot script in order to maintain our
->> ability to boot guest operating systems that have a secure bootloader.
->>
->> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
->> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
->> ---
->>  pc-bios/s390-ccw/bootmap.c | 19 +++++++++++++++++--
->>  pc-bios/s390-ccw/bootmap.h | 10 ++++++----
->>  2 files changed, 23 insertions(+), 6 deletions(-)
-> 
-> Acked-by: Thomas Huth <thuth@redhat.com>
-> 
-> Jason, Christian, do you have any other changes to the s390-ccw firmware
-> currently pending that you plan to send out within the next week? If so,
-> I'll wait a little bit longer with building a new binary for the
-> repository ... if not, I'll pick this patch up next week.
+Hi Qiming,
+Thanks for submitting the patch!
+
+On 5/6/19 10:50 AM, Hou Qiming wrote:
+> From 48d1f092a7960d711fb2c77ab8d3f9d0a0ca0d5c Mon Sep 17 00:00:00 2001
+> From: HQM <hqm03ster@gmail.com <mailto:hqm03ster@gmail.com>>
+> Date: Mon, 6 May 2019 15:37:59 +0800
+> Subject: [PATCH] Precautionary glBindTexture and surface->texture 
+> validation
+>  in surface_gl_update_texture
+>
+
+The lines above should not go into the patch comment, while the mail 
+subject should
+start with [PATCH].
+
+I suggest preparing the patch with git format-patch and sending it with 
+git send-email.
+You can also prepare it "manually" as long the format is correct.
+
+> In a GVT-g setup with dmabuf and GTK GUI, the current 2D texture at 
+> surface_gl_update_texture is not necessarily
+> surface->texture. Adding a glBindTexture fixes related crashes and 
+> artifacts, and is generally more secure.
+>
+> Signed-off-by: HQM <hqm03ster@gmail.com <mailto:hqm03ster@gmail.com>>
+> ---
+>  ui/console-gl.c | 18 +++++++++++-------
+>  1 file changed, 11 insertions(+), 7 deletions(-)
+>
+> diff --git a/ui/console-gl.c b/ui/console-gl.c
+> index a56e1cd..c1cb3bd 100644
+> --- a/ui/console-gl.c
+> +++ b/ui/console-gl.c
+> @@ -92,13 +92,17 @@ void surface_gl_update_texture(QemuGLShader *gls,
+>
+>      assert(gls);
+>
+> -    glPixelStorei(GL_UNPACK_ROW_LENGTH_EXT,
+> -                  surface_stride(surface) / 
+> surface_bytes_per_pixel(surface));
+> -    glTexSubImage2D(GL_TEXTURE_2D, 0,
+> -                    x, y, w, h,
+> -                    surface->glformat, surface->gltype,
+> -                    data + surface_stride(surface) * y
+> -                    + surface_bytes_per_pixel(surface) * x);
+> +    if (surface->texture) {
+
+I confirm it fixes a boot QEMU crash when the Windows guest i915 driver 
+loads.
+
+> +        glBindTexture(GL_TEXTURE_2D, surface->texture);
+
+I confirm it fixes strange artifacts seen on screen (some huge mouse 
+icon on the upper left side)
+when guest monitor "turns off" or the GTK window gets resized and the 
+guest desktop resolution changes.
+
+> +        glPixelStorei(GL_UNPACK_ROW_LENGTH_EXT,
+> +                      surface_stride(surface)
+> +                      / surface_bytes_per_pixel(surface));
+> +        glTexSubImage2D(GL_TEXTURE_2D, 0,
+> +                        x, y, w, h,
+> +                        surface->glformat, surface->gltype,
+> +                        data + surface_stride(surface) * y
+> +                        + surface_bytes_per_pixel(surface) * x);
+> +    }
+>  }
+>
+>  void surface_gl_render_texture(QemuGLShader *gls,
+> -- 
+> 2.17.1
+>
+>
+
+I have no OpenGL background to understand the consequences, but the patch
+does solve 2 gvt issues, so:
+
+Tested-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
 
 
-I have nothing at the moment.
+Thanks,
+Marcel
+
+
 
 
