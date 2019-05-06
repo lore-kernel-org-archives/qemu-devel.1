@@ -6,72 +6,72 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8697C04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:39:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BA0FC04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:41:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 898062082F
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:39:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CAE6D2082F
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:41:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t2CugovX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 898062082F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pkil7NXw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAE6D2082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59950 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59999 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNha0-0005Zs-La
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 13:39:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39764)
+	id 1hNhc5-0007Pb-Ki
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 13:41:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hNhV9-00010s-4F
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:34:08 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hNhVA-00011n-5x
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:34:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hNhV5-0001Fd-1o
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:34:07 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:33542)
+	(envelope-from <richard.henderson@linaro.org>) id 1hNhV9-0001IE-3l
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:34:08 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:33274)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hNhV3-0001DM-1r
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:34:02 -0400
-Received: by mail-pg1-x544.google.com with SMTP id h17so818186pgv.0
-	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 10:33:59 -0700 (PDT)
+	id 1hNhV5-0001Ee-03
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:34:04 -0400
+Received: by mail-pf1-x443.google.com with SMTP id z28so7145429pfk.0
+	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 10:34:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=1xjlqRXirnP5LswdNxna6nzxrI47MTAcF912r95XRb0=;
-	b=t2CugovX1/haMwIVga+gft4+pIDnMUVLUxgHoAcFivygQl7rP7iJdl0OToTNIGpeFn
-	7To872ySiLXWAWqNo1+AOauzny9sG6PeWH/oVUN/WtGCFx+hQX92YAWGurVodnj1Xpix
-	PT9k0iPbueuPPwQGdexmLOf54fv8Z0Aerny3yCnZBoRRmYS92tpmD16kPk1nTIjkT9Lg
-	Xw/LF1aLnBXnVYKS8pL6AdN7qr9H6GpdxSe1BmrxyB8N/zWMPAuojjNvBN8vitHbdFfd
-	ztF4xbtIraMejUc57UPwaLaKx70MXmSwv7rJjTSyiq5MYD7jLjuUv2Rt/iV4fK/OumO6
-	TKuQ==
+	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+	:content-transfer-encoding;
+	bh=SxHcSgvXH46Lcz+sBihH+DQ9BaQG6plA/B5ZKvOuxJA=;
+	b=pkil7NXwQ0LqaEBzco3zRNKPlgnZYoK7PI32QoHcMkfhprBVa99RoQqn/KxfbNUL6f
+	RzNppNhYONng6jOice7MGDn2zEVZHhdecPTJSWaMIKKLHAH2vamr9OdQ8PvekzWNkR20
+	/5q+jzRDAzNwpQB3YnfEcbJ4BZxtGIO3pSSu/RPY3MxaLfbkF6ZEQo0nhHc+YjQLcHDN
+	i9fXAcPn/IJOMT5DuRTDMP/EY2DYx2Lm6H0WeDlgBLG3DUN+h9aj4u+4il7mWeSVrVwF
+	7R4JBa0ynT2c7RW151zD6hJnZmrqnMsjlmlTVzdb7vCpoEy6dQ44Bz90jc8c6ZZ93gSo
+	S5Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=1xjlqRXirnP5LswdNxna6nzxrI47MTAcF912r95XRb0=;
-	b=uCUhJr4GyGR+uCznGsMxjHJEAdsPB2chM9LczMYdsvQBU0jScwqcb9697PuynwIxrL
-	vHuf9jKg8vZ/IO7W2ktXD38hMgrXNFJ3GDxvVugPPntuMPzBPepvIAFUfV2yOGDCiFDz
-	FTaxUZo0YjLDOvEFBz8JpYsryCDOEw9eHZT/IRglYRj3KZktHTZOO5IXuc/7QjXCXm/5
-	asSOZgSyuU3P/73FaoowZomS3hWMAF+L6rdlxfQ9kYSAdxDyjhbXYerqe1pvFDEsNizg
-	QdcYas6f5gKmOc+6+Rtm9LHAbvqgdgq7Hb0fwy0zwwsOMk1yYGWSjstlS1RtWUKthkSJ
-	Epvw==
-X-Gm-Message-State: APjAAAUyMCqIQWkORC79/tArasBon56u4szzkS7seiJ0zuPHjQdfrGtm
-	kFib/8pPGLtcM9uI+p7sInCPd1StKFM=
-X-Google-Smtp-Source: APXvYqxUNv0EtdkYk1eKEFDDs7MDu27pX8Iqcxn9NznkZPUHj4+XXChdWm2b7roedBude7fnVwJPXw==
-X-Received: by 2002:aa7:8b12:: with SMTP id f18mr34787998pfd.178.1557164037998;
-	Mon, 06 May 2019 10:33:57 -0700 (PDT)
+	bh=SxHcSgvXH46Lcz+sBihH+DQ9BaQG6plA/B5ZKvOuxJA=;
+	b=cMS6Tbr4oiVKNJ56B7PzqlVYh9ooEgFOFq0PlUBPEzwBwFKqb/pBVM3woy6wkLbjOg
+	UaEFdCSH0i3MZFS8qaJwOOvTWvs12/r6u29vfV2R0ETb2jcifRCtz/sQTKsjkFTo1fcQ
+	u0rB7Ahu6pnI4hrRHXC1SYRiKoFQQsxKUCiDop6oUYC02qXt05xhiNXOqeGn0a3Yuhuw
+	w9wLdWaoE1xclv/42hrbpZa1k1wFthL2ziL87nc/ZXZDW8Y27Pj7Wx1Vlw1sRDHzAbuG
+	fca+wQXJcdKZxJ4DgxwBjKAKI2SmlyNQNljHiHuY/c5AHrvGevzqoG8b2LwnwCOr9ALQ
+	WyCA==
+X-Gm-Message-State: APjAAAXcBHo4lzwkyNNwwTEmCFkxMfBPFXieFuUkLAGrFouQ2nCBFy/O
+	sFr96i+oRoLSYt+PmBqGO71pOfoQu9Y=
+X-Google-Smtp-Source: APXvYqxb38FwDYIByAhdPO3V7+E9BOFbTlDNsKardpoR4xNDU1CQ9HmBOON6QzU6O+evYqmrodPW7Q==
+X-Received: by 2002:a63:4a5a:: with SMTP id j26mr32302687pgl.361.1557164040520;
+	Mon, 06 May 2019 10:34:00 -0700 (PDT)
 Received: from localhost.localdomain (97-113-189-189.tukw.qwest.net.
 	[97.113.189.189]) by smtp.gmail.com with ESMTPSA id
-	k9sm2268839pfa.180.2019.05.06.10.33.56
+	k9sm2268839pfa.180.2019.05.06.10.33.59 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 06 May 2019 10:33:57 -0700 (PDT)
+	Mon, 06 May 2019 10:33:59 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon,  6 May 2019 10:33:31 -0700
-Message-Id: <20190506173353.32206-3-richard.henderson@linaro.org>
+Date: Mon,  6 May 2019 10:33:33 -0700
+Message-Id: <20190506173353.32206-5-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190506173353.32206-1-richard.henderson@linaro.org>
 References: <20190506173353.32206-1-richard.henderson@linaro.org>
@@ -80,9 +80,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: [Qemu-devel] [PATCH v4 02/24] crypto: Merge crypto-obj-y into
- libqemuutil.a
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: [Qemu-devel] [PATCH v4 04/24] crypto: Do not fail for EINTR during
+ qcrypto_random_bytes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,167 +98,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We will shortly need this in the user-only binaries, so drop the split
-into system and tools binaries.  This also means that crypto-aes-obj-y
-can be merged back into crypto-obj-y.
+We can always get EINTR for read; /dev/urandom is no exception.
 
-Cc: Daniel P. Berrangé <berrange@redhat.com>
+Rearrange the order of tests for likelihood; allow degenerate buflen==0
+case to perform a no-op zero-length read.  This means that the normal
+success path is a straight line with a single test for success.
+
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- Makefile             | 12 +++++-------
- Makefile.objs        |  8 ++------
- Makefile.target      |  4 ----
- configure            |  9 +++------
- crypto/Makefile.objs |  5 +----
- 5 files changed, 11 insertions(+), 27 deletions(-)
+v3: Rearrage the read loop again.
+---
+ crypto/random-platform.c | 36 +++++++++++++++---------------------
+ 1 file changed, 15 insertions(+), 21 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index d372493042..09c8591805 100644
---- a/Makefile
-+++ b/Makefile
-@@ -410,7 +410,6 @@ dummy := $(call unnest-vars,, \
-                 block-obj-y \
-                 block-obj-m \
-                 crypto-obj-y \
--                crypto-aes-obj-y \
-                 qom-obj-y \
-                 io-obj-y \
-                 common-obj-y \
-@@ -446,7 +445,6 @@ SOFTMMU_SUBDIR_RULES=$(filter %-softmmu,$(SUBDIR_RULES))
- 
- $(SOFTMMU_SUBDIR_RULES): $(authz-obj-y)
- $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
--$(SOFTMMU_SUBDIR_RULES): $(crypto-obj-y)
- $(SOFTMMU_SUBDIR_RULES): $(io-obj-y)
- $(SOFTMMU_SUBDIR_RULES): config-all-devices.mak
- $(SOFTMMU_SUBDIR_RULES): $(edk2-decompressed)
-@@ -502,7 +500,7 @@ Makefile: $(version-obj-y)
- ######################################################################
- # Build libraries
- 
--libqemuutil.a: $(util-obj-y) $(trace-obj-y) $(stub-obj-y)
-+libqemuutil.a: $(util-obj-y) $(trace-obj-y) $(stub-obj-y) $(crypto-obj-y)
- libvhost-user.a: $(libvhost-user-obj-y) $(util-obj-y) $(stub-obj-y)
- 
- ######################################################################
-@@ -511,9 +509,9 @@ COMMON_LDADDS = libqemuutil.a
- 
- qemu-img.o: qemu-img-cmds.h
- 
--qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
--qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
--qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
-+qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
-+qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
-+qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
- 
- qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
- 
-@@ -524,7 +522,7 @@ qemu-edid$(EXESUF): qemu-edid.o hw/display/edid-generate.o $(COMMON_LDADDS)
- fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
- fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
- 
--scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(authz-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
-+scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(authz-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
- ifdef CONFIG_MPATH
- scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
- endif
-diff --git a/Makefile.objs b/Makefile.objs
-index cf065de5ed..0ce429c1af 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -3,6 +3,8 @@
- stub-obj-y = stubs/ util/ crypto/
- util-obj-y = util/ qobject/ qapi/
- 
-+crypto-obj-y = crypto/
-+
- chardev-obj-y = chardev/
- 
- #######################################################################
-@@ -21,12 +23,6 @@ block-obj-$(CONFIG_REPLICATION) += replication.o
- 
- block-obj-m = block/
- 
--#######################################################################
--# crypto-obj-y is code used by both qemu system emulation and qemu-img
+diff --git a/crypto/random-platform.c b/crypto/random-platform.c
+index f995fc0ef1..260b64564d 100644
+--- a/crypto/random-platform.c
++++ b/crypto/random-platform.c
+@@ -65,29 +65,23 @@ int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
+                          "Unable to read random bytes");
+         return -1;
+     }
 -
--crypto-obj-y = crypto/
--crypto-aes-obj-y = crypto/
+-    return 0;
+ #else
+-    int ret = -1;
+-    int got;
 -
- #######################################################################
- # qom-obj-y is code used by both qemu system emulation and qemu-img
- 
-diff --git a/Makefile.target b/Makefile.target
-index ae02495951..ce02924ffb 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -179,8 +179,6 @@ dummy := $(call unnest-vars,.., \
-                block-obj-y \
-                block-obj-m \
-                chardev-obj-y \
--               crypto-obj-y \
--               crypto-aes-obj-y \
-                qom-obj-y \
-                io-obj-y \
-                common-obj-y \
-@@ -189,8 +187,6 @@ all-obj-y += $(common-obj-y)
- all-obj-y += $(qom-obj-y)
- all-obj-$(CONFIG_SOFTMMU) += $(authz-obj-y)
- all-obj-$(CONFIG_SOFTMMU) += $(block-obj-y) $(chardev-obj-y)
--all-obj-$(CONFIG_USER_ONLY) += $(crypto-aes-obj-y)
--all-obj-$(CONFIG_SOFTMMU) += $(crypto-obj-y)
- all-obj-$(CONFIG_SOFTMMU) += $(io-obj-y)
- 
- ifdef CONFIG_SOFTMMU
-diff --git a/configure b/configure
-index daadfe9ad4..0099e85a03 100755
---- a/configure
-+++ b/configure
-@@ -2792,8 +2792,7 @@ if test "$gnutls" != "no"; then
-         # At least ubuntu 18.04 ships only shared libraries.
-         write_c_skeleton
-         if compile_prog "" "$gnutls_libs" ; then
--            libs_softmmu="$gnutls_libs $libs_softmmu"
--            libs_tools="$gnutls_libs $libs_tools"
-+            LIBS="$gnutls_libs $LIBS"
-             QEMU_CFLAGS="$QEMU_CFLAGS $gnutls_cflags"
-             pass="yes"
-         fi
-@@ -2860,8 +2859,7 @@ if test "$nettle" != "no"; then
-         nettle_cflags=$($pkg_config --cflags nettle)
-         nettle_libs=$($pkg_config --libs nettle)
-         nettle_version=$($pkg_config --modversion nettle)
--        libs_softmmu="$nettle_libs $libs_softmmu"
--        libs_tools="$nettle_libs $libs_tools"
-+        LIBS="$nettle_libs $LIBS"
-         QEMU_CFLAGS="$QEMU_CFLAGS $nettle_cflags"
-         nettle="yes"
- 
-@@ -2888,8 +2886,7 @@ if test "$gcrypt" != "no"; then
-         then
-             gcrypt_libs="$gcrypt_libs -lgpg-error"
-         fi
--        libs_softmmu="$gcrypt_libs $libs_softmmu"
--        libs_tools="$gcrypt_libs $libs_tools"
-+        LIBS="$gcrypt_libs $LIBS"
-         QEMU_CFLAGS="$QEMU_CFLAGS $gcrypt_cflags"
-         gcrypt="yes"
- 
-diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-index 256c9aca1f..a291bc5b9a 100644
---- a/crypto/Makefile.objs
-+++ b/crypto/Makefile.objs
-@@ -34,8 +34,5 @@ crypto-obj-y += xts.o
- crypto-obj-y += block.o
- crypto-obj-y += block-qcow.o
- crypto-obj-y += block-luks.o
+-    while (buflen > 0) {
+-        got = read(fd, buf, buflen);
+-        if (got < 0) {
+-            error_setg_errno(errp, errno,
+-                             "Unable to read random bytes");
+-            goto cleanup;
+-        } else if (!got) {
+-            error_setg(errp,
+-                       "Unexpected EOF reading random bytes");
+-            goto cleanup;
++    while (1) {
++        ssize_t got = read(fd, buf, buflen);
++        if (likely(got == buflen)) {
++            return 0;
++        }
++        if (got > 0) {
++            buflen -= got;
++            buf += got;
++        } else if (got == 0) {
++            error_setg(errp, "Unexpected EOF reading random bytes");
++            return -1;
++        } else if (errno != EINTR) {
++            error_setg_errno(errp, errno, "Unable to read random bytes");
++            return -1;
+         }
+-        buflen -= got;
+-        buf += got;
+     }
 -
--# Let the userspace emulators avoid linking gnutls/etc
--crypto-aes-obj-y = aes.o
--
-+crypto-obj-y += aes.o
- stub-obj-y += pbkdf-stub.o
+-    ret = 0;
+- cleanup:
+-    return ret;
+ #endif
++    return 0;
+ }
 -- 
 2.17.1
 
