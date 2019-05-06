@@ -2,87 +2,75 @@ Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A6DFC04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:53:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDEBDC04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:54:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AE042053B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:53:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M0lQsOCD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AE042053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id CBC1F2053B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:54:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBC1F2053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60168 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60192 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNhnh-0000t9-41
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 13:53:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40083)
+	id 1hNhpI-00029F-4b
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 13:54:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hNhVS-0001Lo-6v
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:34:27 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hNhdO-0000o3-Ez
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:42:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hNhVQ-0001ZM-BT
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:34:26 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:39619)
+	(envelope-from <sgarzare@redhat.com>) id 1hNhdL-0007wF-CH
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:42:37 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:37088)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hNhVO-0001Uh-Cf
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:34:23 -0400
-Received: by mail-pg1-x544.google.com with SMTP id w22so5482385pgi.6
-	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 10:34:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=WkMgXREw0aoSQxhQGI3jtOyJDuRA2/EcPM5PhnT27hg=;
-	b=M0lQsOCDnQ1jXB8oOlUdFWQEnQl2GKBcG39v9z7yxfTA5yax80UsmGLJL3XbgGwRIZ
-	w8RJlHAQ+ehS6e7VcrU2IsXp+KANuR7/iwP+VM7eBCxb8meC1VxMltyitzx7SzJSURXB
-	DGQ5EC3fnwwcmYznShqkqR/yg6BzPaEQ/6GBcRCBPo46g8zOui0qUU6qqeB7ZAqfrPXh
-	fJS+HIVgnBy55567Zj7eJvPEHlLg/tjyAnB3ndc9hC4scZhErZmcpqtLnYs1mCIWagY4
-	clTC+PnhZ5/8tS9DSZg0TRAnlj2cFe22ajUUea5otUju4fD5s2PThdjBIe4zBwyBSs98
-	T+Pw==
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hNhdI-0007rm-2N
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:42:32 -0400
+Received: by mail-wr1-f65.google.com with SMTP id a12so8277807wrn.4
+	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 10:42:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=WkMgXREw0aoSQxhQGI3jtOyJDuRA2/EcPM5PhnT27hg=;
-	b=hSElmU8AHGFTwkK6Q9lM7jrNlzJXFolzf+O9FiI2ITk5g17O9KBCkj7eplVzVQHGxE
-	lsQZy1VZ/5HakDufIw54mTcjWup/40IU16Kx+ISx1xS+ak/rpEoc/gyLJRozgCVHDBfB
-	bgG3Ho7y/j9LWPbPxnP18792JY/jV5q2zfokpwxdYiPBo/b7dm8vm9XLv2iO+ruyeeFF
-	ubWlVrYgJSseqh/RhyQ79SJlb0KsMXxMVNKQO+Lu89kmIEbi56vaLkQDHAnqVj/MRnvv
-	TYEv5rNec0ztXH65SFiO5ne4btQUzKJtncWGqsYJP6LgzGGBE62rTVNmSgk/ZwmBMK93
-	ZEhg==
-X-Gm-Message-State: APjAAAW8R7Ojs2b3j9oCEUD6W6ihyUOP7RlM0LFRahB0Ic4uiWnTR+ri
-	8LmXcoC8yj9m82ov5JONocO89bGQkOs=
-X-Google-Smtp-Source: APXvYqyXHcsDzKyF1c7ndIZgJ0pe1liHklZJNJ7QN29FvqVqUq3UWp7M+reKS9BDdFGPE8wZoczZcw==
-X-Received: by 2002:a62:5915:: with SMTP id n21mr34013649pfb.180.1557164059592;
-	Mon, 06 May 2019 10:34:19 -0700 (PDT)
-Received: from localhost.localdomain (97-113-189-189.tukw.qwest.net.
-	[97.113.189.189]) by smtp.gmail.com with ESMTPSA id
-	k9sm2268839pfa.180.2019.05.06.10.34.18
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 06 May 2019 10:34:18 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Mon,  6 May 2019 10:33:49 -0700
-Message-Id: <20190506173353.32206-21-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190506173353.32206-1-richard.henderson@linaro.org>
-References: <20190506173353.32206-1-richard.henderson@linaro.org>
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=b9w9Fi/gUkrgIISZq5cmNR6T2ByfGEhwUV+lk/bz3q8=;
+	b=iAG+IjRxhS20oMpDOBLxLUP7cYpTG3H3QXPQVBS+m9MmbOnNJZOsRpL3qi16NKXOlO
+	rGvGOvielRog/abT6+tJWpD7LpTqg977a6TCde9F5G1vNkDWSg20TisG7o1jMhRaKUiF
+	Vd+xX70lE8Lc0dpvxjT7QA7m7BnpmUxdGMWVwgxSWREq22GFynYI8WPu2xfpLwb+oql/
+	BcPB0RW9t7qWMalFMO/ApU0uP2V0SjfFLWTpbdgAOjiAjWhNkeBuateevUahdli477qG
+	pOBagl2ZvGrPCPab5MGrOmNRH2jQYkl1FmX8jjG7pgLuQdWOnO0BuuySMoyOqaJAeIFp
+	HM4w==
+X-Gm-Message-State: APjAAAVPTh6GmjYzEO/YU3qwBZHdlCQMYnaRcSnUOfiQbjND6LMgbXkV
+	ukW7JwSu9GxC2vF+0EW83h/ptw==
+X-Google-Smtp-Source: APXvYqyLbKAC373y5269aIPtIOvMeMLjDzva8dU5kQFP0n3IiAUDUTgA1x57wl26hUiojumgQOpkwg==
+X-Received: by 2002:a5d:438d:: with SMTP id i13mr8725224wrq.33.1557164545366; 
+	Mon, 06 May 2019 10:42:25 -0700 (PDT)
+Received: from steredhat (host103-125-dynamic.46-79-r.retail.telecomitalia.it.
+	[79.46.125.103])
+	by smtp.gmail.com with ESMTPSA id w2sm7216571wrm.74.2019.05.06.10.42.24
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Mon, 06 May 2019 10:42:24 -0700 (PDT)
+Date: Mon, 6 May 2019 19:42:22 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190506174222.dvpxouohlgtsi6qu@steredhat>
+References: <20190503170631.228487-1-sgarzare@redhat.com>
+	<878svjra2r.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: [Qemu-devel] [PATCH v4 20/24] hw/misc/exynos4210_rng: Use
- qemu_guest_getrandom
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <878svjra2r.fsf@dusky.pond.sub.org>
+User-Agent: NeoMutt/20180716
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH] net: avoid to use variable length array in
+ net_client_init()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,64 +82,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The random number is intended for use by the guest.  As such, we should
-honor the -seed argument for reproducibility.
+On Mon, May 06, 2019 at 03:23:08PM +0200, Markus Armbruster wrote:
+> Stefano Garzarella <sgarzare@redhat.com> writes:
+> 
+> > net_client_init() uses a variable length array to store the prefix
+> > of 'ipv6-net' parameter (e.g. if ipv6-net=fec0::0/64, the prefix
+> > is 'fec0::0').
+> > Since the IPv6 prefix can be at most as long as an IPv6 address,
+> > we can use an array with fixed size equals to INET6_ADDRSTRLEN.
+> >
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > ---
+> >  net/net.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/net/net.c b/net/net.c
+> > index f3a3c5444c..2e5f27e121 100644
+> > --- a/net/net.c
+> > +++ b/net/net.c
+> > @@ -1118,7 +1118,7 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+> >          const char *ip6_net = qemu_opt_get(opts, "ipv6-net");
+> >  
+> >          if (ip6_net) {
+> > -            char buf[strlen(ip6_net) + 1];
+> > +            char buf[INET6_ADDRSTRLEN];
+> >  
+> >              if (get_str_sep(buf, sizeof(buf), &ip6_net, '/') < 0) {
+> >                  /* Default 64bit prefix length.  */
+> 
+> Hmm.
+> 
+> Parameter "ipv6-net" is of the form ADDRESS[/PREFIX-SIZE].  If
+> /PREFIX-SIZE is present, get_str_sep() copies the ADDRESS part to buf[].
+> 
+> However, nothing stops the user from passing in an ADDRESS longer than
+> INET6_ADDRSTRLEN, say by adding a enough leading zeros.  get_str_sep()
+> will then silently truncate ADDRESS.
+> 
+> Suggest to avoid get_str_sep() like this (not even compile-tested):
+> 
+>         if (ip6_net) {
+>             char *slashp = strchr(ip6_net, '/');
+> 
+>             if (!slashp) {
+>                 /* Default 64bit prefix length.  */
+>                 qemu_opt_set(opts, "ipv6-prefix", ip6_net, &error_abort);
+>                 qemu_opt_set_number(opts, "ipv6-prefixlen", 64, &error_abort);
+>             } else {
+>                 /* User-specified prefix length.  */
+>                 unsigned long len;
+>                 int err;
+>                 char *addr = g_strndup(ip6_net, slashp - ip6_net);
+> 
+>                 qemu_opt_set(opts, "ipv6-prefix", addr, &error_abort);
+>                 g_free(addr);
+>                 err = qemu_strtoul(slashp + 1, NULL, 10, &len);
+>                 if (err) {
+>                     error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+>                               "ipv6-prefix", "a number");
+>                 } else {
+>                     qemu_opt_set_number(opts, "ipv6-prefixlen", len,
+>                                         &error_abort);
+>                 }
+>             }
+>             qemu_opt_unset(opts, "ipv6-net");
+>         }
+>     }
 
-Cc: qemu-arm@nongnu.org
-Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- hw/misc/exynos4210_rng.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+Thank you for the suggestion! It seems much better to me.
+I'll follow your idea for the v2.
 
-diff --git a/hw/misc/exynos4210_rng.c b/hw/misc/exynos4210_rng.c
-index 4ecbebd2d7..0e70ffb404 100644
---- a/hw/misc/exynos4210_rng.c
-+++ b/hw/misc/exynos4210_rng.c
-@@ -18,10 +18,10 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "crypto/random.h"
- #include "hw/sysbus.h"
- #include "qapi/error.h"
- #include "qemu/log.h"
-+#include "qemu/guest-random.h"
- 
- #define DEBUG_EXYNOS_RNG 0
- 
-@@ -109,7 +109,6 @@ static void exynos4210_rng_set_seed(Exynos4210RngState *s, unsigned int i,
- static void exynos4210_rng_run_engine(Exynos4210RngState *s)
- {
-     Error *err = NULL;
--    int ret;
- 
-     /* Seed set? */
-     if ((s->reg_status & EXYNOS4210_RNG_STATUS_SEED_SETTING_DONE) == 0) {
-@@ -127,13 +126,11 @@ static void exynos4210_rng_run_engine(Exynos4210RngState *s)
-     }
- 
-     /* Get randoms */
--    ret = qcrypto_random_bytes((uint8_t *)s->randr_value,
--                               sizeof(s->randr_value), &err);
--    if (!ret) {
-+    if (qemu_guest_getrandom(s->randr_value, sizeof(s->randr_value), &err)) {
-+        error_report_err(err);
-+    } else {
-         /* Notify that PRNG is ready */
-         s->reg_status |= EXYNOS4210_RNG_STATUS_PRNG_DONE;
--    } else {
--        error_report_err(err);
-     }
- 
- out:
--- 
-2.17.1
+> 
+> I'd be tempted to clean up further; de-duplicate the qemu_opt_set() and
+> qemu_opt_set_number().
 
+Yes, it seems simple to de-duplicate in this way:
+        if (ip6_net) {
+            char *slashp = strchr(ip6_net, '/');
+            char *addr = ip6_net;
+            unsigned long len = 64;
+
+            if (slashp) {
+                ...
+            }
+
+            qemu_opt_set(opts, "ipv6-prefix", addr, &error_abort);
+            qemu_opt_set_number(opts, "ipv6-prefixlen", len, &error_abort);
+            qemu_opt_unset(opts, "ipv6-net");
+        }
+
+> 
+> There's just one more use of get_str_sep(), in parse_host_port(), and it
+> looks just as prone to silent truncation.
+
+I'll check it.
+
+Thanks,
+Stefano
 
