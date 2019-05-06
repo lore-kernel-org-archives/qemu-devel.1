@@ -2,59 +2,103 @@ Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23D5AC04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 20:34:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90AF2C04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 21:00:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E69E020830
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 20:34:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E69E020830
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4A9252082F
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 21:00:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A9252082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33692 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33921 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNkK4-0005Vf-M2
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 16:34:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52958)
+	id 1hNkiU-0002sw-Ee
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 17:00:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hNkJ7-00054S-Mm
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 16:33:54 -0400
+	(envelope-from <farman@linux.ibm.com>) id 1hNkhj-0002Zk-6J
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 16:59:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hNkJ6-0004FN-LG
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 16:33:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33530)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
-	id 1hNkJ4-0004DE-Gv; Mon, 06 May 2019 16:33:50 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F1860305B886;
-	Mon,  6 May 2019 20:33:47 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-164.bos.redhat.com [10.18.17.164])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D8D9460BEC;
-	Mon,  6 May 2019 20:33:44 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon,  6 May 2019 16:33:44 -0400
-Message-Id: <20190506203344.30781-1-jsnow@redhat.com>
+	(envelope-from <farman@linux.ibm.com>) id 1hNkhh-0000n1-8c
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 16:59:19 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33110)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <farman@linux.ibm.com>)
+	id 1hNkhf-0000Ot-JE
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 16:59:17 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x46Kw5nw129745
+	for <qemu-devel@nongnu.org>; Mon, 6 May 2019 16:58:12 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2sau1nb9bp-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 16:58:12 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
+	Mon, 6 May 2019 21:58:11 +0100
+Received: from b03cxnp08028.gho.boulder.ibm.com (9.17.130.20)
+	by e32.co.us.ibm.com (192.168.1.132) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Mon, 6 May 2019 21:58:08 +0100
+Received: from b03ledav005.gho.boulder.ibm.com
+	(b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+	by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x46Kw58w52887642
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Mon, 6 May 2019 20:58:05 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5387DBE051;
+	Mon,  6 May 2019 20:58:05 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8E068BE053;
+	Mon,  6 May 2019 20:58:04 +0000 (GMT)
+Received: from [9.85.216.218] (unknown [9.85.216.218])
+	by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+	Mon,  6 May 2019 20:58:04 +0000 (GMT)
+To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20190506171730.17556-1-cohuck@redhat.com>
+From: Eric Farman <farman@linux.ibm.com>
+Date: Mon, 6 May 2019 16:58:03 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Mon, 06 May 2019 20:33:48 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] blockdev-backup: don't check aio_context too
- early
+In-Reply-To: <20190506171730.17556-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19050620-0004-0000-0000-0000150AD204
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011062; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000285; SDB=6.01199563; UDB=6.00629333;
+	IPR=6.00980439; 
+	MB=3.00026760; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-06 20:58:09
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19050620-0005-0000-0000-00008B8DDB7F
+Message-Id: <0688a42a-4a7d-8aa4-7993-994c8f46193b@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-05-06_12:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1905060165
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [PATCH RFC] s390/css: handle CCW_FLAG_SKIP
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,56 +110,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, aihua liang <aliang@redhat.com>,
-	qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
-	qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>,
-	John Snow <jsnow@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-in blockdev_backup_prepare, we check to make sure that the target is
-associated with a compatible aio context. However, do_blockdev_backup is
-called later and has some logic to move the target to a compatible
-aio_context. The transaction version will fail certain commands
-needlessly early as a result.
 
-Allow blockdev_backup_prepare to simply call do_blockdev_backup, which
-will ultimately decide if the contexts are compatible or not.
 
-Note: the transaction version has always disallowed this operation since
-its initial commit bd8baecd (2014), whereas the version of
-qmp_blockdev_backup at the time, from commit c29c1dd312f, tried to
-enforce the aio_context switch instead. It's not clear, and I can't see
-from the mailing list archives at the time, why the two functions take a
-different approach. It wasn't until later in efd7556708b (2016) that the
-standalone version tried to determine if it could set the context or
-not.
+On 5/6/19 1:17 PM, Cornelia Huck wrote:
+> If a ccw has CCW_FLAG_SKIP set, and the command is of type
+> read, read backwards, or sense, no data should be written
+> to the guest for that command.
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+> 
+> Only extremely lightly tested (i.e., can boot a guest.)
+> 
+> ---
+>   hw/s390x/css.c         | 22 ++++++++++++++++++----
+>   include/hw/s390x/css.h |  1 +
+>   2 files changed, 19 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index 8fc9e35ba5d3..6ee31cc2e08f 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -830,8 +830,12 @@ static int ccw_dstream_rw_noflags(CcwDataStream *cds, void *buff, int len,
+>       if (op == CDS_OP_A) {
+>           goto incr;
+>       }
+> -    ret = address_space_rw(&address_space_memory, cds->cda,
+> -                           MEMTXATTRS_UNSPECIFIED, buff, len, op);
+> +    if (!cds->do_skip) {
+> +        ret = address_space_rw(&address_space_memory, cds->cda,
+> +                               MEMTXATTRS_UNSPECIFIED, buff, len, op);
+> +    } else {
+> +        ret = 0;
+> +    }
+>       if (ret != MEMTX_OK) {
+>           cds->flags |= CDS_F_STREAM_BROKEN;
+>           return -EINVAL;
+> @@ -928,8 +932,13 @@ static int ccw_dstream_rw_ida(CcwDataStream *cds, void *buff, int len,
+>       do {
+>           iter_len = MIN(len, cont_left);
+>           if (op != CDS_OP_A) {
+> -            ret = address_space_rw(&address_space_memory, cds->cda,
+> -                                   MEMTXATTRS_UNSPECIFIED, buff, iter_len, op);
+> +            if (!cds->do_skip) {
+> +                ret = address_space_rw(&address_space_memory, cds->cda,
+> +                                       MEMTXATTRS_UNSPECIFIED, buff, iter_len,
+> +                                       op);
+> +            } else {
+> +                ret = 0;
+> +            }
+>               if (ret != MEMTX_OK) {
+>                   /* assume inaccessible address */
+>                   ret = -EINVAL; /* channel program check */
+> @@ -968,6 +977,11 @@ void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB const *orb)
+>   
+>       cds->count = ccw->count;
+>       cds->cda_orig = ccw->cda;
+> +    /* skip is only effective for read, read backwards, or sense commands */
+> +    cds->do_skip = (ccw->flags & CCW_FLAG_SKIP) &&
+> +        (ccw->cmd_code & CCW_CMD_BASIC_SENSE ||
+> +         ccw->cmd_code & 0x02 /* read */ ||
+> +         ccw->cmd_code & 0x0c /* read backwards */);
 
-Reported-by: aihua liang <aliang@redhat.com>
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1683498
----
- blockdev.c | 4 ----
- 1 file changed, 4 deletions(-)
+I wish so badly that these checks work, since it'd simplify the vfio-ccw 
+code, but I don't think this lets you tell the difference between a READ 
+(x02) and a NOP (x03) or any other control-type CCW.  Ditto 
+read-backward versus TIC.  :-(
 
-diff --git a/blockdev.c b/blockdev.c
-index 79fbac8450..a81d88980c 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1872,10 +1872,6 @@ static void blockdev_backup_prepare(BlkActionState=
- *common, Error **errp)
-     }
-=20
-     aio_context =3D bdrv_get_aio_context(bs);
--    if (aio_context !=3D bdrv_get_aio_context(target)) {
--        error_setg(errp, "Backup between two IO threads is not implement=
-ed");
--        return;
--    }
-     aio_context_acquire(aio_context);
-     state->bs =3D bs;
-=20
---=20
-2.20.1
+>       ccw_dstream_rewind(cds);
+>       if (!(cds->flags & CDS_F_IDA)) {
+>           cds->op_handler = ccw_dstream_rw_noflags;
+> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+> index aae19c427229..7cc183ef4366 100644
+> --- a/include/hw/s390x/css.h
+> +++ b/include/hw/s390x/css.h
+> @@ -97,6 +97,7 @@ typedef struct CcwDataStream {
+>       int (*op_handler)(struct CcwDataStream *cds, void *buff, int len,
+>                         CcwDataStreamOp op);
+>       hwaddr cda;
+> +    bool do_skip;
+>   } CcwDataStream;
+>   
+>   /*
+> 
 
 
