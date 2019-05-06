@@ -2,62 +2,77 @@ Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 153F1C04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 15:27:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 596EFC04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 15:33:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D39C8205ED
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 15:27:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24585205ED
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 15:33:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="A3UYPLVO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D39C8205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a5+jKVt8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24585205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58210 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58278 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNfWL-0003bU-3O
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 11:27:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35303)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
-	<590216e2666653bac21d950aaba98f87d0a53324@lizzy.crudebyte.com>)
-	id 1hNfTl-0001XV-Tu
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:24:34 -0400
+	id 1hNfby-0005vH-CD
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 11:33:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37076)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <fintelia@gmail.com>) id 1hNfas-0005YH-Jc
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:31:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from
-	<590216e2666653bac21d950aaba98f87d0a53324@lizzy.crudebyte.com>)
-	id 1hNfTl-0005fj-0q
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:24:33 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:47307)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from
-	<590216e2666653bac21d950aaba98f87d0a53324@lizzy.crudebyte.com>)
-	id 1hNfTk-0004zc-Qe
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:24:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=crudebyte.com; s=lizzy; h=Subject:Date:Cc:To:From:Message-Id:Sender:
-	Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=T+6uJPoWkfQD/iVYDTZBTRiGcUZBD2zXjAiXeKoQClw=;
-	b=A3UYPLVO84NTGWQ2gdfsTeZRRJ
-	QubENPHv1XGK95x5a53qRG4QuZOF7ZKJkDJoGCw7wE0OJ9f8ZC05+Hvommr7FheHvrxmrg0S+rChC
-	5H2XDz2g7Lfd52UBUa2hf0KTvAHAswrqQeNmtc/o/BOeJULSJhufKJ4iCGenVugbtGvq0Hgf0xETn
-	xUrpqD6gKXa8qJBcmVQOfcVW5zAIeWde+7yR+XwJ84XHCIVLuvLfHGq/RPx7PP/D/4i3YNkeW4/u/
-	d4dNlk1YiSyB+5JS4cfcUssAhIHOhn8N+0CzANhjBWOoiJgVbXMaHVNXHVvaGOckJxAZWJkmqBLBN
-	wjfqJuKQ==;
-Message-Id: <cover.1557093245.git.qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 6 May 2019 16:37:15 +0200
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.194.90.13
-Subject: [Qemu-devel] [PATCH v3 0/5] 9p: Fix file ID collisions
+	(envelope-from <fintelia@gmail.com>) id 1hNfar-0003sY-Lm
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:31:54 -0400
+Received: from mail-lf1-x136.google.com ([2a00:1450:4864:20::136]:38630)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <fintelia@gmail.com>)
+	id 1hNfar-0003rR-EM; Mon, 06 May 2019 11:31:53 -0400
+Received: by mail-lf1-x136.google.com with SMTP id y19so1904492lfy.5;
+	Mon, 06 May 2019 08:31:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:from:date:message-id:subject:to:cc;
+	bh=FB9+SCfnB8QzagMDoXtuby435WXka8anbsg63mzE4aQ=;
+	b=a5+jKVt8PEK+67H9Y6nu82VEJPzGr6IsMgm+VFHbU6hMUn2kK0Nrwc42ruKlFAoFFK
+	BZlXNjCwSNUAgrGVdUSXnI/2Ej1/0CeqNKn2RJ0uSkJuQrffQYaIRAUtlmb601/QEuHe
+	rCQPxC7ULvwx7JZ4zatKEFzmAGImPpYtHYnZxGtOA8o/D1MKgI5rlIese+P4nWSDW74o
+	+j29kAkIKZGnl6xysEV4/HJ6qqF5vW+Sx2u6tvWWbE7oeLGW5nwkCl0Ebh8PatdmYC5P
+	oyCjneAW92DHRC6mS4SNopjuE8HTEKAEKgMAFpK3vwekyiANBXtDjts7b5aAmchgd3ek
+	ZpHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+	bh=FB9+SCfnB8QzagMDoXtuby435WXka8anbsg63mzE4aQ=;
+	b=VP869Nd7Zvfy82Z0X0TlM16iYqwxM8+SSsuFLlTLdAxOjfUXwGfk4a3SZCA/JWQDH2
+	kPmwlIAnnSxCGpwwEZOYgeGVFvzgTERymXflS0intovkONhjsUAN3zBo8E297vGabjyZ
+	yQJtKXOgma9sRebYJOOYbDkwUC752GecaXw/XMvdl1muchYQF6X7wVh5RxX2KyjQN9lR
+	yfsyTXtiXypvh406AK2bzJyr7H43/FNRoSao5y2tP8d1E9uUxpQOPQGp1xX3hAvLQepn
+	VqGvDC35wZEo4qcMldKfFDmLB0znk65nxCcjpfL+aM5PyLQUdKlA/SokdArk2yzXyHgs
+	jzrA==
+X-Gm-Message-State: APjAAAXCzZcCgaFRbsIIzBX9JrsyEuWjujqG7QOWGFviL2+Txh8KAdcZ
+	6GvjyHXZ3amiVRpMmbtH3gvlCbJU4H7iuYpiXoM56Nz6lAk=
+X-Google-Smtp-Source: APXvYqyYxT56gtddLmGYJfCpC9JolzfCBLbgyKTnf++k2WeNoCajOUNiBTpY3Xg7+IjjusSo7ricWfmRQTSdy6ow7FE=
+X-Received: by 2002:ac2:4571:: with SMTP id k17mr4272321lfm.133.1557156710847; 
+	Mon, 06 May 2019 08:31:50 -0700 (PDT)
+MIME-Version: 1.0
+From: Jonathan Behrens <fintelia@gmail.com>
+Date: Mon, 6 May 2019 11:31:24 -0400
+Message-ID: <CANnJOVFj9yhbjPY=_+LNDWwO=Q8jLFnH01AbTY8T0p=cmkrNiw@mail.gmail.com>
+To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::136
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: [Qemu-devel] [PATCH for 4.1] target/riscv: Only flush TLB if
+ SATP.ASID changes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,51 +84,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Cc: Greg Kurz <groug@kaod.org>, Antonios Motakis <antonios.motakis@huawei.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>,
+	Palmer Dabbelt <palmer@sifive.com>,
+	"open list:RISC-V" <qemu-riscv@nongnu.org>,
+	Sagar Karandikar <sagark@eecs.berkeley.edu>,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is v3 of a proposed patch set for fixing file ID collisions with 9pfs. 
+There is an analogous change for ARM here:
+https://patchwork.kernel.org/patch/10649857
+---
+ target/riscv/csr.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-That's it from my side for now regarding this overall issue. I am waiting for
-your comments on this patch set before doing anything else.
-
-Patch 1 to 4 are identical to the previous version. New patch 5 adds an
-optional qemu virtfs device parameter "vii" (very important inode[s]) , which
-allows host admins to configure which fs device(s) should get the largest inode
-namespaces on guest.
-
-I will also send a (6th) patch against libvirt which allows to configure the
-"vii" feature of patch 5 via xml config instead of qemu command line argument.
-
-I am yet unresolved whether or not to use persistency for file IDs that is
-introduced with patch 3. After applying the entire patch set, the
-persistency feature is disabled by default at compile time, but you can
-enable it with macro QPP_TABLE_PERSISTENCY_LIMIT.
-
-Christian Schoenebeck (5):
-  9p: mitigates most QID path collisions
-  9P: trivial cleanup of QID path collision mitigation
-  9p: persistency of QID path beyond reboots / suspensions
-  9p: use variable length suffixes for inode mapping
-  9p: adds virtfs 'vii' device parameter
-
- fsdev/9p-marshal.h         |    6 +-
- fsdev/file-op-9p.h         |    1 +
- fsdev/qemu-fsdev-opts.c    |    6 +
- fsdev/qemu-fsdev.c         |    3 +
- hw/9pfs/9p.c               | 1199 +++++++++++++++++++++++++++++++++++++++++++-
- hw/9pfs/9p.h               |  173 +++++++
- hw/9pfs/trace-events       |   14 +-
- hw/9pfs/virtio-9p-device.c |    1 +
- qemu-options.hx            |    5 +-
- vl.c                       |    9 +-
- 10 files changed, 1378 insertions(+), 39 deletions(-)
-
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 6083c782a1..1ec1222da1 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -732,7 +732,9 @@ static int write_satp(CPURISCVState *env, int csrno,
+target_ulong val)
+         if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
+             return -1;
+         } else {
+-            tlb_flush(CPU(riscv_env_get_cpu(env)));
++            if((val ^ env->satp) & SATP_ASID) {
++                tlb_flush(CPU(riscv_env_get_cpu(env)));
++            }
+             env->satp = val;
+         }
+     }
 -- 
-2.11.0
-
-
+2.20.1
