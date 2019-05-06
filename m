@@ -6,55 +6,57 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0490CC04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:19:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19AEBC04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:20:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D02072053B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:19:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D02072053B
+	by mail.kernel.org (Postfix) with ESMTPS id D494020830
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:20:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D494020830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59635 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59671 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNhGY-0005kK-Mg
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 13:19:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33747)
+	id 1hNhI8-0006zd-UC
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 13:20:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hNhFB-0005BW-E3
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:17:38 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hNhFp-0005Tb-9R
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:18:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hNhFA-0004Mg-HE
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:17:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53316)
+	(envelope-from <kwolf@redhat.com>) id 1hNhFo-0004qE-05
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:18:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53416)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
-	id 1hNhFA-0004M0-Bi; Mon, 06 May 2019 13:17:36 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hNhFl-0004mm-2b; Mon, 06 May 2019 13:18:13 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3CA173086227;
-	Mon,  6 May 2019 17:17:35 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.81])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id BB0DD60BEC;
-	Mon,  6 May 2019 17:17:34 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon,  6 May 2019 19:17:30 +0200
-Message-Id: <20190506171730.17556-1-cohuck@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 591663002C60;
+	Mon,  6 May 2019 17:18:12 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-117-82.ams2.redhat.com
+	[10.36.117.82])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 232571001DF9;
+	Mon,  6 May 2019 17:18:10 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Date: Mon,  6 May 2019 19:17:56 +0200
+Message-Id: <20190506171805.14236-2-kwolf@redhat.com>
+In-Reply-To: <20190506171805.14236-1-kwolf@redhat.com>
+References: <20190506171805.14236-1-kwolf@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Mon, 06 May 2019 17:17:35 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.46]);
+	Mon, 06 May 2019 17:18:12 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH RFC] s390/css: handle CCW_FLAG_SKIP
+Subject: [Qemu-devel] [PATCH 01/10] block: Add bdrv_try_set_aio_context()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,92 +68,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Farman <farman@linux.ibm.com>, qemu-s390x@nongnu.org,
-	Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If a ccw has CCW_FLAG_SKIP set, and the command is of type
-read, read backwards, or sense, no data should be written
-to the guest for that command.
+Eventually, we want to make sure that all parents and all children of a
+node are in the same AioContext as the node itself. This means that
+changing the AioContext may fail because one of the other involved
+parties (e.g. a guest device that was configured with an iothread)
+cannot allow switching to a different AioContext.
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Introduce a set of functions that allow to first check whether all
+involved nodes can switch to a new context and only then do the actual
+switch. The check recursively covers children and parents.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
+ include/block/block.h     |  8 ++++
+ include/block/block_int.h |  3 ++
+ block.c                   | 92 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 103 insertions(+)
 
-Only extremely lightly tested (i.e., can boot a guest.)
-
----
- hw/s390x/css.c         | 22 ++++++++++++++++++----
- include/hw/s390x/css.h |  1 +
- 2 files changed, 19 insertions(+), 4 deletions(-)
-
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 8fc9e35ba5d3..6ee31cc2e08f 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -830,8 +830,12 @@ static int ccw_dstream_rw_noflags(CcwDataStream *cds=
-, void *buff, int len,
-     if (op =3D=3D CDS_OP_A) {
-         goto incr;
-     }
--    ret =3D address_space_rw(&address_space_memory, cds->cda,
--                           MEMTXATTRS_UNSPECIFIED, buff, len, op);
-+    if (!cds->do_skip) {
-+        ret =3D address_space_rw(&address_space_memory, cds->cda,
-+                               MEMTXATTRS_UNSPECIFIED, buff, len, op);
-+    } else {
-+        ret =3D 0;
-+    }
-     if (ret !=3D MEMTX_OK) {
-         cds->flags |=3D CDS_F_STREAM_BROKEN;
-         return -EINVAL;
-@@ -928,8 +932,13 @@ static int ccw_dstream_rw_ida(CcwDataStream *cds, vo=
-id *buff, int len,
-     do {
-         iter_len =3D MIN(len, cont_left);
-         if (op !=3D CDS_OP_A) {
--            ret =3D address_space_rw(&address_space_memory, cds->cda,
--                                   MEMTXATTRS_UNSPECIFIED, buff, iter_le=
-n, op);
-+            if (!cds->do_skip) {
-+                ret =3D address_space_rw(&address_space_memory, cds->cda=
+diff --git a/include/block/block.h b/include/block/block.h
+index c7a26199aa..649aa5b86d 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -590,6 +590,14 @@ void bdrv_coroutine_enter(BlockDriverState *bs, Coro=
+utine *co);
+  * This function must be called with iothread lock held.
+  */
+ void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)=
+;
++int bdrv_try_set_aio_context(BlockDriverState *bs, AioContext *ctx,
++                             Error **errp);
++int bdrv_child_try_set_aio_context(BlockDriverState *bs, AioContext *ctx=
 ,
-+                                       MEMTXATTRS_UNSPECIFIED, buff, ite=
-r_len,
-+                                       op);
-+            } else {
-+                ret =3D 0;
-+            }
-             if (ret !=3D MEMTX_OK) {
-                 /* assume inaccessible address */
-                 ret =3D -EINVAL; /* channel program check */
-@@ -968,6 +977,11 @@ void ccw_dstream_init(CcwDataStream *cds, CCW1 const=
- *ccw, ORB const *orb)
++                                   BdrvChild *ignore_child, Error **errp=
+);
++bool bdrv_child_can_set_aio_context(BdrvChild *c, AioContext *ctx,
++                                    GSList **ignore, Error **errp);
++bool bdrv_can_set_aio_context(BlockDriverState *bs, AioContext *ctx,
++                              GSList **ignore, Error **errp);
+ int bdrv_probe_blocksizes(BlockDriverState *bs, BlockSizes *bsz);
+ int bdrv_probe_geometry(BlockDriverState *bs, HDGeometry *geo);
 =20
-     cds->count =3D ccw->count;
-     cds->cda_orig =3D ccw->cda;
-+    /* skip is only effective for read, read backwards, or sense command=
-s */
-+    cds->do_skip =3D (ccw->flags & CCW_FLAG_SKIP) &&
-+        (ccw->cmd_code & CCW_CMD_BASIC_SENSE ||
-+         ccw->cmd_code & 0x02 /* read */ ||
-+         ccw->cmd_code & 0x0c /* read backwards */);
-     ccw_dstream_rewind(cds);
-     if (!(cds->flags & CDS_F_IDA)) {
-         cds->op_handler =3D ccw_dstream_rw_noflags;
-diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-index aae19c427229..7cc183ef4366 100644
---- a/include/hw/s390x/css.h
-+++ b/include/hw/s390x/css.h
-@@ -97,6 +97,7 @@ typedef struct CcwDataStream {
-     int (*op_handler)(struct CcwDataStream *cds, void *buff, int len,
-                       CcwDataStreamOp op);
-     hwaddr cda;
-+    bool do_skip;
- } CcwDataStream;
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 94d45c9708..b150c5f047 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -691,6 +691,9 @@ struct BdrvChildRole {
+      * can update its reference. */
+     int (*update_filename)(BdrvChild *child, BlockDriverState *new_base,
+                            const char *filename, Error **errp);
++
++    bool (*can_set_aio_ctx)(BdrvChild *child, AioContext *ctx,
++                            GSList **ignore, Error **errp);
+ };
+=20
+ extern const BdrvChildRole child_file;
+diff --git a/block.c b/block.c
+index 9ae5c0ed2f..a70c01effb 100644
+--- a/block.c
++++ b/block.c
+@@ -936,6 +936,13 @@ static int bdrv_child_cb_inactivate(BdrvChild *child=
+)
+     return 0;
+ }
+=20
++static bool bdrv_child_cb_can_set_aio_ctx(BdrvChild *child, AioContext *=
+ctx,
++                                          GSList **ignore, Error **errp)
++{
++    BlockDriverState *bs =3D child->opaque;
++    return bdrv_can_set_aio_context(bs, ctx, ignore, errp);
++}
++
+ /*
+  * Returns the options and flags that a temporary snapshot should get, b=
+ased on
+  * the originally requested flags (the originally requested image will h=
+ave
+@@ -1003,6 +1010,7 @@ const BdrvChildRole child_file =3D {
+     .attach          =3D bdrv_child_cb_attach,
+     .detach          =3D bdrv_child_cb_detach,
+     .inactivate      =3D bdrv_child_cb_inactivate,
++    .can_set_aio_ctx =3D bdrv_child_cb_can_set_aio_ctx,
+ };
 =20
  /*
+@@ -1029,6 +1037,7 @@ const BdrvChildRole child_format =3D {
+     .attach          =3D bdrv_child_cb_attach,
+     .detach          =3D bdrv_child_cb_detach,
+     .inactivate      =3D bdrv_child_cb_inactivate,
++    .can_set_aio_ctx =3D bdrv_child_cb_can_set_aio_ctx,
+ };
+=20
+ static void bdrv_backing_attach(BdrvChild *c)
+@@ -1152,6 +1161,7 @@ const BdrvChildRole child_backing =3D {
+     .drained_end     =3D bdrv_child_cb_drained_end,
+     .inactivate      =3D bdrv_child_cb_inactivate,
+     .update_filename =3D bdrv_backing_update_filename,
++    .can_set_aio_ctx =3D bdrv_child_cb_can_set_aio_ctx,
+ };
+=20
+ static int bdrv_open_flags(BlockDriverState *bs, int flags)
+@@ -5751,6 +5761,88 @@ void bdrv_set_aio_context(BlockDriverState *bs, Ai=
+oContext *new_context)
+     aio_context_release(new_context);
+ }
+=20
++static bool bdrv_parent_can_set_aio_context(BdrvChild *c, AioContext *ct=
+x,
++                                            GSList **ignore, Error **err=
+p)
++{
++    if (g_slist_find(*ignore, c)) {
++        return true;
++    }
++    *ignore =3D g_slist_prepend(*ignore, c);
++
++    /* A BdrvChildRole that doesn't handle AioContext changes cannot
++     * tolerate any AioContext changes */
++    if (!c->role->can_set_aio_ctx) {
++        char *user =3D bdrv_child_user_desc(c);
++        error_setg(errp, "Changing iothreads is not supported by %s", us=
+er);
++        g_free(user);
++        return false;
++    }
++    if (!c->role->can_set_aio_ctx(c, ctx, ignore, errp)) {
++        assert(!errp || *errp);
++        return false;
++    }
++    return true;
++}
++
++bool bdrv_child_can_set_aio_context(BdrvChild *c, AioContext *ctx,
++                                    GSList **ignore, Error **errp)
++{
++    if (g_slist_find(*ignore, c)) {
++        return true;
++    }
++    *ignore =3D g_slist_prepend(*ignore, c);
++    return bdrv_can_set_aio_context(c->bs, ctx, ignore, errp);
++}
++
++/* @ignore will accumulate all visited BdrvChild object. The caller is
++ * responsible for freeing the list afterwards. */
++bool bdrv_can_set_aio_context(BlockDriverState *bs, AioContext *ctx,
++                              GSList **ignore, Error **errp)
++{
++    BdrvChild *c;
++
++    if (bdrv_get_aio_context(bs) =3D=3D ctx) {
++        return true;
++    }
++
++    QLIST_FOREACH(c, &bs->parents, next_parent) {
++        if (!bdrv_parent_can_set_aio_context(c, ctx, ignore, errp)) {
++            return false;
++        }
++    }
++    QLIST_FOREACH(c, &bs->children, next) {
++        if (!bdrv_child_can_set_aio_context(c, ctx, ignore, errp)) {
++            return false;
++        }
++    }
++
++    return true;
++}
++
++int bdrv_child_try_set_aio_context(BlockDriverState *bs, AioContext *ctx=
+,
++                                   BdrvChild *ignore_child, Error **errp=
+)
++{
++    GSList *ignore;
++    bool ret;
++
++    ignore =3D ignore_child ? g_slist_prepend(NULL, ignore_child) : NULL=
+;
++    ret =3D bdrv_can_set_aio_context(bs, ctx, &ignore, errp);
++    g_slist_free(ignore);
++
++    if (!ret) {
++        return -EPERM;
++    }
++
++    bdrv_set_aio_context(bs, ctx);
++    return 0;
++}
++
++int bdrv_try_set_aio_context(BlockDriverState *bs, AioContext *ctx,
++                             Error **errp)
++{
++    return bdrv_child_try_set_aio_context(bs, ctx, NULL, errp);
++}
++
+ void bdrv_add_aio_context_notifier(BlockDriverState *bs,
+         void (*attached_aio_context)(AioContext *new_context, void *opaq=
+ue),
+         void (*detach_aio_context)(void *opaque), void *opaque)
 --=20
 2.20.1
 
