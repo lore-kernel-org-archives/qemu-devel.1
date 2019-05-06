@@ -1,87 +1,150 @@
-Return-Path: <SRS0=nlPZ=TC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9A51C43219
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 08:32:35 +0000 (UTC)
-Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D139C04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 10:20:15 +0000 (UTC)
+X-Greylist: delayed 184 seconds by postgrey-1.34 at mail.kernel.org; Mon, 06 May 2019 10:20:15 UTC
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30A842082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
+Received: from lists.gnu.org (unknown [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63B5420873
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 May 2019 08:32:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g7rweuhQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63B5420873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
-Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47419 helo=lists.gnu.org)
+	by mail.kernel.org (Postfix) with ESMTPS id 30A842082F
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 10:20:15 +0000 (UTC)
+Received: from localhost ([127.0.0.1]:53931 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hM78s-00012p-IR
-	for qemu-devel@archiver.kernel.org; Thu, 02 May 2019 04:32:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42697)
+	id 1hNajC-0004e6-FM
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 06:20:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6te-0003Uy-Aq
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:52 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hNai8-0003r6-17
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 06:19:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hM6ta-0007zF-D4
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:48 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51695)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hM6tY-0007ay-Dq
-	for qemu-devel@nongnu.org; Thu, 02 May 2019 04:16:46 -0400
-Received: by mail-wm1-x343.google.com with SMTP id t76so1485709wmt.1
-	for <qemu-devel@nongnu.org>; Thu, 02 May 2019 01:16:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=6XppYMRruE5laPQu4tuOEJD3R2TgHj9UJ0kj9FF2Z0o=;
-	b=g7rweuhQ02WGqqpLl3LfGFc8M8PAHVu8jQ0b1SQEBBEwp0fMqm6ajS3Mcsa9DP4TY2
-	fvKPN8lA8YRBso40lUF2I2CZGx17GpSZPVd5bbFFJeWjPAN76nbnKYN8tHMWxqV1lJh6
-	gmUOjT3haCTuIGp+I6VycaG3H2x+SNkAvArxf8ZD+AbdrfEWj8WuT+FsQfiygmLIYCXf
-	PlvCseUHCRnzafDoHwnb4jJid54IxEUu6U5J/V50en5xxQHCb66mJ2LTenUsQKpPST8p
-	76HuYgWDzSQBVFoZs2idvEuq+h6GTW3xRE6uT5GwlDF1NG51RYp3JI/5lhnvmL8wqmg/
-	98cQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=6XppYMRruE5laPQu4tuOEJD3R2TgHj9UJ0kj9FF2Z0o=;
-	b=oPZNHMtmtaS2H0RiA8QrOH/oeWalL7A+Dsgg31dm/0sD0F92F1sWHWbuuAWLWt1jbN
-	tB0Wbxpsgf+FOKpbscCGt9k+Tde+AHmYKhzupr0zKD43O4JmhHbQn10okXXpZbb2Ywnw
-	S8+f2UBrAE2gEFY2sd3cQ/qat/Ip8woN1WvV8AWlOSw7Bz4G4fp5PFOekQPDm4r+US6r
-	e7khno2WP2jVjLh2Q9qiJP9giCCV5CSVujd8x72tPnbD794E2OprL3umjrCBLyPGkUkC
-	K6mnHlO0rjWFMjgtV6KyE3M5+2v/ec61LOou1A3ESKyR9tsexzkcu1ghdsfZ+GNFjq9d
-	JUSg==
-X-Gm-Message-State: APjAAAX9oui5LET+UBU50SkvIIWpVJ+RveuJgIyez/niBiDNdjiQve/o
-	S+Jb9DBiiSp3wqJc1JHpxM6gkTT8
-X-Google-Smtp-Source: APXvYqyTQ8y7jwgvskmmJOSkyGztugXNVraM649dBe2fZVaBTEv8wime0EYcjm1JYDCBzxOE9DtKLA==
-X-Received: by 2002:a1c:a00f:: with SMTP id j15mr1307511wme.148.1556784996071; 
-	Thu, 02 May 2019 01:16:36 -0700 (PDT)
-Received: from localhost.localdomain ([176.230.64.186])
-	by smtp.gmail.com with ESMTPSA id
-	d16sm44698367wra.54.2019.05.02.01.16.34
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 02 May 2019 01:16:35 -0700 (PDT)
-From: Jon Doron <arilou@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Thu,  2 May 2019 11:15:45 +0300
-Message-Id: <20190502081554.5521-19-arilou@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190502081554.5521-1-arilou@gmail.com>
-References: <20190502081554.5521-1-arilou@gmail.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1hNai6-0005Np-7D
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 06:19:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58118
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1hNai5-0005Mx-Cd
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 06:19:02 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x46AHqQ4157110
+	for <qemu-devel@nongnu.org>; Mon, 6 May 2019 06:18:58 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2sag58y88h-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 06:18:57 -0400
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 6 May 2019 11:18:47 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+	by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Mon, 6 May 2019 11:18:45 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+	[9.149.105.62])
+	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x46AIhPo48496804
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Mon, 6 May 2019 10:18:43 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 83955AE059;
+	Mon,  6 May 2019 10:18:43 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2A56CAE04D;
+	Mon,  6 May 2019 10:18:43 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.177])
+	by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+	Mon,  6 May 2019 10:18:43 +0000 (GMT)
+To: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
+	"Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org,
+	qemu-s390x@nongnu.org, cohuck@redhat.com, alifm@linux.ibm.com
+References: <1556543381-12671-1-git-send-email-jjherne@linux.ibm.com>
+	<daad75f0-c8bb-1c9f-5b43-afa828601c42@redhat.com>
+	<df6bde4f-9c83-5009-3ca8-32d7a5e088d3@redhat.com>
+	<55907be5-61a5-f251-4609-b0336818de17@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+	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
+	syiRa+UVlsKmx1hsEg==
+Date: Mon, 6 May 2019 12:18:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH v9 18/27] gdbstub: Implement generic query (q
- pkt) with new infra
+In-Reply-To: <55907be5-61a5-f251-4609-b0336818de17@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19050610-0028-0000-0000-0000036AC7E8
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19050610-0029-0000-0000-0000242A3C1C
+Message-Id: <98a268ee-17fb-079e-01d1-5dc554a24efd@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-05-06_07:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1905060090
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] s390-bios: Skip bootmap
+ signature entries
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,364 +156,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20190502081545.C45zxTHXEyRuCtYpIemRlSAZQbYBaqm2wSXPqLpTm18@z>
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
----
- gdbstub.c | 327 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 327 insertions(+)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index d56d0fd235..83ae8738cc 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1915,6 +1915,323 @@ static void handle_v_commands(GdbCmdContext *gdb_ctx, void *user_ctx)
-     }
- }
- 
-+static void handle_query_qemu_sstepbits(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf),
-+             "ENABLE=%x,NOIRQ=%x,NOTIMER=%x", SSTEP_ENABLE,
-+             SSTEP_NOIRQ, SSTEP_NOTIMER);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+
-+static void handle_set_qemu_sstep(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    if (!gdb_ctx->num_params) {
-+        return;
-+    }
-+
-+    sstep_flags = gdb_ctx->params[0].val_ul;
-+    put_packet(gdb_ctx->s, "OK");
-+}
-+
-+static void handle_query_qemu_sstep(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "0x%x", sstep_flags);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+
-+static void handle_query_curr_tid(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    CPUState *cpu;
-+    GDBProcess *process;
-+    char thread_id[16];
-+
-+    /*
-+     * "Current thread" remains vague in the spec, so always return
-+     * the first thread of the current process (gdb returns the
-+     * first thread).
-+     */
-+    process = gdb_get_cpu_process(gdb_ctx->s, gdb_ctx->s->g_cpu);
-+    cpu = get_first_cpu_in_process(gdb_ctx->s, process);
-+    gdb_fmt_thread_id(gdb_ctx->s, cpu, thread_id, sizeof(thread_id));
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "QC%s", thread_id);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+
-+static void handle_query_threads(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    char thread_id[16];
-+
-+    if (!gdb_ctx->s->query_cpu) {
-+        put_packet(gdb_ctx->s, "l");
-+        return;
-+    }
-+
-+    gdb_fmt_thread_id(gdb_ctx->s, gdb_ctx->s->query_cpu, thread_id,
-+                      sizeof(thread_id));
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "m%s", thread_id);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+    gdb_ctx->s->query_cpu =
-+        gdb_next_attached_cpu(gdb_ctx->s, gdb_ctx->s->query_cpu);
-+}
-+
-+static void handle_query_first_threads(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    gdb_ctx->s->query_cpu = gdb_first_attached_cpu(gdb_ctx->s);
-+    handle_query_threads(gdb_ctx, user_ctx);
-+}
-+
-+static void handle_query_thread_extra(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    CPUState *cpu;
-+    int len;
-+
-+    if (!gdb_ctx->num_params ||
-+        gdb_ctx->params[0].thread_id.kind == GDB_READ_THREAD_ERR) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    cpu = gdb_get_cpu(gdb_ctx->s, gdb_ctx->params[0].thread_id.pid,
-+                      gdb_ctx->params[0].thread_id.tid);
-+    if (!cpu) {
-+        return;
-+    }
-+
-+    cpu_synchronize_state(cpu);
-+
-+    if (gdb_ctx->s->multiprocess && (gdb_ctx->s->process_num > 1)) {
-+        /* Print the CPU model and name in multiprocess mode */
-+        ObjectClass *oc = object_get_class(OBJECT(cpu));
-+        const char *cpu_model = object_class_get_name(oc);
-+        char *cpu_name = object_get_canonical_path_component(OBJECT(cpu));
-+        len = snprintf((char *)gdb_ctx->mem_buf, sizeof(gdb_ctx->str_buf) / 2,
-+                       "%s %s [%s]", cpu_model, cpu_name,
-+                       cpu->halted ? "halted " : "running");
-+        g_free(cpu_name);
-+    } else {
-+        /* memtohex() doubles the required space */
-+        len = snprintf((char *)gdb_ctx->mem_buf, sizeof(gdb_ctx->str_buf) / 2,
-+                        "CPU#%d [%s]", cpu->cpu_index,
-+                        cpu->halted ? "halted " : "running");
-+    }
-+    trace_gdbstub_op_extra_info((char *)gdb_ctx->mem_buf);
-+    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, len);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+
-+#ifdef CONFIG_USER_ONLY
-+static void handle_query_offsets(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    TaskState *ts;
-+
-+    ts = gdb_ctx->s->c_cpu->opaque;
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf),
-+             "Text=" TARGET_ABI_FMT_lx ";Data=" TARGET_ABI_FMT_lx
-+             ";Bss=" TARGET_ABI_FMT_lx,
-+             ts->info->code_offset,
-+             ts->info->data_offset,
-+             ts->info->data_offset);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+#else
-+static void handle_query_rcmd(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    int len;
-+
-+    if (!gdb_ctx->num_params) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    len = strlen(gdb_ctx->params[0].data);
-+    if (len % 2) {
-+        put_packet(gdb_ctx->s, "E01");
-+        return;
-+    }
-+
-+    len = len / 2;
-+    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[0].data, len);
-+    gdb_ctx->mem_buf[len++] = 0;
-+    qemu_chr_be_write(gdb_ctx->s->mon_chr, gdb_ctx->mem_buf, len);
-+    put_packet(gdb_ctx->s, "OK");
-+
-+}
-+#endif
-+
-+static void handle_query_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    CPUClass *cc;
-+
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "PacketSize=%x",
-+             MAX_PACKET_LENGTH);
-+    cc = CPU_GET_CLASS(first_cpu);
-+    if (cc->gdb_core_xml_file) {
-+        pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf),
-+                ";qXfer:features:read+");
-+    }
-+
-+    if (gdb_ctx->num_params &&
-+        strstr(gdb_ctx->params[0].data, "multiprocess+")) {
-+        gdb_ctx->s->multiprocess = true;
-+    }
-+
-+    pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";multiprocess+");
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+
-+static void handle_query_xfer_features(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    GDBProcess *process;
-+    CPUClass *cc;
-+    unsigned long len, total_len, addr;
-+    const char *xml;
-+    const char *p;
-+
-+    if (gdb_ctx->num_params < 3) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    process = gdb_get_cpu_process(gdb_ctx->s, gdb_ctx->s->g_cpu);
-+    cc = CPU_GET_CLASS(gdb_ctx->s->g_cpu);
-+    if (!cc->gdb_core_xml_file) {
-+        put_packet(gdb_ctx->s, "");
-+        return;
-+    }
-+
-+    gdb_has_xml = true;
-+    p = gdb_ctx->params[0].data;
-+    xml = get_feature_xml(gdb_ctx->s, p, &p, process);
-+    if (!xml) {
-+        put_packet(gdb_ctx->s, "E00");
-+        return;
-+    }
-+
-+    addr = gdb_ctx->params[1].val_ul;
-+    len = gdb_ctx->params[2].val_ul;
-+    total_len = strlen(xml);
-+    if (addr > total_len) {
-+        put_packet(gdb_ctx->s, "E00");
-+        return;
-+    }
-+
-+    if (len > (MAX_PACKET_LENGTH - 5) / 2) {
-+        len = (MAX_PACKET_LENGTH - 5) / 2;
-+    }
-+
-+    if (len < total_len - addr) {
-+        gdb_ctx->str_buf[0] = 'm';
-+        len = memtox(gdb_ctx->str_buf + 1, xml + addr, len);
-+    } else {
-+        gdb_ctx->str_buf[0] = 'l';
-+        len = memtox(gdb_ctx->str_buf + 1, xml + addr, total_len - addr);
-+    }
-+
-+    put_packet_binary(gdb_ctx->s, gdb_ctx->str_buf, len + 1, true);
-+}
-+
-+static void handle_query_attached(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    put_packet(gdb_ctx->s, GDB_ATTACHED);
-+}
-+
-+static GdbCmdParseEntry gdb_gen_query_set_common_table[] = {
-+    /* Order is important if has same prefix */
-+    {
-+        .handler = handle_query_qemu_sstepbits,
-+        .cmd = "qemu.sstepbits",
-+    },
-+    {
-+        .handler = handle_query_qemu_sstep,
-+        .cmd = "qemu.sstep",
-+    },
-+    {
-+        .handler = handle_set_qemu_sstep,
-+        .cmd = "qemu.sstep=",
-+        .cmd_startswith = 1,
-+        .schema = "l0"
-+    },
-+};
-+
-+static GdbCmdParseEntry gdb_gen_query_table[] = {
-+    {
-+        .handler = handle_query_curr_tid,
-+        .cmd = "C",
-+    },
-+    {
-+        .handler = handle_query_threads,
-+        .cmd = "sThreadInfo",
-+    },
-+    {
-+        .handler = handle_query_first_threads,
-+        .cmd = "fThreadInfo",
-+    },
-+    {
-+        .handler = handle_query_thread_extra,
-+        .cmd = "ThreadExtraInfo,",
-+        .cmd_startswith = 1,
-+        .schema = "t0"
-+    },
-+#ifdef CONFIG_USER_ONLY
-+    {
-+        .handler = handle_query_offsets,
-+        .cmd = "Offsets",
-+    },
-+#else
-+    {
-+        .handler = handle_query_rcmd,
-+        .cmd = "Rcmd,",
-+        .cmd_startswith = 1,
-+        .schema = "s0"
-+    },
-+#endif
-+    {
-+        .handler = handle_query_supported,
-+        .cmd = "Supported:",
-+        .cmd_startswith = 1,
-+        .schema = "s0"
-+    },
-+    {
-+        .handler = handle_query_supported,
-+        .cmd = "Supported",
-+        .schema = "s0"
-+    },
-+    {
-+        .handler = handle_query_xfer_features,
-+        .cmd = "Xfer:features:read:",
-+        .cmd_startswith = 1,
-+        .schema = "s:l,l0"
-+    },
-+    {
-+        .handler = handle_query_attached,
-+        .cmd = "Attached:",
-+        .cmd_startswith = 1
-+    },
-+    {
-+        .handler = handle_query_attached,
-+        .cmd = "Attached",
-+    },
-+};
-+
-+static void handle_gen_query(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    if (!gdb_ctx->num_params) {
-+        return;
-+    }
-+
-+    if (!process_string_cmd(gdb_ctx->s, NULL, gdb_ctx->params[0].data,
-+                            gdb_gen_query_set_common_table,
-+                            ARRAY_SIZE(gdb_gen_query_set_common_table))) {
-+        return;
-+    }
-+
-+    if (process_string_cmd(gdb_ctx->s, NULL, gdb_ctx->params[0].data,
-+                           gdb_gen_query_table,
-+                           ARRAY_SIZE(gdb_gen_query_table))) {
-+        put_packet(gdb_ctx->s, "");
-+    }
-+}
-+
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -2128,6 +2445,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-         break;
-     case 'q':
-+        {
-+            static const GdbCmdParseEntry gen_query_cmd_desc = {
-+                .handler = handle_gen_query,
-+                .cmd = "q",
-+                .cmd_startswith = 1,
-+                .schema = "s0"
-+            };
-+            cmd_parser = &gen_query_cmd_desc;
-+        }
-+        break;
-     case 'Q':
-         /* parse any 'q' packets here */
-         if (!strcmp(p,"qemu.sstepbits")) {
--- 
-2.20.1
+
+On 06.05.19 12:16, Thomas Huth wrote:
+> On 06/05/2019 12.10, David Hildenbrand wrote:
+>> On 06.05.19 12:01, David Hildenbrand wrote:
+>>> On 29.04.19 15:09, Jason J. Herne wrote:
+>>>> Newer versions of zipl have the ability to write signature entries to the boot
+>>>> script for secure boot. We don't yet support secure boot, but we need to skip
+>>>> over signature entries while reading the boot script in order to maintain our
+>>>> ability to boot guest operating systems that have a secure bootloader.
+>>>>
+>>>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+>>>> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+>>>> ---
+>>>>  pc-bios/s390-ccw/bootmap.c | 19 +++++++++++++++++--
+>>>>  pc-bios/s390-ccw/bootmap.h | 10 ++++++----
+>>>>  2 files changed, 23 insertions(+), 6 deletions(-)
+>>>>
+>>>> diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+>>>> index 7aef65a..d13b7cb 100644
+>>>> --- a/pc-bios/s390-ccw/bootmap.c
+>>>> +++ b/pc-bios/s390-ccw/bootmap.c
+>>>> @@ -254,7 +254,14 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr,
+>>>>      memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+>>>>      read_block(block_nr, sec, "Cannot read Boot Map Script");
+>>>>  
+>>>> -    for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD; i++) {
+>>>> +    for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD ||
+>>>> +                bms->entry[i].type == BOOT_SCRIPT_SIGNATURE; i++) {
+>>>> +
+>>>> +        /* We don't support secure boot yet, so we skip signature entries */
+>>>> +        if (bms->entry[i].type == BOOT_SCRIPT_SIGNATURE) {
+>>>> +            continue;
+>>>> +        }
+>>>> +
+>>>>          address = bms->entry[i].address.load_address;
+>>>>          block_nr = eckd_block_num(&bms->entry[i].blkptr.xeckd.bptr.chs);
+>>>>  
+>>>> @@ -489,7 +496,15 @@ static void zipl_run(ScsiBlockPtr *pte)
+>>>>  
+>>>>      /* Load image(s) into RAM */
+>>>>      entry = (ComponentEntry *)(&header[1]);
+>>>> -    while (entry->component_type == ZIPL_COMP_ENTRY_LOAD) {
+>>>> +    while (entry->component_type == ZIPL_COMP_ENTRY_LOAD ||
+>>>> +           entry->component_type == ZIPL_COMP_ENTRY_SIGNATURE) {
+>>>> +
+>>>> +        /* We don't support secure boot yet, so we skip signature entries */
+>>>> +        if (entry->component_type == ZIPL_COMP_ENTRY_SIGNATURE) {
+>>>> +            entry++;
+>>>> +            continue;
+>>>> +        }
+>>>> +
+>>>>          zipl_load_segment(entry);
+>>>>  
+>>>>          entry++;
+>>>> diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
+>>>> index a085212..94f53a5 100644
+>>>> --- a/pc-bios/s390-ccw/bootmap.h
+>>>> +++ b/pc-bios/s390-ccw/bootmap.h
+>>>> @@ -98,8 +98,9 @@ typedef struct ScsiMbr {
+>>>>  #define ZIPL_COMP_HEADER_IPL    0x00
+>>>>  #define ZIPL_COMP_HEADER_DUMP   0x01
+>>>>  
+>>>> -#define ZIPL_COMP_ENTRY_LOAD    0x02
+>>>> -#define ZIPL_COMP_ENTRY_EXEC    0x01
+>>>> +#define ZIPL_COMP_ENTRY_EXEC      0x01
+>>>> +#define ZIPL_COMP_ENTRY_LOAD      0x02
+>>>> +#define ZIPL_COMP_ENTRY_SIGNATURE 0x03
+>>>>  
+>>>>  typedef struct XEckdMbr {
+>>>>      uint8_t magic[4];   /* == "xIPL"        */
+>>>> @@ -117,8 +118,9 @@ typedef struct BootMapScriptEntry {
+>>>>      BootMapPointer blkptr;
+>>>>      uint8_t pad[7];
+>>>>      uint8_t type;   /* == BOOT_SCRIPT_* */
+>>>> -#define BOOT_SCRIPT_EXEC 0x01
+>>>> -#define BOOT_SCRIPT_LOAD 0x02
+>>>> +#define BOOT_SCRIPT_EXEC      0x01
+>>>> +#define BOOT_SCRIPT_LOAD      0x02
+>>>> +#define BOOT_SCRIPT_SIGNATURE 0x03
+>>>>      union {
+>>>>          uint64_t load_address;
+>>>>          uint64_t load_psw;
+>>>>
+>>>
+>>> Naive question from me:
+>>>
+>>> Can't we place the signatures somewhere else, and instead associate them
+>>> with entries? This avoids breaking backwards compatibility for the sake
+>>> of signatures we want unmodified zipl loaders to ignore.
+>>>
+>>
+>>
+>> ... but I guess this is already documented somewhere internally and
+>> other components have been adjusted. IOW, cannot be changed anymore.
+>>
+>> Guess our implementation should have tolerated other entries than
+>> "BOOT_SCRIPT_LOAD" right from the beginning.
+> 
+> Hmm, now we only tolerate the _LOAD and _SIGNATURE entries, but still
+> nothing else... would it make sense to rewrite the code a little bit to
+> tolerate all other kind of entries, but just act on the well-known _LOAD
+> entries, so that we do not step into this trap in the future anymore?
+
+I think we should not. Those entries might have sematic elements that the guest
+wants to enforce. I do not think that this will come, but imagine a boot entry
+that mandates some security wishes (e.g. do only run on non-shared cores).
 
 
