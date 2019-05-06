@@ -6,79 +6,78 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15308C04AAB
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 15:01:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B429C04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 15:05:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE1832053B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 15:01:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE1832053B
+	by mail.kernel.org (Postfix) with ESMTPS id 220222053B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 15:05:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 220222053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57876 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57945 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNf7d-0007jE-3O
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 11:01:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58489)
+	id 1hNfBK-0000nB-4n
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 11:05:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNf6T-00076c-7W
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:00:34 -0400
+	(envelope-from <philmd@redhat.com>) id 1hNf9o-0008RX-66
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:04:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNf6R-0007PF-Ew
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:00:28 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:50719)
+	(envelope-from <philmd@redhat.com>) id 1hNf9m-000101-TW
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:03:55 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:40667)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hNf6R-0007Lg-8Z
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:00:27 -0400
-Received: by mail-wm1-f66.google.com with SMTP id p21so16176590wmc.0
-	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 08:00:27 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hNf9m-0000zb-Mb
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 11:03:54 -0400
+Received: by mail-wr1-f68.google.com with SMTP id h4so17712102wre.7
+	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 08:03:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=8PJRFru9GTn5IEri305UtxALWGHwapioC+ZsjmD6/IY=;
-	b=T9YZVUL11uKGpoo7Dt3EcwUb+S/neJWf7XESxQG1evKx18LEvlmnHFQzJRsO2cwj5W
-	DppxYKgTPVlPaaTWbRhe5I4+zIYwvBnXj6F15axAoJ9qJxyZrXhdOFMLk1MjtnnMyH/Y
-	39PgsB3mjXGFr1c8Zvqp+NzwdbgOqRgw6lYyLHsUzCycRomC6OnI4UQxWWKc8E9ytYfy
-	q6V8WmsVk7/mjODtmTGV1aOgtOBhks4pjaIbVfM+obBNO6KMCcrBoAe9XLTK9BCAaHYa
-	IFaQJ29QtyD4gbdJAK0FljmdNE4e9kYyZYyUpfDCUXIVo3W/tmYysMSb0MxWKGcwMLVM
-	xnjA==
-X-Gm-Message-State: APjAAAWHkQLM+RUOMmjr/NC4t7b00L00hC8cgu2BtlQretjaVt/lVzIB
-	GVZC+NwJ2QANvvgR8NSNG7Pn+w==
-X-Google-Smtp-Source: APXvYqzOZOqn3H2R5hB9kisYzHr5Xl5b1KBRWN06TdvzRJ2rzGr2QxdU6tvfsz0osVKdXsXyyMz5rw==
-X-Received: by 2002:a05:600c:1191:: with SMTP id
-	i17mr16869817wmf.84.1557154826145; 
-	Mon, 06 May 2019 08:00:26 -0700 (PDT)
+	bh=59/j8jbijb9GRmsy8+BVwJxh9KkZztFgn0HfCCnm3UM=;
+	b=UG6zmgPk5A1ZctRwONifFrO6GRHaVjbJZlUbI+rXhG9EBO9SyHSj0YlUVU8LZNH9zY
+	owXT1bD+ENSJr27zTX4ERGgp7eoM2e4Y4SOAYN8+B03Wxl0WlW6h40PYL8Rq295qdRL7
+	4AyYnrXFLjPn9EJc984QAQxjzalTqxmoNjYYx3bHxbBwaaTngef2yDaHg2XWdsS8HNE0
+	j4lITktml+k3iEdK5fwtz6EJ7riE35Wxfm2qLs1YI6OSkXnPoMK6KoKxpwqv4FYiyuYu
+	QWUeL97r/qvZO1mtqQ6fDAyxZvSwQQN/QjWSTw1m3rzwFEr94hLmHxUt4MgqEuU2puJh
+	RpkA==
+X-Gm-Message-State: APjAAAWG8RyH3oQnvPqCQRIqJsaaazGsEuNWI6CP8pisuci9Wq8RgMe/
+	1BCY5Dz9dIbSPNxzgq4KGTmSMQ==
+X-Google-Smtp-Source: APXvYqylfBevJLCKzWEvOW64YF1ZERjxvruZkJ8D0xY62yBkoP35UVL4Yxw96s4XeRYMNT/964amIA==
+X-Received: by 2002:a5d:4985:: with SMTP id r5mr13729156wrq.37.1557155033720; 
+	Mon, 06 May 2019 08:03:53 -0700 (PDT)
 Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
 	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	o13sm19229737wrg.40.2019.05.06.08.00.24
+	r2sm10853022wmh.31.2019.05.06.08.03.52
 	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 06 May 2019 08:00:25 -0700 (PDT)
+	Mon, 06 May 2019 08:03:52 -0700 (PDT)
 To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org,
 	qemu-stable@nongnu.org
 References: <20190505200602.12412-1-philmd@redhat.com>
-	<20190505200602.12412-2-philmd@redhat.com>
-	<310808da-71c5-19d8-be81-ae255682e79e@redhat.com>
+	<20190505200602.12412-5-philmd@redhat.com>
+	<05b25819-eaca-3452-5933-437afbe11298@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
 	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <28db6e11-2d49-757b-7851-e9a6fc0843d0@redhat.com>
-Date: Mon, 6 May 2019 17:00:24 +0200
+Message-ID: <963e0d54-af61-4ca7-3a39-bd50318e283b@redhat.com>
+Date: Mon, 6 May 2019 17:03:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <310808da-71c5-19d8-be81-ae255682e79e@redhat.com>
+In-Reply-To: <05b25819-eaca-3452-5933-437afbe11298@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH 1/5] hw/block/pflash_cfi01: Removed an
- unused timer
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH 4/5] hw/block/pflash_cfi02: Extract the
+ pflash_reset() code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -102,113 +101,86 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/6/19 4:39 PM, Laszlo Ersek wrote:
-> On 05/05/19 22:05, Philippe Mathieu-Daudé wrote:
->> The 'CFI01' NOR flash was introduced in commit 29133e9a0fff, with
->> timing modelled. One year later, the CFI02 model was introduced
->> (commit 05ee37ebf630) based on the CFI01 model. As noted in the
-> 
-> You got those commit references backwards, I believe:
-> 
-> * Commit 29133e9a0fff ("AMD NOR flash device support (initial patch by
-> Jocelyn Mayer)", 2006-06-25) introduced "hw/pflash_cfi02.c".
-> 
-> * Commit 05ee37ebf630 ("Gumstix 'connex' board support by Thorsten
-> Zitterell.", 2007-11-17) introduced "hw/pflash_cfi01.c".
-
-Argh yes, thank you!
-
->> header, "It does not support timings". 12 years later, we never
->> had to model the device timings. Time to remove the unused timer,
->> we can still add it back if required.
+On 5/6/19 4:57 PM, Laszlo Ersek wrote:
+> On 05/05/19 22:06, Philippe Mathieu-Daudé wrote:
+>> The reset() code is used in various places, refactor it.
 >>
->> Suggested-by: Laszlo Ersek <lersek@redhat.com>
 >> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 >> ---
->> Yes, I plan to model those timings later. Actually I have a series
->> working, but I'd rather first
->> 1/ refactor common code between the both CFI implementations,
-> 
-> Good idea.
-> 
->> 2/ discuss on list whether or not use timings for the Virt flash.
-> 
-> What would the timer buy us (specifically wrt. cfi01 / OVMF / ArmVirt)?
-> 
-> Being faithful to actual hardware is always good... except when it runs
-> a significant risk of regressions. :) By that I don't mean "programming
-> errors"; I mean that guest code would now have to conform to various
-> timeouts, and that always makes me a bit concerned.
-
-I'm glat you feel concerned :)
-My goal is to model enough of the device to be able to run 'Capsule
-Based Firmware Updates' [*], but I haven't investigated much yet.
-Embedded firmware usually care about such timings. Anyway if this is
-implemented as a feature, it would be disabled by default for the Virt
-flash (I name the Virt flash the one used by the Virt X86/Aarch64 machines).
-
-> 
-> For this patch, with the commit references fixed:
-> 
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Will do, thanks!
-
-> 
-> Thanks,
-> Laszlo
-> 
->> ---
->>  hw/block/pflash_cfi01.c | 15 ---------------
->>  1 file changed, 15 deletions(-)
+>>  hw/block/pflash_cfi02.c | 25 +++++++++++++++----------
+>>  1 file changed, 15 insertions(+), 10 deletions(-)
 >>
->> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
->> index 16dfae14b80..6dc04f156a7 100644
->> --- a/hw/block/pflash_cfi01.c
->> +++ b/hw/block/pflash_cfi01.c
->> @@ -42,7 +42,6 @@
->>  #include "hw/block/flash.h"
->>  #include "sysemu/block-backend.h"
->>  #include "qapi/error.h"
->> -#include "qemu/timer.h"
->>  #include "qemu/bitops.h"
->>  #include "qemu/host-utils.h"
->>  #include "qemu/log.h"
->> @@ -86,7 +85,6 @@ struct PFlashCFI01 {
->>      uint8_t cfi_table[0x52];
->>      uint64_t counter;
->>      unsigned int writeblock_size;
->> -    QEMUTimer *timer;
->>      MemoryRegion mem;
->>      char *name;
->>      void *storage;
->> @@ -110,18 +108,6 @@ static const VMStateDescription vmstate_pflash = {
->>      }
->>  };
+>> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+>> index f2c6201f813..f321b74433c 100644
+>> --- a/hw/block/pflash_cfi02.c
+>> +++ b/hw/block/pflash_cfi02.c
+>> @@ -120,6 +120,17 @@ static void pflash_register_memory(PFlashCFI02 *pfl, int rom_mode)
+>>      pfl->rom_mode = rom_mode;
+>>  }
 >>  
->> -static void pflash_timer (void *opaque)
->> -{
->> -    PFlashCFI01 *pfl = opaque;
->> -
->> -    trace_pflash_timer_expired(pfl->cmd);
->> -    /* Reset flash */
->> -    pfl->status ^= 0x80;
->> -    memory_region_rom_device_set_romd(&pfl->mem, true);
+>> +static void pflash_reset(PFlashCFI02 *pfl)
+>> +{
+>> +    trace_pflash_reset();
+>> +    timer_del(&pfl->timer);
+>> +    pfl->bypass = 0;
+>> +    pfl->wcycle = 0;
+>> +    pfl->cmd = 0;
+>> +    pfl->status = 0;
+>> +    pflash_register_memory(pfl, 1);
+>> +}
+>> +
+>>  static void pflash_timer (void *opaque)
+>>  {
+>>      PFlashCFI02 *pfl = opaque;
+>> @@ -129,11 +140,10 @@ static void pflash_timer (void *opaque)
+>>      pfl->status ^= 0x80;
+>>      if (pfl->bypass) {
+>>          pfl->wcycle = 2;
+>> +        pfl->cmd = 0;
+>>      } else {
+>> -        pflash_register_memory(pfl, 1);
+>> -        pfl->wcycle = 0;
+>> +        pflash_reset(pfl);
+>>      }
+>> -    pfl->cmd = 0;
+>>  }
+>>  
+>>  static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
+>> @@ -481,10 +491,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
+>>  
+>>      /* Reset flash */
+>>   reset_flash:
+>> -    trace_pflash_reset();
+>> -    pfl->bypass = 0;
 >> -    pfl->wcycle = 0;
 >> -    pfl->cmd = 0;
->> -}
->> -
->>  /* Perform a CFI query based on the bank width of the flash.
->>   * If this code is called we know we have a device_width set for
->>   * this flash.
->> @@ -771,7 +757,6 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
->>          pfl->max_device_width = pfl->device_width;
->>      }
+>> +    pflash_reset(pfl);
+>>      return;
 >>  
->> -    pfl->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, pflash_timer, pfl);
->>      pfl->wcycle = 0;
->>      pfl->cmd = 0;
->>      pfl->status = 0;
+>>   do_bypass:
+>> @@ -588,9 +595,7 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
+>>      sysbus_init_mmio(SYS_BUS_DEVICE(dev), &pfl->mem);
+>>  
+>>      timer_init_ns(&pfl->timer, QEMU_CLOCK_VIRTUAL, pflash_timer, pfl);
+>> -    pfl->wcycle = 0;
+>> -    pfl->cmd = 0;
+>> -    pfl->status = 0;
+>> +    pflash_reset(pfl);
+>>      /* Hardcoded CFI table (mostly from SG29 Spansion flash) */
+>>      /* Standard "QRY" string */
+>>      pfl->cfi_table[0x10] = 'Q';
 >>
+> 
+> I don't have a vested interest in the pflash_cfi02 device model, but I
+> guess my earlier (cfi01) comments would apply -- unify first, extract
+> second. (Or at least document why these changes are unobservable from
+> the behavior POV.)
+
+Ah sorry I forgot to add "Laszlo, please only review patches 1-3" in the
+cover :( I use git-publish that send all the patches of the series to
+all the list. I might start to add 'Cc:' tags in my patches.
+
+> Thanks
+> Laszlo
 > 
 
