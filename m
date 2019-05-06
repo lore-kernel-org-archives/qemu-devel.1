@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00010C04A6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A49C04A6B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:27:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C932820830
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:26:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C932820830
+	by mail.kernel.org (Postfix) with ESMTPS id C9DAE20830
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 17:27:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9DAE20830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59774 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59784 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNhNl-0003s2-1z
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 13:26:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34018)
+	id 1hNhOs-0004pc-Vg
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 13:27:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hNhFs-0005VO-RZ
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:18:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hNhFy-0005d5-4p
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:18:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hNhFr-0004uC-PN
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:18:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39716)
+	(envelope-from <kwolf@redhat.com>) id 1hNhFx-00050U-0v
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 13:18:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53160)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hNhFo-0004px-4e; Mon, 06 May 2019 13:18:16 -0400
+	id 1hNhFu-0004wH-CL; Mon, 06 May 2019 13:18:22 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 72A66D571A;
-	Mon,  6 May 2019 17:18:15 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A6F3081E0C;
+	Mon,  6 May 2019 17:18:21 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-117-82.ams2.redhat.com
 	[10.36.117.82])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 38EB110027C6;
-	Mon,  6 May 2019 17:18:14 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6E4D51001DF9;
+	Mon,  6 May 2019 17:18:20 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon,  6 May 2019 19:17:58 +0200
-Message-Id: <20190506171805.14236-4-kwolf@redhat.com>
+Date: Mon,  6 May 2019 19:18:02 +0200
+Message-Id: <20190506171805.14236-8-kwolf@redhat.com>
 In-Reply-To: <20190506171805.14236-1-kwolf@redhat.com>
 References: <20190506171805.14236-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Mon, 06 May 2019 17:18:15 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.25]);
+	Mon, 06 May 2019 17:18:21 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 03/10] block: Move recursion to
- bdrv_set_aio_context()
+Subject: [Qemu-devel] [PATCH 07/10] block: Add
+ blk_set_allow_aio_context_change()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,84 +74,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead of having two recursions, in bdrv_attach_aio_context() and in
-bdrv_detach_aio_context(), just having one recursion is enough. Said
-functions are only about a single node now.
-
-It is important that the recursion doesn't happen between detaching and
-attaching a context to the current node because the nested call will
-drain the node, and draining with a NULL context would segfault.
+Some users (like block jobs) can tolerate an AioContext change for their
+BlockBackend. Add a function that tells the BlockBackend that it can
+allow changes.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ include/sysemu/block-backend.h |  1 +
+ block/block-backend.c          | 10 ++++++++++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/block.c b/block.c
-index 00332c1eb4..e36c72e297 100644
---- a/block.c
-+++ b/block.c
-@@ -5680,7 +5680,6 @@ static void bdrv_do_remove_aio_context_notifier(Bdr=
-vAioNotifier *ban)
- static void bdrv_detach_aio_context(BlockDriverState *bs)
- {
-     BdrvAioNotifier *baf, *baf_tmp;
--    BdrvChild *child;
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backen=
+d.h
+index 5be6224226..938de34fe9 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -103,6 +103,7 @@ int blk_set_perm(BlockBackend *blk, uint64_t perm, ui=
+nt64_t shared_perm,
+ void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_pe=
+rm);
 =20
-     assert(!bs->walking_aio_notifiers);
-     bs->walking_aio_notifiers =3D true;
-@@ -5699,9 +5698,6 @@ static void bdrv_detach_aio_context(BlockDriverStat=
-e *bs)
-     if (bs->drv && bs->drv->bdrv_detach_aio_context) {
-         bs->drv->bdrv_detach_aio_context(bs);
-     }
--    QLIST_FOREACH(child, &bs->children, next) {
--        bdrv_detach_aio_context(child->bs);
--    }
+ void blk_set_allow_write_beyond_eof(BlockBackend *blk, bool allow);
++void blk_set_allow_aio_context_change(BlockBackend *blk, bool allow);
+ void blk_iostatus_enable(BlockBackend *blk);
+ bool blk_iostatus_is_enabled(const BlockBackend *blk);
+ BlockDeviceIoStatus blk_iostatus(const BlockBackend *blk);
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 0e75fc8849..4c0a8ef88d 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -71,6 +71,7 @@ struct BlockBackend {
+     uint64_t shared_perm;
+     bool disable_perm;
 =20
-     if (bs->quiesce_counter) {
-         aio_enable_external(bs->aio_context);
-@@ -5713,7 +5709,6 @@ static void bdrv_attach_aio_context(BlockDriverStat=
-e *bs,
-                                     AioContext *new_context)
- {
-     BdrvAioNotifier *ban, *ban_tmp;
--    BdrvChild *child;
++    bool allow_aio_context_change;
+     bool allow_write_beyond_eof;
 =20
-     if (bs->quiesce_counter) {
-         aio_disable_external(new_context);
-@@ -5721,9 +5716,6 @@ static void bdrv_attach_aio_context(BlockDriverStat=
-e *bs,
+     NotifierList remove_bs_notifiers, insert_bs_notifiers;
+@@ -1092,6 +1093,11 @@ void blk_set_allow_write_beyond_eof(BlockBackend *=
+blk, bool allow)
+     blk->allow_write_beyond_eof =3D allow;
+ }
 =20
-     bs->aio_context =3D new_context;
-=20
--    QLIST_FOREACH(child, &bs->children, next) {
--        bdrv_attach_aio_context(child->bs, new_context);
--    }
-     if (bs->drv && bs->drv->bdrv_attach_aio_context) {
-         bs->drv->bdrv_attach_aio_context(bs, new_context);
-     }
-@@ -5745,11 +5737,18 @@ static void bdrv_attach_aio_context(BlockDriverSt=
-ate *bs,
-  * the same as the current context of bs). */
- void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
- {
-+    BdrvChild *child;
++void blk_set_allow_aio_context_change(BlockBackend *blk, bool allow)
++{
++    blk->allow_aio_context_change =3D allow;
++}
 +
-     if (bdrv_get_aio_context(bs) =3D=3D new_context) {
-         return;
-     }
+ static int blk_check_byte_request(BlockBackend *blk, int64_t offset,
+                                   size_t size)
+ {
+@@ -1891,6 +1897,10 @@ static bool blk_root_can_set_aio_ctx(BdrvChild *ch=
+ild, AioContext *ctx,
+ {
+     BlockBackend *blk =3D child->opaque;
 =20
-     bdrv_drained_begin(bs);
-+
-+    QLIST_FOREACH(child, &bs->children, next) {
-+        bdrv_set_aio_context(child->bs, new_context);
++    if (blk->allow_aio_context_change) {
++        return true;
 +    }
 +
-     bdrv_detach_aio_context(bs);
-=20
-     /* This function executes in the old AioContext so acquire the new o=
-ne in
+     /* Only manually created BlockBackends that are not attached to anyt=
+hing
+      * can change their AioContext without updating their user. */
+     if (!blk->name || blk->dev) {
 --=20
 2.20.1
 
