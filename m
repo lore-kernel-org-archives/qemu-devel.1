@@ -2,85 +2,65 @@ Return-Path: <SRS0=msIk=TG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEB23C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 07:35:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA21C04AAD
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 07:43:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B11C52082F
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 07:35:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B11C52082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 90705206A3
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 May 2019 07:43:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90705206A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51834 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51879 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNYAE-0002ES-Le
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 03:35:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40219)
+	id 1hNYHa-00043F-Ov
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 03:43:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNY96-0001FZ-8N
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 03:34:46 -0400
+	(envelope-from <zhenyuw@linux.intel.com>) id 1hNYGl-0003lP-DH
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 03:42:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNY92-0007HH-FB
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 03:34:44 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:34599)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hNY90-0007G8-LS
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 03:34:39 -0400
-Received: by mail-wm1-f66.google.com with SMTP id m20so4790629wmg.1
-	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 00:34:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=wbGHMmQqTA1t/CsP9AVzh43f5ajvujLgQ1emU/HQIHs=;
-	b=qFkBbYmWidwKkVBEQYnmATfK4HGeRyKyAA6SpPdz1b38snnLUWLKpGw08TKUiuW95J
-	20x4xAevl/bGEBt3cOWJ7J9o9KD8ZCAt4hYxQl57VuHAci0XVYv63jHlLF4vG4ECnZ7P
-	v4oWueJi00CddlGpaGKz2XlRJc4b0nsQUIB6YdCF9vtpNpP+2KFuQJgViPQHVPoAN4Zy
-	hDCqCY7R3JAAMTx9RV1cOpcW/RqX3YBbmwcvOmYad38m9UFldYPcKcfOTxM1TN/M2mJi
-	YrV+kgkBbaHCJxmfJ10Ylkj9JUsMSukLjhUQWRNr3NpShRGOOV+Hhlsym4pUr91Offpb
-	MHpA==
-X-Gm-Message-State: APjAAAVU7p5mualuidBiA+l/nL+fiG8XEua4w0pff7AABTiGIrKgAbIP
-	HKrrn9eop/nMOK1yk9g7JkYCxw==
-X-Google-Smtp-Source: APXvYqwnzFoECiu+ACplnZxXcNzWB3UUFI76cElIt+/bmd5viMLyG4uw/Zs9tUWbUXZJCBjk9LEZqA==
-X-Received: by 2002:a7b:cc12:: with SMTP id f18mr15858358wmh.40.1557128077495; 
-	Mon, 06 May 2019 00:34:37 -0700 (PDT)
-Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	b12sm16882780wrf.21.2019.05.06.00.34.36
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 06 May 2019 00:34:36 -0700 (PDT)
-To: Stephen Checkoway <stephen.checkoway@oberlin.edu>,
-	QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>,
-	Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
-	"open list:Block layer core" <qemu-block@nongnu.org>,
-	Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
-	Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-References: <20190426162624.55977-1-stephen.checkoway@oberlin.edu>
-	<20190426162624.55977-3-stephen.checkoway@oberlin.edu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <7ae88ff9-aed2-15e1-8716-5ca674b16059@redhat.com>
-Date: Mon, 6 May 2019 09:34:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <zhenyuw@linux.intel.com>) id 1hNYGj-0004jD-6B
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 03:42:39 -0400
+Received: from mga09.intel.com ([134.134.136.24]:39000)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zhenyuw@linux.intel.com>)
+	id 1hNYGh-0004fX-BL
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 03:42:35 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+	by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	06 May 2019 00:42:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,437,1549958400"; 
+	d="asc'?scan'208";a="297412604"
+Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.13.116])
+	by orsmga004.jf.intel.com with ESMTP; 06 May 2019 00:42:26 -0700
+Date: Mon, 6 May 2019 15:41:58 +0800
+From: Zhenyu Wang <zhenyuw@linux.intel.com>
+To: "Zhao, Yan Y" <yan.y.zhao@intel.com>
+Message-ID: <20190506074158.GU12913@zhen-hp.sh.intel.com>
+References: <20190506014514.3555-1-yan.y.zhao@intel.com>
+	<20190506015102.3691-1-yan.y.zhao@intel.com>
+	<20190506032032.GP12913@zhen-hp.sh.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20190426162624.55977-3-stephen.checkoway@oberlin.edu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH v4 02/10] block/pflash_cfi02: Refactor,
- NFC intended
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="88pBQ1/6ie/nQzMF"
+Content-Disposition: inline
+In-Reply-To: <20190506032032.GP12913@zhen-hp.sh.intel.com>
+User-Agent: Mutt/1.10.0 (2018-05-17)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 134.134.136.24
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] drm/i915/gvt: export mdev device
+ version to sysfs for Intel vGPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,387 +72,357 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
+Cc: cjia@nvidia.com, kvm@vger.kernel.org, aik@ozlabs.ru,
+	Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+	qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com,
+	yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com,
+	mlevitsk@redhat.com, pasic@linux.ibm.com, libvir-list@redhat.com,
+	arei.gonglei@huawei.com, felipe@nutanix.com, Ken.Xue@amd.com,
+	kevin.tian@intel.com, dgilbert@redhat.com, dinechin@redhat.com,
+	alex.williamson@redhat.com, intel-gvt-dev@lists.freedesktop.org,
+	changpeng.liu@intel.com, cohuck@redhat.com,
+	linux-kernel@vger.kernel.org, zhi.a.wang@intel.com,
+	jonathan.davies@nutanix.com, shaopeng.he@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/26/19 6:26 PM, Stephen Checkoway wrote:
-> Simplify and refactor for upcoming commits. In particular, pull out all
-> of the code to modify the status into simple helper functions. Status
-> handling becomes more complex once multiple chips are interleaved to
-> produce a single device.
-> 
-> No change in functionality is intended with this commit.
 
-As this patch is hard to digest, I splitted it in various atomic changes
-in another series:
-https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg00975.html
+--88pBQ1/6ie/nQzMF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
-> ---
->  hw/block/pflash_cfi02.c | 221 +++++++++++++++++-----------------------
->  1 file changed, 95 insertions(+), 126 deletions(-)
-> 
-> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-> index f2c6201f81..4b7af71806 100644
-> --- a/hw/block/pflash_cfi02.c
-> +++ b/hw/block/pflash_cfi02.c
-> @@ -46,18 +46,19 @@
->  #include "hw/sysbus.h"
->  #include "trace.h"
->  
-> -//#define PFLASH_DEBUG
-> -#ifdef PFLASH_DEBUG
-> +#define PFLASH_DEBUG false
->  #define DPRINTF(fmt, ...)                                  \
->  do {                                                       \
-> -    fprintf(stderr, "PFLASH: " fmt , ## __VA_ARGS__);       \
-> +    if (PFLASH_DEBUG) {                                    \
-> +        fprintf(stderr, "PFLASH: " fmt, ## __VA_ARGS__);   \
-> +    }                                                      \
->  } while (0)
-> -#else
-> -#define DPRINTF(fmt, ...) do { } while (0)
-> -#endif
->  
->  #define PFLASH_LAZY_ROMD_THRESHOLD 42
->  
-> +/* Special write cycle for CFI queries. */
-> +#define WCYCLE_CFI 7
-> +
->  struct PFlashCFI02 {
->      /*< private >*/
->      SysBusDevice parent_obj;
-> @@ -97,6 +98,31 @@ struct PFlashCFI02 {
->      void *storage;
->  };
->  
-> +/*
-> + * Toggle status bit DQ7.
-> + */
-> +static inline void toggle_dq7(PFlashCFI02 *pfl)
-> +{
-> +    pfl->status ^= 0x80;
-> +}
-> +
-> +/*
-> + * Set status bit DQ7 to bit 7 of value.
-> + */
-> +static inline void set_dq7(PFlashCFI02 *pfl, uint8_t value)
-> +{
-> +    pfl->status &= 0x7F;
-> +    pfl->status |= value & 0x80;
-> +}
-> +
-> +/*
-> + * Toggle status bit DQ6.
-> + */
-> +static inline void toggle_dq6(PFlashCFI02 *pfl)
-> +{
-> +    pfl->status ^= 0x40;
-> +}
-> +
->  /*
->   * Set up replicated mappings of the same region.
->   */
-> @@ -126,7 +152,7 @@ static void pflash_timer (void *opaque)
->  
->      trace_pflash_timer_expired(pfl->cmd);
->      /* Reset flash */
-> -    pfl->status ^= 0x80;
-> +    toggle_dq7(pfl);
->      if (pfl->bypass) {
->          pfl->wcycle = 2;
->      } else {
-> @@ -136,12 +162,34 @@ static void pflash_timer (void *opaque)
->      pfl->cmd = 0;
->  }
->  
-> -static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
-> -                            int width, int be)
-> +/*
-> + * Read data from flash.
-> + */
-> +static uint64_t pflash_data_read(PFlashCFI02 *pfl, hwaddr offset,
-> +                                 unsigned int width)
->  {
-> +    uint8_t *p = (uint8_t *)pfl->storage + offset;
-> +    uint64_t ret = pfl->be ? ldn_be_p(p, width) : ldn_le_p(p, width);
-> +    /* XXX: Need a trace_pflash_data_read(offset, ret, width) */
-> +    switch (width) {
-> +    case 1:
-> +        trace_pflash_data_read8(offset, ret);
-> +        break;
-> +    case 2:
-> +        trace_pflash_data_read16(offset, ret);
-> +        break;
-> +    case 4:
-> +        trace_pflash_data_read32(offset, ret);
-> +        break;
-> +    }
-> +    return ret;
-> +}
-> +
-> +static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int width)
-> +{
-> +    PFlashCFI02 *pfl = opaque;
->      hwaddr boff;
-> -    uint32_t ret;
-> -    uint8_t *p;
-> +    uint64_t ret;
->  
->      ret = -1;
->      trace_pflash_read(offset, pfl->cmd, width, pfl->wcycle);
-> @@ -166,39 +214,8 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
->      case 0x80:
->          /* We accept reads during second unlock sequence... */
->      case 0x00:
-> -    flash_read:
->          /* Flash area read */
-> -        p = pfl->storage;
-> -        switch (width) {
-> -        case 1:
-> -            ret = p[offset];
-> -            trace_pflash_data_read8(offset, ret);
-> -            break;
-> -        case 2:
-> -            if (be) {
-> -                ret = p[offset] << 8;
-> -                ret |= p[offset + 1];
-> -            } else {
-> -                ret = p[offset];
-> -                ret |= p[offset + 1] << 8;
-> -            }
-> -            trace_pflash_data_read16(offset, ret);
-> -            break;
-> -        case 4:
-> -            if (be) {
-> -                ret = p[offset] << 24;
-> -                ret |= p[offset + 1] << 16;
-> -                ret |= p[offset + 2] << 8;
-> -                ret |= p[offset + 3];
-> -            } else {
-> -                ret = p[offset];
-> -                ret |= p[offset + 1] << 8;
-> -                ret |= p[offset + 2] << 16;
-> -                ret |= p[offset + 3] << 24;
-> -            }
-> -            trace_pflash_data_read32(offset, ret);
-> -            break;
-> -        }
-> +        ret = pflash_data_read(pfl, offset, width);
->          break;
->      case 0x90:
->          /* flash ID read */
-> @@ -213,23 +230,23 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
->          case 0x0E:
->          case 0x0F:
->              ret = boff & 0x01 ? pfl->ident3 : pfl->ident2;
-> -            if (ret == (uint8_t)-1) {
-> -                goto flash_read;
-> +            if (ret != (uint8_t)-1) {
-> +                break;
->              }
-> -            break;
-> +            /* Fall through to data read. */
->          default:
-> -            goto flash_read;
-> +            ret = pflash_data_read(pfl, offset, width);
->          }
-> -        DPRINTF("%s: ID " TARGET_FMT_plx " %x\n", __func__, boff, ret);
-> +        DPRINTF("%s: ID " TARGET_FMT_plx " %" PRIx64 "\n", __func__, boff, ret);
->          break;
->      case 0xA0:
->      case 0x10:
->      case 0x30:
->          /* Status register read */
->          ret = pfl->status;
-> -        DPRINTF("%s: status %x\n", __func__, ret);
-> +        DPRINTF("%s: status %" PRIx64 "\n", __func__, ret);
->          /* Toggle bit 6 */
-> -        pfl->status ^= 0x40;
-> +        toggle_dq6(pfl);
->          break;
->      case 0x98:
->          /* CFI query mode */
-> @@ -245,8 +262,7 @@ static uint32_t pflash_read(PFlashCFI02 *pfl, hwaddr offset,
->  }
->  
->  /* update flash content on disk */
-> -static void pflash_update(PFlashCFI02 *pfl, int offset,
-> -                          int size)
-> +static void pflash_update(PFlashCFI02 *pfl, int offset, int size)
->  {
->      int offset_end;
->      if (pfl->blk) {
-> @@ -259,9 +275,10 @@ static void pflash_update(PFlashCFI02 *pfl, int offset,
->      }
->  }
->  
-> -static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
-> -                         uint32_t value, int width, int be)
-> +static void pflash_write(void *opaque, hwaddr offset, uint64_t value,
-> +                         unsigned int width)
->  {
-> +    PFlashCFI02 *pfl = opaque;
->      hwaddr boff;
->      uint8_t *p;
->      uint8_t cmd;
-> @@ -277,7 +294,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
->      trace_pflash_write(offset, value, width, pfl->wcycle);
->      offset &= pfl->chip_len - 1;
->  
-> -    DPRINTF("%s: offset " TARGET_FMT_plx " %08x %d\n", __func__,
-> +    DPRINTF("%s: offset " TARGET_FMT_plx " %08" PRIx64 " %d\n", __func__,
->              offset, value, width);
->      boff = offset & (pfl->sector_len - 1);
->      if (pfl->width == 2)
-> @@ -295,7 +312,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
->          if (boff == 0x55 && cmd == 0x98) {
->          enter_CFI_mode:
->              /* Enter CFI query mode */
-> -            pfl->wcycle = 7;
-> +            pfl->wcycle = WCYCLE_CFI;
->              pfl->cmd = 0x98;
->              return;
->          }
-> @@ -345,40 +362,22 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
->              goto check_unlock0;
->          case 0xA0:
->              trace_pflash_data_write(offset, value, width, 0);
-> -            p = pfl->storage;
->              if (!pfl->ro) {
-> -                switch (width) {
-> -                case 1:
-> -                    p[offset] &= value;
-> -                    pflash_update(pfl, offset, 1);
-> -                    break;
-> -                case 2:
-> -                    if (be) {
-> -                        p[offset] &= value >> 8;
-> -                        p[offset + 1] &= value;
-> -                    } else {
-> -                        p[offset] &= value;
-> -                        p[offset + 1] &= value >> 8;
-> -                    }
-> -                    pflash_update(pfl, offset, 2);
-> -                    break;
-> -                case 4:
-> -                    if (be) {
-> -                        p[offset] &= value >> 24;
-> -                        p[offset + 1] &= value >> 16;
-> -                        p[offset + 2] &= value >> 8;
-> -                        p[offset + 3] &= value;
-> -                    } else {
-> -                        p[offset] &= value;
-> -                        p[offset + 1] &= value >> 8;
-> -                        p[offset + 2] &= value >> 16;
-> -                        p[offset + 3] &= value >> 24;
-> -                    }
-> -                    pflash_update(pfl, offset, 4);
-> -                    break;
-> +                p = (uint8_t *)pfl->storage + offset;
-> +                if (pfl->be) {
-> +                    uint64_t current = ldn_be_p(p, width);
-> +                    stn_be_p(p, width, current & value);
-> +                } else {
-> +                    uint64_t current = ldn_le_p(p, width);
-> +                    stn_le_p(p, width, current & value);
->                  }
-> +                pflash_update(pfl, offset, width);
->              }
-> -            pfl->status = 0x00 | ~(value & 0x80);
-> +            /*
-> +             * While programming, status bit DQ7 should hold the opposite
-> +             * value from how it was programmed.
-> +             */
-> +            set_dq7(pfl, ~value);
->              /* Let's pretend write is immediate */
->              if (pfl->bypass)
->                  goto do_bypass;
-> @@ -426,7 +425,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
->                  memset(pfl->storage, 0xFF, pfl->chip_len);
->                  pflash_update(pfl, 0, pfl->chip_len);
->              }
-> -            pfl->status = 0x00;
-> +            set_dq7(pfl, 0x00);
->              /* Let's wait 5 seconds before chip erase is done */
->              timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
->                        (NANOSECONDS_PER_SECOND * 5));
-> @@ -441,7 +440,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
->                  memset(p + offset, 0xFF, pfl->sector_len);
->                  pflash_update(pfl, offset, pfl->sector_len);
->              }
-> -            pfl->status = 0x00;
-> +            set_dq7(pfl, 0x00);
->              /* Let's wait 1/2 second before sector erase is done */
->              timer_mod(&pfl->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
->                        (NANOSECONDS_PER_SECOND / 2));
-> @@ -467,7 +466,7 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
->              goto reset_flash;
->          }
->          break;
-> -    case 7: /* Special value for CFI queries */
-> +    case WCYCLE_CFI: /* Special value for CFI queries */
->          DPRINTF("%s: invalid write in CFI query mode\n", __func__);
->          goto reset_flash;
->      default:
-> @@ -492,39 +491,9 @@ static void pflash_write(PFlashCFI02 *pfl, hwaddr offset,
->      pfl->cmd = 0;
->  }
->  
-> -static uint64_t pflash_be_readfn(void *opaque, hwaddr addr, unsigned size)
-> -{
-> -    return pflash_read(opaque, addr, size, 1);
-> -}
-> -
-> -static void pflash_be_writefn(void *opaque, hwaddr addr,
-> -                              uint64_t value, unsigned size)
-> -{
-> -    pflash_write(opaque, addr, value, size, 1);
-> -}
-> -
-> -static uint64_t pflash_le_readfn(void *opaque, hwaddr addr, unsigned size)
-> -{
-> -    return pflash_read(opaque, addr, size, 0);
-> -}
-> -
-> -static void pflash_le_writefn(void *opaque, hwaddr addr,
-> -                              uint64_t value, unsigned size)
-> -{
-> -    pflash_write(opaque, addr, value, size, 0);
-> -}
-> -
-> -static const MemoryRegionOps pflash_cfi02_ops_be = {
-> -    .read = pflash_be_readfn,
-> -    .write = pflash_be_writefn,
-> -    .valid.min_access_size = 1,
-> -    .valid.max_access_size = 4,
-> -    .endianness = DEVICE_NATIVE_ENDIAN,
-> -};
-> -
-> -static const MemoryRegionOps pflash_cfi02_ops_le = {
-> -    .read = pflash_le_readfn,
-> -    .write = pflash_le_writefn,
-> +static const MemoryRegionOps pflash_cfi02_ops = {
-> +    .read = pflash_read,
-> +    .write = pflash_write,
->      .valid.min_access_size = 1,
->      .valid.max_access_size = 4,
->      .endianness = DEVICE_NATIVE_ENDIAN,
-> @@ -552,9 +521,9 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
->  
->      chip_len = pfl->sector_len * pfl->nb_blocs;
->  
-> -    memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl), pfl->be ?
-> -                                  &pflash_cfi02_ops_be : &pflash_cfi02_ops_le,
-> -                                  pfl, pfl->name, chip_len, &local_err);
-> +    memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl),
-> +                                  &pflash_cfi02_ops, pfl, pfl->name,
-> +                                  chip_len, &local_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
->          return;
-> 
+On 2019.05.06 11:20:32 +0800, Zhenyu Wang wrote:
+> On 2019.05.05 21:51:02 -0400, Yan Zhao wrote:
+> > This feature implements the version attribute for Intel's vGPU mdev
+> > devices.
+> >=20
+> > version attribute is rw.
+> > It's used to check device compatibility for two mdev devices.
+> > version string format and length are private for vendor driver. vendor
+> > driver is able to define them freely.
+> >=20
+> > For Intel vGPU of gen8 and gen9, the mdev device version
+> > consists of 3 fields: "vendor id" + "device id" + "mdev type".
+> >=20
+> > Reading from a vGPU's version attribute, a string is returned in below
+> > format: <vendor id>-<device id>-<mdev type>. e.g.
+> > 8086-193b-i915-GVTg_V5_2.
+> >=20
+> > Writing a string to a vGPU's version attribute will trigger GVT to check
+> > whether a vGPU identified by the written string is compatible with
+> > current vGPU owning this version attribute. errno is returned if the two
+> > vGPUs are incompatible. The length of written string is returned in
+> > compatible case.
+> >=20
+> > For other platforms, and for GVT not supporting vGPU live migration
+> > feature, errnos are returned when read/write of mdev devices' version
+> > attributes.
+> >=20
+> > For old GVT versions where no version attributes exposed in sysfs, it is
+> > regarded as not supporting vGPU live migration.
+> >=20
+> > For future platforms, besides the current 2 fields in vendor proprietary
+> > part, more fields may be added to identify Intel vGPU well for live
+> > migration purpose.
+> >=20
+> > v2:
+> > 1. removed 32 common part of version string
+> > (Alex Williamson)
+> > 2. do not register version attribute for GVT not supporting live
+> > migration.(Cornelia Huck)
+> > 3. for platforms out of gen8, gen9, return -EINVAL --> -ENODEV for
+> > incompatible. (Cornelia Huck)
+> >=20
+> > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > Cc: Erik Skultety <eskultet@redhat.com>
+> > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > Cc: Cornelia Huck <cohuck@redhat.com>
+> > Cc: "Tian, Kevin" <kevin.tian@intel.com>
+> > Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+> > Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
+> > c: Neo Jia <cjia@nvidia.com>
+> > Cc: Kirti Wankhede <kwankhede@nvidia.com>
+> >=20
+> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > ---
+> >  drivers/gpu/drm/i915/gvt/Makefile         |  2 +-
+> >  drivers/gpu/drm/i915/gvt/device_version.c | 87 +++++++++++++++++++++++
+> >  drivers/gpu/drm/i915/gvt/gvt.c            | 51 +++++++++++++
+> >  drivers/gpu/drm/i915/gvt/gvt.h            |  6 ++
+> >  4 files changed, 145 insertions(+), 1 deletion(-)
+> >  create mode 100644 drivers/gpu/drm/i915/gvt/device_version.c
+> >=20
+> > diff --git a/drivers/gpu/drm/i915/gvt/Makefile b/drivers/gpu/drm/i915/g=
+vt/Makefile
+> > index 271fb46d4dd0..54e209a23899 100644
+> > --- a/drivers/gpu/drm/i915/gvt/Makefile
+> > +++ b/drivers/gpu/drm/i915/gvt/Makefile
+> > @@ -3,7 +3,7 @@ GVT_DIR :=3D gvt
+> >  GVT_SOURCE :=3D gvt.o aperture_gm.o handlers.o vgpu.o trace_points.o f=
+irmware.o \
+> >  	interrupt.o gtt.o cfg_space.o opregion.o mmio.o display.o edid.o \
+> >  	execlist.o scheduler.o sched_policy.o mmio_context.o cmd_parser.o deb=
+ugfs.o \
+> > -	fb_decoder.o dmabuf.o page_track.o
+> > +	fb_decoder.o dmabuf.o page_track.o device_version.o
+> > =20
+> >  ccflags-y				+=3D -I$(src) -I$(src)/$(GVT_DIR)
+> >  i915-y					+=3D $(addprefix $(GVT_DIR)/, $(GVT_SOURCE))
+> > diff --git a/drivers/gpu/drm/i915/gvt/device_version.c b/drivers/gpu/dr=
+m/i915/gvt/device_version.c
+> > new file mode 100644
+> > index 000000000000..bd4cdcbdba95
+> > --- /dev/null
+> > +++ b/drivers/gpu/drm/i915/gvt/device_version.c
+> > @@ -0,0 +1,87 @@
+> > +/*
+> > + * Copyright(c) 2011-2017 Intel Corporation. All rights reserved.
+> > + *
+> > + * Permission is hereby granted, free of charge, to any person obtaini=
+ng a
+> > + * copy of this software and associated documentation files (the "Soft=
+ware"),
+> > + * to deal in the Software without restriction, including without limi=
+tation
+> > + * the rights to use, copy, modify, merge, publish, distribute, sublic=
+ense,
+> > + * and/or sell copies of the Software, and to permit persons to whom t=
+he
+> > + * Software is furnished to do so, subject to the following conditions:
+> > + *
+> > + * The above copyright notice and this permission notice (including th=
+e next
+> > + * paragraph) shall be included in all copies or substantial portions =
+of the
+> > + * Software.
+> > + *
+> > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXP=
+RESS OR
+> > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABI=
+LITY,
+> > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT =
+SHALL
+> > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES O=
+R OTHER
+> > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARI=
+SING FROM,
+> > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
+NGS IN THE
+> > + * SOFTWARE.
+> > + *
+> > + * Authors:
+> > + *    Yan Zhao <yan.y.zhao@intel.com>
+> > + */
+> > +#include <linux/vfio.h>
+> > +#include "i915_drv.h"
+> > +
+> > +static bool is_compatible(const char *self, const char *remote)
+> > +{
+> > +	if (strlen(remote) !=3D strlen(self))
+> > +		return false;
+> > +
+> > +	return (strncmp(self, remote, strlen(self))) ? false : true;
+> > +}
+> > +
+> > +ssize_t intel_gvt_get_vfio_device_version_len(struct drm_i915_private =
+*dev_priv)
+> > +{
+> > +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
+> > +		return -ENODEV;
+> > +
+> > +	return PAGE_SIZE;
+> > +}
+> > +
+> > +ssize_t intel_gvt_get_vfio_device_version(struct drm_i915_private *dev=
+_priv,
+> > +		char *buf, const char *mdev_type)
+> > +{
+> > +	int cnt =3D 0, ret =3D 0;
+> > +	const char *str =3D NULL;
+> > +
+>=20
+> > +	/* currently only gen8 & gen9 are supported */
+> > +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
+> > +		return -ENODEV;
+> > +
+> > +	/* vendor id + device id + mdev type */
+> > +	/* vendor id */
+> > +	cnt =3D snprintf(buf, 5, "%04x", PCI_VENDOR_ID_INTEL);
+> > +	buf +=3D cnt;
+> > +	ret +=3D cnt;
+> > +
+> > +	/* device id */
+> > +	cnt =3D snprintf(buf, 6, "-%04x", INTEL_DEVID(dev_priv));
+> > +	buf +=3D cnt;
+> > +	ret +=3D cnt;
+> > +
+> > +	/* mdev type */
+> > +	str =3D mdev_type;
+> > +	cnt =3D snprintf(buf, strlen(str) + 3, "-%s\n", mdev_type);
+> > +	buf +=3D cnt;
+> > +	ret +=3D cnt;
+> > +
+> > +	return ret;
+> > +}
+> > +
+> > +ssize_t intel_gvt_check_vfio_device_version(struct drm_i915_private *d=
+ev_priv,
+> > +		const char *self, const char *remote)
+> > +{
+> > +
+> > +	/* currently only gen8 & gen9 are supported */
+> > +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
+> > +		return -ENODEV;
+> > +
+> > +	if (!is_compatible(self, remote))
+> > +		return -EINVAL;
+> > +
+> > +	return 0;
+> > +}
+> > diff --git a/drivers/gpu/drm/i915/gvt/gvt.c b/drivers/gpu/drm/i915/gvt/=
+gvt.c
+> > index 43f4242062dd..19f16eec5a4c 100644
+> > --- a/drivers/gpu/drm/i915/gvt/gvt.c
+> > +++ b/drivers/gpu/drm/i915/gvt/gvt.c
+> > @@ -105,14 +105,65 @@ static ssize_t description_show(struct kobject *k=
+obj, struct device *dev,
+> >  		       type->weight);
+> >  }
+> > =20
+> > +#ifdef GVT_MIGRATION_VERSION
+>=20
+> No extra define.
+>=20
+> > +static ssize_t version_show(struct kobject *kobj, struct device *dev,
+> > +		char *buf)
+> > +{
+> > +	struct drm_i915_private *i915 =3D kdev_to_i915(dev);
+> > +	const char *mdev_type =3D kobject_name(kobj);
+> > +
+> > +	return intel_gvt_get_vfio_device_version(i915, buf, mdev_type);
+> > +}
+> > +
+> > +static ssize_t version_store(struct kobject *kobj, struct device *dev,
+> > +		const char *buf, size_t count)
+> > +{
+> > +	char *remote =3D NULL, *self =3D NULL;
+> > +	int len, ret =3D 0;
+> > +	struct drm_i915_private *i915 =3D kdev_to_i915(dev);
+> > +	const char *mdev_type =3D kobject_name(kobj);
+> > +
+> > +	len =3D intel_gvt_get_vfio_device_version_len(i915);
+> > +	if (len < 0)
+> > +		return len;
+> > +
+> > +	self =3D kmalloc(len, GFP_KERNEL);
+> > +	if (!self)
+> > +		return -ENOMEM;
+> > +
+> > +	ret =3D intel_gvt_get_vfio_device_version(i915, self, mdev_type);
+> > +	if (ret < 0)
+> > +		goto out;
+> > +
+> > +	remote =3D kstrndup(buf, count, GFP_KERNEL);
+> > +	if (!remote) {
+> > +		ret =3D -ENOMEM;
+> > +		goto out;
+> > +	}
+>=20
+> Please make device version as attribute for vgpu instead of allocating me=
+mory
+> everytime to generate it.
+>
+
+Seems this is attribute for mdev type instead of instance, I was wrong
+to take it as vgpu instance attribute, so we could add it for vgpu type
+definition for device with migration.
+
+> > +
+> > +	ret =3D intel_gvt_check_vfio_device_version(i915, self, remote);
+> > +
+> > +out:
+> > +	kfree(self);
+> > +	kfree(remote);
+> > +	return (ret < 0 ? ret : count);
+> > +}
+> > +#endif
+> > +
+> >  static MDEV_TYPE_ATTR_RO(available_instances);
+> >  static MDEV_TYPE_ATTR_RO(device_api);
+> >  static MDEV_TYPE_ATTR_RO(description);
+> > +#ifdef GVT_MIGRATION_VERSION
+> > +static MDEV_TYPE_ATTR_RW(version);
+> > +#endif
+>=20
+> Don't need extra define.
+>=20
+> > =20
+> >  static struct attribute *gvt_type_attrs[] =3D {
+> >  	&mdev_type_attr_available_instances.attr,
+> >  	&mdev_type_attr_device_api.attr,
+> >  	&mdev_type_attr_description.attr,
+> > +#ifdef GVT_MIGRATION_VERSION
+> > +	&mdev_type_attr_version.attr,
+> > +#endif
+> >  	NULL,
+> >  };
+>=20
+> I think you need another group of attrs for type that could support
+> migration, it will be assigned during host init for current platform
+> with driver support. So just add new group of attrs for like
+> gvt_migration_type_attrs[] with version.
+>=20
+> > =20
+> > diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/=
+gvt.h
+> > index f5a328b5290a..4062f6b26acf 100644
+> > --- a/drivers/gpu/drm/i915/gvt/gvt.h
+> > +++ b/drivers/gpu/drm/i915/gvt/gvt.h
+> > @@ -687,6 +687,12 @@ void intel_gvt_debugfs_remove_vgpu(struct intel_vg=
+pu *vgpu);
+> >  int intel_gvt_debugfs_init(struct intel_gvt *gvt);
+> >  void intel_gvt_debugfs_clean(struct intel_gvt *gvt);
+> > =20
+> > +ssize_t intel_gvt_get_vfio_device_version(struct drm_i915_private *i91=
+5,
+> > +		char *buf, const char *mdev_type);
+> > +ssize_t intel_gvt_check_vfio_device_version(struct drm_i915_private *d=
+ev_priv,
+> > +		const char *self, const char *remote);
+> > +ssize_t
+> > +intel_gvt_get_vfio_device_version_len(struct drm_i915_private *dev_pri=
+v);
+> > =20
+> >  #include "trace.h"
+> >  #include "mpt.h"
+> > --=20
+> > 2.17.1
+> >=20
+>=20
+> --=20
+> Open Source Technology Center, Intel ltd.
+>=20
+> $gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+
+
+
+--=20
+Open Source Technology Center, Intel ltd.
+
+$gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+
+--88pBQ1/6ie/nQzMF
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCXM/lRgAKCRCxBBozTXgY
+J3mgAJ9uaM8nSoJ+1omd5e5I3D1cnYvX8QCgnY9Ykxd8jrvcrOFLXU7FoBiZgA0=
+=1h40
+-----END PGP SIGNATURE-----
+
+--88pBQ1/6ie/nQzMF--
 
