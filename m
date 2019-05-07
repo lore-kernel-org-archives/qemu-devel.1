@@ -2,64 +2,70 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E195EC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 13:08:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A75D2C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 13:12:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B796D2053B
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 13:08:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B796D2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 703422053B
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 13:12:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="alUBEqen"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 703422053B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46605 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46647 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNzpc-000633-OG
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 09:08:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58694)
+	id 1hNztN-0008E1-LK
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 09:12:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hNzoh-0005iM-Gy
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 09:07:32 -0400
+	(envelope-from <qemu_oss@crudebyte.com>) id 1hNzsb-0007wv-Bg
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 09:11:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hNzog-0005al-5j
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 09:07:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47960)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hNzof-0005Zw-U9
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 09:07:30 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 86893883BC;
-	Tue,  7 May 2019 13:07:28 +0000 (UTC)
-Received: from redhat.com (ovpn-112-52.ams2.redhat.com [10.36.112.52])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D15AE61B7D;
-	Tue,  7 May 2019 13:07:25 +0000 (UTC)
-Date: Tue, 7 May 2019 14:07:22 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Message-ID: <20190507130722.GQ27205@redhat.com>
-References: <20190507124853.9015-1-tao3.xu@intel.com>
+	(envelope-from <qemu_oss@crudebyte.com>) id 1hNzsa-0007jv-Df
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 09:11:33 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:51571)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+	id 1hNzsZ-0007it-RK
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 09:11:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=47Lb/gBOJ8x2VR1rqxanUphDoM68pm28fhCyW9ooyUQ=;
+	b=alUBEqenaCQ3tQJ0NbPZU97YmE
+	C/jQQfc/L1RoGuCWjvc2VQOAFRnMjNObPdsaE7+rkpK0iWAGlO1CCUinHvQ7HW8Q1VXmw7bw8EpAd
+	qqlptyuKC3PcitYfRY8SB2X/qHwCSjOvalG7wX3slmsa4KtCDFy3H4JNsal4JJIf+a+LIP7tqUJ58
+	oQjiUIL182lL0p2x+V+FNJnMJ2TwdK6DpuZn840BUWgS9o7MIknE/h2hYSy26sH3TkVdkRIH4WPvV
+	SGydyqt8zRVjlUjtNIDFjHRh38/QBL4lUbrwMIpKjdYVG4N50BQv0aEUWavTEiRpeYTMYiDd6Tphg
+	RAi7gCYOEwKLWc47fNSmUrv1AVs8C1AzHhZABXW5zIyMEDOnIpgetubRqnT1TaCoF03V7/TRuv0P4
+	KWYkOY7tDnsWSr/zPID50Vxg1DVHOxIxLqfxiBVzq3GviiydSgbk1S3Hfg2toX8fq69I/3wcr8dC+
+	CorMcPvSrMpSTpV+nNWFWUYJrqn2TM00IogFGNA77oUwzdhu/+w4BSBU46qZf48pJaaRBo6XU9abI
+	iMUqf3LMT3Oz5ly1c9Inu0PtjCPQiwu8E3ZN4Fj1abb8HrhWSR5Jyl6Q0Yyw62Am+4iYe7jtdxoDa
+	G+kt57VJLgsBWlQuRxiRfAlVOABNVyvzsnzSw9vJU=;
+To: qemu-devel@nongnu.org
+Date: Tue, 07 May 2019 15:11:26 +0200
+Message-ID: <3809087.3a1rNnKprp@silver>
+In-Reply-To: <20190507124247.GN27205@redhat.com>
+References: <cover.1557093245.git.qemu_oss@crudebyte.com>
+	<5b5c005fbf4e31c07273468cb022d25a8907bc87.1557093245.git.qemu_oss@crudebyte.com>
+	<20190507124247.GN27205@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190507124853.9015-1-tao3.xu@intel.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Tue, 07 May 2019 13:07:28 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2] i386: Add some MSR based features on
- Cascadelake-Server CPU model
+X-Received-From: 5.189.157.229
+Subject: Re: [Qemu-devel] [PATCH v3 1/5] 9p: mitigates most QID path
+ collisions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,90 +77,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: ehabkost@redhat.com, xiaoyao.li@intel.com, qemu-devel@nongnu.org,
-	robert.hu@intel.com, pbonzini@redhat.com, rth@twiddle.net
+From: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Cc: Greg Kurz <groug@kaod.org>, Antonios Motakis <antonios.motakis@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 07, 2019 at 08:48:53PM +0800, Tao Xu wrote:
-> As noted in
-> http://lists.gnu.org/archive/html/qemu-devel/2018-09/msg02212.html
+On Dienstag, 7. Mai 2019 13:42:47 CEST Daniel P. Berrang=E9 wrote:
+> > This first patch here is an updated version of Antonios Motakis'
+> > original 4-patch set (using fixed length 16 bit prefixes), merged to one
+> > patch:
+> >=20
+> > https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg02283.html
+> >=20
+> > * Updated to latest git master, specifically to new qht interface.
+> >=20
+> > * Merged the original 4 patches to this single patch.
+>=20
+> Why did you merge them all into one ?  The split patches were "best
+> practice" IMHO. The original patch authorship & S-o-B lines could
+> be preserved if you kept them split as before too.
 
-Rather than pointing to the mailing list post, please just refer
-to the git commit hash that patch was merged under, which IIUC
-is c7a88b52f62b30c04158eeb07f73e3f72221b6a8.
+Seems I misinterpreted an old comment of Greg that he would like to see the=
+m=20
+to be merged into less patches. I think it was this one:
 
-> Because MSR based feature has been supported by QEMU,
-> we add CPUID_7_0_EDX_ARCH_CAPABILITIES on Cascadelake-Server CPU
-> model, and add IA32_ARCH_CAPABILITIES MSR based features (RDCL_NO,
-> IBRS_ALL and SKIP_L1DFL_VMENTRY).
-> 
-> And "014018e19b i386: Make arch_capabilities migratable" has been
-> in QEMU upstream, the CPUID_7_0_EDX_ARCH_CAPABILITIES can be
-> safely added into CPU Model.
-> 
-> Changes in v2:
->     - rebased patch to latest qemu base
-> 
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> ---
->  hw/i386/pc.c      | 7 ++++++-
->  target/i386/cpu.c | 6 +++++-
->  2 files changed, 11 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index d98b737b8f..27c3d25436 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -115,7 +115,12 @@ struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
->  /* Physical Address of PVH entry point read from kernel ELF NOTE */
->  static size_t pvh_start_addr;
->  
-> -GlobalProperty pc_compat_4_0[] = {};
-> +GlobalProperty pc_compat_4_0[] = {
-> +    { "Cascadelake-Server" "-" TYPE_X86_CPU, "arch-capabilities", "off" },
-> +    { "Cascadelake-Server" "-" TYPE_X86_CPU, "rdctl-no", "off" },
-> +    { "Cascadelake-Server" "-" TYPE_X86_CPU, "ibrs-all", "off" },
-> +    { "Cascadelake-Server" "-" TYPE_X86_CPU, "skip-l1dfl-vmentry", "off" },
-> +};
->  const size_t pc_compat_4_0_len = G_N_ELEMENTS(pc_compat_4_0);
->  
->  GlobalProperty pc_compat_3_1[] = {
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 722c5514d4..2aa0a8f9ba 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -2536,7 +2536,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
->              CPUID_7_0_ECX_PKU |
->              CPUID_7_0_ECX_AVX512VNNI,
->          .features[FEAT_7_0_EDX] =
-> -            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
-> +            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD |
-> +            CPUID_7_0_EDX_ARCH_CAPABILITIES,
->          /* Missing: XSAVES (not supported by some Linux versions,
->                  * including v4.1 to v4.12).
->                  * KVM doesn't yet expose any XSAVES state save component,
-> @@ -2548,6 +2549,9 @@ static X86CPUDefinition builtin_x86_defs[] = {
->              CPUID_XSAVE_XGETBV1,
->          .features[FEAT_6_EAX] =
->              CPUID_6_EAX_ARAT,
-> +        .features[FEAT_ARCH_CAPABILITIES] =
-> +            MSR_ARCH_CAP_RDCL_NO | MSR_ARCH_CAP_IBRS_ALL |
-> +            MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY,
->          .xlevel = 0x80000008,
->          .model_id = "Intel Xeon Processor (Cascadelake)",
->      },
-> -- 
-> 2.17.1
-> 
-> 
+https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg02590.html
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+No problem, I will restore Antonios' original individual 4 patches=20
+appropriately. What about SOB then? Should I just place Antonio's SOB on th=
+ose=20
+4 patches or does it need his and mine SOB lines? (I mean I need to rebase=
+=20
+those 4 patches and address the old issues on them)
+
+Best regards,
+Christian Schoenebeck
 
