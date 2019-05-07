@@ -2,65 +2,81 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F428C04AAD
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:50:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC42C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:50:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6262205ED
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:50:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6262205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id B75F2205ED
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:50:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vHT5Sy9F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B75F2205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40448 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40465 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNszi-00033A-SW
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 01:50:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60712)
+	id 1hNszs-0003Cy-1e
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 01:50:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1hNsyV-0002RL-3a
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:49:13 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hNsye-0002V6-1F
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:49:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1hNsyT-0005Oh-7b
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:49:11 -0400
-Received: from mga05.intel.com ([192.55.52.43]:27230)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
-	id 1hNsyS-0005O9-QT
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:49:09 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-	by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	06 May 2019 22:49:07 -0700
-X-ExtLoop1: 1
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
-	([10.239.13.9])
-	by fmsmga004.fm.intel.com with ESMTP; 06 May 2019 22:49:02 -0700
-Date: Tue, 7 May 2019 01:43:25 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Zhenyu Wang <zhenyuw@linux.intel.com>
-Message-ID: <20190507054325.GB14284@joy-OptiPlex-7040>
-References: <20190506014514.3555-1-yan.y.zhao@intel.com>
-	<20190506015102.3691-1-yan.y.zhao@intel.com>
-	<20190506032032.GP12913@zhen-hp.sh.intel.com>
-	<20190506074158.GU12913@zhen-hp.sh.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190506074158.GU12913@zhen-hp.sh.intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hNsyd-0005S4-1U
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:49:19 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52369)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1hNsyc-0005Rh-Re
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:49:18 -0400
+Received: by mail-wm1-x342.google.com with SMTP id o25so7552303wmf.2
+	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 22:49:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id;
+	bh=gUcCm4i1OeCf+HzJrBGVY7Q5mpogSng+t/VW/HOB4wM=;
+	b=vHT5Sy9FxUkR8gbtJs1UxQY3ysKV+7pFHNEhZOCA/8c2DtYwSL0pALDfjYfaZW4KwT
+	QaYPBVb7vb7zItEOKvz/pfKql7yTp6kFcj0t+nynT6fxAmB9NqwunNE/3q4R+B5RKEKk
+	R+b1+7eUMXYgcgiXlItPlmZJ+uvCW2eTPmGKh3qvgLNOwMPLeCXZHlqwYtNE6CCMfPKz
+	6RUXCWxd1Nr4WYAiZ9Bf4k/mEK+32ioJ31SNG4Ca6HqaNf2BPE/1PGauSFonhftu/C7o
+	UtZIWqlBuchVxeaOeXTlQFT8yqjp88qSyytM/75dGOVmYUSbsg85yDpSxHu1ZAP2hzlq
+	0V1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id;
+	bh=gUcCm4i1OeCf+HzJrBGVY7Q5mpogSng+t/VW/HOB4wM=;
+	b=TsMZhlrfEHzPnGkWL3gr8+NuY4Go8cCvitmDWIAWYlhoPb2lcZXODisbr6S4jFXbqo
+	5/SKQ9BBFIRrn755949PUflZfUdQjtArRIk8D9S1yj9gWJOT5DZWtBMknq6QHYiBCbKw
+	O3MDu25Q3NTD5+R63EUSjtSTIoZD30k1pG4iwacnguGvlxUqGe/6rUKdJYlG86m0dsMc
+	uR9KRk+JB8mb7X104sw+MdWxD9B3nhRWLEvusci3W6j9y5BmcMPhzFPFLyv/i4glKUkT
+	LlT1fVDsPQVOcTiYlDSAl30qjE7N56nj/q/Fm806UAWvRM8Bw6Mp1StgDtmSTB7LBKG1
+	Svjw==
+X-Gm-Message-State: APjAAAXGmuqGLYnU8fmUn/jmnkEkRr/jdyeB9GbHtP/RQqgx55FjJ+7H
+	E1VzGF96aw7yaR4WwZAQZ55ws/UM
+X-Google-Smtp-Source: APXvYqyENjjQ5fXs9tlH8VJz5TvhdWJB0loXMP7DnPXfOTHyEJ2b8+wnjcx4YantKzCST/SJnr11vg==
+X-Received: by 2002:a1c:f413:: with SMTP id z19mr20192977wma.71.1557208157468; 
+	Mon, 06 May 2019 22:49:17 -0700 (PDT)
+Received: from localhost.localdomain ([37.142.144.27])
+	by smtp.gmail.com with ESMTPSA id
+	n63sm11513439wmn.38.2019.05.06.22.49.16
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Mon, 06 May 2019 22:49:16 -0700 (PDT)
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Tue,  7 May 2019 08:49:14 +0300
+Message-Id: <20190507054914.25261-1-marcel.apfelbaum@gmail.com>
+X-Mailer: git-send-email 2.17.1
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 192.55.52.43
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] drm/i915/gvt: export mdev device
- version to sysfs for Intel vGPU
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PATCH v2] ui/console: Precautionary glBindTexture and
+ surface->texture validation in surface_gl_update_texture
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,341 +88,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"aik@ozlabs.ru" <aik@ozlabs.ru>,
-	"Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-	"shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-	"eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
-	"eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
-	Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-	"pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-	"libvir-list@redhat.com" <libvir-list@redhat.com>,
-	"arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
-	"felipe@nutanix.com" <felipe@nutanix.com>,
-	"Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>,
-	"dgilbert@redhat.com" <dgilbert@redhat.com>,
-	"jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"intel-gvt-dev@lists.freedesktop.org"
-	<intel-gvt-dev@lists.freedesktop.org>, "Liu,
-	Changpeng" <changpeng.liu@intel.com>,
-	"cohuck@redhat.com" <cohuck@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Wang, Zhi A" <zhi.a.wang@intel.com>,
-	"dinechin@redhat.com" <dinechin@redhat.com>, "He,
-	Shaopeng" <shaopeng.he@intel.com>
+Cc: kraxel@redhat.com, hqm03ster@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 06, 2019 at 03:41:58PM +0800, Zhenyu Wang wrote:
-> On 2019.05.06 11:20:32 +0800, Zhenyu Wang wrote:
-> > On 2019.05.05 21:51:02 -0400, Yan Zhao wrote:
-> > > This feature implements the version attribute for Intel's vGPU mdev
-> > > devices.
-> > >
-> > > version attribute is rw.
-> > > It's used to check device compatibility for two mdev devices.
-> > > version string format and length are private for vendor driver. vendor
-> > > driver is able to define them freely.
-> > >
-> > > For Intel vGPU of gen8 and gen9, the mdev device version
-> > > consists of 3 fields: "vendor id" + "device id" + "mdev type".
-> > >
-> > > Reading from a vGPU's version attribute, a string is returned in below
-> > > format: <vendor id>-<device id>-<mdev type>. e.g.
-> > > 8086-193b-i915-GVTg_V5_2.
-> > >
-> > > Writing a string to a vGPU's version attribute will trigger GVT to check
-> > > whether a vGPU identified by the written string is compatible with
-> > > current vGPU owning this version attribute. errno is returned if the two
-> > > vGPUs are incompatible. The length of written string is returned in
-> > > compatible case.
-> > >
-> > > For other platforms, and for GVT not supporting vGPU live migration
-> > > feature, errnos are returned when read/write of mdev devices' version
-> > > attributes.
-> > >
-> > > For old GVT versions where no version attributes exposed in sysfs, it is
-> > > regarded as not supporting vGPU live migration.
-> > >
-> > > For future platforms, besides the current 2 fields in vendor proprietary
-> > > part, more fields may be added to identify Intel vGPU well for live
-> > > migration purpose.
-> > >
-> > > v2:
-> > > 1. removed 32 common part of version string
-> > > (Alex Williamson)
-> > > 2. do not register version attribute for GVT not supporting live
-> > > migration.(Cornelia Huck)
-> > > 3. for platforms out of gen8, gen9, return -EINVAL --> -ENODEV for
-> > > incompatible. (Cornelia Huck)
-> > >
-> > > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > > Cc: Erik Skultety <eskultet@redhat.com>
-> > > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > Cc: Cornelia Huck <cohuck@redhat.com>
-> > > Cc: "Tian, Kevin" <kevin.tian@intel.com>
-> > > Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-> > > Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
-> > > c: Neo Jia <cjia@nvidia.com>
-> > > Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> > >
-> > > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > > ---
-> > >  drivers/gpu/drm/i915/gvt/Makefile         |  2 +-
-> > >  drivers/gpu/drm/i915/gvt/device_version.c | 87 +++++++++++++++++++++++
-> > >  drivers/gpu/drm/i915/gvt/gvt.c            | 51 +++++++++++++
-> > >  drivers/gpu/drm/i915/gvt/gvt.h            |  6 ++
-> > >  4 files changed, 145 insertions(+), 1 deletion(-)
-> > >  create mode 100644 drivers/gpu/drm/i915/gvt/device_version.c
-> > >
-> > > diff --git a/drivers/gpu/drm/i915/gvt/Makefile b/drivers/gpu/drm/i915/gvt/Makefile
-> > > index 271fb46d4dd0..54e209a23899 100644
-> > > --- a/drivers/gpu/drm/i915/gvt/Makefile
-> > > +++ b/drivers/gpu/drm/i915/gvt/Makefile
-> > > @@ -3,7 +3,7 @@ GVT_DIR := gvt
-> > >  GVT_SOURCE := gvt.o aperture_gm.o handlers.o vgpu.o trace_points.o firmware.o \
-> > >     interrupt.o gtt.o cfg_space.o opregion.o mmio.o display.o edid.o \
-> > >     execlist.o scheduler.o sched_policy.o mmio_context.o cmd_parser.o debugfs.o \
-> > > -   fb_decoder.o dmabuf.o page_track.o
-> > > +   fb_decoder.o dmabuf.o page_track.o device_version.o
-> > >
-> > >  ccflags-y                          += -I$(src) -I$(src)/$(GVT_DIR)
-> > >  i915-y                                     += $(addprefix $(GVT_DIR)/, $(GVT_SOURCE))
-> > > diff --git a/drivers/gpu/drm/i915/gvt/device_version.c b/drivers/gpu/drm/i915/gvt/device_version.c
-> > > new file mode 100644
-> > > index 000000000000..bd4cdcbdba95
-> > > --- /dev/null
-> > > +++ b/drivers/gpu/drm/i915/gvt/device_version.c
-> > > @@ -0,0 +1,87 @@
-> > > +/*
-> > > + * Copyright(c) 2011-2017 Intel Corporation. All rights reserved.
-> > > + *
-> > > + * Permission is hereby granted, free of charge, to any person obtaining a
-> > > + * copy of this software and associated documentation files (the "Software"),
-> > > + * to deal in the Software without restriction, including without limitation
-> > > + * the rights to use, copy, modify, merge, publish, distribute, sublicense,
-> > > + * and/or sell copies of the Software, and to permit persons to whom the
-> > > + * Software is furnished to do so, subject to the following conditions:
-> > > + *
-> > > + * The above copyright notice and this permission notice (including the next
-> > > + * paragraph) shall be included in all copies or substantial portions of the
-> > > + * Software.
-> > > + *
-> > > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> > > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> > > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-> > > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> > > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> > > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-> > > + * SOFTWARE.
-> > > + *
-> > > + * Authors:
-> > > + *    Yan Zhao <yan.y.zhao@intel.com>
-> > > + */
-> > > +#include <linux/vfio.h>
-> > > +#include "i915_drv.h"
-> > > +
-> > > +static bool is_compatible(const char *self, const char *remote)
-> > > +{
-> > > +   if (strlen(remote) != strlen(self))
-> > > +           return false;
-> > > +
-> > > +   return (strncmp(self, remote, strlen(self))) ? false : true;
-> > > +}
-> > > +
-> > > +ssize_t intel_gvt_get_vfio_device_version_len(struct drm_i915_private *dev_priv)
-> > > +{
-> > > +   if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> > > +           return -ENODEV;
-> > > +
-> > > +   return PAGE_SIZE;
-> > > +}
-> > > +
-> > > +ssize_t intel_gvt_get_vfio_device_version(struct drm_i915_private *dev_priv,
-> > > +           char *buf, const char *mdev_type)
-> > > +{
-> > > +   int cnt = 0, ret = 0;
-> > > +   const char *str = NULL;
-> > > +
-> >
-> > > +   /* currently only gen8 & gen9 are supported */
-> > > +   if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> > > +           return -ENODEV;
-> > > +
-> > > +   /* vendor id + device id + mdev type */
-> > > +   /* vendor id */
-> > > +   cnt = snprintf(buf, 5, "%04x", PCI_VENDOR_ID_INTEL);
-> > > +   buf += cnt;
-> > > +   ret += cnt;
-> > > +
-> > > +   /* device id */
-> > > +   cnt = snprintf(buf, 6, "-%04x", INTEL_DEVID(dev_priv));
-> > > +   buf += cnt;
-> > > +   ret += cnt;
-> > > +
-> > > +   /* mdev type */
-> > > +   str = mdev_type;
-> > > +   cnt = snprintf(buf, strlen(str) + 3, "-%s\n", mdev_type);
-> > > +   buf += cnt;
-> > > +   ret += cnt;
-> > > +
-> > > +   return ret;
-> > > +}
-> > > +
-> > > +ssize_t intel_gvt_check_vfio_device_version(struct drm_i915_private *dev_priv,
-> > > +           const char *self, const char *remote)
-> > > +{
-> > > +
-> > > +   /* currently only gen8 & gen9 are supported */
-> > > +   if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> > > +           return -ENODEV;
-> > > +
-> > > +   if (!is_compatible(self, remote))
-> > > +           return -EINVAL;
-> > > +
-> > > +   return 0;
-> > > +}
-> > > diff --git a/drivers/gpu/drm/i915/gvt/gvt.c b/drivers/gpu/drm/i915/gvt/gvt.c
-> > > index 43f4242062dd..19f16eec5a4c 100644
-> > > --- a/drivers/gpu/drm/i915/gvt/gvt.c
-> > > +++ b/drivers/gpu/drm/i915/gvt/gvt.c
-> > > @@ -105,14 +105,65 @@ static ssize_t description_show(struct kobject *kobj, struct device *dev,
-> > >                    type->weight);
-> > >  }
-> > >
-> > > +#ifdef GVT_MIGRATION_VERSION
-> >
-> > No extra define.
-> >
-ok. I'll try to define a variable in struct intel_gvt.
-e.g. 
+From: HQM <hqm03ster@gmail.com>
 
-gvt->is_migration_enabled.
+In a GVT-g setup with dmabuf and GTK GUI, the current 2D texture at
+surface_gl_update_texture is not necessarily
+surface->texture. Adding a glBindTexture fixes related crashes and
+artifacts, and is generally more secure.
 
-> > > +static ssize_t version_show(struct kobject *kobj, struct device *dev,
-> > > +           char *buf)
-> > > +{
-> > > +   struct drm_i915_private *i915 = kdev_to_i915(dev);
-> > > +   const char *mdev_type = kobject_name(kobj);
-> > > +
-> > > +   return intel_gvt_get_vfio_device_version(i915, buf, mdev_type);
-> > > +}
-> > > +
-> > > +static ssize_t version_store(struct kobject *kobj, struct device *dev,
-> > > +           const char *buf, size_t count)
-> > > +{
-> > > +   char *remote = NULL, *self = NULL;
-> > > +   int len, ret = 0;
-> > > +   struct drm_i915_private *i915 = kdev_to_i915(dev);
-> > > +   const char *mdev_type = kobject_name(kobj);
-> > > +
-> > > +   len = intel_gvt_get_vfio_device_version_len(i915);
-> > > +   if (len < 0)
-> > > +           return len;
-> > > +
-> > > +   self = kmalloc(len, GFP_KERNEL);
-> > > +   if (!self)
-> > > +           return -ENOMEM;
-> > > +
-> > > +   ret = intel_gvt_get_vfio_device_version(i915, self, mdev_type);
-> > > +   if (ret < 0)
-> > > +           goto out;
-> > > +
-> > > +   remote = kstrndup(buf, count, GFP_KERNEL);
-> > > +   if (!remote) {
-> > > +           ret = -ENOMEM;
-> > > +           goto out;
-> > > +   }
-> >
-> > Please make device version as attribute for vgpu instead of allocating memory
-> > everytime to generate it.
-> >
-> 
-> Seems this is attribute for mdev type instead of instance, I was wrong
-> to take it as vgpu instance attribute, so we could add it for vgpu type
-> definition for device with migration.
->
-ok. I'll try to add one version field in struct intel_vgpu_type.
+Signed-off-by: HQM <hqm03ster@gmail.com>
+Tested-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+[fixed malformed patch, rebase to master]
+Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+---
 
-> > > +
-> > > +   ret = intel_gvt_check_vfio_device_version(i915, self, remote);
-> > > +
-> > > +out:
-> > > +   kfree(self);
-> > > +   kfree(remote);
-> > > +   return (ret < 0 ? ret : count);
-> > > +}
-> > > +#endif
-> > > +
-> > >  static MDEV_TYPE_ATTR_RO(available_instances);
-> > >  static MDEV_TYPE_ATTR_RO(device_api);
-> > >  static MDEV_TYPE_ATTR_RO(description);
-> > > +#ifdef GVT_MIGRATION_VERSION
-> > > +static MDEV_TYPE_ATTR_RW(version);
-> > > +#endif
-> >
-> > Don't need extra define.
-> >
-> > >
-> > >  static struct attribute *gvt_type_attrs[] = {
-> > >     &mdev_type_attr_available_instances.attr,
-> > >     &mdev_type_attr_device_api.attr,
-> > >     &mdev_type_attr_description.attr,
-> > > +#ifdef GVT_MIGRATION_VERSION
-> > > +   &mdev_type_attr_version.attr,
-> > > +#endif
-> > >     NULL,
-> > >  };
-> >
-> > I think you need another group of attrs for type that could support
-> > migration, it will be assigned during host init for current platform
-> > with driver support. So just add new group of attrs for like
-> > gvt_migration_type_attrs[] with version.
-> >
-> > >
-> > > diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/gvt.h
-> > > index f5a328b5290a..4062f6b26acf 100644
-> > > --- a/drivers/gpu/drm/i915/gvt/gvt.h
-> > > +++ b/drivers/gpu/drm/i915/gvt/gvt.h
-> > > @@ -687,6 +687,12 @@ void intel_gvt_debugfs_remove_vgpu(struct intel_vgpu *vgpu);
-> > >  int intel_gvt_debugfs_init(struct intel_gvt *gvt);
-> > >  void intel_gvt_debugfs_clean(struct intel_gvt *gvt);
-> > >
-> > > +ssize_t intel_gvt_get_vfio_device_version(struct drm_i915_private *i915,
-> > > +           char *buf, const char *mdev_type);
-> > > +ssize_t intel_gvt_check_vfio_device_version(struct drm_i915_private *dev_priv,
-> > > +           const char *self, const char *remote);
-> > > +ssize_t
-> > > +intel_gvt_get_vfio_device_version_len(struct drm_i915_private *dev_priv);
-> > >
-> > >  #include "trace.h"
-> > >  #include "mpt.h"
-> > > --
-> > > 2.17.1
-> > >
-> >
-> > --
-> > Open Source Technology Center, Intel ltd.
-> >
-> > $gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
-> 
-> 
-> 
-> --
-> Open Source Technology Center, Intel ltd.
-> 
-> $gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+v2:
+ - fixed malformed patch
+ - rebased to master
 
+ ui/console-gl.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-> _______________________________________________
-> intel-gvt-dev mailing list
-> intel-gvt-dev@lists.freedesktop.org
-> https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
+diff --git a/ui/console-gl.c b/ui/console-gl.c
+index a56e1cd8eb..c1cb3bd673 100644
+--- a/ui/console-gl.c
++++ b/ui/console-gl.c
+@@ -92,13 +92,17 @@ void surface_gl_update_texture(QemuGLShader *gls,
+ 
+     assert(gls);
+ 
+-    glPixelStorei(GL_UNPACK_ROW_LENGTH_EXT,
+-                  surface_stride(surface) / surface_bytes_per_pixel(surface));
+-    glTexSubImage2D(GL_TEXTURE_2D, 0,
+-                    x, y, w, h,
+-                    surface->glformat, surface->gltype,
+-                    data + surface_stride(surface) * y
+-                    + surface_bytes_per_pixel(surface) * x);
++    if (surface->texture) {
++        glBindTexture(GL_TEXTURE_2D, surface->texture);
++        glPixelStorei(GL_UNPACK_ROW_LENGTH_EXT,
++                      surface_stride(surface)
++                      / surface_bytes_per_pixel(surface));
++        glTexSubImage2D(GL_TEXTURE_2D, 0,
++                        x, y, w, h,
++                        surface->glformat, surface->gltype,
++                        data + surface_stride(surface) * y
++                        + surface_bytes_per_pixel(surface) * x);
++    }
+ }
+ 
+ void surface_gl_render_texture(QemuGLShader *gls,
+-- 
+2.17.1
 
 
