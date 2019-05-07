@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6489C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 16:39:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A12C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 16:40:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7D9B205C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 16:39:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7D9B205C9
+	by mail.kernel.org (Postfix) with ESMTPS id 55B30205C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 16:40:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55B30205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49824 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49855 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO384-0004wj-0C
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 12:39:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50773)
+	id 1hO38t-0005cd-Ii
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 12:40:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hO33p-0000m9-HT
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 12:35:24 -0400
+	(envelope-from <philmd@redhat.com>) id 1hO33g-0000ZV-0M
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 12:35:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hO33n-0001GO-KM
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 12:35:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52226)
+	(envelope-from <philmd@redhat.com>) id 1hO33e-00013h-3s
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 12:35:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55396)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <philmd@redhat.com>)
-	id 1hO33j-00018W-Mf; Tue, 07 May 2019 12:35:15 -0400
+	id 1hO33Y-0000v5-M7; Tue, 07 May 2019 12:35:05 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 46E2C3082E57;
-	Tue,  7 May 2019 16:35:13 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id AC04D81E1D;
+	Tue,  7 May 2019 16:35:03 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-58.brq.redhat.com [10.40.204.58])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B2898162;
-	Tue,  7 May 2019 16:35:04 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id AB8008160;
+	Tue,  7 May 2019 16:34:46 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>,
 	qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue,  7 May 2019 18:34:03 +0200
-Message-Id: <20190507163416.24647-4-philmd@redhat.com>
+Date: Tue,  7 May 2019 18:34:02 +0200
+Message-Id: <20190507163416.24647-3-philmd@redhat.com>
 In-Reply-To: <20190507163416.24647-1-philmd@redhat.com>
 References: <20190507163416.24647-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Tue, 07 May 2019 16:35:13 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.25]);
+	Tue, 07 May 2019 16:35:04 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 03/16] hw/virtio: Use
- object_initialize_child for correct reference counting
+Subject: [Qemu-devel] [PATCH v2 02/16] hw/misc/macio: Use
+ object_initialize_child for correct ref. counting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -102,7 +102,8 @@ As explained in commit aff39be0ed97:
   Thus let's use now object_initialize_child() instead to get the
   reference counting here right.
 
-This patch was generated using the following Coccinelle script:
+This patch was generated using the following Coccinelle script
+(with a bit of manual fix-up for overly long lines):
 
  @use_object_initialize_child@
  expression parent_obj;
@@ -144,27 +145,49 @@ Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
 Inspired-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/virtio/virtio.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ hw/misc/macio/macio.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 2626a895cbb..f2462ce0152 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2267,9 +2267,8 @@ void virtio_instance_init_common(Object *proxy_obj,=
- void *data,
- {
-     DeviceState *vdev =3D data;
+diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+index 94da85c8d7d..b726c73022c 100644
+--- a/hw/misc/macio/macio.c
++++ b/hw/misc/macio/macio.c
+@@ -346,12 +346,12 @@ static void macio_newworld_realize(PCIDevice *d, Er=
+ror **errp)
+         object_property_set_bool(OBJECT(&ns->gpio), true, "realized", &e=
+rr);
 =20
--    object_initialize(vdev, vdev_size, vdev_name);
--    object_property_add_child(proxy_obj, "virtio-backend", OBJECT(vdev),=
- NULL);
--    object_unref(OBJECT(vdev));
-+    object_initialize_child(proxy_obj, "virtio-backend", vdev, vdev_size=
-,
-+                            vdev_name, &error_abort, NULL);
-     qdev_alias_all_properties(vdev, proxy_obj);
- }
+         /* PMU */
+-        object_initialize(&s->pmu, sizeof(s->pmu), TYPE_VIA_PMU);
++        object_initialize_child(OBJECT(s), "pmu", &s->pmu, sizeof(s->pmu=
+),
++                                TYPE_VIA_PMU, &error_abort, NULL);
+         object_property_set_link(OBJECT(&s->pmu), OBJECT(sysbus_dev), "g=
+pio",
+                                  &error_abort);
+         qdev_prop_set_bit(DEVICE(&s->pmu), "has-adb", ns->has_adb);
+         qdev_set_parent_bus(DEVICE(&s->pmu), BUS(&s->macio_bus));
+-        object_property_add_child(OBJECT(s), "pmu", OBJECT(&s->pmu), NUL=
+L);
+=20
+         object_property_set_bool(OBJECT(&s->pmu), true, "realized", &err=
+);
+         if (err) {
+@@ -365,9 +365,9 @@ static void macio_newworld_realize(PCIDevice *d, Erro=
+r **errp)
+                                     sysbus_mmio_get_region(sysbus_dev, 0=
+));
+     } else {
+         /* CUDA */
+-        object_initialize(&s->cuda, sizeof(s->cuda), TYPE_CUDA);
++        object_initialize_child(OBJECT(s), "cuda", &s->cuda, sizeof(s->c=
+uda),
++                                TYPE_CUDA, &error_abort, NULL);
+         qdev_set_parent_bus(DEVICE(&s->cuda), BUS(&s->macio_bus));
+-        object_property_add_child(OBJECT(s), "cuda", OBJECT(&s->cuda), N=
+ULL);
+         qdev_prop_set_uint64(DEVICE(&s->cuda), "timebase-frequency",
+                              s->frequency);
 =20
 --=20
 2.20.1
