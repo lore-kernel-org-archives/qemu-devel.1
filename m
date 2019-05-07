@@ -3,59 +3,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74736C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:20:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88622C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:22:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D2C9205ED
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:20:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D2C9205ED
+	by mail.kernel.org (Postfix) with ESMTPS id 56ECA20578
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:22:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56ECA20578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48481 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48514 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO1tS-0000Zu-FI
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 11:20:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58167)
+	id 1hO1vj-0002no-JY
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 11:22:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hO1rX-0007s1-MT
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:18:36 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hO1rW-0003u1-E1
+	(envelope-from <mreitz@redhat.com>) id 1hO1rW-0007pv-Dq
 	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:18:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39430)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <mreitz@redhat.com>) id 1hO1rU-0003se-Fj
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:18:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34920)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hO1rQ-0003oX-KH; Tue, 07 May 2019 11:18:30 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	id 1hO1rO-0003lE-Lw; Tue, 07 May 2019 11:18:26 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CBBC9C04FFF1;
-	Tue,  7 May 2019 15:18:26 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6F370308793B;
+	Tue,  7 May 2019 15:18:24 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.217])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6356F5D9CC;
-	Tue,  7 May 2019 15:18:26 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 075F860C5F;
+	Tue,  7 May 2019 15:18:23 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Tue,  7 May 2019 17:18:10 +0200
-Message-Id: <20190507151819.17401-3-mreitz@redhat.com>
+Date: Tue,  7 May 2019 17:18:09 +0200
+Message-Id: <20190507151819.17401-2-mreitz@redhat.com>
 In-Reply-To: <20190507151819.17401-1-mreitz@redhat.com>
 References: <20190507151819.17401-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Tue, 07 May 2019 15:18:26 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.45]);
+	Tue, 07 May 2019 15:18:24 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 02/11] qcow2-refcount: avoid eating RAM
+Subject: [Qemu-devel] [PULL 01/11] qcow2-refcount: fix check_oflag_copied
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,115 +75,62 @@ Sender: "Qemu-devel"
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-qcow2_inc_refcounts_imrt() (through realloc_refcount_array()) can eat
-an unpredictable amount of memory on corrupted table entries, which are
-referencing regions far beyond the end of file.
-
-Prevent this, by skipping such regions from further processing.
-
-Interesting that iotest 138 checks exactly the behavior which we fix
-here. So, change the test appropriately.
+Increase corruptions_fixed only after successful fix.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190227131433.197063-3-vsementsov@virtuozzo.com
+Message-id: 20190227131433.197063-2-vsementsov@virtuozzo.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-refcount.c     | 19 +++++++++++++++++++
- tests/qemu-iotests/138     | 12 +++++-------
- tests/qemu-iotests/138.out |  5 ++++-
- 3 files changed, 28 insertions(+), 8 deletions(-)
+ block/qcow2-refcount.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index ed3d8ebd57..21e50dacf4 100644
+index e0fe322500..ed3d8ebd57 100644
 --- a/block/qcow2-refcount.c
 +++ b/block/qcow2-refcount.c
-@@ -1520,12 +1520,31 @@ int qcow2_inc_refcounts_imrt(BlockDriverState *bs=
-, BdrvCheckResult *res,
- {
-     BDRVQcow2State *s =3D bs->opaque;
-     uint64_t start, last, cluster_offset, k, refcount;
-+    int64_t file_len;
-     int ret;
+@@ -1846,7 +1846,7 @@ static int check_oflag_copied(BlockDriverState *bs,=
+ BdrvCheckResult *res,
+     for (i =3D 0; i < s->l1_size; i++) {
+         uint64_t l1_entry =3D s->l1_table[i];
+         uint64_t l2_offset =3D l1_entry & L1E_OFFSET_MASK;
+-        bool l2_dirty =3D false;
++        int l2_dirty =3D 0;
 =20
-     if (size <=3D 0) {
-         return 0;
+         if (!l2_offset) {
+             continue;
+@@ -1912,8 +1912,7 @@ static int check_oflag_copied(BlockDriverState *bs,=
+ BdrvCheckResult *res,
+                         l2_table[j] =3D cpu_to_be64(refcount =3D=3D 1
+                                     ? l2_entry |  QCOW_OFLAG_COPIED
+                                     : l2_entry & ~QCOW_OFLAG_COPIED);
+-                        l2_dirty =3D true;
+-                        res->corruptions_fixed++;
++                        l2_dirty++;
+                     } else {
+                         res->corruptions++;
+                     }
+@@ -1921,7 +1920,7 @@ static int check_oflag_copied(BlockDriverState *bs,=
+ BdrvCheckResult *res,
+             }
+         }
+=20
+-        if (l2_dirty) {
++        if (l2_dirty > 0) {
+             ret =3D qcow2_pre_write_overlap_check(bs, QCOW2_OL_ACTIVE_L2=
+,
+                                                 l2_offset, s->cluster_si=
+ze,
+                                                 false);
+@@ -1940,6 +1939,7 @@ static int check_oflag_copied(BlockDriverState *bs,=
+ BdrvCheckResult *res,
+                 res->check_errors++;
+                 goto fail;
+             }
++            res->corruptions_fixed +=3D l2_dirty;
+         }
      }
 =20
-+    file_len =3D bdrv_getlength(bs->file->bs);
-+    if (file_len < 0) {
-+        return file_len;
-+    }
-+
-+    /*
-+     * Last cluster of qcow2 image may be semi-allocated, so it may be O=
-K to
-+     * reference some space after file end but it should be less than on=
-e
-+     * cluster.
-+     */
-+    if (offset + size - file_len >=3D s->cluster_size) {
-+        fprintf(stderr, "ERROR: counting reference for region exceeding =
-the "
-+                "end of the file by one cluster or more: offset 0x%" PRI=
-x64
-+                " size 0x%" PRIx64 "\n", offset, size);
-+        res->corruptions++;
-+        return 0;
-+    }
-+
-     start =3D start_of_cluster(s, offset);
-     last =3D start_of_cluster(s, offset + size - 1);
-     for(cluster_offset =3D start; cluster_offset <=3D last;
-diff --git a/tests/qemu-iotests/138 b/tests/qemu-iotests/138
-index f353ac8219..6a731370db 100755
---- a/tests/qemu-iotests/138
-+++ b/tests/qemu-iotests/138
-@@ -54,15 +54,13 @@ $QEMU_IO -c 'write 0 512' "$TEST_IMG" | _filter_qemu_=
-io
- # Put the data cluster at a multiple of 2 TB, resulting in the image app=
-arently
- # having a multiple of 2^32 clusters
- # (To be more specific: It is at 32 PB)
--poke_file "$TEST_IMG" 2048 "\x80\x80\x00\x00\x00\x00\x00\x00"
-+poke_file "$TEST_IMG" $((2048 + 8)) "\x00\x80\x00\x00\x00\x00\x00\x00"
-=20
- # An offset of 32 PB results in qemu-img check having to allocate an in-=
-memory
--# refcount table of 128 TB (16 bit refcounts, 512 byte clusters).
--# This should be generally too much for any system and thus fail.
--# What this test is checking is that the qcow2 driver actually tries to =
-allocate
--# such a large amount of memory (and is consequently aborting) instead o=
-f having
--# truncated the cluster count somewhere (which would result in much less=
- memory
--# being allocated and then a segfault occurring).
-+# refcount table of 128 TB (16 bit refcounts, 512 byte clusters), if qem=
-u-img
-+# don't check that referenced data cluster is far beyond the end of file=
-.
-+# But starting from 4.0, qemu-img does this check, and instead of "Canno=
-t
-+# allocate memory", we have an error showing that l2 entry is invalid.
- _check_test_img
-=20
- # success, all done
-diff --git a/tests/qemu-iotests/138.out b/tests/qemu-iotests/138.out
-index 3fe911f85a..aca7d47a80 100644
---- a/tests/qemu-iotests/138.out
-+++ b/tests/qemu-iotests/138.out
-@@ -5,5 +5,8 @@ QA output created by 138
- Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D512
- wrote 512/512 bytes at offset 0
- 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--qemu-img: Check failed: Cannot allocate memory
-+ERROR: counting reference for region exceeding the end of the file by on=
-e cluster or more: offset 0x80000000000000 size 0x200
-+
-+1 errors were found on the image.
-+Data may be corrupted, or further writes to the image may corrupt it.
- *** done
 --=20
 2.20.1
 
