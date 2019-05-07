@@ -2,80 +2,63 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 993EFC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:41:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00BF2C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:44:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61BBC20825
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:41:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="P0NmBCU8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61BBC20825
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id C4D6A20825
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:44:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4D6A20825
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48862 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48880 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO2E5-0000qD-Lu
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 11:41:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36396)
+	id 1hO2G8-0002MK-3o
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 11:44:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1hO2D0-0000Gw-7z
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:40:47 -0400
+	(envelope-from <groug@kaod.org>) id 1hO2F0-0001lM-AV
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:42:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1hO2Cz-0001sK-4x
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:40:46 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:43483)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1hO2Cy-0001qX-W0
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:40:45 -0400
-Received: by mail-ot1-x344.google.com with SMTP id i8so5628350oth.10
-	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 08:40:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=intel-com.20150623.gappssmtp.com; s=20150623;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=eDjq30ddseBaIw6socWxfPv6NTtk+5QW4X1Ug5iEyJk=;
-	b=P0NmBCU8zUOfaF8xaYZsuZ8crvxFB33fl7wDNB9MZv5fgE9bufZ9uXOFacVBRIyhyk
-	7jy7cEut0ZZu1RaoDtrr50BVaB/CX/skGeBOtXxoGAGKW89ZemgDpFwl6g0BCyZNTY71
-	c96Bv/+lzcoe4YYcd5EMePUR4gTK7GrAqK6itLr2obeqWzYKb3Dql3mDDHzIv1x+/JnT
-	zIvYGvdBDonXfV8sEZV0PvMIvA63l1OoRV+8kWQPCfuhVRSXMOb+jYMxWFhFzCGAXSHH
-	RES21PeWYeTfPIbRNgVP3JVS3PVW0F6JNq0X1vpUrTbfXgSQ4Ev5ZlVumch1kGRMghci
-	mHRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=eDjq30ddseBaIw6socWxfPv6NTtk+5QW4X1Ug5iEyJk=;
-	b=UhpAG/hV6fbn/qzf1wtAzLPzAtYRTA1NeKymDqIua5FTrj3yG/HVStUIPei69egYoO
-	NVpURAvQlpdwzudqcXRU6OxpDtOkD0Ip4WtgU7hkSn380T+d5AwNq2mavtSzvNQQrx6V
-	wxbI5ORcN68WfNQD7FtsutcHKGFqFjL7EAOg6TyWBcRBWlB/wIXNd9NUWUw5PTFqid4r
-	2BPVDG2L3PwGVXnHy9+prhMteZiJ1bOZFgwuuKNMgDiGZscYfKm967CA77dd2Q5n1zMp
-	/2G0Hj1EkcNmS2HRmbwB+vDk/1a9B43mGxCs2lw+9hrxyEc6tiG8VcS1LeHH5Aj/A649
-	R32g==
-X-Gm-Message-State: APjAAAWzK+J91EHrL0rgawHlKAcgkuDyYKDUCpYBN6jV5T+xUsOxZ/YH
-	4A+tTr89rMsRdyICp+yTl3kSvnEBajc5D6URMFh9Tg==
-X-Google-Smtp-Source: APXvYqxgIWANkc/KHq9kAogc8tqlkqRrOccsWEIKbqAeeZcNH5LiQg3MPoGwMh9hdCCYG0LuKCXgqpIi0akzNLzuZFI=
-X-Received: by 2002:a9d:222c:: with SMTP id o41mr22033787ota.353.1557243640877;
-	Tue, 07 May 2019 08:40:40 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1hO2Ez-0002wk-6z
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:42:50 -0400
+Received: from 6.mo179.mail-out.ovh.net ([46.105.56.76]:46115)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hO2Ez-0002vb-0p
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:42:49 -0400
+Received: from player738.ha.ovh.net (unknown [10.108.57.49])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 81360124FF9
+	for <qemu-devel@nongnu.org>; Tue,  7 May 2019 17:42:46 +0200 (CEST)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+	(Authenticated sender: groug@kaod.org)
+	by player738.ha.ovh.net (Postfix) with ESMTPSA id 602965A14343;
+	Tue,  7 May 2019 15:42:41 +0000 (UTC)
+Date: Tue, 7 May 2019 17:42:39 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Message-ID: <20190507174239.59ad26d1@bahia.lan>
+In-Reply-To: <3336211.WybC1Bzqah@silver>
+References: <590216e2666653bac21d950aaba98f87d0a53324.1557093245.git.qemu_oss@crudebyte.com>
+	<1895198.u98Sn5qOsY@silver> <20190507115556.3d578690@bahia.lan>
+	<3336211.WybC1Bzqah@silver>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20190426050039.17460-1-pagupta@redhat.com>
-	<20190426050039.17460-4-pagupta@redhat.com>
-In-Reply-To: <20190426050039.17460-4-pagupta@redhat.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Tue, 7 May 2019 08:40:30 -0700
-Message-ID: <CAPcyv4hRdvypEj4LBTMfUFm80BdpRYbOugrkkj-3Kk_LErXPqQ@mail.gmail.com>
-To: Pankaj Gupta <pagupta@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH v7 3/6] libnvdimm: add dax_dev sync flag
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 12066832252380485952
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrkedtgdeljecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.56.76
+Subject: Re: [Qemu-devel] [libvirt patch] qemu: adds support for virtfs 9p
+ argument 'vii'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,59 +70,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, Jan Kara <jack@suse.cz>, KVM list <kvm@vger.kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, david <david@fromorbit.com>,
-	Qemu Developers <qemu-devel@nongnu.org>,
-	virtualization@lists.linux-foundation.org,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Ross Zwisler <zwisler@kernel.org>, Andrea Arcangeli <aarcange@redhat.com>,
-	Dave Jiang <dave.jiang@intel.com>,
-	linux-nvdimm <linux-nvdimm@lists.01.org>,
-	Vishal L Verma <vishal.l.verma@intel.com>,
-	David Hildenbrand <david@redhat.com>, Matthew Wilcox <willy@infradead.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Linux ACPI <linux-acpi@vger.kernel.org>, jmoyer <jmoyer@redhat.com>,
-	linux-ext4 <linux-ext4@vger.kernel.org>,
-	Len Brown <lenb@kernel.org>, kilobyte@angband.pl,
-	Rik van Riel <riel@surriel.com>, yuval shaia <yuval.shaia@oracle.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
-	Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>,
-	Theodore Ts'o <tytso@mit.edu>,
-	Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-	"Darrick J. Wong" <darrick.wong@oracle.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-xfs <linux-xfs@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Antonios Motakis <antonios.motakis@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 25, 2019 at 10:02 PM Pankaj Gupta <pagupta@redhat.com> wrote:
->
-> This patch adds 'DAXDEV_SYNC' flag which is set
-> for nd_region doing synchronous flush. This later
-> is used to disable MAP_SYNC functionality for
-> ext4 & xfs filesystem for devices don't support
-> synchronous flush.
->
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-[..]
-> diff --git a/include/linux/dax.h b/include/linux/dax.h
-> index 0dd316a74a29..c97fc0cc7167 100644
-> --- a/include/linux/dax.h
-> +++ b/include/linux/dax.h
-> @@ -7,6 +7,9 @@
->  #include <linux/radix-tree.h>
->  #include <asm/pgtable.h>
->
-> +/* Flag for synchronous flush */
-> +#define DAXDEV_F_SYNC true
+On Tue, 07 May 2019 14:23:11 +0200
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
-I'd feel better, i.e. it reads more canonically, if this was defined
-as (1UL << 0) and the argument to alloc_dax() was changed to 'unsigned
-long flags' rather than a bool.
+> On Dienstag, 7. Mai 2019 11:55:56 CEST Greg Kurz wrote:
+> > > support the 'vii' feature of patch 5, which introduces the XML config  
+> > 
+> > What is patch 5 ?!? What is 'vii' ? I am a bit lost here...  
+> 
+> Hi Greg,
+> 
+> Sorry that I caused a bit of confusion, You were actually commenting mostly on 
+> v2 of the patch set, where my email client replaced the message IDs and hence 
+> screwed threading.
+> 
+> This is v3 that I sent yesterday and which has correct threading:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01143.html
+> 
+
+For a reason yet to be investigated, I haven't received it yet...
+
+> Please just have a glimpse on that v3 thread, and before I address the details 
+> that you requested (I have reviewed them all already and will address them), I 
+> would like you to ask you for a coarse feedback on design/features first. 
+> Because there are some things where I am unresolved on design level yet:
+> 
+
+I'll try but probably not before next week.
+
+> 1. Should I drop the "persistency" feature of patch 3 (same inode numbers 
+> after reboots/suspends)  completely from the patch set? It is disabled at 
+> compile time by default for now after entire v3 patch set is applied. Or 
+> should that persistency feature probably become a qemu command line option 
+> instead?
+> 
+> 2. If persistency feature should be preserved, shall I probably move out all 
+> the inode remapping code into a separate C unit to avoid 9p.c getting bloated 
+> too much (the amount of code for saving/loading the qp*_table hash tables is 
+> quite large). If yes, any suggestion for an appropriate unit name?
+> 
+> 3. Are you fine with the suggested variable length suffixes (patch 4) becoming 
+> the default behaviour (instead of the fixed length 16 bit prefix solution by 
+> Antonios)?
+> 
+> 4. Do you have a better idea for a name instead of the suggested "vii" (patch 
+> 5) virtfs qemu command line option? And are you fine with the idea of that 
+> "vii" feature anyway?
+> 
+> > > This is the counter part patch against latest libvirt git master head to  
+> > 
+> > Hmm... shouldn't this be Cc'd to libvir-list@redhat.com as well then ?  
+> 
+> Well, for now I just provided that libvirt patch to give you an idea about how 
+> imagined this "vii" feature to be used. Does it make sense to CC them already 
+> even though this suggested "vii" command line option does not exist on qemu 
+> side yet?
+> 
+> I know I piled up quite a bit of code on this patch set, so to speed up things 
+> simply raise questions instead of spending too much time in reviewing 
+> everything in detail already.
+> 
+> Thanks Greg!
+> 
+> Best regards,
+> Christian Schoenebeck
+
 
