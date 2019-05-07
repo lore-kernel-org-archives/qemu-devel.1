@@ -2,79 +2,81 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B541CC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 22:38:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 423CBC004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 22:41:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7435620825
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 22:38:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03EF120825
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 22:41:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OURU7Syc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7435620825
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TD/uBnaF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03EF120825
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55653 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55701 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO8ja-0001Ys-CX
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 18:38:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54948)
+	id 1hO8mD-0002zU-9l
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 18:41:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hO8ip-0001Fi-W7
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 18:38:04 -0400
+	(envelope-from <fintelia@gmail.com>) id 1hO8l6-00029r-AA
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 18:40:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hO8ip-00061J-2L
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 18:38:03 -0400
-Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:34324)
+	(envelope-from <fintelia@gmail.com>) id 1hO8kx-00043Z-Ep
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 18:40:20 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:45196)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hO8io-0005yS-T4
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 18:38:03 -0400
-Received: by mail-oi1-x229.google.com with SMTP id v10so13687286oib.1
-	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 15:38:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:from:date:message-id:subject:to:cc
-	:content-transfer-encoding;
-	bh=eBYifXrDSkS4KxOTwaCrGoK3eQar9G2fCjRjrK6uAcw=;
-	b=OURU7SycCTmFjmbpa4cuT7UREHHsBYjP74YP9m5DWTZofiPwcKd73bFMt6pfmF8VRq
-	WdPHJRvRRFXVDnwRTm60StkGbr7fhqW1C9F2BnfTByx2OL9uAdWhu8ITszai8HMZkfTJ
-	jxJzMqbir3B4e1JzpQEBTgDccYuDCAzgvj58kDowW10cXFmRJM0xdCuC33wg7JGkPAQv
-	dTluxismAgnt0K25ob57rzCZw3IPt+YqwSuHiZGqXpd1cvkr8UnHwgqGXUMhvGINPWLr
-	6CrAKj6uviSdVR+teuvK6p9fCKYfcjb9D3PCR3PSmkAAHkQHQ45xo2nJJiR+vcKS23bv
-	GReA==
+	(Exim 4.71) (envelope-from <fintelia@gmail.com>)
+	id 1hO8kr-0003d1-Ha; Tue, 07 May 2019 18:40:09 -0400
+Received: by mail-lj1-x242.google.com with SMTP id r76so4687721lja.12;
+	Tue, 07 May 2019 15:40:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=9ED1N8Nz1S22w3WHAYcAXqzBpvu410fa4BfW85S97qQ=;
+	b=TD/uBnaFC3IVQ+djwYzCgEQOpywx1LvM+Hkv9Bvg0tjvCapjt/FcGefdIhNdPtst1N
+	P+3roNyPSiba9EmPk+NBVipbNnIK/Y0GcZaapxUyaHcufdSu1DVsGZ932G39rIbHqHrx
+	F6ksxuidCG6vN2rxvEhWT4pq0lSYPBKj0ohrTnnY6RaxIshcn4zfXfzo/OScX+vEMYCJ
+	or6QAW+hGpplGJSxBXaiEPvZG6X09Ce/02xhsWdP/+1dONhq63kKizbEUvU5/9goy4bz
+	aUh2cao7q3LGxSo/8+B3Id7kkieKafIMdDLfm5k1HNeHS5PuRocZWo8/hwBGOSxde5Ww
+	nQeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc
-	:content-transfer-encoding;
-	bh=eBYifXrDSkS4KxOTwaCrGoK3eQar9G2fCjRjrK6uAcw=;
-	b=i6ghuYxQd3a0wdNCaP77O561QbssHAQX0pWXC7a7kebKj1yS0Lf2qlmVdAac1VP4Hd
-	Xo/0vTcwbNGLHUGZ9o1kQGa79rrvt7Hkd3nWzzFv359NiNUjFjH61TGMNw5o7eIfvWqn
-	53Dspn5p35WyPENWVDL8HqANJFAM/i5J2OEX9fwrUVE/hRAq0vVv8kNsJYDy21buFf02
-	ao81vby8PpMSaeIDKr9vYb9txp4lAsc9wVUeNrUOoDZdAfD1YPKYGKp7/fcxCCm8uZJe
-	N0EC9LxP2IviIGWXDYPmmntmWFez7LnpXMmET1CjYXbgbMOEXHWfOaRBdWteO+FA3Myz
-	OVmQ==
-X-Gm-Message-State: APjAAAUVXXfxJMhM3NGXFAJv9Fx0bR9h05qwWFx4i/+Mo6yOYNR9Wv+0
-	xdY3f8Rwc6g8levhc9Ep6xoUdJWhO6JqPdlLVQFJIh4gdz0=
-X-Google-Smtp-Source: APXvYqw5zREXG6n11cWKZfWI2+jWeNYrTBBklFjQ62fY5em6ejaslJXEEMCAd91GDZ9/TgyCRoiPIcByt1Lw+bELTwU=
-X-Received: by 2002:aca:b3c2:: with SMTP id c185mr16337oif.98.1557268681604;
-	Tue, 07 May 2019 15:38:01 -0700 (PDT)
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=9ED1N8Nz1S22w3WHAYcAXqzBpvu410fa4BfW85S97qQ=;
+	b=tQLsfTszXp1+cBj4pfdIVCnd3sTzQsq/qFUPdqxAxwbzRgzXLLB96b/ZIfi1x26e5T
+	DA4Th58BYnk/YqhWsh4EgqLFJ03DAH1yITN38F8clDzmGuZQZsbVUFUbNW2LbMND4KYo
+	X7FKLmBaN6kay9Gqh77RxxWZtWcNDNngDP9m2XUUwfZVaZ2zbAdnlSFnWlFtejA6z+z0
+	dFtRENBZad+yZIF9GHFDfqu3jw/IqVvqJPnzhQ3XOEscUXAkAT5/npJzXRn8qmWE7OpP
+	IoY1QZnRwbjeNVFqt3Ql2NzdeXedFJrMqdOXb69b3qnamnl25XVL+CmRjh9IflXQgooK
+	foTg==
+X-Gm-Message-State: APjAAAWxGYFp8IHFKrSoGVQnndTgsVWaoGAODU0G1G+Vpu11ECFw/8dT
+	9HDqGJV4fGVJJxmBOZKwHi00FiyngS7KIS5DFeQ=
+X-Google-Smtp-Source: APXvYqxTqfddm+WUQHyBIYSNwyRq0VI7H65WvW1jlrov3k6PyJFQpJSUDmsl2dNRvAtCimWUsACOAbWIKgjTeiKMU84=
+X-Received: by 2002:a2e:84ce:: with SMTP id q14mr19236826ljh.80.1557268807076; 
+	Tue, 07 May 2019 15:40:07 -0700 (PDT)
 MIME-Version: 1.0
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 May 2019 23:37:50 +0100
-Message-ID: <CAFEAcA9nd6Xta8CGSRp605i9bcpeKsj+h4r5gbpot4_iNKXyRg@mail.gmail.com>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <CANnJOVHd1aFR2tiORJmZ2h3xa+t8djToUEom4WSy=4vBcOjegg@mail.gmail.com>
+	<mhng-29822037-900e-4149-aa85-36cbc1db4972@palmer-si-x1e>
+In-Reply-To: <mhng-29822037-900e-4149-aa85-36cbc1db4972@palmer-si-x1e>
+From: Jonathan Behrens <fintelia@gmail.com>
+Date: Tue, 7 May 2019 18:39:40 -0400
+Message-ID: <CANnJOVFDXH3PfAX3dJMhUi=ovXrJ953+Zfu2j19eBfKt7vSObQ@mail.gmail.com>
+To: Palmer Dabbelt <palmer@sifive.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::229
-Subject: [Qemu-devel] qapi-scheme/unicode-str test failure due to mismatch
- between e-acute and \xe9
+X-Received-From: 2a00:1450:4864:20::242
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH for 4.1] target/riscv: More accurate
+ handling of `sip` CSR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,39 +88,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>,
+	"open list:RISC-V" <qemu-riscv@nongnu.org>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+	Sagar Karandikar <sagark@eecs.berkeley.edu>,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I just ran into this test failure:
+Yes, I was pasting the output of `git format-patch`. Gmail displays
+properly for me, but seems to have hard-wrapped the plaintext version of my
+outgoing message to 78 characters. I've tried re-sending from a different
+address where I can use `git send-email` directly, please let me know if it
+works and I'll resend the other patch the same way. Sorry about this!
 
-PYTHONPATH=3D/home/linux1/qemu/scripts python3 -B
-/home/linux1/qemu/tests/qapi-schema/test-qapi.py
-/home/linux1/qemu/tests/qapi-schema/unicode-str.json
->tests/qapi-schema/unicode-str.test.out
-2>tests/qapi-schema/unicode-str.test.err; echo $?
->tests/qapi-schema/unicode-str.test.exit
---- /home/linux1/qemu/tests/qapi-schema/unicode-str.err    2017-07-06
-10:23:13.601812330 -0400
-+++ -    2019-05-07 18:32:31.533125931 -0400
-@@ -1 +1 @@
--tests/qapi-schema/unicode-str.json:2: 'command' uses invalid name '=C3=A9'
-+tests/qapi-schema/unicode-str.json:2: 'command' uses invalid name '\xe9'
-/home/linux1/qemu/tests/Makefile.include:1105: recipe for target
-'check-tests/qapi-schema/unicode-str.json' failed
-make: *** [check-tests/qapi-schema/unicode-str.json] Error 1
-make: Leaving directory '/home/linux1/qemu/build/all'
+Jonathan
 
-but oddly only when I ran 'make check' by logging directly
-into this machine (usually I run the tests automatically
-via ssh and scripting), which suggests it may depend
-on the locale settings. Does anybody recognize this ?
-I think LANG=3DC fails, but LANG=3DC.UTF-8 passes.
 
-Ideally our test suite should not depend on the locale
-or environment settings of the user running it.
+On Tue, May 7, 2019 at 1:52 PM Palmer Dabbelt <palmer@sifive.com> wrote:
 
-thanks
--- PMM
-
+> On Mon, 06 May 2019 08:52:43 PDT (-0700), fintelia@gmail.com wrote:
+> > According to the spec, "All bits besides SSIP, USIP, and UEIP in the sip
+> > register are read-only." Further, if an interrupt is not delegated to
+> mode
+> > x,
+> > then "the corresponding bits in xip [...] should appear to be hardwired
+> to
+> > zero. This patch implements both of those requirements.
+> >
+> > Signed-off-by: Jonathan Behrens <fintelia@gmail.com>
+> > ---
+> >  target/riscv/csr.c | 7 +++++--
+> >  1 file changed, 5 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> > index 1ec1222da1..fff7d834e8 100644
+> > --- a/target/riscv/csr.c
+> > +++ b/target/riscv/csr.c
+> > @@ -246,6 +246,7 @@ static const target_ulong sstatus_v1_9_mask =
+> > SSTATUS_SIE | SSTATUS_SPIE |
+> >  static const target_ulong sstatus_v1_10_mask = SSTATUS_SIE |
+> SSTATUS_SPIE |
+> >      SSTATUS_UIE | SSTATUS_UPIE | SSTATUS_SPP | SSTATUS_FS | SSTATUS_XS |
+> >      SSTATUS_SUM | SSTATUS_MXR | SSTATUS_SD;
+> > +static const target_ulong sip_writable_mask = SIP_SSIP | MIP_USIP |
+> > MIP_UEIP;
+> >
+> >  #if defined(TARGET_RISCV32)
+> >  static const char valid_vm_1_09[16] = {
+> > @@ -694,8 +695,10 @@ static int write_sbadaddr(CPURISCVState *env, int
+> > csrno, target_ulong val)
+> >  static int rmw_sip(CPURISCVState *env, int csrno, target_ulong
+> *ret_value,
+> >                     target_ulong new_value, target_ulong write_mask)
+> >  {
+> > -    return rmw_mip(env, CSR_MSTATUS, ret_value, new_value,
+> > -                   write_mask & env->mideleg);
+> > +    int ret = rmw_mip(env, CSR_MSTATUS, ret_value, new_value,
+> > +                      write_mask & env->mideleg & sip_writable_mask);
+> > +    *ret_value &= env->mideleg;
+> > +    return ret;
+> >  }
+> >
+> >  /* Supervisor Protection and Translation */
+>
+> This patch (and your previous one) don't apply for me.  I don't see the
+> git-send-email tags in your messages, are you trying to do something like
+> paste
+> them into gmail?  If so I think they're getting line wrapped.
+>
