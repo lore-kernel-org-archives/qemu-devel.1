@@ -2,62 +2,76 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07CF6C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 08:13:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C593C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 08:15:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D16CD204FD
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 08:13:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D16CD204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 54792204FD
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 08:15:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="Uh2srD4e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54792204FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41936 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41954 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNvEU-00076q-3U
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 04:13:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56464)
+	id 1hNvFn-0007pC-H5
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 04:15:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hNvDc-0006eh-6D
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 04:12:57 -0400
+	(envelope-from <antonkuchin@yandex-team.ru>) id 1hNvDp-0006oH-Q5
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 04:13:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hNvDb-0004ip-6r
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 04:12:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43432)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
-	id 1hNvDa-0004iY-Vw; Tue, 07 May 2019 04:12:55 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3E90E3097025;
-	Tue,  7 May 2019 08:12:54 +0000 (UTC)
-Received: from localhost (dhcp-192-187.str.redhat.com [10.33.192.187])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E097B611D9;
-	Tue,  7 May 2019 08:12:53 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue,  7 May 2019 10:12:51 +0200
-Message-Id: <20190507081251.24307-1-cohuck@redhat.com>
+	(envelope-from <antonkuchin@yandex-team.ru>) id 1hNvDo-0004nZ-VE
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 04:13:09 -0400
+Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:59318)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <antonkuchin@yandex-team.ru>)
+	id 1hNvDm-0004ls-8R; Tue, 07 May 2019 04:13:06 -0400
+Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
+	[IPv6:2a02:6b8:0:1a2d::301])
+	by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 703E82E0AFA;
+	Tue,  7 May 2019 11:13:04 +0300 (MSK)
+Received: from smtpcorp1j.mail.yandex.net (smtpcorp1j.mail.yandex.net
+	[2a02:6b8:0:1619::137])
+	by mxbackcorp1o.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
+	3uaFGNXsiA-D3UC2Eeb; Tue, 07 May 2019 11:13:04 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+	s=default; 
+	t=1557216784; bh=aBVu0BFcr7SV1Ac/Td1wiG1yDkmWdggwwMy2v3ciw2s=;
+	h=Message-Id:Date:Subject:To:From:Cc;
+	b=Uh2srD4eqOWTgeaRE6jOhaP+Qq4aM5jPlZZYXj74togHIB4MilQXNuyRKsnUapeTI
+	+MhYnjBm6heFOzP71gt2oBPCNUdVdowW/zf6hnkoxE3zALYfw8LlzlX/V87O2jxgPk
+	r1vvk5WdiS4P4kEzi1+kEwaGEQeM4l5HxqYEgVSE=
+Authentication-Results: mxbackcorp1o.mail.yandex.net;
+	dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
+	[2a02:6b8:0:408:250:b6ff:fe97:2682])
+	by smtpcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
+	U0bTkyutKU-D3JCDnte; Tue, 07 May 2019 11:13:03 +0300
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(Client certificate not present)
+From: Anton Kuchin <antonkuchin@yandex-team.ru>
+To: qemu-devel@nongnu.org
+Date: Tue,  7 May 2019 11:12:56 +0300
+Message-Id: <20190507081256.27599-1-antonkuchin@yandex-team.ru>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Tue, 07 May 2019 08:12:54 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH RFC v2] s390/css: handle CCW_FLAG_SKIP
+	[fuzzy]
+X-Received-From: 77.88.29.217
+Subject: [Qemu-devel] [PATCH] block: remove bs from lists before closing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -66,97 +80,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Farman <farman@linux.ibm.com>, qemu-s390x@nongnu.org,
-	Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Kuchin <antonkuchin@yandex-team.ru>,
+	yc-core@yandex-team.ru, qemu-block@nongnu.org,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If a ccw has CCW_FLAG_SKIP set, and the command is of type
-read, read backwards, or sense, no data should be written
-to the guest for that command.
+Close involves flush that can be performed asynchronously and bs
+must be protected from being referenced before it is deleted.
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Anton Kuchin <antonkuchin@yandex-team.ru>
 ---
+ block.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-v1 -> v2: fixed checks for command type [Eric]
-
-Still only lightly tested (it boots); I don't think I have a tool
-generating channel programs with the skip flag handy.
-
----
- hw/s390x/css.c         | 22 ++++++++++++++++++----
- include/hw/s390x/css.h |  1 +
- 2 files changed, 19 insertions(+), 4 deletions(-)
-
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 8fc9e35ba5d3..080ac7e5bc0b 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -830,8 +830,12 @@ static int ccw_dstream_rw_noflags(CcwDataStream *cds=
-, void *buff, int len,
-     if (op =3D=3D CDS_OP_A) {
-         goto incr;
+diff --git a/block.c b/block.c
+index 9ae5c0ed2f..b505271a4d 100644
+--- a/block.c
++++ b/block.c
+@@ -4083,14 +4083,14 @@ static void bdrv_delete(BlockDriverState *bs)
+     assert(bdrv_op_blocker_is_empty(bs));
+     assert(!bs->refcnt);
+=20
+-    bdrv_close(bs);
+-
+     /* remove from list, if necessary */
+     if (bs->node_name[0] !=3D '\0') {
+         QTAILQ_REMOVE(&graph_bdrv_states, bs, node_list);
      }
--    ret =3D address_space_rw(&address_space_memory, cds->cda,
--                           MEMTXATTRS_UNSPECIFIED, buff, len, op);
-+    if (!cds->do_skip) {
-+        ret =3D address_space_rw(&address_space_memory, cds->cda,
-+                               MEMTXATTRS_UNSPECIFIED, buff, len, op);
-+    } else {
-+        ret =3D 0;
-+    }
-     if (ret !=3D MEMTX_OK) {
-         cds->flags |=3D CDS_F_STREAM_BROKEN;
-         return -EINVAL;
-@@ -928,8 +932,13 @@ static int ccw_dstream_rw_ida(CcwDataStream *cds, vo=
-id *buff, int len,
-     do {
-         iter_len =3D MIN(len, cont_left);
-         if (op !=3D CDS_OP_A) {
--            ret =3D address_space_rw(&address_space_memory, cds->cda,
--                                   MEMTXATTRS_UNSPECIFIED, buff, iter_le=
-n, op);
-+            if (!cds->do_skip) {
-+                ret =3D address_space_rw(&address_space_memory, cds->cda=
-,
-+                                       MEMTXATTRS_UNSPECIFIED, buff, ite=
-r_len,
-+                                       op);
-+            } else {
-+                ret =3D 0;
-+            }
-             if (ret !=3D MEMTX_OK) {
-                 /* assume inaccessible address */
-                 ret =3D -EINVAL; /* channel program check */
-@@ -968,6 +977,11 @@ void ccw_dstream_init(CcwDataStream *cds, CCW1 const=
- *ccw, ORB const *orb)
+     QTAILQ_REMOVE(&all_bdrv_states, bs, bs_list);
 =20
-     cds->count =3D ccw->count;
-     cds->cda_orig =3D ccw->cda;
-+    /* skip is only effective for read, read backwards, or sense command=
-s */
-+    cds->do_skip =3D (ccw->flags & CCW_FLAG_SKIP) &&
-+        ((ccw->cmd_code & CCW_CMD_BASIC_SENSE) =3D=3D CCW_CMD_BASIC_SENS=
-E ||
-+         (ccw->cmd_code & 0x02) =3D=3D 0x02 /* read */ ||
-+         (ccw->cmd_code & 0x0c) =3D=3D 0x0c /* read backwards */);
-     ccw_dstream_rewind(cds);
-     if (!(cds->flags & CDS_F_IDA)) {
-         cds->op_handler =3D ccw_dstream_rw_noflags;
-diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-index aae19c427229..7cc183ef4366 100644
---- a/include/hw/s390x/css.h
-+++ b/include/hw/s390x/css.h
-@@ -97,6 +97,7 @@ typedef struct CcwDataStream {
-     int (*op_handler)(struct CcwDataStream *cds, void *buff, int len,
-                       CcwDataStreamOp op);
-     hwaddr cda;
-+    bool do_skip;
- } CcwDataStream;
++    bdrv_close(bs);
++
+     g_free(bs);
+ }
 =20
- /*
 --=20
-2.20.1
+2.19.1
 
 
