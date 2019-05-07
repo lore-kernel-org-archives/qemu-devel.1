@@ -2,91 +2,79 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0EDAC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 19:53:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB3DBC004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 19:55:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5EF9206A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 19:53:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5EF9206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 49C2020825
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 19:55:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="F6ld+tZI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49C2020825
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52583 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52696 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO69U-0001Kx-WB
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 15:53:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41384)
+	id 1hO6Br-00032t-BV
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 15:55:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hO64G-0004g8-Ru
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 15:48:01 -0400
+	(envelope-from <jstaron@google.com>) id 1hO5ho-0004e9-KG
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 15:24:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hO64F-0001PC-UF
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 15:48:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35920)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hO64A-0001Ho-6W; Tue, 07 May 2019 15:47:55 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D30CB307D854;
-	Tue,  7 May 2019 19:47:52 +0000 (UTC)
-Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D5AE7600D4;
-	Tue,  7 May 2019 19:47:51 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190507183610.9848-1-mreitz@redhat.com>
-	<20190507183610.9848-4-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <b4df5fba-7009-3a7a-2b5a-451eb24d1087@redhat.com>
-Date: Tue, 7 May 2019 14:47:50 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <jstaron@google.com>) id 1hO5hn-0004hs-Rw
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 15:24:48 -0400
+Received: from mail-lf1-x132.google.com ([2a00:1450:4864:20::132]:35600)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jstaron@google.com>) id 1hO5hn-0004em-I7
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 15:24:47 -0400
+Received: by mail-lf1-x132.google.com with SMTP id j20so12715497lfh.2
+	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 12:24:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=9VH2cI54WOtf0TgOVICv7YfH/dmJx9RgBuqx8oc1Mjk=;
+	b=F6ld+tZIKD1TRL0AE6fEb2WqRxcP76uZx0RNPDleIxyf5RJkwYPqK0Bs9zD4aODmmE
+	4NNavp1nVKPc4olfZNB0csbl8Mt2jrfw/4cvqI1dQpb6hDyRxWSjJ7Yy4Q29HBvFbOfA
+	JtYubFLJeY+4ZpX9T0ONIWuycTh2DIrMPc1SCGpQzEDby6c9B7ZikuGkc84pDR1T+N6M
+	9spwBfJp4nacEIzecHYOyudxpJIHO5m/IUkW4JFPQf66ZbDiyfZVU/nw8vjKyLhqtWer
+	9FWQL1ENLRVadfjFY2rI1CERtp+W1p4k6aV0bmDTRupY82fFnsyC2IcEpAqT8PcIv623
+	jo8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=9VH2cI54WOtf0TgOVICv7YfH/dmJx9RgBuqx8oc1Mjk=;
+	b=R4+5Hhl2zHfHoqRVQ4wgpfsi/9O8l38yP1Pf9By7bX2W+zq2ULf1emzuzX2vzEwNQb
+	dvZVgbIBczIYXdp6M0Jqp3dmmnKm5CvoJPuNAa1jPzyZVTFuNZGWdXMBPOu06S01FO8m
+	S6stuS6uKj4mS8l51wLmYHxgMjAlGOUpsgAHk3EPmzf6Ur0T2L5ZcImQWEUY9LRC+RUj
+	aaNudwpKWQfMWbCurd8wz/r+O4xgfvJUVwRy7H7N5rOlIO18OqKhGpWspMirmyyFHZZS
+	XSJ9uClcL/tkCdyhEMLMOvvj5jPMmWQJSpkAtsL6nNGIB+xZ7KCrHbhQUMybEy6p2YKh
+	PI5g==
+X-Gm-Message-State: APjAAAWB3d84EctpJpYNKwYWxRxFyY8KB2+89va/zsZeewHYNUIeVjbk
+	OnrwoK3InulcBfsvjaZP+nKZTDgkppzxa8x5SKw/KA==
+X-Google-Smtp-Source: APXvYqyg8BJ0mWtUnVsZIHd1nlxtEq/TQoby+zEdt5YK0v6BrfynU4C4tehxKhziDkaheD+CcYQOn+z9h45ZgO05JFs=
+X-Received: by 2002:ac2:51a9:: with SMTP id f9mr9455271lfk.56.1557257083907;
+	Tue, 07 May 2019 12:24:43 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190507183610.9848-4-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JgIn4OgCi3K7vSr51lgZ7WckybDzhDzXP"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Tue, 07 May 2019 19:47:52 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 3/5] qemu-nbd: Do not close stderr
+References: <20190426050039.17460-1-pagupta@redhat.com>
+	<20190426050039.17460-5-pagupta@redhat.com>
+In-Reply-To: <20190426050039.17460-5-pagupta@redhat.com>
+Date: Tue, 7 May 2019 12:24:32 -0700
+Message-ID: <CA+nGSuOgCAoS4MkbuSL2q5Gyi4jG2oyJqLu_sDgexm5fSBmPLQ@mail.gmail.com>
+To: Pankaj Gupta <pagupta@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::132
+X-Mailman-Approved-At: Tue, 07 May 2019 15:52:32 -0400
+Subject: Re: [Qemu-devel] [PATCH v7 4/6] dax: check synchronous mapping is
+ supported
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,79 +86,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+From: =?UTF-8?Q?Jakub_Staro=C5=84?= via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: =?UTF-8?Q?Jakub_Staro=C5=84?= <jstaron@google.com>
+Cc: cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com,
+	jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
+	virtualization@lists.linux-foundation.org,
+	adilger.kernel@dilger.ca, Stephen Barber <smbarber@google.com>,
+	zwisler@kernel.org, aarcange@redhat.com, dave.jiang@intel.com,
+	linux-nvdimm@lists.01.org, vishal.l.verma@intel.com,
+	david@redhat.com, willy@infradead.org, hch@infradead.org,
+	linux-acpi@vger.kernel.org, jmoyer@redhat.com,
+	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
+	riel@surriel.com, yuval.shaia@oracle.com, stefanha@redhat.com,
+	imammedo@redhat.com, dan.j.williams@intel.com,
+	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
+	tytso@mit.edu, xiaoguangrong.eric@gmail.com,
+	darrick.wong@oracle.com, rjw@rjwysocki.net,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JgIn4OgCi3K7vSr51lgZ7WckybDzhDzXP
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Message-ID: <b4df5fba-7009-3a7a-2b5a-451eb24d1087@redhat.com>
-Subject: Re: [PATCH 3/5] qemu-nbd: Do not close stderr
-References: <20190507183610.9848-1-mreitz@redhat.com>
- <20190507183610.9848-4-mreitz@redhat.com>
-In-Reply-To: <20190507183610.9848-4-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: Pankaj Gupta <pagupta@redhat.com>
+Date: Thu, Apr 25, 2019 at 10:00 PM
 
-On 5/7/19 1:36 PM, Max Reitz wrote:
-> We kept old_stderr specifically so we could keep emitting error message=
+> +static inline bool daxdev_mapping_supported(struct vm_area_struct *vma,
+> +                               struct dax_device *dax_dev)
+> +{
+> +       return !(vma->flags & VM_SYNC);
+> +}
 
-> on stderr.  However, qemu_daemon() closes stderr.  Therefore, we need t=
-o
-> dup() stderr to old_stderr before invoking qemu_daemon().
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
-> As I hinted at in the cover letter, I am not sure whether this is truly=
+Shouldn't it be rather `return !(vma->vm_flags & VM_SYNC);`? There is
+no field named `flags` in `struct vm_area_struct`.
 
-> a bug or whether the current behavior is intentional.  So if you
-> disagree with me on this patch, you are welcome to suggest an
-> alternative.
-
-Looks to me like a bug fix, for a problem present since commit c1f8fdc3
-added old_stderr in 2011.
-
->=20
-> I personally can see two:
-> (1) Add a --log option for a file to store the server's messages in.
->     Seems a bit cumbersome to me.
->=20
-> (2) Add a --keep-stderr option, which specifically enables this behavio=
-r
->     here.  Without this option we keep the old behavior.
-
-The approach done here is simplest, I wouldn't worry about your two
-alternatives.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---JgIn4OgCi3K7vSr51lgZ7WckybDzhDzXP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzR4OcACgkQp6FrSiUn
-Q2rvyQgAlJHfGD05Ux5Dv0RJWXodM+3V1sjSaioO8AdAREzn6DQmRcai2ta8pnZN
-4AoF8xLaXGE4AfrtdN6ouUIPzjGFgh4q5smf2zUvG7/v9lawbSd1xOlR+b090P27
-UjMOy0x2GCW3YozqwZroC/2vlPkx8/scgiMM8gHmbeRNG54kfNrHDobwFcVIHTIX
-WY1g4OvAWg/bl4uJSW27XMv9w2CzeIIpcTTEMspmlct/w5VCN/+VtjN0vp/BE1bj
-7IEnnni0PGEPGBEvxac4QfuT3wagAfJYDXPjxd/rI1/ON8LpLG9x5uwG2uNotmC5
-WL2aETO894EeogZanzDAd3cBbo/OyQ==
-=9yCx
------END PGP SIGNATURE-----
-
---JgIn4OgCi3K7vSr51lgZ7WckybDzhDzXP--
+Thank you,
+Jakub
 
