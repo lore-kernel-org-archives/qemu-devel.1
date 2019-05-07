@@ -6,46 +6,43 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AA75C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:35:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4532CC004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:38:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 202A42087F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:35:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 202A42087F
+	by mail.kernel.org (Postfix) with ESMTPS id 19ED9205ED
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:38:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19ED9205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40331 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40339 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNslL-0006jB-Dm
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 01:35:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58458)
+	id 1hNso5-0007yV-Dq
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 01:38:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNskU-0006Kx-20
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:34:43 -0400
+	(envelope-from <thuth@redhat.com>) id 1hNsnI-0007f9-T4
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:37:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNskT-0006bu-4s
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:34:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50776)
+	(envelope-from <thuth@redhat.com>) id 1hNsnI-0008E1-2s
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:37:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54156)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hNskQ-0006K8-R8; Tue, 07 May 2019 01:34:39 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	id 1hNsnF-00088s-WC; Tue, 07 May 2019 01:37:34 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BE09387642;
-	Tue,  7 May 2019 05:34:36 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4AE4C3097025;
+	Tue,  7 May 2019 05:37:33 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-130.ams2.redhat.com [10.36.116.130])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 31F5C1FC;
-	Tue,  7 May 2019 05:34:34 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>,
-	Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-References: <20190501134127.21104-1-thuth@redhat.com>
-	<ff77f7bb-650d-4a95-42da-55d0c8b49a6a@redhat.com>
-	<423e6bb2-493f-991d-2d35-4a9f84093625@redhat.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CEA2110021B1;
+	Tue,  7 May 2019 05:37:31 +0000 (UTC)
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20190506172111.31594-1-eblake@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -91,23 +88,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <b731310f-24a3-9e0f-133a-b35d672ef1ea@redhat.com>
-Date: Tue, 7 May 2019 07:34:34 +0200
+Message-ID: <14ddc8ed-fc20-5434-0e0c-8519ea910777@redhat.com>
+Date: Tue, 7 May 2019 07:37:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <423e6bb2-493f-991d-2d35-4a9f84093625@redhat.com>
+In-Reply-To: <20190506172111.31594-1-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Tue, 07 May 2019 05:34:36 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.43]);
+	Tue, 07 May 2019 05:37:33 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] tests/qemu-iotests: Fix more reference
- output files due to recent qemu-io change
+Subject: Re: [Qemu-devel] [PATCH] iotests: Tweak 221 sizing for different
+ hole granularities
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -119,39 +116,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/05/2019 18.52, Eric Blake wrote:
-> On 5/6/19 10:32 AM, Max Reitz wrote:
->> On 01.05.19 15:41, Thomas Huth wrote:
->>> The output of qemu-io changed recently - most tests have been fixed i=
-n
->>> commit 36b9986b08787019ef42 ("tests/qemu-iotests: Fix output of qemu-=
-io
->>> related tests") already, but the qcow1 and the vmdk test was still mi=
-ssing.
->>>
->>> Fixes: 99e98d7c9fc1a1639fad ("qemu-io: Use error_[gs]et_progname()")
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  tests/qemu-iotests/059.out |  8 ++++----
->>>  tests/qemu-iotests/092.out | 24 ++++++++++++------------
->>>  2 files changed, 16 insertions(+), 16 deletions(-)
->>
->> Hmm, nbd's 083 is also broken.  Would you mind fixing that, too? O:-)
->>
->=20
-> See below for what to squash in. With that, I can give:
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
-> In fact, I don't mind taking it through my NBD tree, since there is at
-> least one other iotest fix for NBD pending.
+On 06/05/2019 19.21, Eric Blake wrote:
+> For some particular configurations of ext4, sizing an image to 84
+> sectors + 1 byte causes test failures when the size of the hole is
+> rounded to a 4k alignment. Let's instead size things to 128 sectors +
+> 1 byte, as the 64k boundary is more likely to work with various hole
+> granularities.
+> 
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+> 
+> I have been unable to reproduce Thomas' failure, but suspect that this
+> will address it. If I can get a Tested-by, then I'm happy to add it
+> through my NBD tree, as I have a couple other iotest fixes ready for a
+> pull request.
+> 
+>  tests/qemu-iotests/221     | 10 +++++-----
+>  tests/qemu-iotests/221.out | 20 ++++++++++----------
+>  2 files changed, 15 insertions(+), 15 deletions(-)
 
-Thanks! I assume you can fix up the patch, or do you want me to resend it=
-?
+Thanks, this fixes the issue on my ext4 partition!
 
- Thomas
+Tested-by: Thomas Huth <thuth@redhat.com>
 
