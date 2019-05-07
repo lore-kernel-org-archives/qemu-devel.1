@@ -2,96 +2,98 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55F00C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 19:47:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 979E6C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 19:49:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CEA520578
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 19:47:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="SlqXQH6c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CEA520578
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+	by mail.kernel.org (Postfix) with ESMTPS id 5C5F620578
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 19:49:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C5F620578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52173 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52306 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO63H-0003Zy-AP
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 15:46:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39300)
+	id 1hO65X-0005GP-JC
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 15:49:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jgg@ziepe.ca>) id 1hO60g-00024n-Nd
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 15:44:37 -0400
+	(envelope-from <bounces@canonical.com>) id 1hO61B-0002Du-2x
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 15:44:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jgg@ziepe.ca>) id 1hO5zc-0004ze-SN
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 15:44:17 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:34169)
+	(envelope-from <bounces@canonical.com>) id 1hO5sg-0004cw-26
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 15:38:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42986)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jgg@ziepe.ca>) id 1hO5zc-0004yS-8v
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 15:43:12 -0400
-Received: by mail-qt1-x842.google.com with SMTP id j6so20519005qtq.1
-	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 12:43:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ziepe.ca; s=google;
-	h=date:from:to:cc:subject:message-id:references:mime-version
-	:content-disposition:in-reply-to:user-agent;
-	bh=Ee/vWvn/Ifzj7Fj8CJW5WypvdZbF3rI74RwswfNy3s8=;
-	b=SlqXQH6cdfmDcoXK151NvgNOEL8C9rtVLRGZYegxJ5pRaiMErghgNSEUNcm8XOgnBm
-	Q7Olw9WbgFBUGU2iDCkwi5y4P6LbPvssY/y8G7sAy2o/IDwVIW3UNJk3oNH5uTnEQBe6
-	xnWNiXRxQs3KTm02xrq9ERvEvl5ab/N6pff2NY2lmzVtA6niaZiWeWugHSt5nXVR8rAP
-	HfJg3A/UXegsz8XhYGpG7nzAqlNS2FaltaSNlZrWib25/KUPpoCEj3wQ43V8sDx7W81w
-	TwgyJAj04iwS6mmd+p6VlrrTRvtd2PQDCDNh26OQvcQ/YuDQgItrhSo51NDIJloaDsLp
-	l6xA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=Ee/vWvn/Ifzj7Fj8CJW5WypvdZbF3rI74RwswfNy3s8=;
-	b=mK02trex6lqRZqmV1epzOc5fYSdQN9tM569UFfwSIeoYpGnUDLUuD3nGqZlj6QBPwM
-	0Va2QtEJGGwCUx58djB+jI+PujeZQWxMTwJ6TiDRz08w8OnQoL0/dnQga8tgnaif8MMq
-	l6AiRJH4Jc1QesJYkSsO8hSvb9a4KLHzPoIeT1Jd8E34TlN8lOOTwIDxvcgOgCdnRJis
-	toGXo7ZdA2OSeoVwFmUnsMfadtVD73HQY68o4I4fHVPwrBhOht3JNQza3VQq5gzNYxNs
-	1tQ6/xeOuSHyP6HVFK/3A5yBkqUqeprmkOuW8Nr9Pda8c0XVQZizmqDhG14ARZ4zmi4W
-	EKhg==
-X-Gm-Message-State: APjAAAWN38y60gEwae7vN3z8BSCnK8Fh2xZ100g9Ti5AmnYHItPj1OaG
-	axPC/aetubCTGHUn+1f0dLpBOg==
-X-Google-Smtp-Source: APXvYqw3KSJ3ehNU8RQ0M4ocEOtB2IpJ3gJQrhf2sWV4FOnrdHCkkwNpNrnHzJv7qop0/fuwyZ7GaA==
-X-Received: by 2002:ac8:2a10:: with SMTP id k16mr28126307qtk.220.1557258190850;
-	Tue, 07 May 2019 12:43:10 -0700 (PDT)
-Received: from ziepe.ca
-	(hlfxns017vw-156-34-49-251.dhcp-dynamic.fibreop.ns.bellaliant.net.
-	[156.34.49.251]) by smtp.gmail.com with ESMTPSA id
-	n21sm7704457qkk.30.2019.05.07.12.43.09
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 07 May 2019 12:43:09 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1hO5zY-0007dD-NA; Tue, 07 May 2019 16:43:08 -0300
-Date: Tue, 7 May 2019 16:43:08 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20190507194308.GK6201@ziepe.ca>
-References: <20190411110157.14252-1-yuval.shaia@oracle.com>
-	<20190411190215.2163572e.cohuck@redhat.com>
-	<20190415103546.GA6854@lap1>
-	<e73e03c2-ea2b-6ffc-cd23-e8e44d42ce80@suse.de>
-	<20190422164527.GF21588@ziepe.ca> <20190430171350.GA2763@lap1>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hO5sc-0004SU-7n
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 15:36:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hO5sW-0006wN-9V
+	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 19:35:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 161252E8193
+	for <qemu-devel@nongnu.org>; Tue,  7 May 2019 19:35:51 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190430171350.GA2763@lap1>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::842
-Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 07 May 2019 19:26:59 -0000
+From: Dan Streetman <dan.streetman@canonical.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=cloud-archive; status=Fix Released;
+	importance=Undecided; assignee=None; 
+X-Launchpad-Bug: product=cloud-archive; productseries=mitaka;
+	status=Fix Committed; importance=Medium; assignee=None; 
+X-Launchpad-Bug: product=cloud-archive; productseries=ocata;
+	status=Fix Committed; importance=Medium; assignee=None; 
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+	status=Fix Released; importance=Medium; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=trusty; sourcepackage=qemu; 
+	component=main; status=Won't Fix; importance=Medium;
+	assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=xenial; sourcepackage=qemu; 
+	component=main; status=Incomplete; importance=Medium;
+	assignee=dan.streetman@canonical.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
+	component=main; status=Fix Released; importance=Medium;
+	assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=cosmic; sourcepackage=qemu; 
+	component=main; status=Fix Released; importance=Medium;
+	assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
+	component=main; status=Fix Released; importance=Medium;
+	assignee=None; 
+X-Launchpad-Bug-Tags: verification-done verification-done-xenial
+	verification-mitaka-done verification-ocata-done
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: brian-murray corey.bryant ddstreet racb sil2100
+X-Launchpad-Bug-Reporter: Dan Streetman (ddstreet)
+X-Launchpad-Bug-Modifier: Dan Streetman (ddstreet)
+References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
+Message-Id: <155725721976.31028.5727310486810919284.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18958";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 9c9d35b54533be14b2c23c02344a5fbff7784b28
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1823458] Re: race condition between
+ vhost_net_stop and CHR_EVENT_CLOSED on shutdown crashes qemu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -100,64 +102,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com, linux-rdma@vger.kernel.org,
-	Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
-	virtualization@lists.linux-foundation.org, Hannes Reinecke <hare@suse.de>
+Reply-To: Bug 1823458 <1823458@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Apr 30, 2019 at 08:13:54PM +0300, Yuval Shaia wrote:
-> On Mon, Apr 22, 2019 at 01:45:27PM -0300, Jason Gunthorpe wrote:
-> > On Fri, Apr 19, 2019 at 01:16:06PM +0200, Hannes Reinecke wrote:
-> > > On 4/15/19 12:35 PM, Yuval Shaia wrote:
-> > > > On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
-> > > > > On Thu, 11 Apr 2019 14:01:54 +0300
-> > > > > Yuval Shaia <yuval.shaia@oracle.com> wrote:
-> > > > > 
-> > > > > > Data center backends use more and more RDMA or RoCE devices and more and
-> > > > > > more software runs in virtualized environment.
-> > > > > > There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
-> > > > > > 
-> > > > > > Virtio is the optimal solution since is the de-facto para-virtualizaton
-> > > > > > technology and also because the Virtio specification
-> > > > > > allows Hardware Vendors to support Virtio protocol natively in order to
-> > > > > > achieve bare metal performance.
-> > > > > > 
-> > > > > > This RFC is an effort to addresses challenges in defining the RDMA/RoCE
-> > > > > > Virtio Specification and a look forward on possible implementation
-> > > > > > techniques.
-> > > > > > 
-> > > > > > Open issues/Todo list:
-> > > > > > List is huge, this is only start point of the project.
-> > > > > > Anyway, here is one example of item in the list:
-> > > > > > - Multi VirtQ: Every QP has two rings and every CQ has one. This means that
-> > > > > >    in order to support for example 32K QPs we will need 64K VirtQ. Not sure
-> > > > > >    that this is reasonable so one option is to have one for all and
-> > > > > >    multiplex the traffic on it. This is not good approach as by design it
-> > > > > >    introducing an optional starvation. Another approach would be multi
-> > > > > >    queues and round-robin (for example) between them.
-> > > > > > 
-> > > Typically there will be a one-to-one mapping between QPs and CPUs (on the
-> > > guest). 
-> > 
-> > Er we are really overloading words here.. The typical expectation is
-> > that a 'RDMA QP' will have thousands and thousands of instances on a
-> > system.
-> > 
-> > Most likely I think mapping 1:1 a virtio queue to a 'RDMA QP, CQ, SRQ,
-> > etc' is a bad idea...
-> 
-> We have three options, no virtqueue for QP, 1 to 1 or multiplexing. What
-> would be your vote on that?
-> I think you are for option #1, right? but in this case there is actually no
-> use of having a virtio-driver, isn't it?
+@sil2100 yes I agree, let's wait longer before releasing.  We have the
+Canonical customer performing testing with the package, and we can run
+some additional sanity checks as well.  The config coming from the
+customer is an openstack setup using OVS, so that's what we will setup
+and perform sanity testing on.
 
-The virtio driver is supposed to be a standard, like a hardware
-standard, for doing the operation.
+@cpaelzer, if you have any suggestions for specific tests/configurations
+that might be good to test the specific code changed here, please let me
+know.
 
-It doesn't mean that every single element under the driver needs to
-use the virtio format QP.
+@bdmurray, sure, let's leave it set to incomplete while we're regression
+testing ;-)
 
-Jason
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1823458
+
+Title:
+  race condition between vhost_net_stop and CHR_EVENT_CLOSED on shutdown
+  crashes qemu
+
+Status in Ubuntu Cloud Archive:
+  Fix Released
+Status in Ubuntu Cloud Archive mitaka series:
+  Fix Committed
+Status in Ubuntu Cloud Archive ocata series:
+  Fix Committed
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Trusty:
+  Won't Fix
+Status in qemu source package in Xenial:
+  Incomplete
+Status in qemu source package in Bionic:
+  Fix Released
+Status in qemu source package in Cosmic:
+  Fix Released
+Status in qemu source package in Disco:
+  Fix Released
+
+Bug description:
+  [impact]
+
+  on shutdown of a guest, there is a race condition that results in qemu
+  crashing instead of normally shutting down.  The bt looks similar to
+  this (depending on the specific version of qemu, of course; this is
+  taken from 2.5 version of qemu):
+
+  (gdb) bt
+  #0  __GI___pthread_mutex_lock (mutex=3D0x0) at ../nptl/pthread_mutex_lock=
+.c:66
+  #1  0x00005636c0bc4389 in qemu_mutex_lock (mutex=3Dmutex@entry=3D0x0) at =
+/build/qemu-7I4i1R/qemu-2.5+dfsg/util/qemu-thread-posix.c:73
+  #2  0x00005636c0988130 in qemu_chr_fe_write_all (s=3Ds@entry=3D0x0, buf=
+=3Dbuf@entry=3D0x7ffe65c086a0 "\v", len=3Dlen@entry=3D20) at /build/qemu-7I=
+4i1R/qemu-2.5+dfsg/qemu-char.c:205
+  #3  0x00005636c08f3483 in vhost_user_write (msg=3Dmsg@entry=3D0x7ffe65c08=
+6a0, fds=3Dfds@entry=3D0x0, fd_num=3Dfd_num@entry=3D0, dev=3D0x5636c1bf6b70=
+, dev=3D0x5636c1bf6b70)
+  =C2=A0=C2=A0=C2=A0=C2=A0at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vho=
+st-user.c:195
+  #4  0x00005636c08f411c in vhost_user_get_vring_base (dev=3D0x5636c1bf6b70=
+, ring=3D0x7ffe65c087e0) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhos=
+t-user.c:364
+  #5  0x00005636c08efff0 in vhost_virtqueue_stop (dev=3Ddev@entry=3D0x5636c=
+1bf6b70, vdev=3Dvdev@entry=3D0x5636c2853338, vq=3D0x5636c1bf6d00, idx=3D1) =
+at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/vhost.c:895
+  #6  0x00005636c08f2944 in vhost_dev_stop (hdev=3Dhdev@entry=3D0x5636c1bf6=
+b70, vdev=3Dvdev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfs=
+g/hw/virtio/vhost.c:1262
+  #7  0x00005636c08db2a8 in vhost_net_stop_one (net=3D0x5636c1bf6b70, dev=
+=3Ddev@entry=3D0x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/v=
+host_net.c:293
+  #8  0x00005636c08dbe5b in vhost_net_stop (dev=3Ddev@entry=3D0x5636c285333=
+8, ncs=3D0x5636c209d110, total_queues=3Dtotal_queues@entry=3D1) at /build/q=
+emu-7I4i1R/qemu-2.5+dfsg/hw/net/vhost_net.c:371
+  #9  0x00005636c08d7745 in virtio_net_vhost_status (status=3D7 '\a', n=3D0=
+x5636c2853338) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:150
+  #10 virtio_net_set_status (vdev=3D<optimized out>, status=3D<optimized ou=
+t>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/net/virtio-net.c:162
+  #11 0x00005636c08ec42c in virtio_set_status (vdev=3D0x5636c2853338, val=
+=3D<optimized out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/hw/virtio/virtio.c:=
+624
+  #12 0x00005636c098fed2 in vm_state_notify (running=3Drunning@entry=3D0, s=
+tate=3Dstate@entry=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+dfs=
+g/vl.c:1605
+  #13 0x00005636c089172a in do_vm_stop (state=3DRUN_STATE_SHUTDOWN) at /bui=
+ld/qemu-7I4i1R/qemu-2.5+dfsg/cpus.c:724
+  #14 vm_stop (state=3DRUN_STATE_SHUTDOWN) at /build/qemu-7I4i1R/qemu-2.5+d=
+fsg/cpus.c:1407
+  #15 0x00005636c085d240 in main_loop_should_exit () at /build/qemu-7I4i1R/=
+qemu-2.5+dfsg/vl.c:1883
+  #16 main_loop () at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:1931
+  #17 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
+ed out>) at /build/qemu-7I4i1R/qemu-2.5+dfsg/vl.c:4683
+
+  [test case]
+
+  unfortunately since this is a race condition, it's very hard to
+  arbitrarily reproduce; it depends very much on the overall
+  configuration of the guest as well as how exactly it's shut down -
+  specifically, its vhost user net must be closed from the host side at
+  a specific time during qemu shutdown.
+
+  I have someone with such a setup who has reported to me their setup is
+  able to reproduce this reliably, but the config is too complex for me
+  to reproduce so I have relied on their reproduction and testing to
+  debug and craft the patch for this.
+
+  [regression potential]
+
+  the change adds a flag to prevent repeated calls to vhost_net_stop().
+  This also prevents any calls to vhost_net_cleanup() from
+  net_vhost_user_event().  Any regression would be seen when stopping
+  and/or cleaning up a vhost net.  Regressions might include failure to
+  hot-remove a vhost net from a guest, or failure to cleanup (i.e. mem
+  leak), or crashes during cleanup or stopping a vhost net.
+
+  [other info]
+
+  this was originally seen in the 2.5 version of qemu - specifically,
+  the UCA version in trusty-mitaka (which uses the xenial qemu
+  codebase).
+
+  After discussion upstream, it appears this was fixed upstream by
+  commit e7c83a885f8, which is included starting in version 2.9.
+  However, this commit depends on at least commit 5345fdb4467, and
+  likely more other previous commits, which make widespread code changes
+  and are unsuitable to backport.  Therefore this seems like it should
+  be specifically worked around in the Xenial qemu codebase.
+
+  =
+
+  The specific race condition for this (in the qemu 2.5 code version) is:
+
+  as shown in above bt, thread A starts shutting down qemu, e.g.:
+
+  vm_stop->do_vm_stop->vm_state_notify
+  =C2=A0=C2=A0virtio_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
+
+  in this function, code gets to an if-else check for
+  (!n->vhost_started), which is false (i.e. vhost_started is true) and
+  enters the else code block, which calls vhost_net_stop() and then sets
+  n->vhost_started to false.
+
+  While thread A is inside vhost_net_stop(), thread B is triggered by
+  the vhost net chr handler with a user event and calls:
+
+  net_vhost_user_event
+  =C2=A0=C2=A0qmp_set_link (from case CHR_EVENT_CLOSED)
+  =C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_link_status (via ->link_status_cha=
+nged)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_set_status
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0virtio_net_vhost_status
+
+  notice thread B has now reached the same function that thread A is in;
+  since the checks in the function have not changed, thread B follows
+  the same path that thread A followed, and enters vhost_net_stop().
+
+  Since thread A has already shut down and cleaned up some of the
+  internals, once thread B starts trying to also clean up things, it
+  segfaults as the shown in the bt.
+
+  Avoiding only this duplicate call to vhost_net_stop() is required, but
+  not enough - let's continue to look at what thread B does after its
+  call to qmp_set_link() returns:
+
+  net_vhost_user_event
+  =C2=A0=C2=A0vhost_user_stop
+  =C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cleanup
+
+  However, in main() qemu registers atexit(net_cleanup()), which does:
+  net_cleanup
+  =C2=A0=C2=A0qemu_del_nic (or qemu_del_net_client, depending on ->type)
+  =C2=A0=C2=A0=C2=A0=C2=A0qemu_cleanup_net_client
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_user_cleanup (via ->cleanup)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_net_cleanup
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vhost_dev_cle=
+anup
+
+  and the duplicate vhost_dev_cleanup fails assertions since things were
+  already cleaned up.  Additionally, if thread B's call to
+  vhost_dev_cleanup() comes before thread A finishes vhost_net_stop(),
+  then that will call vhost_dev_stop() and vhost_disable_notifiers()
+  which both try to access things that have been freed/cleared/disabled
+  by vhost_dev_cleanup().
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/cloud-archive/+bug/1823458/+subscriptions
 
