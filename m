@@ -2,47 +2,46 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B8CC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 18:12:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B7AC004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 18:13:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D262B20825
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 18:12:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D262B20825
+	by mail.kernel.org (Postfix) with ESMTPS id 8CA8620825
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 18:13:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CA8620825
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51038 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51060 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO4ZX-000681-Vq
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 14:12:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42911)
+	id 1hO4aw-00073U-Mz
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 14:13:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hO4YC-0005Lj-Mz
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 14:10:49 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hO4Zy-0006aw-CJ
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 14:12:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hO4YB-00050I-Q8
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 14:10:48 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:40870
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hO4Zx-0006co-GM
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 14:12:38 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:40880
 	helo=mail.default.ilande.uk0.bigv.io)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hO4YB-0004zd-KJ; Tue, 07 May 2019 14:10:47 -0400
+	id 1hO4Zv-0006Z2-Eq; Tue, 07 May 2019 14:12:35 -0400
 Received: from host109-149-60-255.range109-149.btcentralplus.com
 	([109.149.60.255] helo=[192.168.1.65])
 	by mail.default.ilande.uk0.bigv.io with esmtpsa
 	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
 	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hO4VF-0004ST-Q0; Tue, 07 May 2019 19:07:49 +0100
-To: Anton Blanchard <anton@ozlabs.org>, qemu-ppc@nongnu.org,
-	qemu-devel@nongnu.org
+	id 1hO4ZJ-0004UW-3M; Tue, 07 May 2019 19:11:57 +0100
+To: Anton Blanchard <anton@ozlabs.org>, Alexey Kardashevskiy <aik@ozlabs.ru>
 References: <20190507004811.29968-1-anton@ozlabs.org>
-	<20190507004811.29968-9-anton@ozlabs.org>
+	<eea46cc5-a8d5-cef9-5197-db212272481f@ozlabs.ru>
+	<20190507134839.3860d5ae@kryten>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
@@ -69,12 +68,12 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
 	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
 	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
 	imgcU9TTGC5qd9g=
-Message-ID: <71ffbbb1-4602-3971-8616-fc8dd60db387@ilande.co.uk>
-Date: Tue, 7 May 2019 19:08:21 +0100
+Message-ID: <674b5aad-99b2-cc71-2294-34b37b41f547@ilande.co.uk>
+Date: Tue, 7 May 2019 19:12:32 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190507004811.29968-9-anton@ozlabs.org>
+In-Reply-To: <20190507134839.3860d5ae@kryten>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
@@ -84,7 +83,7 @@ X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH 9/9] target/ppc: Fix vsum2sws
+Subject: Re: [Qemu-devel] [PATCH 1/9] target/ppc: Fix xvxsigdp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,47 +96,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: ego@linux.vnet.ibm.com, sandipandas1990@gmail.com,
-	richard.henderson@linaro.org, f4bug@amsat.org, david@gibson.dropbear.id.au
+	richard.henderson@linaro.org, qemu-devel@nongnu.org,
+	f4bug@amsat.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/05/2019 01:48, Anton Blanchard wrote:
+On 07/05/2019 04:48, Anton Blanchard wrote:
 
-> A recent cleanup changed the pre zeroing of the result from 64 bit
-> to 32 bit operations:
+> Hi Alexey,
 > 
-> -        result.u64[i] = 0;
-> +        result.VsrW(i) = 0;
+>> Out of curiosity - how did you find this one and (especially) the next
+>> one - "Fix xxspltib"? Is there some testsuite, or by just looking at
+>> the code? Thanks,
 > 
-> This corrupts the result.
-> 
-> Fixes: 60594fea298d ("target/ppc: remove various HOST_WORDS_BIGENDIAN hacks in int_helper.c")
-> Signed-off-by: Anton Blanchard <anton@ozlabs.org>
-> ---
->  target/ppc/int_helper.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-> index 111586c981..b8b3279f71 100644
-> --- a/target/ppc/int_helper.c
-> +++ b/target/ppc/int_helper.c
-> @@ -2038,7 +2038,7 @@ void helper_vsum2sws(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
->      for (i = 0; i < ARRAY_SIZE(r->u64); i++) {
->          int64_t t = (int64_t)b->VsrSW(upper + i * 2);
->  
-> -        result.VsrW(i) = 0;
-> +        result.VsrD(i) = 0;
->          for (j = 0; j < ARRAY_SIZE(r->u64); j++) {
->              t += a->VsrSW(2 * i + j);
->          }
+> I'm running test cases and comparing results between QEMU and real
+> hardware.
 
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Nice - thanks for looking into these issues and reporting them. There is likely some
+other low hanging fruit e.g. converting more accesses of the form .uX[i] into VsrX(i)
+which can potentially be done, but without much in the way of test coverage against
+real hardware I've been reluctant to go ahead with more changes.
 
 
 ATB,
 
 Mark.
-
-
 
