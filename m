@@ -2,65 +2,91 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13610C46460
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 18:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF8EBC004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 18:09:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0BD22054F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 18:02:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0BD22054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 983AD20825
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 18:09:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 983AD20825
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50903 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50970 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO4Pu-0000BK-4W
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 14:02:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40856)
+	id 1hO4WY-00045W-LY
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 14:09:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hO4Ov-0008ED-Rf
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 14:01:14 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hO4VY-0003hX-TN
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 14:08:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hO4Ou-0004hR-Uu
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 14:01:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>)
-	id 1hO4Op-0004Xb-Ci; Tue, 07 May 2019 14:01:07 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D51DBCA1FD;
-	Tue,  7 May 2019 18:01:04 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
-	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E317D1001E8D;
-	Tue,  7 May 2019 18:01:01 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 5FBEA1132B35; Tue,  7 May 2019 20:01:00 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Xiang Zheng <zhengxiang9@huawei.com>
-References: <20190505070059.4664-1-zhengxiang9@huawei.com>
-Date: Tue, 07 May 2019 20:01:00 +0200
-In-Reply-To: <20190505070059.4664-1-zhengxiang9@huawei.com> (Xiang Zheng's
-	message of "Sun, 5 May 2019 15:00:59 +0800")
-Message-ID: <87a7fyb0v7.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hO4VX-0002Z6-PH
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 14:08:04 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:40820
+	helo=mail.default.ilande.uk0.bigv.io)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hO4VV-0001ly-1E; Tue, 07 May 2019 14:08:01 -0400
+Received: from host109-149-60-255.range109-149.btcentralplus.com
+	([109.149.60.255] helo=[192.168.1.65])
+	by mail.default.ilande.uk0.bigv.io with esmtpsa
+	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hO4Rm-0004RP-7Y; Tue, 07 May 2019 19:04:10 +0100
+To: David Gibson <david@gibson.dropbear.id.au>,
+	Anton Blanchard <anton@ozlabs.org>
+References: <20190507004811.29968-1-anton@ozlabs.org>
+	<20190507004811.29968-4-anton@ozlabs.org>
+	<20190507052815.GK7073@umbus.fritz.box>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+	mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+	3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+	E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+	PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+	PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+	AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+	OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+	NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+	mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+	z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+	T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+	DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+	y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+	2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+	14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+	YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+	Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+	BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+	opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+	NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+	imgcU9TTGC5qd9g=
+Message-ID: <c69c4513-417b-8415-c48b-61d0a05c1680@ilande.co.uk>
+Date: Tue, 7 May 2019 19:04:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Tue, 07 May 2019 18:01:04 +0000 (UTC)
+In-Reply-To: <20190507052815.GK7073@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 109.149.60.255
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] pflash: Only read non-zero parts of
- backend image
+X-Received-From: 46.43.2.167
+Subject: Re: [Qemu-devel] [PATCH 4/9] target/ppc: Fix lxvw4x,
+ lxvh8x and lxvb16x
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,51 +98,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org,
-	ard.biesheuvel@linaro.org, qemu-devel@nongnu.org,
-	mreitz@redhat.com, stefanha@redhat.com, guoheyi@huawei.com,
-	wanghaibin.wang@huawei.com, lersek@redhat.com
+Cc: ego@linux.vnet.ibm.com, sandipandas1990@gmail.com,
+	richard.henderson@linaro.org, qemu-devel@nongnu.org,
+	f4bug@amsat.org, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The subject is slightly misleading.  Holes read as zero.  So do
-non-holes full of zeroes.  The patch avoids reading the former, but
-still reads the latter.
+On 07/05/2019 06:28, David Gibson wrote:
 
-Xiang Zheng <zhengxiang9@huawei.com> writes:
+> On Tue, May 07, 2019 at 10:48:06AM +1000, Anton Blanchard wrote:
+>> During the conversion these instructions were incorrectly treated as
+>> stores. We need to use set_cpu_vsr* and not get_cpu_vsr*.
+>>
+>> Fixes: 8b3b2d75c7c0 ("introduce get_cpu_vsr{l,h}() and set_cpu_vsr{l,h}() helpers for VSR register access")
+>> Signed-off-by: Anton Blanchard <anton@ozlabs.org>
+>> ---
+>>  target/ppc/translate/vsx-impl.inc.c | 13 +++++++------
+>>  1 file changed, 7 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
+>> index 05b75105be..c13f84e745 100644
+>> --- a/target/ppc/translate/vsx-impl.inc.c
+>> +++ b/target/ppc/translate/vsx-impl.inc.c
+>> @@ -102,8 +102,7 @@ static void gen_lxvw4x(DisasContext *ctx)
+>>      }
+>>      xth = tcg_temp_new_i64();
+>>      xtl = tcg_temp_new_i64();
+>> -    get_cpu_vsrh(xth, xT(ctx->opcode));
+>> -    get_cpu_vsrl(xtl, xT(ctx->opcode));
+>> +
+> 
+> Something seems amiss here.  Clearly we do need a set..() back to the
+> loaded register, but with the removal of these gets, it doesn't look
+> like the xth and xtl temporaries are initialized any more.
+> 
+>>      gen_set_access_type(ctx, ACCESS_INT);
+>>      EA = tcg_temp_new();
+>>  
+>> @@ -126,6 +125,8 @@ static void gen_lxvw4x(DisasContext *ctx)
+>>          tcg_gen_addi_tl(EA, EA, 8);
+>>          tcg_gen_qemu_ld_i64(xtl, EA, ctx->mem_idx, MO_BEQ);
+>>      }
+>> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+>> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+>>      tcg_temp_free(EA);
+>>      tcg_temp_free_i64(xth);
+>>      tcg_temp_free_i64(xtl);
+>> @@ -185,8 +186,6 @@ static void gen_lxvh8x(DisasContext *ctx)
+>>      }
+>>      xth = tcg_temp_new_i64();
+>>      xtl = tcg_temp_new_i64();
+>> -    get_cpu_vsrh(xth, xT(ctx->opcode));
+>> -    get_cpu_vsrl(xtl, xT(ctx->opcode));
+>>      gen_set_access_type(ctx, ACCESS_INT);
+>>  
+>>      EA = tcg_temp_new();
+>> @@ -197,6 +196,8 @@ static void gen_lxvh8x(DisasContext *ctx)
+>>      if (ctx->le_mode) {
+>>          gen_bswap16x8(xth, xtl, xth, xtl);
+>>      }
+>> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+>> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+>>      tcg_temp_free(EA);
+>>      tcg_temp_free_i64(xth);
+>>      tcg_temp_free_i64(xtl);
+>> @@ -214,14 +215,14 @@ static void gen_lxvb16x(DisasContext *ctx)
+>>      }
+>>      xth = tcg_temp_new_i64();
+>>      xtl = tcg_temp_new_i64();
+>> -    get_cpu_vsrh(xth, xT(ctx->opcode));
+>> -    get_cpu_vsrl(xtl, xT(ctx->opcode));
+>>      gen_set_access_type(ctx, ACCESS_INT);
+>>      EA = tcg_temp_new();
+>>      gen_addr_reg_index(ctx, EA);
+>>      tcg_gen_qemu_ld_i64(xth, EA, ctx->mem_idx, MO_BEQ);
+>>      tcg_gen_addi_tl(EA, EA, 8);
+>>      tcg_gen_qemu_ld_i64(xtl, EA, ctx->mem_idx, MO_BEQ);
+>> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+>> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+>>      tcg_temp_free(EA);
+>>      tcg_temp_free_i64(xth);
+>>      tcg_temp_free_i64(xtl);
 
-> Currently we fill the memory space with two 64MB NOR images when
-> using persistent UEFI variables on virt board. Actually we only use
-> a very small(non-zero) part of the memory while the rest significant
-> large(zero) part of memory is wasted.
+AFAICT I think that this is correct since the patterns should be as follows:
 
-Neglects to mention that the "virt board" is ARM.
+Load instructions:
+    tcg_gen_qemu_ld_i64(xth, ...);
+    set_cpu_vsrh(n, xth);
 
-> So this patch checks the block status and only writes the non-zero part
-> into memory. This requires pflash devices to use sparse files for
-> backends.
+Store instructions:
+    get_cpu_vsrh(xth, n);
+    tcg_gen_qemu_st_i64(xth, ...);
 
-I started to draft an improved commit message, but then I realized this
-patch can't work.
+I remember that when I first started experimenting with the very first version of
+this patchset last year, someone on IRC (maybe Richard?) pointed out that I had
+inverted the load and store operations and so I went and reworked them all from
+scratch. Unfortunately with this and Greg's patch for stxsdx I have a feeling that
+something when wrong during a cherry-pick or rebase of the patchset :(
 
-The pflash_cfi01 device allocates its device memory like this:
+Following on from this I've just gone through the load/store operations once again
+and spotted two things:
 
-    memory_region_init_rom_device(
-        &pfl->mem, OBJECT(dev),
-        &pflash_cfi01_ops,
-        pfl,
-        pfl->name, total_len, &local_err);
 
-pflash_cfi02 is similar.
+1) VSX_LOAD_SCALAR_DS has an extra get_cpu_vsrh() which can be removed
 
-memory_region_init_rom_device() calls
-memory_region_init_rom_device_nomigrate() calls qemu_ram_alloc() calls
-qemu_ram_alloc_internal() calls g_malloc0().  Thus, all the device
-memory gets written to even with this patch.
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
+index 11d9b75d01..004ea56c4f 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -329,7 +329,6 @@ static void gen_##name(DisasContext *ctx)                         \
+         return;                                                   \
+     }                                                             \
+     xth = tcg_temp_new_i64();                                     \
+-    get_cpu_vsrh(xth, rD(ctx->opcode) + 32);                      \
+     gen_set_access_type(ctx, ACCESS_INT);                         \
+     EA = tcg_temp_new();                                          \
+     gen_addr_imm_index(ctx, EA, 0x03);                            \
 
-I'm afraid you neglected to test.
 
-I still believe this approach can be made to work.  Need a replacement
-for memory_region_init_rom_device() that uses mmap() with MAP_ANONYMOUS.
+2) VSX_VECTOR_LOAD_STORE is confusing and should be split into separate
+VSX_VECTOR_LOAD and VSX_VECTOR_STORE macros
+
+
+Does that sound reasonable? I'm also thinking that we should consider adding a CC to
+stable for patches 4, 5 and 9 in this series since these are genuine regressions.
+
+
+ATB,
+
+Mark.
 
