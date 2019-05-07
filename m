@@ -2,79 +2,65 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25B74C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 11:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DA0CC04AAB
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 11:10:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5E65204FD
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 11:02:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YRwTrMq8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5E65204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 016CC20825
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 11:10:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 016CC20825
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44510 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44578 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNxrw-0002Zi-8g
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 07:02:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34819)
+	id 1hNxzM-00045G-9X
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 07:10:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hNxqh-00023k-GU
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 07:01:28 -0400
+	(envelope-from <armbru@redhat.com>) id 1hNxyO-0003ho-Di
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 07:09:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hNxqe-0005YV-U9
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 07:01:25 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41445)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hNxqc-0005Ws-4o
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 07:01:22 -0400
-Received: by mail-ot1-x343.google.com with SMTP id g8so14447975otl.8
-	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 04:01:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=UlvYLBu+8+Kg11geN/1X2OLOgDY+iIcX2Bw2SSk28HY=;
-	b=YRwTrMq8hnys72I+Hlv39aEW4hhIwggo/guZCrXYCbNiERvy33YoMfbUQWKRBWCDE0
-	f9qdkXJ533st2EOcWgz9Gb8E/8Cw3REztSMLQkdzIv5gDGtB4iSE21tbuycDKBrG9HBt
-	2bIMGJwCOl3VluST4AOv15WPMzI1hhCqCWXHX+ERllP98mqEInPMCps0SMQpMOMED54V
-	lUrUetqhM6NHFG8SmMCWn8ejaZpI9xvDT7vDFoVIwleArM6g9NP7SZRc5B8aYqDBeUls
-	eZmykUowAN8qzSHooKFTMOThomwZBwuEmgS1uVDNqf+5ttmSgVaUofoKdNOQmST7gHmx
-	3lPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=UlvYLBu+8+Kg11geN/1X2OLOgDY+iIcX2Bw2SSk28HY=;
-	b=HYHRUNGbch1dB9bLCDBwumVDVn9YOL+f90gYSTweD6Ajzw+wLMX+Ny9Zycev3l+OlQ
-	K+nRIY6kaEBWvjwLq1+pOKipOnD0jyb+dunrTPtz8gk9z83oCEJYSCRwSiOH+eN9WmKP
-	MSTZcUNJ+6TbaFMocViSoetcNXtJ42I4l71jvv99rv6JUykvjPCBQ3NDD9cFgJAfEn+a
-	BoTvIh2GqAgXVBA4snzuCeOc4KjiE8XWgNPICyfJMcAvGSHFL9lyTBvQEO3f/yYyHvQi
-	xOiu5JkjBB28QkO/5N4VsAvrtWOwtq1XClkaH37zf/N0c5o/n4kKSfayMcDIR93Pr8z0
-	EPug==
-X-Gm-Message-State: APjAAAWVsg6FGFIaEIvJOHnWxCAcadmk3zUb9K+Ro6KlArhtNlFmReBA
-	lfWke+a5HyMs5fVCraqYCzDSI+ymJQHw8dzWs9kx+w==
-X-Google-Smtp-Source: APXvYqxce2dDznkQuar5jBY1uROmYcubk0HZQp8yXspp/pndicwY9MDjdid62Wjgu5nW+2W6Od6DXdaVHe4Zi9XYN3M=
-X-Received: by 2002:a9d:61c6:: with SMTP id h6mr20561611otk.316.1557226878015; 
-	Tue, 07 May 2019 04:01:18 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1hNxyM-00014Q-Qj
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 07:09:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53364)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>)
+	id 1hNxyM-00013h-Ie; Tue, 07 May 2019 07:09:22 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5D9F0C04B2C0;
+	Tue,  7 May 2019 11:09:21 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
+	[10.36.116.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D3D5F6063B;
+	Tue,  7 May 2019 11:09:20 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id B80D31132B35; Tue,  7 May 2019 13:09:17 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+References: <20190501053522.10967-1-sjitindarsingh@gmail.com>
+Date: Tue, 07 May 2019 13:09:17 +0200
+In-Reply-To: <20190501053522.10967-1-sjitindarsingh@gmail.com> (Suraj Jitindar
+	Singh's message of "Wed, 1 May 2019 15:35:21 +1000")
+Message-ID: <87woj2cyhu.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-References: <20190505135714.11277-1-thuth@redhat.com>
-In-Reply-To: <20190505135714.11277-1-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 May 2019 12:01:06 +0100
-Message-ID: <CAFEAcA_utmcMFAmaGL5CJm4erBg2dZWZpdGvETRqVukOxrdpPg@mail.gmail.com>
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PULL 00/28] Kconfig for Arm machines
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.32]);
+	Tue, 07 May 2019 11:09:21 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/2] monitor: Add dump-stack command
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,52 +72,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, dgilbert@redhat.com,
+	david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 5 May 2019 at 14:57, Thomas Huth <thuth@redhat.com> wrote:
->
->  Hi Peter,
->
-> the following changes since commit a6ae23831b05a11880b40f7d58e332c45a6b04f7:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-request' into staging (2019-05-03 15:26:09 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/huth/qemu.git tags/pull-request-2019-05-05
->
-> for you to fetch changes up to 55e5578fabf744e62038f7357369a68e460fe205:
->
->   hw/arm: Remove hard-enablement of the remaining PCI devices (2019-05-03 17:06:20 +0200)
->
-> ----------------------------------------------------------------
-> Kconfig settings for the Arm machines
-> ----------------------------------------------------------------
+Suraj Jitindar Singh <sjitindarsingh@gmail.com> writes:
 
-Hi Thomas. My test setup that does 'make clean' before the build
-failed in 'make check':
+> Add a monitor command "dump-stack" to be used to dump the stack for the
+> current cpu.
 
-MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-QTEST_QEMU_BINARY=i386-softmmu/qemu-system-i38
-6 QTEST_QEMU_IMG=qemu-img tests/ahci-test -m=quick -k --tap <
-/dev/null | ./scripts/tap-driver.pl --test-name="a
-hci-test"
-qemu-system-i386: Unknown device 'ich9-ahci' for bus 'PCIE'
-Broken pipe
-/home/petmay01/linaro/qemu-for-merges/tests/libqtest.c:143:
-kill_qemu() detected QEMU death from signal 6 (Abort
-ed) (core dumped)
-Aborted (core dumped)
-ERROR - too few tests run (expected 74, got 0)
-/home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:903:
-recipe for target 'check-qtest-i386' failed
+I guess this is just for debugging.  Correct?
 
-(all the builds that are just incremental without the 'make clean'
-worked ok). Any idea what's happened here?
+Shouldn't this be "info stack", to match "info registers" and "info
+cpustats"?
 
-thanks
--- PMM
+>
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> ---
+>  hmp-commands.hx   | 13 +++++++++++++
+>  hmp.h             |  1 +
+>  include/qom/cpu.h | 10 ++++++++++
+>  monitor.c         | 12 ++++++++++++
+>  qom/cpu.c         | 10 ++++++++++
+>  5 files changed, 46 insertions(+)
+>
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 9b4035965c..965ccdea28 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -862,6 +862,19 @@ ETEXI
+>      },
+>  
+>  STEXI
+> +@item dump-stack
+> +@findex dump-stack
+> +dump stack of the cpu
+> +ETEXI
+> +    {
+> +        .name           = "dump-stack",
+> +        .args_type      = "",
+> +        .params         = "",
+> +        .help           = "dump stack",
+> +        .cmd            = hmp_dumpstack,
+> +    },
+> +
+> +STEXI
+>  @item pmemsave @var{addr} @var{size} @var{file}
+>  @findex pmemsave
+>  save to disk physical memory dump starting at @var{addr} of size @var{size}.
+> diff --git a/hmp.h b/hmp.h
+> index 43617f2646..e6edf1215c 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -51,6 +51,7 @@ void hmp_announce_self(Monitor *mon, const QDict *qdict);
+>  void hmp_cpu(Monitor *mon, const QDict *qdict);
+>  void hmp_memsave(Monitor *mon, const QDict *qdict);
+>  void hmp_pmemsave(Monitor *mon, const QDict *qdict);
+> +void hmp_dumpstack(Monitor *mon, const QDict *qdict);
+>  void hmp_ringbuf_write(Monitor *mon, const QDict *qdict);
+>  void hmp_ringbuf_read(Monitor *mon, const QDict *qdict);
+>  void hmp_cont(Monitor *mon, const QDict *qdict);
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index 08abcbd3fe..f2e83e9918 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -181,6 +181,7 @@ typedef struct CPUClass {
+>      int (*memory_rw_debug)(CPUState *cpu, vaddr addr,
+>                             uint8_t *buf, int len, bool is_write);
+>      void (*dump_state)(CPUState *cpu, FILE *, int flags);
+> +    void (*dump_stack)(CPUState *cpu, FILE *f);
+>      GuestPanicInformation* (*get_crash_info)(CPUState *cpu);
+>      void (*dump_statistics)(CPUState *cpu, int flags);
+>      int64_t (*get_arch_id)(CPUState *cpu);
+> @@ -568,6 +569,15 @@ enum CPUDumpFlags {
+>  void cpu_dump_state(CPUState *cpu, FILE *f, int flags);
+>  
+>  /**
+> + * cpu_dump_stack:
+> + * @cpu: The CPU whose stack is to be dumped.
+> + * @f: If non-null, dump to this stream, else to current print sink.
+> + *
+> + * Dumps CPU stack.
+> + */
+> +void cpu_dump_stack(CPUState *cpu, FILE *f);
+> +
+> +/**
+>   * cpu_dump_statistics:
+>   * @cpu: The CPU whose state is to be dumped.
+>   * @flags: Flags what to dump.
+> diff --git a/monitor.c b/monitor.c
+> index 9b5f10b475..dbec2e4376 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1299,6 +1299,18 @@ static void hmp_info_registers(Monitor *mon, const QDict *qdict)
+>      }
+>  }
+>  
+> +void hmp_dumpstack(Monitor *mon, const QDict *qdict)
+> +{
+> +    CPUState *cs = mon_get_cpu();
+> +
+> +    if (!cs) {
+> +        monitor_printf(mon, "No CPU available\n");
+> +        return;
+> +    }
+> +
+> +    cpu_dump_stack(cs, NULL);
+> +}
+> +
+>  #ifdef CONFIG_TCG
+>  static void hmp_info_jit(Monitor *mon, const QDict *qdict)
+>  {
+> diff --git a/qom/cpu.c b/qom/cpu.c
+> index 3c5493c96c..0dc10004f4 100644
+> --- a/qom/cpu.c
+> +++ b/qom/cpu.c
+> @@ -230,6 +230,16 @@ void cpu_dump_state(CPUState *cpu, FILE *f, int flags)
+>      }
+>  }
+>  
+> +void cpu_dump_stack(CPUState *cpu, FILE *f)
+> +{
+> +    CPUClass *cc = CPU_GET_CLASS(cpu);
+> +
+> +    if (cc->dump_stack) {
+> +        cpu_synchronize_state(cpu);
+> +        cc->dump_stack(cpu, f);
+> +    }
+> +}
+
+Silently does nothing when the CPU doesn't implement dump_stack().
+Matches "info registers" and "info cpustats".  Awful UI, but at least
+it's consistently awful.
+
+> +
+>  void cpu_dump_statistics(CPUState *cpu, int flags)
+>  {
+>      CPUClass *cc = CPU_GET_CLASS(cpu);
 
