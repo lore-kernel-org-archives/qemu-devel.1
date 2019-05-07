@@ -2,94 +2,93 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1C9FC04AAB
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:12:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E86C2C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:26:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A466206A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:12:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A466206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A4FD8208C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:26:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="ON/NQjQW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4FD8208C4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53404 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54063 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO6Rm-00022s-KY
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 16:12:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50300)
+	id 1hO6fs-0001wH-Ip
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 16:26:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hO6Pi-0000EV-6z
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:10:11 -0400
+	(envelope-from <jstaron@google.com>) id 1hO6f7-0001cI-OR
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:26:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hO6Ph-0004jf-6y
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:10:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48442)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hO6Pe-0004hw-Kx; Tue, 07 May 2019 16:10:06 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E5190301BE65;
-	Tue,  7 May 2019 20:10:05 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.217])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0DB92600D4;
-	Tue,  7 May 2019 20:10:00 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-References: <20190507183610.9848-1-mreitz@redhat.com>
-	<20190507183610.9848-2-mreitz@redhat.com>
-	<81dd6702-1d51-ca2e-1445-e8cdcfb14711@redhat.com>
-	<f34fb38c-22dd-1ed3-821d-7c8a9ea8943a@redhat.com>
-	<e9280cc0-fd2d-0213-9883-f77138bd2831@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d5d3f82a-c9df-ecad-3a94-2646be570129@redhat.com>
-Date: Tue, 7 May 2019 22:09:59 +0200
+	(envelope-from <jstaron@google.com>) id 1hO6f4-0006Cj-JT
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:26:04 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:35712)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jstaron@google.com>) id 1hO6f2-0006B4-55
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:26:00 -0400
+Received: by mail-pf1-x442.google.com with SMTP id t87so8664789pfa.2
+	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 13:25:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+	h=subject:to:cc:references:from:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=SDTbfUna34Qd79ay/PvHpXeLqKHYqAqzFBtMK1XzxGI=;
+	b=ON/NQjQWEi3fON/DDBAYu5HG4F3A9wQYYX3ZHXewW6rdfpyfN6GDeKnlxgf9/si9a9
+	9JHSodUWXjDvUXWyvoEwEE0DgwhDeKMop/6LDrDPkGLUCYR03QkkfX5S7JFJ8pfilSDZ
+	xvvi21rJRzAsyyhE+/kT6jH7WSjJD4+uklULukm2H+Pokk9wj1CJ1/NtVElLjBkK6KcS
+	JqikN21lQ/W3kOqZE29va5iKvC/1zmXoxZvy0PuN6Nh+lQFN6TTKu80Ldt+bYozlFh95
+	K/LSeCc2Mr0qC2NpnPv30EkDStUnE9M9IgeET/tA/SjNLgtMCQoX8YEn/nGCjEfLlQaU
+	jpyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=SDTbfUna34Qd79ay/PvHpXeLqKHYqAqzFBtMK1XzxGI=;
+	b=AHjDBudU5LwQRKv5Gpba6GklPawkcIswLDlx3HjFKcvMEoLzr9oWvfUgRna+bYescV
+	2FN69XxFx3pF+k3NBhB8bpMzNg7kcSpFl08cV9C/aPRLp9eVn4lFIU51QKA5AUXiWEFl
+	iFAZhPMdKidsvc4hkDd/Fc/in+QXpPhC1mZ332fkuGhYXRYsAQnM+8JEscRWsckx6Bt4
+	xqHP853WENYFS/2qSW4PPqzGNOJW02HJYvQh4Egd0I3CiXuyxcoUIVKedz0l5pG2wYT+
+	t3lov2xsJsQXA1QXM+mEqU1EL5OzAhS2kBZg7J8tB9Ny9AmvFLvkKhzWN+I2wdB2RHOb
+	3WoA==
+X-Gm-Message-State: APjAAAVFXHHTUsBqBPmqr5o2Tr3V0fRR8VN+UlzKleKSjLBm947w+cqs
+	bUenq+KK/o+/AqYn7jE9R21XAA==
+X-Google-Smtp-Source: APXvYqxbPfJ5tBulG/r6tvcVjjtvKQlgkwdEbMW3aGkGHvRkjNKPxepulcAi/TILththSdbF+vLDMw==
+X-Received: by 2002:aa7:8dc3:: with SMTP id j3mr43498542pfr.141.1557260757236; 
+	Tue, 07 May 2019 13:25:57 -0700 (PDT)
+Received: from jstaron2.mtv.corp.google.com
+	([2620:15c:202:201:b94f:2527:c39f:ca2d])
+	by smtp.gmail.com with ESMTPSA id
+	f5sm15855223pgo.75.2019.05.07.13.25.55
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Tue, 07 May 2019 13:25:56 -0700 (PDT)
+To: Pankaj Gupta <pagupta@redhat.com>, linux-nvdimm@lists.01.org,
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-acpi@vger.kernel.org, qemu-devel@nongnu.org,
+	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
+References: <20190426050039.17460-1-pagupta@redhat.com>
+	<20190426050039.17460-3-pagupta@redhat.com>
+Message-ID: <3d6479ae-6c39-d614-f1d9-aa1978e2e438@google.com>
+Date: Tue, 7 May 2019 13:25:54 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <e9280cc0-fd2d-0213-9883-f77138bd2831@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="FNl6dmBqjMVqHNX56zvgZvCEqGDpesUpR"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Tue, 07 May 2019 20:10:06 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 1/5] qemu-nbd: Add --pid-file option
+In-Reply-To: <20190426050039.17460-3-pagupta@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH v7 2/6] virtio-pmem: Add virtio pmem driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,112 +100,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+From: =?UTF-8?Q?Jakub_Staro=c5=84?= via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: =?UTF-8?Q?Jakub_Staro=c5=84?= <jstaron@google.com>
+Cc: jack@suse.cz, mst@redhat.com, jasowang@redhat.com, david@fromorbit.com,
+	lcapitulino@redhat.com, adilger.kernel@dilger.ca,
+	smbarber@google.com, zwisler@kernel.org, aarcange@redhat.com,
+	dave.jiang@intel.com, darrick.wong@oracle.com,
+	vishal.l.verma@intel.com, david@redhat.com, willy@infradead.org,
+	hch@infradead.org, jmoyer@redhat.com, nilal@redhat.com,
+	lenb@kernel.org, kilobyte@angband.pl, riel@surriel.com,
+	yuval.shaia@oracle.com, stefanha@redhat.com, imammedo@redhat.com,
+	dan.j.williams@intel.com, kwolf@redhat.com, tytso@mit.edu,
+	xiaoguangrong.eric@gmail.com, cohuck@redhat.com,
+	rjw@rjwysocki.net, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FNl6dmBqjMVqHNX56zvgZvCEqGDpesUpR
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Message-ID: <d5d3f82a-c9df-ecad-3a94-2646be570129@redhat.com>
-Subject: Re: [PATCH 1/5] qemu-nbd: Add --pid-file option
-References: <20190507183610.9848-1-mreitz@redhat.com>
- <20190507183610.9848-2-mreitz@redhat.com>
- <81dd6702-1d51-ca2e-1445-e8cdcfb14711@redhat.com>
- <f34fb38c-22dd-1ed3-821d-7c8a9ea8943a@redhat.com>
- <e9280cc0-fd2d-0213-9883-f77138bd2831@redhat.com>
-In-Reply-To: <e9280cc0-fd2d-0213-9883-f77138bd2831@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 4/25/19 10:00 PM, Pankaj Gupta wrote:
 
-On 07.05.19 21:51, Eric Blake wrote:
-> On 5/7/19 2:39 PM, Max Reitz wrote:
->> On 07.05.19 21:30, Eric Blake wrote:
->>> On 5/7/19 1:36 PM, Max Reitz wrote:
->>>> --fork is a bit boring if there is no way to get the child's PID.  T=
-his
->>>> option helps.
->>>>
->>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>>> ---
->>>>  qemu-nbd.c    | 29 +++++++++++++++++++++++++++++
->>>>  qemu-nbd.texi |  2 ++
->>>>  2 files changed, 31 insertions(+)
->>>>
->>>
->>>> @@ -111,6 +112,7 @@ static void usage(const char *name)
->>>>  "                            specify tracing options\n"
->>>>  "  --fork                    fork off the server process and exit t=
-he parent\n"
->>>>  "                            once the server is running\n"
->>>> +"  --pid-file=3DPATH           store the server's process ID in the=
- given file\n"
->>>
->>> Should --pid-file imply --fork, or be an error if --fork was not
->>> supplied? As coded, it writes a pid file regardless of --fork, even
->>> though it is less obvious that it is useful in that case. I don't hav=
-e a
->>> strong preference (there doesn't seem to be a useful consensus on wha=
-t
->>> forking daemons should do), but it would at least be worth documentin=
-g
->>> the intended action (even if that implies a tweak to the patch to mat=
-ch
->>> the intent).
->>
->> I think the documentation is pretty clear.  It stores the server's PID=
-,
->> whether it has been forked or not.
->>
->> I don't think we would gain anything from forbidding --pid-file withou=
-t
->> --fork, would we?
->=20
-> I can't think of any reason to forbid it. So it sounds like we are
-> intentional, this writes the pid into --pid-file regardless of whether
-> that pid can be learned by other means as well.
->=20
->=20
->>>> +    const char *pid_path =3D NULL;
->>>
->>> Bikeshedding: pid_name is nicer (path makes me think of $PATH and oth=
-er
->>> colon-separated lists, which this is not).
->>
->> I'd prefer pid_filename myself, then, because pid_name sounds like a
->> weird way to say "process name". O:-)
->=20
-> Works for me, even if it is longer. Do you want to respin, or just have=
+> +void host_ack(struct virtqueue *vq)
+> +{
+> +	unsigned int len;
+> +	unsigned long flags;
+> +	struct virtio_pmem_request *req, *req_buf;
+> +	struct virtio_pmem *vpmem = vq->vdev->priv;
+> +
+> +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> +	while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
+> +		req->done = true;
+> +		wake_up(&req->host_acked);
+> +
+> +		if (!list_empty(&vpmem->req_list)) {
+> +			req_buf = list_first_entry(&vpmem->req_list,
+> +					struct virtio_pmem_request, list);
+> +			list_del(&vpmem->req_list);
 
-> me touch it up when folding it into my NBD tree?
+Shouldn't it be rather `list_del(vpmem->req_list.next)`? We are trying to unlink
+first element of the list and `vpmem->req_list` is just the list head.
 
-I suppose I=E2=80=99d prefer a respin, independently of what you make of =
-patches
-4 and 5.
+> +int virtio_pmem_flush(struct nd_region *nd_region)
+> +{
+> +	int err;
+> +	unsigned long flags;
+> +	struct scatterlist *sgs[2], sg, ret;
+> +	struct virtio_device *vdev = nd_region->provider_data;
+> +	struct virtio_pmem *vpmem = vdev->priv;
+> +	struct virtio_pmem_request *req;
+> +
+> +	might_sleep();
+> +	req = kmalloc(sizeof(*req), GFP_KERNEL);
+> +	if (!req)
+> +		return -ENOMEM;
+> +
+> +	req->done = req->wq_buf_avail = false;
+> +	strcpy(req->name, "FLUSH");
+> +	init_waitqueue_head(&req->host_acked);
+> +	init_waitqueue_head(&req->wq_buf);
+> +	sg_init_one(&sg, req->name, strlen(req->name));
+> +	sgs[0] = &sg;
+> +	sg_init_one(&ret, &req->ret, sizeof(req->ret));
+> +	sgs[1] = &ret;
+> +
+> +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> +	err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
+> +	if (err) {
+> +		dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
+> +
+> +		list_add_tail(&vpmem->req_list, &req->list);
+> +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+> +
+> +		/* When host has read buffer, this completes via host_ack */
+> +		wait_event(req->wq_buf, req->wq_buf_avail);
+> +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> +	}
 
-Max
+Aren't the arguments in `list_add_tail` swapped? The element we are adding should
+be first, the list should be second. Also, shouldn't we resubmit the request after
+waking up from `wait_event(req->wq_buf, req->wq_buf_avail)`?
+
+I propose rewriting it like that:
+
+diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
+index 66b582f751a3..ff0556b04e86 100644
+--- a/drivers/nvdimm/virtio_pmem.c
++++ b/drivers/nvdimm/virtio_pmem.c
+@@ -25,7 +25,7 @@ void host_ack(struct virtqueue *vq)
+ 		if (!list_empty(&vpmem->req_list)) {
+ 			req_buf = list_first_entry(&vpmem->req_list,
+ 					struct virtio_pmem_request, list);
+-			list_del(&vpmem->req_list);
++			list_del(vpmem->req_list.next);
+ 			req_buf->wq_buf_avail = true;
+ 			wake_up(&req_buf->wq_buf);
+ 		}
+@@ -59,17 +59,33 @@ int virtio_pmem_flush(struct nd_region *nd_region)
+ 	sgs[1] = &ret;
+ 
+ 	spin_lock_irqsave(&vpmem->pmem_lock, flags);
+-	err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
+-	if (err) {
+-		dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
++	/*
++	 * If virtqueue_add_sgs returns -ENOSPC then req_vq virtual queue does not
++	 * have free descriptor slots. We add the request to req_list and wait
++	 * for host_ack to wake us up when free slots are available.
++	 */
++	while ((err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC)) == -ENOSPC) {
++		dev_err(&vdev->dev, "failed to send command to virtio pmem device, no free slots in the virtqueue, postponing request\n");
++		req->wq_buf_avail = false;
+ 
+-		list_add_tail(&vpmem->req_list, &req->list);
++		list_add_tail(&req->list, &vpmem->req_list);
+ 		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+ 
+ 		/* When host has read buffer, this completes via host_ack */
+ 		wait_event(req->wq_buf, req->wq_buf_avail);
+ 		spin_lock_irqsave(&vpmem->pmem_lock, flags);
+ 	}
++
++	/*
++	 * virtqueue_add_sgs failed with error different than -ENOSPC, we can't
++	 * do anything about that.
++	 */
++	if (err) {
++		dev_info(&vdev->dev, "failed to send command to virtio pmem device, error code %d\n", err);
++		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
++		err = -EIO;
++		goto ret;
++	}
+ 	err = virtqueue_kick(vpmem->req_vq);
+ 	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
 
 
---FNl6dmBqjMVqHNX56zvgZvCEqGDpesUpR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Let me know if it looks reasonable to you.
 
------BEGIN PGP SIGNATURE-----
+Thank you,
+Jakub Staron
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzR5hcACgkQ9AfbAGHV
-z0D0MQf7BmS0JJj31lPRSwUtjM97jJiXZsH8n+T0OOC8y7f+um2rEiySlPJZnLLp
-3pv2na/JeTwnZHe0QIfEGh4MP4mBw3ASfbuL3XzGjjFpAyEt2E6rX5GRL85anqWd
-2tQ1l1BtwsC4OgKXZ6y4Uz4yUmLaICIHtLqS5fw9Sd+RbkfYQkZMtEp6ptG88Mtm
-rS91XAXL+i8mYFyYJlKPgLKitUDjdRSv5C95FsdGxmmNfxr6vU/5CLxC40VzwWmA
-zkmdAdGpS75FB0ck0unYaMuE4DjRUVVMauMEukPIBPABf58C3QGQNrWeIHpfaMFO
-78xS7xKHnGN4wS95UToB2GUNx2KuXg==
-=kzOQ
------END PGP SIGNATURE-----
-
---FNl6dmBqjMVqHNX56zvgZvCEqGDpesUpR--
 
