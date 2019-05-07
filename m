@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F39C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 12:05:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9C3EC004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 12:06:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6ECB8206BF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 12:05:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 869B420825
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 12:06:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Po9GDH7G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ECB8206BF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Bi2HNjMP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 869B420825
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45656 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45660 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNyr7-0002pr-Jd
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 08:05:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44907)
+	id 1hNyrB-0002tt-LG
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 08:06:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hNylr-0007dg-Q6
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:00:32 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hNylm-0007Sm-8t
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:00:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hNylq-0003t1-KC
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:00:31 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:40737)
+	(envelope-from <peter.maydell@linaro.org>) id 1hNylk-0003Vx-Uj
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:00:26 -0400
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:38531)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hNylq-0003s4-DH
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:00:30 -0400
-Received: by mail-wm1-x334.google.com with SMTP id h11so19613378wmb.5
-	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 05:00:30 -0700 (PDT)
+	id 1hNylg-0003OI-Vv
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:00:23 -0400
+Received: by mail-wr1-x432.google.com with SMTP id v11so1815858wru.5
+	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 05:00:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
 	:content-transfer-encoding;
-	bh=2H24j/ivxKhpWMoNZRyFm5/WUhhAwlHuP6YRtZPABdg=;
-	b=Po9GDH7GhqXavjGPmL2GFhMIfMm1PbDdrfrn7Gy45f11Oogo9As3XZJv0QjnWwU1en
-	/IGIHUimZ7Ge56gXihpEwF1nLkJ2TgOSLAY4+5ecrh/Pcof2IsTq/szfsasGk4LjI5Ny
-	ZiwryR+us5QOzyVJYCecnMXtkLJnpi4ftahrtryGcHzdMBu8CAlQzN326JYLCMIojOq5
-	gbSYv7KOnda+4MIGRannH6dui/RoS6SnGUH/wqELKYMpigtNiLwztaxGPBaDREDe/AMq
-	ztjWv96teUDajYvjX8lmkXy8KHexyKwyBauo5v3dqlp6/mQW9ECs0XcxSKetYe5yQ9Tu
-	D/sg==
+	bh=cukpgcV1j7F/Z6mZritMbWeaif27ugZHIZtYyXsN4A8=;
+	b=Bi2HNjMPDT7eJlmlr0XLAiopmtU56VPynJDqZTS8WlwQFTi/XARaAcIOJd0MhMMT/K
+	ALR7GxrnQYF4Vrjt3qpSqjcqyj+rUWx2NB1rqIpD87Kd/mIbCgv8bQtfCvPUssnFdlOO
+	SMrZsHXbLlCIuQHn28T8muoVdy8tj/HChqLRKtm6NIyrwYhqhDfto96hxxBWtWfNPRkW
+	F4XEWbuMSgLDKTBn2Bt7AxOZWUYXoDEuK7AznnQdIGOHVmJVxJwkg6A5rTuPeBItGDA0
+	q0p0vHd1LYyaKRfbNupPz98UHCPgwLbJa870vs5NZb9P7pPfnLWreXCQ9upDFcnldcB0
+	4/6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=2H24j/ivxKhpWMoNZRyFm5/WUhhAwlHuP6YRtZPABdg=;
-	b=LMaGxvm/J+MkFoMlXYKcHihYNZD953jBWV8rVzhYta4uAUXFRSBJcP/w1MNDgOKTUM
-	Bwe74spZfBl9XpgwN4cpzh+LVijxyvEyFJki4pqR/leRYS69Z0wUPokdiXKwqdNdLt4D
-	NQPpo/F1l/w07TqJuQ2VG9TcjXwW5lQ6a3QSJgmLMFIW0CQHIPKmbf/owOY1WmDkxGpV
-	kNrI4+r2tLHqDgk7erjAha0WOkOsQACRXpcvC4q9+vJGI+gd1uWcdTQPelFGOSqfYeb9
-	5FZsq8PZl9O1YpJfbyksciN63CyljhGass7F1KofnOtj7wJbf0JjedGDTFHvuWkbijFH
-	7lDg==
-X-Gm-Message-State: APjAAAXjjUfX2DB21TrBfQIfI3Dx3+wP5DhW9t2N6cwGHcvE/JrCLMpl
-	I95VLgLrQV7UoDli28bVgcstXPk7k/E=
-X-Google-Smtp-Source: APXvYqzLX4z5Yl6q/KCtD+zhluzuPuelQNia2NlxMWy0+f4sgRpZ6raGgTrpW+ZvrRrtPe4MG06UFA==
-X-Received: by 2002:a1c:ac07:: with SMTP id v7mr19777642wme.49.1557230428551; 
-	Tue, 07 May 2019 05:00:28 -0700 (PDT)
+	bh=cukpgcV1j7F/Z6mZritMbWeaif27ugZHIZtYyXsN4A8=;
+	b=jBYsTTJMelhKojxbFTWSs+v8ML/bD1OqVuirB7+x1+Zutqrf86UIBxu+i/Rm3k2Bbd
+	JaJL50xcXdX+1zRZfNe6soADB0n2iGRW5QLmaxPd9ma99F6jdX89h7a8dZx8dRrroTfH
+	QE9cfXvVNZqQxSn92V7EaUm7OC8QszR3hxYJq4AWNgQNpckxNS4C2wnDXXQD1Ok/6xm5
+	cKqQQqFAuIrIJ35i2uY0olcRE2qRSkLGf99AXNgVuiu+P27dYlI6fqpbnuzRRWeaMqYV
+	XuGCEPKMq8YX902htj6FyyA9XQFHWCCxD+Ngb0iCmZu5ntbfwTmHq3XIXexK4YAKnqkn
+	84GA==
+X-Gm-Message-State: APjAAAVWyW8BYdmoeu5yiUKlDopQnV58LB1ZXZWgQ4vVkxpr/nChu0ml
+	1got1v8PiqamQ/A1tSdtYGjcTAuhfUI=
+X-Google-Smtp-Source: APXvYqzXVmz/jqtglC66eZ+PQzxyA56be6UM6u/MUWmqFUvcSsx40OjdhV+4O82doOB80vnzZGW7ZA==
+X-Received: by 2002:a5d:6a47:: with SMTP id t7mr21325003wrw.307.1557230417468; 
+	Tue, 07 May 2019 05:00:17 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id g3sm12348596wmf.9.2019.05.07.05.00.27
+	by smtp.gmail.com with ESMTPSA id g3sm12348596wmf.9.2019.05.07.05.00.15
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 07 May 2019 05:00:27 -0700 (PDT)
+	Tue, 07 May 2019 05:00:16 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  7 May 2019 13:00:06 +0100
-Message-Id: <20190507120011.18100-11-peter.maydell@linaro.org>
+Date: Tue,  7 May 2019 12:59:58 +0100
+Message-Id: <20190507120011.18100-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190507120011.18100-1-peter.maydell@linaro.org>
 References: <20190507120011.18100-1-peter.maydell@linaro.org>
@@ -81,9 +81,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::334
-Subject: [Qemu-devel] [PULL 10/15] osdep: Fix mingw compilation regarding
- stdio formats
+X-Received-From: 2a00:1450:4864:20::432
+Subject: [Qemu-devel] [PULL 02/15] pflash_cfi01: New
+ pflash_cfi01_legacy_drive()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,56 +99,118 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cao Jiaxi <driver1998@foxmail.com>
+From: Markus Armbruster <armbru@redhat.com>
 
-I encountered the following compilation error on mingw:
+Factored out of pc_system_firmware_init() so the next commit can reuse
+it in hw/arm/virt.c.
 
-/mnt/d/qemu/include/qemu/osdep.h:97:9: error: '__USE_MINGW_ANSI_STDIO' macro redefined [-Werror,-Wmacro-redefined]
- #define __USE_MINGW_ANSI_STDIO 1
-        ^
-/mnt/d/llvm-mingw/aarch64-w64-mingw32/include/_mingw.h:433:9: note: previous definition is here
- #define __USE_MINGW_ANSI_STDIO 0      /* was not defined so it should be 0 */
-
-It turns out that __USE_MINGW_ANSI_STDIO must be set before any
-system headers are included, not just before stdio.h.
-
-Signed-off-by: Cao Jiaxi <driver1998@foxmail.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
-Message-id: 20190503003719.10233-1-driver1998@foxmail.com
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20190416091348.26075-3-armbru@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/qemu/osdep.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ include/hw/block/flash.h |  1 +
+ hw/block/pflash_cfi01.c  | 28 ++++++++++++++++++++++++++++
+ hw/i386/pc_sysfw.c       | 16 ++--------------
+ 3 files changed, 31 insertions(+), 14 deletions(-)
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 303d315c5d4..af2b91f0b87 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -85,17 +85,17 @@ extern int daemon(int, int);
- #endif
- #endif
+diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
+index a0f488732af..1acaf7de802 100644
+--- a/include/hw/block/flash.h
++++ b/include/hw/block/flash.h
+@@ -24,6 +24,7 @@ PFlashCFI01 *pflash_cfi01_register(hwaddr base,
+                                    int be);
+ BlockBackend *pflash_cfi01_get_blk(PFlashCFI01 *fl);
+ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl);
++void pflash_cfi01_legacy_drive(PFlashCFI01 *dev, DriveInfo *dinfo);
  
-+/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later) */
-+#ifdef __MINGW32__
-+#define __USE_MINGW_ANSI_STDIO 1
-+#endif
+ /* pflash_cfi02.c */
+ 
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index 16dfae14b80..333b7362771 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -44,9 +44,12 @@
+ #include "qapi/error.h"
+ #include "qemu/timer.h"
+ #include "qemu/bitops.h"
++#include "qemu/error-report.h"
+ #include "qemu/host-utils.h"
+ #include "qemu/log.h"
++#include "qemu/option.h"
+ #include "hw/sysbus.h"
++#include "sysemu/blockdev.h"
+ #include "sysemu/sysemu.h"
+ #include "trace.h"
+ 
+@@ -968,6 +971,31 @@ MemoryRegion *pflash_cfi01_get_memory(PFlashCFI01 *fl)
+     return &fl->mem;
+ }
+ 
++/*
++ * Handle -drive if=pflash for machines that use properties.
++ * If @dinfo is null, do nothing.
++ * Else if @fl's property "drive" is already set, fatal error.
++ * Else set it to the BlockBackend with @dinfo.
++ */
++void pflash_cfi01_legacy_drive(PFlashCFI01 *fl, DriveInfo *dinfo)
++{
++    Location loc;
 +
- #include <stdarg.h>
- #include <stddef.h>
- #include <stdbool.h>
- #include <stdint.h>
- #include <sys/types.h>
- #include <stdlib.h>
--
--/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later) */
--#ifdef __MINGW32__
--#define __USE_MINGW_ANSI_STDIO 1
--#endif
- #include <stdio.h>
++    if (!dinfo) {
++        return;
++    }
++
++    loc_push_none(&loc);
++    qemu_opts_loc_restore(dinfo->opts);
++    if (fl->blk) {
++        error_report("clashes with -machine");
++        exit(1);
++    }
++    qdev_prop_set_drive(DEVICE(fl), "drive",
++                        blk_by_legacy_dinfo(dinfo), &error_fatal);
++    loc_pop(&loc);
++}
++
+ static void postload_update_cb(void *opaque, int running, RunState state)
+ {
+     PFlashCFI01 *pfl = opaque;
+diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+index 75925f5d3f7..751fcafa121 100644
+--- a/hw/i386/pc_sysfw.c
++++ b/hw/i386/pc_sysfw.c
+@@ -269,9 +269,7 @@ void pc_system_firmware_init(PCMachineState *pcms,
+ {
+     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+     int i;
+-    DriveInfo *pflash_drv;
+     BlockBackend *pflash_blk[ARRAY_SIZE(pcms->flash)];
+-    Location loc;
  
- #include <string.h>
+     if (!pcmc->pci_enabled) {
+         old_pc_system_rom_init(rom_memory, true);
+@@ -280,18 +278,8 @@ void pc_system_firmware_init(PCMachineState *pcms,
+ 
+     /* Map legacy -drive if=pflash to machine properties */
+     for (i = 0; i < ARRAY_SIZE(pcms->flash); i++) {
+-        pflash_drv = drive_get(IF_PFLASH, 0, i);
+-        if (pflash_drv) {
+-            loc_push_none(&loc);
+-            qemu_opts_loc_restore(pflash_drv->opts);
+-            if (pflash_cfi01_get_blk(pcms->flash[i])) {
+-                error_report("clashes with -machine");
+-                exit(1);
+-            }
+-            qdev_prop_set_drive(DEVICE(pcms->flash[i]), "drive",
+-                                blk_by_legacy_dinfo(pflash_drv), &error_fatal);
+-            loc_pop(&loc);
+-        }
++        pflash_cfi01_legacy_drive(pcms->flash[i],
++                                  drive_get(IF_PFLASH, 0, i));
+         pflash_blk[i] = pflash_cfi01_get_blk(pcms->flash[i]);
+     }
+ 
 -- 
 2.20.1
 
