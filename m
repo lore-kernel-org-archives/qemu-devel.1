@@ -2,63 +2,83 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26D50C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 16:53:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8BABC004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 17:02:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F17082054F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 16:53:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F17082054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 83879205C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 17:02:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xPOgpa63"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83879205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50099 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50209 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO3LN-0000jA-8m
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 12:53:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51875)
+	id 1hO3U7-0003u6-OU
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 13:02:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hO376-0004V6-R5
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 12:38:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hO3TN-0003YU-4A
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 13:01:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hO375-0005Yd-Qe
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 12:38:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:30748)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>)
-	id 1hO372-0005UU-U5; Tue, 07 May 2019 12:38:41 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8387D30B96D1;
-	Tue,  7 May 2019 16:38:37 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-58.brq.redhat.com [10.40.204.58])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B896C8166;
-	Tue,  7 May 2019 16:37:59 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue,  7 May 2019 18:34:14 +0200
-Message-Id: <20190507163416.24647-15-philmd@redhat.com>
-In-Reply-To: <20190507163416.24647-1-philmd@redhat.com>
-References: <20190507163416.24647-1-philmd@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hO3TM-0004wh-8k
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 13:01:45 -0400
+Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:38789)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hO3TM-0004to-3d
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 13:01:44 -0400
+Received: by mail-ot1-x329.google.com with SMTP id b1so15657761otp.5
+	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 10:01:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=RU+OciKc7oqqP0StmbSOCcSNkE7KJSjRgAGt8wBTFBY=;
+	b=xPOgpa63jExld0Ncvfzq53GePcDhqmqXDo5u9Sx9wy2RgGMmILeE89bV7I5YTxco8Z
+	FpmA+vr8WVLXt4mxlzUZEqAdAMw5KTnBfRTfQyQ3bva7uR+FQyXdGHn/ocqHvUyQ+rGN
+	e08fmAh0xcW9tQTFOVVCJDJG5dI7tewZRNG5ZPoQGnGma5czR9GgR2i7Z3UzvRoCRir3
+	GLhGb+7BKT7MfIgnqURpwRapSuLDpQ/fkm7jmnZ1i6qlEBULgQ4wJsjag2lJnjBj3EGt
+	DW3MfmDIo6EhvyylQ3wOJArBDERriM9VegVAs41+oUty5MS4/64nHJ5I4dxpeapRP3EM
+	G2OQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=RU+OciKc7oqqP0StmbSOCcSNkE7KJSjRgAGt8wBTFBY=;
+	b=J5QVlJ4fjD/gi59fzXH+jlGVXOhUIAP06eMWn+FLKZ347/B750+zm/TdNZ0hqtIS96
+	FZrbLfyrYQxndcIfMxNXy3ISN7mbxYX0lgAliAoMfEN0gC/k9KPupopaccmeWehg72H9
+	nu2BBsVvITQdRNW9gnZw0X0HsQLLUq/Oj3J1PQc03YkOVWVQc6rLSHrpT2EOMlFaGssB
+	MKbWShRVwiVraCSik832wy66hm8mtejm+nvpdlBVbRmCdNBZX91DAkiwUFWLC2szMYop
+	9XP3Jb72zTiuBx3Lf06mjpuW/aXABVGMR6EwK1uo4Mb5G1UhG5SRnsspPO6ktUWp6kOO
+	95aw==
+X-Gm-Message-State: APjAAAXitMNeN3S1kjt2PIsYAdkVHb08yRFTO49JIt1sR7EKkAmraGDV
+	lwzB2a1KsCPmV5u+4/u8gBUsr17kfVZiHJIVzj1T5A==
+X-Google-Smtp-Source: APXvYqyBKLf6Y2IxIPWPg7U8dsZ1G/qjdaqMPSa1gy2aFZOS/b16iikZff9ouP5QvtYenBK57SRp73kx/FJOOd+RRPs=
+X-Received: by 2002:a9d:6156:: with SMTP id c22mr22001897otk.363.1557248503239;
+	Tue, 07 May 2019 10:01:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Tue, 07 May 2019 16:38:38 +0000 (UTC)
+References: <20190502223007.29494-1-samuel.thibault@ens-lyon.org>
+	<0da3ec00-9040-f367-7666-a54824f1dcde@redhat.com>
+	<20190507141906.GT27205@redhat.com>
+In-Reply-To: <20190507141906.GT27205@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 May 2019 18:01:31 +0100
+Message-ID: <CAFEAcA9NM8c0bX+D-VFOvO7iOWjcyv1U=F5K5810mHRb-zgDZw@mail.gmail.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 14/16] hw/microblaze/zynqmp: Use
- object_initialize_child for correct ref. counting
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::329
+Subject: Re: [Qemu-devel] [PULL 0/2] slirp: move slirp as git submodule
+ project
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,107 +90,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Antony Pavlov <antonynpavlov@gmail.com>,
-	Paul Burton <pburton@wavecomp.com>, Andrew Jeffery <andrew@aj.id.au>,
-	Alistair Francis <alistair@alistair23.me>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-	Andrew Baumann <Andrew.Baumann@microsoft.com>,
-	Joel Stanley <joel@jms.id.au>,
-	Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-arm@nongnu.org,
-	Peter Chubb <peter.chubb@nicta.com.au>,
-	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-ppc@nongnu.org,
-	Jean-Christophe Dubois <jcd@tribudubois.net>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	David Gibson <david@gibson.dropbear.id.au>
+Cc: Jan Kiszka <jan.kiszka@siemens.com>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	=?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+	Samuel Thibault <samuel.thibault@ens-lyon.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As explained in commit aff39be0ed97:
+On Tue, 7 May 2019 at 15:19, Daniel P. Berrang=C3=A9 <berrange@redhat.com> =
+wrote:
+> On Tue, May 07, 2019 at 09:11:09AM -0500, Eric Blake wrote:
+> > In the meantime, where do we stand on our goal of disabling in-tree bui=
+lds?
+>
+> The view was largely positive when we discussed it. So I think it just
+> needs someone to step up with a patch proposal, and at the start of the
+> dev cycle is a good time for such a change i guess.
 
-  Both functions, object_initialize() and object_property_add_child()
-  increase the reference counter of the new object, so one of the
-  references has to be dropped afterwards to get the reference
-  counting right. Otherwise the child object will not be properly
-  cleaned up when the parent gets destroyed.
-  Thus let's use now object_initialize_child() instead to get the
-  reference counting here right.
+Pitfalls to watch out for include checking whether any of:
+ * the tests/vm scripting for the BSDs
+ * various travis/etc CI configs
+ * etc
+are currently using in-tree builds.
+Paolo will also need to update his coverity build config.
 
-This patch was generated using the following Coccinelle script
-(with a bit of manual fix-up for overly long lines):
-
- @use_object_initialize_child@
- expression parent_obj;
- expression child_ptr;
- expression child_name;
- expression child_type;
- expression child_size;
- expression errp;
- @@
- (
- -   object_initialize(child_ptr, child_size, child_type);
- +   object_initialize_child(parent_obj, child_name,  child_ptr, child_si=
-ze,
- +                           child_type, &error_abort, NULL);
-     ... when !=3D parent_obj
- -   object_property_add_child(parent_obj, child_name, OBJECT(child_ptr),=
- NULL);
-     ...
-?-   object_unref(OBJECT(child_ptr));
- |
- -   object_initialize(child_ptr, child_size, child_type);
- +   object_initialize_child(parent_obj, child_name,  child_ptr, child_si=
-ze,
- +                            child_type, errp, NULL);
-     ... when !=3D parent_obj
- -   object_property_add_child(parent_obj, child_name, OBJECT(child_ptr),=
- errp);
-     ...
-?-   object_unref(OBJECT(child_ptr));
- )
-
-While the object_initialize() function doesn't take an
-'Error *errp' argument, the object_initialize_child() does.
-Since this code is used when a machine is created (and is not
-yet running), we deliberately choose to use the &error_abort
-argument instead of ignoring errors if an object creation failed.
-
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Inspired-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/microblaze/xlnx-zynqmp-pmu.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-=
-pmu.c
-index 0948b1fd5f2..df6c0048aa6 100644
---- a/hw/microblaze/xlnx-zynqmp-pmu.c
-+++ b/hw/microblaze/xlnx-zynqmp-pmu.c
-@@ -176,9 +176,9 @@ static void xlnx_zynqmp_pmu_init(MachineState *machin=
-e)
-                                 pmu_ram);
-=20
-     /* Create the PMU device */
--    object_initialize(pmu, sizeof(XlnxZynqMPPMUSoCState), TYPE_XLNX_ZYNQ=
-MP_PMU_SOC);
--    object_property_add_child(OBJECT(machine), "pmu", OBJECT(pmu),
--                              &error_abort);
-+    object_initialize_child(OBJECT(machine), "pmu", pmu,
-+                            sizeof(XlnxZynqMPPMUSoCState),
-+                            TYPE_XLNX_ZYNQMP_PMU_SOC, &error_abort, NULL=
-);
-     object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal=
-);
-=20
-     /* Load the kernel */
---=20
-2.20.1
-
+thanks
+-- PMM
 
