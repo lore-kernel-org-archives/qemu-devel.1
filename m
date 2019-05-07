@@ -2,64 +2,59 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 149CBC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 09:28:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96F61C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 09:30:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBD2C21019
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 09:28:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBD2C21019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6AC8721019
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 09:30:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AC8721019
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43122 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43124 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNwOz-0006lj-Sf
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 05:28:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44930)
+	id 1hNwQE-0007rs-NI
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 05:30:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hNwNn-0006K8-Rw
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:27:32 -0400
+	(envelope-from <groug@kaod.org>) id 1hNwOS-0006gV-0s
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:28:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hNwNm-0003sa-Un
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:27:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55052)
+	(envelope-from <groug@kaod.org>) id 1hNwOR-0004J4-3i
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:28:12 -0400
+Received: from 16.mo7.mail-out.ovh.net ([46.105.72.216]:42089)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hNwNk-0003qv-S0; Tue, 07 May 2019 05:27:28 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 21DDB307CDD5;
-	Tue,  7 May 2019 09:27:28 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-186.ams2.redhat.com
-	[10.36.116.186])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id DEC0060BEC;
-	Tue,  7 May 2019 09:27:26 +0000 (UTC)
-Date: Tue, 7 May 2019 11:27:25 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Message-ID: <20190507092725.GD5808@localhost.localdomain>
-References: <20190506061854.22207-1-thuth@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hNwOQ-0004Hi-UO
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:28:11 -0400
+Received: from player795.ha.ovh.net (unknown [10.108.57.153])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 78A991127D6
+	for <qemu-devel@nongnu.org>; Tue,  7 May 2019 11:28:08 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player795.ha.ovh.net (Postfix) with ESMTPSA id 2BEE456DA660;
+	Tue,  7 May 2019 09:28:05 +0000 (UTC)
+Date: Tue, 7 May 2019 11:28:04 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Message-ID: <20190507112804.23cde966@bahia.lan>
+In-Reply-To: <1926077.q6xKvCkoZ9@silver>
+References: <1926077.q6xKvCkoZ9@silver>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190506061854.22207-1-thuth@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Tue, 07 May 2019 09:27:28 +0000 (UTC)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 5739837727215294784
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrkedtgdduiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [QEMU PATCH] MAINTAINERS: Downgrade status of
- block sections without "M:" to "Odd Fixes"
+X-Received-From: 46.105.72.216
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] 9p: Fix file ID collisions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,22 +66,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, qemu-block@nongnu.org,
-	Niels de Vos <ndevos@redhat.com>
+Cc: qemu-devel@nongnu.org, Antonios Motakis <antonios.motakis@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 06.05.2019 um 08:18 hat Thomas Huth geschrieben:
-> Fixes might still get picked up via the qemu-block mailing list,
-> so the status is not "Orphan" yet.
-> Also add the gluster mailing list as suggested by Niels here:
-> 
->  https://patchwork.kernel.org/patch/10613297/#22409943
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On Fri, 03 May 2019 18:20:39 +0200
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
-Thanks, applied to the block branch.
+> Hi!
+> 
+> This is v2 of a proposed patch set for fixing file ID collisions with 9pfs.
+> 
+> Patch 1 to 3 are identical to the previous version. New in this v2 is patch 4
+> which introduces variable length suffixes for inode mapping instead of fixed
+> length prefixes.
+> 
+> Also: patch 4 disables file ID persistency at compile time by default for now,
+> since I am yet unresolved about details of that persistency.
+> 
+> Christian Schoenebeck (4):
+>   9p: mitigates most QID path collisions
+>   9P: trivial cleanup of QID path collision mitigation
+>   9p: persistency of QID path beyond reboots / suspensions
+>   9p: use variable length suffixes for inode mapping
+> 
+>  fsdev/9p-marshal.h   |    6 +-
+>  hw/9pfs/9p.c         | 1145 ++++++++++++++++++++++++++++++++++++++++++++++++--
+>  hw/9pfs/9p.h         |  167 ++++++++
+>  hw/9pfs/trace-events |   14 +-
+>  4 files changed, 1296 insertions(+), 36 deletions(-)
+> 
 
-Kevin
+Hmm... this series comes unthreaded again because the cover has:
+
+Message-ID: <1926077.q6xKvCkoZ9@silver>
+
+while the patches have:
+
+In-Reply-To: <cover.1556896526.git.qemu_oss@crudebyte.com>
+
+Maybe consider using git send-email or stgit mail to have proper
+threading for free.
+
+Cheers,
+
+--
+Greg
 
