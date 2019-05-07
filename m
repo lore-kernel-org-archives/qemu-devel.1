@@ -2,91 +2,93 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B90EBC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 19:32:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55F00C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 19:47:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8285820675
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 19:32:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8285820675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1CEA520578
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 19:47:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="SlqXQH6c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CEA520578
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51937 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52173 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO5pQ-0000Co-2t
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 15:32:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57685)
+	id 1hO63H-0003Zy-AP
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 15:46:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hO5nj-0007NU-M4
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 15:30:56 -0400
+	(envelope-from <jgg@ziepe.ca>) id 1hO60g-00024n-Nd
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 15:44:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hO5ni-0004YZ-IE
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 15:30:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46526)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hO5ne-0004Ri-UG; Tue, 07 May 2019 15:30:51 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3F2323082132;
-	Tue,  7 May 2019 19:30:50 +0000 (UTC)
-Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 553E9600D4;
-	Tue,  7 May 2019 19:30:49 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190507183610.9848-1-mreitz@redhat.com>
-	<20190507183610.9848-2-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <81dd6702-1d51-ca2e-1445-e8cdcfb14711@redhat.com>
-Date: Tue, 7 May 2019 14:30:48 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <jgg@ziepe.ca>) id 1hO5zc-0004ze-SN
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 15:44:17 -0400
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:34169)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jgg@ziepe.ca>) id 1hO5zc-0004yS-8v
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 15:43:12 -0400
+Received: by mail-qt1-x842.google.com with SMTP id j6so20519005qtq.1
+	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 12:43:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ziepe.ca; s=google;
+	h=date:from:to:cc:subject:message-id:references:mime-version
+	:content-disposition:in-reply-to:user-agent;
+	bh=Ee/vWvn/Ifzj7Fj8CJW5WypvdZbF3rI74RwswfNy3s8=;
+	b=SlqXQH6cdfmDcoXK151NvgNOEL8C9rtVLRGZYegxJ5pRaiMErghgNSEUNcm8XOgnBm
+	Q7Olw9WbgFBUGU2iDCkwi5y4P6LbPvssY/y8G7sAy2o/IDwVIW3UNJk3oNH5uTnEQBe6
+	xnWNiXRxQs3KTm02xrq9ERvEvl5ab/N6pff2NY2lmzVtA6niaZiWeWugHSt5nXVR8rAP
+	HfJg3A/UXegsz8XhYGpG7nzAqlNS2FaltaSNlZrWib25/KUPpoCEj3wQ43V8sDx7W81w
+	TwgyJAj04iwS6mmd+p6VlrrTRvtd2PQDCDNh26OQvcQ/YuDQgItrhSo51NDIJloaDsLp
+	l6xA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=Ee/vWvn/Ifzj7Fj8CJW5WypvdZbF3rI74RwswfNy3s8=;
+	b=mK02trex6lqRZqmV1epzOc5fYSdQN9tM569UFfwSIeoYpGnUDLUuD3nGqZlj6QBPwM
+	0Va2QtEJGGwCUx58djB+jI+PujeZQWxMTwJ6TiDRz08w8OnQoL0/dnQga8tgnaif8MMq
+	l6AiRJH4Jc1QesJYkSsO8hSvb9a4KLHzPoIeT1Jd8E34TlN8lOOTwIDxvcgOgCdnRJis
+	toGXo7ZdA2OSeoVwFmUnsMfadtVD73HQY68o4I4fHVPwrBhOht3JNQza3VQq5gzNYxNs
+	1tQ6/xeOuSHyP6HVFK/3A5yBkqUqeprmkOuW8Nr9Pda8c0XVQZizmqDhG14ARZ4zmi4W
+	EKhg==
+X-Gm-Message-State: APjAAAWN38y60gEwae7vN3z8BSCnK8Fh2xZ100g9Ti5AmnYHItPj1OaG
+	axPC/aetubCTGHUn+1f0dLpBOg==
+X-Google-Smtp-Source: APXvYqw3KSJ3ehNU8RQ0M4ocEOtB2IpJ3gJQrhf2sWV4FOnrdHCkkwNpNrnHzJv7qop0/fuwyZ7GaA==
+X-Received: by 2002:ac8:2a10:: with SMTP id k16mr28126307qtk.220.1557258190850;
+	Tue, 07 May 2019 12:43:10 -0700 (PDT)
+Received: from ziepe.ca
+	(hlfxns017vw-156-34-49-251.dhcp-dynamic.fibreop.ns.bellaliant.net.
+	[156.34.49.251]) by smtp.gmail.com with ESMTPSA id
+	n21sm7704457qkk.30.2019.05.07.12.43.09
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Tue, 07 May 2019 12:43:09 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1hO5zY-0007dD-NA; Tue, 07 May 2019 16:43:08 -0300
+Date: Tue, 7 May 2019 16:43:08 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20190507194308.GK6201@ziepe.ca>
+References: <20190411110157.14252-1-yuval.shaia@oracle.com>
+	<20190411190215.2163572e.cohuck@redhat.com>
+	<20190415103546.GA6854@lap1>
+	<e73e03c2-ea2b-6ffc-cd23-e8e44d42ce80@suse.de>
+	<20190422164527.GF21588@ziepe.ca> <20190430171350.GA2763@lap1>
 MIME-Version: 1.0
-In-Reply-To: <20190507183610.9848-2-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="yNCNUvkxu4ZbUOYKhYTeLqEpfnBS5KmS1"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Tue, 07 May 2019 19:30:50 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 1/5] qemu-nbd: Add --pid-file option
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190430171350.GA2763@lap1>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::842
+Subject: Re: [Qemu-devel] [RFC 0/3] VirtIO RDMA
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,100 +100,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, linux-rdma@vger.kernel.org,
+	Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+	virtualization@lists.linux-foundation.org, Hannes Reinecke <hare@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---yNCNUvkxu4ZbUOYKhYTeLqEpfnBS5KmS1
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Message-ID: <81dd6702-1d51-ca2e-1445-e8cdcfb14711@redhat.com>
-Subject: Re: [PATCH 1/5] qemu-nbd: Add --pid-file option
-References: <20190507183610.9848-1-mreitz@redhat.com>
- <20190507183610.9848-2-mreitz@redhat.com>
-In-Reply-To: <20190507183610.9848-2-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Apr 30, 2019 at 08:13:54PM +0300, Yuval Shaia wrote:
+> On Mon, Apr 22, 2019 at 01:45:27PM -0300, Jason Gunthorpe wrote:
+> > On Fri, Apr 19, 2019 at 01:16:06PM +0200, Hannes Reinecke wrote:
+> > > On 4/15/19 12:35 PM, Yuval Shaia wrote:
+> > > > On Thu, Apr 11, 2019 at 07:02:15PM +0200, Cornelia Huck wrote:
+> > > > > On Thu, 11 Apr 2019 14:01:54 +0300
+> > > > > Yuval Shaia <yuval.shaia@oracle.com> wrote:
+> > > > > 
+> > > > > > Data center backends use more and more RDMA or RoCE devices and more and
+> > > > > > more software runs in virtualized environment.
+> > > > > > There is a need for a standard to enable RDMA/RoCE on Virtual Machines.
+> > > > > > 
+> > > > > > Virtio is the optimal solution since is the de-facto para-virtualizaton
+> > > > > > technology and also because the Virtio specification
+> > > > > > allows Hardware Vendors to support Virtio protocol natively in order to
+> > > > > > achieve bare metal performance.
+> > > > > > 
+> > > > > > This RFC is an effort to addresses challenges in defining the RDMA/RoCE
+> > > > > > Virtio Specification and a look forward on possible implementation
+> > > > > > techniques.
+> > > > > > 
+> > > > > > Open issues/Todo list:
+> > > > > > List is huge, this is only start point of the project.
+> > > > > > Anyway, here is one example of item in the list:
+> > > > > > - Multi VirtQ: Every QP has two rings and every CQ has one. This means that
+> > > > > >    in order to support for example 32K QPs we will need 64K VirtQ. Not sure
+> > > > > >    that this is reasonable so one option is to have one for all and
+> > > > > >    multiplex the traffic on it. This is not good approach as by design it
+> > > > > >    introducing an optional starvation. Another approach would be multi
+> > > > > >    queues and round-robin (for example) between them.
+> > > > > > 
+> > > Typically there will be a one-to-one mapping between QPs and CPUs (on the
+> > > guest). 
+> > 
+> > Er we are really overloading words here.. The typical expectation is
+> > that a 'RDMA QP' will have thousands and thousands of instances on a
+> > system.
+> > 
+> > Most likely I think mapping 1:1 a virtio queue to a 'RDMA QP, CQ, SRQ,
+> > etc' is a bad idea...
+> 
+> We have three options, no virtqueue for QP, 1 to 1 or multiplexing. What
+> would be your vote on that?
+> I think you are for option #1, right? but in this case there is actually no
+> use of having a virtio-driver, isn't it?
 
-On 5/7/19 1:36 PM, Max Reitz wrote:
-> --fork is a bit boring if there is no way to get the child's PID.  This=
+The virtio driver is supposed to be a standard, like a hardware
+standard, for doing the operation.
 
-> option helps.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  qemu-nbd.c    | 29 +++++++++++++++++++++++++++++
->  qemu-nbd.texi |  2 ++
->  2 files changed, 31 insertions(+)
->=20
+It doesn't mean that every single element under the driver needs to
+use the virtio format QP.
 
-> @@ -111,6 +112,7 @@ static void usage(const char *name)
->  "                            specify tracing options\n"
->  "  --fork                    fork off the server process and exit the =
-parent\n"
->  "                            once the server is running\n"
-> +"  --pid-file=3DPATH           store the server's process ID in the gi=
-ven file\n"
-
-Should --pid-file imply --fork, or be an error if --fork was not
-supplied? As coded, it writes a pid file regardless of --fork, even
-though it is less obvious that it is useful in that case. I don't have a
-strong preference (there doesn't seem to be a useful consensus on what
-forking daemons should do), but it would at least be worth documenting
-the intended action (even if that implies a tweak to the patch to match
-the intent).
-
->  #if HAVE_NBD_DEVICE
->  "\n"
->  "Kernel NBD client support:\n"
-> @@ -651,6 +653,7 @@ int main(int argc, char **argv)
->          { "image-opts", no_argument, NULL, QEMU_NBD_OPT_IMAGE_OPTS },
->          { "trace", required_argument, NULL, 'T' },
->          { "fork", no_argument, NULL, QEMU_NBD_OPT_FORK },
-> +        { "pid-file", required_argument, NULL, QEMU_NBD_OPT_PID_FILE }=
-,
->          { NULL, 0, NULL, 0 }
->      };
->      int ch;
-> @@ -677,6 +680,8 @@ int main(int argc, char **argv)
->      bool list =3D false;
->      int old_stderr =3D -1;
->      unsigned socket_activation;
-> +    const char *pid_path =3D NULL;
-
-Bikeshedding: pid_name is nicer (path makes me think of $PATH and other
-colon-separated lists, which this is not).
-
-Otherwise, I agree that this is long overdue. Thanks! If you can justify
-the behavior without --fork,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---yNCNUvkxu4ZbUOYKhYTeLqEpfnBS5KmS1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzR3OgACgkQp6FrSiUn
-Q2rwbgf+J+GZR2N9nQzmO3d+82FByTnQtmhXwpraZPBd5rT+cZBeEvm2nVWs3k3X
-H48X5wkocz6Rc+1ySRAhtdg005Ak530F8bGR2IccgMw7PiWmubsab3mIGlsWA8JN
-nX3u+exgq4CBlzjTqXO4wq89mh0bpVzjdFTEpiUNmPiGt8kh6nRPzA2zRMF4ZFp3
-784OK+3i0pRsZ9oXDSr8THd/GV8AjAX/AWP0MrCpyHkZSLW4Q1cipub0Mbys3N0P
-dYvvzNBAED8RkwbdcBjVXoX8e3hW5vGiG5N1qP/RY2UE7vdLz28iEDkqtA/sP7IM
-ho69ae95qivw8DGeg6Grf/q8e6uuEA==
-=9/Aj
------END PGP SIGNATURE-----
-
---yNCNUvkxu4ZbUOYKhYTeLqEpfnBS5KmS1--
+Jason
 
