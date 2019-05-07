@@ -2,62 +2,63 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C82EAC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 06:31:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C6F7C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 06:31:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81FA9206A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 06:31:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1745A206A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 06:31:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="m3/sihIB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81FA9206A3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="bEETd27Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1745A206A3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40859 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40863 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNtdC-00078Q-O2
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 02:31:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37810)
+	id 1hNtda-0007Uh-8X
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 02:31:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hNtVq-0000sN-Rr
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 02:23:40 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hNtVs-0000vX-Uu
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 02:23:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hNtVn-0002jj-6t
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 02:23:36 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:58215)
+	(envelope-from <dgibson@ozlabs.org>) id 1hNtVr-0002nF-0J
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 02:23:40 -0400
+Received: from ozlabs.org ([203.11.71.1]:37175)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hNtVl-0002eZ-8g; Tue, 07 May 2019 02:23:34 -0400
+	id 1hNtVo-0002iM-V3; Tue, 07 May 2019 02:23:38 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 44yqL32fl6z9sNl; Tue,  7 May 2019 16:23:22 +1000 (AEST)
+	id 44yqL35N1Wz9sNT; Tue,  7 May 2019 16:23:22 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
 	d=gibson.dropbear.id.au; s=201602; t=1557210203;
-	bh=iXRbtKnEi4KD2zFvx3pS7UHijBpaA9oyb90cQ+3y1pQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=m3/sihIBbaqHFWeWZ+MugZfGraomuInVe9zfcctpWQwU9yqZQAc0yT675pef+XOiJ
-	NOlwmgh8mf5gJPLCL+jKZakPeKAieUS+RuChPRI0vhWhfPDULocclrslQJKz7CqPJ8
-	xOTTm9DCjywM2kZnPGuGZdIs3FqZNiH/ulR7QGBI=
+	bh=ohFGequI5YLEF6PFqtIqds6MwpxK33C0I2m+sA2JVGo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bEETd27Zu0YhgNPmOTU99Ce/vE6JhvQC1C3/f1JDA2cL/bOLVy1o68oJ7EEof/tdl
+	YwNccHrdBMGwk6dtKy+F4Ay8v6lPlNA3c3czhSNQfkBgLTCM8wqXitw2WlFfboB4fX
+	4Nbv9fqRRhEDjei7avFf21hJQ+wZHcu/Il54UG0A=
+Date: Tue, 7 May 2019 15:30:31 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: qemu-devel@nongnu.org,
-	mst@redhat.com
-Date: Tue,  7 May 2019 16:23:15 +1000
-Message-Id: <20190507062316.20916-5-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190507062316.20916-1-david@gibson.dropbear.id.au>
-References: <20190507062316.20916-1-david@gibson.dropbear.id.au>
+To: Anton Blanchard <anton@ozlabs.org>
+Message-ID: <20190507053031.GL7073@umbus.fritz.box>
+References: <20190507004811.29968-1-anton@ozlabs.org>
+	<20190507004811.29968-7-anton@ozlabs.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PATCH v3 4/5] pci: Make is_bridge a bool
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="yQDbd2FCF2Yhw41T"
+Content-Disposition: inline
+In-Reply-To: <20190507004811.29968-7-anton@ozlabs.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH 7/9] target/ppc: Fix vrlwmi and vrlwnm
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,172 +70,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@ozlabs.ru, qemu-ppc@nongnu.org,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	David Gibson <david@gibson.dropbear.id.au>
+Cc: ego@linux.vnet.ibm.com, sandipandas1990@gmail.com,
+	mark.cave-ayland@ilande.co.uk, richard.henderson@linaro.org,
+	qemu-devel@nongnu.org, f4bug@amsat.org, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The is_bridge field in PCIDevice acts as a bool, but is declared as an in=
-t.
-Declare it as a bool for clarity, and change everything that writes it to
-use true/false instead of 0/1 to match.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/pci-bridge/dec.c                | 4 ++--
- hw/pci-bridge/i82801b11.c          | 2 +-
- hw/pci-bridge/pci_bridge_dev.c     | 2 +-
- hw/pci-bridge/pcie_pci_bridge.c    | 2 +-
- hw/pci-bridge/pcie_root_port.c     | 2 +-
- hw/pci-bridge/simba.c              | 2 +-
- hw/pci-bridge/xio3130_downstream.c | 2 +-
- hw/pci-bridge/xio3130_upstream.c   | 2 +-
- include/hw/pci/pci.h               | 2 +-
- 9 files changed, 10 insertions(+), 10 deletions(-)
+--yQDbd2FCF2Yhw41T
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
-index 8484bfd434..ca40253730 100644
---- a/hw/pci-bridge/dec.c
-+++ b/hw/pci-bridge/dec.c
-@@ -68,7 +68,7 @@ static void dec_21154_pci_bridge_class_init(ObjectClass=
- *klass, void *data)
-     k->vendor_id =3D PCI_VENDOR_ID_DEC;
-     k->device_id =3D PCI_DEVICE_ID_DEC_21154;
-     k->config_write =3D pci_bridge_write_config;
--    k->is_bridge =3D 1;
-+    k->is_bridge =3D true;
-     dc->desc =3D "DEC 21154 PCI-PCI bridge";
-     dc->reset =3D pci_bridge_reset;
-     dc->vmsd =3D &vmstate_pci_device;
-@@ -129,7 +129,7 @@ static void dec_21154_pci_host_class_init(ObjectClass=
- *klass, void *data)
-     k->device_id =3D PCI_DEVICE_ID_DEC_21154;
-     k->revision =3D 0x02;
-     k->class_id =3D PCI_CLASS_BRIDGE_PCI;
--    k->is_bridge =3D 1;
-+    k->is_bridge =3D true;
-     /*
-      * PCI-facing part of the host bridge, not usable without the
-      * host-facing part, which can't be device_add'ed, yet.
-diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
-index 10e590e5c6..6d8b0f54a7 100644
---- a/hw/pci-bridge/i82801b11.c
-+++ b/hw/pci-bridge/i82801b11.c
-@@ -90,7 +90,7 @@ static void i82801b11_bridge_class_init(ObjectClass *kl=
-ass, void *data)
-     PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-=20
--    k->is_bridge =3D 1;
-+    k->is_bridge =3D true;
-     k->vendor_id =3D PCI_VENDOR_ID_INTEL;
-     k->device_id =3D PCI_DEVICE_ID_INTEL_82801BA_11;
-     k->revision =3D ICH9_D2P_A2_REVISION;
-diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_de=
-v.c
-index ff6b8323da..c56ed1f52f 100644
---- a/hw/pci-bridge/pci_bridge_dev.c
-+++ b/hw/pci-bridge/pci_bridge_dev.c
-@@ -253,7 +253,7 @@ static void pci_bridge_dev_class_init(ObjectClass *kl=
-ass, void *data)
-     k->vendor_id =3D PCI_VENDOR_ID_REDHAT;
-     k->device_id =3D PCI_DEVICE_ID_REDHAT_BRIDGE;
-     k->class_id =3D PCI_CLASS_BRIDGE_PCI;
--    k->is_bridge =3D 1,
-+    k->is_bridge =3D true;
-     dc->desc =3D "Standard PCI Bridge";
-     dc->reset =3D qdev_pci_bridge_dev_reset;
-     dc->props =3D pci_bridge_dev_properties;
-diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bri=
-dge.c
-index d491b40d04..9a4fba413a 100644
---- a/hw/pci-bridge/pcie_pci_bridge.c
-+++ b/hw/pci-bridge/pcie_pci_bridge.c
-@@ -143,7 +143,7 @@ static void pcie_pci_bridge_class_init(ObjectClass *k=
-lass, void *data)
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     HotplugHandlerClass *hc =3D HOTPLUG_HANDLER_CLASS(klass);
-=20
--    k->is_bridge =3D 1;
-+    k->is_bridge =3D true;
-     k->vendor_id =3D PCI_VENDOR_ID_REDHAT;
-     k->device_id =3D PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
-     k->realize =3D pcie_pci_bridge_realize;
-diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_por=
-t.c
-index e94d918b6d..be3f4d5e03 100644
---- a/hw/pci-bridge/pcie_root_port.c
-+++ b/hw/pci-bridge/pcie_root_port.c
-@@ -162,7 +162,7 @@ static void rp_class_init(ObjectClass *klass, void *d=
-ata)
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
-=20
--    k->is_bridge =3D 1;
-+    k->is_bridge =3D true;
-     k->config_write =3D rp_write_config;
-     k->realize =3D rp_realize;
-     k->exit =3D rp_exit;
-diff --git a/hw/pci-bridge/simba.c b/hw/pci-bridge/simba.c
-index dea4c8c5e7..7cf0d6e047 100644
---- a/hw/pci-bridge/simba.c
-+++ b/hw/pci-bridge/simba.c
-@@ -76,7 +76,7 @@ static void simba_pci_bridge_class_init(ObjectClass *kl=
-ass, void *data)
-     k->device_id =3D PCI_DEVICE_ID_SUN_SIMBA;
-     k->revision =3D 0x11;
-     k->config_write =3D pci_bridge_write_config;
--    k->is_bridge =3D 1;
-+    k->is_bridge =3D true;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     dc->reset =3D pci_bridge_reset;
-     dc->vmsd =3D &vmstate_pci_device;
-diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_d=
-ownstream.c
-index 467bbabe4c..ab2a51e15d 100644
---- a/hw/pci-bridge/xio3130_downstream.c
-+++ b/hw/pci-bridge/xio3130_downstream.c
-@@ -152,7 +152,7 @@ static void xio3130_downstream_class_init(ObjectClass=
- *klass, void *data)
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
-=20
--    k->is_bridge =3D 1;
-+    k->is_bridge =3D true;
-     k->config_write =3D xio3130_downstream_write_config;
-     k->realize =3D xio3130_downstream_realize;
-     k->exit =3D xio3130_downstream_exitfn;
-diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_ups=
-tream.c
-index b524908cf1..1d41a49ab0 100644
---- a/hw/pci-bridge/xio3130_upstream.c
-+++ b/hw/pci-bridge/xio3130_upstream.c
-@@ -126,7 +126,7 @@ static void xio3130_upstream_class_init(ObjectClass *=
-klass, void *data)
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
-=20
--    k->is_bridge =3D 1;
-+    k->is_bridge =3D true;
-     k->config_write =3D xio3130_upstream_write_config;
-     k->realize =3D xio3130_upstream_realize;
-     k->exit =3D xio3130_upstream_exitfn;
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index da20c915ef..d082707dfa 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -234,7 +234,7 @@ typedef struct PCIDeviceClass {
-      * This doesn't mean pci host switch.
-      * When card bus bridge is supported, this would be enhanced.
-      */
--    int is_bridge;
-+    bool is_bridge;
-=20
-     /* rom bar */
-     const char *romfile;
+On Tue, May 07, 2019 at 10:48:09AM +1000, Anton Blanchard wrote:
+> We should only look at 5 bits of each byte, not 6.
+>=20
+> Fixes: 3e00884f4e9f ("target-ppc: add vrldnmi and vrlwmi instructions")
+> Signed-off-by: Anton Blanchard <anton@ozlabs.org>
+
+Hrm.  So, what lives in those extra bits in the 'w' instructions?  Is
+ignoring it correct?  Should we throw an exception?  Does it mean
+something else?
+
+> ---
+>  target/ppc/int_helper.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+> index fd715b4076..111586c981 100644
+> --- a/target/ppc/int_helper.c
+> +++ b/target/ppc/int_helper.c
+> @@ -1652,7 +1652,7 @@ void helper_vrsqrtefp(CPUPPCState *env, ppc_avr_t *=
+r, ppc_avr_t *b)
+>      }
+>  }
+> =20
+> -#define VRLMI(name, size, element, insert)                            \
+> +#define VRLMI(name, size, element, insert, modifier_bits)             \
+>  void helper_##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)          \
+>  {                                                                     \
+>      int i;                                                            \
+> @@ -1662,9 +1662,9 @@ void helper_##name(ppc_avr_t *r, ppc_avr_t *a, ppc_=
+avr_t *b)          \
+>          uint##size##_t src3 =3D r->element[i];                          \
+>          uint##size##_t begin, end, shift, mask, rot_val;              \
+>                                                                        \
+> -        shift =3D extract##size(src2, 0, 6);                            \
+> -        end   =3D extract##size(src2, 8, 6);                            \
+> -        begin =3D extract##size(src2, 16, 6);                           \
+> +        shift =3D extract##size(src2, 0, modifier_bits);                \
+> +        end   =3D extract##size(src2, 8, modifier_bits);                \
+> +        begin =3D extract##size(src2, 16, modifier_bits);               \
+>          rot_val =3D rol##size(src1, shift);                             \
+>          mask =3D mask_u##size(begin, end);                              \
+>          if (insert) {                                                 \
+> @@ -1675,10 +1675,10 @@ void helper_##name(ppc_avr_t *r, ppc_avr_t *a, pp=
+c_avr_t *b)          \
+>      }                                                                 \
+>  }
+> =20
+> -VRLMI(vrldmi, 64, u64, 1);
+> -VRLMI(vrlwmi, 32, u32, 1);
+> -VRLMI(vrldnm, 64, u64, 0);
+> -VRLMI(vrlwnm, 32, u32, 0);
+> +VRLMI(vrldmi, 64, u64, 1, 6);
+> +VRLMI(vrlwmi, 32, u32, 1, 5);
+> +VRLMI(vrldnm, 64, u64, 0, 6);
+> +VRLMI(vrlwnm, 32, u32, 0, 5);
+> =20
+>  void helper_vsel(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t=
+ *b,
+>                   ppc_avr_t *c)
+
 --=20
-2.21.0
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--yQDbd2FCF2Yhw41T
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzRF/cACgkQbDjKyiDZ
+s5JMVA/6AqocD2iWrzbOWuAKlIdQ8DTiKsjbHyNuAwLivgaMc0CrWOl6eTu3Tn3M
+Qxwal7bQDsgwnJO8lzXn6JprS703Q6A/59p4VkTXgdZ3pTOYT5+69f/mu6SHLBXD
+lk5nJNDNQ28zyAwWj5F3gFvzygAmoEua5aaHZvpro6Qrz1c+PTKGXXBBpGAcixTL
+4kisX6OVMGbe196gubMlQi8riM1fDQT2XjWIF0HsUcGiJFSiVtPUqEgRWRzD99nD
+eLWVdeCM70mb1dJeLQU8RP8b5B9M4+Y80QG+Nq/jOpKFCgOR+upJEh8LXBqCftqg
+YT21427xc2wbKTHGRlKxE2g20NiKhu2tCzoUKqe2XldhTXqUkgMbRzjrsJnA3yg5
+EKeUOc6FHqkvFtbFPZHob2m3kvP1OJdjVcBpC+9EuvyvzexpoGLUpLKDx2OQmzB2
+6xFmeGJF5viqHDPePp3zZYnKdAMSR++BdtOzYIiB2saSrKsrUyIAhbzXIVYGZ0Vl
+gWY5vSiK2p3s78qkX9k049TwB7aAGOyxWzoHRsy9OYX/sNEFo4GkCthiKBOF3mPZ
+ozlIXKOCiRHYuMqMvTXGB38kwJ6/TpUM3gVWCEDn/eX+wD7kkz9+5s2DRfSdwqAv
+NJtdKOdPmykdJpTWZaOUklRp/y/aGaRsrhHR6IkVUA1mMp8THW4=
+=xlhX
+-----END PGP SIGNATURE-----
+
+--yQDbd2FCF2Yhw41T--
 
