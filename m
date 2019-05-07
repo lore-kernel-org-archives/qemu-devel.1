@@ -2,53 +2,48 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BFD9C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 10:15:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE133C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 10:16:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0726C205ED
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 10:15:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0726C205ED
+	by mail.kernel.org (Postfix) with ESMTPS id BD877205ED
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 10:16:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD877205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43804 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43852 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNx7j-0002s2-8M
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 06:14:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54011)
+	id 1hNx99-00048M-3n
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 06:16:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNx6l-0002Lg-RX
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 06:14:00 -0400
+	(envelope-from <thuth@redhat.com>) id 1hNx84-0003As-3L
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 06:15:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNx6k-0003Yf-U6
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 06:13:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50216)
+	(envelope-from <thuth@redhat.com>) id 1hNx83-00040W-7h
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 06:15:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42864)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hNx6i-0003Xv-7e; Tue, 07 May 2019 06:13:56 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hNx82-0003zf-WE
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 06:15:19 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 773EA88305;
-	Tue,  7 May 2019 10:13:55 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E0813307D91F;
+	Tue,  7 May 2019 10:15:17 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-130.ams2.redhat.com [10.36.116.130])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9A2DA5D9D1;
-	Tue,  7 May 2019 10:13:44 +0000 (UTC)
-To: Gerd Hoffmann <kraxel@redhat.com>
-References: <20190424103747.10173-1-thuth@redhat.com>
-	<20190424103747.10173-5-thuth@redhat.com>
-	<f9dc291b-7ba2-c6b8-33aa-c8fa3c6d4950@redhat.com>
-	<0300c8cc-d73c-b919-13f7-59f3218a609f@redhat.com>
-	<13ecf357-d43c-ecc6-012e-bed62008677d@redhat.com>
-	<c6080cb1-b48f-028f-e774-ca0e7b94369d@redhat.com>
-	<20190507083218.lrjuab4gp5bexf3e@sirius.home.kraxel.org>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 08ACA10027BD;
+	Tue,  7 May 2019 10:15:16 +0000 (UTC)
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+References: <155721868351.451636.16735088470797960209.stgit@bahia.lan>
+	<155721868932.451636.17837774103334071645.stgit@bahia.lan>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -94,23 +89,22 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <7f5db89e-53f5-166f-df15-e21c3fbe8d40@redhat.com>
-Date: Tue, 7 May 2019 12:13:43 +0200
+Message-ID: <a5f65374-a683-1a0f-76c0-fe0e2150b6de@redhat.com>
+Date: Tue, 7 May 2019 12:15:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190507083218.lrjuab4gp5bexf3e@sirius.home.kraxel.org>
+In-Reply-To: <155721868932.451636.17837774103334071645.stgit@bahia.lan>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Tue, 07 May 2019 10:13:55 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.48]);
+	Tue, 07 May 2019 10:15:17 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Update *BSD images with gnu-sed and bash (was:
- [PATCH 4/6] cirrus / travis: Add gnu-sed and bash for macOS and FreeBSD)
+Subject: Re: [Qemu-devel] [PATCH 1/6] fsdev: Drop unused extern declaration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -122,56 +116,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
-	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Kamil Rytarowski <kamil@netbsd.org>,
-	Laszlo Ersek <lersek@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>,
-	Brad Smith <brad@comstyle.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/05/2019 10.32, Gerd Hoffmann wrote:
->>>> D'oh! Does anybody know what are the correct steps to update these images?
->>>
->>> (1) make the OPENBSD subsystem maintainer care
->>>
->>> (2) update <https://wiki.qemu.org/Hosts/BSD>
->>>
->>> (3) download the image from download.patchew.org, boot it and update it
->>>
->>> (4) upload the image to download.patchew.org
->>>
->>> (5) update the "tests/vm/openbsd" script in the QEMU tree in sync
->>> (checksums, commands etc)
->>
->>  Ed, Li-Wen,
->>
->> any chance you could help with updating the FreeBSD image and the
->> tests/vm/freebsd script, so that we get more test covarage here?
->>
->>  Kamil,
->>
->> could you maybe help with the NetBSD image and the tests/vm/netbsd script?
->>
->>  Brad,
->>
->> could you please help with the OpenBSD image and the tests/vm/openbsd
->> script?
->>
->> I think it would also be good to update the images to the latest
->> released versions, too...
+On 07/05/2019 10.44, Greg Kurz wrote:
+> This is a leftover of the handle backend, removed in QEMU 4.0.
 > 
-> FYI:  I'm working on revamping the tests/vm setup, creating the images
-> scripted on the developer machine.  That'll take download.patchew.org
-> out of the loop and makes adding packages as easy as patching a docker
-> script.
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  fsdev/qemu-fsdev.h |    1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/fsdev/qemu-fsdev.h b/fsdev/qemu-fsdev.h
+> index d9716b414492..844159d1e1ff 100644
+> --- a/fsdev/qemu-fsdev.h
+> +++ b/fsdev/qemu-fsdev.h
+> @@ -41,7 +41,6 @@ typedef struct FsDriverListEntry {
+>  int qemu_fsdev_add(QemuOpts *opts, Error **errp);
+>  FsDriverEntry *get_fsdev_fsentry(char *id);
+>  extern FileOperations local_ops;
+> -extern FileOperations handle_ops;
+>  extern FileOperations synth_ops;
+>  extern FileOperations proxy_ops;
+>  #endif
+> 
 
-Cool, that sounds like the best solution, indeed!
-
- Thanks,
-  Thomas
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
