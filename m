@@ -2,88 +2,59 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D11AC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 12:14:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0307AC004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 12:17:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67CC0205ED
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 12:14:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ypd5zaHX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67CC0205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8A7B620825
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 12:16:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A7B620825
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kent.ac.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45803 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45902 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNyz4-0001hi-Mc
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 08:14:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45003)
+	id 1hNz1m-0004Bs-8J
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 08:16:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hNym0-0007lU-Ts
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:00:41 -0400
+	(envelope-from <S.E.Harris@kent.ac.uk>) id 1hNyv0-0006e8-1N
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:09:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hNylw-000421-2Q
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:00:40 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36306)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hNylv-0003zU-Rk
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:00:35 -0400
-Received: by mail-wr1-x441.google.com with SMTP id o4so21968493wra.3
-	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 05:00:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-	:content-transfer-encoding;
-	bh=NJGpq0OAxWQIci6soRm4qOcyKSMv9zMfLaUKqYHLGrI=;
-	b=Ypd5zaHXyixCR2IeX22+kB9GhGgdLbrfh6rcHXqq+F3VvQUBgbgtj3P9t0BMzXIL4O
-	hkfjU/Pofb4HQ/q9iSwVAYFaubCVLdTtDZGsNdZTU3R9SCVGEQLjYgtmh/EUK1hii2Rn
-	EASGtiiq+pg9l7GkSMHofX2S6q4vO5T6uptvTTBzvE/ez/5t+poKJqu6Gp4EfK/YIjPK
-	64R7c0idan28rcrhTSMdkF2hu56OChC6hkvKqrWEHVmfVgcThKJ87CzJyvudbsSWcfRk
-	oKQqZaUWoMr0iRIPYdVJPHdxujK/7Q8wnADogHdykKfWsj9DqtPr4uxSM1inReIO3B9/
-	KC8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=NJGpq0OAxWQIci6soRm4qOcyKSMv9zMfLaUKqYHLGrI=;
-	b=CxaYG+HVSrnwvTDvVd0zAclA7P/uBzIE1xoWPxvGuEDcuCngvTr/A1s4LKu2MRkqg1
-	y+DktePzSww2JPVQD69oKzuXVJXcY9xoDEr0PeFwePI9A9UUN1/CGfjsuXa8GhZWbpZ/
-	kcGFMzUJDB9HrwhpliIlgKsMp47+02ASILt47SZt4nEE1cwNZPLZWm3y0p34VN4thS2j
-	3DJj6vF2nVsLm8G0kuKM3vNk6r/N1botYwkT8QOwNKAHQyUKYSsai3rOVM4dK2UTiKHP
-	MJH0YFq9BnxjU65MFgp/GYR33XxDG75rhUWCw92h+p3kgiD8IaxslYdPTUG/D+bDMaeV
-	GjNw==
-X-Gm-Message-State: APjAAAUXC2Ws0UbZaY/iKaOVOq/RfUS0H+HKmcrI+fqNfjVC8sAfQv8L
-	zrz8OYxx2CHABezgfPF2vF2fm0AREBs=
-X-Google-Smtp-Source: APXvYqybl6SF3JrzwEkmHIQOuE2l6ycYLBvL+8bELV8Ei78lSrB6ZZugW5Gl94w/lk91P2tOIZyneQ==
-X-Received: by 2002:a5d:6a47:: with SMTP id t7mr21326158wrw.307.1557230434760; 
-	Tue, 07 May 2019 05:00:34 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id g3sm12348596wmf.9.2019.05.07.05.00.33
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 07 May 2019 05:00:33 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Tue,  7 May 2019 13:00:11 +0100
-Message-Id: <20190507120011.18100-16-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190507120011.18100-1-peter.maydell@linaro.org>
-References: <20190507120011.18100-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PULL 15/15] target/arm: Stop using variable length
- array in dc_zva
+	(envelope-from <S.E.Harris@kent.ac.uk>) id 1hNyuz-0001ZE-5u
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:09:58 -0400
+Received: from mx0.kent.ac.uk ([129.12.21.32]:39952)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <S.E.Harris@kent.ac.uk>)
+	id 1hNyuy-0001VL-Vi
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:09:57 -0400
+Received: from edue375.kent.ac.uk ([129.12.227.117] helo=cadance)
+	by mx0.kent.ac.uk with esmtpsa
+	(TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256) (Exim 4.91)
+	(envelope-from <S.E.Harris@kent.ac.uk>)
+	id 1hNyuu-000IVk-Oo; Tue, 07 May 2019 13:09:52 +0100
+Date: Tue, 7 May 2019 13:10:44 +0100
+From: Sarah Harris <S.E.Harris@kent.ac.uk>
+To: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190507131044.132119028123a748e4278add@kent.ac.uk>
+In-Reply-To: <CAK4993h0yCqpjBFzPy7GHt3kbSK43nLD6EXh4WFd_STHu15DTA@mail.gmail.com>
+References: <20190504083638.13380-1-S.E.Harris@kent.ac.uk>
+	<20190504083638.13380-9-S.E.Harris@kent.ac.uk>
+	<c05b4876-c55e-fd82-46d0-83be1b128cee@linaro.org>
+	<CAK4993h0yCqpjBFzPy7GHt3kbSK43nLD6EXh4WFd_STHu15DTA@mail.gmail.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.32; x86_64-unknown-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 129.12.21.32
+Subject: Re: [Qemu-devel] [PATCH v1 8/8] target/avr: Register AVR support
+ with the rest of QEMU, the build system, and the MAINTAINERS file
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,56 +66,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: E.J.C.Robbins@kent.ac.uk, Sarah Harris <S.E.Harris@kent.ac.uk>,
+	Michael Rolnik <mrolnik@gmail.com>,
+	QEMU Developers <qemu-devel@nongnu.org>, A.M.King@kent.ac.uk
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently the dc_zva helper function uses a variable length
-array. In fact we know (as the comment above remarks) that
-the length of this array is bounded because the architecture
-limits the block size and QEMU limits the target page size.
-Use a fixed array size and assert that we don't run off it.
+Hi Richard,
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20190503120448.13385-1-peter.maydell@linaro.org
----
- target/arm/helper.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+I've raised this with my colleagues, we'll discuss tomorrow whether we have the funding and person resources to provide maintenance and get back to you.
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index b9745a42bab..1e6eb0d0f36 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -1,4 +1,5 @@
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "target/arm/idau.h"
- #include "trace.h"
- #include "cpu.h"
-@@ -13130,14 +13131,17 @@ void HELPER(dc_zva)(CPUARMState *env, uint64_t vaddr_in)
-          * We know that in fact for any v8 CPU the page size is at least 4K
-          * and the block size must be 2K or less, but TARGET_PAGE_SIZE is only
-          * 1K as an artefact of legacy v5 subpage support being present in the
--         * same QEMU executable.
-+         * same QEMU executable. So in practice the hostaddr[] array has
-+         * two entries, given the current setting of TARGET_PAGE_BITS_MIN.
-          */
-         int maxidx = DIV_ROUND_UP(blocklen, TARGET_PAGE_SIZE);
--        void *hostaddr[maxidx];
-+        void *hostaddr[DIV_ROUND_UP(2 * KiB, 1 << TARGET_PAGE_BITS_MIN)];
-         int try, i;
-         unsigned mmu_idx = cpu_mmu_index(env, false);
-         TCGMemOpIdx oi = make_memop_idx(MO_UB, mmu_idx);
- 
-+        assert(maxidx <= ARRAY_SIZE(hostaddr));
-+
-         for (try = 0; try < 2; try++) {
- 
-             for (i = 0; i < maxidx; i++) {
--- 
-2.20.1
+I've noted the issues you and Eric raised, I'll wait until I know where things are going before I look at fixing them.
 
+Kind regards,
+Sarah Harris
+
+On Sun, 5 May 2019 09:10:00 -0700
+Michael Rolnik <mrolnik@gmail.com> wrote:
+
+> Hi Richard.
+> 
+> I can maintain it
+> 
+> Sent from my cell phone, please ignore typos
+> 
+> On Sun, May 5, 2019, 8:57 AM Richard Henderson <richard.henderson@linaro.org>
+> wrote:
+> 
+> > On 5/4/19 1:36 AM, Sarah Harris wrote:
+> > > Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+> > ...
+> > >
+> > > +AVR
+> > > +M: Michael Rolnik <mrolnik@gmail.com>
+> > > +S: Odd Fixes
+> > > +F: target-avr/
+> > > +F: hw/avr/
+> > > +
+> >
+> > This is not how things work.  Michael wasn't up to maintaining the code 2
+> > years
+> > ago; that's why it was never committed.
+> >
+> > You would need to maintain this yourself, and for more than "Odd Fixes".
+> >
+> >
+> > r~
+> >
 
