@@ -3,60 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,LOTS_OF_MONEY,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 682C4C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:23:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AC38C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:23:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DD6C20578
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:23:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DD6C20578
+	by mail.kernel.org (Postfix) with ESMTPS id 3166F20578
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:23:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3166F20578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48516 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48519 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO1vr-0002wT-9a
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 11:23:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58237)
+	id 1hO1wA-0003Gp-E7
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 11:23:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hO1ra-0007vu-FC
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:18:39 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hO1rg-00082l-Jq
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:18:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hO1rZ-0003yF-CL
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:18:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41054)
+	(envelope-from <mreitz@redhat.com>) id 1hO1rf-00041t-0r
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:18:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54028)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hO1rW-0003tf-Kd; Tue, 07 May 2019 11:18:34 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	id 1hO1rb-0003zS-HZ; Tue, 07 May 2019 11:18:39 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EA96A89C35;
-	Tue,  7 May 2019 15:18:33 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D86CB307D863;
+	Tue,  7 May 2019 15:18:38 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.217])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8149357DE5;
-	Tue,  7 May 2019 15:18:33 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F6955D9D1;
+	Tue,  7 May 2019 15:18:38 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Tue,  7 May 2019 17:18:13 +0200
-Message-Id: <20190507151819.17401-6-mreitz@redhat.com>
+Date: Tue,  7 May 2019 17:18:15 +0200
+Message-Id: <20190507151819.17401-8-mreitz@redhat.com>
 In-Reply-To: <20190507151819.17401-1-mreitz@redhat.com>
 References: <20190507151819.17401-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Tue, 07 May 2019 15:18:33 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.48]);
+	Tue, 07 May 2019 15:18:38 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 05/11] qcow2-refcount: don't mask corruptions
- under internal errors
+Subject: [Qemu-devel] [PULL 07/11] block/ssh: Implement
+ .bdrv_refresh_filename()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,148 +74,278 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+This requires some changes to keep iotests 104 and 207 working.
 
-No reasons for not reporting found corruptions as corruptions in case
-of some internal errors, especially in case of just failed to fix l2
-entry (and in this case, missed corruptions may influence comparing
-logic, when we calculate difference between corruptions fields of two
-results)
+qemu-img info in 104 will now return a filename including the user name
+and the port, which need to be filtered by adjusting REMOTE_TEST_DIR in
+common.rc.  This additional information has to be marked optional,
+however (which is simple as REMOTE_TEST_DIR is a regex), because
+otherwise 197 and 215 would fail: They use it (indirectly) to filter
+qemu-img create output which contains a backing filename they have
+passed to it -- which probably does not contain a user name or port
+number.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190227131433.197063-6-vsementsov@virtuozzo.com
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+The problem in 207 is a nice one to have: qemu-img info used to return
+json:{} filenames, but with this patch it returns nice plain ones.  We
+now need to adjust the filtering to hide the user name (and port number
+while we are at it).  The simplest way to do this is to include both in
+iotests.remote_filename() so that bdrv_refresh_filename() will not
+change it, and then iotests.img_info_log() will filter it correctly
+automatically.
+
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Tested-by: Richard W.M. Jones <rjones@redhat.com>
+Message-id: 20190225190828.17726-2-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-refcount.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+ block/ssh.c                   | 52 +++++++++++++++++++++++++++++++----
+ tests/qemu-iotests/207        | 10 +++----
+ tests/qemu-iotests/207.out    | 10 +++----
+ tests/qemu-iotests/common.rc  |  2 +-
+ tests/qemu-iotests/iotests.py |  2 +-
+ 5 files changed, 59 insertions(+), 17 deletions(-)
 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 6851807ffc..fa7ac1f7cb 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1662,6 +1662,8 @@ static int check_refcounts_l2(BlockDriverState *bs,=
- BdrvCheckResult *res,
+diff --git a/block/ssh.c b/block/ssh.c
+index 859249113d..2eaeab84d5 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -75,6 +75,14 @@ typedef struct BDRVSSHState {
 =20
-             /* Correct offsets are cluster aligned */
-             if (offset_into_cluster(s, offset)) {
-+                res->corruptions++;
+     /* Used to warn if 'flush' is not supported. */
+     bool unsafe_flush_warning;
 +
-                 if (qcow2_get_cluster_type(bs, l2_entry) =3D=3D
-                     QCOW2_CLUSTER_ZERO_ALLOC)
-                 {
-@@ -1697,18 +1699,16 @@ static int check_refcounts_l2(BlockDriverState *b=
-s, BdrvCheckResult *res,
-                             /* Do not abort, continue checking the rest =
-of this
-                              * L2 table's entries */
-                         } else {
-+                            res->corruptions--;
-                             res->corruptions_fixed++;
-                             /* Skip marking the cluster as used
-                              * (it is unused now) */
-                             continue;
-                         }
--                    } else {
--                        res->corruptions++;
-                     }
-                 } else {
-                     fprintf(stderr, "ERROR offset=3D%" PRIx64 ": Data cl=
-uster is "
-                         "not properly aligned; L2 entry corrupted.\n", o=
-ffset);
--                    res->corruptions++;
-                 }
-             }
++    /*
++     * Store the user name for ssh_refresh_filename() because the
++     * default depends on the system you are on -- therefore, when we
++     * generate a filename, it should always contain the user name we
++     * are actually using.
++     */
++    char *user;
+ } BDRVSSHState;
 =20
-@@ -1879,6 +1879,7 @@ static int check_oflag_copied(BlockDriverState *bs,=
- BdrvCheckResult *res,
-             continue;
-         }
-         if ((refcount =3D=3D 1) !=3D ((l1_entry & QCOW_OFLAG_COPIED) !=3D=
- 0)) {
-+            res->corruptions++;
-             fprintf(stderr, "%s OFLAG_COPIED L2 cluster: l1_index=3D%d "
-                     "l1_entry=3D%" PRIx64 " refcount=3D%" PRIu64 "\n",
-                     repair ? "Repairing" : "ERROR", i, l1_entry, refcoun=
-t);
-@@ -1891,9 +1892,8 @@ static int check_oflag_copied(BlockDriverState *bs,=
- BdrvCheckResult *res,
-                     res->check_errors++;
-                     goto fail;
-                 }
-+                res->corruptions--;
-                 res->corruptions_fixed++;
--            } else {
--                res->corruptions++;
-             }
-         }
+ static void ssh_state_init(BDRVSSHState *s)
+@@ -87,6 +95,8 @@ static void ssh_state_init(BDRVSSHState *s)
 =20
-@@ -1925,6 +1925,7 @@ static int check_oflag_copied(BlockDriverState *bs,=
- BdrvCheckResult *res,
-                     }
-                 }
-                 if ((refcount =3D=3D 1) !=3D ((l2_entry & QCOW_OFLAG_COP=
-IED) !=3D 0)) {
-+                    res->corruptions++;
-                     fprintf(stderr, "%s OFLAG_COPIED data cluster: "
-                             "l2_entry=3D%" PRIx64 " refcount=3D%" PRIu64=
- "\n",
-                             repair ? "Repairing" : "ERROR", l2_entry, re=
-fcount);
-@@ -1933,8 +1934,6 @@ static int check_oflag_copied(BlockDriverState *bs,=
- BdrvCheckResult *res,
-                                     ? l2_entry |  QCOW_OFLAG_COPIED
-                                     : l2_entry & ~QCOW_OFLAG_COPIED);
-                         l2_dirty++;
--                    } else {
--                        res->corruptions++;
-                     }
-                 }
-             }
-@@ -1959,6 +1958,7 @@ static int check_oflag_copied(BlockDriverState *bs,=
- BdrvCheckResult *res,
-                 res->check_errors++;
-                 goto fail;
-             }
-+            res->corruptions -=3D l2_dirty;
-             res->corruptions_fixed +=3D l2_dirty;
-         }
+ static void ssh_state_free(BDRVSSHState *s)
+ {
++    g_free(s->user);
++
+     if (s->sftp_handle) {
+         libssh2_sftp_close(s->sftp_handle);
      }
-@@ -1997,6 +1997,7 @@ static int check_refblocks(BlockDriverState *bs, Bd=
-rvCheckResult *res,
-         }
+@@ -628,14 +638,13 @@ static int connect_to_ssh(BDRVSSHState *s, Blockdev=
+OptionsSsh *opts,
+                           int ssh_flags, int creat_mode, Error **errp)
+ {
+     int r, ret;
+-    const char *user;
+     long port =3D 0;
 =20
-         if (cluster >=3D *nb_clusters) {
-+            res->corruptions++;
-             fprintf(stderr, "%s refcount block %" PRId64 " is outside im=
-age\n",
-                     fix & BDRV_FIX_ERRORS ? "Repairing" : "ERROR", i);
+     if (opts->has_user) {
+-        user =3D opts->user;
++        s->user =3D g_strdup(opts->user);
+     } else {
+-        user =3D g_get_user_name();
+-        if (!user) {
++        s->user =3D g_strdup(g_get_user_name());
++        if (!s->user) {
+             error_setg_errno(errp, errno, "Can't get user name");
+             ret =3D -errno;
+             goto err;
+@@ -685,7 +694,7 @@ static int connect_to_ssh(BDRVSSHState *s, BlockdevOp=
+tionsSsh *opts,
+     }
 =20
-@@ -2036,6 +2037,7 @@ static int check_refblocks(BlockDriverState *bs, Bd=
-rvCheckResult *res,
-                     goto resize_fail;
-                 }
+     /* Authenticate. */
+-    ret =3D authenticate(s, user, errp);
++    ret =3D authenticate(s, s->user, errp);
+     if (ret < 0) {
+         goto err;
+     }
+@@ -1242,6 +1251,38 @@ static int coroutine_fn ssh_co_truncate(BlockDrive=
+rState *bs, int64_t offset,
+     return ssh_grow_file(s, offset, errp);
+ }
 =20
-+                res->corruptions--;
-                 res->corruptions_fixed++;
-                 ret =3D qcow2_inc_refcounts_imrt(bs, res,
-                                                refcount_table, nb_cluste=
-rs,
-@@ -2049,12 +2051,9 @@ static int check_refblocks(BlockDriverState *bs, B=
-drvCheckResult *res,
-                 continue;
++static void ssh_refresh_filename(BlockDriverState *bs)
++{
++    BDRVSSHState *s =3D bs->opaque;
++    const char *path, *host_key_check;
++    int ret;
++
++    /*
++     * None of these options can be represented in a plain "host:port"
++     * format, so if any was given, we have to abort.
++     */
++    if (s->inet->has_ipv4 || s->inet->has_ipv6 || s->inet->has_to ||
++        s->inet->has_numeric)
++    {
++        return;
++    }
++
++    path =3D qdict_get_try_str(bs->full_open_options, "path");
++    assert(path); /* mandatory option */
++
++    host_key_check =3D qdict_get_try_str(bs->full_open_options, "host_ke=
+y_check");
++
++    ret =3D snprintf(bs->exact_filename, sizeof(bs->exact_filename),
++                   "ssh://%s@%s:%s%s%s%s",
++                   s->user, s->inet->host, s->inet->port, path,
++                   host_key_check ? "?host_key_check=3D" : "",
++                   host_key_check ?: "");
++    if (ret >=3D sizeof(bs->exact_filename)) {
++        /* An overflow makes the filename unusable, so do not report any=
+ */
++        bs->exact_filename[0] =3D '\0';
++    }
++}
++
+ static const char *const ssh_strong_runtime_opts[] =3D {
+     "host",
+     "port",
+@@ -1268,6 +1309,7 @@ static BlockDriver bdrv_ssh =3D {
+     .bdrv_getlength               =3D ssh_getlength,
+     .bdrv_co_truncate             =3D ssh_co_truncate,
+     .bdrv_co_flush_to_disk        =3D ssh_co_flush,
++    .bdrv_refresh_filename        =3D ssh_refresh_filename,
+     .create_opts                  =3D &ssh_create_opts,
+     .strong_runtime_opts          =3D ssh_strong_runtime_opts,
+ };
+diff --git a/tests/qemu-iotests/207 b/tests/qemu-iotests/207
+index dfd3c51bd1..b3816136f7 100755
+--- a/tests/qemu-iotests/207
++++ b/tests/qemu-iotests/207
+@@ -66,7 +66,7 @@ with iotests.FilePath('t.img') as disk_path, \
+                           'size': 4194304 })
+     vm.shutdown()
 =20
- resize_fail:
--                res->corruptions++;
-                 *rebuild =3D true;
-                 fprintf(stderr, "ERROR could not resize image: %s\n",
-                         strerror(-ret));
--            } else {
--                res->corruptions++;
-             }
-             continue;
-         }
+-    iotests.img_info_log(remote_path, filter_path=3Ddisk_path)
++    iotests.img_info_log(remote_path)
+     iotests.log("")
+     iotests.img_info_log(disk_path)
+=20
+@@ -91,7 +91,7 @@ with iotests.FilePath('t.img') as disk_path, \
+                           'size': 8388608 })
+     vm.shutdown()
+=20
+-    iotests.img_info_log(remote_path, filter_path=3Ddisk_path)
++    iotests.img_info_log(remote_path)
+=20
+     vm.launch()
+     blockdev_create(vm, { 'driver': 'ssh',
+@@ -108,7 +108,7 @@ with iotests.FilePath('t.img') as disk_path, \
+                           'size': 4194304 })
+     vm.shutdown()
+=20
+-    iotests.img_info_log(remote_path, filter_path=3Ddisk_path)
++    iotests.img_info_log(remote_path)
+=20
+     md5_key =3D subprocess.check_output(
+         'ssh-keyscan -t rsa 127.0.0.1 2>/dev/null | grep -v "\\^#" | ' +
+@@ -146,7 +146,7 @@ with iotests.FilePath('t.img') as disk_path, \
+                           'size': 8388608 })
+     vm.shutdown()
+=20
+-    iotests.img_info_log(remote_path, filter_path=3Ddisk_path)
++    iotests.img_info_log(remote_path)
+=20
+     sha1_key =3D subprocess.check_output(
+         'ssh-keyscan -t rsa 127.0.0.1 2>/dev/null | grep -v "\\^#" | ' +
+@@ -184,7 +184,7 @@ with iotests.FilePath('t.img') as disk_path, \
+                           'size': 4194304 })
+     vm.shutdown()
+=20
+-    iotests.img_info_log(remote_path, filter_path=3Ddisk_path)
++    iotests.img_info_log(remote_path)
+=20
+     #
+     # Invalid path and user
+diff --git a/tests/qemu-iotests/207.out b/tests/qemu-iotests/207.out
+index 979d5cf745..ec9823793a 100644
+--- a/tests/qemu-iotests/207.out
++++ b/tests/qemu-iotests/207.out
+@@ -5,7 +5,7 @@
+ {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+ {"return": {}}
+=20
+-image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "s=
+erver.port": "22", "driver": "ssh", "path": "TEST_IMG"}}
++image: TEST_IMG
+ file format: IMGFMT
+ virtual size: 4 MiB (4194304 bytes)
+=20
+@@ -21,7 +21,7 @@ virtual size: 4 MiB (4194304 bytes)
+ {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+ {"return": {}}
+=20
+-image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "s=
+erver.port": "22", "driver": "ssh", "path": "TEST_IMG"}}
++image: TEST_IMG
+ file format: IMGFMT
+ virtual size: 8 MiB (8388608 bytes)
+=20
+@@ -30,7 +30,7 @@ virtual size: 8 MiB (8388608 bytes)
+ {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+ {"return": {}}
+=20
+-image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "s=
+erver.port": "22", "driver": "ssh", "path": "TEST_IMG"}}
++image: TEST_IMG
+ file format: IMGFMT
+ virtual size: 4 MiB (4194304 bytes)
+=20
+@@ -45,7 +45,7 @@ Job failed: remote host key does not match host_key_che=
+ck 'wrong'
+ {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+ {"return": {}}
+=20
+-image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "s=
+erver.port": "22", "driver": "ssh", "path": "TEST_IMG"}}
++image: TEST_IMG
+ file format: IMGFMT
+ virtual size: 8 MiB (8388608 bytes)
+=20
+@@ -60,7 +60,7 @@ Job failed: remote host key does not match host_key_che=
+ck 'wrong'
+ {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+ {"return": {}}
+=20
+-image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "s=
+erver.port": "22", "driver": "ssh", "path": "TEST_IMG"}}
++image: TEST_IMG
+ file format: IMGFMT
+ virtual size: 4 MiB (4194304 bytes)
+=20
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index a543e546c2..93f87389b6 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -158,7 +158,7 @@ else
+         TEST_IMG=3D"nbd:127.0.0.1:10810"
+     elif [ "$IMGPROTO" =3D "ssh" ]; then
+         TEST_IMG_FILE=3D$TEST_DIR/t.$IMGFMT
+-        REMOTE_TEST_DIR=3D"ssh://127.0.0.1$TEST_DIR"
++        REMOTE_TEST_DIR=3D"ssh://\\($USER@\\)\\?127.0.0.1\\(:[0-9]\\+\\)=
+\\?$TEST_DIR"
+         TEST_IMG=3D"ssh://127.0.0.1$TEST_IMG_FILE"
+     elif [ "$IMGPROTO" =3D "nfs" ]; then
+         TEST_IMG_FILE=3D$TEST_DIR/t.$IMGFMT
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+index 997dc910cb..f811f69135 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -411,7 +411,7 @@ def remote_filename(path):
+     if imgproto =3D=3D 'file':
+         return path
+     elif imgproto =3D=3D 'ssh':
+-        return "ssh://127.0.0.1%s" % (path)
++        return "ssh://%s@127.0.0.1:22%s" % (os.environ.get('USER'), path=
+)
+     else:
+         raise Exception("Protocol %s not supported" % (imgproto))
+=20
 --=20
 2.20.1
 
