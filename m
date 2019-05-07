@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46EB0C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:20:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01E7CC004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:21:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02DD420825
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:20:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC85120825
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:21:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="f5x4dqKr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02DD420825
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="heIivDNn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC85120825
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40130 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40188 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNsWS-0001Rn-1M
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 01:20:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55685)
+	id 1hNsY2-00033u-2N
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 01:21:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1hNsVB-0000aH-3z
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:18:53 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1hNsWc-0001kK-Qm
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:20:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1hNsV9-0002pG-2q
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:18:52 -0400
-Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:37477)
+	(envelope-from <joel.stan@gmail.com>) id 1hNsWc-0003pb-1C
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:20:22 -0400
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:45554)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <joel.stan@gmail.com>)
-	id 1hNsV4-0002n0-Ot; Tue, 07 May 2019 01:18:47 -0400
-Received: by mail-qk1-x743.google.com with SMTP id c1so139514qkk.4;
-	Mon, 06 May 2019 22:18:46 -0700 (PDT)
+	id 1hNsWW-0003j8-OR; Tue, 07 May 2019 01:20:16 -0400
+Received: by mail-qk1-x744.google.com with SMTP id j1so3530702qkk.12;
+	Mon, 06 May 2019 22:20:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
 	:cc:content-transfer-encoding;
-	bh=qhZig2axSZIgL7BGzsy1qVAtFItOkCIEnW62wof9wb4=;
-	b=f5x4dqKrrJx05bARe5eOZkQRY9WYqh3aAUFeBU5jkRfIU3bfVFkvNcqx6I9XRpvIX2
-	td+XcgxjLAvj045LsVzAv3b0sL94BlbJjJKwXjdko3vsW6tv/sPL/74Waugk889/gsGW
-	RZ3io/JYGPOXoehYWgt1DGwuNXGFvz+but51c=
+	bh=gNF1guSC/XzjZL9VnCwYhAjrF52A9evcZ6a+F9k6uRU=;
+	b=heIivDNnha9tVWo2TEugB5kgIpD1c4Jet3pGDaHtQx3qlccijUhxXXIYJhr3/mOwc0
+	506Hc5uuaFJo4kMZ90ZSQEEdINIKEWA0TGZb29tHzr3jYPO5QzFBC97EOXNqwBl40UOp
+	GO2IcZI35aediJdzCMCprGa3rCoXkivzRAoek=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=qhZig2axSZIgL7BGzsy1qVAtFItOkCIEnW62wof9wb4=;
-	b=ZjHgxRi4QTK3sstkqeQBTQ5ckvSa3aNc3I7HxzFh0Wjzmn/j3mrTyvkL3xlOxvdUm9
-	JpbpFpSrsUTEKc97Vk9yHray8ciFwCf8iCLYPwzXH5PQv8DAohpXmskSS9RAFTaVOl7N
-	B5Q4NGNbOZUi83VS+vDMS8d2OgWMh4pEWIgaJSexhj3VxVQn5zwo2GNK+gXFscqYBLbn
-	bczsLlOWlh/ErhfRrYK1zwz8PPecy6fJT0DuStI62+ge7gAR+7CZSQfreeMp0sii5PKY
-	LJhTKTWNV2QpDvBJLJV4POcIOCYxSkAhnaDvXfHpkd81eT0SQyS8f9MGySVMXVUqLPHd
-	G5zA==
-X-Gm-Message-State: APjAAAWMCEDm+zAhMgGiKB19Dn8JVLYfTpCxgC6p3zlqmmBIEH2rr3zv
-	63uefHb5q+6YxAkWFlTaop2LBeMeZIb/pmLNg8E=
-X-Google-Smtp-Source: APXvYqxQSWsUsZD5bsnH74PvooQLS8p7I6LMLhBc9ZeRF+hJy0lXkzRLZ5NjwqyspnGWDXst2Z1yWtqRluq9N5dKTns=
-X-Received: by 2002:a37:a289:: with SMTP id l131mr8098306qke.231.1557206325376;
-	Mon, 06 May 2019 22:18:45 -0700 (PDT)
+	bh=gNF1guSC/XzjZL9VnCwYhAjrF52A9evcZ6a+F9k6uRU=;
+	b=CKmXdqSGCuT+n/YRVxrWcW+9zGVa5/IDeME8RQzWSiHiyO7RUe1VYqM8Y0WpkqR4Hs
+	L3KmC+prnGv3y99hfHWU8Wo/IZ7y7kK9AsRbMP4kVqJDC/qmQ+VtIZ/mHC84+eLVdGj7
+	YnKvLMIXZOzD8hZyXsvY/Weuugu+oT17pNMvQlxAVTsUEEjgJeObSzWva2bkIwXoFUOH
+	jz48dD2fmh+nu3QfVS12zjYLyhK/X6Q0EReYOB8b8wvhWdyY93PWaRRhS179ZbRlFYdZ
+	t+bvvpYqwPi1jtl0ZV2scezJ5k3at07L4vpjw5XLHCU0HTlqSb0itRJqB81VlvtTpBAA
+	zfEw==
+X-Gm-Message-State: APjAAAVyqYF3VvvqPQ1L7Nfnsu+F+Thj2Epu819iq98h+M9ccaUsLpda
+	p7VbDJIrDKUpO9y4pAA7GZ0WwyljwuOK/oe9yJKJhCmf
+X-Google-Smtp-Source: APXvYqzU5TfROxvnW8Um/UbxLvi12a0ECJ3lg6knoe5gMIvv3vWqYdG1yMU1+S1aTiUVqr3OEZWgyji63vqeoR5sLbE=
+X-Received: by 2002:ae9:f00e:: with SMTP id l14mr18396247qkg.127.1557206416237;
+	Mon, 06 May 2019 22:20:16 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190506142042.28096-1-clg@kaod.org>
-	<20190506142042.28096-2-clg@kaod.org>
-In-Reply-To: <20190506142042.28096-2-clg@kaod.org>
+	<20190506142042.28096-4-clg@kaod.org>
+In-Reply-To: <20190506142042.28096-4-clg@kaod.org>
 From: Joel Stanley <joel@jms.id.au>
-Date: Tue, 7 May 2019 05:18:33 +0000
-Message-ID: <CACPK8XdJofG-bL2gArsFpRe5R_eq4ZRwP0iwt2XnAoxRNbaVnQ@mail.gmail.com>
+Date: Tue, 7 May 2019 05:20:04 +0000
+Message-ID: <CACPK8Xe8XXx9af7LExd+NSQK8Jt+9Ca=ReP3xv94DV7vwTY3EA@mail.gmail.com>
 To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::743
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] aspeed: add a per SoC mapping for
- the interrupt space
+X-Received-From: 2607:f8b0:4864:20::744
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] aspeed: use sysbus_init_child_obj()
+ to initialize children
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,9 +92,6 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On Mon, 6 May 2019 at 14:21, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->
-> This will simplify the definition of new SoCs, like the AST2600 which
-> should use a different CPU and a different IRQ number layout.
 >
 > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
