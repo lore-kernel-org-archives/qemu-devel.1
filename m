@@ -2,108 +2,65 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02946C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 21:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D142AC004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 21:19:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEB5920656
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 21:02:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="v+Qmli9e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEB5920656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 95D9E206A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 21:19:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95D9E206A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54827 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54971 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO7EQ-0005zD-Qx
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 17:02:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40950)
+	id 1hO7VF-0002oa-Mm
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 17:19:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1hO7D5-0005Or-NK
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 17:01:13 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1hO7U2-0002Gj-DN
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 17:18:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elena.ufimtseva@oracle.com>) id 1hO7D4-0001Xa-6j
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 17:01:11 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:38718)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
-	id 1hO7D3-0001T1-UM
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 17:01:10 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-	by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x47Ksh0G194161; Tue, 7 May 2019 21:01:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
-	h=date : from : to : cc
-	: subject : message-id : references : mime-version : content-type :
-	content-transfer-encoding : in-reply-to; s=corp-2018-07-02;
-	bh=tG/KjFqJtdG8nOjI2W4agNJqpTTq6CQOtExGIYh2Ezs=;
-	b=v+Qmli9ePhLxPh9KkKZTo3u6DccMxh+D3dJ5+bP9BIsfDZbqcooyOybtyH2CzFsajx1l
-	JhPhQbC6sQVnQaK5JNgjsL0l4Px/NzXbOkmvPfBi7qXgYVBS4pjl46D4j45M8888URW7
-	yMve64A9j//1TsF0VuCTHEBG6t4z+zkG0Lw1ssL4Xc48DeYlLzqE3fRUg1VSAmo+JJTV
-	JeAE+4nYxN4GmnV3QwNNcT4TGLT6B+issQdfbKj+vgQvMA2Gz0dFJ2OhmO9tHbeqaGXz
-	crWfuW4t3gdszL71j0xFGhfjKS56yKajQFD9JiOJaY554iPo+ysz240ih7oFr2dqwMO4
-	QA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-	by aserp2130.oracle.com with ESMTP id 2s94b603gs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 07 May 2019 21:01:04 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-	by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x47KxsaC192796; Tue, 7 May 2019 21:01:03 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-	by userp3030.oracle.com with ESMTP id 2sagyu5vga-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 07 May 2019 21:01:03 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-	by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x47L12V8022444;
-	Tue, 7 May 2019 21:01:02 GMT
-Received: from heatpipe (/73.170.27.202)
-	by default (Oracle Beehive Gateway v4.0)
-	with ESMTP ; Tue, 07 May 2019 14:01:01 -0700
-Date: Tue, 7 May 2019 14:00:59 -0700
-From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190507210059.GA26233@heatpipe>
-References: <20190307072253.9868-1-elena.ufimtseva@oracle.com>
-	<20190307142609.GF2843@stefanha-x1.localdomain>
-	<20190307145120.GF32268@redhat.com>
-	<20190307192727.GG2915@stefanha-x1.localdomain>
-	<BDEBF2EE-DE0F-46CF-B60E-536B3DA9BF77@oracle.com>
-	<20190311102006.GK12393@redhat.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1hO7Tz-0003m7-V7
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 17:18:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41786)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1hO7Ty-0003Ls-11
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 17:18:38 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0384B30832C5;
+	Tue,  7 May 2019 21:18:35 +0000 (UTC)
+Received: from x1.home (ovpn-117-92.phx2.redhat.com [10.3.117.92])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A9CFA60BF3;
+	Tue,  7 May 2019 21:18:27 +0000 (UTC)
+Date: Tue, 7 May 2019 15:18:26 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Message-ID: <20190507151826.502be009@x1.home>
+In-Reply-To: <20190506014904.3621-1-yan.y.zhao@intel.com>
+References: <20190506014514.3555-1-yan.y.zhao@intel.com>
+	<20190506014904.3621-1-yan.y.zhao@intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190311102006.GK12393@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9250
-	signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
-	malwarescore=0
-	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
-	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
-	engine=8.0.1-1810050000 definitions=main-1905070131
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9250
-	signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
-	priorityscore=1501 malwarescore=0
-	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
-	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
-	adultscore=0
-	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
-	definitions=main-1905070131
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2130.oracle.com id
-	x47Ksh0G194161
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.79
-Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 36/37] multi-process: add
- the concept description to docs/devel/qemu-multiprocess
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.44]);
+	Tue, 07 May 2019 21:18:35 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] vfio/mdev: add version attribute
+ for mdev device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -115,133 +72,429 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John G Johnson <john.g.johnson@oracle.com>, sstabellini@kernel.org,
-	Jag Raman <jag.raman@oracle.com>, konrad.wilk@oracle.com,
-	Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
-	ross.lagerwall@citrix.com, liran.alon@oracle.com,
-	Stefan Hajnoczi <stefanha@redhat.com>, kanth.ghatraju@oracle.com
+Cc: cjia@nvidia.com, kvm@vger.kernel.org, aik@ozlabs.ru,
+	Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+	qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com,
+	yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com,
+	mlevitsk@redhat.com, pasic@linux.ibm.com, libvir-list@redhat.com,
+	arei.gonglei@huawei.com, felipe@nutanix.com, Ken.Xue@amd.com,
+	kevin.tian@intel.com, dgilbert@redhat.com,
+	zhenyuw@linux.intel.com, dinechin@redhat.com,
+	intel-gvt-dev@lists.freedesktop.org, changpeng.liu@intel.com,
+	cohuck@redhat.com, linux-kernel@vger.kernel.org,
+	zhi.a.wang@intel.com, jonathan.davies@nutanix.com, shaopeng.he@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Mar 11, 2019 at 10:20:06AM +0000, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Mar 07, 2019 at 03:29:41PM -0800, John G Johnson wrote:
-> >=20
-> >=20
+On Sun,  5 May 2019 21:49:04 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-Hi Daniel, Stefan
-
-We have not replied in a while as we were trying to figure out
-the best approach after multiple comments we have received on the
-patch series.
-
-Leaving other concerns that you, Stefan and others shared with us
-out of this particular topic, we would like to get your opinion on
-the following approach.
-
-Please see below.
-
-> > > On Mar 7, 2019, at 11:27 AM, Stefan Hajnoczi <stefanha@redhat.com> =
-wrote:
-> > >=20
-> > > On Thu, Mar 07, 2019 at 02:51:20PM +0000, Daniel P. Berrang=C3=A9 w=
-rote:
-> > >> I guess one obvious answer is that the existing security mechanism=
-s like
-> > >> SELinux/ApArmor/DAC can be made to work in a more fine grained man=
-ner if
-> > >> there are distinct processes. This would allow for a more useful s=
-eccomp
-> > >> filter to better protect against secondary kernel exploits should =
-QEMU
-> > >> itself be exploited, if we can protect individual components.
-> > >=20
-> > > Fine-grained sandboxing is possible in theory but tedious in practi=
-ce.
-> > > From what I can tell this patch series doesn't implement any sandbo=
-xing
-> > > for child processes.
-> > >=20
-> >=20
-> > 	The policies aren=E2=80=99t in QEMU, but in the selinux config files.
-> > They would say, for example, that when the QEMU process exec()s the
-> > disk emulation process, the process security context type transitions
-> > to a new type.  This type would have permission to access the VM imag=
-e
-> > objects, whereas the QEMU process type (and any other device emulatio=
-n
-> > process types) cannot access them.
+> version attribute is used to check two mdev devices' compatibility.
 >=20
-> Note that currently all QEMU instances run by libvirt have seccomp
-> policy applied that explicitly forbids any use of fork+exec as a way
-> to reduce avenues of attack for an exploited QEMU.
+> The key point of this version attribute is that it's rw.
+> User space has no need to understand internal of device version and no
+> need to compare versions by itself.
+> Compared to reading version strings from both two mdev devices being
+> checked, user space only reads from one mdev device's version attribute.
+> After getting its version string, user space writes this string into the
+> other mdev device's version attribute. Vendor driver of mdev device
+> whose version attribute being written will check device compatibility of
+> the two mdev devices for user space and return success for compatibility
+> or errno for incompatibility.
+> So two readings of version attributes + checking in user space are now
+> changed to one reading + one writing of version attributes + checking in
+> vendor driver.
+> Format and length of version strings are now private to vendor driver
+> who can define them freely.
 >=20
-> Even in a modularized QEMU I'd be loathe to allow QEMU to have the
-> fork+exec privileged, unless "QEMU" in this case was just a stub
-> process that does nothing more than fork+exec the other binaries,
-> while having zero attack exposed to the untrusted guest OS.
+>              __ user space
+>               /\          \
+>              /             \write
+>             / read          \
+>      ______/__           ___\|/___
+>     | version |         | version |-->check compatibility
+>     -----------         -----------
+>     mdev device A       mdev device B
+>=20
+> This version attribute is optional. If a mdev device does not provide
+> with a version attribute, this mdev device is incompatible to all other
+> mdev devices.
+>=20
+> Live migration is able to take advantage of this version attribute.
+> Before user space actually starts live migration, it can first check
+> whether two mdev devices are compatible.
+>=20
+> v2:
+> 1. added detailed intent and usage
+> 2. made definition of version string completely private to vendor driver
+>    (Alex Williamson)
+> 3. abandoned changes to sample mdev drivers (Alex Williamson)
+> 4. mandatory --> optional (Cornelia Huck)
+> 5. added description for errno (Cornelia Huck)
+>=20
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Erik Skultety <eskultet@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: "Tian, Kevin" <kevin.tian@intel.com>
+> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+> Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
+> Cc: Neo Jia <cjia@nvidia.com>
+> Cc: Kirti Wankhede <kwankhede@nvidia.com>
+> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Cc: Christophe de Dinechin <dinechin@redhat.com>
+>=20
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> ---
+>  Documentation/vfio-mediated-device.txt | 140 +++++++++++++++++++++++++
+>  1 file changed, 140 insertions(+)
+>=20
+> diff --git a/Documentation/vfio-mediated-device.txt b/Documentation/vfio-=
+mediated-device.txt
+> index c3f69bcaf96e..013a764968eb 100644
+> --- a/Documentation/vfio-mediated-device.txt
+> +++ b/Documentation/vfio-mediated-device.txt
+> @@ -202,6 +202,7 @@ Directories and files under the sysfs for Each Physic=
+al Device
+>    |     |   |--- available_instances
+>    |     |   |--- device_api
+>    |     |   |--- description
+> +  |     |   |--- version
+>    |     |   |--- [devices]
+>    |     |--- [<type-id>]
+>    |     |   |--- create
+> @@ -209,6 +210,7 @@ Directories and files under the sysfs for Each Physic=
+al Device
+>    |     |   |--- available_instances
+>    |     |   |--- device_api
+>    |     |   |--- description
+> +  |     |   |--- version
+>    |     |   |--- [devices]
+>    |     |--- [<type-id>]
+>    |          |--- create
+> @@ -216,6 +218,7 @@ Directories and files under the sysfs for Each Physic=
+al Device
+>    |          |--- available_instances
+>    |          |--- device_api
+>    |          |--- description
+> +  |          |--- version
+>    |          |--- [devices]
 
-We see libvirt uses QEMU=E2=80=99s -sandbox option to indicate that QEMU
-should use seccomp() to prohibit future use of certain system calls,
-including fork() and exec().  Our idea is to enumerate the remote
-processes needed via QEMU command line options, and have QEMU exec()
-those processes before -sandbox is processed.
-And we also will init seccomp for emulated devices processes.
+I thought there was a request to make this more specific to migration
+by renaming it to something like migration_version.  Also, as an
+optional attribute, it seems the example should perhaps not add it to
+all types to illustrate that it is not required.
 
->=20
-> > 	If you wanted to use DAC, you could do the something similar by
-> > making the disk emulation executable setuid to a UID than can access
-> > VM image files.
-> >=20
-> > 	In either case, the policies and permissions are set up before
-> > libvirt even runs, so it doesn=E2=80=99t need to be aware of them.
->=20
-> That's not the case bearing in mind the above point about fork+exec
-> being forbidden. It would likely require libvirt to be in charge of
-> spawning the various helper binaries from a trusted context.
->=20
->=20
-> > > How to do this in practice must be clear from the beginning if
-> > > fine-grained sandboxing is the main selling point.
-> > >=20
-> > > Some details to start the discussion:
-> > >=20
-> > > * How will fine-grained SELinux/AppArmor/DAC policies be configured=
- for
-> > >   each process?  I guess this requires root, so does libvirt need t=
-o
-> > >   know about each process?
-> > >=20
-> >=20
-> > 	The polices would apply to process security context types (or
-> > UIDs in a DAC regime), so I would not expect libvirt to be aware of t=
-hem.
->=20
-> I'm pretty skeptical that such a large modularization of QEMU can be
-> done without libvirt being aware of it & needing some kind of changes
-> applied.
->
+> =20
+>  * [mdev_supported_types]
+> @@ -246,6 +249,143 @@ Directories and files under the sysfs for Each Phys=
+ical Device
+>    This attribute should show the number of devices of type <type-id> tha=
+t can be
+>    created.
+> =20
+> +* version
+> +
+> +  This attribute is rw, and is optional.
+> +  It is used to check device compatibility between two mdev devices and =
+is
 
-We agree with that. With above proposed approach we still have to change =
-hotplug
-in some way.
-If a eparate process will be spawned, libvirt will be the one doing
-fork/exec of the separate processes. Or possibly launch a helper
-binaries that will unify the way how an instance is being started with
-multiple processes and hotplugging.
+between two mdev devices of the same type.
 
-Thanks!
-Elena, Jag, John.
+> +  accessed in pairs between the two mdev devices being checked.
+
+"in pairs"?
+
+> +  The intent of this attribute is to make an mdev device's version opaqu=
+e to
+> +  user space, so instead of reading two mdev devices' version strings and
+
+perhaps "...instead of reading the version string of two mdev devices
+and comparing them in userspace..."
+
+> +  comparing in userspace, user space should only read one mdev device's =
+version
+> +  attribute, and writes this version string into the other mdev device's=
+ version
+> +  attribute. Then vendor driver of mdev device whose version attribute b=
+eing
+> +  written would check the incoming version string and tell user space wh=
+ether
+> +  the two mdev devices are compatible via return value. That's why this
+> +  attribute is writable.
+> +
+> +  when reading this attribute, it should show device version string of
+> +  the device of type <type-id>.
+> +
+> +  This string is private to vendor driver itself. Vendor driver is able =
+to
+> +  freely define format and length of device version string.
+> +  e.g. It can use a combination of pciid of parent device + mdev type.
+
+Can the user assume the data contents of the string is ascii
+characters?  It's good that the vendor driver defines the format and
+length, but the user probably needs some expectation bounding that
+length.  Should we define it as no larger than PATH_MAX (4096), or maybe
+NAME_MAX (255) might be more reasonable?
+
+> +
+> +  When writing a string to this attribute, vendor driver should analyze =
+this
+> +  string and check whether the mdev device being identified by this stri=
+ng is
+> +  compatible with the mdev device for this attribute. vendor driver shou=
+ld then
+
+Compatible for what purpose?  I think this is where specifically
+calling this a migration_version potentially has value.
+
+> +  return written string's length if it regards the two mdev devices are
+> +  compatible; vendor driver should return negative errno if it regards t=
+he two
+> +  mdev devices are not compatible.
+
+IOW, the write(2) will succeed if the version is determined to be
+compatible and otherwise fail with vendor specific errno.
+
+> +
+> +  User space should treat ANY of below conditions as two mdev devices not
+> +  compatible:
+
+(0) The mdev devices are not of the same type.
+
+> +  (1) any one of the two mdev devices does not have a version attribute
+> +  (2) error when read from one mdev device's version attribute
+
+Is this intended to support that the vendor driver can supply a version
+attribute but not support migration?  TBH, this sounds like a vendor
+driver bug, but maybe it's necessary if the vendor driver could have
+some types that support migration and others that do not?  IOW, we're
+supplying the same attribute groups to all devices from a vendor, in
+which case my comment above regarding an example type without a version
+attribute might be invalid.
+
+> +  (3) error when write one mdev device's version string to the other mdev
+> +  device's version attribute
+> +
+> +  User space should regard two mdev devices compatible when ALL of below
+> +  conditions are met:
+
+(0) The mdev devices are of the same type
+
+> +  (1) success when read from one mdev device's version attribute.
+> +  (2) success when write one mdev device's version string to the other m=
+dev
+> +  device's version attribute
+> +
+> +  Errno:
+> +  If vendor driver wants to claim a mdev device incompatible to all othe=
+r mdev
+> +  devices, it should not register version attribute for this mdev device=
+. But if
+> +  a vendor driver has already registered version attribute and it wants =
+to claim
+> +  a mdev device incompatible to all other mdev devices, it needs to retu=
+rn
+> +  -ENODEV on access to this mdev device's version attribute.
+> +  If a mdev device is only incompatible to certain mdev devices, write of
+> +  incompatible mdev devices's version strings to its version attribute s=
+hould
+> +  return -EINVAL;
+
+I think it's best not to define the specific errno returned for a
+specific situation, let the vendor driver decide, userspace simply
+needs to know that an errno on read indicates the device does not
+support migration version comparison and that an errno on write
+indicates the devices are incompatible or the target doesn't support
+migration versions.
+
+> +
+> +  This attribute can be taken advantage of by live migration.
+> +  If user space detects two mdev devices are compatible through version
+> +  attribute, it can start migration between the two mdev devices, otherw=
+ise it
+> +  should abort its migration attempts between the two mdev devices.
+> +
+> +  Example Usage:
+> +  case 1:
+> +  source side mdev device is of uuid 5ac1fb20-2bbf-4842-bb7e-36c58c3be9c=
+d,
+> +  its mdev type is i915-GVTg_V5_4. pci id of parent device is 8086-193b.
+> +  target side mdev device is if of uuid 882cc4da-dede-11e7-9180-078a6206=
+3ab1,
+> +  its mdev type is i915-GVTg_V5_4. pci id of parent device is 8086-193b.
+> +
+> +  # readlink /sys/bus/pci/devices/0000\:00\:02.0/\
+> +  5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/mdev_type
+> +  ../mdev_supported_types/i915-GVTg_V5_4
+> +
+> +  # readlink /sys/bus/pci/devices/0000\:00\:02.0/\
+> +  882cc4da-dede-11e7-9180-078a62063ab1/mdev_type
+> +  ../mdev_supported_types/i915-GVTg_V5_4
+> +
+> +  (1) read source side mdev device's version.
+> +  #cat \
+> +    /sys/bus/pci/devices/0000\:00\:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3b=
+e9cd/\
+> +    mdev_type/version
+> +  8086-193b-i915-GVTg_V5_4
+
+Is this really the version information exposed in 2/2?  This is opaque,
+so of course you can add things later, but it seems short sighted not
+to even append a version 0 tag to account for software compatibility
+differences since the above only represents a parent and mdev type
+based version.
+
+> +  (2) write source side mdev device's version string into target side md=
+ev
+> +  device's version attribute.
+> +  # echo 8086-193b-i915-GVTg_V5_4 >
+> +   /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063=
+ab1/\
+> +  mdev_type/version
+> +  # echo $?
+> +  0
+
+TBH, there's a lot of superfluous information in this example that can
+be stripped out.  For example:
+
+"
+(1) Compare mdev types:
+
+The mdev type of an instantiated device can be read from the mdev_type
+link within the device instance in sysfs, for example:
+
+  # basename $(readlink -f /sys/bus/mdev/devices/$MDEV_UUID/mdev_type/)
+
+The mdev types available on a given host system can also be found
+through /sys/class/mdev_bus, for example:
+
+  # ls /sys/class/mdev_bus/*/mdev_supported_types/
+
+Migration is only possible between devices of the same mdev type.
+
+(2) Retrieve the mdev source version:
+
+The migration version information can either be read from the mdev_type
+link on an instantiated device:
+
+  # cat /sys/bus/mdev/devices/$UUID1/mdev_type/version
+
+Or it can be read from the mdev type definition, for example:
+
+  # cat /sys/class/mdev_bus/*/mdev_supported_types/$MDEV_TYPE/version
+
+If reading the source version generates an error, migration is not
+possible.  NB, there might be several parent devices for a given mdev
+type on a host system, each may support or expose different versions.
+Matching the specific mdev type to a parent may become important in
+such configurations.
+
+(3) Test source version at target:
+
+Given a version as outlined above, its compatibility to an instantiated
+device of the same mdev type can be tested as:
+
+  # echo $VERSION > /sys/bus/mdev/devices/$UUID2/mdev_type/version
+
+If this write fails, the source and target versions are not compatible
+or the target does not support migration.
+
+Compatibility can also be tested prior to target device creation using
+the mdev type definition for a parent device with a previously found
+matching mdev type, for example:
+
+  # echo $VERSION > /sys/class/mdev_bus/$PARENT/mdev_supported_types/$MDEV_=
+TYPE/version
+
+Again, an error writing the version indicates that an instance of this
+mdev type would not support a migration from the provided version.
+"
+
+In particular from the provided example, the specific UUIDs, mdev
+types, parent information, and contents of the version attribute do not
+contribute to illustrating the protocol.  In fact, displaying the
+contents of the version attribute may tempt users to do comparison on
+their own, especially given how easy it is to decide the GVT-g version
+string.
 
 
->=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
+> +
+> +  in this case, user space's write to target side mdev device's version
+> +  attribute returns success to indicate the two mdev devices are compati=
+ble.
+> +
+> +  case 2:
+> +  source side mdev device is of uuid 5ac1fb20-2bbf-4842-bb7e-36c58c3be9c=
+d,
+> +  its mdev type is i915-GVTg_V5_4. pci id of parent device is 8086-193b.
+> +  target side mdev device is if of uuid 882cc4da-dede-11e7-9180-078a6206=
+3ab1,
+> +  its mdev type is i915-GVTg_V5_4. pci id of parent device is 8086-191b.
+> +
+> +  # readlink /sys/bus/pci/devices/0000\:00\:02.0/\
+> +  5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/mdev_type
+> +  ../mdev_supported_types/i915-GVTg_V5_4
+> +
+> +  # readlink /sys/bus/pci/devices/0000\:00\:02.0/\
+> +  882cc4da-dede-11e7-9180-078a62063ab1/mdev_type
+> +  ../mdev_supported_types/i915-GVTg_V5_4
+> +
+> +  (1) read source side mdev device's version.
+> +  #cat \
+> +    /sys/bus/pci/devices/0000\:00\:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3b=
+e9cd/\
+> +    mdev_type/version
+> +  8086-193b-i915-GVTg_V5_4
+> +
+> +  (2) write source side mdev device's version string into target side md=
+ev
+> +  device's version attribute.
+> +  # echo 8086-193b-i915-GVTg_V5_4 >
+> +   /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063=
+ab1/\
+> +  mdev_type/version
+> +  -bash: echo: write error: Invalid argument
+> +
+> +  in this case, user space's write to target side mdev device's version
+> +  attribute returns error to indicate the two mdev devices are incompati=
+ble.
+> +  (incompatible because pci ids of the two mdev devices' parent devices =
+are
+> +  different).
+> +
+> +  case 3:
+> +  source side mdev device is of uuid 5ac1fb20-2bbf-4842-bb7e-36c58c3be9c=
+d,
+> +  its mdev type is i915-GVTg_V5_4. pci id of parent device is 8086-193b.
+> +  But vendor driver does not provide version attribute for this device.
+> +
+> +  (1) read source side mdev device's version.
+> +  #cat \
+> +    /sys/bus/pci/devices/0000\:00\:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3b=
+e9cd/\
+> +    mdev_type/version
+> +  cat: '/sys/bus/pci/devices/0000:00:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c=
+3be9cd/\
+> +  mdev_type/version': No such file or directory
+> +
+> +  in this case, user space reads source side mdev device's version attri=
+bute
+> +  which does not exist however. user space regards the two mdev devices =
+as not
+> +  compatible and will not start migration between the two mdev devices.
+> +
+> +
+
+This is far too long for description and examples, it's not this
+complicated.  Thanks,
+
+Alex
+
+>  * [device]
+> =20
+>    This directory contains links to the devices of type <type-id> that ha=
+ve been
+
 
