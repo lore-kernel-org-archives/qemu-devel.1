@@ -3,62 +3,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F355C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 07:35:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95D3EC004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 07:45:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22A9C21019
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 07:35:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22A9C21019
+	by mail.kernel.org (Postfix) with ESMTPS id 691DC20989
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 07:45:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 691DC20989
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41480 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41585 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNud2-0001Nq-6H
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 03:35:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49057)
+	id 1hNumq-0004A3-8Q
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 03:45:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hNuc4-00013c-V6
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 03:34:13 -0400
+	(envelope-from <philmd@redhat.com>) id 1hNuly-0003ps-LU
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 03:44:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hNuc3-0004Sr-Nv
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 03:34:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37812)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
-	id 1hNuc2-0004Ry-TM; Tue, 07 May 2019 03:34:07 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2556A356CF;
-	Tue,  7 May 2019 07:34:05 +0000 (UTC)
-Received: from gondolin (dhcp-192-187.str.redhat.com [10.33.192.187])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id DE2CC4C47E;
-	Tue,  7 May 2019 07:34:03 +0000 (UTC)
-Date: Tue, 7 May 2019 09:34:01 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Eric Farman <farman@linux.ibm.com>
-Message-ID: <20190507093401.56205f1d.cohuck@redhat.com>
-In-Reply-To: <0688a42a-4a7d-8aa4-7993-994c8f46193b@linux.ibm.com>
-References: <20190506171730.17556-1-cohuck@redhat.com>
-	<0688a42a-4a7d-8aa4-7993-994c8f46193b@linux.ibm.com>
-Organization: Red Hat GmbH
+	(envelope-from <philmd@redhat.com>) id 1hNulx-0004y2-CW
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 03:44:22 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:42597)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hNulx-0004wu-6M
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 03:44:21 -0400
+Received: by mail-wr1-f66.google.com with SMTP id l2so20833904wrb.9
+	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 00:44:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=ZOBaeZ/j3KhD5od9lLwNv8kxQQPgWwQty3aEqsGsUjA=;
+	b=OCXvWDoDEt6EeeacDc8zfcjIxOUE78sxnegEx7y+kKhOiM7m7CZ6iJ9nS1A7RFvIy/
+	wY0SwO4b1VW+zi0n33hMu+yrLPZ3q7KQz74rmUR1XEHd15DrM486a9WvESvFoOp3AwXH
+	us5mTdCQdkOZQuQae+q32ZZfoK9WShc5Y+LO4f74MtVh6DW20wIXZl6YmomPvJ2yDTpr
+	P/RtYPCQR/uoHSWdpAr+qjD4zUSTfx3j4GWPb5kEM6ytixN3GIFMyFp6y/GxIv07nrOR
+	PUZsIlvKI5v9oO1GZ5CNJOCj/wZludFfrDtaAYdeonjEPzf5EtDh0wAI79N80ehaH0bx
+	oK4Q==
+X-Gm-Message-State: APjAAAUqgdLaZKK6FAoG4aM79zOeB2+94ccUsIDhZ4MkMQBuDWy9M9xv
+	LrpKL0Ph7x2oHOqzLQ+dL9KrsA==
+X-Google-Smtp-Source: APXvYqwKNlF8q+mmqR0pw25iEO+NCTXNfEs3737r9DglJCCo3k+/0cqg46MePVdLNU3/2JL7NqQACg==
+X-Received: by 2002:adf:df92:: with SMTP id z18mr4189335wrl.213.1557215059619; 
+	Tue, 07 May 2019 00:44:19 -0700 (PDT)
+Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	v17sm9142534wmc.30.2019.05.07.00.44.18
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Tue, 07 May 2019 00:44:19 -0700 (PDT)
+To: Hou Qiming <hqm03ster@gmail.com>
+References: <20190507054914.25261-1-marcel.apfelbaum@gmail.com>
+	<f7c57c29-0aa1-c68e-44ed-4ea52d3006c4@redhat.com>
+	<CABSdmrmKYMyMFX-O6y2fAGRow9sHhtSN50knQ_yVwKiNmdyGBw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <e4c2c9bf-f73e-5f75-3c2b-5bf92cb3a524@redhat.com>
+Date: Tue, 7 May 2019 09:44:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Tue, 07 May 2019 07:34:05 +0000 (UTC)
+In-Reply-To: <CABSdmrmKYMyMFX-O6y2fAGRow9sHhtSN50knQ_yVwKiNmdyGBw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH RFC] s390/css: handle CCW_FLAG_SKIP
+	[fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH v2] ui/console: Precautionary glBindTexture
+ and surface->texture validation in surface_gl_update_texture
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,100 +88,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
-	qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 6 May 2019 16:58:03 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
+On 5/7/19 8:49 AM, Hou Qiming wrote:
+> My real name is "HOU Qiming". @Marcel Apfelbaum
+> <mailto:marcel.apfelbaum@gmail.com> can you incorporate that in your v2
+> patch? Thanks!
 
-> On 5/6/19 1:17 PM, Cornelia Huck wrote:
-> > If a ccw has CCW_FLAG_SKIP set, and the command is of type
-> > read, read backwards, or sense, no data should be written
-> > to the guest for that command.
-> > 
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> > 
-> > Only extremely lightly tested (i.e., can boot a guest.)
-> > 
-> > ---
-> >   hw/s390x/css.c         | 22 ++++++++++++++++++----
-> >   include/hw/s390x/css.h |  1 +
-> >   2 files changed, 19 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> > index 8fc9e35ba5d3..6ee31cc2e08f 100644
-> > --- a/hw/s390x/css.c
-> > +++ b/hw/s390x/css.c
-> > @@ -830,8 +830,12 @@ static int ccw_dstream_rw_noflags(CcwDataStream *cds, void *buff, int len,
-> >       if (op == CDS_OP_A) {
-> >           goto incr;
-> >       }
-> > -    ret = address_space_rw(&address_space_memory, cds->cda,
-> > -                           MEMTXATTRS_UNSPECIFIED, buff, len, op);
-> > +    if (!cds->do_skip) {
-> > +        ret = address_space_rw(&address_space_memory, cds->cda,
-> > +                               MEMTXATTRS_UNSPECIFIED, buff, len, op);
-> > +    } else {
-> > +        ret = 0;
-> > +    }
-> >       if (ret != MEMTX_OK) {
-> >           cds->flags |= CDS_F_STREAM_BROKEN;
-> >           return -EINVAL;
-> > @@ -928,8 +932,13 @@ static int ccw_dstream_rw_ida(CcwDataStream *cds, void *buff, int len,
-> >       do {
-> >           iter_len = MIN(len, cont_left);
-> >           if (op != CDS_OP_A) {
-> > -            ret = address_space_rw(&address_space_memory, cds->cda,
-> > -                                   MEMTXATTRS_UNSPECIFIED, buff, iter_len, op);
-> > +            if (!cds->do_skip) {
-> > +                ret = address_space_rw(&address_space_memory, cds->cda,
-> > +                                       MEMTXATTRS_UNSPECIFIED, buff, iter_len,
-> > +                                       op);
-> > +            } else {
-> > +                ret = 0;
-> > +            }
-> >               if (ret != MEMTX_OK) {
-> >                   /* assume inaccessible address */
-> >                   ret = -EINVAL; /* channel program check */
-> > @@ -968,6 +977,11 @@ void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB const *orb)
-> >   
-> >       cds->count = ccw->count;
-> >       cds->cda_orig = ccw->cda;
-> > +    /* skip is only effective for read, read backwards, or sense commands */
-> > +    cds->do_skip = (ccw->flags & CCW_FLAG_SKIP) &&
-> > +        (ccw->cmd_code & CCW_CMD_BASIC_SENSE ||
-> > +         ccw->cmd_code & 0x02 /* read */ ||
-> > +         ccw->cmd_code & 0x0c /* read backwards */);  
+Thanks a lot Qiming :)
+
+> On Tue, May 7, 2019 at 2:25 PM Philippe Mathieu-Daudé <philmd@redhat.com
+> <mailto:philmd@redhat.com>> wrote:
 > 
-> I wish so badly that these checks work, since it'd simplify the vfio-ccw 
-> code, but I don't think this lets you tell the difference between a READ 
-> (x02) and a NOP (x03) or any other control-type CCW.  Ditto 
-> read-backward versus TIC.  :-(
-
-Drat, why is that never easy... I'll rework this check.
-
+>     Hi Marcel,
 > 
-> >       ccw_dstream_rewind(cds);
-> >       if (!(cds->flags & CDS_F_IDA)) {
-> >           cds->op_handler = ccw_dstream_rw_noflags;
-> > diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-> > index aae19c427229..7cc183ef4366 100644
-> > --- a/include/hw/s390x/css.h
-> > +++ b/include/hw/s390x/css.h
-> > @@ -97,6 +97,7 @@ typedef struct CcwDataStream {
-> >       int (*op_handler)(struct CcwDataStream *cds, void *buff, int len,
-> >                         CcwDataStreamOp op);
-> >       hwaddr cda;
-> > +    bool do_skip;
-> >   } CcwDataStream;
-> >   
-> >   /*
-> >   
+>     On 5/7/19 7:49 AM, Marcel Apfelbaum wrote:
+>     > From: HQM <hqm03ster@gmail.com <mailto:hqm03ster@gmail.com>>
+>     >
+>     > In a GVT-g setup with dmabuf and GTK GUI, the current 2D texture at
+>     > surface_gl_update_texture is not necessarily
+>     > surface->texture. Adding a glBindTexture fixes related crashes and
+>     > artifacts, and is generally more secure.
+>     >
+>     > Signed-off-by: HQM <hqm03ster@gmail.com <mailto:hqm03ster@gmail.com>>
 > 
-
+>     This looks like an acronym, per
+>     https://wiki.qemu.org/Contribute/SubmitAPatch#Patch_emails_must_include_a_Signed-off-by:_line
+> 
+>     "Patch emails must include a Signed-off-by: line [...] Please use your
+>     real name to sign a patch (not an alias or acronym)."
+> 
+>     > Tested-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com
+>     <mailto:marcel.apfelbaum@gmail.com>>
+>     > [fixed malformed patch, rebase to master]
+>     > Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com
+>     <mailto:marcel.apfelbaum@gmail.com>>
+>     > ---
+>     >
+>     > v2:
+>     >  - fixed malformed patch
+>     >  - rebased to master
+>     >
+>     >  ui/console-gl.c | 18 +++++++++++-------
+>     >  1 file changed, 11 insertions(+), 7 deletions(-)
+>     >
+>     > diff --git a/ui/console-gl.c b/ui/console-gl.c
+>     > index a56e1cd8eb..c1cb3bd673 100644
+>     > --- a/ui/console-gl.c
+>     > +++ b/ui/console-gl.c
+>     > @@ -92,13 +92,17 @@ void surface_gl_update_texture(QemuGLShader *gls,
+>     > 
+>     >      assert(gls);
+>     > 
+>     > -    glPixelStorei(GL_UNPACK_ROW_LENGTH_EXT,
+>     > -                  surface_stride(surface) /
+>     surface_bytes_per_pixel(surface));
+>     > -    glTexSubImage2D(GL_TEXTURE_2D, 0,
+>     > -                    x, y, w, h,
+>     > -                    surface->glformat, surface->gltype,
+>     > -                    data + surface_stride(surface) * y
+>     > -                    + surface_bytes_per_pixel(surface) * x);
+>     > +    if (surface->texture) {
+>     > +        glBindTexture(GL_TEXTURE_2D, surface->texture);
+>     > +        glPixelStorei(GL_UNPACK_ROW_LENGTH_EXT,
+>     > +                      surface_stride(surface)
+>     > +                      / surface_bytes_per_pixel(surface));
+>     > +        glTexSubImage2D(GL_TEXTURE_2D, 0,
+>     > +                        x, y, w, h,
+>     > +                        surface->glformat, surface->gltype,
+>     > +                        data + surface_stride(surface) * y
+>     > +                        + surface_bytes_per_pixel(surface) * x);
+>     > +    }
+>     >  }
+>     > 
+>     >  void surface_gl_render_texture(QemuGLShader *gls,
+>     >
+> 
 
