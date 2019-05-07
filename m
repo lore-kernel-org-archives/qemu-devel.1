@@ -2,73 +2,65 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89626C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 17:54:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13610C46460
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 18:02:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 628AA2054F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 17:54:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 628AA2054F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id E0BD22054F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 18:02:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0BD22054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50803 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50903 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO4IZ-0006Nc-EM
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 13:54:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38907)
+	id 1hO4Pu-0000BK-4W
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 14:02:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@dabbelt.com>) id 1hO4GV-0005Jo-ES
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 13:52:34 -0400
+	(envelope-from <armbru@redhat.com>) id 1hO4Ov-0008ED-Rf
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 14:01:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@dabbelt.com>) id 1hO4GU-0005Vj-Cu
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 13:52:31 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:44071)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hO4GU-0005V1-7W
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 13:52:30 -0400
-Received: by mail-pl1-f194.google.com with SMTP id d3so4523447plj.11
-	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 10:52:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
-	:mime-version:content-transfer-encoding;
-	bh=cYprQMWktnww3CUSan+0ugetvPRquyZiZq8dJoeUsHE=;
-	b=lmogmx4z2ci7oZNmk5oap+Alb6PI8113Ll8wyq3v2rAqtql6Y/sPDH3IvBtMNj7zpC
-	io9w5FP5YxOFFMbctH3JDVnNsak7rzNYOZKTQmf0wwHCfbonnHQ2Jxzg4gvsg8cvUHbL
-	/oep1o84fHc4RsXqTSqTPozTeOQN0H5ENwrkNhIMz2cTiUNWMdmEFhLSNWtGrQJeI/Pv
-	5YmiWkOZ/2bBwkxS/8RRC7xJAnN33f3sdyv0hySk6D2VWzT1lz80BAnDpsysvEIKJovT
-	vEWymXrEBMQf2Ru7BG9AoZFEB0ngk2Bm8tnv+7LpS/Zz2vueY90tpKP17Ub9iYD+pmG8
-	2qrg==
-X-Gm-Message-State: APjAAAWqdJqgO3NAhan+Wq+42wwuJJwyPZ1wcsd/pG00o2z7rlgm7clT
-	HJ3YTE26m1KHMVm7uxXzegREDMawuJI=
-X-Google-Smtp-Source: APXvYqzRlyo7Sa9ZDMUJv8ycBxHkq2ETTa+Ny+MP/FrKdrsigBL6kr6QNlsqR30MA//UKOSwoVpm+w==
-X-Received: by 2002:a17:902:8f93:: with SMTP id
-	z19mr34015284plo.108.1557251547998; 
-	Tue, 07 May 2019 10:52:27 -0700 (PDT)
-Received: from localhost ([12.206.222.5]) by smtp.gmail.com with ESMTPSA id
-	f14sm20340508pgj.24.2019.05.07.10.52.27
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 07 May 2019 10:52:27 -0700 (PDT)
-Date: Tue, 07 May 2019 10:52:27 -0700 (PDT)
-X-Google-Original-Date: Tue, 07 May 2019 10:18:29 PDT (-0700)
-In-Reply-To: <CANnJOVHd1aFR2tiORJmZ2h3xa+t8djToUEom4WSy=4vBcOjegg@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: fintelia@gmail.com
-Message-ID: <mhng-29822037-900e-4149-aa85-36cbc1db4972@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+	(envelope-from <armbru@redhat.com>) id 1hO4Ou-0004hR-Uu
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 14:01:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60638)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>)
+	id 1hO4Op-0004Xb-Ci; Tue, 07 May 2019 14:01:07 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D51DBCA1FD;
+	Tue,  7 May 2019 18:01:04 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
+	[10.36.116.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E317D1001E8D;
+	Tue,  7 May 2019 18:01:01 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 5FBEA1132B35; Tue,  7 May 2019 20:01:00 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Xiang Zheng <zhengxiang9@huawei.com>
+References: <20190505070059.4664-1-zhengxiang9@huawei.com>
+Date: Tue, 07 May 2019 20:01:00 +0200
+In-Reply-To: <20190505070059.4664-1-zhengxiang9@huawei.com> (Xiang Zheng's
+	message of "Sun, 5 May 2019 15:00:59 +0800")
+Message-ID: <87a7fyb0v7.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.38]);
+	Tue, 07 May 2019 18:01:04 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.214.194
-Subject: Re: [Qemu-devel] [PATCH for 4.1] target/riscv: More accurate
- handling of `sip` CSR
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] pflash: Only read non-zero parts of
+ backend image
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,55 +72,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org,
-	qemu-devel@nongnu.org, sagark@eecs.berkeley.edu,
-	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org,
+	ard.biesheuvel@linaro.org, qemu-devel@nongnu.org,
+	mreitz@redhat.com, stefanha@redhat.com, guoheyi@huawei.com,
+	wanghaibin.wang@huawei.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 06 May 2019 08:52:43 PDT (-0700), fintelia@gmail.com wrote:
-> According to the spec, "All bits besides SSIP, USIP, and UEIP in the sip
-> register are read-only." Further, if an interrupt is not delegated to mode
-> x,
-> then "the corresponding bits in xip [...] should appear to be hardwired to
-> zero. This patch implements both of those requirements.
->
-> Signed-off-by: Jonathan Behrens <fintelia@gmail.com>
-> ---
->  target/riscv/csr.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
->
-> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-> index 1ec1222da1..fff7d834e8 100644
-> --- a/target/riscv/csr.c
-> +++ b/target/riscv/csr.c
-> @@ -246,6 +246,7 @@ static const target_ulong sstatus_v1_9_mask =
-> SSTATUS_SIE | SSTATUS_SPIE |
->  static const target_ulong sstatus_v1_10_mask = SSTATUS_SIE | SSTATUS_SPIE |
->      SSTATUS_UIE | SSTATUS_UPIE | SSTATUS_SPP | SSTATUS_FS | SSTATUS_XS |
->      SSTATUS_SUM | SSTATUS_MXR | SSTATUS_SD;
-> +static const target_ulong sip_writable_mask = SIP_SSIP | MIP_USIP |
-> MIP_UEIP;
->
->  #if defined(TARGET_RISCV32)
->  static const char valid_vm_1_09[16] = {
-> @@ -694,8 +695,10 @@ static int write_sbadaddr(CPURISCVState *env, int
-> csrno, target_ulong val)
->  static int rmw_sip(CPURISCVState *env, int csrno, target_ulong *ret_value,
->                     target_ulong new_value, target_ulong write_mask)
->  {
-> -    return rmw_mip(env, CSR_MSTATUS, ret_value, new_value,
-> -                   write_mask & env->mideleg);
-> +    int ret = rmw_mip(env, CSR_MSTATUS, ret_value, new_value,
-> +                      write_mask & env->mideleg & sip_writable_mask);
-> +    *ret_value &= env->mideleg;
-> +    return ret;
->  }
->
->  /* Supervisor Protection and Translation */
+The subject is slightly misleading.  Holes read as zero.  So do
+non-holes full of zeroes.  The patch avoids reading the former, but
+still reads the latter.
 
-This patch (and your previous one) don't apply for me.  I don't see the
-git-send-email tags in your messages, are you trying to do something like paste
-them into gmail?  If so I think they're getting line wrapped.
+Xiang Zheng <zhengxiang9@huawei.com> writes:
+
+> Currently we fill the memory space with two 64MB NOR images when
+> using persistent UEFI variables on virt board. Actually we only use
+> a very small(non-zero) part of the memory while the rest significant
+> large(zero) part of memory is wasted.
+
+Neglects to mention that the "virt board" is ARM.
+
+> So this patch checks the block status and only writes the non-zero part
+> into memory. This requires pflash devices to use sparse files for
+> backends.
+
+I started to draft an improved commit message, but then I realized this
+patch can't work.
+
+The pflash_cfi01 device allocates its device memory like this:
+
+    memory_region_init_rom_device(
+        &pfl->mem, OBJECT(dev),
+        &pflash_cfi01_ops,
+        pfl,
+        pfl->name, total_len, &local_err);
+
+pflash_cfi02 is similar.
+
+memory_region_init_rom_device() calls
+memory_region_init_rom_device_nomigrate() calls qemu_ram_alloc() calls
+qemu_ram_alloc_internal() calls g_malloc0().  Thus, all the device
+memory gets written to even with this patch.
+
+I'm afraid you neglected to test.
+
+I still believe this approach can be made to work.  Need a replacement
+for memory_region_init_rom_device() that uses mmap() with MAP_ANONYMOUS.
 
