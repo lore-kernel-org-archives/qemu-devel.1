@@ -2,83 +2,61 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 920E0C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:06:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5EEDC004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:08:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C05620578
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:06:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PmfN0Kgp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C05620578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9C53B205ED
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:08:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C53B205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48264 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48288 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO1fe-0008B7-G1
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 11:06:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54669)
+	id 1hO1hb-0001VS-NV
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 11:08:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hO1dZ-0006X2-M8
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:04:10 -0400
+	(envelope-from <eblake@redhat.com>) id 1hO1bZ-0004za-G8
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:02:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1hO1dY-00046F-9N
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:04:09 -0400
-Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:34894)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1hO1dY-00045R-2P
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:04:08 -0400
-Received: by mail-it1-x143.google.com with SMTP id l140so26268735itb.0
-	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 08:04:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=Qk+BUUuOsQX6n5dqHox1f5kCJ4tKpfjXdtkDP7Xlmwg=;
-	b=PmfN0KgpOuA5x6aehIgIxXNqi+jRcTq3kq5BWgBqDpLd4nFj3HUJxsD9PES7ExRLy8
-	R8bFjM84CpwPnOqPJa16WZXZ4qWpYZtYZw+PyBKC2h0Le6zZqjcFfzGFeIbHJhEe7z0N
-	Ql6tkAhRjI4Ip67oY5O0todQl6aRkt15uGEEDWRAcrCwPDzpQxp9APdv7Wri/RyPi0ab
-	27/Q1/y2xcBFy0Er/Gllqp77HJmqyAP2Zi2eIMXi08VWIvKLDCdRlgW8ZboPgi5yDSng
-	OywdWePrIABOTMt39I0Pme/oHt3S0qhntvOMhugj22Qtcv6Qky7Gti2hBjZ4YsSeEL3U
-	a6uQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=Qk+BUUuOsQX6n5dqHox1f5kCJ4tKpfjXdtkDP7Xlmwg=;
-	b=snZ5FiYMr945iEI/xDNv3T1TA0rpzbONp634rheHcIRkPfZzxvJmiVhVDK3A4ju9St
-	LLQ61tt/5XzOOhk3ShRCbBpIhZ+AFeiuzBwH1+NMTbWcM9502qq4fxL4je/qT/p9qMwB
-	3yTYWa8r1/cQvFGanwlJ7iO1pKuS7FAtKZooTSFRMLe0s9cVypiHKt5IHvHQpA1dpyXG
-	xLaw9xWyqHZnZP6/HOzJXJe4wS0ahpkkpxHWc7Onj+V7i6Y2r9CqYxSfC7u1x392NKYS
-	W4U1oO2aByqWfMHLijt9H3lwrntP98QCgfL9hy8+r8NIosRmWT6lMDKopbejI1x/ipsD
-	ZXBA==
-X-Gm-Message-State: APjAAAWr3wJZlDDCoEwflXvRKQB3T2VQxXCXGuIYUgKV+mSHM7VsjDvt
-	27TFJVGudJyIsWw8cEzM8Cl6fYtLuwKxkniyW7U=
-X-Google-Smtp-Source: APXvYqz8yCQG0LaYshoryNriPZPUME7Iw1WDHmuY9EVMP3PMEz0unX/stKDADi7XJLvXJ/fwVXvw6FqCwG5n9lLpKtw=
-X-Received: by 2002:a24:7c9:: with SMTP id f192mr23697268itf.97.1557241446283; 
-	Tue, 07 May 2019 08:04:06 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1hO1bX-0002Sc-GT
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:02:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48324)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hO1bT-0002QS-AC; Tue, 07 May 2019 11:01:59 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8BCC63001565;
+	Tue,  7 May 2019 15:01:58 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-15.phx2.redhat.com [10.3.116.15])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id DC18A53E20;
+	Tue,  7 May 2019 15:01:57 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue,  7 May 2019 10:01:51 -0500
+Message-Id: <20190507150153.26859-4-eblake@redhat.com>
+In-Reply-To: <20190507150153.26859-1-eblake@redhat.com>
+References: <20190507150153.26859-1-eblake@redhat.com>
 MIME-Version: 1.0
-References: <1557003754-26473-1-git-send-email-atar4qemu@gmail.com>
-	<1557003754-26473-2-git-send-email-atar4qemu@gmail.com>
-	<d28ed626-f7f8-53df-208a-cbf6c06e3cc9@ilande.co.uk>
-	<CACXAS8BU-OamhTL03QNuukiKvy+vpdu8VRB4gWPe2+zz2nEymA@mail.gmail.com>
-	<5306bcc1-e308-05eb-9ce5-79553cee3a23@ilande.co.uk>
-In-Reply-To: <5306bcc1-e308-05eb-9ce5-79553cee3a23@ilande.co.uk>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Tue, 7 May 2019 17:03:56 +0200
-Message-ID: <CACXAS8AAXTy1xiQp2ftjEqhkXkbn-QG6Z=6AfKFCqJhT7eDF7Q@mail.gmail.com>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::143
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] lsi53c895a: hide 53c895a registers
- in 53c810
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Tue, 07 May 2019 15:01:58 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 3/5] tests/qemu-iotests: Fix more reference
+ output files due to recent qemu-io change
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,107 +68,332 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
-	qemu-devel <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Max Reitz <mreitz@redhat.com>,
+	"open list:Block layer core" <qemu-block@nongnu.org>,
+	Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 6, 2019 at 4:27 PM Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
->
-> On 06/05/2019 09:42, Artyom Tarasenko wrote:
->
-> > On Sun, May 5, 2019 at 12:43 PM Mark Cave-Ayland
-> > <mark.cave-ayland@ilande.co.uk> wrote:
-> >>
-> >> On 04/05/2019 22:02, Artyom Tarasenko wrote:
-> >>
-> >>> AIX/PReP does access to the aliased IO registers of 53810.
-> >>> Implement aliasing to make the AIX driver work.
-> >>>
-> >>> Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
-> >>> ---
-> >>>  hw/scsi/lsi53c895a.c | 17 ++++++++++++++---
-> >>>  1 file changed, 14 insertions(+), 3 deletions(-)
-> >>>
-> >>> diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-> >>> index da7239d..6b95699 100644
-> >>> --- a/hw/scsi/lsi53c895a.c
-> >>> +++ b/hw/scsi/lsi53c895a.c
-> >>> @@ -2271,6 +2271,9 @@ static void lsi_scsi_realize(PCIDevice *dev, Error **errp)
-> >>>      LSIState *s = LSI53C895A(dev);
-> >>>      DeviceState *d = DEVICE(dev);
-> >>>      uint8_t *pci_conf;
-> >>> +    uint64_t mmio_size;
-> >>> +    MemoryRegion *mr;
-> >>> +    uint16_t type = PCI_DEVICE_GET_CLASS(dev)->device_id;
-> >>>
-> >>>      pci_conf = dev->config;
-> >>>
-> >>> @@ -2279,13 +2282,21 @@ static void lsi_scsi_realize(PCIDevice *dev, Error **errp)
-> >>>      /* Interrupt pin A */
-> >>>      pci_conf[PCI_INTERRUPT_PIN] = 0x01;
-> >>>
-> >>> -    memory_region_init_io(&s->mmio_io, OBJECT(s), &lsi_mmio_ops, s,
-> >>> -                          "lsi-mmio", 0x400);
-> >>>      memory_region_init_io(&s->ram_io, OBJECT(s), &lsi_ram_ops, s,
-> >>>                            "lsi-ram", 0x2000);
-> >>>      memory_region_init_io(&s->io_io, OBJECT(s), &lsi_io_ops, s,
-> >>>                            "lsi-io", 256);
-> >>> -
-> >>> +    if (type == PCI_DEVICE_ID_LSI_53C895A) {
-> >>> +        mmio_size = 0x400;
-> >>> +    } else {
-> >>> +        mr = g_new(MemoryRegion, 1);
-> >>
-> >> In general these days it's worth keeping the reference to the MemoryRegion within
-> >> LSIState since then its lifecycle is more clearly defined.
-> >
-> > On the other hand, it's a PCI card, and can not be
-> > hot-plugged/removed, so the lifecycle is pretty simple here.
-> > Or am I missing something?
->
-> Well Thomas has been working on a set of tests that for each machine will plug and
-> unplug each device via the monitor to make sure that init/realize/unrealize work
-> correctly so it would be good to ensure that these tests don't leak.
+From: Thomas Huth <thuth@redhat.com>
 
-Makes sense, indeed.
+The output of qemu-io changed recently - most tests have been fixed in
+commit 36b9986b08787019ef42 ("tests/qemu-iotests: Fix output of qemu-io
+related tests") already, but a qcow1, vmdk, and nbd test were still missi=
+ng.
 
-> However...
->
-> >>> +        memory_region_init_alias(mr, OBJECT(d), "lsi-io-alias", &s->io_io,
-> >>> +                                 0, 0x80);
-> >>> +        memory_region_add_subregion_overlap(&s->io_io, 0x80, mr, -1);
-> >>> +        mmio_size = 0x80;
-> >>
-> >> This feels a little strange - is it possible to see from the datasheets that the
-> >> 53C895A has 0x400 bytes MMIO whilst the 53C810 has 0x80 bytes MMIO? It's not clear to
-> >> me where the aliasing is happening.
-> >
-> > These values are empiric. For 810 it can not be more than 0x80,
-> > because the AIX does access the registers with the shift of 0x80.
-> > For  895A we did already have 0x400.
->
-> After a bit of searching I managed to locate an 810 datasheet and in Chapter 5 it
-> clearly describes the IO space (s->io_io) as being 256 bytes in size which is the
-> same as the 895A, but with 0x80-0xff aliased onto 0x00 - 0x7f.
->
-> It feels to me that rather than complicate things with an additional alias
-> MemoryRegion, the simplest solution would be to simply change the mask in
-> lsi_io_read() and lsi_io_write() to be 0x7f rather than 0xff if we've instantiated a
-> 810 rather than an 895A.
+Fixes: 99e98d7c9fc1a1639fad ("qemu-io: Use error_[gs]et_progname()")
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20190501134127.21104-1-thuth@redhat.com>
+[eblake: squash in NBD 083 fixes]
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Tested-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ tests/qemu-iotests/059.out |  8 ++---
+ tests/qemu-iotests/083.out | 68 +++++++++++++++++++-------------------
+ tests/qemu-iotests/092.out | 24 +++++++-------
+ 3 files changed, 50 insertions(+), 50 deletions(-)
 
-Initially I implemented it exactly as you suggest, via mask. But then
-I thought that memory_region_init_alias makes aliasing more obvious.
-I don't have a strong opinion on this one though.
+diff --git a/tests/qemu-iotests/059.out b/tests/qemu-iotests/059.out
+index 700ad1f2906..f51394ae8e0 100644
+--- a/tests/qemu-iotests/059.out
++++ b/tests/qemu-iotests/059.out
+@@ -2,15 +2,15 @@ QA output created by 059
 
-@Paolo, what do you think?
+ =3D=3D=3D Testing invalid granularity =3D=3D=3D
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+-can't open device TEST_DIR/t.vmdk: Invalid granularity, image may be cor=
+rupt
++qemu-io: can't open device TEST_DIR/t.vmdk: Invalid granularity, image m=
+ay be corrupt
 
--- 
-Regards,
-Artyom Tarasenko
+ =3D=3D=3D Testing too big L2 table size =3D=3D=3D
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+-can't open device TEST_DIR/t.vmdk: L2 table size too big
++qemu-io: can't open device TEST_DIR/t.vmdk: L2 table size too big
 
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
+ =3D=3D=3D Testing too big L1 table size =3D=3D=3D
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+-can't open device TEST_DIR/t.vmdk: L1 size too big
++qemu-io: can't open device TEST_DIR/t.vmdk: L1 size too big
+
+ =3D=3D=3D Testing monolithicFlat creation and opening =3D=3D=3D
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2147483648 subformat=
+=3DmonolithicFlat
+@@ -2050,7 +2050,7 @@ wrote 512/512 bytes at offset 10240
+
+ =3D=3D=3D Testing monolithicFlat with internally generated JSON file nam=
+e =3D=3D=3D
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 subformat=3D=
+monolithicFlat
+-can't open: Cannot use relative extent paths with VMDK descriptor file '=
+json:{"image": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "driv=
+er": "blkdebug", "inject-error.0.event": "read_aio"}'
++qemu-io: can't open: Cannot use relative extent paths with VMDK descript=
+or file 'json:{"image": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT=
+"}, "driver": "blkdebug", "inject-error.0.event": "read_aio"}'
+
+ =3D=3D=3D Testing version 3 =3D=3D=3D
+ image: TEST_DIR/iotest-version3.IMGFMT
+diff --git a/tests/qemu-iotests/083.out b/tests/qemu-iotests/083.out
+index 7419722cd7a..eee6dd13794 100644
+--- a/tests/qemu-iotests/083.out
++++ b/tests/qemu-iotests/083.out
+@@ -1,43 +1,43 @@
+ QA output created by 083
+ =3D=3D=3D Check disconnect before neg1 =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/foo
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ =3D=3D=3D Check disconnect after neg1 =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/foo
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ =3D=3D=3D Check disconnect 8 neg1 =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/foo
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ =3D=3D=3D Check disconnect 16 neg1 =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/foo
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ =3D=3D=3D Check disconnect before export =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/foo
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ =3D=3D=3D Check disconnect after export =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/foo
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ =3D=3D=3D Check disconnect 4 export =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/foo
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ =3D=3D=3D Check disconnect 12 export =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/foo
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ =3D=3D=3D Check disconnect 16 export =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/foo
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ =3D=3D=3D Check disconnect before neg2 =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/foo
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ =3D=3D=3D Check disconnect after neg2 =3D=3D=3D
+
+@@ -45,11 +45,11 @@ read failed: Input/output error
+
+ =3D=3D=3D Check disconnect 8 neg2 =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/foo
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ =3D=3D=3D Check disconnect 10 neg2 =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/foo
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ =3D=3D=3D Check disconnect before request =3D=3D=3D
+
+@@ -86,23 +86,23 @@ read 512/512 bytes at offset 0
+
+ =3D=3D=3D Check disconnect before neg-classic =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/
+
+ =3D=3D=3D Check disconnect 8 neg-classic =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/
+
+ =3D=3D=3D Check disconnect 16 neg-classic =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/
+
+ =3D=3D=3D Check disconnect 24 neg-classic =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/
+
+ =3D=3D=3D Check disconnect 28 neg-classic =3D=3D=3D
+
+-can't open device nbd+tcp://127.0.0.1:PORT/
++qemu-io: can't open device nbd+tcp://127.0.0.1:PORT/
+
+ =3D=3D=3D Check disconnect after neg-classic =3D=3D=3D
+
+@@ -110,43 +110,43 @@ read failed: Input/output error
+
+ =3D=3D=3D Check disconnect before neg1 =3D=3D=3D
+
+-can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect after neg1 =3D=3D=3D
+
+-can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect 8 neg1 =3D=3D=3D
+
+-can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect 16 neg1 =3D=3D=3D
+
+-can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect before export =3D=3D=3D
+
+-can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect after export =3D=3D=3D
+
+-can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect 4 export =3D=3D=3D
+
+-can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect 12 export =3D=3D=3D
+
+-can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect 16 export =3D=3D=3D
+
+-can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect before neg2 =3D=3D=3D
+
+-can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect after neg2 =3D=3D=3D
+
+@@ -154,11 +154,11 @@ read failed: Input/output error
+
+ =3D=3D=3D Check disconnect 8 neg2 =3D=3D=3D
+
+-can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect 10 neg2 =3D=3D=3D
+
+-can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///foo?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect before request =3D=3D=3D
+
+@@ -195,23 +195,23 @@ read 512/512 bytes at offset 0
+
+ =3D=3D=3D Check disconnect before neg-classic =3D=3D=3D
+
+-can't open device nbd+unix:///?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect 8 neg-classic =3D=3D=3D
+
+-can't open device nbd+unix:///?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect 16 neg-classic =3D=3D=3D
+
+-can't open device nbd+unix:///?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect 24 neg-classic =3D=3D=3D
+
+-can't open device nbd+unix:///?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect 28 neg-classic =3D=3D=3D
+
+-can't open device nbd+unix:///?socket=3DTEST_DIR/nbd.sock
++qemu-io: can't open device nbd+unix:///?socket=3DTEST_DIR/nbd.sock
+
+ =3D=3D=3D Check disconnect after neg-classic =3D=3D=3D
+
+diff --git a/tests/qemu-iotests/092.out b/tests/qemu-iotests/092.out
+index 6eda321fc6b..3e799148735 100644
+--- a/tests/qemu-iotests/092.out
++++ b/tests/qemu-iotests/092.out
+@@ -2,25 +2,25 @@ QA output created by 092
+
+ =3D=3D Invalid cluster size =3D=3D
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+-can't open device TEST_DIR/t.qcow: Cluster size must be between 512 and =
+64k
+-can't open device TEST_DIR/t.qcow: Cluster size must be between 512 and =
+64k
+-can't open device TEST_DIR/t.qcow: Cluster size must be between 512 and =
+64k
+-can't open device TEST_DIR/t.qcow: Cluster size must be between 512 and =
+64k
++qemu-io: can't open device TEST_DIR/t.qcow: Cluster size must be between=
+ 512 and 64k
++qemu-io: can't open device TEST_DIR/t.qcow: Cluster size must be between=
+ 512 and 64k
++qemu-io: can't open device TEST_DIR/t.qcow: Cluster size must be between=
+ 512 and 64k
++qemu-io: can't open device TEST_DIR/t.qcow: Cluster size must be between=
+ 512 and 64k
+
+ =3D=3D Invalid L2 table size =3D=3D
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+-can't open device TEST_DIR/t.qcow: L2 table size must be between 512 and=
+ 64k
+-can't open device TEST_DIR/t.qcow: L2 table size must be between 512 and=
+ 64k
+-can't open device TEST_DIR/t.qcow: L2 table size must be between 512 and=
+ 64k
+-can't open device TEST_DIR/t.qcow: L2 table size must be between 512 and=
+ 64k
++qemu-io: can't open device TEST_DIR/t.qcow: L2 table size must be betwee=
+n 512 and 64k
++qemu-io: can't open device TEST_DIR/t.qcow: L2 table size must be betwee=
+n 512 and 64k
++qemu-io: can't open device TEST_DIR/t.qcow: L2 table size must be betwee=
+n 512 and 64k
++qemu-io: can't open device TEST_DIR/t.qcow: L2 table size must be betwee=
+n 512 and 64k
+
+ =3D=3D Invalid size =3D=3D
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+-can't open device TEST_DIR/t.qcow: Image too large
+-can't open device TEST_DIR/t.qcow: Image too large
++qemu-io: can't open device TEST_DIR/t.qcow: Image too large
++qemu-io: can't open device TEST_DIR/t.qcow: Image too large
+
+ =3D=3D Invalid backing file length =3D=3D
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+-can't open device TEST_DIR/t.qcow: Backing file name too long
+-can't open device TEST_DIR/t.qcow: Backing file name too long
++qemu-io: can't open device TEST_DIR/t.qcow: Backing file name too long
++qemu-io: can't open device TEST_DIR/t.qcow: Backing file name too long
+ *** done
+--=20
+2.20.1
+
 
