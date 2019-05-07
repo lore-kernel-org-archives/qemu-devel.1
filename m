@@ -2,66 +2,69 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 034A0C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:58:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC591C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 16:17:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDB77205ED
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:58:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDB77205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B417B2054F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 16:17:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="KiunDHIt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B417B2054F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49072 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49583 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO2Tx-0002Gs-0N
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 11:58:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40380)
+	id 1hO2mf-0003Oa-Fr
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 12:17:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1hO2TA-0001xj-FP
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:57:29 -0400
+	(envelope-from <qemu_oss@crudebyte.com>) id 1hO2lQ-0002kv-Sb
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 12:16:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1hO2T9-0005vx-A2
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:57:28 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:34803)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1hO2T9-0005v9-5o
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:57:27 -0400
-Received: by mail-ot1-f65.google.com with SMTP id l17so5889349otq.1
-	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 08:57:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=KnR6kucZkhdGzgZriGzmIkM3on0Tbt/B7yb/MYjQ9as=;
-	b=mDZ4N21du9xNYTdSXb6Vbh9yz1JoP2ER9CG5NvnMb5H2GCAkOnjfSxm2Aqf6wM7s6A
-	3DPHSl6973lDHwCm15wrSqIgja2aHG3tzx4eCpAhYBo7CdstXKnLiz0vPTXZtyM3exBI
-	KGeIML8qnKtB6tvegLcjl5HPxWc0tsNdiTr/NIS0El/aVFBwJL2CZF25O83ZeJWOBcY8
-	UiUd9+dxk/qeiSowjJRkjqXgjc0Ge+ZUc3btCaqEEcNCr/rUv8vDtwDsdT6vQUNlvACT
-	T1onq18SAvKt3PH90j0Pt4eCMoxSSTw/xGX5veoT2J24/l881vTfuMXw7xOLSX4BIvVm
-	1MsQ==
-X-Gm-Message-State: APjAAAVP6bkkHkaGVTgq4ZfsJOdMOxZJlqRYyEe5aaTq3lk9MpMblHmb
-	tWuBijIlnMOOo7APOYI3RIM0sPbvUGIcZ4iKqJOCiA==
-X-Google-Smtp-Source: APXvYqxFZednQU6Ymo0fzeTVrenrIJs8YCYpwF+ajbmHcFDc0U5AdfjPNRaMAuF17F0e0BWKYzwfrbthADnCJPbGmN0=
-X-Received: by 2002:a9d:e95:: with SMTP id 21mr7652832otj.145.1557244645054;
-	Tue, 07 May 2019 08:57:25 -0700 (PDT)
+	(envelope-from <qemu_oss@crudebyte.com>) id 1hO2lN-0001Mq-MS
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 12:16:19 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:34671)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+	id 1hO2lK-0001Km-Nu
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 12:16:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=n+I9NZiFb9xYfcfZUKi5n0GzFpkn/gg6KmHZWplTBRg=;
+	b=KiunDHItx2dkmBkHicxbxfdBkr
+	bmlSqeCEWaz83Wh/gjtPspQiNe9u+BZYZTjQd1lyytRjOjIGuqBPqF4QnjTKMRNx5stMa/iYPE7IU
+	B9pP3fbPp9DHxUAXVr5p4aweIq0Yp/E+lCnRcoRhGL25DA7JKty01AlMhZrU8qQu6mJ9r3DN1I3V/
+	kkFdnmBGBgxYxhprcedHvtlbbkKhDR5Pvt8xcDoPRwEuOuTG+DkPg4JutoGZHemkWlmBy0OmCaoHG
+	KcZhyfoPES3qR95iFAw9j3UAoDGrdNB5pRv96bEZAXOnN7/z3M394Ygw8EYZKWJGm6SomJQC9cgZ0
+	XLR37WH+5RmT69m4gz/CmS3VnSh/ef762a9EqrZ8nicNzh3Fdrkxp7bBwBByQH5e85/Yw6yL48qBm
+	qwbTDludQVvQkWNIXGqEAx2OSsvJBvggE8Rau5ZJCDLrjMwtrIcZaho4DoiiNvZ34OMXLE2DH4p5I
+	osAaRhU8c1/+PYoJlENMhHzKY7FhcWK/OeCzUG6SW8vs0UyGUiu2IDo0ioUvd/fqmZa1jYJtsbSZj
+	0WoVvIJ16T0/Jcov7UYC9dsuxUbwv/i+Ngdq+r7uGnKB6NNTS1o8GsZNKJLk2OLZtNjeulfuLnp24
+	2BqjS1uETZ9mh38IQOnvic0JEFRsPqUn7Ol6K3M4s=;
+To: qemu-devel@nongnu.org
+Date: Tue, 07 May 2019 18:16:08 +0200
+Message-ID: <1714809.tFt2Qa06yj@silver>
+In-Reply-To: <20190507174239.59ad26d1@bahia.lan>
+References: <590216e2666653bac21d950aaba98f87d0a53324.1557093245.git.qemu_oss@crudebyte.com>
+	<3336211.WybC1Bzqah@silver> <20190507174239.59ad26d1@bahia.lan>
 MIME-Version: 1.0
-References: <20190507143727.15640-1-eblake@redhat.com>
-In-Reply-To: <20190507143727.15640-1-eblake@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Tue, 7 May 2019 17:57:13 +0200
-Message-ID: <CAMxuvax99S82UVZggPGj+R22qJp3MFZ0_YseTQ5g9=5Mz33YYQ@mail.gmail.com>
-To: Eric Blake <eblake@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.210.65
-Subject: Re: [Qemu-devel] [slirp PATCH] maint: Add .gitignore
+X-Received-From: 5.189.157.229
+Subject: Re: [Qemu-devel] [libvirt patch] qemu: adds support for virtfs 9p
+ argument 'vii'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,49 +76,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+From: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Cc: Greg Kurz <groug@kaod.org>, Antonios Motakis <antonios.motakis@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+On Dienstag, 7. Mai 2019 17:42:39 CEST Greg Kurz wrote:
+> > Sorry that I caused a bit of confusion, You were actually commenting
+> > mostly on v2 of the patch set, where my email client replaced the message
+> > IDs and hence screwed threading.
+> > 
+> > This is v3 that I sent yesterday and which has correct threading:
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01143.html
+> 
+> For a reason yet to be investigated, I haven't received it yet...
 
-On Tue, May 7, 2019 at 4:37 PM Eric Blake <eblake@redhat.com> wrote:
->
-> Ignore build artifacts during an in-tree build.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->
-> Sadly, libslirp includes no README (yet), and
-> https://gitlab.freedesktop.org/slirp (mentioned in qemu commit
-> 7c47bdd8) does not seem to call out any slirp-specific mailing list
-> which should be cc'd for this patch.  I'd recommend that libslirp add
-> some documentation (both to a README file present in a git checkout,
-> and to the project web page), to make it friendlier to drive-by
-> emailed patch contributions.
+Here are the archive links for latest v3 patch set [5(+1) patches total]:
 
-I started one, see:
-https://gitlab.freedesktop.org/slirp/libslirp/merge_requests/7
+[PATCH v3 0/5] 9p: Fix file ID collisions:
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01143.html
 
-thanks
+[PATCH v3 1/5] 9p: mitigates most QID path collisions:
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01142.html
 
->
->  .gitignore | 4 ++++
->  1 file changed, 4 insertions(+)
->  create mode 100644 .gitignore
->
-> diff --git a/.gitignore b/.gitignore
-> new file mode 100644
-> index 0000000..daded16
-> --- /dev/null
-> +++ b/.gitignore
-> @@ -0,0 +1,4 @@
-> +*.a
-> +*.d
-> +*.o
-> +/src/libslirp-version.h
-> --
-> 2.20.1
->
+[PATCH v3 2/5] 9P: trivial cleanup of QID path collision mitigation:
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01140.html
+
+[PATCH v3 3/5] 9p: persistency of QID path beyond reboots / suspensions:
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01144.html
+
+[PATCH v3 4/5] 9p: use variable length suffixes for inode mapping:
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01141.html
+
+[PATCH v3 5/5] 9p: adds virtfs 'vii' device parameter
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01138.html
+
+And the optional libvirt patch:
+
+[libvirt patch] qemu: adds support for virtfs 9p argument 'vii':
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01223.html
+
+> > Please just have a glimpse on that v3 thread, and before I address the
+> > details that you requested (I have reviewed them all already and will
+> > address them), I would like you to ask you for a coarse feedback on
+> > design/features first.
+> > Because there are some things where I am unresolved on design level yet:
+> I'll try but probably not before next week.
+
+No problem, take your time!
+
+Best regards,
+Christian Schoenebeck
 
