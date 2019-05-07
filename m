@@ -2,66 +2,66 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C597C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 09:44:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B052C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 09:45:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72CF8204FD
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 09:44:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72CF8204FD
+	by mail.kernel.org (Postfix) with ESMTPS id 2D2D0204FD
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 09:45:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D2D0204FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43442 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43444 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNwed-00075W-MP
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 05:44:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48680)
+	id 1hNweu-0007G9-G9
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 05:45:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hNwdZ-0006XF-73
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:43:50 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hNwdk-0006d6-SC
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:44:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hNwdX-0000XG-Vr
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:43:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38404)
+	(envelope-from <kwolf@redhat.com>) id 1hNwdj-0000cz-Qa
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:44:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59942)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hNwdX-0000Wj-PJ
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:43:47 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hNwdh-0000bG-AN; Tue, 07 May 2019 05:43:57 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 83C15821C3;
-	Tue,  7 May 2019 09:43:46 +0000 (UTC)
-Received: from redhat.com (ovpn-112-52.ams2.redhat.com [10.36.112.52])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 71F2A277D3;
-	Tue,  7 May 2019 09:43:42 +0000 (UTC)
-Date: Tue, 7 May 2019 10:43:39 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20190507094339.GH27205@redhat.com>
-References: <20190503154613.4192-1-kchamart@redhat.com>
-	<20190503154613.4192-2-kchamart@redhat.com>
-	<20190503154905.GJ17905@redhat.com> <20190503204757.GF4675@paraplu>
+	by mx1.redhat.com (Postfix) with ESMTPS id 7D913307CDD5;
+	Tue,  7 May 2019 09:43:56 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-186.ams2.redhat.com
+	[10.36.116.186])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9CA5863BBC;
+	Tue,  7 May 2019 09:43:51 +0000 (UTC)
+Date: Tue, 7 May 2019 11:43:50 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190507094350.GE5808@localhost.localdomain>
+References: <20190503163028.213823-1-sgarzare@redhat.com>
+	<CA+aFP1BWA416Q1=PB3xcQUPc1fQ-Cq+mhnG8FbkJiLDEvT0wyA@mail.gmail.com>
+	<20190506095031.kffsp76faaqhkdr2@steredhat>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190503204757.GF4675@paraplu>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20190506095031.kffsp76faaqhkdr2@steredhat>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Tue, 07 May 2019 09:43:46 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.49]);
+	Tue, 07 May 2019 09:43:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] VirtIO-RNG: Update default entropy source
- to `/dev/urandom`
+Subject: Re: [Qemu-devel] [PATCH v2] block/rbd: increase dynamically the
+ image size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,61 +73,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: peter.maydell@linaro.org, armbru@redhat.com, rjones@redhat.com,
-	qemu-devel@nongnu.org, amit@kernel.org
+Cc: Josh Durgin <jdurgin@redhat.com>, dillaman@redhat.com,
+	qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 03, 2019 at 10:47:57PM +0200, Kashyap Chamarthy wrote:
-> On Fri, May 03, 2019 at 04:49:05PM +0100, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Fri, May 03, 2019 at 05:46:13PM +0200, Kashyap Chamarthy wrote:
-> > > When QEMU exposes a VirtIO-RNG device to the guest, that device nee=
-ds a
-> > > source of entropy, and that source needs to be "non-blocking", like
-> > > `/dev/urandom`.  However, currently QEMU defaults to the problemati=
-c
-> > > `/dev/random`, which is "blocking" (as in, it waits until sufficien=
-t
-> > > entropy is available).
-> > >=20
-> > > So change the entropy source to the recommended `/dev/urandom`.
-> > >=20
-> > > Related discussion in these[1][2] past threads.
-> > >=20
-> > > [1] https://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg083=
-35.html
-> > >     -- "RNG: Any reason QEMU doesn't default to `/dev/urandom`?"
-> > > [2] https://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg027=
-24.html
-> > >     -- "[RFC] Virtio RNG: Consider changing the default entropy sou=
-rce to
-> > >        /dev/urandom"
-> > >=20
-> > > Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+Am 06.05.2019 um 11:50 hat Stefano Garzarella geschrieben:
+> On Fri, May 03, 2019 at 01:21:23PM -0400, Jason Dillaman wrote:
+> > On Fri, May 3, 2019 at 12:30 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+> > >
+> > > RBD APIs don't allow us to write more than the size set with
+> > > rbd_create() or rbd_resize().
+> > > In order to support growing images (eg. qcow2), we resize the
+> > > image before write operations that exceed the current size.
+> > >
+> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > > > ---
-> > >  backends/rng-random.c | 2 +-
-> > >  qemu-options.hx       | 2 +-
-> > >  2 files changed, 2 insertions(+), 2 deletions(-)
-> >=20
-> > Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->=20
-> I'm wondering if this needs to be mentioned on a Release Notes wiki
-> somewhere -- because we're changing the default.
+> > > v2:
+> > >   - use bs->total_sectors instead of adding a new field [Kevin]
+> > >   - resize the image only during write operation [Kevin]
+> > >     for read operation, the bdrv_aligned_preadv() already handles reads
+> > >     that exceed the length returned by bdrv_getlength(), so IMHO we can
+> > >     avoid to handle it in the rbd driver
+> > > ---
+> > >  block/rbd.c | 14 +++++++++++++-
+> > >  1 file changed, 13 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/block/rbd.c b/block/rbd.c
+> > > index 0c549c9935..613e8f4982 100644
+> > > --- a/block/rbd.c
+> > > +++ b/block/rbd.c
+> > > @@ -934,13 +934,25 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
+> > >      }
+> > >
+> > >      switch (cmd) {
+> > > -    case RBD_AIO_WRITE:
+> > > +    case RBD_AIO_WRITE: {
+> > > +        /*
+> > > +         * RBD APIs don't allow us to write more than actual size, so in order
+> > > +         * to support growing images, we resize the image before write
+> > > +         * operations that exceed the current size.
+> > > +         */
+> > > +        if (off + size > bs->total_sectors * BDRV_SECTOR_SIZE) {
+> > 
+> > When will "bs->total_sectors" be refreshed to represent the correct
+> > current size? You wouldn't want a future write whose extent was
+> > greater than the original image size but less then a previous IO that
+> > expanded the image to attempt to shrink the image.
+> > 
+> 
+> Good point!
+> IIUC it can happen, because in the bdrv_aligned_pwritev() we do these
+> steps:
+> 1. call bdrv_driver_pwritev() that invokes "drv->bdrv_aio_pwritev" and
+>    then it waits calling "qemu_coroutine_yield()"
+> 2. call bdrv_co_write_req_finish() that updates the "bs->total_sectors"
+> 
+> Between steps 1 and 2, maybe another request can be executed, then the
+> issue that you described can occur.
+> 
+> The solutions that I have in mind are:
+> a. Add a variable in the BDRVRBDState to track the latest resize.
 
-Release notes need to get updated when pull requests merge to mention
-any user relevant changes.
+This would work and be relatively simple.
 
+> b. Call rbd_get_size() before the rbd_resize() to be sure to avoid to shrink
+>    the image.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+I'm not sure if rbd_get_size() involves network traffic or other
+significant complexity. If so, I'd definitely avoid it.
+
+> c. Updates the "bs->total_sectors" after the rbd_resize(), but I'm not
+>    sure it is allowed.
+> 
+> @Jason, @Kevin Do you have any advice?
+
+We need to make sure to run everything that bdrv_co_write_req_finish()
+does for resizing an image:
+
+    bs->total_sectors = end_sector;
+    bdrv_parent_cb_resize(bs);
+    bdrv_dirty_bitmap_truncate(bs, end_sector << BDRV_SECTOR_BITS);
+
+Just duplicating that code wouldn't be good; if something is added, we'd
+probably forget updating rbd, too. So I think your solution c would at
+least involve refactoring the above code into a separate function that
+can be called from rbd.
+
+But solution a might actually be the simplest. In this case, sorry for
+giving you bad advice in v1 of the patch.
+
+Kevin
 
