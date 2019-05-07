@@ -2,92 +2,108 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B364C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:51:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02946C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 21:02:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1023620656
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:51:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1023620656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AEB5920656
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 21:02:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="v+Qmli9e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEB5920656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54722 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54827 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO73U-0002Ks-CT
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 16:51:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39006)
+	id 1hO7EQ-0005zD-Qx
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 17:02:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hO725-0001ab-DS
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:49:50 -0400
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1hO7D5-0005Or-NK
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 17:01:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hO721-0006TH-Kj
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:49:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35882)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hO71u-0006CK-KA; Tue, 07 May 2019 16:49:39 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E4A663082E57;
-	Tue,  7 May 2019 20:49:35 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.217])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B3A31001DDC;
-	Tue,  7 May 2019 20:49:32 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-References: <20190507183610.9848-1-mreitz@redhat.com>
-	<20190507183610.9848-6-mreitz@redhat.com>
-	<bb490ce7-7943-6607-6a74-cfb5c2f9b95a@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <a1cbbc56-2d4d-2000-4da4-f7c30561a5e2@redhat.com>
-Date: Tue, 7 May 2019 22:49:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <elena.ufimtseva@oracle.com>) id 1hO7D4-0001Xa-6j
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 17:01:11 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:38718)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
+	id 1hO7D3-0001T1-UM
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 17:01:10 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+	by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x47Ksh0G194161; Tue, 7 May 2019 21:01:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=date : from : to : cc
+	: subject : message-id : references : mime-version : content-type :
+	content-transfer-encoding : in-reply-to; s=corp-2018-07-02;
+	bh=tG/KjFqJtdG8nOjI2W4agNJqpTTq6CQOtExGIYh2Ezs=;
+	b=v+Qmli9ePhLxPh9KkKZTo3u6DccMxh+D3dJ5+bP9BIsfDZbqcooyOybtyH2CzFsajx1l
+	JhPhQbC6sQVnQaK5JNgjsL0l4Px/NzXbOkmvPfBi7qXgYVBS4pjl46D4j45M8888URW7
+	yMve64A9j//1TsF0VuCTHEBG6t4z+zkG0Lw1ssL4Xc48DeYlLzqE3fRUg1VSAmo+JJTV
+	JeAE+4nYxN4GmnV3QwNNcT4TGLT6B+issQdfbKj+vgQvMA2Gz0dFJ2OhmO9tHbeqaGXz
+	crWfuW4t3gdszL71j0xFGhfjKS56yKajQFD9JiOJaY554iPo+ysz240ih7oFr2dqwMO4
+	QA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+	by aserp2130.oracle.com with ESMTP id 2s94b603gs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 07 May 2019 21:01:04 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+	by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x47KxsaC192796; Tue, 7 May 2019 21:01:03 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+	by userp3030.oracle.com with ESMTP id 2sagyu5vga-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 07 May 2019 21:01:03 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+	by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x47L12V8022444;
+	Tue, 7 May 2019 21:01:02 GMT
+Received: from heatpipe (/73.170.27.202)
+	by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Tue, 07 May 2019 14:01:01 -0700
+Date: Tue, 7 May 2019 14:00:59 -0700
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190507210059.GA26233@heatpipe>
+References: <20190307072253.9868-1-elena.ufimtseva@oracle.com>
+	<20190307142609.GF2843@stefanha-x1.localdomain>
+	<20190307145120.GF32268@redhat.com>
+	<20190307192727.GG2915@stefanha-x1.localdomain>
+	<BDEBF2EE-DE0F-46CF-B60E-536B3DA9BF77@oracle.com>
+	<20190311102006.GK12393@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <bb490ce7-7943-6607-6a74-cfb5c2f9b95a@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="R2wGXK6WHw75AeOsH42A5NKy1p7q4e85M"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Tue, 07 May 2019 20:49:35 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 5/5] iotests: Let 233 run concurrently
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190311102006.GK12393@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9250
+	signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1905070131
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9250
+	signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1905070131
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2130.oracle.com id
+	x47Ksh0G194161
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.79
+Subject: Re: [Qemu-devel] [multiprocess RFC PATCH 36/37] multi-process: add
+ the concept description to docs/devel/qemu-multiprocess
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,146 +115,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: John G Johnson <john.g.johnson@oracle.com>, sstabellini@kernel.org,
+	Jag Raman <jag.raman@oracle.com>, konrad.wilk@oracle.com,
+	Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
+	ross.lagerwall@citrix.com, liran.alon@oracle.com,
+	Stefan Hajnoczi <stefanha@redhat.com>, kanth.ghatraju@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---R2wGXK6WHw75AeOsH42A5NKy1p7q4e85M
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Message-ID: <a1cbbc56-2d4d-2000-4da4-f7c30561a5e2@redhat.com>
-Subject: Re: [PATCH 5/5] iotests: Let 233 run concurrently
-References: <20190507183610.9848-1-mreitz@redhat.com>
- <20190507183610.9848-6-mreitz@redhat.com>
- <bb490ce7-7943-6607-6a74-cfb5c2f9b95a@redhat.com>
-In-Reply-To: <bb490ce7-7943-6607-6a74-cfb5c2f9b95a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Mar 11, 2019 at 10:20:06AM +0000, Daniel P. Berrang=C3=A9 wrote:
+> On Thu, Mar 07, 2019 at 03:29:41PM -0800, John G Johnson wrote:
+> >=20
+> >=20
 
-On 07.05.19 22:38, Eric Blake wrote:
-> On 5/7/19 1:36 PM, Max Reitz wrote:
->> common.nbd's nbd_server_set_tcp_port() tries to find a free port, and
->> then uses it for the whole test run.  However, this is racey because
+Hi Daniel, Stefan
+
+We have not replied in a while as we were trying to figure out
+the best approach after multiple comments we have received on the
+patch series.
+
+Leaving other concerns that you, Stefan and others shared with us
+out of this particular topic, we would like to get your opinion on
+the following approach.
+
+Please see below.
+
+> > > On Mar 7, 2019, at 11:27 AM, Stefan Hajnoczi <stefanha@redhat.com> =
+wrote:
+> > >=20
+> > > On Thu, Mar 07, 2019 at 02:51:20PM +0000, Daniel P. Berrang=C3=A9 w=
+rote:
+> > >> I guess one obvious answer is that the existing security mechanism=
+s like
+> > >> SELinux/ApArmor/DAC can be made to work in a more fine grained man=
+ner if
+> > >> there are distinct processes. This would allow for a more useful s=
+eccomp
+> > >> filter to better protect against secondary kernel exploits should =
+QEMU
+> > >> itself be exploited, if we can protect individual components.
+> > >=20
+> > > Fine-grained sandboxing is possible in theory but tedious in practi=
+ce.
+> > > From what I can tell this patch series doesn't implement any sandbo=
+xing
+> > > for child processes.
+> > >=20
+> >=20
+> > 	The policies aren=E2=80=99t in QEMU, but in the selinux config files.
+> > They would say, for example, that when the QEMU process exec()s the
+> > disk emulation process, the process security context type transitions
+> > to a new type.  This type would have permission to access the VM imag=
+e
+> > objects, whereas the QEMU process type (and any other device emulatio=
+n
+> > process types) cannot access them.
 >=20
-> racy
+> Note that currently all QEMU instances run by libvirt have seccomp
+> policy applied that explicitly forbids any use of fork+exec as a way
+> to reduce avenues of attack for an exploited QEMU.
 >=20
->> even if the port was free at the beginning, there is no guarantee it
->> will continue to be available.  Therefore, 233 currently cannot reliab=
-ly
->> be run concurrently with other NBD TCP tests.
->>
->> This patch addresses the problem by dropping nbd_server_set_tcp_port()=
-,
->> and instead finding a new port every time nbd_server_start_tcp_socket(=
-)
->> is invoked.  For this, we run qemu-nbd with --fork and on error evalua=
-te
->> the output to see whether it contains "Address already in use".  If so=
-,
->> we try the next port.
->>
->> On success, we still want to continually redirect the output from
->> qemu-nbd to stderr.  To achieve both, we redirect qemu-nbd's stderr to=
- a
->> FIFO that we then open in bash.  If the parent process exits with stat=
-us
->> 0 (which means that the server has started successfully), we launch a
->> background cat process that copies the FIFO to stderr.  On failure, we=
+> Even in a modularized QEMU I'd be loathe to allow QEMU to have the
+> fork+exec privileged, unless "QEMU" in this case was just a stub
+> process that does nothing more than fork+exec the other binaries,
+> while having zero attack exposed to the untrusted guest OS.
 
->> read the whole content into a variable and then evaluate it.
->>
->> While at it, use --fork in nbd_server_start_unix_socket(), too.  Doing=
+We see libvirt uses QEMU=E2=80=99s -sandbox option to indicate that QEMU
+should use seccomp() to prohibit future use of certain system calls,
+including fork() and exec().  Our idea is to enumerate the remote
+processes needed via QEMU command line options, and have QEMU exec()
+those processes before -sandbox is processed.
+And we also will init seccomp for emulated devices processes.
 
->> so allows us to drop nbd_server_wait_for_*_socket().
->>
->> Note that the reason common.nbd did not use --fork before is that
->> qemu-nbd did not have --pid-file.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  tests/qemu-iotests/233        |  1 -
->>  tests/qemu-iotests/common.nbd | 93 ++++++++++++++++------------------=
--
->>  2 files changed, 42 insertions(+), 52 deletions(-)
->>
 >=20
->> @@ -34,76 +39,62 @@ nbd_server_stop()
->>          fi
->>      fi
->>      rm -f "$nbd_unix_socket"
->> -}
->> -
->> -nbd_server_wait_for_unix_socket()
->> -{
-> ...
->> -    echo "Failed in check of unix socket created by qemu-nbd"
->> -    exit 1
->> +    rm -f "$nbd_stderr_fifo"
+> > 	If you wanted to use DAC, you could do the something similar by
+> > making the disk emulation executable setuid to a UID than can access
+> > VM image files.
+> >=20
+> > 	In either case, the policies and permissions are set up before
+> > libvirt even runs, so it doesn=E2=80=99t need to be aware of them.
 >=20
-> You could use a single 'rm -f "$nbd_unix_socket" "$nbd_stderr_fifo"'.
-> That's cosmetic, though.
+> That's not the case bearing in mind the above point about fork+exec
+> being forbidden. It would likely require libvirt to be in charge of
+> spawning the various helper binaries from a trusted context.
 >=20
-> Are we sure that even on failure, our fifo will not fill up and cause
-> deadlock? If the failing qemu-nbd has so much output as to be non-atomi=
-c
-> so that it blocks waiting for a reader, but we don't read anything unti=
-l
-> after qemu-nbd exits after forking the daemon, then we have deadlock.
-
-Hm, right.  I don=E2=80=99t think it will happen, but if it does, it won=E2=
-=80=99t be
-because of an =E2=80=9CAddress already in use=E2=80=9D.  So if it did hap=
-pen, the test
-should fail anyway.
-
-Of course, a hang is not the nicest way to fail a test, but I think as
-long as we don=E2=80=99t think it will be a problem, it should be fine.
-
-(The alternative I can think of would be to start a background cat that
-copies data over to a log file, and then kill it after the qemu-nbd
-parent process has exited.  On error, we read the log; on success, we
-print it to stderr and then start the cat from nbd_stderr_fifo to stderr.=
-)
-
-> But in the common case, I don't think qemu-nbd ever spits out that much=
-
-> in errors, even when it fails to start whether due to a socket in use o=
-r
-> for other reasons.  And even if it does hang, it is our testsuite (and
-> our CI tools will probably notice it), rather than our main code.
 >=20
-> Otherwise, it's a lot of shell code with quite a few bash-isms, but we
-> already require bash, and I didn't spot anything blatantly wrong.
+> > > How to do this in practice must be clear from the beginning if
+> > > fine-grained sandboxing is the main selling point.
+> > >=20
+> > > Some details to start the discussion:
+> > >=20
+> > > * How will fine-grained SELinux/AppArmor/DAC policies be configured=
+ for
+> > >   each process?  I guess this requires root, so does libvirt need t=
+o
+> > >   know about each process?
+> > >=20
+> >=20
+> > 	The polices would apply to process security context types (or
+> > UIDs in a DAC regime), so I would not expect libvirt to be aware of t=
+hem.
 >=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> I'm pretty skeptical that such a large modularization of QEMU can be
+> done without libvirt being aware of it & needing some kind of changes
+> applied.
+>
 
-Thanks again!
+We agree with that. With above proposed approach we still have to change =
+hotplug
+in some way.
+If a eparate process will be spawned, libvirt will be the one doing
+fork/exec of the separate processes. Or possibly launch a helper
+binaries that will unify the way how an instance is being started with
+multiple processes and hotplugging.
 
-I=E2=80=99ll prepare the v2.
+Thanks!
+Elena, Jag, John.
 
-Max
 
-
---R2wGXK6WHw75AeOsH42A5NKy1p7q4e85M
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzR71oACgkQ9AfbAGHV
-z0BO1Af+JKMXPPoquNzaffvoccwJJ5VTe/448MojetaEAUb51oLAldJD+avUW8Kx
-DjFkMqlSqjqfVQHoaoW4ZlD1cPg73UK2rTiYB+TP0eYawephjEYwjGivjqiiPbDn
-k3sMWpJ8qHezHwA/yJZYpKBtSAfCcUrfKyx2yh58VQ4hWPjp9+gfyv3XF4m4CWxx
-B0YPXfHm0QAdTPfOKZlEP76JL7Z/meC1splCMi8UnXsfI1nNQloNmYlLMR1ZgEb8
-u55zywBYPIirthVniKjMIJhnle5Vqrvz+Em2onuZMEqLIOxdVjv3RITT9/kPoRFU
-zU+88QB+jqE6SG+AqoBK0Gd40LCuhg==
-=C7p3
------END PGP SIGNATURE-----
-
---R2wGXK6WHw75AeOsH42A5NKy1p7q4e85M--
+>=20
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
 
