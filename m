@@ -2,81 +2,65 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15436C04AAD
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F428C04AAD
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:50:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D26B9205ED
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:47:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D26B9205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C6262205ED
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:50:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6262205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40422 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40448 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNswn-000249-5c
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 01:47:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60094)
+	id 1hNszi-00033A-SW
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 01:50:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNsvb-0001H6-GI
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:46:13 -0400
+	(envelope-from <yan.y.zhao@intel.com>) id 1hNsyV-0002RL-3a
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:49:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNsva-0003xz-3h
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:46:11 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:34955)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hNsvZ-0003xg-Tp
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:46:10 -0400
-Received: by mail-wr1-f67.google.com with SMTP id w12so6917609wrp.2
-	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 22:46:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=X6FuCssFlQh7pMhHf4MFiyuPR7kYecNTo54TamMBiUc=;
-	b=Pg44m2lEu/bLsU+4SRh+c8JSZDfZHjX5IhM22thhvgNt2V+xrmGeTPXzChvdrrUS5m
-	MiizuHilaAJHG2xk9soEttpwYHWlbvEkgkgibhz3jcJI/lS38FATlzdeO0e5b4Ula9IK
-	UPWxrlYIutxXb/btCEr25Y5mU+ievlI/AN0D9vxSq4ClArZb1WaqFAEPy6qQuDfDLDY4
-	r+91Olljl4vuha7ciWHcciTAanmxR7BXBx2E8Br0ZzTRTrvOHh1O5bxsr7sPc/5OaFcm
-	cAuCrMjT1nHz/Jtnvcoc8lKfR/Cznmx1G0H+KVmebsbhWJC3SittXPIS2w9k2ko3OtS+
-	PmGA==
-X-Gm-Message-State: APjAAAXFSDgq/O3XxYbVYrTlTHr4uENqOPFT3zwbJclugC9EiGMavsrj
-	c2JxHGZIDKL+SFCbc3d5mpZ1XA==
-X-Google-Smtp-Source: APXvYqzeKHgfAZgjkSN5jWqheLjjvBhB+6uGeVglTDMUvw4aJOOnClEPlim+tXD1kPRbSLBM5BSgpw==
-X-Received: by 2002:adf:eb0e:: with SMTP id s14mr11463465wrn.158.1557207968991;
-	Mon, 06 May 2019 22:46:08 -0700 (PDT)
-Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	z7sm16255682wme.26.2019.05.06.22.46.08
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 06 May 2019 22:46:08 -0700 (PDT)
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-	Peter Maydell <peter.maydell@linaro.org>
-References: <20190506142042.28096-1-clg@kaod.org>
-	<20190506142042.28096-4-clg@kaod.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <4f7131a7-9099-f506-035f-abc584bf56b0@redhat.com>
-Date: Tue, 7 May 2019 07:46:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <yan.y.zhao@intel.com>) id 1hNsyT-0005Oh-7b
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:49:11 -0400
+Received: from mga05.intel.com ([192.55.52.43]:27230)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+	id 1hNsyS-0005O9-QT
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:49:09 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+	by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	06 May 2019 22:49:07 -0700
+X-ExtLoop1: 1
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+	([10.239.13.9])
+	by fmsmga004.fm.intel.com with ESMTP; 06 May 2019 22:49:02 -0700
+Date: Tue, 7 May 2019 01:43:25 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Zhenyu Wang <zhenyuw@linux.intel.com>
+Message-ID: <20190507054325.GB14284@joy-OptiPlex-7040>
+References: <20190506014514.3555-1-yan.y.zhao@intel.com>
+	<20190506015102.3691-1-yan.y.zhao@intel.com>
+	<20190506032032.GP12913@zhen-hp.sh.intel.com>
+	<20190506074158.GU12913@zhen-hp.sh.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20190506142042.28096-4-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] aspeed: use sysbus_init_child_obj()
- to initialize children
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190506074158.GU12913@zhen-hp.sh.intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 192.55.52.43
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] drm/i915/gvt: export mdev device
+ version to sysfs for Intel vGPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,117 +72,341 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"aik@ozlabs.ru" <aik@ozlabs.ru>,
+	"Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+	"shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+	"eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+	"eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+	Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+	"pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+	"libvir-list@redhat.com" <libvir-list@redhat.com>,
+	"arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
+	"felipe@nutanix.com" <felipe@nutanix.com>,
+	"Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+	"dgilbert@redhat.com" <dgilbert@redhat.com>,
+	"jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"intel-gvt-dev@lists.freedesktop.org"
+	<intel-gvt-dev@lists.freedesktop.org>, "Liu,
+	Changpeng" <changpeng.liu@intel.com>,
+	"cohuck@redhat.com" <cohuck@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Wang, Zhi A" <zhi.a.wang@intel.com>,
+	"dinechin@redhat.com" <dinechin@redhat.com>, "He,
+	Shaopeng" <shaopeng.he@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Cédric,
+On Mon, May 06, 2019 at 03:41:58PM +0800, Zhenyu Wang wrote:
+> On 2019.05.06 11:20:32 +0800, Zhenyu Wang wrote:
+> > On 2019.05.05 21:51:02 -0400, Yan Zhao wrote:
+> > > This feature implements the version attribute for Intel's vGPU mdev
+> > > devices.
+> > >
+> > > version attribute is rw.
+> > > It's used to check device compatibility for two mdev devices.
+> > > version string format and length are private for vendor driver. vendor
+> > > driver is able to define them freely.
+> > >
+> > > For Intel vGPU of gen8 and gen9, the mdev device version
+> > > consists of 3 fields: "vendor id" + "device id" + "mdev type".
+> > >
+> > > Reading from a vGPU's version attribute, a string is returned in below
+> > > format: <vendor id>-<device id>-<mdev type>. e.g.
+> > > 8086-193b-i915-GVTg_V5_2.
+> > >
+> > > Writing a string to a vGPU's version attribute will trigger GVT to check
+> > > whether a vGPU identified by the written string is compatible with
+> > > current vGPU owning this version attribute. errno is returned if the two
+> > > vGPUs are incompatible. The length of written string is returned in
+> > > compatible case.
+> > >
+> > > For other platforms, and for GVT not supporting vGPU live migration
+> > > feature, errnos are returned when read/write of mdev devices' version
+> > > attributes.
+> > >
+> > > For old GVT versions where no version attributes exposed in sysfs, it is
+> > > regarded as not supporting vGPU live migration.
+> > >
+> > > For future platforms, besides the current 2 fields in vendor proprietary
+> > > part, more fields may be added to identify Intel vGPU well for live
+> > > migration purpose.
+> > >
+> > > v2:
+> > > 1. removed 32 common part of version string
+> > > (Alex Williamson)
+> > > 2. do not register version attribute for GVT not supporting live
+> > > migration.(Cornelia Huck)
+> > > 3. for platforms out of gen8, gen9, return -EINVAL --> -ENODEV for
+> > > incompatible. (Cornelia Huck)
+> > >
+> > > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > > Cc: Erik Skultety <eskultet@redhat.com>
+> > > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > Cc: Cornelia Huck <cohuck@redhat.com>
+> > > Cc: "Tian, Kevin" <kevin.tian@intel.com>
+> > > Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+> > > Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
+> > > c: Neo Jia <cjia@nvidia.com>
+> > > Cc: Kirti Wankhede <kwankhede@nvidia.com>
+> > >
+> > > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > > ---
+> > >  drivers/gpu/drm/i915/gvt/Makefile         |  2 +-
+> > >  drivers/gpu/drm/i915/gvt/device_version.c | 87 +++++++++++++++++++++++
+> > >  drivers/gpu/drm/i915/gvt/gvt.c            | 51 +++++++++++++
+> > >  drivers/gpu/drm/i915/gvt/gvt.h            |  6 ++
+> > >  4 files changed, 145 insertions(+), 1 deletion(-)
+> > >  create mode 100644 drivers/gpu/drm/i915/gvt/device_version.c
+> > >
+> > > diff --git a/drivers/gpu/drm/i915/gvt/Makefile b/drivers/gpu/drm/i915/gvt/Makefile
+> > > index 271fb46d4dd0..54e209a23899 100644
+> > > --- a/drivers/gpu/drm/i915/gvt/Makefile
+> > > +++ b/drivers/gpu/drm/i915/gvt/Makefile
+> > > @@ -3,7 +3,7 @@ GVT_DIR := gvt
+> > >  GVT_SOURCE := gvt.o aperture_gm.o handlers.o vgpu.o trace_points.o firmware.o \
+> > >     interrupt.o gtt.o cfg_space.o opregion.o mmio.o display.o edid.o \
+> > >     execlist.o scheduler.o sched_policy.o mmio_context.o cmd_parser.o debugfs.o \
+> > > -   fb_decoder.o dmabuf.o page_track.o
+> > > +   fb_decoder.o dmabuf.o page_track.o device_version.o
+> > >
+> > >  ccflags-y                          += -I$(src) -I$(src)/$(GVT_DIR)
+> > >  i915-y                                     += $(addprefix $(GVT_DIR)/, $(GVT_SOURCE))
+> > > diff --git a/drivers/gpu/drm/i915/gvt/device_version.c b/drivers/gpu/drm/i915/gvt/device_version.c
+> > > new file mode 100644
+> > > index 000000000000..bd4cdcbdba95
+> > > --- /dev/null
+> > > +++ b/drivers/gpu/drm/i915/gvt/device_version.c
+> > > @@ -0,0 +1,87 @@
+> > > +/*
+> > > + * Copyright(c) 2011-2017 Intel Corporation. All rights reserved.
+> > > + *
+> > > + * Permission is hereby granted, free of charge, to any person obtaining a
+> > > + * copy of this software and associated documentation files (the "Software"),
+> > > + * to deal in the Software without restriction, including without limitation
+> > > + * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+> > > + * and/or sell copies of the Software, and to permit persons to whom the
+> > > + * Software is furnished to do so, subject to the following conditions:
+> > > + *
+> > > + * The above copyright notice and this permission notice (including the next
+> > > + * paragraph) shall be included in all copies or substantial portions of the
+> > > + * Software.
+> > > + *
+> > > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> > > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> > > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+> > > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> > > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> > > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+> > > + * SOFTWARE.
+> > > + *
+> > > + * Authors:
+> > > + *    Yan Zhao <yan.y.zhao@intel.com>
+> > > + */
+> > > +#include <linux/vfio.h>
+> > > +#include "i915_drv.h"
+> > > +
+> > > +static bool is_compatible(const char *self, const char *remote)
+> > > +{
+> > > +   if (strlen(remote) != strlen(self))
+> > > +           return false;
+> > > +
+> > > +   return (strncmp(self, remote, strlen(self))) ? false : true;
+> > > +}
+> > > +
+> > > +ssize_t intel_gvt_get_vfio_device_version_len(struct drm_i915_private *dev_priv)
+> > > +{
+> > > +   if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
+> > > +           return -ENODEV;
+> > > +
+> > > +   return PAGE_SIZE;
+> > > +}
+> > > +
+> > > +ssize_t intel_gvt_get_vfio_device_version(struct drm_i915_private *dev_priv,
+> > > +           char *buf, const char *mdev_type)
+> > > +{
+> > > +   int cnt = 0, ret = 0;
+> > > +   const char *str = NULL;
+> > > +
+> >
+> > > +   /* currently only gen8 & gen9 are supported */
+> > > +   if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
+> > > +           return -ENODEV;
+> > > +
+> > > +   /* vendor id + device id + mdev type */
+> > > +   /* vendor id */
+> > > +   cnt = snprintf(buf, 5, "%04x", PCI_VENDOR_ID_INTEL);
+> > > +   buf += cnt;
+> > > +   ret += cnt;
+> > > +
+> > > +   /* device id */
+> > > +   cnt = snprintf(buf, 6, "-%04x", INTEL_DEVID(dev_priv));
+> > > +   buf += cnt;
+> > > +   ret += cnt;
+> > > +
+> > > +   /* mdev type */
+> > > +   str = mdev_type;
+> > > +   cnt = snprintf(buf, strlen(str) + 3, "-%s\n", mdev_type);
+> > > +   buf += cnt;
+> > > +   ret += cnt;
+> > > +
+> > > +   return ret;
+> > > +}
+> > > +
+> > > +ssize_t intel_gvt_check_vfio_device_version(struct drm_i915_private *dev_priv,
+> > > +           const char *self, const char *remote)
+> > > +{
+> > > +
+> > > +   /* currently only gen8 & gen9 are supported */
+> > > +   if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
+> > > +           return -ENODEV;
+> > > +
+> > > +   if (!is_compatible(self, remote))
+> > > +           return -EINVAL;
+> > > +
+> > > +   return 0;
+> > > +}
+> > > diff --git a/drivers/gpu/drm/i915/gvt/gvt.c b/drivers/gpu/drm/i915/gvt/gvt.c
+> > > index 43f4242062dd..19f16eec5a4c 100644
+> > > --- a/drivers/gpu/drm/i915/gvt/gvt.c
+> > > +++ b/drivers/gpu/drm/i915/gvt/gvt.c
+> > > @@ -105,14 +105,65 @@ static ssize_t description_show(struct kobject *kobj, struct device *dev,
+> > >                    type->weight);
+> > >  }
+> > >
+> > > +#ifdef GVT_MIGRATION_VERSION
+> >
+> > No extra define.
+> >
+ok. I'll try to define a variable in struct intel_gvt.
+e.g. 
 
-On 5/6/19 4:20 PM, Cédric Le Goater wrote:
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
-> ---
->  hw/arm/aspeed_soc.c | 50 ++++++++++++++++++---------------------------
->  1 file changed, 20 insertions(+), 30 deletions(-)
+gvt->is_migration_enabled.
+
+> > > +static ssize_t version_show(struct kobject *kobj, struct device *dev,
+> > > +           char *buf)
+> > > +{
+> > > +   struct drm_i915_private *i915 = kdev_to_i915(dev);
+> > > +   const char *mdev_type = kobject_name(kobj);
+> > > +
+> > > +   return intel_gvt_get_vfio_device_version(i915, buf, mdev_type);
+> > > +}
+> > > +
+> > > +static ssize_t version_store(struct kobject *kobj, struct device *dev,
+> > > +           const char *buf, size_t count)
+> > > +{
+> > > +   char *remote = NULL, *self = NULL;
+> > > +   int len, ret = 0;
+> > > +   struct drm_i915_private *i915 = kdev_to_i915(dev);
+> > > +   const char *mdev_type = kobject_name(kobj);
+> > > +
+> > > +   len = intel_gvt_get_vfio_device_version_len(i915);
+> > > +   if (len < 0)
+> > > +           return len;
+> > > +
+> > > +   self = kmalloc(len, GFP_KERNEL);
+> > > +   if (!self)
+> > > +           return -ENOMEM;
+> > > +
+> > > +   ret = intel_gvt_get_vfio_device_version(i915, self, mdev_type);
+> > > +   if (ret < 0)
+> > > +           goto out;
+> > > +
+> > > +   remote = kstrndup(buf, count, GFP_KERNEL);
+> > > +   if (!remote) {
+> > > +           ret = -ENOMEM;
+> > > +           goto out;
+> > > +   }
+> >
+> > Please make device version as attribute for vgpu instead of allocating memory
+> > everytime to generate it.
+> >
 > 
-> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-> index bd83618ceba9..4b705afd096a 100644
-> --- a/hw/arm/aspeed_soc.c
-> +++ b/hw/arm/aspeed_soc.c
-> @@ -172,12 +172,11 @@ static void aspeed_soc_init(Object *obj)
->      AspeedSoCClass *sc = ASPEED_SOC_GET_CLASS(s);
->      int i;
->  
-> -    object_initialize(&s->cpu, sizeof(s->cpu), sc->info->cpu_type);
-> -    object_property_add_child(obj, "cpu", OBJECT(&s->cpu), NULL);
-> +    object_initialize_child(obj, "cpu", OBJECT(&s->cpu), sizeof(s->cpu),
-> +                            sc->info->cpu_type, &error_abort, NULL);
->  
-> -    object_initialize(&s->scu, sizeof(s->scu), TYPE_ASPEED_SCU);
-> -    object_property_add_child(obj, "scu", OBJECT(&s->scu), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->scu), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "scu", OBJECT(&s->scu), sizeof(s->scu),
-> +                          TYPE_ASPEED_SCU);
+> Seems this is attribute for mdev type instead of instance, I was wrong
+> to take it as vgpu instance attribute, so we could add it for vgpu type
+> definition for device with migration.
+>
+ok. I'll try to add one version field in struct intel_vgpu_type.
 
-A similar patch (although better described IMO) was posted here:
-https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg05931.html
-
-However you improved it by using sysbus_init_child_obj(). If you don't
-mind I'll respin addressing Markus comment and using your improvement.
-
->      qdev_prop_set_uint32(DEVICE(&s->scu), "silicon-rev",
->                           sc->info->silicon_rev);
->      object_property_add_alias(obj, "hw-strap1", OBJECT(&s->scu),
-> @@ -187,36 +186,29 @@ static void aspeed_soc_init(Object *obj)
->      object_property_add_alias(obj, "hw-prot-key", OBJECT(&s->scu),
->                                "hw-prot-key", &error_abort);
->  
-> -    object_initialize(&s->vic, sizeof(s->vic), TYPE_ASPEED_VIC);
-> -    object_property_add_child(obj, "vic", OBJECT(&s->vic), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->vic), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "vic", OBJECT(&s->vic), sizeof(s->vic),
-> +                          TYPE_ASPEED_VIC);
->  
-> -    object_initialize(&s->timerctrl, sizeof(s->timerctrl), TYPE_ASPEED_TIMER);
-> -    object_property_add_child(obj, "timerctrl", OBJECT(&s->timerctrl), NULL);
-> +    sysbus_init_child_obj(obj, "timerctrl", OBJECT(&s->timerctrl),
-> +                          sizeof(s->timerctrl), TYPE_ASPEED_TIMER);
->      object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
->                                     OBJECT(&s->scu), &error_abort);
-> -    qdev_set_parent_bus(DEVICE(&s->timerctrl), sysbus_get_default());
->  
-> -    object_initialize(&s->i2c, sizeof(s->i2c), TYPE_ASPEED_I2C);
-> -    object_property_add_child(obj, "i2c", OBJECT(&s->i2c), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->i2c), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "i2c", OBJECT(&s->i2c), sizeof(s->i2c),
-> +                          TYPE_ASPEED_I2C);
->  
-> -    object_initialize(&s->fmc, sizeof(s->fmc), sc->info->fmc_typename);
-> -    object_property_add_child(obj, "fmc", OBJECT(&s->fmc), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->fmc), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "fmc", OBJECT(&s->fmc), sizeof(s->fmc),
-> +                          sc->info->fmc_typename);
->      object_property_add_alias(obj, "num-cs", OBJECT(&s->fmc), "num-cs",
->                                &error_abort);
->  
->      for (i = 0; i < sc->info->spis_num; i++) {
-> -        object_initialize(&s->spi[i], sizeof(s->spi[i]),
-> -                          sc->info->spi_typename[i]);
-> -        object_property_add_child(obj, "spi[*]", OBJECT(&s->spi[i]), NULL);
-> -        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
-> +        sysbus_init_child_obj(obj, "spi[*]", OBJECT(&s->spi[i]),
-> +                              sizeof(s->spi[i]), sc->info->spi_typename[i]);
->      }
->  
-> -    object_initialize(&s->sdmc, sizeof(s->sdmc), TYPE_ASPEED_SDMC);
-> -    object_property_add_child(obj, "sdmc", OBJECT(&s->sdmc), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->sdmc), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "sdmc", OBJECT(&s->sdmc), sizeof(s->sdmc),
-> +                          TYPE_ASPEED_SDMC);
->      qdev_prop_set_uint32(DEVICE(&s->sdmc), "silicon-rev",
->                           sc->info->silicon_rev);
->      object_property_add_alias(obj, "ram-size", OBJECT(&s->sdmc),
-> @@ -225,16 +217,14 @@ static void aspeed_soc_init(Object *obj)
->                                "max-ram-size", &error_abort);
->  
->      for (i = 0; i < sc->info->wdts_num; i++) {
-> -        object_initialize(&s->wdt[i], sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
-> -        object_property_add_child(obj, "wdt[*]", OBJECT(&s->wdt[i]), NULL);
-> -        qdev_set_parent_bus(DEVICE(&s->wdt[i]), sysbus_get_default());
-> +        sysbus_init_child_obj(obj, "wdt[*]", OBJECT(&s->wdt[i]),
-> +                              sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
->          qdev_prop_set_uint32(DEVICE(&s->wdt[i]), "silicon-rev",
->                                      sc->info->silicon_rev);
->      }
->  
-> -    object_initialize(&s->ftgmac100, sizeof(s->ftgmac100), TYPE_FTGMAC100);
-> -    object_property_add_child(obj, "ftgmac100", OBJECT(&s->ftgmac100), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->ftgmac100), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "ftgmac100", OBJECT(&s->ftgmac100),
-> +                          sizeof(s->ftgmac100), TYPE_FTGMAC100);
->  }
->  
->  static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+> > > +
+> > > +   ret = intel_gvt_check_vfio_device_version(i915, self, remote);
+> > > +
+> > > +out:
+> > > +   kfree(self);
+> > > +   kfree(remote);
+> > > +   return (ret < 0 ? ret : count);
+> > > +}
+> > > +#endif
+> > > +
+> > >  static MDEV_TYPE_ATTR_RO(available_instances);
+> > >  static MDEV_TYPE_ATTR_RO(device_api);
+> > >  static MDEV_TYPE_ATTR_RO(description);
+> > > +#ifdef GVT_MIGRATION_VERSION
+> > > +static MDEV_TYPE_ATTR_RW(version);
+> > > +#endif
+> >
+> > Don't need extra define.
+> >
+> > >
+> > >  static struct attribute *gvt_type_attrs[] = {
+> > >     &mdev_type_attr_available_instances.attr,
+> > >     &mdev_type_attr_device_api.attr,
+> > >     &mdev_type_attr_description.attr,
+> > > +#ifdef GVT_MIGRATION_VERSION
+> > > +   &mdev_type_attr_version.attr,
+> > > +#endif
+> > >     NULL,
+> > >  };
+> >
+> > I think you need another group of attrs for type that could support
+> > migration, it will be assigned during host init for current platform
+> > with driver support. So just add new group of attrs for like
+> > gvt_migration_type_attrs[] with version.
+> >
+> > >
+> > > diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/gvt.h
+> > > index f5a328b5290a..4062f6b26acf 100644
+> > > --- a/drivers/gpu/drm/i915/gvt/gvt.h
+> > > +++ b/drivers/gpu/drm/i915/gvt/gvt.h
+> > > @@ -687,6 +687,12 @@ void intel_gvt_debugfs_remove_vgpu(struct intel_vgpu *vgpu);
+> > >  int intel_gvt_debugfs_init(struct intel_gvt *gvt);
+> > >  void intel_gvt_debugfs_clean(struct intel_gvt *gvt);
+> > >
+> > > +ssize_t intel_gvt_get_vfio_device_version(struct drm_i915_private *i915,
+> > > +           char *buf, const char *mdev_type);
+> > > +ssize_t intel_gvt_check_vfio_device_version(struct drm_i915_private *dev_priv,
+> > > +           const char *self, const char *remote);
+> > > +ssize_t
+> > > +intel_gvt_get_vfio_device_version_len(struct drm_i915_private *dev_priv);
+> > >
+> > >  #include "trace.h"
+> > >  #include "mpt.h"
+> > > --
+> > > 2.17.1
+> > >
+> >
+> > --
+> > Open Source Technology Center, Intel ltd.
+> >
+> > $gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
 > 
+> 
+> 
+> --
+> Open Source Technology Center, Intel ltd.
+> 
+> $gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+
+
+> _______________________________________________
+> intel-gvt-dev mailing list
+> intel-gvt-dev@lists.freedesktop.org
+> https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
+
 
