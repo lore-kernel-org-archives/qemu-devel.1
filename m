@@ -2,61 +2,64 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E284FC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 06:34:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CF6CC004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 06:35:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F08D2087F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 06:34:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4853220B7C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 06:35:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Hr1QXqRM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F08D2087F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="VK98Q+ZE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4853220B7C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40895 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40909 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNtfw-00020h-UH
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 02:34:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37812)
+	id 1hNth0-0002fQ-FV
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 02:35:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hNtVq-0000sO-Rw
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 02:23:40 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hNtVl-0002hy-By
+	(envelope-from <dgibson@ozlabs.org>) id 1hNtVn-0000o5-4B
 	for qemu-devel@nongnu.org; Tue, 07 May 2019 02:23:36 -0400
-Received: from ozlabs.org ([203.11.71.1]:35967)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1hNtVl-0002hd-Bq
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 02:23:34 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:40433)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hNtVi-0002ds-Uo; Tue, 07 May 2019 02:23:32 -0400
+	id 1hNtVj-0002e8-Cq; Tue, 07 May 2019 02:23:32 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 44yqL30P33z9sNC; Tue,  7 May 2019 16:23:22 +1000 (AEST)
+	id 44yqL250nTz9sD4; Tue,  7 May 2019 16:23:22 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1557210203;
-	bh=eXt6jbXbDf70/Q2NJBka7jj4BKphfb5wCwAJcdlJZis=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Hr1QXqRMBkILl0osSeEfydaSdiuzgtCXCbsloYB+9ovgJCSjnWPQhoE75zVxoKnpK
-	5xR2H53DgLTI/hrjhrhnP0otKxPurT2M8zirckfWX6jkz3PxxqliW+RgU+6mPuh4Aw
-	e8pOAGZN2hCxQRk9hosRBu5Pf3gdAUluhdH6IxLk=
+	d=gibson.dropbear.id.au; s=201602; t=1557210202;
+	bh=B8s0wa7uKzCF07V2NRa7udjsSMZldDSr/gFPsf+z1XM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VK98Q+ZE9EQ7iZfvHzovvVc7a/GL/TGi5K/B0BlZxIYzEF380k79Yl9VVI98ys0fj
+	rCGKuxWCVIeg14pmX6uEASxVmb81XQWhCbxkW7Kgrar+oJjkxJA7gxbtxkKGPp0OKB
+	rSgsYESOv3eun2zd23CjZ1e5zkwNyQLXU83sdxkU=
+Date: Tue, 7 May 2019 15:23:58 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: qemu-devel@nongnu.org,
-	mst@redhat.com
-Date: Tue,  7 May 2019 16:23:13 +1000
-Message-Id: <20190507062316.20916-3-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190507062316.20916-1-david@gibson.dropbear.id.au>
-References: <20190507062316.20916-1-david@gibson.dropbear.id.au>
+To: Anton Blanchard <anton@ozlabs.org>
+Message-ID: <20190507052358.GI7073@umbus.fritz.box>
+References: <20190507004811.29968-1-anton@ozlabs.org>
+	<20190507004811.29968-6-anton@ozlabs.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PATCH v3 2/5] pci: Simplify pci_bus_is_root()
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="cf0hFtnykp6aONGL"
+Content-Disposition: inline
+In-Reply-To: <20190507004811.29968-6-anton@ozlabs.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PATCH 6/9] target/ppc: Fix vslv and vsrv
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,176 +71,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@ozlabs.ru, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	Greg Kurz <groug@kaod.org>, Peter Xu <peterx@redhat.com>,
-	qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>,
-	David Gibson <david@gibson.dropbear.id.au>
+Cc: ego@linux.vnet.ibm.com, sandipandas1990@gmail.com,
+	mark.cave-ayland@ilande.co.uk, richard.henderson@linaro.org,
+	qemu-devel@nongnu.org, f4bug@amsat.org, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-pci_bus_is_root() currently relies on a method in the PCIBusClass.
-But it's always known if a PCI bus is a root bus when we create it, so
-using a dynamic method is overkill.
 
-This replaces it with an IS_ROOT bit in a new flags field, which is set o=
-n
-root buses and otherwise clear.  As a bonus this removes the special
-is_root logic from pci_expander_bridge, since it already creates its bus
-as a root bus.
+--cf0hFtnykp6aONGL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
----
- hw/pci-bridge/pci_expander_bridge.c |  6 ------
- hw/pci/pci.c                        | 14 ++------------
- hw/virtio/virtio-pci.c              |  1 +
- include/hw/pci/pci.h                |  1 -
- include/hw/pci/pci_bus.h            | 12 +++++++++++-
- 5 files changed, 14 insertions(+), 20 deletions(-)
+On Tue, May 07, 2019 at 10:48:08AM +1000, Anton Blanchard wrote:
+> vslv and vsrv are broken on little endian, we append 00 to the
+> high byte not the low byte. Fix it by using the VsrB() accessor.
+>=20
+> Signed-off-by: Anton Blanchard <anton@ozlabs.org>
 
-diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expa=
-nder_bridge.c
-index e62de4218f..ca66bc721a 100644
---- a/hw/pci-bridge/pci_expander_bridge.c
-+++ b/hw/pci-bridge/pci_expander_bridge.c
-@@ -66,11 +66,6 @@ static int pxb_bus_num(PCIBus *bus)
-     return pxb->bus_nr;
- }
-=20
--static bool pxb_is_root(PCIBus *bus)
--{
--    return true; /* by definition */
--}
--
- static uint16_t pxb_bus_numa_node(PCIBus *bus)
- {
-     PXBDev *pxb =3D convert_to_pxb(bus->parent_dev);
-@@ -83,7 +78,6 @@ static void pxb_bus_class_init(ObjectClass *class, void=
- *data)
-     PCIBusClass *pbc =3D PCI_BUS_CLASS(class);
-=20
-     pbc->bus_num =3D pxb_bus_num;
--    pbc->is_root =3D pxb_is_root;
-     pbc->numa_node =3D pxb_bus_numa_node;
- }
-=20
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index a78023f669..b386777045 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -129,14 +129,9 @@ static void pci_bus_unrealize(BusState *qbus, Error =
-**errp)
-     vmstate_unregister(NULL, &vmstate_pcibus, bus);
- }
-=20
--static bool pcibus_is_root(PCIBus *bus)
--{
--    return !bus->parent_dev;
--}
--
- static int pcibus_num(PCIBus *bus)
- {
--    if (pcibus_is_root(bus)) {
-+    if (pci_bus_is_root(bus)) {
-         return 0; /* pci host bridge */
-     }
-     return bus->parent_dev->config[PCI_SECONDARY_BUS];
-@@ -164,7 +159,6 @@ static void pci_bus_class_init(ObjectClass *klass, vo=
-id *data)
-     k->unrealize =3D pci_bus_unrealize;
-     k->reset =3D pcibus_reset;
-=20
--    pbc->is_root =3D pcibus_is_root;
-     pbc->bus_num =3D pcibus_num;
-     pbc->numa_node =3D pcibus_numa_node;
-     pbc->allows_extended_config_space =3D pcibus_allows_extended_config_=
-space;
-@@ -398,6 +392,7 @@ static void pci_root_bus_init(PCIBus *bus, DeviceStat=
-e *parent,
-     bus->slot_reserved_mask =3D 0x0;
-     bus->address_space_mem =3D address_space_mem;
-     bus->address_space_io =3D address_space_io;
-+    bus->flags |=3D PCI_BUS_IS_ROOT;
-=20
-     /* host bridge */
-     QLIST_INIT(&bus->child);
-@@ -415,11 +410,6 @@ bool pci_bus_is_express(PCIBus *bus)
-     return object_dynamic_cast(OBJECT(bus), TYPE_PCIE_BUS);
- }
-=20
--bool pci_bus_is_root(PCIBus *bus)
--{
--    return PCI_BUS_GET_CLASS(bus)->is_root(bus);
--}
--
- bool pci_bus_allows_extended_config_space(PCIBus *bus)
- {
-     return PCI_BUS_GET_CLASS(bus)->allows_extended_config_space(bus);
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index cb44e19b67..942173d830 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -20,6 +20,7 @@
- #include "standard-headers/linux/virtio_pci.h"
- #include "hw/virtio/virtio.h"
- #include "hw/pci/pci.h"
-+#include "hw/pci/pci_bus.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "hw/pci/msi.h"
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index fdd4c43d3a..edf44de21d 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -395,7 +395,6 @@ typedef PCIINTxRoute (*pci_route_irq_fn)(void *opaque=
-, int pin);
- #define TYPE_PCIE_BUS "PCIE"
-=20
- bool pci_bus_is_express(PCIBus *bus);
--bool pci_bus_is_root(PCIBus *bus);
- bool pci_bus_allows_extended_config_space(PCIBus *bus);
-=20
- void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState =
-*parent,
-diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
-index f6df834170..aea98d5040 100644
---- a/include/hw/pci/pci_bus.h
-+++ b/include/hw/pci/pci_bus.h
-@@ -15,14 +15,19 @@ typedef struct PCIBusClass {
-     BusClass parent_class;
-     /*< public >*/
-=20
--    bool (*is_root)(PCIBus *bus);
-     int (*bus_num)(PCIBus *bus);
-     uint16_t (*numa_node)(PCIBus *bus);
-     bool (*allows_extended_config_space)(PCIBus *bus);
- } PCIBusClass;
-=20
-+enum PCIBusFlags {
-+    /* This bus is the root of a PCI domain */
-+    PCI_BUS_IS_ROOT                                         =3D 0x0001,
-+};
-+
- struct PCIBus {
-     BusState qbus;
-+    enum PCIBusFlags flags;
-     PCIIOMMUFunc iommu_fn;
-     void *iommu_opaque;
-     uint8_t devfn_min;
-@@ -47,4 +52,9 @@ struct PCIBus {
-     Notifier machine_done;
- };
-=20
-+static inline bool pci_bus_is_root(PCIBus *bus)
-+{
-+    return !!(bus->flags & PCI_BUS_IS_ROOT);
-+}
-+
- #endif /* QEMU_PCI_BUS_H */
+Applied, thanks.
+
+> ---
+>  target/ppc/int_helper.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+> index f6a088ac08..fd715b4076 100644
+> --- a/target/ppc/int_helper.c
+> +++ b/target/ppc/int_helper.c
+> @@ -1800,10 +1800,10 @@ void helper_vslv(ppc_avr_t *r, ppc_avr_t *a, ppc_=
+avr_t *b)
+> =20
+>      size =3D ARRAY_SIZE(r->u8);
+>      for (i =3D 0; i < size; i++) {
+> -        shift =3D b->u8[i] & 0x7;             /* extract shift value */
+> -        bytes =3D (a->u8[i] << 8) +             /* extract adjacent byte=
+s */
+> -            (((i + 1) < size) ? a->u8[i + 1] : 0);
+> -        r->u8[i] =3D (bytes << shift) >> 8;   /* shift and store result =
+*/
+> +        shift =3D b->VsrB(i) & 0x7;             /* extract shift value */
+> +        bytes =3D (a->VsrB(i) << 8) +           /* extract adjacent byte=
+s */
+> +            (((i + 1) < size) ? a->VsrB(i + 1) : 0);
+> +        r->VsrB(i) =3D (bytes << shift) >> 8;   /* shift and store resul=
+t */
+>      }
+>  }
+> =20
+> @@ -1818,10 +1818,10 @@ void helper_vsrv(ppc_avr_t *r, ppc_avr_t *a, ppc_=
+avr_t *b)
+>       * order will guarantee that computed result is not fed back.
+>       */
+>      for (i =3D ARRAY_SIZE(r->u8) - 1; i >=3D 0; i--) {
+> -        shift =3D b->u8[i] & 0x7;                 /* extract shift value=
+ */
+> -        bytes =3D ((i ? a->u8[i - 1] : 0) << 8) + a->u8[i];
+> +        shift =3D b->VsrB(i) & 0x7;               /* extract shift value=
+ */
+> +        bytes =3D ((i ? a->VsrB(i - 1) : 0) << 8) + a->VsrB(i);
+>                                                  /* extract adjacent byte=
+s */
+> -        r->u8[i] =3D (bytes >> shift) & 0xFF;     /* shift and store res=
+ult */
+> +        r->VsrB(i) =3D (bytes >> shift) & 0xFF;   /* shift and store res=
+ult */
+>      }
+>  }
+> =20
+
 --=20
-2.21.0
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--cf0hFtnykp6aONGL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzRFm4ACgkQbDjKyiDZ
+s5K8og/+MFb/VpFCFSfbsSfLq78BQEjwcoVKyGvvS/Vw6Q2ET++Efv7G1MXY2O86
+mrqYYozjkK1foW3QTcqhxfy0UfjT3HuYuqexWHQPysJusy42pnQmYcd6WcSRMa7l
+JGTVdl/MWcxi5aL7U3lxIlYS7viLrMNqNpJdBMnh5w8hsophjdgP1WTrNyHiaZa4
+fcElvxvT09EC3R5anXahEFhCYAdp1zkD45MOVBEi6Pm+nS8mpM6GW+bcQjKtaOql
+zOnVfNDL0tpL4G6EX+wBbB8QjwsIRjXJsblXjl2Dvh3MGinibaX1JkmVIAODUpSu
+T1bbaGQY6qbSn+toh7AHmivxFLHxBfKpX4zp6fW0jVI/TIoXMkJkhRH2zIe7CsnA
+r+Cct5p/gBJnHyrrOtUorUbaGMhe64H2140tfPz89dV5TugV0M2f17gGlVMJOonr
+A8yLP9P7LcVN4RtOZF4BhFUlqLA186Ic26BuHOeBHMppIZHPDvh1+mCYMCzBPFla
+S3mn4z5SnR6VcIY9R1p+aN3FD9M6ZDXbxImzBvIs3l0tHqpxvZ95JSsPLmVfRFB/
+21x7A0hhRDKLF3mtVj2et4KR4Ow7e9GxxoXc1hJFTmEU6SEHZwYwZxcuB5hUD561
+iR2uNBSbIBPLOd3sPIVSarP8T9V5sk+NmzaXOgfDncscZ0Kf03M=
+=UUpM
+-----END PGP SIGNATURE-----
+
+--cf0hFtnykp6aONGL--
 
