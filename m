@@ -2,60 +2,91 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0EE9C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:43:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81425C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:45:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A42F420449
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:43:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A42F420449
+	by mail.kernel.org (Postfix) with ESMTPS id 42FB620449
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:45:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42FB620449
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54545 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54596 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO6vV-0005dq-Ss
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 16:43:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34801)
+	id 1hO6xY-0007Gd-El
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 16:45:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hO6oV-0005MS-CX
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:35:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1hO6rh-0000my-Is
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:39:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hO6oT-00043U-G7
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:35:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55368)
+	(envelope-from <eblake@redhat.com>) id 1hO6rg-0006bn-F0
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:39:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43706)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hO6oK-0003iq-Sr; Tue, 07 May 2019 16:35:37 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hO6rd-0006aG-SM; Tue, 07 May 2019 16:39:02 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ACC165D68A;
-	Tue,  7 May 2019 20:35:27 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.217])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0FB6017CC3;
-	Tue,  7 May 2019 20:35:26 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Tue,  7 May 2019 22:35:07 +0200
-Message-Id: <20190507203508.18026-7-mreitz@redhat.com>
-In-Reply-To: <20190507203508.18026-1-mreitz@redhat.com>
-References: <20190507203508.18026-1-mreitz@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id EBF13308FC22;
+	Tue,  7 May 2019 20:39:00 +0000 (UTC)
+Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5910B60BF3;
+	Tue,  7 May 2019 20:39:00 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20190507183610.9848-1-mreitz@redhat.com>
+	<20190507183610.9848-6-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <bb490ce7-7943-6607-6a74-cfb5c2f9b95a@redhat.com>
+Date: Tue, 7 May 2019 15:38:59 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20190507183610.9848-6-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="gF99DanDRE3DGzYFwxZOVqlBxRWI2wJVM"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Tue, 07 May 2019 20:35:27 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.43]);
+	Tue, 07 May 2019 20:39:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 6/7] iotests: Test qemu-img convert --salvage
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH 5/5] iotests: Let 233 run concurrently
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,269 +98,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
-	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test converts a simple image to another, but blkdebug injects
-block_status and read faults at some offsets.  The resulting image
-should be the same as the input image, except that sectors that could
-not be read have to be 0.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--gF99DanDRE3DGzYFwxZOVqlBxRWI2wJVM
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Message-ID: <bb490ce7-7943-6607-6a74-cfb5c2f9b95a@redhat.com>
+Subject: Re: [PATCH 5/5] iotests: Let 233 run concurrently
+References: <20190507183610.9848-1-mreitz@redhat.com>
+ <20190507183610.9848-6-mreitz@redhat.com>
+In-Reply-To: <20190507183610.9848-6-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/251     | 162 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/251.out |  43 ++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 206 insertions(+)
- create mode 100755 tests/qemu-iotests/251
- create mode 100644 tests/qemu-iotests/251.out
+On 5/7/19 1:36 PM, Max Reitz wrote:
+> common.nbd's nbd_server_set_tcp_port() tries to find a free port, and
+> then uses it for the whole test run.  However, this is racey because
 
-diff --git a/tests/qemu-iotests/251 b/tests/qemu-iotests/251
-new file mode 100755
-index 0000000000..508d69769f
---- /dev/null
-+++ b/tests/qemu-iotests/251
-@@ -0,0 +1,162 @@
-+#!/usr/bin/env bash
-+#
-+# Test qemu-img convert --salvage
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=3Dmreitz@redhat.com
-+
-+seq=3D$(basename $0)
-+echo "QA output created by $seq"
-+
-+status=3D1	# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+_supported_fmt generic
-+_supported_proto file
-+_supported_os Linux
-+
-+
-+TEST_IMG=3D"$TEST_IMG.orig" _make_test_img 64M
-+
-+$QEMU_IO -c 'write -P 42 0 64M' "$TEST_IMG.orig" | _filter_qemu_io
-+
-+
-+sector_size=3D512
-+
-+# Offsets on which to fail block-status.  Keep in ascending order so
-+# the indexing done by _filter_offsets will appear in ascending order
-+# in the output as well.
-+status_fail_offsets=3D"$((16 * 1024 * 1024 + 8192))
-+                     $((33 * 1024 * 1024 + 512))"
-+
-+# Offsets on which to fail reads.  Keep in ascending order for the
-+# same reason.
-+# The second element is shared with $status_fail_offsets on purpose.
-+# Starting with the third element, we test what happens when a
-+# continuous range of sectors is inaccessible.
-+read_fail_offsets=3D"$((32 * 1024 * 1024 - 65536))
-+                   $((33 * 1024 * 1024 + 512))
-+                   $(seq $((34 * 1024 * 1024)) $sector_size \
-+                         $((34 * 1024 * 1024 + 4096 - $sector_size)))"
-+
-+
-+# blkdebug must be above the format layer so it can intercept all
-+# block-status events
-+source_img=3D"json:{'driver': 'blkdebug',
-+                  'image': {
-+                      'driver': '$IMGFMT',
-+                      'file': {
-+                          'driver': 'file',
-+                          'filename': '$TEST_IMG.orig'
-+                      }
-+                  },
-+                  'inject-error': ["
-+
-+for ofs in $status_fail_offsets
-+do
-+    source_img+=3D"{ 'event': 'none',
-+                   'iotype': 'block-status',
-+                   'errno': 5,
-+                   'sector': $((ofs / sector_size)) },"
-+done
-+
-+for ofs in $read_fail_offsets
-+do
-+    source_img+=3D"{ 'event': 'none',
-+                   'iotype': 'read',
-+                   'errno': 5,
-+                   'sector': $((ofs / sector_size)) },"
-+done
-+
-+# Remove the trailing comma and terminate @inject-error and json:{}
-+source_img=3D"${source_img%,} ] }"
-+
-+
-+echo
-+
-+
-+_filter_offsets() {
-+    filters=3D
-+
-+    index=3D0
-+    for ofs in $2
-+    do
-+        filters+=3D" -e s/$(printf "$1" $ofs)/status_fail_offset_$index/=
-"
-+        index=3D$((index + 1))
-+    done
-+
-+    index=3D0
-+    for ofs in $3
-+    do
-+        filters+=3D" -e s/$(printf "$1" $ofs)/read_fail_offset_$index/"
-+        index=3D$((index + 1))
-+    done
-+
-+    sed $filters
-+}
-+
-+# While determining the number of allocated sectors in the input
-+# image, we should see one block status warning per element of
-+# $status_fail_offsets.
-+#
-+# Then, the image is read.  Since the block status is queried in
-+# basically the same way, the same warnings as in the previous step
-+# should reappear.  Interleaved with those we should see a read
-+# warning per element of $read_fail_offsets.
-+# Note that $read_fail_offsets and $status_fail_offsets share an
-+# element (read_fail_offset_1 =3D=3D status_fail_offset_1), so
-+# "status_fail_offset_1" in the output is the same as
-+# "read_fail_offset_1".
-+$QEMU_IMG convert --salvage "$source_img" "$TEST_IMG" 2>&1 \
-+    | _filter_offsets '%i' "$status_fail_offsets" "$read_fail_offsets"
-+
-+echo
-+
-+# The offsets where the block status could not be determined should
-+# have been treated as containing data and thus should be correct in
-+# the output image.
-+# The offsets where reading failed altogether should be 0.  Make them
-+# 0 in the input image, too, so we can compare both images.
-+for ofs in $read_fail_offsets
-+do
-+    $QEMU_IO -c "write -z $ofs $sector_size" "$TEST_IMG.orig" \
-+        | _filter_qemu_io \
-+        | _filter_offsets '%i' '' "$read_fail_offsets"
-+done
-+
-+echo
-+
-+# These should be equal now.
-+$QEMU_IMG compare "$TEST_IMG.orig" "$TEST_IMG"
-+
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
-diff --git a/tests/qemu-iotests/251.out b/tests/qemu-iotests/251.out
-new file mode 100644
-index 0000000000..75b8796aad
---- /dev/null
-+++ b/tests/qemu-iotests/251.out
-@@ -0,0 +1,43 @@
-+QA output created by 251
-+Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=3DIMGFMT size=3D67108864
-+wrote 67108864/67108864 bytes at offset 0
-+64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+qemu-img: warning: error while reading block status at offset status_fai=
-l_offset_0: Input/output error
-+qemu-img: warning: error while reading block status at offset status_fai=
-l_offset_1: Input/output error
-+qemu-img: warning: error while reading block status at offset status_fai=
-l_offset_0: Input/output error
-+qemu-img: warning: error while reading offset read_fail_offset_0: Input/=
-output error
-+qemu-img: warning: error while reading block status at offset status_fai=
-l_offset_1: Input/output error
-+qemu-img: warning: error while reading offset status_fail_offset_1: Inpu=
-t/output error
-+qemu-img: warning: error while reading offset read_fail_offset_2: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_3: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_4: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_5: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_6: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_7: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_8: Input/=
-output error
-+qemu-img: warning: error while reading offset read_fail_offset_9: Input/=
-output error
-+
-+wrote 512/512 bytes at offset read_fail_offset_0
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_1
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_2
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_3
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_4
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_5
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_6
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_7
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_8
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 512/512 bytes at offset read_fail_offset_9
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+Images are identical.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 7ac9a5ea4a..dde113a552 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -249,3 +249,4 @@
- 247 rw auto quick
- 248 rw auto quick
- 249 rw auto quick
-+251 auto quick
+racy
+
+> even if the port was free at the beginning, there is no guarantee it
+> will continue to be available.  Therefore, 233 currently cannot reliabl=
+y
+> be run concurrently with other NBD TCP tests.
+>=20
+> This patch addresses the problem by dropping nbd_server_set_tcp_port(),=
+
+> and instead finding a new port every time nbd_server_start_tcp_socket()=
+
+> is invoked.  For this, we run qemu-nbd with --fork and on error evaluat=
+e
+> the output to see whether it contains "Address already in use".  If so,=
+
+> we try the next port.
+>=20
+> On success, we still want to continually redirect the output from
+> qemu-nbd to stderr.  To achieve both, we redirect qemu-nbd's stderr to =
+a
+> FIFO that we then open in bash.  If the parent process exits with statu=
+s
+> 0 (which means that the server has started successfully), we launch a
+> background cat process that copies the FIFO to stderr.  On failure, we
+> read the whole content into a variable and then evaluate it.
+>=20
+> While at it, use --fork in nbd_server_start_unix_socket(), too.  Doing
+> so allows us to drop nbd_server_wait_for_*_socket().
+>=20
+> Note that the reason common.nbd did not use --fork before is that
+> qemu-nbd did not have --pid-file.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/233        |  1 -
+>  tests/qemu-iotests/common.nbd | 93 ++++++++++++++++-------------------=
+
+>  2 files changed, 42 insertions(+), 52 deletions(-)
+>=20
+
+> @@ -34,76 +39,62 @@ nbd_server_stop()
+>          fi
+>      fi
+>      rm -f "$nbd_unix_socket"
+> -}
+> -
+> -nbd_server_wait_for_unix_socket()
+> -{
+=2E..
+> -    echo "Failed in check of unix socket created by qemu-nbd"
+> -    exit 1
+> +    rm -f "$nbd_stderr_fifo"
+
+You could use a single 'rm -f "$nbd_unix_socket" "$nbd_stderr_fifo"'.
+That's cosmetic, though.
+
+Are we sure that even on failure, our fifo will not fill up and cause
+deadlock? If the failing qemu-nbd has so much output as to be non-atomic
+so that it blocks waiting for a reader, but we don't read anything until
+after qemu-nbd exits after forking the daemon, then we have deadlock.
+But in the common case, I don't think qemu-nbd ever spits out that much
+in errors, even when it fails to start whether due to a socket in use or
+for other reasons.  And even if it does hang, it is our testsuite (and
+our CI tools will probably notice it), rather than our main code.
+
+Otherwise, it's a lot of shell code with quite a few bash-isms, but we
+already require bash, and I didn't spot anything blatantly wrong.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 --=20
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
+
+--gF99DanDRE3DGzYFwxZOVqlBxRWI2wJVM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzR7OMACgkQp6FrSiUn
+Q2qangf+LrnNVcd5RmYn70PO3kipLonnT/8Mf8aP1pwZShFHYBqfS0EJnxyevFcd
+ksGKjFfR6cKifRiNWcav/ALUoRiPiOP26FVpYo0r0DdEmXpvcgEB7/WnLMm2HS45
+OntEW9ASdv3hBzAnv9T3yvnGfg/hqPmV4qNxjwK0UROXHF9FaCn3RmmrQrMw0hKq
+WDqq1yO5sUxDr4kOp3tsm1qwrzA5XJ1JBxldAejc9o0Y26qT8XUa7uiFyxkk5XEo
+N2eKfwItpPiWVD+gcLoJwOGLuNL9s7LYSELVrsn1v8GFkiukADn5q1xB1kRMAC6Q
+jfBlxM8nKbFToD8BzW2doyp3LsYFPw==
+=7azk
+-----END PGP SIGNATURE-----
+
+--gF99DanDRE3DGzYFwxZOVqlBxRWI2wJVM--
 
