@@ -2,61 +2,69 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 586BBC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 13:47:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F403C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 13:49:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D2CE20578
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 13:47:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D2CE20578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2A577206BF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 13:49:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="KKTx4CUa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A577206BF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47120 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47153 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO0RS-0006JS-EV
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 09:47:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38355)
+	id 1hO0Th-0007V6-Ex
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 09:49:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hO0Pe-00050F-L1
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 09:45:43 -0400
+	(envelope-from <qemu_oss@crudebyte.com>) id 1hO0Sm-0007BT-53
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 09:48:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hO0Pd-000762-Do
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 09:45:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:13394)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hO0PW-0006wz-Nf; Tue, 07 May 2019 09:45:34 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C8809301BE66;
-	Tue,  7 May 2019 13:45:33 +0000 (UTC)
-Received: from thuth.com (ovpn-116-130.ams2.redhat.com [10.36.116.130])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1AA0747341;
-	Tue,  7 May 2019 13:45:23 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Date: Tue,  7 May 2019 15:45:20 +0200
-Message-Id: <20190507134521.31044-1-thuth@redhat.com>
+	(envelope-from <qemu_oss@crudebyte.com>) id 1hO0Sk-0001eF-6d
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 09:48:56 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:48211)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+	id 1hO0Si-0001Xw-9T
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 09:48:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=O0ydUdcZGLO4pE0OqG0OLi579G8c7v1O83O1upHB11k=;
+	b=KKTx4CUa7v1bb+9k7NXbKldBQz
+	NpCdfwMIcq8nzxdsIShusp85diSN5xG2iUEnEeuyLObJFHj9v+HZoVBaO6lOFUPHTk8xjryogiyjZ
+	BhDhRgWV10xdpuY2xbaLDYbsBl37O1F8fd7d+4dMTMs2Ge6OaqDCf0rrTnmZARZ3EJuctIZAM82mN
+	YVi3zdCUDiYl3kU1AnRz1caxn4v+bXxKnv59L1v2xHA2Y8sKu2Z6zyVFpS5gwFTGd84sLZUZ048fR
+	sVdvj2KZRQzVI1CZZw4rJ2VITCLE65nmmcKfeFcDupDU4NUeuffxuF0kt6dQFq/xd4W8nO0qohnpD
+	cG8y1c7da/HdY58Xz5dhYYft6jnz/LlzpQYb+hiHXxQ1gsmnzGl6HY2KLgwFVZagS3foVrJV6RJgu
+	PzUTvBMYy3KxJBUp3C6sgWtO9h1XpgOHzlMCK0JwVr+Wl2dtKGYoHcyhZkQOQI/tqhMdWD2xpqe9J
+	HDy6etdqqm2xU2LiJw+Lerv65PCPWuVUT89wQ0C7me0lfnLpU1rkBPuYLMViOU09iav/+ymVLHhfx
+	xmTCxyoDeqLUHJnEsRqS+HSfilePf+aYgxWwfn7Cp1vjTByreJAK5bK9keJUzmlqGEDDlzGZ0zo0m
+	18MhGK0d6U9j64gG51Yp0jNqWMazllbVtxZwQw93g=;
+To: qemu-devel@nongnu.org
+Date: Tue, 07 May 2019 15:48:47 +0200
+Message-ID: <1985409.cXXgv05A0a@silver>
+In-Reply-To: <20190507125756.GP27205@redhat.com>
+References: <590216e2666653bac21d950aaba98f87d0a53324.1557093245.git.qemu_oss@crudebyte.com>
+	<1895198.u98Sn5qOsY@silver> <20190507125756.GP27205@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Tue, 07 May 2019 13:45:33 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v2 00/28] Kconfig for Arm machines
+X-Received-From: 5.189.157.229
+Subject: Re: [Qemu-devel] [libvirt patch] qemu: adds support for virtfs 9p
+ argument 'vii'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,81 +76,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jsnow@redhat.com, qemu-arm@nongnu.org, philmd@redhat.com
+From: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Cc: Greg Kurz <groug@kaod.org>, Antonios Motakis <antonios.motakis@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
- Hi Peter,
+On Dienstag, 7. Mai 2019 13:57:56 CEST Daniel P. Berrang=E9 wrote:
+> >       ...
+> >       <filesystem type=3D'mount' accessmode=3D'mapped'>
+> >      =20
+> >         <source dir=3D'/vm/fs'/>
+> >         <target dir=3D'root'/>
+> >         <important path=3D'/var/shares'/>
+> >         <important path=3D'/tmp'/>
+> >      =20
+> >       </filesystem>
+> >    =20
+> >     </devices>
+> >  =20
+> >   </domain>
+> >=20
+> > Like with the vii qemu virtfs command line argument, the order of the
+> > "important" tag defines which one gets the highest inode namespace
+> > (smallest generated suffix) on guest side.
+>=20
+> Do we think anyone is likely to use this feature in the real world ?
 
-the following changes since commit a6ae23831b05a11880b40f7d58e332c45a6b04=
-f7:
+I don't know if other people need it, that's one of the reasons why I am=20
+asking for a coarse high level feedback of the current v3 patch set before=
+=20
+getting into the details.
 
-  Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-re=
-quest' into staging (2019-05-03 15:26:09 +0100)
+The only thing I can say right now is that I must use this feature when=20
+running Samba to avoid all kinds of serious problems. And I could imagine=20
+inode namespace control to become more of an issue once nested virtualizati=
+on=20
+becomes more popular.
 
-are available in the Git repository at:
+> I'm not really a fan of the representation, because this is affecting
+> guest ABI via a side effect of the ordering which is the kind of thing
+> that has got us in trouble before.  If we need control over the IDs
+> used for each mount point, then I tend to think we need to represent
+> it explicitly such that the mgmt app sets the exact ID used.
+>=20
+>      <pathid dir=3D"/var/shares" id=3D"0x1"/>
+>      <pathid dir=3D"/tmp" id=3D"0x3"/>
+>=20
+> this ensures that the IDs are still stable when adding or removing
+> paths
 
-  https://gitlab.com/huth/qemu.git tags/pull-request-2019-05-07
+Well, that would lead to the exact opposite of what you asked for. Because=
+=20
+allowing admins to configure an exact ID (which I think you mean should be =
+used=20
+as exact inode suffix by 9p then) would expose implementation details insid=
+e=20
+9pfs to config space, which are subject to change, might collide with=20
+implementation details, and requires implementation knowledge and extreme c=
+are=20
+by admins so they would pick appropriate IDs with "suffix-free" property wh=
+ich=20
+are guaranteed to create unique numbers in all cases:
 
-for you to fetch changes up to 69f879e9fefab9aaf24893fe4ce23e07756d703c:
+https://en.wikipedia.org/wiki/Prefix_code
 
-  hw/arm: Remove hard-enablement of the remaining PCI devices (2019-05-07=
- 15:01:47 +0200)
+Also keep in mind that one fs device might end up having multiple suffixes.
 
-----------------------------------------------------------------
-Kconfig settings for the Arm machines
-(v2: Fix the dependency of q35 to AHCI_ICH9 in the second patch)
-----------------------------------------------------------------
+Hence my suggestion was to only expose the bare minimum to config space=20
+regarding this issue: Asking (if required at all) admins which ones are the=
+=20
+most critical pathes regarding inode namespace for their use cases, and 9p=
+=20
+would then automatically generate appropriate suffixes for those mentioned =
+by=20
+admin to achieve the highest inode namespace appropriately and in a safe wa=
+y.
 
-Thomas Huth (28):
-      hw/pci/pci-stub: Add msi_enabled() and msi_notify() to the pci stub=
-s
-      hw/ide/ahci: Add a Kconfig switch for the AHCI-ICH9 device
-      hw/arm: Express dependencies of the exynos machines with Kconfig
-      hw/arm: Express dependencies of the highbank machines with Kconfig
-      hw/arm: Express dependencies of integratorcp with Kconfig
-      hw/arm: Express dependencies of the fsl-imx31 machine with Kconfig
-      hw/arm: Express dependencies of musicpal with Kconfig
-      hw/arm: Express dependencies of the OMAP machines with Kconfig
-      hw/arm: Express dependencies of stellaris with Kconfig
-      hw/arm: Express dependencies of realview, versatile and vexpress wi=
-th Kconfig
-      hw/arm: Express dependencies of the PXA2xx machines with Kconfig
-      hw/arm: Express dependencies of xilinx-zynq with Kconfig
-      hw/arm: Express dependencies of collie with Kconfig
-      hw/arm: Express dependencies of the aspeed boards with Kconfig
-      hw/arm: Express dependencies of the virt machine with Kconfig
-      hw/arm: Express dependencies of netduino / stm32f2xx with Kconfig
-      hw/arm: Express dependencies of allwinner / cubieboard with Kconfig
-      hw/arm: Express dependencies of the MPS2 boards with Kconfig
-      hw/arm: Express dependencies of the raspi machines with Kconfig
-      hw/arm: Express dependencies of canon-a1100 with Kconfig
-      hw/arm: Express dependencies of sabrelite with Kconfig
-      hw/arm: Express dependencies of the MSF2 / EMCRAFT_SF2 machine with=
- Kconfig
-      hw/arm: Express dependencies of the remaining IMX boards with Kconf=
-ig
-      hw/arm: Express dependencies of the microbit / nrf51 machine with K=
-config
-      hw/arm: Express dependencies of the ZynqMP zcu102 machine with Kcon=
-fig
-      hw/arm: Express dependencies of the xlnx-versal-virt machine with K=
-config
-      hw/arm: Express dependencies of the musca machines with Kconfig
-      hw/arm: Remove hard-enablement of the remaining PCI devices
+Plus for the "important path=3D" semantics I suggested you don't have have =
+to=20
+use mount points BTW. You can use subdirs and even individual files and 9pf=
+s=20
+would then automatically resolve the appropriate fs device of the given pat=
+h.=20
+So e.g. when using nested virtualization, an admin inside a lower level gue=
+st=20
+does not even need to know the exact mount points on a higher level / host.
 
- default-configs/aarch64-softmmu.mak |   5 -
- default-configs/arm-softmmu.mak     | 179 ++++----------------
- hw/arm/Kconfig                      | 317 ++++++++++++++++++++++++++++++=
-+++++-
- hw/arm/Makefile.objs                |  25 ++-
- hw/display/Kconfig                  |   3 +
- hw/i2c/Kconfig                      |   2 +-
- hw/i386/Kconfig                     |   2 +-
- hw/ide/Kconfig                      |   6 +-
- hw/ide/Makefile.objs                |   2 +-
- hw/misc/Kconfig                     |   2 +
- hw/pci/pci-stub.c                   |  11 ++
- 11 files changed, 384 insertions(+), 170 deletions(-)
+Best regards,
+Christian Schoenebeck
 
