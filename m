@@ -2,80 +2,78 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A3FC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46EB0C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:20:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5043120825
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:19:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5043120825
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 02DD420825
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:20:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="f5x4dqKr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02DD420825
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40115 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40130 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNsVU-0000a7-JC
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 01:19:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55309)
+	id 1hNsWS-0001Rn-1M
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 01:20:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNsUQ-0000AH-Ux
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:18:08 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1hNsVB-0000aH-3z
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:18:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNsUP-0002Sd-Tq
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:18:06 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:36437)
+	(envelope-from <joel.stan@gmail.com>) id 1hNsV9-0002pG-2q
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:18:52 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:37477)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hNsUP-0002Rp-FP
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:18:05 -0400
-Received: by mail-wm1-f68.google.com with SMTP id j187so1918262wmj.1
-	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 22:18:05 -0700 (PDT)
+	(Exim 4.71) (envelope-from <joel.stan@gmail.com>)
+	id 1hNsV4-0002n0-Ot; Tue, 07 May 2019 01:18:47 -0400
+Received: by mail-qk1-x743.google.com with SMTP id c1so139514qkk.4;
+	Mon, 06 May 2019 22:18:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=qhZig2axSZIgL7BGzsy1qVAtFItOkCIEnW62wof9wb4=;
+	b=f5x4dqKrrJx05bARe5eOZkQRY9WYqh3aAUFeBU5jkRfIU3bfVFkvNcqx6I9XRpvIX2
+	td+XcgxjLAvj045LsVzAv3b0sL94BlbJjJKwXjdko3vsW6tv/sPL/74Waugk889/gsGW
+	RZ3io/JYGPOXoehYWgt1DGwuNXGFvz+but51c=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=2mlt/Nivd3xg9klZHlZRU3nWz1AmHiwwGK9asAfsNt4=;
-	b=pL0OCffWV9VRsXSJoPwgTeoNOJCBFRqqTV/B3Ib1T972WuFZHv2mHayzk565nNP6W+
-	N755PAv3TXQzV4LzhequnqHKuzIgGuy/OFvUZVIXV/YzVkafXAPg9QEplO1umWTHNBVf
-	UVC/Q8Uat+pPTbFpqL7MBzJQrp5nCu7Zm2GQlEpCqNTKA/N6CHRK93tb/AltO16KTBQZ
-	CftnTOFR08wO2BthTu+mUPhdv7JMkHdOgusaErE0Ez0bo4GG5mWCpKRnWPbbw+8YlJXT
-	6OwKMfkL5BwF60qzIhNrwoTv92hr2b5us2D3Sp5+rgp1Y8jGT6pVe0K0+AN4QQ8Xs+jq
-	mcFw==
-X-Gm-Message-State: APjAAAWAr+81RoXge6CjhF64CQWHKLCsLphOgtwTwSeMBuJv298WH2xp
-	SR5B+j+Ym8mxSI1dxkzx5di7aw==
-X-Google-Smtp-Source: APXvYqx/s5bDjem9mEveup+pW+6Z3c2v17yAYtU/thLwPu5LLs82P9pxtYFdotum4nMrkdyJ886gug==
-X-Received: by 2002:a1c:f413:: with SMTP id z19mr20101337wma.71.1557206284418; 
-	Mon, 06 May 2019 22:18:04 -0700 (PDT)
-Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	t16sm8233388wrw.56.2019.05.06.22.18.03
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 06 May 2019 22:18:03 -0700 (PDT)
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20190312234541.2887-1-philmd@redhat.com>
-	<d5d84efd-ef8c-4e0d-d48a-6996d91832e7@redhat.com>
-	<20190506214155.GI28722@habkost.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <4202015a-d86f-a626-e87c-57fb328ae64a@redhat.com>
-Date: Tue, 7 May 2019 07:18:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=qhZig2axSZIgL7BGzsy1qVAtFItOkCIEnW62wof9wb4=;
+	b=ZjHgxRi4QTK3sstkqeQBTQ5ckvSa3aNc3I7HxzFh0Wjzmn/j3mrTyvkL3xlOxvdUm9
+	JpbpFpSrsUTEKc97Vk9yHray8ciFwCf8iCLYPwzXH5PQv8DAohpXmskSS9RAFTaVOl7N
+	B5Q4NGNbOZUi83VS+vDMS8d2OgWMh4pEWIgaJSexhj3VxVQn5zwo2GNK+gXFscqYBLbn
+	bczsLlOWlh/ErhfRrYK1zwz8PPecy6fJT0DuStI62+ge7gAR+7CZSQfreeMp0sii5PKY
+	LJhTKTWNV2QpDvBJLJV4POcIOCYxSkAhnaDvXfHpkd81eT0SQyS8f9MGySVMXVUqLPHd
+	G5zA==
+X-Gm-Message-State: APjAAAWMCEDm+zAhMgGiKB19Dn8JVLYfTpCxgC6p3zlqmmBIEH2rr3zv
+	63uefHb5q+6YxAkWFlTaop2LBeMeZIb/pmLNg8E=
+X-Google-Smtp-Source: APXvYqxQSWsUsZD5bsnH74PvooQLS8p7I6LMLhBc9ZeRF+hJy0lXkzRLZ5NjwqyspnGWDXst2Z1yWtqRluq9N5dKTns=
+X-Received: by 2002:a37:a289:: with SMTP id l131mr8098306qke.231.1557206325376;
+	Mon, 06 May 2019 22:18:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190506214155.GI28722@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] Acceptance Tests: Test the
- Raspberry Pi 2 board
+References: <20190506142042.28096-1-clg@kaod.org>
+	<20190506142042.28096-2-clg@kaod.org>
+In-Reply-To: <20190506142042.28096-2-clg@kaod.org>
+From: Joel Stanley <joel@jms.id.au>
+Date: Tue, 7 May 2019 05:18:33 +0000
+Message-ID: <CACPK8XdJofG-bL2gArsFpRe5R_eq4ZRwP0iwt2XnAoxRNbaVnQ@mail.gmail.com>
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::743
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] aspeed: add a per SoC mapping for
+ the interrupt space
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,36 +85,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org, Andrew Baumann <Andrew.Baumann@microsoft.com>,
-	Cleber Rosa <crosa@redhat.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+	qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/6/19 11:41 PM, Eduardo Habkost wrote:
-> On Sat, May 04, 2019 at 01:52:51PM +0200, Philippe Mathieu-Daudé wrote:
->> On 3/13/19 12:45 AM, Philippe Mathieu-Daudé wrote:
->>> Add the raspi2 to the list of boards tested by the
->>> boot_linux_console Avocado test.
->>>
->>> Based on "Acceptance Tests: target architecture support" v5:
->>> https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg04111.html
->>> Based-on: <20190312171824.5134-1-crosa@redhat.com>
->>>
->>> Philippe Mathieu-Daudé (2):
->>>   BootLinuxConsoleTest: Let extract_from_deb handle various compressions
->>>   Boot Linux Console Test: add a test for the Raspberry Pi 2
->>>
->>>  tests/acceptance/boot_linux_console.py | 34 ++++++++++++++++++++++++--
->>>  1 file changed, 32 insertions(+), 2 deletions(-)
->>
->> I was hoping this series would be included in "Acceptance Tests: target
->> architecture support" by Eduardo (removing the 'print' debug line) but I
->> just realized I forgot to Cc him :S
-> 
-> Problem solved: queued on python-next (after removing the print
-> statement from patch 2/2).  :)
+On Mon, 6 May 2019 at 14:21, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>
+> This will simplify the definition of new SoCs, like the AST2600 which
+> should use a different CPU and a different IRQ number layout.
+>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Thanks a lot!
+Reviewed-by: Joel Stanley <joel@jms.id.au>
 
