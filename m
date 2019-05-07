@@ -7,82 +7,83 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF8BC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 12:13:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D11AC004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 12:14:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63AC8205ED
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 12:13:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 67CC0205ED
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 12:14:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UxldnRDP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63AC8205ED
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ypd5zaHX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67CC0205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45801 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45803 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNyyS-0001Gv-NA
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 08:13:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44980)
+	id 1hNyz4-0001hi-Mc
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 08:14:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hNylx-0007iW-FM
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:00:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hNym0-0007lU-Ts
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:00:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hNyls-0003xZ-F0
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:00:37 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:35279)
+	(envelope-from <peter.maydell@linaro.org>) id 1hNylw-000421-2Q
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:00:40 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36306)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hNyls-0003uX-74
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:00:32 -0400
-Received: by mail-wm1-x334.google.com with SMTP id y197so19641470wmd.0
-	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 05:00:32 -0700 (PDT)
+	id 1hNylv-0003zU-Rk
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 08:00:35 -0400
+Received: by mail-wr1-x441.google.com with SMTP id o4so21968493wra.3
+	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 05:00:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
 	:content-transfer-encoding;
-	bh=z9A+d6NR/272WHXylxaqVz5VB4YHQmOPLGtdfveFKqg=;
-	b=UxldnRDPuwOfg7GN6XbtDRF3treUI0QrxrCSxGUbG4TTTEe26P0Evnkeaat9QMR12Q
-	V5xXBt0eSI1IISHa35Fiz4X+x0iEyXCKfL1CAcM2nhtz+rIjfv7rlo8zMbgEwjfZtdq9
-	eDW55KPp7BSRaZqCpUuvSNuKaytiGsbFTbmAtbRVhoUEHAe2mKALUQWr0kYlj5neWFiz
-	EoNEudugkuqr2SVxUcLQcDg2dw6bfgpZN6IwdEWReJdAM9dKFHJVH0p2mJzdmaSiRXiT
-	usEeiS7yxtz4E8yqotdNxzU6UheeXYOPU5T41xn+oY7tNPIN/tZZtfSJReUD+0JUGVp+
-	BbWg==
+	bh=NJGpq0OAxWQIci6soRm4qOcyKSMv9zMfLaUKqYHLGrI=;
+	b=Ypd5zaHXyixCR2IeX22+kB9GhGgdLbrfh6rcHXqq+F3VvQUBgbgtj3P9t0BMzXIL4O
+	hkfjU/Pofb4HQ/q9iSwVAYFaubCVLdTtDZGsNdZTU3R9SCVGEQLjYgtmh/EUK1hii2Rn
+	EASGtiiq+pg9l7GkSMHofX2S6q4vO5T6uptvTTBzvE/ez/5t+poKJqu6Gp4EfK/YIjPK
+	64R7c0idan28rcrhTSMdkF2hu56OChC6hkvKqrWEHVmfVgcThKJ87CzJyvudbsSWcfRk
+	oKQqZaUWoMr0iRIPYdVJPHdxujK/7Q8wnADogHdykKfWsj9DqtPr4uxSM1inReIO3B9/
+	KC8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=z9A+d6NR/272WHXylxaqVz5VB4YHQmOPLGtdfveFKqg=;
-	b=rAFLtFIpWlVX+lwaAVlnAT6b1U1wzhwtDXwCihoW8zaSq9CJd/3NdPdo5VwprzOcxp
-	a8xuaYHsayUrpvr/jQlAQWmQVU/29cyVesNIo81fwxWrHCWNflNPSpbFeLXH74rIMKaI
-	MWI7dHRO8qO7lSVfcR9uyGdQO0L1XbGXVziqYcum08Zs2/ij7ZTr3bz0tVgn1N00S4S+
-	+UstncPIo4CmAa0os1x4XjfeIHrmtihsEbhgjF6MHQ5Lmg2Hr/hnLCgQOiW5AcvjQOyY
-	xydPlx25aqLIZWX44HH2gZx7nbPSCz9cMkQuptZAN4CYcQDBjFjAX6z0PcrSW5MYhlMo
-	ih6A==
-X-Gm-Message-State: APjAAAV5+n/Lw9bnFI6InfvPF9708/SHYpPhrPSEqcy2oZsKT5LBxML8
-	f1PgJRehmmJpmZZb/eMYFwZSrS8R/OU=
-X-Google-Smtp-Source: APXvYqx1N9e4z76Wk6NRPazoBLCM3gYtc4+9pkxohxX8d8Vr1k2kW5WwFiElkcjswxc8+0nexnFMrA==
-X-Received: by 2002:a1c:f50a:: with SMTP id t10mr19881056wmh.86.1557230431051; 
-	Tue, 07 May 2019 05:00:31 -0700 (PDT)
+	bh=NJGpq0OAxWQIci6soRm4qOcyKSMv9zMfLaUKqYHLGrI=;
+	b=CxaYG+HVSrnwvTDvVd0zAclA7P/uBzIE1xoWPxvGuEDcuCngvTr/A1s4LKu2MRkqg1
+	y+DktePzSww2JPVQD69oKzuXVJXcY9xoDEr0PeFwePI9A9UUN1/CGfjsuXa8GhZWbpZ/
+	kcGFMzUJDB9HrwhpliIlgKsMp47+02ASILt47SZt4nEE1cwNZPLZWm3y0p34VN4thS2j
+	3DJj6vF2nVsLm8G0kuKM3vNk6r/N1botYwkT8QOwNKAHQyUKYSsai3rOVM4dK2UTiKHP
+	MJH0YFq9BnxjU65MFgp/GYR33XxDG75rhUWCw92h+p3kgiD8IaxslYdPTUG/D+bDMaeV
+	GjNw==
+X-Gm-Message-State: APjAAAUXC2Ws0UbZaY/iKaOVOq/RfUS0H+HKmcrI+fqNfjVC8sAfQv8L
+	zrz8OYxx2CHABezgfPF2vF2fm0AREBs=
+X-Google-Smtp-Source: APXvYqybl6SF3JrzwEkmHIQOuE2l6ycYLBvL+8bELV8Ei78lSrB6ZZugW5Gl94w/lk91P2tOIZyneQ==
+X-Received: by 2002:a5d:6a47:: with SMTP id t7mr21326158wrw.307.1557230434760; 
+	Tue, 07 May 2019 05:00:34 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id g3sm12348596wmf.9.2019.05.07.05.00.29
+	by smtp.gmail.com with ESMTPSA id g3sm12348596wmf.9.2019.05.07.05.00.33
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 07 May 2019 05:00:30 -0700 (PDT)
+	Tue, 07 May 2019 05:00:33 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  7 May 2019 13:00:08 +0100
-Message-Id: <20190507120011.18100-13-peter.maydell@linaro.org>
+Date: Tue,  7 May 2019 13:00:11 +0100
+Message-Id: <20190507120011.18100-16-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190507120011.18100-1-peter.maydell@linaro.org>
 References: <20190507120011.18100-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::334
-Subject: [Qemu-devel] [PULL 12/15] hw/intc/armv7m_nvic: NS BFAR and BFSR are
- RAZ/WI if BFHFNMINS == 0
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PULL 15/15] target/arm: Stop using variable length
+ array in dc_zva
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,78 +99,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The non-secure versions of the BFAR and BFSR registers are
-supposed to be RAZ/WI if AICR.BFHFNMINS == 0; we were
-incorrectly allowing NS code to access the real values.
+Currently the dc_zva helper function uses a variable length
+array. In fact we know (as the comment above remarks) that
+the length of this array is bounded because the architecture
+limits the block size and QEMU limits the target page size.
+Use a fixed array size and assert that we don't run off it.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190430131439.25251-3-peter.maydell@linaro.org
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20190503120448.13385-1-peter.maydell@linaro.org
 ---
- hw/intc/armv7m_nvic.c | 27 ++++++++++++++++++++++++---
- 1 file changed, 24 insertions(+), 3 deletions(-)
+ target/arm/helper.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 131b5938b9a..15cba63c964 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -1167,6 +1167,10 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-         if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-             goto bad_offset;
-         }
-+        if (!attrs.secure &&
-+            !(s->cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK)) {
-+            return 0;
-+        }
-         return cpu->env.v7m.bfar;
-     case 0xd3c: /* Aux Fault Status.  */
-         /* TODO: Implement fault status registers.  */
-@@ -1646,6 +1650,10 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-         if (!arm_feature(&cpu->env, ARM_FEATURE_M_MAIN)) {
-             goto bad_offset;
-         }
-+        if (!attrs.secure &&
-+            !(s->cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK)) {
-+            return;
-+        }
-         cpu->env.v7m.bfar = value;
-         return;
-     case 0xd3c: /* Aux Fault Status.  */
-@@ -2130,11 +2138,18 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-             val = 0;
-             break;
-         };
--        /* The BFSR bits [15:8] are shared between security states
--         * and we store them in the NS copy
-+        /*
-+         * The BFSR bits [15:8] are shared between security states
-+         * and we store them in the NS copy. They are RAZ/WI for
-+         * NS code if AIRCR.BFHFNMINS is 0.
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index b9745a42bab..1e6eb0d0f36 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -1,4 +1,5 @@
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "target/arm/idau.h"
+ #include "trace.h"
+ #include "cpu.h"
+@@ -13130,14 +13131,17 @@ void HELPER(dc_zva)(CPUARMState *env, uint64_t vaddr_in)
+          * We know that in fact for any v8 CPU the page size is at least 4K
+          * and the block size must be 2K or less, but TARGET_PAGE_SIZE is only
+          * 1K as an artefact of legacy v5 subpage support being present in the
+-         * same QEMU executable.
++         * same QEMU executable. So in practice the hostaddr[] array has
++         * two entries, given the current setting of TARGET_PAGE_BITS_MIN.
           */
-         val = s->cpu->env.v7m.cfsr[attrs.secure];
--        val |= s->cpu->env.v7m.cfsr[M_REG_NS] & R_V7M_CFSR_BFSR_MASK;
-+        if (!attrs.secure &&
-+            !(s->cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK)) {
-+            val &= ~R_V7M_CFSR_BFSR_MASK;
-+        } else {
-+            val |= s->cpu->env.v7m.cfsr[M_REG_NS] & R_V7M_CFSR_BFSR_MASK;
-+        }
-         val = extract32(val, (offset - 0xd28) * 8, size * 8);
-         break;
-     case 0xfe0 ... 0xfff: /* ID.  */
-@@ -2249,6 +2264,12 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
-          */
-         value <<= ((offset - 0xd28) * 8);
+         int maxidx = DIV_ROUND_UP(blocklen, TARGET_PAGE_SIZE);
+-        void *hostaddr[maxidx];
++        void *hostaddr[DIV_ROUND_UP(2 * KiB, 1 << TARGET_PAGE_BITS_MIN)];
+         int try, i;
+         unsigned mmu_idx = cpu_mmu_index(env, false);
+         TCGMemOpIdx oi = make_memop_idx(MO_UB, mmu_idx);
  
-+        if (!attrs.secure &&
-+            !(s->cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK)) {
-+            /* BFSR bits are RAZ/WI for NS if BFHFNMINS is set */
-+            value &= ~R_V7M_CFSR_BFSR_MASK;
-+        }
++        assert(maxidx <= ARRAY_SIZE(hostaddr));
 +
-         s->cpu->env.v7m.cfsr[attrs.secure] &= ~value;
-         if (attrs.secure) {
-             /* The BFSR bits [15:8] are shared between security states
+         for (try = 0; try < 2; try++) {
+ 
+             for (i = 0; i < maxidx; i++) {
 -- 
 2.20.1
 
