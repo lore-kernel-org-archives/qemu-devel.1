@@ -2,77 +2,58 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A903C04A6B
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 02:30:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDCBAC04A6B
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 03:19:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10A61206BF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 02:30:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ckvGRAbj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10A61206BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 99ED3206BF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 03:19:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99ED3206BF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36934 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38935 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNprm-0008Ih-4V
-	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 22:30:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52847)
+	id 1hNqdr-0003TF-MM
+	for qemu-devel@archiver.kernel.org; Mon, 06 May 2019 23:19:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgh8183@gmail.com>) id 1hNpr3-0007zp-1E
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 22:29:17 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hNqd3-0003AN-Gi
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 23:18:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgh8183@gmail.com>) id 1hNpr2-000602-5b
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 22:29:17 -0400
-Received: from mail-ua1-x934.google.com ([2607:f8b0:4864:20::934]:36839)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgh8183@gmail.com>) id 1hNpr1-0005zg-Tv
-	for qemu-devel@nongnu.org; Mon, 06 May 2019 22:29:16 -0400
-Received: by mail-ua1-x934.google.com with SMTP id z17so5450876uar.3
-	for <qemu-devel@nongnu.org>; Mon, 06 May 2019 19:29:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:from:date:message-id:subject:to;
-	bh=9W+pa9XYqTKOzskvXkwvfx0Urv0bMigNWXPHp6/rsm0=;
-	b=ckvGRAbj02Uq5DJevtu6qMG8+//+V3vp7HAUrGymLbVA9uCl3tsBotdwkOTRdqIeWj
-	7H+ABDfwf+fOVY+FsjH6xlZl1NMoTu5udtw3Z8IbO8SPRLswvt9NE8sng23KcoQcaQhG
-	fclhdXfU1OgelZpWrwbn/jFLxNyfa8Se2eB/wsTM2aT/adSZGUOqF0NOa6tLh3GHTxwx
-	QFn9aHITCqNAMzpu89nEfNMdiupfBEMdGJn3vitb4g1JdwDbSdQup6BnnjrjEW0Ogj/C
-	+XPHU+2DohQIlItysaL/LZUi9UYMk2NSN6uxbkUtN4UruBL8gixwTuaeAt+TVt/GJmF9
-	BDPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-	bh=9W+pa9XYqTKOzskvXkwvfx0Urv0bMigNWXPHp6/rsm0=;
-	b=jErekwtESy5ae7yr5P1GZcQKAUwpKsoHx2WK1BdLmzwMPw4CFDTKQDxjK8jHuC9Krm
-	m35JPLPB3xzM2VRyA2A3PNWHFMDNwq+BISDsLUSTj0dk4Km6QG2FusoKYaiCNQnJVV2V
-	BKiPvGboEvA8VmV6ljCnapYM77b364fIwrluoSwc+wFbAw2Z5AunAZX6N+VPZuMgb1JO
-	5rGj/7dbwfUGe5ocNrdRVNiCZIa4b4FxYx1t8QiTs1lVO7L1VSV+ysveClQwJca5kYCJ
-	E5BMq1/mXKlgeNV1BLIDFUKu2Peii945L0T1OyF4v0SWRAXGc8xGzfwbyrNyCABCkeR7
-	uH5w==
-X-Gm-Message-State: APjAAAV3cIYtDWhjUwmhSbNiJmGwTuNt9yb2eYQ8zF9myyelzRzZZ5Gu
-	UKgEJXZkFLAqX01NCaaBnDFp/uPqTprJVn1fQSvk2HFalN8=
-X-Google-Smtp-Source: APXvYqwuzrxQYIaqfTTo+k9AVclqxFdkfPrUqZPkPTWjf7dtdV9qkuyt6FjHUlNjTfnXSbc3+CwqhXHYgqcSzfqWI1U=
-X-Received: by 2002:ab0:20d7:: with SMTP id z23mr15250539ual.51.1557196154084; 
-	Mon, 06 May 2019 19:29:14 -0700 (PDT)
-MIME-Version: 1.0
-From: S KH <sgh8183@gmail.com>
-Date: Tue, 7 May 2019 11:29:03 +0900
-Message-ID: <CAE519-nz3KE2GcQCj_4Ufs+ZR_jKwoMDpdrZS43bbZ_SxSjHeg@mail.gmail.com>
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hNqd2-00078W-JS
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 23:18:53 -0400
+Received: from mga17.intel.com ([192.55.52.151]:6048)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1hNqd2-0005i8-Bb
+	for qemu-devel@nongnu.org; Mon, 06 May 2019 23:18:52 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+	by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	06 May 2019 20:17:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,440,1549958400"; d="scan'208";a="142082249"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+	by orsmga006.jf.intel.com with ESMTP; 06 May 2019 20:17:44 -0700
+From: Wei Yang <richardw.yang@linux.intel.com>
 To: qemu-devel@nongnu.org
+Date: Tue,  7 May 2019 11:17:03 +0800
+Message-Id: <20190507031703.856-1-richardw.yang@linux.intel.com>
+X-Mailer: git-send-email 2.19.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::934
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: [Qemu-devel] Question on QEMU : How to record debug log in VM of
- QEMU
+X-Received-From: 192.55.52.151
+Subject: [Qemu-devel] [PATCH] migratioin/ram: leave RAMBlock->bmap blank on
+ allocating
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -84,27 +65,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, dgilbert@redhat.com,
+	quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a question I have encountered while using QEMU.
+During migration, we would sync bitmap from ram_list.dirty_memory to
+RAMBlock.bmap in cpu_physical_memory_sync_dirty_bitmap().
 
-I want to compile the source directly rather than through apt or yum and
-install QEMU and input the output statement to the source to check the
-output value.
+Since we set RAMBlock.bmap and ram_list.dirty_memory both to all 1, this
+means at the first round this sync is meaningless and is a duplicated
+work.
 
-When I compiled QEMU using dpkg-buildpackage in Ubuntu, I verified that
-when QEMU's VM is executed by inputting and compiling the output statement,
-the output value is recorded in the log file(ex.
-/var/log/libvirt/qemu/win7.log) of that VM.
+Leaving RAMBlock->bmap blank on allocating would have a side effect on
+migration_dirty_pages, since it is calculated from the result of
+cpu_physical_memory_sync_dirty_bitmap(). To keep it right, we need to
+set migration_dirty_pages to 0 in ram_state_init().
 
-In Centos, I tried to use rpmbuild to input the output to QEMU source,
-compile and check the output value. I confirmed that the log file is not
-written, but I have confirmed that the output value is rare from the
-terminal during the compilation process.
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+---
+ migration/ram.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-What I want to do is to get the output to be written to the log file like
-in Ubuntu.
+diff --git a/migration/ram.c b/migration/ram.c
+index 95c51109d2..417874707d 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -3151,12 +3151,7 @@ static int ram_state_init(RAMState **rsp)
+     qemu_mutex_init(&(*rsp)->src_page_req_mutex);
+     QSIMPLEQ_INIT(&(*rsp)->src_page_requests);
+ 
+-    /*
+-     * Count the total number of pages used by ram blocks not including any
+-     * gaps due to alignment or unplugs.
+-     */
+-    (*rsp)->migration_dirty_pages = ram_bytes_total() >> TARGET_PAGE_BITS;
+-
++    (*rsp)->migration_dirty_pages = 0;
+     ram_state_reset(*rsp);
+ 
+     return 0;
+@@ -3172,7 +3167,6 @@ static void ram_list_init_bitmaps(void)
+         RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+             pages = block->max_length >> TARGET_PAGE_BITS;
+             block->bmap = bitmap_new(pages);
+-            bitmap_set(block->bmap, 0, pages);
+             if (migrate_postcopy_ram()) {
+                 block->unsentmap = bitmap_new(pages);
+                 bitmap_set(block->unsentmap, 0, pages);
+-- 
+2.19.1
 
-Thank you
+
