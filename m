@@ -2,93 +2,57 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E86C2C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:26:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC163C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:37:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4FD8208C4
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:26:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="ON/NQjQW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4FD8208C4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9EBCD20449
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:37:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EBCD20449
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54063 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54433 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO6fs-0001wH-Ip
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 16:26:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57753)
+	id 1hO6qC-00074a-PP
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 16:37:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jstaron@google.com>) id 1hO6f7-0001cI-OR
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:26:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hO6oK-0005B8-If
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:35:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jstaron@google.com>) id 1hO6f4-0006Cj-JT
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:26:04 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:35712)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jstaron@google.com>) id 1hO6f2-0006B4-55
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:26:00 -0400
-Received: by mail-pf1-x442.google.com with SMTP id t87so8664789pfa.2
-	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 13:25:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
-	h=subject:to:cc:references:from:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=SDTbfUna34Qd79ay/PvHpXeLqKHYqAqzFBtMK1XzxGI=;
-	b=ON/NQjQWEi3fON/DDBAYu5HG4F3A9wQYYX3ZHXewW6rdfpyfN6GDeKnlxgf9/si9a9
-	9JHSodUWXjDvUXWyvoEwEE0DgwhDeKMop/6LDrDPkGLUCYR03QkkfX5S7JFJ8pfilSDZ
-	xvvi21rJRzAsyyhE+/kT6jH7WSjJD4+uklULukm2H+Pokk9wj1CJ1/NtVElLjBkK6KcS
-	JqikN21lQ/W3kOqZE29va5iKvC/1zmXoxZvy0PuN6Nh+lQFN6TTKu80Ldt+bYozlFh95
-	K/LSeCc2Mr0qC2NpnPv30EkDStUnE9M9IgeET/tA/SjNLgtMCQoX8YEn/nGCjEfLlQaU
-	jpyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-	:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=SDTbfUna34Qd79ay/PvHpXeLqKHYqAqzFBtMK1XzxGI=;
-	b=AHjDBudU5LwQRKv5Gpba6GklPawkcIswLDlx3HjFKcvMEoLzr9oWvfUgRna+bYescV
-	2FN69XxFx3pF+k3NBhB8bpMzNg7kcSpFl08cV9C/aPRLp9eVn4lFIU51QKA5AUXiWEFl
-	iFAZhPMdKidsvc4hkDd/Fc/in+QXpPhC1mZ332fkuGhYXRYsAQnM+8JEscRWsckx6Bt4
-	xqHP853WENYFS/2qSW4PPqzGNOJW02HJYvQh4Egd0I3CiXuyxcoUIVKedz0l5pG2wYT+
-	t3lov2xsJsQXA1QXM+mEqU1EL5OzAhS2kBZg7J8tB9Ny9AmvFLvkKhzWN+I2wdB2RHOb
-	3WoA==
-X-Gm-Message-State: APjAAAVFXHHTUsBqBPmqr5o2Tr3V0fRR8VN+UlzKleKSjLBm947w+cqs
-	bUenq+KK/o+/AqYn7jE9R21XAA==
-X-Google-Smtp-Source: APXvYqxbPfJ5tBulG/r6tvcVjjtvKQlgkwdEbMW3aGkGHvRkjNKPxepulcAi/TILththSdbF+vLDMw==
-X-Received: by 2002:aa7:8dc3:: with SMTP id j3mr43498542pfr.141.1557260757236; 
-	Tue, 07 May 2019 13:25:57 -0700 (PDT)
-Received: from jstaron2.mtv.corp.google.com
-	([2620:15c:202:201:b94f:2527:c39f:ca2d])
-	by smtp.gmail.com with ESMTPSA id
-	f5sm15855223pgo.75.2019.05.07.13.25.55
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 07 May 2019 13:25:56 -0700 (PDT)
-To: Pankaj Gupta <pagupta@redhat.com>, linux-nvdimm@lists.01.org,
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-acpi@vger.kernel.org, qemu-devel@nongnu.org,
-	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
-References: <20190426050039.17460-1-pagupta@redhat.com>
-	<20190426050039.17460-3-pagupta@redhat.com>
-Message-ID: <3d6479ae-6c39-d614-f1d9-aa1978e2e438@google.com>
-Date: Tue, 7 May 2019 13:25:54 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <mreitz@redhat.com>) id 1hO6oI-0003q6-Eu
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:35:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54118)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hO6oC-0003VW-F5; Tue, 07 May 2019 16:35:30 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 64005883B8;
+	Tue,  7 May 2019 20:35:11 +0000 (UTC)
+Received: from localhost (unknown [10.40.205.217])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E8DB95D9D2;
+	Tue,  7 May 2019 20:35:10 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Tue,  7 May 2019 22:35:01 +0200
+Message-Id: <20190507203508.18026-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190426050039.17460-3-pagupta@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH v7 2/6] virtio-pmem: Add virtio pmem driver
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.26]);
+	Tue, 07 May 2019 20:35:11 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v4 0/7] qemu-img: Add salvaging mode to convert
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,142 +64,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: =?UTF-8?Q?Jakub_Staro=c5=84?= via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: =?UTF-8?Q?Jakub_Staro=c5=84?= <jstaron@google.com>
-Cc: jack@suse.cz, mst@redhat.com, jasowang@redhat.com, david@fromorbit.com,
-	lcapitulino@redhat.com, adilger.kernel@dilger.ca,
-	smbarber@google.com, zwisler@kernel.org, aarcange@redhat.com,
-	dave.jiang@intel.com, darrick.wong@oracle.com,
-	vishal.l.verma@intel.com, david@redhat.com, willy@infradead.org,
-	hch@infradead.org, jmoyer@redhat.com, nilal@redhat.com,
-	lenb@kernel.org, kilobyte@angband.pl, riel@surriel.com,
-	yuval.shaia@oracle.com, stefanha@redhat.com, imammedo@redhat.com,
-	dan.j.williams@intel.com, kwolf@redhat.com, tytso@mit.edu,
-	xiaoguangrong.eric@gmail.com, cohuck@redhat.com,
-	rjw@rjwysocki.net, pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/25/19 10:00 PM, Pankaj Gupta wrote:
+Hi,
 
-> +void host_ack(struct virtqueue *vq)
-> +{
-> +	unsigned int len;
-> +	unsigned long flags;
-> +	struct virtio_pmem_request *req, *req_buf;
-> +	struct virtio_pmem *vpmem = vq->vdev->priv;
-> +
-> +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +	while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
-> +		req->done = true;
-> +		wake_up(&req->host_acked);
-> +
-> +		if (!list_empty(&vpmem->req_list)) {
-> +			req_buf = list_first_entry(&vpmem->req_list,
-> +					struct virtio_pmem_request, list);
-> +			list_del(&vpmem->req_list);
+This series adds a --salvage option to qemu-img convert.  With this,
+qemu-img will not abort when it encounters an I/O error.  Instead, it
+tries to narrow it down and will treat the affected sectors as being
+completely 0 (and print a warning).
 
-Shouldn't it be rather `list_del(vpmem->req_list.next)`? We are trying to unlink
-first element of the list and `vpmem->req_list` is just the list head.
+Testing this is not so easy, because while real I/O errors during read
+operations should be treated as described above, errors encountered
+during bdrv_block_status() should just be ignored and the affected
+sectors should be considered allocated.  But blkdebug does not yet have
+a way to intercept this, and:
 
-> +int virtio_pmem_flush(struct nd_region *nd_region)
-> +{
-> +	int err;
-> +	unsigned long flags;
-> +	struct scatterlist *sgs[2], sg, ret;
-> +	struct virtio_device *vdev = nd_region->provider_data;
-> +	struct virtio_pmem *vpmem = vdev->priv;
-> +	struct virtio_pmem_request *req;
-> +
-> +	might_sleep();
-> +	req = kmalloc(sizeof(*req), GFP_KERNEL);
-> +	if (!req)
-> +		return -ENOMEM;
-> +
-> +	req->done = req->wq_buf_avail = false;
-> +	strcpy(req->name, "FLUSH");
-> +	init_waitqueue_head(&req->host_acked);
-> +	init_waitqueue_head(&req->wq_buf);
-> +	sg_init_one(&sg, req->name, strlen(req->name));
-> +	sgs[0] = &sg;
-> +	sg_init_one(&ret, &req->ret, sizeof(req->ret));
-> +	sgs[1] = &ret;
-> +
-> +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +	err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
-> +	if (err) {
-> +		dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
-> +
-> +		list_add_tail(&vpmem->req_list, &req->list);
-> +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +
-> +		/* When host has read buffer, this completes via host_ack */
-> +		wait_event(req->wq_buf, req->wq_buf_avail);
-> +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +	}
+(1) Just adding a new block-status event would be silly, because I don't
+    want an event, I want it to fail on a certain kind of operation, on
+    a certain sector range, independently of any events, so why can't we
+    just do that?  See patch 4.
 
-Aren't the arguments in `list_add_tail` swapped? The element we are adding should
-be first, the list should be second. Also, shouldn't we resubmit the request after
-waking up from `wait_event(req->wq_buf, req->wq_buf_avail)`?
+(2) If we just make blkdebug intercept .bdrv_co_block_status() like all
+    other kinds of operations, at least iotest 041 fails, which does
+    exactly that silly thing: It uses the read_aio event to wait for any
+    read.  But it turns out that there may be a bdrv_*block_status()
+    call in between, so suddenly the wrong operation yields an error.
+    As I said, the real fault here is that it does not really make sense
+    to pray that the operation you want to fail is the one that is
+    immediately executed after some event that you hope will trigger
+    that operation.
+    See patch 3.
 
-I propose rewriting it like that:
+So patch 3 allows blkdebug users to select which kind of I/O operation
+they actually want to make fail, and patch 4 allows them to not use any
+event, but to have a rule active all the time.
 
-diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
-index 66b582f751a3..ff0556b04e86 100644
---- a/drivers/nvdimm/virtio_pmem.c
-+++ b/drivers/nvdimm/virtio_pmem.c
-@@ -25,7 +25,7 @@ void host_ack(struct virtqueue *vq)
- 		if (!list_empty(&vpmem->req_list)) {
- 			req_buf = list_first_entry(&vpmem->req_list,
- 					struct virtio_pmem_request, list);
--			list_del(&vpmem->req_list);
-+			list_del(vpmem->req_list.next);
- 			req_buf->wq_buf_avail = true;
- 			wake_up(&req_buf->wq_buf);
- 		}
-@@ -59,17 +59,33 @@ int virtio_pmem_flush(struct nd_region *nd_region)
- 	sgs[1] = &ret;
- 
- 	spin_lock_irqsave(&vpmem->pmem_lock, flags);
--	err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
--	if (err) {
--		dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
-+	/*
-+	 * If virtqueue_add_sgs returns -ENOSPC then req_vq virtual queue does not
-+	 * have free descriptor slots. We add the request to req_list and wait
-+	 * for host_ack to wake us up when free slots are available.
-+	 */
-+	while ((err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC)) == -ENOSPC) {
-+		dev_err(&vdev->dev, "failed to send command to virtio pmem device, no free slots in the virtqueue, postponing request\n");
-+		req->wq_buf_avail = false;
- 
--		list_add_tail(&vpmem->req_list, &req->list);
-+		list_add_tail(&req->list, &vpmem->req_list);
- 		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
- 
- 		/* When host has read buffer, this completes via host_ack */
- 		wait_event(req->wq_buf, req->wq_buf_avail);
- 		spin_lock_irqsave(&vpmem->pmem_lock, flags);
- 	}
-+
-+	/*
-+	 * virtqueue_add_sgs failed with error different than -ENOSPC, we can't
-+	 * do anything about that.
-+	 */
-+	if (err) {
-+		dev_info(&vdev->dev, "failed to send command to virtio pmem device, error code %d\n", err);
-+		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-+		err = -EIO;
-+		goto ret;
-+	}
- 	err = virtqueue_kick(vpmem->req_vq);
- 	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+Together, we can then enable error injection for block-status in patch 5
+and make use of event=3Dnone iotype=3Dblock-status in patch 6.
 
 
-Let me know if it looks reasonable to you.
+v4:
+- Patch 2: Rebase conflict (265a7e54efad246f4bde63f77aee6311f436f5f1)
+- Patch 3: Fix enum prefix to be BLKDEBUG_IO_TYPE [Vladimir]
+- Patch 5: The same
+- Patch 6:
+  - 249 -> 251
+  - s%#!/bin/bash%#!/usr/bin/env bash% [Thomas]
+  - s/2018/2019/ [Vladimir]
+  - Drop here=3D$PWD [Vladimir]
+  - Clarified a comment (I hope) [Vladimir]
 
-Thank you,
-Jakub Staron
+
+git-backport-diff against v3:
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream pat=
+ch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
+
+001/7:[----] [--] 'qemu-img: Move quiet into ImgConvertState'
+002/7:[0006] [FC] 'qemu-img: Add salvaging mode to convert'
+003/7:[0028] [FC] 'blkdebug: Add @iotype error option'
+004/7:[----] [--] 'blkdebug: Add "none" event'
+005/7:[0002] [FC] 'blkdebug: Inject errors on .bdrv_co_block_status()'
+006/7:[0015] [FC] 'iotests: Test qemu-img convert --salvage'
+007/7:[----] [--] 'iotests: Test qemu-img convert -C --salvage'
+
+
+Max Reitz (7):
+  qemu-img: Move quiet into ImgConvertState
+  qemu-img: Add salvaging mode to convert
+  blkdebug: Add @iotype error option
+  blkdebug: Add "none" event
+  blkdebug: Inject errors on .bdrv_co_block_status()
+  iotests: Test qemu-img convert --salvage
+  iotests: Test qemu-img convert -C --salvage
+
+ qapi/block-core.json       |  33 +++++++-
+ block/blkdebug.c           |  60 +++++++++++---
+ qemu-img.c                 | 103 ++++++++++++++++-------
+ qemu-img-cmds.hx           |   4 +-
+ qemu-img.texi              |   4 +
+ tests/qemu-iotests/082     |   1 +
+ tests/qemu-iotests/082.out |   3 +
+ tests/qemu-iotests/251     | 162 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/251.out |  43 ++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 10 files changed, 375 insertions(+), 39 deletions(-)
+ create mode 100755 tests/qemu-iotests/251
+ create mode 100644 tests/qemu-iotests/251.out
+
+--=20
+2.20.1
 
 
