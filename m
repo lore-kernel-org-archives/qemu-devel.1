@@ -2,91 +2,79 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81425C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:45:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12B79C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:50:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42FB620449
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:45:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42FB620449
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D1ECA20825
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 20:50:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pFgmd8nr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1ECA20825
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54596 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54686 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO6xY-0007Gd-El
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 16:45:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36318)
+	id 1hO72d-0001hk-S1
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 16:50:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hO6rh-0000my-Is
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:39:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hO71F-0001Bv-3Y
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:48:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hO6rg-0006bn-F0
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:39:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43706)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hO6rd-0006aG-SM; Tue, 07 May 2019 16:39:02 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EBF13308FC22;
-	Tue,  7 May 2019 20:39:00 +0000 (UTC)
-Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5910B60BF3;
-	Tue,  7 May 2019 20:39:00 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190507183610.9848-1-mreitz@redhat.com>
-	<20190507183610.9848-6-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <bb490ce7-7943-6607-6a74-cfb5c2f9b95a@redhat.com>
-Date: Tue, 7 May 2019 15:38:59 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <peter.maydell@linaro.org>) id 1hO71D-0004rj-Cq
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:48:57 -0400
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:43374)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hO71D-0004oO-4U
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 16:48:55 -0400
+Received: by mail-ot1-x331.google.com with SMTP id i8so6587019oth.10
+	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 13:48:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=X2bzEXwhoqBgBx5Fz8GIgVWU1fWEI1ArFuUV+AksY94=;
+	b=pFgmd8nrqhVgstEBX4aTOTbV3L0WS7I+vZ475poMJ8nZwqTen7HCqlW6r17uELMgjm
+	SmjelXPidvSX//HNMHVUJC1QrWt9IT2illPo5ktCi9qW6iBAYZQdhVfNgaKnnvjstcls
+	oDr6g4l13cgbe+xsS4Od8hSfAcfx4Eyy/TlKPbYcE3vc5nVXmN3BzC/g14R5os6CAcuA
+	ZC5py7t8DzQDb5xp0am2+tzdr3KpM6mIHAJlC2Z3u/eqDGf1Ipddo+7AqIXKJxcqUsEK
+	7ZWcvEEM8/D3PZF7LBzToaf0I/OwGazLXHCN1CAlb9YdPhxYiD5LumvIua/RfCREhwhY
+	KVNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=X2bzEXwhoqBgBx5Fz8GIgVWU1fWEI1ArFuUV+AksY94=;
+	b=JEO+laliFlBqLyD0rJTjMR6Q9Ea0kUejB/Icm2lcSEMP2TQL5QFBW4VF5f4hDiW734
+	LgGDjzb67Gh3oJ+2jmMLMgeBWSOHlslPNxCnkqlynSkM2JYKLSuOUqIajV6/N3jZthHE
+	sPkYRt2l38f+9j/vNVnteAENXrypThY5RKK8cL11uCY+IqnG3UtXGyNMPhFB2p0HP173
+	C92aRAe10SZwcB00acMAZzfg0ZWjHmgt86vC+YeaPldsZ9TGVZ/+g//3hM2z0EfG0YWK
+	TLnBNhpFxee3pNYnEvPtBwkyr6PmEzpZ3co+ii7yFcb/r8eX4zIMV7wOSI2DQNanf+tX
+	DWnw==
+X-Gm-Message-State: APjAAAXuzYpn+nDpKjNofSPDN1LzA+Mf0MqkNG35HNvV2a7Ixhu17JLm
+	+SU6k7TEkjza0Ios7ZycDovo7p4E2kksQpwuIDrvAA==
+X-Google-Smtp-Source: APXvYqySAYC8o+uZUDrnfIPpwl+RwiB7QsosKVTkB2x0vLOUaWFDnF0/pfL1y6jkvfIsh+gm3OJlqzTh9hJKoCuSrBs=
+X-Received: by 2002:a9d:404:: with SMTP id 4mr13624743otc.352.1557262132825;
+	Tue, 07 May 2019 13:48:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190507183610.9848-6-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="gF99DanDRE3DGzYFwxZOVqlBxRWI2wJVM"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Tue, 07 May 2019 20:39:00 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 5/5] iotests: Let 233 run concurrently
+References: <20190503112654.4393-1-laurent@vivier.eu>
+	<80fb3313-239a-5828-94fa-d27137bfcb05@vivier.eu>
+In-Reply-To: <80fb3313-239a-5828-94fa-d27137bfcb05@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 May 2019 21:48:40 +0100
+Message-ID: <CAFEAcA_y24gpugttDTR-QrJ0fA7JCQeC0XXsR6pjm2rQ19rfCA@mail.gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::331
+Subject: Re: [Qemu-devel] [PULL v2 00/12] Trivial branch patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,121 +86,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	Jason Wang <jasowang@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Fabien Chouteau <chouteau@adacore.com>,
+	Michael Roth <mdroth@linux.vnet.ibm.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>,
+	Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gF99DanDRE3DGzYFwxZOVqlBxRWI2wJVM
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Message-ID: <bb490ce7-7943-6607-6a74-cfb5c2f9b95a@redhat.com>
-Subject: Re: [PATCH 5/5] iotests: Let 233 run concurrently
-References: <20190507183610.9848-1-mreitz@redhat.com>
- <20190507183610.9848-6-mreitz@redhat.com>
-In-Reply-To: <20190507183610.9848-6-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 7 May 2019 at 20:10, Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> Ping ?
 
-On 5/7/19 1:36 PM, Max Reitz wrote:
-> common.nbd's nbd_server_set_tcp_port() tries to find a free port, and
-> then uses it for the whole test run.  However, this is racey because
+This is in my queue to process, but there are still a bunch of
+other pullreqs in the queue too; I am working through them.
 
-racy
-
-> even if the port was free at the beginning, there is no guarantee it
-> will continue to be available.  Therefore, 233 currently cannot reliabl=
-y
-> be run concurrently with other NBD TCP tests.
->=20
-> This patch addresses the problem by dropping nbd_server_set_tcp_port(),=
-
-> and instead finding a new port every time nbd_server_start_tcp_socket()=
-
-> is invoked.  For this, we run qemu-nbd with --fork and on error evaluat=
-e
-> the output to see whether it contains "Address already in use".  If so,=
-
-> we try the next port.
->=20
-> On success, we still want to continually redirect the output from
-> qemu-nbd to stderr.  To achieve both, we redirect qemu-nbd's stderr to =
-a
-> FIFO that we then open in bash.  If the parent process exits with statu=
-s
-> 0 (which means that the server has started successfully), we launch a
-> background cat process that copies the FIFO to stderr.  On failure, we
-> read the whole content into a variable and then evaluate it.
->=20
-> While at it, use --fork in nbd_server_start_unix_socket(), too.  Doing
-> so allows us to drop nbd_server_wait_for_*_socket().
->=20
-> Note that the reason common.nbd did not use --fork before is that
-> qemu-nbd did not have --pid-file.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/233        |  1 -
->  tests/qemu-iotests/common.nbd | 93 ++++++++++++++++-------------------=
-
->  2 files changed, 42 insertions(+), 52 deletions(-)
->=20
-
-> @@ -34,76 +39,62 @@ nbd_server_stop()
->          fi
->      fi
->      rm -f "$nbd_unix_socket"
-> -}
-> -
-> -nbd_server_wait_for_unix_socket()
-> -{
-=2E..
-> -    echo "Failed in check of unix socket created by qemu-nbd"
-> -    exit 1
-> +    rm -f "$nbd_stderr_fifo"
-
-You could use a single 'rm -f "$nbd_unix_socket" "$nbd_stderr_fifo"'.
-That's cosmetic, though.
-
-Are we sure that even on failure, our fifo will not fill up and cause
-deadlock? If the failing qemu-nbd has so much output as to be non-atomic
-so that it blocks waiting for a reader, but we don't read anything until
-after qemu-nbd exits after forking the daemon, then we have deadlock.
-But in the common case, I don't think qemu-nbd ever spits out that much
-in errors, even when it fails to start whether due to a socket in use or
-for other reasons.  And even if it does hang, it is our testsuite (and
-our CI tools will probably notice it), rather than our main code.
-
-Otherwise, it's a lot of shell code with quite a few bash-isms, but we
-already require bash, and I didn't spot anything blatantly wrong.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---gF99DanDRE3DGzYFwxZOVqlBxRWI2wJVM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzR7OMACgkQp6FrSiUn
-Q2qangf+LrnNVcd5RmYn70PO3kipLonnT/8Mf8aP1pwZShFHYBqfS0EJnxyevFcd
-ksGKjFfR6cKifRiNWcav/ALUoRiPiOP26FVpYo0r0DdEmXpvcgEB7/WnLMm2HS45
-OntEW9ASdv3hBzAnv9T3yvnGfg/hqPmV4qNxjwK0UROXHF9FaCn3RmmrQrMw0hKq
-WDqq1yO5sUxDr4kOp3tsm1qwrzA5XJ1JBxldAejc9o0Y26qT8XUa7uiFyxkk5XEo
-N2eKfwItpPiWVD+gcLoJwOGLuNL9s7LYSELVrsn1v8GFkiukADn5q1xB1kRMAC6Q
-jfBlxM8nKbFToD8BzW2doyp3LsYFPw==
-=7azk
------END PGP SIGNATURE-----
-
---gF99DanDRE3DGzYFwxZOVqlBxRWI2wJVM--
+thanks
+-- PMM
 
