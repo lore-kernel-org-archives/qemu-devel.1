@@ -3,61 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BD76C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 09:56:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D394CC004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 10:03:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E18E22053B
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 09:56:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E18E22053B
+	by mail.kernel.org (Postfix) with ESMTPS id 892E920578
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 10:03:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 892E920578
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43597 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43671 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNwqC-0003Yp-Rf
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 05:56:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50786)
+	id 1hNwx1-000577-HY
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 06:03:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hNwpS-0003Fk-DX
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:56:07 -0400
+	(envelope-from <groug@kaod.org>) id 1hNwvq-0004j0-VD
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 06:02:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hNwpR-0008Ha-3s
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:56:06 -0400
-Received: from 8.mo5.mail-out.ovh.net ([178.32.116.78]:34923)
+	(envelope-from <groug@kaod.org>) id 1hNwvl-0005Bf-PT
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 06:02:42 -0400
+Received: from 10.mo6.mail-out.ovh.net ([87.98.157.236]:53690)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hNwpQ-0008Ff-UL
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:56:05 -0400
-Received: from player773.ha.ovh.net (unknown [10.108.42.167])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 574DB22E55C
-	for <qemu-devel@nongnu.org>; Tue,  7 May 2019 11:56:02 +0200 (CEST)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hNwvl-0005AO-Gz
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 06:02:37 -0400
+Received: from player697.ha.ovh.net (unknown [10.109.160.232])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 9496E1C18A2
+	for <qemu-devel@nongnu.org>; Tue,  7 May 2019 12:02:33 +0200 (CEST)
 Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
 	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
-	by player773.ha.ovh.net (Postfix) with ESMTPSA id B2A6A57D3893;
-	Tue,  7 May 2019 09:55:57 +0000 (UTC)
-Date: Tue, 7 May 2019 11:55:56 +0200
+	by player697.ha.ovh.net (Postfix) with ESMTPSA id 8EC7F5826A32;
+	Tue,  7 May 2019 10:02:24 +0000 (UTC)
+Date: Tue, 7 May 2019 12:02:21 +0200
 From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Message-ID: <20190507115556.3d578690@bahia.lan>
-In-Reply-To: <1895198.u98Sn5qOsY@silver>
-References: <590216e2666653bac21d950aaba98f87d0a53324.1557093245.git.qemu_oss@crudebyte.com>
-	<1895198.u98Sn5qOsY@silver>
+To: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190507120221.772eae29@bahia.lan>
+In-Reply-To: <20190507062316.20916-5-david@gibson.dropbear.id.au>
+References: <20190507062316.20916-1-david@gibson.dropbear.id.au>
+	<20190507062316.20916-5-david@gibson.dropbear.id.au>
 X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 6211026838202849600
+X-Ovh-Tracer-Id: 6321083552594500070
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrkedtgddvfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrkedtgddvgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.32.116.78
-Subject: Re: [Qemu-devel] [libvirt patch] qemu: adds support for virtfs 9p
- argument 'vii'
+X-Received-From: 87.98.157.236
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3 4/5] pci: Make is_bridge a
+ bool
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,200 +69,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Antonios Motakis <antonios.motakis@huawei.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 06 May 2019 19:58:28 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+On Tue,  7 May 2019 16:23:15 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> This is the counter part patch against latest libvirt git master head to
-
-Hmm... shouldn't this be Cc'd to libvir-list@redhat.com as well then ?
-
-> support the 'vii' feature of patch 5, which introduces the XML config
-
-What is patch 5 ?!? What is 'vii' ? I am a bit lost here...
-
-> XML tag "important" on libvirt side.
+> The is_bridge field in PCIDevice acts as a bool, but is declared as an int.
+> Declare it as a bool for clarity, and change everything that writes it to
+> use true/false instead of 0/1 to match.
 > 
-> To stick with the previous example mentioned with patch 5, likewise
-> libvirt XML configuration might then look like this:
-> 
->   <domain type='kvm'>
->     ...
->     <devices>
->       ...
->       <filesystem type='mount' accessmode='mapped'>
->         <source dir='/vm/fs'/>
->         <target dir='root'/>
->         <important path='/var/shares'/>
->         <important path='/tmp'/>
->       </filesystem>
->     </devices>
->   </domain>
-> 
-> Like with the vii qemu virtfs command line argument, the order of the
-> "important" tag defines which one gets the highest inode namespace
-> (smallest generated suffix) on guest side.
-> 
-> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  docs/schemas/domaincommon.rng |  6 ++++++
->  src/conf/domain_conf.c        | 30 ++++++++++++++++++++++++++++++
->  src/conf/domain_conf.h        |  3 +++
->  src/qemu/qemu_command.c       | 10 ++++++++++
->  4 files changed, 49 insertions(+)
+>  hw/pci-bridge/dec.c                | 4 ++--
+>  hw/pci-bridge/i82801b11.c          | 2 +-
+>  hw/pci-bridge/pci_bridge_dev.c     | 2 +-
+>  hw/pci-bridge/pcie_pci_bridge.c    | 2 +-
+>  hw/pci-bridge/pcie_root_port.c     | 2 +-
+>  hw/pci-bridge/simba.c              | 2 +-
+>  hw/pci-bridge/xio3130_downstream.c | 2 +-
+>  hw/pci-bridge/xio3130_upstream.c   | 2 +-
+>  include/hw/pci/pci.h               | 2 +-
+>  9 files changed, 10 insertions(+), 10 deletions(-)
 > 
-> diff --git a/docs/schemas/domaincommon.rng b/docs/schemas/domaincommon.rng
-> index 111b85c36f..c75edfc4d3 100644
-> --- a/docs/schemas/domaincommon.rng
-> +++ b/docs/schemas/domaincommon.rng
-> @@ -2515,6 +2515,12 @@
->              </choice>
->            </attribute>
->          </optional>
-> +        <zeroOrMore>
-> +          <element name='important'>
-> +            <attribute name="path"/>
-> +            <empty/>
-> +          </element>
-> +        </zeroOrMore>
->          <optional>
->            <element name='readonly'>
->              <empty/>
-> diff --git a/src/conf/domain_conf.c b/src/conf/domain_conf.c
-> index b4fb6cf981..cc75c6a7dd 100644
-> --- a/src/conf/domain_conf.c
-> +++ b/src/conf/domain_conf.c
-> @@ -2294,6 +2294,8 @@ virDomainFSDefNew(void)
+> diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
+> index 8484bfd434..ca40253730 100644
+> --- a/hw/pci-bridge/dec.c
+> +++ b/hw/pci-bridge/dec.c
+> @@ -68,7 +68,7 @@ static void dec_21154_pci_bridge_class_init(ObjectClass *klass, void *data)
+>      k->vendor_id = PCI_VENDOR_ID_DEC;
+>      k->device_id = PCI_DEVICE_ID_DEC_21154;
+>      k->config_write = pci_bridge_write_config;
+> -    k->is_bridge = 1;
+> +    k->is_bridge = true;
+>      dc->desc = "DEC 21154 PCI-PCI bridge";
+>      dc->reset = pci_bridge_reset;
+>      dc->vmsd = &vmstate_pci_device;
+> @@ -129,7 +129,7 @@ static void dec_21154_pci_host_class_init(ObjectClass *klass, void *data)
+>      k->device_id = PCI_DEVICE_ID_DEC_21154;
+>      k->revision = 0x02;
+>      k->class_id = PCI_CLASS_BRIDGE_PCI;
+> -    k->is_bridge = 1;
+> +    k->is_bridge = true;
+>      /*
+>       * PCI-facing part of the host bridge, not usable without the
+>       * host-facing part, which can't be device_add'ed, yet.
+> diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
+> index 10e590e5c6..6d8b0f54a7 100644
+> --- a/hw/pci-bridge/i82801b11.c
+> +++ b/hw/pci-bridge/i82801b11.c
+> @@ -90,7 +90,7 @@ static void i82801b11_bridge_class_init(ObjectClass *klass, void *data)
+>      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>      DeviceClass *dc = DEVICE_CLASS(klass);
 >  
->  void virDomainFSDefFree(virDomainFSDefPtr def)
->  {
-> +    size_t i;
-> +
->      if (!def)
->          return;
+> -    k->is_bridge = 1;
+> +    k->is_bridge = true;
+>      k->vendor_id = PCI_VENDOR_ID_INTEL;
+>      k->device_id = PCI_DEVICE_ID_INTEL_82801BA_11;
+>      k->revision = ICH9_D2P_A2_REVISION;
+> diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+> index ff6b8323da..c56ed1f52f 100644
+> --- a/hw/pci-bridge/pci_bridge_dev.c
+> +++ b/hw/pci-bridge/pci_bridge_dev.c
+> @@ -253,7 +253,7 @@ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
+>      k->vendor_id = PCI_VENDOR_ID_REDHAT;
+>      k->device_id = PCI_DEVICE_ID_REDHAT_BRIDGE;
+>      k->class_id = PCI_CLASS_BRIDGE_PCI;
+> -    k->is_bridge = 1,
+> +    k->is_bridge = true;
+>      dc->desc = "Standard PCI Bridge";
+>      dc->reset = qdev_pci_bridge_dev_reset;
+>      dc->props = pci_bridge_dev_properties;
+> diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+> index d491b40d04..9a4fba413a 100644
+> --- a/hw/pci-bridge/pcie_pci_bridge.c
+> +++ b/hw/pci-bridge/pcie_pci_bridge.c
+> @@ -143,7 +143,7 @@ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>      HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
 >  
-> @@ -2302,6 +2304,13 @@ void virDomainFSDefFree(virDomainFSDefPtr def)
->      virDomainDeviceInfoClear(&def->info);
->      VIR_FREE(def->virtio);
+> -    k->is_bridge = 1;
+> +    k->is_bridge = true;
+>      k->vendor_id = PCI_VENDOR_ID_REDHAT;
+>      k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
+>      k->realize = pcie_pci_bridge_realize;
+> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> index e94d918b6d..be3f4d5e03 100644
+> --- a/hw/pci-bridge/pcie_root_port.c
+> +++ b/hw/pci-bridge/pcie_root_port.c
+> @@ -162,7 +162,7 @@ static void rp_class_init(ObjectClass *klass, void *data)
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
 >  
-> +    if (def->important) {
-> +        for (i = 0; i < def->nimportant; i++)
-> +            if (def->important[i])
-> +                VIR_FREE(def->important[i]);
-> +    }
-> +    VIR_FREE(def->important);
-> +
->      VIR_FREE(def);
->  }
+> -    k->is_bridge = 1;
+> +    k->is_bridge = true;
+>      k->config_write = rp_write_config;
+>      k->realize = rp_realize;
+>      k->exit = rp_exit;
+> diff --git a/hw/pci-bridge/simba.c b/hw/pci-bridge/simba.c
+> index dea4c8c5e7..7cf0d6e047 100644
+> --- a/hw/pci-bridge/simba.c
+> +++ b/hw/pci-bridge/simba.c
+> @@ -76,7 +76,7 @@ static void simba_pci_bridge_class_init(ObjectClass *klass, void *data)
+>      k->device_id = PCI_DEVICE_ID_SUN_SIMBA;
+>      k->revision = 0x11;
+>      k->config_write = pci_bridge_write_config;
+> -    k->is_bridge = 1;
+> +    k->is_bridge = true;
+>      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>      dc->reset = pci_bridge_reset;
+>      dc->vmsd = &vmstate_pci_device;
+> diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
+> index 467bbabe4c..ab2a51e15d 100644
+> --- a/hw/pci-bridge/xio3130_downstream.c
+> +++ b/hw/pci-bridge/xio3130_downstream.c
+> @@ -152,7 +152,7 @@ static void xio3130_downstream_class_init(ObjectClass *klass, void *data)
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
 >  
-> @@ -10953,6 +10962,7 @@ virDomainFSDefParseXML(virDomainXMLOptionPtr xmlopt,
->      VIR_AUTOFREE(char *) usage = NULL;
->      VIR_AUTOFREE(char *) units = NULL;
->      VIR_AUTOFREE(char *) model = NULL;
-> +    long n;
+> -    k->is_bridge = 1;
+> +    k->is_bridge = true;
+>      k->config_write = xio3130_downstream_write_config;
+>      k->realize = xio3130_downstream_realize;
+>      k->exit = xio3130_downstream_exitfn;
+> diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_upstream.c
+> index b524908cf1..1d41a49ab0 100644
+> --- a/hw/pci-bridge/xio3130_upstream.c
+> +++ b/hw/pci-bridge/xio3130_upstream.c
+> @@ -126,7 +126,7 @@ static void xio3130_upstream_class_init(ObjectClass *klass, void *data)
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
 >  
->      ctxt->node = node;
+> -    k->is_bridge = 1;
+> +    k->is_bridge = true;
+>      k->config_write = xio3130_upstream_write_config;
+>      k->realize = xio3130_upstream_realize;
+>      k->exit = xio3130_upstream_exitfn;
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index da20c915ef..d082707dfa 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -234,7 +234,7 @@ typedef struct PCIDeviceClass {
+>       * This doesn't mean pci host switch.
+>       * When card bus bridge is supported, this would be enhanced.
+>       */
+> -    int is_bridge;
+> +    bool is_bridge;
 >  
-> @@ -11001,6 +11011,12 @@ virDomainFSDefParseXML(virDomainXMLOptionPtr xmlopt,
->                                    1, ULLONG_MAX, false) < 0)
->          goto error;
->  
-> +    n = virXMLChildElementCount(node);
-> +    if (n > 0) {
-> +        if (VIR_ALLOC_N(def->important, n) < 0)
-> +            goto error;
-> +    }
-> +
->      cur = node->children;
->      while (cur != NULL) {
->          if (cur->type == XML_ELEMENT_NODE) {
-> @@ -11039,6 +11055,8 @@ virDomainFSDefParseXML(virDomainXMLOptionPtr xmlopt,
->  
->                  if (virDomainVirtioOptionsParseXML(cur, &def->virtio) < 0)
->                      goto error;
-> +            } else if (virXMLNodeNameEqual(cur, "important")) {
-> +                def->important[def->nimportant++] = virXMLPropString(cur, "path");
->              }
->          }
->          cur = cur->next;
-> @@ -11107,6 +11125,8 @@ virDomainFSDefParseXML(virDomainXMLOptionPtr xmlopt,
->          goto error;
->  
->   cleanup:
-> +    if (def && def->important && !def->nimportant)
-> +        VIR_FREE(def->important);
->      return def;
->  
->   error:
-> @@ -24601,6 +24621,7 @@ virDomainFSDefFormat(virBufferPtr buf,
->      const char *src = def->src->path;
->      VIR_AUTOCLEAN(virBuffer) driverBuf = VIR_BUFFER_INITIALIZER;
->      int ret = -1;
-> +    size_t i;
->  
->      if (!type) {
->          virReportError(VIR_ERR_INTERNAL_ERROR,
-> @@ -24689,6 +24710,15 @@ virDomainFSDefFormat(virBufferPtr buf,
->      if (def->readonly)
->          virBufferAddLit(buf, "<readonly/>\n");
->  
-> +    if (def->important) {
-> +        for (i = 0; i < def->nimportant; ++i) {
-> +            if (!def->important[i]) continue;
-> +            virBufferAddLit(buf, "<important");
-> +            virBufferEscapeString(buf, " path='%s'", def->important[i]);
-> +            virBufferAddLit(buf, "/>\n");
-> +        }
-> +    }
-> +
->      if (virDomainDeviceInfoFormat(buf, &def->info, flags) < 0)
->          goto cleanup;
->  
-> diff --git a/src/conf/domain_conf.h b/src/conf/domain_conf.h
-> index 01c22d8cc3..9bbd66d932 100644
-> --- a/src/conf/domain_conf.h
-> +++ b/src/conf/domain_conf.h
-> @@ -818,6 +818,9 @@ struct _virDomainFSDef {
->      unsigned long long space_soft_limit; /* in bytes */
->      bool symlinksResolved;
->      virDomainVirtioOptionsPtr virtio;
-> +
-> +    size_t nimportant;
-> +    char **important;
->  };
->  
->  
-> diff --git a/src/qemu/qemu_command.c b/src/qemu/qemu_command.c
-> index 50b4205267..2005ccadf8 100644
-> --- a/src/qemu/qemu_command.c
-> +++ b/src/qemu/qemu_command.c
-> @@ -2732,6 +2732,7 @@ qemuBuildFSStr(virDomainFSDefPtr fs)
->      virBuffer opt = VIR_BUFFER_INITIALIZER;
->      const char *driver = qemuDomainFSDriverTypeToString(fs->fsdriver);
->      const char *wrpolicy = virDomainFSWrpolicyTypeToString(fs->wrpolicy);
-> +    size_t i;
->  
->      if (fs->type != VIR_DOMAIN_FS_TYPE_MOUNT) {
->          virReportError(VIR_ERR_CONFIG_UNSUPPORTED, "%s",
-> @@ -2775,6 +2776,15 @@ qemuBuildFSStr(virDomainFSDefPtr fs)
->      if (fs->readonly)
->          virBufferAddLit(&opt, ",readonly");
->  
-> +    if (fs->important) {
-> +        for (i = 0; i < fs->nimportant; ++i) {
-> +            if (i == 0)
-> +                virBufferAsprintf(&opt, ",vii=%s", fs->important[i]);
-> +            else
-> +                virBufferAsprintf(&opt, ":%s", fs->important[i]);
-> +        }
-> +    }
-> +
->      if (virBufferCheckError(&opt) < 0)
->          goto error;
->  
+>      /* rom bar */
+>      const char *romfile;
 
 
