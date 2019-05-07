@@ -2,109 +2,67 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4532CC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2C2FC04AAB
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:46:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19ED9205ED
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:38:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19ED9205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8A34B20578
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 05:46:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A34B20578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40339 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40410 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNso5-0007yV-Dq
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 01:38:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58820)
+	id 1hNsvS-0000dm-Rj
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 01:46:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNsnI-0007f9-T4
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:37:37 -0400
+	(envelope-from <yan.y.zhao@intel.com>) id 1hNsuX-0000FF-PU
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:45:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hNsnI-0008E1-2s
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:37:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54156)
+	(envelope-from <yan.y.zhao@intel.com>) id 1hNsuW-0003IL-7s
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:45:05 -0400
+Received: from mga18.intel.com ([134.134.136.126]:15358)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hNsnF-00088s-WC; Tue, 07 May 2019 01:37:34 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4AE4C3097025;
-	Tue,  7 May 2019 05:37:33 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-130.ams2.redhat.com [10.36.116.130])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id CEA2110021B1;
-	Tue,  7 May 2019 05:37:31 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20190506172111.31594-1-eblake@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <14ddc8ed-fc20-5434-0e0c-8519ea910777@redhat.com>
-Date: Tue, 7 May 2019 07:37:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+	id 1hNsuV-0003FM-Vl
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 01:45:04 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+	by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	06 May 2019 22:44:55 -0700
+X-ExtLoop1: 1
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+	([10.239.13.9])
+	by fmsmga005.fm.intel.com with ESMTP; 06 May 2019 22:44:50 -0700
+Date: Tue, 7 May 2019 01:39:13 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190507053913.GA14284@joy-OptiPlex-7040>
+References: <20190419083258.19580-1-yan.y.zhao@intel.com>
+	<20190419083505.19654-1-yan.y.zhao@intel.com>
+	<20190423115932.42619422.cohuck@redhat.com>
+	<20190424031036.GB26247@joy-OptiPlex-7040>
+	<20190424095624.0ce97328.cohuck@redhat.com>
+	<20190424081558.GE26247@joy-OptiPlex-7040>
+	<20190430172908.2ae77fa9.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190506172111.31594-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Tue, 07 May 2019 05:37:33 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] iotests: Tweak 221 sizing for different
- hole granularities
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190430172908.2ae77fa9.cohuck@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 134.134.136.126
+Subject: Re: [Qemu-devel] [PATCH 1/2] vfio/mdev: add version field as
+ mandatory attribute for mdev device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -116,33 +74,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
-	Max Reitz <mreitz@redhat.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"aik@ozlabs.ru" <aik@ozlabs.ru>,
+	"Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+	"shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+	"eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+	"eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+	Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+	"pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+	"libvir-list@redhat.com" <libvir-list@redhat.com>,
+	"arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
+	"felipe@nutanix.com" <felipe@nutanix.com>,
+	"Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+	"dgilbert@redhat.com" <dgilbert@redhat.com>,
+	"zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"intel-gvt-dev@lists.freedesktop.org"
+	<intel-gvt-dev@lists.freedesktop.org>, "Liu,
+	Changpeng" <changpeng.liu@intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Wang, Zhi A" <zhi.a.wang@intel.com>,
+	"jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "He,
+	Shaopeng" <shaopeng.he@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/05/2019 19.21, Eric Blake wrote:
-> For some particular configurations of ext4, sizing an image to 84
-> sectors + 1 byte causes test failures when the size of the hole is
-> rounded to a 4k alignment. Let's instead size things to 128 sectors +
-> 1 byte, as the 64k boundary is more likely to work with various hole
-> granularities.
+On Tue, Apr 30, 2019 at 11:29:08PM +0800, Cornelia Huck wrote:
+> On Wed, 24 Apr 2019 04:15:58 -0400
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
 > 
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
+> > On Wed, Apr 24, 2019 at 03:56:24PM +0800, Cornelia Huck wrote:
+> > > On Tue, 23 Apr 2019 23:10:37 -0400
+> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > >
+> > > > On Tue, Apr 23, 2019 at 05:59:32PM +0800, Cornelia Huck wrote:
+> > > > > On Fri, 19 Apr 2019 04:35:04 -0400
+> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
 > 
-> I have been unable to reproduce Thomas' failure, but suspect that this
-> will address it. If I can get a Tested-by, then I'm happy to add it
-> through my NBD tree, as I have a couple other iotest fixes ready for a
-> pull request.
+> > > > > > @@ -225,6 +228,8 @@ Directories and files under the sysfs for Each Physical Device
+> > > > > >    [<type-id>], device_api, and available_instances are mandatory attributes
+> > > > > >    that should be provided by vendor driver.
+> > > > > >
+> > > > > > +  version is a mandatory attribute if a mdev device supports live migration.
+> > > > >
+> > > > > What about "An mdev device wishing to support live migration must
+> > > > > provide the version attribute."?
+> > > > yes, I just want to keep consistent with the line above it
+> > > > " [<type-id>], device_api, and available_instances are mandatory attributes
+> > > >   that should be provided by vendor driver."
+> > > > what about below one?
+> > > >   "version is a mandatory attribute if a mdev device wishing to support live
+> > > >   migration."
+> > >
+> > > My point is that an attribute is not mandatory if it can be left out :)
+> > > (I'm not a native speaker, though; maybe this makes perfect sense
+> > > after all?)
+> > >
+> > > Maybe "version is a required attribute if live migration is supported
+> > > for an mdev device"?
+> > >
+> > you are right, "mandatory" may bring some confusion.
+> > Maybe
+> > "vendor driver must provide version attribute for an mdev device wishing to
+> > support live migration." ?
+> > based on your first version :)
 > 
->  tests/qemu-iotests/221     | 10 +++++-----
->  tests/qemu-iotests/221.out | 20 ++++++++++----------
->  2 files changed, 15 insertions(+), 15 deletions(-)
+> "The vendor driver must provide the version attribute for any mdev
+> device it wishes to support live migration for." ?
+> 
+> >
+> > > >
+> > > >
+> > > > > > +
+> > > > > >  * [<type-id>]
+> > > > > >
+> > > > > >    The [<type-id>] name is created by adding the device driver string as a prefix
+> > > > > > @@ -246,6 +251,35 @@ Directories and files under the sysfs for Each Physical Device
+> > > > > >    This attribute should show the number of devices of type <type-id> that can be
+> > > > > >    created.
+> > > > > >
+> > > > > > +* version
+> > > > > > +
+> > > > > > +  This attribute is rw. It is used to check whether two devices are compatible
+> > > > > > +  for live migration. If this attribute is missing, then the corresponding mdev
+> > > > > > +  device is regarded as not supporting live migration.
+> > > > > > +
+> > > > > > +  It consists of two parts: common part and vendor proprietary part.
+> > > > > > +  common part: 32 bit. lower 16 bits is vendor id and higher 16 bits identifies
+> > > > > > +               device type. e.g., for pci device, it is
+> > > > > > +               "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
+> > > > > > +  vendor proprietary part: this part is varied in length. vendor driver can
+> > > > > > +               specify any string to identify a device.
+> > > > > > +
+> > > > > > +  When reading this attribute, it should show device version string of the device
+> > > > > > +  of type <type-id>. If a device does not support live migration, it should
+> > > > > > +  return errno.
+> > > > > > +  When writing a string to this attribute, it returns errno for incompatibility
+> > > > > > +  or returns written string length in compatibility case. If a device does not
+> > > > > > +  support live migration, it always returns errno.
+> > > > >
+> > > > > I'm not sure whether a device that does not support live migration
+> > > > > should expose this attribute in the first place. Or is that to cover
+> > > > > cases where a driver supports live migration only for some of the
+> > > > > devices it supports?
+> > > > yes, driver returning error code is to cover the cases where only part of devices it
+> > > > supports can be migrated.
+> > > >
+> > > >
+> > > > > Also, I'm not sure if a string that has to be parsed is a good idea...
+> > > > > is this 'version' attribute supposed to convey some human-readable
+> > > > > information as well? The procedure you describe for compatibility
+> > > > > checking does the checking within the vendor driver which I would
+> > > > > expect to have a table/rules for that anyway.
+> > > > right. if a vendor driver has the confidence to migrate between devices of
+> > > > diffent platform or mdev types, it can maintain a compatibility table for that
+> > > > purpose. That's the reason why we would leave the compatibility check to vendor
+> > > > driver. vendor driver can freely choose its own complicated way to decide
+> > > > which device is migratable to which device.
+> > >
+> > > I think there are two scenarios here:
+> > > - Migrating between different device types, which is unlikely to work,
+> > >   except in special cases.
+> > > - Migrating between different versions of the same device type, which
+> > >   may work for some drivers/devices (and at least migrating to a newer
+> > >   version looks quite reasonable).
+> > >
+> > > But both should be something that is decided by the individual driver;
+> > > I hope we don't want to support migration between different drivers :-O
+> > >
+> > > Can we make this a driver-defined format?
+> > >
+> > yes, this is indeed driver-defined format.
+> > Actually we define it into two parts: common part and vendor proprietary part.
+> > common part: 32 bit. lower 16 bits is vendor id and higher 16 bits
+> >              identifies device type. e.g., for pci device, it is
+> >              "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
+> > vendor proprietary part: this part is varied in length. vendor driver can
+> >              specify any string to identify a device.
+> >
+> > vendor proprietary part is defined by vendor driver. vendor driver can
+> > define any format it wishes to use. Also it is its own responsibility to
+> > ensure backward compatibility if it wants to update format definition in this
+> > part.
+> >
+> > So user space only needs to get source side's version string, and asks
+> > target side whether the two are compatible. The decision maker is the
+> > vendor driver:)
+> 
+> If I followed the discussion correctly, I think you plan to drop this
+> format, don't you? I'd be happy if a vendor driver can use a simple
+> number without any prefixes if it so chooses.
+> 
+> I also like the idea of renaming this "migration_version" so that it is
+> clear we're dealing with versioning of the migration capability (and
+> not a version of the device or so).
+hi Cornelia,
+sorry I just saw this mail after sending v2 of this patch set...
+yes, I dropped the common part and vendor driver now can define whatever it
+wishes to identify a device version.
+However, I don't agree to rename it to "migration_version", as it still may
+bring some kind of confusing with the migration version a vendor driver is
+using, e.g. vendor driver changes migration code and increases that migration
+version.
+In fact, what info we want to get from this attribute is whether this mdev
+device is compatible with another mdev device, which is tied to device, and not
+necessarily bound to migration.
 
-Thanks, this fixes the issue on my ext4 partition!
+do you think so?
 
-Tested-by: Thomas Huth <thuth@redhat.com>
+Thanks
+Yan
+> _______________________________________________
+> intel-gvt-dev mailing list
+> intel-gvt-dev@lists.freedesktop.org
+> https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
 
