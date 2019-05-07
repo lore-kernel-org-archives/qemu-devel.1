@@ -2,107 +2,80 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29FA5C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:35:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD0D6C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:36:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3A96206BF
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:35:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3A96206BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9A2D2206BF
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:36:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="TlGX4D84"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A2D2206BF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48766 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48790 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO284-0005rz-5M
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 11:35:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33936)
+	id 1hO29J-0006aI-Vd
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 11:36:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1hO240-0003Ng-C0
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:31:29 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1hO288-00061t-JC
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:35:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1hO23z-00052W-8C
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:31:28 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34358)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farman@linux.ibm.com>)
-	id 1hO23z-000514-01
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:31:27 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x47FTbkp092574
-	for <qemu-devel@nongnu.org>; Tue, 7 May 2019 11:31:23 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2sb9uu0327-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 11:31:23 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
-	Tue, 7 May 2019 16:31:22 +0100
-Received: from b01cxnp22036.gho.pok.ibm.com (9.57.198.26)
-	by e17.ny.us.ibm.com (146.89.104.204) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Tue, 7 May 2019 16:31:19 +0100
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
-	[9.57.199.110])
-	by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	x47FVHSS27000846
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Tue, 7 May 2019 15:31:17 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0713AAE068;
-	Tue,  7 May 2019 15:31:17 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B03EAAE062;
-	Tue,  7 May 2019 15:31:16 +0000 (GMT)
-Received: from [9.80.218.140] (unknown [9.80.218.140])
-	by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-	Tue,  7 May 2019 15:31:16 +0000 (GMT)
-To: pmorel@linux.ibm.com, Cornelia Huck <cohuck@redhat.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>
-References: <20190507081251.24307-1-cohuck@redhat.com>
-	<ee335c4c-468a-3e70-fe7e-02d0d77ef9d1@linux.ibm.com>
-From: Eric Farman <farman@linux.ibm.com>
-Date: Tue, 7 May 2019 11:31:16 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <dan.j.williams@intel.com>) id 1hO286-0007nd-KM
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:35:44 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:44791)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1hO286-0007WR-0w
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:35:42 -0400
+Received: by mail-oi1-x241.google.com with SMTP id y25so5623047oih.11
+	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 08:35:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=intel-com.20150623.gappssmtp.com; s=20150623;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=pln9LT1uNdfaqhJNGD+O26m6HebQTGwT47fBp9Sl9RM=;
+	b=TlGX4D8425HPlx+7p+S0uYa/l9Wse5Bk4e2arPdiSpjovqCqDcs+9LOYMOP6HfVzU0
+	TWixf7FReM5mQZFLKUId2NxKdlxa9AmTAx53KG06ByqkPKInRDkKj/naYzXM7aFtQOC5
+	rg+i8/s0NWyk/g3LXvPPJ9BYcQFfV3d3JpkImMB83c5tbrFtE7Io0Uov0MqEhKRrEd0/
+	/B00oahA9VK286ch70ZgQX9KWibCmtGVFgUCeE5ien9ew8Ayr+MOjSm0BSwOgvIMfCPD
+	a4Fpj3kJ9T9hbc2xCKpy9lxg0dmVjMqFRY7fdATI6H+XP2xoy1APBNUg/iLxqOxOz87V
+	8nCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=pln9LT1uNdfaqhJNGD+O26m6HebQTGwT47fBp9Sl9RM=;
+	b=MMLcf8EBWtzXW3GpW9bbgplxJolXGKUHDN/8cUdZHVupS43X5UNUBM/pHKQYOs3jwO
+	DEq2UieIRrZNWYnwTTpIvPrqUkGGFlZ00MFidG09VKp1apiqzA0Kki6HUuFm+GojOqTL
+	C2hRD2KCtz+S65FFUQn+sFciDPD1QMXCMQXBhwAGy/BLom26VVF5QjSWrZchu3XQIjl3
+	bG5AOgtRU5c+soeRjSJLk3KqCES//LLfrBxUj6ZbH4HjOHkegKI8YOHt9pX4AuSf6IwP
+	02P5ivcGFnq7UYRKSdun0c68CsXnS8C+e9LNftCu3W5tVEvPB6MgmanbkmWffw89jfMN
+	icIw==
+X-Gm-Message-State: APjAAAWXY+QtIiEcBgnNFs7a+5Z1w4pJrAn9wEm6llHAqi07e3z0p+mU
+	wB2DRSMXzZ2BcFqq+QMPa4e5C3vrfmTzrlFANwPdtA==
+X-Google-Smtp-Source: APXvYqyeQ6p2bch8wmzCnpksKWy3fVGWmfRiIOMb1+AjV0Hj+AEzvzFaNNgudGwCcMt1jKM2z5AdKFkEM5L2bjm1/vk=
+X-Received: by 2002:aca:220f:: with SMTP id b15mr541042oic.73.1557243323110;
+	Tue, 07 May 2019 08:35:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <ee335c4c-468a-3e70-fe7e-02d0d77ef9d1@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19050715-0040-0000-0000-000004EC6339
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011066; HX=3.00000242; KW=3.00000007;
-	PH=3.00000004; SC=3.00000285; SDB=6.01199927; UDB=6.00629556;
-	IPR=6.00980810; 
-	MB=3.00026771; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-07 15:31:20
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050715-0041-0000-0000-000008F86BF3
-Message-Id: <42ffdd81-7bbd-1a46-c4f9-3771ea26a84b@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-07_08:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1905070100
-Content-Transfer-Encoding: base64
-X-MIME-Autoconverted: from 8bit to base64 by mx0a-001b2d01.pphosted.com id
-	x47FTbkp092574
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: Re: [Qemu-devel] [PATCH RFC v2] s390/css: handle CCW_FLAG_SKIP
+References: <20190426050039.17460-1-pagupta@redhat.com>
+	<20190426050039.17460-3-pagupta@redhat.com>
+In-Reply-To: <20190426050039.17460-3-pagupta@redhat.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Tue, 7 May 2019 08:35:12 -0700
+Message-ID: <CAPcyv4hdT5bbgv0Gy1r0Xb3RMfE_Zpe7DV10a=F1PFeTeEt+Fw@mail.gmail.com>
+To: Pankaj Gupta <pagupta@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH v7 2/6] virtio-pmem: Add virtio pmem driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -114,90 +87,460 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: cohuck@redhat.com, Jan Kara <jack@suse.cz>, KVM list <kvm@vger.kernel.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, david <david@fromorbit.com>,
+	Qemu Developers <qemu-devel@nongnu.org>,
+	virtualization@lists.linux-foundation.org,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Ross Zwisler <zwisler@kernel.org>, Andrea Arcangeli <aarcange@redhat.com>,
+	Dave Jiang <dave.jiang@intel.com>,
+	linux-nvdimm <linux-nvdimm@lists.01.org>,
+	Vishal L Verma <vishal.l.verma@intel.com>,
+	David Hildenbrand <david@redhat.com>, Matthew Wilcox <willy@infradead.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Linux ACPI <linux-acpi@vger.kernel.org>, jmoyer <jmoyer@redhat.com>,
+	linux-ext4 <linux-ext4@vger.kernel.org>,
+	Len Brown <lenb@kernel.org>, kilobyte@angband.pl,
+	Rik van Riel <riel@surriel.com>, yuval shaia <yuval.shaia@oracle.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
+	Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>,
+	Theodore Ts'o <tytso@mit.edu>,
+	Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+	"Darrick J. Wong" <darrick.wong@oracle.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-xfs <linux-xfs@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCk9uIDUvNy8xOSA1OjA4IEFNLCBQaWVycmUgTW9yZWwgd3JvdGU6DQo+IE9uIDA3LzA1
-LzIwMTkgMTA6MTIsIENvcm5lbGlhIEh1Y2sgd3JvdGU6DQo+PiBJZiBhIGNjdyBoYXMgQ0NX
-X0ZMQUdfU0tJUCBzZXQsIGFuZCB0aGUgY29tbWFuZCBpcyBvZiB0eXBlDQo+PiByZWFkLCBy
-ZWFkIGJhY2t3YXJkcywgb3Igc2Vuc2UsIG5vIGRhdGEgc2hvdWxkIGJlIHdyaXR0ZW4NCj4+
-IHRvIHRoZSBndWVzdCBmb3IgdGhhdCBjb21tYW5kLg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6
-IENvcm5lbGlhIEh1Y2sgPGNvaHVja0ByZWRoYXQuY29tPg0KPj4gLS0tDQo+Pg0KPj4gdjEg
-LT4gdjI6IGZpeGVkIGNoZWNrcyBmb3IgY29tbWFuZCB0eXBlIFtFcmljXQ0KPj4NCj4+IFN0
-aWxsIG9ubHkgbGlnaHRseSB0ZXN0ZWQgKGl0IGJvb3RzKTsgSSBkb24ndCB0aGluayBJIGhh
-dmUgYSB0b29sDQo+PiBnZW5lcmF0aW5nIGNoYW5uZWwgcHJvZ3JhbXMgd2l0aCB0aGUgc2tp
-cCBmbGFnIGhhbmR5Lg0KDQpGV0lXLCBteSB0ZXN0IHByb2dyYW0gaGl0cyB0aGlzIGNvZGUg
-b25jZSAocmVhZCBvZiBhIHNpbmdsZSBwYWdlLCB3aXRoIA0KU0xJIGFuZCBTS0lQIGZsYWdz
-IHNldCkgYmVmb3JlIGdldHRpbmcgaW50byB0aGUgcGFzc3Rocm91Z2ggY29kZXBhdGguDQoN
-Cj4+DQo+PiAtLS0NCj4+IMKgIGh3L3MzOTB4L2Nzcy5jwqDCoMKgwqDCoMKgwqDCoCB8IDIy
-ICsrKysrKysrKysrKysrKysrKy0tLS0NCj4+IMKgIGluY2x1ZGUvaHcvczM5MHgvY3NzLmgg
-fMKgIDEgKw0KPj4gwqAgMiBmaWxlcyBjaGFuZ2VkLCAxOSBpbnNlcnRpb25zKCspLCA0IGRl
-bGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9ody9zMzkweC9jc3MuYyBiL2h3L3Mz
-OTB4L2Nzcy5jDQo+PiBpbmRleCA4ZmM5ZTM1YmE1ZDMuLjA4MGFjN2U1YmMwYiAxMDA2NDQN
-Cj4+IC0tLSBhL2h3L3MzOTB4L2Nzcy5jDQo+PiArKysgYi9ody9zMzkweC9jc3MuYw0KPj4g
-QEAgLTgzMCw4ICs4MzAsMTIgQEAgc3RhdGljIGludCBjY3dfZHN0cmVhbV9yd19ub2ZsYWdz
-KENjd0RhdGFTdHJlYW0gDQo+PiAqY2RzLCB2b2lkICpidWZmLCBpbnQgbGVuLA0KPj4gwqDC
-oMKgwqDCoCBpZiAob3AgPT0gQ0RTX09QX0EpIHsNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCBn
-b3RvIGluY3I7DQo+PiDCoMKgwqDCoMKgIH0NCj4+IC3CoMKgwqAgcmV0ID0gYWRkcmVzc19z
-cGFjZV9ydygmYWRkcmVzc19zcGFjZV9tZW1vcnksIGNkcy0+Y2RhLA0KPj4gLcKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgTUVNVFhBVFRS
-U19VTlNQRUNJRklFRCwgYnVmZiwgbGVuLCBvcCk7DQo+PiArwqDCoMKgIGlmICghY2RzLT5k
-b19za2lwKSB7DQo+PiArwqDCoMKgwqDCoMKgwqAgcmV0ID0gYWRkcmVzc19zcGFjZV9ydygm
-YWRkcmVzc19zcGFjZV9tZW1vcnksIGNkcy0+Y2RhLA0KPj4gK8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBNRU1UWEFUVFJT
-X1VOU1BFQ0lGSUVELCBidWZmLCBsZW4sIG9wKTsNCj4+ICvCoMKgwqAgfSBlbHNlIHsNCj4+
-ICvCoMKgwqDCoMKgwqDCoCByZXQgPSAwOw0KPj4gK8KgwqDCoCB9DQo+PiDCoMKgwqDCoMKg
-IGlmIChyZXQgIT0gTUVNVFhfT0spIHsNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCBjZHMtPmZs
-YWdzIHw9IENEU19GX1NUUkVBTV9CUk9LRU47DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0
-dXJuIC1FSU5WQUw7DQo+PiBAQCAtOTI4LDggKzkzMiwxMyBAQCBzdGF0aWMgaW50IGNjd19k
-c3RyZWFtX3J3X2lkYShDY3dEYXRhU3RyZWFtICpjZHMsIA0KPj4gdm9pZCAqYnVmZiwgaW50
-IGxlbiwNCj4+IMKgwqDCoMKgwqAgZG8gew0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIGl0ZXJf
-bGVuID0gTUlOKGxlbiwgY29udF9sZWZ0KTsNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAo
-b3AgIT0gQ0RTX09QX0EpIHsNCj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldCA9IGFk
-ZHJlc3Nfc3BhY2VfcncoJmFkZHJlc3Nfc3BhY2VfbWVtb3J5LCBjZHMtPmNkYSwNCj4+IC3C
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCBNRU1UWEFUVFJTX1VOU1BFQ0lGSUVELCBidWZmLCANCj4+IGl0ZXJf
-bGVuLCBvcCk7DQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAoIWNkcy0+ZG9fc2tp
-cCkgew0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXQgPSBhZGRyZXNz
-X3NwYWNlX3J3KCZhZGRyZXNzX3NwYWNlX21lbW9yeSwgY2RzLT5jZGEsDQo+PiArwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCBNRU1UWEFUVFJTX1VOU1BFQ0lGSUVELCBidWZmLCANCj4+IGl0
-ZXJfbGVuLA0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgb3ApOw0KPj4gK8KgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgfSBlbHNlIHsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgcmV0ID0gMDsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIH0NCj4+IMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChyZXQgIT0gTUVNVFhfT0spIHsNCj4+IMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgLyogYXNzdW1lIGluYWNjZXNzaWJsZSBh
-ZGRyZXNzICovDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldCA9
-IC1FSU5WQUw7IC8qIGNoYW5uZWwgcHJvZ3JhbSBjaGVjayAqLw0KPj4gQEAgLTk2OCw2ICs5
-NzcsMTEgQEAgdm9pZCBjY3dfZHN0cmVhbV9pbml0KENjd0RhdGFTdHJlYW0gKmNkcywgQ0NX
-MSANCj4+IGNvbnN0ICpjY3csIE9SQiBjb25zdCAqb3JiKQ0KPj4gwqDCoMKgwqDCoCBjZHMt
-PmNvdW50ID0gY2N3LT5jb3VudDsNCj4+IMKgwqDCoMKgwqAgY2RzLT5jZGFfb3JpZyA9IGNj
-dy0+Y2RhOw0KPj4gK8KgwqDCoCAvKiBza2lwIGlzIG9ubHkgZWZmZWN0aXZlIGZvciByZWFk
-LCByZWFkIGJhY2t3YXJkcywgb3Igc2Vuc2UgDQo+PiBjb21tYW5kcyAqLw0KPj4gK8KgwqDC
-oCBjZHMtPmRvX3NraXAgPSAoY2N3LT5mbGFncyAmIENDV19GTEFHX1NLSVApICYmDQo+PiAr
-wqDCoMKgwqDCoMKgwqAgKChjY3ctPmNtZF9jb2RlICYgQ0NXX0NNRF9CQVNJQ19TRU5TRSkg
-PT0gQ0NXX0NNRF9CQVNJQ19TRU5TRSB8fA0KPj4gK8KgwqDCoMKgwqDCoMKgwqAgKGNjdy0+
-Y21kX2NvZGUgJiAweDAyKSA9PSAweDAyIC8qIHJlYWQgKi8gfHwNCj4+ICvCoMKgwqDCoMKg
-wqDCoMKgIChjY3ctPmNtZF9jb2RlICYgMHgwYykgPT0gMHgwYyAvKiByZWFkIGJhY2t3YXJk
-cyAqLyk7DQo+IA0KPiBJIHRoaW5rIHlvdSBzaG91bGQgdXNlIG1hc2tzIGxpa2UNCj4gKChj
-b2RlICYgMHgzKSA9PSAyKSA9PiBSRUFEDQo+ICgoY29kZSAmIDB4ZikgPT0gMHhjKSA9PiBS
-RUFEIEJBQ0tXQVJEDQo+ICgoY29kZSAmIDB4ZikgPT0gMHg0KSA9PiBTRU5TRQ0KDQpJIHRo
-aW5rIFBpZXJyZSBpcyByaWdodC4gIEluIHRoZSB2MiBjb2RlLCBhIGNvbnRyb2wgQ0NXIChs
-aWtlIE5PUCkgd291bGQgDQpzdGlsbCBiZSBmbGFnZ2VkIGFzIGEgUkVBRC4NCg0KPiANCj4g
-UmVnYXJkcywNCj4gUGllcnJlDQo+IA0KPiANCj4gDQo+IA0KPj4gwqDCoMKgwqDCoCBjY3df
-ZHN0cmVhbV9yZXdpbmQoY2RzKTsNCj4+IMKgwqDCoMKgwqAgaWYgKCEoY2RzLT5mbGFncyAm
-IENEU19GX0lEQSkpIHsNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCBjZHMtPm9wX2hhbmRsZXIg
-PSBjY3dfZHN0cmVhbV9yd19ub2ZsYWdzOw0KPj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvaHcv
-czM5MHgvY3NzLmggYi9pbmNsdWRlL2h3L3MzOTB4L2Nzcy5oDQo+PiBpbmRleCBhYWUxOWM0
-MjcyMjkuLjdjYzE4M2VmNDM2NiAxMDA2NDQNCj4+IC0tLSBhL2luY2x1ZGUvaHcvczM5MHgv
-Y3NzLmgNCj4+ICsrKyBiL2luY2x1ZGUvaHcvczM5MHgvY3NzLmgNCj4+IEBAIC05Nyw2ICs5
-Nyw3IEBAIHR5cGVkZWYgc3RydWN0IENjd0RhdGFTdHJlYW0gew0KPj4gwqDCoMKgwqDCoCBp
-bnQgKCpvcF9oYW5kbGVyKShzdHJ1Y3QgQ2N3RGF0YVN0cmVhbSAqY2RzLCB2b2lkICpidWZm
-LCBpbnQgbGVuLA0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCBDY3dEYXRhU3RyZWFtT3Agb3ApOw0KPj4gwqDCoMKgwqDCoCBod2FkZHIgY2Rh
-Ow0KPj4gK8KgwqDCoCBib29sIGRvX3NraXA7DQo+PiDCoCB9IENjd0RhdGFTdHJlYW07DQo+
-PiDCoCAvKg0KPj4NCj4gDQo+IA0KDQo=
+Hi Pankaj,
+
+Some minor file placement comments below.
+
+On Thu, Apr 25, 2019 at 10:02 PM Pankaj Gupta <pagupta@redhat.com> wrote:
+>
+> This patch adds virtio-pmem driver for KVM guest.
+>
+> Guest reads the persistent memory range information from
+> Qemu over VIRTIO and registers it on nvdimm_bus. It also
+> creates a nd_region object with the persistent memory
+> range information so that existing 'nvdimm/pmem' driver
+> can reserve this into system memory map. This way
+> 'virtio-pmem' driver uses existing functionality of pmem
+> driver to register persistent memory compatible for DAX
+> capable filesystems.
+>
+> This also provides function to perform guest flush over
+> VIRTIO from 'pmem' driver when userspace performs flush
+> on DAX memory range.
+>
+> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> ---
+>  drivers/nvdimm/virtio_pmem.c     | 114 +++++++++++++++++++++++++++++
+>  drivers/virtio/Kconfig           |  10 +++
+>  drivers/virtio/Makefile          |   1 +
+>  drivers/virtio/pmem.c            | 118 +++++++++++++++++++++++++++++++
+>  include/linux/virtio_pmem.h      |  60 ++++++++++++++++
+>  include/uapi/linux/virtio_ids.h  |   1 +
+>  include/uapi/linux/virtio_pmem.h |  10 +++
+>  7 files changed, 314 insertions(+)
+>  create mode 100644 drivers/nvdimm/virtio_pmem.c
+>  create mode 100644 drivers/virtio/pmem.c
+>  create mode 100644 include/linux/virtio_pmem.h
+>  create mode 100644 include/uapi/linux/virtio_pmem.h
+>
+> diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
+> new file mode 100644
+> index 000000000000..66b582f751a3
+> --- /dev/null
+> +++ b/drivers/nvdimm/virtio_pmem.c
+> @@ -0,0 +1,114 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * virtio_pmem.c: Virtio pmem Driver
+> + *
+> + * Discovers persistent memory range information
+> + * from host and provides a virtio based flushing
+> + * interface.
+> + */
+> +#include <linux/virtio_pmem.h>
+> +#include "nd.h"
+> +
+> + /* The interrupt handler */
+> +void host_ack(struct virtqueue *vq)
+> +{
+> +       unsigned int len;
+> +       unsigned long flags;
+> +       struct virtio_pmem_request *req, *req_buf;
+> +       struct virtio_pmem *vpmem = vq->vdev->priv;
+> +
+> +       spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> +       while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
+> +               req->done = true;
+> +               wake_up(&req->host_acked);
+> +
+> +               if (!list_empty(&vpmem->req_list)) {
+> +                       req_buf = list_first_entry(&vpmem->req_list,
+> +                                       struct virtio_pmem_request, list);
+> +                       list_del(&vpmem->req_list);
+> +                       req_buf->wq_buf_avail = true;
+> +                       wake_up(&req_buf->wq_buf);
+> +               }
+> +       }
+> +       spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+> +}
+> +EXPORT_SYMBOL_GPL(host_ack);
+> +
+> + /* The request submission function */
+> +int virtio_pmem_flush(struct nd_region *nd_region)
+> +{
+> +       int err;
+> +       unsigned long flags;
+> +       struct scatterlist *sgs[2], sg, ret;
+> +       struct virtio_device *vdev = nd_region->provider_data;
+> +       struct virtio_pmem *vpmem = vdev->priv;
+> +       struct virtio_pmem_request *req;
+> +
+> +       might_sleep();
+> +       req = kmalloc(sizeof(*req), GFP_KERNEL);
+> +       if (!req)
+> +               return -ENOMEM;
+> +
+> +       req->done = req->wq_buf_avail = false;
+> +       strcpy(req->name, "FLUSH");
+> +       init_waitqueue_head(&req->host_acked);
+> +       init_waitqueue_head(&req->wq_buf);
+> +       sg_init_one(&sg, req->name, strlen(req->name));
+> +       sgs[0] = &sg;
+> +       sg_init_one(&ret, &req->ret, sizeof(req->ret));
+> +       sgs[1] = &ret;
+> +
+> +       spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> +       err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
+> +       if (err) {
+> +               dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
+> +
+> +               list_add_tail(&vpmem->req_list, &req->list);
+> +               spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+> +
+> +               /* When host has read buffer, this completes via host_ack */
+> +               wait_event(req->wq_buf, req->wq_buf_avail);
+> +               spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> +       }
+> +       err = virtqueue_kick(vpmem->req_vq);
+> +       spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+> +
+> +       if (!err) {
+> +               err = -EIO;
+> +               goto ret;
+> +       }
+> +       /* When host has read buffer, this completes via host_ack */
+> +       wait_event(req->host_acked, req->done);
+> +       err = req->ret;
+> +ret:
+> +       kfree(req);
+> +       return err;
+> +};
+> +
+> + /* The asynchronous flush callback function */
+> +int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
+> +{
+> +       int rc = 0;
+> +
+> +       /* Create child bio for asynchronous flush and chain with
+> +        * parent bio. Otherwise directly call nd_region flush.
+> +        */
+> +       if (bio && bio->bi_iter.bi_sector != -1) {
+> +               struct bio *child = bio_alloc(GFP_ATOMIC, 0);
+> +
+> +               if (!child)
+> +                       return -ENOMEM;
+> +               bio_copy_dev(child, bio);
+> +               child->bi_opf = REQ_PREFLUSH;
+> +               child->bi_iter.bi_sector = -1;
+> +               bio_chain(child, bio);
+> +               submit_bio(child);
+> +       } else {
+> +               if (virtio_pmem_flush(nd_region))
+> +                       rc = -EIO;
+> +       }
+> +
+> +       return rc;
+> +};
+> +EXPORT_SYMBOL_GPL(async_pmem_flush);
+> +MODULE_LICENSE("GPL");
+> diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
+> index 35897649c24f..9f634a2ed638 100644
+> --- a/drivers/virtio/Kconfig
+> +++ b/drivers/virtio/Kconfig
+> @@ -42,6 +42,16 @@ config VIRTIO_PCI_LEGACY
+>
+>           If unsure, say Y.
+>
+> +config VIRTIO_PMEM
+> +       tristate "Support for virtio pmem driver"
+> +       depends on VIRTIO
+> +       depends on LIBNVDIMM
+> +       help
+> +       This driver provides support for virtio based flushing interface
+> +       for persistent memory range.
+> +
+> +       If unsure, say M.
+> +
+>  config VIRTIO_BALLOON
+>         tristate "Virtio balloon driver"
+>         depends on VIRTIO
+> diff --git a/drivers/virtio/Makefile b/drivers/virtio/Makefile
+> index 3a2b5c5dcf46..143ce91eabe9 100644
+> --- a/drivers/virtio/Makefile
+> +++ b/drivers/virtio/Makefile
+> @@ -6,3 +6,4 @@ virtio_pci-y := virtio_pci_modern.o virtio_pci_common.o
+>  virtio_pci-$(CONFIG_VIRTIO_PCI_LEGACY) += virtio_pci_legacy.o
+>  obj-$(CONFIG_VIRTIO_BALLOON) += virtio_balloon.o
+>  obj-$(CONFIG_VIRTIO_INPUT) += virtio_input.o
+> +obj-$(CONFIG_VIRTIO_PMEM) += pmem.o ../nvdimm/virtio_pmem.o
+> diff --git a/drivers/virtio/pmem.c b/drivers/virtio/pmem.c
+> new file mode 100644
+> index 000000000000..309788628e41
+> --- /dev/null
+> +++ b/drivers/virtio/pmem.c
+
+It's not clear to me why this driver is located in drivers/virtio/
+
+> @@ -0,0 +1,118 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * virtio_pmem.c: Virtio pmem Driver
+> + *
+> + * Discovers persistent memory range information
+> + * from host and registers the virtual pmem device
+> + * with libnvdimm core.
+> + */
+> +#include <linux/virtio_pmem.h>
+> +#include <../../drivers/nvdimm/nd.h>
+
+...especially because it seems to require nvdimm internals.
+
+However I don't see why that header is included.
+
+In any event lets move this to drivers/nvdimm/virtio.c to live
+alongside the other generic bus provider drivers/nvdimm/e820.c.
+
+> +
+> +static struct virtio_device_id id_table[] = {
+> +       { VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
+> +       { 0 },
+> +};
+> +
+> + /* Initialize virt queue */
+> +static int init_vq(struct virtio_pmem *vpmem)
+> +{
+> +       /* single vq */
+> +       vpmem->req_vq = virtio_find_single_vq(vpmem->vdev,
+> +                               host_ack, "flush_queue");
+> +       if (IS_ERR(vpmem->req_vq))
+> +               return PTR_ERR(vpmem->req_vq);
+> +
+> +       spin_lock_init(&vpmem->pmem_lock);
+> +       INIT_LIST_HEAD(&vpmem->req_list);
+> +
+> +       return 0;
+> +};
+> +
+> +static int virtio_pmem_probe(struct virtio_device *vdev)
+> +{
+> +       int err = 0;
+> +       struct resource res;
+> +       struct virtio_pmem *vpmem;
+> +       struct nd_region_desc ndr_desc = {};
+> +       int nid = dev_to_node(&vdev->dev);
+> +       struct nd_region *nd_region;
+> +
+> +       if (!vdev->config->get) {
+> +               dev_err(&vdev->dev, "%s failure: config access disabled\n",
+> +                       __func__);
+> +               return -EINVAL;
+> +       }
+> +
+> +       vpmem = devm_kzalloc(&vdev->dev, sizeof(*vpmem), GFP_KERNEL);
+> +       if (!vpmem) {
+> +               err = -ENOMEM;
+> +               goto out_err;
+> +       }
+> +
+> +       vpmem->vdev = vdev;
+> +       vdev->priv = vpmem;
+> +       err = init_vq(vpmem);
+> +       if (err)
+> +               goto out_err;
+> +
+> +       virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> +                       start, &vpmem->start);
+> +       virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> +                       size, &vpmem->size);
+> +
+> +       res.start = vpmem->start;
+> +       res.end   = vpmem->start + vpmem->size-1;
+> +       vpmem->nd_desc.provider_name = "virtio-pmem";
+> +       vpmem->nd_desc.module = THIS_MODULE;
+> +
+> +       vpmem->nvdimm_bus = nvdimm_bus_register(&vdev->dev,
+> +                                               &vpmem->nd_desc);
+> +       if (!vpmem->nvdimm_bus)
+> +               goto out_vq;
+> +
+> +       dev_set_drvdata(&vdev->dev, vpmem->nvdimm_bus);
+> +
+> +       ndr_desc.res = &res;
+> +       ndr_desc.numa_node = nid;
+> +       ndr_desc.flush = async_pmem_flush;
+> +       set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
+> +       set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
+> +       nd_region = nvdimm_pmem_region_create(vpmem->nvdimm_bus, &ndr_desc);
+> +
+> +       if (!nd_region)
+> +               goto out_nd;
+> +       nd_region->provider_data =  dev_to_virtio
+> +                                       (nd_region->dev.parent->parent);
+> +       return 0;
+> +out_nd:
+> +       err = -ENXIO;
+> +       nvdimm_bus_unregister(vpmem->nvdimm_bus);
+> +out_vq:
+> +       vdev->config->del_vqs(vdev);
+> +out_err:
+> +       dev_err(&vdev->dev, "failed to register virtio pmem memory\n");
+> +       return err;
+> +}
+> +
+> +static void virtio_pmem_remove(struct virtio_device *vdev)
+> +{
+> +       struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
+> +
+> +       nvdimm_bus_unregister(nvdimm_bus);
+> +       vdev->config->del_vqs(vdev);
+> +       vdev->config->reset(vdev);
+> +}
+> +
+> +static struct virtio_driver virtio_pmem_driver = {
+> +       .driver.name            = KBUILD_MODNAME,
+> +       .driver.owner           = THIS_MODULE,
+> +       .id_table               = id_table,
+> +       .probe                  = virtio_pmem_probe,
+> +       .remove                 = virtio_pmem_remove,
+> +};
+> +
+> +module_virtio_driver(virtio_pmem_driver);
+> +MODULE_DEVICE_TABLE(virtio, id_table);
+> +MODULE_DESCRIPTION("Virtio pmem driver");
+> +MODULE_LICENSE("GPL");
+> diff --git a/include/linux/virtio_pmem.h b/include/linux/virtio_pmem.h
+> new file mode 100644
+> index 000000000000..ab1da877575d
+> --- /dev/null
+> +++ b/include/linux/virtio_pmem.h
+
+Why is this a global header?
+
+Seems it can move to drivers/nvdimm/virtio.h.
+
+Also, I'd like to get a virtio ack from Michael (mst@redhat.com)
+before taking this through the nvdimm tree.
+
+> @@ -0,0 +1,60 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * virtio_pmem.h: virtio pmem Driver
+> + *
+> + * Discovers persistent memory range information
+> + * from host and provides a virtio based flushing
+> + * interface.
+> + **/
+> +
+> +#ifndef _LINUX_VIRTIO_PMEM_H
+> +#define _LINUX_VIRTIO_PMEM_H
+> +
+> +#include <linux/virtio_ids.h>
+> +#include <linux/module.h>
+> +#include <linux/virtio_config.h>
+> +#include <uapi/linux/virtio_pmem.h>
+> +#include <linux/libnvdimm.h>
+> +#include <linux/spinlock.h>
+> +
+> +struct virtio_pmem_request {
+> +       /* Host return status corresponding to flush request */
+> +       int ret;
+> +
+> +       /* command name*/
+> +       char name[16];
+> +
+> +       /* Wait queue to process deferred work after ack from host */
+> +       wait_queue_head_t host_acked;
+> +       bool done;
+> +
+> +       /* Wait queue to process deferred work after virt queue buffer avail */
+> +       wait_queue_head_t wq_buf;
+> +       bool wq_buf_avail;
+> +       struct list_head list;
+> +};
+> +
+> +struct virtio_pmem {
+> +       struct virtio_device *vdev;
+> +
+> +       /* Virtio pmem request queue */
+> +       struct virtqueue *req_vq;
+> +
+> +       /* nvdimm bus registers virtio pmem device */
+> +       struct nvdimm_bus *nvdimm_bus;
+> +       struct nvdimm_bus_descriptor nd_desc;
+> +
+> +       /* List to store deferred work if virtqueue is full */
+> +       struct list_head req_list;
+> +
+> +       /* Synchronize virtqueue data */
+> +       spinlock_t pmem_lock;
+> +
+> +       /* Memory region information */
+> +       uint64_t start;
+> +       uint64_t size;
+> +};
+> +
+> +void host_ack(struct virtqueue *vq);
+> +int async_pmem_flush(struct nd_region *nd_region, struct bio *bio);
+> +#endif
+> diff --git a/include/uapi/linux/virtio_ids.h b/include/uapi/linux/virtio_ids.h
+> index 6d5c3b2d4f4d..32b2f94d1f58 100644
+> --- a/include/uapi/linux/virtio_ids.h
+> +++ b/include/uapi/linux/virtio_ids.h
+> @@ -43,5 +43,6 @@
+>  #define VIRTIO_ID_INPUT        18 /* virtio input */
+>  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
+>  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
+> +#define VIRTIO_ID_PMEM         27 /* virtio pmem */
+>
+>  #endif /* _LINUX_VIRTIO_IDS_H */
+> diff --git a/include/uapi/linux/virtio_pmem.h b/include/uapi/linux/virtio_pmem.h
+> new file mode 100644
+> index 000000000000..fa3f7d52717a
+> --- /dev/null
+> +++ b/include/uapi/linux/virtio_pmem.h
+> @@ -0,0 +1,10 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +
+> +#ifndef _UAPI_LINUX_VIRTIO_PMEM_H
+> +#define _UAPI_LINUX_VIRTIO_PMEM_H
+> +
+> +struct virtio_pmem_config {
+> +       __le64 start;
+> +       __le64 size;
+> +};
+> +#endif
+> --
+> 2.20.1
+>
 
