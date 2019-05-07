@@ -2,66 +2,139 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5C97C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 09:04:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C60C4C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 09:08:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A66BF204FD
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 09:04:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A66BF204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 811522087F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 09:08:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 811522087F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42692 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42742 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNw1a-0007NE-VO
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 05:04:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39949)
+	id 1hNw5o-000063-RV
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 05:08:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hNw0W-0006yc-Q8
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:03:33 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hNw4v-0008CL-Kr
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:08:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hNw0V-0001gd-Bx
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:03:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37580)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hNw0V-0001es-4p
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:03:27 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 37B7F5D68A;
-	Tue,  7 May 2019 09:03:26 +0000 (UTC)
-Received: from [10.40.204.24] (ovpn-204-24.brq.redhat.com [10.40.204.24])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2E3C61001DDE;
-	Tue,  7 May 2019 09:03:24 +0000 (UTC)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190506173353.32206-1-richard.henderson@linaro.org>
-	<20190506173353.32206-3-richard.henderson@linaro.org>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <5f6eaa15-4a36-37c2-3199-0084178e9cfb@redhat.com>
-Date: Tue, 7 May 2019 11:03:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <borntraeger@de.ibm.com>) id 1hNw4u-0004rY-4F
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:08:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38636)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1hNw4t-0004pr-SY
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 05:08:00 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x478wTOf017204
+	for <qemu-devel@nongnu.org>; Tue, 7 May 2019 05:07:57 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2sb6b2j7fg-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 05:07:56 -0400
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 7 May 2019 10:07:54 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+	by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Tue, 7 May 2019 10:07:52 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+	[9.149.105.232])
+	by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x4797oV617825928
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Tue, 7 May 2019 09:07:50 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 81ABF52057;
+	Tue,  7 May 2019 09:07:50 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.71])
+	by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 2F2E052054;
+	Tue,  7 May 2019 09:07:50 +0000 (GMT)
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20190429090250.7648-1-borntraeger@de.ibm.com>
+	<20190429180817.540c2f82.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+	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
+	syiRa+UVlsKmx1hsEg==
+Date: Tue, 7 May 2019 11:07:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190506173353.32206-3-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190429180817.540c2f82.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Tue, 07 May 2019 09:03:26 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 02/24] crypto: Merge crypto-obj-y into
- libqemuutil.a
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19050709-0016-0000-0000-000002791EA1
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19050709-0017-0000-0000-000032D5C749
+Message-Id: <b118f253-0f75-0252-6408-565ebf7f904b@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-05-07_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1905070059
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 0/9] s390x: new guest
+ features
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,202 +146,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
+	Collin Walling <walling@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+	Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/05/2019 19:33, Richard Henderson wrote:
-> We will shortly need this in the user-only binaries, so drop the split
-> into system and tools binaries.  This also means that crypto-aes-obj-y
-> can be merged back into crypto-obj-y.
->
 
-This patch breaks linux-user statically linked build on Fedora.
 
-Fedora doesn't provide static version of nettle and gcrypt, so the=20
-configure fails.
+On 29.04.19 18:08, Cornelia Huck wrote:
+> On Mon, 29 Apr 2019 05:02:41 -0400
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> Adding gen15.
+>>
+>> v2->v3: - merge  deprecation patch into gen 15 patch
+>> 	- fix comments
+>> 	- use gen15a and gen15b instead of cpuid
+>> v1->v2: - rework csske deprecation
+>> 	- white space fixes
+>> 	- also require msa4 for msa9
+>>
+>> Christian Borntraeger (9):
+>>   linux header sync
 
-You should update the configure for them like you did for gnutls in PATCH=
- 1.
+FWIW, all the patches are in kvm/next so they should hit 5.2-rc1. We can either wait
+for that or do a header sync on kvm/next.
+> 
+> I think we can do that sync once the companion kernel series hits the
+> kvm next branch.
+> 
+>>   s390x/cpumodel: ignore csske for expansion
+>>   s390x/cpumodel: Miscellaneous-Instruction-Extensions Facility 3
+>>   s390x/cpumodel: msa9 facility
+> 
+> This seems to be the only patch that does not yet have a R-b from David
+> -- David, do you plan to review this one as well?
+> 
+>>   s390x/cpumodel: vector enhancements
+>>   s390x/cpumodel: enhanced sort facility
+>>   s390x/cpumodel: add Deflate-conversion facility
+>>   s390x/cpumodel: add gen15 defintions
+>>   s390x/cpumodel: wire up 8561 and 8562 as gen15 machines
+>>
+>>  linux-headers/asm-s390/kvm.h    |   5 +-
+>>  target/s390x/cpu_features.c     |  54 ++++++++++++++++
+>>  target/s390x/cpu_features.h     |   3 +
+>>  target/s390x/cpu_features_def.h |  49 +++++++++++++++
+>>  target/s390x/cpu_models.c       |  13 ++--
+>>  target/s390x/gen-features.c     | 105 ++++++++++++++++++++++++++++++++
+>>  target/s390x/kvm.c              |  18 ++++++
+>>  7 files changed, 242 insertions(+), 5 deletions(-)
+>>
+> 
+> Only thing I noticed were some minor typos in some commit messages, I
+> can fix up while applying.
 
-Thanks,
-Laurent
-
-> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->   Makefile             | 12 +++++-------
->   Makefile.objs        |  8 ++------
->   Makefile.target      |  4 ----
->   configure            |  9 +++------
->   crypto/Makefile.objs |  5 +----
->   5 files changed, 11 insertions(+), 27 deletions(-)
->=20
-> diff --git a/Makefile b/Makefile
-> index d372493042..09c8591805 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -410,7 +410,6 @@ dummy :=3D $(call unnest-vars,, \
->                   block-obj-y \
->                   block-obj-m \
->                   crypto-obj-y \
-> -                crypto-aes-obj-y \
->                   qom-obj-y \
->                   io-obj-y \
->                   common-obj-y \
-> @@ -446,7 +445,6 @@ SOFTMMU_SUBDIR_RULES=3D$(filter %-softmmu,$(SUBDIR_=
-RULES))
->  =20
->   $(SOFTMMU_SUBDIR_RULES): $(authz-obj-y)
->   $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
-> -$(SOFTMMU_SUBDIR_RULES): $(crypto-obj-y)
->   $(SOFTMMU_SUBDIR_RULES): $(io-obj-y)
->   $(SOFTMMU_SUBDIR_RULES): config-all-devices.mak
->   $(SOFTMMU_SUBDIR_RULES): $(edk2-decompressed)
-> @@ -502,7 +500,7 @@ Makefile: $(version-obj-y)
->   #####################################################################=
-#
->   # Build libraries
->  =20
-> -libqemuutil.a: $(util-obj-y) $(trace-obj-y) $(stub-obj-y)
-> +libqemuutil.a: $(util-obj-y) $(trace-obj-y) $(stub-obj-y) $(crypto-obj=
--y)
->   libvhost-user.a: $(libvhost-user-obj-y) $(util-obj-y) $(stub-obj-y)
->  =20
->   #####################################################################=
-#
-> @@ -511,9 +509,9 @@ COMMON_LDADDS =3D libqemuutil.a
->  =20
->   qemu-img.o: qemu-img-cmds.h
->  =20
-> -qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y) $(crypto-o=
-bj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
-> -qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-o=
-bj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
-> -qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj=
--y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
-> +qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y) $(io-obj-y=
-) $(qom-obj-y) $(COMMON_LDADDS)
-> +qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(io-obj-y=
-) $(qom-obj-y) $(COMMON_LDADDS)
-> +qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(io-obj-y) =
-$(qom-obj-y) $(COMMON_LDADDS)
->  =20
->   qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
->  =20
-> @@ -524,7 +522,7 @@ qemu-edid$(EXESUF): qemu-edid.o hw/display/edid-gen=
-erate.o $(COMMON_LDADDS)
->   fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev=
-/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
->   fsdev/virtfs-proxy-helper$(EXESUF): LIBS +=3D -lcap
->  =20
-> -scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(aut=
-hz-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
-> +scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(aut=
-hz-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
->   ifdef CONFIG_MPATH
->   scsi/qemu-pr-helper$(EXESUF): LIBS +=3D -ludev -lmultipath -lmpathper=
-sist
->   endif
-> diff --git a/Makefile.objs b/Makefile.objs
-> index cf065de5ed..0ce429c1af 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -3,6 +3,8 @@
->   stub-obj-y =3D stubs/ util/ crypto/
->   util-obj-y =3D util/ qobject/ qapi/
->  =20
-> +crypto-obj-y =3D crypto/
-> +
->   chardev-obj-y =3D chardev/
->  =20
->   #####################################################################=
-##
-> @@ -21,12 +23,6 @@ block-obj-$(CONFIG_REPLICATION) +=3D replication.o
->  =20
->   block-obj-m =3D block/
->  =20
-> -######################################################################=
-#
-> -# crypto-obj-y is code used by both qemu system emulation and qemu-img
-> -
-> -crypto-obj-y =3D crypto/
-> -crypto-aes-obj-y =3D crypto/
-> -
->   #####################################################################=
-##
->   # qom-obj-y is code used by both qemu system emulation and qemu-img
->  =20
-> diff --git a/Makefile.target b/Makefile.target
-> index ae02495951..ce02924ffb 100644
-> --- a/Makefile.target
-> +++ b/Makefile.target
-> @@ -179,8 +179,6 @@ dummy :=3D $(call unnest-vars,.., \
->                  block-obj-y \
->                  block-obj-m \
->                  chardev-obj-y \
-> -               crypto-obj-y \
-> -               crypto-aes-obj-y \
->                  qom-obj-y \
->                  io-obj-y \
->                  common-obj-y \
-> @@ -189,8 +187,6 @@ all-obj-y +=3D $(common-obj-y)
->   all-obj-y +=3D $(qom-obj-y)
->   all-obj-$(CONFIG_SOFTMMU) +=3D $(authz-obj-y)
->   all-obj-$(CONFIG_SOFTMMU) +=3D $(block-obj-y) $(chardev-obj-y)
-> -all-obj-$(CONFIG_USER_ONLY) +=3D $(crypto-aes-obj-y)
-> -all-obj-$(CONFIG_SOFTMMU) +=3D $(crypto-obj-y)
->   all-obj-$(CONFIG_SOFTMMU) +=3D $(io-obj-y)
->  =20
->   ifdef CONFIG_SOFTMMU
-> diff --git a/configure b/configure
-> index daadfe9ad4..0099e85a03 100755
-> --- a/configure
-> +++ b/configure
-> @@ -2792,8 +2792,7 @@ if test "$gnutls" !=3D "no"; then
->           # At least ubuntu 18.04 ships only shared libraries.
->           write_c_skeleton
->           if compile_prog "" "$gnutls_libs" ; then
-> -            libs_softmmu=3D"$gnutls_libs $libs_softmmu"
-> -            libs_tools=3D"$gnutls_libs $libs_tools"
-> +            LIBS=3D"$gnutls_libs $LIBS"
->               QEMU_CFLAGS=3D"$QEMU_CFLAGS $gnutls_cflags"
->               pass=3D"yes"
->           fi
-> @@ -2860,8 +2859,7 @@ if test "$nettle" !=3D "no"; then
->           nettle_cflags=3D$($pkg_config --cflags nettle)
->           nettle_libs=3D$($pkg_config --libs nettle)
->           nettle_version=3D$($pkg_config --modversion nettle)
-> -        libs_softmmu=3D"$nettle_libs $libs_softmmu"
-> -        libs_tools=3D"$nettle_libs $libs_tools"
-> +        LIBS=3D"$nettle_libs $LIBS"
->           QEMU_CFLAGS=3D"$QEMU_CFLAGS $nettle_cflags"
->           nettle=3D"yes"
->  =20
-> @@ -2888,8 +2886,7 @@ if test "$gcrypt" !=3D "no"; then
->           then
->               gcrypt_libs=3D"$gcrypt_libs -lgpg-error"
->           fi
-> -        libs_softmmu=3D"$gcrypt_libs $libs_softmmu"
-> -        libs_tools=3D"$gcrypt_libs $libs_tools"
-> +        LIBS=3D"$gcrypt_libs $LIBS"
->           QEMU_CFLAGS=3D"$QEMU_CFLAGS $gcrypt_cflags"
->           gcrypt=3D"yes"
->  =20
-> diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-> index 256c9aca1f..a291bc5b9a 100644
-> --- a/crypto/Makefile.objs
-> +++ b/crypto/Makefile.objs
-> @@ -34,8 +34,5 @@ crypto-obj-y +=3D xts.o
->   crypto-obj-y +=3D block.o
->   crypto-obj-y +=3D block-qcow.o
->   crypto-obj-y +=3D block-luks.o
-> -
-> -# Let the userspace emulators avoid linking gnutls/etc
-> -crypto-aes-obj-y =3D aes.o
-> -
-> +crypto-obj-y +=3D aes.o
->   stub-obj-y +=3D pbkdf-stub.o
->=20
 
 
