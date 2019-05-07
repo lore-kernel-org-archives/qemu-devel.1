@@ -3,49 +3,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 869A2C004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:52:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DECD1C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:54:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 452A0205ED
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:52:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 452A0205ED
+	by mail.kernel.org (Postfix) with ESMTPS id 9C423205ED
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 15:54:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C423205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48991 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49005 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO2Oo-0006u6-F8
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 11:52:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38588)
+	id 1hO2QO-0008Ug-RM
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 11:54:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hO2Mc-00054e-9m
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:50:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1hO2Ox-0007by-Bm
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:53:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hO2Mb-0001Bq-9n
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:50:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36392)
+	(envelope-from <eblake@redhat.com>) id 1hO2Ow-0003R7-7n
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:53:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59582)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hO2MV-00016f-40; Tue, 07 May 2019 11:50:35 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hO2Ov-0003Qq-Uu
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 11:53:06 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 013AD19D058;
-	Tue,  7 May 2019 15:50:34 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 361B85D688
+	for <qemu-devel@nongnu.org>; Tue,  7 May 2019 15:53:05 +0000 (UTC)
 Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E84B7799D;
-	Tue,  7 May 2019 15:50:23 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>
-References: <20190502084506.8009-1-thuth@redhat.com>
-	<20190502084506.8009-7-thuth@redhat.com>
-	<87ef5acsce.fsf@dusky.pond.sub.org>
-	<b53b7591-44fa-2982-6674-91137f69be63@redhat.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D4A1646CA;
+	Tue,  7 May 2019 15:53:01 +0000 (UTC)
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+	Nikos Mavrogiannopoulos <nmav@redhat.com>
+References: <20180921154323.GS28120@paraplu> <20190502180201.GA31376@paraplu>
+	<CADh2w8TEVZt3KMDiiT8c7Ez+80=gaTB6=8azJQt0Ni58L7e0WQ@mail.gmail.com>
+	<20190507152211.GU27205@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -72,24 +71,24 @@ Autocrypt: addr=eblake@redhat.com; keydata=
 	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
 	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <3741b9b6-632a-b517-7533-818727ef75a7@redhat.com>
-Date: Tue, 7 May 2019 10:50:22 -0500
+Message-ID: <4e9ff44c-fa61-71c5-f835-24047403ba67@redhat.com>
+Date: Tue, 7 May 2019 10:53:00 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <b53b7591-44fa-2982-6674-91137f69be63@redhat.com>
+In-Reply-To: <20190507152211.GU27205@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="aSQZlKVTuz56dr3fTsY7PhvdEgwfmKQqC"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+	boundary="3fUHHFILuANk5945bcOtt2yaruHD6grpm"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Tue, 07 May 2019 15:50:34 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Tue, 07 May 2019 15:53:05 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] tests/qemu-iotests/group: Re-use
- the "auto" group for tests that can always run
+Subject: Re: [Qemu-devel] [RFC] Virtio RNG: Consider changing the default
+ entropy source to /dev/urandom?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,105 +100,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
-	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org, Christophe Fergeau <cfergeau@redhat.com>,
-	Max Reitz <mreitz@redhat.com>,
-	Wainer dos Santos Moschetta <wainersm@redhat.com>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: Markus Armbruster <armbru@redhat.com>,
+	Kashyap Chamarthy <kchamart@redhat.com>,
+	Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org,
+	"Richard W.M. Jones" <rjones@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aSQZlKVTuz56dr3fTsY7PhvdEgwfmKQqC
+--3fUHHFILuANk5945bcOtt2yaruHD6grpm
 From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org, Christophe Fergeau <cfergeau@redhat.com>,
- Max Reitz <mreitz@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Li-Wen Hsu <lwhsu@freebsd.org>
-Message-ID: <3741b9b6-632a-b517-7533-818727ef75a7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] tests/qemu-iotests/group: Re-use the
- "auto" group for tests that can always run
-References: <20190502084506.8009-1-thuth@redhat.com>
- <20190502084506.8009-7-thuth@redhat.com> <87ef5acsce.fsf@dusky.pond.sub.org>
- <b53b7591-44fa-2982-6674-91137f69be63@redhat.com>
-In-Reply-To: <b53b7591-44fa-2982-6674-91137f69be63@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Nikos Mavrogiannopoulos <nmav@redhat.com>
+Cc: qemu-devel@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <4e9ff44c-fa61-71c5-f835-24047403ba67@redhat.com>
+Subject: Re: [Qemu-devel] [RFC] Virtio RNG: Consider changing the default
+ entropy source to /dev/urandom?
+References: <20180921154323.GS28120@paraplu> <20190502180201.GA31376@paraplu>
+ <CADh2w8TEVZt3KMDiiT8c7Ez+80=gaTB6=8azJQt0Ni58L7e0WQ@mail.gmail.com>
+ <20190507152211.GU27205@redhat.com>
+In-Reply-To: <20190507152211.GU27205@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 5/7/19 10:22 AM, Thomas Huth wrote:
-> On 07/05/2019 15.22, Markus Armbruster wrote:
->> Thomas Huth <thuth@redhat.com> writes:
+On 5/7/19 10:22 AM, Daniel P. Berrang=C3=A9 wrote:
+> On Tue, May 07, 2019 at 11:59:05AM +0200, Nikos Mavrogiannopoulos wrote=
+:
+>> In terms of RHEL what is preferred is (1) use a crypto lib, and (2) if=
+
+>> that's not possible use getrandom(). That is summarized in this
+>> article:
 >>
->>> Currently, all tests are in the "auto" group. This is a little bit po=
-intless.
->>> OTOH, we need a group for the tests that we can automatically run dur=
-ing
->>> "make check" each time, too. Tests in this new group are supposed to =
-run
->>> with every possible QEMU configuration, for example they must run wit=
-h every
->>> QEMU binary (also non-x86), without failing when an optional features=
- is
->>> missing (but reporting "skip" is ok), and be able to run on all kind =
-of host
->>> filesystems and users (i.e. also as "nobody" or "root").
->>> So let's use the "auto" group for this class of tests now. The initia=
-l
->>> list has been determined by running the iotests with non-x86 QEMU tar=
-gets
->>> and with our CI pipelines on Gitlab, Cirrus-CI and Travis (i.e. inclu=
-ding
->>> macOS and FreeBSD).
->>
->> I wonder whether we should additionally limit "make check" to "quick"
->> tests.  How slow are the non-quick auto tests for you?
+>> https://www.redhat.com/en/blog/understanding-red-hat-enterprise-linux-=
+random-number-generator-interface
 >=20
-> I already sorted out some of the tests that run veeeery long, since the=
-
-> run time on gitlab, cirrus-ci and travis is limited. "make check-block"=
-
-> currently takes 3 minutes on my laptop, I think that's still ok?
+> For QEMU this would mean re-writing the code to use qcrypto_random_byte=
+s
+> instead. This internal API is backed by a crypto lib if available,
+> falling back to /dev/urandom or /dev/random on UNIX, or CryptGenRandom
+> on Windows. We could add getrandom() support there too.
 >=20
-> When I run the tests from the auto group that are not in the quick
-> group, I currently get:
->=20
+> The main question is whether to implement a new backends/rng-builtin.c
+> or modify backends/rng-random.c so that it has a NULL filename by
+> default, which would be taken as meaning use the qcrypto_random_bytes
+> API.  The latter benefits that all existing VMs which don't have a
+> filename set would get the new behaviour. The latter has downside
+> that it is not discoverable from mgmt apps, so they won't know if
+> they can rely on it or not.
 
-My personal threshold is about 5 seconds for quick, so:
+Alas, our example in misc.json is:
 
-> 003 1s ...
-> 007 2s ...
+# -> { "execute": "object-add",
+#      "arguments": { "qom-type": "rng-random", "id": "rng1",
+#                     "props": { "filename": "/dev/hwrng" } } }
+# <- { "return": {} }
 
-Should these be moved to quick?
-
-> 013 5s ...
-
-this one is borderline
-
-> 014 15s ...
-> 015 9s ...
-
-Definitely not quick, but if you think they are still okay for auto, I
-can live with that.
-
-> 022 1s ...
-
-Another candidate for quick?
-
-> 023 18s ...
-
-Even longer than 14. Okay for auto?
-
-etc.
-
+which is indeed one of the interfaces that evades introspection at the
+present, so even if we made filename a StrOrNull, which would normally
+show up in introspection when done on any other command, it is invisible
+here. :(
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -207,22 +169,22 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---aSQZlKVTuz56dr3fTsY7PhvdEgwfmKQqC
+--3fUHHFILuANk5945bcOtt2yaruHD6grpm
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzRqT8ACgkQp6FrSiUn
-Q2qf9gf/URHgozVJ5oEZXyaK/gQEZkb1+kczVCjiosGHxH5MwFn1gCJpnOgJ1Or+
-iCbZvjwp000yzDs91ld+6kwaDoHMHwt9IeJ0qVkwBBk6isiLKp/uJOf/syq/R5kK
-wzHoONy+bqitcYT0K1R8g3wigEhbCPADQdWQ5hZIcsGM2/lWBYd/WQWS6261r+33
-v4Cekh8MuBkkywHNTc1+loDDLSsRmWsOJFyDkm9Xe6icJClOd/CeAXmVVK9jJhTF
-7/YMbedUaufIHcMPMIw0S6RJanJd9tefNqQwwNSsoOPuG87G6tB7Gx6KvvTQ3hpH
-Xtn97BTDi+o+/zqFi5ke51/VC0W8TA==
-=8HDF
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzRqdwACgkQp6FrSiUn
+Q2oRugf/R32HaK1QHI9yqcOBPwCshq+8tMXwuKvyb4Ble45+H2Vd3qqeoCOeWEsB
+UHmQugzGjEKZbVg4HYYFi45d6E4xv03xvxupcTvx2U9YfMB3QxQRnewRDXoPc5eF
+50AirPvtn/psRoVyeg6XWbFnV9e9MmYaMqFlIPb+qLPvFus3jcUSMg6P3EEU1fcB
+HQnsJ40Td4PE8776UBKCrvSzoiC3S5ZnpJDt171slgqDhnufXAobJuQOMmLb6Rc3
+w9OcQCrDuV5sRtgWJsr3uACoapNWwrLmNkAzY7bUEzL8y9vEWGtCadJmPKIRFhGC
+dY/175TUKVRgcpGgsAMUi7QmyPCh5A==
+=N27V
 -----END PGP SIGNATURE-----
 
---aSQZlKVTuz56dr3fTsY7PhvdEgwfmKQqC--
+--3fUHHFILuANk5945bcOtt2yaruHD6grpm--
 
