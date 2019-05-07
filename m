@@ -2,81 +2,66 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95D3EC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 07:45:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91BEFC004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 07:50:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 691DC20989
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 07:45:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 691DC20989
+	by mail.kernel.org (Postfix) with ESMTPS id 608DE20989
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 07:50:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 608DE20989
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41585 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41660 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNumq-0004A3-8Q
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 03:45:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50686)
+	id 1hNurj-0005YZ-Kt
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 03:50:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNuly-0003ps-LU
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 03:44:23 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hNuqp-00056w-WB
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 03:49:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNulx-0004y2-CW
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 03:44:22 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:42597)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hNulx-0004wu-6M
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 03:44:21 -0400
-Received: by mail-wr1-f66.google.com with SMTP id l2so20833904wrb.9
-	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 00:44:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=ZOBaeZ/j3KhD5od9lLwNv8kxQQPgWwQty3aEqsGsUjA=;
-	b=OCXvWDoDEt6EeeacDc8zfcjIxOUE78sxnegEx7y+kKhOiM7m7CZ6iJ9nS1A7RFvIy/
-	wY0SwO4b1VW+zi0n33hMu+yrLPZ3q7KQz74rmUR1XEHd15DrM486a9WvESvFoOp3AwXH
-	us5mTdCQdkOZQuQae+q32ZZfoK9WShc5Y+LO4f74MtVh6DW20wIXZl6YmomPvJ2yDTpr
-	P/RtYPCQR/uoHSWdpAr+qjD4zUSTfx3j4GWPb5kEM6ytixN3GIFMyFp6y/GxIv07nrOR
-	PUZsIlvKI5v9oO1GZ5CNJOCj/wZludFfrDtaAYdeonjEPzf5EtDh0wAI79N80ehaH0bx
-	oK4Q==
-X-Gm-Message-State: APjAAAUqgdLaZKK6FAoG4aM79zOeB2+94ccUsIDhZ4MkMQBuDWy9M9xv
-	LrpKL0Ph7x2oHOqzLQ+dL9KrsA==
-X-Google-Smtp-Source: APXvYqwKNlF8q+mmqR0pw25iEO+NCTXNfEs3737r9DglJCCo3k+/0cqg46MePVdLNU3/2JL7NqQACg==
-X-Received: by 2002:adf:df92:: with SMTP id z18mr4189335wrl.213.1557215059619; 
-	Tue, 07 May 2019 00:44:19 -0700 (PDT)
-Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	v17sm9142534wmc.30.2019.05.07.00.44.18
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 07 May 2019 00:44:19 -0700 (PDT)
-To: Hou Qiming <hqm03ster@gmail.com>
-References: <20190507054914.25261-1-marcel.apfelbaum@gmail.com>
-	<f7c57c29-0aa1-c68e-44ed-4ea52d3006c4@redhat.com>
-	<CABSdmrmKYMyMFX-O6y2fAGRow9sHhtSN50knQ_yVwKiNmdyGBw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <e4c2c9bf-f73e-5f75-3c2b-5bf92cb3a524@redhat.com>
-Date: Tue, 7 May 2019 09:44:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <kraxel@redhat.com>) id 1hNuqp-0000xB-8Q
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 03:49:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38550)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hNuqp-0000wL-2T
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 03:49:23 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 177A7C05B022
+	for <qemu-devel@nongnu.org>; Tue,  7 May 2019 07:49:22 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-45.ams2.redhat.com
+	[10.36.116.45])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B9432272DC;
+	Tue,  7 May 2019 07:49:19 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id 74AA611AA3; Tue,  7 May 2019 09:49:18 +0200 (CEST)
+Date: Tue, 7 May 2019 09:49:18 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <20190507074918.vv7ba6f5rvoxo37y@sirius.home.kraxel.org>
+References: <20190412152713.16018-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CABSdmrmKYMyMFX-O6y2fAGRow9sHhtSN50knQ_yVwKiNmdyGBw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190412152713.16018-1-marcandre.lureau@redhat.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.31]);
+	Tue, 07 May 2019 07:49:22 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH v2] ui/console: Precautionary glBindTexture
- and surface->texture validation in surface_gl_update_texture
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/2] Add -vga help
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,83 +73,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+	armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/7/19 8:49 AM, Hou Qiming wrote:
-> My real name is "HOU Qiming". @Marcel Apfelbaum
-> <mailto:marcel.apfelbaum@gmail.com> can you incorporate that in your v2
-> patch? Thanks!
+On Fri, Apr 12, 2019 at 05:27:11PM +0200, Marc-Andr=E9 Lureau wrote:
+> Hi,
+>=20
+> SSIA, see patches.
 
-Thanks a lot Qiming :)
+Series added to vga queue.
 
-> On Tue, May 7, 2019 at 2:25 PM Philippe Mathieu-Daudé <philmd@redhat.com
-> <mailto:philmd@redhat.com>> wrote:
-> 
->     Hi Marcel,
-> 
->     On 5/7/19 7:49 AM, Marcel Apfelbaum wrote:
->     > From: HQM <hqm03ster@gmail.com <mailto:hqm03ster@gmail.com>>
->     >
->     > In a GVT-g setup with dmabuf and GTK GUI, the current 2D texture at
->     > surface_gl_update_texture is not necessarily
->     > surface->texture. Adding a glBindTexture fixes related crashes and
->     > artifacts, and is generally more secure.
->     >
->     > Signed-off-by: HQM <hqm03ster@gmail.com <mailto:hqm03ster@gmail.com>>
-> 
->     This looks like an acronym, per
->     https://wiki.qemu.org/Contribute/SubmitAPatch#Patch_emails_must_include_a_Signed-off-by:_line
-> 
->     "Patch emails must include a Signed-off-by: line [...] Please use your
->     real name to sign a patch (not an alias or acronym)."
-> 
->     > Tested-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com
->     <mailto:marcel.apfelbaum@gmail.com>>
->     > [fixed malformed patch, rebase to master]
->     > Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com
->     <mailto:marcel.apfelbaum@gmail.com>>
->     > ---
->     >
->     > v2:
->     >  - fixed malformed patch
->     >  - rebased to master
->     >
->     >  ui/console-gl.c | 18 +++++++++++-------
->     >  1 file changed, 11 insertions(+), 7 deletions(-)
->     >
->     > diff --git a/ui/console-gl.c b/ui/console-gl.c
->     > index a56e1cd8eb..c1cb3bd673 100644
->     > --- a/ui/console-gl.c
->     > +++ b/ui/console-gl.c
->     > @@ -92,13 +92,17 @@ void surface_gl_update_texture(QemuGLShader *gls,
->     > 
->     >      assert(gls);
->     > 
->     > -    glPixelStorei(GL_UNPACK_ROW_LENGTH_EXT,
->     > -                  surface_stride(surface) /
->     surface_bytes_per_pixel(surface));
->     > -    glTexSubImage2D(GL_TEXTURE_2D, 0,
->     > -                    x, y, w, h,
->     > -                    surface->glformat, surface->gltype,
->     > -                    data + surface_stride(surface) * y
->     > -                    + surface_bytes_per_pixel(surface) * x);
->     > +    if (surface->texture) {
->     > +        glBindTexture(GL_TEXTURE_2D, surface->texture);
->     > +        glPixelStorei(GL_UNPACK_ROW_LENGTH_EXT,
->     > +                      surface_stride(surface)
->     > +                      / surface_bytes_per_pixel(surface));
->     > +        glTexSubImage2D(GL_TEXTURE_2D, 0,
->     > +                        x, y, w, h,
->     > +                        surface->glformat, surface->gltype,
->     > +                        data + surface_stride(surface) * y
->     > +                        + surface_bytes_per_pixel(surface) * x);
->     > +    }
->     >  }
->     > 
->     >  void surface_gl_render_texture(QemuGLShader *gls,
->     >
-> 
+thanks,
+  Gerd
+
 
