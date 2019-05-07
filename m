@@ -2,92 +2,73 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E75CC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 17:46:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89626C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 17:54:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D84DC205C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 17:46:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D84DC205C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 628AA2054F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 17:54:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 628AA2054F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50727 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50803 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hO4AR-0003f1-W5
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 13:46:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37413)
+	id 1hO4IZ-0006Nc-EM
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 13:54:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hO49X-0003E4-IT
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 13:45:20 -0400
+	(envelope-from <palmer@dabbelt.com>) id 1hO4GV-0005Jo-ES
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 13:52:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hO49V-0008Rw-AI
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 13:45:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56932)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hO49P-0008MY-NJ
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 13:45:13 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DE21D30842A0;
-	Tue,  7 May 2019 17:45:08 +0000 (UTC)
-Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 99AD62E038;
-	Tue,  7 May 2019 17:45:03 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>, Ernest Esene <eroken1@gmail.com>
-References: <20190504181119.GA3317@erokenlabserver>
-	<87ftpqb25m.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <85baf98a-0309-8168-a0f7-6d7e9d4e447b@redhat.com>
-Date: Tue, 7 May 2019 12:45:02 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <87ftpqb25m.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="VaG9fhRWZRvQR2rmYy3yAhlQelL2TbVki"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Tue, 07 May 2019 17:45:08 +0000 (UTC)
+	(envelope-from <palmer@dabbelt.com>) id 1hO4GU-0005Vj-Cu
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 13:52:31 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:44071)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hO4GU-0005V1-7W
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 13:52:30 -0400
+Received: by mail-pl1-f194.google.com with SMTP id d3so4523447plj.11
+	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 10:52:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+	:mime-version:content-transfer-encoding;
+	bh=cYprQMWktnww3CUSan+0ugetvPRquyZiZq8dJoeUsHE=;
+	b=lmogmx4z2ci7oZNmk5oap+Alb6PI8113Ll8wyq3v2rAqtql6Y/sPDH3IvBtMNj7zpC
+	io9w5FP5YxOFFMbctH3JDVnNsak7rzNYOZKTQmf0wwHCfbonnHQ2Jxzg4gvsg8cvUHbL
+	/oep1o84fHc4RsXqTSqTPozTeOQN0H5ENwrkNhIMz2cTiUNWMdmEFhLSNWtGrQJeI/Pv
+	5YmiWkOZ/2bBwkxS/8RRC7xJAnN33f3sdyv0hySk6D2VWzT1lz80BAnDpsysvEIKJovT
+	vEWymXrEBMQf2Ru7BG9AoZFEB0ngk2Bm8tnv+7LpS/Zz2vueY90tpKP17Ub9iYD+pmG8
+	2qrg==
+X-Gm-Message-State: APjAAAWqdJqgO3NAhan+Wq+42wwuJJwyPZ1wcsd/pG00o2z7rlgm7clT
+	HJ3YTE26m1KHMVm7uxXzegREDMawuJI=
+X-Google-Smtp-Source: APXvYqzRlyo7Sa9ZDMUJv8ycBxHkq2ETTa+Ny+MP/FrKdrsigBL6kr6QNlsqR30MA//UKOSwoVpm+w==
+X-Received: by 2002:a17:902:8f93:: with SMTP id
+	z19mr34015284plo.108.1557251547998; 
+	Tue, 07 May 2019 10:52:27 -0700 (PDT)
+Received: from localhost ([12.206.222.5]) by smtp.gmail.com with ESMTPSA id
+	f14sm20340508pgj.24.2019.05.07.10.52.27
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Tue, 07 May 2019 10:52:27 -0700 (PDT)
+Date: Tue, 07 May 2019 10:52:27 -0700 (PDT)
+X-Google-Original-Date: Tue, 07 May 2019 10:18:29 PDT (-0700)
+In-Reply-To: <CANnJOVHd1aFR2tiORJmZ2h3xa+t8djToUEom4WSy=4vBcOjegg@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: fintelia@gmail.com
+Message-ID: <mhng-29822037-900e-4149-aa85-36cbc1db4972@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v2] chardev/char-i2c: Implement Linux I2C
- character device
+	[fuzzy]
+X-Received-From: 209.85.214.194
+Subject: Re: [Qemu-devel] [PATCH for 4.1] target/riscv: More accurate
+ handling of `sip` CSR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,71 +80,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
-	qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org,
+	qemu-devel@nongnu.org, sagark@eecs.berkeley.edu,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---VaG9fhRWZRvQR2rmYy3yAhlQelL2TbVki
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, Ernest Esene <eroken1@gmail.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <85baf98a-0309-8168-a0f7-6d7e9d4e447b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] chardev/char-i2c: Implement Linux I2C
- character device
-References: <20190504181119.GA3317@erokenlabserver>
- <87ftpqb25m.fsf@dusky.pond.sub.org>
-In-Reply-To: <87ftpqb25m.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, 06 May 2019 08:52:43 PDT (-0700), fintelia@gmail.com wrote:
+> According to the spec, "All bits besides SSIP, USIP, and UEIP in the sip
+> register are read-only." Further, if an interrupt is not delegated to mode
+> x,
+> then "the corresponding bits in xip [...] should appear to be hardwired to
+> zero. This patch implements both of those requirements.
+>
+> Signed-off-by: Jonathan Behrens <fintelia@gmail.com>
+> ---
+>  target/riscv/csr.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+>
+> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> index 1ec1222da1..fff7d834e8 100644
+> --- a/target/riscv/csr.c
+> +++ b/target/riscv/csr.c
+> @@ -246,6 +246,7 @@ static const target_ulong sstatus_v1_9_mask =
+> SSTATUS_SIE | SSTATUS_SPIE |
+>  static const target_ulong sstatus_v1_10_mask = SSTATUS_SIE | SSTATUS_SPIE |
+>      SSTATUS_UIE | SSTATUS_UPIE | SSTATUS_SPP | SSTATUS_FS | SSTATUS_XS |
+>      SSTATUS_SUM | SSTATUS_MXR | SSTATUS_SD;
+> +static const target_ulong sip_writable_mask = SIP_SSIP | MIP_USIP |
+> MIP_UEIP;
+>
+>  #if defined(TARGET_RISCV32)
+>  static const char valid_vm_1_09[16] = {
+> @@ -694,8 +695,10 @@ static int write_sbadaddr(CPURISCVState *env, int
+> csrno, target_ulong val)
+>  static int rmw_sip(CPURISCVState *env, int csrno, target_ulong *ret_value,
+>                     target_ulong new_value, target_ulong write_mask)
+>  {
+> -    return rmw_mip(env, CSR_MSTATUS, ret_value, new_value,
+> -                   write_mask & env->mideleg);
+> +    int ret = rmw_mip(env, CSR_MSTATUS, ret_value, new_value,
+> +                      write_mask & env->mideleg & sip_writable_mask);
+> +    *ret_value &= env->mideleg;
+> +    return ret;
+>  }
+>
+>  /* Supervisor Protection and Translation */
 
-On 5/7/19 12:33 PM, Markus Armbruster wrote:
-
->> +static int i2c_ioctl(Chardev *chr, int cmd, void *arg)
->> +{
->> +    FDChardev *fd_chr =3D FD_CHARDEV(chr);
->> +    QIOChannelFile *floc =3D QIO_CHANNEL_FILE(fd_chr->ioc_in);
->> +    int fd =3D floc->fd;
->> +    int addr;
->> +
->> +    switch (cmd) {
->> +    case CHR_IOCTL_I2C_SET_ADDR:
->> +        addr =3D (int) (long) arg;
->=20
-> Would (int)arg make the compiler unhappy?
-
-If you're trying to pass an integer through void*, it's probably best to
-write:
-
-addr =3D (intptr_t) arg;
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---VaG9fhRWZRvQR2rmYy3yAhlQelL2TbVki
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzRxB4ACgkQp6FrSiUn
-Q2oeGwf+KDnZI0flzk+dWVIAKine77s2L41F5jsPEig+f4HssGvmQ3kyT/TgahOn
-nk/HzfCCvbImtrxfRMY670dqLIlWVb2lfuh2VWhLPBgXtZq7Uju2NWE9TfdG5gYk
-NIDSI3WYUNbR0NOCSuQmSXMd4xUcQFmvn8iNCorubKWzWtjEkjAYMks416G2AAWq
-9sxwvqNhMereREeJPrtaXLwykCOk1MKRq9V/gzkibz/ggf5c+ats7fb6uWGZlAle
-tEQsxppNm3CzGwmkgHH04fAYk/DPHUsgmbd3y4peMMbJwXicDL5gqWWTWRqigVkq
-ZkxXqKx5s2klFuXrdwIH9AGfH8keqQ==
-=EPH+
------END PGP SIGNATURE-----
-
---VaG9fhRWZRvQR2rmYy3yAhlQelL2TbVki--
+This patch (and your previous one) don't apply for me.  I don't see the
+git-send-email tags in your messages, are you trying to do something like paste
+them into gmail?  If so I think they're getting line wrapped.
 
