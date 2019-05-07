@@ -7,60 +7,58 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1770C04AAB
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 06:25:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6332C04AAD
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 06:25:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D021206A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 06:25:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 709EF206A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 06:25:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="YNoXsnza"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D021206A3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="AUq2852w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 709EF206A3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40737 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40739 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNtXb-00021Q-O9
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 02:25:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37632)
+	id 1hNtXc-00022G-ME
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 02:25:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hNtVi-0000mL-5n
+	(envelope-from <dgibson@ozlabs.org>) id 1hNtVh-0000mD-U3
 	for qemu-devel@nongnu.org; Tue, 07 May 2019 02:23:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hNtVg-0002dS-S1
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 02:23:30 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:52207)
+	(envelope-from <dgibson@ozlabs.org>) id 1hNtVg-0002dG-RU
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 02:23:29 -0400
+Received: from ozlabs.org ([203.11.71.1]:51053)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hNtVe-0002Yn-Jb; Tue, 07 May 2019 02:23:27 -0400
+	id 1hNtVe-0002Yk-UG; Tue, 07 May 2019 02:23:27 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 44yqL23mZPz9sCJ; Tue,  7 May 2019 16:23:22 +1000 (AEST)
+	id 44yqL21kCKz9sB8; Tue,  7 May 2019 16:23:22 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
 	d=gibson.dropbear.id.au; s=201602; t=1557210202;
-	bh=gpQrHJyWQexYpx5/xWG2PXXC2z/I5IoQUN483yRDw7A=;
+	bh=GbPCRSaNKC2k1UFTcKFQpSOz02oTnGKpP3jVFm9/EtU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YNoXsnzaZu4Bg6jWp6BWToKgLt946roURZn4WNjk8WSwqxDSSgXyVcDkDtYR4+HYu
-	W/cX4DmWaOWkNyDTunh6VufFZRh0ebGgPn9F++Br3Qpunl5qvD89ePM4u0wZP543gT
-	Nv9GQYr8M+XN99LTV89+gR3pFMC9wwJ/ChBJNe5A=
-Date: Tue, 7 May 2019 15:22:43 +1000
+	b=AUq2852wAf8PM3eWwSCGNEQaWS8aU5K3hvWZb/fIWL+kfWmETUVHQ1qvuLURJfGx1
+	xrgrVAhPoeGpdzDUnkhM8kjCFIgvAgBsnIJUl0V7atBzRS+YR6Swx83TMQS9JmC7jP
+	19uUMZN85DhLqL6DvHdL9XO0DyFzJJ2zCc7EXTSI=
+Date: Tue, 7 May 2019 15:20:40 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Anton Blanchard <anton@ozlabs.org>
-Message-ID: <20190507052243.GH7073@umbus.fritz.box>
+To: Anton Blanchard <anton@ozlabs.org>, y@umbus.fritz.box
+Message-ID: <20190507052039.GF7073@umbus.fritz.box>
 References: <20190507004811.29968-1-anton@ozlabs.org>
-	<20190507004811.29968-5-anton@ozlabs.org>
+	<20190507004811.29968-2-anton@ozlabs.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="xHbokkKX1kTiQeDC"
+	protocol="application/pgp-signature"; boundary="vA66WO2vHvL/CRSR"
 Content-Disposition: inline
-In-Reply-To: <20190507004811.29968-5-anton@ozlabs.org>
+In-Reply-To: <20190507004811.29968-2-anton@ozlabs.org>
 User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH 5/9] target/ppc: Fix xvabs[sd]p, xvnabs[sd]p,
- xvneg[sd]p, xvcpsgn[sd]p
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH 2/9] target/ppc: Fix xxspltib
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,41 +78,51 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---xHbokkKX1kTiQeDC
+--vA66WO2vHvL/CRSR
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 07, 2019 at 10:48:07AM +1000, Anton Blanchard wrote:
-> We were using set_cpu_vsr* when we should have used set_cpu_vsrl*
-
-Commit message doesn't appear to match the code.
-
+On Tue, May 07, 2019 at 10:48:04AM +1000, Anton Blanchard wrote:
+> xxspltib raises a VMX or a VSX exception depending on the register
+> set it is operating on. We had a check, but it was backwards.
 >=20
-> Fixes: 8b3b2d75c7c0 ("introduce get_cpu_vsr{l,h}() and set_cpu_vsr{l,h}()=
- helpers for VSR register access")
+> Fixes: f113283525a4 ("target-ppc: add xxspltib instruction")
 > Signed-off-by: Anton Blanchard <anton@ozlabs.org>
 > ---
->  target/ppc/translate/vsx-impl.inc.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  target/ppc/translate/vsx-impl.inc.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
 >=20
 > diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
 sx-impl.inc.c
-> index c13f84e745..0a48020e3b 100644
+> index 4d8ca7cf32..d050cc03ed 100644
 > --- a/target/ppc/translate/vsx-impl.inc.c
 > +++ b/target/ppc/translate/vsx-impl.inc.c
-> @@ -859,8 +859,8 @@ static void glue(gen_, name)(DisasContext *ctx)      =
-            \
->          xbh =3D tcg_temp_new_i64();                                \
->          xbl =3D tcg_temp_new_i64();                                \
->          sgm =3D tcg_temp_new_i64();                                \
-> -        set_cpu_vsrh(xB(ctx->opcode), xbh);                      \
-> -        set_cpu_vsrl(xB(ctx->opcode), xbl);                      \
-> +        get_cpu_vsrh(xbh, xB(ctx->opcode));                      \
-> +        get_cpu_vsrl(xbl, xB(ctx->opcode));                      \
->          tcg_gen_movi_i64(sgm, sgn_mask);                         \
->          switch (op) {                                            \
->              case OP_ABS: {                                       \
+> @@ -1355,16 +1355,17 @@ static void gen_xxspltib(DisasContext *ctx)
+>      int rt =3D xT(ctx->opcode);
+> =20
+>      if (rt < 32) {
+> -        if (unlikely(!ctx->altivec_enabled)) {
+> -            gen_exception(ctx, POWERPC_EXCP_VPU);
+> +        if (unlikely(!ctx->vsx_enabled)) {
+> +            gen_exception(ctx, POWERPC_EXCP_VSXU);
+>              return;
+>          }
+>      } else {
+> -        if (unlikely(!ctx->vsx_enabled)) {
+> -            gen_exception(ctx, POWERPC_EXCP_VSXU);
+> +        if (unlikely(!ctx->altivec_enabled)) {
+> +            gen_exception(ctx, POWERPC_EXCP_VPU);
+>              return;
+>          }
+>      }
+> +    printf("XT %x IMM8 %x\n", rt, uim8);
+
+Looks like you have some leftover debugging here.
+
+>      tcg_gen_gvec_dup8i(vsr_full_offset(rt), 16, 16, uim8);
+>  }
+> =20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -122,25 +130,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---xHbokkKX1kTiQeDC
+--vA66WO2vHvL/CRSR
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzRFiMACgkQbDjKyiDZ
-s5I+QRAA0nThDjCOaLpGXUdgPCmIs/d2f5sGN2qwsDQmT8xaRomGt+ZXF4sAHwe7
-eUP4i4uuporFP+FhJzMjHBfx8LEJdT2Ohk6my5u5XckKrnfh5UvpgNfD14gLTXrQ
-2OyymI3AvnCNX9HQlsuieWWdnmSNJeuorb/pAzF7vgw7c+ThxYyiwp2zIukiYoGr
-8DD3lBXRZSpomeJkx5YKOomDX7294xdoeDGmchZEPgeBfxmEkN1dGu+F0ccltOSt
-Sa/FdCN7ZynAKHavvAhKfboJdBeDmbx1w+BfUHCguwyUFr7FMoYv+JSNTFu0oeCh
-N6TJ/MBSPGJKskKbZDzUJYVjLCl4a58xanxasqzr0BI4BnG8oBtzVne1fpoHHygA
-iTX/iO0oZt299EncpeSBKBdwZoTaRu6bmZXhBR700xiRr4ic6LM0oN5h+g4BGx3K
-rsmUY7kuRzG2Dnw0ghaODTf10en+3sdod8Ks5jNIk0pZk1HwPvJBUByvxw/elIYi
-HllRjwL/6b2KJzgz3itdXsDGWG6YslJe5+PMxQZHSSHM2AxCi48ulCCDkSkRX8iA
-vorjn913XVXU3Wv8P8AmguS1amXQBp1cpwxelpdYeCKa9nbWSYUmiOBEMMGQ4OXA
-/Pzv0ef1Ppo5FgKLOwar9ppjXzFSYdL0Lj1Lu/Rn1pkFvdhQMzo=
-=M0TX
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzRFacACgkQbDjKyiDZ
+s5LFEBAAqLHwEf1ScoHwymawpzWNxlXP2RTnowU7I/hPzRebuWJipGpZCpGzqO5y
+L2IxXOM2sYCwDuskvRl1Npvn9Psg1JAZdAzODcAHaoJxDhc2U1kWVp+awasvUaw5
++wZ/A6uBSewTPNY8U9Oqw62lWdQLLDotkb9dI8pfrY5oEiTf5u2ybQL+xkpsudUA
+ylWrz/EXe+tTktIywIFvPRkT3E12qZzfDvbAagGsGFyMwPxsuNF5y8dG43/uQttC
+jJUfByeTXjYSZVZ/hhnbgXdc8VBUU1ebn1gh4U5ZnKmy60g0bduRDf98NMiAmcS8
+Zhj8Ua++G8pihpG8mLT1aNxbiH9YpwUYR2LHjcvvHJP6HkTDPEbTkyNacva0vh0N
+S3+6z5wrMuaGUtPjpO1fwp5WmGIl6TYvIj5NzTPxXiTewal+/Nfb0m81dozQa7yc
+34ClH09nCaetA1ZgDOhMdb4jyaMIk9NYSSjo4KsiT0OClAs7yMary2AmYEH2yvh8
+ZbUzds1E+keNy+wwkiU8n4k3x5wX1NZbRXUDTeJY+75ckc5yGvP4kS4aLoVFq6DL
+FtKZN/VwXw9T9wWmB9VCdLAjrTwEXRw5ybnE+417H1wGJZ9P/m8HLxlcc7uaYp/t
+y9YIdQnnZFZLedoTAP69SoZpFfLlYaTP95R/KUM+IS6Vy1gM+RI=
+=F6LM
 -----END PGP SIGNATURE-----
 
---xHbokkKX1kTiQeDC--
+--vA66WO2vHvL/CRSR--
 
