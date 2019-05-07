@@ -2,82 +2,59 @@ Return-Path: <SRS0=60fc=TH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DECAC004C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 08:12:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07CF6C004C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 08:13:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32A7420C01
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 08:12:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32A7420C01
+	by mail.kernel.org (Postfix) with ESMTPS id D16CD204FD
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 May 2019 08:13:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D16CD204FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41926 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41936 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hNvDS-0006Tw-Gt
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 04:12:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56106)
+	id 1hNvEU-00076q-3U
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 04:13:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNvBq-0005eS-1p
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 04:11:09 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hNvDc-0006eh-6D
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 04:12:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hNvBp-0003sO-61
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 04:11:06 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:35835)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hNvBp-0003rs-0j
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 04:11:05 -0400
-Received: by mail-wm1-f65.google.com with SMTP id y197so18611238wmd.0
-	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 01:11:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=QBThy8UXvr/DHTUHSEz2ZVL3ciAScRGhiWQuJCjzl4Q=;
-	b=C1v6nPYTYJfyhHblsunXxft09aHn/J6wAzMJAMByrF2oobNMhp+CKM7oX0aLMqQOUL
-	gi7v3Thuhv9LhSCY2tAMGJ2fi0VrWCg6Ld9BcvnPXZz9iTdwQX+5u7nguoxLZjmPwWQ5
-	oOk3yzrRdqn5eBo8osxGpwy8VtMUnB+GpU/p8MIstj8YzXTjyt9Dr47TXFkgwN1pwBlV
-	GNVdgnUmkNy1BhPWVtLNHyQufj/YW6WTBC4aam9w2UuQVHWwRUP0x4lsdX/QYxCd6lKT
-	GZ7yAo6VH0wt6T8Gf33dsM2Vxdo0Nt/L2oGa/krcnjlBWIrlV/ajagTp1INjy/Zc8PjZ
-	/4+A==
-X-Gm-Message-State: APjAAAVClO9MOF8UQhK78gdUcSzyS9AAHnm34d8qcwTQsH8zQ133oUWf
-	9dsNuJwlO3wUM9bplB3wqenp0w==
-X-Google-Smtp-Source: APXvYqx7ilBV5pUNg4TN9sgx7tOu1we41LsMjKoDBI44BBZ7G9omWCwLqdPczjW4wUGPueAzMM5j+Q==
-X-Received: by 2002:a1c:2109:: with SMTP id h9mr20110368wmh.68.1557216664037; 
-	Tue, 07 May 2019 01:11:04 -0700 (PDT)
-Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	e5sm10080138wrh.79.2019.05.07.01.11.02
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 07 May 2019 01:11:03 -0700 (PDT)
-To: Gerd Hoffmann <kraxel@redhat.com>,
-	=?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20190412121626.19829-1-berrange@redhat.com>
-	<20190412121626.19829-6-berrange@redhat.com>
-	<20190507075415.fsngpdrgnh2e5vch@sirius.home.kraxel.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <0516fc8f-5bf1-66cc-4865-f75c4f5309b8@redhat.com>
-Date: Tue, 7 May 2019 10:11:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <cohuck@redhat.com>) id 1hNvDb-0004ip-6r
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 04:12:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43432)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
+	id 1hNvDa-0004iY-Vw; Tue, 07 May 2019 04:12:55 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3E90E3097025;
+	Tue,  7 May 2019 08:12:54 +0000 (UTC)
+Received: from localhost (dhcp-192-187.str.redhat.com [10.33.192.187])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E097B611D9;
+	Tue,  7 May 2019 08:12:53 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Halil Pasic <pasic@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue,  7 May 2019 10:12:51 +0200
+Message-Id: <20190507081251.24307-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190507075415.fsngpdrgnh2e5vch@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.43]);
+	Tue, 07 May 2019 08:12:54 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] qxl: avoid unaligned pointer
- reads/writes
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH RFC v2] s390/css: handle CCW_FLAG_SKIP
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,31 +66,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
-	Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
-	Laurent Vivier <laurent@vivier.eu>
+Cc: Eric Farman <farman@linux.ibm.com>, qemu-s390x@nongnu.org,
+	Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Gerd,
+If a ccw has CCW_FLAG_SKIP set, and the command is of type
+read, read backwards, or sense, no data should be written
+to the guest for that command.
 
-On 5/7/19 9:54 AM, Gerd Hoffmann wrote:
-> On Fri, Apr 12, 2019 at 01:16:26PM +0100, Daniel P. Berrangé wrote:
->> The SPICE_RING_PROD_ITEM() macro is initializing a local
->> 'uint64_t *' variable to point to the 'el' field inside
->> the QXLReleaseRing struct. This uint64_t field is not
->> guaranteed aligned as the struct is packed.
->>
->> Code should not take the address of fields within a
->> packed struct. Changing the SPICE_RING_PROD_ITEM()
->> macro to avoid taking the address of the field is
->> impractical. It is clearer to just remove the macro
->> and inline its functionality in the three call sites
->> that need it.
-> 
-> Added patch to vga queue.
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
 
-What about the other patch Marc-André sent?
-https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg01318.html
+v1 -> v2: fixed checks for command type [Eric]
+
+Still only lightly tested (it boots); I don't think I have a tool
+generating channel programs with the skip flag handy.
+
+---
+ hw/s390x/css.c         | 22 ++++++++++++++++++----
+ include/hw/s390x/css.h |  1 +
+ 2 files changed, 19 insertions(+), 4 deletions(-)
+
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 8fc9e35ba5d3..080ac7e5bc0b 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -830,8 +830,12 @@ static int ccw_dstream_rw_noflags(CcwDataStream *cds=
+, void *buff, int len,
+     if (op =3D=3D CDS_OP_A) {
+         goto incr;
+     }
+-    ret =3D address_space_rw(&address_space_memory, cds->cda,
+-                           MEMTXATTRS_UNSPECIFIED, buff, len, op);
++    if (!cds->do_skip) {
++        ret =3D address_space_rw(&address_space_memory, cds->cda,
++                               MEMTXATTRS_UNSPECIFIED, buff, len, op);
++    } else {
++        ret =3D 0;
++    }
+     if (ret !=3D MEMTX_OK) {
+         cds->flags |=3D CDS_F_STREAM_BROKEN;
+         return -EINVAL;
+@@ -928,8 +932,13 @@ static int ccw_dstream_rw_ida(CcwDataStream *cds, vo=
+id *buff, int len,
+     do {
+         iter_len =3D MIN(len, cont_left);
+         if (op !=3D CDS_OP_A) {
+-            ret =3D address_space_rw(&address_space_memory, cds->cda,
+-                                   MEMTXATTRS_UNSPECIFIED, buff, iter_le=
+n, op);
++            if (!cds->do_skip) {
++                ret =3D address_space_rw(&address_space_memory, cds->cda=
+,
++                                       MEMTXATTRS_UNSPECIFIED, buff, ite=
+r_len,
++                                       op);
++            } else {
++                ret =3D 0;
++            }
+             if (ret !=3D MEMTX_OK) {
+                 /* assume inaccessible address */
+                 ret =3D -EINVAL; /* channel program check */
+@@ -968,6 +977,11 @@ void ccw_dstream_init(CcwDataStream *cds, CCW1 const=
+ *ccw, ORB const *orb)
+=20
+     cds->count =3D ccw->count;
+     cds->cda_orig =3D ccw->cda;
++    /* skip is only effective for read, read backwards, or sense command=
+s */
++    cds->do_skip =3D (ccw->flags & CCW_FLAG_SKIP) &&
++        ((ccw->cmd_code & CCW_CMD_BASIC_SENSE) =3D=3D CCW_CMD_BASIC_SENS=
+E ||
++         (ccw->cmd_code & 0x02) =3D=3D 0x02 /* read */ ||
++         (ccw->cmd_code & 0x0c) =3D=3D 0x0c /* read backwards */);
+     ccw_dstream_rewind(cds);
+     if (!(cds->flags & CDS_F_IDA)) {
+         cds->op_handler =3D ccw_dstream_rw_noflags;
+diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+index aae19c427229..7cc183ef4366 100644
+--- a/include/hw/s390x/css.h
++++ b/include/hw/s390x/css.h
+@@ -97,6 +97,7 @@ typedef struct CcwDataStream {
+     int (*op_handler)(struct CcwDataStream *cds, void *buff, int len,
+                       CcwDataStreamOp op);
+     hwaddr cda;
++    bool do_skip;
+ } CcwDataStream;
+=20
+ /*
+--=20
+2.20.1
+
 
