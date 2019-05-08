@@ -2,59 +2,93 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB20C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 14:35:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E86BC04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 14:37:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22F6E21655
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 14:35:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22F6E21655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C79E6205C9
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 14:37:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O/bsEHhb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C79E6205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38271 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38289 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hONfl-0007DM-Cn
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 10:35:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53913)
+	id 1hONhT-0008Ru-57
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 10:37:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hONcR-0005VL-P1
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 10:32:31 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hONd3-0005o8-8x
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 10:33:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hONcQ-00047d-1H
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 10:32:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48718)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hONcK-00045G-Ff; Wed, 08 May 2019 10:32:21 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7BC4C309B15A;
-	Wed,  8 May 2019 14:32:17 +0000 (UTC)
-Received: from thuth.com (ovpn-116-100.ams2.redhat.com [10.36.116.100])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 76F1C19729;
-	Wed,  8 May 2019 14:32:12 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed,  8 May 2019 16:32:09 +0200
-Message-Id: <20190508143209.24350-1-thuth@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hONd2-0004JA-F7
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 10:33:05 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:41755)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hONd2-0004Id-64
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 10:33:04 -0400
+Received: by mail-pf1-x444.google.com with SMTP id l132so1109143pfc.8
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 07:33:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=K2jc9dNMDIPDj/kjeLus5RuR9URVn2943gkVig1NC18=;
+	b=O/bsEHhbXTb8MhouNqAL9bgNRFHu+TZv8tfkrEgG5JKeBDqEAXI4elzpD/CHVSkq2G
+	t+AAdogcMUzGU2dvdWZyv6k3d+1x6rEH3n8M0C8MwgnVYN4vMgwHkkSswByxlfM9NUGP
+	0V6kw6dMyY+V6iQUWqOLXQxPOLeTKJBQFHeRSpZJ8+tH1v6MhDhRunAqSgZXggl5wAw/
+	ec/jtsdTOzvGYj+aOhjT0qqRjgIM9ZdWCxbcAg+yqfiPzIa6Qo67yh19gccUVCJb6r0/
+	u8kQTXzSeCoZe48jzegJiqdHa22fYa0SP/1LmmFVhqjAlGQQnDOA9aUtDOuIOa+aOVtE
+	83KA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=K2jc9dNMDIPDj/kjeLus5RuR9URVn2943gkVig1NC18=;
+	b=mXOgrKwO4aasuXNGvZbo9N+YMXtw2LpJRXwrgd7Gi3er38S3F6/c1KacoUpVxsk0PT
+	ddAaaBVunSl4DDdIsBrwRMRqQ9XGDTl8n9zLbrUE75k02He/G4Sb9p9TYoBjWDYY41gJ
+	qhYP9w2JsPVf6Zxm+tRdhr1ipBWJwV+UTOU/CeXo06rQk2Gk9fWxsCkcQMtILmbBfnGM
+	ai8nk6O86wTeRVqS1DVuuOTAAs23g4MhTdzjS0IqbZzb1zLyesIsnMMhUKGfrC5sjCDv
+	zSZ+n8FHRnPVH/8jAn3TpXvCqV37HldggjnF1oXdLZfDvxAML9ihnUFxZbMB+P/9qEbT
+	B0aA==
+X-Gm-Message-State: APjAAAXIz6B8pRZIyPyKoLJ8OaQXyVh41jq5G+QclPUVWQn7PmHIb35Z
+	nFEO2alprcJRs6tOCJEzNwEvZha8JAA=
+X-Google-Smtp-Source: APXvYqzI5XzETtBkzNFqQAC/CyqNr/jmluKADzIq9k6LiG/3ljveEcooYUyL94fSp85j16usidrTdw==
+X-Received: by 2002:a63:a1a:: with SMTP id 26mr46080480pgk.11.1557325981936;
+	Wed, 08 May 2019 07:33:01 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-27-95.tukw.qwest.net. [97.113.27.95])
+	by smtp.gmail.com with ESMTPSA id
+	x4sm21080238pfm.19.2019.05.08.07.33.00
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 08 May 2019 07:33:01 -0700 (PDT)
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20190508000641.19090-1-richard.henderson@linaro.org>
+	<20190508000641.19090-19-richard.henderson@linaro.org>
+	<CAL1e-=iRwS-1LvP2m5oS2PAKigiDr0g8jRNP6xPV2b_9AYU08Q@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <de1b6006-866c-b3a8-9726-4620821a9657@linaro.org>
+Date: Wed, 8 May 2019 07:32:58 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Wed, 08 May 2019 14:32:17 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] tests: qpci_unplug_acpi_device_test() should
- not rely on global_qtest
+In-Reply-To: <CAL1e-=iRwS-1LvP2m5oS2PAKigiDr0g8jRNP6xPV2b_9AYU08Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH v3 18/39] target/mips: Use env_cpu,
+ env_archcpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,193 +100,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-block@nongnu.org,
-	Amit Shah <amit@kernel.org>, Jason Wang <jasowang@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-libqos functions should not use functions that require global_qtest to
-be set, since such library functions could also be used by tests that
-deal with multiple test states. Add a parameter to this function to
-explicitly specify the test state.
+On 5/8/19 1:15 AM, Aleksandar Markovic wrote:
+> 
+> On May 8, 2019 2:19 AM, "Richard Henderson" <richard.henderson@linaro.org
+> <mailto:richard.henderson@linaro.org>> wrote:
+>>
+>>
+>>
+> 
+> This commit message doesnˊt explain the reason for the change, and why is this
+> an improvement. The underlyng reason for distingishing between  env_cpu and
+> env_archcpu cases is not explained too.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/e1000e-test.c     |  4 +++-
- tests/ivshmem-test.c    |  9 ++++++---
- tests/libqos/pci-pc.c   | 10 +++++-----
- tests/libqos/pci.h      |  2 +-
- tests/virtio-blk-test.c |  3 ++-
- tests/virtio-net-test.c |  4 +++-
- tests/virtio-rng-test.c |  5 ++++-
- 7 files changed, 24 insertions(+), 13 deletions(-)
+It's certainly explained in the preceeding patches that introduce those functions.
 
-diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
-index 77ba8095bb..6a946c0484 100644
---- a/tests/e1000e-test.c
-+++ b/tests/e1000e-test.c
-@@ -231,8 +231,10 @@ static void test_e1000e_multiple_transfers(void *obj=
-, void *data,
-=20
- static void test_e1000e_hotplug(void *obj, void *data, QGuestAllocator *=
- alloc)
- {
-+    QTestState *qts =3D global_qtest;  /* TODO: get rid of global_qtest =
-here */
-+
-     qtest_qmp_device_add("e1000e", "e1000e_net", "{'addr': '0x06'}");
--    qpci_unplug_acpi_device_test("e1000e_net", 0x06);
-+    qpci_unplug_acpi_device_test(qts, "e1000e_net", 0x06);
- }
-=20
- static void data_test_clear(void *sockets)
-diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
-index 227561fbca..a467b8c03d 100644
---- a/tests/ivshmem-test.c
-+++ b/tests/ivshmem-test.c
-@@ -383,18 +383,21 @@ static void test_ivshmem_server(void)
-=20
- static void test_ivshmem_hotplug(void)
- {
-+    QTestState *qts;
-     const char *arch =3D qtest_get_arch();
-=20
--    qtest_start("-object memory-backend-ram,size=3D1M,id=3Dmb1");
-+    qts =3D qtest_init("-object memory-backend-ram,size=3D1M,id=3Dmb1");
-=20
-+    global_qtest =3D qts;  /* TODO: Get rid of global_qtest here */
-     qtest_qmp_device_add("ivshmem-plain", "iv1",
-                          "{'addr': %s, 'memdev': 'mb1'}",
-                          stringify(PCI_SLOT_HP));
-     if (strcmp(arch, "ppc64") !=3D 0) {
--        qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
-+        qpci_unplug_acpi_device_test(qts, "iv1", PCI_SLOT_HP);
-     }
-=20
--    qtest_end();
-+    qtest_quit(qts);
-+    global_qtest =3D NULL;
- }
-=20
- static void test_ivshmem_memdev(void)
-diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
-index 407d8aff78..634fedd049 100644
---- a/tests/libqos/pci-pc.c
-+++ b/tests/libqos/pci-pc.c
-@@ -176,19 +176,19 @@ void qpci_free_pc(QPCIBus *bus)
-     g_free(s);
- }
-=20
--void qpci_unplug_acpi_device_test(const char *id, uint8_t slot)
-+void qpci_unplug_acpi_device_test(QTestState *qts, const char *id, uint8=
-_t slot)
- {
-     QDict *response;
-=20
--    response =3D qmp("{'execute': 'device_del', 'arguments': {'id': %s}}=
-",
--                   id);
-+    response =3D qtest_qmp(qts, "{'execute': 'device_del',"
-+                              " 'arguments': {'id': %s}}", id);
-     g_assert(response);
-     g_assert(!qdict_haskey(response, "error"));
-     qobject_unref(response);
-=20
--    outb(ACPI_PCIHP_ADDR + PCI_EJ_BASE, 1 << slot);
-+    qtest_outb(qts, ACPI_PCIHP_ADDR + PCI_EJ_BASE, 1 << slot);
-=20
--    qmp_eventwait("DEVICE_DELETED");
-+    qtest_qmp_eventwait(qts, "DEVICE_DELETED");
- }
-=20
- static void qpci_pc_register_nodes(void)
-diff --git a/tests/libqos/pci.h b/tests/libqos/pci.h
-index 8e1d292a7d..a5389a5845 100644
---- a/tests/libqos/pci.h
-+++ b/tests/libqos/pci.h
-@@ -123,7 +123,7 @@ QPCIBar qpci_iomap(QPCIDevice *dev, int barno, uint64=
-_t *sizeptr);
- void qpci_iounmap(QPCIDevice *dev, QPCIBar addr);
- QPCIBar qpci_legacy_iomap(QPCIDevice *dev, uint16_t addr);
-=20
--void qpci_unplug_acpi_device_test(const char *id, uint8_t slot);
-+void qpci_unplug_acpi_device_test(QTestState *qs, const char *id, uint8_=
-t slot);
-=20
- void add_qpci_address(QOSGraphEdgeOptions *opts, QPCIAddress *addr);
- #endif
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index b65365934b..fe1168a90a 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -679,6 +679,7 @@ static void pci_hotplug(void *obj, void *data, QGuest=
-Allocator *t_alloc)
- {
-     QVirtioPCIDevice *dev1 =3D obj;
-     QVirtioPCIDevice *dev;
-+    QTestState *qts =3D dev1->pdev->bus->qts;
-=20
-     /* plug secondary disk */
-     qtest_qmp_device_add("virtio-blk-pci", "drv1",
-@@ -693,7 +694,7 @@ static void pci_hotplug(void *obj, void *data, QGuest=
-Allocator *t_alloc)
-     qos_object_destroy((QOSGraphObject *)dev);
-=20
-     /* unplug secondary disk */
--    qpci_unplug_acpi_device_test("drv1", PCI_SLOT_HP);
-+    qpci_unplug_acpi_device_test(qts, "drv1", PCI_SLOT_HP);
- }
-=20
- /*
-diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-index 0d956f36fe..163126cf07 100644
---- a/tests/virtio-net-test.c
-+++ b/tests/virtio-net-test.c
-@@ -162,13 +162,15 @@ static void stop_cont_test(void *obj, void *data, Q=
-GuestAllocator *t_alloc)
-=20
- static void hotplug(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-+    QVirtioPCIDevice *dev =3D obj;
-+    QTestState *qts =3D dev->pdev->bus->qts;
-     const char *arch =3D qtest_get_arch();
-=20
-     qtest_qmp_device_add("virtio-net-pci", "net1",
-                          "{'addr': %s}", stringify(PCI_SLOT_HP));
-=20
-     if (strcmp(arch, "i386") =3D=3D 0 || strcmp(arch, "x86_64") =3D=3D 0=
-) {
--        qpci_unplug_acpi_device_test("net1", PCI_SLOT_HP);
-+        qpci_unplug_acpi_device_test(qts, "net1", PCI_SLOT_HP);
-     }
- }
-=20
-diff --git a/tests/virtio-rng-test.c b/tests/virtio-rng-test.c
-index 5309c7c8ab..fcb22481bd 100644
---- a/tests/virtio-rng-test.c
-+++ b/tests/virtio-rng-test.c
-@@ -16,13 +16,16 @@
-=20
- static void rng_hotplug(void *obj, void *data, QGuestAllocator *alloc)
- {
-+    QVirtioPCIDevice *dev =3D obj;
-+    QTestState *qts =3D dev->pdev->bus->qts;
-+
-     const char *arch =3D qtest_get_arch();
-=20
-     qtest_qmp_device_add("virtio-rng-pci", "rng1",
-                          "{'addr': %s}", stringify(PCI_SLOT_HP));
-=20
-     if (strcmp(arch, "i386") =3D=3D 0 || strcmp(arch, "x86_64") =3D=3D 0=
-) {
--        qpci_unplug_acpi_device_test("rng1", PCI_SLOT_HP);
-+        qpci_unplug_acpi_device_test(qts, "rng1", PCI_SLOT_HP);
-     }
- }
-=20
---=20
-2.21.0
+Are you suggesting that it is beneficial to copy-and-paste a common block
+explanation into 21 commit messages for each of target/foo/?
 
+
+r~
 
