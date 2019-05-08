@@ -2,93 +2,64 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0B0EC04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 04:12:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBC3FC04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 04:28:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B96D214AE
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 04:12:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MU63An3a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B96D214AE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A59D721019
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 04:28:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A59D721019
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=pku.edu.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58554 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58672 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hODw8-0006mk-Oh
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 00:12:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44427)
+	id 1hOEC7-0001vO-Kx
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 00:28:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hODvO-0006Ti-Rg
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 00:11:23 -0400
+	(envelope-from <gxt@pku.edu.cn>) id 1hOEBJ-0001eW-OU
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 00:27:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hODvO-0005VD-2Y
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 00:11:22 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45590)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hODvN-0005Sl-Sy
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 00:11:22 -0400
-Received: by mail-pf1-x443.google.com with SMTP id e24so9766476pfi.12
-	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 21:11:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=EsvgpjsCuDLdHRvorBD5pbGKEopjanR0m9I/vibjsB4=;
-	b=MU63An3aV+9mkpl6OzOtOMwsuTDm9nXrWmgh3zXnxpm997XXvUVmbvjBOjF1zDv9ox
-	k2+jdASvSpP5OW3c/W6uUgvEeWsNCXWMSeBA4lsBtP+9jypHJ11GMQTnq3+JiSofGqfU
-	NZP2jcfAbGRMoTArY8+3QFcJU6D1pTg8sh7Nj2bFTMFHSUGWsM98x9IqQvXQGwI0xrqz
-	FylGd+rM4tXC7XnjHnRJ7AJUFzVAkYogbM2Cti8FGk/Y0t6A9KzzGN5ogVJRdoE1K6Da
-	SXMdib+FGP80aZIB4gGwLFSpZJbMr0Q/JgOgJzgg0W/hxcYPSNKBk4jXbcdGGpQFeg5d
-	UsKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=EsvgpjsCuDLdHRvorBD5pbGKEopjanR0m9I/vibjsB4=;
-	b=YAEm1TAVd3F5t99R4ykt1xHWRuGlugRncHAmCeXlgUifviepUFxHl9Z5iTZy5KDomt
-	MYZEqFUw2fAWvamV+3OHZhKrGsqX8l8yrXr2NxtqLlAWI1mzoxAMAAh1WSugz7uxs0Es
-	3OANUL5kWBcUNqsV73ycisydEAoNtP++XWOp82KNDnZau3/qe2HXJDnmsnRj64QyZhW6
-	NHmooi8zkBuAnPc+SoPqFZzAVD3s0HbncNsidNHUxPHDaokeV00gDLuGS+HeHhT9JGEG
-	3Zp3Iw/Ty2Kxr9vNgBZqp4AYB+ZYOJPBkTCGS7bL20jXSAC8MfOWcllOIroiiOS696or
-	NACg==
-X-Gm-Message-State: APjAAAX3Jjv9gj/ulylapxwb49uG9so4lkpcVjDbax3mv81Ny1UpYo1x
-	uyGC6nM7l/L6YtJqoutucGPvbw==
-X-Google-Smtp-Source: APXvYqzGo7uXIlOqdHt9zKD+NwKNHyWuyD+jwhOw34//btHCDJ8FS1xLjLYmk8DlvvUCdMV8yoi4yw==
-X-Received: by 2002:a63:5c5b:: with SMTP id n27mr34310840pgm.52.1557288680432; 
-	Tue, 07 May 2019 21:11:20 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-189-189.tukw.qwest.net. [97.113.189.189])
-	by smtp.gmail.com with ESMTPSA id
-	n18sm30937698pfi.48.2019.05.07.21.11.19
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 07 May 2019 21:11:19 -0700 (PDT)
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-References: <20190506173353.32206-1-richard.henderson@linaro.org>
-	<20190506173353.32206-14-richard.henderson@linaro.org>
-	<c9f9ca4f-d6b5-0225-96d5-ebbb78c10c4b@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <7e900a3b-303d-8271-2f6b-199b09d75551@linaro.org>
-Date: Tue, 7 May 2019 21:11:17 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <gxt@pku.edu.cn>) id 1hOEBI-0002gt-Nc
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 00:27:49 -0400
+Received: from mx11.pku.edu.cn ([162.105.129.174]:15084 helo=pku.edu.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <gxt@pku.edu.cn>) id 1hOEBI-0002dx-5I
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 00:27:48 -0400
+Received: by ajax-webmail-mailfront04 (Coremail) ; Wed, 8 May 2019 12:27:38
+	+0800 (GMT+08:00)
+X-Originating-IP: [203.187.182.140]
+Date: Wed, 8 May 2019 12:27:38 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: "Guan Xuetao" <gxt@pku.edu.cn>
+To: "peter maydell" <peter.maydell@linaro.org>
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.7b build 20180509(9e2321e9)
+	Copyright (c) 2002-2019 www.mailtech.cn pku.edu.cn
+In-Reply-To: <CAFEAcA_jBgEvFTnSu_KMHD6Ofnr05DvX6mTZD1x7-jhdi8sdJg@mail.gmail.com>
+References: <20190403034358.21999-1-richard.henderson@linaro.org>
+	<20190403034358.21999-23-richard.henderson@linaro.org>
+	<CAFEAcA_jBgEvFTnSu_KMHD6Ofnr05DvX6mTZD1x7-jhdi8sdJg@mail.gmail.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-In-Reply-To: <c9f9ca4f-d6b5-0225-96d5-ebbb78c10c4b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH v4 13/24] linux-user: Call qcrypto_init if
- not using -seed
+Message-ID: <688c1a14.5ab49.16a95b26835.Coremail.gxt@pku.edu.cn>
+X-Coremail-Locale: en_US
+X-CM-TRANSID: 9IFpogAH0yC6WtJcvPCTAg--.11247W
+X-CM-SenderInfo: qqqqliixuslio6sn3hxhgxhubq/1tbiAQAEB1Py8iCO+AAAsH
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW7Jw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 162.105.129.174
+Subject: Re: [Qemu-devel] [PATCH 22/26] target/unicore32: Convert to
+ CPUClass::tlb_fill
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,31 +71,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: richard henderson <richard.henderson@linaro.org>,
+	qemu developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/7/19 7:13 AM, Laurent Vivier wrote:
->> -    if (seed_optarg != NULL) {
->> -        qemu_guest_random_seed_main(seed_optarg, &error_fatal);
->> +    {
->> +        Error *err = NULL;
->> +        if (seed_optarg != NULL) {
->> +            qemu_guest_random_seed_main(seed_optarg, &err);
->> +        } else {
->> +            /* ??? Assumes qcrypto is only used by qemu_guest_getrandom.  */
-> 
-> perhaps you can add a qemu_guest_random_init() function close to this
-> assumption to call qcrypto_init()? So we will not forget to change this if we
-> use something else in the future.
-
-I'm not sure what you're suggesting.
-
-Why would putting qcrypto_init within qemu_guest_random_init make it more
-likely that, if something else within linux-user required qcrypto routines, we
-would remember to remove qemu_guest_random_init and call qcrypto_init exactly once?
-
-
-r~
+Ckl0J3MgT0sgZm9yIHVuaWNvcmUzMiBjb2Rlcy4KClRoYW5rcy4KCkd1YW4gWHVldGFvCgoKPiAt
+LS0tLU9yaWdpbmFsIE1lc3NhZ2VzLS0tLS0KPiBGcm9tOiAiUGV0ZXIgTWF5ZGVsbCIgPHBldGVy
+Lm1heWRlbGxAbGluYXJvLm9yZz4KPiBTZW50IFRpbWU6IDIwMTktMDQtMzAgMTg6MDY6MDMgKFR1
+ZXNkYXkpCj4gVG86ICJSaWNoYXJkIEhlbmRlcnNvbiIgPHJpY2hhcmQuaGVuZGVyc29uQGxpbmFy
+by5vcmc+Cj4gQ2M6ICJRRU1VIERldmVsb3BlcnMiIDxxZW11LWRldmVsQG5vbmdudS5vcmc+LCAi
+R3VhbiBYdWV0YW8iIDxneHRAbXByYy5wa3UuZWR1LmNuPgo+IFN1YmplY3Q6IFJlOiBbUWVtdS1k
+ZXZlbF0gW1BBVENIIDIyLzI2XSB0YXJnZXQvdW5pY29yZTMyOiBDb252ZXJ0IHRvIENQVUNsYXNz
+Ojp0bGJfZmlsbAo+IAo+IE9uIFdlZCwgMyBBcHIgMjAxOSBhdCAwNDo1OCwgUmljaGFyZCBIZW5k
+ZXJzb24KPiA8cmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZz4gd3JvdGU6Cj4gPgo+ID4gQ2M6
+IEd1YW4gWHVldGFvIDxneHRAbXByYy5wa3UuZWR1LmNuPgo+ID4gU2lnbmVkLW9mZi1ieTogUmlj
+aGFyZCBIZW5kZXJzb24gPHJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmc+Cj4gPiAtLS0KPiA+
+ICB0YXJnZXQvdW5pY29yZTMyL2NwdS5oICAgICAgIHwgIDUgKysrLS0KPiA+ICB0YXJnZXQvdW5p
+Y29yZTMyL2NwdS5jICAgICAgIHwgIDUgKy0tLS0KPiA+ICB0YXJnZXQvdW5pY29yZTMyL2hlbHBl
+ci5jICAgIHwgMjMgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiA+ICB0YXJnZXQvdW5pY29yZTMy
+L29wX2hlbHBlci5jIHwgMTQgLS0tLS0tLS0tLS0tLS0KPiA+ICB0YXJnZXQvdW5pY29yZTMyL3Nv
+ZnRtbXUuYyAgIHwgMTkgKysrKysrKysrKysrKysrLS0tLQo+ID4gIDUgZmlsZXMgY2hhbmdlZCwg
+MTkgaW5zZXJ0aW9ucygrKSwgNDcgZGVsZXRpb25zKC0pCj4gCj4gUmV2aWV3ZWQtYnk6IFBldGVy
+IE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz4KPiAKPiBZb3UgbWlnaHQgbm90ZSBp
+biB0aGUgY29tbWl0IG1lc3NhZ2UgdGhhdCB3ZSBjYW4ganVzdCBkZWxldGUKPiB0aGUgdXNlci1t
+b2RlIChub24tKWhhbmRsaW5nIG9mIHRsYiBmaWxsIGJlY2F1c2Ugd2UKPiBkb24ndCBzdXBwb3J0
+IHVuaWNvcmUzMiBsaW51eC11c2VyIGFueSBtb3JlLgo+IAo+IHRoYW5rcwo+IC0tIFBNTQo=
 
