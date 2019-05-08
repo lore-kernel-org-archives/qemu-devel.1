@@ -2,67 +2,64 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDA7C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 08:35:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B6B7C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 08:44:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 245922053B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 08:35:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 245922053B
+	by mail.kernel.org (Postfix) with ESMTPS id 19D6120989
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 08:44:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19D6120989
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33214 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33269 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOI3O-0008P6-Cy
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 04:35:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38649)
+	id 1hOIC9-0003Lo-7O
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 04:44:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hOI2K-0007sV-Dh
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:34:49 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hOIBN-00031Z-2q
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:44:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hOI2J-0006UF-6X
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:34:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40310)
+	(envelope-from <cohuck@redhat.com>) id 1hOIBL-0004i5-VK
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:44:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:8863)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hOI2I-0006Tl-VO
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:34:47 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
+	id 1hOIBL-0004hY-ND; Wed, 08 May 2019 04:44:07 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 15F86308A953;
-	Wed,  8 May 2019 08:34:46 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
-	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 97C1B5D9D6;
-	Wed,  8 May 2019 08:34:45 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 1911D1132B35; Wed,  8 May 2019 10:34:44 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20190419061429.17695-1-ehabkost@redhat.com>
-	<87ftprre87.fsf@dusky.pond.sub.org>
-	<20190506195321.GB28722@habkost.net>
-Date: Wed, 08 May 2019 10:34:44 +0200
-In-Reply-To: <20190506195321.GB28722@habkost.net> (Eduardo Habkost's message
-	of "Mon, 6 May 2019 16:53:21 -0300")
-Message-ID: <877eb173a3.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	by mx1.redhat.com (Postfix) with ESMTPS id 41C61307D962;
+	Wed,  8 May 2019 08:44:06 +0000 (UTC)
+Received: from gondolin (ovpn-204-161.brq.redhat.com [10.40.204.161])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 496F95D9D6;
+	Wed,  8 May 2019 08:44:04 +0000 (UTC)
+Date: Wed, 8 May 2019 10:44:00 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Eric Farman <farman@linux.ibm.com>
+Message-ID: <20190508104400.68e62de0.cohuck@redhat.com>
+In-Reply-To: <42ffdd81-7bbd-1a46-c4f9-3771ea26a84b@linux.ibm.com>
+References: <20190507081251.24307-1-cohuck@redhat.com>
+	<ee335c4c-468a-3e70-fe7e-02d0d77ef9d1@linux.ibm.com>
+	<42ffdd81-7bbd-1a46-c4f9-3771ea26a84b@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Wed, 08 May 2019 08:34:46 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.48]);
+	Wed, 08 May 2019 08:44:06 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/7] Delete 16 *_cpu_class_by_name()
- functions
+Subject: Re: [Qemu-devel] [PATCH RFC v2] s390/css: handle CCW_FLAG_SKIP
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,170 +71,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org,
-	Richard Henderson <rth@twiddle.net>
+Cc: Halil Pasic <pasic@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	qemu-s390x@nongnu.org, qemu-devel@nongnu.org, pmorel@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+On Tue, 7 May 2019 11:31:16 -0400
+Eric Farman <farman@linux.ibm.com> wrote:
 
-> On Mon, May 06, 2019 at 01:53:28PM +0200, Markus Armbruster wrote:
->> Eduardo Habkost <ehabkost@redhat.com> writes:
->> 
->> > This series adds a new CPUClass::class_name_format field, which
->> > allows us to delete 16 of the 21 *_cpu_class_by_name() functions
->> > that exist today.
->> 
->> Which five remain, and why?
->
-> alpha_cpu_class_by_name:
-> * Translates aliases based on alpha_cpu_aliases;
-> * Falls back to "ev67" unconditionally
->   (there's a "TODO: remove match everything nonsense" comment).
->
-> cris_cpu_class_by_name:
-> * Translates "any" alias to "crisv32" if CONFIG_USER_ONLY.
->
-> ppc_cpu_class_by_name:
-> * Supports lookup by PVR if CPU model is a 8 digit hex number;
-> * Converts CPU model to lowercase.
->
-> superh_cpu_class_by_name:
-> * Translates "any" alias to TYPE_SH7750R_CPU.
->
-> sparc_cpu_class_by_name:
-> * Replaces whitespaces with '-' on CPU model name.
+> On 5/7/19 5:08 AM, Pierre Morel wrote:
+> > On 07/05/2019 10:12, Cornelia Huck wrote: =20
+> >> If a ccw has CCW_FLAG_SKIP set, and the command is of type
+> >> read, read backwards, or sense, no data should be written
+> >> to the guest for that command.
+> >>
+> >> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> >> ---
+> >>
+> >> v1 -> v2: fixed checks for command type [Eric]
+> >>
+> >> Still only lightly tested (it boots); I don't think I have a tool
+> >> generating channel programs with the skip flag handy. =20
+>=20
+> FWIW, my test program hits this code once (read of a single page, with=20
+> SLI and SKIP flags set) before getting into the passthrough codepath.
 
-I'm of course asking because I wonder whether we can dumb down this CPU
-naming business to something simpler and more regular.
+Ah, good.
 
-Let's review what we have.
+>=20
+> >>
+> >> ---
+> >> =C2=A0 hw/s390x/css.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+| 22 ++++++++++++++++++----
+> >> =C2=A0 include/hw/s390x/css.h |=C2=A0 1 +
+> >> =C2=A0 2 files changed, 19 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> >> index 8fc9e35ba5d3..080ac7e5bc0b 100644
+> >> --- a/hw/s390x/css.c
+> >> +++ b/hw/s390x/css.c
+> >> @@ -830,8 +830,12 @@ static int ccw_dstream_rw_noflags(CcwDataStream=20
+> >> *cds, void *buff, int len,
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (op =3D=3D CDS_OP_A) {
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto incr;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >> -=C2=A0=C2=A0=C2=A0 ret =3D address_space_rw(&address_space_memory, cd=
+s->cda,
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 MEMTXATTRS_UNSPECIFIED, buff, len, op);
+> >> +=C2=A0=C2=A0=C2=A0 if (!cds->do_skip) {
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D address_space_rw(&=
+address_space_memory, cds->cda,
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 MEMTXATTRS_UNSPECIFIED, buff, len, op);
+> >> +=C2=A0=C2=A0=C2=A0 } else {
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D 0;
+> >> +=C2=A0=C2=A0=C2=A0 }
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret !=3D MEMTX_OK) {
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cds->flags |=3D=
+ CDS_F_STREAM_BROKEN;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;
+> >> @@ -928,8 +932,13 @@ static int ccw_dstream_rw_ida(CcwDataStream *cds,=
+=20
+> >> void *buff, int len,
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 do {
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iter_len =3D MI=
+N(len, cont_left);
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (op !=3D CDS=
+_OP_A) {
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 re=
+t =3D address_space_rw(&address_space_memory, cds->cda,
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 MEMTXATTRS_UNS=
+PECIFIED, buff,=20
+> >> iter_len, op);
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if=
+ (!cds->do_skip) {
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 ret =3D address_space_rw(&address_space_memory, cds->=
+cda,
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 MEMTXATTRS_UNSPECIFIED, buff,=20
+> >> iter_len,
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 op);
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } =
+else {
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 ret =3D 0;
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 if (ret !=3D MEMTX_OK) {
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* assume inaccessible address */
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D -EINVAL; /* channel program check=
+ */
+> >> @@ -968,6 +977,11 @@ void ccw_dstream_init(CcwDataStream *cds, CCW1=20
+> >> const *ccw, ORB const *orb)
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cds->count =3D ccw->count;
+> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cds->cda_orig =3D ccw->cda;
+> >> +=C2=A0=C2=A0=C2=A0 /* skip is only effective for read, read backwards=
+, or sense=20
+> >> commands */
+> >> +=C2=A0=C2=A0=C2=A0 cds->do_skip =3D (ccw->flags & CCW_FLAG_SKIP) &&
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ((ccw->cmd_code & CCW_CMD_=
+BASIC_SENSE) =3D=3D CCW_CMD_BASIC_SENSE ||
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (ccw->cmd_code & 0x0=
+2) =3D=3D 0x02 /* read */ ||
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (ccw->cmd_code & 0x0=
+c) =3D=3D 0x0c /* read backwards */); =20
+> >=20
+> > I think you should use masks like
+> > ((code & 0x3) =3D=3D 2) =3D> READ
+> > ((code & 0xf) =3D=3D 0xc) =3D> READ BACKWARD
+> > ((code & 0xf) =3D=3D 0x4) =3D> SENSE =20
+>=20
+> I think Pierre is right.  In the v2 code, a control CCW (like NOP) would=
+=20
+> still be flagged as a READ.
 
-For all <TARGET> in target/*:
-
-* arm i386 lm32 m68k mips moxie openrisc riscv s390x s390x tricore
-  unicore32 xtensa
-
-  CPU type name format is <TARGET>_CPU_TYPE_NAME("%s"), which boils down
-  to:
-
-  - arm lm32 m68k moxie riscv s390x tricore unicore32 xtensa
-    "%s-<TARGET>-cpu"
-
-  - openrisc
-    "%s-or1k-cpu"
-
-  - i386
-    "%s-x86_64-cpu" #ifdef TARGET_X86_64
-    "%s-i386-cpu" #else
-
-  - mips
-    "%s-mips64-cpu" #ifdef TARGET_MIPS64
-    "%s-mips-cpu" #else
-
-  The %s gets replaced by the user's cpu model.
-
-* hppa microblaze nios2 tilegx
-
-  CPU type name format is <TARGET>-cpu.  The user's cpu model seems
-  silently ignored.
-
-* alpha cris ppc sh4 sparc
-
-  No format, using ->class_by_name()
-
-  - alpha
-
-    CPU type name format is "%s-alpha-cpu".
-
-    alpha_cpu_class_by_name() recognizes the full name, the full name
-    without "-alpha-cpu" suffix, and a bunch of aliases.
-
-  - cris
-
-    CPU type name format is "%s-cris-cpu".
-
-    cris_cpu_class_by_name() recognizes the name without the "-cris-cpu"
-    suffix, plus "any" as alias for "crisv32-cris-cpu" #ifdef
-    CONFIG_USER_ONLY (this is the default CPU type for machine
-    "axis-dev88"; the other machine "none" has no default).
-
-  - ppc
-
-    CPU type name format is
-    "%s-powerpc64-cpu" #ifdef TARGET_PPC64
-    "%s-powerpc-cpu" #else
-
-    ppc_cpu_class_by_name() recognizes the name without the suffix, plus
-    the CPU type's PVR (8 digit hex number), plus a bunch of (case
-    insensitive) aliases.
-
-  - sh4
-
-    CPU type name format is "%s-superh-cpu".
-
-    superh_cpu_class_by_name() recognizes the name without the suffix,
-    plus "any" as alias for "sh7750r-superh-cpu" (this is the default
-    CPU type for machine "shix"; machines "r2d" defaults to "sh7751r",
-    and "none" has no default).
-
-  - sparc
-
-    CPU type name format is
-    "%s-sparc64-cpu" #ifdef TARGET_SPARC64
-    "%s-sparc-cpu" #else
-
-    sparc_cpu_class_by_name() recognizes the name without the suffix,
-    mapping any spaces in the user's cpu model to '-'.
-
-Observations:
-
-* The CPU type name format is generally "%s-T-cpu", where T is either
-  <TARGET> or <TARGET>64.
-
-  Exceptions:
-
-  - openrisc, sh4 uses or1k, superh instead.  Looks pointless to me.
-
-  - i386 uses x86_64 instead of i38664.  Makes sense.
-
-  - hppa, microblaze, nios2 and tilegx use CPU type name format "T-cpu",
-    ignoring the user's cpu model.  These exceptions looks pointless to
-    me.
-
-* The user's CPU model is generally the "%s" part of the format.
-
-  Exceptions:
-
-  - alpha additionaly recognizes full type names.  If that's useful for
-    alpha (I'm not sure it is), why isn't it useful for all other
-    targets?
-
-  - cris and sh4 additionaly recognize an "any" alias, cris only #ifdef
-    CONFIG_USER_ONLY.
-
-    Until PATCH 4, arm also recognizes an "any" alias #ifdef
-    CONFIG_USER_ONLY.  PATCH 4 drops that, because it's redundant with
-    the "any" CPU, which is a copy instead of an alias.  Sure we want to
-    do have different targets do "any" in different ways?
-
-    See aliases below.
-
-  - ppc additionaly recognizes PVR aliases and additional (case
-    insensitive) aliases.  Feels overengineered to me.  See aliases
-    below.
-
-  - sparc additionally recognizes aliases with ' ' instead of '-'.
-    Feels pointless to me.  See aliases below.
-
-* What about deprecating pointless exceptions?
-
-* Aliases
-
-  We have several targets roll their own CPU name aliases code.
-  Assuming aliases are here to stay (i.e. we're not deprecating all of
-  them): what about letting each CPU type specify a set of aliases, so
-  we can recognize them in generic code?
+Sigh. I hope third time's the charm.
 
