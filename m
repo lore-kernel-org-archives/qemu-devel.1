@@ -2,62 +2,65 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A986C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:08:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B848C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:10:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60F0B2053B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:08:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60F0B2053B
+	by mail.kernel.org (Postfix) with ESMTPS id 016E12053B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:10:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 016E12053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33563 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33597 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOIZ2-0000e3-IZ
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 05:08:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42166)
+	id 1hOIaj-0001lH-4r
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 05:10:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hOINp-0007gi-Q6
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:57:06 -0400
+	(envelope-from <berrange@redhat.com>) id 1hOIUV-0005WJ-OK
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:04:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hOINn-00032d-W1
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:57:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52916)
+	(envelope-from <berrange@redhat.com>) id 1hOIUU-0007ls-Kf
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:03:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34840)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hOINn-00032A-N0
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:56:59 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <berrange@redhat.com>)
+	id 1hOIUR-0007jB-CC; Wed, 08 May 2019 05:03:51 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F07DC3082E8E;
-	Wed,  8 May 2019 08:56:58 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-45.ams2.redhat.com
-	[10.36.116.45])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D1BBC5D9C8;
-	Wed,  8 May 2019 08:56:53 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 078C3A208; Wed,  8 May 2019 10:56:46 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed,  8 May 2019 10:56:41 +0200
-Message-Id: <20190508085645.11595-10-kraxel@redhat.com>
-In-Reply-To: <20190508085645.11595-1-kraxel@redhat.com>
-References: <20190508085645.11595-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+	by mx1.redhat.com (Postfix) with ESMTPS id B600F5277B;
+	Wed,  8 May 2019 09:03:49 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.22.189])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5DE9D60C6A;
+	Wed,  8 May 2019 09:03:48 +0000 (UTC)
+Date: Wed, 8 May 2019 10:03:45 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190508090345.GB32552@redhat.com>
+References: <20190507183610.9848-1-mreitz@redhat.com>
+	<20190507183610.9848-2-mreitz@redhat.com>
+	<81dd6702-1d51-ca2e-1445-e8cdcfb14711@redhat.com>
+	<f34fb38c-22dd-1ed3-821d-7c8a9ea8943a@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f34fb38c-22dd-1ed3-821d-7c8a9ea8943a@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Wed, 08 May 2019 08:56:59 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.29]);
+	Wed, 08 May 2019 09:03:49 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 09/13] tests/vm: openbsd autoinstall,
- using serial console
+Subject: Re: [Qemu-devel] [PATCH 1/5] qemu-nbd: Add --pid-file option
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,203 +72,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead of fetching the prebuilt image from patchew download the install
-iso and prepare the image locally.  Install to disk, using the serial
-console.  Create qemu user, configure ssh login.  Install packages
-needed for qemu builds.
+On Tue, May 07, 2019 at 09:39:01PM +0200, Max Reitz wrote:
+> On 07.05.19 21:30, Eric Blake wrote:
+> > On 5/7/19 1:36 PM, Max Reitz wrote:
+> >> --fork is a bit boring if there is no way to get the child's PID.  This
+> >> option helps.
+> >>
+> >> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >> ---
+> >>  qemu-nbd.c    | 29 +++++++++++++++++++++++++++++
+> >>  qemu-nbd.texi |  2 ++
+> >>  2 files changed, 31 insertions(+)
+> >>
+> > 
+> >> @@ -111,6 +112,7 @@ static void usage(const char *name)
+> >>  "                            specify tracing options\n"
+> >>  "  --fork                    fork off the server process and exit the parent\n"
+> >>  "                            once the server is running\n"
+> >> +"  --pid-file=PATH           store the server's process ID in the given file\n"
+> > 
+> > Should --pid-file imply --fork, or be an error if --fork was not
+> > supplied? As coded, it writes a pid file regardless of --fork, even
+> > though it is less obvious that it is useful in that case. I don't have a
+> > strong preference (there doesn't seem to be a useful consensus on what
+> > forking daemons should do), but it would at least be worth documenting
+> > the intended action (even if that implies a tweak to the patch to match
+> > the intent).
+> 
+> I think the documentation is pretty clear.  It stores the server's PID,
+> whether it has been forked or not.
+> 
+> I don't think we would gain anything from forbidding --pid-file without
+> --fork, would we?
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- tests/vm/openbsd | 150 +++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 138 insertions(+), 12 deletions(-)
+Indeed, use of --pid-file should be independant of --fork, as a mgmt app
+may have already forked it into the background, and merely want to get
+the pidfile
 
-diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-index 2105c01a267a..02f07026debe 100755
---- a/tests/vm/openbsd
-+++ b/tests/vm/openbsd
-@@ -13,34 +13,160 @@
- 
- import os
- import sys
-+import socket
- import subprocess
- import basevm
- 
- class OpenBSDVM(basevm.BaseVM):
-     name = "openbsd"
-     arch = "x86_64"
-+
-+    link = "https://cdn.openbsd.org/pub/OpenBSD/6.5/amd64/install65.iso"
-+    csum = "38d1f8cadd502f1c27bf05c5abde6cc505dd28f3f34f8a941048ff9a54f9f608"
-+    size = "20G"
-+    pkgs = [
-+        # tools
-+        "git",
-+        "pkgconf",
-+        "bzip2", "xz",
-+
-+        # gnu tools
-+        "bash",
-+        "gmake",
-+        "gsed",
-+        "bison",
-+
-+        # libs: usb
-+        "libusb1",
-+
-+        # libs: crypto
-+        "gnutls",
-+
-+        # libs: images
-+        "jpeg",
-+        "png",
-+
-+	# libs: ui
-+        "sdl2",
-+        "gtk+3",
-+        "libxkbcommon",
-+    ]
-+
-     BUILD_SCRIPT = """
-         set -e;
--        rm -rf /var/tmp/qemu-test.*
--        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-+        rm -rf /home/qemu/qemu-test.*
-+        cd $(mktemp -d /home/qemu/qemu-test.XXXXXX);
-+        mkdir src build; cd src;
-         tar -xf /dev/rsd1c;
--        ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4 --python=python2.7 {configure_opts};
--        gmake --output-sync -j{jobs} {verbose};
--        # XXX: "gmake check" seems to always hang or fail
--        #gmake --output-sync -j{jobs} check {verbose};
-+        cd ../build
-+        ../src/configure --cc=cc --python=python3 {configure_opts};
-+        gmake --output-sync -j{jobs} {target} {verbose};
-     """
- 
-     def build_image(self, img):
--        cimg = self._download_with_cache("http://download.patchew.org/openbsd-6.1-amd64.img.xz",
--                sha256sum='8c6cedc483e602cfee5e04f0406c64eb99138495e8ca580bc0293bcf0640c1bf')
--        img_tmp_xz = img + ".tmp.xz"
-+        self.print_step("Downloading install iso")
-+        cimg = self._download_with_cache(self.link, sha256sum=self.csum)
-         img_tmp = img + ".tmp"
--        sys.stderr.write("Extracting the image...\n")
--        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
--        subprocess.check_call(["xz", "-dvf", img_tmp_xz])
-+        iso = img + ".install.iso"
-+
-+        self.print_step("Preparing iso and disk image")
-+        subprocess.check_call(["cp", "-f", cimg, iso])
-+        subprocess.check_call(["qemu-img", "create", "-f", "qcow2",
-+                               img_tmp, self.size])
-+
-+        self.print_step("Booting installer")
-+        self.boot(img_tmp, extra_args = [
-+            "-machine", "graphics=off",
-+            "-cdrom", iso
-+        ])
-+        self.console_init()
-+        self.console_wait_send("boot>", "set tty com0\n")
-+        self.console_wait_send("boot>", "\n")
-+
-+        # pre-install configuration
-+        self.console_wait_send("(I)nstall",               "i\n")
-+        self.console_wait_send("Terminal type",           "xterm\n")
-+        self.console_wait_send("System hostname",         "openbsd\n")
-+        self.console_wait_send("Which network interface", "vio0\n")
-+        self.console_wait_send("IPv4 address",            "dhcp\n")
-+        self.console_wait_send("IPv6 address",            "none\n")
-+        self.console_wait_send("Which network interface", "done\n")
-+        self.console_wait_send("DNS domain name",         "localnet\n")
-+        self.console_wait("Password for root account")
-+        self.console_send("%s\n" % self.ROOT_PASS)
-+        self.console_wait("Password for root account")
-+        self.console_send("%s\n" % self.ROOT_PASS)
-+        self.console_wait_send("Start sshd(8)",           "yes\n")
-+        self.console_wait_send("X Window System",         "\n")
-+        self.console_wait_send("xenodm",                  "\n")
-+        self.console_wait_send("console to com0",         "\n")
-+        self.console_wait_send("Which speed",             "\n")
-+
-+        self.console_wait("Setup a user")
-+        self.console_send("%s\n" % self.GUEST_USER)
-+        self.console_wait("Full name")
-+        self.console_send("%s\n" % self.GUEST_USER)
-+        self.console_wait("Password")
-+        self.console_send("%s\n" % self.GUEST_PASS)
-+        self.console_wait("Password")
-+        self.console_send("%s\n" % self.GUEST_PASS)
-+
-+        self.console_wait_send("Allow root ssh login",    "yes\n")
-+        self.console_wait_send("timezone",                "UTC\n")
-+        self.console_wait_send("root disk",               "\n")
-+        self.console_wait_send("(W)hole disk",            "\n")
-+        self.console_wait_send("(A)uto layout",           "\n")
-+        self.console_wait_send("Location of sets",        "cd0\n")
-+        self.console_wait_send("Pathname to the sets",    "\n")
-+        self.console_wait_send("Set name(s)",             "\n")
-+        self.console_wait_send("without verification",    "yes\n")
-+
-+        self.print_step("Installation started now, this will take a while")
-+        self.console_wait_send("Location of sets",        "done\n")
-+
-+        self.console_wait("successfully completed")
-+        self.print_step("Installation finished, rebooting")
-+        self.console_wait_send("(R)eboot",                "reboot\n")
-+
-+        # setup qemu user
-+        prompt = "$"
-+        self.console_ssh_init(prompt, self.GUEST_USER, self.GUEST_PASS)
-+        self.console_wait_send(prompt, "exit\n")
-+
-+        # setup root user
-+        prompt = "openbsd#"
-+        self.console_ssh_init(prompt, "root", self.ROOT_PASS)
-+        self.console_sshd_config(prompt)
-+
-+        # setup virtio-blk #1 (tarfile)
-+        self.console_wait(prompt)
-+        self.console_send("echo 'chmod 666 /dev/rsd1c' >> /etc/rc.local\n")
-+
-+        # enable w+x for /home
-+        self.console_wait(prompt)
-+        self.console_send("sed -i -e '/home/s/rw,/rw,wxallowed,/' /etc/fstab\n")
-+
-+        # use http (be proxy cache friendly)
-+        self.console_wait(prompt)
-+        self.console_send("sed -i -e 's/https/http/' /etc/installurl\n")
-+
-+        self.print_step("Configuration finished, rebooting")
-+        self.console_wait_send(prompt, "reboot\n")
-+        self.console_wait("login:")
-+        self.wait_ssh()
-+
-+        self.print_step("Installing packages")
-+        self.ssh_root_check("pkg_add %s\n" % " ".join(self.pkgs))
-+
-+        # shutdown
-+        self.ssh_root("halt -p")
-+        self.wait()
-+
-         if os.path.exists(img):
-             os.remove(img)
-         os.rename(img_tmp, img)
-+        os.remove(iso)
-+        self.print_step("All done")
- 
- if __name__ == "__main__":
-     sys.exit(basevm.main(OpenBSDVM))
+Regards,
+Daniel
 -- 
-2.18.1
-
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
