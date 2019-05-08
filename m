@@ -2,76 +2,77 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30211C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 10:10:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B11E9C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 10:10:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02D3920578
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 10:10:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02D3920578
+	by mail.kernel.org (Postfix) with ESMTPS id 86A1820578
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 10:10:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86A1820578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34209 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34242 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOJWb-0004dm-21
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 06:10:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54726)
+	id 1hOJXG-00058S-MG
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 06:10:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hOJVc-0004GO-1Y
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 06:09:09 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hOJW2-0004TG-Oa
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 06:09:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hOJVa-0002Gz-GZ
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 06:09:07 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:36100)
+	(envelope-from <pbonzini@redhat.com>) id 1hOJW1-0002Q4-Ec
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 06:09:34 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:54003)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOJVa-0002F5-Aa
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 06:09:06 -0400
-Received: by mail-wm1-f66.google.com with SMTP id j187so2486890wmj.1
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 03:09:04 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOJW0-0002PR-SB
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 06:09:33 -0400
+Received: by mail-wm1-f65.google.com with SMTP id 198so2499965wme.3
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 03:09:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
 	:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=0hnsObrnE+yAqmrYPin9nzrZ/lplUfXQpq+5wKVmnSc=;
-	b=sFg9Y6wKG0hJF5D01n9FUNJrC1DHfvzxnHLR3RhsE41Gc7hNnvvcB00Ud0RcyY/EKl
-	4n4wOmMVcan5mCqWF05AiYE4ivxCxzbRshlDqvLLVWlr6pj432KU95/YJacSxXuxaQ3/
-	weroNgahydR+9YI85PN/RwTYX8VGX4ECjlznrSmBFveatoy9D+rQNwIdbm8J78rycLbY
-	Q5tBKKVOUULXAE89g/H8nDDlaoJASCFsXbYBMlFCbm2ecnBE/lVYmnnlj8WcDs2HoDS+
-	pq9fyqbhEbyUKnSgZbovILt+ArwRUAWHmz8oQN3mXMOBQeVlfbKTZIXiuF3VFcdFmWV3
-	g0MA==
-X-Gm-Message-State: APjAAAXY3iaGZectNzLTZ1jg1PhHJf446R9Pn2740Vi2wp4KpMcyomfZ
-	EdTMVB+X492Xyz7rW76jHMAebw==
-X-Google-Smtp-Source: APXvYqx2CnJxtUfDQyq14LPpvR8iFnkcCrFV4KtYM+IIp3677BBpAwRcs84n5Y+uB3692vZDzn/oUA==
-X-Received: by 2002:a05:600c:3d1:: with SMTP id
-	z17mr2411613wmd.27.1557310142719; 
-	Wed, 08 May 2019 03:09:02 -0700 (PDT)
+	bh=Zl/ag0j59R78ioltGC0oApLxj+x2SXVqFcJvsiVMx8k=;
+	b=D1mWKd+Dde2QrGFV0R98+bihOcGKWTM0fqbZlHGYGftjHaJiDf0zCRQBUmP9N6yae3
+	Ib44JF2WdTmO89nDFlx8wh5tyP8MGW7+/EX3U9nNtTDzM1I2fZiVIDFyQMn2xfKXfkWy
+	9K8pFNjq/tIT1CjvRkNwLfisFG/4euPhVXefZDvv4TM6L2UtW9O9LUTSmhN8dTtA6Oqy
+	iQcTKX6VLd18UvQzs8slRalZ0GnMb9hQuKQhrvTew6Vr7XZ6aKZK3K/Tk9Xgf1Ozde1m
+	YMGBsB9Fjfzq+GXxAV3EjljL/Sv4XV6VJ22lp1dVC0ipLkDxKoY6/l5egX6fWapnadG6
+	o5wg==
+X-Gm-Message-State: APjAAAXETjYE4ALRqz1tkG82zjkeMEYWlb2mEPAKb3+UeIRNWeuCkJRN
+	ceoMxXzs1xsZRXURo/OTyUl6Ow==
+X-Google-Smtp-Source: APXvYqwXXn3dHtOKTDBcV6KONfDZGcVgBjYQiZyxVKTqiqXA7MZVg3M2Q+U7W7NSRfbwhae6Ip9anA==
+X-Received: by 2002:a1c:14e:: with SMTP id 75mr2582745wmb.100.1557310171791;
+	Wed, 08 May 2019 03:09:31 -0700 (PDT)
 Received: from [10.201.49.229] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
-	by smtp.gmail.com with ESMTPSA id z74sm3111762wmc.2.2019.05.08.03.09.01
+	by smtp.gmail.com with ESMTPSA id j4sm8379510wrw.94.2019.05.08.03.09.30
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 08 May 2019 03:09:02 -0700 (PDT)
+	Wed, 08 May 2019 03:09:31 -0700 (PDT)
 To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
 References: <20190508061523.17666-1-peterx@redhat.com>
+	<20190508061523.17666-4-peterx@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4df1963e-5b76-4990-6c2f-a66ecd172869@redhat.com>
-Date: Wed, 8 May 2019 12:09:00 +0200
+Message-ID: <ef78aa6a-0634-f479-72fb-364af13ab037@redhat.com>
+Date: Wed, 8 May 2019 12:09:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190508061523.17666-1-peterx@redhat.com>
+In-Reply-To: <20190508061523.17666-4-peterx@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH 00/11] kvm/migration: support
- KVM_CLEAR_DIRTY_LOG
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH 03/11] memory: Don't set migration bitmap
+ when without migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,53 +92,75 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 08/05/19 01:15, Peter Xu wrote:
-> Design
-> ===================
+> Similar to 9460dee4b2 ("memory: do not touch code dirty bitmap unless
+> TCG is enabled", 2015-06-05) but for the migration bitmap - we can
+> skip the MIGRATION bitmap update if migration not enabled.
 > 
-> I started with a naive/stupid design that I always pass all 1's to the
-> KVM for a memory range to clear all the dirty bits within that memory
-> range, but then I encountered guest oops - it's simply because we
-> can't clear any dirty bit from QEMU if we are not _sure_ that the bit
-> is dirty in the kernel.  Otherwise we might accidentally clear a bit
-> that we don't even know of (e.g., the bit was clear in migration's
-> dirty bitmap in QEMU) but actually that page was just being written so
-> QEMU will never remember to migrate that new page again.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  include/exec/memory.h   |  2 ++
+>  include/exec/ram_addr.h | 12 +++++++++++-
+>  memory.c                |  2 +-
+>  3 files changed, 14 insertions(+), 2 deletions(-)
 > 
-> The new design is focused on a dirty bitmap cache within the QEMU kvm
-> layer (which is per kvm memory slot).  With that we know what's dirty
-> in the kernel previously (note! the kernel bitmap is still growing all
-> the time so the cache will only be a subset of the realtime kernel
-> bitmap but that's far enough for us) and with that we'll be sure to
-> not accidentally clear unknown dirty pages.
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index e6140e8a04..f29300c54d 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -46,6 +46,8 @@
+>          OBJECT_GET_CLASS(IOMMUMemoryRegionClass, (obj), \
+>                           TYPE_IOMMU_MEMORY_REGION)
+>  
+> +extern bool global_dirty_log;
+> +
+>  typedef struct MemoryRegionOps MemoryRegionOps;
+>  typedef struct MemoryRegionMmio MemoryRegionMmio;
+>  
+> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> index 993fb760f3..86bc8e1a4a 100644
+> --- a/include/exec/ram_addr.h
+> +++ b/include/exec/ram_addr.h
+> @@ -348,8 +348,13 @@ static inline void cpu_physical_memory_set_dirty_lebitmap(unsigned long *bitmap,
+>              if (bitmap[k]) {
+>                  unsigned long temp = leul_to_cpu(bitmap[k]);
+>  
+> -                atomic_or(&blocks[DIRTY_MEMORY_MIGRATION][idx][offset], temp);
+>                  atomic_or(&blocks[DIRTY_MEMORY_VGA][idx][offset], temp);
+> +
+> +                if (global_dirty_log) {
+> +                    atomic_or(&blocks[DIRTY_MEMORY_MIGRATION][idx][offset],
+> +                              temp);
+> +                }
+> +
+>                  if (tcg_enabled()) {
+>                      atomic_or(&blocks[DIRTY_MEMORY_CODE][idx][offset], temp);
+>                  }
+> @@ -366,6 +371,11 @@ static inline void cpu_physical_memory_set_dirty_lebitmap(unsigned long *bitmap,
+>          xen_hvm_modified_memory(start, pages << TARGET_PAGE_BITS);
+>      } else {
+>          uint8_t clients = tcg_enabled() ? DIRTY_CLIENTS_ALL : DIRTY_CLIENTS_NOCODE;
+> +
+> +        if (!global_dirty_log) {
+> +            clients &= ~(1 << DIRTY_MEMORY_MIGRATION);
+> +        }
+> +
+>          /*
+>           * bitmap-traveling is faster than memory-traveling (for addr...)
+>           * especially when most of the memory is not dirty.
+> diff --git a/memory.c b/memory.c
+> index 0cce3a6fc5..1cc3531df5 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -38,7 +38,7 @@
+>  static unsigned memory_region_transaction_depth;
+>  static bool memory_region_update_pending;
+>  static bool ioeventfd_update_pending;
+> -static bool global_dirty_log = false;
+> +bool global_dirty_log;
+>  
+>  static QTAILQ_HEAD(, MemoryListener) memory_listeners
+>      = QTAILQ_HEAD_INITIALIZER(memory_listeners);
 > 
-> With this method, we can also avoid race when multiple users (e.g.,
-> DIRTY_MEMORY_VGA and DIRTY_MEMORY_MIGRATION) want to clear the bit for
-> multiple time.  If without the kvm memory slot cached dirty bitmap we
-> won't be able to know which bit has been cleared and then if we send
-> the CLEAR operation upon the same bit twice (or more) we can still
-> face the same issue to clear something accidentally while we
-> shouldn't.
-> 
-> Summary: we really need to be careful on what bit to clear otherwise
-> we can face anything after the migration completes.  And I hope this
-> series has considered all about this.
 
-The disadvantage of this is that you won't clear in the kernel those
-dirty bits that come from other sources (e.g. vhost or
-address_space_map).  This can lead to double-copying of pages.
-
-Migration already makes a local copy in rb->bmap, and
-memory_region_snapshot_and_clear_dirty can also do the clear.  Would it
-be possible to invoke the clear using rb->bmap instead of the KVMSlot's
-new bitmap?
-
-Thanks,
-
-Paolo
-
-> Besides the new KVM cache layer and the new ioctl support, this series
-> introduced the memory_region_clear_dirty_bitmap() in the memory API
-> layer to allow clearing dirty bits of a specific memory range within
-> the memory region.
-
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
