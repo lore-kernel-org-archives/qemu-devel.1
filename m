@@ -4,82 +4,84 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B752CC004C9
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 00:21:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17CC2C004C9
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 00:21:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B2E220675
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 00:21:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C326C20675
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 00:21:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="StJEqMV/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B2E220675
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cV4xNnuY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C326C20675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56586 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56588 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOAKk-0002Ij-Ij
-	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 20:21:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39428)
+	id 1hOAKm-0002T8-VF
+	for qemu-devel@archiver.kernel.org; Tue, 07 May 2019 20:21:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOA73-0007TZ-PS
+	(envelope-from <richard.henderson@linaro.org>) id 1hOA75-0007Vh-Cl
 	for qemu-devel@nongnu.org; Tue, 07 May 2019 20:07:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOA70-0006hp-R6
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 20:07:09 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:36913)
+	(envelope-from <richard.henderson@linaro.org>) id 1hOA73-0006pP-Ef
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 20:07:11 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:38441)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hOA70-0006Vt-G6
-	for qemu-devel@nongnu.org; Tue, 07 May 2019 20:07:06 -0400
-Received: by mail-pl1-x642.google.com with SMTP id p15so1773519pll.4
-	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 17:07:04 -0700 (PDT)
+	id 1hOA73-0006k6-6G
+	for qemu-devel@nongnu.org; Tue, 07 May 2019 20:07:09 -0400
+Received: by mail-pg1-x542.google.com with SMTP id j26so9119834pgl.5
+	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 17:07:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:subject:date:message-id:in-reply-to:references;
-	bh=FiCZqSS6wKeRmYap2qgvPaqBc3zhhAWRiK2tapmwRp0=;
-	b=StJEqMV/ONt31ki94vL/nc3jD5/uHic6KdHehlbERjIriJH3sCWbw4F+A2N015lrbv
-	8orKTZ1Hs+C7TLXzcThbrgAZflUne0k/IWbWdPLMc0oaglk/VyHxizHVECeq2u7JPDEN
-	rWHU/HJC9PsPzPWArQZG5f56q6cVwfhx86a4XFgdzmmBiqMUvHkV7GBWiu7bZ+oT6LV/
-	HQ+o82R8fvxaTyrnUnFX6C7fRjGdX/UzL/sBtwOyRKLctQpYK28h99UFalZCz+D5hTxE
-	9pJcs35bIo0LOdtRalwqHRNw5I6qjCnvlURn130uBYZcAlOn7LVqGrxIw4OXBHcoiXll
-	NWHg==
+	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+	:content-transfer-encoding;
+	bh=lKj9T9SvEdDtkOj7GMn7I6YU14mL8+jmmJ3Y/sA0GK8=;
+	b=cV4xNnuYVxZy0635i+nyBtPTqBbrFH5417YFq0GjJMUjotNCv7AFLHUgelpXbRvBwW
+	LBpYI3VY2fdVYSL4aDBO4IIkyyOffaa6fGWrt5GvysH+ygrqpodE237FjwEfVMjfk7Ao
+	u0Ghiw752/VWy4JVEvQ8AbJBhjtGTY+e0jSw/9CLkDK4pjkfhrsX8AKbJEw5GIn1UPOv
+	Z8mAknaIJX4q692tdqX2wdKaNLl3meyhcokHn34mwKTipj301HYCuj/jLM/ne2u517EC
+	MMk2DOzJBP/EP4PFJfulBMYfv+Dja1IFYSMaFbxclJaRtgPrLMOUa5bGoOjsW/zHZAOM
+	39Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-	:references;
-	bh=FiCZqSS6wKeRmYap2qgvPaqBc3zhhAWRiK2tapmwRp0=;
-	b=LUkGIZLE3XNLdvz2Tajq4YXVTsk38yo8PyeK2G2My1xbtdx7ItHc04KKAR6GkR4cTd
-	KLIE8xzHjjvTfMLzyyS1HzRboEaRetCp0sfqePPKeyPMFiNw+lzr6LSC620W/oLojUKl
-	G+OJkIw0YeIlX/mdhEQojdvXxKPbtrLnH6o+PubnSwuRmHvm3x22/kjpIKM7n41acWZS
-	U8rmCdwXxvFxI4rtoOLG4p1wFM/u8q2zPNPo80XJHWZaRunhnDl81RiYFT/cr55ueD8t
-	aLtNmKjxu2o+wCgnv8LMlzNrXQBUDxa1XBK++b8JSimAZBHfJFOF0WxeJnLGCjtlh34X
-	7knA==
-X-Gm-Message-State: APjAAAXzIAsu6abkssMYn+RZc8j+F+MBtjzieXPEFm5VEGlNh+Xb1dMH
-	DaNSvviR797irNdwGJyyrdfwXoM0LPE=
-X-Google-Smtp-Source: APXvYqxrnpxzsBFUmcjl3IkjiXytq1bIO2CexHKzWE4R78geA98B34QKlS4kl15exoVupKceai1UFw==
-X-Received: by 2002:a17:902:4283:: with SMTP id
-	h3mr42536564pld.176.1557274021832; 
-	Tue, 07 May 2019 17:07:01 -0700 (PDT)
+	:references:mime-version:content-transfer-encoding;
+	bh=lKj9T9SvEdDtkOj7GMn7I6YU14mL8+jmmJ3Y/sA0GK8=;
+	b=BGWtDqQnT4To+RM62ipjtk18X/g9IFU5n+8lZyB+6AlUTc0/OW9I0nTnizEHCv9ExS
+	1fTN+6SxvnGz/n9YYaa5rJaEBcfTcq+Ow9vP8Z3GMA5jY2pLfu6UvcbAh5U5wQanu48r
+	QTicwWyss0iFaGnWvQDnRzDbuvAe1nww+UTUT+8Z8VHXsRU++Dfc14lYdODyPhaQ/2bj
+	MheCtv5y//Ya0X1or7zCpelg9SOQnOE79J+lYIUw7xFQ1GuXnMCVNOQqW/5WROCUT3Nf
+	8DCFh2cTu27r1fIizIpqs2GDeyrrknK3B7wQhE/rNDZALeTSHeF+2XVcDl7v/9JloXr4
+	TTVA==
+X-Gm-Message-State: APjAAAUudqILd801kR31KW3jBBKJS75OcDkppk6SWceuSyrY0Z9rU73H
+	B0IpIK+W0BwUWfzbnKzphTNgLOxNnY4=
+X-Google-Smtp-Source: APXvYqzqKGwaKYXy5MrmobMoyXVQ7MJjGmfYbIbJd55An8Oe7+ss0SHtWE2RwZDiqt3GMjSxOo1ymQ==
+X-Received: by 2002:a62:b411:: with SMTP id h17mr44520823pfn.61.1557274026677; 
+	Tue, 07 May 2019 17:07:06 -0700 (PDT)
 Received: from localhost.localdomain (97-113-189-189.tukw.qwest.net.
 	[97.113.189.189]) by smtp.gmail.com with ESMTPSA id
-	j1sm15793183pgp.91.2019.05.07.17.07.00 for <qemu-devel@nongnu.org>
+	j1sm15793183pgp.91.2019.05.07.17.07.05 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 07 May 2019 17:07:01 -0700 (PDT)
+	Tue, 07 May 2019 17:07:05 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  7 May 2019 17:06:16 -0700
-Message-Id: <20190508000641.19090-15-richard.henderson@linaro.org>
+Date: Tue,  7 May 2019 17:06:20 -0700
+Message-Id: <20190508000641.19090-19-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190508000641.19090-1-richard.henderson@linaro.org>
 References: <20190508000641.19090-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::642
-Subject: [Qemu-devel] [PATCH v3 14/39] target/i386: Use env_cpu, env_archcpu
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: [Qemu-devel] [PATCH v3 18/39] target/mips: Use env_cpu, env_archcpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,623 +97,299 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Combined uses of CPU(x86_env_get_cpu()) were failures to use
-the more proper, ENV_GET_CPU macro, now replaced by env_cpu.
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/i386/cpu.h          |  5 -----
- bsd-user/main.c            |  3 +--
- hw/i386/kvmvapic.c         |  4 ++--
- hw/i386/pc.c               |  2 +-
- linux-user/i386/cpu_loop.c |  2 +-
- linux-user/i386/signal.c   |  2 +-
- linux-user/vm86.c          | 18 +++++++++---------
- target/i386/bpt_helper.c   |  4 ++--
- target/i386/cpu.c          |  4 ++--
- target/i386/excp_helper.c  |  2 +-
- target/i386/fpu_helper.c   |  2 +-
- target/i386/helper.c       | 16 ++++++----------
- target/i386/misc_helper.c  | 24 +++++++++++-------------
- target/i386/seg_helper.c   | 14 +++++++-------
- target/i386/smm_helper.c   |  4 ++--
- target/i386/svm_helper.c   | 22 +++++++++++-----------
- 16 files changed, 58 insertions(+), 70 deletions(-)
+ target/mips/cpu.h                |  5 -----
+ hw/intc/mips_gic.c               |  2 +-
+ hw/mips/mips_int.c               |  2 +-
+ linux-user/mips/cpu_loop.c       |  2 +-
+ target/mips/helper.c             | 15 +++++----------
+ target/mips/op_helper.c          | 25 +++++++++++--------------
+ target/mips/translate.c          |  3 +--
+ target/mips/translate_init.inc.c |  4 +---
+ 8 files changed, 21 insertions(+), 37 deletions(-)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 2546ffa4d4..e7f94437b1 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1479,11 +1479,6 @@ struct X86CPU {
-     int32_t hv_max_vps;
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 31e15834ca..e0645eb1d1 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -1051,11 +1051,6 @@ struct MIPSCPU {
+     CPUMIPSState env;
  };
  
--static inline X86CPU *x86_env_get_cpu(CPUX86State *env)
+-static inline MIPSCPU *mips_env_get_cpu(CPUMIPSState *env)
 -{
--    return container_of(env, X86CPU, env);
+-    return container_of(env, MIPSCPU, env);
 -}
 -
- #define ENV_OFFSET offsetof(X86CPU, env)
+ #define ENV_OFFSET offsetof(MIPSCPU, env)
  
- #ifndef CONFIG_USER_ONLY
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index 6192e9d91e..bfdcae4269 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -140,8 +140,7 @@ static void set_idt(int n, unsigned int dpl)
- 
- void cpu_loop(CPUX86State *env)
- {
--    X86CPU *cpu = x86_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUState *cs = env_cpu(cpu);
-     int trapnr;
-     abi_ulong pc;
-     //target_siginfo_t info;
-diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
-index 70f6f26a94..fe5b12ef6e 100644
---- a/hw/i386/kvmvapic.c
-+++ b/hw/i386/kvmvapic.c
-@@ -152,7 +152,7 @@ static void update_guest_rom_state(VAPICROMState *s)
- 
- static int find_real_tpr_addr(VAPICROMState *s, CPUX86State *env)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     hwaddr paddr;
-     target_ulong addr;
- 
-@@ -279,7 +279,7 @@ instruction_ok:
- 
- static int update_rom_mapping(VAPICROMState *s, CPUX86State *env, target_ulong ip)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     hwaddr paddr;
-     uint32_t rom_state_vaddr;
-     uint32_t pos, patch, offset;
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index d98b737b8f..6a3a0678fc 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -408,7 +408,7 @@ uint64_t cpu_get_tsc(CPUX86State *env)
- /* IRQ handling */
- int cpu_get_pic_interrupt(CPUX86State *env)
- {
--    X86CPU *cpu = x86_env_get_cpu(env);
-+    X86CPU *cpu = env_archcpu(env);
-     int intno;
- 
-     if (!kvm_irqchip_in_kernel()) {
-diff --git a/linux-user/i386/cpu_loop.c b/linux-user/i386/cpu_loop.c
-index 51cfa006c9..71da24384f 100644
---- a/linux-user/i386/cpu_loop.c
-+++ b/linux-user/i386/cpu_loop.c
-@@ -82,7 +82,7 @@ static void set_idt(int n, unsigned int dpl)
- 
- void cpu_loop(CPUX86State *env)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     int trapnr;
-     abi_ulong pc;
-     abi_ulong ret;
-diff --git a/linux-user/i386/signal.c b/linux-user/i386/signal.c
-index fecb4c99c3..97a39204cc 100644
---- a/linux-user/i386/signal.c
-+++ b/linux-user/i386/signal.c
-@@ -198,7 +198,7 @@ static void setup_sigcontext(struct target_sigcontext *sc,
-         struct target_fpstate *fpstate, CPUX86State *env, abi_ulong mask,
-         abi_ulong fpstate_addr)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- #ifndef TARGET_X86_64
-     uint16_t magic;
- 
-diff --git a/linux-user/vm86.c b/linux-user/vm86.c
-index 9c393df424..2fa7a89edc 100644
---- a/linux-user/vm86.c
-+++ b/linux-user/vm86.c
-@@ -72,7 +72,7 @@ static inline unsigned int vm_getl(CPUX86State *env,
- 
- void save_v86_state(CPUX86State *env)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     TaskState *ts = cs->opaque;
-     struct target_vm86plus_struct * target_v86;
- 
-@@ -132,7 +132,7 @@ static inline void return_to_32bit(CPUX86State *env, int retval)
- 
- static inline int set_IF(CPUX86State *env)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     TaskState *ts = cs->opaque;
- 
-     ts->v86flags |= VIF_MASK;
-@@ -145,7 +145,7 @@ static inline int set_IF(CPUX86State *env)
- 
- static inline void clear_IF(CPUX86State *env)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     TaskState *ts = cs->opaque;
- 
-     ts->v86flags &= ~VIF_MASK;
-@@ -163,7 +163,7 @@ static inline void clear_AC(CPUX86State *env)
- 
- static inline int set_vflags_long(unsigned long eflags, CPUX86State *env)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     TaskState *ts = cs->opaque;
- 
-     set_flags(ts->v86flags, eflags, ts->v86mask);
-@@ -177,7 +177,7 @@ static inline int set_vflags_long(unsigned long eflags, CPUX86State *env)
- 
- static inline int set_vflags_short(unsigned short flags, CPUX86State *env)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     TaskState *ts = cs->opaque;
- 
-     set_flags(ts->v86flags, flags, ts->v86mask & 0xffff);
-@@ -191,7 +191,7 @@ static inline int set_vflags_short(unsigned short flags, CPUX86State *env)
- 
- static inline unsigned int get_vflags(CPUX86State *env)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     TaskState *ts = cs->opaque;
-     unsigned int flags;
- 
-@@ -208,7 +208,7 @@ static inline unsigned int get_vflags(CPUX86State *env)
-    support TSS interrupt revectoring, so this code is always executed) */
- static void do_int(CPUX86State *env, int intno)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     TaskState *ts = cs->opaque;
-     uint32_t int_addr, segoffs, ssp;
-     unsigned int sp;
-@@ -267,7 +267,7 @@ void handle_vm86_trap(CPUX86State *env, int trapno)
- 
- void handle_vm86_fault(CPUX86State *env)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     TaskState *ts = cs->opaque;
-     uint32_t csp, ssp;
-     unsigned int ip, sp, newflags, newip, newcs, opcode, intno;
-@@ -392,7 +392,7 @@ void handle_vm86_fault(CPUX86State *env)
- 
- int do_vm86(CPUX86State *env, long subfunction, abi_ulong vm86_addr)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     TaskState *ts = cs->opaque;
-     struct target_vm86plus_struct * target_v86;
-     int ret;
-diff --git a/target/i386/bpt_helper.c b/target/i386/bpt_helper.c
-index b3efdc77ec..c3a8ea73c9 100644
---- a/target/i386/bpt_helper.c
-+++ b/target/i386/bpt_helper.c
-@@ -53,7 +53,7 @@ static inline int hw_breakpoint_len(unsigned long dr7, int index)
- 
- static int hw_breakpoint_insert(CPUX86State *env, int index)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     target_ulong dr7 = env->dr[7];
-     target_ulong drN = env->dr[index];
-     int err = 0;
-@@ -97,7 +97,7 @@ static int hw_breakpoint_insert(CPUX86State *env, int index)
- 
- static void hw_breakpoint_remove(CPUX86State *env, int index)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     switch (hw_breakpoint_type(env->dr[7], index)) {
-     case DR7_TYPE_BP_INST:
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 722c5514d4..5b84629f91 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4221,8 +4221,8 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-                    uint32_t *eax, uint32_t *ebx,
-                    uint32_t *ecx, uint32_t *edx)
- {
--    X86CPU *cpu = x86_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    X86CPU *cpu = env_archcpu(env);
-+    CPUState *cs = env_cpu(env);
-     uint32_t pkg_offset;
-     uint32_t limit;
-     uint32_t signature[3];
-diff --git a/target/i386/excp_helper.c b/target/i386/excp_helper.c
-index 49231f6b69..371792ce8b 100644
---- a/target/i386/excp_helper.c
-+++ b/target/i386/excp_helper.c
-@@ -90,7 +90,7 @@ static void QEMU_NORETURN raise_interrupt2(CPUX86State *env, int intno,
-                                            int next_eip_addend,
-                                            uintptr_t retaddr)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     if (!is_int) {
-         cpu_svm_check_intercept_param(env, SVM_EXIT_EXCP_BASE + intno,
-diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
-index ea5a0c4861..005f1f68f8 100644
---- a/target/i386/fpu_helper.c
-+++ b/target/i386/fpu_helper.c
-@@ -1477,7 +1477,7 @@ void helper_xrstor(CPUX86State *env, target_ulong ptr, uint64_t rfbm)
-             env->pkru = 0;
-         }
-         if (env->pkru != old_pkru) {
--            CPUState *cs = CPU(x86_env_get_cpu(env));
-+            CPUState *cs = env_cpu(env);
-             tlb_flush(cs);
-         }
+ void mips_cpu_list(void);
+diff --git a/hw/intc/mips_gic.c b/hw/intc/mips_gic.c
+index 15e6e40f9f..8f509493ea 100644
+--- a/hw/intc/mips_gic.c
++++ b/hw/intc/mips_gic.c
+@@ -44,7 +44,7 @@ static void mips_gic_set_vp_irq(MIPSGICState *gic, int vp, int pin)
+                       GIC_VP_MASK_CMP_SHF;
      }
-diff --git a/target/i386/helper.c b/target/i386/helper.c
-index 96336055f3..ff3a60c7cf 100644
---- a/target/i386/helper.c
-+++ b/target/i386/helper.c
-@@ -622,7 +622,7 @@ void x86_cpu_set_a20(X86CPU *cpu, int a20_state)
+     if (kvm_enabled())  {
+-        kvm_mips_set_ipi_interrupt(mips_env_get_cpu(gic->vps[vp].env),
++        kvm_mips_set_ipi_interrupt(env_archcpu(gic->vps[vp].env),
+                                    pin + GIC_CPU_PIN_OFFSET,
+                                    ored_level);
+     } else {
+diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
+index 5ddeb15848..f899f6ceb3 100644
+--- a/hw/mips/mips_int.c
++++ b/hw/mips/mips_int.c
+@@ -76,7 +76,7 @@ void cpu_mips_irq_init_cpu(MIPSCPU *cpu)
+     qemu_irq *qi;
+     int i;
  
- void cpu_x86_update_cr0(CPUX86State *env, uint32_t new_cr0)
- {
--    X86CPU *cpu = x86_env_get_cpu(env);
-+    X86CPU *cpu = env_archcpu(env);
-     int pe_state;
+-    qi = qemu_allocate_irqs(cpu_mips_irq_request, mips_env_get_cpu(env), 8);
++    qi = qemu_allocate_irqs(cpu_mips_irq_request, env_archcpu(env), 8);
+     for (i = 0; i < 8; i++) {
+         env->irq[i] = qi[i];
+     }
+diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
+index 828137cd84..ac6c6d1504 100644
+--- a/linux-user/mips/cpu_loop.c
++++ b/linux-user/mips/cpu_loop.c
+@@ -425,7 +425,7 @@ static int do_break(CPUMIPSState *env, target_siginfo_t *info,
  
-     qemu_log_mask(CPU_LOG_MMU, "CR0 update: CR0=0x%08x\n", new_cr0);
-@@ -664,19 +664,16 @@ void cpu_x86_update_cr0(CPUX86State *env, uint32_t new_cr0)
-    the PDPT */
- void cpu_x86_update_cr3(CPUX86State *env, target_ulong new_cr3)
+ void cpu_loop(CPUMIPSState *env)
  {
--    X86CPU *cpu = x86_env_get_cpu(env);
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     target_siginfo_t info;
+     int trapnr;
+     abi_long ret;
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index c44cdca3b5..1fc0a4ce4b 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -336,10 +336,8 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
+ 
+ void cpu_mips_tlb_flush(CPUMIPSState *env)
+ {
+-    MIPSCPU *cpu = mips_env_get_cpu(env);
 -
-     env->cr[3] = new_cr3;
-     if (env->cr[0] & CR0_PG_MASK) {
-         qemu_log_mask(CPU_LOG_MMU,
-                         "CR3 update: CR3=" TARGET_FMT_lx "\n", new_cr3);
--        tlb_flush(CPU(cpu));
-+        tlb_flush(env_cpu(env));
-     }
+     /* Flush qemu's TLB and discard all shadowed entries.  */
+-    tlb_flush(CPU(cpu));
++    tlb_flush(env_cpu(env));
+     env->tlb->tlb_in_use = env->tlb->nb_tlb;
  }
  
- void cpu_x86_update_cr4(CPUX86State *env, uint32_t new_cr4)
- {
--    X86CPU *cpu = x86_env_get_cpu(env);
-     uint32_t hflags;
- 
- #if defined(DEBUG_MMU)
-@@ -685,7 +682,7 @@ void cpu_x86_update_cr4(CPUX86State *env, uint32_t new_cr4)
-     if ((new_cr4 ^ env->cr[4]) &
-         (CR4_PGE_MASK | CR4_PAE_MASK | CR4_PSE_MASK |
-          CR4_SMEP_MASK | CR4_SMAP_MASK | CR4_LA57_MASK)) {
--        tlb_flush(CPU(cpu));
+@@ -401,7 +399,7 @@ void cpu_mips_store_status(CPUMIPSState *env, target_ulong val)
+ #if defined(TARGET_MIPS64)
+     if ((env->CP0_Status ^ old) & (old & (7 << CP0St_UX))) {
+         /* Access to at least one of the 64-bit segments has been disabled */
+-        tlb_flush(CPU(mips_env_get_cpu(env)));
 +        tlb_flush(env_cpu(env));
      }
- 
-     /* Clear bits we're going to recompute.  */
-@@ -977,8 +974,8 @@ void cpu_x86_inject_mce(Monitor *mon, X86CPU *cpu, int bank,
- 
- void cpu_report_tpr_access(CPUX86State *env, TPRAccess access)
+ #endif
+     if (env->CP0_Config3 & (1 << CP0C3_MT)) {
+@@ -446,7 +444,7 @@ void cpu_mips_store_cause(CPUMIPSState *env, target_ulong val)
+ static void raise_mmu_exception(CPUMIPSState *env, target_ulong address,
+                                 int rw, int tlb_error)
  {
--    X86CPU *cpu = x86_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    X86CPU *cpu = env_archcpu(env);
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
 +    CPUState *cs = env_cpu(env);
+     int exception = 0, error_code = 0;
  
-     if (kvm_enabled() || whpx_enabled()) {
-         env->tpr_access_type = access;
-@@ -996,8 +993,7 @@ int cpu_x86_get_descr_debug(CPUX86State *env, unsigned int selector,
-                             target_ulong *base, unsigned int *limit,
-                             unsigned int *flags)
+     if (rw == MMU_INST_FETCH) {
+@@ -1400,8 +1398,7 @@ bool mips_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+ #if !defined(CONFIG_USER_ONLY)
+ void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
  {
--    X86CPU *cpu = x86_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUState *cs = env_cpu(env);
-     SegmentCache *dt;
-     target_ulong ptr;
-     uint32_t e1, e2;
-diff --git a/target/i386/misc_helper.c b/target/i386/misc_helper.c
-index 78f2020ef2..3eff6885f8 100644
---- a/target/i386/misc_helper.c
-+++ b/target/i386/misc_helper.c
-@@ -133,7 +133,7 @@ target_ulong helper_read_crN(CPUX86State *env, int reg)
-         break;
-     case 8:
-         if (!(env->hflags2 & HF2_VINTR_MASK)) {
--            val = cpu_get_apic_tpr(x86_env_get_cpu(env)->apic_state);
-+            val = cpu_get_apic_tpr(env_archcpu(env)->apic_state);
-         } else {
-             val = env->v_tpr;
-         }
-@@ -158,7 +158,7 @@ void helper_write_crN(CPUX86State *env, int reg, target_ulong t0)
-     case 8:
-         if (!(env->hflags2 & HF2_VINTR_MASK)) {
-             qemu_mutex_lock_iothread();
--            cpu_set_apic_tpr(x86_env_get_cpu(env)->apic_state, t0);
-+            cpu_set_apic_tpr(env_archcpu(env)->apic_state, t0);
-             qemu_mutex_unlock_iothread();
-         }
-         env->v_tpr = t0 & 0x0f;
-@@ -180,7 +180,7 @@ void helper_lmsw(CPUX86State *env, target_ulong t0)
- 
- void helper_invlpg(CPUX86State *env, target_ulong addr)
- {
--    X86CPU *cpu = x86_env_get_cpu(env);
-+    X86CPU *cpu = env_archcpu(env);
- 
-     cpu_svm_check_intercept_param(env, SVM_EXIT_INVLPG, 0, GETPC());
-     tlb_flush_page(CPU(cpu), addr);
-@@ -247,7 +247,7 @@ void helper_wrmsr(CPUX86State *env)
-         env->sysenter_eip = val;
-         break;
-     case MSR_IA32_APICBASE:
--        cpu_set_apic_base(x86_env_get_cpu(env)->apic_state, val);
-+        cpu_set_apic_base(env_archcpu(env)->apic_state, val);
-         break;
-     case MSR_EFER:
-         {
-@@ -404,7 +404,7 @@ void helper_rdmsr(CPUX86State *env)
-         val = env->sysenter_eip;
-         break;
-     case MSR_IA32_APICBASE:
--        val = cpu_get_apic_base(x86_env_get_cpu(env)->apic_state);
-+        val = cpu_get_apic_base(env_archcpu(env)->apic_state);
-         break;
-     case MSR_EFER:
-         val = env->efer;
-@@ -561,7 +561,7 @@ static void do_hlt(X86CPU *cpu)
- 
- void helper_hlt(CPUX86State *env, int next_eip_addend)
- {
--    X86CPU *cpu = x86_env_get_cpu(env);
-+    X86CPU *cpu = env_archcpu(env);
- 
-     cpu_svm_check_intercept_param(env, SVM_EXIT_HLT, 0, GETPC());
-     env->eip += next_eip_addend;
-@@ -580,8 +580,8 @@ void helper_monitor(CPUX86State *env, target_ulong ptr)
- 
- void helper_mwait(CPUX86State *env, int next_eip_addend)
- {
+-    MIPSCPU *cpu = mips_env_get_cpu(env);
 -    CPUState *cs;
--    X86CPU *cpu;
 +    CPUState *cs = env_cpu(env);
-+    X86CPU *cpu = env_archcpu(env);
- 
-     if ((uint32_t)env->regs[R_ECX] != 0) {
-         raise_exception_ra(env, EXCP0D_GPF, GETPC());
-@@ -589,8 +589,6 @@ void helper_mwait(CPUX86State *env, int next_eip_addend)
-     cpu_svm_check_intercept_param(env, SVM_EXIT_MWAIT, 0, GETPC());
-     env->eip += next_eip_addend;
- 
--    cpu = x86_env_get_cpu(env);
--    cs = CPU(cpu);
-     /* XXX: not complete but not completely erroneous */
-     if (cs->cpu_index != 0 || CPU_NEXT(cs) != NULL) {
-         do_pause(cpu);
-@@ -601,7 +599,7 @@ void helper_mwait(CPUX86State *env, int next_eip_addend)
- 
- void helper_pause(CPUX86State *env, int next_eip_addend)
+     r4k_tlb_t *tlb;
+     target_ulong addr;
+     target_ulong end;
+@@ -1427,7 +1424,6 @@ void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
+     /* 1k pages are not supported. */
+     mask = tlb->PageMask | ~(TARGET_PAGE_MASK << 1);
+     if (tlb->V0) {
+-        cs = CPU(cpu);
+         addr = tlb->VPN & ~mask;
+ #if defined(TARGET_MIPS64)
+         if (addr >= (0xFFFFFFFF80000000ULL & env->SEGMask)) {
+@@ -1441,7 +1437,6 @@ void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
+         }
+     }
+     if (tlb->V1) {
+-        cs = CPU(cpu);
+         addr = (tlb->VPN & ~mask) | ((mask >> 1) + 1);
+ #if defined(TARGET_MIPS64)
+         if (addr >= (0xFFFFFFFF80000000ULL & env->SEGMask)) {
+@@ -1462,7 +1457,7 @@ void QEMU_NORETURN do_raise_exception_err(CPUMIPSState *env,
+                                           int error_code,
+                                           uintptr_t pc)
  {
--    X86CPU *cpu = x86_env_get_cpu(env);
-+    X86CPU *cpu = env_archcpu(env);
- 
-     cpu_svm_check_intercept_param(env, SVM_EXIT_PAUSE, 0, GETPC());
-     env->eip += next_eip_addend;
-@@ -611,7 +609,7 @@ void helper_pause(CPUX86State *env, int next_eip_addend)
- 
- void helper_debug(CPUX86State *env)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
 +    CPUState *cs = env_cpu(env);
  
-     cs->exception_index = EXCP_DEBUG;
-     cpu_loop_exit(cs);
-@@ -631,7 +629,7 @@ uint64_t helper_rdpkru(CPUX86State *env, uint32_t ecx)
- 
- void helper_wrpkru(CPUX86State *env, uint32_t ecx, uint64_t val)
+     qemu_log_mask(CPU_LOG_INT, "%s: %d %d\n",
+                   __func__, exception, error_code);
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 0f272a5b93..0705e8c686 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -350,7 +350,7 @@ static inline hwaddr do_translate_address(CPUMIPSState *env,
+                                                       int rw, uintptr_t retaddr)
  {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
+     hwaddr paddr;
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
 +    CPUState *cs = env_cpu(env);
  
-     if ((env->cr[4] & CR4_PKE_MASK) == 0) {
-         raise_exception_err_ra(env, EXCP06_ILLOP, 0, GETPC());
-diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
-index 63e265cb38..87a627f9dc 100644
---- a/target/i386/seg_helper.c
-+++ b/target/i386/seg_helper.c
-@@ -137,7 +137,7 @@ static inline void get_ss_esp_from_tss(CPUX86State *env, uint32_t *ss_ptr,
-                                        uint32_t *esp_ptr, int dpl,
-                                        uintptr_t retaddr)
- {
--    X86CPU *cpu = x86_env_get_cpu(env);
-+    X86CPU *cpu = env_archcpu(env);
-     int type, index, shift;
+     paddr = cpu_mips_translate_address(env, address, rw);
  
- #if 0
-@@ -830,7 +830,7 @@ static void do_interrupt_protected(CPUX86State *env, int intno, int is_int,
+@@ -699,7 +699,7 @@ static CPUMIPSState *mips_cpu_map_tc(CPUMIPSState *env, int *tc)
+         return env;
+     }
  
- static inline target_ulong get_rsp_from_tss(CPUX86State *env, int level)
- {
--    X86CPU *cpu = x86_env_get_cpu(env);
-+    X86CPU *cpu = env_archcpu(env);
-     int index;
+-    cs = CPU(mips_env_get_cpu(env));
++    cs = env_cpu(env);
+     vpe_idx = tc_idx / cs->nr_threads;
+     *tc = tc_idx % cs->nr_threads;
+     other_cs = qemu_get_cpu(vpe_idx);
+@@ -1298,7 +1298,7 @@ void helper_mttc0_tcrestart(CPUMIPSState *env, target_ulong arg1)
  
- #if 0
-@@ -972,7 +972,7 @@ static void do_interrupt64(CPUX86State *env, int intno, int is_int,
- #if defined(CONFIG_USER_ONLY)
- void helper_syscall(CPUX86State *env, int next_eip_addend)
+ void helper_mtc0_tchalt(CPUMIPSState *env, target_ulong arg1)
  {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
+-    MIPSCPU *cpu = mips_env_get_cpu(env);
++    MIPSCPU *cpu = env_archcpu(env);
+ 
+     env->active_tc.CP0_TCHalt = arg1 & 0x1;
+ 
+@@ -1314,7 +1314,7 @@ void helper_mttc0_tchalt(CPUMIPSState *env, target_ulong arg1)
+ {
+     int other_tc = env->CP0_VPEControl & (0xff << CP0VPECo_TargTC);
+     CPUMIPSState *other = mips_cpu_map_tc(env, &other_tc);
+-    MIPSCPU *other_cpu = mips_env_get_cpu(other);
++    MIPSCPU *other_cpu = env_archcpu(other);
+ 
+     // TODO: Halt TC / Restart (if allocated+active) TC.
+ 
+@@ -1427,7 +1427,7 @@ void helper_mtc0_pagegrain(CPUMIPSState *env, target_ulong arg1)
+ 
+ void helper_mtc0_segctl0(CPUMIPSState *env, target_ulong arg1)
+ {
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
 +    CPUState *cs = env_cpu(env);
  
-     cs->exception_index = EXCP_SYSCALL;
-     env->exception_next_eip = env->eip + next_eip_addend;
-@@ -1172,7 +1172,7 @@ static void do_interrupt_user(CPUX86State *env, int intno, int is_int,
- static void handle_even_inj(CPUX86State *env, int intno, int is_int,
-                             int error_code, int is_hw, int rm)
+     env->CP0_SegCtl0 = arg1 & CP0SC0_MASK;
+     tlb_flush(cs);
+@@ -1435,7 +1435,7 @@ void helper_mtc0_segctl0(CPUMIPSState *env, target_ulong arg1)
+ 
+ void helper_mtc0_segctl1(CPUMIPSState *env, target_ulong arg1)
  {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
 +    CPUState *cs = env_cpu(env);
-     uint32_t event_inj = x86_ldl_phys(cs, env->vm_vmcb + offsetof(struct vmcb,
-                                                           control.event_inj));
  
-@@ -1312,7 +1312,7 @@ void x86_cpu_do_interrupt(CPUState *cs)
+     env->CP0_SegCtl1 = arg1 & CP0SC1_MASK;
+     tlb_flush(cs);
+@@ -1443,7 +1443,7 @@ void helper_mtc0_segctl1(CPUMIPSState *env, target_ulong arg1)
  
- void do_interrupt_x86_hardirq(CPUX86State *env, int intno, int is_hw)
+ void helper_mtc0_segctl2(CPUMIPSState *env, target_ulong arg1)
  {
--    do_interrupt_all(x86_env_get_cpu(env), intno, 0, 0, 0, is_hw);
-+    do_interrupt_all(env_archcpu(env), intno, 0, 0, 0, is_hw);
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     env->CP0_SegCtl2 = arg1 & CP0SC2_MASK;
+     tlb_flush(cs);
+@@ -1666,7 +1666,7 @@ void helper_mtc0_entryhi(CPUMIPSState *env, target_ulong arg1)
+     /* If the ASID changes, flush qemu's TLB.  */
+     if ((old & env->CP0_EntryHi_ASID_mask) !=
+         (val & env->CP0_EntryHi_ASID_mask)) {
+-        tlb_flush(CPU(mips_env_get_cpu(env)));
++        tlb_flush(env_cpu(env));
+     }
  }
  
- bool x86_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-@@ -1763,7 +1763,7 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
-     target_ulong ssp, old_ssp, offset, sp;
+@@ -1686,7 +1686,6 @@ void helper_mtc0_compare(CPUMIPSState *env, target_ulong arg1)
  
-     LOG_PCALL("lcall %04x:" TARGET_FMT_lx " s=%d\n", new_cs, new_eip, shift);
--    LOG_PCALL_STATE(CPU(x86_env_get_cpu(env)));
-+    LOG_PCALL_STATE(env_cpu(env));
-     if ((new_cs & 0xfffc) == 0) {
-         raise_exception_err_ra(env, EXCP0D_GPF, 0, GETPC());
-     }
-@@ -2167,7 +2167,7 @@ static inline void helper_ret_protected(CPUX86State *env, int shift,
-     }
-     LOG_PCALL("lret new %04x:" TARGET_FMT_lx " s=%d addend=0x%x\n",
-               new_cs, new_eip, shift, addend);
--    LOG_PCALL_STATE(CPU(x86_env_get_cpu(env)));
-+    LOG_PCALL_STATE(env_cpu(env));
-     if ((new_cs & 0xfffc) == 0) {
-         raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, retaddr);
-     }
-diff --git a/target/i386/smm_helper.c b/target/i386/smm_helper.c
-index c1c34a75db..eb5aa6eb3d 100644
---- a/target/i386/smm_helper.c
-+++ b/target/i386/smm_helper.c
-@@ -204,8 +204,8 @@ void do_smm_enter(X86CPU *cpu)
- 
- void helper_rsm(CPUX86State *env)
+ void helper_mtc0_status(CPUMIPSState *env, target_ulong arg1)
  {
--    X86CPU *cpu = x86_env_get_cpu(env);
+-    MIPSCPU *cpu = mips_env_get_cpu(env);
+     uint32_t val, old;
+ 
+     old = env->CP0_Status;
+@@ -1706,7 +1705,7 @@ void helper_mtc0_status(CPUMIPSState *env, target_ulong arg1)
+         case MIPS_HFLAG_SM: qemu_log(", SM\n"); break;
+         case MIPS_HFLAG_KM: qemu_log("\n"); break;
+         default:
+-            cpu_abort(CPU(cpu), "Invalid MMU mode!\n");
++            cpu_abort(env_cpu(env), "Invalid MMU mode!\n");
+             break;
+         }
+     }
+@@ -2485,8 +2484,6 @@ static void debug_pre_eret(CPUMIPSState *env)
+ 
+ static void debug_post_eret(CPUMIPSState *env)
+ {
+-    MIPSCPU *cpu = mips_env_get_cpu(env);
+-
+     if (qemu_loglevel_mask(CPU_LOG_EXEC)) {
+         qemu_log("  =>  PC " TARGET_FMT_lx " EPC " TARGET_FMT_lx,
+                 env->active_tc.PC, env->CP0_EPC);
+@@ -2502,7 +2499,7 @@ static void debug_post_eret(CPUMIPSState *env)
+         case MIPS_HFLAG_SM: qemu_log(", SM\n"); break;
+         case MIPS_HFLAG_KM: qemu_log("\n"); break;
+         default:
+-            cpu_abort(CPU(cpu), "Invalid MMU mode!\n");
++            cpu_abort(env_cpu(env), "Invalid MMU mode!\n");
+             break;
+         }
+     }
+@@ -2633,7 +2630,7 @@ void helper_pmon(CPUMIPSState *env, int function)
+ 
+ void helper_wait(CPUMIPSState *env)
+ {
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     cs->halted = 1;
+     cpu_reset_interrupt(cs, CPU_INTERRUPT_WAKE);
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index f96c0d01ef..8043e8d398 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -29912,8 +29912,7 @@ void cpu_set_exception_base(int vp_index, target_ulong address)
+ 
+ void cpu_state_reset(CPUMIPSState *env)
+ {
+-    MIPSCPU *cpu = mips_env_get_cpu(env);
 -    CPUState *cs = CPU(cpu);
-+    X86CPU *cpu = env_archcpu(env);
 +    CPUState *cs = env_cpu(env);
-     target_ulong sm_state;
-     int i, offset;
-     uint32_t val;
-diff --git a/target/i386/svm_helper.c b/target/i386/svm_helper.c
-index 9fd22a883b..7b8105a1c3 100644
---- a/target/i386/svm_helper.c
-+++ b/target/i386/svm_helper.c
-@@ -84,7 +84,7 @@ void helper_svm_check_io(CPUX86State *env, uint32_t port, uint32_t param,
- static inline void svm_save_seg(CPUX86State *env, hwaddr addr,
-                                 const SegmentCache *sc)
+ 
+     /* Reset registers to their default values */
+     env->CP0_PRid = env->cpu_model->CP0_PRid;
+diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
+index 1c2d017d36..6d145a905a 100644
+--- a/target/mips/translate_init.inc.c
++++ b/target/mips/translate_init.inc.c
+@@ -871,8 +871,6 @@ static void r4k_mmu_init (CPUMIPSState *env, const mips_def_t *def)
+ 
+ static void mmu_init (CPUMIPSState *env, const mips_def_t *def)
  {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
+-    MIPSCPU *cpu = mips_env_get_cpu(env);
+-
+     env->tlb = g_malloc0(sizeof(CPUMIPSTLBContext));
  
-     x86_stw_phys(cs, addr + offsetof(struct vmcb_seg, selector),
-              sc->selector);
-@@ -99,7 +99,7 @@ static inline void svm_save_seg(CPUX86State *env, hwaddr addr,
- static inline void svm_load_seg(CPUX86State *env, hwaddr addr,
-                                 SegmentCache *sc)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     unsigned int flags;
- 
-     sc->selector = x86_lduw_phys(cs,
-@@ -122,7 +122,7 @@ static inline void svm_load_seg_cache(CPUX86State *env, hwaddr addr,
- 
- void helper_vmrun(CPUX86State *env, int aflag, int next_eip_addend)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     target_ulong addr;
-     uint64_t nested_ctl;
-     uint32_t event_inj;
-@@ -314,7 +314,7 @@ void helper_vmrun(CPUX86State *env, int aflag, int next_eip_addend)
-     env->hflags2 |= HF2_GIF_MASK;
- 
-     if (int_ctl & V_IRQ_MASK) {
--        CPUState *cs = CPU(x86_env_get_cpu(env));
-+        CPUState *cs = env_cpu(env);
- 
-         cs->interrupt_request |= CPU_INTERRUPT_VIRQ;
+     switch (def->mmu_type) {
+@@ -889,7 +887,7 @@ static void mmu_init (CPUMIPSState *env, const mips_def_t *def)
+         case MMU_TYPE_R6000:
+         case MMU_TYPE_R8000:
+         default:
+-            cpu_abort(CPU(cpu), "MMU type not supported\n");
++            cpu_abort(env_cpu(env), "MMU type not supported\n");
      }
-@@ -379,7 +379,7 @@ void helper_vmmcall(CPUX86State *env)
- 
- void helper_vmload(CPUX86State *env, int aflag)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     target_ulong addr;
- 
-     cpu_svm_check_intercept_param(env, SVM_EXIT_VMLOAD, 0, GETPC());
-@@ -419,7 +419,7 @@ void helper_vmload(CPUX86State *env, int aflag)
- 
- void helper_vmsave(CPUX86State *env, int aflag)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     target_ulong addr;
- 
-     cpu_svm_check_intercept_param(env, SVM_EXIT_VMSAVE, 0, GETPC());
-@@ -482,7 +482,7 @@ void helper_skinit(CPUX86State *env)
- 
- void helper_invlpga(CPUX86State *env, int aflag)
- {
--    X86CPU *cpu = x86_env_get_cpu(env);
-+    X86CPU *cpu = env_archcpu(env);
-     target_ulong addr;
- 
-     cpu_svm_check_intercept_param(env, SVM_EXIT_INVLPGA, 0, GETPC());
-@@ -501,7 +501,7 @@ void helper_invlpga(CPUX86State *env, int aflag)
- void cpu_svm_check_intercept_param(CPUX86State *env, uint32_t type,
-                                    uint64_t param, uintptr_t retaddr)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     if (likely(!(env->hflags & HF_GUEST_MASK))) {
-         return;
-@@ -583,7 +583,7 @@ void helper_svm_check_intercept_param(CPUX86State *env, uint32_t type,
- void helper_svm_check_io(CPUX86State *env, uint32_t port, uint32_t param,
-                          uint32_t next_eip_addend)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     if (env->intercept & (1ULL << (SVM_EXIT_IOIO - SVM_EXIT_INTR))) {
-         /* FIXME: this should be read in at vmrun (faster this way?) */
-@@ -604,7 +604,7 @@ void helper_svm_check_io(CPUX86State *env, uint32_t port, uint32_t param,
- void cpu_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1,
-                 uintptr_t retaddr)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     cpu_restore_state(cs, retaddr, true);
- 
-@@ -625,7 +625,7 @@ void cpu_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1,
- 
- void do_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1)
- {
--    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     uint32_t int_ctl;
- 
-     if (env->hflags & HF_INHIBIT_IRQ_MASK) {
+ }
+ #endif /* CONFIG_USER_ONLY */
 -- 
 2.17.1
 
