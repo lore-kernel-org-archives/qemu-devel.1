@@ -2,93 +2,69 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0595C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 12:44:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 181A5C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 12:45:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F45820644
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 12:44:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F45820644
+	by mail.kernel.org (Postfix) with ESMTPS id D170C20644
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 12:45:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D170C20644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36465 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36503 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOLvZ-0006Yw-Le
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 08:44:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53979)
+	id 1hOLwt-0007XN-3r
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 08:45:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hOLuS-00060X-90
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 08:42:57 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hOLvh-0006jh-TU
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 08:44:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hOLuR-0007aI-2g
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 08:42:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43208)
+	(envelope-from <dgilbert@redhat.com>) id 1hOLvg-0008Na-6d
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 08:44:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52900)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hOLuK-0007Vj-Pe; Wed, 08 May 2019 08:42:49 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hOLvf-0008N4-UJ
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 08:44:12 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A3F8C2D7EF;
-	Wed,  8 May 2019 12:42:47 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-94.brq.redhat.com
-	[10.40.204.94])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 253B6600D4;
-	Wed,  8 May 2019 12:42:45 +0000 (UTC)
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20190507183610.9848-1-mreitz@redhat.com>
-	<20190507183610.9848-2-mreitz@redhat.com>
-	<20190508090131.GA32552@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <0f76927d-9e7d-1735-0ec4-a934c2a003f9@redhat.com>
-Date: Wed, 8 May 2019 14:42:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 4A0503DD99
+	for <qemu-devel@nongnu.org>; Wed,  8 May 2019 12:44:11 +0000 (UTC)
+Received: from work-vm (ovpn-117-175.ams2.redhat.com [10.36.117.175])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 62FFA600D4;
+	Wed,  8 May 2019 12:44:07 +0000 (UTC)
+Date: Wed, 8 May 2019 13:44:04 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190508124404.GH2718@work-vm>
+References: <20190430131919.GN6818@redhat.com> <20190430144546.GA3065@work-vm>
+	<20190430150556.GA2423@redhat.com>
+	<87sgtqejn9.fsf@dusky.pond.sub.org>
+	<20190507093954.GG27205@redhat.com>
+	<f30e9f99-5d9a-5d78-754e-a2acaa799edc@redhat.com>
+	<87imul3ywc.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190508090131.GA32552@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="TvwluoJ3RIhvanxkxSeHiabV2CdAvPVCT"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <87imul3ywc.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Wed, 08 May 2019 12:42:47 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.29]);
+	Wed, 08 May 2019 12:44:11 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 1/5] qemu-nbd: Add --pid-file option
+Subject: Re: [Qemu-devel] QMP; unsigned 64-bit ints;
+ JSON standards compliance
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,142 +76,267 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: libvir-list@redhat.com, =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TvwluoJ3RIhvanxkxSeHiabV2CdAvPVCT
-From: Max Reitz <mreitz@redhat.com>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <0f76927d-9e7d-1735-0ec4-a934c2a003f9@redhat.com>
-Subject: Re: [PATCH 1/5] qemu-nbd: Add --pid-file option
-References: <20190507183610.9848-1-mreitz@redhat.com>
- <20190507183610.9848-2-mreitz@redhat.com> <20190508090131.GA32552@redhat.com>
-In-Reply-To: <20190508090131.GA32552@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 08.05.19 11:01, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, May 07, 2019 at 08:36:06PM +0200, Max Reitz wrote:
->> --fork is a bit boring if there is no way to get the child's PID.  Thi=
+* Markus Armbruster (armbru@redhat.com) wrote:
+> Eric Blake <eblake@redhat.com> writes:
+>=20
+> > On 5/7/19 4:39 AM, Daniel P. Berrang=E9 wrote:
+> >
+> >>> JSON is terrible at interoperability, so good luck with that.
+> >>>
+> >>> If you reduce your order to "the commonly used JSON libraries we kn=
+ow",
+> >>> we can talk.
+> >>=20
+> >> I don't particularly want us to rely on semantics of small known set
+> >> of JSON libs. I really do want us to do something that is capable of
+> >> working with any JSON impl that exists in any programming language.
+> >>=20
+> >> My suggested option 2 & 3 at least would manage that I believe, as
+> >> any credible JSON impl will be able to represent 32-bit integers
+> >> or strings without loosing data.
+> >>=20
+> >> Option 1 would not cope as some impls can't even cope with
+> >> signed 64-bit ints.
+> >>=20
+> >>>>>> I can think of some options:
+> >>>>>>
+> >>>>>>   1. Encode unsigned 64-bit integers as signed 64-bit integers.
+> >>>>>>
+> >>>>>>      This follows the example that most C libraries map JSON int=
 s
->> option helps.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  qemu-nbd.c    | 29 +++++++++++++++++++++++++++++
->>  qemu-nbd.texi |  2 ++
->>  2 files changed, 31 insertions(+)
->>
->> diff --git a/qemu-nbd.c b/qemu-nbd.c
->> index dca9e72cee..7e48154f44 100644
->> --- a/qemu-nbd.c
->> +++ b/qemu-nbd.c
->> @@ -59,6 +59,7 @@
->>  #define QEMU_NBD_OPT_IMAGE_OPTS    262
->>  #define QEMU_NBD_OPT_FORK          263
->>  #define QEMU_NBD_OPT_TLSAUTHZ      264
->> +#define QEMU_NBD_OPT_PID_FILE      265
->> =20
->>  #define MBR_SIZE 512
->> =20
->> @@ -111,6 +112,7 @@ static void usage(const char *name)
->>  "                            specify tracing options\n"
->>  "  --fork                    fork off the server process and exit the=
- parent\n"
->>  "                            once the server is running\n"
->> +"  --pid-file=3DPATH           store the server's process ID in the g=
-iven file\n"
->>  #if HAVE_NBD_DEVICE
->>  "\n"
->>  "Kernel NBD client support:\n"
->> @@ -651,6 +653,7 @@ int main(int argc, char **argv)
->>          { "image-opts", no_argument, NULL, QEMU_NBD_OPT_IMAGE_OPTS },=
-
->>          { "trace", required_argument, NULL, 'T' },
->>          { "fork", no_argument, NULL, QEMU_NBD_OPT_FORK },
->> +        { "pid-file", required_argument, NULL, QEMU_NBD_OPT_PID_FILE =
-},
->>          { NULL, 0, NULL, 0 }
->>      };
->>      int ch;
->> @@ -677,6 +680,8 @@ int main(int argc, char **argv)
->>      bool list =3D false;
->>      int old_stderr =3D -1;
->>      unsigned socket_activation;
->> +    const char *pid_path =3D NULL;
->> +    FILE *pid_file;
->> =20
->>      /* The client thread uses SIGTERM to interrupt the server.  A sig=
-nal
->>       * handler ensures that "qemu-nbd -v -c" exits with a nice status=
- code.
->> @@ -876,6 +881,9 @@ int main(int argc, char **argv)
->>          case 'L':
->>              list =3D true;
->>              break;
->> +        case QEMU_NBD_OPT_PID_FILE:
->> +            pid_path =3D optarg;
->> +            break;
->>          }
->>      }
->> =20
->> @@ -1196,6 +1204,27 @@ int main(int argc, char **argv)
->> =20
->>      nbd_update_server_watch();
->> =20
->> +    if (pid_path) {
->> +        pid_file =3D fopen(pid_path, "w");
->> +        if (!pid_file) {
->> +            error_report("Failed to store PID in %s: %s",
->> +                         pid_path, strerror(errno));
->> +            exit(EXIT_FAILURE);
->> +        }
->> +
->> +        ret =3D fprintf(pid_file, "%ld", (long)getpid());
->> +        if (ret < 0) {
->> +            ret =3D -errno;
->> +        }
->> +        fclose(pid_file);
->> +
->> +        if (ret < 0) {
->> +            error_report("Failed to store PID in %s: %s",
->> +                         pid_path, strerror(-ret));
->> +            exit(EXIT_FAILURE);
->> +        }
->> +    }
+> >>>>>>      to 'long long int'. This is still relying on undefined
+> >>>>>>      behaviour as apps don't need to support > 2^53-1.
+> >>>>>>
+> >>>>>>      Apps would need to cast back to 'unsigned long long' for
+> >>>>>>      those QMP fields they know are supposed to be unsigned.
+> >>>
+> >>> Ugly.  It's also what we did until v2.10, August 2017.  QMP's input
+> >>> direction still does it, for backward compatibility.
+> >
+> > Having qemu accept signed ints in place of large unsigned values is e=
+asy
+> > enough. But you are right that it loses precision when doubles are
+> > involved on the receiving end, and we cross the 2^53 barrier.
+> >
+> >>>
+> >>>>>>
+> >>>>>>
+> >>>>>>   2. Encode all 64-bit integers as a pair of 32-bit integers.
+> >>>>>>    =20
+> >>>>>>      This is fully compliant with the JSON spec as each half
+> >>>>>>      is fully within the declared limits. App has to split or
+> >>>>>>      assemble the 2 pieces from/to a signed/unsigned 64-bit
+> >>>>>>      int as needed.
+> >>>
+> >>> Differently ugly.
+> >
+> > Particularly ugly as we turn 1<<55 from:
+> >
+> > "value":36028797018963968
+> >
+> > into
+> >
+> > "value":[8388608,0]
+> >
+> > and now both qemu and the client end have to agree that an array of t=
+wo
+> > integers is a valid replacement for any larger 64-bit quantity
+> > (presumably, we'd always accept the array form even for small integer
+> > values, but only produce the array form for large values).  And while=
+ it
+> > manages just fine for uint64_t values, what rules would you place on
+> > int64_t values? That the resulting 2-integer array is combined with t=
+he
+> > first number as a 2's-complement signed value, and the second being a
+> > 32-bit unsigned value?
 >=20
-> This is racy because multiple qemu-nbd's can be started pointing to
-> the same pidfile and one will blindly overwrite the other.
+> There's more than one way to encode integers as a list of 53 bit signed
+> integers.  Any of them will do, we just have to specify one.
 >=20
-> Please use  qemu_write_pidfile instead which acquires locks on the
-> pidfile in a race free manner.
+> >>>>>>
+> >>>>>>
+> >>>>>>   3. Encode all 64-bit integers as strings
+> >>>>>>
+> >>>>>>      The application has todo all parsing/formatting client
+> >>>>>>      side.
+> >>>
+> >>> Yet another ugly.
+> >
+> > But less so than option 2.
+> >
+> > "value":36028797018963968
+> >
+> > vs.
+> >
+> > "value":"36028797018963968"
+> >
+> > is at least tolerable.
+>=20
+> Yes.
+>=20
+> >>>>>> None of these changes are backwards compatible, so I doubt we co=
+uld make
+> >>>>>> the change transparently in QMP.  Instead we would have to have =
+a
+> >>>>>> QMP greeting message capability where the client can request ena=
+blement
+> >>>>>> of the enhanced integer handling.
+> >>>
+> >>> We might be able to do option 1 without capability negotiation.  v2=
+.10's
+> >>> change from option 1 to what we have now produced zero complaints.
+> >>>
+> >>> On the other hand, we made that change for a reason, so we may want=
+ a
+> >>> "send large integers as negative integers" capability regardless.
+> >>>
+> >>>>>>
+> >>>>>> Any of the three options above would likely work for libvirt, bu=
+t I
+> >>>>>> would have a slight preference for either 2 or 3, so that we bec=
+ome
+> >>>>>> 100% standards compliant.
+> >
+> > If we're going to negotiate something, I'd lean towards option 3
+> > (anywhere the introspection states that we accept 'int64' or similar,=
+ it
+> > is also appropriate to send a string value in its place). We'd also h=
+ave
+> > to decide if we want to allow "0xabcd", or strictly insist on 43981,
+> > when stringizing an integer.  And while qemu should accept a string o=
+r a
+> > number on input, we'd still have to decide/document whether it's
+> > response to the client capability negotiation is to output a string
+> > always, or only for values larger than the 2^53 threshold.
+>=20
+> Picking option 3 is no excuse for complicating matters further.  QMP is
+> primarily for machines.  So my first choice would be to keep everything
+> decimal.  I could be persuaded to have QEMU parse integers from strings
+> with base 0, i.e. leading 0x gets you hex, leading 0 gets you octal.
 
-Ah, nice, that makes things better and easier. :-)
+as I said in an earlier reply, my preference would also be to keep it
+very strict and simple; although my preference is to stick to hex.
+My suggestion was 0x%x format, always with the leading 0x, always lower
+case, allowing but not requiring 0 padding, and never more than 18
+characters (including the 0x). Always using the string format.
 
-Max
+Dave
 
-
---TvwluoJ3RIhvanxkxSeHiabV2CdAvPVCT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzSzsQACgkQ9AfbAGHV
-z0AVwQgAmHMTpKAEL+s3s0pefrUeT5o0nQSPitbRAp7neriq7ZoU2ylOlz/KEv2p
-l+gWzgUZHfmI4NvsRizkZ80jFLPUG2kU/x9p4cVQeqV01VoZ+5Qz6zxRLtrNzY9T
-/KqOVxNgCS/ypmK5GGsm6/srP96kS99k2QcXKjnxWG2scbpOWoA8JxMRnbego4Fh
-xtt17uBhtEO/T5Z6cwlDmBtm9niNVI00EQPjksa3jH5bf3KCKSELlfXMMxWtJKkR
-NrmimXLEY8VspHKbO6zbH6DnP58IaRxZ9uM/79NNhh0PQOIJKMMCXJyQduCyIk10
-hp8ago8g9QOXH8qq6TyHos41Dy+42g==
-=clV5
------END PGP SIGNATURE-----
-
---TvwluoJ3RIhvanxkxSeHiabV2CdAvPVCT--
+> >>>
+> >>> There's no such thing.  You mean "we maximize interoperability with
+> >>> common implementations of JSON".
+> >>=20
+> >> s/common/any/
+> >>=20
+> >>> Let's talk implementation for a bit.
+> >>>
+> >>> Encoding and decoding integers in funny ways should be fairly easy =
+in
+> >>> the QObject visitors.  The generated QMP marshallers all use them.
+> >>> Trouble is a few commands still bypass the generated marshallers, a=
+nd
+> >>> mess with the QObject themselves:
+> >>>
+> >>> * query-qmp-schema: minor hack explained in qmp_query_qmp_schema()'=
+s
+> >>>   comment.  Should be harmless.
+> >>>
+> >>> * netdev_add: not QAPIfied.  Eric's patches to QAPIfy it got stuck
+> >>>   because they reject some abuses like passing numbers and bools as
+> >>>   strings.
+> >>>
+> >>> * device_add: not QAPIfied.  We're not sure QAPIfication is feasibl=
+e.
+> >>>
+> >>> netdev_add and device_add both use qemu_opts_from_qdict().  Perhaps=
+ we
+> >>> could hack that to mirror what the QObject visitor do.
+> >>>
+> >>> Else, we might have to do it in the JSON parser.  Should be possibl=
+e,
+> >>> but I'd rather not.
+> >>>
+> >>>>> My preference would be 3 with the strings defined as being
+> >>>>> %x lower case hex formated with a 0x prefix and no longer than 18=
+ characters
+> >>>>> ("0x" + 16 nybbles). Zero padding allowed but not required.
+> >>>>> It's readable and unambiguous when dealing with addresses; I don'=
+t want
+> >>>>> to have to start decoding (2) by hand when debugging.
+> >>>>
+> >>>> Yep, that's a good point about readability.
+> >>>
+> >>> QMP sending all integers in decimal is inconvenient for some values=
+,
+> >>> such as addresses.  QMP sending all (large) integers in hexadecimal
+> >>> would be inconvenient for other values.
+> >>>
+> >>> Let's keep it simple & stupid.  If you want sophistication, JSON is=
+ the
+> >>> wrong choice.
+> >
+> > JSON requires decimal-only, but I'm okay if we state that when
+> > negotiating the alternative representation, that we output hex-only.
+> > (JSON5 adds hex support among other things, but it is not an RFC
+> > standard, and even fewer libraries exist that parse JSON5 in addition=
+ to
+> > straight JSON).
+> >
+> >>>
+> >>>
+> >>> Option 1 feels simplest.
+> >>=20
+> >> But will still fail with any JSON impl that uses double precision fl=
+oating
+> >> point for integers as it will loose precision.
+> >>=20
+> >>> Option 2 feels ugliest.  Less simple, more interoperable than optio=
+n 1.
+> >>=20
+> >> If we assume any JSON impl can do 32-bit integers without loss of
+> >> precision, then I think we can say it is guaranteed portable, but
+> >> it is certainly horrible / ugly.
+> >>=20
+> >>> Option 3 is like option 2, just not quite as ugly.
+> >>=20
+> >> I think option 3 can be guaranteed to be loss-less with /any/ JSON i=
+mpl
+> >> that exists, since you're delegating all string -> int conversion to
+> >> the application code taking the JSON parser/formatter out of the equ=
+ation.
+> >>=20
+> >> This is close to the approach libvirt takes with YAJL parser today. =
+YAJL
+> >> parses as a int64 and we then ignore its result, and re-parse the st=
+ring
+> >> again in libvirt as uint64. When generating json we format as uint64
+> >> in libvirt and ignore YAJLs formatting for int64.
+> >>=20
+> >>> Can we agree to eliminate option 2 from the race?
+> >>=20
+> >> I'm fine with eliminating option 2.
+> >
+> > Same here.
+>=20
+> Noted.
+>=20
+> >> I guess I'd have a preference for option 3 given that it has better
+> >> interoperability
+> >
+> > Likewise - if we're going to bother with a capability that changes
+> > output and allows the input validators to accept more forms, I'd pref=
+er
+> > a string form with correct sign over a negative integer that depends =
+on
+> > 64-bit 2's-complement arithmetic to intepret correctly.
+>=20
+> Noted.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
