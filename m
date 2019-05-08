@@ -2,72 +2,95 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EA31C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 18:04:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B77C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 18:06:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 479772173B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 18:04:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 479772173B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=quantentunnel.de
+	by mail.kernel.org (Postfix) with ESMTPS id A61B4216C4
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 18:06:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UyJK1Yan"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A61B4216C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41232 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41275 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOQvc-0002qI-Hc
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 14:04:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47007)
+	id 1hOQxV-0004ct-KF
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 14:06:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hOQsK-0001A7-7a
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 14:01:05 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hOQvL-0002r8-Rt
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 14:04:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hOQsI-0007hf-CH
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 14:01:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39302)
+	(envelope-from <richard.henderson@linaro.org>) id 1hOQvJ-0000mt-Cn
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 14:04:11 -0400
+Received: from mail-pl1-x631.google.com ([2607:f8b0:4864:20::631]:43628)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hOQsH-0007fk-Cx
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 14:01:02 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hOQsF-0000d6-TX
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 18:00:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DBEA72E8041
-	for <qemu-devel@nongnu.org>; Wed,  8 May 2019 18:00:59 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hOQvJ-0000lZ-3W
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 14:04:09 -0400
+Received: by mail-pl1-x631.google.com with SMTP id n8so10290514plp.10
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 11:04:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=easSRJRIFw2ZrC74E2/GAeMUZZ0pyNjONK6UMe55Q44=;
+	b=UyJK1YanHnGSm77ONcpvqeddnbq5xDVq/LLA1BoYlravK5xvzT5PqjX+rIny8OjabM
+	nZzQkwm8b6ZW7FOjl65pZglQvLA5FGOMU0qVK0D6zdk1CB0JmU84YinWVoz7kMXhZwqP
+	vHZsL0iI/Fu3qMx3dymDuNw1RHHAf9cDlVbqaV/DB5t37aAMIutQ8em308HwIrFNlRHK
+	a6RM012h8hH2VxMCNZRPdlvq1avliZcJWggjF0FJ6HOVbYQstIH+/EiyBK3Xf1QyRMs6
+	4xxOhVljLg66T5kyBVq7SutuRLtpdlKMr5HqbItd3jc5uekRYrsdMBVPxdpJ1xDiPH9a
+	IrXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=easSRJRIFw2ZrC74E2/GAeMUZZ0pyNjONK6UMe55Q44=;
+	b=QaKjSkO3Do7N9TXUfzRJA6MwMChz/wH/iQPTfRii+82xfpoVsJlMk2j1D8zqtzsmMh
+	aEyk0JGMGkFo7mIcAdaQmHmEAFXJtKvSin+zck7QNa0eDNn/5OiTQOVbl9FJ2AGhTSvP
+	khjM5UmQGAFOsshIPKGfrfwUSpfET1KJPtIapogLNhAv3dTS1xxv4Vcd18FiF26F8IZ3
+	n7y+ijjz5L3jrSF9VHf/TRCDDxshSp/7cM2nCX4+7tKqVBHsl5hiDhZTo8THAbfa42nw
+	KTpegvbcZ2IU52qkMZsIADzq8aYRa21/3m6tGYYhPHWNFPQp1uhiHTW0ItOAma7JLJQG
+	gMDw==
+X-Gm-Message-State: APjAAAUn+NhzpKcrhTfL7qXwqxQ9vnQvogBisiOA+yjW0mCYRs3SsSSc
+	6O3XXuqjNRZ27BVg8OkMJIQR5w==
+X-Google-Smtp-Source: APXvYqzqIFNnlPueyDx1/NkgGUBTstOAARobNQAoVZ6tBmtNRjByruTq2BvJ43h6PZccmSnNgfymhQ==
+X-Received: by 2002:a17:902:2825:: with SMTP id
+	e34mr49840592plb.264.1557338646109; 
+	Wed, 08 May 2019 11:04:06 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-27-95.tukw.qwest.net. [97.113.27.95])
+	by smtp.gmail.com with ESMTPSA id
+	k65sm30883316pfj.141.2019.05.08.11.04.04
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 08 May 2019 11:04:05 -0700 (PDT)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20190508150608.3311-1-thuth@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <d783fdeb-fe7a-fc27-3769-1ca245ffd4c7@linaro.org>
+Date: Wed, 8 May 2019 11:04:03 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 08 May 2019 17:54:19 -0000
-From: Frederick Metzengerstein <merak@quantentunnel.de>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: metzengerstein
-X-Launchpad-Bug-Reporter: Frederick Metzengerstein (metzengerstein)
-X-Launchpad-Bug-Modifier: Frederick Metzengerstein (metzengerstein)
-References: <155733764243.16739.6026352756192984678.malonedeb@gac.canonical.com>
-Message-Id: <155733806029.20754.8771334243558515890.launchpad@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18961";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: af359bf9268d44e11010f554dbbe2bac2cdd42bf
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-X-Mailman-Approved-At: Wed, 08 May 2019 14:01:15 -0400
-Subject: [Qemu-devel] [Bug 1828272] Re: 4.0 breaks keyboard autorepeat in
- guests with xserver
+In-Reply-To: <20190508150608.3311-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::631
+Subject: Re: [Qemu-devel] [PATCH] include/exec/poison: Mark TARGET_FMT_lu as
+ poisoned, too
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,101 +99,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1828272 <1828272@bugs.launchpad.net>
+Cc: qemu-trivial@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Description changed:
+On 5/8/19 8:06 AM, Thomas Huth wrote:
+> We already poison TARGET_FMT_lx and TARGET_FMT_ld, but apparently
+> forgot to poison TARGET_FMT_lu, too. Do it now.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  include/exec/poison.h | 1 +
+>  1 file changed, 1 insertion(+)
 
-  Description:
-  In a linux/bsd guest within X, pressing and holding a key for a short tim=
-e causes an endless repeat of that key in the guest. The release of the key=
- gets ignored.
-  Example 1: pressing and holding 'a' for a few seconds results in typing o=
-f 'aaaaaaaaaaaa...' endlessly.
-  Example 2: pressing and holding 'Backspace' for a few seconds results in =
-deleting all your previously typed text.
-  =
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-  It doesn't happen within a VT in the guest. It also doesn't happen with
-  guests that run windows, reactos or haiku for example.
-  =
 
-  The problem goes away, when disabling xorgs autorepeat function via "xset=
- -r" in the host.
-  Normally, this setting should not have any effect on the guest, since it =
-has it's own autorepeat setting. So there is some conflict here.
-  =
-
-  Steps to reproduce:
-  Start any linux/bsd guest system with xserver, open a terminal, press and=
- hold a key for a short time: Look how it gets typed endlessly (Try a few t=
-imes if it doesn't happen immediately).
-  The easiest way is to run a linux live cd, like this (Link to example iso=
- :http://download.grml.org/grml64-full_2018.12.iso)
-- $ qemu-system-x86_64 -enable-kvm -m 512 -boot d -cdrom grml64-full_2018.1=
-2.iso
-+ $ qemu-system-x86_64 -enable-kvm -m 512 -net none -boot d -cdrom grml64-f=
-ull_2018.12.iso
-  =
-
-  Qemu version info:
-  QEMU emulator version 4.0.0
-  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
-  =
-
-  System info:
-  Linux **** 5.0.13-arch1-1-ARCH #1 SMP PREEMPT Sun May 5 18:05:41 UTC 2019=
- x86_64 GNU/Linux
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1828272
-
-Title:
-  4.0 breaks keyboard autorepeat in guests with xserver
-
-Status in QEMU:
-  New
-
-Bug description:
-  Description:
-  In a linux/bsd guest within X, pressing and holding a key for a short tim=
-e causes an endless repeat of that key in the guest. The release of the key=
- gets ignored.
-  Example 1: pressing and holding 'a' for a few seconds results in typing o=
-f 'aaaaaaaaaaaa...' endlessly.
-  Example 2: pressing and holding 'Backspace' for a few seconds results in =
-deleting all your previously typed text.
-
-  It doesn't happen within a VT in the guest. It also doesn't happen
-  with guests that run windows, reactos or haiku for example.
-
-  The problem goes away, when disabling xorgs autorepeat function via "xset=
- -r" in the host.
-  Normally, this setting should not have any effect on the guest, since it =
-has it's own autorepeat setting. So there is some conflict here.
-
-  Steps to reproduce:
-  Start any linux/bsd guest system with xserver, open a terminal, press and=
- hold a key for a short time: Look how it gets typed endlessly (Try a few t=
-imes if it doesn't happen immediately).
-  The easiest way is to run a linux live cd, like this (Link to example iso=
- :http://download.grml.org/grml64-full_2018.12.iso)
-  $ qemu-system-x86_64 -enable-kvm -m 512 -net none -boot d -cdrom grml64-f=
-ull_2018.12.iso
-
-  Qemu version info:
-  QEMU emulator version 4.0.0
-  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
-
-  System info:
-  Linux **** 5.0.13-arch1-1-ARCH #1 SMP PREEMPT Sun May 5 18:05:41 UTC 2019=
- x86_64 GNU/Linux
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1828272/+subscriptions
+r~
 
