@@ -6,88 +6,88 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8AEC04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 17:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C21CC04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 17:26:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59720216F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 17:25:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E8F16216F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 17:26:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jRRIYKNS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59720216F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VhXfDEyo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8F16216F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40707 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40752 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOQJX-0005D1-AB
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 13:25:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37872)
+	id 1hOQL1-00076W-3v
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 13:26:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOQHw-0004HN-P6
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:23:29 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hOQJC-0005G8-1p
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:24:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOQHv-0005YZ-UA
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:23:28 -0400
-Received: from mail-pl1-x636.google.com ([2607:f8b0:4864:20::636]:42097)
+	(envelope-from <richard.henderson@linaro.org>) id 1hOQJB-0006UY-1l
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:24:45 -0400
+Received: from mail-pl1-x635.google.com ([2607:f8b0:4864:20::635]:35132)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hOQHv-0005XX-MC
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:23:27 -0400
-Received: by mail-pl1-x636.google.com with SMTP id x15so10235596pln.9
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 10:23:27 -0700 (PDT)
+	id 1hOQJA-0006U3-Iq
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:24:44 -0400
+Received: by mail-pl1-x635.google.com with SMTP id w24so10250765plp.2
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 10:24:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
 	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=W6hn44I4hXuBHBoIxDgow9TLPfl/QepgHWWWchOerKs=;
-	b=jRRIYKNSCQecp7dAtbIU9jXLzYDpmZr3BrkT8q2xLwvjNmeJVg6FURd4l0VZ3zkZRb
-	+ZUaDf67iiFKy2fLTIYlZEWWn/1cR0j6dytLNQ65GE+03p5XOzeCxgZWtsQDN5m3vKuI
-	xeCRdXWpAHqa30Lk1z8KY+TmbghSXrkP3sbFcgWu+1zhu4/Q1dGO+KKU35a4RHjiLgvh
-	/Q9DAe/MtSCEhY6WXBpkhMppP0ffKZnbMp4iOilOTkbhwP/eRUOA4YvmRlqciz9qMa2K
-	QHKS1+jdMVvcDLAxg4TtiW/XkIL1i7YZ4YXUsPIIIMrT1QPwp+6Z/Okxb9hMTbTsZfsx
-	UOCQ==
+	bh=HrFTSUIu61jOw1peQtA/Iupgxciy8WI3II7dT997cCU=;
+	b=VhXfDEyobLRlhHEyuYgY1nNF536g578Z5WU1SfRBjCbLviXIvkd/QEJF/E/HmvW1fu
+	BgvXuzpdDEKD29PyCV5DQGgszjxkOgSQ2O6ejliemsd6fxpLxYmIhtsCtRSqvMHvJprw
+	jEMVEfXitCLmXT42gWTf1EuMctUq0t7I3OzzzXN+rXWZFc27rSyOXS+uQ7304GdVkpZ5
+	UgX7e0Shq2fbzQVdijzEnejEcIQFf1sn/6j2JSqgcpMOxRzZOFBvCSBKyHW7jF7aNFgc
+	2Z5c/p03cqtHjRo0zZOSYaB0CKvKv8gwYCnMUUBliqHNc8SxqpNPOmcVRp4wB//4Jfe4
+	uUxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=W6hn44I4hXuBHBoIxDgow9TLPfl/QepgHWWWchOerKs=;
-	b=O4eocryLivnrUqyB4+m3ZwmgZD17y9JjpZlAWsCH7Z8NB3StOpELHmDSHgTwTg03K5
-	xvJQIGBR3lu3wSoLTgvQyFbuXd7iPpSlv2SBmKM0QxVPgBm9N9hQiA4mKh4+ggQyLPDF
-	n73Ap+vRDgSsfpJdn1Fu892NtuCfYsQ4Ko7tV51q2VdJ6IkiecJ/acHeB4M/laYHk4CL
-	QhetFOYs0RApK9qn18LnIbWLiLd64zeE/1XyHRW0/L3JfIf6iOxL+/n6ViIV7mIvDmwa
-	EzBV33npSfaeZdzejk06MwcXnXEgar3ahvnxK1IPMh/iK3zP3dGPaQGeYAEp/EGqqE2F
-	MW4w==
-X-Gm-Message-State: APjAAAX3fxqhTGkRdyBgyDtw9IWEpfonHW0Vq3e945XsIM/JzlSMyFxA
-	69sYO8l0AQZYFViBF1YP5voiRw==
-X-Google-Smtp-Source: APXvYqyligknb6Pj8/SuuBRKtjtZxFuWSFRGa5CFPC9OwqIKD2UCWCSY2ikwvsGXJDmj75MpVVkiNw==
-X-Received: by 2002:a17:902:2924:: with SMTP id
-	g33mr48830697plb.26.1557336206514; 
-	Wed, 08 May 2019 10:23:26 -0700 (PDT)
+	bh=HrFTSUIu61jOw1peQtA/Iupgxciy8WI3II7dT997cCU=;
+	b=RhiS4vA0uM5dqOv8SRmSAnLnI/nVEFPA1xP5F3AR1SEKQe59bFDdpNruEqg7AB1GmR
+	SHM/ehZFuEsWZ1/OE6wn9FtX6ZXA/7XKpY7mbxIBk03iTVYVQCTT++PhU9oHgWult5QI
+	lknAwoqw01s5vbQgqWjk7FdiHeZV+PRFymEx2KqmplA2bC/oK/7zQNK98mwvuvFWXw+c
+	2jSNyFqZa8itxSrBpe/9mD1W584l9rSmZnrylwQwHDx88PC5YBbeyry7MBIquMmsgdsb
+	5zu0axpXb+/qYN6s9uf2iVtQSh1RiFyNkfIS5YTIFPaE87HrApla+5ohIaspp7NklzD7
+	J9iw==
+X-Gm-Message-State: APjAAAX5BBrPSFQLvskfetTkADeYhxp6M8SqL8gey3Pl7x6lHiZnDksR
+	giC4kP26bvnVEBsnHOtulCgjxQ==
+X-Google-Smtp-Source: APXvYqzQoYSZJqhTo7GBdcZwNRWMS/TB33QlLAQl6E9mUcv88cViYFXN3gk6cD2bRBRunAajFpeo6w==
+X-Received: by 2002:a17:902:29e9:: with SMTP id
+	h96mr49022903plb.258.1557336283363; 
+	Wed, 08 May 2019 10:24:43 -0700 (PDT)
 Received: from [192.168.1.11] (97-113-27-95.tukw.qwest.net. [97.113.27.95])
 	by smtp.gmail.com with ESMTPSA id
-	n64sm25098750pfb.38.2019.05.08.10.23.25
+	u66sm22282046pfb.76.2019.05.08.10.24.42
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 08 May 2019 10:23:25 -0700 (PDT)
+	Wed, 08 May 2019 10:24:42 -0700 (PDT)
 To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
 References: <20190508145611.107133-1-ysato@users.sourceforge.jp>
-	<20190508145611.107133-3-ysato@users.sourceforge.jp>
+	<20190508145611.107133-4-ysato@users.sourceforge.jp>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <805f159b-53fa-b4cd-4983-5912c525c2ec@linaro.org>
-Date: Wed, 8 May 2019 10:23:23 -0700
+Message-ID: <b3355c8f-5463-a7af-24b3-18d9687b3e3f@linaro.org>
+Date: Wed, 8 May 2019 10:24:40 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190508145611.107133-3-ysato@users.sourceforge.jp>
+In-Reply-To: <20190508145611.107133-4-ysato@users.sourceforge.jp>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::636
-Subject: Re: [Qemu-devel] [PATCH v10 02/13] target/rx: TCG helper
+X-Received-From: 2607:f8b0:4864:20::635
+Subject: Re: [Qemu-devel] [PATCH v10 03/13] target/rx: CPU definition
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -107,13 +107,13 @@ Sender: "Qemu-devel"
 On 5/8/19 7:56 AM, Yoshinori Sato wrote:
 > Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 > ---
->  target/rx/helper.h    |  31 ++++
->  target/rx/helper.c    | 148 ++++++++++++++++
->  target/rx/op_helper.c | 481 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 660 insertions(+)
->  create mode 100644 target/rx/helper.h
->  create mode 100644 target/rx/helper.c
->  create mode 100644 target/rx/op_helper.c
+>  target/rx/cpu-qom.h |  52 ++++++++++++
+>  target/rx/cpu.h     | 196 ++++++++++++++++++++++++++++++++++++++++++++++
+>  target/rx/cpu.c     | 222 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 470 insertions(+)
+>  create mode 100644 target/rx/cpu-qom.h
+>  create mode 100644 target/rx/cpu.h
+>  create mode 100644 target/rx/cpu.c
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
