@@ -2,64 +2,95 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBC3FC04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 04:28:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4C04C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 04:44:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A59D721019
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 04:28:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A59D721019
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=pku.edu.cn
+	by mail.kernel.org (Postfix) with ESMTPS id B120720850
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 04:44:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jfU4JmDI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B120720850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58672 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58776 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOEC7-0001vO-Kx
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 00:28:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46282)
+	id 1hOER2-0004ht-MA
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 00:44:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gxt@pku.edu.cn>) id 1hOEBJ-0001eW-OU
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 00:27:50 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hOEQE-0004P4-Fa
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 00:43:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gxt@pku.edu.cn>) id 1hOEBI-0002gt-Nc
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 00:27:49 -0400
-Received: from mx11.pku.edu.cn ([162.105.129.174]:15084 helo=pku.edu.cn)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gxt@pku.edu.cn>) id 1hOEBI-0002dx-5I
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 00:27:48 -0400
-Received: by ajax-webmail-mailfront04 (Coremail) ; Wed, 8 May 2019 12:27:38
-	+0800 (GMT+08:00)
-X-Originating-IP: [203.187.182.140]
-Date: Wed, 8 May 2019 12:27:38 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Guan Xuetao" <gxt@pku.edu.cn>
-To: "peter maydell" <peter.maydell@linaro.org>
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.7b build 20180509(9e2321e9)
-	Copyright (c) 2002-2019 www.mailtech.cn pku.edu.cn
-In-Reply-To: <CAFEAcA_jBgEvFTnSu_KMHD6Ofnr05DvX6mTZD1x7-jhdi8sdJg@mail.gmail.com>
-References: <20190403034358.21999-1-richard.henderson@linaro.org>
-	<20190403034358.21999-23-richard.henderson@linaro.org>
-	<CAFEAcA_jBgEvFTnSu_KMHD6Ofnr05DvX6mTZD1x7-jhdi8sdJg@mail.gmail.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <richard.henderson@linaro.org>) id 1hOEQD-0001Kh-Ha
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 00:43:14 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:46631)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hOEQD-0001Jg-Ao
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 00:43:13 -0400
+Received: by mail-pl1-x643.google.com with SMTP id bi2so9273523plb.13
+	for <qemu-devel@nongnu.org>; Tue, 07 May 2019 21:43:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:from:to:references:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=XGxQckPcguvPhvG16CMg92ycJMTyNIdamLdFKJKKK6Y=;
+	b=jfU4JmDITOZrjp3nv9iUCFT7dxclfzWrZs8f7GXUy7rtKz7UcyyrK6FF4eJFAwvGUr
+	PdNrqDkYKBSJRMIKmdTzhTK94Nutb46WOkeNaCo2nCbfvM3fJd+UGm638joxaB7WGcVt
+	VBmWWeqnTLfjBrZvqTWHOIm1/NHwTcL9XIikGgi5MwFJP2JgHlEP06lmeRis0lRaYNSg
+	8GgOqvefU6qZ6pxSfxh5clj70PNPJyGnsCxHw5qePFxM3y/8uH4tjJNf/uL55J9NkMsu
+	s2aFDoFIzfYzngT3wikn1VUdkuUh3EpR+Ew/Vv3Y9c/TaAJyBHzQYmUYUU2DVg71HdeU
+	r7qQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:from:to:references:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=XGxQckPcguvPhvG16CMg92ycJMTyNIdamLdFKJKKK6Y=;
+	b=piEHCb2I81YgiT8qYEUO1GJasTuGjaEOQsBf+VdsRjV8DkVfMykvzpZ0ws3OTiPh2H
+	6jxtOV9IqyG9Sp+wpWfoRnfPsoB9kxwTVmg2Xe+nJG2eoXcYmLGfdHzABNjfy3XojaYj
+	Gy57Qei5mJZUYE8b7jFEdNqFBUUN41FRWFvBFTtgGwsom1rsZMn07zthMTWKO72RYN1g
+	EmMd4yM1USg/v5B+IAhctFjvZGm5eLvY8upssQOFmejaPuG9XLbMNcwj/lpefdfEKleM
+	idbojWZNjfsPikjt946qsxxSrqaI0J7BAnGQuxZTdxDjKHpro+ikt9ykz2n/n2EjMbq5
+	71wg==
+X-Gm-Message-State: APjAAAUZlfd7WPnp4mvzpsTGVUfxv/DH9PQ3eK8kWhgvmV70lXYTeA0L
+	giz9ZwHwL7S7OeVL73uWPeBBCOy+wCI=
+X-Google-Smtp-Source: APXvYqxYykfzy809h1XGGB0ck9wlg0f3AMiAWNVcBSudUqyXojq/JmAx/7FSKNKB00QZAmEDxEO07g==
+X-Received: by 2002:a17:902:5995:: with SMTP id
+	p21mr45012224pli.216.1557290591306; 
+	Tue, 07 May 2019 21:43:11 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-189-189.tukw.qwest.net. [97.113.189.189])
+	by smtp.gmail.com with ESMTPSA id
+	f22sm20902694pgv.45.2019.05.07.21.43.09
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 07 May 2019 21:43:10 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+References: <20190506173353.32206-1-richard.henderson@linaro.org>
+	<20190506173353.32206-3-richard.henderson@linaro.org>
+	<5f6eaa15-4a36-37c2-3199-0084178e9cfb@redhat.com>
+	<c692a451-15a0-43b5-4255-37f4bce5cfe3@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <9dfb52f7-af21-1a98-7ced-3494368f5668@linaro.org>
+Date: Tue, 7 May 2019 21:43:08 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Message-ID: <688c1a14.5ab49.16a95b26835.Coremail.gxt@pku.edu.cn>
-X-Coremail-Locale: en_US
-X-CM-TRANSID: 9IFpogAH0yC6WtJcvPCTAg--.11247W
-X-CM-SenderInfo: qqqqliixuslio6sn3hxhgxhubq/1tbiAQAEB1Py8iCO+AAAsH
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW7Jw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 162.105.129.174
-Subject: Re: [Qemu-devel] [PATCH 22/26] target/unicore32: Convert to
- CPUClass::tlb_fill
+In-Reply-To: <c692a451-15a0-43b5-4255-37f4bce5cfe3@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::643
+Subject: Re: [Qemu-devel] [PATCH v4 02/24] crypto: Merge crypto-obj-y into
+ libqemuutil.a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,31 +102,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard henderson <richard.henderson@linaro.org>,
-	qemu developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ckl0J3MgT0sgZm9yIHVuaWNvcmUzMiBjb2Rlcy4KClRoYW5rcy4KCkd1YW4gWHVldGFvCgoKPiAt
-LS0tLU9yaWdpbmFsIE1lc3NhZ2VzLS0tLS0KPiBGcm9tOiAiUGV0ZXIgTWF5ZGVsbCIgPHBldGVy
-Lm1heWRlbGxAbGluYXJvLm9yZz4KPiBTZW50IFRpbWU6IDIwMTktMDQtMzAgMTg6MDY6MDMgKFR1
-ZXNkYXkpCj4gVG86ICJSaWNoYXJkIEhlbmRlcnNvbiIgPHJpY2hhcmQuaGVuZGVyc29uQGxpbmFy
-by5vcmc+Cj4gQ2M6ICJRRU1VIERldmVsb3BlcnMiIDxxZW11LWRldmVsQG5vbmdudS5vcmc+LCAi
-R3VhbiBYdWV0YW8iIDxneHRAbXByYy5wa3UuZWR1LmNuPgo+IFN1YmplY3Q6IFJlOiBbUWVtdS1k
-ZXZlbF0gW1BBVENIIDIyLzI2XSB0YXJnZXQvdW5pY29yZTMyOiBDb252ZXJ0IHRvIENQVUNsYXNz
-Ojp0bGJfZmlsbAo+IAo+IE9uIFdlZCwgMyBBcHIgMjAxOSBhdCAwNDo1OCwgUmljaGFyZCBIZW5k
-ZXJzb24KPiA8cmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZz4gd3JvdGU6Cj4gPgo+ID4gQ2M6
-IEd1YW4gWHVldGFvIDxneHRAbXByYy5wa3UuZWR1LmNuPgo+ID4gU2lnbmVkLW9mZi1ieTogUmlj
-aGFyZCBIZW5kZXJzb24gPHJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmc+Cj4gPiAtLS0KPiA+
-ICB0YXJnZXQvdW5pY29yZTMyL2NwdS5oICAgICAgIHwgIDUgKysrLS0KPiA+ICB0YXJnZXQvdW5p
-Y29yZTMyL2NwdS5jICAgICAgIHwgIDUgKy0tLS0KPiA+ICB0YXJnZXQvdW5pY29yZTMyL2hlbHBl
-ci5jICAgIHwgMjMgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiA+ICB0YXJnZXQvdW5pY29yZTMy
-L29wX2hlbHBlci5jIHwgMTQgLS0tLS0tLS0tLS0tLS0KPiA+ICB0YXJnZXQvdW5pY29yZTMyL3Nv
-ZnRtbXUuYyAgIHwgMTkgKysrKysrKysrKysrKysrLS0tLQo+ID4gIDUgZmlsZXMgY2hhbmdlZCwg
-MTkgaW5zZXJ0aW9ucygrKSwgNDcgZGVsZXRpb25zKC0pCj4gCj4gUmV2aWV3ZWQtYnk6IFBldGVy
-IE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz4KPiAKPiBZb3UgbWlnaHQgbm90ZSBp
-biB0aGUgY29tbWl0IG1lc3NhZ2UgdGhhdCB3ZSBjYW4ganVzdCBkZWxldGUKPiB0aGUgdXNlci1t
-b2RlIChub24tKWhhbmRsaW5nIG9mIHRsYiBmaWxsIGJlY2F1c2Ugd2UKPiBkb24ndCBzdXBwb3J0
-IHVuaWNvcmUzMiBsaW51eC11c2VyIGFueSBtb3JlLgo+IAo+IHRoYW5rcwo+IC0tIFBNTQo=
+On 5/7/19 8:58 PM, Richard Henderson wrote:
+> On 5/7/19 2:03 AM, Laurent Vivier wrote:
+>> This patch breaks linux-user statically linked build on Fedora.
+>>
+>> Fedora doesn't provide static version of nettle and gcrypt, so the configure
+>> fails.
+>>
+>> You should update the configure for them like you did for gnutls in PATCH 1.
+> 
+> Which fedora?  I just tried fedora30 and it worked for me...
+
+Nevermind, I see it now.
+
+
+r~
 
