@@ -2,80 +2,78 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F861C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 16:28:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FE9CC04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 16:30:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35F66208C3
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 16:28:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35F66208C3
+	by mail.kernel.org (Postfix) with ESMTPS id E84EB208C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 16:30:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E84EB208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40108 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40148 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOPQp-0007xi-I1
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 12:28:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54997)
+	id 1hOPSe-0000Vb-4x
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 12:30:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hOPQ2-0007bs-9j
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 12:27:48 -0400
+	(envelope-from <philmd@redhat.com>) id 1hOPRm-0008Us-Kz
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 12:29:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hOPQ0-0003yL-2N
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 12:27:46 -0400
-Received: from mail-wm1-f45.google.com ([209.85.128.45]:37667)
+	(envelope-from <philmd@redhat.com>) id 1hOPRk-0004lO-SE
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 12:29:34 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:44125)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hOPPz-0003y0-RS
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 12:27:44 -0400
-Received: by mail-wm1-f45.google.com with SMTP id y5so4033333wma.2
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 09:27:43 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hOPRk-0004l2-Cj
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 12:29:32 -0400
+Received: by mail-wr1-f65.google.com with SMTP id c5so2790156wrs.11
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 09:29:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=iC2yOUkmIFnYW5vQRDiodtDHYFaQ49YP27qa2Y2Qxzs=;
-	b=iZMXkY8CTbmIOMrtXGzoYebZoUaJ5cYyudmojlQGLrUGqskKCUqyIAz/q1aPcijgBQ
-	QUW/j9ACV2hta8cacO3kBHoE4zTUMz9bxbSLcNE/2taup9M7p9sY0YULCL2EAIrCEFH/
-	55I190hSnoO3tCeoQSk8bJqiA74Pw/xq3N+cXRm+OquE8BxSYNJx646RTKdsQr7iNiiX
-	+35vzgNvcVmbtEQd29c+RfmzGtP6JOereUl6A6+KtQQez27fpeTZJ/9jp1B0p6pgvEs5
-	aFsQ+9v4FMFW+dFRFJXM2LG20UjudsqIpUCAuSCk9upeMowLmRCyoe/x3LVKOZYVZB0H
-	6RnA==
-X-Gm-Message-State: APjAAAWFjKGpMKmvnrau3AJdYFVsdBPXobGifz9PUvSZMhMxATRYwgaL
-	QLwpkgXJq9qOOT8/Ux0/EguCCQ==
-X-Google-Smtp-Source: APXvYqyhXioS9QRtqwliWzCAMLY304IeftlhnOHU85OiQLLciZBlPOAwcKEA49K9bkxmvq6PsNyKyg==
-X-Received: by 2002:a1c:2388:: with SMTP id j130mr1795764wmj.133.1557332862681;
-	Wed, 08 May 2019 09:27:42 -0700 (PDT)
+	bh=PXRRbqGY8iAEwchgmbad1wrs6XK5QE6UUUOJS0v6w+0=;
+	b=Zr+cVgrHaoRD67BdntQ1XMlX9z20hDK3LXDatbrK+ZGrU3mTnff+itr9vhLAB3kZIA
+	u3YqbLEkgaKhOCWsSJgVWjBArTx+js0K+sQro9fAQIvHhkSdJ6aLXXO1F3kwjm6m5nff
+	BU1rd5kN/Jk+rFqAh7iNafTZuFTe/nX6GRnVaO3LgSMJIsmMYdwTePrzlvBkSzdb1zaA
+	MGCCoeIi6gUse0nzfTc8OBLQFwsuWGyw9hHjqR4BVIyQ6IxngUB0wwDOBpFri6pjVfkn
+	zj90GUlagnv6wj7L56/Mnc4xAV5772gqTFYQEgSb/nCPHQqW4u4A6gNLPrwCndgNx24D
+	2fOw==
+X-Gm-Message-State: APjAAAX6deGnhQ1XmNsSyWKdlAKQEsJGhQwgJfCad0YegPBsHyALk5HN
+	O5LT08TVQQT2pRD3AVsgzwB96Q==
+X-Google-Smtp-Source: APXvYqyiGO2EZ0dJliCouWpOlgF68bJv5huplexvuqAC1FX7Q19mnMVmD3jyekunlUR1jonmlmEy9A==
+X-Received: by 2002:a5d:5108:: with SMTP id s8mr9729992wrt.99.1557332971349;
+	Wed, 08 May 2019 09:29:31 -0700 (PDT)
 Received: from [10.201.33.53] ([195.166.127.210])
-	by smtp.gmail.com with ESMTPSA id
-	q4sm14469785wrx.25.2019.05.08.09.27.41
+	by smtp.gmail.com with ESMTPSA id u9sm3342131wmd.14.2019.05.08.09.29.30
 	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Wed, 08 May 2019 09:27:42 -0700 (PDT)
+	Wed, 08 May 2019 09:29:30 -0700 (PDT)
 To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
 References: <20190508145611.107133-1-ysato@users.sourceforge.jp>
-	<20190508145611.107133-7-ysato@users.sourceforge.jp>
+	<20190508145611.107133-2-ysato@users.sourceforge.jp>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
 	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <c7990acf-15ec-8d40-4b49-eea4c7e9b52b@redhat.com>
-Date: Wed, 8 May 2019 18:27:40 +0200
+Message-ID: <a6e0032c-883f-1b00-f15b-3cb2dc8120c5@redhat.com>
+Date: Wed, 8 May 2019 18:29:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190508145611.107133-7-ysato@users.sourceforge.jp>
+In-Reply-To: <20190508145611.107133-2-ysato@users.sourceforge.jp>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.128.45
-Subject: Re: [Qemu-devel] [PATCH v10 06/13] hw/intc: RX62N interrupt
- controller (ICUa)
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH v10 01/13] target/rx: TCG translation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,550 +90,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/8/19 4:56 PM, Yoshinori Sato wrote:
-> This implementation supported only ICUa.
-> Hardware manual.
-> https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033ej0140_rx62n.pdf
+On 5/8/19 4:55 PM, Yoshinori Sato wrote:
+> This part only supported RXv1 instructions.
+> Instruction manual.
+> https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01us0032ej0120_rxsm.pdf
 > 
 > Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 > ---
->  include/hw/intc/rx_icu.h |  49 +++++++
->  hw/intc/rx_icu.c         | 375 +++++++++++++++++++++++++++++++++++++++++++++++
->  hw/intc/Makefile.objs    |   1 +
->  3 files changed, 425 insertions(+)
->  create mode 100644 include/hw/intc/rx_icu.h
->  create mode 100644 hw/intc/rx_icu.c
-> 
-> diff --git a/include/hw/intc/rx_icu.h b/include/hw/intc/rx_icu.h
-> new file mode 100644
-> index 0000000000..bc46b3079b
-> --- /dev/null
-> +++ b/include/hw/intc/rx_icu.h
-> @@ -0,0 +1,49 @@
-> +#ifndef RX_ICU_H
-> +#define RX_ICU_H
-> +
-> +#include "qemu-common.h"
-> +#include "hw/irq.h"
-> +
-> +struct IRQSource {
-> +    int sense;
+>  target/rx/translate.c  | 2432 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  target/rx/insns.decode |  617 ++++++++++++
+>  2 files changed, 3049 insertions(+)
+>  create mode 100644 target/rx/translate.c
+>  create mode 100644 target/rx/insns.decode
 
-Hmm can you use the enum?
+I got this error (haven't look at it):
 
-> +    int level;
-> +};
-> +
-> +struct RXICUState {
-> +    SysBusDevice parent_obj;
-> +
-> +    MemoryRegion memory;
-> +    struct IRQSource src[256];
-> +    char *icutype;
-> +    uint32_t nr_irqs;
-> +    uint32_t *map;
-> +    uint32_t nr_sense;
-> +    uint32_t *init_sense;
-> +
-> +    uint8_t ir[256];
-> +    uint8_t dtcer[256];
-> +    uint8_t ier[32];
-> +    uint8_t ipr[142];
-> +    uint8_t dmasr[4];
-> +    uint16_t fir;
-> +    uint8_t nmisr;
-> +    uint8_t nmier;
-> +    uint8_t nmiclr;
-> +    uint8_t nmicr;
-> +    int req_irq;
-> +    qemu_irq _irq;
-> +    qemu_irq _fir;
-> +    qemu_irq _swi;
-> +};
-> +typedef struct RXICUState RXICUState;
-> +
-> +#define TYPE_RXICU "rxicu"
-> +#define RXICU(obj) OBJECT_CHECK(RXICUState, (obj), TYPE_RXICU)
-> +
-> +#define SWI 27
-
-enum {
-
-> +#define TRG_LEVEL 0
-> +#define TRG_NEDGE 1
-> +#define TRG_PEDGE 2
-> +#define TRG_BEDGE 3
-
-};
-
-> +
-> +#endif /* RX_ICU_H */
-> diff --git a/hw/intc/rx_icu.c b/hw/intc/rx_icu.c
-> new file mode 100644
-> index 0000000000..345e047a45
-> --- /dev/null
-> +++ b/hw/intc/rx_icu.c
-> @@ -0,0 +1,375 @@
-> +/*
-> + * RX Interrupt control unit
-
-"Interrupt Control Unit"
-
-"Warning: Only ICUa is supported."
-
-> + *
-> + * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-> + * (Rev.1.40 R01UH0033EJ0140)
-> + *
-> + * Copyright (c) 2019 Yoshinori Sato
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "qemu/log.h"
-> +#include "qapi/error.h"
-> +#include "cpu.h"
-> +#include "hw/hw.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/registerfields.h"
-> +#include "hw/intc/rx_icu.h"
-> +#include "qemu/error-report.h"
-> +
-> +REG8(IR, 0)
-> +  FIELD(IR, IR,  0, 1)
-> +REG8(DTCER, 0x100)
-> +  FIELD(DTCER, DTCE,  0, 1)
-> +REG8(IER, 0x200)
-> +REG8(SWINTR, 0x2e0)
-> +  FIELD(SWINTR, SWINT, 0, 1)
-> +REG16(FIR, 0x2f0)
-> +  FIELD(FIR, FVCT, 0, 8)
-> +  FIELD(FIR, FIEN, 15, 1)
-> +REG8(IPR, 0x300)
-> +  FIELD(IPR, IPR, 0, 4)
-> +REG8(DMRSR, 0x400)
-> +REG8(IRQCR, 0x500)
-> +  FIELD(IRQCR, IRQMD, 2, 2)
-> +REG8(NMISR, 0x580)
-> +  FIELD(NMISR, NMIST, 0, 1)
-> +  FIELD(NMISR, LVDST, 1, 1)
-> +  FIELD(NMISR, OSTST, 2, 1)
-> +REG8(NMIER, 0x581)
-> +  FIELD(NMIER, NMIEN, 0, 1)
-> +  FIELD(NMIER, LVDEN, 1, 1)
-> +  FIELD(NMIER, OSTEN, 2, 1)
-> +REG8(NMICLR, 0x582)
-> +  FIELD(NMICLR, NMICLR, 0, 1)
-> +  FIELD(NMICLR, OSTCLR, 2, 1)
-> +REG8(NMICR, 0x583)
-> +  FIELD(NMICR, NMIMD, 3, 1)
-> +
-> +#define request(icu, n) (icu->ipr[icu->map[n]] << 8 | n)
-> +
-> +static qemu_irq *rxicu_pin(RXICUState *icu, int n_IRQ)
-> +{
-> +    if ((icu->fir & R_FIR_FIEN_MASK) &&
-> +        (icu->fir & R_FIR_FVCT_MASK) == n_IRQ) {
-> +        return &icu->_fir;
-> +    } else {
-> +        return &icu->_irq;
-> +    }
-> +}
-> +
-> +static void rxicu_request(RXICUState *icu, int n_IRQ)
-> +{
-> +    int enable;
-> +
-> +    enable = icu->ier[n_IRQ / 8] & (1 << (n_IRQ & 7));
-> +    if (n_IRQ > 0 && enable != 0 && atomic_read(&icu->req_irq) < 0) {
-> +        atomic_set(&icu->req_irq, n_IRQ);
-> +        qemu_set_irq(*rxicu_pin(icu, n_IRQ), request(icu, n_IRQ));
-> +    }
-> +}
-> +
-> +static void rxicu_set_irq(void *opaque, int n_IRQ, int level)
-> +{
-> +    RXICUState *icu = opaque;
-> +    struct IRQSource *src;
-> +    int issue;
-> +
-> +    if (n_IRQ >= 256) {
-
-OK this should be RX_IRQ_COUNT (noted in later patch).
-
-> +        error_report("%s: IRQ %d out of range", __func__, n_IRQ);
-> +        return;
-> +    }
-> +
-> +    src = &icu->src[n_IRQ];
-> +
-> +    level = (level != 0);
-> +    switch (src->sense) {
-> +    case TRG_LEVEL:
-> +        /* level-sensitive irq */
-> +        issue = level;
-> +        src->level = level;
-> +        break;
-> +    case TRG_NEDGE:
-> +        issue = (level == 0 && src->level == 1);
-> +        src->level = level;
-> +        break;
-> +    case TRG_PEDGE:
-> +        issue = (level == 1 && src->level == 0);
-> +        src->level = level;
-> +        break;
-> +    case TRG_BEDGE:
-> +        issue = ((level ^ src->level) & 1);
-> +        src->level = level;
-> +        break;
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +    if (issue == 0 && src->sense == TRG_LEVEL) {
-> +        icu->ir[n_IRQ] = 0;
-> +        if (atomic_read(&icu->req_irq) == n_IRQ) {
-> +            /* clear request */
-> +            qemu_set_irq(*rxicu_pin(icu, n_IRQ), 0);
-> +            atomic_set(&icu->req_irq, -1);
-> +        }
-> +        return;
-> +    }
-> +    if (issue) {
-> +        icu->ir[n_IRQ] = 1;
-> +        rxicu_request(icu, n_IRQ);
-> +    }
-> +}
-> +
-> +static void rxicu_ack_irq(void *opaque, int no, int level)
-> +{
-> +    RXICUState *icu = opaque;
-> +    int i;
-> +    int n_IRQ;
-> +    int max_pri;
-> +
-> +    n_IRQ = atomic_read(&icu->req_irq);
-> +    if (n_IRQ < 0) {
-> +        return;
-> +    }
-> +    atomic_set(&icu->req_irq, -1);
-> +    if (icu->src[n_IRQ].sense != TRG_LEVEL) {
-> +        icu->ir[n_IRQ] = 0;
-> +    }
-> +
-> +    max_pri = 0;
-> +    n_IRQ = -1;
-> +    for (i = 0; i < 256; i++) {
-> +        if (icu->ir[i]) {
-> +            if (max_pri < icu->ipr[icu->map[i]]) {
-> +                n_IRQ = i;
-> +                max_pri = icu->ipr[icu->map[i]];
-> +            }
-> +        }
-> +    }
-> +
-> +    if (n_IRQ >= 0) {
-> +        rxicu_request(icu, n_IRQ);
-> +    }
-> +}
-> +
-> +static uint64_t icu_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    hwaddr offset = addr & 0xfff;
-
-The region is 0x600 wide, why AND? (if required that would be & 0x5ff).
-
-> +    RXICUState *icu = opaque;
-> +    int reg = addr & 0xff;
-> +
-> +    if ((offset != A_FIR && size != 1) ||
-> +        (offset == A_FIR && size != 2)) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "rx_icu: Invalid read size %08lx.\n", offset);
-> +        return 0xffffffffffffffffULL;
-
-UINT64_MAX?
-
-Here I get on 32bit host:
-
-In file included from qemu/hw/intc/rx_icu.c:24:0:
-qemu/hw/intc/rx_icu.c: In function 'icu_read':
-qemu/hw/intc/rx_icu.c:176:23: error: format '%lx' expects argument of
-type 'long unsigned int', but argument 2 has type 'hwaddr {aka long long
-unsigned int}' [-Werror=format=]
-                       "rx_icu: Invalid read size %08lx.\n", offset);
-                       ^
-qemu/include/qemu/log.h:85:22: note: in definition of macro 'qemu_log_mask'
-             qemu_log(FMT, ## __VA_ARGS__);              \
-                      ^
-qemu/hw/intc/rx_icu.c:208:23: error: format '%lx' expects argument of
-type 'long unsigned int', but argument 2 has type 'hwaddr {aka long long
-unsigned int}' [-Werror=format=]
-                       "rx_icu: Register %08lx not implemented\n", offset);
-                       ^
-qemu/include/qemu/log.h:85:22: note: in definition of macro 'qemu_log_mask'
-             qemu_log(FMT, ## __VA_ARGS__);              \
-                      ^
-qemu/hw/intc/rx_icu.c: In function 'icu_write':
-qemu/hw/intc/rx_icu.c:223:23: error: format '%lx' expects argument of
-type 'long unsigned int', but argument 2 has type 'hwaddr {aka long long
-unsigned int}' [-Werror=format=]
-                       "rx_icu: Invalid write size at %08lx.\n", offset);
-                       ^
-qemu/include/qemu/log.h:85:22: note: in definition of macro 'qemu_log_mask'
-             qemu_log(FMT, ## __VA_ARGS__);              \
-                      ^
-qemu/hw/intc/rx_icu.c:276:23: error: format '%lx' expects argument of
-type 'long unsigned int', but argument 2 has type 'hwaddr {aka long long
-unsigned int}' [-Werror=format=]
-                       "rx_icu: Register %08lx not implemented\n", offset);
-                       ^
-qemu/include/qemu/log.h:85:22: note: in definition of macro 'qemu_log_mask'
-             qemu_log(FMT, ## __VA_ARGS__);              \
-                      ^
+qemu/target/rx/translate.c: In function 'trans_XCHG_mr':
+qemu/target/rx/translate.c:744:5: error: 'addr' may be used
+uninitialized in this function [-Werror=maybe-uninitialized]
+     tcg_gen_atomic_xchg_i32(cpu_regs[a->rd], addr, cpu_regs[a->rd],
+     ^
 cc1: all warnings being treated as errors
+qemu/rules.mak:69: recipe for target 'target/rx/translate.o' failed
 
-Please fix using HWADDR_PRIX.
-
-> +    }
-> +    switch (offset) {
-> +    case A_IR ... A_IR + 0xff:
-> +        return icu->ir[reg] & R_IR_IR_MASK;
-> +    case A_DTCER ... A_DTCER + 0xff:
-> +        return icu->dtcer[reg] & R_DTCER_DTCE_MASK;
-> +    case A_IER ... A_IER + 0x1f:
-> +        return icu->ier[reg];
-> +    case A_SWINTR:
-> +        return 0;
-> +    case A_FIR:
-> +        return icu->fir & (R_FIR_FIEN_MASK | R_FIR_FVCT_MASK);
-> +    case A_IPR ... A_IPR + 0x8f:
-> +        return icu->ipr[reg] & R_IPR_IPR_MASK;
-> +    case A_DMRSR:
-> +    case A_DMRSR + 4:
-> +    case A_DMRSR + 8:
-> +    case A_DMRSR + 12:
-> +        return icu->dmasr[reg >> 2];
-> +    case A_IRQCR ... A_IRQCR + 0x1f:
-> +        return icu->src[64 + reg].sense << R_IRQCR_IRQMD_SHIFT;
-> +    case A_NMISR:
-> +    case A_NMICLR:
-> +        return 0;
-> +    case A_NMIER:
-> +        return icu->nmier;
-> +    case A_NMICR:
-> +        return icu->nmicr;
-> +    default:
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "rx_icu: Register %08lx not implemented\n", offset);
-> +        break;
-> +    }
-> +    return 0xffffffffffffffffULL;
-
-UINT64_MAX
-
-> +}
-> +
-> +static void icu_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
-> +{
-> +    hwaddr offset = addr & 0xfff;
-
-AND not needed IMO.
-
-> +    RXICUState *icu = opaque;
-> +    int reg = addr & 0xff;
-> +
-> +    if ((offset != A_FIR && size != 1) ||
-> +        (offset == A_FIR && size != 2)) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "rx_icu: Invalid write size at %08lx.\n", offset);
-
-Oh, I think we don't end logging with trailing dot...
-
-> +        return;
-> +    }
-> +    switch (offset) {
-> +    case A_IR ... A_IR + 0xff:
-> +        if (icu->src[reg].sense != TRG_LEVEL && val == 0) {
-> +            icu->ir[reg] = 0;
-> +        }
-> +        break;
-> +    case A_DTCER ... A_DTCER + 0xff:
-> +        icu->dtcer[reg] = val & R_DTCER_DTCE_MASK;
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "rx_icu: DTC not implemented\n");
-> +        break;
-> +    case A_IER ... A_IER + 0x1f:
-> +        icu->ier[reg] = val;
-> +        break;
-> +    case A_SWINTR:
-> +        if (val & R_SWINTR_SWINT_MASK) {
-> +            qemu_irq_pulse(icu->_swi);
-> +        }
-> +        break;
-> +    case A_FIR:
-> +        icu->fir = val & (R_FIR_FIEN_MASK | R_FIR_FVCT_MASK);
-> +        break;
-> +    case A_IPR ... A_IPR + 0x8f:
-> +        icu->ipr[reg] = val & R_IPR_IPR_MASK;
-> +        break;
-> +    case A_DMRSR:
-> +    case A_DMRSR + 4:
-> +    case A_DMRSR + 8:
-> +    case A_DMRSR + 12:
-> +        icu->dmasr[reg >> 2] = val;
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "rx_icu: DMAC not implemented\n");
-> +        break;
-> +    case A_IRQCR ... A_IRQCR + 0x1f:
-> +        icu->src[64 + reg].sense = val >> R_IRQCR_IRQMD_SHIFT;
-> +        break;
-> +    case A_NMICLR:
-> +        break;
-> +    case A_NMIER:
-> +        icu->nmier |= val & (R_NMIER_NMIEN_MASK |
-> +                             R_NMIER_LVDEN_MASK |
-> +                             R_NMIER_OSTEN_MASK);
-> +            break;
-> +    case A_NMICR:
-> +        if ((icu->nmier & R_NMIER_NMIEN_MASK) == 0) {
-> +            icu->nmicr = val & R_NMICR_NMIMD_MASK;
-> +        }
-> +        break;
-> +    default:
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "rx_icu: Register %08lx not implemented\n", offset);
-> +        break;
-> +    }
-> +}
-> +
-> +static const MemoryRegionOps icu_ops = {
-> +    .write = icu_write,
-> +    .read  = icu_read,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +    .impl = {
-> +        .max_access_size = 2,
-> +    },
-> +};
-> +
-> +static void rxicu_realize(DeviceState *dev, Error **errp)
-> +{
-> +    RXICUState *icu = RXICU(dev);
-> +    int i, j;
-> +
-> +    if (icu->init_sense == NULL) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "rx_icu: trigger-level property must be set.");
-> +        return;
-> +    }
-> +    for (i = j = 0; i < 256; i++) {
-
-RX_IRQ_COUNT
-
-> +        if (icu->init_sense[j] == i) {
-> +            icu->src[i].sense = TRG_LEVEL;
-> +            if (j < icu->nr_sense) {
-> +                j++;
-> +            }
-> +        } else
-> +            icu->src[i].sense = TRG_PEDGE;
-> +    }
-> +    icu->req_irq = -1;
-> +}
-> +
-> +static void rxicu_init(Object *obj)
-> +{
-> +    SysBusDevice *d = SYS_BUS_DEVICE(obj);
-> +    RXICUState *icu = RXICU(obj);
-> +
-> +    memory_region_init_io(&icu->memory, OBJECT(icu), &icu_ops,
-> +                          icu, "rx-icu", 0x600);
-> +    sysbus_init_mmio(d, &icu->memory);
-> +
-> +    qdev_init_gpio_in(DEVICE(d), rxicu_set_irq, 256);
-
-RX_IRQ_COUNT
-
-> +    qdev_init_gpio_in_named(DEVICE(d), rxicu_ack_irq, "ack", 1);
-> +    sysbus_init_irq(d, &icu->_irq);
-> +    sysbus_init_irq(d, &icu->_fir);
-> +    sysbus_init_irq(d, &icu->_swi);
-> +}
-> +
-> +static void rxicu_fini(Object *obj)
-> +{
-> +    RXICUState *icu = RXICU(obj);
-> +    g_free(icu->map);
-> +    g_free(icu->init_sense);
-> +}
-> +
-> +static const VMStateDescription vmstate_rxicu = {
-> +    .name = "rx-icu",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static Property rxicu_properties[] = {
-> +    DEFINE_PROP_ARRAY("ipr-map", RXICUState, nr_irqs, map,
-> +                      qdev_prop_uint32, uint32_t),
-> +    DEFINE_PROP_ARRAY("trigger-level", RXICUState, nr_sense, init_sense,
-> +                      qdev_prop_uint32, uint32_t),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void rxicu_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->realize = rxicu_realize;
-> +    dc->props = rxicu_properties;
-> +    dc->vmsd = &vmstate_rxicu;
-> +}
-> +
-> +static const TypeInfo rxicu_info = {
-> +    .name       = TYPE_RXICU,
-> +    .parent     = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(RXICUState),
-> +    .instance_init = rxicu_init,
-> +    .instance_finalize = rxicu_fini,
-> +    .class_init = rxicu_class_init,
-> +};
-> +
-> +static void rxicu_register_types(void)
-> +{
-> +    type_register_static(&rxicu_info);
-> +}
-> +
-> +type_init(rxicu_register_types)
-> diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-> index df712c3e6c..b54b09b12e 100644
-> --- a/hw/intc/Makefile.objs
-> +++ b/hw/intc/Makefile.objs
-> @@ -48,3 +48,4 @@ obj-$(CONFIG_ARM_GIC) += arm_gicv3_cpuif.o
->  obj-$(CONFIG_MIPS_CPS) += mips_gic.o
->  obj-$(CONFIG_NIOS2) += nios2_iic.o
->  obj-$(CONFIG_OMPIC) += ompic.o
-> +obj-$(CONFIG_RX) += rx_icu.o
-
-Why not declare a RENESAS_ICU in Kconfig and use it?
-
-obj-$(CONFIG_RENESAS_ICU) += rx_icu.o
-
-Good work!
-
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
