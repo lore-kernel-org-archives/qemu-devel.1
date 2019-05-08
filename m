@@ -2,48 +2,48 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B5F6C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 08:27:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6524AC04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 08:29:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1D252053B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 08:27:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1D252053B
+	by mail.kernel.org (Postfix) with ESMTPS id 386F92053B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 08:29:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 386F92053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33125 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33135 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOHvY-0006Ub-Rk
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 04:27:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37612)
+	id 1hOHwp-0007Af-G6
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 04:29:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOHuk-0006B8-A5
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:26:59 -0400
+	(envelope-from <thuth@redhat.com>) id 1hOHvq-0006ho-Tv
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:28:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOHuj-0002Np-AD
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:26:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51370)
+	(envelope-from <thuth@redhat.com>) id 1hOHvp-0002q1-WE
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:28:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51984)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hOHuj-0002Ni-2m
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:26:57 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hOHvp-0002pg-OV
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:28:05 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BAC3540F14;
-	Wed,  8 May 2019 08:26:55 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0E2912D7E6;
+	Wed,  8 May 2019 08:28:05 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-100.ams2.redhat.com [10.36.116.100])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id BD0B662671;
-	Wed,  8 May 2019 08:26:54 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 27D515EDE4;
+	Wed,  8 May 2019 08:28:03 +0000 (UTC)
 To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 References: <155721868351.451636.16735088470797960209.stgit@bahia.lan>
-	<155721871159.451636.6528273080303910901.stgit@bahia.lan>
+	<155721870044.451636.8272207759150286399.stgit@bahia.lan>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -89,22 +89,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <2fb1b764-0609-c140-8781-e4a2c9005847@redhat.com>
-Date: Wed, 8 May 2019 10:26:53 +0200
+Message-ID: <856d5954-7198-2b72-df90-12de16813761@redhat.com>
+Date: Wed, 8 May 2019 10:28:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <155721871159.451636.6528273080303910901.stgit@bahia.lan>
+In-Reply-To: <155721870044.451636.8272207759150286399.stgit@bahia.lan>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
 	(mx1.redhat.com [10.5.110.30]);
-	Wed, 08 May 2019 08:26:56 +0000 (UTC)
+	Wed, 08 May 2019 08:28:05 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 5/6] vl: Deprecate -virtfs_synth
+Subject: Re: [Qemu-devel] [PATCH 3/6] fsdev: Move some types definition to
+ qemu-fsdev.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -122,72 +123,19 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 07/05/2019 10.45, Greg Kurz wrote:
-> The synth fsdriver never got used for anything else but the
-> QTest testcase for VirtIO 9P. And even there, QTest directly
-> uses -fsdev synth and -device virtio-9p-{pci|device}.
+> It would make sense for these types to be defined in a header file if
+> we had an API for fsdrivers to register themselves. In practice, we
+> only have three of them and it is very unlikely we add new ones since
+> the future of file sharing between host and guest is the upcoming
+> virtio-fs.
+> 
+> Move the types to qemu-fsdev.c instead since they are only used there.
 > 
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
-> 
-> This should be Cc'd to libvir-list@redhat.com according to MAINTAINERS,
-> but libvirt doesn't know about -virtfs_synth, so I choose to not spam :)
-> ---
->  qemu-deprecated.texi |    4 ++++
->  qemu-options.hx      |    3 ++-
->  vl.c                 |    5 +++++
->  3 files changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 842e71b11dcc..f0ff065e7dc1 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -72,6 +72,10 @@ backend settings instead of environment variables.  To ease migration to
->  the new format, the ``-audiodev-help'' option can be used to convert
->  the current values of the environment variables to ``-audiodev'' options.
->  
-> +@subsection -virtfs_synth (since 4.1)
-> +
-> +The ``-virtfs_synth'' argument is now deprecated with no replacement.
-> +
->  @section QEMU Machine Protocol (QMP) commands
->  
->  @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 51802cbb266a..9c5cc2e6bf70 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -1368,7 +1368,8 @@ DEF("virtfs_synth", 0, QEMU_OPTION_virtfs_synth,
->  STEXI
->  @item -virtfs_synth
->  @findex -virtfs_synth
-> -Create synthetic file system image
-> +Create synthetic file system image. Note that this option is deprecated with
-> +no replacement.
->  ETEXI
->  
->  DEF("iscsi", HAS_ARG, QEMU_OPTION_iscsi,
-> diff --git a/vl.c b/vl.c
-> index d9fea0a11966..c010cb3e98df 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3507,6 +3507,11 @@ int main(int argc, char **argv, char **envp)
->                  QemuOpts *fsdev;
->                  QemuOpts *device;
->  
-> +                warn_report("The -virtfs_synth option is deprecated and will "
-> +                            "be removed soon. If the -virtfs_synth option is "
-> +                            "still useful for you, please send a mail to "
-> +                            "qemu-devel@nongnu.org with your usecase.");
-> +
->                  fsdev = qemu_opts_create(qemu_find_opts("fsdev"), "v_synth",
->                                           1, NULL);
->                  if (!fsdev) {
+>  fsdev/qemu-fsdev.c |   23 +++++++++++++++++++++++
+>  fsdev/qemu-fsdev.h |   24 ------------------------
+>  2 files changed, 23 insertions(+), 24 deletions(-)
 
-Do you plan to only deprecate the -virtfs_synth option, or also "-fsdev
-synth", i.e. the whole "synth" driver? In the first case, I think you
-should point the users to use "-fsdev synth" instead of saying "with no
-replacement". In the second case, I think you should declare "-fsdev
-synth" in the documentation, too.
-
- Thomas
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
