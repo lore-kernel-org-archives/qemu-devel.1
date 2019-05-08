@@ -2,58 +2,57 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38265C46470
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 06:28:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81558C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 06:28:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2C31214C6
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 06:28:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2C31214C6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 47AF021019
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 06:28:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47AF021019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60227 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60233 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOG3d-0004Vm-72
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 02:28:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40023)
+	id 1hOG4H-00057v-IQ
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 02:28:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hOFs1-00018L-5c
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:16:02 -0400
+	(envelope-from <tao3.xu@intel.com>) id 1hOFw7-0005EL-EX
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:20:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hOFrz-0004Nt-IJ
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:16:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53312)
+	(envelope-from <tao3.xu@intel.com>) id 1hOFw3-0000F0-Sj
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:20:13 -0400
+Received: from mga05.intel.com ([192.55.52.43]:57358)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hOFrz-0004NC-9l
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:15:59 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9D83630820E6
-	for <qemu-devel@nongnu.org>; Wed,  8 May 2019 06:15:58 +0000 (UTC)
-Received: from xz-x1.nay.redhat.com (dhcp-15-205.nay.redhat.com [10.66.15.205])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8C95416BF0;
-	Wed,  8 May 2019 06:15:56 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed,  8 May 2019 14:15:22 +0800
-Message-Id: <20190508061523.17666-11-peterx@redhat.com>
-In-Reply-To: <20190508061523.17666-1-peterx@redhat.com>
-References: <20190508061523.17666-1-peterx@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Wed, 08 May 2019 06:15:58 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 10/11] kvm: Support KVM_CLEAR_DIRTY_LOG
+	(Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hOFw0-00005t-0D
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:20:09 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+	by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	07 May 2019 23:20:07 -0700
+X-ExtLoop1: 1
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.92])
+	by fmsmga005.fm.intel.com with ESMTP; 07 May 2019 23:20:05 -0700
+From: Tao Xu <tao3.xu@intel.com>
+To: imammedo@redhat.com, mst@redhat.com, eblake@redhat.com,
+	ehabkost@redhat.com, xiaoguangrong.eric@gmail.com
+Date: Wed,  8 May 2019 14:17:22 +0800
+Message-Id: <20190508061726.27631-8-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190508061726.27631-1-tao3.xu@intel.com>
+References: <20190508061726.27631-1-tao3.xu@intel.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 192.55.52.43
+Subject: [Qemu-devel] [PATCH v4 07/11] hmat acpi: Build Memory Side Cache
+ Information Structure(s) in ACPI HMAT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -65,256 +64,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	"Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-	peterx@redhat.com, Juan Quintela <quintela@redhat.com>
+Cc: pbonzini@redhat.com, tao3.xu@intel.com, jingqi.liu@intel.com,
+	qemu-devel@nongnu.org, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Firstly detect the interface using KVM_CAP_MANUAL_DIRTY_LOG_PROTECT
-and mark it.  When failed to enable the new feature we'll fall back to
-the old sync.
+From: Liu Jingqi <jingqi.liu@intel.com>
 
-Provide the log_clear() hook for the memory listeners for both address
-spaces of KVM (normal system memory, and SMM) and deliever the clear
-message to kernel.
+This structure describes memory side cache information for memory
+proximity domains if the memory side cache is present and the
+physical device(SMBIOS handle) forms the memory side cache.
+The software could use this information to effectively place
+the data in memory to maximize the performance of the system
+memory that use the memory side cache.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
- accel/kvm/kvm-all.c    | 180 +++++++++++++++++++++++++++++++++++++++++
- accel/kvm/trace-events |   1 +
- 2 files changed, 181 insertions(+)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index a19535bf6a..2d8067aadc 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -91,6 +91,7 @@ struct KVMState
-     int many_ioeventfds;
-     int intx_set_mask;
-     bool sync_mmu;
-+    bool manual_dirty_log_protect;
-     /* The man page (and posix) say ioctl numbers are signed int, but
-      * they're not.  Linux, glibc and *BSD all treat ioctl numbers as
-      * unsigned, and treating them as signed here can break things */
-@@ -536,6 +537,157 @@ out:
-     return ret;
- }
+Changes in v4 -> v3:
+    - use build_append_int_noprefix() to build Memory Side Cache
+    Information Structure(s) tables (Igor)
+    - move globals (hmat_cache_info) into MachineState (Igor)
+    - move hmat_build_cache() inside of hmat_build_hma() (Igor)
+---
+ hw/acpi/hmat.c          | 50 ++++++++++++++++++++++++++++++++++++++++-
+ hw/acpi/hmat.h          | 25 +++++++++++++++++++++
+ include/hw/boards.h     |  3 +++
+ include/qemu/typedefs.h |  1 +
+ include/sysemu/sysemu.h |  8 +++++++
+ 5 files changed, 86 insertions(+), 1 deletion(-)
+
+diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
+index 54aabf77eb..3a8c41162d 100644
+--- a/hw/acpi/hmat.c
++++ b/hw/acpi/hmat.c
+@@ -102,10 +102,11 @@ static void hmat_build_hma(GArray *table_data, MachineState *ms)
+ {
+     GSList *device_list = NULL;
+     uint64_t mem_base, mem_len;
+-    int i, j, hrchy, type;
++    int i, j, hrchy, type, level;
+     uint32_t mem_ranges_num = ms->numa_state->mem_ranges_num;
+     NumaMemRange *mem_ranges = ms->numa_state->mem_ranges;
+     HMAT_LB_Info *numa_hmat_lb;
++    HMAT_Cache_Info *numa_hmat_cache = NULL;
  
-+/* Alignment requirement for KVM_CLEAR_DIRTY_LOG - 64 pages */
-+#define KVM_CLEAR_LOG_SHIFT  6
-+#define KVM_CLEAR_LOG_ALIGN  (qemu_real_host_page_size << KVM_CLEAR_LOG_SHIFT)
-+#define KVM_CLEAR_LOG_MASK   (-KVM_CLEAR_LOG_ALIGN)
-+
-+/**
-+ * kvm_physical_log_clear - Clear the kernel's dirty bitmap for range
-+ *
-+ * NOTE: this will be a no-op if we haven't enabled manual dirty log
-+ * protection in the host kernel because in that case this operation
-+ * will be done within log_sync().
-+ *
-+ * @kml:     the kvm memory listener
-+ * @section: the memory range to clear dirty bitmap
-+ */
-+static int kvm_physical_log_clear(KVMMemoryListener *kml,
-+                                  MemoryRegionSection *section)
-+{
-+    KVMState *s = kvm_state;
-+    struct kvm_clear_dirty_log d;
-+    uint64_t start, end, bmap_start, start_delta, bmap_npages, size;
-+    unsigned long *bmap_clear = NULL, psize = qemu_real_host_page_size;
-+    KVMSlot *mem;
-+    int ret, i;
-+
-+    if (!s->manual_dirty_log_protect) {
-+        /* No need to do explicit clear */
-+        return 0;
-+    }
-+
-+    start = section->offset_within_address_space;
-+    size = int128_get64(section->size);
-+
-+    if (!size) {
-+        /* Nothing more we can do... */
-+        return 0;
-+    }
-+
-+    kvm_slots_lock(kml);
-+
-+    /* Find any possible slot that covers the section */
-+    for (i = 0; i < s->nr_slots; i++) {
-+        mem = &kml->slots[i];
-+        if (mem->start_addr <= start &&
-+            start + size <= mem->start_addr + mem->memory_size) {
-+            break;
-+        }
-+    }
-+
-+    /*
-+     * We should always find one memslot until this point, otherwise
-+     * there could be something wrong from the upper layer
-+     */
-+    assert(i != s->nr_slots);
-+
-+    /*
-+     * We need to extend either the start or the size or both to
-+     * satisfy the KVM interface requirement.  Firstly, do the start
-+     * page alignment on 64 host pages
-+     */
-+    bmap_start = (start - mem->start_addr) & KVM_CLEAR_LOG_MASK;
-+    start_delta = start - mem->start_addr - bmap_start;
-+    bmap_start /= psize;
-+
-+    /*
-+     * The kernel interface has restriction on the size too, that either:
-+     *
-+     * (1) the size is 64 host pages aligned (just like the start), or
-+     * (2) the size fills up until the end of the KVM memslot.
-+     */
-+    bmap_npages = DIV_ROUND_UP(size + start_delta, KVM_CLEAR_LOG_ALIGN)
-+        << KVM_CLEAR_LOG_SHIFT;
-+    end = mem->memory_size / psize;
-+    if (bmap_npages > end - bmap_start) {
-+        bmap_npages = end - bmap_start;
-+    }
-+    start_delta /= psize;
-+
-+    /*
-+     * Prepare the bitmap to clear dirty bits.  Here we must guarantee
-+     * that we won't clear any unknown dirty bits otherwise we might
-+     * accidentally clear some set bits which are not yet synced from
-+     * the kernel into QEMU's bitmap, then we'll lose track of the
-+     * guest modifications upon those pages (which can directly lead
-+     * to guest data loss or panic after migration).
-+     *
-+     * Layout of the KVMSlot.dirty_bmap:
-+     *
-+     *                   |<-------- bmap_npages -----------..>|
-+     *                                                     [1]
-+     *                     start_delta         size
-+     *  |----------------|-------------|------------------|------------|
-+     *  ^                ^             ^                               ^
-+     *  |                |             |                               |
-+     * start          bmap_start     (start)                         end
-+     * of memslot                                             of memslot
-+     *
-+     * [1] bmap_npages can be aligned to either 64 pages or the end of slot
-+     */
-+
-+    assert(bmap_start % BITS_PER_LONG == 0);
-+    if (start_delta) {
-+        /* Slow path - we need to manipulate a temp bitmap */
-+        bmap_clear = bitmap_new(bmap_npages);
-+        bitmap_copy_with_src_offset(bmap_clear, mem->dirty_bmap,
-+                                    bmap_start, start_delta + size / psize);
-+        /*
-+         * We need to fill the holes at start because that was not
-+         * specified by the caller and we extended the bitmap only for
-+         * 64 pages alignment
-+         */
-+        bitmap_clear(bmap_clear, 0, start_delta);
-+        d.dirty_bitmap = bmap_clear;
-+    } else {
-+        /* Fast path - start address aligns well with BITS_PER_LONG */
-+        d.dirty_bitmap = mem->dirty_bmap + BIT_WORD(bmap_start);
-+    }
-+
-+    d.first_page = bmap_start;
-+    /* It should never overflow.  If it happens, say something */
-+    assert(bmap_npages <= UINT32_MAX);
-+    d.num_pages = bmap_npages;
-+    d.slot = mem->slot | (kml->as_id << 16);
-+
-+    if (kvm_vm_ioctl(s, KVM_CLEAR_DIRTY_LOG, &d) == -1) {
-+        ret = -errno;
-+        error_report("%s: KVM_CLEAR_DIRTY_LOG failed, slot=%d, "
-+                     "start=0x%"PRIx64", size=0x%"PRIx32", errno=%d",
-+                     __func__, d.slot, (uint64_t)d.first_page,
-+                     (uint32_t)d.num_pages, ret);
-+    } else {
-+        ret = 0;
-+        trace_kvm_clear_dirty_log(d.slot, d.first_page, d.num_pages);
-+    }
-+
-+    /*
-+     * After we have updated the remote dirty bitmap, we update the
-+     * cached bitmap as well for the memslot, then if another user
-+     * clears the same region we know we shouldn't clear it again on
-+     * the remote otherwise it's data loss as well.
-+     */
-+    bitmap_clear(mem->dirty_bmap, bmap_start + start_delta,
-+                 size / psize);
-+    /* This handles the NULL case well */
-+    g_free(bmap_clear);
-+
-+    kvm_slots_unlock(kml);
-+
-+    return ret;
-+}
-+
- static void kvm_coalesce_mmio_region(MemoryListener *listener,
-                                      MemoryRegionSection *secion,
-                                      hwaddr start, hwaddr size)
-@@ -888,6 +1040,22 @@ static void kvm_log_sync(MemoryListener *listener,
+     PCMachineState *pcms = PC_MACHINE(ms);
+     AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_GET_CLASS(pcms->acpi_dev);
+@@ -212,6 +213,53 @@ static void hmat_build_hma(GArray *table_data, MachineState *ms)
+             }
+         }
      }
- }
- 
-+static void kvm_log_clear(MemoryListener *listener,
-+                          MemoryRegionSection *section)
-+{
-+    KVMMemoryListener *kml = container_of(listener, KVMMemoryListener, listener);
-+    int r;
 +
-+    r = kvm_physical_log_clear(kml, section);
-+    if (r < 0) {
-+        error_report_once("%s: kvm log clear failed: mr=%s "
-+                          "offset=%"HWADDR_PRIx" size=%"PRIx64, __func__,
-+                          section->mr->name, section->offset_within_region,
-+                          int128_get64(section->size));
-+        abort();
-+    }
-+}
++    /* Build HMAT Memory Side Cache Information. */
++    for (i = 0; i < ms->numa_state->num_nodes; i++) {
++        for (level = 0; level <= MAX_HMAT_CACHE_LEVEL; level++) {
++            numa_hmat_cache = ms->numa_state->hmat_cache[i][level];
++            if (numa_hmat_cache) {
++                uint16_t n = numa_hmat_cache->num_smbios_handles;
++                uint32_t cache_attr = HMAT_CACHE_TOTAL_LEVEL(
++                                      numa_hmat_cache->total_levels);
++                cache_attr |= HMAT_CACHE_CURRENT_LEVEL(
++                              numa_hmat_cache->level);
++                cache_attr |= HMAT_CACHE_ASSOC(
++                                          numa_hmat_cache->associativity);
++                cache_attr |= HMAT_CACHE_WRITE_POLICY(
++                                          numa_hmat_cache->write_policy);
++                cache_attr |= HMAT_CACHE_LINE_SIZE(
++                                          numa_hmat_cache->line_size);
++                cache_attr = cpu_to_le32(cache_attr);
 +
- static void kvm_mem_ioeventfd_add(MemoryListener *listener,
-                                   MemoryRegionSection *section,
-                                   bool match_data, uint64_t data,
-@@ -975,6 +1143,7 @@ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
-     kml->listener.log_start = kvm_log_start;
-     kml->listener.log_stop = kvm_log_stop;
-     kml->listener.log_sync = kvm_log_sync;
-+    kml->listener.log_clear = kvm_log_clear;
-     kml->listener.priority = 10;
- 
-     memory_listener_register(&kml->listener, as);
-@@ -1699,6 +1868,17 @@ static int kvm_init(MachineState *ms)
-     s->coalesced_pio = s->coalesced_mmio &&
-                        kvm_check_extension(s, KVM_CAP_COALESCED_PIO);
- 
-+    s->manual_dirty_log_protect =
-+        kvm_check_extension(s, KVM_CAP_MANUAL_DIRTY_LOG_PROTECT);
-+    if (s->manual_dirty_log_protect) {
-+        ret = kvm_vm_enable_cap(s, KVM_CAP_MANUAL_DIRTY_LOG_PROTECT, 0, 1);
-+        if (ret) {
-+            warn_report("Trying to enable KVM_CAP_MANUAL_DIRTY_LOG_PROTECT "
-+                        "but failed.  Falling back to the legacy mode. ");
-+            s->manual_dirty_log_protect = false;
++                /* Memory Side Cache Information Structure */
++                /* Type */
++                build_append_int_noprefix(table_data, 2, 2);
++                /* Reserved */
++                build_append_int_noprefix(table_data, 0, 2);
++                /* Length */
++                build_append_int_noprefix(table_data, 32 + 2 * n, 4);
++                /* Proximity Domain for the Memory */
++                build_append_int_noprefix(table_data,
++                                          numa_hmat_cache->mem_proximity, 4);
++                /* Reserved */
++                build_append_int_noprefix(table_data, 0, 4);
++                /* Memory Side Cache Size */
++                build_append_int_noprefix(table_data,
++                                          numa_hmat_cache->size, 8);
++                /* Cache Attributes */
++                build_append_int_noprefix(table_data, cache_attr, 4);
++                /* Reserved */
++                build_append_int_noprefix(table_data, 0, 2);
++                /* Number of SMBIOS handles (n) */
++                build_append_int_noprefix(table_data, n, 2);
++
++                /* SMBIOS Handles */
++                /* TBD: set smbios handles */
++                build_append_int_noprefix(table_data, 0, 2 * n);
++            }
 +        }
 +    }
-+
- #ifdef KVM_CAP_VCPU_EVENTS
-     s->vcpu_events = kvm_check_extension(s, KVM_CAP_VCPU_EVENTS);
- #endif
-diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
-index 33c5b1b3af..4fb6e59d19 100644
---- a/accel/kvm/trace-events
-+++ b/accel/kvm/trace-events
-@@ -15,4 +15,5 @@ kvm_irqchip_release_virq(int virq) "virq %d"
- kvm_set_ioeventfd_mmio(int fd, uint64_t addr, uint32_t val, bool assign, uint32_t size, bool datamatch) "fd: %d @0x%" PRIx64 " val=0x%x assign: %d size: %d match: %d"
- kvm_set_ioeventfd_pio(int fd, uint16_t addr, uint32_t val, bool assign, uint32_t size, bool datamatch) "fd: %d @0x%x val=0x%x assign: %d size: %d match: %d"
- kvm_set_user_memory(uint32_t slot, uint32_t flags, uint64_t guest_phys_addr, uint64_t memory_size, uint64_t userspace_addr, int ret) "Slot#%d flags=0x%x gpa=0x%"PRIx64 " size=0x%"PRIx64 " ua=0x%"PRIx64 " ret=%d"
-+kvm_clear_dirty_log(uint32_t slot, uint64_t start, uint32_t size) "slot#%"PRId32" start 0x%"PRIx64" size 0x%"PRIx32
+ }
  
+ void hmat_build_acpi(GArray *table_data, BIOSLinker *linker, MachineState *ms)
+diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
+index f37e30e533..8f563f19dd 100644
+--- a/hw/acpi/hmat.h
++++ b/hw/acpi/hmat.h
+@@ -77,6 +77,31 @@ struct HMAT_LB_Info {
+     uint16_t    bandwidth[MAX_NODES][MAX_NODES];
+ };
+ 
++struct HMAT_Cache_Info {
++    /* The memory proximity domain to which the memory belongs. */
++    uint32_t    mem_proximity;
++    /* Size of memory side cache in bytes. */
++    uint64_t    size;
++    /*
++     * Total cache levels for this memory
++     * pr#include "hw/acpi/aml-build.h"oximity domain.
++     */
++    uint8_t     total_levels;
++    /* Cache level described in this structure. */
++    uint8_t     level;
++    /* Cache Associativity: None/Direct Mapped/Comple Cache Indexing */
++    uint8_t     associativity;
++    /* Write Policy: None/Write Back(WB)/Write Through(WT) */
++    uint8_t     write_policy;
++    /* Cache Line size in bytes. */
++    uint16_t    line_size;
++    /*
++     * Number of SMBIOS handles that contributes to
++     * the memory side cache physical devices.
++     */
++    uint16_t    num_smbios_handles;
++};
++
+ void hmat_build_acpi(GArray *table_data, BIOSLinker *linker, MachineState *ms);
+ 
+ #endif
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index e0169b0a64..8609f923d9 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -266,6 +266,9 @@ typedef struct NumaState {
+ 
+     /* NUMA modes HMAT Locality Latency and Bandwidth Information */
+     HMAT_LB_Info *hmat_lb[HMAT_LB_LEVELS][HMAT_LB_TYPES];
++
++    /* Memory Side Cache Information Structure */
++    HMAT_Cache_Info *hmat_cache[MAX_NODES][MAX_HMAT_CACHE_LEVEL + 1];
+ } NumaState;
+ 
+ /**
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index c0257e936b..d971f5109e 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -33,6 +33,7 @@ typedef struct FWCfgEntry FWCfgEntry;
+ typedef struct FWCfgIoState FWCfgIoState;
+ typedef struct FWCfgMemState FWCfgMemState;
+ typedef struct FWCfgState FWCfgState;
++typedef struct HMAT_Cache_Info HMAT_Cache_Info;
+ typedef struct HMAT_LB_Info HMAT_LB_Info;
+ typedef struct HVFX86EmulatorState HVFX86EmulatorState;
+ typedef struct I2CBus I2CBus;
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index da51a9bc26..0cfb387887 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -143,9 +143,17 @@ enum {
+     HMAT_LB_DATA_WRITE_BANDWIDTH  = 5,
+ };
+ 
++#define MAX_HMAT_CACHE_LEVEL        3
++
+ #define HMAT_LB_LEVELS    (HMAT_LB_MEM_CACHE_3RD_LEVEL + 1)
+ #define HMAT_LB_TYPES     (HMAT_LB_DATA_WRITE_BANDWIDTH + 1)
+ 
++#define HMAT_CACHE_TOTAL_LEVEL(level)      (level & 0xF)
++#define HMAT_CACHE_CURRENT_LEVEL(level)    ((level & 0xF) << 4)
++#define HMAT_CACHE_ASSOC(assoc)            ((assoc & 0xF) << 8)
++#define HMAT_CACHE_WRITE_POLICY(policy)    ((policy & 0xF) << 12)
++#define HMAT_CACHE_LINE_SIZE(size)         ((size & 0xFFFF) << 16)
++
+ #define MAX_OPTION_ROMS 16
+ typedef struct QEMUOptionRom {
+     const char *name;
 -- 
 2.17.1
 
