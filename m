@@ -2,84 +2,75 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABFBCC04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 13:34:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3CBFC04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 13:42:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76C51204FD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 13:34:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Quqfpkkv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76C51204FD
+	by mail.kernel.org (Postfix) with ESMTPS id 76B98214AF
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 13:42:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76B98214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37294 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37446 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOMhz-0004tk-QS
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 09:34:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39395)
+	id 1hOMq9-0000sL-W0
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 09:42:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hOMh8-0004aU-QK
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 09:33:15 -0400
+	(envelope-from <bounces@canonical.com>) id 1hOMoQ-0007YS-1t
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 09:40:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hOMh7-0003XB-Sx
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 09:33:14 -0400
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:39723)
+	(envelope-from <bounces@canonical.com>) id 1hOMoO-0001TW-UV
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 09:40:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46794)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hOMh7-0003WL-NF
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 09:33:13 -0400
-Received: by mail-ot1-x32b.google.com with SMTP id o39so18299958ota.6
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 06:33:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=TOPCxf1bApDzD2uiPivTv2wxgULm1JqUWA0wbGQdB2c=;
-	b=Quqfpkkv8gYst6d+I7nyjLipb27Wfmpbj6jiBbcw1dRtfmtT1HYv1ZoGr988FeKfel
-	Rp9omoBCWoIMOVNifgNXRwbf4tXxUJjODoYKTz0u+Tj8ZcNQ8p9/L+f3WEg5y316+1ci
-	cQ+418xNDQbEhxGm+3ICV9VFbJtuUzTT6pWTvOAzoKXEktiyOmIelSGN1Daa+8Ids6C7
-	9k/UmLUcgVkEfqlYpFWCowCKk8l68pJKOH2Ew/FRW7Ou4jvt6/vFslbDn6GgwtAqI/Ce
-	KTrKTl2Tdwb3bykOoSYUh0itjkJVXwS6Xb7UJXIPReyFPldd+svO8CPQWWHZDzvBUS/a
-	TlgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=TOPCxf1bApDzD2uiPivTv2wxgULm1JqUWA0wbGQdB2c=;
-	b=CL0p8qk1sShQUHRJeXCRdGFpoJw78MoBnkSd+vMnO29jRBr2PWPC9JIW9y4lGXhBVA
-	CsxwGUKyUa3Ofb1oQKgwEGJPOrFk85Efo+DhA7dx1X5ps78fL8S3JLSeUHprXhUb1uk3
-	J8AzOG3FYxZ4Ghd3LYozHeUHDTf6AAFR54TpxBecMor0Wl86XhG4Ea7WxrpwNZBzkG4V
-	LbGDhAwltPyOz25Q0RduL7nwnKOifupBdQivudhlYgGZTjbsP1Ni+/pF+D4M1dtuH8od
-	prWmcLQzayhS0H1mfolmySlYuVt+sOlI2dLzoa1xB9EzsIJPzGRB8zhCqO+ykFWtNypL
-	Y6GQ==
-X-Gm-Message-State: APjAAAUIsQvqIC65QIG8Urptt1zsEguRAMUAQGNyIfgROcTybShDY+fU
-	0VfFjwp6elgeZ5/HrcogHpcUto3u7ZSFPBX+U/PLloAG
-X-Google-Smtp-Source: APXvYqxaJJzTPdvBYuFmECwsrytLm3/u6NpRrSDBiwZndcs2daGfYL3dq4OoCrUPmfF1XaNOH9E5oI23G2BTvB0lDjo=
-X-Received: by 2002:a05:6830:1258:: with SMTP id
-	s24mr3946692otp.238.1557322392499; 
-	Wed, 08 May 2019 06:33:12 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hOMoO-0001Sg-PD
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 09:40:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hOMoN-000212-B0
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 13:40:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 503712E807B
+	for <qemu-devel@nongnu.org>; Wed,  8 May 2019 13:40:43 +0000 (UTC)
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 08 May 2019 13:33:00 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: feature-request
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange pmaydell rawlik
+X-Launchpad-Bug-Reporter: Druta Pavel (rawlik)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
 References: <155731026034.22594.3160504765111033354.malonedeb@chaenomeles.canonical.com>
 	<155732093601.13635.15801388089086899054.malone@gac.canonical.com>
-In-Reply-To: <155732093601.13635.15801388089086899054.malone@gac.canonical.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 8 May 2019 14:33:00 +0100
-Message-ID: <CAFEAcA_rk6i9LXkdJ0_cKcCnR4ijkwSQ3aOT0m=HYnV744U2gg@mail.gmail.com>
-To: Bug 1828207 <1828207@bugs.launchpad.net>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::32b
+Message-Id:
+ <CAFEAcA_rk6i9LXkdJ0_cKcCnR4ijkwSQ3aOT0m=HYnV744U2gg@mail.gmail.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18958";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 30b2aac5afc30873dbc111c4b23c662523926bbd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 Subject: Re: [Qemu-devel] [Bug 1828207] Re: Request to add something like
  "Auth failed from IP" log report for built-in VNC server
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,12 +79,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1828207 <1828207@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20190508133300.jGUkCTEHU0ctm05v7aFkvR3yAZ6C-o5Obf1mUuRmf3A@z>
 
-On Wed, 8 May 2019 at 14:23, Daniel Berrange <1828207@bugs.launchpad.net> wrote:
+On Wed, 8 May 2019 at 14:23, Daniel Berrange <1828207@bugs.launchpad.net> w=
+rote:
 >
 > Note that any use of the built-in VNC-auth scheme is always considered a
 > security flaw. It should essentially never be used, especially not on
@@ -104,4 +97,32 @@ Should we deprecate-and-remove the feature, then ?
 
 thanks
 -- PMM
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1828207
+
+Title:
+  Request to add something like "Auth failed from IP" log report for
+  built-in VNC server
+
+Status in QEMU:
+  New
+
+Bug description:
+  In environment with needs of public accessible VNC ports there is no logs=
+ or other registered events about authentication failures to analyze and/or=
+ integrate it to automated services like fail2ban ans so on.
+  Thus the built-in VNC service is vulnerable to brutforce attacks and in c=
+ombination with weak built-in VNC-auth scheme can be a security vulnerabili=
+ty.
+
+  Adding a simple log record like "QEMU VNC Authentication failed
+  192.168.0.5:5902 - 123.45.67.89:7898" will permit to quickly integrate
+  it to fail2ban system.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1828207/+subscriptions
 
