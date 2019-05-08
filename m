@@ -2,90 +2,77 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99851C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 520C1C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:42:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F87A20656
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:20:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bzOnPjCe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F87A20656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 13E9521479
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:42:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13E9521479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33771 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33948 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOIkl-0006I2-MJ
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 05:20:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46943)
+	id 1hOJ5O-0003iQ-1D
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 05:42:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hOIjz-0005vy-0O
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:19:56 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hOJ4Y-0003MN-4G
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:41:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hOIjy-0000LE-3c
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:19:54 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37924)
+	(envelope-from <sgarzare@redhat.com>) id 1hOJ4X-0002Br-0k
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:41:10 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42674)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hOIjx-0000Kg-RW
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:19:54 -0400
-Received: by mail-wr1-x444.google.com with SMTP id v11so6066299wru.5
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 02:19:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=zzKMN5PHQaK5lVbPLR4qxYW9E9uzQ7YU2GoTiuZgJP8=;
-	b=bzOnPjCenOKcM7aeSiXvCTeKhcF3KPvNPXJ8IFMg6U6x6MpE9vESuGwWLPHBF6lKVe
-	s4ZPe3oZf0gMsypJLOnApnsDipPXCGPO4UF8hlFqUz0agn7jdHEUkX3GW9IgbZwUy5zH
-	MtqkFRA428LlrQHZFTu/dFafDPVNODHM9CW8gxzsce+7HyRPYAnj0oiXdWZuXlvgGDuz
-	V+NjZNM8g3oLrcnArXufsvuaq/eOJKH6ubpHuwwaISMRQl62zm8o5aSugmPfR+pYgqkh
-	ujXBNZI2fF0eiVISiupaUCN1zNKtCtSkDXE2UxRqPk29OTa1FFPtgf8TC7DLpQlX3glU
-	xoBA==
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hOJ4W-0002Aj-QX
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:41:08 -0400
+Received: by mail-wr1-f67.google.com with SMTP id l2so26304281wrb.9
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 02:41:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=zzKMN5PHQaK5lVbPLR4qxYW9E9uzQ7YU2GoTiuZgJP8=;
-	b=k5u6hhoIPrk4+40E8WQ+jQgVElp2m0XhUO+GunrrB9XKjOjMcoYZzDtmqwTmmlvtPT
-	un7OivSODXeqXBLc3uRwp9362NxIhy3BjdDhHYqLvZuXroTwe3/qtQoaieX+IirSAaMs
-	BIi88zv84hSgjzACRu8gWADhPQwtfXJ0ehtDt8R08w5un8ILrWTsS+kddfRMm+pKWCOD
-	8YuQmr9jqkfDQMspR8/XKBK9X/+UfGtLkGtKVKm+el9rqnuATPgfWcQIsrIidc+pibR1
-	xaEqst5e900nHkKByYloR9+As4HaQN6P/OxpCVrQrVgacKlWpDNm10Mf6f//3nW2fPZY
-	5DDQ==
-X-Gm-Message-State: APjAAAVvaJfdiJnFPtgPDRimLsGU2L8kB7hfjlswewTPpajFt5Lqd7GM
-	Eh9NOokl4ovQKi3h+xSWo7hZsA==
-X-Google-Smtp-Source: APXvYqwtDTVGh0b9g8/rWKdTKkObU5Z1pTxcjPYiIxJLCOlXgWUbR8meGUFT8/bxl94CW5CL6r3KPg==
-X-Received: by 2002:adf:dc08:: with SMTP id t8mr24978178wri.220.1557307191934; 
-	Wed, 08 May 2019 02:19:51 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	j131sm4388607wmb.9.2019.05.08.02.19.50
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=HKCvhZMUr3qI8raRCGNb3WIEG28SJzKmhMGrENfN2ck=;
+	b=Kq3drOHkTO07M2IuSX6RVjN9P6T3UHv55O+EITOhFz/zwOHq9VwzeuKLpL3fqBfb6o
+	WMsXraERs2mwZdE9XM0gsp94J4Mh/SoLzG5iJNn24gZObxfC+5f6w7E3sGvN1Qw3aeDc
+	0ERNYC4v/DljwVlgQ13kHAvNqHW0eZ3lM+/UWP9qjPCUxqncvzyIawjHKVhxkUYqRaOu
+	DN6YVg5gsnfs2kaTm2bMv57n1IAJnkSSROTNdKCYCQGB0HH5ppgThEYPghTcClTH2Qsp
+	IFNoaL3FD2xnsiYGy8NXE1hSnGrrjBiSSX5bhSAJGAmUFmWHFfgMxxbPrtJ7RcC0zKx6
+	qc7Q==
+X-Gm-Message-State: APjAAAU/JKdRBLT/44QNHJP0n64ntv+9uwpE5oAnJ+uRy1gSmyNqpgui
+	EPZKyXY+ortiAB2Jew8vPCr36Q==
+X-Google-Smtp-Source: APXvYqxiIkpi1aZrUly5+J5+cAPZf3TAPWqSwdhnC4ZtfaTYdge1aOHLLIeS8I58RkeAeCe61iN0LA==
+X-Received: by 2002:adf:9042:: with SMTP id h60mr8225112wrh.248.1557308466245; 
+	Wed, 08 May 2019 02:41:06 -0700 (PDT)
+Received: from steredhat (host151-251-static.12-87-b.business.telecomitalia.it.
+	[87.12.251.151]) by smtp.gmail.com with ESMTPSA id
+	s10sm1823437wrt.66.2019.05.08.02.41.04
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 08 May 2019 02:19:50 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 536071FF87;
-	Wed,  8 May 2019 10:19:50 +0100 (BST)
-References: <20190506213817.14344-1-ehabkost@redhat.com>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190506213817.14344-1-ehabkost@redhat.com>
-Date: Wed, 08 May 2019 10:19:50 +0100
-Message-ID: <87v9yl4821.fsf@zen.linaroharston>
+	Wed, 08 May 2019 02:41:05 -0700 (PDT)
+Date: Wed, 8 May 2019 11:41:02 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190508094102.6iw2ryf7rphdjhhf@steredhat>
+References: <20190503163028.213823-1-sgarzare@redhat.com>
+	<CA+aFP1BWA416Q1=PB3xcQUPc1fQ-Cq+mhnG8FbkJiLDEvT0wyA@mail.gmail.com>
+	<20190506095031.kffsp76faaqhkdr2@steredhat>
+	<20190507094350.GE5808@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH] tests: Force Python I/O encoding for
- check-qapi-schema
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190507094350.GE5808@localhost.localdomain>
+User-Agent: NeoMutt/20180716
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH v2] block/rbd: increase dynamically the
+ image size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,60 +84,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Cleber Rosa <crosa@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Michael Roth <mdroth@linux.vnet.ibm.com>,
-	Markus Armbruster <armbru@redhat.com>
+Cc: Josh Durgin <jdurgin@redhat.com>, dillaman@redhat.com,
+	qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, May 07, 2019 at 11:43:50AM +0200, Kevin Wolf wrote:
+> Am 06.05.2019 um 11:50 hat Stefano Garzarella geschrieben:
+> > On Fri, May 03, 2019 at 01:21:23PM -0400, Jason Dillaman wrote:
+> > > On Fri, May 3, 2019 at 12:30 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+> > > >
+> > > > RBD APIs don't allow us to write more than the size set with
+> > > > rbd_create() or rbd_resize().
+> > > > In order to support growing images (eg. qcow2), we resize the
+> > > > image before write operations that exceed the current size.
+> > > >
+> > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > > ---
+> > > > v2:
+> > > >   - use bs->total_sectors instead of adding a new field [Kevin]
+> > > >   - resize the image only during write operation [Kevin]
+> > > >     for read operation, the bdrv_aligned_preadv() already handles reads
+> > > >     that exceed the length returned by bdrv_getlength(), so IMHO we can
+> > > >     avoid to handle it in the rbd driver
+> > > > ---
+> > > >  block/rbd.c | 14 +++++++++++++-
+> > > >  1 file changed, 13 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/block/rbd.c b/block/rbd.c
+> > > > index 0c549c9935..613e8f4982 100644
+> > > > --- a/block/rbd.c
+> > > > +++ b/block/rbd.c
+> > > > @@ -934,13 +934,25 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
+> > > >      }
+> > > >
+> > > >      switch (cmd) {
+> > > > -    case RBD_AIO_WRITE:
+> > > > +    case RBD_AIO_WRITE: {
+> > > > +        /*
+> > > > +         * RBD APIs don't allow us to write more than actual size, so in order
+> > > > +         * to support growing images, we resize the image before write
+> > > > +         * operations that exceed the current size.
+> > > > +         */
+> > > > +        if (off + size > bs->total_sectors * BDRV_SECTOR_SIZE) {
+> > > 
+> > > When will "bs->total_sectors" be refreshed to represent the correct
+> > > current size? You wouldn't want a future write whose extent was
+> > > greater than the original image size but less then a previous IO that
+> > > expanded the image to attempt to shrink the image.
+> > > 
+> > 
+> > Good point!
+> > IIUC it can happen, because in the bdrv_aligned_pwritev() we do these
+> > steps:
+> > 1. call bdrv_driver_pwritev() that invokes "drv->bdrv_aio_pwritev" and
+> >    then it waits calling "qemu_coroutine_yield()"
+> > 2. call bdrv_co_write_req_finish() that updates the "bs->total_sectors"
+> > 
+> > Between steps 1 and 2, maybe another request can be executed, then the
+> > issue that you described can occur.
+> > 
+> > The solutions that I have in mind are:
+> > a. Add a variable in the BDRVRBDState to track the latest resize.
+> 
+> This would work and be relatively simple.
+> 
+> > b. Call rbd_get_size() before the rbd_resize() to be sure to avoid to shrink
+> >    the image.
+> 
+> I'm not sure if rbd_get_size() involves network traffic or other
+> significant complexity. If so, I'd definitely avoid it.
+> 
+> > c. Updates the "bs->total_sectors" after the rbd_resize(), but I'm not
+> >    sure it is allowed.
+> > 
+> > @Jason, @Kevin Do you have any advice?
+> 
+> We need to make sure to run everything that bdrv_co_write_req_finish()
+> does for resizing an image:
+> 
+>     bs->total_sectors = end_sector;
+>     bdrv_parent_cb_resize(bs);
+>     bdrv_dirty_bitmap_truncate(bs, end_sector << BDRV_SECTOR_BITS);
+> 
+> Just duplicating that code wouldn't be good; if something is added, we'd
+> probably forget updating rbd, too. So I think your solution c would at
+> least involve refactoring the above code into a separate function that
+> can be called from rbd.
+> 
+> But solution a might actually be the simplest. In this case, sorry for
+> giving you bad advice in v1 of the patch.
+> 
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+I agree with you, 'a' should be simplest to implement.
 
-> test-qapi.py doesn't force a specific encoding for stderr or
-> stdout, but the reference files used by check-qapi-schema are in
-> UTF-8.  This breaks check-qapi-schema under certain circumstances
-> (e.g. if using the C locale and Python < 3.7).
->
-> We need to make sure test-qapi.py always generate UTF-8 output
-> somehow.  On Python 3.7+ we can do it using
-> `sys.stdout.reconfigure(...)`, but we need a solution that works
-> with older Python versions.
->
-> Instead of trying a hack like reopening sys.stdout and
-> sys.stderr, we can just tell Python to use UTF-8 for I/O encoding
-> when running test-qapi.py.  Do it by setting PYTHONIOENCODING.
->
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Tested-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+I'll send a v3 fixing this.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  tests/Makefile.include | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 7c8b9c84b2..af88ab6f8b 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -1103,7 +1103,7 @@ check-tests/qemu-iotests-quick.sh: tests/qemu-iotes=
-ts-quick.sh qemu-img$(EXESUF)
->  .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
->  $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SRC_PATH=
-)/%.json
->  	$(call quiet-command, PYTHONPATH=3D$(SRC_PATH)/scripts \
-> -		$(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py \
-> +		PYTHONIOENCODING=3Dutf-8 $(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-=
-qapi.py \
->  		$^ >$*.test.out 2>$*.test.err; \
->  		echo $$? >$*.test.exit, \
->  		"TEST","$*.out")
-
-
---
-Alex Benn=C3=A9e
+Thanks,
+Stefano
 
