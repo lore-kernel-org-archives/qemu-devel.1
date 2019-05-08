@@ -2,71 +2,80 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABC7EC04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:14:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F990C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:15:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FB4521530
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:14:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FB4521530
+	by mail.kernel.org (Postfix) with ESMTPS id 512A721530
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:15:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 512A721530
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34928 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34951 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOKWQ-0003TX-P8
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 07:14:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36797)
+	id 1hOKXb-0004CY-Ia
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 07:15:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hOKVH-0002xb-Ns
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:12:53 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hOKWJ-0003Ws-Jq
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:13:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hOKVG-0000gt-Ck
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:12:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38152)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hOKVG-0000gc-4T
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:12:50 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CD27530842B2;
-	Wed,  8 May 2019 11:12:48 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
-	(colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 80D2960C67;
-	Wed,  8 May 2019 11:12:48 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com
-	(zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-	by colo-mx.corp.redhat.com (Postfix) with ESMTP id F3F3D41F3C;
-	Wed,  8 May 2019 11:12:47 +0000 (UTC)
-Date: Wed, 8 May 2019 07:12:47 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: Jakub =?utf-8?Q?Staro=C5=84?= <jstaron@google.com>
-Message-ID: <1555943483.27247564.1557313967518.JavaMail.zimbra@redhat.com>
-In-Reply-To: <3d6479ae-6c39-d614-f1d9-aa1978e2e438@google.com>
-References: <20190426050039.17460-1-pagupta@redhat.com>
-	<20190426050039.17460-3-pagupta@redhat.com>
-	<3d6479ae-6c39-d614-f1d9-aa1978e2e438@google.com>
+	(envelope-from <pbonzini@redhat.com>) id 1hOKWH-0001A9-V7
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:13:55 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:34452)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOKWH-00019L-Mh
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:13:53 -0400
+Received: by mail-wm1-f65.google.com with SMTP id m20so1676332wmg.1
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 04:13:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=gi2t/D+HFQZhqVZHaJbMYThMZKmupvT3IdYeQtCc4Uk=;
+	b=S4mmDyujAE0vcSjdQdn464YDh5G7iB8aBXv8+cKFs9sldiYFhh86KIkjQ39LDWgOf+
+	X916I3KxsSnwenxZeCDJxVyDtmiMz6D/5sryblRX3QuSJZ0OAr2V64QLYoa0rmeiSc+A
+	sy9kT2RwHJkuTTBn2UOxP+B5yJm9ntfARcAMPEt0yBDniB85DOqMhhYsCXYm3DMyTSdA
+	A6uVFnQMzk2ez0yA0yDyBZlaxXk1D0JZj9HSy2DjK8DAJ4adIz9yil10VIcNum+QtDMG
+	qo9oiJdnzKmJOYwf5nDyJsTHTNOTqwFbcsvq3+pw6ko//N/fcWt+s30dEQgOMlsQhj9J
+	T53A==
+X-Gm-Message-State: APjAAAVHXk5lgjej3bbVsiped+5SMe/Lt7RLeyfYuTMBz2EPMbI4V168
+	MPOJaf0fnvWjH/RWyY0/cfZktw==
+X-Google-Smtp-Source: APXvYqyb7hCI+O2vcOBK5QMAJm+PpeItzwWdheUH9AMJF0139Fe6yyKHjBSsA7EGzkTqLi594e7mIg==
+X-Received: by 2002:a1c:f909:: with SMTP id x9mr2765196wmh.18.1557314032646;
+	Wed, 08 May 2019 04:13:52 -0700 (PDT)
+Received: from [10.201.49.229] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
+	by smtp.gmail.com with ESMTPSA id
+	p18sm25405249wrp.38.2019.05.08.04.13.50
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 08 May 2019 04:13:52 -0700 (PDT)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, 
+	qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+References: <20190507163416.24647-1-philmd@redhat.com>
+	<20190507163416.24647-8-philmd@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <075c122b-ffcf-9dda-4f1f-dae23bde4191@redhat.com>
+Date: Wed, 8 May 2019 13:13:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190507163416.24647-8-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.116.97, 10.4.195.7]
-Thread-Topic: virtio-pmem: Add virtio pmem driver
-Thread-Index: PGqRBxt7ac04jwyhY+CEFoY6aRdKvA==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Wed, 08 May 2019 11:12:49 +0000 (UTC)
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v7 2/6] virtio-pmem: Add virtio pmem driver
+	[fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH v2 07/16] hw/arm/aspeed: Use
+ object_initialize_child for correct ref. counting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,192 +87,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com,
-	jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
-	virtualization@lists.linux-foundation.org,
-	adilger kernel <adilger.kernel@dilger.ca>, smbarber@google.com,
-	zwisler@kernel.org, aarcange@redhat.com,
-	dave jiang <dave.jiang@intel.com>, linux-nvdimm@lists.01.org,
-	vishal l verma <vishal.l.verma@intel.com>, david@redhat.com,
-	willy@infradead.org, hch@infradead.org,
-	linux-acpi@vger.kernel.org, jmoyer@redhat.com,
-	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
-	riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
-	stefanha@redhat.com, imammedo@redhat.com,
-	dan j williams <dan.j.williams@intel.com>,
-	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
-	tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-	darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, pbonzini@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Paul Burton <pburton@wavecomp.com>, Andrew Jeffery <andrew@aj.id.au>,
+	Alistair Francis <alistair@alistair23.me>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+	Andrew Baumann <Andrew.Baumann@microsoft.com>,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>,
+	=?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+	qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+	Antony Pavlov <antonynpavlov@gmail.com>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+	Peter Chubb <peter.chubb@nicta.com.au>,
+	David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
+	Aurelien Jarno <aurelien@aurel32.net>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
+On 07/05/19 11:34, Philippe Mathieu-Daudé wrote:
+> As explained in commit aff39be0ed97:
 > 
-> On 4/25/19 10:00 PM, Pankaj Gupta wrote:
+>   Both functions, object_initialize() and object_property_add_child()
+>   increase the reference counter of the new object, so one of the
+>   references has to be dropped afterwards to get the reference
+>   counting right. Otherwise the child object will not be properly
+>   cleaned up when the parent gets destroyed.
+>   Thus let's use now object_initialize_child() instead to get the
+>   reference counting here right.
 > 
-> > +void host_ack(struct virtqueue *vq)
-> > +{
-> > +	unsigned int len;
-> > +	unsigned long flags;
-> > +	struct virtio_pmem_request *req, *req_buf;
-> > +	struct virtio_pmem *vpmem = vq->vdev->priv;
-> > +
-> > +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
-> > +		req->done = true;
-> > +		wake_up(&req->host_acked);
-> > +
-> > +		if (!list_empty(&vpmem->req_list)) {
-> > +			req_buf = list_first_entry(&vpmem->req_list,
-> > +					struct virtio_pmem_request, list);
-> > +			list_del(&vpmem->req_list);
+> This patch was generated using the following Coccinelle script
+> (with a bit of manual fix-up for overly long lines):
 > 
-> Shouldn't it be rather `list_del(vpmem->req_list.next)`? We are trying to
-> unlink
-> first element of the list and `vpmem->req_list` is just the list head.
-
-This looks correct. We are not deleting head but first entry in 'req_list'
-which is device corresponding list of pending requests.
-
-Please see below:
-
-/**
- * Retrieve the first list entry for the given list pointer.
- *
- * Example:
- * struct foo *first;
- * first = list_first_entry(&bar->list_of_foos, struct foo, list_of_foos);
- *
- * @param ptr The list head
- * @param type Data type of the list element to retrieve
- * @param member Member name of the struct list_head field in the list element.
- * @return A pointer to the first list element.
- */
-#define list_first_entry(ptr, type, member) \
-    list_entry((ptr)->next, type, member)
-
+>  @use_object_initialize_child@
+>  expression parent_obj;
+>  expression child_ptr;
+>  expression child_name;
+>  expression child_type;
+>  expression child_size;
+>  expression errp;
+>  @@
+>  (
+>  -   object_initialize(child_ptr, child_size, child_type);
+>  +   object_initialize_child(parent_obj, child_name,  child_ptr, child_size,
+>  +                           child_type, &error_abort, NULL);
+>      ... when != parent_obj
+>  -   object_property_add_child(parent_obj, child_name, OBJECT(child_ptr), NULL);
+>      ...
+>  ?-  object_unref(OBJECT(child_ptr));
+>  |
+>  -   object_initialize(child_ptr, child_size, child_type);
+>  +   object_initialize_child(parent_obj, child_name,  child_ptr, child_size,
+>  +                            child_type, errp, NULL);
+>      ... when != parent_obj
+>  -   object_property_add_child(parent_obj, child_name, OBJECT(child_ptr), errp);
+>      ...
+>  ?-  object_unref(OBJECT(child_ptr));
+>  )
 > 
-> > +int virtio_pmem_flush(struct nd_region *nd_region)
-> > +{
-> > +	int err;
-> > +	unsigned long flags;
-> > +	struct scatterlist *sgs[2], sg, ret;
-> > +	struct virtio_device *vdev = nd_region->provider_data;
-> > +	struct virtio_pmem *vpmem = vdev->priv;
-> > +	struct virtio_pmem_request *req;
-> > +
-> > +	might_sleep();
-> > +	req = kmalloc(sizeof(*req), GFP_KERNEL);
-> > +	if (!req)
-> > +		return -ENOMEM;
-> > +
-> > +	req->done = req->wq_buf_avail = false;
-> > +	strcpy(req->name, "FLUSH");
-> > +	init_waitqueue_head(&req->host_acked);
-> > +	init_waitqueue_head(&req->wq_buf);
-> > +	sg_init_one(&sg, req->name, strlen(req->name));
-> > +	sgs[0] = &sg;
-> > +	sg_init_one(&ret, &req->ret, sizeof(req->ret));
-> > +	sgs[1] = &ret;
-> > +
-> > +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
-> > +	if (err) {
-> > +		dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
-> > +
-> > +		list_add_tail(&vpmem->req_list, &req->list);
-> > +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +
-> > +		/* When host has read buffer, this completes via host_ack */
-> > +		wait_event(req->wq_buf, req->wq_buf_avail);
-> > +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	}
+>  @use_sysbus_init_child_obj@
+>  expression parent_obj;
+>  expression dev;
+>  expression child_ptr;
+>  expression child_name;
+>  expression child_type;
+>  expression child_size;
+>  expression errp;
+>  @@
+>  (
+>  -   object_initialize_child(parent_obj, child_name, child_ptr, child_size,
+>  -                           child_type, errp, NULL);
+>  +   sysbus_init_child_obj(parent_obj, child_name, child_ptr, child_size,
+>  +                         child_type);
+>      ...
+>  -   qdev_set_parent_bus(DEVICE(child_ptr), sysbus_get_default());
+>  |
+>  -   object_initialize_child(parent_obj, child_name, child_ptr, child_size,
+>  -                           child_type, errp, NULL);
+>  +   sysbus_init_child_obj(parent_obj, child_name, child_ptr, child_size,
+>  +                         child_type);
+>  -   dev = DEVICE(child_ptr);
+>  -   qdev_set_parent_bus(dev, sysbus_get_default());
+>  )
 > 
-> Aren't the arguments in `list_add_tail` swapped? The element we are adding
-
-No, this is intentional. 'vpmem->req_list' maintains a list of pending requests
-for entire pmem device.  'req->list'is per request list and maintains pending
-request on virtio queue add failure. I think we don't need this list.
-
-> should
-> be first, the list should be second. Also, shouldn't we resubmit the request
-> after
-> waking up from `wait_event(req->wq_buf, req->wq_buf_avail)`?
-
-Yes. we should. Good point.
-
+> While the object_initialize() function doesn't take an
+> 'Error *errp' argument, the object_initialize_child() does.
+> Since this code is used when a machine is created (and is not
+> yet running), we deliberately choose to use the &error_abort
+> argument instead of ignoring errors if an object creation failed.
+> This choice also matches when using sysbus_init_child_obj(),
+> since its code is:
 > 
-> I propose rewriting it like that:
+>   void sysbus_init_child_obj(Object *parent,
+>                              const char *childname, void *child,
+>                              size_t childsize, const char *childtype)
+>   {
+>       object_initialize_child(parent, childname, child, childsize,
+>                               childtype, &error_abort, NULL);
 > 
-> diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
-> index 66b582f751a3..ff0556b04e86 100644
-> --- a/drivers/nvdimm/virtio_pmem.c
-> +++ b/drivers/nvdimm/virtio_pmem.c
-> @@ -25,7 +25,7 @@ void host_ack(struct virtqueue *vq)
->  		if (!list_empty(&vpmem->req_list)) {
->  			req_buf = list_first_entry(&vpmem->req_list,
->  					struct virtio_pmem_request, list);
-> -			list_del(&vpmem->req_list);
-> +			list_del(vpmem->req_list.next);
-
-Don't think its correct.
-
->  			req_buf->wq_buf_avail = true;
->  			wake_up(&req_buf->wq_buf);
->  		}
-> @@ -59,17 +59,33 @@ int virtio_pmem_flush(struct nd_region *nd_region)
->  	sgs[1] = &ret;
+>       qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
+>   }
+> 
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> Inspired-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+> Reviewed-by: Joel Stanley <joel@jms.id.au>
+> ---
+> v2:
+>  - Described new use of &error_abort (Markus)
+>  - Added Cédric S-o-b (he sent the same 'hw/arm/aspeed_soc.c' patch)
+>  - Added Joel R-b of Cédric patch
+> ---
+>  hw/arm/aspeed.c     |  6 +++---
+>  hw/arm/aspeed_soc.c | 50 ++++++++++++++++++---------------------------
+>  2 files changed, 23 insertions(+), 33 deletions(-)
+> 
+> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+> index 1c23ebd9925..f700b7e4fe0 100644
+> --- a/hw/arm/aspeed.c
+> +++ b/hw/arm/aspeed.c
+> @@ -159,9 +159,9 @@ static void aspeed_board_init(MachineState *machine,
+>      ram_addr_t max_ram_size;
 >  
->  	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> -	err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
-> -	if (err) {
-> -		dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
-> +	/*
-> +	 * If virtqueue_add_sgs returns -ENOSPC then req_vq virtual queue does not
-> +	 * have free descriptor slots. We add the request to req_list and wait
-> +	 * for host_ack to wake us up when free slots are available.
-> +	 */
-> +	while ((err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC))
-> == -ENOSPC) {
-> +		dev_err(&vdev->dev, "failed to send command to virtio pmem device, no free
-> slots in the virtqueue, postponing request\n");
-> +		req->wq_buf_avail = false;
+>      bmc = g_new0(AspeedBoardState, 1);
+> -    object_initialize(&bmc->soc, (sizeof(bmc->soc)), cfg->soc_name);
+> -    object_property_add_child(OBJECT(machine), "soc", OBJECT(&bmc->soc),
+> -                              &error_abort);
+> +    object_initialize_child(OBJECT(machine), "soc", &bmc->soc,
+> +                            (sizeof(bmc->soc)), cfg->soc_name, &error_abort,
+> +                            NULL);
 >  
-> -		list_add_tail(&vpmem->req_list, &req->list);
-> +		list_add_tail(&req->list, &vpmem->req_list);
->  		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+>      sc = ASPEED_SOC_GET_CLASS(&bmc->soc);
 >  
->  		/* When host has read buffer, this completes via host_ack */
->  		wait_event(req->wq_buf, req->wq_buf_avail);
->  		spin_lock_irqsave(&vpmem->pmem_lock, flags);
->  	}
-> +
-> +	/*
-> +	 * virtqueue_add_sgs failed with error different than -ENOSPC, we can't
-> +	 * do anything about that.
-> +	 */
-> +	if (err) {
-> +		dev_info(&vdev->dev, "failed to send command to virtio pmem device, error
-> code %d\n", err);
-> +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +		err = -EIO;
-> +		goto ret;
-> +	}
->  	err = virtqueue_kick(vpmem->req_vq);
->  	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+> index a27233d4876..faff42b84ad 100644
+> --- a/hw/arm/aspeed_soc.c
+> +++ b/hw/arm/aspeed_soc.c
+> @@ -106,12 +106,11 @@ static void aspeed_soc_init(Object *obj)
+>      AspeedSoCClass *sc = ASPEED_SOC_GET_CLASS(s);
+>      int i;
+>  
+> -    object_initialize(&s->cpu, sizeof(s->cpu), sc->info->cpu_type);
+> -    object_property_add_child(obj, "cpu", OBJECT(&s->cpu), NULL);
+> +    object_initialize_child(obj, "cpu", OBJECT(&s->cpu), sizeof(s->cpu),
+> +                            sc->info->cpu_type, &error_abort, NULL);
+>  
+> -    object_initialize(&s->scu, sizeof(s->scu), TYPE_ASPEED_SCU);
+> -    object_property_add_child(obj, "scu", OBJECT(&s->scu), NULL);
+> -    qdev_set_parent_bus(DEVICE(&s->scu), sysbus_get_default());
+> +    sysbus_init_child_obj(obj, "scu", OBJECT(&s->scu), sizeof(s->scu),
+> +                          TYPE_ASPEED_SCU);
+>      qdev_prop_set_uint32(DEVICE(&s->scu), "silicon-rev",
+>                           sc->info->silicon_rev);
+>      object_property_add_alias(obj, "hw-strap1", OBJECT(&s->scu),
+> @@ -121,36 +120,29 @@ static void aspeed_soc_init(Object *obj)
+>      object_property_add_alias(obj, "hw-prot-key", OBJECT(&s->scu),
+>                                "hw-prot-key", &error_abort);
+>  
+> -    object_initialize(&s->vic, sizeof(s->vic), TYPE_ASPEED_VIC);
+> -    object_property_add_child(obj, "vic", OBJECT(&s->vic), NULL);
+> -    qdev_set_parent_bus(DEVICE(&s->vic), sysbus_get_default());
+> +    sysbus_init_child_obj(obj, "vic", OBJECT(&s->vic), sizeof(s->vic),
+> +                          TYPE_ASPEED_VIC);
+>  
+> -    object_initialize(&s->timerctrl, sizeof(s->timerctrl), TYPE_ASPEED_TIMER);
+> -    object_property_add_child(obj, "timerctrl", OBJECT(&s->timerctrl), NULL);
+> +    sysbus_init_child_obj(obj, "timerctrl", OBJECT(&s->timerctrl),
+> +                          sizeof(s->timerctrl), TYPE_ASPEED_TIMER);
+>      object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
+>                                     OBJECT(&s->scu), &error_abort);
+> -    qdev_set_parent_bus(DEVICE(&s->timerctrl), sysbus_get_default());
+>  
+> -    object_initialize(&s->i2c, sizeof(s->i2c), TYPE_ASPEED_I2C);
+> -    object_property_add_child(obj, "i2c", OBJECT(&s->i2c), NULL);
+> -    qdev_set_parent_bus(DEVICE(&s->i2c), sysbus_get_default());
+> +    sysbus_init_child_obj(obj, "i2c", OBJECT(&s->i2c), sizeof(s->i2c),
+> +                          TYPE_ASPEED_I2C);
+>  
+> -    object_initialize(&s->fmc, sizeof(s->fmc), sc->info->fmc_typename);
+> -    object_property_add_child(obj, "fmc", OBJECT(&s->fmc), NULL);
+> -    qdev_set_parent_bus(DEVICE(&s->fmc), sysbus_get_default());
+> +    sysbus_init_child_obj(obj, "fmc", OBJECT(&s->fmc), sizeof(s->fmc),
+> +                          sc->info->fmc_typename);
+>      object_property_add_alias(obj, "num-cs", OBJECT(&s->fmc), "num-cs",
+>                                &error_abort);
+>  
+>      for (i = 0; i < sc->info->spis_num; i++) {
+> -        object_initialize(&s->spi[i], sizeof(s->spi[i]),
+> -                          sc->info->spi_typename[i]);
+> -        object_property_add_child(obj, "spi[*]", OBJECT(&s->spi[i]), NULL);
+> -        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
+> +        sysbus_init_child_obj(obj, "spi[*]", OBJECT(&s->spi[i]),
+> +                              sizeof(s->spi[i]), sc->info->spi_typename[i]);
+>      }
+>  
+> -    object_initialize(&s->sdmc, sizeof(s->sdmc), TYPE_ASPEED_SDMC);
+> -    object_property_add_child(obj, "sdmc", OBJECT(&s->sdmc), NULL);
+> -    qdev_set_parent_bus(DEVICE(&s->sdmc), sysbus_get_default());
+> +    sysbus_init_child_obj(obj, "sdmc", OBJECT(&s->sdmc), sizeof(s->sdmc),
+> +                          TYPE_ASPEED_SDMC);
+>      qdev_prop_set_uint32(DEVICE(&s->sdmc), "silicon-rev",
+>                           sc->info->silicon_rev);
+>      object_property_add_alias(obj, "ram-size", OBJECT(&s->sdmc),
+> @@ -159,16 +151,14 @@ static void aspeed_soc_init(Object *obj)
+>                                "max-ram-size", &error_abort);
+>  
+>      for (i = 0; i < sc->info->wdts_num; i++) {
+> -        object_initialize(&s->wdt[i], sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
+> -        object_property_add_child(obj, "wdt[*]", OBJECT(&s->wdt[i]), NULL);
+> -        qdev_set_parent_bus(DEVICE(&s->wdt[i]), sysbus_get_default());
+> +        sysbus_init_child_obj(obj, "wdt[*]", OBJECT(&s->wdt[i]),
+> +                              sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
+>          qdev_prop_set_uint32(DEVICE(&s->wdt[i]), "silicon-rev",
+>                                      sc->info->silicon_rev);
+>      }
+>  
+> -    object_initialize(&s->ftgmac100, sizeof(s->ftgmac100), TYPE_FTGMAC100);
+> -    object_property_add_child(obj, "ftgmac100", OBJECT(&s->ftgmac100), NULL);
+> -    qdev_set_parent_bus(DEVICE(&s->ftgmac100), sysbus_get_default());
+> +    sysbus_init_child_obj(obj, "ftgmac100", OBJECT(&s->ftgmac100),
+> +                          sizeof(s->ftgmac100), TYPE_FTGMAC100);
+>  }
+>  
+>  static void aspeed_soc_realize(DeviceState *dev, Error **errp)
 > 
-> 
-> Let me know if it looks reasonable to you.
 
-Don't think this is fulfilling entire logic correctly. But thanks, I spotted a bug in my code :)
-Will fix it. 
-
-> 
-> Thank you,
-> Jakub Staron
-> 
-> 
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
