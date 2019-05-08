@@ -2,79 +2,68 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29349C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 20:18:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03ABEC04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 20:19:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB23E204FD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 20:18:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB23E204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BE7E120578
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 20:19:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs.org header.i=@ozlabs.org header.b="PDFacoS2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE7E120578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ozlabs.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43334 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43342 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOT0t-0002nU-IS
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 16:18:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47047)
+	id 1hOT25-0003Sj-28
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 16:19:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hOSzo-0002Tm-GO
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 16:16:57 -0400
+	(envelope-from <anton@ozlabs.org>) id 1hOT0q-0002sF-RT
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 16:18:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hOSzn-0007Sp-MK
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 16:16:56 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:56269)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hOSzn-0007SH-Gw
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 16:16:55 -0400
-Received: by mail-wm1-f66.google.com with SMTP id y2so187236wmi.5
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 13:16:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=SXxKdbuuFLhMCJMYIhyM0I7bGfZqlBBLOhy52+XdYmI=;
-	b=CIFnahVAF0Kr6p/L9nLjTVyymXOBr3TtxLA7ru9XBP7swaiYEFg3MHoiYjaxBzDM+L
-	ZEESj156EAE7XFYx2v24ys2GOGANLY5gSxSOy16+4mzYgzlUhGCyMryAlW/VGXv0uHqb
-	bViUFlaZ4o7jrdV4ypvR24uN0OJLVEcZK44Ew6s3FXDWTOUzW9IvGh6+BYhOwfJKVPiH
-	oyoqhOPu6KQ06PkURBXBWHTT29csQOn1Nz4loQfgxRSkX9GywH9eoikVH6uyofIp4NL0
-	68/bVdvn0yWm6Hq/sDKsDGQyoZVj4XS1wjfqUuuw7otmTnO8lruJT9SavtrHA++lhfyx
-	JP7w==
-X-Gm-Message-State: APjAAAVLBtIf/8CDVHpTfRLZIhTWlveBMeel4C1PNgglYiIPTLr5UEXf
-	p0wDMSf7UTOeeaI8APZOVl8hsQ==
-X-Google-Smtp-Source: APXvYqw6Q8bgRoYPD6qBRiQWOOAjNjclHYQsI5xmygjIbQALEUWoEbMnN+oYOpmwJwrRPFvddgr00g==
-X-Received: by 2002:a7b:c415:: with SMTP id k21mr65855wmi.29.1557346614249;
-	Wed, 08 May 2019 13:16:54 -0700 (PDT)
-Received: from [192.168.1.37] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	p17sm22851439wrg.92.2019.05.08.13.16.52
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Wed, 08 May 2019 13:16:53 -0700 (PDT)
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-References: <20190316234456.18140-1-philmd@redhat.com>
-	<97745dfa-ceaf-6572-59ba-a37e8f3c1e89@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <097f4f90-b190-93d3-5c72-756fb29f7cc3@redhat.com>
-Date: Wed, 8 May 2019 22:16:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <anton@ozlabs.org>) id 1hOT0p-0007z5-4j
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 16:18:00 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:54875 helo=ozlabs.org)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anton@ozlabs.org>)
+	id 1hOT0o-0007iJ-I9; Wed, 08 May 2019 16:17:59 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits)
+	server-digest SHA256) (No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 44znp62Wxhz9s9T;
+	Thu,  9 May 2019 06:17:34 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+	t=1557346656; bh=1ZUozj+aqczDyPmG/j2bjCpGDLuHpAdkAJnlA7qalhU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PDFacoS2X0UZL4tT67LxdOeBFcBpEZYoLmKq8wLgO5Rg9etUPBbwzqdvNsoP38hNp
+	9IrL0U7xhw6LjUeSGJfc0VtH5UhdTMEA+o6WFVNEhwe7ZQ6E3locAxIyh8xfLFytfx
+	uLMSzW52JbxinJmypPxb097E9KOH3ieSTwtYrZN150YCCSljGGLADiUwoKF9/4KrN/
+	VKnic537XwO9wsEZmMBLgioo9n0MJQB/o3OftAwnAfYJwlSjBs+VCuqYdRrxQRmGcJ
+	61ATKkob7gi3e1oCJf1ABf1tqQ4fu+F6eMacVhwTNa0vSeAxd/T40b+YbTXKiRpU7B
+	n302R/OSLbZqQ==
+Date: Thu, 9 May 2019 06:17:33 +1000
+From: Anton Blanchard <anton@ozlabs.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190509061713.69490488@kryten>
+In-Reply-To: <20190507052039.GF7073@umbus.fritz.box>
+References: <20190507004811.29968-1-anton@ozlabs.org>
+	<20190507004811.29968-2-anton@ozlabs.org>
+	<20190507052039.GF7073@umbus.fritz.box>
+X-Mailer: Mutt/1.8.0 (2017-02-23)
 MIME-Version: 1.0
-In-Reply-To: <97745dfa-ceaf-6572-59ba-a37e8f3c1e89@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH for-4.1 0/2] hw/alpha: Add the CY82C693UB
- southbridge in Kconfig
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PATCH v2] target/ppc: Fix xxspltib
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,27 +75,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+Cc: ego@linux.vnet.ibm.com, sandipandas1990@gmail.com,
+	mark.cave-ayland@ilande.co.uk, richard.henderson@linaro.org,
+	qemu-devel@nongnu.org, f4bug@amsat.org, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo, Thomas,
+xxspltib raises a VMX or a VSX exception depending on the register
+set it is operating on. We had a check, but it was backwards.
 
-On 4/29/19 1:29 PM, Philippe Mathieu-Daudé wrote:
-> CC'ing Thomas who is a Kconfig expert.
-> 
-> On 3/17/19 12:44 AM, Philippe Mathieu-Daudé wrote:
->> Explicit the CY82C693UB southbridge used by the 264DP.
->>
->> Philippe Mathieu-Daudé (2):
->>   hw/isa/southbridge: Add the Cypress 82C693UB chipset
->>   hw/alpha/Kconfig: The 264DP machine use a CY82C693UB southbridge
+Fixes: f113283525a4 ("target-ppc: add xxspltib instruction")
+Signed-off-by: Anton Blanchard <anton@ozlabs.org>
+---
+ target/ppc/translate/vsx-impl.inc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-This series does not fix anything, but makes the kconfig graph cleaner.
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
+index 4d8ca7cf32..4812a374aa 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -1355,13 +1355,13 @@ static void gen_xxspltib(DisasContext *ctx)
+     int rt = xT(ctx->opcode);
+ 
+     if (rt < 32) {
+-        if (unlikely(!ctx->altivec_enabled)) {
+-            gen_exception(ctx, POWERPC_EXCP_VPU);
++        if (unlikely(!ctx->vsx_enabled)) {
++            gen_exception(ctx, POWERPC_EXCP_VSXU);
+             return;
+         }
+     } else {
+-        if (unlikely(!ctx->vsx_enabled)) {
+-            gen_exception(ctx, POWERPC_EXCP_VSXU);
++        if (unlikely(!ctx->altivec_enabled)) {
++            gen_exception(ctx, POWERPC_EXCP_VPU);
+             return;
+         }
+     }
+-- 
+2.20.1
 
-Regards,
-
-Phil.
 
