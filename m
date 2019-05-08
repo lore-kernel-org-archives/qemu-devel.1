@@ -2,67 +2,90 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36CD1C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:17:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99851C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:20:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F14E520656
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:17:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F14E520656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5F87A20656
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:20:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bzOnPjCe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F87A20656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33735 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33771 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOIhs-0005Ld-7b
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 05:17:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46595)
+	id 1hOIkl-0006I2-MJ
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 05:20:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hOIh5-00054n-UG
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:16:57 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hOIjz-0005vy-0O
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:19:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hOIh4-0007OT-KG
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:16:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41280)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hOIh4-0007Kq-D9
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:16:54 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CE5F6307D971
-	for <qemu-devel@nongnu.org>; Wed,  8 May 2019 09:16:52 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
-	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D8C7600D4;
-	Wed,  8 May 2019 09:16:52 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id E55331132B35; Wed,  8 May 2019 11:16:50 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20190423212246.3542-1-ehabkost@redhat.com>
-	<87imumj1jb.fsf@dusky.pond.sub.org>
-	<20190507161845.GL28722@habkost.net>
-Date: Wed, 08 May 2019 11:16:50 +0200
-In-Reply-To: <20190507161845.GL28722@habkost.net> (Eduardo Habkost's message
-	of "Tue, 7 May 2019 13:18:45 -0300")
-Message-ID: <87lfzh5mrh.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(envelope-from <alex.bennee@linaro.org>) id 1hOIjy-0000LE-3c
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:19:54 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37924)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hOIjx-0000Kg-RW
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:19:54 -0400
+Received: by mail-wr1-x444.google.com with SMTP id v11so6066299wru.5
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 02:19:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=zzKMN5PHQaK5lVbPLR4qxYW9E9uzQ7YU2GoTiuZgJP8=;
+	b=bzOnPjCenOKcM7aeSiXvCTeKhcF3KPvNPXJ8IFMg6U6x6MpE9vESuGwWLPHBF6lKVe
+	s4ZPe3oZf0gMsypJLOnApnsDipPXCGPO4UF8hlFqUz0agn7jdHEUkX3GW9IgbZwUy5zH
+	MtqkFRA428LlrQHZFTu/dFafDPVNODHM9CW8gxzsce+7HyRPYAnj0oiXdWZuXlvgGDuz
+	V+NjZNM8g3oLrcnArXufsvuaq/eOJKH6ubpHuwwaISMRQl62zm8o5aSugmPfR+pYgqkh
+	ujXBNZI2fF0eiVISiupaUCN1zNKtCtSkDXE2UxRqPk29OTa1FFPtgf8TC7DLpQlX3glU
+	xoBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=zzKMN5PHQaK5lVbPLR4qxYW9E9uzQ7YU2GoTiuZgJP8=;
+	b=k5u6hhoIPrk4+40E8WQ+jQgVElp2m0XhUO+GunrrB9XKjOjMcoYZzDtmqwTmmlvtPT
+	un7OivSODXeqXBLc3uRwp9362NxIhy3BjdDhHYqLvZuXroTwe3/qtQoaieX+IirSAaMs
+	BIi88zv84hSgjzACRu8gWADhPQwtfXJ0ehtDt8R08w5un8ILrWTsS+kddfRMm+pKWCOD
+	8YuQmr9jqkfDQMspR8/XKBK9X/+UfGtLkGtKVKm+el9rqnuATPgfWcQIsrIidc+pibR1
+	xaEqst5e900nHkKByYloR9+As4HaQN6P/OxpCVrQrVgacKlWpDNm10Mf6f//3nW2fPZY
+	5DDQ==
+X-Gm-Message-State: APjAAAVvaJfdiJnFPtgPDRimLsGU2L8kB7hfjlswewTPpajFt5Lqd7GM
+	Eh9NOokl4ovQKi3h+xSWo7hZsA==
+X-Google-Smtp-Source: APXvYqwtDTVGh0b9g8/rWKdTKkObU5Z1pTxcjPYiIxJLCOlXgWUbR8meGUFT8/bxl94CW5CL6r3KPg==
+X-Received: by 2002:adf:dc08:: with SMTP id t8mr24978178wri.220.1557307191934; 
+	Wed, 08 May 2019 02:19:51 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	j131sm4388607wmb.9.2019.05.08.02.19.50
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 08 May 2019 02:19:50 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 536071FF87;
+	Wed,  8 May 2019 10:19:50 +0100 (BST)
+References: <20190506213817.14344-1-ehabkost@redhat.com>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190506213817.14344-1-ehabkost@redhat.com>
+Date: Wed, 08 May 2019 10:19:50 +0100
+Message-ID: <87v9yl4821.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Wed, 08 May 2019 09:16:52 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/3] Export machine type deprecation info
- through QMP
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH] tests: Force Python I/O encoding for
+ check-qapi-schema
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,139 +97,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mprivozn@redhat.com, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Michael Roth <mdroth@linux.vnet.ibm.com>,
+	Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+
 Eduardo Habkost <ehabkost@redhat.com> writes:
 
-> On Tue, May 07, 2019 at 07:07:04AM +0200, Markus Armbruster wrote:
->> Eduardo Habkost <ehabkost@redhat.com> writes:
->> 
->> > This series adds machine type deprecation information to the
->> > output of the `query-machines` QMP command.  With this, libvirt
->> > and management software will be able to show this information to
->> > users and/or suggest changes to VM configuration to avoid
->> > deprecated machine types.
->> 
->> This overlaps with something I want to try, namely using Kevin's
->> proposed QAPI feature flags for deprecation markings.  Let's compare the
->> two.
->> 
->> To mark something as deprecated with your patches, you add a
->> @support-status member somewhere, where "somewhere" is related to
->> "something" by "provides information on".
->> 
->> Example: MachineInfo (returned by query-machines) provides information
->> on possible values of -machine parameter type.  If -machine was
->> QAPIfied, it would provide information on possible values of a QAPI
->> object type's member.  The type might be anonymous.  The member should
->> be an enum (we currently use 'str' in MachineInfo).
+> test-qapi.py doesn't force a specific encoding for stderr or
+> stdout, but the reference files used by check-qapi-schema are in
+> UTF-8.  This breaks check-qapi-schema under certain circumstances
+> (e.g. if using the C locale and Python < 3.7).
 >
-> QAPIfying -machine, -cpu, and -device would be wonderful.
+> We need to make sure test-qapi.py always generate UTF-8 output
+> somehow.  On Python 3.7+ we can do it using
+> `sys.stdout.reconfigure(...)`, but we need a solution that works
+> with older Python versions.
 >
->> 
->> Example: say we want to deprecate block driver "vfat",
->> i.e. BlockdevDriver member @vfat.  Type BlockdevDriver is used in
->> multiple places; let's ignore all but BlockdevOptions.  We need to add
->> @support-status to something that provides information on
->> BlockdevDriver, or maybe on BlockdevOptions.  There is no ad hoc query
->> providing information on either of the two, because QAPI/QMP
->> introspection has been sufficient.  What now?
->> 
->> Can we add deprecation information to (general) QAPI/QMP introspection
+> Instead of trying a hack like reopening sys.stdout and
+> sys.stderr, we can just tell Python to use UTF-8 for I/O encoding
+> when running test-qapi.py.  Do it by setting PYTHONIOENCODING.
 >
-> Yes, we can.  I think it's a good idea.  But:
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Tested-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  tests/Makefile.include | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
->> instead of ad hoc queries?
->
-> I'm not sure about the "instead of" part.  I don't want perfect
-> to be the enemy of done, and I don't want QAPIfication of
-> -machine to be a requirement to start reporting machine type
-> deprecation information.
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 7c8b9c84b2..af88ab6f8b 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -1103,7 +1103,7 @@ check-tests/qemu-iotests-quick.sh: tests/qemu-iotes=
+ts-quick.sh qemu-img$(EXESUF)
+>  .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
+>  $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SRC_PATH=
+)/%.json
+>  	$(call quiet-command, PYTHONPATH=3D$(SRC_PATH)/scripts \
+> -		$(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py \
+> +		PYTHONIOENCODING=3Dutf-8 $(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-=
+qapi.py \
+>  		$^ >$*.test.out 2>$*.test.err; \
+>  		echo $$? >$*.test.exit, \
+>  		"TEST","$*.out")
 
-Valid point.  Still, I believe we should at least try to predict how the
-pieces we create now would fit with the pieces we plan to create later
-on.
 
-Note that full QAPIfication of -machine isn't necessary to make QAPI
-feature "deprecated" work for machine types.  Turning MachineInfo member
-@name into an enum, so we can tack "deprecated" onto its values, would
-suffice.
-
-Such a QAPIfication of machine types is still hard: QOM types are
-defined at compile time just like the QAPI schema, but their definition
-is distributed, and collected into one place only at run time.  I
-discussed this on slide 39 of my "QEMU interface introspection: From
-hacks to solutions" talk (KVM Form 2015).  Just for device_add, but it's
-just a special case of QOM.  Choices listed there:
-
-* Collect drivers at compile time? Hard...
-* Make QAPI schema dynamic? Hard...
-* Forgo driver-specific arguments in schema?
-  Defeats introspection...
-
-I'd like to add to the last item:
-
-  Provide QOM introspection on par with QAPI schema introspection
-
-The QOM introspection we have (qom-list-types etc. is not on par.
-
-Back to exposing machine type deprecation.
-
-I'm doubtful your proposed solution can be applied widely.  It relies on
-adding @support-status to something that provides information on
-whatever is deprecated.  The initial use is with a something that is an
-ad hoc query, namely query-machines.  To use it, the management
-application needs to understand what query-machines' @support-status
-applies to.  Certainly feasible.  But I fear every use will be a special
-case.  Furthermore, a suitable ad hoc query need not exist.  What then?
-Create suitable ad hoc queries just for communicating deprecation?
-
-Instead, I'd like us to think about a more genral solution.  Or perhaps
-two: one for properly QAPIfied stuff, and one for QOM.
-
->> Kevin's proposed QAPI feature flags[*] extend the QAPI language so that
->> struct types can optionally have a list of feature flags, which are
->> strings.  Struct types suffice for his immediate needs.  I'd like to use
->> feature flags to mark deprecation by tacking a "deprecated" feature onto
->> whatever is deprecated.  This obviously needs feature support for
->> everything we want to be able to deprecate: commands, and events, as
->> well as members of enum and object types.
->> 
->> Example: to deprecate block driver "vfat", add feature "deprecated" to
->> BlockdevDriver member @vfat.
->> 
->> Unlike your patches, this does not require finding a "somewhere" that
->> provides information on "something".  You simply tack "deprecated" right
->> onto "something".
->> 
->> Your patches provide more information, however: human-readable messages.
->
-> It also includes a machine-friendly suggested alternative (which
-> I think is even more important that the human-readable message).
-
-I agree we should point to a preferred replacement whenever we deprecate
-something.
-
-We have to do it in documentation.  And we generally do, in
-qemu-deprecated.texi.
-
-How useful would doing it in QMP as well be?  Depends on what management
-applications can do with the additional information.
-
-> We could extend QAPI introspection to return that if necessary,
-> right?
-
-I'm confident we can come up with *something*.  It might kill the neat
-and simple "use QAPI features to communicate deprecation" idea, though.
-
->> Food for thought :)
->> 
->> 
->> [*] Hiding in
->> Subject: [PATCH 0/4] file-posix: Add dynamic-auto-read-only QAPI feature
->> Date: Mon,  8 Apr 2019 16:35:39 +0200
->> Message-Id: <20190408143543.3982-1-kwolf@redhat.com>
+--
+Alex Benn=C3=A9e
 
