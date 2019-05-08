@@ -2,87 +2,109 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E49C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 08:19:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B5F6C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 08:27:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D2EC21530
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 08:19:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tix/6MYw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D2EC21530
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D1D252053B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 08:27:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1D252053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33037 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33125 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOHnf-0003vI-Ds
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 04:19:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35738)
+	id 1hOHvY-0006Ub-Rk
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 04:27:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hOHk9-0002Ok-Br
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:16:04 -0400
+	(envelope-from <thuth@redhat.com>) id 1hOHuk-0006B8-A5
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:26:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hOHk6-0004nl-Nb
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:16:01 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42524)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1hOHk6-0004mf-Dr
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:15:58 -0400
-Received: by mail-ot1-x344.google.com with SMTP id f23so17557018otl.9
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 01:15:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-	:cc; bh=MmqIFlzY725L0wK6uXb4ff5YY7Ng8GuVfansCXipJO0=;
-	b=tix/6MYwCP75ZhTOEi8l0JtJzIPSTUe/BPGiDoP4dtdHvHNVS9HdNgLjpmhMvER8bM
-	JBrQdfbElBtFFzMTwDlZp0jy+WEcpumdPGQrhzWl+FYBsCKVEOGmsNB1H+jO/lzTX1IR
-	K81zRfEO7Xu3EGqv3yDOOHF6rkyfq/3F49dKrpeqAX58GZ9HX5IPPcE7oIhk4LiJpagw
-	zQgq2GX59kTwMUGIuC632DelWr6eRaeJJGP4HPmxv9kIgMMokDX6Tz4+61oXM+3a+0FG
-	0VeliloN1+U6tXhymsdnUBh+fAYHlQ2/gOSkCpF0GmF5Ds1ITju6N+U83VGwroS70/ih
-	7Ywg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-	:message-id:subject:to:cc;
-	bh=MmqIFlzY725L0wK6uXb4ff5YY7Ng8GuVfansCXipJO0=;
-	b=mkCu/sE09RFdHprcsNMLkMuXLUSx6THbcAh0ZErPnV3NhvLNUKWhWpO1enkfrko7/D
-	0Xx5701WQ7z28z0jfCvslrXLmnc8BjeDmv7tXJ35g7YIhnUD7wm1ph3ba3UMlFnt0iUY
-	Lij67l7GBkKh9hK5Y7uLC7E4PMgIqmRhqeAuNzztbUSJLejqdmndtJ3fcTR2QB63a+zx
-	du8msc21Y/BRHMAHsYvo83N7giKIgwO0bz0cfy/rq3DvLTnsOcLoN6/+EQ7xra33LB+8
-	ajYP0gXEi8F3L3oaZrTbcKRJgcacRZ5vxGoVyPf+LBr1iVaFxe7jdxYg0zXMo8OBtzqQ
-	gEWg==
-X-Gm-Message-State: APjAAAW3WyyZm9HVz3IR5uq8vX+TWeKos/tNa44yhoxtE2YBy0MfK8Uq
-	XFArkcnhauJ9HlXB3khjvu1JzrcAmxQrvNXwVkM=
-X-Google-Smtp-Source: APXvYqyNoMI10+R2gonANNMiUeEqOoelJdTw6zLly5rx8LqSpTiv2DxRMwXwHtsYQ242OWM3BePm1mlBVZbJ/yaNFa8=
-X-Received: by 2002:a9d:6c51:: with SMTP id g17mr16258253otq.171.1557303356523;
-	Wed, 08 May 2019 01:15:56 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1hOHuj-0002Np-AD
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:26:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51370)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hOHuj-0002Ni-2m
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:26:57 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BAC3540F14;
+	Wed,  8 May 2019 08:26:55 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-100.ams2.redhat.com [10.36.116.100])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BD0B662671;
+	Wed,  8 May 2019 08:26:54 +0000 (UTC)
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+References: <155721868351.451636.16735088470797960209.stgit@bahia.lan>
+	<155721871159.451636.6528273080303910901.stgit@bahia.lan>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <2fb1b764-0609-c140-8781-e4a2c9005847@redhat.com>
+Date: Wed, 8 May 2019 10:26:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Received: by 2002:a9d:3be5:0:0:0:0:0 with HTTP;
-	Wed, 8 May 2019 01:15:55 -0700 (PDT)
-Received: by 2002:a9d:3be5:0:0:0:0:0 with HTTP;
-	Wed, 8 May 2019 01:15:55 -0700 (PDT)
-In-Reply-To: <20190508000641.19090-19-richard.henderson@linaro.org>
-References: <20190508000641.19090-1-richard.henderson@linaro.org>
-	<20190508000641.19090-19-richard.henderson@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 8 May 2019 10:15:55 +0200
-Message-ID: <CAL1e-=iRwS-1LvP2m5oS2PAKigiDr0g8jRNP6xPV2b_9AYU08Q@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v3 18/39] target/mips: Use env_cpu,
- env_archcpu
+In-Reply-To: <155721871159.451636.6528273080303910901.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.30]);
+	Wed, 08 May 2019 08:26:56 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 5/6] vl: Deprecate -virtfs_synth
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,347 +116,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On May 8, 2019 2:19 AM, "Richard Henderson" <richard.henderson@linaro.org>
-wrote:
->
->
->
-
-This commit message doesn=CB=8At explain the reason for the change, and why=
- is
-this an improvement. The underlyng reason for distingishing between
-env_cpu and env_archcpu cases is not explained too.
-
-Thanks,
-Aleksandar
-
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 07/05/2019 10.45, Greg Kurz wrote:
+> The synth fsdriver never got used for anything else but the
+> QTest testcase for VirtIO 9P. And even there, QTest directly
+> uses -fsdev synth and -device virtio-9p-{pci|device}.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  target/mips/cpu.h                |  5 -----
->  hw/intc/mips_gic.c               |  2 +-
->  hw/mips/mips_int.c               |  2 +-
->  linux-user/mips/cpu_loop.c       |  2 +-
->  target/mips/helper.c             | 15 +++++----------
->  target/mips/op_helper.c          | 25 +++++++++++--------------
->  target/mips/translate.c          |  3 +--
->  target/mips/translate_init.inc.c |  4 +---
->  8 files changed, 21 insertions(+), 37 deletions(-)
->
-> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-> index 31e15834ca..e0645eb1d1 100644
-> --- a/target/mips/cpu.h
-> +++ b/target/mips/cpu.h
-> @@ -1051,11 +1051,6 @@ struct MIPSCPU {
->      CPUMIPSState env;
->  };
->
-> -static inline MIPSCPU *mips_env_get_cpu(CPUMIPSState *env)
-> -{
-> -    return container_of(env, MIPSCPU, env);
-> -}
-> -
->  #define ENV_OFFSET offsetof(MIPSCPU, env)
->
->  void mips_cpu_list(void);
-> diff --git a/hw/intc/mips_gic.c b/hw/intc/mips_gic.c
-> index 15e6e40f9f..8f509493ea 100644
-> --- a/hw/intc/mips_gic.c
-> +++ b/hw/intc/mips_gic.c
-> @@ -44,7 +44,7 @@ static void mips_gic_set_vp_irq(MIPSGICState *gic, int
-vp, int pin)
->                        GIC_VP_MASK_CMP_SHF;
->      }
->      if (kvm_enabled())  {
-> -        kvm_mips_set_ipi_interrupt(mips_env_get_cpu(gic->vps[vp].env),
-> +        kvm_mips_set_ipi_interrupt(env_archcpu(gic->vps[vp].env),
->                                     pin + GIC_CPU_PIN_OFFSET,
->                                     ored_level);
->      } else {
-> diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
-> index 5ddeb15848..f899f6ceb3 100644
-> --- a/hw/mips/mips_int.c
-> +++ b/hw/mips/mips_int.c
-> @@ -76,7 +76,7 @@ void cpu_mips_irq_init_cpu(MIPSCPU *cpu)
->      qemu_irq *qi;
->      int i;
->
-> -    qi =3D qemu_allocate_irqs(cpu_mips_irq_request, mips_env_get_cpu(env=
-),
-8);
-> +    qi =3D qemu_allocate_irqs(cpu_mips_irq_request, env_archcpu(env), 8)=
-;
->      for (i =3D 0; i < 8; i++) {
->          env->irq[i] =3D qi[i];
->      }
-> diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-> index 828137cd84..ac6c6d1504 100644
-> --- a/linux-user/mips/cpu_loop.c
-> +++ b/linux-user/mips/cpu_loop.c
-> @@ -425,7 +425,7 @@ static int do_break(CPUMIPSState *env,
-target_siginfo_t *info,
->
->  void cpu_loop(CPUMIPSState *env)
->  {
-> -    CPUState *cs =3D CPU(mips_env_get_cpu(env));
-> +    CPUState *cs =3D env_cpu(env);
->      target_siginfo_t info;
->      int trapnr;
->      abi_long ret;
-> diff --git a/target/mips/helper.c b/target/mips/helper.c
-> index c44cdca3b5..1fc0a4ce4b 100644
-> --- a/target/mips/helper.c
-> +++ b/target/mips/helper.c
-> @@ -336,10 +336,8 @@ static int get_physical_address (CPUMIPSState *env,
-hwaddr *physical,
->
->  void cpu_mips_tlb_flush(CPUMIPSState *env)
->  {
-> -    MIPSCPU *cpu =3D mips_env_get_cpu(env);
-> -
->      /* Flush qemu's TLB and discard all shadowed entries.  */
-> -    tlb_flush(CPU(cpu));
-> +    tlb_flush(env_cpu(env));
->      env->tlb->tlb_in_use =3D env->tlb->nb_tlb;
->  }
->
-> @@ -401,7 +399,7 @@ void cpu_mips_store_status(CPUMIPSState *env,
-target_ulong val)
->  #if defined(TARGET_MIPS64)
->      if ((env->CP0_Status ^ old) & (old & (7 << CP0St_UX))) {
->          /* Access to at least one of the 64-bit segments has been
-disabled */
-> -        tlb_flush(CPU(mips_env_get_cpu(env)));
-> +        tlb_flush(env_cpu(env));
->      }
->  #endif
->      if (env->CP0_Config3 & (1 << CP0C3_MT)) {
-> @@ -446,7 +444,7 @@ void cpu_mips_store_cause(CPUMIPSState *env,
-target_ulong val)
->  static void raise_mmu_exception(CPUMIPSState *env, target_ulong address,
->                                  int rw, int tlb_error)
->  {
-> -    CPUState *cs =3D CPU(mips_env_get_cpu(env));
-> +    CPUState *cs =3D env_cpu(env);
->      int exception =3D 0, error_code =3D 0;
->
->      if (rw =3D=3D MMU_INST_FETCH) {
-> @@ -1400,8 +1398,7 @@ bool mips_cpu_exec_interrupt(CPUState *cs, int
-interrupt_request)
->  #if !defined(CONFIG_USER_ONLY)
->  void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
->  {
-> -    MIPSCPU *cpu =3D mips_env_get_cpu(env);
-> -    CPUState *cs;
-> +    CPUState *cs =3D env_cpu(env);
->      r4k_tlb_t *tlb;
->      target_ulong addr;
->      target_ulong end;
-> @@ -1427,7 +1424,6 @@ void r4k_invalidate_tlb (CPUMIPSState *env, int
-idx, int use_extra)
->      /* 1k pages are not supported. */
->      mask =3D tlb->PageMask | ~(TARGET_PAGE_MASK << 1);
->      if (tlb->V0) {
-> -        cs =3D CPU(cpu);
->          addr =3D tlb->VPN & ~mask;
->  #if defined(TARGET_MIPS64)
->          if (addr >=3D (0xFFFFFFFF80000000ULL & env->SEGMask)) {
-> @@ -1441,7 +1437,6 @@ void r4k_invalidate_tlb (CPUMIPSState *env, int
-idx, int use_extra)
->          }
->      }
->      if (tlb->V1) {
-> -        cs =3D CPU(cpu);
->          addr =3D (tlb->VPN & ~mask) | ((mask >> 1) + 1);
->  #if defined(TARGET_MIPS64)
->          if (addr >=3D (0xFFFFFFFF80000000ULL & env->SEGMask)) {
-> @@ -1462,7 +1457,7 @@ void QEMU_NORETURN
-do_raise_exception_err(CPUMIPSState *env,
->                                            int error_code,
->                                            uintptr_t pc)
->  {
-> -    CPUState *cs =3D CPU(mips_env_get_cpu(env));
-> +    CPUState *cs =3D env_cpu(env);
->
->      qemu_log_mask(CPU_LOG_INT, "%s: %d %d\n",
->                    __func__, exception, error_code);
-> diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-> index 0f272a5b93..0705e8c686 100644
-> --- a/target/mips/op_helper.c
-> +++ b/target/mips/op_helper.c
-> @@ -350,7 +350,7 @@ static inline hwaddr
-do_translate_address(CPUMIPSState *env,
->                                                        int rw, uintptr_t
-retaddr)
->  {
->      hwaddr paddr;
-> -    CPUState *cs =3D CPU(mips_env_get_cpu(env));
-> +    CPUState *cs =3D env_cpu(env);
->
->      paddr =3D cpu_mips_translate_address(env, address, rw);
->
-> @@ -699,7 +699,7 @@ static CPUMIPSState *mips_cpu_map_tc(CPUMIPSState
-*env, int *tc)
->          return env;
->      }
->
-> -    cs =3D CPU(mips_env_get_cpu(env));
-> +    cs =3D env_cpu(env);
->      vpe_idx =3D tc_idx / cs->nr_threads;
->      *tc =3D tc_idx % cs->nr_threads;
->      other_cs =3D qemu_get_cpu(vpe_idx);
-> @@ -1298,7 +1298,7 @@ void helper_mttc0_tcrestart(CPUMIPSState *env,
-target_ulong arg1)
->
->  void helper_mtc0_tchalt(CPUMIPSState *env, target_ulong arg1)
->  {
-> -    MIPSCPU *cpu =3D mips_env_get_cpu(env);
-> +    MIPSCPU *cpu =3D env_archcpu(env);
->
->      env->active_tc.CP0_TCHalt =3D arg1 & 0x1;
->
-> @@ -1314,7 +1314,7 @@ void helper_mttc0_tchalt(CPUMIPSState *env,
-target_ulong arg1)
->  {
->      int other_tc =3D env->CP0_VPEControl & (0xff << CP0VPECo_TargTC);
->      CPUMIPSState *other =3D mips_cpu_map_tc(env, &other_tc);
-> -    MIPSCPU *other_cpu =3D mips_env_get_cpu(other);
-> +    MIPSCPU *other_cpu =3D env_archcpu(other);
->
->      // TODO: Halt TC / Restart (if allocated+active) TC.
->
-> @@ -1427,7 +1427,7 @@ void helper_mtc0_pagegrain(CPUMIPSState *env,
-target_ulong arg1)
->
->  void helper_mtc0_segctl0(CPUMIPSState *env, target_ulong arg1)
->  {
-> -    CPUState *cs =3D CPU(mips_env_get_cpu(env));
-> +    CPUState *cs =3D env_cpu(env);
->
->      env->CP0_SegCtl0 =3D arg1 & CP0SC0_MASK;
->      tlb_flush(cs);
-> @@ -1435,7 +1435,7 @@ void helper_mtc0_segctl0(CPUMIPSState *env,
-target_ulong arg1)
->
->  void helper_mtc0_segctl1(CPUMIPSState *env, target_ulong arg1)
->  {
-> -    CPUState *cs =3D CPU(mips_env_get_cpu(env));
-> +    CPUState *cs =3D env_cpu(env);
->
->      env->CP0_SegCtl1 =3D arg1 & CP0SC1_MASK;
->      tlb_flush(cs);
-> @@ -1443,7 +1443,7 @@ void helper_mtc0_segctl1(CPUMIPSState *env,
-target_ulong arg1)
->
->  void helper_mtc0_segctl2(CPUMIPSState *env, target_ulong arg1)
->  {
-> -    CPUState *cs =3D CPU(mips_env_get_cpu(env));
-> +    CPUState *cs =3D env_cpu(env);
->
->      env->CP0_SegCtl2 =3D arg1 & CP0SC2_MASK;
->      tlb_flush(cs);
-> @@ -1666,7 +1666,7 @@ void helper_mtc0_entryhi(CPUMIPSState *env,
-target_ulong arg1)
->      /* If the ASID changes, flush qemu's TLB.  */
->      if ((old & env->CP0_EntryHi_ASID_mask) !=3D
->          (val & env->CP0_EntryHi_ASID_mask)) {
-> -        tlb_flush(CPU(mips_env_get_cpu(env)));
-> +        tlb_flush(env_cpu(env));
->      }
->  }
->
-> @@ -1686,7 +1686,6 @@ void helper_mtc0_compare(CPUMIPSState *env,
-target_ulong arg1)
->
->  void helper_mtc0_status(CPUMIPSState *env, target_ulong arg1)
->  {
-> -    MIPSCPU *cpu =3D mips_env_get_cpu(env);
->      uint32_t val, old;
->
->      old =3D env->CP0_Status;
-> @@ -1706,7 +1705,7 @@ void helper_mtc0_status(CPUMIPSState *env,
-target_ulong arg1)
->          case MIPS_HFLAG_SM: qemu_log(", SM\n"); break;
->          case MIPS_HFLAG_KM: qemu_log("\n"); break;
->          default:
-> -            cpu_abort(CPU(cpu), "Invalid MMU mode!\n");
-> +            cpu_abort(env_cpu(env), "Invalid MMU mode!\n");
->              break;
->          }
->      }
-> @@ -2485,8 +2484,6 @@ static void debug_pre_eret(CPUMIPSState *env)
->
->  static void debug_post_eret(CPUMIPSState *env)
->  {
-> -    MIPSCPU *cpu =3D mips_env_get_cpu(env);
-> -
->      if (qemu_loglevel_mask(CPU_LOG_EXEC)) {
->          qemu_log("  =3D>  PC " TARGET_FMT_lx " EPC " TARGET_FMT_lx,
->                  env->active_tc.PC, env->CP0_EPC);
-> @@ -2502,7 +2499,7 @@ static void debug_post_eret(CPUMIPSState *env)
->          case MIPS_HFLAG_SM: qemu_log(", SM\n"); break;
->          case MIPS_HFLAG_KM: qemu_log("\n"); break;
->          default:
-> -            cpu_abort(CPU(cpu), "Invalid MMU mode!\n");
-> +            cpu_abort(env_cpu(env), "Invalid MMU mode!\n");
->              break;
->          }
->      }
-> @@ -2633,7 +2630,7 @@ void helper_pmon(CPUMIPSState *env, int function)
->
->  void helper_wait(CPUMIPSState *env)
->  {
-> -    CPUState *cs =3D CPU(mips_env_get_cpu(env));
-> +    CPUState *cs =3D env_cpu(env);
->
->      cs->halted =3D 1;
->      cpu_reset_interrupt(cs, CPU_INTERRUPT_WAKE);
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index f96c0d01ef..8043e8d398 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -29912,8 +29912,7 @@ void cpu_set_exception_base(int vp_index,
-target_ulong address)
->
->  void cpu_state_reset(CPUMIPSState *env)
->  {
-> -    MIPSCPU *cpu =3D mips_env_get_cpu(env);
-> -    CPUState *cs =3D CPU(cpu);
-> +    CPUState *cs =3D env_cpu(env);
->
->      /* Reset registers to their default values */
->      env->CP0_PRid =3D env->cpu_model->CP0_PRid;
-> diff --git a/target/mips/translate_init.inc.c
-b/target/mips/translate_init.inc.c
-> index 1c2d017d36..6d145a905a 100644
-> --- a/target/mips/translate_init.inc.c
-> +++ b/target/mips/translate_init.inc.c
-> @@ -871,8 +871,6 @@ static void r4k_mmu_init (CPUMIPSState *env, const
-mips_def_t *def)
->
->  static void mmu_init (CPUMIPSState *env, const mips_def_t *def)
->  {
-> -    MIPSCPU *cpu =3D mips_env_get_cpu(env);
-> -
->      env->tlb =3D g_malloc0(sizeof(CPUMIPSTLBContext));
->
->      switch (def->mmu_type) {
-> @@ -889,7 +887,7 @@ static void mmu_init (CPUMIPSState *env, const
-mips_def_t *def)
->          case MMU_TYPE_R6000:
->          case MMU_TYPE_R8000:
->          default:
-> -            cpu_abort(CPU(cpu), "MMU type not supported\n");
-> +            cpu_abort(env_cpu(env), "MMU type not supported\n");
->      }
->  }
->  #endif /* CONFIG_USER_ONLY */
-> --
-> 2.17.1
->
->
+> 
+> This should be Cc'd to libvir-list@redhat.com according to MAINTAINERS,
+> but libvirt doesn't know about -virtfs_synth, so I choose to not spam :)
+> ---
+>  qemu-deprecated.texi |    4 ++++
+>  qemu-options.hx      |    3 ++-
+>  vl.c                 |    5 +++++
+>  3 files changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 842e71b11dcc..f0ff065e7dc1 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -72,6 +72,10 @@ backend settings instead of environment variables.  To ease migration to
+>  the new format, the ``-audiodev-help'' option can be used to convert
+>  the current values of the environment variables to ``-audiodev'' options.
+>  
+> +@subsection -virtfs_synth (since 4.1)
+> +
+> +The ``-virtfs_synth'' argument is now deprecated with no replacement.
+> +
+>  @section QEMU Machine Protocol (QMP) commands
+>  
+>  @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 51802cbb266a..9c5cc2e6bf70 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -1368,7 +1368,8 @@ DEF("virtfs_synth", 0, QEMU_OPTION_virtfs_synth,
+>  STEXI
+>  @item -virtfs_synth
+>  @findex -virtfs_synth
+> -Create synthetic file system image
+> +Create synthetic file system image. Note that this option is deprecated with
+> +no replacement.
+>  ETEXI
+>  
+>  DEF("iscsi", HAS_ARG, QEMU_OPTION_iscsi,
+> diff --git a/vl.c b/vl.c
+> index d9fea0a11966..c010cb3e98df 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3507,6 +3507,11 @@ int main(int argc, char **argv, char **envp)
+>                  QemuOpts *fsdev;
+>                  QemuOpts *device;
+>  
+> +                warn_report("The -virtfs_synth option is deprecated and will "
+> +                            "be removed soon. If the -virtfs_synth option is "
+> +                            "still useful for you, please send a mail to "
+> +                            "qemu-devel@nongnu.org with your usecase.");
+> +
+>                  fsdev = qemu_opts_create(qemu_find_opts("fsdev"), "v_synth",
+>                                           1, NULL);
+>                  if (!fsdev) {
+
+Do you plan to only deprecate the -virtfs_synth option, or also "-fsdev
+synth", i.e. the whole "synth" driver? In the first case, I think you
+should point the users to use "-fsdev synth" instead of saying "with no
+replacement". In the second case, I think you should declare "-fsdev
+synth" in the documentation, too.
+
+ Thomas
+
