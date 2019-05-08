@@ -2,64 +2,61 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D431DC04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36D00C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:06:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8F53214C6
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:05:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8F53214C6
+	by mail.kernel.org (Postfix) with ESMTPS id 0CB1F214C6
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:06:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CB1F214C6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33504 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33546 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOIVp-0006EA-Ue
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 05:05:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43083)
+	id 1hOIX6-0007TG-BF
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 05:06:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hOISO-0003ug-Ia
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:01:49 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hOINk-0007WW-Ro
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:56:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hOISM-0006dw-Iu
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:01:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48420)
+	(envelope-from <kraxel@redhat.com>) id 1hOINj-0002ww-KC
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:56:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>)
-	id 1hOISG-0006Z9-QA; Wed, 08 May 2019 05:01:37 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hOINj-0002vf-Da
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:56:55 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 805383084213;
-	Wed,  8 May 2019 09:01:35 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.22.189])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2160260C6A;
-	Wed,  8 May 2019 09:01:33 +0000 (UTC)
-Date: Wed, 8 May 2019 10:01:31 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190508090131.GA32552@redhat.com>
-References: <20190507183610.9848-1-mreitz@redhat.com>
-	<20190507183610.9848-2-mreitz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190507183610.9848-2-mreitz@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+	by mx1.redhat.com (Postfix) with ESMTPS id A67E3307D95F;
+	Wed,  8 May 2019 08:56:54 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-45.ams2.redhat.com
+	[10.36.116.45])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4516A1A267;
+	Wed,  8 May 2019 08:56:54 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id 2C1699DAE; Wed,  8 May 2019 10:56:46 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed,  8 May 2019 10:56:45 +0200
+Message-Id: <20190508085645.11595-14-kraxel@redhat.com>
+In-Reply-To: <20190508085645.11595-1-kraxel@redhat.com>
+References: <20190508085645.11595-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Wed, 08 May 2019 09:01:35 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.48]);
+	Wed, 08 May 2019 08:56:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/5] qemu-nbd: Add --pid-file option
+Subject: [Qemu-devel] [PATCH 13/13] tests/vm: ubuntu.i386: apt proxy setup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,105 +68,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 07, 2019 at 08:36:06PM +0200, Max Reitz wrote:
-> --fork is a bit boring if there is no way to get the child's PID.  This
-> option helps.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  qemu-nbd.c    | 29 +++++++++++++++++++++++++++++
->  qemu-nbd.texi |  2 ++
->  2 files changed, 31 insertions(+)
-> 
-> diff --git a/qemu-nbd.c b/qemu-nbd.c
-> index dca9e72cee..7e48154f44 100644
-> --- a/qemu-nbd.c
-> +++ b/qemu-nbd.c
-> @@ -59,6 +59,7 @@
->  #define QEMU_NBD_OPT_IMAGE_OPTS    262
->  #define QEMU_NBD_OPT_FORK          263
->  #define QEMU_NBD_OPT_TLSAUTHZ      264
-> +#define QEMU_NBD_OPT_PID_FILE      265
->  
->  #define MBR_SIZE 512
->  
-> @@ -111,6 +112,7 @@ static void usage(const char *name)
->  "                            specify tracing options\n"
->  "  --fork                    fork off the server process and exit the parent\n"
->  "                            once the server is running\n"
-> +"  --pid-file=PATH           store the server's process ID in the given file\n"
->  #if HAVE_NBD_DEVICE
->  "\n"
->  "Kernel NBD client support:\n"
-> @@ -651,6 +653,7 @@ int main(int argc, char **argv)
->          { "image-opts", no_argument, NULL, QEMU_NBD_OPT_IMAGE_OPTS },
->          { "trace", required_argument, NULL, 'T' },
->          { "fork", no_argument, NULL, QEMU_NBD_OPT_FORK },
-> +        { "pid-file", required_argument, NULL, QEMU_NBD_OPT_PID_FILE },
->          { NULL, 0, NULL, 0 }
->      };
->      int ch;
-> @@ -677,6 +680,8 @@ int main(int argc, char **argv)
->      bool list = false;
->      int old_stderr = -1;
->      unsigned socket_activation;
-> +    const char *pid_path = NULL;
-> +    FILE *pid_file;
->  
->      /* The client thread uses SIGTERM to interrupt the server.  A signal
->       * handler ensures that "qemu-nbd -v -c" exits with a nice status code.
-> @@ -876,6 +881,9 @@ int main(int argc, char **argv)
->          case 'L':
->              list = true;
->              break;
-> +        case QEMU_NBD_OPT_PID_FILE:
-> +            pid_path = optarg;
-> +            break;
->          }
->      }
->  
-> @@ -1196,6 +1204,27 @@ int main(int argc, char **argv)
->  
->      nbd_update_server_watch();
->  
-> +    if (pid_path) {
-> +        pid_file = fopen(pid_path, "w");
-> +        if (!pid_file) {
-> +            error_report("Failed to store PID in %s: %s",
-> +                         pid_path, strerror(errno));
-> +            exit(EXIT_FAILURE);
-> +        }
-> +
-> +        ret = fprintf(pid_file, "%ld", (long)getpid());
-> +        if (ret < 0) {
-> +            ret = -errno;
-> +        }
-> +        fclose(pid_file);
-> +
-> +        if (ret < 0) {
-> +            error_report("Failed to store PID in %s: %s",
-> +                         pid_path, strerror(-ret));
-> +            exit(EXIT_FAILURE);
-> +        }
-> +    }
+Configure apt proxy so package downloads
+can be cached and can pass firewalls.
 
-This is racy because multiple qemu-nbd's can be started pointing to
-the same pidfile and one will blindly overwrite the other.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ tests/vm/ubuntu.i386 | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Please use  qemu_write_pidfile instead which acquires locks on the
-pidfile in a race free manner.
-
-
-Regards,
-Daniel
+diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
+index a22d137e76df..b869afd212fa 100755
+--- a/tests/vm/ubuntu.i386
++++ b/tests/vm/ubuntu.i386
+@@ -51,6 +51,10 @@ class UbuntuX86VM(basevm.BaseVM):
+                           "    ssh-authorized-keys:\n",
+                           "    - %s\n" % basevm.SSH_PUB_KEY,
+                           "locale: en_US.UTF-8\n"])
++        proxy = os.environ.get("http_proxy")
++        if not proxy is None:
++            udata.writelines(["apt:\n",
++                              "  proxy: %s" % proxy])
+         udata.close()
+         subprocess.check_call(["genisoimage", "-output", "cloud-init.iso",
+                                "-volid", "cidata", "-joliet", "-rock",
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.18.1
+
 
