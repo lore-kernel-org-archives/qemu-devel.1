@@ -2,64 +2,80 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC516C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 10:51:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4923DC04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:11:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9168921019
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 10:51:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9168921019
+	by mail.kernel.org (Postfix) with ESMTPS id 1ED8421530
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:11:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ED8421530
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34704 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34912 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOKAt-0003SS-M0
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 06:51:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33251)
+	id 1hOKTt-0001nV-7E
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 07:11:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hOKA1-0002Gs-CW
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 06:50:55 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hOKSD-0000DE-ST
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:09:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hOK9z-0003qJ-4y
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 06:50:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47336)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hOK9y-0003p4-QP
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 06:50:51 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2CFAA89C36;
-	Wed,  8 May 2019 10:50:49 +0000 (UTC)
-Received: from work-vm (ovpn-117-175.ams2.redhat.com [10.36.117.175])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3588A6013B;
-	Wed,  8 May 2019 10:50:36 +0000 (UTC)
-Date: Wed, 8 May 2019 11:50:33 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Message-ID: <20190508105032.GE2718@work-vm>
-References: <20190506014514.3555-1-yan.y.zhao@intel.com>
-	<20190506015102.3691-1-yan.y.zhao@intel.com>
+	(envelope-from <pbonzini@redhat.com>) id 1hOKSC-0007bA-D1
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:09:41 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:38367)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOKSC-0007aE-0p
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:09:40 -0400
+Received: by mail-wm1-f65.google.com with SMTP id f2so2722798wmj.3
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 04:09:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=wr0k0q7FKcI6IsoL0WjH9SOSxiIfGfF8JyhCKV2olgE=;
+	b=JbIu0EB0ucUuK5MERSHSdx8R8djVfJlcQ3oiNDb0wZTeMgZ8LU+dj1szWHyR4Kzfes
+	91dgGRANlvJGTk27IB30tbg9JUZeOOTf0ZK4esSBBWjNakiw62rDLGmdRG+IEph1DSLC
+	hvaOW+/p0oNXPEPHic3tXBu2SooHZR/sCsDBhi2gN/voE07FonEDq+7vYE/yiOsgD9nE
+	kM9Ens4Y5ESE8Xj9QafzUGkRR4lJtr6V8h6xhiTJKsfSV9TdHpB4EAJIoD1fsOV8I9By
+	HC3Enc+aOFUt0ltUdAnKY58Rw2VcCbAV93MStNOBH6S3nTDyat8QZZ2ZK/jNKol75iF1
+	2BMQ==
+X-Gm-Message-State: APjAAAVw8k5HgOLgFDI4oV2O5g44hJkZujomiK/lAoliBfrDpx+JMNYB
+	TG5vzceD+RHc9d1/1114d9RJxQ==
+X-Google-Smtp-Source: APXvYqxB6gHopXIN3NsqFEyy1Xj42EP8Pf6N7DkMibF7Tgfq/7m4fbRY+7Uc8OLtg7mOcpFFHy1gAQ==
+X-Received: by 2002:a1c:988b:: with SMTP id a133mr2036763wme.89.1557313777401; 
+	Wed, 08 May 2019 04:09:37 -0700 (PDT)
+Received: from [10.201.49.229] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
+	by smtp.gmail.com with ESMTPSA id
+	b10sm2905437wme.25.2019.05.08.04.09.35
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 08 May 2019 04:09:36 -0700 (PDT)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, 
+	qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+References: <20190507163416.24647-1-philmd@redhat.com>
+	<20190507163416.24647-5-philmd@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a261e867-ff96-d9f7-cf99-6f08e50b20f8@redhat.com>
+Date: Wed, 8 May 2019 13:09:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190506015102.3691-1-yan.y.zhao@intel.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Wed, 08 May 2019 10:50:49 +0000 (UTC)
+In-Reply-To: <20190507163416.24647-5-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] drm/i915/gvt: export mdev device
- version to sysfs for Intel vGPU
+	[fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH v2 04/16] hw/arm/bcm2835: Use TYPE_PL011
+ instead of hardcoded string
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,281 +87,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cjia@nvidia.com, kvm@vger.kernel.org, aik@ozlabs.ru,
-	Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
-	qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com,
-	yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com,
-	mlevitsk@redhat.com, pasic@linux.ibm.com, libvir-list@redhat.com,
-	arei.gonglei@huawei.com, felipe@nutanix.com, Ken.Xue@amd.com,
-	kevin.tian@intel.com, zhenyuw@linux.intel.com,
-	dinechin@redhat.com, alex.williamson@redhat.com,
-	intel-gvt-dev@lists.freedesktop.org, changpeng.liu@intel.com,
-	cohuck@redhat.com, linux-kernel@vger.kernel.org,
-	zhi.a.wang@intel.com, jonathan.davies@nutanix.com, shaopeng.he@intel.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Paul Burton <pburton@wavecomp.com>, Andrew Jeffery <andrew@aj.id.au>,
+	Alistair Francis <alistair@alistair23.me>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+	Andrew Baumann <Andrew.Baumann@microsoft.com>,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>,
+	=?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+	qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+	Antony Pavlov <antonynpavlov@gmail.com>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+	Peter Chubb <peter.chubb@nicta.com.au>,
+	David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
+	Aurelien Jarno <aurelien@aurel32.net>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Yan Zhao (yan.y.zhao@intel.com) wrote:
-> This feature implements the version attribute for Intel's vGPU mdev
-> devices.
-> 
-> version attribute is rw.
-> It's used to check device compatibility for two mdev devices.
-> version string format and length are private for vendor driver. vendor
-> driver is able to define them freely.
-> 
-> For Intel vGPU of gen8 and gen9, the mdev device version
-> consists of 3 fields: "vendor id" + "device id" + "mdev type".
-> 
-> Reading from a vGPU's version attribute, a string is returned in below
-> format: <vendor id>-<device id>-<mdev type>. e.g.
-> 8086-193b-i915-GVTg_V5_2.
-> 
-> Writing a string to a vGPU's version attribute will trigger GVT to check
-> whether a vGPU identified by the written string is compatible with
-> current vGPU owning this version attribute. errno is returned if the two
-> vGPUs are incompatible. The length of written string is returned in
-> compatible case.
-> 
-> For other platforms, and for GVT not supporting vGPU live migration
-> feature, errnos are returned when read/write of mdev devices' version
-> attributes.
-> 
-> For old GVT versions where no version attributes exposed in sysfs, it is
-> regarded as not supporting vGPU live migration.
-> 
-> For future platforms, besides the current 2 fields in vendor proprietary
-> part, more fields may be added to identify Intel vGPU well for live
-> migration purpose.
-> 
-> v2:
-> 1. removed 32 common part of version string
-> (Alex Williamson)
-> 2. do not register version attribute for GVT not supporting live
-> migration.(Cornelia Huck)
-> 3. for platforms out of gen8, gen9, return -EINVAL --> -ENODEV for
-> incompatible. (Cornelia Huck)
-> 
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Erik Skultety <eskultet@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: "Tian, Kevin" <kevin.tian@intel.com>
-> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-> Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
-> c: Neo Jia <cjia@nvidia.com>
-> Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> 
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+On 07/05/19 11:34, Philippe Mathieu-Daudé wrote:
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  drivers/gpu/drm/i915/gvt/Makefile         |  2 +-
->  drivers/gpu/drm/i915/gvt/device_version.c | 87 +++++++++++++++++++++++
->  drivers/gpu/drm/i915/gvt/gvt.c            | 51 +++++++++++++
->  drivers/gpu/drm/i915/gvt/gvt.h            |  6 ++
->  4 files changed, 145 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/gpu/drm/i915/gvt/device_version.c
+>  hw/arm/bcm2835_peripherals.c         | 2 +-
+>  include/hw/arm/bcm2835_peripherals.h | 1 +
+>  2 files changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/gpu/drm/i915/gvt/Makefile b/drivers/gpu/drm/i915/gvt/Makefile
-> index 271fb46d4dd0..54e209a23899 100644
-> --- a/drivers/gpu/drm/i915/gvt/Makefile
-> +++ b/drivers/gpu/drm/i915/gvt/Makefile
-> @@ -3,7 +3,7 @@ GVT_DIR := gvt
->  GVT_SOURCE := gvt.o aperture_gm.o handlers.o vgpu.o trace_points.o firmware.o \
->  	interrupt.o gtt.o cfg_space.o opregion.o mmio.o display.o edid.o \
->  	execlist.o scheduler.o sched_policy.o mmio_context.o cmd_parser.o debugfs.o \
-> -	fb_decoder.o dmabuf.o page_track.o
-> +	fb_decoder.o dmabuf.o page_track.o device_version.o
+> diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+> index 6be7660e8cb..7ffb51b6927 100644
+> --- a/hw/arm/bcm2835_peripherals.c
+> +++ b/hw/arm/bcm2835_peripherals.c
+> @@ -46,7 +46,7 @@ static void bcm2835_peripherals_init(Object *obj)
+>      qdev_set_parent_bus(DEVICE(&s->ic), sysbus_get_default());
 >  
->  ccflags-y				+= -I$(src) -I$(src)/$(GVT_DIR)
->  i915-y					+= $(addprefix $(GVT_DIR)/, $(GVT_SOURCE))
-> diff --git a/drivers/gpu/drm/i915/gvt/device_version.c b/drivers/gpu/drm/i915/gvt/device_version.c
-> new file mode 100644
-> index 000000000000..bd4cdcbdba95
-> --- /dev/null
-> +++ b/drivers/gpu/drm/i915/gvt/device_version.c
-> @@ -0,0 +1,87 @@
-> +/*
-> + * Copyright(c) 2011-2017 Intel Corporation. All rights reserved.
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a
-> + * copy of this software and associated documentation files (the "Software"),
-> + * to deal in the Software without restriction, including without limitation
-> + * the rights to use, copy, modify, merge, publish, distribute, sublicense,
-> + * and/or sell copies of the Software, and to permit persons to whom the
-> + * Software is furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice (including the next
-> + * paragraph) shall be included in all copies or substantial portions of the
-> + * Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-> + * SOFTWARE.
-> + *
-> + * Authors:
-> + *    Yan Zhao <yan.y.zhao@intel.com>
-> + */
-> +#include <linux/vfio.h>
-> +#include "i915_drv.h"
-> +
-> +static bool is_compatible(const char *self, const char *remote)
-> +{
-> +	if (strlen(remote) != strlen(self))
-> +		return false;
-> +
-> +	return (strncmp(self, remote, strlen(self))) ? false : true;
-> +}
-> +
-> +ssize_t intel_gvt_get_vfio_device_version_len(struct drm_i915_private *dev_priv)
-> +{
-> +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> +		return -ENODEV;
-> +
-> +	return PAGE_SIZE;
-> +}
-> +
-> +ssize_t intel_gvt_get_vfio_device_version(struct drm_i915_private *dev_priv,
-> +		char *buf, const char *mdev_type)
-> +{
-> +	int cnt = 0, ret = 0;
-> +	const char *str = NULL;
-> +
-> +	/* currently only gen8 & gen9 are supported */
-> +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> +		return -ENODEV;
-> +
-> +	/* vendor id + device id + mdev type */
-> +	/* vendor id */
-> +	cnt = snprintf(buf, 5, "%04x", PCI_VENDOR_ID_INTEL);
-> +	buf += cnt;
-> +	ret += cnt;
-> +
-> +	/* device id */
-> +	cnt = snprintf(buf, 6, "-%04x", INTEL_DEVID(dev_priv));
-> +	buf += cnt;
-> +	ret += cnt;
-> +
-> +	/* mdev type */
-> +	str = mdev_type;
-> +	cnt = snprintf(buf, strlen(str) + 3, "-%s\n", mdev_type);
-> +	buf += cnt;
-> +	ret += cnt;
-
-Why not just one big snprintf?
-
-Dave
-
-> +	return ret;
-> +}
-> +
-> +ssize_t intel_gvt_check_vfio_device_version(struct drm_i915_private *dev_priv,
-> +		const char *self, const char *remote)
-> +{
-> +
-> +	/* currently only gen8 & gen9 are supported */
-> +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> +		return -ENODEV;
-> +
-> +	if (!is_compatible(self, remote))
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> diff --git a/drivers/gpu/drm/i915/gvt/gvt.c b/drivers/gpu/drm/i915/gvt/gvt.c
-> index 43f4242062dd..19f16eec5a4c 100644
-> --- a/drivers/gpu/drm/i915/gvt/gvt.c
-> +++ b/drivers/gpu/drm/i915/gvt/gvt.c
-> @@ -105,14 +105,65 @@ static ssize_t description_show(struct kobject *kobj, struct device *dev,
->  		       type->weight);
->  }
+>      /* UART0 */
+> -    s->uart0 = SYS_BUS_DEVICE(object_new("pl011"));
+> +    s->uart0 = SYS_BUS_DEVICE(object_new(TYPE_PL011));
+>      object_property_add_child(obj, "uart0", OBJECT(s->uart0), NULL);
+>      qdev_set_parent_bus(DEVICE(s->uart0), sysbus_get_default());
 >  
-> +#ifdef GVT_MIGRATION_VERSION
-> +static ssize_t version_show(struct kobject *kobj, struct device *dev,
-> +		char *buf)
-> +{
-> +	struct drm_i915_private *i915 = kdev_to_i915(dev);
-> +	const char *mdev_type = kobject_name(kobj);
-> +
-> +	return intel_gvt_get_vfio_device_version(i915, buf, mdev_type);
-> +}
-> +
-> +static ssize_t version_store(struct kobject *kobj, struct device *dev,
-> +		const char *buf, size_t count)
-> +{
-> +	char *remote = NULL, *self = NULL;
-> +	int len, ret = 0;
-> +	struct drm_i915_private *i915 = kdev_to_i915(dev);
-> +	const char *mdev_type = kobject_name(kobj);
-> +
-> +	len = intel_gvt_get_vfio_device_version_len(i915);
-> +	if (len < 0)
-> +		return len;
-> +
-> +	self = kmalloc(len, GFP_KERNEL);
-> +	if (!self)
-> +		return -ENOMEM;
-> +
-> +	ret = intel_gvt_get_vfio_device_version(i915, self, mdev_type);
-> +	if (ret < 0)
-> +		goto out;
-> +
-> +	remote = kstrndup(buf, count, GFP_KERNEL);
-> +	if (!remote) {
-> +		ret = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	ret = intel_gvt_check_vfio_device_version(i915, self, remote);
-> +
-> +out:
-> +	kfree(self);
-> +	kfree(remote);
-> +	return (ret < 0 ? ret : count);
-> +}
-> +#endif
-> +
->  static MDEV_TYPE_ATTR_RO(available_instances);
->  static MDEV_TYPE_ATTR_RO(device_api);
->  static MDEV_TYPE_ATTR_RO(description);
-> +#ifdef GVT_MIGRATION_VERSION
-> +static MDEV_TYPE_ATTR_RW(version);
-> +#endif
+> diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
+> index f5b193f6707..959508d57dd 100644
+> --- a/include/hw/arm/bcm2835_peripherals.h
+> +++ b/include/hw/arm/bcm2835_peripherals.h
+> @@ -13,6 +13,7 @@
 >  
->  static struct attribute *gvt_type_attrs[] = {
->  	&mdev_type_attr_available_instances.attr,
->  	&mdev_type_attr_device_api.attr,
->  	&mdev_type_attr_description.attr,
-> +#ifdef GVT_MIGRATION_VERSION
-> +	&mdev_type_attr_version.attr,
-> +#endif
->  	NULL,
->  };
->  
-> diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/gvt.h
-> index f5a328b5290a..4062f6b26acf 100644
-> --- a/drivers/gpu/drm/i915/gvt/gvt.h
-> +++ b/drivers/gpu/drm/i915/gvt/gvt.h
-> @@ -687,6 +687,12 @@ void intel_gvt_debugfs_remove_vgpu(struct intel_vgpu *vgpu);
->  int intel_gvt_debugfs_init(struct intel_gvt *gvt);
->  void intel_gvt_debugfs_clean(struct intel_gvt *gvt);
->  
-> +ssize_t intel_gvt_get_vfio_device_version(struct drm_i915_private *i915,
-> +		char *buf, const char *mdev_type);
-> +ssize_t intel_gvt_check_vfio_device_version(struct drm_i915_private *dev_priv,
-> +		const char *self, const char *remote);
-> +ssize_t
-> +intel_gvt_get_vfio_device_version_len(struct drm_i915_private *dev_priv);
->  
->  #include "trace.h"
->  #include "mpt.h"
-> -- 
-> 2.17.1
+>  #include "qemu-common.h"
+>  #include "hw/sysbus.h"
+> +#include "hw/char/pl011.h"
+>  #include "hw/char/bcm2835_aux.h"
+>  #include "hw/display/bcm2835_fb.h"
+>  #include "hw/dma/bcm2835_dma.h"
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
