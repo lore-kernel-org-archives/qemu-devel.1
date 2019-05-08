@@ -2,92 +2,92 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B16CC04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 17:46:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52FE7C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 17:49:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE1F021734
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 17:46:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2118821734
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 17:49:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dg0QMC/n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE1F021734
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UWdAicsV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2118821734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41016 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41050 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOQeE-0002g6-7z
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 13:46:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43173)
+	id 1hOQhK-0004ah-BE
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 13:49:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hOQdC-0001Me-AF
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:45:27 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hOQfg-0003iK-S8
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:48:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hOQdB-0004DY-8V
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:45:26 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34081)
+	(envelope-from <richard.henderson@linaro.org>) id 1hOQfe-0005cG-Lg
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:48:00 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:33709)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hOQdB-0004Cj-09
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:45:25 -0400
-Received: by mail-wr1-x442.google.com with SMTP id f7so18003729wrq.1
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 10:45:24 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hOQfd-0005bS-Dd
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:47:57 -0400
+Received: by mail-pl1-x644.google.com with SMTP id y3so10282617plp.0
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 10:47:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=97oI7gqhYp+YP7IWWdCZjm+XVFptkUlPZHDGSsQNLbo=;
-	b=Dg0QMC/nRUVAV6IOioWA5i7qSdBjYukfgSN+xAbFUCC71oe6yQyhABykDOWWRRdLQ8
-	ai0X9ahVm+IryJFnK/V3us7wzik9Or89QkpIXVINGyRljTeOh78DirFn17V0v1bkIWE4
-	l4Afy0nea/oJ9/vb7wUCTI7Tikhuf7RMYywFdX8YjYrSwVhIFZ91KWBBvDovlp+gnaD4
-	vYokSTGgFZmdGnHqvym7DPxBAexfZXKiLvd9b1Uxv3mk/ZNwNNL5xO5brwW+Pbs87+pP
-	EaDTeNdDg6r84FQk3WcCAm28wAI5fHVaunHsLfwPlZZJu30uB3MOFLUEnUG44zkBaMtf
-	KbUQ==
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=cjdS/iI/gWEaK9rWXHcGPI8xgjgbFsWcVpG9/iPIp2Q=;
+	b=UWdAicsVFEab5M1waOBLO5bGjcSCSkAxQwwI5bVMkp5DJbn5pTV/8JQ7RHN5eqr4iG
+	hC5EdJJ3JGD+aP0ypv9mJHJhMfmbZlJ63A9j2n1oCVR1Zid6zB4fakRH+kXBhlDIyWJQ
+	EAFDb7Yin67TxUD+g1rm9WWZDBtZfpWbQ+YJ2TbXpqr7YtCqf1xBWVB+7p2O76b9Dcqs
+	TpjttZTDMTCjXGiIDXFcWK0cXAUOI5qi0GngbdNkmxMsrQc7oWqBn2XIWSTMvo6GxgFP
+	lz1AzGE9fCJOPvhktmwfEfmu66p8FI2wRPcDNRtRNUmQSPnUxOa3AWjW+hZckuMAiD5o
+	OtLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=97oI7gqhYp+YP7IWWdCZjm+XVFptkUlPZHDGSsQNLbo=;
-	b=Qh+BNn8NsQ8xbeigsjj23gpP/GeASWKJQdA5wmZcgaLv/UIcqYEoCjxHPdU0WOaYJW
-	ttb+Z6P+MmAa+8pJlMCfKgzV2EZWlgOFqAB09stjQmvroFCznN24IpRME9OrwlFu+6xr
-	UgZTakSJ+P67wPemeZjU7PSNsRdI5Uyb6y2nOzs3A1SIgQLgAK6nkRmlU7IdIr+Pg333
-	gwMWbt/7SMAwnKS6dsSWuDxDz549TIhG6zF+cCxMZIIc8fhKqpXdZzA3tfDuVOcOK1El
-	8jukQZ8nlkDqXX64L5i0h85LKDsIqG7Hrevg9Sl6mDFBpwOvha8kb2+0WU95YdGww5bU
-	rSog==
-X-Gm-Message-State: APjAAAXnrvZhzZdJp23wKszZuq5ir/yduOlbEAxZIIGLgF8zDjQ4Ne3T
-	DobImMOTDMa5jYU59YDZttfxEA==
-X-Google-Smtp-Source: APXvYqx7VQjyUoYDglDqmvDNawkpXVxS+OqzkDmvkKb7eqPETAoB6iGLB3s0yTwHR8yXb+aW8yQgvg==
-X-Received: by 2002:adf:dd12:: with SMTP id a18mr29249748wrm.188.1557337523660;
-	Wed, 08 May 2019 10:45:23 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=cjdS/iI/gWEaK9rWXHcGPI8xgjgbFsWcVpG9/iPIp2Q=;
+	b=NXz0Up+/O1ErwsA8F84LDeXr+TxsTGW/puHfk9Lsg5M6nfiKySGy6oxQuf4frI7hZj
+	NuKRDcOBbNvniKhRcECnVzJTjw3OsGckNrP3zd9rTDBmvTvtdBXf8P1xL/c5ViLE2ntc
+	p/1HAIuPkZITB0sx8rstEt8VxXZg/ESXQ31Kc3VHLrLPzK4IVbSQ17HuyJhezEu9Vr6D
+	7L+5K0s85cOc6EXdGpHouFeUSVtrTdsMaPfsYqkFaUAPGO1xEfG6puJim+HbBq8k9Byi
+	MnkyCsrbLBwvZqxoomzRqkP4nFrHCk87KATubaQK/H4WJI3UsefMgi08O2ilbkvzXO3H
+	g2JA==
+X-Gm-Message-State: APjAAAWbI9Pl9cuHsJ/TMNJPeCq7hWMf2/ONpUz1AzSSNTaET2N0MDkE
+	vu/UZuXQZzoB/dT/0S/8UiD84A==
+X-Google-Smtp-Source: APXvYqym5uIZGg+r5HpNcu8VIZYcZJwEdbZ2B2gf7B2+rFT2U3q4JEUj0L5zu6IvQciZ+59AE8ml/Q==
+X-Received: by 2002:a17:902:f208:: with SMTP id
+	gn8mr9960720plb.312.1557337675809; 
+	Wed, 08 May 2019 10:47:55 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-27-95.tukw.qwest.net. [97.113.27.95])
 	by smtp.gmail.com with ESMTPSA id
-	u11sm33738623wrg.35.2019.05.08.10.45.22
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 08 May 2019 10:45:22 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 300701FF87;
-	Wed,  8 May 2019 18:45:22 +0100 (BST)
-References: <20190430165234.32272-1-alex.bennee@linaro.org>
-	<20190430165234.32272-4-alex.bennee@linaro.org>
-	<83e4f91b-a590-2a2a-bf5f-14b99c5aa0fc@linaro.org>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-In-reply-to: <83e4f91b-a590-2a2a-bf5f-14b99c5aa0fc@linaro.org>
-Date: Wed, 08 May 2019 18:45:22 +0100
-Message-ID: <87sgto4z7x.fsf@zen.linaroharston>
+	e6sm26615975pfl.115.2019.05.08.10.47.54
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 08 May 2019 10:47:55 -0700 (PDT)
+To: Jonathan Behrens <jonathan@fintelia.io>, qemu-devel@nongnu.org
+References: <20190508173835.14528-1-jonathan@fintelia.io>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <c8e5df4d-f149-2f6a-8045-be2bf4de6e04@linaro.org>
+Date: Wed, 8 May 2019 10:47:53 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190508173835.14528-1-jonathan@fintelia.io>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH v5 03/15] tests/tcg/aarch64: add system
- boot.S
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: Re: [Qemu-devel] [PATCH] target/riscv: Only flush TLB if SATP.ASID
+ changes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,98 +99,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
-	cota@braap.org
+Cc: Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org,
+	Jonathan Behrens <fintelia@gmail.com>,
+	Sagar Karandikar <sagark@eecs.berkeley.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 5/8/19 10:38 AM, Jonathan Behrens wrote:
+> There is an analogous change for ARM here:
+> https://patchwork.kernel.org/patch/10649857
+> 
+> Signed-off-by: Jonathan Behrens <jonathan@fintelia.io>
+> ---
+>  target/riscv/csr.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> On 4/30/19 9:52 AM, Alex Benn=C3=A9e wrote:
->> +.error:
->> +	.string "Terminated by exception.\n"
->
-> Put it in .rodata just because we can?
->
->> +        /* Page table setup (identity mapping).  */
->> +	adrp	x0, ttb
->> +	add	x0, x0, :lo12:ttb
->
-> You are in control of the layout of the executable,
-> and adr has a 1MB range.  Why use adrp+add?
-
-Well I have to now as I've aligned .data with:
-
-    /* align r/w section to next 2mb */
-    . =3D ALIGN(1 << 21);
-
->
->> +        /* Create some (big) pages */
->> +	adr	x1, .				/* phys address */
->> +	bic	x1, x1, #(1 << 30) - 1		/* 1GB block alignment */
->
-> Do you really want 1GB pages?  You'll pretty much only be able to test va=
-lid
-> memory operations with that.  Which is also true until there's something =
-other
-> than an exit for the exception vector... but ya know what I mean.
-
-Not using it for testing but I'm trying to set-up a 2 stage translation
-so we get:
-
-  1gb->1gb+2mb =3D .text/.rodata
-  1gb+2mb->1gb+4mb =3D .data/.bss
-
->
->> +        /* Setup some stack space and enter the test code.
->> +         * Assume everthing except the return value is garbage when we
->> +	 * return, we won't need it.
->> +         */
->> +	adrp	x0, stack
->> +	add	x0, x0, :lo12:stack
->> +        mov      sp, x0
->
-> You need a pointer to the end of the stack, not the beginning.
-> Again, I think this could be just
->
-> 	adr	sp, stack_end
->
-> Also, there's tab/space confusion all through this file.
-> IMO, this is assembly, so it *should* be tabs.
-
-I'm adding an entry to editorconfig and fixing up the damage.
-
->
->> @@ -0,0 +1,22 @@
->> +ENTRY(__start)
->> +
->> +SECTIONS
->> +{
->> +    /* virt machine, RAM starts at 1gb */
->> +    . =3D (1 << 30);
->> +    .text : {
->> +        *(.text)
->> +    }
->> +    .data : {
->> +        *(.data)
->> +    }
->> +    .rodata : {
->> +        *(.rodata)
->> +    }
->
-> If you ever wanted to make this read-only, swap .rodata before .data, so =
-that
-> it's next to .text.
-
-done.
-
->
->
-> r~
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
---
-Alex Benn=C3=A9e
+r~
+
 
