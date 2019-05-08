@@ -6,76 +6,77 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B9A5C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:17:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A18C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:20:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5DAE2054F
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:17:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5DAE2054F
+	by mail.kernel.org (Postfix) with ESMTPS id F17F221655
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:20:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F17F221655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35005 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35030 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOKa3-0006VB-57
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 07:17:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37417)
+	id 1hOKcO-0008CG-1D
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 07:20:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hOKYO-0005L5-3Y
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:16:05 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hOKYd-0005ip-2P
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:16:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hOKYM-0002bu-Pp
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:16:04 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:34923)
+	(envelope-from <pbonzini@redhat.com>) id 1hOKYb-0002jw-GZ
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:16:18 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:53177)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOKYM-0002bJ-Ig
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:16:02 -0400
-Received: by mail-wm1-f68.google.com with SMTP id y197so2754108wmd.0
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 04:16:02 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOKYb-0002j6-7S
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:16:17 -0400
+Received: by mail-wm1-f68.google.com with SMTP id o25so2769085wmf.2
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 04:16:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
 	:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=WcBPukSRlNYA5QzAfUbJkyk/58sz49Ga62vg2xigo04=;
-	b=EH92FIYI0B1bCxXA1dzDDw3IFg8uJjPNVdrSIDyXTn2yCtfc9OhegtMgVK/scZQepM
-	E0O0V3r2HvCa0bpZnpCdos0r71Fa/K24TJJsu1l/AAGrV0M/EbS/4vrYmLutJmXntv6Y
-	xBUCTPPkZEPgx6wQRhqSX15574vexRZvOVkfq9bonChs6Jot9SMNxO7qKQwmIxfwGvuM
-	6xvQQaygAz3A+jZwOy+gr2VSfJuwiXiTPlmYwugH95A1bb+9Ufz8Qz0MqUE0wok/lsbp
-	GZfNn/LUReMGuXaZTxocoi5FvLKyUj75eY+AkB9WBRyjkfQxHZWVrXLRnzMdW6fnQQu/
-	LBiw==
-X-Gm-Message-State: APjAAAVzjbUckmJFOuQbXor2YGPcOYPNcsG8sJioMFNec+G8sGB5kAMR
-	EZs/ttVfp5UdvgAsIpmn9kls2g==
-X-Google-Smtp-Source: APXvYqynhKUDNpNw9efejEQRi6rVtUkVaMwsfEL2TDwesPI6Cw0fW6eficXqmVkS/xjfAupNatj43A==
-X-Received: by 2002:a1c:a406:: with SMTP id n6mr2604650wme.126.1557314161590; 
-	Wed, 08 May 2019 04:16:01 -0700 (PDT)
+	bh=Eq7qSLyleWrNCHx4P4SRi3MKHGejKq3JrAmj3Wbb+Ss=;
+	b=WD9KajQgVKWAgIbmS8KJR6SVT82No5dychEtCZjQbwItuR/BJRBmGUzmrCfeJuSbb6
+	1TezWOdhSHeYNbP4DOJeLiE65El/HJ5lVpeCpQsYdMXWONLyoXdYQIlVZAygVEbSTMSR
+	LvxJI5Dkx/TEid+SfOaTgwIkbFhKX1C9AyQYUmJ6Akgkc3K0lu53IzXg0X93wXRcOlDB
+	xYf35YcDVB6AeRkSB3X6M7lJkhnwzcWnp8F2nda3KZdrYCB7GL8HSY4bMv4hHbEOp8te
+	R8Tb3xfLH/ZOvTr05wtlUtf7MsersPA1ypM+EMJtDfYNbMDG1SglnAj7AinMO5KQLkA0
+	QfwQ==
+X-Gm-Message-State: APjAAAV0GA/lybf6T1NDuIljUXsCNnCraZNjNfAZN0hlXExBCCKjuCT8
+	4+ZaLX1WqG28v/1ydt8T28gqlg==
+X-Google-Smtp-Source: APXvYqyc18QPrkT7qH66pLpTwTbbRMDPbNQl+e8l60uHIrDjuJ+m9zNhqZUVgk/zHPFsMRtxpRVEfA==
+X-Received: by 2002:a05:600c:2291:: with SMTP id
+	17mr2584957wmf.132.1557314176242; 
+	Wed, 08 May 2019 04:16:16 -0700 (PDT)
 Received: from [10.201.49.229] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
 	by smtp.gmail.com with ESMTPSA id
-	f128sm3082970wme.28.2019.05.08.04.15.59
+	o6sm35170410wrh.55.2019.05.08.04.16.14
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 08 May 2019 04:16:01 -0700 (PDT)
+	Wed, 08 May 2019 04:16:15 -0700 (PDT)
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
 	Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, 
 	qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 References: <20190507163416.24647-1-philmd@redhat.com>
-	<20190507163416.24647-10-philmd@redhat.com>
+	<20190507163416.24647-11-philmd@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f429133c-a991-2172-7170-53912f624689@redhat.com>
-Date: Wed, 8 May 2019 13:15:58 +0200
+Message-ID: <f56c85c7-4045-ce26-4a44-8e6bc28a71e2@redhat.com>
+Date: Wed, 8 May 2019 13:16:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190507163416.24647-10-philmd@redhat.com>
+In-Reply-To: <20190507163416.24647-11-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
 X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH v2 09/16] hw/mips: Use object_initialize()
- on MIPSCPSState
+Subject: Re: [Qemu-devel] [PATCH v2 10/16] hw/mips: Use
+ object_initialize_child for correct reference counting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -108,136 +109,143 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 07/05/19 11:34, Philippe Mathieu-Daudé wrote:
-> Initialize the MIPSCPSState with object_initialize() instead of
-> object_new(). This will allow us to add it as children of the
-> machine container.
+> As explained in commit aff39be0ed97:
 > 
+>   Both functions, object_initialize() and object_property_add_child()
+>   increase the reference counter of the new object, so one of the
+>   references has to be dropped afterwards to get the reference
+>   counting right. Otherwise the child object will not be properly
+>   cleaned up when the parent gets destroyed.
+>   Thus let's use now object_initialize_child() instead to get the
+>   reference counting here right.
+> 
+> This patch was generated using the following Coccinelle script:
+> 
+>  @use_sysbus_init_child_obj_missing_parent@
+>  expression child_ptr;
+>  expression child_type;
+>  expression child_size;
+>  @@
+>  -   object_initialize(child_ptr, child_size, child_type);
+>      ...
+>  -   qdev_set_parent_bus(DEVICE(child_ptr), sysbus_get_default());
+>      ...
+>  ?-  object_unref(OBJECT(child_ptr));
+>  +   sysbus_init_child_obj(OBJECT(PARENT_OBJ), "CHILD_NAME", child_ptr,
+>  +                         child_size, child_type);
+> 
+> We let the Malta/Boston machines adopt the CPS child, and similarly
+> the CPS adopts the ITU/CPC/GIC/GCR children.
+> 
+> While the object_initialize() function doesn't take an
+> 'Error *errp' argument, the object_initialize_child() does.
+> Since this code is used when a machine is created (and is not
+> yet running), we deliberately choose to use the &error_abort
+> argument instead of ignoring errors if an object creation failed.
+> This choice also matches when using sysbus_init_child_obj(),
+> since its code is:
+> 
+>   void sysbus_init_child_obj(Object *parent,
+>                              const char *childname, void *child,
+>                              size_t childsize, const char *childtype)
+>   {
+>       object_initialize_child(parent, childname, child, childsize,
+>                               childtype, &error_abort, NULL);
+> 
+>       qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
+>   }
+> 
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> Inspired-by: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/mips/boston.c     | 25 ++++++++++++-------------
->  hw/mips/mips_malta.c | 17 ++++++++---------
->  2 files changed, 20 insertions(+), 22 deletions(-)
+>  hw/mips/boston.c     |  4 ++--
+>  hw/mips/cps.c        | 20 ++++++++------------
+>  hw/mips/mips_malta.c |  4 ++--
+>  3 files changed, 12 insertions(+), 16 deletions(-)
 > 
 > diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-> index a8b29f62f5b..cb3ea85fdc1 100644
+> index cb3ea85fdc1..1ffccc8da92 100644
 > --- a/hw/mips/boston.c
 > +++ b/hw/mips/boston.c
-> @@ -49,7 +49,7 @@ typedef struct {
->      SysBusDevice parent_obj;
->  
->      MachineState *mach;
-> -    MIPSCPSState *cps;
-> +    MIPSCPSState cps;
->      SerialState *uart;
->  
->      CharBackend lcd_display;
-> @@ -188,7 +188,7 @@ static uint64_t boston_platreg_read(void *opaque, hwaddr addr,
->      case PLAT_DDR3_STATUS:
->          return PLAT_DDR3_STATUS_LOCKED | PLAT_DDR3_STATUS_CALIBRATED;
->      case PLAT_MMCM_DIV:
-> -        gic_freq = mips_gictimer_get_freq(s->cps->gic.gic_timer) / 1000000;
-> +        gic_freq = mips_gictimer_get_freq(s->cps.gic.gic_timer) / 1000000;
->          val = gic_freq << PLAT_MMCM_DIV_INPUT_SHIFT;
->          val |= 1 << PLAT_MMCM_DIV_MUL_SHIFT;
->          val |= 1 << PLAT_MMCM_DIV_CLK0DIV_SHIFT;
-> @@ -455,20 +455,19 @@ static void boston_mach_init(MachineState *machine)
+> @@ -455,8 +455,8 @@ static void boston_mach_init(MachineState *machine)
 >  
 >      is_64b = cpu_supports_isa(machine->cpu_type, ISA_MIPS64);
 >  
-> -    s->cps = MIPS_CPS(object_new(TYPE_MIPS_CPS));
-> -    qdev_set_parent_bus(DEVICE(s->cps), sysbus_get_default());
-> -
-> -    object_property_set_str(OBJECT(s->cps), machine->cpu_type, "cpu-type",
-> +    object_initialize(&s->cps, sizeof(s->cps), TYPE_MIPS_CPS);
-> +    qdev_set_parent_bus(DEVICE(&s->cps), sysbus_get_default());
-> +    object_property_set_str(OBJECT(&s->cps), machine->cpu_type, "cpu-type",
+> -    object_initialize(&s->cps, sizeof(s->cps), TYPE_MIPS_CPS);
+> -    qdev_set_parent_bus(DEVICE(&s->cps), sysbus_get_default());
+> +    sysbus_init_child_obj(OBJECT(machine), "cps", OBJECT(&s->cps),
+> +                          sizeof(s->cps), TYPE_MIPS_CPS);
+>      object_property_set_str(OBJECT(&s->cps), machine->cpu_type, "cpu-type",
 >                              &err);
-> -    object_property_set_int(OBJECT(s->cps), smp_cpus, "num-vp", &err);
-> -    object_property_set_bool(OBJECT(s->cps), true, "realized", &err);
-> +    object_property_set_int(OBJECT(&s->cps), smp_cpus, "num-vp", &err);
-> +    object_property_set_bool(OBJECT(&s->cps), true, "realized", &err);
+>      object_property_set_int(OBJECT(&s->cps), smp_cpus, "num-vp", &err);
+> diff --git a/hw/mips/cps.c b/hw/mips/cps.c
+> index fc97f59af4c..649b35a76c5 100644
+> --- a/hw/mips/cps.c
+> +++ b/hw/mips/cps.c
+> @@ -94,9 +94,8 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
 >  
->      if (err != NULL) {
->          error_report("%s", error_get_pretty(err));
->          exit(1);
+>      /* Inter-Thread Communication Unit */
+>      if (itu_present) {
+> -        object_initialize(&s->itu, sizeof(s->itu), TYPE_MIPS_ITU);
+> -        qdev_set_parent_bus(DEVICE(&s->itu), sysbus_get_default());
+> -
+> +        sysbus_init_child_obj(OBJECT(dev), "itu", &s->itu, sizeof(s->itu),
+> +                              TYPE_MIPS_ITU);
+>          object_property_set_int(OBJECT(&s->itu), 16, "num-fifo", &err);
+>          object_property_set_int(OBJECT(&s->itu), 16, "num-semaphores", &err);
+>          object_property_set_bool(OBJECT(&s->itu), saar_present, "saar-present",
+> @@ -115,9 +114,8 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
 >      }
 >  
-> -    sysbus_mmio_map_overlap(SYS_BUS_DEVICE(s->cps), 0, 0, 1);
-> +    sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->cps), 0, 0, 1);
+>      /* Cluster Power Controller */
+> -    object_initialize(&s->cpc, sizeof(s->cpc), TYPE_MIPS_CPC);
+> -    qdev_set_parent_bus(DEVICE(&s->cpc), sysbus_get_default());
+> -
+> +    sysbus_init_child_obj(OBJECT(dev), "cpc", &s->cpc, sizeof(s->cpc),
+> +                          TYPE_MIPS_CPC);
+>      object_property_set_int(OBJECT(&s->cpc), s->num_vp, "num-vp", &err);
+>      object_property_set_int(OBJECT(&s->cpc), 1, "vp-start-running", &err);
+>      object_property_set_bool(OBJECT(&s->cpc), true, "realized", &err);
+> @@ -130,9 +128,8 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
+>                              sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->cpc), 0));
 >  
->      flash =  g_new(MemoryRegion, 1);
->      memory_region_init_rom(flash, NULL, "boston.flash", 128 * MiB, &err);
-> @@ -487,17 +486,17 @@ static void boston_mach_init(MachineState *machine)
->      xilinx_pcie_init(sys_mem, 0,
->                       0x10000000, 32 * MiB,
->                       0x40000000, 1 * GiB,
-> -                     get_cps_irq(s->cps, 2), false);
-> +                     get_cps_irq(&s->cps, 2), false);
+>      /* Global Interrupt Controller */
+> -    object_initialize(&s->gic, sizeof(s->gic), TYPE_MIPS_GIC);
+> -    qdev_set_parent_bus(DEVICE(&s->gic), sysbus_get_default());
+> -
+> +    sysbus_init_child_obj(OBJECT(dev), "gic", &s->gic, sizeof(s->gic),
+> +                          TYPE_MIPS_GIC);
+>      object_property_set_int(OBJECT(&s->gic), s->num_vp, "num-vp", &err);
+>      object_property_set_int(OBJECT(&s->gic), 128, "num-irq", &err);
+>      object_property_set_bool(OBJECT(&s->gic), true, "realized", &err);
+> @@ -147,9 +144,8 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
+>      /* Global Configuration Registers */
+>      gcr_base = env->CP0_CMGCRBase << 4;
 >  
->      xilinx_pcie_init(sys_mem, 1,
->                       0x12000000, 32 * MiB,
->                       0x20000000, 512 * MiB,
-> -                     get_cps_irq(s->cps, 1), false);
-> +                     get_cps_irq(&s->cps, 1), false);
->  
->      pcie2 = xilinx_pcie_init(sys_mem, 2,
->                               0x14000000, 32 * MiB,
->                               0x16000000, 1 * MiB,
-> -                             get_cps_irq(s->cps, 0), true);
-> +                             get_cps_irq(&s->cps, 0), true);
->  
->      platreg = g_new(MemoryRegion, 1);
->      memory_region_init_io(platreg, NULL, &boston_platreg_ops, s,
-> @@ -505,7 +504,7 @@ static void boston_mach_init(MachineState *machine)
->      memory_region_add_subregion_overlap(sys_mem, 0x17ffd000, platreg, 0);
->  
->      s->uart = serial_mm_init(sys_mem, 0x17ffe000, 2,
-> -                             get_cps_irq(s->cps, 3), 10000000,
-> +                             get_cps_irq(&s->cps, 3), 10000000,
->                               serial_hd(0), DEVICE_NATIVE_ENDIAN);
->  
->      lcd = g_new(MemoryRegion, 1);
+> -    object_initialize(&s->gcr, sizeof(s->gcr), TYPE_MIPS_GCR);
+> -    qdev_set_parent_bus(DEVICE(&s->gcr), sysbus_get_default());
+> -
+> +    sysbus_init_child_obj(OBJECT(dev), "gcr", &s->gcr, sizeof(s->gcr),
+> +                          TYPE_MIPS_GCR);
+>      object_property_set_int(OBJECT(&s->gcr), s->num_vp, "num-vp", &err);
+>      object_property_set_int(OBJECT(&s->gcr), 0x800, "gcr-rev", &err);
+>      object_property_set_int(OBJECT(&s->gcr), gcr_base, "gcr-base", &err);
 > diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> index 439665ab45e..04f2117d71e 100644
+> index 04f2117d71e..aff8464f2ac 100644
 > --- a/hw/mips/mips_malta.c
 > +++ b/hw/mips/mips_malta.c
-> @@ -94,7 +94,7 @@ typedef struct {
->  typedef struct {
->      SysBusDevice parent_obj;
->  
-> -    MIPSCPSState *cps;
-> +    MIPSCPSState cps;
->      qemu_irq *i8259;
->  } MaltaState;
->  
-> @@ -1151,20 +1151,19 @@ static void create_cps(MaltaState *s, const char *cpu_type,
+> @@ -1151,8 +1151,8 @@ static void create_cps(MaltaState *s, const char *cpu_type,
 >  {
 >      Error *err = NULL;
 >  
-> -    s->cps = MIPS_CPS(object_new(TYPE_MIPS_CPS));
-> -    qdev_set_parent_bus(DEVICE(s->cps), sysbus_get_default());
-> -
-> -    object_property_set_str(OBJECT(s->cps), cpu_type, "cpu-type", &err);
-> -    object_property_set_int(OBJECT(s->cps), smp_cpus, "num-vp", &err);
-> -    object_property_set_bool(OBJECT(s->cps), true, "realized", &err);
-> +    object_initialize(&s->cps, sizeof(s->cps), TYPE_MIPS_CPS);
-> +    qdev_set_parent_bus(DEVICE(&s->cps), sysbus_get_default());
-> +    object_property_set_str(OBJECT(&s->cps), cpu_type, "cpu-type", &err);
-> +    object_property_set_int(OBJECT(&s->cps), smp_cpus, "num-vp", &err);
-> +    object_property_set_bool(OBJECT(&s->cps), true, "realized", &err);
->      if (err != NULL) {
->          error_report("%s", error_get_pretty(err));
->          exit(1);
->      }
->  
-> -    sysbus_mmio_map_overlap(SYS_BUS_DEVICE(s->cps), 0, 0, 1);
-> +    sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->cps), 0, 0, 1);
->  
-> -    *i8259_irq = get_cps_irq(s->cps, 3);
-> +    *i8259_irq = get_cps_irq(&s->cps, 3);
->      *cbus_irq = NULL;
->  }
->  
+> -    object_initialize(&s->cps, sizeof(s->cps), TYPE_MIPS_CPS);
+> -    qdev_set_parent_bus(DEVICE(&s->cps), sysbus_get_default());
+> +    sysbus_init_child_obj(OBJECT(s), "cps", OBJECT(&s->cps), sizeof(s->cps),
+> +                          TYPE_MIPS_CPS);
+>      object_property_set_str(OBJECT(&s->cps), cpu_type, "cpu-type", &err);
+>      object_property_set_int(OBJECT(&s->cps), smp_cpus, "num-vp", &err);
+>      object_property_set_bool(OBJECT(&s->cps), true, "realized", &err);
 > 
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
