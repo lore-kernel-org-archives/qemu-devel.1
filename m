@@ -3,110 +3,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9668EC04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 15:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F35E5C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 15:24:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6505B21530
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 15:22:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6505B21530
+	by mail.kernel.org (Postfix) with ESMTPS id C912020644
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 15:24:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C912020644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39062 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39069 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOOPH-0003NO-K4
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 11:22:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40526)
+	id 1hOOQk-0003yr-T0
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 11:24:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOOOT-00032C-6H
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 11:22:06 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hOOPv-0003fw-Rq
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 11:23:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOOOS-0001RT-9Z
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 11:22:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52098)
+	(envelope-from <pagupta@redhat.com>) id 1hOOPu-00027U-VG
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 11:23:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40614)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hOOOP-0001QD-VK; Wed, 08 May 2019 11:22:02 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hOOPu-00027D-NB
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 11:23:34 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0E0D640D89;
-	Wed,  8 May 2019 15:22:01 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-100.ams2.redhat.com [10.36.116.100])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7586560F93;
-	Wed,  8 May 2019 15:21:47 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
-	dgilbert@redhat.com
-References: <20190124122525.145968-1-vsementsov@virtuozzo.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <f92a06b5-6af6-dfe3-6e78-c4448e6a9cd0@redhat.com>
-Date: Wed, 8 May 2019 17:21:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 924EB3007149;
+	Wed,  8 May 2019 15:23:33 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+	(colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BE972E09B;
+	Wed,  8 May 2019 15:23:33 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com
+	(zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+	by colo-mx.corp.redhat.com (Postfix) with ESMTP id B6B4B41F56;
+	Wed,  8 May 2019 15:23:32 +0000 (UTC)
+Date: Wed, 8 May 2019 11:23:32 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: Jakub =?utf-8?Q?Staro=C5=84?= <jstaron@google.com>
+Message-ID: <1482604497.27348783.1557329012320.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1555943483.27247564.1557313967518.JavaMail.zimbra@redhat.com>
+References: <20190426050039.17460-1-pagupta@redhat.com>
+	<20190426050039.17460-3-pagupta@redhat.com>
+	<3d6479ae-6c39-d614-f1d9-aa1978e2e438@google.com>
+	<1555943483.27247564.1557313967518.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190124122525.145968-1-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Originating-IP: [10.67.116.32, 10.4.195.26]
+Thread-Topic: virtio-pmem: Add virtio pmem driver
+Thread-Index: PGqRBxt7ac04jwyhY+CEFoY6aRdKvNGTIbxd
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Wed, 08 May 2019 15:22:01 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Wed, 08 May 2019 15:23:33 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/2] fix qmp-cont vs migration-finish
- race-crash
+Subject: Re: [Qemu-devel] [PATCH v7 2/6] virtio-pmem: Add virtio pmem driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -118,39 +79,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Karen Mezick <kmezick@redhat.com>, armbru@redhat.com,
-	lcapitulino@redhat.com
+Cc: cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com,
+	jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
+	virtualization@lists.linux-foundation.org,
+	adilger kernel <adilger.kernel@dilger.ca>, smbarber@google.com,
+	zwisler@kernel.org, aarcange@redhat.com,
+	dave jiang <dave.jiang@intel.com>, linux-nvdimm@lists.01.org,
+	vishal l verma <vishal.l.verma@intel.com>, david@redhat.com,
+	willy@infradead.org, hch@infradead.org,
+	linux-acpi@vger.kernel.org, jmoyer@redhat.com,
+	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
+	riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
+	stefanha@redhat.com, imammedo@redhat.com,
+	dan j williams <dan.j.williams@intel.com>,
+	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
+	tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
+	darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/01/2019 13.25, Vladimir Sementsov-Ogievskiy wrote:
-> Hi.
-> 
-> It's a simple fix for problems reported in "Aborts in iotest 169"
-> by Max:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg05907.html
-> 
-> In thread Kevin described that a problem itself is bigger and needs
-> more effort:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg06136.html
-> 
-> So, we may continue discussion in "Aborts in iotest 169", and in
-> parallel apply these patches at least as a temporary fix.
-> 
-> The problem of this fix is that we finally have a bit weird interface:
-> 
-> User gets event MIGRATION_COMPLETED, and after it he can get error
-> message "Migration is not finalized yet". 
-> 
-> But it is better than crash, anyway.
-> 
-> Vladimir Sementsov-Ogievskiy (2):
->   qmp: forbid qmp_cont in RUN_STATE_FINISH_MIGRATE
->   iotest: fix 169: do not run qmp_cont in RUN_STATE_FINISH_MIGRATE
 
-What happened to these two patches? As far as I can see, they've never
-got applied? Has another fix for 169 included instead?
+> > 
+> > > +int virtio_pmem_flush(struct nd_region *nd_region)
+> > > +{
+> > > +        int err;
+> > > +        unsigned long flags;
+> > > +        struct scatterlist *sgs[2], sg, ret;
+> > > +        struct virtio_device *vdev = nd_region->provider_data;
+> > > +        struct virtio_pmem *vpmem = vdev->priv;
+> > > +        struct virtio_pmem_request *req;
+> > > +
+> > > +        might_sleep();
+> > > +        req = kmalloc(sizeof(*req), GFP_KERNEL);
+> > > +        if (!req)
+> > > +                return -ENOMEM;
+> > > +
+> > > +        req->done = req->wq_buf_avail = false;
+> > > +        strcpy(req->name, "FLUSH");
+> > > +        init_waitqueue_head(&req->host_acked);
+> > > +        init_waitqueue_head(&req->wq_buf);
+> > > +        sg_init_one(&sg, req->name, strlen(req->name));
+> > > +        sgs[0] = &sg;
+> > > +        sg_init_one(&ret, &req->ret, sizeof(req->ret));
+> > > +        sgs[1] = &ret;
+> > > +
+> > > +        spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> > > +        err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
+> > > +        if (err) {
+> > > +                dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
+> > > +
+> > > +                list_add_tail(&vpmem->req_list, &req->list);
+> > > +                spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+> > > +
+> > > +                /* When host has read buffer, this completes via host_ack */
+> > > +                wait_event(req->wq_buf, req->wq_buf_avail);
+> > > +                spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> > > +        }
+> > 
+> > Aren't the arguments in `list_add_tail` swapped? The element we are adding
+> 
 
- Thomas
+Yes, arguments for 'list_add_tail' should be swapped.
+
+list_add_tail(&req->list, &vpmem->req_list);
+
+
+Thank you,
+Pankaj
 
