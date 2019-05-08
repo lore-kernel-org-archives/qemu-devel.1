@@ -2,57 +2,59 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83E60C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 06:29:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AA50C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 06:30:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A6C421019
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 06:29:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A6C421019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id CE7E521019
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 06:30:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE7E521019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60239 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60278 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOG4x-0005k3-FU
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 02:29:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40924)
+	id 1hOG6C-0006qB-05
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 02:30:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tao3.xu@intel.com>) id 1hOFvx-00053y-W4
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:20:07 -0400
+	(envelope-from <peterx@redhat.com>) id 1hOFs4-0001B2-2K
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:16:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tao3.xu@intel.com>) id 1hOFvw-00007D-0e
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:20:05 -0400
-Received: from mga05.intel.com ([192.55.52.43]:57351)
+	(envelope-from <peterx@redhat.com>) id 1hOFs2-0004Q9-2h
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:16:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53518)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hOFvu-0008RD-35
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:20:03 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-	by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	07 May 2019 23:20:00 -0700
-X-ExtLoop1: 1
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.92])
-	by fmsmga005.fm.intel.com with ESMTP; 07 May 2019 23:19:58 -0700
-From: Tao Xu <tao3.xu@intel.com>
-To: imammedo@redhat.com, mst@redhat.com, eblake@redhat.com,
-	ehabkost@redhat.com, xiaoguangrong.eric@gmail.com
-Date: Wed,  8 May 2019 14:17:19 +0800
-Message-Id: <20190508061726.27631-5-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190508061726.27631-1-tao3.xu@intel.com>
-References: <20190508061726.27631-1-tao3.xu@intel.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 192.55.52.43
-Subject: [Qemu-devel] [PATCH v4 04/11] acpi: introduce
- AcpiDeviceIfClass.build_mem_ranges hook
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hOFs1-0004PL-R7
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:16:02 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2F9A23086205
+	for <qemu-devel@nongnu.org>; Wed,  8 May 2019 06:16:01 +0000 (UTC)
+Received: from xz-x1.nay.redhat.com (dhcp-15-205.nay.redhat.com [10.66.15.205])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1D9281A267;
+	Wed,  8 May 2019 06:15:58 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed,  8 May 2019 14:15:23 +0800
+Message-Id: <20190508061523.17666-12-peterx@redhat.com>
+In-Reply-To: <20190508061523.17666-1-peterx@redhat.com>
+References: <20190508061523.17666-1-peterx@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Wed, 08 May 2019 06:16:01 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 11/11] migration: Split log_clear() into
+ smaller chunks
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -64,298 +66,298 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, tao3.xu@intel.com, jingqi.liu@intel.com,
-	qemu-devel@nongnu.org, rth@twiddle.net
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	"Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+	peterx@redhat.com, Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add build_mem_ranges callback to AcpiDeviceIfClass and use
-it for generating SRAT and HMAT numa memory ranges.
+Currently we are doing log_clear() right after log_sync() which mostly
+keeps the old behavior when log_clear() was still part of log_sync().
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Co-developed-by: Liu Jingqi <jingqi.liu@intel.com>
-Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
+This patch tries to further optimize the migration log_clear() code
+path to split huge log_clear()s into smaller chunks.
+
+We do this by spliting the whole guest memory region into memory
+chunks, whose size is decided by MigrationState.clear_bitmap_shift (an
+example will be given below).  With that, we don't do the dirty bitmap
+clear operation on the remote node (e.g., KVM) when we fetch the dirty
+bitmap, instead we explicitly clear the dirty bitmap for the memory
+chunk for each of the first time we send a page in that chunk.
+
+Here comes an example.
+
+Assuming the guest has 64G memory, then before this patch the KVM
+ioctl KVM_CLEAR_DIRTY_LOG will be a single one covering 64G memory.
+If after the patch, let's assume when the clear bitmap shift is 18,
+then the memory chunk size on x86_64 will be 1UL<<18 * 4K = 1GB.  Then
+instead of sending a big 64G ioctl, we'll send 64 small ioctls, each
+of the ioctl will cover 1G of the guest memory.  For each of the 64
+small ioctls, we'll only send if any of the page in that small chunk
+was going to be sent right away.
+
+Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
+ include/exec/ram_addr.h | 75 +++++++++++++++++++++++++++++++++++++++--
+ migration/migration.c   |  4 +++
+ migration/migration.h   | 27 +++++++++++++++
+ migration/ram.c         | 44 ++++++++++++++++++++++++
+ migration/trace-events  |  1 +
+ 5 files changed, 149 insertions(+), 2 deletions(-)
 
-Changes in v4 -> v3:
-    - spilt the 1/8 of v3 patch into two patches, 4/13 introduces
-    build_mem_ranges() and adding it to ACPI interface, 5/13 builds
-    HMAT (Igor)
----
- hw/acpi/piix4.c                      |   1 +
- hw/i386/acpi-build.c                 | 116 ++++++++++++++++-----------
- hw/isa/lpc_ich9.c                    |   1 +
- include/hw/acpi/acpi_dev_interface.h |   3 +
- include/hw/boards.h                  |  12 +++
- include/hw/i386/pc.h                 |   1 +
- stubs/Makefile.objs                  |   1 +
- stubs/pc_build_mem_ranges.c          |   6 ++
- 8 files changed, 96 insertions(+), 45 deletions(-)
- create mode 100644 stubs/pc_build_mem_ranges.c
-
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index 9c079d6834..7c320a49b2 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -723,6 +723,7 @@ static void piix4_pm_class_init(ObjectClass *klass, void *data)
-     adevc->ospm_status = piix4_ospm_status;
-     adevc->send_event = piix4_send_gpe;
-     adevc->madt_cpu = pc_madt_cpu_entry;
-+    adevc->build_mem_ranges = pc_build_mem_ranges;
- }
- 
- static const TypeInfo piix4_pm_info = {
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 43a807c483..5598e7f780 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2271,6 +2271,65 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
- #define HOLE_640K_START  (640 * KiB)
- #define HOLE_640K_END   (1 * MiB)
- 
-+void pc_build_mem_ranges(AcpiDeviceIf *adev, MachineState *ms)
-+{
-+    uint64_t mem_len, mem_base, next_base;
-+    int i;
-+    PCMachineState *pcms = PC_MACHINE(ms);
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index 896324281a..c2db157d98 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -50,8 +50,69 @@ struct RAMBlock {
+     unsigned long *unsentmap;
+     /* bitmap of already received pages in postcopy */
+     unsigned long *receivedmap;
++
 +    /*
-+     * the memory map is a bit tricky, it contains at least one hole
-+     * from 640k-1M and possibly another one from 3.5G-4G.
++     * bitmap of already cleared dirty bitmap.  Set this up to
++     * non-NULL to enable the capability to postpone and split
++     * clearing of dirty bitmap on the remote node (e.g., KVM).  The
++     * bitmap will be set only when doing global sync.
++     *
++     * NOTE: this bitmap is different comparing to the other bitmaps
++     * in that one bit can represent multiple guest pages (which is
++     * decided by the `clear_bmap_shift' variable below).  On
++     * destination side, this should always be NULL, and the variable
++     * `clear_bmap_shift' is meaningless.
 +     */
-+    NumaMemRange *mem_ranges = ms->numa_state->mem_ranges;
-+    ms->numa_state->mem_ranges_num = 0;
-+    next_base = 0;
-+
-+    for (i = 0; i < pcms->numa_nodes; ++i) {
-+        mem_base = next_base;
-+        mem_len = pcms->node_mem[i];
-+        next_base = mem_base + mem_len;
-+
-+        /* Cut out the 640K hole */
-+        if (mem_base <= HOLE_640K_START &&
-+            next_base > HOLE_640K_START) {
-+            mem_len -= next_base - HOLE_640K_START;
-+            if (mem_len > 0) {
-+                mem_ranges[ms->numa_state->mem_ranges_num].base = mem_base;
-+                mem_ranges[ms->numa_state->mem_ranges_num].length = mem_len;
-+                mem_ranges[ms->numa_state->mem_ranges_num].node = i;
-+                ms->numa_state->mem_ranges_num++;
-+            }
-+
-+            /* Check for the rare case: 640K < RAM < 1M */
-+            if (next_base <= HOLE_640K_END) {
-+                next_base = HOLE_640K_END;
-+                continue;
-+            }
-+            mem_base = HOLE_640K_END;
-+            mem_len = next_base - HOLE_640K_END;
-+        }
-+
-+        /* Cut out the ACPI_PCI hole */
-+        if (mem_base <= pcms->below_4g_mem_size &&
-+            next_base > pcms->below_4g_mem_size) {
-+            mem_len -= next_base - pcms->below_4g_mem_size;
-+            if (mem_len > 0) {
-+                mem_ranges[ms->numa_state->mem_ranges_num].base = mem_base;
-+                mem_ranges[ms->numa_state->mem_ranges_num].length = mem_len;
-+                mem_ranges[ms->numa_state->mem_ranges_num].node = i;
-+                ms->numa_state->mem_ranges_num++;
-+            }
-+            mem_base = 1ULL << 32;
-+            mem_len = next_base - pcms->below_4g_mem_size;
-+            next_base = mem_base + mem_len;
-+        }
-+        mem_ranges[ms->numa_state->mem_ranges_num].base = mem_base;
-+        mem_ranges[ms->numa_state->mem_ranges_num].length = mem_len;
-+        mem_ranges[ms->numa_state->mem_ranges_num].node = i;
-+        ms->numa_state->mem_ranges_num++;
-+    }
-+}
-+
- static void
- build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
- {
-@@ -2279,10 +2338,13 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
- 
-     int i;
-     int srat_start, numa_start, slots;
--    uint64_t mem_len, mem_base, next_base;
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
-     PCMachineState *pcms = PC_MACHINE(machine);
-+    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_GET_CLASS(pcms->acpi_dev);
-+    AcpiDeviceIf *adev = ACPI_DEVICE_IF(pcms->acpi_dev);
-+    uint32_t mem_ranges_num = machine->numa_state->mem_ranges_num;
-+    NumaMemRange *mem_ranges = machine->numa_state->mem_ranges;
-     ram_addr_t hotplugabble_address_space_size =
-         object_property_get_int(OBJECT(pcms), PC_MACHINE_DEVMEM_REGION_SIZE,
-                                 NULL);
-@@ -2319,57 +2381,21 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-         }
-     }
- 
-+    if (pcms->numa_nodes && !mem_ranges_num) {
-+        adevc->build_mem_ranges(adev, machine);
-+    }
- 
--    /* the memory map is a bit tricky, it contains at least one hole
--     * from 640k-1M and possibly another one from 3.5G-4G.
--     */
--    next_base = 0;
-     numa_start = table_data->len;
- 
--    for (i = 1; i < pcms->numa_nodes + 1; ++i) {
--        mem_base = next_base;
--        mem_len = pcms->node_mem[i - 1];
--        next_base = mem_base + mem_len;
--
--        /* Cut out the 640K hole */
--        if (mem_base <= HOLE_640K_START &&
--            next_base > HOLE_640K_START) {
--            mem_len -= next_base - HOLE_640K_START;
--            if (mem_len > 0) {
-+    for (i = 0; i < mem_ranges_num; i++) {
-+        if (mem_ranges[i].length > 0) {
-                 numamem = acpi_data_push(table_data, sizeof *numamem);
--                build_srat_memory(numamem, mem_base, mem_len, i - 1,
-+            build_srat_memory(numamem, mem_ranges[i].base,
-+                              mem_ranges[i].length,
-+                              mem_ranges[i].node,
-                                   MEM_AFFINITY_ENABLED);
-             }
--
--            /* Check for the rare case: 640K < RAM < 1M */
--            if (next_base <= HOLE_640K_END) {
--                next_base = HOLE_640K_END;
--                continue;
-             }
--            mem_base = HOLE_640K_END;
--            mem_len = next_base - HOLE_640K_END;
--        }
--
--        /* Cut out the ACPI_PCI hole */
--        if (mem_base <= pcms->below_4g_mem_size &&
--            next_base > pcms->below_4g_mem_size) {
--            mem_len -= next_base - pcms->below_4g_mem_size;
--            if (mem_len > 0) {
--                numamem = acpi_data_push(table_data, sizeof *numamem);
--                build_srat_memory(numamem, mem_base, mem_len, i - 1,
--                                  MEM_AFFINITY_ENABLED);
--            }
--            mem_base = 1ULL << 32;
--            mem_len = next_base - pcms->below_4g_mem_size;
--            next_base = mem_base + mem_len;
--        }
--
--        if (mem_len > 0) {
--            numamem = acpi_data_push(table_data, sizeof *numamem);
--            build_srat_memory(numamem, mem_base, mem_len, i - 1,
--                              MEM_AFFINITY_ENABLED);
--        }
--    }
-     slots = (table_data->len - numa_start) / sizeof *numamem;
-     for (; slots < pcms->numa_nodes + 2; slots++) {
-         numamem = acpi_data_push(table_data, sizeof *numamem);
-diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-index ac44aa53be..4ae64846ba 100644
---- a/hw/isa/lpc_ich9.c
-+++ b/hw/isa/lpc_ich9.c
-@@ -812,6 +812,7 @@ static void ich9_lpc_class_init(ObjectClass *klass, void *data)
-     adevc->ospm_status = ich9_pm_ospm_status;
-     adevc->send_event = ich9_send_gpe;
-     adevc->madt_cpu = pc_madt_cpu_entry;
-+    adevc->build_mem_ranges = pc_build_mem_ranges;
- }
- 
- static const TypeInfo ich9_lpc_info = {
-diff --git a/include/hw/acpi/acpi_dev_interface.h b/include/hw/acpi/acpi_dev_interface.h
-index 43ff119179..d8634ac1ed 100644
---- a/include/hw/acpi/acpi_dev_interface.h
-+++ b/include/hw/acpi/acpi_dev_interface.h
-@@ -39,6 +39,7 @@ void acpi_send_event(DeviceState *dev, AcpiEventStatusBits event);
-  *           for CPU indexed by @uid in @apic_ids array,
-  *           returned structure types are:
-  *           0 - Local APIC, 9 - Local x2APIC, 0xB - GICC
-+ * build_mem_ranges: build memory ranges of ACPI SRAT and HMAT
-  *
-  * Interface is designed for providing unified interface
-  * to generic ACPI functionality that could be used without
-@@ -54,5 +55,7 @@ typedef struct AcpiDeviceIfClass {
-     void (*send_event)(AcpiDeviceIf *adev, AcpiEventStatusBits ev);
-     void (*madt_cpu)(AcpiDeviceIf *adev, int uid,
-                      const CPUArchIdList *apic_ids, GArray *entry);
-+    void (*build_mem_ranges)(AcpiDeviceIf *adev, MachineState *ms);
-+
- } AcpiDeviceIfClass;
- #endif
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 777eed4dd9..9fbf921ecf 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -240,6 +240,12 @@ struct NodeInfo {
-     uint8_t distance[MAX_NODES];
++    unsigned long *clear_bmap;
++    uint8_t clear_bmap_shift;
  };
  
-+typedef struct NumaMemRange {
-+    uint64_t base;
-+    uint64_t length;
-+    uint32_t node;
-+} NumaMemRange;
-+
- typedef struct NumaState {
-     /* Number of NUMA nodes */
-     int num_nodes;
-@@ -249,6 +255,12 @@ typedef struct NumaState {
- 
-     /* NUMA nodes information */
-     NodeInfo nodes[MAX_NODES];
-+
-+    /* Number of NUMA memory ranges */
-+    uint32_t mem_ranges_num;
-+
-+    /* NUMA memory ranges */
-+    NumaMemRange mem_ranges[MAX_NODES + 2];
- } NumaState;
- 
- /**
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 43df7230a2..1e4ee404ae 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -281,6 +281,7 @@ void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
- /* acpi-build.c */
- void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
-                        const CPUArchIdList *apic_ids, GArray *entry);
-+void pc_build_mem_ranges(AcpiDeviceIf *adev, MachineState *ms);
- 
- /* e820 types */
- #define E820_RAM        1
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 269dfa5832..7e0a962815 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -33,6 +33,7 @@ stub-obj-y += qmp_memory_device.o
- stub-obj-y += target-monitor-defs.o
- stub-obj-y += target-get-monitor-def.o
- stub-obj-y += pc_madt_cpu_entry.o
-+stub-obj-y += pc_build_mem_ranges.o
- stub-obj-y += vmgenid.o
- stub-obj-y += xen-common.o
- stub-obj-y += xen-hvm.o
-diff --git a/stubs/pc_build_mem_ranges.c b/stubs/pc_build_mem_ranges.c
-new file mode 100644
-index 0000000000..0f104ba79d
---- /dev/null
-+++ b/stubs/pc_build_mem_ranges.c
-@@ -0,0 +1,6 @@
-+#include "qemu/osdep.h"
-+#include "hw/i386/pc.h"
-+
-+void pc_build_mem_ranges(AcpiDeviceIf *adev, MachineState *machine)
++/**
++ * clear_bmap_size: calculate clear bitmap size
++ *
++ * @pages: number of guest pages
++ * @shift: guest page number shift
++ *
++ * Returns: number of bits for the clear bitmap
++ */
++static inline long clear_bmap_size(uint64_t pages, uint8_t shift)
 +{
++    return DIV_ROUND_UP(pages, 1UL << shift);
 +}
++
++/**
++ * clear_bmap_set: set clear bitmap for the page range
++ *
++ * @rb: the ramblock to operate on
++ * @start: the start page number
++ * @size: number of pages to set in the bitmap
++ *
++ * Returns: None
++ */
++static inline void clear_bmap_set(RAMBlock *rb, uint64_t start,
++                                  uint64_t npages)
++{
++    uint8_t shift = rb->clear_bmap_shift;
++
++    bitmap_set_atomic(rb->clear_bmap, start >> shift,
++                      clear_bmap_size(npages, shift));
++}
++
++/**
++ * clear_bmap_test_and_clear: test clear bitmap for the page, clear if set
++ *
++ * @rb: the ramblock to operate on
++ * @page: the page number to check
++ *
++ * Returns: true if the bit was set, false otherwise
++ */
++static inline bool clear_bmap_test_and_clear(RAMBlock *rb, uint64_t page)
++{
++    uint8_t shift = rb->clear_bmap_shift;
++
++    return bitmap_test_and_clear_atomic(rb->clear_bmap, page >> shift, 1);
++}
++
+ static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
+ {
+     return (b && b->host && offset < b->used_length) ? true : false;
+@@ -462,8 +523,18 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+             }
+         }
+ 
+-        /* TODO: split the huge bitmap into smaller chunks */
+-        memory_region_clear_dirty_bitmap(rb->mr, start, length);
++        if (rb->clear_bmap) {
++            /*
++             * Postpone the dirty bitmap clear to the point before we
++             * really send the pages, also we will split the clear
++             * dirty procedure into smaller chunks.
++             */
++            clear_bmap_set(rb, start >> TARGET_PAGE_BITS,
++                           length >> TARGET_PAGE_BITS);
++        } else {
++            /* Slow path - still do that in a huge chunk */
++            memory_region_clear_dirty_bitmap(rb->mr, start, length);
++        }
+     } else {
+         ram_addr_t offset = rb->offset;
+ 
+diff --git a/migration/migration.c b/migration/migration.c
+index 609e0df5d0..cc85326955 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -3348,6 +3348,8 @@ void migration_global_dump(Monitor *mon)
+                    ms->send_section_footer ? "on" : "off");
+     monitor_printf(mon, "decompress-error-check: %s\n",
+                    ms->decompress_error_check ? "on" : "off");
++    monitor_printf(mon, "clear-bitmap-shift: %u\n",
++                   ms->clear_bitmap_shift);
+ }
+ 
+ #define DEFINE_PROP_MIG_CAP(name, x)             \
+@@ -3362,6 +3364,8 @@ static Property migration_properties[] = {
+                      send_section_footer, true),
+     DEFINE_PROP_BOOL("decompress-error-check", MigrationState,
+                       decompress_error_check, true),
++    DEFINE_PROP_UINT8("x-clear-bitmap-shift", MigrationState,
++                      clear_bitmap_shift, CLEAR_BITMAP_SHIFT_DEFAULT),
+ 
+     /* Migration parameters */
+     DEFINE_PROP_UINT8("x-compress-level", MigrationState,
+diff --git a/migration/migration.h b/migration/migration.h
+index 438f17edad..ed836ccf03 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -27,6 +27,23 @@ struct PostcopyBlocktimeContext;
+ 
+ #define  MIGRATION_RESUME_ACK_VALUE  (1)
+ 
++/*
++ * 1<<6=64 pages -> 256K chunk when page size is 4K.  This gives us
++ * the benefit that all the chunks are 64 pages aligned then the
++ * bitmaps are always aligned to LONG.
++ */
++#define CLEAR_BITMAP_SHIFT_MIN             6
++/*
++ * 1<<18=256K pages -> 1G chunk when page size is 4K.  This is the
++ * default value to use if no one specified.
++ */
++#define CLEAR_BITMAP_SHIFT_DEFAULT        18
++/*
++ * 1<<31=2G pages -> 8T chunk when page size is 4K.  This should be
++ * big enough and make sure we won't overflow easily.
++ */
++#define CLEAR_BITMAP_SHIFT_MAX            31
++
+ /* State for the incoming migration */
+ struct MigrationIncomingState {
+     QEMUFile *from_src_file;
+@@ -234,6 +251,16 @@ struct MigrationState
+      * do not trigger spurious decompression errors.
+      */
+     bool decompress_error_check;
++
++    /*
++     * This decides the size of guest memory chunk that will be used
++     * to track dirty bitmap clearing.  The size of memory chunk will
++     * be GUEST_PAGE_SIZE << N.  Say, N=0 means we will clear dirty
++     * bitmap for each page to send (1<<0=1); N=10 means we will clear
++     * dirty bitmap only once for 1<<10=1K continuous guest pages
++     * (which is in 4M chunk).
++     */
++    uint8_t clear_bitmap_shift;
+ };
+ 
+ void migrate_set_state(int *state, int old_state, int new_state);
+diff --git a/migration/ram.c b/migration/ram.c
+index 3e11806ccd..6cecce39a4 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1670,6 +1670,33 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs,
+     bool ret;
+ 
+     qemu_mutex_lock(&rs->bitmap_mutex);
++
++    /*
++     * Clear dirty bitmap if needed.  This _must_ be called before we
++     * send any of the page in the chunk because we need to make sure
++     * we can capture further page content changes when we sync dirty
++     * log the next time.  So as long as we are going to send any of
++     * the page in the chunk we clear the remote dirty bitmap for all.
++     * Clearing it earlier won't be a problem, but too late will.
++     */
++    if (rb->clear_bmap && clear_bmap_test_and_clear(rb, page)) {
++        uint8_t shift = rb->clear_bmap_shift;
++        hwaddr size = 1ULL << (TARGET_PAGE_BITS + shift);
++        hwaddr start = (page << TARGET_PAGE_BITS) & (-size);
++
++        /*
++         * CLEAR_BITMAP_SHIFT_MIN should always guarantee this... this
++         * can make things easier sometimes since then start address
++         * of the small chunk will always be 64 pages aligned so the
++         * bitmap will always be aligned to unsigned long.  We should
++         * even be able to remove this restriction but I'm simply
++         * keeping it.
++         */
++        assert(shift >= 6);
++        trace_migration_bitmap_clear_dirty(rb->idstr, start, size, page);
++        memory_region_clear_dirty_bitmap(rb->mr, start, size);
++    }
++
+     ret = test_and_clear_bit(page, rb->bmap);
+ 
+     if (ret) {
+@@ -2687,6 +2714,8 @@ static void ram_save_cleanup(void *opaque)
+     memory_global_dirty_log_stop();
+ 
+     RAMBLOCK_FOREACH_NOT_IGNORED(block) {
++        g_free(block->clear_bmap);
++        block->clear_bmap = NULL;
+         g_free(block->bmap);
+         block->bmap = NULL;
+         g_free(block->unsentmap);
+@@ -3197,15 +3226,30 @@ static int ram_state_init(RAMState **rsp)
+ 
+ static void ram_list_init_bitmaps(void)
+ {
++    MigrationState *ms = migrate_get_current();
+     RAMBlock *block;
+     unsigned long pages;
++    uint8_t shift;
+ 
+     /* Skip setting bitmap if there is no RAM */
+     if (ram_bytes_total()) {
++        shift = ms->clear_bitmap_shift;
++        if (shift > CLEAR_BITMAP_SHIFT_MAX) {
++            error_report("clear_bitmap_shift (%u) too big, using "
++                         "max value (%u)", shift, CLEAR_BITMAP_SHIFT_MAX);
++            shift = CLEAR_BITMAP_SHIFT_MAX;
++        } else if (shift < CLEAR_BITMAP_SHIFT_MIN) {
++            error_report("clear_bitmap_shift (%u) too small, using "
++                         "min value (%u)", shift, CLEAR_BITMAP_SHIFT_MIN);
++            shift = CLEAR_BITMAP_SHIFT_MIN;
++        }
++
+         RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+             pages = block->max_length >> TARGET_PAGE_BITS;
+             block->bmap = bitmap_new(pages);
+             bitmap_set(block->bmap, 0, pages);
++            block->clear_bmap_shift = shift;
++            block->clear_bmap = bitmap_new(clear_bmap_size(pages, shift));
+             if (migrate_postcopy_ram()) {
+                 block->unsentmap = bitmap_new(pages);
+                 bitmap_set(block->unsentmap, 0, pages);
+diff --git a/migration/trace-events b/migration/trace-events
+index de2e136e57..2c45974330 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -79,6 +79,7 @@ get_queued_page(const char *block_name, uint64_t tmp_offset, unsigned long page_
+ get_queued_page_not_dirty(const char *block_name, uint64_t tmp_offset, unsigned long page_abs, int sent) "%s/0x%" PRIx64 " page_abs=0x%lx (sent=%d)"
+ migration_bitmap_sync_start(void) ""
+ migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
++migration_bitmap_clear_dirty(char *str, uint64_t start, uint64_t size, unsigned long page) "rb %s start 0x%"PRIx64" size 0x%"PRIx64" page 0x%lx"
+ migration_throttle(void) ""
+ multifd_recv(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t flags, uint32_t next_packet_size) "channel %d packet number %" PRIu64 " pages %d flags 0x%x next packet size %d"
+ multifd_recv_sync_main(long packet_num) "packet num %ld"
 -- 
 2.17.1
 
