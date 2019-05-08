@@ -2,92 +2,86 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-11.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 789BBC04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 19:23:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E351C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 19:31:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33F2F206A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 19:23:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC3452089E
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 19:31:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="IGV/cukg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33F2F206A3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="TAEuCf13"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC3452089E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42820 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42900 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOS9v-00077f-9H
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 15:23:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37542)
+	id 1hOSI0-0003ou-Rq
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 15:31:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39051)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1hOS8u-0006kA-JR
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 15:22:19 -0400
+	id 1hOSGk-0002as-KC
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 15:30:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1hOS8o-0005Jw-Ff
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 15:22:13 -0400
-Received: from mout.gmx.net ([212.227.17.22]:52029)
+	(envelope-from <n54@gmx.com>) id 1hOSGi-00027e-Sg
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 15:30:22 -0400
+Received: from mout.gmx.net ([212.227.17.20]:56559)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1hOS8i-0005Ba-SY; Wed, 08 May 2019 15:22:06 -0400
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1hOSGi-00027A-Ha
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 15:30:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-	s=badeba3b8450; t=1557343300;
-	bh=PWzLj7SY0HC0MKM3lnm67fMKbfUOWLwCoHUFKw6/mUY=;
+	s=badeba3b8450; t=1557343804;
+	bh=5zYqrS28eRxsfvvoNuSqw9h331xB53aEWFRw6dzNKK0=;
 	h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-	b=IGV/cukg0qd8qtULN/f+4L+IHj4cyNJkdnYvgqMJbFwPeYjG7etirHUh8azokRCn7
-	pE9DE0eLi3+awJwCgNzQ0DopQIWr51hKDDbO8NYKVe3e+2I/SKn67amqIHH2LOuM9L
-	sSOqwi3PO7GijfGIajuxKJVmMo3tikKVP6ci9Ttk=
+	b=TAEuCf1342o0b9dsEm867UhBYiNo79XQgQViZV4s6DBMn2VwoIYGRXnb6yfMujvmF
+	eaX45Moq11qLDpGLBkzRV8LPxBrH/PUxxUoCE09cduHJE3D8iDAieZG3SizFSsi1oP
+	Et4/9ix29eucUZqSn8HpLtAtHtCmJJmMSJ4/8Da8=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.0.241] ([89.71.135.231]) by mail.gmx.com (mrgmx103
-	[212.227.17.174]) with ESMTPSA (Nemesis) id 0Lt1yI-1giGsw0CFO-012WLd;
-	Wed, 08 May 2019 21:21:40 +0200
-To: Thomas Huth <thuth@redhat.com>, Ed Maste <emaste@freebsd.org>,
-	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>,
-	Kamil Rytarowski <kamil@netbsd.org>
-References: <20190424103747.10173-1-thuth@redhat.com>
-	<20190424103747.10173-5-thuth@redhat.com>
-	<f9dc291b-7ba2-c6b8-33aa-c8fa3c6d4950@redhat.com>
-	<0300c8cc-d73c-b919-13f7-59f3218a609f@redhat.com>
-	<13ecf357-d43c-ecc6-012e-bed62008677d@redhat.com>
-	<c6080cb1-b48f-028f-e774-ca0e7b94369d@redhat.com>
-	<d24f9f08-4feb-1372-844e-ff58e0d2dce4@gmx.com>
-	<d65f9f6e-6761-6882-3be7-c9c65c68de3b@redhat.com>
+Received: from [192.168.0.241] ([89.71.135.231]) by mail.gmx.com (mrgmx105
+	[212.227.17.174]) with ESMTPSA (Nemesis) id 1M1ps8-1hQe7V20jo-002GxF;
+	Wed, 08 May 2019 21:30:04 +0200
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20190508085645.11595-1-kraxel@redhat.com>
+	<20190508085645.11595-12-kraxel@redhat.com>
 From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <139756cd-3df0-43a6-770a-5a1273e667d5@gmx.com>
-Date: Wed, 8 May 2019 21:21:58 +0200
+Message-ID: <461b0a0f-2843-afc3-6289-db08d6415771@gmx.com>
+Date: Wed, 8 May 2019 21:30:18 +0200
 User-Agent: Mozilla/5.0 (X11; NetBSD amd64; rv:52.0) Gecko/20100101
 	Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <d65f9f6e-6761-6882-3be7-c9c65c68de3b@redhat.com>
+In-Reply-To: <20190508085645.11595-12-kraxel@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Yil10c0523foGA5vRGKiX6fSx1iOpydXj"
-X-Provags-ID: V03:K1:E4uAdldVtrof04/mKuvzlRu1kkJb/TQbihlTFkcYcJ8J9PTOZtL
-	/+NymnD9l5ON/C5Jlj6uMFYwBPbTvpRC2aKjiFcy6pFDxuxfILDC3R6/m6m8VKEeg6T9Qbe
-	opqDp1oW4CM6nqQrPukEUxIAieMZT7sEla6aILxF+zqFTwZSHU/+M7dlLov6vja+It55aQj
-	G8cGTXnH3smAdyICXycCw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:UWWdBYzIE9k=:1h1BuJlWd+rsz5ZosgGVwB
-	mRMdQPTEzwSf3w+8kP7CNb6I+NczBNOjCaMkCRkhU3glLtvEd9EokDfWWY1x6zWJb0PfHvTaY
-	2prdSVgyHoBQxliq+P0qL3QFiSurtl0JPDhZbOL0r8v2wBobGmwNTfqeBfWQsUgeTOqkvY00/
-	+FN8kQ4Y0pBU/clrUXIBJkuAfK+AkJ9Z3Y/Ql8JnYZV+aqE+xPytx1HZqOYOrO4KL7N8ZIREq
-	KcYUVrJIqZrCcr5SKQBLQBwRf++pAu99bg5Q1xOixrQnH32MJhrJHoBv/nxuDRnN+9RGdclfd
-	b7UZhP9W7EIAbOgg1xG6UDVOb/gM41vzfbVXhc0yJCBtLRWbU7C2cRiCDJbdEDnAUw/IPkf99
-	ZDWgZIl1nuh7nUmO7xckhY4OFAZ9D2lUioRMt5uzs4ZG7Knpg63QCZN4VibAF4ONnWob3Tjw4
-	DOWekRrgaKAmCshvljdMukWo8JXpialpEecSGYxa9APsjN7URjhp3g8wohqs0vwenlcO3P+Nk
-	A9ouywRtUW6nxvHwR2pce7D7cZ9NilSC6lpSHLVtWMI67kvN8LMkIwy5V52O5cLGCWz1NRRdC
-	ZtKRQujdmHS2kwAiw/01n2WMXNfqOqAG8uLkuN6FGPfJSk9TC2741IAmxLWdH8tYHkVITqkQh
-	zzORIAJwlwUdbKVhhfuGlZi+8CsZVNlP/Z7TDfxe1pU9zkntgBfLUdXW6oTUJUuzvrUzuAyPV
-	7/y9BLfB5Z8HzRcy8emaiKlzymellJHxT3To1BNmyL0zdWPzkxrCu7Yb1htvQqiYMDEy9Y2tf
-	Z/pg+JDnuK2kMN8/jR+Ikv7H547eaRgQ1As9mU36R0A4XRGVdGxyGs0y5yjyWNZKpOgzpO+BG
-	pYlMYtHNyYodsqAP2YilSN3u2cLQrqcJcwvr0fq48=
+	boundary="CV82An4uCpMv5m8lfgLKLPxJKTX9IpFs9"
+X-Provags-ID: V03:K1:efhxpYCoofwmGFdB7JmnKLtqodNiAy7OIEuz5J6H4e5jDCYYuVh
+	/XA/tsGlxvzN7IspVF+HxiCOFOaw2oUH1DvtqSpG1KOK1JVmBk9jOQkbrW3t7aeGQzJU8YW
+	DgNtYKg6UB7wuizW+vv58r2SKnrnC/4ZDATFqP1ge21ovobuRPyny96Qu3AzQPGMsxwhDij
+	tTw16RtJm72NeGqUmT+XQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ppSIXEwDh6g=:A2PEH522fYVDEllw/QwXyl
+	ClhctFQLf+kF+4kg4LcNRAhbf+xi0ISB2+PUpmNTwAxiOp6ttr5cONi5+3Rc/Bv1thdbP/QZB
+	YI+yLxquPqnQ6bs0Oi3WNCDxGBjHsZR85m63MfKcjIJKM8utDszzmKhlI7frSAAGpKfpUqqD8
+	tnDsvYG8d1idQl6RK1HV4D4Rs52T5PHhu9BWQSzBDymPt1FcvPInbPL9blwMnv6ZX9sRlcZZO
+	mRu2dtT8hjzznmAbHYwXnMWd4nfWuyLrOATrql2vRHc/PM3CcDqnCKOYfjAmAUXXz9j1TiCoB
+	C+H1/AJg+Q+ZmBMoWQvpqdaye0WoPufTuPVm30Y09LMH2PZw97XEkNg7Mku505G/2oJIpq+AI
+	LsDZkvsBWzdjtUENMgCXsnYAw+3mSrgmzoVgpgco+KaWD3GQbvD/jL1fsZAi4tidezq94UFfy
+	26keja5bKGxvr3BSiS6MpqckDgUV3hXBgtTc0pfRvFUkrACPke1/pLU0XRl6TiVQncjQZsjsW
+	ZEsNJchRy6wYhxWvy1pPvaTOExF6QMTYS30P8dCNKPKd2eEhSS/aq8iX6sD/FDXmSeRByQu/M
+	j1A5XWO/w99jMBcCDEyrV4jbqFJ8EfBhh4s3GmOd4LJ/esRPEOxbf58R7L4kXQMkAke5GUTDh
+	QUYuj2pjTxDfa6dbsJ1DSykofigouBP1wEadnxMGhI+8mRowccK1bpTiVxWDgk5WQkxzKZNRZ
+	EMMkuMu6SK/kWvddYEB4NhwPHgP9x0t8m+XxCp2BRV3TlcLnhMsn4Hvm//2cdVV9ZUvQS/0Re
+	9bTJNLTX1bv0ednD7z3UpqmgTO0c5Evup6uaFL+uSG7psjgsVOyGuiUeITuQAyk0Ipnn213yR
+	lfTEsSlI8mAxedL0fW/GtPbPPrF+CTUDjClCfUzeE=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.22
+X-Received-From: 212.227.17.20
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] Update *BSD images with gnu-sed and bash
+Subject: Re: [Qemu-devel] [PATCH 11/13] tests/vm: netbsd autoinstall,
+ using serial console
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,119 +93,300 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
-	qemu-block@nongnu.org,
+Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
 	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+	Kamil Rytarowski <kamil@netbsd.org>,
 	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Yil10c0523foGA5vRGKiX6fSx1iOpydXj
+--CV82An4uCpMv5m8lfgLKLPxJKTX9IpFs9
 From: Kamil Rytarowski <n54@gmx.com>
-To: Thomas Huth <thuth@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>,
- Kamil Rytarowski <kamil@netbsd.org>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Laszlo Ersek <lersek@redhat.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
  =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <139756cd-3df0-43a6-770a-5a1273e667d5@gmx.com>
-Subject: Re: [Qemu-devel] Update *BSD images with gnu-sed and bash
-References: <20190424103747.10173-1-thuth@redhat.com>
- <20190424103747.10173-5-thuth@redhat.com>
- <f9dc291b-7ba2-c6b8-33aa-c8fa3c6d4950@redhat.com>
- <0300c8cc-d73c-b919-13f7-59f3218a609f@redhat.com>
- <13ecf357-d43c-ecc6-012e-bed62008677d@redhat.com>
- <c6080cb1-b48f-028f-e774-ca0e7b94369d@redhat.com>
- <d24f9f08-4feb-1372-844e-ff58e0d2dce4@gmx.com>
- <d65f9f6e-6761-6882-3be7-c9c65c68de3b@redhat.com>
-In-Reply-To: <d65f9f6e-6761-6882-3be7-c9c65c68de3b@redhat.com>
+ Kamil Rytarowski <kamil@netbsd.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
+Message-ID: <461b0a0f-2843-afc3-6289-db08d6415771@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH 11/13] tests/vm: netbsd autoinstall, using
+ serial console
+References: <20190508085645.11595-1-kraxel@redhat.com>
+ <20190508085645.11595-12-kraxel@redhat.com>
+In-Reply-To: <20190508085645.11595-12-kraxel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08.05.2019 10:07, Thomas Huth wrote:
-> On 08/05/2019 09.06, Kamil Rytarowski wrote:
->> On 06.05.2019 12:12, Thomas Huth wrote:
-> [...]
->>>  Kamil,
->>>
->>> could you maybe help with the NetBSD image and the tests/vm/netbsd sc=
-ript?
->>>
->>
->> Please be more specific what am I expected to do.
->=20
-> We have some VMs (including NetBSD) available that are used during
-> Peter's regression tests when somebody sends him a PULL requests. You
-> can run them also locally with:
->=20
->  make BUILD_TARGET=3Dcheck vm-build-netbsd
->=20
-> From time to time, we've got to update these images, either to a newer
-> version or to add some missing packages (like bash and gnu-sed in this
-> case).
-
-The process has been documented on wiki.
-
-https://wiki.qemu.org/Hosts/BSD#NetBSD
-
-> However, many people (including me) don't have a clue about the various=
-
-> *BSD flavours, so also no clue about how to update these images easily.=
-
-> That's why I was hoping you could help here.
->=20
-> But looks like Gerd is already working on a way to generate these image=
-s
-> in a more automated way, so let's hope that he'll find some spare time
-> to finish that work soon.
+On 08.05.2019 10:56, Gerd Hoffmann wrote:
+> Instead of fetching the prebuilt image from patchew download the instal=
+l
+> iso and prepare the image locally.  Install to disk, using the serial
+> console.  Create qemu user, configure ssh login.  Install packages
+> needed for qemu builds.
 >=20
 
-I recommend to upgrade to 8.0.
+I recommend to add one extra step into generated image:
 
-One extra step is to disable PaX MPROTECT (tcg violates W^X):
+echo security.pax.mprotect.enabled=3D0 >> /etc/sysctl.conf
 
-This should be addressed in qemu with an extension flag to
-mmap(2)/mremap(2). I still have this on my TODO list.
+Alternatively (and preferably) enhance qemu to handle RWX allocation for
+JIT on NetBSD.
 
-sysctl -w security.pax.mprotect.enabled=3D1
+Example in libffi.
 
-NetBSD 9.0 will be released sooner than later and soon after that
-NetBSD-7.x will be EOL.
+https://github.com/libffi/libffi/commit/2bfcd29955c02b67fa10a68cc4200f683=
+8181e0f
 
->  Thomas
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  tests/vm/netbsd | 178 +++++++++++++++++++++++++++++++++++++++++++++---=
+
+>  1 file changed, 169 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+> index 4c6624ea5ed5..eaf0ae21db42 100755
+> --- a/tests/vm/netbsd
+> +++ b/tests/vm/netbsd
+> @@ -13,32 +13,192 @@
+> =20
+>  import os
+>  import sys
+> +import time
+>  import subprocess
+>  import basevm
+> =20
+>  class NetBSDVM(basevm.BaseVM):
+>      name =3D "netbsd"
+>      arch =3D "x86_64"
+> +
+> +    link =3D "https://cdn.netbsd.org/pub/NetBSD/NetBSD-8.0/images/NetB=
+SD-8.0-amd64.iso"
+> +    size =3D "20G"
+> +    pkgs =3D [
+> +        # tools
+> +        "git",
+> +        "pkgconf",
+> +        "bzip2", "xz",
+> +
+> +        # gnu tools
+> +        "bash",
+> +        "gmake",
+> +        "gsed",
+> +        "flex", "bison",
+> +
+> +        # libs: crypto
+> +        "gnutls",
+> +
+> +        # libs: images
+> +        "jpeg",
+> +        "png",
+> +
+> +	# libs: ui
+> +        "SDL2",
+> +        "gtk3+",
+> +        "libxkbcommon",
+> +    ]
+> +
+>      BUILD_SCRIPT =3D """
+>          set -e;
+> -        rm -rf /var/tmp/qemu-test.*
+> -        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+> +        rm -rf /home/qemu/qemu-test.*
+> +        cd $(mktemp -d /home/qemu/qemu-test.XXXXXX);
+> +        mkdir src build; cd src;
+>          tar -xf /dev/rld1a;
+> -        ./configure --python=3Dpython2.7 {configure_opts};
+> +        cd ../build
+> +        ../src/configure --python=3Dpython2.7 --disable-opengl {config=
+ure_opts};
+>          gmake --output-sync -j{jobs} {target} {verbose};
+>      """
+> =20
+>      def build_image(self, img):
+> -        cimg =3D self._download_with_cache("http://download.patchew.or=
+g/netbsd-7.1-amd64.img.xz",
+> -                                         sha256sum=3D'b633d565b0eac3d0=
+2015cd0c81440bd8a7a8df8512615ac1ee05d318be015732')
+> -        img_tmp_xz =3D img + ".tmp.xz"
+> +        cimg =3D self._download_with_cache(self.link)
+>          img_tmp =3D img + ".tmp"
+> -        sys.stderr.write("Extracting the image...\n")
+> -        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
+> -        subprocess.check_call(["xz", "-dvf", img_tmp_xz])
+> +        iso =3D img + ".install.iso"
+> +
+> +        self.print_step("Preparing iso and disk image")
+> +        subprocess.check_call(["cp", "-f", cimg, iso])
+> +        subprocess.check_call(["qemu-img", "create", "-f", "qcow2",
+> +                               img_tmp, self.size])
+> +
+> +        self.print_step("Booting installer")
+> +        self.boot(img_tmp, extra_args =3D [
+> +            "-device", "VGA",
+> +            "-machine", "graphics=3Doff",
+> +            "-cdrom", iso
+> +        ])
+> +        self.console_init()
+> +        self.console_wait("Primary Bootstrap")
+> +
+> +        # serial console boot menu output doesn't work for some
+> +        # reason, so we have to fly blind ...
+> +        for char in list("5consdev com0\n"):
+> +            time.sleep(0.2)
+> +            self.console_send(char)
+> +            self.console_wait("")
+> +        self.console_wait_send("> ", "boot\n")
+> +
+> +        self.console_wait_send("Terminal type",            "xterm\n")
+> +        self.console_wait_send("a: Installation messages", "a\n")
+> +        self.console_wait_send("b: US-English",            "b\n")
+> +        self.console_wait_send("a: Install NetBSD",        "a\n")
+> +        self.console_wait("Shall we continue?")
+> +        self.console_wait_send("b: Yes",                   "b\n")
+> +
+> +        self.console_wait_send("a: ld0",                   "a\n")
+> +        self.console_wait_send("a: This is the correct",   "a\n")
+> +        self.console_wait_send("b: Use the entire disk",   "b\n")
+> +        self.console_wait("NetBSD bootcode")
+> +        self.console_wait_send("a: Yes",                   "a\n")
+> +        self.console_wait_send("b: Use existing part",     "b\n")
+> +        self.console_wait_send("x: Partition sizes ok",    "x\n")
+> +        self.console_wait_send("for your NetBSD disk",     "\n")
+> +        self.console_wait("Shall we continue?")
+> +        self.console_wait_send("b: Yes",                   "b\n")
+> +
+> +        self.console_wait_send("b: Use serial port com0",  "b\n")
+> +        self.console_wait_send("f: Set serial baud rate",  "f\n")
+> +        self.console_wait_send("a: 9600",                  "a\n")
+> +        self.console_wait_send("x: Exit",                  "x\n")
+> +
+> +        self.console_wait_send("a: Full installation",     "a\n")
+> +        self.console_wait_send("a: CD-ROM",                "a\n")
+> +
+> +        self.print_step("Installation started now, this will take a wh=
+ile")
+> +        self.console_wait_send("Hit enter to continue",    "\n")
+> +
+> +        self.console_wait_send("d: Change root password",  "d\n")
+> +        self.console_wait_send("a: Yes",                   "a\n")
+> +        self.console_wait("New password:")
+> +        self.console_send("%s\n" % self.ROOT_PASS)
+> +        self.console_wait("New password:")
+> +        self.console_send("%s\n" % self.ROOT_PASS)
+> +        self.console_wait("Retype new password:")
+> +        self.console_send("%s\n" % self.ROOT_PASS)
+> +
+> +        self.console_wait_send("o: Add a user",            "o\n")
+> +        self.console_wait("username")
+> +        self.console_send("%s\n" % self.GUEST_USER)
+> +        self.console_wait("to group wheel")
+> +        self.console_wait_send("a: Yes",                   "a\n")
+> +        self.console_wait_send("a: /bin/sh",               "a\n")
+> +        self.console_wait("New password:")
+> +        self.console_send("%s\n" % self.GUEST_PASS)
+> +        self.console_wait("New password:")
+> +        self.console_send("%s\n" % self.GUEST_PASS)
+> +        self.console_wait("Retype new password:")
+> +        self.console_send("%s\n" % self.GUEST_PASS)
+> +
+> +        self.console_wait_send("a: Configure network",     "a\n")
+> +        self.console_wait_send("a: vioif0",                "a\n")
+> +        self.console_wait_send("Network media type",       "\n")
+> +        self.console_wait("autoconfiguration")
+> +        self.console_wait_send("a: Yes",                   "a\n")
+> +        self.console_wait_send("DNS domain",               "localnet\n=
+")
+> +        self.console_wait("Are they OK?")
+> +        self.console_wait_send("a: Yes",                   "a\n")
+> +        self.console_wait("installed in /etc")
+> +        self.console_wait_send("a: Yes",                   "a\n")
+> +
+> +        self.console_wait_send("e: Enable install",        "e\n")
+> +        proxy =3D os.environ.get("http_proxy")
+> +        if not proxy is None:
+> +            self.console_wait_send("f: Proxy",             "f\n")
+> +            self.console_wait("Proxy")
+> +            self.console_send("%s\n" % proxy)
+> +        self.console_wait_send("x: Install pkgin",         "x\n")
+> +        self.console_init(1200)
+> +        self.console_wait_send("Hit enter to continue", "\n")
+> +        self.console_init()
+> +
+> +        self.console_wait_send("g: Enable sshd",           "g\n")
+> +        self.console_wait_send("x: Finished conf",         "x\n")
+> +        self.console_wait_send("Hit enter to continue",    "\n")
+> +
+> +        self.print_step("Installation finished, rebooting")
+> +        self.console_wait_send("d: Reboot the computer",   "d\n")
+> +
+> +        # setup qemu user
+> +        prompt =3D "localhost$"
+> +        self.console_ssh_init(prompt, self.GUEST_USER, self.GUEST_PASS=
+)
+> +        self.console_wait_send(prompt, "exit\n")
+> +
+> +        # setup root user
+> +        prompt =3D "localhost#"
+> +        self.console_ssh_init(prompt, "root", self.ROOT_PASS)
+> +        self.console_sshd_config(prompt)
+> +
+> +        # setup virtio-blk #1 (tarfile)
+> +        self.console_wait(prompt)
+> +        self.console_send("echo 'chmod 666 /dev/rld1a' >> /etc/rc.loca=
+l\n")
+> +
+> +        self.print_step("Configuration finished, rebooting")
+> +        self.console_wait_send(prompt, "reboot\n")
+> +        self.console_wait("login:")
+> +        self.wait_ssh()
+> +
+> +        self.print_step("Installing packages")
+> +        self.ssh_root_check("pkgin update\n")
+> +        self.ssh_root_check("pkgin -y install %s\n" % " ".join(self.pk=
+gs))
+> +
+> +        # shutdown
+> +        self.ssh_root("/sbin/poweroff")
+> +        self.console_wait("entering state S5")
+> +        self.wait()
+> +
+>          if os.path.exists(img):
+>              os.remove(img)
+>          os.rename(img_tmp, img)
+> +        os.remove(iso)
+> +        self.print_step("All done")
+> =20
+>  if __name__ =3D=3D "__main__":
+>      sys.exit(basevm.main(NetBSDVM))
 >=20
 
 
 
---Yil10c0523foGA5vRGKiX6fSx1iOpydXj
+--CV82An4uCpMv5m8lfgLKLPxJKTX9IpFs9
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlzTLFYMHG41NEBnbXgu
-Y29tAAoJEEuzCOmwLnZsa2MP/A7DwvME0D7EAW7ULRKhruhb53yhQLo5JFnsiTia
-kT43fiuVHaqL0d5cp7/NIMQaE6WOHURzTWnB6O9MdXSYck6bqEM5kODj6z/nFQ5q
-bYRd3bQgZGzkYF86wCN/sKudFdZK2cuTLE+gbTw72rLDKl/Y/9AsOPAkvgiVrdRQ
-HyA3M6A7lNm47NryMrhGmREN1ZuKDnm5LVEK8e1kdoJsWDOkapezs8KrRMxd+PD6
-36zGd3mW+S8tJggfQDM9w0jcBcBmKYpP5dh74OVfJOT5rIFxQWNTd4oOrbqTdFKm
-G9iIC8eN95he3Ig9GBeev8Lm0OX9K+26bxYLhcSPjPz+lIml7qPCpVGv0gZ3McHY
-IeITtQKNKzMWFOSXcCNxKFlemFplqI4OhUY7eAPGxqb87lDvzeYk6ncu/sm/6+Ur
-Ok5SBuSXNmx5PiLNY5cPu38K+aLk+Ansjo8bdwdPPuYqbOZW1q1OyuGXGSswErNr
-7Nw7BfpFLlPAZqVSZQicIzvGVUvHl+WDXgYpLwkYWCVNI1qLCZVZ3qxu4beelriI
-8ERJALwuE7TYr7LeV4YzJP5xynWIm6pfJNdkqs6acWu0b+6Grio4ODfWx6V8sY8j
-UpptzXUhfwGge2ptsPKYY14Qdp+acWDUL7rd95hy3pAfbix+UBKs29Gwdp36C47/
-1H5y
-=KKJv
+iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlzTLkoMHG41NEBnbXgu
+Y29tAAoJEEuzCOmwLnZstb4P+QEBuJFRzOls6RMZ0E5tXuq6yhEC685vOoLaUAIm
+Tl/xfORlYIi6vRmHla4JW04qx8YpQmBgkjRJQwHQMhfgLrSRwgt1QJ4xN4Q0CFAJ
+gmU+VENDLaDBehJoSprxroNJzjacmukNjttXJgN4uqVMk8e2dPYaKMxoTNqOTx2n
+rdEpvOAiLIs3YuZGIPOvZ1mgJ+NAPzDV8qOrQ7YrhJ/BLegfz2RfYlO9HFAp+eet
+hRpSVXTzTClYa1j5Cbb99lkzZ5HxxIPsc9ZqbZ2aVTQP2D75K/yA53OXRXZi/uPh
+sNWmJ3R3zHyzYXRX3kTXy5M36+MEq9+GGzNB6Y4PPJsdh/ZMCmVPUxrLaAwVdIGH
+RcQdtNS/pFOe7lvnq2FXJ5fWWvlhJHcnMzz9LaahjhEUtvw+nxF7ptcLKEMVLmTm
+/AWuuxLhBfEiqHHJWqqFAB6zdsjbLSIvsGNvW760+KzqhQQ2f6oRGw3s0CkQcuHU
+P2DuGsEDjBMSpSmmpNucRzW2CLNQUh8jVMI2/IA5Xiihu18y6QbDjd0OimAyp8mW
+/dSxz41lEpc3msY11Qn6MM5nQ15LQKdgxyMpzUlNhFJ5lxqDm/e8khaFtWwXFVmf
+lrP/VpYDVQstMNbwBc6Z9hOW944Pq7g8A1vCDTQKTxICduKGtT2q3NnwGpY3WdLq
+lZau
+=jm/4
 -----END PGP SIGNATURE-----
 
---Yil10c0523foGA5vRGKiX6fSx1iOpydXj--
+--CV82An4uCpMv5m8lfgLKLPxJKTX9IpFs9--
 
