@@ -6,73 +6,74 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B11E9C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 10:10:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79BA3C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 10:11:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86A1820578
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 10:10:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86A1820578
+	by mail.kernel.org (Postfix) with ESMTPS id 4B25720578
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 10:11:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B25720578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34242 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34252 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOJXG-00058S-MG
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 06:10:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54808)
+	id 1hOJYC-0006VF-K5
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 06:11:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hOJW2-0004TG-Oa
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 06:09:35 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hOJVs-0004N3-Lp
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 06:09:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hOJW1-0002Q4-Ec
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 06:09:34 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:54003)
+	(envelope-from <pbonzini@redhat.com>) id 1hOJVr-0002N1-NG
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 06:09:24 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:44037)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOJW0-0002PR-SB
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 06:09:33 -0400
-Received: by mail-wm1-f65.google.com with SMTP id 198so2499965wme.3
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 03:09:32 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOJVr-0002Mi-HP
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 06:09:23 -0400
+Received: by mail-wr1-f68.google.com with SMTP id c5so1166097wrs.11
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 03:09:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
 	:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=Zl/ag0j59R78ioltGC0oApLxj+x2SXVqFcJvsiVMx8k=;
-	b=D1mWKd+Dde2QrGFV0R98+bihOcGKWTM0fqbZlHGYGftjHaJiDf0zCRQBUmP9N6yae3
-	Ib44JF2WdTmO89nDFlx8wh5tyP8MGW7+/EX3U9nNtTDzM1I2fZiVIDFyQMn2xfKXfkWy
-	9K8pFNjq/tIT1CjvRkNwLfisFG/4euPhVXefZDvv4TM6L2UtW9O9LUTSmhN8dTtA6Oqy
-	iQcTKX6VLd18UvQzs8slRalZ0GnMb9hQuKQhrvTew6Vr7XZ6aKZK3K/Tk9Xgf1Ozde1m
-	YMGBsB9Fjfzq+GXxAV3EjljL/Sv4XV6VJ22lp1dVC0ipLkDxKoY6/l5egX6fWapnadG6
-	o5wg==
-X-Gm-Message-State: APjAAAXETjYE4ALRqz1tkG82zjkeMEYWlb2mEPAKb3+UeIRNWeuCkJRN
-	ceoMxXzs1xsZRXURo/OTyUl6Ow==
-X-Google-Smtp-Source: APXvYqwXXn3dHtOKTDBcV6KONfDZGcVgBjYQiZyxVKTqiqXA7MZVg3M2Q+U7W7NSRfbwhae6Ip9anA==
-X-Received: by 2002:a1c:14e:: with SMTP id 75mr2582745wmb.100.1557310171791;
-	Wed, 08 May 2019 03:09:31 -0700 (PDT)
+	bh=uLPywSGVG+l4McPe07txfigGD5Suwi+ILhFgnuGxY8g=;
+	b=LTQ5D0BfYXeVeYz7GZwMUha9u3E15o6RmFfnpi76t0t0renncDOx/msGTpjTsj6Tf6
+	zJEaA3DvnG6adJ4QMi0a6p3QH54RewSQb6yPUvQLL5Go7ka23236EEpJFZ9JysX4tX1m
+	QJBc/Ke6USnOepx2WdynAgA0fodU/1k0MTsDEWZiJbv0Z1Ey8SzWxQ8cudNR0fxAUbpt
+	CyVAcr2khEKixBEG5PvOXDo3YeVBpf+iC99a1Ebiaa+DvHUHrkKJMe1Mx0drvHyfPn5V
+	gkR5XDIws3HFodXEv1Hx/eLXO7M94+liQNY0iy3y+X17ZFU5JJNCQFTG0IH8PgZxoAd9
+	IZcg==
+X-Gm-Message-State: APjAAAX6loxrciK4WkoM+BgO/PMPUzZEEHAVFSnpT1Y3jzAUvx4RZ3uX
+	Qeh/61l2PvQ7KbYH2Ssxn7kXCw==
+X-Google-Smtp-Source: APXvYqxm30b6777EHbcJ0tky7+uRV6u0dEn/JorGe8uqag2jSWcHsO9KRAsBrgHhzgTkTvLHz2fgcA==
+X-Received: by 2002:a5d:4a87:: with SMTP id o7mr26127455wrq.207.1557310161988; 
+	Wed, 08 May 2019 03:09:21 -0700 (PDT)
 Received: from [10.201.49.229] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
-	by smtp.gmail.com with ESMTPSA id j4sm8379510wrw.94.2019.05.08.03.09.30
+	by smtp.gmail.com with ESMTPSA id
+	q4sm13049668wrx.25.2019.05.08.03.09.20
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 08 May 2019 03:09:31 -0700 (PDT)
+	Wed, 08 May 2019 03:09:21 -0700 (PDT)
 To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
 References: <20190508061523.17666-1-peterx@redhat.com>
-	<20190508061523.17666-4-peterx@redhat.com>
+	<20190508061523.17666-2-peterx@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ef78aa6a-0634-f479-72fb-364af13ab037@redhat.com>
-Date: Wed, 8 May 2019 12:09:30 +0200
+Message-ID: <5d642321-a485-ab75-7526-d81af2944afe@redhat.com>
+Date: Wed, 8 May 2019 12:09:20 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190508061523.17666-4-peterx@redhat.com>
+In-Reply-To: <20190508061523.17666-2-peterx@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH 03/11] memory: Don't set migration bitmap
- when without migration
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH 01/11] migration: No need to take rcu
+ during sync_dirty_bitmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,74 +93,59 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 08/05/19 01:15, Peter Xu wrote:
-> Similar to 9460dee4b2 ("memory: do not touch code dirty bitmap unless
-> TCG is enabled", 2015-06-05) but for the migration bitmap - we can
-> skip the MIGRATION bitmap update if migration not enabled.
+> cpu_physical_memory_sync_dirty_bitmap() has one RAMBlock* as
+> parameter, which means that it must be with RCU read lock held
+> already.  Taking it again inside seems redundant.  Removing it.
+> Instead comment on the functions about the RCU read lock.
 > 
 > Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  include/exec/memory.h   |  2 ++
->  include/exec/ram_addr.h | 12 +++++++++++-
->  memory.c                |  2 +-
->  3 files changed, 14 insertions(+), 2 deletions(-)
+>  include/exec/ram_addr.h | 5 +----
+>  migration/ram.c         | 1 +
+>  2 files changed, 2 insertions(+), 4 deletions(-)
 > 
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index e6140e8a04..f29300c54d 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -46,6 +46,8 @@
->          OBJECT_GET_CLASS(IOMMUMemoryRegionClass, (obj), \
->                           TYPE_IOMMU_MEMORY_REGION)
->  
-> +extern bool global_dirty_log;
-> +
->  typedef struct MemoryRegionOps MemoryRegionOps;
->  typedef struct MemoryRegionMmio MemoryRegionMmio;
->  
 > diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> index 993fb760f3..86bc8e1a4a 100644
+> index 139ad79390..993fb760f3 100644
 > --- a/include/exec/ram_addr.h
 > +++ b/include/exec/ram_addr.h
-> @@ -348,8 +348,13 @@ static inline void cpu_physical_memory_set_dirty_lebitmap(unsigned long *bitmap,
->              if (bitmap[k]) {
->                  unsigned long temp = leul_to_cpu(bitmap[k]);
+> @@ -408,6 +408,7 @@ static inline void cpu_physical_memory_clear_dirty_range(ram_addr_t start,
+>  }
 >  
-> -                atomic_or(&blocks[DIRTY_MEMORY_MIGRATION][idx][offset], temp);
->                  atomic_or(&blocks[DIRTY_MEMORY_VGA][idx][offset], temp);
-> +
-> +                if (global_dirty_log) {
-> +                    atomic_or(&blocks[DIRTY_MEMORY_MIGRATION][idx][offset],
-> +                              temp);
-> +                }
-> +
->                  if (tcg_enabled()) {
->                      atomic_or(&blocks[DIRTY_MEMORY_CODE][idx][offset], temp);
->                  }
-> @@ -366,6 +371,11 @@ static inline void cpu_physical_memory_set_dirty_lebitmap(unsigned long *bitmap,
->          xen_hvm_modified_memory(start, pages << TARGET_PAGE_BITS);
+>  
+> +/* Must be with rcu read lock held */
+>  static inline
+>  uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+>                                                 ram_addr_t start,
+> @@ -431,8 +432,6 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+>                                          DIRTY_MEMORY_BLOCK_SIZE);
+>          unsigned long page = BIT_WORD(start >> TARGET_PAGE_BITS);
+>  
+> -        rcu_read_lock();
+> -
+>          src = atomic_rcu_read(
+>                  &ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION])->blocks;
+>  
+> @@ -452,8 +451,6 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+>                  idx++;
+>              }
+>          }
+> -
+> -        rcu_read_unlock();
 >      } else {
->          uint8_t clients = tcg_enabled() ? DIRTY_CLIENTS_ALL : DIRTY_CLIENTS_NOCODE;
-> +
-> +        if (!global_dirty_log) {
-> +            clients &= ~(1 << DIRTY_MEMORY_MIGRATION);
-> +        }
-> +
->          /*
->           * bitmap-traveling is faster than memory-traveling (for addr...)
->           * especially when most of the memory is not dirty.
-> diff --git a/memory.c b/memory.c
-> index 0cce3a6fc5..1cc3531df5 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -38,7 +38,7 @@
->  static unsigned memory_region_transaction_depth;
->  static bool memory_region_update_pending;
->  static bool ioeventfd_update_pending;
-> -static bool global_dirty_log = false;
-> +bool global_dirty_log;
+>          ram_addr_t offset = rb->offset;
 >  
->  static QTAILQ_HEAD(, MemoryListener) memory_listeners
->      = QTAILQ_HEAD_INITIALIZER(memory_listeners);
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 1ca9ba77b6..3e11806ccd 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1680,6 +1680,7 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs,
+>      return ret;
+>  }
+>  
+> +/* Must be with rcu read lock held */
+>  static void migration_bitmap_sync_range(RAMState *rs, RAMBlock *rb,
+>                                          ram_addr_t start, ram_addr_t length)
+>  {
 > 
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
