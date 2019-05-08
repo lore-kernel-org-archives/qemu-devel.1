@@ -2,81 +2,80 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A18C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7362AC04AAB
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:20:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F17F221655
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:20:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F17F221655
+	by mail.kernel.org (Postfix) with ESMTPS id 4958D21530
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:20:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4958D21530
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35030 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35048 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOKcO-0008CG-1D
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 07:20:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37478)
+	id 1hOKcg-0008Q0-Dk
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 07:20:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hOKYd-0005ip-2P
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:16:20 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hOKao-0007Gb-LW
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:18:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hOKYb-0002jw-GZ
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:16:18 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:53177)
+	(envelope-from <pbonzini@redhat.com>) id 1hOKan-0004Nf-DM
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:18:34 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:38935)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOKYb-0002j6-7S
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:16:17 -0400
-Received: by mail-wm1-f68.google.com with SMTP id o25so2769085wmf.2
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 04:16:17 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOKan-0004N0-5s
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:18:33 -0400
+Received: by mail-wr1-f66.google.com with SMTP id v10so1440734wrt.6
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 04:18:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
 	:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=Eq7qSLyleWrNCHx4P4SRi3MKHGejKq3JrAmj3Wbb+Ss=;
-	b=WD9KajQgVKWAgIbmS8KJR6SVT82No5dychEtCZjQbwItuR/BJRBmGUzmrCfeJuSbb6
-	1TezWOdhSHeYNbP4DOJeLiE65El/HJ5lVpeCpQsYdMXWONLyoXdYQIlVZAygVEbSTMSR
-	LvxJI5Dkx/TEid+SfOaTgwIkbFhKX1C9AyQYUmJ6Akgkc3K0lu53IzXg0X93wXRcOlDB
-	xYf35YcDVB6AeRkSB3X6M7lJkhnwzcWnp8F2nda3KZdrYCB7GL8HSY4bMv4hHbEOp8te
-	R8Tb3xfLH/ZOvTr05wtlUtf7MsersPA1ypM+EMJtDfYNbMDG1SglnAj7AinMO5KQLkA0
-	QfwQ==
-X-Gm-Message-State: APjAAAV0GA/lybf6T1NDuIljUXsCNnCraZNjNfAZN0hlXExBCCKjuCT8
-	4+ZaLX1WqG28v/1ydt8T28gqlg==
-X-Google-Smtp-Source: APXvYqyc18QPrkT7qH66pLpTwTbbRMDPbNQl+e8l60uHIrDjuJ+m9zNhqZUVgk/zHPFsMRtxpRVEfA==
-X-Received: by 2002:a05:600c:2291:: with SMTP id
-	17mr2584957wmf.132.1557314176242; 
-	Wed, 08 May 2019 04:16:16 -0700 (PDT)
+	bh=xEKdl6jGihOoYEc/ymEI0k6WtSvqhaB/R5yGrQ99Ykg=;
+	b=DKqvgt+OOzjZ9sK1F0xBFA7u9n3gQRgR3QrB57ypyrIjl5J+9FXRnXogpWGaR3ump5
+	Y1oV46V01SOR6gtZoVT21n+vvFREHExfUeZe178XN5UpbNHZsGx4eHEAUb1rQ8KW4AsS
+	gvR0qIN7zTpqzz7wpzqf1eEQw3zyDoPgv+p9yyEFxLkzKmNQQkps9E1iIH2SEDVr0Q+3
+	SJQhdcZOysR364uUYlp3SIKJbAhlUdJpPbfyFlPEk0HXmXZdkEVDlwszWTtsh93+r6iZ
+	eCM+8sySRxGBcv8Pf31rvu7iMr8mWCv7KYhwxYCLfOZBGVnTYekATg0bpC8HGRbTK9zX
+	JTTg==
+X-Gm-Message-State: APjAAAV0B37DKRbxqVrOnPbVAwQHQT54VBD18kJqkqZ+7r3sm8ScKZS+
+	wNkgcl7U5ve6Cp9AemCEMYnDFQ==
+X-Google-Smtp-Source: APXvYqzPet6W6mi2VS6YAp1QvKKxu0Ti176HnXsVZUAa9zf9DfdxXpK6QUzVHXF+OhfXGzBQYYqKBw==
+X-Received: by 2002:a5d:4e4f:: with SMTP id r15mr12204152wrt.157.1557314312261;
+	Wed, 08 May 2019 04:18:32 -0700 (PDT)
 Received: from [10.201.49.229] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
 	by smtp.gmail.com with ESMTPSA id
-	o6sm35170410wrh.55.2019.05.08.04.16.14
+	g185sm1946153wmf.30.2019.05.08.04.18.28
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 08 May 2019 04:16:15 -0700 (PDT)
+	Wed, 08 May 2019 04:18:31 -0700 (PDT)
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
 	Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, 
 	qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 References: <20190507163416.24647-1-philmd@redhat.com>
-	<20190507163416.24647-11-philmd@redhat.com>
+	<20190507163416.24647-14-philmd@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f56c85c7-4045-ce26-4a44-8e6bc28a71e2@redhat.com>
-Date: Wed, 8 May 2019 13:16:13 +0200
+Message-ID: <1119aab7-8d35-a635-9b8f-9a066956079d@redhat.com>
+Date: Wed, 8 May 2019 13:18:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190507163416.24647-11-philmd@redhat.com>
+In-Reply-To: <20190507163416.24647-14-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH v2 10/16] hw/mips: Use
- object_initialize_child for correct reference counting
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH v2 13/16] hw/microblaze/zynqmp: Use
+ object_initialize_child for correct ref. counting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -119,7 +118,8 @@ On 07/05/19 11:34, Philippe Mathieu-Daudé wrote:
 >   Thus let's use now object_initialize_child() instead to get the
 >   reference counting here right.
 > 
-> This patch was generated using the following Coccinelle script:
+> This patch was generated using the following Coccinelle script
+> (then manually modified to use numbered IPI name)
 > 
 >  @use_sysbus_init_child_obj_missing_parent@
 >  expression child_ptr;
@@ -134,8 +134,7 @@ On 07/05/19 11:34, Philippe Mathieu-Daudé wrote:
 >  +   sysbus_init_child_obj(OBJECT(PARENT_OBJ), "CHILD_NAME", child_ptr,
 >  +                         child_size, child_type);
 > 
-> We let the Malta/Boston machines adopt the CPS child, and similarly
-> the CPS adopts the ITU/CPC/GIC/GCR children.
+> We let the SoC adopt the IPI children.
 > 
 > While the object_initialize() function doesn't take an
 > 'Error *errp' argument, the object_initialize_child() does.
@@ -159,93 +158,27 @@ On 07/05/19 11:34, Philippe Mathieu-Daudé wrote:
 > Inspired-by: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/mips/boston.c     |  4 ++--
->  hw/mips/cps.c        | 20 ++++++++------------
->  hw/mips/mips_malta.c |  4 ++--
->  3 files changed, 12 insertions(+), 16 deletions(-)
+>  hw/microblaze/xlnx-zynqmp-pmu.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 > 
-> diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-> index cb3ea85fdc1..1ffccc8da92 100644
-> --- a/hw/mips/boston.c
-> +++ b/hw/mips/boston.c
-> @@ -455,8 +455,8 @@ static void boston_mach_init(MachineState *machine)
+> diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
+> index 20e973edf5f..0948b1fd5f2 100644
+> --- a/hw/microblaze/xlnx-zynqmp-pmu.c
+> +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
+> @@ -71,9 +71,10 @@ static void xlnx_zynqmp_pmu_soc_init(Object *obj)
 >  
->      is_64b = cpu_supports_isa(machine->cpu_type, ISA_MIPS64);
->  
-> -    object_initialize(&s->cps, sizeof(s->cps), TYPE_MIPS_CPS);
-> -    qdev_set_parent_bus(DEVICE(&s->cps), sysbus_get_default());
-> +    sysbus_init_child_obj(OBJECT(machine), "cps", OBJECT(&s->cps),
-> +                          sizeof(s->cps), TYPE_MIPS_CPS);
->      object_property_set_str(OBJECT(&s->cps), machine->cpu_type, "cpu-type",
->                              &err);
->      object_property_set_int(OBJECT(&s->cps), smp_cpus, "num-vp", &err);
-> diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-> index fc97f59af4c..649b35a76c5 100644
-> --- a/hw/mips/cps.c
-> +++ b/hw/mips/cps.c
-> @@ -94,9 +94,8 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
->  
->      /* Inter-Thread Communication Unit */
->      if (itu_present) {
-> -        object_initialize(&s->itu, sizeof(s->itu), TYPE_MIPS_ITU);
-> -        qdev_set_parent_bus(DEVICE(&s->itu), sysbus_get_default());
-> -
-> +        sysbus_init_child_obj(OBJECT(dev), "itu", &s->itu, sizeof(s->itu),
-> +                              TYPE_MIPS_ITU);
->          object_property_set_int(OBJECT(&s->itu), 16, "num-fifo", &err);
->          object_property_set_int(OBJECT(&s->itu), 16, "num-semaphores", &err);
->          object_property_set_bool(OBJECT(&s->itu), saar_present, "saar-present",
-> @@ -115,9 +114,8 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
+>      /* Create the IPI device */
+>      for (int i = 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
+> -        object_initialize(&s->ipi[i], sizeof(XlnxZynqMPIPI),
+> -                          TYPE_XLNX_ZYNQMP_IPI);
+> -        qdev_set_parent_bus(DEVICE(&s->ipi[i]), sysbus_get_default());
+> +        char *name = g_strdup_printf("ipi%d", i);
+> +        sysbus_init_child_obj(obj, name, &s->ipi[i],
+> +                              sizeof(XlnxZynqMPIPI), TYPE_XLNX_ZYNQMP_IPI);
+> +        g_free(name);
 >      }
+>  }
 >  
->      /* Cluster Power Controller */
-> -    object_initialize(&s->cpc, sizeof(s->cpc), TYPE_MIPS_CPC);
-> -    qdev_set_parent_bus(DEVICE(&s->cpc), sysbus_get_default());
-> -
-> +    sysbus_init_child_obj(OBJECT(dev), "cpc", &s->cpc, sizeof(s->cpc),
-> +                          TYPE_MIPS_CPC);
->      object_property_set_int(OBJECT(&s->cpc), s->num_vp, "num-vp", &err);
->      object_property_set_int(OBJECT(&s->cpc), 1, "vp-start-running", &err);
->      object_property_set_bool(OBJECT(&s->cpc), true, "realized", &err);
-> @@ -130,9 +128,8 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
->                              sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->cpc), 0));
->  
->      /* Global Interrupt Controller */
-> -    object_initialize(&s->gic, sizeof(s->gic), TYPE_MIPS_GIC);
-> -    qdev_set_parent_bus(DEVICE(&s->gic), sysbus_get_default());
-> -
-> +    sysbus_init_child_obj(OBJECT(dev), "gic", &s->gic, sizeof(s->gic),
-> +                          TYPE_MIPS_GIC);
->      object_property_set_int(OBJECT(&s->gic), s->num_vp, "num-vp", &err);
->      object_property_set_int(OBJECT(&s->gic), 128, "num-irq", &err);
->      object_property_set_bool(OBJECT(&s->gic), true, "realized", &err);
-> @@ -147,9 +144,8 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
->      /* Global Configuration Registers */
->      gcr_base = env->CP0_CMGCRBase << 4;
->  
-> -    object_initialize(&s->gcr, sizeof(s->gcr), TYPE_MIPS_GCR);
-> -    qdev_set_parent_bus(DEVICE(&s->gcr), sysbus_get_default());
-> -
-> +    sysbus_init_child_obj(OBJECT(dev), "gcr", &s->gcr, sizeof(s->gcr),
-> +                          TYPE_MIPS_GCR);
->      object_property_set_int(OBJECT(&s->gcr), s->num_vp, "num-vp", &err);
->      object_property_set_int(OBJECT(&s->gcr), 0x800, "gcr-rev", &err);
->      object_property_set_int(OBJECT(&s->gcr), gcr_base, "gcr-base", &err);
-> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> index 04f2117d71e..aff8464f2ac 100644
-> --- a/hw/mips/mips_malta.c
-> +++ b/hw/mips/mips_malta.c
-> @@ -1151,8 +1151,8 @@ static void create_cps(MaltaState *s, const char *cpu_type,
->  {
->      Error *err = NULL;
->  
-> -    object_initialize(&s->cps, sizeof(s->cps), TYPE_MIPS_CPS);
-> -    qdev_set_parent_bus(DEVICE(&s->cps), sysbus_get_default());
-> +    sysbus_init_child_obj(OBJECT(s), "cps", OBJECT(&s->cps), sizeof(s->cps),
-> +                          TYPE_MIPS_CPS);
->      object_property_set_str(OBJECT(&s->cps), cpu_type, "cpu-type", &err);
->      object_property_set_int(OBJECT(&s->cps), smp_cpus, "num-vp", &err);
->      object_property_set_bool(OBJECT(&s->cps), true, "realized", &err);
 > 
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
