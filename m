@@ -2,47 +2,50 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 239CBC04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 12:41:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0595C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 12:44:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E733720449
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 12:41:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E733720449
+	by mail.kernel.org (Postfix) with ESMTPS id 5F45820644
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 12:44:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F45820644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36455 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36465 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOLtP-0005Qn-94
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 08:41:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53604)
+	id 1hOLvZ-0006Yw-Le
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 08:44:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hOLsU-0004q4-H3
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 08:40:55 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hOLuS-00060X-90
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 08:42:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hOLsT-0006SH-Fl
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 08:40:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49076)
+	(envelope-from <mreitz@redhat.com>) id 1hOLuR-0007aI-2g
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 08:42:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43208)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hOLsN-0006EX-8c; Wed, 08 May 2019 08:40:47 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	id 1hOLuK-0007Vj-Pe; Wed, 08 May 2019 08:42:49 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D9ADA821EF;
-	Wed,  8 May 2019 12:40:45 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A3F8C2D7EF;
+	Wed,  8 May 2019 12:42:47 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-94.brq.redhat.com
 	[10.40.204.94])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id F2F984502;
-	Wed,  8 May 2019 12:40:43 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>, Qemu-block <qemu-block@nongnu.org>
-References: <aac34cba-a184-f059-20f1-fb1e7e219d0b@redhat.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 253B6600D4;
+	Wed,  8 May 2019 12:42:45 +0000 (UTC)
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20190507183610.9848-1-mreitz@redhat.com>
+	<20190507183610.9848-2-mreitz@redhat.com>
+	<20190508090131.GA32552@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -69,23 +72,23 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
 	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
 	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
 	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <1a4339c6-b426-0972-246a-30494020751f@redhat.com>
-Date: Wed, 8 May 2019 14:40:41 +0200
+Message-ID: <0f76927d-9e7d-1735-0ec4-a934c2a003f9@redhat.com>
+Date: Wed, 8 May 2019 14:42:44 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <aac34cba-a184-f059-20f1-fb1e7e219d0b@redhat.com>
+In-Reply-To: <20190508090131.GA32552@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="HKVCRnktd3va6TvGpgop1b7yp8TnJsXe0"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+	boundary="TvwluoJ3RIhvanxkxSeHiabV2CdAvPVCT"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Wed, 08 May 2019 12:40:45 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.30]);
+	Wed, 08 May 2019 12:42:47 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] qemu iotest 192 does not clean up correctly
+Subject: Re: [Qemu-devel] [PATCH 1/5] qemu-nbd: Add --pid-file option
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,87 +100,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HKVCRnktd3va6TvGpgop1b7yp8TnJsXe0
+--TvwluoJ3RIhvanxkxSeHiabV2CdAvPVCT
 From: Max Reitz <mreitz@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, Qemu-block <qemu-block@nongnu.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, Fam Zheng <fam@euphon.net>
-Message-ID: <1a4339c6-b426-0972-246a-30494020751f@redhat.com>
-Subject: Re: qemu iotest 192 does not clean up correctly
-References: <aac34cba-a184-f059-20f1-fb1e7e219d0b@redhat.com>
-In-Reply-To: <aac34cba-a184-f059-20f1-fb1e7e219d0b@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <0f76927d-9e7d-1735-0ec4-a934c2a003f9@redhat.com>
+Subject: Re: [PATCH 1/5] qemu-nbd: Add --pid-file option
+References: <20190507183610.9848-1-mreitz@redhat.com>
+ <20190507183610.9848-2-mreitz@redhat.com> <20190508090131.GA32552@redhat.com>
+In-Reply-To: <20190508090131.GA32552@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08.05.19 10:14, Thomas Huth wrote:
->=20
-> I've ran into this failure today:
->=20
-> 140 0s ... - output mismatch (see 140.out.bad)
-> --- /home/thuth/devel/qemu/tests/qemu-iotests/140.out	2019-05-07 17:57:=
-08.000000000 +0200
-> +++ /home/thuth/tmp/qemu-build/tests/qemu-iotests/140.out.bad	2019-05-0=
-8 07:19:23.000000000 +0200
-> @@ -10,6 +10,8 @@
->  {"return": {}}
->  qemu-io: can't open device nbd+unix:///drv?socket=3DTEST_DIR/nbd: Requ=
-ested export not available
->  server reported: export 'drv' not present
-> +mkfifo: cannot create fifo '/home/thuth/tmp/qemu-build/tests/qemu-iote=
-sts/scratch/qmp-out-27628_0': File exists
-> +mkfifo: cannot create fifo '/home/thuth/tmp/qemu-build/tests/qemu-iote=
-sts/scratch/qmp-in-27628_0': File exists
->  {"return": {}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "ev=
-ent": "SHUTDOWN", "data": {"guest": false, "reason": "host-qmp-quit"}}
->  *** done
->=20
-> ... and indeed, there were lots of stale qmp-in-* and qmp-out-*
-> files in my scratch directory, ultimately causing the above failure
-> after a couple of days.
->=20
-> After some more testing, it seems like test 192 is not cleaning up
-> correctly:
->=20
-> $ ls scratch/
-> $ ./check -qcow2 192
-> [...]
-> 192 0s ...
-> Passed all 1 tests
-> $ ls scratch/
-> nbd  qemu-0.pid  qmp-in-8772_0  qmp-out-8772_0
->=20
-> Any ideas how to fix this in a clean way (e.g. simply add a
-> "rm -f scratch/..." at the end of the script) ?
+On 08.05.19 11:01, Daniel P. Berrang=C3=A9 wrote:
+> On Tue, May 07, 2019 at 08:36:06PM +0200, Max Reitz wrote:
+>> --fork is a bit boring if there is no way to get the child's PID.  Thi=
+s
+>> option helps.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  qemu-nbd.c    | 29 +++++++++++++++++++++++++++++
+>>  qemu-nbd.texi |  2 ++
+>>  2 files changed, 31 insertions(+)
+>>
+>> diff --git a/qemu-nbd.c b/qemu-nbd.c
+>> index dca9e72cee..7e48154f44 100644
+>> --- a/qemu-nbd.c
+>> +++ b/qemu-nbd.c
+>> @@ -59,6 +59,7 @@
+>>  #define QEMU_NBD_OPT_IMAGE_OPTS    262
+>>  #define QEMU_NBD_OPT_FORK          263
+>>  #define QEMU_NBD_OPT_TLSAUTHZ      264
+>> +#define QEMU_NBD_OPT_PID_FILE      265
+>> =20
+>>  #define MBR_SIZE 512
+>> =20
+>> @@ -111,6 +112,7 @@ static void usage(const char *name)
+>>  "                            specify tracing options\n"
+>>  "  --fork                    fork off the server process and exit the=
+ parent\n"
+>>  "                            once the server is running\n"
+>> +"  --pid-file=3DPATH           store the server's process ID in the g=
+iven file\n"
+>>  #if HAVE_NBD_DEVICE
+>>  "\n"
+>>  "Kernel NBD client support:\n"
+>> @@ -651,6 +653,7 @@ int main(int argc, char **argv)
+>>          { "image-opts", no_argument, NULL, QEMU_NBD_OPT_IMAGE_OPTS },=
 
-I think it=E2=80=99s just lacking a _cleanup_qemu.
+>>          { "trace", required_argument, NULL, 'T' },
+>>          { "fork", no_argument, NULL, QEMU_NBD_OPT_FORK },
+>> +        { "pid-file", required_argument, NULL, QEMU_NBD_OPT_PID_FILE =
+},
+>>          { NULL, 0, NULL, 0 }
+>>      };
+>>      int ch;
+>> @@ -677,6 +680,8 @@ int main(int argc, char **argv)
+>>      bool list =3D false;
+>>      int old_stderr =3D -1;
+>>      unsigned socket_activation;
+>> +    const char *pid_path =3D NULL;
+>> +    FILE *pid_file;
+>> =20
+>>      /* The client thread uses SIGTERM to interrupt the server.  A sig=
+nal
+>>       * handler ensures that "qemu-nbd -v -c" exits with a nice status=
+ code.
+>> @@ -876,6 +881,9 @@ int main(int argc, char **argv)
+>>          case 'L':
+>>              list =3D true;
+>>              break;
+>> +        case QEMU_NBD_OPT_PID_FILE:
+>> +            pid_path =3D optarg;
+>> +            break;
+>>          }
+>>      }
+>> =20
+>> @@ -1196,6 +1204,27 @@ int main(int argc, char **argv)
+>> =20
+>>      nbd_update_server_watch();
+>> =20
+>> +    if (pid_path) {
+>> +        pid_file =3D fopen(pid_path, "w");
+>> +        if (!pid_file) {
+>> +            error_report("Failed to store PID in %s: %s",
+>> +                         pid_path, strerror(errno));
+>> +            exit(EXIT_FAILURE);
+>> +        }
+>> +
+>> +        ret =3D fprintf(pid_file, "%ld", (long)getpid());
+>> +        if (ret < 0) {
+>> +            ret =3D -errno;
+>> +        }
+>> +        fclose(pid_file);
+>> +
+>> +        if (ret < 0) {
+>> +            error_report("Failed to store PID in %s: %s",
+>> +                         pid_path, strerror(-ret));
+>> +            exit(EXIT_FAILURE);
+>> +        }
+>> +    }
+>=20
+> This is racy because multiple qemu-nbd's can be started pointing to
+> the same pidfile and one will blindly overwrite the other.
+>=20
+> Please use  qemu_write_pidfile instead which acquires locks on the
+> pidfile in a race free manner.
+
+Ah, nice, that makes things better and easier. :-)
 
 Max
 
 
---HKVCRnktd3va6TvGpgop1b7yp8TnJsXe0
+--TvwluoJ3RIhvanxkxSeHiabV2CdAvPVCT
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzSzkkACgkQ9AfbAGHV
-z0A4xwf+OdcFbFWcFe5B+4TPJLLW1vlK2PTtUsds8+o6MJcGk20gV4/eTAHFhHNf
-+CvyEMiY8rcn0vBR6T01yOTAtIyrB6w9ZU53RuJgKdkLZItEQSmlw4K9+yQu6ozR
-jge+4YGMstKKt+nBss0qy8AMsawp0rZ0L/qKS9RNAmxT2fnErmVrZCDNbHgMEyAJ
-57yO3N16kmkLU17OfbErB1qfrK/jqNlP+DYloS1VbNM7wFdj/GDg0dWSCHaGmjii
-YWUfw3vMmB4xaJiQuBjgUtnQwVpmeKViFHDiuzZXKh/1lBVHRFu83NlNClpl1Hh9
-HNBMcfjw4eprmkoeCx3Wpf/iHB2sxw==
-=r0fA
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzSzsQACgkQ9AfbAGHV
+z0AVwQgAmHMTpKAEL+s3s0pefrUeT5o0nQSPitbRAp7neriq7ZoU2ylOlz/KEv2p
+l+gWzgUZHfmI4NvsRizkZ80jFLPUG2kU/x9p4cVQeqV01VoZ+5Qz6zxRLtrNzY9T
+/KqOVxNgCS/ypmK5GGsm6/srP96kS99k2QcXKjnxWG2scbpOWoA8JxMRnbego4Fh
+xtt17uBhtEO/T5Z6cwlDmBtm9niNVI00EQPjksa3jH5bf3KCKSELlfXMMxWtJKkR
+NrmimXLEY8VspHKbO6zbH6DnP58IaRxZ9uM/79NNhh0PQOIJKMMCXJyQduCyIk10
+hp8ago8g9QOXH8qq6TyHos41Dy+42g==
+=clV5
 -----END PGP SIGNATURE-----
 
---HKVCRnktd3va6TvGpgop1b7yp8TnJsXe0--
+--TvwluoJ3RIhvanxkxSeHiabV2CdAvPVCT--
 
