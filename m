@@ -6,57 +6,56 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 069A2C04A6B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1D5AC04AAD
 	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 18:30:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2F712175B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 18:30:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2F712175B
+	by mail.kernel.org (Postfix) with ESMTPS id BBCB62173C
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 18:30:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBCB62173C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41476 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41478 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hORKP-0007uS-46
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 14:30:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51382)
+	id 1hORKQ-0007v7-1H
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 14:30:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hORH2-0004vT-C7
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 14:26:37 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hORGZ-0004Sp-8W
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 14:26:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hORH1-0003ag-9O
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 14:26:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48040)
+	(envelope-from <mreitz@redhat.com>) id 1hORGX-00032F-A0
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 14:26:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36518)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hORGv-0003Gi-Ud; Wed, 08 May 2019 14:26:30 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	id 1hORGS-000302-Jy; Wed, 08 May 2019 14:26:00 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C5E2381F25;
-	Wed,  8 May 2019 18:26:19 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DEF093097063;
+	Wed,  8 May 2019 18:25:59 +0000 (UTC)
 Received: from localhost (ovpn-204-94.brq.redhat.com [10.40.204.94])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E548B600CC;
-	Wed,  8 May 2019 18:26:16 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 100B25DAAF;
+	Wed,  8 May 2019 18:25:56 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Wed,  8 May 2019 20:25:46 +0200
-Message-Id: <20190508182546.2239-8-mreitz@redhat.com>
+Date: Wed,  8 May 2019 20:25:41 +0200
+Message-Id: <20190508182546.2239-3-mreitz@redhat.com>
 In-Reply-To: <20190508182546.2239-1-mreitz@redhat.com>
 References: <20190508182546.2239-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Wed, 08 May 2019 18:26:19 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Wed, 08 May 2019 18:25:59 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 7/7] block: Ignore loosening perm
- restrictions failures
+Subject: [Qemu-devel] [PATCH v2 2/7] block: Add bdrv_child_refresh_perms()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,122 +73,88 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We generally assume that loosening permission restrictions can never
-fail.  We have seen in the past that this assumption is wrong.  This has
-led to crashes because we generally pass &error_abort when loosening
-permissions.
+If a block node uses bdrv_child_try_set_perm() to change the permission
+it takes on its child, the result may be very short-lived.  If anything
+makes the block layer recalculate the permissions internally, it will
+invoke the node driver's .bdrv_child_perm() implementation.  The
+permission/shared permissions masks that returns will then override the
+values previously passed to bdrv_child_try_set_perm().
 
-However, a failure in such a case should actually be handled in quite
-the opposite way: It is very much not fatal, so qemu may report it, but
-still consider the operation successful.  The only realistic problem is
-that qemu may then retain permissions and thus locks on images it
-actually does not require.  But again, that is not fatal.
-
-To implement this behavior, we make all functions that change
-permissions and that pass &error_abort to the initiating function
-(bdrv_check_perm() or bdrv_child_check_perm()) evaluate the
-@loosen_restrictions value introduced in the previous patch.  If it is
-true and an error did occur, we abort the permission update, report
-the error, and report success to the caller.
-
-bdrv_child_try_set_perm() itself does not pass &error_abort, but it is
-the only public function to change permissions.  As such, callers may
-pass &error_abort to it, expecting dropping permission restrictions to
-never fail.
+If drivers want a child edge to have specific values for the
+permissions/shared permissions mask, it must return them in
+.bdrv_child_perm().  Consequentially, there is no need for them to pass
+the same values to bdrv_child_try_set_perm() then: It is better to have
+a function that invokes .bdrv_child_perm() and calls
+bdrv_child_try_set_perm() with the result.  This patch adds such a
+function under the name of bdrv_child_refresh_perms().
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c | 40 ++++++++++++++++++++++++++++++++++------
- 1 file changed, 34 insertions(+), 6 deletions(-)
+ include/block/block_int.h | 15 +++++++++++++++
+ block.c                   | 12 ++++++++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/block.c b/block.c
-index 8f517be5b4..a5a03906d0 100644
---- a/block.c
-+++ b/block.c
-@@ -2088,11 +2088,20 @@ static void bdrv_child_abort_perm_update(BdrvChil=
-d *c)
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 94d45c9708..5522e58201 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -1184,9 +1184,24 @@ BdrvChild *bdrv_root_attach_child(BlockDriverState=
+ *child_bs,
+                                   void *opaque, Error **errp);
+ void bdrv_root_unref_child(BdrvChild *child);
+=20
++/**
++ * Sets a BdrvChild's permissions.  Avoid if the parent is a BDS; use
++ * bdrv_child_refresh_perms() instead and make the parent's
++ * .bdrv_child_perm() implementation return the correct values.
++ */
  int bdrv_child_try_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared=
 ,
-                             Error **errp)
- {
-+    Error *local_err =3D NULL;
-     int ret;
-+    bool tighten_restrictions;
+                             Error **errp);
 =20
--    ret =3D bdrv_child_check_perm(c, NULL, perm, shared, NULL, NULL, err=
-p);
-+    ret =3D bdrv_child_check_perm(c, NULL, perm, shared, NULL,
-+                                &tighten_restrictions, &local_err);
-     if (ret < 0) {
-         bdrv_child_abort_perm_update(c);
-+        if (tighten_restrictions) {
-+            error_propagate(errp, local_err);
-+        } else {
-+            warn_reportf_err(local_err, "Failed to loosen restrictions: =
-");
-+            ret =3D 0;
-+        }
-         return ret;
-     }
-=20
-@@ -2275,10 +2284,20 @@ static void bdrv_replace_child(BdrvChild *child, =
-BlockDriverState *new_bs)
-         /* Update permissions for old node. This is guaranteed to succee=
-d
-          * because we're just taking a parent away, so we're loosening
-          * restrictions. */
-+        bool tighten_restrictions;
-+        Error *local_err =3D NULL;
-+        int ret;
++/**
++ * Calls bs->drv->bdrv_child_perm() and updates the child's permission
++ * masks with the result.
++ * Drivers should invoke this function whenever an event occurs that
++ * makes their .bdrv_child_perm() implementation return different
++ * values than before, but which will not result in the block layer
++ * automatically refreshing the permissions.
++ */
++int bdrv_child_refresh_perms(BlockDriverState *bs, BdrvChild *c, Error *=
+*errp);
 +
-         bdrv_get_cumulative_perm(old_bs, &perm, &shared_perm);
--        bdrv_check_perm(old_bs, NULL, perm, shared_perm, NULL,
--                        NULL, &error_abort);
--        bdrv_set_perm(old_bs, perm, shared_perm);
-+        ret =3D bdrv_check_perm(old_bs, NULL, perm, shared_perm, NULL,
-+                              &tighten_restrictions, &local_err);
-+        assert(tighten_restrictions =3D=3D false);
-+        if (ret < 0) {
-+            warn_reportf_err(local_err, "Failed to loosen restrictions: =
-");
-+            bdrv_abort_perm_update(old_bs);
-+        } else {
-+            bdrv_set_perm(old_bs, perm, shared_perm);
-+        }
-     }
+ /* Default implementation for BlockDriver.bdrv_child_perm() that can be =
+used by
+  * block filters: Forward CONSISTENT_READ, WRITE, WRITE_UNCHANGED and RE=
+SIZE to
+  * all children */
+diff --git a/block.c b/block.c
+index 7778e0dd89..be11504940 100644
+--- a/block.c
++++ b/block.c
+@@ -2048,6 +2048,18 @@ int bdrv_child_try_set_perm(BdrvChild *c, uint64_t=
+ perm, uint64_t shared,
+     return 0;
  }
 =20
-@@ -5322,7 +5341,9 @@ static bool bdrv_has_bds_parent(BlockDriverState *b=
-s, bool only_active)
- static int bdrv_inactivate_recurse(BlockDriverState *bs)
- {
-     BdrvChild *child, *parent;
-+    bool tighten_restrictions;
-     uint64_t perm, shared_perm;
-+    Error *local_err =3D NULL;
-     int ret;
-=20
-     if (!bs->drv) {
-@@ -5358,8 +5379,15 @@ static int bdrv_inactivate_recurse(BlockDriverStat=
-e *bs)
-=20
-     /* Update permissions, they may differ for inactive nodes */
-     bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
--    bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, NULL, &error_abor=
-t);
--    bdrv_set_perm(bs, perm, shared_perm);
-+    ret =3D bdrv_check_perm(bs, NULL, perm, shared_perm, NULL,
-+                          &tighten_restrictions, &local_err);
-+    assert(tighten_restrictions =3D=3D false);
-+    if (ret < 0) {
-+        warn_reportf_err(local_err, "Failed to loosen restrictions: ");
-+        bdrv_abort_perm_update(bs);
-+    } else {
-+        bdrv_set_perm(bs, perm, shared_perm);
-+    }
-=20
-=20
-     /* Recursively inactivate children */
++int bdrv_child_refresh_perms(BlockDriverState *bs, BdrvChild *c, Error *=
+*errp)
++{
++    uint64_t parent_perms, parent_shared;
++    uint64_t perms, shared;
++
++    bdrv_get_cumulative_perm(bs, &parent_perms, &parent_shared);
++    bdrv_child_perm(bs, c->bs, c, c->role, NULL, parent_perms, parent_sh=
+ared,
++                    &perms, &shared);
++
++    return bdrv_child_try_set_perm(c, perms, shared, errp);
++}
++
+ void bdrv_filter_default_perms(BlockDriverState *bs, BdrvChild *c,
+                                const BdrvChildRole *role,
+                                BlockReopenQueue *reopen_queue,
 --=20
 2.20.1
 
