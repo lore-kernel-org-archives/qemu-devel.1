@@ -6,76 +6,76 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4923DC04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:11:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB361C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:11:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1ED8421530
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:11:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ED8421530
+	by mail.kernel.org (Postfix) with ESMTPS id 953C321655
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:11:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 953C321655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34912 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34914 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOKTt-0001nV-7E
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 07:11:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36126)
+	id 1hOKTx-0001wZ-Rc
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 07:11:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hOKSD-0000DE-ST
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:09:42 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hOKST-0000Mb-01
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:09:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hOKSC-0007bA-D1
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:09:41 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:38367)
+	(envelope-from <pbonzini@redhat.com>) id 1hOKSN-0007fg-F4
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:09:53 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:40179)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOKSC-0007aE-0p
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:09:40 -0400
-Received: by mail-wm1-f65.google.com with SMTP id f2so2722798wmj.3
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 04:09:38 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOKSN-0007eU-7i
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:09:51 -0400
+Received: by mail-wr1-f65.google.com with SMTP id h4so7383858wre.7
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 04:09:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
 	:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=wr0k0q7FKcI6IsoL0WjH9SOSxiIfGfF8JyhCKV2olgE=;
-	b=JbIu0EB0ucUuK5MERSHSdx8R8djVfJlcQ3oiNDb0wZTeMgZ8LU+dj1szWHyR4Kzfes
-	91dgGRANlvJGTk27IB30tbg9JUZeOOTf0ZK4esSBBWjNakiw62rDLGmdRG+IEph1DSLC
-	hvaOW+/p0oNXPEPHic3tXBu2SooHZR/sCsDBhi2gN/voE07FonEDq+7vYE/yiOsgD9nE
-	kM9Ens4Y5ESE8Xj9QafzUGkRR4lJtr6V8h6xhiTJKsfSV9TdHpB4EAJIoD1fsOV8I9By
-	HC3Enc+aOFUt0ltUdAnKY58Rw2VcCbAV93MStNOBH6S3nTDyat8QZZ2ZK/jNKol75iF1
-	2BMQ==
-X-Gm-Message-State: APjAAAVw8k5HgOLgFDI4oV2O5g44hJkZujomiK/lAoliBfrDpx+JMNYB
-	TG5vzceD+RHc9d1/1114d9RJxQ==
-X-Google-Smtp-Source: APXvYqxB6gHopXIN3NsqFEyy1Xj42EP8Pf6N7DkMibF7Tgfq/7m4fbRY+7Uc8OLtg7mOcpFFHy1gAQ==
-X-Received: by 2002:a1c:988b:: with SMTP id a133mr2036763wme.89.1557313777401; 
-	Wed, 08 May 2019 04:09:37 -0700 (PDT)
+	bh=kTeDAeJHTbTbhAf6Au5D/u+567YefQgAfLgDokL+9fI=;
+	b=pZP+aOH89IskoFvqrZMzxCWisb5FeVEIonoV9xsaVAt/jY1MDkhLyHV6oIrupzBxGN
+	aSJLuryMaE13WUXp5oJFK6CWk0k+YAJYi4AV3JAkz4YOe8TnqLml7P2jdduZTZ8IBnj+
+	FYwIjjsbaqwx3FdSFDwqsWosGHdhTTDaLzKjocBPsgDMAgK7ZsQp6vE4m2l0r8zDOTI5
+	AtYdQDlkRO9N2eOtgcJiF9yYFzAJL0zHOf18C8ANzaHrhxgaaIxxh92h3AezhO95CgIX
+	fkQDBEQeQ8Eq3fciwMYTi/xtcOqZh9myYwRM5uzxTUiK4+ywBrV2GH/Tb4kk6DTQ18QZ
+	9mcQ==
+X-Gm-Message-State: APjAAAW0Ezt2vQfbidWenXpUFExDaJEcWfBuRts6eKN6KTykvTy1HtOR
+	6weTFYCDwBok3fTAp+s1/13i8Q==
+X-Google-Smtp-Source: APXvYqxk+0VBIy2Pzdh7ma1eZSt8r6OtU4m8g37+swm1fS/axRwagKUoLQ5LszaUJkwfFVDIxkk62Q==
+X-Received: by 2002:a5d:4e46:: with SMTP id r6mr7888937wrt.290.1557313788236; 
+	Wed, 08 May 2019 04:09:48 -0700 (PDT)
 Received: from [10.201.49.229] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
 	by smtp.gmail.com with ESMTPSA id
-	b10sm2905437wme.25.2019.05.08.04.09.35
+	s10sm2224950wrt.66.2019.05.08.04.09.46
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 08 May 2019 04:09:36 -0700 (PDT)
+	Wed, 08 May 2019 04:09:47 -0700 (PDT)
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
 	Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, 
 	qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 References: <20190507163416.24647-1-philmd@redhat.com>
-	<20190507163416.24647-5-philmd@redhat.com>
+	<20190507163416.24647-6-philmd@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a261e867-ff96-d9f7-cf99-6f08e50b20f8@redhat.com>
-Date: Wed, 8 May 2019 13:09:34 +0200
+Message-ID: <b88c1846-5490-8468-dfd5-1c35ac6a640f@redhat.com>
+Date: Wed, 8 May 2019 13:09:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190507163416.24647-5-philmd@redhat.com>
+In-Reply-To: <20190507163416.24647-6-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH v2 04/16] hw/arm/bcm2835: Use TYPE_PL011
- instead of hardcoded string
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH v2 05/16] hw/arm/bcm2835: Use
+ object_initialize() on PL011State
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -108,37 +108,70 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 07/05/19 11:34, Philippe Mathieu-Daudé wrote:
+> To be coherent with the other peripherals contained in the
+> BCM2835PeripheralState structure, directly allocate the PL011State
+> (instead of using the pl011 uart as a pointer to a SysBusDevice).
+> 
+> Initialize the PL011State with object_initialize() instead of
+> object_new().
+> 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/arm/bcm2835_peripherals.c         | 2 +-
->  include/hw/arm/bcm2835_peripherals.h | 1 +
->  2 files changed, 2 insertions(+), 1 deletion(-)
+>  hw/arm/bcm2835_peripherals.c         | 14 +++++++-------
+>  include/hw/arm/bcm2835_peripherals.h |  2 +-
+>  2 files changed, 8 insertions(+), 8 deletions(-)
 > 
 > diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-> index 6be7660e8cb..7ffb51b6927 100644
+> index 7ffb51b6927..2931a82a25a 100644
 > --- a/hw/arm/bcm2835_peripherals.c
 > +++ b/hw/arm/bcm2835_peripherals.c
-> @@ -46,7 +46,7 @@ static void bcm2835_peripherals_init(Object *obj)
+> @@ -46,9 +46,9 @@ static void bcm2835_peripherals_init(Object *obj)
 >      qdev_set_parent_bus(DEVICE(&s->ic), sysbus_get_default());
 >  
 >      /* UART0 */
-> -    s->uart0 = SYS_BUS_DEVICE(object_new("pl011"));
-> +    s->uart0 = SYS_BUS_DEVICE(object_new(TYPE_PL011));
->      object_property_add_child(obj, "uart0", OBJECT(s->uart0), NULL);
->      qdev_set_parent_bus(DEVICE(s->uart0), sysbus_get_default());
+> -    s->uart0 = SYS_BUS_DEVICE(object_new(TYPE_PL011));
+> -    object_property_add_child(obj, "uart0", OBJECT(s->uart0), NULL);
+> -    qdev_set_parent_bus(DEVICE(s->uart0), sysbus_get_default());
+> +    object_initialize(&s->uart0, sizeof(s->uart0), TYPE_PL011);
+> +    object_property_add_child(obj, "uart0", OBJECT(&s->uart0), NULL);
+> +    qdev_set_parent_bus(DEVICE(&s->uart0), sysbus_get_default());
 >  
+>      /* AUX / UART1 */
+>      object_initialize(&s->aux, sizeof(s->aux), TYPE_BCM2835_AUX);
+> @@ -166,16 +166,16 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+>      sysbus_pass_irq(SYS_BUS_DEVICE(s), SYS_BUS_DEVICE(&s->ic));
+>  
+>      /* UART0 */
+> -    qdev_prop_set_chr(DEVICE(s->uart0), "chardev", serial_hd(0));
+> -    object_property_set_bool(OBJECT(s->uart0), true, "realized", &err);
+> +    qdev_prop_set_chr(DEVICE(&s->uart0), "chardev", serial_hd(0));
+> +    object_property_set_bool(OBJECT(&s->uart0), true, "realized", &err);
+>      if (err) {
+>          error_propagate(errp, err);
+>          return;
+>      }
+>  
+>      memory_region_add_subregion(&s->peri_mr, UART0_OFFSET,
+> -                                sysbus_mmio_get_region(s->uart0, 0));
+> -    sysbus_connect_irq(s->uart0, 0,
+> +                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->uart0), 0));
+> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->uart0), 0,
+>          qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
+>                                 INTERRUPT_UART));
+>      /* AUX / UART1 */
 > diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
-> index f5b193f6707..959508d57dd 100644
+> index 959508d57dd..e79c21771fe 100644
 > --- a/include/hw/arm/bcm2835_peripherals.h
 > +++ b/include/hw/arm/bcm2835_peripherals.h
-> @@ -13,6 +13,7 @@
+> @@ -38,7 +38,7 @@ typedef struct BCM2835PeripheralState {
+>      MemoryRegion ram_alias[4];
+>      qemu_irq irq, fiq;
 >  
->  #include "qemu-common.h"
->  #include "hw/sysbus.h"
-> +#include "hw/char/pl011.h"
->  #include "hw/char/bcm2835_aux.h"
->  #include "hw/display/bcm2835_fb.h"
->  #include "hw/dma/bcm2835_dma.h"
+> -    SysBusDevice *uart0;
+> +    PL011State uart0;
+>      BCM2835AuxState aux;
+>      BCM2835FBState fb;
+>      BCM2835DMAState dma;
 > 
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
