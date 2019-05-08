@@ -2,68 +2,79 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03ABEC04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 20:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57DD0C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 20:20:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE7E120578
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 20:19:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CF31204FD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 20:20:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs.org header.i=@ozlabs.org header.b="PDFacoS2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE7E120578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ozlabs.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tDrJLU0d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CF31204FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43342 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43387 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOT25-0003Sj-28
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 16:19:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47237)
+	id 1hOT3X-0004BC-B3
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 16:20:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton@ozlabs.org>) id 1hOT0q-0002sF-RT
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 16:18:02 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hOT2n-0003o7-9b
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 16:20:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton@ozlabs.org>) id 1hOT0p-0007z5-4j
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 16:18:00 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:54875 helo=ozlabs.org)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anton@ozlabs.org>)
-	id 1hOT0o-0007iJ-I9; Wed, 08 May 2019 16:17:59 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits)
-	server-digest SHA256) (No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 44znp62Wxhz9s9T;
-	Thu,  9 May 2019 06:17:34 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-	t=1557346656; bh=1ZUozj+aqczDyPmG/j2bjCpGDLuHpAdkAJnlA7qalhU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PDFacoS2X0UZL4tT67LxdOeBFcBpEZYoLmKq8wLgO5Rg9etUPBbwzqdvNsoP38hNp
-	9IrL0U7xhw6LjUeSGJfc0VtH5UhdTMEA+o6WFVNEhwe7ZQ6E3locAxIyh8xfLFytfx
-	uLMSzW52JbxinJmypPxb097E9KOH3ieSTwtYrZN150YCCSljGGLADiUwoKF9/4KrN/
-	VKnic537XwO9wsEZmMBLgioo9n0MJQB/o3OftAwnAfYJwlSjBs+VCuqYdRrxQRmGcJ
-	61ATKkob7gi3e1oCJf1ABf1tqQ4fu+F6eMacVhwTNa0vSeAxd/T40b+YbTXKiRpU7B
-	n302R/OSLbZqQ==
-Date: Thu, 9 May 2019 06:17:33 +1000
-From: Anton Blanchard <anton@ozlabs.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190509061713.69490488@kryten>
-In-Reply-To: <20190507052039.GF7073@umbus.fritz.box>
-References: <20190507004811.29968-1-anton@ozlabs.org>
-	<20190507004811.29968-2-anton@ozlabs.org>
-	<20190507052039.GF7073@umbus.fritz.box>
-X-Mailer: Mutt/1.8.0 (2017-02-23)
+	(envelope-from <alistair23@gmail.com>) id 1hOT2m-00017j-B4
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 16:20:01 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:44278)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hOT2m-00016z-1m; Wed, 08 May 2019 16:20:00 -0400
+Received: by mail-lf1-x143.google.com with SMTP id n134so13657097lfn.11;
+	Wed, 08 May 2019 13:19:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=c74To35lqowx86X4mBSQThqsM7IlN3Oz7o+zU1qHIgo=;
+	b=tDrJLU0diaxbaQXT/ik3EYBDTrhUljZ0kcB3F3lZrwzVNTzE41cEJe0DZU6t+KR8+S
+	yo9AMNQiRHEoR1bTsWd8szWCzS2PJluyQf99RgnW4RvNKJxVSrhG7cjkBdX0WqaR+1HZ
+	tlDeP9JbrifSbsvuWnSv+DkG2XaH8Lwrttwb9TMCd/ns/qz9HJQy0JcZHjYPqmqYahKU
+	JATpxq1/nVrFvajrGYXUVfN1CQPOpZ+rnwsn9x2aN80di3Rpp+rDbnFN5HLdheRYVLT9
+	Vde5dYOPG0JctAKsDX5ITLXJPivh9z0yGQN3W7ILEEsn3bHj2Vt+mcevshq89lx/2kVN
+	C3ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=c74To35lqowx86X4mBSQThqsM7IlN3Oz7o+zU1qHIgo=;
+	b=lz4VkgHRrpS6w4gnUKJI5mJt7Hg55h69iPc1pkdGNlOUltxxEpsiBIgtUA3tnD94ph
+	j4GfQJlpNzSA3E0H05ef3E9xoI2cB0xPN/DlH/XGVmQufNh3BmGnZnyN7q8m2cu1hSDy
+	NiXjskywqAXxzqFif+yQAiQCLg6JsFCTK6AspGPJuYWD3ppdGjH9+y3ldfFXjSj0neuJ
+	HqH9efezvzkG9wXYJjJiRhmKzqUZGTG11Fhjp9byAdYqC0NSFmYgV8PtAPsbGeJgcsNV
+	Q1f4DpfIrKfooaSrrG8daT3d2HIxastqdPcedVoDo09EIGMmSk/OjFTdcvVRE3SPkzaj
+	uQ4A==
+X-Gm-Message-State: APjAAAXDFStnpsb+Bq0n6V1S5HrBF8ES4rlZKz7VeX4gjGOlMWvLvpos
+	63ZgvJozVLN78T78S9x78RCObJB7mnEgC5RO1Z8=
+X-Google-Smtp-Source: APXvYqxieY1iSbmKY+cuNBhIHGpmHwseYZzZg7F4Qrc9EAJpR7yrxBjJd6KxteIuwXxxcVQSn9is1eiotZtAERIg0sA=
+X-Received: by 2002:ac2:523a:: with SMTP id i26mr37714lfl.118.1557346798224;
+	Wed, 08 May 2019 13:19:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PATCH v2] target/ppc: Fix xxspltib
+References: <20190508173835.14528-1-jonathan@fintelia.io>
+In-Reply-To: <20190508173835.14528-1-jonathan@fintelia.io>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 8 May 2019 13:17:53 -0700
+Message-ID: <CAKmqyKO-cWqxKCa0kZ=ivMmZn-0OK6ZVYk_BOM4M3ocRTGhKLw@mail.gmail.com>
+To: Jonathan Behrens <jonathan@fintelia.io>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::143
+Subject: Re: [Qemu-devel] [PATCH] target/riscv: Only flush TLB if SATP.ASID
+ changes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,45 +86,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ego@linux.vnet.ibm.com, sandipandas1990@gmail.com,
-	mark.cave-ayland@ilande.co.uk, richard.henderson@linaro.org,
-	qemu-devel@nongnu.org, f4bug@amsat.org, qemu-ppc@nongnu.org
+Cc: Palmer Dabbelt <palmer@sifive.com>,
+	"open list:RISC-V" <qemu-riscv@nongnu.org>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+	Sagar Karandikar <sagark@eecs.berkeley.edu>,
+	Jonathan Behrens <fintelia@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-xxspltib raises a VMX or a VSX exception depending on the register
-set it is operating on. We had a check, but it was backwards.
+On Wed, May 8, 2019 at 10:39 AM Jonathan Behrens <jonathan@fintelia.io> wrote:
+>
+> There is an analogous change for ARM here:
+> https://patchwork.kernel.org/patch/10649857
+>
+> Signed-off-by: Jonathan Behrens <jonathan@fintelia.io>
 
-Fixes: f113283525a4 ("target-ppc: add xxspltib instruction")
-Signed-off-by: Anton Blanchard <anton@ozlabs.org>
----
- target/ppc/translate/vsx-impl.inc.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index 4d8ca7cf32..4812a374aa 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -1355,13 +1355,13 @@ static void gen_xxspltib(DisasContext *ctx)
-     int rt = xT(ctx->opcode);
- 
-     if (rt < 32) {
--        if (unlikely(!ctx->altivec_enabled)) {
--            gen_exception(ctx, POWERPC_EXCP_VPU);
-+        if (unlikely(!ctx->vsx_enabled)) {
-+            gen_exception(ctx, POWERPC_EXCP_VSXU);
-             return;
-         }
-     } else {
--        if (unlikely(!ctx->vsx_enabled)) {
--            gen_exception(ctx, POWERPC_EXCP_VSXU);
-+        if (unlikely(!ctx->altivec_enabled)) {
-+            gen_exception(ctx, POWERPC_EXCP_VPU);
-             return;
-         }
-     }
--- 
-2.20.1
+Alistair
 
+> ---
+>  target/riscv/csr.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> index 6083c782a1..1ec1222da1 100644
+> --- a/target/riscv/csr.c
+> +++ b/target/riscv/csr.c
+> @@ -732,7 +732,9 @@ static int write_satp(CPURISCVState *env, int csrno, target_ulong val)
+>          if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
+>              return -1;
+>          } else {
+> -            tlb_flush(CPU(riscv_env_get_cpu(env)));
+> +            if((val ^ env->satp) & SATP_ASID) {
+> +                tlb_flush(CPU(riscv_env_get_cpu(env)));
+> +            }
+>              env->satp = val;
+>          }
+>      }
+> --
+> 2.20.1
+>
 
