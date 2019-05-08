@@ -6,69 +6,58 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70401C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 13:24:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98A8DC04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 13:24:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 426AA204EC
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 13:24:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 426AA204EC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6F0FD204EC
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 13:24:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F0FD204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37135 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37139 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOMYC-000567-Aw
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 09:24:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34563)
+	id 1hOMYP-0005PM-Hn
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 09:24:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hOMV8-00034H-V4
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 09:20:52 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hOMWb-00044j-4g
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 09:22:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hOMV7-0007gu-2z
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 09:20:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39176)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hOMV6-0007ay-R6
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 09:20:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hOMV4-0007gO-1j
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 13:20:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 089802E807C
-	for <qemu-devel@nongnu.org>; Wed,  8 May 2019 13:20:46 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1hOMWZ-00015y-8i
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 09:22:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59076)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hOMWT-000119-JT; Wed, 08 May 2019 09:22:14 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F3763369C4;
+	Wed,  8 May 2019 13:22:11 +0000 (UTC)
+Received: from localhost (ovpn-204-94.brq.redhat.com [10.40.204.94])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B5AF10027D5;
+	Wed,  8 May 2019 13:22:11 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Wed,  8 May 2019 15:22:04 +0200
+Message-Id: <20190508132209.17707-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.30]);
+	Wed, 08 May 2019 13:22:12 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 08 May 2019 13:08:55 -0000
-From: Daniel Berrange <1828207@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: feature-request
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange rawlik
-X-Launchpad-Bug-Reporter: Druta Pavel (rawlik)
-X-Launchpad-Bug-Modifier: Daniel Berrange (berrange)
-References: <155731026034.22594.3160504765111033354.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155732093601.13635.15801388089086899054.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18958";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 7c99dbd9191883b7e100859573d6b5e121526515
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1828207] Re: Request to add something like "Auth
- failed from IP" log report for built-in VNC server
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 0/5] iotests: Let 233 run concurrently
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,52 +66,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1828207 <1828207@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Note that any use of the built-in VNC-auth scheme is always considered a
-security flaw. It should essentially never be used, especially not on
-any public internet facing service, even if fail2ban were able to be
-used.
+Currently, 233 cannot reliably run concurrently to other NBD TCP tests.
+When it starts, it looks for a free port and then attempts to use that
+for the whole duration of the test run.  This is a TOCTTOU race
+condition: It does not reserve that port, so another NBD TCP test that
+runs in parallel can grab it.
 
-A secure VNC server should use the VeNCrypt extension which enables TLS,
-with optional client certificate validation as an auth mechanism.  Once
-you have TLS enabled, you can also then enable the SASL auth mechanism
-to further authenticate clients using Kerberos or PAM, or other SASL
-plugins.
+To fix this, we must not use the same port all the time, but always
+choose a new one when qemu-nbd is started.  We cannot check whether it
+is free, but must let qemu-nbd do so and take it atomically.  We can
+achieve this by using the existing --fork option.
 
-That's not to say we shouldn't emit a log message, suitable for
-consuming from fail2ban, as remote clients can still trigger a CPU
-denial of service by repeatedly connecting even if they ultimately
-always fail authentication.
+There are two problems with --fork, however.  First, it does not give us
+a chance to reliably get the server=E2=80=99s PID, which we need.  We can=
+ change
+that by letting qemu-nbd (optionally) write a PID file, though.  (Which
+makes sense if we have a daemon mode.)
 
--- =
+Second, it currently discards all output after the server has been
+started.  That looks like an accident to me, because we clearly try to
+restore the old stderr channel after having redirected all startup
+messages to the parent process.  If it is a bug, we can fix it.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1828207
 
-Title:
-  Request to add something like "Auth failed from IP" log report for
-  built-in VNC server
+v2:
+- Patch 1:
+  - Use qemu_write_pidfile() [Dan]
+  - %s/pid_path/pid_filename/ [Eric]
+- Patch 4: Drop the now superfluous subshell [Eric]
+  (Didn=E2=80=99t touch _qemu_img_wrapper, because, well, it doesn=E2=80=99=
+t belong in
+  this series?)
+- Patch 5:
+  - s/racey/racy/ [Eric]
+  - Unite the =E2=80=9Crm -f=E2=80=9Ds [Eric]
+  (Did not address the =E2=80=9CFIFO filling up=E2=80=9D problem, because=
+ 64 kB of FIFO
+  space ought to be enough.  Also, cat-ing around that felt weird.)
 
-Status in QEMU:
-  New
 
-Bug description:
-  In environment with needs of public accessible VNC ports there is no logs=
- or other registered events about authentication failures to analyze and/or=
- integrate it to automated services like fail2ban ans so on.
-  Thus the built-in VNC service is vulnerable to brutforce attacks and in c=
-ombination with weak built-in VNC-auth scheme can be a security vulnerabili=
-ty.
+git backport-diff against v1:
 
-  Adding a simple log record like "QEMU VNC Authentication failed
-  192.168.0.5:5902 - 123.45.67.89:7898" will permit to quickly integrate
-  it to fail2ban system.
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream pat=
+ch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1828207/+subscriptions
+001/5:[0025] [FC] 'qemu-nbd: Add --pid-file option'
+002/5:[----] [--] 'iotests.py: Add qemu_nbd_early_pipe()'
+003/5:[----] [--] 'qemu-nbd: Do not close stderr'
+004/5:[0006] [FC] 'iotests: Use qemu-nbd's --pid-file'
+005/5:[0003] [FC] 'iotests: Let 233 run concurrently'
+
+
+Max Reitz (5):
+  qemu-nbd: Add --pid-file option
+  iotests.py: Add qemu_nbd_early_pipe()
+  qemu-nbd: Do not close stderr
+  iotests: Use qemu-nbd's --pid-file
+  iotests: Let 233 run concurrently
+
+ qemu-nbd.c                    | 15 +++++-
+ qemu-nbd.texi                 |  2 +
+ tests/qemu-iotests/147        |  4 +-
+ tests/qemu-iotests/233        |  1 -
+ tests/qemu-iotests/common.nbd | 94 ++++++++++++++++-------------------
+ tests/qemu-iotests/common.rc  |  6 +--
+ tests/qemu-iotests/iotests.py |  9 ++--
+ 7 files changed, 68 insertions(+), 63 deletions(-)
+
+--=20
+2.20.1
+
 
