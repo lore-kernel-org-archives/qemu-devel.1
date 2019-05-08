@@ -2,61 +2,64 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A0CDC46460
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:04:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D431DC04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:05:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E6E6214C6
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:04:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E6E6214C6
+	by mail.kernel.org (Postfix) with ESMTPS id A8F53214C6
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 09:05:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8F53214C6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33500 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33504 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOIUq-0005V5-HB
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 05:04:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42116)
+	id 1hOIVp-0006EA-Ue
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 05:05:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hOINl-0007Yf-NI
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:56:58 -0400
+	(envelope-from <berrange@redhat.com>) id 1hOISO-0003ug-Ia
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:01:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hOINk-0002xr-2y
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:56:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42376)
+	(envelope-from <berrange@redhat.com>) id 1hOISM-0006dw-Iu
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 05:01:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48420)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hOINj-0002wO-PQ
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:56:55 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>)
+	id 1hOISG-0006Z9-QA; Wed, 08 May 2019 05:01:37 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F4112C0586D8;
-	Wed,  8 May 2019 08:56:54 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-45.ams2.redhat.com
-	[10.36.116.45])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1924560C70;
-	Wed,  8 May 2019 08:56:52 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id F2FE0A1EA; Wed,  8 May 2019 10:56:45 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed,  8 May 2019 10:56:40 +0200
-Message-Id: <20190508085645.11595-9-kraxel@redhat.com>
-In-Reply-To: <20190508085645.11595-1-kraxel@redhat.com>
-References: <20190508085645.11595-1-kraxel@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 805383084213;
+	Wed,  8 May 2019 09:01:35 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.22.189])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2160260C6A;
+	Wed,  8 May 2019 09:01:33 +0000 (UTC)
+Date: Wed, 8 May 2019 10:01:31 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190508090131.GA32552@redhat.com>
+References: <20190507183610.9848-1-mreitz@redhat.com>
+	<20190507183610.9848-2-mreitz@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190507183610.9848-2-mreitz@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Wed, 08 May 2019 08:56:55 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Wed, 08 May 2019 09:01:35 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 08/13] tests/vm: serial console support helpers
+Subject: Re: [Qemu-devel] [PATCH 1/5] qemu-nbd: Add --pid-file option
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,142 +71,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a bunch of helpers to talk to the guest using the
-serial console.
+On Tue, May 07, 2019 at 08:36:06PM +0200, Max Reitz wrote:
+> --fork is a bit boring if there is no way to get the child's PID.  This
+> option helps.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  qemu-nbd.c    | 29 +++++++++++++++++++++++++++++
+>  qemu-nbd.texi |  2 ++
+>  2 files changed, 31 insertions(+)
+> 
+> diff --git a/qemu-nbd.c b/qemu-nbd.c
+> index dca9e72cee..7e48154f44 100644
+> --- a/qemu-nbd.c
+> +++ b/qemu-nbd.c
+> @@ -59,6 +59,7 @@
+>  #define QEMU_NBD_OPT_IMAGE_OPTS    262
+>  #define QEMU_NBD_OPT_FORK          263
+>  #define QEMU_NBD_OPT_TLSAUTHZ      264
+> +#define QEMU_NBD_OPT_PID_FILE      265
+>  
+>  #define MBR_SIZE 512
+>  
+> @@ -111,6 +112,7 @@ static void usage(const char *name)
+>  "                            specify tracing options\n"
+>  "  --fork                    fork off the server process and exit the parent\n"
+>  "                            once the server is running\n"
+> +"  --pid-file=PATH           store the server's process ID in the given file\n"
+>  #if HAVE_NBD_DEVICE
+>  "\n"
+>  "Kernel NBD client support:\n"
+> @@ -651,6 +653,7 @@ int main(int argc, char **argv)
+>          { "image-opts", no_argument, NULL, QEMU_NBD_OPT_IMAGE_OPTS },
+>          { "trace", required_argument, NULL, 'T' },
+>          { "fork", no_argument, NULL, QEMU_NBD_OPT_FORK },
+> +        { "pid-file", required_argument, NULL, QEMU_NBD_OPT_PID_FILE },
+>          { NULL, 0, NULL, 0 }
+>      };
+>      int ch;
+> @@ -677,6 +680,8 @@ int main(int argc, char **argv)
+>      bool list = false;
+>      int old_stderr = -1;
+>      unsigned socket_activation;
+> +    const char *pid_path = NULL;
+> +    FILE *pid_file;
+>  
+>      /* The client thread uses SIGTERM to interrupt the server.  A signal
+>       * handler ensures that "qemu-nbd -v -c" exits with a nice status code.
+> @@ -876,6 +881,9 @@ int main(int argc, char **argv)
+>          case 'L':
+>              list = true;
+>              break;
+> +        case QEMU_NBD_OPT_PID_FILE:
+> +            pid_path = optarg;
+> +            break;
+>          }
+>      }
+>  
+> @@ -1196,6 +1204,27 @@ int main(int argc, char **argv)
+>  
+>      nbd_update_server_watch();
+>  
+> +    if (pid_path) {
+> +        pid_file = fopen(pid_path, "w");
+> +        if (!pid_file) {
+> +            error_report("Failed to store PID in %s: %s",
+> +                         pid_path, strerror(errno));
+> +            exit(EXIT_FAILURE);
+> +        }
+> +
+> +        ret = fprintf(pid_file, "%ld", (long)getpid());
+> +        if (ret < 0) {
+> +            ret = -errno;
+> +        }
+> +        fclose(pid_file);
+> +
+> +        if (ret < 0) {
+> +            error_report("Failed to store PID in %s: %s",
+> +                         pid_path, strerror(-ret));
+> +            exit(EXIT_FAILURE);
+> +        }
+> +    }
 
-Also drop the hard-coded -serial parameter for the vm
-so QEMUMachine.set_console() actually works.
+This is racy because multiple qemu-nbd's can be started pointing to
+the same pidfile and one will blindly overwrite the other.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- tests/vm/basevm.py | 82 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 80 insertions(+), 2 deletions(-)
+Please use  qemu_write_pidfile instead which acquires locks on the
+pidfile in a race free manner.
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 9c6bb317ac89..a27d2c72f5f5 100755
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -13,7 +13,9 @@
- 
- from __future__ import print_function
- import os
-+import re
- import sys
-+import socket
- import logging
- import time
- import datetime
-@@ -91,8 +93,7 @@ class BaseVM(object):
-             "-cpu", "max",
-             "-netdev", "user,id=vnet,hostfwd=:127.0.0.1:0-:22",
-             "-device", "virtio-net-pci,netdev=vnet",
--            "-vnc", "127.0.0.1:0,to=20",
--            "-serial", "file:%s" % os.path.join(self._tmpdir, "serial.out")]
-+            "-vnc", "127.0.0.1:0,to=20"]
-         if vcpus and vcpus > 1:
-             self._args += ["-smp", str(vcpus)]
-         if kvm_available(self.arch):
-@@ -173,6 +174,8 @@ class BaseVM(object):
-         logging.debug("QEMU args: %s", " ".join(args))
-         qemu_bin = os.environ.get("QEMU", "qemu-system-" + self.arch)
-         guest = QEMUMachine(binary=qemu_bin, args=args)
-+        guest.set_machine('pc')
-+        guest.set_console()
-         try:
-             guest.launch()
-         except:
-@@ -195,6 +198,81 @@ class BaseVM(object):
-             raise Exception("Cannot find ssh port from 'info usernet':\n%s" % \
-                             usernet_info)
- 
-+    def console_init(self, timeout = 120):
-+        vm = self._guest
-+        vm.console_socket.settimeout(timeout)
-+
-+    def console_log(self, text):
-+        for line in re.split("[\r\n]", text):
-+            # filter out terminal escape sequences
-+            line = re.sub("\x1b\[[0-9;?]*[a-zA-Z]", "", line)
-+            line = re.sub("\x1b\([0-9;?]*[a-zA-Z]", "", line)
-+            # replace unprintable chars
-+            line = re.sub("\x1b", "<esc>", line)
-+            line = re.sub("[\x00-\x1f]", ".", line)
-+            if line == "":
-+                continue
-+            # log console line
-+            sys.stderr.write("con recv: %s\n" % line)
-+
-+    def console_wait(self, expect):
-+        vm = self._guest
-+        output = ""
-+        while True:
-+            try:
-+                chars = vm.console_socket.recv(1024)
-+            except socket.timeout:
-+                sys.stderr.write("console: *** read timeout ***\n")
-+                sys.stderr.write("console: waiting for: '%s'\n" % expect)
-+                sys.stderr.write("console: line buffer:\n")
-+                sys.stderr.write("\n")
-+                self.console_log(output.rstrip())
-+                sys.stderr.write("\n")
-+                raise
-+            output += chars
-+            if expect in output:
-+                break
-+            if "\r" in output or "\n" in output:
-+                lines = re.split("[\r\n]", output)
-+                output = lines.pop()
-+                if self.debug:
-+                    self.console_log("\n".join(lines))
-+        if self.debug:
-+            self.console_log(output)
-+
-+    def console_send(self, command):
-+        vm = self._guest
-+        if self.debug:
-+            logline = re.sub("\n", "<enter>", command)
-+            logline = re.sub("[\x00-\x1f]", ".", logline)
-+            sys.stderr.write("con send: %s\n" % logline)
-+        for char in list(command):
-+            vm.console_socket.send(char)
-+            time.sleep(0.01)
-+
-+    def console_wait_send(self, wait, command):
-+        self.console_wait(wait)
-+        self.console_send(command)
-+
-+    def console_ssh_init(self, prompt, user, pw):
-+        sshkey_cmd = "echo '%s' > .ssh/authorized_keys\n" % SSH_PUB_KEY.rstrip()
-+        self.console_wait_send("login:",    "%s\n" % user)
-+        self.console_wait_send("Password:", "%s\n" % pw)
-+        self.console_wait_send(prompt,      "mkdir .ssh\n")
-+        self.console_wait_send(prompt,      sshkey_cmd)
-+        self.console_wait_send(prompt,      "chmod 755 .ssh\n")
-+        self.console_wait_send(prompt,      "chmod 644 .ssh/authorized_keys\n")
-+
-+    def console_sshd_config(self, prompt):
-+        self.console_wait(prompt)
-+        self.console_send("echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config\n")
-+        for var in self.envvars:
-+            self.console_wait(prompt)
-+            self.console_send("echo 'AcceptEnv %s' >> /etc/ssh/sshd_config\n" % var)
-+
-+    def print_step(self, text):
-+        sys.stderr.write("### %s ...\n" % text)
-+
-     def wait_ssh(self, seconds=300):
-         starttime = datetime.datetime.now()
-         endtime = starttime + datetime.timedelta(seconds=seconds)
+
+Regards,
+Daniel
 -- 
-2.18.1
-
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
