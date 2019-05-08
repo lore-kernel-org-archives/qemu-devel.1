@@ -2,110 +2,67 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6524AC04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 08:29:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDA7C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 08:35:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 386F92053B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 08:29:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 386F92053B
+	by mail.kernel.org (Postfix) with ESMTPS id 245922053B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 08:35:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 245922053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33135 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33214 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOHwp-0007Af-G6
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 04:29:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37757)
+	id 1hOI3O-0008P6-Cy
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 04:35:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOHvq-0006ho-Tv
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:28:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1hOI2K-0007sV-Dh
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:34:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOHvp-0002q1-WE
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:28:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51984)
+	(envelope-from <armbru@redhat.com>) id 1hOI2J-0006UF-6X
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:34:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40310)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hOHvp-0002pg-OV
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:28:05 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hOI2I-0006Tl-VO
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 04:34:47 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0E2912D7E6;
-	Wed,  8 May 2019 08:28:05 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-100.ams2.redhat.com [10.36.116.100])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 27D515EDE4;
-	Wed,  8 May 2019 08:28:03 +0000 (UTC)
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-References: <155721868351.451636.16735088470797960209.stgit@bahia.lan>
-	<155721870044.451636.8272207759150286399.stgit@bahia.lan>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <856d5954-7198-2b72-df90-12de16813761@redhat.com>
-Date: Wed, 8 May 2019 10:28:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 15F86308A953;
+	Wed,  8 May 2019 08:34:46 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
+	[10.36.116.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 97C1B5D9D6;
+	Wed,  8 May 2019 08:34:45 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 1911D1132B35; Wed,  8 May 2019 10:34:44 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20190419061429.17695-1-ehabkost@redhat.com>
+	<87ftprre87.fsf@dusky.pond.sub.org>
+	<20190506195321.GB28722@habkost.net>
+Date: Wed, 08 May 2019 10:34:44 +0200
+In-Reply-To: <20190506195321.GB28722@habkost.net> (Eduardo Habkost's message
+	of "Mon, 6 May 2019 16:53:21 -0300")
+Message-ID: <877eb173a3.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <155721870044.451636.8272207759150286399.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Wed, 08 May 2019 08:28:05 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Wed, 08 May 2019 08:34:46 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/6] fsdev: Move some types definition to
- qemu-fsdev.c
+Subject: Re: [Qemu-devel] [PATCH 0/7] Delete 16 *_cpu_class_by_name()
+ functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -117,25 +74,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/05/2019 10.45, Greg Kurz wrote:
-> It would make sense for these types to be defined in a header file if
-> we had an API for fsdrivers to register themselves. In practice, we
-> only have three of them and it is very unlikely we add new ones since
-> the future of file sharing between host and guest is the upcoming
-> virtio-fs.
-> 
-> Move the types to qemu-fsdev.c instead since they are only used there.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  fsdev/qemu-fsdev.c |   23 +++++++++++++++++++++++
->  fsdev/qemu-fsdev.h |   24 ------------------------
->  2 files changed, 23 insertions(+), 24 deletions(-)
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+> On Mon, May 06, 2019 at 01:53:28PM +0200, Markus Armbruster wrote:
+>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> 
+>> > This series adds a new CPUClass::class_name_format field, which
+>> > allows us to delete 16 of the 21 *_cpu_class_by_name() functions
+>> > that exist today.
+>> 
+>> Which five remain, and why?
+>
+> alpha_cpu_class_by_name:
+> * Translates aliases based on alpha_cpu_aliases;
+> * Falls back to "ev67" unconditionally
+>   (there's a "TODO: remove match everything nonsense" comment).
+>
+> cris_cpu_class_by_name:
+> * Translates "any" alias to "crisv32" if CONFIG_USER_ONLY.
+>
+> ppc_cpu_class_by_name:
+> * Supports lookup by PVR if CPU model is a 8 digit hex number;
+> * Converts CPU model to lowercase.
+>
+> superh_cpu_class_by_name:
+> * Translates "any" alias to TYPE_SH7750R_CPU.
+>
+> sparc_cpu_class_by_name:
+> * Replaces whitespaces with '-' on CPU model name.
+
+I'm of course asking because I wonder whether we can dumb down this CPU
+naming business to something simpler and more regular.
+
+Let's review what we have.
+
+For all <TARGET> in target/*:
+
+* arm i386 lm32 m68k mips moxie openrisc riscv s390x s390x tricore
+  unicore32 xtensa
+
+  CPU type name format is <TARGET>_CPU_TYPE_NAME("%s"), which boils down
+  to:
+
+  - arm lm32 m68k moxie riscv s390x tricore unicore32 xtensa
+    "%s-<TARGET>-cpu"
+
+  - openrisc
+    "%s-or1k-cpu"
+
+  - i386
+    "%s-x86_64-cpu" #ifdef TARGET_X86_64
+    "%s-i386-cpu" #else
+
+  - mips
+    "%s-mips64-cpu" #ifdef TARGET_MIPS64
+    "%s-mips-cpu" #else
+
+  The %s gets replaced by the user's cpu model.
+
+* hppa microblaze nios2 tilegx
+
+  CPU type name format is <TARGET>-cpu.  The user's cpu model seems
+  silently ignored.
+
+* alpha cris ppc sh4 sparc
+
+  No format, using ->class_by_name()
+
+  - alpha
+
+    CPU type name format is "%s-alpha-cpu".
+
+    alpha_cpu_class_by_name() recognizes the full name, the full name
+    without "-alpha-cpu" suffix, and a bunch of aliases.
+
+  - cris
+
+    CPU type name format is "%s-cris-cpu".
+
+    cris_cpu_class_by_name() recognizes the name without the "-cris-cpu"
+    suffix, plus "any" as alias for "crisv32-cris-cpu" #ifdef
+    CONFIG_USER_ONLY (this is the default CPU type for machine
+    "axis-dev88"; the other machine "none" has no default).
+
+  - ppc
+
+    CPU type name format is
+    "%s-powerpc64-cpu" #ifdef TARGET_PPC64
+    "%s-powerpc-cpu" #else
+
+    ppc_cpu_class_by_name() recognizes the name without the suffix, plus
+    the CPU type's PVR (8 digit hex number), plus a bunch of (case
+    insensitive) aliases.
+
+  - sh4
+
+    CPU type name format is "%s-superh-cpu".
+
+    superh_cpu_class_by_name() recognizes the name without the suffix,
+    plus "any" as alias for "sh7750r-superh-cpu" (this is the default
+    CPU type for machine "shix"; machines "r2d" defaults to "sh7751r",
+    and "none" has no default).
+
+  - sparc
+
+    CPU type name format is
+    "%s-sparc64-cpu" #ifdef TARGET_SPARC64
+    "%s-sparc-cpu" #else
+
+    sparc_cpu_class_by_name() recognizes the name without the suffix,
+    mapping any spaces in the user's cpu model to '-'.
+
+Observations:
+
+* The CPU type name format is generally "%s-T-cpu", where T is either
+  <TARGET> or <TARGET>64.
+
+  Exceptions:
+
+  - openrisc, sh4 uses or1k, superh instead.  Looks pointless to me.
+
+  - i386 uses x86_64 instead of i38664.  Makes sense.
+
+  - hppa, microblaze, nios2 and tilegx use CPU type name format "T-cpu",
+    ignoring the user's cpu model.  These exceptions looks pointless to
+    me.
+
+* The user's CPU model is generally the "%s" part of the format.
+
+  Exceptions:
+
+  - alpha additionaly recognizes full type names.  If that's useful for
+    alpha (I'm not sure it is), why isn't it useful for all other
+    targets?
+
+  - cris and sh4 additionaly recognize an "any" alias, cris only #ifdef
+    CONFIG_USER_ONLY.
+
+    Until PATCH 4, arm also recognizes an "any" alias #ifdef
+    CONFIG_USER_ONLY.  PATCH 4 drops that, because it's redundant with
+    the "any" CPU, which is a copy instead of an alias.  Sure we want to
+    do have different targets do "any" in different ways?
+
+    See aliases below.
+
+  - ppc additionaly recognizes PVR aliases and additional (case
+    insensitive) aliases.  Feels overengineered to me.  See aliases
+    below.
+
+  - sparc additionally recognizes aliases with ' ' instead of '-'.
+    Feels pointless to me.  See aliases below.
+
+* What about deprecating pointless exceptions?
+
+* Aliases
+
+  We have several targets roll their own CPU name aliases code.
+  Assuming aliases are here to stay (i.e. we're not deprecating all of
+  them): what about letting each CPU type specify a set of aliases, so
+  we can recognize them in generic code?
 
