@@ -2,91 +2,65 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B89B4C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 14:51:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C0DC04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 14:52:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F8EE20989
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 14:51:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F8EE20989
+	by mail.kernel.org (Postfix) with ESMTPS id 098DD205ED
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 14:52:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 098DD205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38478 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38512 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hONuc-0007Rq-SN
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 10:51:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57724)
+	id 1hONw5-0000Tj-CL
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 10:52:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hONrL-0005Uy-Mt
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 10:47:52 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hONrj-0005k8-Fp
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 10:48:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hONrK-0004GJ-QS
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 10:47:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56881)
+	(envelope-from <kwolf@redhat.com>) id 1hONri-0004Py-Gg
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 10:48:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39776)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hONrK-0004Fp-Hz
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 10:47:50 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hONrg-0004OU-E7; Wed, 08 May 2019 10:48:12 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C5748302548C
-	for <qemu-devel@nongnu.org>; Wed,  8 May 2019 14:47:49 +0000 (UTC)
-Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3D28C604A1;
-	Wed,  8 May 2019 14:47:49 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20190508142153.21555-1-thuth@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <d248dc00-7ef0-0256-cbc1-dc3f5df74ebe@redhat.com>
-Date: Wed, 8 May 2019 09:47:48 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id B84C430024DB;
+	Wed,  8 May 2019 14:48:11 +0000 (UTC)
+Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
+	[10.33.200.226])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A73E25D9D1;
+	Wed,  8 May 2019 14:48:10 +0000 (UTC)
+Date: Wed, 8 May 2019 16:48:09 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190508144809.GI15525@dhcp-200-226.str.redhat.com>
+References: <20190508140139.32722-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190508142153.21555-1-thuth@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="jxtcKhTW86TyKI9qNRqQiZrCXPnkWkCsZ"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190508140139.32722-1-mreitz@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Wed, 08 May 2019 14:47:49 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Wed, 08 May 2019 14:48:11 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH] tests/drive_del-test: Use qtest_init()
- instead of qtest_start()
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] qemu-img: Allow rebase with no
+ input base
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,59 +72,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jxtcKhTW86TyKI9qNRqQiZrCXPnkWkCsZ
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d248dc00-7ef0-0256-cbc1-dc3f5df74ebe@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tests/drive_del-test: Use qtest_init()
- instead of qtest_start()
-References: <20190508142153.21555-1-thuth@redhat.com>
-In-Reply-To: <20190508142153.21555-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 5/8/19 9:21 AM, Thomas Huth wrote:
-> qtest_start() + qtest_end() should be avoided, since they use the
-> global_qtest variable that we want to get rid of in the long run
-> Use qtest_init() and qtest_quit() instead.
+Am 08.05.2019 um 16:01 hat Max Reitz geschrieben:
+> This series allows using qemu-img rebase (without -u) on images that do
+> not have a backing file.  Right now, this fails with the rather cryptic
+> error message:
 >=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/drive_del-test.c | 63 +++++++++++++++++++++---------------------=
+> $ qemu-img rebase -b base.qcow2 foo.qcow2
+> qemu-img: Could not open old backing file '': The 'file' block driver r=
+equires a file name
+>=20
+> Yeah, well, OK.
+>=20
+> With how rebase currently works, this would lead to the overlay being
+> filled with zeroes, however.  This is where patch 2 comes in and instea=
+d
+> makes rebase use blk_pwrite_zeroes() whenever it handles an area past
+> the input=E2=80=99s backing file=E2=80=99s EOF.
+>=20
+> (Note that additionally we could try to punch holes in the overlay
+> whenever it matches the new backing file, but that=E2=80=99s something =
+I=E2=80=99ll put
+> off for later.  (We don=E2=80=99t even have a reliable method for punch=
+ing holes
+> into an overlay yet, although I would like to have such because it coul=
+d
+> make active commit more efficient.))
+>=20
+> And patch 3 adds the usual test.
 
->  1 file changed, 32 insertions(+), 31 deletions(-)
+Thanks, applied to the block branch.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---jxtcKhTW86TyKI9qNRqQiZrCXPnkWkCsZ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzS7BQACgkQp6FrSiUn
-Q2pIQgf/bwcjDUzaqhCh9GxoiOSfS9fy61PwF3cWFnKTLtzhvRoUz7UyjigrCArR
-s2PpSuzUVeOhcmilu+DMH+rAwDvz+8RwPe5VNSgbB1grUENlmc5Ly9AUGBToa55m
-fT4lCbuJWfT0EdvU3w9njo2+RI1a/gjZHSBh6TtvCEmOSGWsQas7SPlduZIZtiN2
-3ZBi9K3k6qgAlAcf7ISc7eAz3kCMqb3YYoLW+ZRQ8fkMOQXQyppKWC68snbj/n4L
-2cxPP4qaT4iGlc9F7z5fSXbSpMwOgeXHwBW7YlZln365wbVU6hwwTyNFNCq7OaTp
-Xkwb53PbNodBymSoDxpIu+Bn0wbpHA==
-=29dW
------END PGP SIGNATURE-----
-
---jxtcKhTW86TyKI9qNRqQiZrCXPnkWkCsZ--
+Kevin
 
