@@ -2,83 +2,67 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 194E5C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 17:50:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 074F0C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 17:54:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86E5121734
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 17:50:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oBuMZI3m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86E5121734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D3B6C21530
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 17:54:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3B6C21530
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41073 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41107 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOQiB-000521-Iu
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 13:50:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44295)
+	id 1hOQla-0007OT-UH
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 13:54:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <radoslaw.biernacki@linaro.org>) id 1hOQge-0004Ks-J1
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:49:02 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hOQko-000754-U5
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:53:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <radoslaw.biernacki@linaro.org>) id 1hOQgc-00068n-Ix
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:49:00 -0400
-Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:41431)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <radoslaw.biernacki@linaro.org>)
-	id 1hOQga-00066Z-Cm
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:48:56 -0400
-Received: by mail-yw1-xc43.google.com with SMTP id o65so15144056ywd.8
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 10:48:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=6E1rJcy6W9vB2kc74SAOH1pZFwmEt8nbZ4TAon/rMBA=;
-	b=oBuMZI3mAnB6tFczv1u9i5B3TNMsBqfJ8YZNowjkUI9e4Mqk6uCRYnPH/ag5/XRRnM
-	w53KKAW+1bW4G3qw0mzq7k3ZX8S2U6ok56O7QCMEyhEghRTt5x6z9fr829MaOB7yUiDm
-	QdB2l4f0BfjOM708OIDt4SphgjyaMQDTMVWEsKEsqJgCqLFtK/KKdZd3fSmkcfWKS62+
-	bQdAXTX+tq5b00dZphULyGJXXktLvuGf5cc5lWQIfTaYPeJmTkutBltTcV85kXWc/s9n
-	5Lznm6QvJHtXDfO4s9wzROBMMqqH6V7+GfScYzKm9ckRKah3BAGsXUxePV1BL1529CTS
-	9+Wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=6E1rJcy6W9vB2kc74SAOH1pZFwmEt8nbZ4TAon/rMBA=;
-	b=Tu0KKgTmezXffDd37GbI6TzR5VGhth8ggVfdgLm5P0Ml0eZHZButs0vCUrAPnXPomp
-	+AjLe+aMi/Py02CgnOGYMjo7w9yPLId6EQHAF2WX00g/64pt+P1JIvzXjTvtYhPkcuwy
-	NQUsfQYrC1hVEROA1lMj6qD7KvANx8Mt+BpdnxiYOcrxsliNE+4LEl6t2xuPZGd7lRcR
-	7ulnk+Kix+uF8JgE/BL72wvmo/eGMxUm+qyvgUaGRpvQS5+2pytYW8fDPkgAMO4Hvrvn
-	bZRc/H4+R/rpU5gotD17XLLHzE7IrS1VCFs0+yNvJWEXe2TwOMvMnkLl1EMCzOhWfkvf
-	vSGA==
-X-Gm-Message-State: APjAAAWXtqcz/U9FmkQ1UW5SMBlc3I9fnJEfgCcoz/MxzLc5zJspJeaN
-	PxyvCQTWqZlrTjEOlSVw/sYKw45XF0/6eyGMOfZjMg==
-X-Google-Smtp-Source: APXvYqxpIDDba+Og0fHL7uWbrC37zTtJdluZ96iwf/p7nUsmxr5B11//7rnoA/TJRozcMYROfMVASs1pLpt4DT7JnNU=
-X-Received: by 2002:a25:8145:: with SMTP id j5mr26617049ybm.114.1557337733008; 
-	Wed, 08 May 2019 10:48:53 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1hOQkn-0000Pr-LW
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:53:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48590)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hOQkl-0000Ig-GI
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 13:53:17 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 48EF8300180F;
+	Wed,  8 May 2019 17:53:08 +0000 (UTC)
+Received: from localhost (ovpn-116-61.gru2.redhat.com [10.97.116.61])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id AF2AF608E4;
+	Wed,  8 May 2019 17:53:05 +0000 (UTC)
+Date: Wed, 8 May 2019 14:53:03 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190508175303.GA4189@habkost.net>
+References: <20190506213817.14344-1-ehabkost@redhat.com>
+	<20190507141345.GS27205@redhat.com>
+	<20190507144500.GK28722@habkost.net>
+	<87pnot2j2s.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <1555560291-3415-1-git-send-email-hongbo.zhang@linaro.org>
-	<1555560291-3415-3-git-send-email-hongbo.zhang@linaro.org>
-	<CAFEAcA-poCxPqPtfhx4mUJ5pcOjn1Hz-WNxEt29f=JgpFMi4Kg@mail.gmail.com>
-	<CAHmQWvB4AZGM+MV0LP-vtfoW0kG4RFkf0R6NoRWm8WrFuum+Og@mail.gmail.com>
-In-Reply-To: <CAHmQWvB4AZGM+MV0LP-vtfoW0kG4RFkf0R6NoRWm8WrFuum+Og@mail.gmail.com>
-From: Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
-Date: Wed, 8 May 2019 19:48:41 +0200
-Message-ID: <CAEK-wKkiyNYjKKsJzukC_LLi163ngWV4P18-47Z6xxF0azB2uw@mail.gmail.com>
-To: Hongbo Zhang <hongbo.zhang@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::c43
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v7 2/2] hw/arm: Add arm SBSA reference
- machine, devices part
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <87pnot2j2s.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Wed, 08 May 2019 17:53:08 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] tests: Force Python I/O encoding for
+ check-qapi-schema
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,153 +74,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	Markus Armbruster <armbru@redhat.com>,
-	Leif Lindholm <leif.lindholm@linaro.org>,
-	QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+	Michael Roth <mdroth@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 8 May 2019 at 13:30, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+On Wed, May 08, 2019 at 03:04:43PM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+>=20
+> > On Tue, May 07, 2019 at 03:13:45PM +0100, Daniel P. Berrang=E9 wrote:
+> >> On Mon, May 06, 2019 at 06:38:17PM -0300, Eduardo Habkost wrote:
+> >> > test-qapi.py doesn't force a specific encoding for stderr or
+> >> > stdout, but the reference files used by check-qapi-schema are in
+> >> > UTF-8.  This breaks check-qapi-schema under certain circumstances
+> >> > (e.g. if using the C locale and Python < 3.7).
+> >> >=20
+> >> > We need to make sure test-qapi.py always generate UTF-8 output
+> >> > somehow.  On Python 3.7+ we can do it using
+> >> > `sys.stdout.reconfigure(...)`, but we need a solution that works
+> >> > with older Python versions.
+> >> >=20
+> >> > Instead of trying a hack like reopening sys.stdout and
+> >> > sys.stderr, we can just tell Python to use UTF-8 for I/O encoding
+> >> > when running test-qapi.py.  Do it by setting PYTHONIOENCODING.
+> >> >=20
+> >> > Reported-by: Thomas Huth <thuth@redhat.com>
+> >> > Tested-by: Thomas Huth <thuth@redhat.com>
+> >> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> >> > ---
+> >> >  tests/Makefile.include | 2 +-
+> >> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >> >=20
+> >> > diff --git a/tests/Makefile.include b/tests/Makefile.include
+> >> > index 7c8b9c84b2..af88ab6f8b 100644
+> >> > --- a/tests/Makefile.include
+> >> > +++ b/tests/Makefile.include
+> >> > @@ -1103,7 +1103,7 @@ check-tests/qemu-iotests-quick.sh: tests/qem=
+u-iotests-quick.sh qemu-img$(EXESUF)
+> >> >  .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
+> >> >  $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(S=
+RC_PATH)/%.json
+> >> >  	$(call quiet-command, PYTHONPATH=3D$(SRC_PATH)/scripts \
+> >> > -		$(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py \
+> >> > +		PYTHONIOENCODING=3Dutf-8 $(PYTHON) $(SRC_PATH)/tests/qapi-schem=
+a/test-qapi.py \
+> >>=20
+> >> I see PYTHONIOENCODING exists since 2.6 which is nice.
+> >>=20
+> >> How about we actually change $(PYTHON) so that it always includes
+> >> PYTHONIOENCODING=3Dutf-8 ?
+> >>=20
+> >> That way we avoid continuing to play whack-a-mole with more utf-8
+> >> bugs in future.
+> >>=20
+> >> It would also let us revert this:
+> >>=20
+> >>   commit de685ae5e9a4b523513033bd6cadc8187a227170
+> >>   Author: Markus Armbruster <armbru@redhat.com>
+> >>   Date:   Mon Jun 18 19:59:57 2018 +0200
+> >>=20
+> >>     qapi: Open files with encoding=3D'utf-8'
+> >>=20
+> >> which had to provide separate logic for py2 vs py3 :-(
+>=20
+> The separate logic will soon be history.  I'd welcome getting rid of th=
+e
+> remainder anyway.
 
-> On Tue, 30 Apr 2019 at 22:17, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
-> >
-> > On Thu, 18 Apr 2019 at 05:05, Hongbo Zhang <hongbo.zhang@linaro.org>
-> wrote:
-> > >
-> > > Following the previous patch, this patch adds peripheral devices to the
-> > > newly introduced SBSA-ref machine.
-> > >
-> > > Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
-> > > ---
-> > >  hw/arm/sbsa-ref.c | 451
-> ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> > >  1 file changed, 451 insertions(+)
-> >
-> > Some fairly minor comments on this one.
-> >
-> > > +static void create_flash(const SBSAMachineState *vms,
-> > > +                         MemoryRegion *sysmem,
-> > > +                         MemoryRegion *secure_sysmem)
-> > > +{
-> > > +    /*
-> > > +     * Create one secure and nonsecure flash devices to fill
-> SBSA_FLASH
-> > > +     * space in the memmap, file passed via -bios goes in the first
-> one.
-> > > +     */
-> > > +    hwaddr flashsize = vms->memmap[SBSA_FLASH].size / 2;
-> > > +    hwaddr flashbase = vms->memmap[SBSA_FLASH].base;
-> > > +
-> > > +    create_one_flash("sbsa-ref.flash0", flashbase, flashsize,
-> > > +                     bios_name, secure_sysmem);
-> > > +    create_one_flash("sbsa-ref.flash1", flashbase + flashsize,
-> flashsize,
-> > > +                     NULL, sysmem);
-> > > +}
-> >
-> > I think Markus might have an opinion on the best way to create
-> > flash devices on a new board model. Is "just create two flash
-> > devices the way the virt board does" the right thing?
-> >
-> For the firmware part, we are using two flashes, one secure and
-> another non-secure.
->
-> > > +static void create_ahci(const SBSAMachineState *vms, qemu_irq *pic)
-> > > +{
-> > > +    hwaddr base = vms->memmap[SBSA_AHCI].base;
-> > > +    int irq = vms->irqmap[SBSA_AHCI];
-> > > +    DeviceState *dev;
-> > > +    DriveInfo *hd[NUM_SATA_PORTS];
-> > > +    SysbusAHCIState *sysahci;
-> > > +    AHCIState *ahci;
-> > > +    int i;
-> > > +
-> > > +    dev = qdev_create(NULL, "sysbus-ahci");
-> > > +    qdev_prop_set_uint32(dev, "num-ports", NUM_SATA_PORTS);
-> > > +    qdev_init_nofail(dev);
-> > > +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
-> > > +    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[irq]);
-> > > +
-> > > +    sysahci = SYSBUS_AHCI(dev);
-> > > +    ahci = &sysahci->ahci;
-> > > +    ide_drive_get(hd, ARRAY_SIZE(hd));
-> > > +    for (i = 0; i < ahci->ports; i++) {
-> > > +        if (hd[i] == NULL) {
-> > > +            continue;
-> > > +        }
-> > > +        ide_create_drive(&ahci->dev[i].port, 0, hd[i]);
-> > > +    }
-> > > +}
-> > > +
-> > > +static void create_ehci(const SBSAMachineState *vms, qemu_irq *pic)
-> > > +{
-> > > +    hwaddr base = vms->memmap[SBSA_EHCI].base;
-> > > +    int irq = vms->irqmap[SBSA_EHCI];
-> > > +    USBBus *usb_bus;
-> > > +
-> > > +    sysbus_create_simple("platform-ehci-usb", base, pic[irq]);
-> > > +
-> > > +    usb_bus = usb_bus_find(-1);
-> > > +    usb_create_simple(usb_bus, "usb-kbd");
-> > > +    usb_create_simple(usb_bus, "usb-mouse");
-> >
-> > I don't think we should automatically create the usb keyboard
-> > and mouse devices. The user can do it on the command line if they
-> > want them.
-> >
-> OK.
->
+Which remainder?  Do you mean the encoding=3D'utf-8' arguments to
+open()?
 
-Actually I need to rise an objection to this one.
-As we trying to make SBSA machine as close as possible to real machine, we
-should have keyboard and mouse.
-Those have the same requirement as for VGA. It's just an expected piece of
-HW when you for e.g. installing a server.
-We also do a lot of FW work so it is expected to have keyboard (and even
-mouse) in UEFI.
+>=20
+> > Not every Python script in the QEMU tree is run by our makefiles
+> > and scripts using $(PYTHON).  We need to ensure our scripts and
+> > modules won't break when run directly from the command line, too.
+> > Setting PYTHONIOENCODING everywhere would just hide these bugs
+> > from us.
+>=20
+> I agree for Python scripts that are meant to be run that way (assuming
+> such scripts exist).  [...]
+
+All scripts inside ./scripts are meant to be run directly from
+the command line, aren't they?
 
 
->
-> > >  static void sbsa_ref_init(MachineState *machine)
-> > >  {
-> > >      SBSAMachineState *vms = SBSA_MACHINE(machine);
-> > > @@ -125,6 +552,7 @@ static void sbsa_ref_init(MachineState *machine)
-> > >      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
-> > >      const CPUArchIdList *possible_cpus;
-> > >      int n, sbsa_max_cpus;
-> > > +    qemu_irq pic[NUM_IRQS];
-> > >
-> > >      if (strcmp(machine->cpu_type, ARM_CPU_TYPE_NAME("cortex-a57"))) {
-> > >          error_report("sbsa-ref: CPU type other than the built-in "
-> > > @@ -209,11 +637,34 @@ static void sbsa_ref_init(MachineState *machine)
-> > >                                           machine->ram_size);
-> > >      memory_region_add_subregion(sysmem, vms->memmap[SBSA_MEM].base,
-> ram);
-> > >
-> > > +    create_fdt(vms);
-> > > +
-> > > +    create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
-> > > +
-> > > +    create_secure_ram(vms, secure_sysmem);
-> > > +
-> > > +    create_gic(vms, pic);
-> > > +
-> > > +    create_uart(vms, pic, SBSA_UART, sysmem, serial_hd(0));
-> > > +    create_uart(vms, pic, SBSA_SECURE_UART, secure_sysmem,
-> serial_hd(1));
-> > > +    create_uart(vms, pic, SBSA_SECURE_UART_MM, secure_sysmem,
-> serial_hd(2));
-> >
-> > What's the third UART for (ie what is the name intended to mean)?
-> > Should we have more than one non-secure UART?
-> >
-> Yes, this is called " Standalone Management Mode", I will add comment
-> for it, this is needed by server RAS feature.
->
-> > thanks
-> > -- PMM
->
+>                [...]  For all the others (including all the QAPI-relate=
+d
+> scripts), I'd be quite fine with
+>=20
+> 1. Our build system runs all Python scripts with the
+> PYTHONIOENCODING=3Dutf-8
+>=20
+> 2. If you run a Python script yourself, you get to specify the
+> PYTHONIOENCODING=3Dutf-8, or use a suitable locale.  Enabling UTF-8 mod=
+e
+> with PYTHONUTF8=3D1 or -X utf8 could also work.
+
+I'm OK if we don't actively try to fix those bugs and just expect
+people to set PYTHONIOENCODING.  But I don't think we should
+reject patches that make the Python code work with non-utf8
+locales if it's an easy fix.
+
+--=20
+Eduardo
+
