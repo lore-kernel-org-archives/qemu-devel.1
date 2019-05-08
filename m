@@ -2,65 +2,66 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DBA7C04AAD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 13:11:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82F33C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 13:14:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04356214AF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 13:11:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04356214AF
+	by mail.kernel.org (Postfix) with ESMTPS id 57F2020850
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 13:14:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57F2020850
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36989 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37002 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOMMF-0007tB-9g
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 09:11:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60579)
+	id 1hOMPN-0000gA-K6
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 09:14:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:32927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hOMLR-00076m-Gk
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 09:10:50 -0400
+	(envelope-from <armbru@redhat.com>) id 1hOMO8-0008Ud-TE
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 09:13:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hOMLQ-0006DK-JM
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 09:10:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41328)
+	(envelope-from <armbru@redhat.com>) id 1hOMO5-0000HU-5e
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 09:13:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51096)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <armbru@redhat.com>)
-	id 1hOMLQ-0006Ca-EK; Wed, 08 May 2019 09:10:48 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1hOMO3-0000Fi-Eq; Wed, 08 May 2019 09:13:32 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 310DFA96E2;
-	Wed,  8 May 2019 13:10:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 74FF9309B167;
+	Wed,  8 May 2019 13:13:30 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
 	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id F2AF05C269;
-	Wed,  8 May 2019 13:10:46 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B39419729;
+	Wed,  8 May 2019 13:13:28 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 206531132B35; Wed,  8 May 2019 15:10:45 +0200 (CEST)
+	id 89C771132B35; Wed,  8 May 2019 15:13:25 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <20190501053522.10967-1-sjitindarsingh@gmail.com>
-	<87woj2cyhu.fsf@dusky.pond.sub.org> <20190508102621.GD2718@work-vm>
-Date: Wed, 08 May 2019 15:10:45 +0200
-In-Reply-To: <20190508102621.GD2718@work-vm> (David Alan Gilbert's message of
-	"Wed, 8 May 2019 11:26:21 +0100")
-Message-ID: <87pnot148a.fsf@dusky.pond.sub.org>
+To: Thomas Huth <thuth@redhat.com>
+References: <20190508075527.32164-1-thuth@redhat.com>
+Date: Wed, 08 May 2019 15:13:25 +0200
+In-Reply-To: <20190508075527.32164-1-thuth@redhat.com> (Thomas Huth's message
+	of "Wed, 8 May 2019 09:55:27 +0200")
+Message-ID: <87lfzh143u.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Wed, 08 May 2019 13:10:47 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.49]);
+	Wed, 08 May 2019 13:13:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] monitor: Add dump-stack command
+Subject: Re: [Qemu-devel] [PATCH v2] tests/Makefile: Remove unused
+ test-obj-y variable
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,35 +73,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
-	Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
-	david@gibson.dropbear.id.au
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+Thomas Huth <thuth@redhat.com> writes:
 
-> * Markus Armbruster (armbru@redhat.com) wrote:
->> Suraj Jitindar Singh <sjitindarsingh@gmail.com> writes:
->> 
->> > Add a monitor command "dump-stack" to be used to dump the stack for the
->> > current cpu.
->> 
->> I guess this is just for debugging.  Correct?
->> 
->> Shouldn't this be "info stack", to match "info registers" and "info
->> cpustats"?
+> I recently noticed that test-obj-y contains a file called
+> tests/check-block-qtest.o which simply does not belong to any .c
+> file and thus wondered why this is not causing any trouble. It is
+> only used to add -Itests to the command line (which refers to the
+> build directory). However, it is not needed because "-iquote $(@D)"
+> already sets this up in rules.mak. Thus we can simply remove this
+> variable.
 >
-> Since this is primarily about walking the guests stack frames and not
-> walking qemu internal data structures, I think it's probably OK to be
-> a dump-stack rather than an info subcommand.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Well, "info registers" is also about the guest's state and not QEMU
-internal state.  Arguably, so are "info pic", "info tlb", ...
-
-We have a long-standing tradition of using "info" for "pure"
-information-retrieving commands.  I rather like that pattern.
-
-Ultimately your choice as the HMP maintainer, of course.
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
