@@ -6,76 +6,76 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F990C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:15:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5EB6C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:17:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 512A721530
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:15:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 512A721530
+	by mail.kernel.org (Postfix) with ESMTPS id A7BE12054F
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:17:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7BE12054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34951 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35003 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOKXb-0004CY-Ia
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 07:15:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36965)
+	id 1hOKZo-0006NH-V3
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 07:17:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hOKWJ-0003Ws-Jq
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:13:57 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hOKY0-0004bf-A9
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:15:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hOKWH-0001A9-V7
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:13:55 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:34452)
+	(envelope-from <pbonzini@redhat.com>) id 1hOKXy-0002O6-C0
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:15:40 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:54351)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOKWH-00019L-Mh
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:13:53 -0400
-Received: by mail-wm1-f65.google.com with SMTP id m20so1676332wmg.1
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 04:13:53 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOKXw-0002Kp-Ez
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:15:36 -0400
+Received: by mail-wm1-f67.google.com with SMTP id b203so1594203wmb.4
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 04:15:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
 	:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=gi2t/D+HFQZhqVZHaJbMYThMZKmupvT3IdYeQtCc4Uk=;
-	b=S4mmDyujAE0vcSjdQdn464YDh5G7iB8aBXv8+cKFs9sldiYFhh86KIkjQ39LDWgOf+
-	X916I3KxsSnwenxZeCDJxVyDtmiMz6D/5sryblRX3QuSJZ0OAr2V64QLYoa0rmeiSc+A
-	sy9kT2RwHJkuTTBn2UOxP+B5yJm9ntfARcAMPEt0yBDniB85DOqMhhYsCXYm3DMyTSdA
-	A6uVFnQMzk2ez0yA0yDyBZlaxXk1D0JZj9HSy2DjK8DAJ4adIz9yil10VIcNum+QtDMG
-	qo9oiJdnzKmJOYwf5nDyJsTHTNOTqwFbcsvq3+pw6ko//N/fcWt+s30dEQgOMlsQhj9J
-	T53A==
-X-Gm-Message-State: APjAAAVHXk5lgjej3bbVsiped+5SMe/Lt7RLeyfYuTMBz2EPMbI4V168
-	MPOJaf0fnvWjH/RWyY0/cfZktw==
-X-Google-Smtp-Source: APXvYqyb7hCI+O2vcOBK5QMAJm+PpeItzwWdheUH9AMJF0139Fe6yyKHjBSsA7EGzkTqLi594e7mIg==
-X-Received: by 2002:a1c:f909:: with SMTP id x9mr2765196wmh.18.1557314032646;
-	Wed, 08 May 2019 04:13:52 -0700 (PDT)
+	bh=floSQeC0a0Gg9HZ3FRFtBn81cP5dNsI/WH2eLaqFb9g=;
+	b=IzNqUnFMs/GmNmg+ljZeGp3nwmBs5oURxtEY8trkoDgFI3lzVOkXbS8sIWwp+TjUnl
+	d/9JUUNIflnpZKn3RiiuPTmivVb2orlr+Vp0tTJpc0xtEAfG0kQzPA0ms/5dcJADrjB2
+	PnD3wuIbHeH795MwEsFWyxir4pF8LNKPME30qxSXW7CXVkVt3KQjW1yR7aw4YBn5tcfQ
+	gyLCIscHxhjRSqpdDqZXfH2tGYQqg2Nj3zQq82MeuznJ1V9z4kkym1C6otTOinp0nVYq
+	KkXvcqQmz76kPT8UqvxNc0DShcZfAL2epypWZsRVxZeaeupbUTHrM/R6f3prVkYWsBZ5
+	k5QQ==
+X-Gm-Message-State: APjAAAUG9CV9/spqKk1Nv3UEuPlMmrOLCirwUPYI8d3VJtJ45r4lTOoM
+	TcYY47tDZ1XNWvSD8qcf/1yBVA==
+X-Google-Smtp-Source: APXvYqzEx27DdpmGJ6+OyJhTEs8ps9OD2Jdk7AsZdxHdjYYhFrIeXlASri2EuOJA23/xVt+J7jO6Xg==
+X-Received: by 2002:a7b:cb85:: with SMTP id m5mr2748925wmi.75.1557314133956;
+	Wed, 08 May 2019 04:15:33 -0700 (PDT)
 Received: from [10.201.49.229] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
 	by smtp.gmail.com with ESMTPSA id
-	p18sm25405249wrp.38.2019.05.08.04.13.50
+	j190sm3560280wmb.19.2019.05.08.04.15.31
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 08 May 2019 04:13:52 -0700 (PDT)
+	Wed, 08 May 2019 04:15:33 -0700 (PDT)
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
 	Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, 
 	qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 References: <20190507163416.24647-1-philmd@redhat.com>
-	<20190507163416.24647-8-philmd@redhat.com>
+	<20190507163416.24647-9-philmd@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <075c122b-ffcf-9dda-4f1f-dae23bde4191@redhat.com>
-Date: Wed, 8 May 2019 13:13:49 +0200
+Message-ID: <e58c6ac3-97f7-b590-0e29-36a2b1e6e336@redhat.com>
+Date: Wed, 8 May 2019 13:15:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190507163416.24647-8-philmd@redhat.com>
+In-Reply-To: <20190507163416.24647-9-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH v2 07/16] hw/arm/aspeed: Use
- object_initialize_child for correct ref. counting
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH v2 08/16] hw/arm: Use
+ object_initialize_child for correct reference counting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -193,126 +193,159 @@ On 07/05/19 11:34, Philippe Mathieu-Daudé wrote:
 > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
 > Inspired-by: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
-> Reviewed-by: Joel Stanley <joel@jms.id.au>
 > ---
 > v2:
+>  - Tweaked cocci to improve digic_init (Thomas)
 >  - Described new use of &error_abort (Markus)
->  - Added Cédric S-o-b (he sent the same 'hw/arm/aspeed_soc.c' patch)
->  - Added Joel R-b of Cédric patch
 > ---
->  hw/arm/aspeed.c     |  6 +++---
->  hw/arm/aspeed_soc.c | 50 ++++++++++++++++++---------------------------
->  2 files changed, 23 insertions(+), 33 deletions(-)
+>  hw/arm/digic.c       | 17 ++++++-----------
+>  hw/arm/imx25_pdk.c   |  5 ++---
+>  hw/arm/kzm.c         |  5 ++---
+>  hw/arm/raspi.c       |  7 +++----
+>  hw/arm/sabrelite.c   |  5 ++---
+>  hw/arm/xlnx-zcu102.c |  5 ++---
+>  hw/arm/xlnx-zynqmp.c |  8 ++++----
+>  7 files changed, 21 insertions(+), 31 deletions(-)
 > 
-> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-> index 1c23ebd9925..f700b7e4fe0 100644
-> --- a/hw/arm/aspeed.c
-> +++ b/hw/arm/aspeed.c
-> @@ -159,9 +159,9 @@ static void aspeed_board_init(MachineState *machine,
->      ram_addr_t max_ram_size;
->  
->      bmc = g_new0(AspeedBoardState, 1);
-> -    object_initialize(&bmc->soc, (sizeof(bmc->soc)), cfg->soc_name);
-> -    object_property_add_child(OBJECT(machine), "soc", OBJECT(&bmc->soc),
-> -                              &error_abort);
-> +    object_initialize_child(OBJECT(machine), "soc", &bmc->soc,
-> +                            (sizeof(bmc->soc)), cfg->soc_name, &error_abort,
-> +                            NULL);
->  
->      sc = ASPEED_SOC_GET_CLASS(&bmc->soc);
->  
-> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-> index a27233d4876..faff42b84ad 100644
-> --- a/hw/arm/aspeed_soc.c
-> +++ b/hw/arm/aspeed_soc.c
-> @@ -106,12 +106,11 @@ static void aspeed_soc_init(Object *obj)
->      AspeedSoCClass *sc = ASPEED_SOC_GET_CLASS(s);
+> diff --git a/hw/arm/digic.c b/hw/arm/digic.c
+> index 726abb9b485..6ef26c6bac3 100644
+> --- a/hw/arm/digic.c
+> +++ b/hw/arm/digic.c
+> @@ -32,27 +32,22 @@
+>  static void digic_init(Object *obj)
+>  {
+>      DigicState *s = DIGIC(obj);
+> -    DeviceState *dev;
 >      int i;
 >  
-> -    object_initialize(&s->cpu, sizeof(s->cpu), sc->info->cpu_type);
+> -    object_initialize(&s->cpu, sizeof(s->cpu), "arm946-" TYPE_ARM_CPU);
 > -    object_property_add_child(obj, "cpu", OBJECT(&s->cpu), NULL);
-> +    object_initialize_child(obj, "cpu", OBJECT(&s->cpu), sizeof(s->cpu),
-> +                            sc->info->cpu_type, &error_abort, NULL);
+> +    object_initialize_child(obj, "cpu", &s->cpu, sizeof(s->cpu),
+> +                            "arm946-" TYPE_ARM_CPU, &error_abort, NULL);
 >  
-> -    object_initialize(&s->scu, sizeof(s->scu), TYPE_ASPEED_SCU);
-> -    object_property_add_child(obj, "scu", OBJECT(&s->scu), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->scu), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "scu", OBJECT(&s->scu), sizeof(s->scu),
-> +                          TYPE_ASPEED_SCU);
->      qdev_prop_set_uint32(DEVICE(&s->scu), "silicon-rev",
->                           sc->info->silicon_rev);
->      object_property_add_alias(obj, "hw-strap1", OBJECT(&s->scu),
-> @@ -121,36 +120,29 @@ static void aspeed_soc_init(Object *obj)
->      object_property_add_alias(obj, "hw-prot-key", OBJECT(&s->scu),
->                                "hw-prot-key", &error_abort);
+>      for (i = 0; i < DIGIC4_NB_TIMERS; i++) {
+>  #define DIGIC_TIMER_NAME_MLEN    11
+>          char name[DIGIC_TIMER_NAME_MLEN];
 >  
-> -    object_initialize(&s->vic, sizeof(s->vic), TYPE_ASPEED_VIC);
-> -    object_property_add_child(obj, "vic", OBJECT(&s->vic), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->vic), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "vic", OBJECT(&s->vic), sizeof(s->vic),
-> +                          TYPE_ASPEED_VIC);
->  
-> -    object_initialize(&s->timerctrl, sizeof(s->timerctrl), TYPE_ASPEED_TIMER);
-> -    object_property_add_child(obj, "timerctrl", OBJECT(&s->timerctrl), NULL);
-> +    sysbus_init_child_obj(obj, "timerctrl", OBJECT(&s->timerctrl),
-> +                          sizeof(s->timerctrl), TYPE_ASPEED_TIMER);
->      object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
->                                     OBJECT(&s->scu), &error_abort);
-> -    qdev_set_parent_bus(DEVICE(&s->timerctrl), sysbus_get_default());
->  
-> -    object_initialize(&s->i2c, sizeof(s->i2c), TYPE_ASPEED_I2C);
-> -    object_property_add_child(obj, "i2c", OBJECT(&s->i2c), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->i2c), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "i2c", OBJECT(&s->i2c), sizeof(s->i2c),
-> +                          TYPE_ASPEED_I2C);
->  
-> -    object_initialize(&s->fmc, sizeof(s->fmc), sc->info->fmc_typename);
-> -    object_property_add_child(obj, "fmc", OBJECT(&s->fmc), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->fmc), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "fmc", OBJECT(&s->fmc), sizeof(s->fmc),
-> +                          sc->info->fmc_typename);
->      object_property_add_alias(obj, "num-cs", OBJECT(&s->fmc), "num-cs",
->                                &error_abort);
->  
->      for (i = 0; i < sc->info->spis_num; i++) {
-> -        object_initialize(&s->spi[i], sizeof(s->spi[i]),
-> -                          sc->info->spi_typename[i]);
-> -        object_property_add_child(obj, "spi[*]", OBJECT(&s->spi[i]), NULL);
-> -        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
-> +        sysbus_init_child_obj(obj, "spi[*]", OBJECT(&s->spi[i]),
-> +                              sizeof(s->spi[i]), sc->info->spi_typename[i]);
+> -        object_initialize(&s->timer[i], sizeof(s->timer[i]), TYPE_DIGIC_TIMER);
+> -        dev = DEVICE(&s->timer[i]);
+> -        qdev_set_parent_bus(dev, sysbus_get_default());
+>          snprintf(name, DIGIC_TIMER_NAME_MLEN, "timer[%d]", i);
+> -        object_property_add_child(obj, name, OBJECT(&s->timer[i]), NULL);
+> +        sysbus_init_child_obj(obj, name, &s->timer[i], sizeof(s->timer[i]),
+> +                              TYPE_DIGIC_TIMER);
 >      }
 >  
-> -    object_initialize(&s->sdmc, sizeof(s->sdmc), TYPE_ASPEED_SDMC);
-> -    object_property_add_child(obj, "sdmc", OBJECT(&s->sdmc), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->sdmc), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "sdmc", OBJECT(&s->sdmc), sizeof(s->sdmc),
-> +                          TYPE_ASPEED_SDMC);
->      qdev_prop_set_uint32(DEVICE(&s->sdmc), "silicon-rev",
->                           sc->info->silicon_rev);
->      object_property_add_alias(obj, "ram-size", OBJECT(&s->sdmc),
-> @@ -159,16 +151,14 @@ static void aspeed_soc_init(Object *obj)
->                                "max-ram-size", &error_abort);
->  
->      for (i = 0; i < sc->info->wdts_num; i++) {
-> -        object_initialize(&s->wdt[i], sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
-> -        object_property_add_child(obj, "wdt[*]", OBJECT(&s->wdt[i]), NULL);
-> -        qdev_set_parent_bus(DEVICE(&s->wdt[i]), sysbus_get_default());
-> +        sysbus_init_child_obj(obj, "wdt[*]", OBJECT(&s->wdt[i]),
-> +                              sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
->          qdev_prop_set_uint32(DEVICE(&s->wdt[i]), "silicon-rev",
->                                      sc->info->silicon_rev);
->      }
->  
-> -    object_initialize(&s->ftgmac100, sizeof(s->ftgmac100), TYPE_FTGMAC100);
-> -    object_property_add_child(obj, "ftgmac100", OBJECT(&s->ftgmac100), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->ftgmac100), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "ftgmac100", OBJECT(&s->ftgmac100),
-> +                          sizeof(s->ftgmac100), TYPE_FTGMAC100);
+> -    object_initialize(&s->uart, sizeof(s->uart), TYPE_DIGIC_UART);
+> -    dev = DEVICE(&s->uart);
+> -    qdev_set_parent_bus(dev, sysbus_get_default());
+> -    object_property_add_child(obj, "uart", OBJECT(&s->uart), NULL);
+> +    sysbus_init_child_obj(obj, "uart", &s->uart, sizeof(s->uart),
+> +                          TYPE_DIGIC_UART);
 >  }
 >  
->  static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+>  static void digic_realize(DeviceState *dev, Error **errp)
+> diff --git a/hw/arm/imx25_pdk.c b/hw/arm/imx25_pdk.c
+> index 9f3ee147390..eef1b184b0d 100644
+> --- a/hw/arm/imx25_pdk.c
+> +++ b/hw/arm/imx25_pdk.c
+> @@ -72,9 +72,8 @@ static void imx25_pdk_init(MachineState *machine)
+>      unsigned int alias_offset;
+>      int i;
+>  
+> -    object_initialize(&s->soc, sizeof(s->soc), TYPE_FSL_IMX25);
+> -    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
+> -                              &error_abort);
+> +    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
+> +                            TYPE_FSL_IMX25, &error_abort, NULL);
+>  
+>      object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_fatal);
+>  
+> diff --git a/hw/arm/kzm.c b/hw/arm/kzm.c
+> index 139934c4ecf..44cba8782bf 100644
+> --- a/hw/arm/kzm.c
+> +++ b/hw/arm/kzm.c
+> @@ -71,9 +71,8 @@ static void kzm_init(MachineState *machine)
+>      unsigned int alias_offset;
+>      unsigned int i;
+>  
+> -    object_initialize(&s->soc, sizeof(s->soc), TYPE_FSL_IMX31);
+> -    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
+> -                              &error_abort);
+> +    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
+> +                            TYPE_FSL_IMX31, &error_abort, NULL);
+>  
+>      object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_fatal);
+>  
+> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> index 66899c28dc1..0a6244096cc 100644
+> --- a/hw/arm/raspi.c
+> +++ b/hw/arm/raspi.c
+> @@ -175,10 +175,9 @@ static void raspi_init(MachineState *machine, int version)
+>      BusState *bus;
+>      DeviceState *carddev;
+>  
+> -    object_initialize(&s->soc, sizeof(s->soc),
+> -                      version == 3 ? TYPE_BCM2837 : TYPE_BCM2836);
+> -    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
+> -                              &error_abort);
+> +    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
+> +                            version == 3 ? TYPE_BCM2837 : TYPE_BCM2836,
+> +                            &error_abort, NULL);
+>  
+>      /* Allocate and map RAM */
+>      memory_region_allocate_system_memory(&s->ram, OBJECT(machine), "ram",
+> diff --git a/hw/arm/sabrelite.c b/hw/arm/sabrelite.c
+> index ee140e5d9eb..f1b00de2294 100644
+> --- a/hw/arm/sabrelite.c
+> +++ b/hw/arm/sabrelite.c
+> @@ -55,9 +55,8 @@ static void sabrelite_init(MachineState *machine)
+>          exit(1);
+>      }
+>  
+> -    object_initialize(&s->soc, sizeof(s->soc), TYPE_FSL_IMX6);
+> -    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
+> -                              &error_abort);
+> +    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
+> +                            TYPE_FSL_IMX6, &error_abort, NULL);
+>  
+>      object_property_set_bool(OBJECT(&s->soc), true, "realized", &err);
+>      if (err != NULL) {
+> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+> index b6bc6a93b89..c802f26fbdf 100644
+> --- a/hw/arm/xlnx-zcu102.c
+> +++ b/hw/arm/xlnx-zcu102.c
+> @@ -91,9 +91,8 @@ static void xlnx_zcu102_init(MachineState *machine)
+>      memory_region_allocate_system_memory(&s->ddr_ram, NULL, "ddr-ram",
+>                                           ram_size);
+>  
+> -    object_initialize(&s->soc, sizeof(s->soc), TYPE_XLNX_ZYNQMP);
+> -    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
+> -                              &error_abort);
+> +    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
+> +                            TYPE_XLNX_ZYNQMP, &error_abort, NULL);
+>  
+>      object_property_set_link(OBJECT(&s->soc), OBJECT(&s->ddr_ram),
+>                           "ddr-ram", &error_abort);
+> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+> index 4f8bc41d9d4..6e991903022 100644
+> --- a/hw/arm/xlnx-zynqmp.c
+> +++ b/hw/arm/xlnx-zynqmp.c
+> @@ -191,10 +191,10 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
+>      for (i = 0; i < num_rpus; i++) {
+>          char *name;
+>  
+> -        object_initialize(&s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
+> -                          "cortex-r5f-" TYPE_ARM_CPU);
+> -        object_property_add_child(OBJECT(&s->rpu_cluster), "rpu-cpu[*]",
+> -                                  OBJECT(&s->rpu_cpu[i]), &error_abort);
+> +        object_initialize_child(OBJECT(&s->rpu_cluster), "rpu-cpu[*]",
+> +                                &s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
+> +                                "cortex-r5f-" TYPE_ARM_CPU, &error_abort,
+> +                                NULL);
+>  
+>          name = object_get_canonical_path_component(OBJECT(&s->rpu_cpu[i]));
+>          if (strcmp(name, boot_cpu)) {
 > 
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
