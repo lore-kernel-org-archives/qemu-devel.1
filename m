@@ -2,57 +2,59 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4963EC04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 06:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3474C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 06:22:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F544214AF
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 06:21:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F544214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id B8850204EC
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 06:22:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8850204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60138 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60146 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOFxl-0006Sw-AQ
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 02:21:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40871)
+	id 1hOFyV-0007MD-Rb
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 02:22:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tao3.xu@intel.com>) id 1hOFvr-0004zM-6W
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:20:00 -0400
+	(envelope-from <peterx@redhat.com>) id 1hOFrb-0000Va-6v
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:15:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tao3.xu@intel.com>) id 1hOFvp-0008SK-TL
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:19:59 -0400
-Received: from mga05.intel.com ([192.55.52.43]:57351)
+	(envelope-from <peterx@redhat.com>) id 1hOFra-0003ol-Bz
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:15:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52210)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hOFvp-0008RD-J4
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:19:57 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-	by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	07 May 2019 23:19:56 -0700
-X-ExtLoop1: 1
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.92])
-	by fmsmga005.fm.intel.com with ESMTP; 07 May 2019 23:19:54 -0700
-From: Tao Xu <tao3.xu@intel.com>
-To: imammedo@redhat.com, mst@redhat.com, eblake@redhat.com,
-	ehabkost@redhat.com, xiaoguangrong.eric@gmail.com
-Date: Wed,  8 May 2019 14:17:17 +0800
-Message-Id: <20190508061726.27631-3-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190508061726.27631-1-tao3.xu@intel.com>
-References: <20190508061726.27631-1-tao3.xu@intel.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 192.55.52.43
-Subject: [Qemu-devel] [PATCH v4 02/11] numa: move numa global variable
- have_numa_distance into MachineState
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hOFra-0003o5-6g
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 02:15:34 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 827DC30842A0
+	for <qemu-devel@nongnu.org>; Wed,  8 May 2019 06:15:33 +0000 (UTC)
+Received: from xz-x1.nay.redhat.com (dhcp-15-205.nay.redhat.com [10.66.15.205])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id EADCE1A267;
+	Wed,  8 May 2019 06:15:29 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed,  8 May 2019 14:15:13 +0800
+Message-Id: <20190508061523.17666-2-peterx@redhat.com>
+In-Reply-To: <20190508061523.17666-1-peterx@redhat.com>
+References: <20190508061523.17666-1-peterx@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Wed, 08 May 2019 06:15:33 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 01/11] migration: No need to take rcu during
+ sync_dirty_bitmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -64,127 +66,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, tao3.xu@intel.com, jingqi.liu@intel.com,
-	qemu-devel@nongnu.org, rth@twiddle.net
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	"Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+	peterx@redhat.com, Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The aim of this patch is to move existing numa global have_numa_distance
-into NumaState.
+cpu_physical_memory_sync_dirty_bitmap() has one RAMBlock* as
+parameter, which means that it must be with RCU read lock held
+already.  Taking it again inside seems redundant.  Removing it.
+Instead comment on the functions about the RCU read lock.
 
-Reviewed-by: Liu Jingqi <jingqi.liu@intel.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
+ include/exec/ram_addr.h | 5 +----
+ migration/ram.c         | 1 +
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-Changes in v4 -> v3:
-    - send the patch together with HMAT patches
----
- hw/arm/virt-acpi-build.c | 2 +-
- hw/arm/virt.c            | 2 +-
- hw/i386/acpi-build.c     | 2 +-
- include/hw/boards.h      | 2 ++
- include/sysemu/numa.h    | 2 --
- numa.c                   | 5 ++---
- 6 files changed, 7 insertions(+), 8 deletions(-)
-
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 6805b4de51..65f070843c 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -815,7 +815,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-     if (nb_numa_nodes > 0) {
-         acpi_add_table(table_offsets, tables_blob);
-         build_srat(tables_blob, tables->linker, vms);
--        if (have_numa_distance) {
-+        if (ms->numa_state->have_numa_distance) {
-             acpi_add_table(table_offsets, tables_blob);
-             build_slit(tables_blob, tables->linker, ms);
-         }
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 70954b658d..f0818ef597 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -228,7 +228,7 @@ static void create_fdt(VirtMachineState *vms)
-                                 "clk24mhz");
-     qemu_fdt_setprop_cell(fdt, "/apb-pclk", "phandle", vms->clock_phandle);
- 
--    if (have_numa_distance) {
-+    if (nb_numa_nodes > 0 && ms->numa_state->have_numa_distance) {
-         int size = nb_numa_nodes * nb_numa_nodes * 3 * sizeof(uint32_t);
-         uint32_t *matrix = g_malloc0(size);
-         int idx, i, j;
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 7d9bc88ac9..43a807c483 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2685,7 +2685,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-     if (pcms->numa_nodes) {
-         acpi_add_table(table_offsets, tables_blob);
-         build_srat(tables_blob, tables->linker, machine);
--        if (have_numa_distance) {
-+        if (machine->numa_state->have_numa_distance) {
-             acpi_add_table(table_offsets, tables_blob);
-             build_slit(tables_blob, tables->linker, machine);
-         }
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 5f102e3075..c3c678b7ff 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -237,6 +237,8 @@ typedef struct NumaState {
-     /* Number of NUMA nodes */
-     int num_nodes;
- 
-+    /* Allow setting NUMA distance for different NUMA nodes */
-+    bool have_numa_distance;
- } NumaState;
- 
- /**
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index a55e2be563..1a29408db9 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -6,8 +6,6 @@
- #include "sysemu/hostmem.h"
- #include "hw/boards.h"
- 
--extern bool have_numa_distance;
--
- struct NodeInfo {
-     uint64_t node_mem;
-     struct HostMemoryBackend *node_memdev;
-diff --git a/numa.c b/numa.c
-index 343fcaf13f..d4f5ff5193 100644
---- a/numa.c
-+++ b/numa.c
-@@ -52,7 +52,6 @@ static int have_memdevs = -1;
- static int max_numa_nodeid; /* Highest specified NUMA node ID, plus one.
-                              * For all nodes, nodeid < max_numa_nodeid
-                              */
--bool have_numa_distance;
- NodeInfo numa_info[MAX_NODES];
- 
- 
-@@ -171,7 +170,7 @@ void parse_numa_distance(MachineState *ms, NumaDistOptions *dist, Error **errp)
-     }
- 
-     numa_info[src].distance[dst] = val;
--    have_numa_distance = true;
-+    ms->numa_state->have_numa_distance = true;
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index 139ad79390..993fb760f3 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -408,6 +408,7 @@ static inline void cpu_physical_memory_clear_dirty_range(ram_addr_t start,
  }
  
- static
-@@ -442,7 +441,7 @@ void numa_complete_configuration(MachineState *ms)
-          * asymmetric. In this case, the distances for both directions
-          * of all node pairs are required.
-          */
--        if (have_numa_distance) {
-+        if (ms->numa_state->have_numa_distance) {
-             /* Validate enough NUMA distance information was provided. */
-             validate_numa_distance(ms);
  
++/* Must be with rcu read lock held */
+ static inline
+ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+                                                ram_addr_t start,
+@@ -431,8 +432,6 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+                                         DIRTY_MEMORY_BLOCK_SIZE);
+         unsigned long page = BIT_WORD(start >> TARGET_PAGE_BITS);
+ 
+-        rcu_read_lock();
+-
+         src = atomic_rcu_read(
+                 &ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION])->blocks;
+ 
+@@ -452,8 +451,6 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+                 idx++;
+             }
+         }
+-
+-        rcu_read_unlock();
+     } else {
+         ram_addr_t offset = rb->offset;
+ 
+diff --git a/migration/ram.c b/migration/ram.c
+index 1ca9ba77b6..3e11806ccd 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1680,6 +1680,7 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs,
+     return ret;
+ }
+ 
++/* Must be with rcu read lock held */
+ static void migration_bitmap_sync_range(RAMState *rs, RAMBlock *rb,
+                                         ram_addr_t start, ram_addr_t length)
+ {
 -- 
 2.17.1
 
