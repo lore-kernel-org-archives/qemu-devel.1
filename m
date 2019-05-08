@@ -2,63 +2,78 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA827C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 12:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB071C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 12:18:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD98621019
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 12:17:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD98621019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8DEF521019
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 12:18:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DEF521019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36135 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36141 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOLWE-0002m6-Sy
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 08:17:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48501)
+	id 1hOLXF-0003WW-MD
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 08:18:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1hOLUd-0000kT-Q9
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 08:16:17 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hOLTm-0007z7-JT
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 08:15:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1hOLUb-0007BZ-Tg
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 08:16:15 -0400
-Received: from mga09.intel.com ([134.134.136.24]:55430)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
-	id 1hOLUb-0007B3-L5
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 08:16:13 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-	by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	08 May 2019 05:16:12 -0700
-X-ExtLoop1: 1
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
-	([10.239.13.9])
-	by fmsmga004.fm.intel.com with ESMTP; 08 May 2019 05:16:07 -0700
-Date: Wed, 8 May 2019 08:10:30 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190508121030.GD24397@joy-OptiPlex-7040>
-References: <20190506014514.3555-1-yan.y.zhao@intel.com>
-	<20190506015102.3691-1-yan.y.zhao@intel.com>
-	<20190508105032.GE2718@work-vm>
+	(envelope-from <pbonzini@redhat.com>) id 1hOLTk-0006dK-Ol
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 08:15:22 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:37187)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOLTk-0006b7-HC
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 08:15:20 -0400
+Received: by mail-wm1-f66.google.com with SMTP id y5so2978443wma.2
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 05:15:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=UIwsR/ZNvp+XSOZL34+yTxqnZwwE+IrugCqniDYGrX8=;
+	b=jXtJ7GenIvKYc34X0E0nkNbHRXARn8JnYMFezhzojBupiSOvXFh5niJZb0gLCp3AJA
+	8e4ic7R1EQ9ixOK6k0o7SPWirV1BYhlAFhKL01AylA2xQ0nmoU5IFs/x8bfhvcSk71Wr
+	rCC9vgYyslC2qumhpeDjLq4lpx0OM3OQ6nyPTeg/BVBy+eoJoLfDPDcLMrPDY3ziK1F7
+	g1PHg6eG7v2T4AjR44uJL+sDbCpWSq/+UPWIbfn2+1p7AESAKXUjHUEvNp4qQYkUbn9q
+	1MaXYVs1XSIG+Z5/iq+5MmTysjAR+0Rj+0ihVpypQvRys43M1O7NiF5T3fX/J97EzdWS
+	1R4g==
+X-Gm-Message-State: APjAAAW+SPOPuv93p0TN6Vp837xfmWOSbz8aVWdVNADu+phX9DFsv2+U
+	OYhjjg0BCXO0b42IDzzh+IX8vQ==
+X-Google-Smtp-Source: APXvYqyc8+UiFMS2dFqzyrgCzQCZ+BJ/53GNczGu5V2TFtczg3Skt58x9HnFcSAuYo7KxaHHvBFyvg==
+X-Received: by 2002:a1c:ef18:: with SMTP id n24mr2723580wmh.94.1557317719254; 
+	Wed, 08 May 2019 05:15:19 -0700 (PDT)
+Received: from [10.201.49.229] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
+	by smtp.gmail.com with ESMTPSA id
+	v5sm22571019wra.83.2019.05.08.05.15.18
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 08 May 2019 05:15:18 -0700 (PDT)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org
+References: <20190504123538.14952-1-philmd@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cc2ede5e-4761-e585-dfee-7026c2f06db8@redhat.com>
+Date: Wed, 8 May 2019 14:15:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190508105032.GE2718@work-vm>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 134.134.136.24
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] drm/i915/gvt: export mdev device
- version to sysfs for Intel vGPU
+In-Reply-To: <20190504123538.14952-1-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH] hw/net/ne2000: Extract the PCI device from
+ the chipset common code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,306 +85,347 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"aik@ozlabs.ru" <aik@ozlabs.ru>,
-	"Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-	"shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-	"eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
-	"eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
-	Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-	"pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-	"libvir-list@redhat.com" <libvir-list@redhat.com>,
-	"arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
-	"felipe@nutanix.com" <felipe@nutanix.com>,
-	"Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>,
-	"zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-	"jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"intel-gvt-dev@lists.freedesktop.org"
-	<intel-gvt-dev@lists.freedesktop.org>, "Liu,
-	Changpeng" <changpeng.liu@intel.com>,
-	"cohuck@redhat.com" <cohuck@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Wang, Zhi A" <zhi.a.wang@intel.com>,
-	"dinechin@redhat.com" <dinechin@redhat.com>, "He,
-	Shaopeng" <shaopeng.he@intel.com>
+Cc: Jason Wang <jasowang@redhat.com>, Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, May 08, 2019 at 06:50:33PM +0800, Dr. David Alan Gilbert wrote:
-> * Yan Zhao (yan.y.zhao@intel.com) wrote:
-> > This feature implements the version attribute for Intel's vGPU mdev
-> > devices.
-> > 
-> > version attribute is rw.
-> > It's used to check device compatibility for two mdev devices.
-> > version string format and length are private for vendor driver. vendor
-> > driver is able to define them freely.
-> > 
-> > For Intel vGPU of gen8 and gen9, the mdev device version
-> > consists of 3 fields: "vendor id" + "device id" + "mdev type".
-> > 
-> > Reading from a vGPU's version attribute, a string is returned in below
-> > format: <vendor id>-<device id>-<mdev type>. e.g.
-> > 8086-193b-i915-GVTg_V5_2.
-> > 
-> > Writing a string to a vGPU's version attribute will trigger GVT to check
-> > whether a vGPU identified by the written string is compatible with
-> > current vGPU owning this version attribute. errno is returned if the two
-> > vGPUs are incompatible. The length of written string is returned in
-> > compatible case.
-> > 
-> > For other platforms, and for GVT not supporting vGPU live migration
-> > feature, errnos are returned when read/write of mdev devices' version
-> > attributes.
-> > 
-> > For old GVT versions where no version attributes exposed in sysfs, it is
-> > regarded as not supporting vGPU live migration.
-> > 
-> > For future platforms, besides the current 2 fields in vendor proprietary
-> > part, more fields may be added to identify Intel vGPU well for live
-> > migration purpose.
-> > 
-> > v2:
-> > 1. removed 32 common part of version string
-> > (Alex Williamson)
-> > 2. do not register version attribute for GVT not supporting live
-> > migration.(Cornelia Huck)
-> > 3. for platforms out of gen8, gen9, return -EINVAL --> -ENODEV for
-> > incompatible. (Cornelia Huck)
-> > 
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > Cc: Erik Skultety <eskultet@redhat.com>
-> > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > Cc: Cornelia Huck <cohuck@redhat.com>
-> > Cc: "Tian, Kevin" <kevin.tian@intel.com>
-> > Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-> > Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
-> > c: Neo Jia <cjia@nvidia.com>
-> > Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> > 
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > ---
-> >  drivers/gpu/drm/i915/gvt/Makefile         |  2 +-
-> >  drivers/gpu/drm/i915/gvt/device_version.c | 87 +++++++++++++++++++++++
-> >  drivers/gpu/drm/i915/gvt/gvt.c            | 51 +++++++++++++
-> >  drivers/gpu/drm/i915/gvt/gvt.h            |  6 ++
-> >  4 files changed, 145 insertions(+), 1 deletion(-)
-> >  create mode 100644 drivers/gpu/drm/i915/gvt/device_version.c
-> > 
-> > diff --git a/drivers/gpu/drm/i915/gvt/Makefile b/drivers/gpu/drm/i915/gvt/Makefile
-> > index 271fb46d4dd0..54e209a23899 100644
-> > --- a/drivers/gpu/drm/i915/gvt/Makefile
-> > +++ b/drivers/gpu/drm/i915/gvt/Makefile
-> > @@ -3,7 +3,7 @@ GVT_DIR := gvt
-> >  GVT_SOURCE := gvt.o aperture_gm.o handlers.o vgpu.o trace_points.o firmware.o \
-> >  	interrupt.o gtt.o cfg_space.o opregion.o mmio.o display.o edid.o \
-> >  	execlist.o scheduler.o sched_policy.o mmio_context.o cmd_parser.o debugfs.o \
-> > -	fb_decoder.o dmabuf.o page_track.o
-> > +	fb_decoder.o dmabuf.o page_track.o device_version.o
-> >  
-> >  ccflags-y				+= -I$(src) -I$(src)/$(GVT_DIR)
-> >  i915-y					+= $(addprefix $(GVT_DIR)/, $(GVT_SOURCE))
-> > diff --git a/drivers/gpu/drm/i915/gvt/device_version.c b/drivers/gpu/drm/i915/gvt/device_version.c
-> > new file mode 100644
-> > index 000000000000..bd4cdcbdba95
-> > --- /dev/null
-> > +++ b/drivers/gpu/drm/i915/gvt/device_version.c
-> > @@ -0,0 +1,87 @@
-> > +/*
-> > + * Copyright(c) 2011-2017 Intel Corporation. All rights reserved.
-> > + *
-> > + * Permission is hereby granted, free of charge, to any person obtaining a
-> > + * copy of this software and associated documentation files (the "Software"),
-> > + * to deal in the Software without restriction, including without limitation
-> > + * the rights to use, copy, modify, merge, publish, distribute, sublicense,
-> > + * and/or sell copies of the Software, and to permit persons to whom the
-> > + * Software is furnished to do so, subject to the following conditions:
-> > + *
-> > + * The above copyright notice and this permission notice (including the next
-> > + * paragraph) shall be included in all copies or substantial portions of the
-> > + * Software.
-> > + *
-> > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-> > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-> > + * SOFTWARE.
-> > + *
-> > + * Authors:
-> > + *    Yan Zhao <yan.y.zhao@intel.com>
-> > + */
-> > +#include <linux/vfio.h>
-> > +#include "i915_drv.h"
-> > +
-> > +static bool is_compatible(const char *self, const char *remote)
-> > +{
-> > +	if (strlen(remote) != strlen(self))
-> > +		return false;
-> > +
-> > +	return (strncmp(self, remote, strlen(self))) ? false : true;
-> > +}
-> > +
-> > +ssize_t intel_gvt_get_vfio_device_version_len(struct drm_i915_private *dev_priv)
-> > +{
-> > +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> > +		return -ENODEV;
-> > +
-> > +	return PAGE_SIZE;
-> > +}
-> > +
-> > +ssize_t intel_gvt_get_vfio_device_version(struct drm_i915_private *dev_priv,
-> > +		char *buf, const char *mdev_type)
-> > +{
-> > +	int cnt = 0, ret = 0;
-> > +	const char *str = NULL;
-> > +
-> > +	/* currently only gen8 & gen9 are supported */
-> > +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> > +		return -ENODEV;
-> > +
-> > +	/* vendor id + device id + mdev type */
-> > +	/* vendor id */
-> > +	cnt = snprintf(buf, 5, "%04x", PCI_VENDOR_ID_INTEL);
-> > +	buf += cnt;
-> > +	ret += cnt;
-> > +
-> > +	/* device id */
-> > +	cnt = snprintf(buf, 6, "-%04x", INTEL_DEVID(dev_priv));
-> > +	buf += cnt;
-> > +	ret += cnt;
-> > +
-> > +	/* mdev type */
-> > +	str = mdev_type;
-> > +	cnt = snprintf(buf, strlen(str) + 3, "-%s\n", mdev_type);
-> > +	buf += cnt;
-> > +	ret += cnt;
+On 04/05/19 07:35, Philippe Mathieu-Daudé wrote:
+> The ne2000.c file contains functions common the the ISA and PCI
+> devices. To allow to build with one or another, extract the PCI
+> specific part into a new file.
 > 
-> Why not just one big snprintf?
+> This fix an issue where the NE2000_ISA Kconfig had to pull the
+> full PCI core objects.
 > 
-> Dave
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  hw/net/Kconfig       |   7 ++-
+>  hw/net/Makefile.objs |   3 +-
+>  hw/net/ne2000-pci.c  | 132 +++++++++++++++++++++++++++++++++++++++++++
+>  hw/net/ne2000.c      | 105 ----------------------------------
+>  4 files changed, 139 insertions(+), 108 deletions(-)
+>  create mode 100644 hw/net/ne2000-pci.c
+> 
+> diff --git a/hw/net/Kconfig b/hw/net/Kconfig
+> index 7d7bbc5d7c9..4ef86dc3a53 100644
+> --- a/hw/net/Kconfig
+> +++ b/hw/net/Kconfig
+> @@ -1,10 +1,14 @@
+>  config DP8393X
+>      bool
+>  
+> +config NE2000_COMMON
+> +    bool
+> +
+>  config NE2000_PCI
+>      bool
+>      default y if PCI_DEVICES
+>      depends on PCI
+> +    select NE2000_COMMON
+>  
+>  config EEPRO100_PCI
+>      bool
+> @@ -51,8 +55,7 @@ config NE2000_ISA
+>      bool
+>      default y
+>      depends on ISA_BUS
+> -    depends on PCI # for NE2000State
+> -    select NE2000_PCI
+> +    select NE2000_COMMON
+>  
+>  config OPENCORES_ETH
+>      bool
+> diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
+> index ea637157802..9904273b060 100644
+> --- a/hw/net/Makefile.objs
+> +++ b/hw/net/Makefile.objs
+> @@ -1,8 +1,9 @@
+>  common-obj-$(CONFIG_DP8393X) += dp8393x.o
+>  common-obj-$(CONFIG_XEN) += xen_nic.o
+> +common-obj-$(CONFIG_NE2000_COMMON) += ne2000.o
+>  
+>  # PCI network cards
+> -common-obj-$(CONFIG_NE2000_PCI) += ne2000.o
+> +common-obj-$(CONFIG_NE2000_PCI) += ne2000-pci.o
+>  common-obj-$(CONFIG_EEPRO100_PCI) += eepro100.o
+>  common-obj-$(CONFIG_PCNET_PCI) += pcnet-pci.o
+>  common-obj-$(CONFIG_PCNET_COMMON) += pcnet.o
+> diff --git a/hw/net/ne2000-pci.c b/hw/net/ne2000-pci.c
+> new file mode 100644
+> index 00000000000..cb05744f3c3
+> --- /dev/null
+> +++ b/hw/net/ne2000-pci.c
+> @@ -0,0 +1,132 @@
+> +/*
+> + * QEMU NE2000 emulation (PCI bus)
+> + *
+> + * Copyright (c) 2003-2004 Fabrice Bellard
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "hw/pci/pci.h"
+> +#include "ne2000.h"
+> +#include "sysemu/sysemu.h"
+> +
+> +typedef struct PCINE2000State {
+> +    PCIDevice dev;
+> +    NE2000State ne2000;
+> +} PCINE2000State;
+> +
+> +static const VMStateDescription vmstate_pci_ne2000 = {
+> +    .name = "ne2000",
+> +    .version_id = 3,
+> +    .minimum_version_id = 3,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_PCI_DEVICE(dev, PCINE2000State),
+> +        VMSTATE_STRUCT(ne2000, PCINE2000State, 0, vmstate_ne2000, NE2000State),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static NetClientInfo net_ne2000_info = {
+> +    .type = NET_CLIENT_DRIVER_NIC,
+> +    .size = sizeof(NICState),
+> +    .receive = ne2000_receive,
+> +};
+> +
+> +static void pci_ne2000_realize(PCIDevice *pci_dev, Error **errp)
+> +{
+> +    PCINE2000State *d = DO_UPCAST(PCINE2000State, dev, pci_dev);
+> +    NE2000State *s;
+> +    uint8_t *pci_conf;
+> +
+> +    pci_conf = d->dev.config;
+> +    pci_conf[PCI_INTERRUPT_PIN] = 1; /* interrupt pin A */
+> +
+> +    s = &d->ne2000;
+> +    ne2000_setup_io(s, DEVICE(pci_dev), 0x100);
+> +    pci_register_bar(&d->dev, 0, PCI_BASE_ADDRESS_SPACE_IO, &s->io);
+> +    s->irq = pci_allocate_irq(&d->dev);
+> +
+> +    qemu_macaddr_default_if_unset(&s->c.macaddr);
+> +    ne2000_reset(s);
+> +
+> +    s->nic = qemu_new_nic(&net_ne2000_info, &s->c,
+> +                          object_get_typename(OBJECT(pci_dev)),
+> +                          pci_dev->qdev.id, s);
+> +    qemu_format_nic_info_str(qemu_get_queue(s->nic), s->c.macaddr.a);
+> +}
+> +
+> +static void pci_ne2000_exit(PCIDevice *pci_dev)
+> +{
+> +    PCINE2000State *d = DO_UPCAST(PCINE2000State, dev, pci_dev);
+> +    NE2000State *s = &d->ne2000;
+> +
+> +    qemu_del_nic(s->nic);
+> +    qemu_free_irq(s->irq);
+> +}
+> +
+> +static void ne2000_instance_init(Object *obj)
+> +{
+> +    PCIDevice *pci_dev = PCI_DEVICE(obj);
+> +    PCINE2000State *d = DO_UPCAST(PCINE2000State, dev, pci_dev);
+> +    NE2000State *s = &d->ne2000;
+> +
+> +    device_add_bootindex_property(obj, &s->c.bootindex,
+> +                                  "bootindex", "/ethernet-phy@0",
+> +                                  &pci_dev->qdev, NULL);
+> +}
+> +
+> +static Property ne2000_properties[] = {
+> +    DEFINE_NIC_PROPERTIES(PCINE2000State, ne2000.c),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void ne2000_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+> +
+> +    k->realize = pci_ne2000_realize;
+> +    k->exit = pci_ne2000_exit;
+> +    k->romfile = "efi-ne2k_pci.rom",
+> +    k->vendor_id = PCI_VENDOR_ID_REALTEK;
+> +    k->device_id = PCI_DEVICE_ID_REALTEK_8029;
+> +    k->class_id = PCI_CLASS_NETWORK_ETHERNET;
+> +    dc->vmsd = &vmstate_pci_ne2000;
+> +    dc->props = ne2000_properties;
+> +    set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
+> +}
+> +
+> +static const TypeInfo ne2000_info = {
+> +    .name          = "ne2k_pci",
+> +    .parent        = TYPE_PCI_DEVICE,
+> +    .instance_size = sizeof(PCINE2000State),
+> +    .class_init    = ne2000_class_init,
+> +    .instance_init = ne2000_instance_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+> +        { },
+> +    },
+> +};
+> +
+> +static void ne2000_register_types(void)
+> +{
+> +    type_register_static(&ne2000_info);
+> +}
+> +
+> +type_init(ne2000_register_types)
+> diff --git a/hw/net/ne2000.c b/hw/net/ne2000.c
+> index 037afc8052a..ca792d96f1b 100644
+> --- a/hw/net/ne2000.c
+> +++ b/hw/net/ne2000.c
+> @@ -22,7 +22,6 @@
+>   * THE SOFTWARE.
+>   */
+>  #include "qemu/osdep.h"
+> -#include "hw/pci/pci.h"
+>  #include "net/eth.h"
+>  #include "ne2000.h"
+>  #include "sysemu/sysemu.h"
+> @@ -118,11 +117,6 @@
+>  #define ENTSR_CDH 0x40	/* The collision detect "heartbeat" signal was lost. */
+>  #define ENTSR_OWC 0x80  /* There was an out-of-window collision. */
+>  
+> -typedef struct PCINE2000State {
+> -    PCIDevice dev;
+> -    NE2000State ne2000;
+> -} PCINE2000State;
+> -
+>  void ne2000_reset(NE2000State *s)
+>  {
+>      int i;
+> @@ -644,17 +638,6 @@ const VMStateDescription vmstate_ne2000 = {
+>      }
+>  };
+>  
+> -static const VMStateDescription vmstate_pci_ne2000 = {
+> -    .name = "ne2000",
+> -    .version_id = 3,
+> -    .minimum_version_id = 3,
+> -    .fields = (VMStateField[]) {
+> -        VMSTATE_PCI_DEVICE(dev, PCINE2000State),
+> -        VMSTATE_STRUCT(ne2000, PCINE2000State, 0, vmstate_ne2000, NE2000State),
+> -        VMSTATE_END_OF_LIST()
+> -    }
+> -};
+> -
+>  static uint64_t ne2000_read(void *opaque, hwaddr addr,
+>                              unsigned size)
+>  {
+> @@ -711,91 +694,3 @@ void ne2000_setup_io(NE2000State *s, DeviceState *dev, unsigned size)
+>  {
+>      memory_region_init_io(&s->io, OBJECT(dev), &ne2000_ops, s, "ne2000", size);
+>  }
+> -
+> -static NetClientInfo net_ne2000_info = {
+> -    .type = NET_CLIENT_DRIVER_NIC,
+> -    .size = sizeof(NICState),
+> -    .receive = ne2000_receive,
+> -};
+> -
+> -static void pci_ne2000_realize(PCIDevice *pci_dev, Error **errp)
+> -{
+> -    PCINE2000State *d = DO_UPCAST(PCINE2000State, dev, pci_dev);
+> -    NE2000State *s;
+> -    uint8_t *pci_conf;
+> -
+> -    pci_conf = d->dev.config;
+> -    pci_conf[PCI_INTERRUPT_PIN] = 1; /* interrupt pin A */
+> -
+> -    s = &d->ne2000;
+> -    ne2000_setup_io(s, DEVICE(pci_dev), 0x100);
+> -    pci_register_bar(&d->dev, 0, PCI_BASE_ADDRESS_SPACE_IO, &s->io);
+> -    s->irq = pci_allocate_irq(&d->dev);
+> -
+> -    qemu_macaddr_default_if_unset(&s->c.macaddr);
+> -    ne2000_reset(s);
+> -
+> -    s->nic = qemu_new_nic(&net_ne2000_info, &s->c,
+> -                          object_get_typename(OBJECT(pci_dev)), pci_dev->qdev.id, s);
+> -    qemu_format_nic_info_str(qemu_get_queue(s->nic), s->c.macaddr.a);
+> -}
+> -
+> -static void pci_ne2000_exit(PCIDevice *pci_dev)
+> -{
+> -    PCINE2000State *d = DO_UPCAST(PCINE2000State, dev, pci_dev);
+> -    NE2000State *s = &d->ne2000;
+> -
+> -    qemu_del_nic(s->nic);
+> -    qemu_free_irq(s->irq);
+> -}
+> -
+> -static void ne2000_instance_init(Object *obj)
+> -{
+> -    PCIDevice *pci_dev = PCI_DEVICE(obj);
+> -    PCINE2000State *d = DO_UPCAST(PCINE2000State, dev, pci_dev);
+> -    NE2000State *s = &d->ne2000;
+> -
+> -    device_add_bootindex_property(obj, &s->c.bootindex,
+> -                                  "bootindex", "/ethernet-phy@0",
+> -                                  &pci_dev->qdev, NULL);
+> -}
+> -
+> -static Property ne2000_properties[] = {
+> -    DEFINE_NIC_PROPERTIES(PCINE2000State, ne2000.c),
+> -    DEFINE_PROP_END_OF_LIST(),
+> -};
+> -
+> -static void ne2000_class_init(ObjectClass *klass, void *data)
+> -{
+> -    DeviceClass *dc = DEVICE_CLASS(klass);
+> -    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+> -
+> -    k->realize = pci_ne2000_realize;
+> -    k->exit = pci_ne2000_exit;
+> -    k->romfile = "efi-ne2k_pci.rom",
+> -    k->vendor_id = PCI_VENDOR_ID_REALTEK;
+> -    k->device_id = PCI_DEVICE_ID_REALTEK_8029;
+> -    k->class_id = PCI_CLASS_NETWORK_ETHERNET;
+> -    dc->vmsd = &vmstate_pci_ne2000;
+> -    dc->props = ne2000_properties;
+> -    set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
+> -}
+> -
+> -static const TypeInfo ne2000_info = {
+> -    .name          = "ne2k_pci",
+> -    .parent        = TYPE_PCI_DEVICE,
+> -    .instance_size = sizeof(PCINE2000State),
+> -    .class_init    = ne2000_class_init,
+> -    .instance_init = ne2000_instance_init,
+> -    .interfaces = (InterfaceInfo[]) {
+> -        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+> -        { },
+> -    },
+> -};
+> -
+> -static void ne2000_register_types(void)
+> -{
+> -    type_register_static(&ne2000_info);
+> -}
+> -
+> -type_init(ne2000_register_types)
+> 
 
-oh, right:)
-I'll use one big snprintf in next revision. thank you:)
+Queued, thanks.
 
-> 
-> > +	return ret;
-> > +}
-> > +
-> > +ssize_t intel_gvt_check_vfio_device_version(struct drm_i915_private *dev_priv,
-> > +		const char *self, const char *remote)
-> > +{
-> > +
-> > +	/* currently only gen8 & gen9 are supported */
-> > +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> > +		return -ENODEV;
-> > +
-> > +	if (!is_compatible(self, remote))
-> > +		return -EINVAL;
-> > +
-> > +	return 0;
-> > +}
-> > diff --git a/drivers/gpu/drm/i915/gvt/gvt.c b/drivers/gpu/drm/i915/gvt/gvt.c
-> > index 43f4242062dd..19f16eec5a4c 100644
-> > --- a/drivers/gpu/drm/i915/gvt/gvt.c
-> > +++ b/drivers/gpu/drm/i915/gvt/gvt.c
-> > @@ -105,14 +105,65 @@ static ssize_t description_show(struct kobject *kobj, struct device *dev,
-> >  		       type->weight);
-> >  }
-> >  
-> > +#ifdef GVT_MIGRATION_VERSION
-> > +static ssize_t version_show(struct kobject *kobj, struct device *dev,
-> > +		char *buf)
-> > +{
-> > +	struct drm_i915_private *i915 = kdev_to_i915(dev);
-> > +	const char *mdev_type = kobject_name(kobj);
-> > +
-> > +	return intel_gvt_get_vfio_device_version(i915, buf, mdev_type);
-> > +}
-> > +
-> > +static ssize_t version_store(struct kobject *kobj, struct device *dev,
-> > +		const char *buf, size_t count)
-> > +{
-> > +	char *remote = NULL, *self = NULL;
-> > +	int len, ret = 0;
-> > +	struct drm_i915_private *i915 = kdev_to_i915(dev);
-> > +	const char *mdev_type = kobject_name(kobj);
-> > +
-> > +	len = intel_gvt_get_vfio_device_version_len(i915);
-> > +	if (len < 0)
-> > +		return len;
-> > +
-> > +	self = kmalloc(len, GFP_KERNEL);
-> > +	if (!self)
-> > +		return -ENOMEM;
-> > +
-> > +	ret = intel_gvt_get_vfio_device_version(i915, self, mdev_type);
-> > +	if (ret < 0)
-> > +		goto out;
-> > +
-> > +	remote = kstrndup(buf, count, GFP_KERNEL);
-> > +	if (!remote) {
-> > +		ret = -ENOMEM;
-> > +		goto out;
-> > +	}
-> > +
-> > +	ret = intel_gvt_check_vfio_device_version(i915, self, remote);
-> > +
-> > +out:
-> > +	kfree(self);
-> > +	kfree(remote);
-> > +	return (ret < 0 ? ret : count);
-> > +}
-> > +#endif
-> > +
-> >  static MDEV_TYPE_ATTR_RO(available_instances);
-> >  static MDEV_TYPE_ATTR_RO(device_api);
-> >  static MDEV_TYPE_ATTR_RO(description);
-> > +#ifdef GVT_MIGRATION_VERSION
-> > +static MDEV_TYPE_ATTR_RW(version);
-> > +#endif
-> >  
-> >  static struct attribute *gvt_type_attrs[] = {
-> >  	&mdev_type_attr_available_instances.attr,
-> >  	&mdev_type_attr_device_api.attr,
-> >  	&mdev_type_attr_description.attr,
-> > +#ifdef GVT_MIGRATION_VERSION
-> > +	&mdev_type_attr_version.attr,
-> > +#endif
-> >  	NULL,
-> >  };
-> >  
-> > diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/gvt.h
-> > index f5a328b5290a..4062f6b26acf 100644
-> > --- a/drivers/gpu/drm/i915/gvt/gvt.h
-> > +++ b/drivers/gpu/drm/i915/gvt/gvt.h
-> > @@ -687,6 +687,12 @@ void intel_gvt_debugfs_remove_vgpu(struct intel_vgpu *vgpu);
-> >  int intel_gvt_debugfs_init(struct intel_gvt *gvt);
-> >  void intel_gvt_debugfs_clean(struct intel_gvt *gvt);
-> >  
-> > +ssize_t intel_gvt_get_vfio_device_version(struct drm_i915_private *i915,
-> > +		char *buf, const char *mdev_type);
-> > +ssize_t intel_gvt_check_vfio_device_version(struct drm_i915_private *dev_priv,
-> > +		const char *self, const char *remote);
-> > +ssize_t
-> > +intel_gvt_get_vfio_device_version_len(struct drm_i915_private *dev_priv);
-> >  
-> >  #include "trace.h"
-> >  #include "mpt.h"
-> > -- 
-> > 2.17.1
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> _______________________________________________
-> intel-gvt-dev mailing list
-> intel-gvt-dev@lists.freedesktop.org
-> https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
+Paolo
 
