@@ -6,75 +6,74 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1A6EC04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23713C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:28:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C568120449
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:27:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C568120449
+	by mail.kernel.org (Postfix) with ESMTPS id DDCE821019
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:28:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDCE821019
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35166 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35179 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOKjU-0006QU-4f
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 07:27:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38657)
+	id 1hOKks-0007AG-7N
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 07:28:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hOKd3-0000ka-NN
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:20:54 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hOKdV-0001Kf-Ul
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:21:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hOKd2-00079T-Hl
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:20:53 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:42898)
+	(envelope-from <pbonzini@redhat.com>) id 1hOKdU-0007Sg-JW
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:21:21 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43893)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOKd2-000797-Af
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:20:52 -0400
-Received: by mail-wr1-f66.google.com with SMTP id l2so26707477wrb.9
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 04:20:52 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hOKdU-0007Rr-CY
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:21:20 -0400
+Received: by mail-wr1-f65.google.com with SMTP id r4so11386635wro.10
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 04:21:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
 	:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=oiEVdit+cpH2GuKWB0ff/Ty4GRLoY1rtT38uhw2uAB4=;
-	b=isLwruZZp/BJ2EQ7C+TQCYgRzLqiBYS11b8JxQ1tNnh8dvMBL82MATpxZww08D8IA/
-	z+pNiMGCJaxj66iabud+fzn8yT0/Lh7tUfAKSuiW4i/D+dz8wiqNLi1tRRFKf3A0edSv
-	7Gk1TG7ogELE1DlYYO2CF2CS5omIG8ugCL2qKMTuoGS21OA9v5gBHUONHpuzdXZysECB
-	7RFoKvAqLIBROBWsvgGYKQS7PxSqUC2rchzTeoWMOWUeicmeJiuy5CrAZoVCCSLsec62
-	hzwtOogD0ZcH0TfKVP0NJO07a745faHc6sHlH14fwVauJC9yloQl3OM8IgmDg5KGajoo
-	/kAQ==
-X-Gm-Message-State: APjAAAWsH0zF7OkhbwJHaSdq3tTUXyAjVLCqBvqplQsb9CODklqCa3uK
-	+EjzTr7tabcPz+ChfiL+TR1/pA==
-X-Google-Smtp-Source: APXvYqxdLSJ+Ba+yVaPNf/e2/oibo+0Hr1fqtrwvjW3o1yWJUH0/8ud0BPhODBvxyLqZG3LPGIed/A==
-X-Received: by 2002:adf:f70a:: with SMTP id r10mr26000670wrp.96.1557314451276; 
-	Wed, 08 May 2019 04:20:51 -0700 (PDT)
+	bh=OSkIv40KGNgEnH+eUeMOVT6Y1cBfn7KPAxfBLJYU9Q4=;
+	b=biJW6mnbHYDjpkTqyc8fyVVQohs1lFJvFzchYmj7YNcLPLIC4LueuGUian0OpyqPNJ
+	718/ees0E9Tbsts6RJSLqvSlNp+lSCxn97WyDzU79NEJsCAIQjCli6u8KczBYqa2DBlB
+	TlYLv4hIWcElQ95i8cm0XxlehaxkOH8CAuDw5VibzSXdK3XZfq+MRL5Ehsl4nHEKa6C5
+	gDrrRs9UFuyoob/uK9zdEoyw75Ow+T8Ng5Foo5TKI+G84TenhzmabtxQHe4VPqQeQcgg
+	zLWaJtNPsAZ6KJH4O7ypX4RvZab1xHv1gTURqq0UWW56a5LeptA9mB2ZfB9rz0H1npiV
+	yAAw==
+X-Gm-Message-State: APjAAAUoiflliaIKwhXHFvEKnD0fpAl/gwMjQ2xIxwdaqIY3bfxIwgD9
+	z1eeL5x/Ca4wFmcIelaCPMd3Kg==
+X-Google-Smtp-Source: APXvYqzZ5HjaZl5n8dJogc9vkTmgZIKijkupsBbtaCnDRTouUGNyOkdYNgq2DvOtpjd5IGxtg9os2w==
+X-Received: by 2002:adf:e546:: with SMTP id z6mr20803268wrm.287.1557314479439; 
+	Wed, 08 May 2019 04:21:19 -0700 (PDT)
 Received: from [10.201.49.229] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
-	by smtp.gmail.com with ESMTPSA id
-	h16sm33014229wrb.31.2019.05.08.04.20.48
+	by smtp.gmail.com with ESMTPSA id a5sm3364716wrt.10.2019.05.08.04.21.16
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 08 May 2019 04:20:50 -0700 (PDT)
+	Wed, 08 May 2019 04:21:18 -0700 (PDT)
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
 	Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, 
 	qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 References: <20190507163416.24647-1-philmd@redhat.com>
-	<20190507163416.24647-17-philmd@redhat.com>
+	<20190507163416.24647-16-philmd@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b08740c8-96fc-e336-78cd-66d595d6be98@redhat.com>
-Date: Wed, 8 May 2019 13:20:48 +0200
+Message-ID: <e2029e72-f8dc-caee-4db9-277041fba5f1@redhat.com>
+Date: Wed, 8 May 2019 13:21:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190507163416.24647-17-philmd@redhat.com>
+In-Reply-To: <20190507163416.24647-16-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH v2 16/16] hw/intc/nvic: Use
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH v2 15/16] hw/arm/mps2: Use
  object_initialize_child for correct reference counting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -133,7 +132,7 @@ On 07/05/19 11:34, Philippe Mathieu-Daudé wrote:
 >  +   sysbus_init_child_obj(OBJECT(PARENT_OBJ), "CHILD_NAME", child_ptr,
 >  +                         child_size, child_type);
 > 
-> We let NVIC adopt the SysTick timer.
+> We let the MPS2 boards adopt the cpu core, the FPGA and the SCC children.
 > 
 > While the object_initialize() function doesn't take an
 > 'Error *errp' argument, the object_initialize_child() does.
@@ -157,31 +156,66 @@ On 07/05/19 11:34, Philippe Mathieu-Daudé wrote:
 > Inspired-by: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/intc/armv7m_nvic.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  hw/arm/mps2-tz.c | 8 ++++----
+>  hw/arm/mps2.c    | 8 ++++----
+>  2 files changed, 8 insertions(+), 8 deletions(-)
 > 
-> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-> index fff6e694e60..2334fe51426 100644
-> --- a/hw/intc/armv7m_nvic.c
-> +++ b/hw/intc/armv7m_nvic.c
-> @@ -2568,9 +2568,9 @@ static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
->           * as we didn't know then if the CPU had the security extensions;
->           * so we have to do it here.
->           */
-> -        object_initialize(&s->systick[M_REG_S], sizeof(s->systick[M_REG_S]),
-> -                          TYPE_SYSTICK);
-> -        qdev_set_parent_bus(DEVICE(&s->systick[M_REG_S]), sysbus_get_default());
-> +        sysbus_init_child_obj(OBJECT(dev), "systick-reg-s",
-> +                              &s->systick[M_REG_S],
-> +                              sizeof(s->systick[M_REG_S]), TYPE_SYSTICK);
+> diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
+> index 7832408bb70..82dce1a7b38 100644
+> --- a/hw/arm/mps2-tz.c
+> +++ b/hw/arm/mps2-tz.c
+> @@ -214,9 +214,9 @@ static MemoryRegion *make_scc(MPS2TZMachineState *mms, void *opaque,
+>      DeviceState *sccdev;
+>      MPS2TZMachineClass *mmc = MPS2TZ_MACHINE_GET_CLASS(mms);
 >  
->          object_property_set_bool(OBJECT(&s->systick[M_REG_S]), true,
->                                   "realized", &err);
+> -    object_initialize(scc, sizeof(mms->scc), TYPE_MPS2_SCC);
+> +    sysbus_init_child_obj(OBJECT(mms), "scc", scc,
+> +                          sizeof(mms->scc), TYPE_MPS2_SCC);
+>      sccdev = DEVICE(scc);
+> -    qdev_set_parent_bus(sccdev, sysbus_get_default());
+>      qdev_prop_set_uint32(sccdev, "scc-cfg4", 0x2);
+>      qdev_prop_set_uint32(sccdev, "scc-aid", 0x00200008);
+>      qdev_prop_set_uint32(sccdev, "scc-id", mmc->scc_id);
+> @@ -229,8 +229,8 @@ static MemoryRegion *make_fpgaio(MPS2TZMachineState *mms, void *opaque,
+>  {
+>      MPS2FPGAIO *fpgaio = opaque;
+>  
+> -    object_initialize(fpgaio, sizeof(mms->fpgaio), TYPE_MPS2_FPGAIO);
+> -    qdev_set_parent_bus(DEVICE(fpgaio), sysbus_get_default());
+> +    sysbus_init_child_obj(OBJECT(mms), "fpgaio", fpgaio,
+> +                          sizeof(mms->fpgaio), TYPE_MPS2_FPGAIO);
+>      object_property_set_bool(OBJECT(fpgaio), true, "realized", &error_fatal);
+>      return sysbus_mmio_get_region(SYS_BUS_DEVICE(fpgaio), 0);
+>  }
+> diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+> index 54b7395849f..ecb8ae3c14c 100644
+> --- a/hw/arm/mps2.c
+> +++ b/hw/arm/mps2.c
+> @@ -174,9 +174,9 @@ static void mps2_common_init(MachineState *machine)
+>          g_assert_not_reached();
+>      }
+>  
+> -    object_initialize(&mms->armv7m, sizeof(mms->armv7m), TYPE_ARMV7M);
+> +    sysbus_init_child_obj(OBJECT(mms), "armv7m", &mms->armv7m,
+> +                          sizeof(mms->armv7m), TYPE_ARMV7M);
+>      armv7m = DEVICE(&mms->armv7m);
+> -    qdev_set_parent_bus(armv7m, sysbus_get_default());
+>      switch (mmc->fpga_type) {
+>      case FPGA_AN385:
+>          qdev_prop_set_uint32(armv7m, "num-irq", 32);
+> @@ -308,9 +308,9 @@ static void mps2_common_init(MachineState *machine)
+>                         qdev_get_gpio_in(armv7m, 10));
+>      sysbus_mmio_map(SYS_BUS_DEVICE(&mms->dualtimer), 0, 0x40002000);
+>  
+> -    object_initialize(&mms->scc, sizeof(mms->scc), TYPE_MPS2_SCC);
+> +    sysbus_init_child_obj(OBJECT(mms), "scc", &mms->scc,
+> +                          sizeof(mms->scc), TYPE_MPS2_SCC);
+>      sccdev = DEVICE(&mms->scc);
+> -    qdev_set_parent_bus(sccdev, sysbus_get_default());
+>      qdev_prop_set_uint32(sccdev, "scc-cfg4", 0x2);
+>      qdev_prop_set_uint32(sccdev, "scc-aid", 0x00200008);
+>      qdev_prop_set_uint32(sccdev, "scc-id", mmc->scc_id);
 > 
-
-Nice, the M_REG_NS is already using sysbus_init_child_obj. :)
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Paolo
 
