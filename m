@@ -2,81 +2,65 @@ Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D3C4C04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:31:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA753C04A6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:34:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A1D021019
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:31:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NRSLhEt2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A1D021019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A19A321479
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 11:34:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A19A321479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35228 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35243 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOKnX-0000UZ-JS
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 07:31:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40401)
+	id 1hOKqc-0001hx-WA
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 07:34:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1hOKmS-0007gz-A3
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:30:37 -0400
+	(envelope-from <yan.y.zhao@intel.com>) id 1hOKpJ-0000yE-LJ
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:33:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1hOKmR-0004Od-15
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:30:36 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:38442)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
-	id 1hOKmQ-0004Kk-P7
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:30:34 -0400
-Received: by mail-lj1-x241.google.com with SMTP id u21so8023835lja.5
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 04:30:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=euDbYukUunzWf2Zre5ZSrbtkk4J2+ci9a3w4dyAZO/M=;
-	b=NRSLhEt2wl4A+ew+zj3Ev1XksjInP1szlciL8baa0fGf/S1e6yIQMpNp6nudnR/xvf
-	KB/l8jNQEPZahWzBr07Tw/uXbrBjMhRpz59Yh+3nTQjZUN2akHu0T0ivMRjGvv3vwUhv
-	inX/hoZaot/a6GUNnaxlAGrM793kBpWp6iAUlq8gNaWGnzce1qgPFCyBvykGjOsQ9S+6
-	w8LgUlcEGXaemrr8UuTKT1q4mHTeR0j4Cf+5a742el5q4h5QRJZhy1woQwV/jxxKfnra
-	E/gAayrgDYIjzc+LeGfxF4U5692TxODWdAuoqxFU3b+AuZO0swzsf5S+47YY1ttC1531
-	yl8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=euDbYukUunzWf2Zre5ZSrbtkk4J2+ci9a3w4dyAZO/M=;
-	b=Sa0btZT5oWjUMHS75iK6Qk7E1libL//zqxQ+I3Y4PcxHm1DOs+efk2tneAf8jtVt9i
-	N472ZdlIdYglr7oV4yG1Vds/6NI189yFzpwEvNsjhIYBAA1JRRvm2yaW4Vkci71tAfPN
-	4BdpMPemCHs3PiGJw5jXKEZxojlKiD4WnuWL6IZwDWohXsg7OKEJyj48yUICw7unUnbr
-	D5mY2vSHeo3y3HOEFvpFxPUe5ovAYNkRF+suXPt/hxSukIsmWX/4vFKgUd3exFrQZn2u
-	bqpMzGx5lGIXHOnO+EBaZbqefErp8Zzo5M4tbEazDOoiKgx7lrqtup31kgsl3QbHU4Dq
-	Mbqg==
-X-Gm-Message-State: APjAAAWi2z3w1QBLDEAhoPbmgr9J55jSGcLijQWARErLU+tazh0zocI4
-	LsMVIIMmtPqhe4/EOEbA8hA4trxhJ4/tMntNm0dQAQ==
-X-Google-Smtp-Source: APXvYqwPubgcfbLDod8OswjE7/W7r6HB/KvX5Yrl1gxSNwxLXDjD+VsABjk6RS9bZWmxLuFGmw/i2BGuMbU6MsWESPk=
-X-Received: by 2002:a2e:894e:: with SMTP id b14mr15563289ljk.158.1557315033407;
-	Wed, 08 May 2019 04:30:33 -0700 (PDT)
+	(envelope-from <yan.y.zhao@intel.com>) id 1hOKpG-0006Y4-Ri
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:33:33 -0400
+Received: from mga04.intel.com ([192.55.52.120]:49636)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+	id 1hOKpG-0006Uf-Fh
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 07:33:30 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+	by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	08 May 2019 04:33:23 -0700
+X-ExtLoop1: 1
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+	([10.239.13.9])
+	by orsmga007.jf.intel.com with ESMTP; 08 May 2019 04:33:17 -0700
+Date: Wed, 8 May 2019 07:27:40 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20190508112740.GA24397@joy-OptiPlex-7040>
+References: <20190506014514.3555-1-yan.y.zhao@intel.com>
+	<20190506014904.3621-1-yan.y.zhao@intel.com>
+	<20190507151826.502be009@x1.home>
 MIME-Version: 1.0
-References: <1555560291-3415-1-git-send-email-hongbo.zhang@linaro.org>
-	<1555560291-3415-3-git-send-email-hongbo.zhang@linaro.org>
-	<CAFEAcA-poCxPqPtfhx4mUJ5pcOjn1Hz-WNxEt29f=JgpFMi4Kg@mail.gmail.com>
-In-Reply-To: <CAFEAcA-poCxPqPtfhx4mUJ5pcOjn1Hz-WNxEt29f=JgpFMi4Kg@mail.gmail.com>
-From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Wed, 8 May 2019 19:30:26 +0800
-Message-ID: <CAHmQWvB4AZGM+MV0LP-vtfoW0kG4RFkf0R6NoRWm8WrFuum+Og@mail.gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190507151826.502be009@x1.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH v7 2/2] hw/arm: Add arm SBSA reference
- machine, devices part
+X-Received-From: 192.55.52.120
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] vfio/mdev: add version attribute
+ for mdev device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,131 +72,464 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	Markus Armbruster <armbru@redhat.com>,
-	Leif Lindholm <leif.lindholm@linaro.org>,
-	QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"aik@ozlabs.ru" <aik@ozlabs.ru>,
+	"Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+	"shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+	"eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+	"eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+	Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+	"pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+	"libvir-list@redhat.com" <libvir-list@redhat.com>,
+	"arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
+	"felipe@nutanix.com" <felipe@nutanix.com>,
+	"Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+	"dgilbert@redhat.com" <dgilbert@redhat.com>,
+	"zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+	"dinechin@redhat.com" <dinechin@redhat.com>,
+	"intel-gvt-dev@lists.freedesktop.org"
+	<intel-gvt-dev@lists.freedesktop.org>, "Liu,
+	Changpeng" <changpeng.liu@intel.com>,
+	"cohuck@redhat.com" <cohuck@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Wang, Zhi A" <zhi.a.wang@intel.com>,
+	"jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "He,
+	Shaopeng" <shaopeng.he@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Apr 2019 at 22:17, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Thu, 18 Apr 2019 at 05:05, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
-> >
-> > Following the previous patch, this patch adds peripheral devices to the
-> > newly introduced SBSA-ref machine.
-> >
-> > Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
+On Wed, May 08, 2019 at 05:18:26AM +0800, Alex Williamson wrote:
+> On Sun,  5 May 2019 21:49:04 -0400
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
+> 
+> > version attribute is used to check two mdev devices' compatibility.
+> > 
+> > The key point of this version attribute is that it's rw.
+> > User space has no need to understand internal of device version and no
+> > need to compare versions by itself.
+> > Compared to reading version strings from both two mdev devices being
+> > checked, user space only reads from one mdev device's version attribute.
+> > After getting its version string, user space writes this string into the
+> > other mdev device's version attribute. Vendor driver of mdev device
+> > whose version attribute being written will check device compatibility of
+> > the two mdev devices for user space and return success for compatibility
+> > or errno for incompatibility.
+> > So two readings of version attributes + checking in user space are now
+> > changed to one reading + one writing of version attributes + checking in
+> > vendor driver.
+> > Format and length of version strings are now private to vendor driver
+> > who can define them freely.
+> > 
+> >              __ user space
+> >               /\          \
+> >              /             \write
+> >             / read          \
+> >      ______/__           ___\|/___
+> >     | version |         | version |-->check compatibility
+> >     -----------         -----------
+> >     mdev device A       mdev device B
+> > 
+> > This version attribute is optional. If a mdev device does not provide
+> > with a version attribute, this mdev device is incompatible to all other
+> > mdev devices.
+> > 
+> > Live migration is able to take advantage of this version attribute.
+> > Before user space actually starts live migration, it can first check
+> > whether two mdev devices are compatible.
+> > 
+> > v2:
+> > 1. added detailed intent and usage
+> > 2. made definition of version string completely private to vendor driver
+> >    (Alex Williamson)
+> > 3. abandoned changes to sample mdev drivers (Alex Williamson)
+> > 4. mandatory --> optional (Cornelia Huck)
+> > 5. added description for errno (Cornelia Huck)
+> > 
+> > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > Cc: Erik Skultety <eskultet@redhat.com>
+> > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > Cc: Cornelia Huck <cohuck@redhat.com>
+> > Cc: "Tian, Kevin" <kevin.tian@intel.com>
+> > Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+> > Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
+> > Cc: Neo Jia <cjia@nvidia.com>
+> > Cc: Kirti Wankhede <kwankhede@nvidia.com>
+> > Cc: Daniel P. Berrangé <berrange@redhat.com>
+> > Cc: Christophe de Dinechin <dinechin@redhat.com>
+> > 
+> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 > > ---
-> >  hw/arm/sbsa-ref.c | 451 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 451 insertions(+)
+> >  Documentation/vfio-mediated-device.txt | 140 +++++++++++++++++++++++++
+> >  1 file changed, 140 insertions(+)
+> > 
+> > diff --git a/Documentation/vfio-mediated-device.txt b/Documentation/vfio-mediated-device.txt
+> > index c3f69bcaf96e..013a764968eb 100644
+> > --- a/Documentation/vfio-mediated-device.txt
+> > +++ b/Documentation/vfio-mediated-device.txt
+> > @@ -202,6 +202,7 @@ Directories and files under the sysfs for Each Physical Device
+> >    |     |   |--- available_instances
+> >    |     |   |--- device_api
+> >    |     |   |--- description
+> > +  |     |   |--- version
+> >    |     |   |--- [devices]
+> >    |     |--- [<type-id>]
+> >    |     |   |--- create
+> > @@ -209,6 +210,7 @@ Directories and files under the sysfs for Each Physical Device
+> >    |     |   |--- available_instances
+> >    |     |   |--- device_api
+> >    |     |   |--- description
+> > +  |     |   |--- version
+> >    |     |   |--- [devices]
+> >    |     |--- [<type-id>]
+> >    |          |--- create
+> > @@ -216,6 +218,7 @@ Directories and files under the sysfs for Each Physical Device
+> >    |          |--- available_instances
+> >    |          |--- device_api
+> >    |          |--- description
+> > +  |          |--- version
+> >    |          |--- [devices]
+> 
+> I thought there was a request to make this more specific to migration
+> by renaming it to something like migration_version.  Also, as an
 >
-> Some fairly minor comments on this one.
->
-> > +static void create_flash(const SBSAMachineState *vms,
-> > +                         MemoryRegion *sysmem,
-> > +                         MemoryRegion *secure_sysmem)
-> > +{
-> > +    /*
-> > +     * Create one secure and nonsecure flash devices to fill SBSA_FLASH
-> > +     * space in the memmap, file passed via -bios goes in the first one.
-> > +     */
-> > +    hwaddr flashsize = vms->memmap[SBSA_FLASH].size / 2;
-> > +    hwaddr flashbase = vms->memmap[SBSA_FLASH].base;
-> > +
-> > +    create_one_flash("sbsa-ref.flash0", flashbase, flashsize,
-> > +                     bios_name, secure_sysmem);
-> > +    create_one_flash("sbsa-ref.flash1", flashbase + flashsize, flashsize,
-> > +                     NULL, sysmem);
-> > +}
->
-> I think Markus might have an opinion on the best way to create
-> flash devices on a new board model. Is "just create two flash
-> devices the way the virt board does" the right thing?
->
-For the firmware part, we are using two flashes, one secure and
-another non-secure.
+so this attribute may not only include a mdev device's parent device info and
+mdev type, but also include numeric software version of vendor specific
+migration code, right?
+This actually makes sense.
+So, do I need to add a disclaimer in this doc like:
+vendor driver should be responsible by itself for a mdev device's migration
+compatibility. 
+During migration setup phase, general migration code in user space VFIO only
+checks this version of VFIO migration region, and will not check software version
+of vendor specific migration code.
+It is suggested to incorporate at least parent device info and software version
+of vendor specific migration code into this migration_version attribute.
 
-> > +static void create_ahci(const SBSAMachineState *vms, qemu_irq *pic)
-> > +{
-> > +    hwaddr base = vms->memmap[SBSA_AHCI].base;
-> > +    int irq = vms->irqmap[SBSA_AHCI];
-> > +    DeviceState *dev;
-> > +    DriveInfo *hd[NUM_SATA_PORTS];
-> > +    SysbusAHCIState *sysahci;
-> > +    AHCIState *ahci;
-> > +    int i;
-> > +
-> > +    dev = qdev_create(NULL, "sysbus-ahci");
-> > +    qdev_prop_set_uint32(dev, "num-ports", NUM_SATA_PORTS);
-> > +    qdev_init_nofail(dev);
-> > +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
-> > +    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[irq]);
-> > +
-> > +    sysahci = SYSBUS_AHCI(dev);
-> > +    ahci = &sysahci->ahci;
-> > +    ide_drive_get(hd, ARRAY_SIZE(hd));
-> > +    for (i = 0; i < ahci->ports; i++) {
-> > +        if (hd[i] == NULL) {
-> > +            continue;
-> > +        }
-> > +        ide_create_drive(&ahci->dev[i].port, 0, hd[i]);
-> > +    }
-> > +}
-> > +
-> > +static void create_ehci(const SBSAMachineState *vms, qemu_irq *pic)
-> > +{
-> > +    hwaddr base = vms->memmap[SBSA_EHCI].base;
-> > +    int irq = vms->irqmap[SBSA_EHCI];
-> > +    USBBus *usb_bus;
-> > +
-> > +    sysbus_create_simple("platform-ehci-usb", base, pic[irq]);
-> > +
-> > +    usb_bus = usb_bus_find(-1);
-> > +    usb_create_simple(usb_bus, "usb-kbd");
-> > +    usb_create_simple(usb_bus, "usb-mouse");
->
-> I don't think we should automatically create the usb keyboard
-> and mouse devices. The user can do it on the command line if they
-> want them.
->
-OK.
+> optional attribute, it seems the example should perhaps not add it to
+> all types to illustrate that it is not required.
+ok. got it.
 
-> >  static void sbsa_ref_init(MachineState *machine)
-> >  {
-> >      SBSAMachineState *vms = SBSA_MACHINE(machine);
-> > @@ -125,6 +552,7 @@ static void sbsa_ref_init(MachineState *machine)
-> >      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
-> >      const CPUArchIdList *possible_cpus;
-> >      int n, sbsa_max_cpus;
-> > +    qemu_irq pic[NUM_IRQS];
-> >
-> >      if (strcmp(machine->cpu_type, ARM_CPU_TYPE_NAME("cortex-a57"))) {
-> >          error_report("sbsa-ref: CPU type other than the built-in "
-> > @@ -209,11 +637,34 @@ static void sbsa_ref_init(MachineState *machine)
-> >                                           machine->ram_size);
-> >      memory_region_add_subregion(sysmem, vms->memmap[SBSA_MEM].base, ram);
-> >
-> > +    create_fdt(vms);
-> > +
-> > +    create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
-> > +
-> > +    create_secure_ram(vms, secure_sysmem);
-> > +
-> > +    create_gic(vms, pic);
-> > +
-> > +    create_uart(vms, pic, SBSA_UART, sysmem, serial_hd(0));
-> > +    create_uart(vms, pic, SBSA_SECURE_UART, secure_sysmem, serial_hd(1));
-> > +    create_uart(vms, pic, SBSA_SECURE_UART_MM, secure_sysmem, serial_hd(2));
->
-> What's the third UART for (ie what is the name intended to mean)?
-> Should we have more than one non-secure UART?
->
-Yes, this is called " Standalone Management Mode", I will add comment
-for it, this is needed by server RAS feature.
 
-> thanks
-> -- PMM
+> >  
+> >  * [mdev_supported_types]
+> > @@ -246,6 +249,143 @@ Directories and files under the sysfs for Each Physical Device
+> >    This attribute should show the number of devices of type <type-id> that can be
+> >    created.
+> >  
+> > +* version
+> > +
+> > +  This attribute is rw, and is optional.
+> > +  It is used to check device compatibility between two mdev devices and is
+> 
+> between two mdev devices of the same type.
+>
+ok. got it.
+But I have a question about aggregation proposed earlier.
+Do we also have to assume the two mdev devices are of the same aggregation
+count?
+However, aggregation count is not available before a mdev device is created. :(
+
+
+> > +  accessed in pairs between the two mdev devices being checked.
+> 
+> "in pairs"?
+I meant, user space needs to access version attributes from two mdev device.
+but seems that it's needless to mention that... I'll remove it :)
+
+
+> > +  The intent of this attribute is to make an mdev device's version opaque to
+> > +  user space, so instead of reading two mdev devices' version strings and
+> 
+> perhaps "...instead of reading the version string of two mdev devices
+> and comparing them in userspace..."
+yes, better, thanks:)
+
+> > +  comparing in userspace, user space should only read one mdev device's version
+> > +  attribute, and writes this version string into the other mdev device's version
+> > +  attribute. Then vendor driver of mdev device whose version attribute being
+> > +  written would check the incoming version string and tell user space whether
+> > +  the two mdev devices are compatible via return value. That's why this
+> > +  attribute is writable.
+> > +
+> > +  when reading this attribute, it should show device version string of
+> > +  the device of type <type-id>.
+> > +
+> > +  This string is private to vendor driver itself. Vendor driver is able to
+> > +  freely define format and length of device version string.
+> > +  e.g. It can use a combination of pciid of parent device + mdev type.
+> 
+> Can the user assume the data contents of the string is ascii
+> characters?  It's good that the vendor driver defines the format and
+> length, but the user probably needs some expectation bounding that
+> length.  Should we define it as no larger than PATH_MAX (4096), or maybe
+> NAME_MAX (255) might be more reasonable?
+I think so. I'll add those restrictions in next revision. 
+
+> > +
+> > +  When writing a string to this attribute, vendor driver should analyze this
+> > +  string and check whether the mdev device being identified by this string is
+> > +  compatible with the mdev device for this attribute. vendor driver should then
+> 
+> Compatible for what purpose?  I think this is where specifically
+> calling this a migration_version potentially has value.
+yes. if it also covers version of vendor specific migration code, calling it
+migration_version is more appropriate.
+
+> > +  return written string's length if it regards the two mdev devices are
+> > +  compatible; vendor driver should return negative errno if it regards the two
+> > +  mdev devices are not compatible.
+> 
+> IOW, the write(2) will succeed if the version is determined to be
+> compatible and otherwise fail with vendor specific errno.
+>
+thanks:)
+
+> > +
+> > +  User space should treat ANY of below conditions as two mdev devices not
+> > +  compatible:
+> 
+> (0) The mdev devices are not of the same type.
+>
+the same as above. do we also need to take aggregation count into consideration?
+
+> > +  (1) any one of the two mdev devices does not have a version attribute
+> > +  (2) error when read from one mdev device's version attribute
+> 
+> Is this intended to support that the vendor driver can supply a version
+> attribute but not support migration?  TBH, this sounds like a vendor
+> driver bug, but maybe it's necessary if the vendor driver could have
+> some types that support migration and others that do not?  IOW, we're
+> supplying the same attribute groups to all devices from a vendor, in
+> which case my comment above regarding an example type without a version
+> attribute might be invalid.
+hmm, this is to make life easier for vendor driver to have some types that
+support migration and others that do not. while we can get rid of returning
+errno by providing different attribute groups to different devices, the way of
+returning errno gives a simpler choice to vendors.
+
+> 
+> > +  (3) error when write one mdev device's version string to the other mdev
+> > +  device's version attribute
+> > +
+> > +  User space should regard two mdev devices compatible when ALL of below
+> > +  conditions are met:
+> 
+> (0) The mdev devices are of the same type
+> 
+> > +  (1) success when read from one mdev device's version attribute.
+> > +  (2) success when write one mdev device's version string to the other mdev
+> > +  device's version attribute
+> > +
+> > +  Errno:
+> > +  If vendor driver wants to claim a mdev device incompatible to all other mdev
+> > +  devices, it should not register version attribute for this mdev device. But if
+> > +  a vendor driver has already registered version attribute and it wants to claim
+> > +  a mdev device incompatible to all other mdev devices, it needs to return
+> > +  -ENODEV on access to this mdev device's version attribute.
+> > +  If a mdev device is only incompatible to certain mdev devices, write of
+> > +  incompatible mdev devices's version strings to its version attribute should
+> > +  return -EINVAL;
+> 
+> I think it's best not to define the specific errno returned for a
+> specific situation, let the vendor driver decide, userspace simply
+> needs to know that an errno on read indicates the device does not
+> support migration version comparison and that an errno on write
+> indicates the devices are incompatible or the target doesn't support
+> migration versions.
+>
+yes, user space only gets 0 or 1 as return code, not those errno. 
+maybe I only need to describe errno in patch 2/2.
+
+> > +
+> > +  This attribute can be taken advantage of by live migration.
+> > +  If user space detects two mdev devices are compatible through version
+> > +  attribute, it can start migration between the two mdev devices, otherwise it
+> > +  should abort its migration attempts between the two mdev devices.
+> > +
+> > +  Example Usage:
+> > +  case 1:
+> > +  source side mdev device is of uuid 5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd,
+> > +  its mdev type is i915-GVTg_V5_4. pci id of parent device is 8086-193b.
+> > +  target side mdev device is if of uuid 882cc4da-dede-11e7-9180-078a62063ab1,
+> > +  its mdev type is i915-GVTg_V5_4. pci id of parent device is 8086-193b.
+> > +
+> > +  # readlink /sys/bus/pci/devices/0000\:00\:02.0/\
+> > +  5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/mdev_type
+> > +  ../mdev_supported_types/i915-GVTg_V5_4
+> > +
+> > +  # readlink /sys/bus/pci/devices/0000\:00\:02.0/\
+> > +  882cc4da-dede-11e7-9180-078a62063ab1/mdev_type
+> > +  ../mdev_supported_types/i915-GVTg_V5_4
+> > +
+> > +  (1) read source side mdev device's version.
+> > +  #cat \
+> > +    /sys/bus/pci/devices/0000\:00\:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/\
+> > +    mdev_type/version
+> > +  8086-193b-i915-GVTg_V5_4
+> 
+> Is this really the version information exposed in 2/2?  This is opaque,
+> so of course you can add things later, but it seems short sighted not
+> to even append a version 0 tag to account for software compatibility
+> differences since the above only represents a parent and mdev type
+> based version.
+> 
+yes, currently in 2/2, the version only includes <vendor id> + <device id> +
+<mdev type>. but you are right, it's better to include software migration
+version number.
+so vendor drivers have below 3 ways to designate a mdev device has no migration
+capability.
+1. not registering migration_version attribute
+2. on reading migration_version, returning errno
+3. on reading migration_version, returning string indicating non-migratable.
+
+The reason of not giving up way 2 is that maybe it can accelerate user space
+getting information of device incompatible. if we only keep way 3, it would not
+know this info until writing this string to target attribute.
+
+do you agree?
+
+> > +  (2) write source side mdev device's version string into target side mdev
+> > +  device's version attribute.
+> > +  # echo 8086-193b-i915-GVTg_V5_4 >
+> > +   /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab1/\
+> > +  mdev_type/version
+> > +  # echo $?
+> > +  0
+> 
+> TBH, there's a lot of superfluous information in this example that can
+> be stripped out.  For example:
+> 
+> "
+> (1) Compare mdev types:
+> 
+> The mdev type of an instantiated device can be read from the mdev_type
+> link within the device instance in sysfs, for example:
+> 
+>   # basename $(readlink -f /sys/bus/mdev/devices/$MDEV_UUID/mdev_type/)
+> 
+> The mdev types available on a given host system can also be found
+> through /sys/class/mdev_bus, for example:
+> 
+>   # ls /sys/class/mdev_bus/*/mdev_supported_types/
+> 
+> Migration is only possible between devices of the same mdev type.
+> 
+> (2) Retrieve the mdev source version:
+> 
+> The migration version information can either be read from the mdev_type
+> link on an instantiated device:
+> 
+>   # cat /sys/bus/mdev/devices/$UUID1/mdev_type/version
+> 
+> Or it can be read from the mdev type definition, for example:
+> 
+>   # cat /sys/class/mdev_bus/*/mdev_supported_types/$MDEV_TYPE/version
+> 
+> If reading the source version generates an error, migration is not
+> possible.  NB, there might be several parent devices for a given mdev
+> type on a host system, each may support or expose different versions.
+> Matching the specific mdev type to a parent may become important in
+> such configurations.
+> 
+> (3) Test source version at target:
+> 
+> Given a version as outlined above, its compatibility to an instantiated
+> device of the same mdev type can be tested as:
+> 
+>   # echo $VERSION > /sys/bus/mdev/devices/$UUID2/mdev_type/version
+> 
+> If this write fails, the source and target versions are not compatible
+> or the target does not support migration.
+> 
+> Compatibility can also be tested prior to target device creation using
+> the mdev type definition for a parent device with a previously found
+> matching mdev type, for example:
+> 
+>   # echo $VERSION > /sys/class/mdev_bus/$PARENT/mdev_supported_types/$MDEV_TYPE/version
+> 
+> Again, an error writing the version indicates that an instance of this
+> mdev type would not support a migration from the provided version.
+> "
+> 
+> In particular from the provided example, the specific UUIDs, mdev
+> types, parent information, and contents of the version attribute do not
+> contribute to illustrating the protocol.  In fact, displaying the
+> contents of the version attribute may tempt users to do comparison on
+> their own, especially given how easy it is to decide the GVT-g version
+> string.
+>
+got it!
+great thanks!
+I'll update it to the next revision.
+> 
+> > +
+> > +  in this case, user space's write to target side mdev device's version
+> > +  attribute returns success to indicate the two mdev devices are compatible.
+> > +
+> > +  case 2:
+> > +  source side mdev device is of uuid 5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd,
+> > +  its mdev type is i915-GVTg_V5_4. pci id of parent device is 8086-193b.
+> > +  target side mdev device is if of uuid 882cc4da-dede-11e7-9180-078a62063ab1,
+> > +  its mdev type is i915-GVTg_V5_4. pci id of parent device is 8086-191b.
+> > +
+> > +  # readlink /sys/bus/pci/devices/0000\:00\:02.0/\
+> > +  5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/mdev_type
+> > +  ../mdev_supported_types/i915-GVTg_V5_4
+> > +
+> > +  # readlink /sys/bus/pci/devices/0000\:00\:02.0/\
+> > +  882cc4da-dede-11e7-9180-078a62063ab1/mdev_type
+> > +  ../mdev_supported_types/i915-GVTg_V5_4
+> > +
+> > +  (1) read source side mdev device's version.
+> > +  #cat \
+> > +    /sys/bus/pci/devices/0000\:00\:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/\
+> > +    mdev_type/version
+> > +  8086-193b-i915-GVTg_V5_4
+> > +
+> > +  (2) write source side mdev device's version string into target side mdev
+> > +  device's version attribute.
+> > +  # echo 8086-193b-i915-GVTg_V5_4 >
+> > +   /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab1/\
+> > +  mdev_type/version
+> > +  -bash: echo: write error: Invalid argument
+> > +
+> > +  in this case, user space's write to target side mdev device's version
+> > +  attribute returns error to indicate the two mdev devices are incompatible.
+> > +  (incompatible because pci ids of the two mdev devices' parent devices are
+> > +  different).
+> > +
+> > +  case 3:
+> > +  source side mdev device is of uuid 5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd,
+> > +  its mdev type is i915-GVTg_V5_4. pci id of parent device is 8086-193b.
+> > +  But vendor driver does not provide version attribute for this device.
+> > +
+> > +  (1) read source side mdev device's version.
+> > +  #cat \
+> > +    /sys/bus/pci/devices/0000\:00\:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/\
+> > +    mdev_type/version
+> > +  cat: '/sys/bus/pci/devices/0000:00:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/\
+> > +  mdev_type/version': No such file or directory
+> > +
+> > +  in this case, user space reads source side mdev device's version attribute
+> > +  which does not exist however. user space regards the two mdev devices as not
+> > +  compatible and will not start migration between the two mdev devices.
+> > +
+> > +
+> 
+> This is far too long for description and examples, it's not this
+> complicated.  Thanks,
+>
+got it. I'll follow your above example :)
+
+thanks
+Yan 
+> >  * [device]
+> >  
+> >    This directory contains links to the devices of type <type-id> that have been
+> 
 
