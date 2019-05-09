@@ -2,82 +2,64 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F120CC04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:55:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 480E7C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:57:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDE7B20675
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:55:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dsq7XGhe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDE7B20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 199F420675
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:57:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 199F420675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54957 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54969 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOjWO-0002na-Tj
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 09:55:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54435)
+	id 1hOjXx-0003ic-Cx
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 09:57:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hOjVO-000289-Nu
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:54:39 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hOjX6-0003Iy-G6
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:56:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hOjVN-0005qh-QH
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:54:38 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38819)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1hOjVN-0005qF-KG; Thu, 09 May 2019 09:54:37 -0400
-Received: by mail-wr1-x443.google.com with SMTP id v11so3206273wru.5;
-	Thu, 09 May 2019 06:54:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=k6RRKwWPLYth/9ZFL0q6xP+XfwMD3JRmUnwbWJFR320=;
-	b=Dsq7XGhe/7gClCA9LmjT6nYfwDFWqdydCigU+sRo0Nkplq81Rm82ECGepXastpQGcJ
-	d/fppOTkmoQM5aXDwYnHH8+3D9/cRtLQdBCoKBSSKRRmhN9JXOOm5CREvxlC/go+OJWO
-	ad9yGaOIRo3Fsls0fovn3UDcUtpPh8nejd/QtTMJ2F+pbGLlJ7DZ0YzXONM1hcUcXopJ
-	o9121jYlZDBO4qhUeDwWlVgEUd9PoACw7kEb+SLFSBKMbdhUvQcIMQCrYmY1ngpQTlFt
-	BEHJ9G16E9i4RENyllTUM8Tio5X4ZPE+xSmelvkldI/EMSIejWp5fc0x6veo7f+gY3gn
-	B8Tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=k6RRKwWPLYth/9ZFL0q6xP+XfwMD3JRmUnwbWJFR320=;
-	b=R8OWSBflCy3SS2r3i04dufN1qxk00fUjWMo6cwz8bTnXZ5tf5FVlpjN7jtE6tkB0xz
-	k2k3XyECIuhPFR+mOXyJ00dWcbxfXJcVH2Hjk5XJ/jqKUgBAcnq9Tso0RaRXZCgQUCEp
-	l1IjepipwSb7f5l/kV2GHewoqdA53MnsQAcb0wFioSG02fYy+gtV2J6SYJzfd0N1pdiJ
-	vMPqs+7Tmys9cl72/oghgKgIvwTOSXcEWQCvbcl2SSnsuf0GOtDqg08L4/Z83HXNlChz
-	DzmAtuAxwm4Jz/0jDqUILdUnJmEXMMdrGzqBUCna0SXMhCbGsuo9sgN16y7p9cAOEpgk
-	XVaQ==
-X-Gm-Message-State: APjAAAVPQwNH41e80YX+/rRajeeVwVETwEx3ofYWiYCggZxqEXKPpbJs
-	CvFlwM/XMLqyYrDT98UTRL1TW1H+EaKu6xP5RAA=
-X-Google-Smtp-Source: APXvYqxKjtmC2DRBbLGw3i37wG7R0DJ4R5h7t+6wYrgyKdjC0RO06zjmhsQuntmaDW+rNeF+zThkGm33kEoUnqQe4ng=
-X-Received: by 2002:adf:9042:: with SMTP id h60mr3225042wrh.248.1557410076357; 
-	Thu, 09 May 2019 06:54:36 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1hOjX5-0006k9-Cz
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:56:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:31694)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hOjX5-0006jx-5H
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:56:23 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 62EC181243;
+	Thu,  9 May 2019 13:56:20 +0000 (UTC)
+Received: from localhost (ovpn-116-61.gru2.redhat.com [10.97.116.61])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E43CC600C7;
+	Thu,  9 May 2019 13:56:19 +0000 (UTC)
+Date: Thu, 9 May 2019 10:56:17 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Jiri Denemark <jdenemar@redhat.com>
+Message-ID: <20190509135617.GH4189@habkost.net>
+References: <20190422234742.15780-1-ehabkost@redhat.com>
+	<20190509133537.GK7181@orkuz.int.mamuti.net>
 MIME-Version: 1.0
-References: <20190509133737.242548-1-sgarzare@redhat.com>
-In-Reply-To: <20190509133737.242548-1-sgarzare@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 9 May 2019 15:54:24 +0200
-Message-ID: <CAJ+F1CJth8eCirh6qQK=mL-LDVStSEJhe9R+vsLX-iWytFZ0+Q@mail.gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH] net/slirp: fix the error message when the
- prefix len is invalid
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190509133537.GK7181@orkuz.int.mamuti.net>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.25]);
+	Thu, 09 May 2019 13:56:20 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/2] i386: "unavailable-features" QOM
+ property
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,49 +71,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu trival <qemu-trivial@nongnu.org>, Jan Kiszka <jan.kiszka@siemens.com>,
-	Jason Wang <jasowang@redhat.com>, QEMU <qemu-devel@nongnu.org>,
-	Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+	qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 9, 2019 at 3:39 PM Stefano Garzarella <sgarzare@redhat.com> wro=
-te:
->
-> Add a missing parentheses at the end of the error message,
-> when we have an invalid prefix len.
->
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+On Thu, May 09, 2019 at 03:35:37PM +0200, Jiri Denemark wrote:
+> On Mon, Apr 22, 2019 at 20:47:40 -0300, Eduardo Habkost wrote:
+> > Currently, libvirt uses the "filtered-features" QOM property at
+> > runtime to ensure no feature was accidentally disabled on VCPUs
+> > because it's not available on the host.
+> > 
+> > However, the code for "feature-words" assumes that all missing
+> > features have a corresponding CPUID bit, which is not true for
+> > MSR-based features like the ones at FEAT_ARCH_CAPABILITIES.
+> > 
+> > We could extend X86CPUFeatureWordInfo to include information
+> > about MSR features, but it's impossible to do that while keeping
+> > compatibility with clients that (reasonably) expect all elements
+> > of "filtered-features" to have the cpuid-* fields.
+> > 
+> > We have a field in "query-cpu-definitions" that already describes
+> > all features that are missing on a CPU, including MSR features:
+> > CpuDefinitionInfo.unavailable-features.  The existing code for
+> > building the unavailable-features array even uses
+> > X86CPU::filtered_features to build the feature list.
+> > 
+> > This series adds a "unavailable-features" QOM property to X86CPU
+> > objects that have the same semantics of "unavailable-features" on
+> > query-cpu-definitions.  The new property has the same goal of
+> > "filtered-features", but is generic enough to let any kind of CPU
+> > feature to be listed there without relying on low level details
+> > like CPUID leaves or MSR numbers.
+> 
+> Thanks.
+> 
+> Would this unavailable-features property contain only canonical names of
+> the features or all possible aliases of all features? For example,
+> "tsc-adjust" can also be spelled as "tsc_adjust". When calling
+> query-cpu-model-expansion, we have a way to request all variants by
+> running full expansion on the result of a previous static expansion. Can
+> we get something like this for unavailable-features too?
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+I'd like to avoid that, and refer only to the canonical names.
 
-> ---
->  net/slirp.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/net/slirp.c b/net/slirp.c
-> index 95934fb36d..0f4ae0abc0 100644
-> --- a/net/slirp.c
-> +++ b/net/slirp.c
-> @@ -498,7 +498,8 @@ static int net_slirp_init(NetClientState *peer, const=
- char *model,
->      }
->      if (vprefix6_len < 0 || vprefix6_len > 126) {
->          error_setg(errp,
-> -                   "Invalid prefix provided (prefix len must be in range=
- 0-126");
-> +                   "Invalid prefix provided "
-> +                   "(prefix len must be in range 0-126)");
->          return -1;
->      }
->
-> --
-> 2.20.1
->
->
+Could you explain the use case you have in mind, so we can look
+for alternatives?
 
+> 
+> As you mentioned, there are two interesting QOM properties:
+> filtered-features and feature-words and both are used by libvirt. We use
+> feature-words to get CPU features which were enabled in the guest CPU on
+> top of what we expected. This is the case of, e.g., a feature added to a
+> given CPU model for new machine types. I guess we could switch to
+> checking QOM properties for individual features as a replacement for
+> feature-words which covers both CPUID and MSR features.
 
---=20
-Marc-Andr=C3=A9 Lureau
+I guess it depends on your goal:
+
+If your just want to know if one specific feature is missing for
+some reason, you can check the QOM properties directly.  That's
+OK, and it's even better than checking the `feature-words`
+property.
+
+If you want to be 100% sure no property was missing when starting
+the VM (e.g. emulate the behavior of the "enforce" option), I
+suggest you check if `unavailable-features` is empty.
+
+-- 
+Eduardo
 
