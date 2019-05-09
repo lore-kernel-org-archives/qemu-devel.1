@@ -2,112 +2,87 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5654C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 12:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E05C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:02:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B94321479
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 12:37:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B94321479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ADB5E21744
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:02:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GZa8xEv/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADB5E21744
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53976 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54246 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOiIs-0001dd-Nh
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 08:37:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38519)
+	id 1hOigR-0007BD-RK
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 09:01:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOiGi-0008Iw-Sp
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 08:35:27 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hOifW-0006sC-UB
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:01:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOiGh-0005r1-QU
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 08:35:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53239)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hOiGh-0005pM-Ii
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 08:35:23 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 72EC5821EF;
-	Thu,  9 May 2019 12:35:22 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-115.ams2.redhat.com [10.36.116.115])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id CD4401A8F1;
-	Thu,  9 May 2019 12:35:14 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20190508085645.11595-1-kraxel@redhat.com>
-	<38ea2334-b819-a439-7a43-92b52263b402@redhat.com>
-	<a8d4aea0-cf45-45f2-604e-adc79bbeb135@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <eebaa68b-59d8-91fd-bdec-49b34dd25eff@redhat.com>
-Date: Thu, 9 May 2019 14:35:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <stefanha@gmail.com>) id 1hOifV-0004Kb-Ud
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:01:02 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41085)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hOifV-0004Gt-Nb
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:01:01 -0400
+Received: by mail-wr1-x442.google.com with SMTP id d12so2932280wrm.8
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 06:00:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=date:from:to:cc:subject:message-id:references:mime-version
+	:content-disposition:in-reply-to:user-agent;
+	bh=Xsv7nhlVWRjNIucZKrV0nDBdcCmbyf3/aSy5Se95SYI=;
+	b=GZa8xEv/ejPCI276I2Zoqb0xZdw9BlTClPDZjoD7gC51+oqyANQbA2jfbvfPS3TPoi
+	j4+GHb5PrdqbznOc+RdkQTKFGhpkKiRuy2sW1O3Z5qQyy1W0EP6YMDpLXy2DsUpgxxvW
+	NOtGiflGE1LJlvIUa1ySE1FUNGycBfTwag9gEMACRVZDlMYHnxU0hbRQz9ES6DsVOyGh
+	ahlqMGZvB3bvsX7oXqV2UR9ZvcsUX8+okZqUOQabSqXoc/AgZstdZhzXws2d0KXpMHoJ
+	kiiJJ/iwOzhJ9PwK9yPBGkY1+cP4VYp8yV6wzNnmPDUgA0k8ICyATkut0BfWvzCz+xCn
+	/q7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=Xsv7nhlVWRjNIucZKrV0nDBdcCmbyf3/aSy5Se95SYI=;
+	b=I0KERe0y8OPGbTBIk6SKT1759PTGGNhCGUph5sJXNAPF0jXql3eO1vojEjEoGQeQKj
+	0UoeCYYieo+nCOk70aYR5MzA318hlGPOA3/+4DycrMlQzLWRSt7NocTbtVe5wXddekUm
+	ufAutI9uZCPK86Y5eeWUKf5xer8E1PzodKVbLHifHr7IdyUbNy2zQd1xl1Lk5MLEg2cQ
+	TRUv/GPP/JcGlUIPrY5S6Lcpodzm/6Fw/w3WTnAYDMMBghwH2RYNt2uyh388uGmQxspN
+	uvEFzIsfiOJPCPhnJDPrp/q3xc9O5iazOdOZHJHXSSJ+5JOXdYfUyR0Jsutd1R2N/Kft
+	ULbw==
+X-Gm-Message-State: APjAAAU7w6XKvdWVCorDQuuow49EbLxVawjvkiHT4CGSxTV6MgRYxuVI
+	Uj35ZkeuUvdE3piAmVCsSu8=
+X-Google-Smtp-Source: APXvYqwapS13d8W0aKEVgzxF7odsEkolIzteHAwWvMx2ypjMLEzHEFbMw24JDKt5mfdDrMoCN1goDQ==
+X-Received: by 2002:adf:da4a:: with SMTP id r10mr2993003wrl.216.1557406858755; 
+	Thu, 09 May 2019 06:00:58 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+	by smtp.gmail.com with ESMTPSA id k2sm3248401wrg.22.2019.05.09.06.00.57
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 09 May 2019 06:00:57 -0700 (PDT)
+Date: Thu, 9 May 2019 14:00:56 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Ernest Esene <eroken1@gmail.com>
+Message-ID: <20190509130056.GA17133@stefanha-x1.localdomain>
+References: <20190504181119.GA3317@erokenlabserver>
 MIME-Version: 1.0
-In-Reply-To: <a8d4aea0-cf45-45f2-604e-adc79bbeb135@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Thu, 09 May 2019 12:35:22 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 00/13] tests/vm: serial console autoinstall,
- misc fixes.
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="a8Wt8u1KmwUX3Y2C"
+Content-Disposition: inline
+In-Reply-To: <20190504181119.GA3317@erokenlabserver>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH v2] chardev/char-i2c: Implement Linux I2C
+ character device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -119,48 +94,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
-	Eduardo Habkost <ehabkost@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/05/2019 14.04, Philippe Mathieu-Daud=C3=A9 wrote:
-[...]
->> I now gave your series another try and replaced patch 3 with the pytho=
-n3
->> fix from Eduardo locally here. FreeBSD works great. OpenBSD is fine to=
-o,
->> except for the known issue that the "gmake check" does not work - but
->> this issue has been there before already. [...]
+
+--a8Wt8u1KmwUX3Y2C
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sat, May 04, 2019 at 07:11:19PM +0100, Ernest Esene wrote:
+> Add support for Linux I2C character device for I2C device passthrough
+> For example:
+> -chardev linux-i2c,address=3D0x46,path=3D/dev/i2c-N,id=3Di2c-chardev
+
+There is a mixture of "linux-i2c" and "char-i2c" names in this patch,
+which I find confusing.  Maybe you changed your mind while writing this
+code.  There are two options:
+
+1. Call it "linux-i2c".  Other host operating systems will need their
+   own equivalent objects.
+
+2. Call it "char-i2c" and make all the parameters optional since they
+   are likely to work differently on other host operating systems.
+
+I tend towards the second approach because I think I2C is simple enough
+that a single user-visible object can work on all host operating
+systems.
+
+Please make the naming consistent in the next revision of this patch.
+
 >=20
-> "gmake check" was working on OpenBSD with this series:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg07513.html
-> I think most of the patch proposed there have been merged, so are you
-> talking about a new issue?
+> Signed-off-by: Ernest Esene <eroken1@gmail.com>
+>=20
+> ---
+> v2:
+>   * Fix errors
+>   * update "MAINTAINERS" file.
+> ---
+>  MAINTAINERS                |   6 ++
+>  chardev/Makefile.objs      |   1 +
+>  chardev/char-i2c.c         | 140 +++++++++++++++++++++++++++++++++++++++=
+++++++
+>  chardev/char.c             |   3 +
+>  include/chardev/char-i2c.h |  35 ++++++++++++
+>  include/chardev/char.h     |   1 +
+>  qapi/char.json             |  18 ++++++
+>  7 files changed, 204 insertions(+)
+>  create mode 100644 chardev/char-i2c.c
+>  create mode 100644 include/chardev/char-i2c.h
 
-Oh, true, I remembered the patches, but was not aware that they've been
-merged.
+Please update the qemu-options.texi user documentation.
 
-The issue that I've seen is this one:
+--a8Wt8u1KmwUX3Y2C
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  [...]
-  TEST    check-qtest-arm: tests/pca9552-test
-  TEST    check-qtest-arm: tests/ds1338-test
-  TEST    check-qtest-arm: tests/microbit-test
-  TEST    check-qtest-arm: tests/m25p80-test
-  TEST    check-qtest-arm: tests/test-arm-mptimer
-  TEST    check-qtest-arm: tests/boot-serial-test
-qemu-system-arm: cannot set up guest memory 'ram': Cannot allocate memory
-Broken pipe
-/home/qemu/qemu-test.znJ6fy/src/tests/libqtest.c:135: kill_qemu() tried
-to terminate QEMU process but encountered exit status 1
-ERROR - too few tests run (expected 2, got 0)
-Abort trap (core dumped)
-gmake: *** [/home/qemu/qemu-test.znJ6fy/src/tests/Makefile.include:903:
-check-qtest-arm] Error 1
+-----BEGIN PGP SIGNATURE-----
 
- Thomas
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzUJGsACgkQnKSrs4Gr
+c8j7tQgAorfguVIcz7L0RXU9y9nf88CxTmEiJhbXmSorszkYWWIlUDnJDRlLa4CO
+jmE01VTbC1pbCan+C7CzLJZGbDeRQHccCsfvDBUvUuWuZn3Myx9EbzpbYUsdCsoY
+NopH+AcKA6eBHPdVVbpW9wsGnKps6TI55VPbytMMI0Y+kpOPwiJ36k349RBhnP5y
+Q8mNfTOnVP1QeHhjrvISLF5ppFdV12AMqAgbopwLyEhCPp367P4jvnnaOEceLwQu
+lvlyIc86SrGFYiWsNrBjLglsy0y7gW40R3zkGEMg7nKQxhA/8m7tJtI+g1KFRS8x
+UpkJf/ti2E82P0WPYcO2fE5JBY8vzw==
+=UCqN
+-----END PGP SIGNATURE-----
+
+--a8Wt8u1KmwUX3Y2C--
 
