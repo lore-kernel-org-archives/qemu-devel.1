@@ -7,60 +7,61 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB3B1C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 05:44:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2529FC04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 05:45:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B34E52053B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 05:44:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4B312053B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 05:45:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="K5n4c27O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B34E52053B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Hd4BacrK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4B312053B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48323 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48361 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hObrM-0005SB-Va
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 01:44:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41007)
+	id 1hObs7-0006DB-Tv
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 01:45:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hObof-0003Pj-3T
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 01:42:02 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hObog-0003Qk-CO
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 01:42:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hObod-0001eg-Qe
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 01:42:01 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:50381)
+	(envelope-from <dgibson@ozlabs.org>) id 1hObof-0001fg-8P
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 01:42:02 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:50965)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hObod-0001ZF-E7; Thu, 09 May 2019 01:41:59 -0400
+	id 1hOboe-0001ZC-RV; Thu, 09 May 2019 01:42:01 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 4502KB54TRz9sBp; Thu,  9 May 2019 15:41:50 +1000 (AEST)
+	id 4502KB3f2Nz9sBV; Thu,  9 May 2019 15:41:50 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
 	d=gibson.dropbear.id.au; s=201602; t=1557380510;
-	bh=xgfnGfX6+FeTELrd78HNe0kwwdXcmDk9nZ1+L26y//s=;
+	bh=JJ1XiJXNVJExPmJGjzrTHq2+B2lmtiM1mVECW5XJNbw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=K5n4c27OxR6ivslFSts0YgIAEJlW33qkExVJuW7akKCuiyqqpAkW0dUGfZg1JMkDw
-	wbxRPr1QVZ48SSC0KRyT7fHqA+pq6yDuTEBV3ZRE2v7rwpjHuN7yk8qbz0J+NW58ee
-	PYIu1tm+lDkmW0/joYXASJiDsO/B/BwQkSz25YEc=
-Date: Thu, 9 May 2019 15:37:00 +1000
+	b=Hd4BacrKIZVxbHiLsX6hmoQJOJI6wvVTx1PMNJ0UakeZyyE1JDnYjmu/H4k5y8qV8
+	PfM1tNNpxVVSi2OrQcBYRYjcJtkC/AL3zYOiWSXHJwsd28WExe1wJbHoO2D7Kd46/4
+	GSqFTtK08EmJswvLHVoRsSmGKs88w1xqaXp1TTMI=
+Date: Thu, 9 May 2019 15:33:01 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Message-ID: <20190509053700.GS7073@umbus.fritz.box>
-References: <20190508171946.657-1-clg@kaod.org>
-	<20190508171946.657-2-clg@kaod.org>
+To: Anton Blanchard <anton@ozlabs.org>
+Message-ID: <20190509053301.GQ7073@umbus.fritz.box>
+References: <20190507004811.29968-1-anton@ozlabs.org>
+	<20190507004811.29968-2-anton@ozlabs.org>
+	<20190507052039.GF7073@umbus.fritz.box>
+	<20190509061713.69490488@kryten>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Bk6L21jbBNK7V1Rv"
+	protocol="application/pgp-signature"; boundary="7kD9y3RnPUgTZee0"
 Content-Disposition: inline
-In-Reply-To: <20190508171946.657-2-clg@kaod.org>
+In-Reply-To: <20190509061713.69490488@kryten>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH 1/3] spapr/xive: EQ page should be
- naturally aligned
+Subject: Re: [Qemu-devel] [PATCH v2] target/ppc: Fix xxspltib
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,49 +73,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: ego@linux.vnet.ibm.com, sandipandas1990@gmail.com,
+	mark.cave-ayland@ilande.co.uk, richard.henderson@linaro.org,
+	qemu-devel@nongnu.org, f4bug@amsat.org, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---Bk6L21jbBNK7V1Rv
-Content-Type: text/plain; charset=iso-8859-1
+--7kD9y3RnPUgTZee0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 08, 2019 at 07:19:44PM +0200, C=E9dric Le Goater wrote:
-> When the OS configures the EQ page in which to receive event
-> notifications from the XIVE interrupt controller, the page should be
-> naturally aligned. Add this check.
+On Thu, May 09, 2019 at 06:17:33AM +1000, Anton Blanchard wrote:
+> xxspltib raises a VMX or a VSX exception depending on the register
+> set it is operating on. We had a check, but it was backwards.
 >=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> Fixes: f113283525a4 ("target-ppc: add xxspltib instruction")
+> Signed-off-by: Anton Blanchard <anton@ozlabs.org>
 
 Applied, thanks.
 
 > ---
->  hw/intc/spapr_xive.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  target/ppc/translate/vsx-impl.inc.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 >=20
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index 097f88d4608d..666e24e9b447 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -993,6 +993,12 @@ static target_ulong h_int_set_queue_config(PowerPCCP=
-U *cpu,
->      case 16:
->      case 21:
->      case 24:
-> +        if (!QEMU_IS_ALIGNED(qpage, 1ul << qsize)) {
-> +            qemu_log_mask(LOG_GUEST_ERROR, "XIVE: EQ @0x%" HWADDR_PRIx
-> +                          " is not naturally aligned with %" HWADDR_PRIx=
- "\n",
-> +                          qpage, 1ul << qsize);
-> +            return H_P4;
-> +        }
->          end.w2 =3D cpu_to_be32((qpage >> 32) & 0x0fffffff);
->          end.w3 =3D cpu_to_be32(qpage & 0xffffffff);
->          end.w0 |=3D cpu_to_be32(END_W0_ENQUEUE);
+> diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
+sx-impl.inc.c
+> index 4d8ca7cf32..4812a374aa 100644
+> --- a/target/ppc/translate/vsx-impl.inc.c
+> +++ b/target/ppc/translate/vsx-impl.inc.c
+> @@ -1355,13 +1355,13 @@ static void gen_xxspltib(DisasContext *ctx)
+>      int rt =3D xT(ctx->opcode);
+> =20
+>      if (rt < 32) {
+> -        if (unlikely(!ctx->altivec_enabled)) {
+> -            gen_exception(ctx, POWERPC_EXCP_VPU);
+> +        if (unlikely(!ctx->vsx_enabled)) {
+> +            gen_exception(ctx, POWERPC_EXCP_VSXU);
+>              return;
+>          }
+>      } else {
+> -        if (unlikely(!ctx->vsx_enabled)) {
+> -            gen_exception(ctx, POWERPC_EXCP_VSXU);
+> +        if (unlikely(!ctx->altivec_enabled)) {
+> +            gen_exception(ctx, POWERPC_EXCP_VPU);
+>              return;
+>          }
+>      }
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -122,25 +129,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Bk6L21jbBNK7V1Rv
+--7kD9y3RnPUgTZee0
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzTvHsACgkQbDjKyiDZ
-s5J1FRAAy6CRUF6dRmSk+B/Q3dqHxmUWNMoMjWzacK9ENt7NUOnnYSirCRIqrsjd
-jyFeiVLBavnHLGofPLzHmeUp7t/H3BB2UwQBtz9jXGccBdGtyWgJRG0Jf4zDQjn7
-UfqDJV/dcohYNIs1Dy4i8UDQOlXwiJlEyP/hgBq2ZF2zn0eeDQXGNVFcUGfTCcEX
-Ry0UU0h6MyChORSUolr4bMAueCKP3gPUuLvDnsc8+qzJaRaXv/0hy/KAmKl3q/0k
-drV7QDc3bM0taXweWf7PGCDwDi+BbMSePqG7Pz/E1i6Gmdxzmrw7p+qbHxUiqcWR
-rgq1AK7S4M5w+Rjm4nsn4pjiSqfIkL45Hl3q/raN/5CJfrR1V5UbySFmBgiJSXHs
-8jjgPTmfmi5JKDaKrstw+YRVoa80NI15epO4PdED/u8H6wE9VEoEUds5wjsaOsUC
-zBw1xSlbOs16hiQ87rTpoTI/zQ/2mLGCJJGGyhvTQq1yg4Zvi+FHfohQpIN1LzPU
-TwZeZmO7LbIrsgeB4v703Bk4gzncKinq3CB/MKrQz3YJl9bL2mf0CUoeGx60XApK
-zAPcoMKdBRkkmQd4aMdPNQYu9EOlcZMh0E3sACiPcIMN0lnW322bsktD7U8i0QK2
-v6jySR2tzdSd/QTcv4WfapLncLhgvI8Ghqz9DV7IPdlhYbyaQwE=
-=s4l+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzTu4oACgkQbDjKyiDZ
+s5I9/Q/+NRQaSzQD3rqyOHi00yWsB76tVEmTIU3eg0Tjyih4jiuH2CqGaViuyULi
+ceJwDfnC8vgCcXvQEXNb3Yt10/fmCirA/xKHw/lStLT0uFqqKVGlaRq5cVauwPQY
+Wd8iRMJveEdtAkrU4C+TxY1MMR7tX0WAf9FmL+nH31WI2Yns7D4J7kIXBHBZF9Tj
+SJsqNnZ8KB+093ESo3WsbGjEZybp6QeSktIJy51s8N41dIwc80nrZGGEy6DJ1l5P
+5HTaPejuoNthdgXRZnJnPu3EDYyUwNLPvXAxE8g3TB9rnfuxehBf1hzSVsSBD8zl
+VDZDIlT1F8ZHVCnqlTxmKtUp53z20jZRzmKtHpJdBKzKphpgY2KwdFuvJHN7CD0z
+B47XORDF8mQUeDh6DrqmOlOza2KIspWqILrVGW++oht8gSbTUXpCGPWkhj8eItxr
+UIef7YMbAQAXKVyqqJPLYFGvLVFU9BL/vVUqZrFPPIIaCbeSittlYqqdauM1SK4F
+44S+/LBjVgjcRx4LotP1n85VBVEXxd4C84GSv+QUOm7YK8I8MnYmkId6aOE6GCvD
+7NZjtDKmXBWpCkruIQuaQ+RoA3cJqKVMUU2lVni+wGZEOBy+jNshsf8vc6Rk1Dhu
+s+W05hZ2hwC5mSqB/Dq99oRZxYRZ5hj60csB6TgoXABOWvU4Tzc=
+=2pLS
 -----END PGP SIGNATURE-----
 
---Bk6L21jbBNK7V1Rv--
+--7kD9y3RnPUgTZee0--
 
