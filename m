@@ -2,66 +2,67 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54122C04A6B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 02:34:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72614C004C9
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 03:17:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E2D2216C4
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 02:34:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E2D2216C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 243BB216C4
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 03:17:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 243BB216C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46534 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46935 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOYtA-00065T-9J
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 22:34:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45399)
+	id 1hOZYz-00087p-W5
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 23:17:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hOYsL-0005jn-1W
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 22:33:37 -0400
+	(envelope-from <yan.y.zhao@intel.com>) id 1hOZY6-0007n3-Lm
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 23:16:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hOYsI-00012R-C1
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 22:33:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37074)
+	(envelope-from <yan.y.zhao@intel.com>) id 1hOZY3-0004z7-HA
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 23:16:46 -0400
+Received: from mga14.intel.com ([192.55.52.115]:31783)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hOYsI-00011n-5H
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 22:33:34 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 443593082A28
-	for <qemu-devel@nongnu.org>; Thu,  9 May 2019 02:33:33 +0000 (UTC)
-Received: from xz-x1 (ovpn-12-102.pek2.redhat.com [10.72.12.102])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 178525C269;
-	Thu,  9 May 2019 02:33:30 +0000 (UTC)
-Date: Thu, 9 May 2019 10:33:19 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190509023319.GG18465@xz-x1>
-References: <20190508061523.17666-1-peterx@redhat.com>
-	<4df1963e-5b76-4990-6c2f-a66ecd172869@redhat.com>
-	<20190508113929.GE18465@xz-x1>
-	<a32b877c-1303-f378-316b-c564a8ccc419@redhat.com>
+	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+	id 1hOZY3-0004wC-28
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 23:16:43 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+	by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	08 May 2019 20:16:39 -0700
+X-ExtLoop1: 1
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+	([10.239.13.9])
+	by orsmga007.jf.intel.com with ESMTP; 08 May 2019 20:16:32 -0700
+Date: Wed, 8 May 2019 23:10:55 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20190509031054.GE24397@joy-OptiPlex-7040>
+References: <20190506014514.3555-1-yan.y.zhao@intel.com>
+	<20190506014904.3621-1-yan.y.zhao@intel.com>
+	<20190507151826.502be009@x1.home>
+	<20190508112740.GA24397@joy-OptiPlex-7040>
+	<20190508152242.4b54a5e7@x1.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <a32b877c-1303-f378-316b-c564a8ccc419@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Thu, 09 May 2019 02:33:33 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 00/11] kvm/migration: support
- KVM_CLEAR_DIRTY_LOG
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190508152242.4b54a5e7@x1.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 192.55.52.115
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] vfio/mdev: add version attribute
+ for mdev device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,66 +74,573 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org,
-	"Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-	Juan Quintela <quintela@redhat.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"aik@ozlabs.ru" <aik@ozlabs.ru>,
+	"Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+	"shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+	"eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+	"eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+	Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+	"pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+	"libvir-list@redhat.com" <libvir-list@redhat.com>,
+	"arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
+	"felipe@nutanix.com" <felipe@nutanix.com>,
+	"Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+	"dgilbert@redhat.com" <dgilbert@redhat.com>,
+	"zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+	"dinechin@redhat.com" <dinechin@redhat.com>,
+	"intel-gvt-dev@lists.freedesktop.org"
+	<intel-gvt-dev@lists.freedesktop.org>, "Liu,
+	Changpeng" <changpeng.liu@intel.com>,
+	"cohuck@redhat.com" <cohuck@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Wang, Zhi A" <zhi.a.wang@intel.com>,
+	"jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "He,
+	Shaopeng" <shaopeng.he@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, May 08, 2019 at 01:55:07PM +0200, Paolo Bonzini wrote:
-> On 08/05/19 06:39, Peter Xu wrote:
-> >> The disadvantage of this is that you won't clear in the kernel those
-> >> dirty bits that come from other sources (e.g. vhost or
-> >> address_space_map).  This can lead to double-copying of pages.
-> >>
-> >> Migration already makes a local copy in rb->bmap, and
-> >> memory_region_snapshot_and_clear_dirty can also do the clear.  Would it
-> >> be possible to invoke the clear using rb->bmap instead of the KVMSlot's
-> >> new bitmap?
-> >
-> > Actually that's what I did in the first version before I post the work
-> > but I noticed that there seems to have a race condition with the
-> > design.  The problem is we have multiple copies of the same dirty
-> > bitmap from KVM and the race can happen with those multiple users
-> > (bitmaps of the users can be a merged version containing KVM and other
-> > sources like vhost, address_space_map, etc. but let's just make it
-> > simpler to not have them yet).
+On Thu, May 09, 2019 at 05:22:42AM +0800, Alex Williamson wrote:
+> On Wed, 8 May 2019 07:27:40 -0400
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
 > 
-> I see now.  And in fact the same double-copying inefficiency happens
-> already without this series, so you are improving the situation anyway.
+> > On Wed, May 08, 2019 at 05:18:26AM +0800, Alex Williamson wrote:
+> > > On Sun,  5 May 2019 21:49:04 -0400
+> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > >   
+> > > > version attribute is used to check two mdev devices' compatibility.
+> > > > 
+> > > > The key point of this version attribute is that it's rw.
+> > > > User space has no need to understand internal of device version and no
+> > > > need to compare versions by itself.
+> > > > Compared to reading version strings from both two mdev devices being
+> > > > checked, user space only reads from one mdev device's version attribute.
+> > > > After getting its version string, user space writes this string into the
+> > > > other mdev device's version attribute. Vendor driver of mdev device
+> > > > whose version attribute being written will check device compatibility of
+> > > > the two mdev devices for user space and return success for compatibility
+> > > > or errno for incompatibility.
+> > > > So two readings of version attributes + checking in user space are now
+> > > > changed to one reading + one writing of version attributes + checking in
+> > > > vendor driver.
+> > > > Format and length of version strings are now private to vendor driver
+> > > > who can define them freely.
+> > > > 
+> > > >              __ user space
+> > > >               /\          \
+> > > >              /             \write
+> > > >             / read          \
+> > > >      ______/__           ___\|/___
+> > > >     | version |         | version |-->check compatibility
+> > > >     -----------         -----------
+> > > >     mdev device A       mdev device B
+> > > > 
+> > > > This version attribute is optional. If a mdev device does not provide
+> > > > with a version attribute, this mdev device is incompatible to all other
+> > > > mdev devices.
+> > > > 
+> > > > Live migration is able to take advantage of this version attribute.
+> > > > Before user space actually starts live migration, it can first check
+> > > > whether two mdev devices are compatible.
+> > > > 
+> > > > v2:
+> > > > 1. added detailed intent and usage
+> > > > 2. made definition of version string completely private to vendor driver
+> > > >    (Alex Williamson)
+> > > > 3. abandoned changes to sample mdev drivers (Alex Williamson)
+> > > > 4. mandatory --> optional (Cornelia Huck)
+> > > > 5. added description for errno (Cornelia Huck)
+> > > > 
+> > > > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > > > Cc: Erik Skultety <eskultet@redhat.com>
+> > > > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > > Cc: Cornelia Huck <cohuck@redhat.com>
+> > > > Cc: "Tian, Kevin" <kevin.tian@intel.com>
+> > > > Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+> > > > Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
+> > > > Cc: Neo Jia <cjia@nvidia.com>
+> > > > Cc: Kirti Wankhede <kwankhede@nvidia.com>
+> > > > Cc: Daniel P. Berrangé <berrange@redhat.com>
+> > > > Cc: Christophe de Dinechin <dinechin@redhat.com>
+> > > > 
+> > > > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > > > ---
+> > > >  Documentation/vfio-mediated-device.txt | 140 +++++++++++++++++++++++++
+> > > >  1 file changed, 140 insertions(+)
+> > > > 
+> > > > diff --git a/Documentation/vfio-mediated-device.txt b/Documentation/vfio-mediated-device.txt
+> > > > index c3f69bcaf96e..013a764968eb 100644
+> > > > --- a/Documentation/vfio-mediated-device.txt
+> > > > +++ b/Documentation/vfio-mediated-device.txt
+> > > > @@ -202,6 +202,7 @@ Directories and files under the sysfs for Each Physical Device
+> > > >    |     |   |--- available_instances
+> > > >    |     |   |--- device_api
+> > > >    |     |   |--- description
+> > > > +  |     |   |--- version
+> > > >    |     |   |--- [devices]
+> > > >    |     |--- [<type-id>]
+> > > >    |     |   |--- create
+> > > > @@ -209,6 +210,7 @@ Directories and files under the sysfs for Each Physical Device
+> > > >    |     |   |--- available_instances
+> > > >    |     |   |--- device_api
+> > > >    |     |   |--- description
+> > > > +  |     |   |--- version
+> > > >    |     |   |--- [devices]
+> > > >    |     |--- [<type-id>]
+> > > >    |          |--- create
+> > > > @@ -216,6 +218,7 @@ Directories and files under the sysfs for Each Physical Device
+> > > >    |          |--- available_instances
+> > > >    |          |--- device_api
+> > > >    |          |--- description
+> > > > +  |          |--- version
+> > > >    |          |--- [devices]  
+> > > 
+> > > I thought there was a request to make this more specific to migration
+> > > by renaming it to something like migration_version.  Also, as an
+> > >  
+> > so this attribute may not only include a mdev device's parent device info and
+> > mdev type, but also include numeric software version of vendor specific
+> > migration code, right?
 > 
-> Have you done any kind of benchmarking already?
+> It's a vendor defined string, it should be considered opaque to the
+> user, the vendor can include whatever they feel is relevant.
+> 
+> > This actually makes sense.
+> > So, do I need to add a disclaimer in this doc like:
+> > vendor driver should be responsible by itself for a mdev device's migration
+> > compatibility. 
+> 
+> I thought that was the purpose of this attribute.
+> 
+> > During migration setup phase, general migration code in user space VFIO only
+> > checks this version of VFIO migration region, and will not check software version
+> > of vendor specific migration code.
+> 
+> What is "software version of vendor specific migration code"?  If
+> you're asking whether anything will check for parent device
+> compatibility or parent vendor driver compatibility, the answer is no,
+> that's what this interface is meant to provide.  Userspace should need
+> to do nothing more than verify the mdev types match and then use the
+> version attribute to confirm source to target compatibility.
+> 
+> > It is suggested to incorporate at least parent device info and software version
+> > of vendor specific migration code into this migration_version attribute.
+> 
+> We can make recommendations as "best practices", but ultimately it's an
+> opaque string defined by the vendor driver.
+> 
+> But you never addressed my comment that previous reviews asked for the
+> attribute to be named something more specific to migration.
+>
+I aggree to rename it to migration_version.
 
-Not yet.  I posted the series for some initial reviews first before
-moving on with performance tests.
+> > > optional attribute, it seems the example should perhaps not add it to
+> > > all types to illustrate that it is not required.  
+> > ok. got it.
+> > 
+> > 
+> > > >  
+> > > >  * [mdev_supported_types]
+> > > > @@ -246,6 +249,143 @@ Directories and files under the sysfs for Each Physical Device
+> > > >    This attribute should show the number of devices of type <type-id> that can be
+> > > >    created.
+> > > >  
+> > > > +* version
+> > > > +
+> > > > +  This attribute is rw, and is optional.
+> > > > +  It is used to check device compatibility between two mdev devices and is  
+> > > 
+> > > between two mdev devices of the same type.
+> > >  
+> > ok. got it.
+> > But I have a question about aggregation proposed earlier.
+> > Do we also have to assume the two mdev devices are of the same aggregation
+> > count?
+> > However, aggregation count is not available before a mdev device is created. :(
+> 
+> We don't support aggregation yet, but yes, that's going to introduce
+> issues here.  Any configuration beyond the base mdev type would imply
+> that the base type could be compatible for migration, but the specific
+> instances might not.  Resolving that would imply that our version
+> information needs to be relative to an instance, not just the base type.
+> 
+> How would we extend this interface to support that?  We could have a
+> version attribute on each device instance, which might report something
+> like:
+> 
+>   0123456789,aggregate=2
+> 
+> IOW the device instance of version concatenates the mdev type version
+> with the additional create parameters for that device.  Writing this to
+> the type attribute should be parsed by the vendor driver as support for
+> given base device with specified additional create parameters.
+> 
+> I'm afraid this also bring us around to treacherous questions around
+> who is responsible for creating that device on the migration target and
+> where is this meta information about the device exposed.  Maybe instead
+> of a per instance version attribute we would instead expose the create
+> parameters as an attribute per instance and it would be userspace's
+> responsibility to create a version string from the mdev type and create
+> parameters similar to above.  This would also make it possible to
+> create a compatible instance on the target without pre-knowledge of how
+> the device was created.
+> 
+> Also, this issue exists already, but compatibility and capacity are two
+> separate things, I think we want to limit this interface to the
+> former.  For instance, if I want to migrate an i915-GVTg_V5_1 device to
+> another system where available_instances for that type is zero, the
+> version attribute should strictly report the device compatibility, it's
+> not responsible for returning an errno due to lack of resources.
+> Similarly if we were to do something with aggregation, the version
+> attribute would strictly report if the target supports creating that
+> device with those parameters, not whether it has capacity to create
+> such as device at that instant in time.
+>
+I think it's good to have a migration_version attribute under each device
+instance.
+It has two pros:
+1. vendor driver can incorperate into the string things like:
+   parent device info + mdev type + aggregate count + software version
+2. even for non mdev devices, like a VF in SRIOV
+   PF driver can export this migration_version under a VF instance. so a VF is
+   possible to migrate with vfio-pci driver installed. (though with current VFIO
+   live migration RFCs, with vfio-pci driver is not able to migrate. but it
+   provides a possibility)
 
-My plan of the test scenario could be:
 
-- find a guest with relatively large memory (I would guess it is
-  better to have memory like 64G or even more to make some big
-  difference)
+could we maintain two migration_version attributes? 
+"create parameter + mdev_type migraton_version" for user space software to
+create a migration compatible mdev device.
+"per device instance migration_version" for verifying migration compatibility of
+devices already created.
 
-- run random dirty memory workload upon most of the mem, with dirty
-  rate X Bps.
 
-- setup the migration bandwidth to Y Bps (Y should be bigger than X
-  but not that big.  One could be X=800M and Y=1G to emulate 10G nic
-  with a workload that we can still converge with precopy only) and
-  start precopy migration.
+> > > > +  accessed in pairs between the two mdev devices being checked.  
+> > > 
+> > > "in pairs"?  
+> > I meant, user space needs to access version attributes from two mdev device.
+> > but seems that it's needless to mention that... I'll remove it :)
+> > 
+> > 
+> > > > +  The intent of this attribute is to make an mdev device's version opaque to
+> > > > +  user space, so instead of reading two mdev devices' version strings and  
+> > > 
+> > > perhaps "...instead of reading the version string of two mdev devices
+> > > and comparing them in userspace..."  
+> > yes, better, thanks:)
+> > 
+> > > > +  comparing in userspace, user space should only read one mdev device's version
+> > > > +  attribute, and writes this version string into the other mdev device's version
+> > > > +  attribute. Then vendor driver of mdev device whose version attribute being
+> > > > +  written would check the incoming version string and tell user space whether
+> > > > +  the two mdev devices are compatible via return value. That's why this
+> > > > +  attribute is writable.
+> > > > +
+> > > > +  when reading this attribute, it should show device version string of
+> > > > +  the device of type <type-id>.
+> > > > +
+> > > > +  This string is private to vendor driver itself. Vendor driver is able to
+> > > > +  freely define format and length of device version string.
+> > > > +  e.g. It can use a combination of pciid of parent device + mdev type.  
+> > > 
+> > > Can the user assume the data contents of the string is ascii
+> > > characters?  It's good that the vendor driver defines the format and
+> > > length, but the user probably needs some expectation bounding that
+> > > length.  Should we define it as no larger than PATH_MAX (4096), or maybe
+> > > NAME_MAX (255) might be more reasonable?  
+> > I think so. I'll add those restrictions in next revision. 
+> 
+> If we start adding creation parameters, PATH_MAX may actually be the
+> more reasonable limit.
+>
+got it.
+> > > > +
+> > > > +  When writing a string to this attribute, vendor driver should analyze this
+> > > > +  string and check whether the mdev device being identified by this string is
+> > > > +  compatible with the mdev device for this attribute. vendor driver should then  
+> > > 
+> > > Compatible for what purpose?  I think this is where specifically
+> > > calling this a migration_version potentially has value.  
+> > yes. if it also covers version of vendor specific migration code, calling it
+> > migration_version is more appropriate.
+> 
+> I think we're discussing an interface that validates "I [the vendor
+> driver] am able to import the state of this version", therefore it must
+> include every relevant aspect of the vendor support for that.
+> 
+> > > > +  return written string's length if it regards the two mdev devices are
+> > > > +  compatible; vendor driver should return negative errno if it regards the two
+> > > > +  mdev devices are not compatible.  
+> > > 
+> > > IOW, the write(2) will succeed if the version is determined to be
+> > > compatible and otherwise fail with vendor specific errno.
+> > >  
+> > thanks:)
+> > 
+> > > > +
+> > > > +  User space should treat ANY of below conditions as two mdev devices not
+> > > > +  compatible:  
+> > > 
+> > > (0) The mdev devices are not of the same type.
+> > >  
+> > the same as above. do we also need to take aggregation count into consideration?
+> > 
+> > > > +  (1) any one of the two mdev devices does not have a version attribute
+> > > > +  (2) error when read from one mdev device's version attribute  
+> > > 
+> > > Is this intended to support that the vendor driver can supply a version
+> > > attribute but not support migration?  TBH, this sounds like a vendor
+> > > driver bug, but maybe it's necessary if the vendor driver could have
+> > > some types that support migration and others that do not?  IOW, we're
+> > > supplying the same attribute groups to all devices from a vendor, in
+> > > which case my comment above regarding an example type without a version
+> > > attribute might be invalid.  
+> > hmm, this is to make life easier for vendor driver to have some types that
+> > support migration and others that do not. while we can get rid of returning
+> > errno by providing different attribute groups to different devices, the way of
+> > returning errno gives a simpler choice to vendors.
+> 
+> Yes, I think it might be overly complicated to provide different
+> attribute groups for different devices, we have more flexibility if the
+> user does not make any assumptions based only on the presence of a
+> version attribute.
+> 
+> > > > +  (3) error when write one mdev device's version string to the other mdev
+> > > > +  device's version attribute
+> > > > +
+> > > > +  User space should regard two mdev devices compatible when ALL of below
+> > > > +  conditions are met:  
+> > > 
+> > > (0) The mdev devices are of the same type
+> > >   
+> > > > +  (1) success when read from one mdev device's version attribute.
+> > > > +  (2) success when write one mdev device's version string to the other mdev
+> > > > +  device's version attribute
+> > > > +
+> > > > +  Errno:
+> > > > +  If vendor driver wants to claim a mdev device incompatible to all other mdev
+> > > > +  devices, it should not register version attribute for this mdev device. But if
+> > > > +  a vendor driver has already registered version attribute and it wants to claim
+> > > > +  a mdev device incompatible to all other mdev devices, it needs to return
+> > > > +  -ENODEV on access to this mdev device's version attribute.
+> > > > +  If a mdev device is only incompatible to certain mdev devices, write of
+> > > > +  incompatible mdev devices's version strings to its version attribute should
+> > > > +  return -EINVAL;  
+> > > 
+> > > I think it's best not to define the specific errno returned for a
+> > > specific situation, let the vendor driver decide, userspace simply
+> > > needs to know that an errno on read indicates the device does not
+> > > support migration version comparison and that an errno on write
+> > > indicates the devices are incompatible or the target doesn't support
+> > > migration versions.
+> > >  
+> > yes, user space only gets 0 or 1 as return code, not those errno. 
+> > maybe I only need to describe errno in patch 2/2.
+> > 
+> > > > +
+> > > > +  This attribute can be taken advantage of by live migration.
+> > > > +  If user space detects two mdev devices are compatible through version
+> > > > +  attribute, it can start migration between the two mdev devices, otherwise it
+> > > > +  should abort its migration attempts between the two mdev devices.
+> > > > +
+> > > > +  Example Usage:
+> > > > +  case 1:
+> > > > +  source side mdev device is of uuid 5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd,
+> > > > +  its mdev type is i915-GVTg_V5_4. pci id of parent device is 8086-193b.
+> > > > +  target side mdev device is if of uuid 882cc4da-dede-11e7-9180-078a62063ab1,
+> > > > +  its mdev type is i915-GVTg_V5_4. pci id of parent device is 8086-193b.
+> > > > +
+> > > > +  # readlink /sys/bus/pci/devices/0000\:00\:02.0/\
+> > > > +  5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/mdev_type
+> > > > +  ../mdev_supported_types/i915-GVTg_V5_4
+> > > > +
+> > > > +  # readlink /sys/bus/pci/devices/0000\:00\:02.0/\
+> > > > +  882cc4da-dede-11e7-9180-078a62063ab1/mdev_type
+> > > > +  ../mdev_supported_types/i915-GVTg_V5_4
+> > > > +
+> > > > +  (1) read source side mdev device's version.
+> > > > +  #cat \
+> > > > +    /sys/bus/pci/devices/0000\:00\:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/\
+> > > > +    mdev_type/version
+> > > > +  8086-193b-i915-GVTg_V5_4  
+> > > 
+> > > Is this really the version information exposed in 2/2?  This is opaque,
+> > > so of course you can add things later, but it seems short sighted not
+> > > to even append a version 0 tag to account for software compatibility
+> > > differences since the above only represents a parent and mdev type
+> > > based version.
+> > >   
+> > yes, currently in 2/2, the version only includes <vendor id> + <device id> +
+> > <mdev type>. but you are right, it's better to include software migration
+> > version number.
+> > so vendor drivers have below 3 ways to designate a mdev device has no migration
+> > capability.
+> > 1. not registering migration_version attribute
+> > 2. on reading migration_version, returning errno
+> > 3. on reading migration_version, returning string indicating non-migratable.
+> > 
+> > The reason of not giving up way 2 is that maybe it can accelerate user space
+> > getting information of device incompatible. if we only keep way 3, it would not
+> > know this info until writing this string to target attribute.
+> > 
+> > do you agree?
+> 
+> The string is opaque to the user, so if you're asking in (3) that the
+> user read and parse some information in the string that indicates the
+> device is non-migratable then no, I don't agree with that policy.  If
+> reading the version attribute produces a result, the only thing the
+> user can do with that result is to test it by writing it to another
+> version attribute.  Thanks,
+> 
+> Alex
 
-- measure total migration time with CLEAR_LOG on & off. We should
-  expect the guest to have these with CLEAR_LOG: (1) not hang during
-  log_sync, and (2) migration should complete faster.
+ok. so we will keep way 2 as a valid choice :)
 
-Does above test plan makes sense?
-
-If both the QEMU/KVM changes looks ok in general, I can at least try
-this on some smaller guests (I can manage ~10G mem guests with my own
-hosts, but I can also try to find some bigger ones).
-
-Thanks,
-
--- 
-Peter Xu
+Thanks
+Yan
+> > > > +  (2) write source side mdev device's version string into target side mdev
+> > > > +  device's version attribute.
+> > > > +  # echo 8086-193b-i915-GVTg_V5_4 >
+> > > > +   /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab1/\
+> > > > +  mdev_type/version
+> > > > +  # echo $?
+> > > > +  0  
+> > > 
+> > > TBH, there's a lot of superfluous information in this example that can
+> > > be stripped out.  For example:
+> > > 
+> > > "
+> > > (1) Compare mdev types:
+> > > 
+> > > The mdev type of an instantiated device can be read from the mdev_type
+> > > link within the device instance in sysfs, for example:
+> > > 
+> > >   # basename $(readlink -f /sys/bus/mdev/devices/$MDEV_UUID/mdev_type/)
+> > > 
+> > > The mdev types available on a given host system can also be found
+> > > through /sys/class/mdev_bus, for example:
+> > > 
+> > >   # ls /sys/class/mdev_bus/*/mdev_supported_types/
+> > > 
+> > > Migration is only possible between devices of the same mdev type.
+> > > 
+> > > (2) Retrieve the mdev source version:
+> > > 
+> > > The migration version information can either be read from the mdev_type
+> > > link on an instantiated device:
+> > > 
+> > >   # cat /sys/bus/mdev/devices/$UUID1/mdev_type/version
+> > > 
+> > > Or it can be read from the mdev type definition, for example:
+> > > 
+> > >   # cat /sys/class/mdev_bus/*/mdev_supported_types/$MDEV_TYPE/version
+> > > 
+> > > If reading the source version generates an error, migration is not
+> > > possible.  NB, there might be several parent devices for a given mdev
+> > > type on a host system, each may support or expose different versions.
+> > > Matching the specific mdev type to a parent may become important in
+> > > such configurations.
+> > > 
+> > > (3) Test source version at target:
+> > > 
+> > > Given a version as outlined above, its compatibility to an instantiated
+> > > device of the same mdev type can be tested as:
+> > > 
+> > >   # echo $VERSION > /sys/bus/mdev/devices/$UUID2/mdev_type/version
+> > > 
+> > > If this write fails, the source and target versions are not compatible
+> > > or the target does not support migration.
+> > > 
+> > > Compatibility can also be tested prior to target device creation using
+> > > the mdev type definition for a parent device with a previously found
+> > > matching mdev type, for example:
+> > > 
+> > >   # echo $VERSION > /sys/class/mdev_bus/$PARENT/mdev_supported_types/$MDEV_TYPE/version
+> > > 
+> > > Again, an error writing the version indicates that an instance of this
+> > > mdev type would not support a migration from the provided version.
+> > > "
+> > > 
+> > > In particular from the provided example, the specific UUIDs, mdev
+> > > types, parent information, and contents of the version attribute do not
+> > > contribute to illustrating the protocol.  In fact, displaying the
+> > > contents of the version attribute may tempt users to do comparison on
+> > > their own, especially given how easy it is to decide the GVT-g version
+> > > string.
+> > >  
+> > got it!
+> > great thanks!
+> > I'll update it to the next revision.
+> > >   
+> > > > +
+> > > > +  in this case, user space's write to target side mdev device's version
+> > > > +  attribute returns success to indicate the two mdev devices are compatible.
+> > > > +
+> > > > +  case 2:
+> > > > +  source side mdev device is of uuid 5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd,
+> > > > +  its mdev type is i915-GVTg_V5_4. pci id of parent device is 8086-193b.
+> > > > +  target side mdev device is if of uuid 882cc4da-dede-11e7-9180-078a62063ab1,
+> > > > +  its mdev type is i915-GVTg_V5_4. pci id of parent device is 8086-191b.
+> > > > +
+> > > > +  # readlink /sys/bus/pci/devices/0000\:00\:02.0/\
+> > > > +  5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/mdev_type
+> > > > +  ../mdev_supported_types/i915-GVTg_V5_4
+> > > > +
+> > > > +  # readlink /sys/bus/pci/devices/0000\:00\:02.0/\
+> > > > +  882cc4da-dede-11e7-9180-078a62063ab1/mdev_type
+> > > > +  ../mdev_supported_types/i915-GVTg_V5_4
+> > > > +
+> > > > +  (1) read source side mdev device's version.
+> > > > +  #cat \
+> > > > +    /sys/bus/pci/devices/0000\:00\:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/\
+> > > > +    mdev_type/version
+> > > > +  8086-193b-i915-GVTg_V5_4
+> > > > +
+> > > > +  (2) write source side mdev device's version string into target side mdev
+> > > > +  device's version attribute.
+> > > > +  # echo 8086-193b-i915-GVTg_V5_4 >
+> > > > +   /sys/bus/pci/devices/0000\:00\:02.0/882cc4da-dede-11e7-9180-078a62063ab1/\
+> > > > +  mdev_type/version
+> > > > +  -bash: echo: write error: Invalid argument
+> > > > +
+> > > > +  in this case, user space's write to target side mdev device's version
+> > > > +  attribute returns error to indicate the two mdev devices are incompatible.
+> > > > +  (incompatible because pci ids of the two mdev devices' parent devices are
+> > > > +  different).
+> > > > +
+> > > > +  case 3:
+> > > > +  source side mdev device is of uuid 5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd,
+> > > > +  its mdev type is i915-GVTg_V5_4. pci id of parent device is 8086-193b.
+> > > > +  But vendor driver does not provide version attribute for this device.
+> > > > +
+> > > > +  (1) read source side mdev device's version.
+> > > > +  #cat \
+> > > > +    /sys/bus/pci/devices/0000\:00\:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/\
+> > > > +    mdev_type/version
+> > > > +  cat: '/sys/bus/pci/devices/0000:00:02.0/5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd/\
+> > > > +  mdev_type/version': No such file or directory
+> > > > +
+> > > > +  in this case, user space reads source side mdev device's version attribute
+> > > > +  which does not exist however. user space regards the two mdev devices as not
+> > > > +  compatible and will not start migration between the two mdev devices.
+> > > > +
+> > > > +  
+> > > 
+> > > This is far too long for description and examples, it's not this
+> > > complicated.  Thanks,
+> > >  
+> > got it. I'll follow your above example :)
+> > 
+> > thanks
+> > Yan 
+> > > >  * [device]
+> > > >  
+> > > >    This directory contains links to the devices of type <type-id> that have been  
+> > >   
+> 
 
