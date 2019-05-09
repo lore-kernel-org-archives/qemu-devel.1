@@ -2,62 +2,59 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B71EC04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:06:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3472FC04AB2
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:06:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 403332173B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:06:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 403332173B
+	by mail.kernel.org (Postfix) with ESMTPS id 0C0FB2173B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:06:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C0FB2173B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54292 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54294 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOike-0000wx-E6
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 09:06:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43704)
+	id 1hOikl-00016S-5e
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 09:06:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hOiie-0007fd-Fs
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:04:21 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hOiin-0007pk-Sr
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:04:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hOiid-0007fM-Gt
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:04:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59016)
+	(envelope-from <sgarzare@redhat.com>) id 1hOiim-0007lW-Os
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:04:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:61883)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hOiid-0007M6-C0
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:04:15 -0400
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hOiik-0007Jf-NG
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:04:23 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0386C3079B66
-	for <qemu-devel@nongnu.org>; Thu,  9 May 2019 13:03:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4AD41308219E
+	for <qemu-devel@nongnu.org>; Thu,  9 May 2019 13:03:49 +0000 (UTC)
 Received: from steredhat.redhat.com (ovpn-116-227.ams2.redhat.com
 	[10.36.116.227])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id AC5DA60F8A;
-	Thu,  9 May 2019 13:03:49 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0514B60FA6;
+	Thu,  9 May 2019 13:03:45 +0000 (UTC)
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu,  9 May 2019 15:03:42 +0200
-Message-Id: <20190509130345.227526-2-sgarzare@redhat.com>
-In-Reply-To: <20190509130345.227526-1-sgarzare@redhat.com>
-References: <20190509130345.227526-1-sgarzare@redhat.com>
+Date: Thu,  9 May 2019 15:03:41 +0200
+Message-Id: <20190509130345.227526-1-sgarzare@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Thu, 09 May 2019 13:03:53 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.47]);
+	Thu, 09 May 2019 13:03:49 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 1/4] net: fix assertion failure when
- ipv6-prefixlen is not a number
+Subject: [Qemu-devel] [PATCH v2 0/4] Clean ups in net/net.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,55 +71,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If 'ipv6-prefixlen' is not a number, the current behaviour
-produces an assertion failure:
-    $ qemu-system-x86_64 -net user,ipv6-net=3Dfeca::0/a
-    qemu-system-x86_64: qemu/util/qemu-option.c:1175: qemu_opts_foreach:
-    Assertion `!errp || !*errp' failed.
-    Aborted (core dumped)
+This series is a follow up of "[PATCH] net: avoid to use variable length
+array in net_client_init()" [1], so it contains the v2 of that patch,
+plus other new related patches.
 
-This patch fixes it, jumping to the end of the function when
-'ipv6-prefixlen' is not a number, and printing the more friendly
-message:
-    $ qemu-system-x86_64 -net user,ipv6-net=3Dfeca::0/a
-    qemu-system-x86_64: Parameter 'ipv6-prefixlen' expects a number
+I discovered an assertion failure while I was testing the patches, so I
+added the patch 1 to solve this issue.
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- net/net.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+Following the Markus' advice, I modified the parsing of IPv6 prefix
+(patch 2) and IPv4 host:port (patch 3). Then I removed the get_str_sep()
+function (patch 4) because it is no longer used.
 
-diff --git a/net/net.c b/net/net.c
-index f3a3c5444c..d5071e49e2 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1134,11 +1134,11 @@ static int net_client_init(QemuOpts *opts, bool i=
-s_netdev, Error **errp)
-=20
-                 if (err) {
-                     error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
--                              "ipv6-prefix", "a number");
--                } else {
--                    qemu_opt_set_number(opts, "ipv6-prefixlen", len,
--                                        &error_abort);
-+                               "ipv6-prefixlen", "a number");
-+                    goto out;
-                 }
-+
-+                qemu_opt_set_number(opts, "ipv6-prefixlen", len, &error_=
-abort);
-             }
-             qemu_opt_unset(opts, "ipv6-net");
-         }
-@@ -1160,6 +1160,7 @@ static int net_client_init(QemuOpts *opts, bool is_=
-netdev, Error **errp)
-         qapi_free_NetLegacy(object);
-     }
-=20
-+out:
-     error_propagate(errp, err);
-     visit_free(v);
-     return ret;
+@Markus, I modified a little bit what you suggested, introducing
+g_strsplit() in order to de-duplicate the qemu_opt_set() and
+qemu_opt_set_number(). I hope it's good for you.
+
+v2:
+ - Added patches 1,3 and 4
+ - Patch 2:
+   - clean up parsing of IPv6 prefix [Markus]
+   - fixed subject line [Eric]
+
+[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg614561.html
+
+Stefano Garzarella (4):
+  net: fix assertion failure when ipv6-prefixlen is not a number
+  net: avoid using variable length array in net_client_init()
+  net: use g_strsplit() for parsing host address and port
+  net: remove unused get_str_sep() function
+
+ net/net.c | 101 +++++++++++++++++++++++++++---------------------------
+ 1 file changed, 51 insertions(+), 50 deletions(-)
+
 --=20
 2.20.1
 
