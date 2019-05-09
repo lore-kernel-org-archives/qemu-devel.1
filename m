@@ -2,110 +2,81 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6074C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 07:36:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8D44C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 07:44:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95A8C216C4
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 07:36:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95A8C216C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B34A5208C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 07:44:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i0bktWZK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B34A5208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49713 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49769 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOdbP-0001ng-OU
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 03:36:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36027)
+	id 1hOdjA-0003tR-ON
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 03:44:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOdaL-0000vj-UG
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 03:35:22 -0400
+	(envelope-from <hqm03ster@gmail.com>) id 1hOdiN-0003Zv-K1
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 03:43:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOdaK-0005F1-PG
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 03:35:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46272)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hOdaK-00059q-I0
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 03:35:20 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9005E89C46;
-	Thu,  9 May 2019 07:35:18 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-115.ams2.redhat.com [10.36.116.115])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0DFE819C77;
-	Thu,  9 May 2019 07:35:11 +0000 (UTC)
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20190508085645.11595-1-kraxel@redhat.com>
-	<20190508085645.11595-4-kraxel@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <53e70dc0-db41-9949-4014-b5efed2fe79f@redhat.com>
-Date: Thu, 9 May 2019 09:35:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <hqm03ster@gmail.com>) id 1hOdiL-00035x-Cq
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 03:43:39 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:46511)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hqm03ster@gmail.com>) id 1hOdiL-00035A-8R
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 03:43:37 -0400
+Received: by mail-qk1-x743.google.com with SMTP id a132so799613qkb.13
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 00:43:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=Tvw/sr/xPhfNC5OWL3E/K0Xy6T9LeLJYR5AFywmj8z8=;
+	b=i0bktWZKazv/5JDKy+v4ftEzdZlw6GbDRCWIv3B8OmkvwAwz+iRXbg2OdWLAUgJGCU
+	UJX804+YgzKpcEGDkw/GKGR3HFsKA1D0pnhWKTtE5iNP08VW3Dcb1ubmwx7exPtuP+Wp
+	xQDnqDpsTVv2+0LWQyjruljH0NjAgXb4tS7z44L3U1gkYVuDHq072PoPKH0E0T0GAWEb
+	I8el37YXH+i+zoPBIzeKjdaDCzgPz/Wpt79FdNbrhMm4DTu/hnzdqMgKf0ISXceWh1/v
+	q0DqG8bGGDXXsz4Gd4yvGhm00EpS4Ifsr1d6HT8wQjK83GNIDlc6f5pRzivW+SgJmd5l
+	PsAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=Tvw/sr/xPhfNC5OWL3E/K0Xy6T9LeLJYR5AFywmj8z8=;
+	b=cb0nzudHB3sq19Dl8YzAYyB0AlF4VyLydiTVi2zyyg0eUEPP9wds/r7SC9AUY66IOZ
+	S0/Yl2Dbnhm/ryhf2Y8/sKUz+x2MxMnsHYvPyhUOSnkIiUQN33X03WC1U9ReoHW3TZvt
+	JTUhcaZIH8j6sjdmRyetkkjrhnEGxK6auiS32Q/Vt8VNZu8r3qfz4zQKyeo1V73QWotg
+	b/tiY0zVtatttdkYlXnj5oXKDKkA85AQg3Cgi0Cag8oMOfnpWhd8OuBsGkclFPvqIywU
+	YX7zn9lEandWrJVACXLnQPfGvJDKW3bBEJ7bwrGECvzVj0OyoefURI7TQIMUviaMsr4m
+	kHfw==
+X-Gm-Message-State: APjAAAUG/Qz6D+k6/PUXnnwIgU9/QrqvpazxipASfaJs5y/PKbCl9+Zg
+	RONav8GYZ7tE48fE1XQa7XMRXG/jZA2kp1ZACAY=
+X-Google-Smtp-Source: APXvYqyz/cNW9CSxF7sEb5HuQzz2BElNiNxmR4g7UlMxGvEIyRKyCUYfxb+9iWaGft1lrNqyKK2+aboUigBVGFKYcRk=
+X-Received: by 2002:a37:9587:: with SMTP id x129mr2060907qkd.9.1557387816247; 
+	Thu, 09 May 2019 00:43:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190508085645.11595-4-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Thu, 09 May 2019 07:35:18 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 03/13] tests/vm: send locale environment
- variables over ssh
+References: <CABSdmrnNW6f=P64PviPP8CTJ5SVfYS8_6kmAtpw9yPObTEkpxg@mail.gmail.com>
+	<CABSdmrnocrqLKWncgy_Lak33__GRPYfs-RzSA14e=vh4cRn2ag@mail.gmail.com>
+	<20190509064848.wjhchsfov7q6komj@sirius.home.kraxel.org>
+In-Reply-To: <20190509064848.wjhchsfov7q6komj@sirius.home.kraxel.org>
+From: Hou Qiming <hqm03ster@gmail.com>
+Date: Thu, 9 May 2019 15:43:19 +0800
+Message-ID: <CABSdmrmm+wJ=+Ccav=X5Gw_oueQvPRejCWVG2SQeCw=K4BM9EA@mail.gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::743
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH] Multiple ramfb enhancements
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -117,76 +88,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Kamil Rytarowski <kamil@netbsd.org>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/05/2019 10.56, Gerd Hoffmann wrote:
-> Needed for unicode tests.
->=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  tests/vm/basevm.py | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
->=20
-> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> index 6b46674f4497..20eec5420dbf 100755
-> --- a/tests/vm/basevm.py
-> +++ b/tests/vm/basevm.py
-> @@ -43,6 +43,20 @@ class BaseVM(object):
->          "http_proxy",
->          "ftp_proxy",
->          "no_proxy",
-> +        "LANG",
-> +        "LC_CTYPE",
-> +        "LC_NUMERIC",
-> +        "LC_TIME",
-> +        "LC_COLLATE",
-> +        "LC_MONETARY",
-> +        "LC_MESSAGES",
-> +        "LC_PAPER",
-> +        "LC_NAME",
-> +        "LC_ADDRESS",
-> +        "LC_TELEPHONE",
-> +        "LC_MEASUREMENT",
-> +        "LC_IDENTIFICATION",
-> +        "LC_ALL",
->      ]
+Done. Will resend the split patches.
 
-I gave your patch series a try, but now I see a lot of these messages in
-the output:
+On Thu, May 9, 2019 at 2:48 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-perl: warning: Setting locale failed.
-perl: warning: Please check that your locale settings:
-	LC_ALL =3D (unset),
-	LC_TIME =3D "en_DK.UTF-8",
-	LANG =3D "en_DK.UTF-8"
-    are supported and installed on your system.
-
-Is it really a good idea to use the host locale in the guest, too? ... I
-don't think so... at least you should make sure that *all* possible
-locales are installed in that case.
-
-"gmake check" then also finally failed:
-
---- /home/qemu/qemu-test.AOvcgx/src/tests/qapi-schema/unicode-str.err
-2019-05-09 05:56:17.000000000 +0000
-+++ -	2019-05-09 06:12:54.451392000 +0000
-@@ -1 +1 @@
--tests/qapi-schema/unicode-str.json:2: 'command' uses invalid name '=C3=A9=
-'
-+tests/qapi-schema/unicode-str.json:2: 'command' uses invalid name '\xe9'
-
-Note that if you just wanted to fix the python3 utf-8 problem with this
-patch here, there is a separate fix available for that problem already:
-
- https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01247.html
-
- HTH,
-  Thomas
-
+> On Thu, May 09, 2019 at 08:15:44AM +0800, Hou Qiming wrote:
+> > Pulled back the `qemu_create_displaysurface_guestmem` function to create
+> > the display surface so that the guest memory gets properly unmaped.
+> >
+> > Only allow one resolution change per guest boot, which prevents a
+> > crash when the guest writes garbage to the configuration space (e.g.
+> > when rebooting).
+> >
+> > Write an initial resolution to the configuration space on guest reset,
+> > which a later BIOS / OVMF patch can take advantage of.
+>
+> Looks all sensible, but can you split this into one patch per change
+> please?
+>
+> thanks,
+>   Gerd
+>
+>
