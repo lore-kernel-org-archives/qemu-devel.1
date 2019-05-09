@@ -2,71 +2,89 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76A32C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:09:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F96AC04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:11:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 375632173C
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:09:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 375632173C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 6C2632173C
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:11:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o3XgOo58"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C2632173C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58110 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58171 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOmXe-00074x-64
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 13:09:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51060)
+	id 1hOma1-0000hJ-Gh
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 13:11:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hOmRC-0001i4-P2
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:02:31 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hOmOA-00072Y-Tu
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:59:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hOmRB-0006c7-MP
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:02:30 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:49069)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hOmRB-0006bf-DD
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:02:29 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1MDyoW-1hWVg617P2-009wnW; Thu, 09 May 2019 19:02:18 +0200
-To: Giuseppe Musacchio <thatlemon@gmail.com>, qemu-devel@nongnu.org
-References: <20190503122007.lkjsvztgt4ycovac@debian>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <466e8902-df09-1f20-1c9e-9e625608744e@vivier.eu>
-Date: Thu, 9 May 2019 19:02:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <alex.bennee@linaro.org>) id 1hOmOA-0004vU-0L
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:59:22 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38821)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hOmO9-0004ug-R2
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:59:21 -0400
+Received: by mail-wm1-x342.google.com with SMTP id f2so4079102wmj.3
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 09:59:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=6WJJoU9/+ULEvlFfrODWtYDGLHuXZHxFQnWAN9OdsAc=;
+	b=o3XgOo58XEAWsXpoq8h3BLhNl2S1ydFFj3N+eCM8OqMuaRrfBsy6hwxkB1tsEqdTMJ
+	cDN4VyUQAB8Z/Kn7Qb0YAW1ZKohB6FjNwnkj43tqhJUsmiwLs+22gfNhXD6aXgbcCN1B
+	4rfAK7tV5cHUkbaduJu7RL32tx/2BeYybqmSG858i4YmfrXAzJsrJ///TJ/DgnlPueBB
+	m9I5hlAOSxwP7Ljeq9o08i2r+aQfrnCzBkwCZ7q2MDno7v0KaY+YmoLADcEnrsd420Jz
+	OhCrJpvsAwRcITlZeuH8qbXn4lCRgsCstWr1Dii4LIyvgNINtzS3t/wK1KW+ltNKV4Cy
+	jWYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=6WJJoU9/+ULEvlFfrODWtYDGLHuXZHxFQnWAN9OdsAc=;
+	b=SZslaSAwk5FFxE+vJnsAZ7PLud4htEX2N8pRlAd4rDwcVznFdiREdJpRga0gkfJGGN
+	25oUKfkE3L+q5EOL8SsIBXWeS6h237w0msX0pJaEMiDC4mtD58HGA8LwfAnHsONefN/C
+	2sQUN0GJqElE9LgjnyCBHrtEu7POfnnOBcWFuzeBGrIrqTpAzLLocBV9xcrhaVLRlq/U
+	iN0Tz0Fr/Qzs3DmyNbNlqKCm7JRUlSnlaNVbI2uMGnUp3sYKvXJrhIHDBl6Xpy4QgS5/
+	Tkg0H6KaayXa9qjLyiTMmoUeFLWpWIpnHS7ht40nTbpEKF85C771ntOrp8r+e7y/LneR
+	C1Gg==
+X-Gm-Message-State: APjAAAVgnoqU6Fjv5lT4lPzR+B2cz4mWjkIfKowWTXbPvzjoO8T6A7xj
+	3wAF9ltSWLbI2/8HEdToic0FAw==
+X-Google-Smtp-Source: APXvYqy5QDOBpTXPK99MlBcC88Hn2cHTlSgMkGoWzGBoOv+IgWSjZ3jCZLcJ/3hwiww21RaYWbgoeQ==
+X-Received: by 2002:a1c:1941:: with SMTP id 62mr3610037wmz.100.1557421160779; 
+	Thu, 09 May 2019 09:59:20 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id z5sm7894192wre.70.2019.05.09.09.59.16
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 09 May 2019 09:59:18 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 26F8E1FF9D;
+	Thu,  9 May 2019 17:59:13 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Thu,  9 May 2019 17:59:01 +0100
+Message-Id: <20190509165912.10512-14-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190509165912.10512-1-alex.bennee@linaro.org>
+References: <20190509165912.10512-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190503122007.lkjsvztgt4ycovac@debian>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:jQVOXQQ9GYng1acHe89GwQNWYZj+tHoSJzGrxHWxUI8x4LPFXLg
-	NNxcT+SU1tXU1znxTdNynY005fDHrYmb2LTJOINBlBDWlmBaQW4GNn1pDrijdZUJ3bgf0wD
-	4WhvmQMorLOxini4IIdTPmM1CF/bIjM5GVS8GZXkjF1RuHqOV92w3DBs1DJJ59b9Vw9X4Uc
-	ylccJ+utLkQy3FG853+jw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:dywa3hX6Q6I=:S6g0RkvMFzJoDnPib75HVC
-	5rQ/ZFbV8WP0+SrVShVLhW/uUJFLtRMHpDvfg2j6NHOqJ72xvGHwJTPEgBMtCnpf7zWHK8sKO
-	f10dDnwNQ2uULCHufiWHLc7QJ6PNUoosgfYiZa07OXbU/chtCIcKnEoS9OHtD0kq2eUJjDEGg
-	QFWsB2FiIsYvNyVZu3aHyvX/Gn2GSnZ0tEpFSZemVc2nhAXNIpij7833VPHoMAVdvrHUoGSfM
-	sqWVWhcKMEe7Ses9fEOCL1na/J4yX885QkJ8ZhoQPGX8au9B2awqBgBqPc7WF7ZD8DSCBP1ID
-	WoUglz/G+86qvwhb/O3BrW+v5RJhldSIEuNasvAfXerL3zvvcv9yf5YLsilJWuhVnNQTBtJsh
-	KyYKdYbTfvL2wPiGLUIuipw6unKV7H5d+cRIoevVAzIN4nAXM9yPFiYSWPw1cbMQBoTzML21i
-	5GsTUWKxUkAm77gpHeTBONNSjtuetAXjMmhHIcp+/wd0WsL5xHODHzFAo0yjQveawaP+vcmR/
-	SZ9kErEtuxtjMGfPioo4o/vYCPVsrt+fTbkFP72jDCxgUeuYIXCTKQOH5+YFmrR7KxYfG0XZZ
-	ZsP30WD1ec99KekIspIAt1TvRuEOg/dv+qbE44japu1hfmYJt+BBisUI9HWJM9aZSP6nNNifn
-	h5NzQf/3EeSybz8DesVD3j1LzphEnTqJc5vljdQJJR6oJhWW5tuB7+9j2pM1JQQfmeVM1TqP0
-	RAl34hkMevynBpK8jq9+ONV9RoOOHV0VtHRqjdB1E1+JxZzTTdGj2HEr/Zg=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.134
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: elf: Map empty PT_LOAD
- segments
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PATCH v1 13/23] Makefile: fix coverage-report
+ reference to BUILD_DIR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,58 +96,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, riku.voipio@iki.fi
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/05/2019 14:20, Giuseppe Musacchio wrote:
-> Some PT_LOAD segments may be completely zeroed out and their p_filesize
-> is zero, in that case the loader should just allocate a page that's at
-> least p_memsz bytes large (plus eventual alignment padding).
-> 
-> Calling zero_bss does this job for us, all we have to do is make sure we
-> don't try to mmap a zero-length page.
-> 
-> Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->   linux-user/elfload.c | 18 +++++++++++++-----
->   1 file changed, 13 insertions(+), 5 deletions(-)
-> 
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index c1a2602..138735b 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -2366,11 +2366,19 @@ static void load_elf_image(const char *image_name, int image_fd,
->               vaddr_ps = TARGET_ELF_PAGESTART(vaddr);
->               vaddr_len = TARGET_ELF_PAGELENGTH(eppnt->p_filesz + vaddr_po);
->   
-> -            error = target_mmap(vaddr_ps, vaddr_len,
-> -                                elf_prot, MAP_PRIVATE | MAP_FIXED,
-> -                                image_fd, eppnt->p_offset - vaddr_po);
-> -            if (error == -1) {
-> -                goto exit_perror;
-> +            /*
-> +             * Some segments may be completely empty without any backing file
-> +             * segment, in that case just let zero_bss allocate an empty buffer
-> +             * for it.
-> +             */
-> +            if (eppnt->p_filesz != 0) {
-> +                error = target_mmap(vaddr_ps, vaddr_len, elf_prot,
-> +                                    MAP_PRIVATE | MAP_FIXED,
-> +                                    image_fd, eppnt->p_offset - vaddr_po);
-> +
-> +                if (error == -1) {
-> +                    goto exit_perror;
-> +                }
->               }
->   
->               vaddr_ef = vaddr + eppnt->p_filesz;
-> 
+Commit 337f2311f actually claimed to do this in the commit log but
+didn't actually. Oops.
 
-Applied to my linux-user branch.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
-Laurent
+diff --git a/Makefile b/Makefile
+index a971247cac8..78d83244849 100644
+--- a/Makefile
++++ b/Makefile
+@@ -995,7 +995,7 @@ $(filter %.1 %.7 %.8,$(DOCS)): scripts/texi2pod.pl
+ %/coverage-report.html:
+ 	@mkdir -p $*
+ 	$(call quiet-command,\
+-		gcovr -r $(SRC_PATH) --object-directory $(BUILD_PATH) \
++		gcovr -r $(SRC_PATH) --object-directory $(BUILD_DIR) \
+ 		-p --html --html-details -o $@, \
+ 		"GEN", "coverage-report.html")
+ 
+-- 
+2.20.1
+
 
