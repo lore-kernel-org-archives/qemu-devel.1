@@ -2,53 +2,47 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84763C04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 05:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A023C04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 05:41:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47C5E20863
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 05:35:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47C5E20863
+	by mail.kernel.org (Postfix) with ESMTPS id 3C4BE206A3
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 05:41:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C4BE206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48229 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48293 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hObi6-0000C0-66
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 01:35:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40006)
+	id 1hOboP-00034N-Su
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 01:41:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hObhE-0008FZ-2S
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 01:34:21 -0400
+	(envelope-from <thuth@redhat.com>) id 1hObnR-0001w0-Tl
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 01:40:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hObhD-00056n-0w
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 01:34:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46480)
+	(envelope-from <thuth@redhat.com>) id 1hObnO-0000j5-2i
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 01:40:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38686)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hObhA-00054a-DX; Thu, 09 May 2019 01:34:16 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hObnL-0000dL-Ov
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 01:40:41 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B2A543001572;
-	Thu,  9 May 2019 05:34:15 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9F0A13DDBE;
+	Thu,  9 May 2019 05:40:38 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-115.ams2.redhat.com [10.36.116.115])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3C50C1001DE7;
-	Thu,  9 May 2019 05:34:09 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>
-References: <20190507134521.31044-1-thuth@redhat.com>
-	<CAFEAcA-j+wQXjPW+puxk=foi2T8O=MzXHtxdWJ6E5P7o89WQSg@mail.gmail.com>
-	<c0cda8fc-cc68-eadd-0750-cc9eeca094a4@redhat.com>
-	<b93b1eb4-d2ff-67cd-a293-5ceb4db9b957@redhat.com>
-	<CAP+75-XRZ22uhxfLF6uOpjDtKOf_EDC8uGgbu=DgYw-kcBSAGQ@mail.gmail.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4ECC845CB;
+	Thu,  9 May 2019 05:40:34 +0000 (UTC)
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+References: <20190508182339.22447-1-ehabkost@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -94,22 +88,22 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <20a27c22-cd1a-f5a8-9e36-db171c4ae19e@redhat.com>
-Date: Thu, 9 May 2019 07:34:09 +0200
+Message-ID: <0f95754b-966e-0581-b8ce-6801692238ce@redhat.com>
+Date: Thu, 9 May 2019 07:40:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <CAP+75-XRZ22uhxfLF6uOpjDtKOf_EDC8uGgbu=DgYw-kcBSAGQ@mail.gmail.com>
+In-Reply-To: <20190508182339.22447-1-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Thu, 09 May 2019 05:34:15 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.29]);
+	Thu, 09 May 2019 05:40:38 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL v2 00/28] Kconfig for Arm machines
+Subject: Re: [Qemu-devel] [PATCH] configure: Require python3 >= 3.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -121,61 +115,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, John Snow <jsnow@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+	Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/05/2019 18.45, Philippe Mathieu-Daud=C3=A9 wrote:
-> [clicked ctrl+enter too fast]
->=20
-> On Wed, May 8, 2019 at 6:43 PM Philippe Mathieu-Daud=C3=A9 <philmd@redh=
-at.com> wrote:
->> On 5/8/19 5:33 PM, Thomas Huth wrote:
->>> On 08/05/2019 17.09, Peter Maydell wrote:
->>>> On Tue, 7 May 2019 at 14:45, Thomas Huth <thuth@redhat.com> wrote:
->>>>>
->>>>>  Hi Peter,
->>>>>
->>>>> the following changes since commit a6ae23831b05a11880b40f7d58e332c4=
-5a6b04f7:
->>>>>
->>>>>   Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-p=
-ull-request' into staging (2019-05-03 15:26:09 +0100)
->>>>>
->>>>> are available in the Git repository at:
->>>>>
->>>>>   https://gitlab.com/huth/qemu.git tags/pull-request-2019-05-07
->>>>>
->>>>> for you to fetch changes up to 69f879e9fefab9aaf24893fe4ce23e07756d=
-703c:
->>>>>
->>>>>   hw/arm: Remove hard-enablement of the remaining PCI devices (2019=
--05-07 15:01:47 +0200)
->>>>>
->>>>> ----------------------------------------------------------------
->>>>> Kconfig settings for the Arm machines
->>>>> (v2: Fix the dependency of q35 to AHCI_ICH9 in the second patch)
->>>>> ----------------------------------------------------------------
->>>>
->>>> Hi -- this is still failing in the build test where I 'make clean'
->>>
->>> Very weird. What is running before the "make clean"? Could you provid=
-e
->>> me with the content of i386-softmmu/config-devices.mak please?
->>
->> It worked for me after running 'git fetch --tags', maybe because Thoma=
-s
->> used the same tag?
->=20
-> Maybe because Thomas used the same tag you are still trying the
-> previous version?
+On 08/05/2019 20.23, Eduardo Habkost wrote:
+> The oldest python3 version in distros that will be supported by
+> QEMU 4.1 is 3.5.3 (the one in Debian Stretch).  Error out if
+> running python3 < 3.5.
+> 
+> We have a .travis.yml job configured to use Python 3.4.  Change
+> it to use Python 3.5.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  configure   | 5 +++--
+>  .travis.yml | 2 +-
+>  2 files changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 6b3ed8c532..520c207d66 100755
+> --- a/configure
+> +++ b/configure
+> @@ -1841,8 +1841,9 @@ fi
+>  
+>  # Note that if the Python conditional here evaluates True we will exit
+>  # with status 1 which is a shell 'false' value.
+> -if ! $python -c 'import sys; sys.exit(sys.version_info < (2,7))'; then
+> -  error_exit "Cannot use '$python', Python 2 >= 2.7 or Python 3 is required." \
+> +if ! $python -c 'import sys; sys.exit(sys.version_info < (2,7) or \
+> +                                      (3,0) <= sys.version_info < (3,5))'; then
+> +  error_exit "Cannot use '$python', Python 2 >= 2.7 or Python 3 >= 3.5 is required." \
 
-I did not use the same tag. v1 had pull-request-2019-05-05 while v2 has
-pull-request-2019-05-07. So this can not be the reason.
+Nit: There won't be a Python2 > 2.7 anymore, so you could also replace
+"2 >= 2.7" with "2.7" here. But well, it will go away next year anyway, so:
 
- Thomas
-
-
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
