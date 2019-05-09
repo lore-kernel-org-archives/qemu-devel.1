@@ -2,93 +2,114 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 278C1C04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 05:25:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84763C04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 05:35:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E389B20850
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 05:25:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t06gJ4iq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E389B20850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 47C5E20863
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 05:35:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47C5E20863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48154 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48229 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hObYU-0005ng-4Z
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 01:25:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38892)
+	id 1hObi6-0000C0-66
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 01:35:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hObXe-0005UZ-8z
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 01:24:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1hObhE-0008FZ-2S
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 01:34:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hObXc-0006de-Al
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 01:24:26 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:39885)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hObXa-0006c2-KA
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 01:24:24 -0400
-Received: by mail-pf1-x442.google.com with SMTP id z26so669587pfg.6
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 22:24:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=TwO1XdjLu0cPckJWg6jjFMvI8tBS6KkF+sYzzQQNuZc=;
-	b=t06gJ4iq8uaSYAkI6x5WpMYGVG815QKHRid/sQD6nQPZ7RXPgRtdBxTQMx+J3TouO+
-	w37YWQjPQBK1BlAyegA4sral0EKBfOWqYWisR/Gte/w2BrTRUj/OgMqQaVLM/Dx6gFje
-	ULG7ayTlcC8bwhoggesnsshc6+Ropz6l/p0iUKMS2nN3uYe/V+WM42ApIvw+6AkHSlOx
-	tKUqCsPlCdfeayqL4cXTGAcRjObFOP2FfIbDirlS0Cu2yhg7PCu38AjhuIf9bXBWXJbY
-	bLEYAsN29M6nwh3sUycIyM3sMlWnH+finqC8lCw9k6bKsvwI7uzQVGGuDbdR8Z7nwaiQ
-	GI8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=TwO1XdjLu0cPckJWg6jjFMvI8tBS6KkF+sYzzQQNuZc=;
-	b=USn2CPXSMJMdzYTdxuSaoLB6Ql4PvptjxLbgwtj+Zb6oKZENcUzpiW+JuFSv3ZTBgD
-	OmVyxIqLjvRqAD+x1A+fll/xV3CQcumnS6CsUL7/p09URJ5vshzkjr53qSAFan2JuyIX
-	4/18XWWD5vMw7tFr2De6Wf64acm4lbeRTZpqWP1GJwHP11bTpFxOhw52yh5e7Wkhbq1E
-	xwadieFPa082ZJl8arH3eM9//upIvggoLeD/3gzochLaz+yRw4TpnCuWp1YGHD0IAsh8
-	oDtlUcd8GGdnk3DbL7UE98C5K3tNTrV2b5EKfdsd8fjB3vGzk2w1qI/q9BRfnRQky6pA
-	OV8g==
-X-Gm-Message-State: APjAAAXjtBMswFWq6Q5GM33JQK9TpiqdfsqqNLM7SHW/0EoJSEmhUdYK
-	VqwaXqt1TftL0yrYdKAgfO5ZlfF2meU=
-X-Google-Smtp-Source: APXvYqzeLT32NUu9NhfvhypZIycwQh2kYlRTdW8yX5Y7atH0+K2nON4qbbY+OBv1/WRfgpXs0q8VOg==
-X-Received: by 2002:a63:fd52:: with SMTP id m18mr3010733pgj.267.1557379460733; 
-	Wed, 08 May 2019 22:24:20 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-27-95.tukw.qwest.net. [97.113.27.95])
-	by smtp.gmail.com with ESMTPSA id
-	q20sm1376547pfi.166.2019.05.08.22.24.18
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 08 May 2019 22:24:19 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190403034358.21999-1-richard.henderson@linaro.org>
-	<20190403034358.21999-27-richard.henderson@linaro.org>
-	<CAFEAcA_TJJ7V3apxmGvhoiRk2dxzT77SapcyMuopGwqmeQoosw@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
+	(envelope-from <thuth@redhat.com>) id 1hObhD-00056n-0w
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 01:34:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46480)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hObhA-00054a-DX; Thu, 09 May 2019 01:34:16 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B2A543001572;
+	Thu,  9 May 2019 05:34:15 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-115.ams2.redhat.com [10.36.116.115])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3C50C1001DE7;
+	Thu,  9 May 2019 05:34:09 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>
+References: <20190507134521.31044-1-thuth@redhat.com>
+	<CAFEAcA-j+wQXjPW+puxk=foi2T8O=MzXHtxdWJ6E5P7o89WQSg@mail.gmail.com>
+	<c0cda8fc-cc68-eadd-0750-cc9eeca094a4@redhat.com>
+	<b93b1eb4-d2ff-67cd-a293-5ceb4db9b957@redhat.com>
+	<CAP+75-XRZ22uhxfLF6uOpjDtKOf_EDC8uGgbu=DgYw-kcBSAGQ@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <b6518e96-e77f-8ae7-0890-091e42334a12@linaro.org>
-Date: Wed, 8 May 2019 22:24:17 -0700
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <20a27c22-cd1a-f5a8-9e36-db171c4ae19e@redhat.com>
+Date: Thu, 9 May 2019 07:34:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_TJJ7V3apxmGvhoiRk2dxzT77SapcyMuopGwqmeQoosw@mail.gmail.com>
+In-Reply-To: <CAP+75-XRZ22uhxfLF6uOpjDtKOf_EDC8uGgbu=DgYw-kcBSAGQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH 26/26] tcg: Use tlb_fill probe from
- tlb_vaddr_to_host
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Thu, 09 May 2019 05:34:15 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL v2 00/28] Kconfig for Arm machines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,36 +121,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, John Snow <jsnow@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/29/19 10:41 AM, Peter Maydell wrote:
-> On Wed, 3 Apr 2019 at 05:05, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
+On 08/05/2019 18.45, Philippe Mathieu-Daud=C3=A9 wrote:
+> [clicked ctrl+enter too fast]
+>=20
+> On Wed, May 8, 2019 at 6:43 PM Philippe Mathieu-Daud=C3=A9 <philmd@redh=
+at.com> wrote:
+>> On 5/8/19 5:33 PM, Thomas Huth wrote:
+>>> On 08/05/2019 17.09, Peter Maydell wrote:
+>>>> On Tue, 7 May 2019 at 14:45, Thomas Huth <thuth@redhat.com> wrote:
+>>>>>
+>>>>>  Hi Peter,
+>>>>>
+>>>>> the following changes since commit a6ae23831b05a11880b40f7d58e332c4=
+5a6b04f7:
+>>>>>
+>>>>>   Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-p=
+ull-request' into staging (2019-05-03 15:26:09 +0100)
+>>>>>
+>>>>> are available in the Git repository at:
+>>>>>
+>>>>>   https://gitlab.com/huth/qemu.git tags/pull-request-2019-05-07
+>>>>>
+>>>>> for you to fetch changes up to 69f879e9fefab9aaf24893fe4ce23e07756d=
+703c:
+>>>>>
+>>>>>   hw/arm: Remove hard-enablement of the remaining PCI devices (2019=
+-05-07 15:01:47 +0200)
+>>>>>
+>>>>> ----------------------------------------------------------------
+>>>>> Kconfig settings for the Arm machines
+>>>>> (v2: Fix the dependency of q35 to AHCI_ICH9 in the second patch)
+>>>>> ----------------------------------------------------------------
+>>>>
+>>>> Hi -- this is still failing in the build test where I 'make clean'
+>>>
+>>> Very weird. What is running before the "make clean"? Could you provid=
+e
+>>> me with the content of i386-softmmu/config-devices.mak please?
 >>
->> Most of the existing users would continue around a loop which
->> would fault the tlb entry in via a normal load/store.  But for
->> SVE we have a true non-faulting case which requires the new
->> probing form of tlb_fill.
-> 
-> So am I right in thinking that this fixes a bug where we
-> previously would mark a load as faulted if the memory happened
-> not to be in the TLB, whereas now we will correctly pull in the
-> TLB entry and do the load ?
+>> It worked for me after running 'git fetch --tags', maybe because Thoma=
+s
+>> used the same tag?
+>=20
+> Maybe because Thomas used the same tag you are still trying the
+> previous version?
 
-Yes.
+I did not use the same tag. v1 had pull-request-2019-05-05 while v2 has
+pull-request-2019-05-07. So this can not be the reason.
 
-> (Since guest code ought to be handling the "non-first-load
-> faulted" case by looping round or otherwise arranging to
-> retry, nothing in practice would have noticed this bug, right?)
-
-Yes.
-
-The only case with changed behaviour is (expected to be) SVE no-fault, where
-the loop you mention would have produced different incorrect results.
+ Thomas
 
 
-r~
 
