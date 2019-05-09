@@ -2,68 +2,81 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,T_HK_NAME_DR,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FF1CC04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 16:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DF57C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 16:50:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55DEF21019
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 16:50:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55DEF21019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 09F1421019
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 16:50:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CsO2dz3l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09F1421019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57840 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57846 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOmFR-0002k5-Kk
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 12:50:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46381)
+	id 1hOmFX-0002lK-9c
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 12:50:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hOmDt-0001zT-5n
+	(envelope-from <alistair23@gmail.com>) id 1hOmDs-0001zM-3T
 	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:48:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hOmDs-0004hZ-6v
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:48:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37702)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hOmDr-0004hG-Vv
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:48:44 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0DCCA3B712;
-	Thu,  9 May 2019 16:48:42 +0000 (UTC)
-Received: from work-vm (ovpn-116-174.ams2.redhat.com [10.36.116.174])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 95FF11710E;
-	Thu,  9 May 2019 16:48:28 +0000 (UTC)
-Date: Thu, 9 May 2019 17:48:26 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190509164825.GG2868@work-vm>
-References: <20190506014514.3555-1-yan.y.zhao@intel.com>
-	<20190506014904.3621-1-yan.y.zhao@intel.com>
-	<20190507151826.502be009@x1.home>
-	<20190509173839.2b9b2b46.cohuck@redhat.com>
-	<20190509154857.GF2868@work-vm>
-	<20190509175404.512ae7aa.cohuck@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1hOmDp-0004gw-Sv
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:48:43 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:33837)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hOmDp-0004ga-HP
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:48:41 -0400
+Received: by mail-lf1-x142.google.com with SMTP id v18so2079950lfi.1
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 09:48:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=Lx/CQJoO8WmXyXZJ5Hsqrrggt6vv+1kI3WukxQr2Ta0=;
+	b=CsO2dz3lD5kG6+s2WPt3AnTuFZ4GXCgoaZQQXkg95jO8QahIXamfalrwrLX7nCCXhZ
+	PAkPZEplcxld41NUjgxOL3KXd6xJml7temRAGrRZlLjI1MtPExygc9MgC2Dv1J5zYTfU
+	OgWH4hURWtcYIz4oG9Rb8VrhH6G8l2FsfS6NwpuOi5995r+ynxqUgiTFb2ldA8paN5cd
+	Xp67hPJS5514YQhOrH2vAsREzH+Rshg1e/giz88JsKzrp3b4Sb5DRASowMFHaZLcsR6y
+	U/1YDNcu+9a5KRUIVJ7OHq11X0X25y89pV8PjrIM16va0sMOIoueG6zEgiH3qMoTRqnu
+	SPgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=Lx/CQJoO8WmXyXZJ5Hsqrrggt6vv+1kI3WukxQr2Ta0=;
+	b=KjcymiRDxGq4B16/BsyQWxNY0CgraljFtcEVpymqGt9kZ22wLzFDmWqvP44vEq2G4U
+	vzBJ7K3OaHPGNJLsy+jrcWHlD2m055L25p13ldaOVgcUHlglTkf7Kly4Y4u14ICh+M7K
+	x0NksYIU6kOzEzXgUNppYbGUTkeq8uLhAez4PTQvDs5mg40JB4mWfE0C11fWDXq+wHxU
+	MFYyoJ/ykkUKKtYNXYByKmUB9WEmO9uuEsFKH/S+1vddcunRqNl84lNJBzYzFTew3ryT
+	IgunlEUsteK5KoHrCjJq9m0TmzxWjS3E3H80kX9ZabvBSIJ+g7c2o6P9u1typoqTzsT0
+	H8HA==
+X-Gm-Message-State: APjAAAUpQdKT+t01JIcstdFDBcO14JQUBIn3sJJmLnohFgNQV2bWJH3t
+	VfpLGrIOhawMmfeOT36inpwlOrZyBkTvRw9Hs+A=
+X-Google-Smtp-Source: APXvYqymMF95BDfgKrtqrFqNaR7sjMdvx++IqFsrZqjHxuuVCf3UoRAID2zkg/lIgN/1bT8KC4mea/QfVJpZYkgMXn0=
+X-Received: by 2002:a19:3f4b:: with SMTP id m72mr3056856lfa.32.1557420519682; 
+	Thu, 09 May 2019 09:48:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190509175404.512ae7aa.cohuck@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Thu, 09 May 2019 16:48:43 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] vfio/mdev: add version attribute
- for mdev device
+References: <1557131596-25403-1-git-send-email-like.xu@linux.intel.com>
+	<1557131596-25403-10-git-send-email-like.xu@linux.intel.com>
+In-Reply-To: <1557131596-25403-10-git-send-email-like.xu@linux.intel.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 9 May 2019 09:46:31 -0700
+Message-ID: <CAKmqyKOSuzY4p_fdgY-9dCL2uK8dXRV4KK-bt5wXA8tKrhC=eQ@mail.gmail.com>
+To: Like Xu <like.xu@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::142
+Subject: Re: [Qemu-devel] [PATCH v2 09/10] cpu/topology: add hw/arm support
+ for smp machine properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,72 +88,458 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cjia@nvidia.com, kvm@vger.kernel.org, aik@ozlabs.ru,
-	Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
-	qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com,
-	yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com,
-	mlevitsk@redhat.com, pasic@linux.ibm.com, libvir-list@redhat.com,
-	arei.gonglei@huawei.com, felipe@nutanix.com, Ken.Xue@amd.com,
-	kevin.tian@intel.com, Yan Zhao <yan.y.zhao@intel.com>,
-	zhenyuw@linux.intel.com, dinechin@redhat.com,
-	Alex Williamson <alex.williamson@redhat.com>,
-	intel-gvt-dev@lists.freedesktop.org, changpeng.liu@intel.com,
-	linux-kernel@vger.kernel.org, zhi.a.wang@intel.com,
-	jonathan.davies@nutanix.com, shaopeng.he@intel.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+	Richard Henderson <rth@twiddle.net>,
+	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Cornelia Huck (cohuck@redhat.com) wrote:
-> On Thu, 9 May 2019 16:48:57 +0100
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> 
-> > * Cornelia Huck (cohuck@redhat.com) wrote:
-> > > On Tue, 7 May 2019 15:18:26 -0600
-> > > Alex Williamson <alex.williamson@redhat.com> wrote:
-> > >   
-> > > > On Sun,  5 May 2019 21:49:04 -0400
-> > > > Yan Zhao <yan.y.zhao@intel.com> wrote:  
-> > >   
-> > > > > +  Errno:
-> > > > > +  If vendor driver wants to claim a mdev device incompatible to all other mdev
-> > > > > +  devices, it should not register version attribute for this mdev device. But if
-> > > > > +  a vendor driver has already registered version attribute and it wants to claim
-> > > > > +  a mdev device incompatible to all other mdev devices, it needs to return
-> > > > > +  -ENODEV on access to this mdev device's version attribute.
-> > > > > +  If a mdev device is only incompatible to certain mdev devices, write of
-> > > > > +  incompatible mdev devices's version strings to its version attribute should
-> > > > > +  return -EINVAL;    
-> > > > 
-> > > > I think it's best not to define the specific errno returned for a
-> > > > specific situation, let the vendor driver decide, userspace simply
-> > > > needs to know that an errno on read indicates the device does not
-> > > > support migration version comparison and that an errno on write
-> > > > indicates the devices are incompatible or the target doesn't support
-> > > > migration versions.  
-> > > 
-> > > I think I have to disagree here: It's probably valuable to have an
-> > > agreed error for 'cannot migrate at all' vs 'cannot migrate between
-> > > those two particular devices'. Userspace might want to do different
-> > > things (e.g. trying with different device pairs).  
-> > 
-> > Trying to stuff these things down an errno seems a bad idea; we can't
-> > get much information that way.
-> 
-> So, what would be a reasonable approach? Userspace should first read
-> the version attributes on both devices (to find out whether migration
-> is supported at all), and only then figure out via writing whether they
-> are compatible?
-> 
-> (Or just go ahead and try, if it does not care about the reason.)
+On Mon, May 6, 2019 at 1:35 AM Like Xu <like.xu@linux.intel.com> wrote:
+>
+> Following the replace rules, the global smp variables in arm
+> are replaced with smp machine properties. The init_cpus() and
+> xlnx_zynqmp_create_rpu() are refactored to pass MachineState.
+> No semantic changes.
+>
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
 
-Well, I'm OK with something like writing to test whether it's
-compatible, it's just we need a better way of saying 'no'.
-I'm not sure if that involves reading back from somewhere after
-the write or what.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Dave
+Alistair
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> ---
+>  hw/arm/fsl-imx6.c      |  6 +++++-
+>  hw/arm/fsl-imx6ul.c    |  6 +++++-
+>  hw/arm/fsl-imx7.c      |  7 +++++--
+>  hw/arm/highbank.c      |  1 +
+>  hw/arm/mcimx6ul-evk.c  |  2 +-
+>  hw/arm/mcimx7d-sabre.c |  2 +-
+>  hw/arm/raspi.c         |  4 ++--
+>  hw/arm/realview.c      |  1 +
+>  hw/arm/sabrelite.c     |  2 +-
+>  hw/arm/vexpress.c      | 12 ++++++++----
+>  hw/arm/virt.c          |  8 +++++++-
+>  hw/arm/xlnx-zynqmp.c   | 16 ++++++++++------
+>  target/arm/cpu.c       |  8 +++++++-
+>  13 files changed, 54 insertions(+), 21 deletions(-)
+>
+> diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
+> index 7b7b97f..ed772d5 100644
+> --- a/hw/arm/fsl-imx6.c
+> +++ b/hw/arm/fsl-imx6.c
+> @@ -23,6 +23,7 @@
+>  #include "qapi/error.h"
+>  #include "qemu-common.h"
+>  #include "hw/arm/fsl-imx6.h"
+> +#include "hw/boards.h"
+>  #include "sysemu/sysemu.h"
+>  #include "chardev/char.h"
+>  #include "qemu/error-report.h"
+> @@ -33,11 +34,12 @@
+>
+>  static void fsl_imx6_init(Object *obj)
+>  {
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+>      FslIMX6State *s = FSL_IMX6(obj);
+>      char name[NAME_SIZE];
+>      int i;
+>
+> -    for (i = 0; i < MIN(smp_cpus, FSL_IMX6_NUM_CPUS); i++) {
+> +    for (i = 0; i < MIN(ms->smp.cpus, FSL_IMX6_NUM_CPUS); i++) {
+>          snprintf(name, NAME_SIZE, "cpu%d", i);
+>          object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
+>                                  "cortex-a9-" TYPE_ARM_CPU, &error_abort, NULL);
+> @@ -93,9 +95,11 @@ static void fsl_imx6_init(Object *obj)
+>
+>  static void fsl_imx6_realize(DeviceState *dev, Error **errp)
+>  {
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+>      FslIMX6State *s = FSL_IMX6(dev);
+>      uint16_t i;
+>      Error *err = NULL;
+> +    unsigned int smp_cpus = ms->smp.cpus;
+>
+>      if (smp_cpus > FSL_IMX6_NUM_CPUS) {
+>          error_setg(errp, "%s: Only %d CPUs are supported (%d requested)",
+> diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+> index 4b56bfa..74b8ecb 100644
+> --- a/hw/arm/fsl-imx6ul.c
+> +++ b/hw/arm/fsl-imx6ul.c
+> @@ -21,6 +21,7 @@
+>  #include "qemu-common.h"
+>  #include "hw/arm/fsl-imx6ul.h"
+>  #include "hw/misc/unimp.h"
+> +#include "hw/boards.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/error-report.h"
+>
+> @@ -28,11 +29,12 @@
+>
+>  static void fsl_imx6ul_init(Object *obj)
+>  {
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+>      FslIMX6ULState *s = FSL_IMX6UL(obj);
+>      char name[NAME_SIZE];
+>      int i;
+>
+> -    for (i = 0; i < MIN(smp_cpus, FSL_IMX6UL_NUM_CPUS); i++) {
+> +    for (i = 0; i < MIN(ms->smp.cpus, FSL_IMX6UL_NUM_CPUS); i++) {
+>          snprintf(name, NAME_SIZE, "cpu%d", i);
+>          object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
+>                                  "cortex-a7-" TYPE_ARM_CPU, &error_abort, NULL);
+> @@ -156,10 +158,12 @@ static void fsl_imx6ul_init(Object *obj)
+>
+>  static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+>  {
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+>      FslIMX6ULState *s = FSL_IMX6UL(dev);
+>      int i;
+>      qemu_irq irq;
+>      char name[NAME_SIZE];
+> +    unsigned int smp_cpus = ms->smp.cpus;
+>
+>      if (smp_cpus > FSL_IMX6UL_NUM_CPUS) {
+>          error_setg(errp, "%s: Only %d CPUs are supported (%d requested)",
+> diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
+> index 7663ad6..71cc414 100644
+> --- a/hw/arm/fsl-imx7.c
+> +++ b/hw/arm/fsl-imx7.c
+> @@ -23,6 +23,7 @@
+>  #include "qemu-common.h"
+>  #include "hw/arm/fsl-imx7.h"
+>  #include "hw/misc/unimp.h"
+> +#include "hw/boards.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/error-report.h"
+>
+> @@ -30,12 +31,12 @@
+>
+>  static void fsl_imx7_init(Object *obj)
+>  {
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+>      FslIMX7State *s = FSL_IMX7(obj);
+>      char name[NAME_SIZE];
+>      int i;
+>
+> -
+> -    for (i = 0; i < MIN(smp_cpus, FSL_IMX7_NUM_CPUS); i++) {
+> +    for (i = 0; i < MIN(ms->smp.cpus, FSL_IMX7_NUM_CPUS); i++) {
+>          snprintf(name, NAME_SIZE, "cpu%d", i);
+>          object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
+>                                  ARM_CPU_TYPE_NAME("cortex-a7"), &error_abort,
+> @@ -155,11 +156,13 @@ static void fsl_imx7_init(Object *obj)
+>
+>  static void fsl_imx7_realize(DeviceState *dev, Error **errp)
+>  {
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+>      FslIMX7State *s = FSL_IMX7(dev);
+>      Object *o;
+>      int i;
+>      qemu_irq irq;
+>      char name[NAME_SIZE];
+> +    unsigned int smp_cpus = ms->smp.cpus;
+>
+>      if (smp_cpus > FSL_IMX7_NUM_CPUS) {
+>          error_setg(errp, "%s: Only %d CPUs are supported (%d requested)",
+> diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
+> index 96ccf18..f3b1712 100644
+> --- a/hw/arm/highbank.c
+> +++ b/hw/arm/highbank.c
+> @@ -240,6 +240,7 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
+>      SysBusDevice *busdev;
+>      qemu_irq pic[128];
+>      int n;
+> +    unsigned int smp_cpus = machine->smp.cpus;
+>      qemu_irq cpu_irq[4];
+>      qemu_irq cpu_fiq[4];
+>      qemu_irq cpu_virq[4];
+> diff --git a/hw/arm/mcimx6ul-evk.c b/hw/arm/mcimx6ul-evk.c
+> index fb2b015..47c44dd 100644
+> --- a/hw/arm/mcimx6ul-evk.c
+> +++ b/hw/arm/mcimx6ul-evk.c
+> @@ -43,7 +43,7 @@ static void mcimx6ul_evk_init(MachineState *machine)
+>          .kernel_filename = machine->kernel_filename,
+>          .kernel_cmdline = machine->kernel_cmdline,
+>          .initrd_filename = machine->initrd_filename,
+> -        .nb_cpus = smp_cpus,
+> +        .nb_cpus = machine->smp.cpus,
+>      };
+>
+>      object_initialize_child(OBJECT(machine), "soc", &s->soc,  sizeof(s->soc),
+> diff --git a/hw/arm/mcimx7d-sabre.c b/hw/arm/mcimx7d-sabre.c
+> index 9c5f0e7..a8df0cc 100644
+> --- a/hw/arm/mcimx7d-sabre.c
+> +++ b/hw/arm/mcimx7d-sabre.c
+> @@ -46,7 +46,7 @@ static void mcimx7d_sabre_init(MachineState *machine)
+>          .kernel_filename = machine->kernel_filename,
+>          .kernel_cmdline = machine->kernel_cmdline,
+>          .initrd_filename = machine->initrd_filename,
+> -        .nb_cpus = smp_cpus,
+> +        .nb_cpus = machine->smp.cpus,
+>      };
+>
+>      object_initialize(&s->soc, sizeof(s->soc), TYPE_FSL_IMX7);
+> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> index 66899c2..3862976 100644
+> --- a/hw/arm/raspi.c
+> +++ b/hw/arm/raspi.c
+> @@ -116,7 +116,7 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
+>
+>      binfo.board_id = raspi_boardid[version];
+>      binfo.ram_size = ram_size;
+> -    binfo.nb_cpus = smp_cpus;
+> +    binfo.nb_cpus = machine->smp.cpus;
+>
+>      if (version <= 2) {
+>          /* The rpi1 and 2 require some custom setup code to run in Secure
+> @@ -189,7 +189,7 @@ static void raspi_init(MachineState *machine, int version)
+>      /* Setup the SOC */
+>      object_property_add_const_link(OBJECT(&s->soc), "ram", OBJECT(&s->ram),
+>                                     &error_abort);
+> -    object_property_set_int(OBJECT(&s->soc), smp_cpus, "enabled-cpus",
+> +    object_property_set_int(OBJECT(&s->soc), machine->smp.cpus, "enabled-cpus",
+>                              &error_abort);
+>      int board_rev = version == 3 ? 0xa02082 : 0xa21041;
+>      object_property_set_int(OBJECT(&s->soc), board_rev, "board-rev",
+> diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+> index 05a244d..f470f21 100644
+> --- a/hw/arm/realview.c
+> +++ b/hw/arm/realview.c
+> @@ -70,6 +70,7 @@ static void realview_init(MachineState *machine,
+>      NICInfo *nd;
+>      I2CBus *i2c;
+>      int n;
+> +    unsigned int smp_cpus = machine->smp.cpus;
+>      int done_nic = 0;
+>      qemu_irq cpu_irq[4];
+>      int is_mpcore = 0;
+> diff --git a/hw/arm/sabrelite.c b/hw/arm/sabrelite.c
+> index ee140e5..f9e7dc5 100644
+> --- a/hw/arm/sabrelite.c
+> +++ b/hw/arm/sabrelite.c
+> @@ -107,7 +107,7 @@ static void sabrelite_init(MachineState *machine)
+>      sabrelite_binfo.kernel_filename = machine->kernel_filename;
+>      sabrelite_binfo.kernel_cmdline = machine->kernel_cmdline;
+>      sabrelite_binfo.initrd_filename = machine->initrd_filename;
+> -    sabrelite_binfo.nb_cpus = smp_cpus;
+> +    sabrelite_binfo.nb_cpus = machine->smp.cpus;
+>      sabrelite_binfo.secure_boot = true;
+>      sabrelite_binfo.write_secondary_boot = sabrelite_write_secondary;
+>      sabrelite_binfo.secondary_cpu_reset_hook = sabrelite_reset_secondary;
+> diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+> index 19273a2..6d93d9f 100644
+> --- a/hw/arm/vexpress.c
+> +++ b/hw/arm/vexpress.c
+> @@ -203,12 +203,14 @@ struct VEDBoardInfo {
+>      DBoardInitFn *init;
+>  };
+>
+> -static void init_cpus(const char *cpu_type, const char *privdev,
+> -                      hwaddr periphbase, qemu_irq *pic, bool secure, bool virt)
+> +static void init_cpus(MachineState *ms, const char *cpu_type,
+> +                      const char *privdev, hwaddr periphbase,
+> +                      qemu_irq *pic, bool secure, bool virt)
+>  {
+>      DeviceState *dev;
+>      SysBusDevice *busdev;
+>      int n;
+> +    unsigned int smp_cpus = ms->smp.cpus;
+>
+>      /* Create the actual CPUs */
+>      for (n = 0; n < smp_cpus; n++) {
+> @@ -269,6 +271,7 @@ static void a9_daughterboard_init(const VexpressMachineState *vms,
+>                                    const char *cpu_type,
+>                                    qemu_irq *pic)
+>  {
+> +    MachineState *machine = MACHINE(vms);
+>      MemoryRegion *sysmem = get_system_memory();
+>      MemoryRegion *ram = g_new(MemoryRegion, 1);
+>      MemoryRegion *lowram = g_new(MemoryRegion, 1);
+> @@ -295,7 +298,7 @@ static void a9_daughterboard_init(const VexpressMachineState *vms,
+>      memory_region_add_subregion(sysmem, 0x60000000, ram);
+>
+>      /* 0x1e000000 A9MPCore (SCU) private memory region */
+> -    init_cpus(cpu_type, TYPE_A9MPCORE_PRIV, 0x1e000000, pic,
+> +    init_cpus(machine, cpu_type, TYPE_A9MPCORE_PRIV, 0x1e000000, pic,
+>                vms->secure, vms->virt);
+>
+>      /* Daughterboard peripherals : 0x10020000 .. 0x20000000 */
+> @@ -355,6 +358,7 @@ static void a15_daughterboard_init(const VexpressMachineState *vms,
+>                                     const char *cpu_type,
+>                                     qemu_irq *pic)
+>  {
+> +    MachineState *machine = MACHINE(vms);
+>      MemoryRegion *sysmem = get_system_memory();
+>      MemoryRegion *ram = g_new(MemoryRegion, 1);
+>      MemoryRegion *sram = g_new(MemoryRegion, 1);
+> @@ -706,7 +710,7 @@ static void vexpress_common_init(MachineState *machine)
+>      daughterboard->bootinfo.kernel_filename = machine->kernel_filename;
+>      daughterboard->bootinfo.kernel_cmdline = machine->kernel_cmdline;
+>      daughterboard->bootinfo.initrd_filename = machine->initrd_filename;
+> -    daughterboard->bootinfo.nb_cpus = smp_cpus;
+> +    daughterboard->bootinfo.nb_cpus = machine->smp.cpus;
+>      daughterboard->bootinfo.board_id = VEXPRESS_BOARD_ID;
+>      daughterboard->bootinfo.loader_start = daughterboard->loader_start;
+>      daughterboard->bootinfo.smp_loader_start = map[VE_SRAM];
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 1b02ba4..002c083 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -555,11 +555,13 @@ static void create_v2m(VirtMachineState *vms, qemu_irq *pic)
+>
+>  static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+>  {
+> +    MachineState *ms = MACHINE(vms);
+>      /* We create a standalone GIC */
+>      DeviceState *gicdev;
+>      SysBusDevice *gicbusdev;
+>      const char *gictype;
+>      int type = vms->gic_version, i;
+> +    unsigned int smp_cpus = ms->smp.cpus;
+>      uint32_t nb_redist_regions = 0;
+>
+>      gictype = (type == 3) ? gicv3_class_name() : gic_class_name();
+> @@ -984,13 +986,14 @@ static void create_flash(const VirtMachineState *vms,
+>
+>  static FWCfgState *create_fw_cfg(const VirtMachineState *vms, AddressSpace *as)
+>  {
+> +    MachineState *ms = MACHINE(vms);
+>      hwaddr base = vms->memmap[VIRT_FW_CFG].base;
+>      hwaddr size = vms->memmap[VIRT_FW_CFG].size;
+>      FWCfgState *fw_cfg;
+>      char *nodename;
+>
+>      fw_cfg = fw_cfg_init_mem_wide(base + 8, base, 8, base + 16, as);
+> -    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
+> +    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)ms->smp.cpus);
+>
+>      nodename = g_strdup_printf("/fw-cfg@%" PRIx64, base);
+>      qemu_fdt_add_subnode(vms->fdt, nodename);
+> @@ -1423,6 +1426,8 @@ static void machvirt_init(MachineState *machine)
+>      MemoryRegion *ram = g_new(MemoryRegion, 1);
+>      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
+>      bool aarch64 = true;
+> +    unsigned int smp_cpus = machine->smp.cpus;
+> +    unsigned int max_cpus = machine->smp.max_cpus;
+>
+>      /*
+>       * In accelerated mode, the memory map is computed earlier in kvm_type()
+> @@ -1786,6 +1791,7 @@ static int64_t virt_get_default_cpu_node_id(const MachineState *ms, int idx)
+>  static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+>  {
+>      int n;
+> +    unsigned int max_cpus = ms->smp.max_cpus;
+>      VirtMachineState *vms = VIRT_MACHINE(ms);
+>
+>      if (ms->possible_cpus) {
+> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+> index 4f8bc41..fc8e1a9 100644
+> --- a/hw/arm/xlnx-zynqmp.c
+> +++ b/hw/arm/xlnx-zynqmp.c
+> @@ -21,6 +21,7 @@
+>  #include "cpu.h"
+>  #include "hw/arm/xlnx-zynqmp.h"
+>  #include "hw/intc/arm_gic_common.h"
+> +#include "hw/boards.h"
+>  #include "exec/address-spaces.h"
+>  #include "sysemu/kvm.h"
+>  #include "kvm_arm.h"
+> @@ -171,12 +172,13 @@ static inline int arm_gic_ppi_index(int cpu_nr, int ppi_index)
+>      return GIC_NUM_SPI_INTR + cpu_nr * GIC_INTERNAL + ppi_index;
+>  }
+>
+> -static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
+> -                                   Error **errp)
+> +static void xlnx_zynqmp_create_rpu(MachineState *ms, XlnxZynqMPState *s,
+> +                                   const char *boot_cpu, Error **errp)
+>  {
+>      Error *err = NULL;
+>      int i;
+> -    int num_rpus = MIN(smp_cpus - XLNX_ZYNQMP_NUM_APU_CPUS, XLNX_ZYNQMP_NUM_RPU_CPUS);
+> +    int num_rpus = MIN(ms->smp.cpus - XLNX_ZYNQMP_NUM_APU_CPUS,
+> +                       XLNX_ZYNQMP_NUM_RPU_CPUS);
+>
+>      if (num_rpus <= 0) {
+>          /* Don't create rpu-cluster object if there's nothing to put in it */
+> @@ -221,9 +223,10 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
+>
+>  static void xlnx_zynqmp_init(Object *obj)
+>  {
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+>      XlnxZynqMPState *s = XLNX_ZYNQMP(obj);
+>      int i;
+> -    int num_apus = MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
+> +    int num_apus = MIN(ms->smp.cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
+>
+>      object_initialize_child(obj, "apu-cluster", &s->apu_cluster,
+>                              sizeof(s->apu_cluster), TYPE_CPU_CLUSTER,
+> @@ -290,11 +293,12 @@ static void xlnx_zynqmp_init(Object *obj)
+>
+>  static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+>  {
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+>      XlnxZynqMPState *s = XLNX_ZYNQMP(dev);
+>      MemoryRegion *system_memory = get_system_memory();
+>      uint8_t i;
+>      uint64_t ram_size;
+> -    int num_apus = MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
+> +    int num_apus = MIN(ms->smp.cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
+>      const char *boot_cpu = s->boot_cpu ? s->boot_cpu : "apu-cpu[0]";
+>      ram_addr_t ddr_low_size, ddr_high_size;
+>      qemu_irq gic_spi[GIC_NUM_SPI_INTR];
+> @@ -456,7 +460,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+>                      "RPUs just use -smp 6.");
+>      }
+>
+> -    xlnx_zynqmp_create_rpu(s, boot_cpu, &err);
+> +    xlnx_zynqmp_create_rpu(ms, s, boot_cpu, &err);
+>      if (err) {
+>          error_propagate(errp, err);
+>          return;
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index a181fa8..d33e3f1 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -29,6 +29,7 @@
+>  #include "hw/qdev-properties.h"
+>  #if !defined(CONFIG_USER_ONLY)
+>  #include "hw/loader.h"
+> +#include "hw/boards.h"
+>  #endif
+>  #include "hw/arm/arm.h"
+>  #include "sysemu/sysemu.h"
+> @@ -1194,6 +1195,9 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+>      init_cpreg_list(cpu);
+>
+>  #ifndef CONFIG_USER_ONLY
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+> +    unsigned int smp_cpus = ms->smp.cpus;
+> +
+>      if (cpu->has_el3 || arm_feature(env, ARM_FEATURE_M_SECURITY)) {
+>          cs->num_ases = 2;
+>
+> @@ -1732,10 +1736,12 @@ static void cortex_a9_initfn(Object *obj)
+>  #ifndef CONFIG_USER_ONLY
+>  static uint64_t a15_l2ctlr_read(CPUARMState *env, const ARMCPRegInfo *ri)
+>  {
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+> +
+>      /* Linux wants the number of processors from here.
+>       * Might as well set the interrupt-controller bit too.
+>       */
+> -    return ((smp_cpus - 1) << 24) | (1 << 23);
+> +    return ((ms->smp.cpus - 1) << 24) | (1 << 23);
+>  }
+>  #endif
+>
+> --
+> 1.8.3.1
+>
 
