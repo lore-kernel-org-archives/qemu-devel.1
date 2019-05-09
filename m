@@ -2,68 +2,72 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A88EC04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 14:56:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2369C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 14:57:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C5FC20644
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 14:56:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C5FC20644
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 93C282054F
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 14:57:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93C282054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56027 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56055 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOkSx-0002OZ-2S
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 10:56:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40487)
+	id 1hOkUT-0003Qd-U0
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 10:57:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hOkRh-0001gQ-Ja
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:54:54 -0400
+	(envelope-from <bounces@canonical.com>) id 1hOkSW-0002KR-Qz
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:55:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hOkRg-0000Et-IU
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:54:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48002)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hOkRg-0000Ee-Cu
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:54:52 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AABF7753FC;
-	Thu,  9 May 2019 14:54:51 +0000 (UTC)
-Received: from redhat.com (ovpn-112-55.ams2.redhat.com [10.36.112.55])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EC596600CC;
-	Thu,  9 May 2019 14:54:49 +0000 (UTC)
-Date: Thu, 9 May 2019 15:54:47 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190509145447.GG31299@redhat.com>
-References: <20190503154613.4192-1-kchamart@redhat.com>
-	<20190509135320.GE17133@stefanha-x1.localdomain>
+	(envelope-from <bounces@canonical.com>) id 1hOkSV-0000jO-Gi
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:55:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45122)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hOkSV-0000iw-B6
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:55:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hOkSQ-0003Yy-0T
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 14:55:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 060432E80CC
+	for <qemu-devel@nongnu.org>; Thu,  9 May 2019 14:55:33 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190509135320.GE17133@stefanha-x1.localdomain>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Thu, 09 May 2019 14:54:51 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 09 May 2019 14:49:37 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bneumeier pmaydell
+X-Launchpad-Bug-Reporter: Brett Neumeier (bneumeier)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <155741248596.25660.12793938251081176084.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155741337710.32090.13896191550251426644.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18961";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 07c8cb5de5cea47ce0e3a42dad732f0c78ecd325
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] VirtIO-RNG: Update default entropy source
- to `/dev/urandom`
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1828429] Re: qemu-system-aarch64 crashes with
+ assertion failed while running GCC 9 test suite
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -72,59 +76,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, rjones@redhat.com, amit@kernel.org,
-	armbru@redhat.com, Kashyap Chamarthy <kchamart@redhat.com>
+Reply-To: Bug 1828429 <1828429@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 09, 2019 at 02:53:20PM +0100, Stefan Hajnoczi wrote:
-> On Fri, May 03, 2019 at 05:46:12PM +0200, Kashyap Chamarthy wrote:
-> > When QEMU exposes a VirtIO-RNG device to the guest, that device needs=
- a
-> > source of entropy, and that source needs to be "non-blocking", like
-> > `/dev/urandom`.  However, currently QEMU defaults to the problematic
-> > `/dev/random`, which is "blocking" (as in, it waits until sufficient
-> > entropy is available).
-> >=20
-> > So change the entropy source to the recommended `/dev/urandom`.
->=20
-> Why is /dev/urandom "recommended"?
->=20
-> I understand the requirement for instant random numbers, but what about
-> the concerns about quality?  Have you decided that the consumers of
-> these random numbers are safe with /dev/urandom?
+Hi -- this looks rather like bug #1824853, which exists in QEMU 4.0 but
+which we have fixed in git. Could you try with a build of QEMU from
+current head-of-git to confirm that it's fixed there ?
 
-The current random(4) man page says:
+-- =
 
-       The /dev/random interface is considered a legacy inter=E2=80=90
-       face, and /dev/urandom is preferred and  sufficient  in
-       all use cases, with the exception of applications which
-       require randomness during early boot  time;  for  these
-       applications,   getrandom(2)   must  be  used  instead,
-       because it will block until the entropy  pool  is  ini=E2=80=90
-       tialized.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1828429
 
-"early boot" is a bit of an ill-defined term here, but I think in
-general QEMU can reasonably be said to not be running in early boot.
+Title:
+  qemu-system-aarch64 crashes with assertion failed while running GCC 9
+  test suite
 
-In any case the newly proposed RNG backend should ultimately become
-the preferred choice for mgmt apps:
+Status in QEMU:
+  New
 
-  https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg02062.html
+Bug description:
+  I am using QEMU 4.0.0 on an x86_64 Linux 4.19.0 host, the guest is an
+  Aarch64 linux 5.0.0 system. The same issue occurred on QEMU 3.1.0.
 
-This new rng-builtin delegates to our crypto random APIs, which are
-backed by GNUTLS, libgcrypt, getrandom (or Windows equiv), and
-finally /dev/urandom as last ditch effort.
+  While running the GCC 9.1 test suite on the guest system, QEMU crashes
+  with:
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+  qemu-system-aarch64: [...]/qemu-4.0.0/tcg/tcg.c:3952: tcg_gen_code:
+  Assertion `s->gen_insn_end_off[num_insns] =3D=3D off' failed.
+
+  I am able to reproduce the issue reliably, which is encouraging. The
+  full QEMU command line is:
+
+  qemu-system-aarch64 -kernel kernel-5.0.0cbl1 -append "root=3D/dev/vda1
+  ro init=3D/sbin/init console=3DttyAMA0" -name guest=3Dcbl -drive
+  file=3Dcbl.qcow2,index=3D0,media=3Ddisk,format=3Dqcow2 -drive
+  file=3Dswap.qcow2,index=3D1,media=3Ddisk,format=3Dqcow2 -machine virt -cpu
+  cortex-a57 -smp 4,sockets=3D1,cores=3D2,threads=3D2 -m size=3D8192 -netdev
+  tap,id=3Dnetwork0,ifname=3Dtapcbl2,script=3Dno,downscript=3Dno -device vi=
+rtio-
+  net-device,netdev=3Dnetwork0,mac=3Daa:bb:cc:dd:ee:02 -nographic
+
+  The specific GCC test that causes QEMU to crash is vldX.c run from
+  advsimd-intrinsics.exp; I can reproduce via "make check-gcc
+  RUNTESTFLAGS=3Dadvsimd-intrinsics.exp=3DvldX.c"
+
+  If there is anything I can do to further triage the issue, or gain
+  more insight into what is going on, please let me know! I am eager to
+  help however I can.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1828429/+subscriptions
 
