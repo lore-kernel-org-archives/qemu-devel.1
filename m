@@ -2,66 +2,71 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E824CC04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:50:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6411C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:51:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B93D82173C
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:50:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B93D82173C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A8FD42173C
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:51:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8FD42173C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56838 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56858 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOlJR-0001XM-1s
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 11:50:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53587)
+	id 1hOlKk-0003EK-SW
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 11:51:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hOlIc-00018n-3G
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:49:35 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hOlJb-0001qp-PT
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:50:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hOlIb-0007o8-3K
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:49:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54690)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hOlIa-0007ik-Tm
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:49:33 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CFA953079B73;
-	Thu,  9 May 2019 15:49:14 +0000 (UTC)
-Received: from work-vm (ovpn-116-174.ams2.redhat.com [10.36.116.174])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 347CF5B681;
-	Thu,  9 May 2019 15:49:00 +0000 (UTC)
-Date: Thu, 9 May 2019 16:48:57 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190509154857.GF2868@work-vm>
-References: <20190506014514.3555-1-yan.y.zhao@intel.com>
-	<20190506014904.3621-1-yan.y.zhao@intel.com>
-	<20190507151826.502be009@x1.home>
-	<20190509173839.2b9b2b46.cohuck@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1hOlJa-0008E0-76
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:50:35 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:58385)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hOlJZ-0008Cz-SY
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:50:34 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+	1M7auL-1hLk6C1pkr-007zqJ; Thu, 09 May 2019 17:50:21 +0200
+To: Giuseppe Musacchio <thatlemon@gmail.com>, qemu-devel@nongnu.org
+References: <20190503122007.lkjsvztgt4ycovac@debian>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <7fb7832d-4e02-8fb1-f8a3-ed81a71774d5@vivier.eu>
+Date: Thu, 9 May 2019 17:50:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190509173839.2b9b2b46.cohuck@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Thu, 09 May 2019 15:49:15 +0000 (UTC)
+In-Reply-To: <20190503122007.lkjsvztgt4ycovac@debian>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:/Bd32PGJ1fx6ItS8YPqc0LsQYmAZLIOa+ruwhsS/cTPUgcNSZT+
+	rWg5a3Zrs8Ns+xPsAmBI52oEDBOnjGYptoAKy623vgWDXZjAzcpHvrvkJ4/2+Kh/xyCXHl6
+	THoaK/IGh6b6H6tnzfIjVoQtA21/f+uEj63fBmNzJNzWq/o6A7kVlGL30JwuWXuw1eUIwiZ
+	B8WptJpXlUtPAP/AGFGVg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:AhfMfm5L3vM=:yNgdcgI7UDVOh/rhMIzHuw
+	7Nc0s6qlve6M4VFHL3h8GqwDmEHIno05YKW/USqyHAL4DnJ/2Fx+a/jwG6ZsbN9rlCVjwos47
+	2olOfUyEd2/Ub6toqNfrVfSgZiTGyFr853cmZD1HS+Y1bFkW8g5MisQ4qRKGGXOKlyrYkHk51
+	h3JesdMCfkkVOWxsA5YymoJDj6Lsd/zCM7rOAgyTNhiJj49NH2iWFN7HBjVKR10Wcm8e0xAaH
+	XGBUf4fX+vvRD7LW/sBhYqGXxau4Xkj5JHnyjyFqFAXWKBK8d+ByPFcbheM2rmz77MZg2R6/x
+	r0DAAKipNkafCktPW+XPrT6ET9n9rT6an3nHnPFiL3wkvotDNu20KBKVP6f83UstGyC7CezIf
+	zLc/O6ZzgpOr/QHZt8hKl33C/VPbObxprXoUZIgeTb8nTD0zYC1qdVmGKLF+mx1z/PKxBXJVp
+	rvwu0Bi3ES2l7BCZnB5CtUSs9FJzSRDPDfWAz+q4ZqFeRviYBUxpbEAWBBKPAEW10ObVDFqBc
+	DkyfzIlpn9gWGJh/MpFyMgHuDAjb1VLGUqlqeJxzTCZYat/3rF7pNwWjal6qrd1pYWj6AAIar
+	mZkJEBO7I/rP8DgpzBu2XIThhTL4R9ZN/qFCTQiTdF+XtzQRXvmHf6NKN67j77JtfGLlhOIy3
+	HvutujYjP4NNq0of+Es5pLffy3V/UpIpVPwZ4o2dphI4oPMi91rgyN4zhQrM81a/AEhWS1JbO
+	w0/04OQgVdI0SmjtZfheBSqTskkN2ckeJKdD8sAdTr72482dFJ0wFS+6M0E=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] vfio/mdev: add version attribute
- for mdev device
+X-Received-From: 212.227.126.130
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: elf: Map empty PT_LOAD
+ segments
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,56 +78,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cjia@nvidia.com, kvm@vger.kernel.org, aik@ozlabs.ru,
-	Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
-	qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com,
-	yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com,
-	mlevitsk@redhat.com, pasic@linux.ibm.com, libvir-list@redhat.com,
-	arei.gonglei@huawei.com, felipe@nutanix.com, Ken.Xue@amd.com,
-	kevin.tian@intel.com, Yan Zhao <yan.y.zhao@intel.com>,
-	zhenyuw@linux.intel.com, dinechin@redhat.com,
-	Alex Williamson <alex.williamson@redhat.com>,
-	intel-gvt-dev@lists.freedesktop.org, changpeng.liu@intel.com,
-	linux-kernel@vger.kernel.org, zhi.a.wang@intel.com,
-	jonathan.davies@nutanix.com, shaopeng.he@intel.com
+Cc: peter.maydell@linaro.org, riku.voipio@iki.fi
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Cornelia Huck (cohuck@redhat.com) wrote:
-> On Tue, 7 May 2019 15:18:26 -0600
-> Alex Williamson <alex.williamson@redhat.com> wrote:
+On 03/05/2019 14:20, Giuseppe Musacchio wrote:
+> Some PT_LOAD segments may be completely zeroed out and their p_filesize
+> is zero, in that case the loader should just allocate a page that's at
+> least p_memsz bytes large (plus eventual alignment padding).
 > 
-> > On Sun,  5 May 2019 21:49:04 -0400
-> > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> Calling zero_bss does this job for us, all we have to do is make sure we
+> don't try to mmap a zero-length page.
 > 
-> > > +  Errno:
-> > > +  If vendor driver wants to claim a mdev device incompatible to all other mdev
-> > > +  devices, it should not register version attribute for this mdev device. But if
-> > > +  a vendor driver has already registered version attribute and it wants to claim
-> > > +  a mdev device incompatible to all other mdev devices, it needs to return
-> > > +  -ENODEV on access to this mdev device's version attribute.
-> > > +  If a mdev device is only incompatible to certain mdev devices, write of
-> > > +  incompatible mdev devices's version strings to its version attribute should
-> > > +  return -EINVAL;  
-> > 
-> > I think it's best not to define the specific errno returned for a
-> > specific situation, let the vendor driver decide, userspace simply
-> > needs to know that an errno on read indicates the device does not
-> > support migration version comparison and that an errno on write
-> > indicates the devices are incompatible or the target doesn't support
-> > migration versions.
+> Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+I don't find the mail from Peter with his R-b.
+Did I miss it?
+
+Thanks,
+Laurent
+
+> ---
+>   linux-user/elfload.c | 18 +++++++++++++-----
+>   1 file changed, 13 insertions(+), 5 deletions(-)
 > 
-> I think I have to disagree here: It's probably valuable to have an
-> agreed error for 'cannot migrate at all' vs 'cannot migrate between
-> those two particular devices'. Userspace might want to do different
-> things (e.g. trying with different device pairs).
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index c1a2602..138735b 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -2366,11 +2366,19 @@ static void load_elf_image(const char *image_name, int image_fd,
+>               vaddr_ps = TARGET_ELF_PAGESTART(vaddr);
+>               vaddr_len = TARGET_ELF_PAGELENGTH(eppnt->p_filesz + vaddr_po);
+>   
+> -            error = target_mmap(vaddr_ps, vaddr_len,
+> -                                elf_prot, MAP_PRIVATE | MAP_FIXED,
+> -                                image_fd, eppnt->p_offset - vaddr_po);
+> -            if (error == -1) {
+> -                goto exit_perror;
+> +            /*
+> +             * Some segments may be completely empty without any backing file
+> +             * segment, in that case just let zero_bss allocate an empty buffer
+> +             * for it.
+> +             */
+> +            if (eppnt->p_filesz != 0) {
+> +                error = target_mmap(vaddr_ps, vaddr_len, elf_prot,
+> +                                    MAP_PRIVATE | MAP_FIXED,
+> +                                    image_fd, eppnt->p_offset - vaddr_po);
+> +
+> +                if (error == -1) {
+> +                    goto exit_perror;
+> +                }
+>               }
+>   
+>               vaddr_ef = vaddr + eppnt->p_filesz;
+> 
 
-Trying to stuff these things down an errno seems a bad idea; we can't
-get much information that way.
-
-Dave
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
