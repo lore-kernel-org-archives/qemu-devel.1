@@ -2,68 +2,95 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED55C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 21:49:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 779D7C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 22:25:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3216217D7
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 21:49:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3216217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2BE032173B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 22:25:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LwE0egeX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BE032173B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33116 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33427 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOqus-0006f8-4o
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 17:49:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55535)
+	id 1hOrU9-0006sC-7k
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 18:25:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hOqty-0006HO-E7
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 17:48:32 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hOrTG-0006WE-UY
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 18:24:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hOqtw-0000P2-IR
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 17:48:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57100)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>)
-	id 1hOqtr-0000L0-W6; Thu, 09 May 2019 17:48:24 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1E63A81112;
-	Thu,  9 May 2019 21:48:22 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-234.rdu2.redhat.com
-	[10.10.120.234])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 14BC65DF49;
-	Thu,  9 May 2019 21:48:15 +0000 (UTC)
-To: Igor Mammedov <imammedo@redhat.com>
-References: <5FC3163CFD30C246ABAA99954A238FA83F1B6A66@lhreml524-mbs.china.huawei.com>
-	<ca5f7231-6924-0720-73a5-766eb13ee331@arm.com>
-	<190831a5-297d-addb-ea56-645afb169efb@redhat.com>
-	<20190509183520.6dc47f2e@Igors-MacBook-Pro>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <cd2aa867-5367-b470-0a2b-33897697c23f@redhat.com>
-Date: Thu, 9 May 2019 23:48:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.9.1
+	(envelope-from <richard.henderson@linaro.org>) id 1hOrTF-0004i3-Vh
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 18:24:58 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:36259)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hOrTF-0004hX-OQ
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 18:24:57 -0400
+Received: by mail-pf1-x441.google.com with SMTP id v80so2052865pfa.3
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 15:24:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=If8FSYdfgbsx+8WDesLEbG6KSM0V5C7scqtz0C69AVA=;
+	b=LwE0egeX07OgttZB1UdIxOPU37OomZG5enBxDwFnMwNmLIZPorylSIFnXbbzUWSb25
+	xhwKXuE/RMX3fmEYIO/tSmsLuBrM5EtZiVUnegyeRsd2fukc9GUfdtmkfoSMLkL3BIBo
+	yHuM1nRknb39xtjUjfxTeo3L8FC/FEF3WdXiW/iyg9bmoh4icI+ixjsbKzgcDt9ghWsV
+	FPnq7F8RILQBTF/iS37ElXQp3/0I0bZl7B0a1VQlJDX4CXXZZDb9YwWhDNpjQ49PPKOt
+	0MfWDRWFIOgHFqtE2XJnRuhT+vdpfuV/d4sP5SjhNVvRzoY+cQPs1ZsEj/X9LnonOqPu
+	9FOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=If8FSYdfgbsx+8WDesLEbG6KSM0V5C7scqtz0C69AVA=;
+	b=a6Uv323QJYMkCTIe/HLaBpvk8kASRwTCyIhA9bi/fYcOUlHUZG1uZSAhvYDTElFiUT
+	WfZHJFnS03JjMrIthbDD6Btr5OdXb2/wf6cS6+9yt8kgkPh1oSCUq7QWtobBq6jmzsI7
+	/pdrxgmyO47EfE4O4efkf+eL+gRYTbCw4LLpKnYy+fcrlptLPNNsv5fuH6iEINarpe4e
+	Sah0mXe85/jqx0OyafnQ9V8MNbEFiIo3NrVCFyu42hrwhAvZfLUOOygvo00vDucMb3Nt
+	EYw+mhJpYuzH3fiE4J9Cf+EDvqN4dx+z6/oKv1oMpGmNtmRHaYxXMhe5Ts/dPV/FW/LV
+	okxQ==
+X-Gm-Message-State: APjAAAV9pQairGhfujFbiagJyRiVA5Qtr2HsYQECmRrdwPZxBe+syqPB
+	2KPOYM4BZH1zKf2NykPUCRIEWg8zDCQ=
+X-Google-Smtp-Source: APXvYqzosDfxQ2+G9MiAW3w+fIBKhA9Ds74D/PytT1a2qS1Ve2KajJkt2Z5pchDYM0DbislZd8yAVQ==
+X-Received: by 2002:a62:2805:: with SMTP id o5mr8919021pfo.256.1557440695775; 
+	Thu, 09 May 2019 15:24:55 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
+	by smtp.gmail.com with ESMTPSA id
+	u5sm4197806pfm.121.2019.05.09.15.24.53
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 09 May 2019 15:24:54 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190403034358.21999-1-richard.henderson@linaro.org>
+	<20190403034358.21999-27-richard.henderson@linaro.org>
+	<CAFEAcA_TJJ7V3apxmGvhoiRk2dxzT77SapcyMuopGwqmeQoosw@mail.gmail.com>
+	<b6518e96-e77f-8ae7-0890-091e42334a12@linaro.org>
+	<CAFEAcA-Agc6KWMqAA3V7tA0aNYF8NhDuC6Opw2Qx5qVey-YTfQ@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <d790a33a-bbe8-70a7-f9e2-65387b8def45@linaro.org>
+Date: Thu, 9 May 2019 15:24:51 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190509183520.6dc47f2e@Igors-MacBook-Pro>
+In-Reply-To: <CAFEAcA-Agc6KWMqAA3V7tA0aNYF8NhDuC6Opw2Qx5qVey-YTfQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Thu, 09 May 2019 21:48:22 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Question] Memory hotplug clarification for Qemu
- ARM/virt
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH 26/26] tcg: Use tlb_fill probe from
+ tlb_vaddr_to_host
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,235 +102,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"xuwei \(O\)" <xuwei5@huawei.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Catalin Marinas <Catalin.Marinas@arm.com>,
-	"ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>,
-	"will.deacon@arm.com" <will.deacon@arm.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	Linuxarm <linuxarm@huawei.com>, linux-mm <linux-mm@kvack.org>,
-	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Robin Murphy <robin.murphy@arm.com>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/09/19 18:35, Igor Mammedov wrote:
-> On Wed, 8 May 2019 22:26:12 +0200
-> Laszlo Ersek <lersek@redhat.com> wrote:
->=20
->> On 05/08/19 14:50, Robin Murphy wrote:
->>> Hi Shameer,
->>>
->>> On 08/05/2019 11:15, Shameerali Kolothum Thodi wrote:
->>>> Hi,
->>>>
->>>> This series here[0] attempts to add support for PCDIMM in QEMU for
->>>> ARM/Virt platform and has stumbled upon an issue as it is not clear(=
-at
->>>> least
->>>> from Qemu/EDK2 point of view) how in physical world the hotpluggable
->>>> memory is handled by kernel.
->>>>
->>>> The proposed implementation in Qemu, builds the SRAT and DSDT parts
->>>> and uses GED device to trigger the hotplug. This works fine.
->>>>
->>>> But when we added the DT node corresponding to the PCDIMM(cold plug
->>>> scenario), we noticed that Guest kernel see this memory during early=
- boot
->>>> even if we are booting with ACPI. Because of this, hotpluggable memo=
-ry
->>>> may end up in zone normal and make it non-hot-un-pluggable even if G=
-uest
->>>> boots with ACPI.
->>>>
->>>> Further discussions[1] revealed that, EDK2 UEFI has no means to
->>>> interpret the
->>>> ACPI content from Qemu(this is designed to do so) and uses DT info t=
-o
->>>> build the GetMemoryMap(). To solve this, introduced "hotpluggable"
->>>> property
->>>> to DT memory node(patches #7 & #8 from [0]) so that UEFI can
->>>> differentiate
->>>> the nodes and exclude the hotpluggable ones from GetMemoryMap().
->>>>
->>>> But then Laszlo rightly pointed out that in order to accommodate the
->>>> changes
->>>> into UEFI we need to know how exactly Linux expects/handles all the
->>>> hotpluggable memory scenarios. Please find the discussion here[2].
->>>>
->>>> For ease, I am just copying the relevant comment from Laszlo below,
->>>>
->>>> /******
->>>> "Given patches #7 and #8, as I understand them, the firmware cannot
->>>> distinguish
->>>> =C2=A0 hotpluggable & present, from hotpluggable & absent. The firmw=
-are can
->>>> only
->>>> =C2=A0 skip both hotpluggable cases. That's fine in that the firmwar=
-e will
->>>> hog neither
->>>> =C2=A0 type -- but is that OK for the OS as well, for both ACPI boot=
- and DT
->>>> boot?
->>>>
->>>> Consider in particular the "hotpluggable & present, ACPI boot" case.
->>>> Assuming
->>>> we modify the firmware to skip "hotpluggable" altogether, the UEFI m=
-emmap
->>>> will not include the range despite it being present at boot.
->>>> Presumably, ACPI
->>>> will refer to the range somehow, however. Will that not confuse the =
-OS?
->>>>
->>>> When Igor raised this earlier, I suggested that
->>>> hotpluggable-and-present should
->>>> be added by the firmware, but also allocated immediately, as
->>>> EfiBootServicesData
->>>> type memory. This will prevent other drivers in the firmware from
->>>> allocating AcpiNVS
->>>> or Reserved chunks from the same memory range, the UEFI memmap will
->>>> contain
->>>> the range as EfiBootServicesData, and then the OS can release that
->>>> allocation in
->>>> one go early during boot.
->>>>
->>>> But this really has to be clarified from the Linux kernel's
->>>> expectations. Please
->>>> formalize all of the following cases:
->>>>
->>>> OS boot (DT/ACPI)=C2=A0 hotpluggable & ...=C2=A0 GetMemoryMap() shou=
-ld report
->>>> as=C2=A0 DT/ACPI should report as
->>>> -----------------=C2=A0 ------------------=C2=A0
->>>> -------------------------------=C2=A0 ------------------------
->>>> DT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 present=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ?=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- ?
->>>> DT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 absent=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ?=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 ?
->>>> ACPI=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 present=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 ?=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ?
->>>> ACPI=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 absent=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ?=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ?
->>>>
->>>> Again, this table is dictated by Linux."
->>>>
->>>> ******/
->>>>
->>>> Could you please take a look at this and let us know what is expecte=
-d
->>>> here from
->>>> a Linux kernel view point.
->>>
->>> For arm64, so far we've not even been considering DT-based hotplug - =
-as
->>> far as I'm aware there would still be a big open question there aroun=
-d
->>> notification mechanisms and how to describe them. The DT stuff so far
->>> has come from the PowerPC folks, so it's probably worth seeing what
->>> their ideas are.
->>>
->>> ACPI-wise I've always assumed/hoped that hotplug-related things shoul=
-d
->>> be sufficiently well-specified in UEFI that "do whatever x86/IA-64 do=
-"
->>> would be enough for us.
+On 5/9/19 1:56 AM, Peter Maydell wrote:
+> On Thu, 9 May 2019 at 06:24, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
 >>
->> As far as I can see in UEFI v2.8 -- and I had checked the spec before
->> dumping the table with the many question marks on Shameer --, all the
->> hot-plug language in the spec refers to USB and PCI hot-plug in the
->> preboot environment. There is not a single word about hot-plug at OS
->> runtime (regarding any device or component type), nor about memory
->> hot-plug (at any time).
->>
->> Looking to x86 appears valid -- so what does the Linux kernel expect o=
-n
->> that architecture, in the "ACPI" rows of the table?
->=20
-> I could only answer from QEMU x86 perspective.
-> QEMU for x86 guests currently doesn't add hot-pluggable RAM into E820
-> because of different linux guests tend to cannibalize it, making it non
-> unpluggable. The last culprit I recall was KASLR.
->=20
-> So I'd refrain from reporting hotpluggable RAM in GetMemoryMap() if
-> it's possible (it's probably hack (spec deosn't say anything about it)
-> but it mostly works for Linux (plug/unplug) and Windows guest also
-> fine with plug part (no unplug there)).
-
-I can accept this as a perfectly valid design. Which would mean, QEMU sho=
-uld mark each hotpluggable RAM range in the DTB for the firmware with the=
- special new property, regardless of its initial ("cold") plugged-ness, a=
-nd then the firmware will not expose the range in the GCD memory space ma=
-p, and consequently in the UEFI memmap either.
-
-IOW, our table is, thus far:
-
-OS boot (DT/ACPI)  hotpluggable & ...  GetMemoryMap() should report as  D=
-T/ACPI should report as
------------------  ------------------  -------------------------------  -=
------------------------
-DT                 present             ABSENT                           ?
-DT                 absent              ABSENT                           ?
-ACPI               present             ABSENT                           P=
-RESENT
-ACPI               absent              ABSENT                           A=
-BSENT
-
-In the firmware, I only need to care about the GetMemoryMap() column, so =
-I can work with this. Can someone please file a feature request at <https=
-://bugzilla.tianocore.org/>, for the ArmVirtPkg Package, with these detai=
-s?
-
-Thanks
-Laszlo
-
->=20
-> As for physical systems, there are out there ones that do report
-> hotpluggable RAM in GetMemoryMap().
->=20
->> Shameer: if you (Huawei) are represented on the USWG / ASWG, I suggest
->> re-raising the question on those lists too; at least the "ACPI" rows o=
-f
->> the table.
->>
->> Thanks!
->> Laszlo
->>
+>> On 4/29/19 10:41 AM, Peter Maydell wrote:
+>>> On Wed, 3 Apr 2019 at 05:05, Richard Henderson
+>>> <richard.henderson@linaro.org> wrote:
+>>>>
+>>>> Most of the existing users would continue around a loop which
+>>>> would fault the tlb entry in via a normal load/store.  But for
+>>>> SVE we have a true non-faulting case which requires the new
+>>>> probing form of tlb_fill.
 >>>
->>> Robin.
->>>
->>>> (Hi Laszlo/Igor/Eric, please feel free to add/change if I have misse=
-d
->>>> any valid
->>>> points above).
->>>>
->>>> Thanks,
->>>> Shameer
->>>> [0] https://patchwork.kernel.org/cover/10890919/
->>>> [1] https://patchwork.kernel.org/patch/10863299/
->>>> [2] https://patchwork.kernel.org/patch/10890937/
->>>>
->>>>
+>>> So am I right in thinking that this fixes a bug where we
+>>> previously would mark a load as faulted if the memory happened
+>>> not to be in the TLB, whereas now we will correctly pull in the
+>>> TLB entry and do the load ?
 >>
->=20
+>> Yes.
+>>
+>>> (Since guest code ought to be handling the "non-first-load
+>>> faulted" case by looping round or otherwise arranging to
+>>> retry, nothing in practice would have noticed this bug, right?)
+>>
+>> Yes.
+>>
+>> The only case with changed behaviour is (expected to be) SVE no-fault, where
+>> the loop you mention would have produced different incorrect results.
+> 
+> OK. If we're fixing a guest-visible bug it would be nice to
+> describe that in the commit message.
 
+The commit message now reads, in part,
+
+But for AArch64 SVE we have an existing emulation bug wherein we
+would mark the first element of a no-fault vector load as faulted
+(within the FFR, not via exception) just because we did not have
+its address in the TLB.  Now we can properly only mark it as faulted
+if there really is no valid, readable translation, while still not
+raising an exception.  (Note that beyond the first element of the
+vector, the hardware may report a fault for any reason whatsoever;
+with at least one element loaded, forward progress is guaranteed.)
+
+
+r~
 
