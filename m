@@ -2,66 +2,65 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0657FC04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 14:55:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A88EC04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 14:56:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D112A20644
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 14:55:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D112A20644
+	by mail.kernel.org (Postfix) with ESMTPS id 1C5FC20644
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 14:56:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C5FC20644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56023 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56027 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOkSi-0002Dr-30
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 10:55:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40370)
+	id 1hOkSx-0002OZ-2S
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 10:56:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hOkRU-0001Y5-7M
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:54:41 -0400
+	(envelope-from <berrange@redhat.com>) id 1hOkRh-0001gQ-Ja
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:54:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hOkRT-0008W8-9x
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:54:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58152)
+	(envelope-from <berrange@redhat.com>) id 1hOkRg-0000Et-IU
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:54:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48002)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>)
-	id 1hOkRT-0008Vi-4b; Thu, 09 May 2019 10:54:39 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hOkRg-0000Ee-Cu
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:54:52 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4510E3D94D;
-	Thu,  9 May 2019 14:54:38 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
-	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 10B9D5DF49;
-	Thu,  9 May 2019 14:54:36 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 5DA4C1132B35; Thu,  9 May 2019 16:54:35 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-References: <20190509133737.242548-1-sgarzare@redhat.com>
-Date: Thu, 09 May 2019 16:54:35 +0200
-In-Reply-To: <20190509133737.242548-1-sgarzare@redhat.com> (Stefano
-	Garzarella's message of "Thu, 9 May 2019 15:37:37 +0200")
-Message-ID: <87y33f1xw4.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	by mx1.redhat.com (Postfix) with ESMTPS id AABF7753FC;
+	Thu,  9 May 2019 14:54:51 +0000 (UTC)
+Received: from redhat.com (ovpn-112-55.ams2.redhat.com [10.36.112.55])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id EC596600CC;
+	Thu,  9 May 2019 14:54:49 +0000 (UTC)
+Date: Thu, 9 May 2019 15:54:47 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190509145447.GG31299@redhat.com>
+References: <20190503154613.4192-1-kchamart@redhat.com>
+	<20190509135320.GE17133@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190509135320.GE17133@stefanha-x1.localdomain>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Thu, 09 May 2019 14:54:38 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Thu, 09 May 2019 14:54:51 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] net/slirp: fix the error message when the
- prefix len is invalid
+Subject: Re: [Qemu-devel] [PATCH] VirtIO-RNG: Update default entropy source
+ to `/dev/urandom`
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,43 +72,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Jan Kiszka <jan.kiszka@siemens.com>,
-	Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
-	Samuel Thibault <samuel.thibault@ens-lyon.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, rjones@redhat.com, amit@kernel.org,
+	armbru@redhat.com, Kashyap Chamarthy <kchamart@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Stefano Garzarella <sgarzare@redhat.com> writes:
+On Thu, May 09, 2019 at 02:53:20PM +0100, Stefan Hajnoczi wrote:
+> On Fri, May 03, 2019 at 05:46:12PM +0200, Kashyap Chamarthy wrote:
+> > When QEMU exposes a VirtIO-RNG device to the guest, that device needs=
+ a
+> > source of entropy, and that source needs to be "non-blocking", like
+> > `/dev/urandom`.  However, currently QEMU defaults to the problematic
+> > `/dev/random`, which is "blocking" (as in, it waits until sufficient
+> > entropy is available).
+> >=20
+> > So change the entropy source to the recommended `/dev/urandom`.
+>=20
+> Why is /dev/urandom "recommended"?
+>=20
+> I understand the requirement for instant random numbers, but what about
+> the concerns about quality?  Have you decided that the consumers of
+> these random numbers are safe with /dev/urandom?
 
-> Add a missing parentheses at the end of the error message,
-> when we have an invalid prefix len.
->
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  net/slirp.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/net/slirp.c b/net/slirp.c
-> index 95934fb36d..0f4ae0abc0 100644
-> --- a/net/slirp.c
-> +++ b/net/slirp.c
-> @@ -498,7 +498,8 @@ static int net_slirp_init(NetClientState *peer, const char *model,
->      }
->      if (vprefix6_len < 0 || vprefix6_len > 126) {
->          error_setg(errp,
-> -                   "Invalid prefix provided (prefix len must be in range 0-126");
-> +                   "Invalid prefix provided "
-> +                   "(prefix len must be in range 0-126)");
->          return -1;
->      }
+The current random(4) man page says:
 
-Preexisting: the error message fails to identify the offending
-parameter.  The user needs to make the connection to "ipv6-prefixlen"
-based on the fact that the only parameters with "prefix" in name or
-description are "ipv6-prefix" and "ipv6-prefixlen", and only the latter
-is a length.
+       The /dev/random interface is considered a legacy inter=E2=80=90
+       face, and /dev/urandom is preferred and  sufficient  in
+       all use cases, with the exception of applications which
+       require randomness during early boot  time;  for  these
+       applications,   getrandom(2)   must  be  used  instead,
+       because it will block until the entropy  pool  is  ini=E2=80=90
+       tialized.
 
-What about "Parameter 'ipv6-prefixlen' expects a length below 127", or
-"Parameter 'ipv6-prefixlen' expects a value between 0 and 126"?
+"early boot" is a bit of an ill-defined term here, but I think in
+general QEMU can reasonably be said to not be running in early boot.
+
+In any case the newly proposed RNG backend should ultimately become
+the preferred choice for mgmt apps:
+
+  https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg02062.html
+
+This new rng-builtin delegates to our crypto random APIs, which are
+backed by GNUTLS, libgcrypt, getrandom (or Windows equiv), and
+finally /dev/urandom as last ditch effort.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
