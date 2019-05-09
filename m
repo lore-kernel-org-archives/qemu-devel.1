@@ -2,69 +2,63 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97DC1C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:18:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 078F8C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:19:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A4762089E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:18:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A4762089E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D0EFA2089E
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:19:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0EFA2089E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54431 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54433 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOiwh-0007Pw-HT
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 09:18:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46277)
+	id 1hOixX-0007y6-5E
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 09:19:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hOivd-00074n-BW
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:17:42 -0400
+	(envelope-from <groug@kaod.org>) id 1hOiwF-0007Mp-E4
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:18:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hOivb-0006am-Td
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:17:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56920)
+	(envelope-from <groug@kaod.org>) id 1hOiwE-0006xs-0Z
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:18:19 -0400
+Received: from 4.mo173.mail-out.ovh.net ([46.105.34.219]:41725)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hOivb-0006Z6-NW
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:17:39 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C1939753F5;
-	Thu,  9 May 2019 13:17:33 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
-	[10.36.117.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2273560CBB;
-	Thu,  9 May 2019 13:17:31 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 1774BA1E0; Thu,  9 May 2019 15:17:30 +0200 (CEST)
-Date: Thu, 9 May 2019 15:17:30 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Message-ID: <20190509131730.kkcjc654h4otbf6z@sirius.home.kraxel.org>
-References: <20190508085645.11595-1-kraxel@redhat.com>
-	<20190508085645.11595-14-kraxel@redhat.com>
-	<99dc6f33-851c-cc01-89b9-44c68f07c199@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hOiwD-0006ry-Qp
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:18:17 -0400
+Received: from player694.ha.ovh.net (unknown [10.108.35.12])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id D1B00FB092
+	for <qemu-devel@nongnu.org>; Thu,  9 May 2019 15:18:07 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player694.ha.ovh.net (Postfix) with ESMTPSA id 070C8580A8F1;
+	Thu,  9 May 2019 13:18:04 +0000 (UTC)
+Date: Thu, 9 May 2019 15:18:04 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Thomas Huth <thuth@redhat.com>
+Message-ID: <20190509151804.56cd4179@bahia.lan>
+In-Reply-To: <2a5ac8c4-60d3-2246-54ca-678ed7a6f988@redhat.com>
+References: <155721868351.451636.16735088470797960209.stgit@bahia.lan>
+	<155721871721.451636.4261205814714842408.stgit@bahia.lan>
+	<2a5ac8c4-60d3-2246-54ca-678ed7a6f988@redhat.com>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <99dc6f33-851c-cc01-89b9-44c68f07c199@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Thu, 09 May 2019 13:17:33 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 2922554684110641458
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrkeeigddtudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 13/13] tests/vm: ubuntu.i386: apt proxy
- setup
+X-Received-From: 46.105.34.219
+Subject: Re: [Qemu-devel] [PATCH 6/6] virtfs: Fix documentation of -fsdev
+ and -virtfs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,50 +70,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
-	qemu-devel@nongnu.org, Kamil Rytarowski <kamil@netbsd.org>,
-	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 09, 2019 at 02:12:11PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> On 5/8/19 10:56 AM, Gerd Hoffmann wrote:
-> > Configure apt proxy so package downloads
-> > can be cached and can pass firewalls.
->=20
-> Yay \o/
->=20
-> >=20
-> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+On Wed, 8 May 2019 17:54:42 +0200
+Thomas Huth <thuth@redhat.com> wrote:
+
+> On 07/05/2019 10.45, Greg Kurz wrote:
+> > This fixes several things:
+> > - add "id" description to -virtfs documentation
+> > - split the description into several lines in both usage and documentation
+> >   for accurateness and clarity
+> > - add documentation and usage of the synth fsdriver
+> > - add "throttling.*" description to -fsdev local
+> > - add some missing periods
+> > 
+> > Buglink: https://bugs.launchpad.net/qemu/+bug/1581976
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
 > > ---
-> >  tests/vm/ubuntu.i386 | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >=20
-> > diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
-> > index a22d137e76df..b869afd212fa 100755
-> > --- a/tests/vm/ubuntu.i386
-> > +++ b/tests/vm/ubuntu.i386
-> > @@ -51,6 +51,10 @@ class UbuntuX86VM(basevm.BaseVM):
-> >                            "    ssh-authorized-keys:\n",
-> >                            "    - %s\n" % basevm.SSH_PUB_KEY,
-> >                            "locale: en_US.UTF-8\n"])
-> > +        proxy =3D os.environ.get("http_proxy")
->=20
-> Some users only use 'https_proxy' (or FTP):
-> https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg08413.html
+> >  qemu-options.hx |   84 +++++++++++++++++++++++++++++++++++++++----------------
+> >  1 file changed, 60 insertions(+), 24 deletions(-)
+> > 
+> > diff --git a/qemu-options.hx b/qemu-options.hx
+> > index 9c5cc2e6bf70..975342dfbd66 100644
+> > --- a/qemu-options.hx
+> > +++ b/qemu-options.hx
+> > @@ -1232,26 +1232,35 @@ the write back by pressing @key{C-a s} (@pxref{disk_images}).
+> >  ETEXI
+> >  
+> >  DEF("fsdev", HAS_ARG, QEMU_OPTION_fsdev,
+> > -    "-fsdev fsdriver,id=id[,path=path,][security_model={mapped-xattr|mapped-file|passthrough|none}]\n"
+> > -    " [,writeout=immediate][,readonly][,socket=socket|sock_fd=sock_fd][,fmode=fmode][,dmode=dmode]\n"
+> > +    "-fsdev local,id=id,path=path,security_model=mapped-xattr|mapped-file|passthrough|none\n"
+> > +    " [,writeout=immediate][,readonly][,fmode=fmode][,dmode=dmode]\n"
+> >      " [[,throttling.bps-total=b]|[[,throttling.bps-read=r][,throttling.bps-write=w]]]\n"
+> >      " [[,throttling.iops-total=i]|[[,throttling.iops-read=r][,throttling.iops-write=w]]]\n"
+> >      " [[,throttling.bps-total-max=bm]|[[,throttling.bps-read-max=rm][,throttling.bps-write-max=wm]]]\n"
+> >      " [[,throttling.iops-total-max=im]|[[,throttling.iops-read-max=irm][,throttling.iops-write-max=iwm]]]\n"
+> > -    " [[,throttling.iops-size=is]]\n",
+> > +    " [[,throttling.iops-size=is]]\n"
+> > +    "-fsdev proxy,id=id,socket=socket[,writeout=immediate][,readonly]\n"
+> > +    "-fsdev proxy,id=id,sock_fd=sock_fd[,writeout=immediate][,readonly]\n"
+> > +    "-fsdev synth,id=id\n",
+> >      QEMU_ARCH_ALL)
+> >  
+> >  STEXI
+> >  
+> > -@item -fsdev @var{fsdriver},id=@var{id},path=@var{path},[security_model=@var{security_model}][,writeout=@var{writeout}][,readonly][,socket=@var{socket}|sock_fd=@var{sock_fd}][,fmode=@var{fmode}][,dmode=@var{dmode}]
+> > +@item -fsdev local,id=@var{id},path=@var{path},security_model=@var{security_model} [,writeout=@var{writeout}][,readonly][,fmode=@var{fmode}][,dmode=@var{dmode}] [,throttling.@var{option}=@var{value}[,throttling.@var{option}=@var{value}[,...]]]
+> > +@itemx -fsdev proxy,id=@var{id},socket=@var{socket}[,writeout=@var{writeout}][,readonly]
+> > +@itemx -fsdev proxy,id=@var{id},sock_fd=@var{sock_fd}[,writeout=@var{writeout}][,readonly]
+> > +@itemx -fsdev synth,id=@var{id}[,readonly]
+> >  @findex -fsdev
+> >  Define a new file system device. Valid options are:
+> >  @table @option
+> > -@item @var{fsdriver}
+> > -This option specifies the fs driver backend to use.
+> > -Currently "local" and "proxy" file system drivers are supported.
+> > +@item local
+> > +Accesses to the filesystem are done by QEMU.
+> > +@item proxy
+> > +Accesses to the filesystem are done by virtfs-proxy-helper(1).
+> > +@item synth
+> > +Synthetic filesystem, only used by QTests.
+> >  @item id=@var{id}
+> > -Specifies identifier for this device
+> > +Specifies identifier for this device.
+> >  @item path=@var{path}
+> >  Specifies the export path for the file system device. Files under
+> >  this path will be available to the 9p client on the guest.
+> > @@ -1279,17 +1288,33 @@ Enables exporting 9p share as a readonly mount for guests. By default
+> >  read-write access is given.
+> >  @item socket=@var{socket}
+> >  Enables proxy filesystem driver to use passed socket file for communicating
+> > -with virtfs-proxy-helper
+> > +with virtfs-proxy-helper(1).  
+> 
+> Why did you add a "(1)" after each virtfs-proxy-helper?
+> 
 
-Well, this configures apt only, and the apt repos are configured
-to use http.  So for package installs we are all set.
+Oops forgot to mention that in the changelog... We have a manual page for the
+virtfs-proxy-helper command, and IIUC this is the way for a manual page to
+reference another one. Makes sense ?
 
-We might additionally setup AcceptEnv in sshd_config (i.e. basically do
-the same thing console_sshd_config() in basevm.py does for serial
-console installs) so proxy evironment pass-through works for ubuntu ssh
-logins too.  I didn't see a strong need for that with package downloads
-being covered already, so I didn't try ...
+> ... apart from that, the modifications look fine to me (but as mentioned
+> earlier, I'm not an expert in this area, so not sure whether that counts
+> ;-))
+> 
 
-cheers,
-  Gerd
+I'm confident about the content, so if this looks fine to you, I'm good :)
+
+>  Thomas
 
 
