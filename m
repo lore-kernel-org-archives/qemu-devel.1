@@ -7,83 +7,78 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DD54C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 06:04:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A2B1C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 06:06:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEE51216C4
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 06:04:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59A1A216C4
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 06:06:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gbrikn+V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEE51216C4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E0K/VCnQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59A1A216C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48569 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48602 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOcAp-00079E-5O
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 02:04:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44751)
+	id 1hOcBt-000899-K5
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 02:06:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOc8r-0005vA-HD
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:02:54 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hOc8u-0005wc-7I
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:02:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOc8q-00070o-BM
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:02:53 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:34946)
+	(envelope-from <richard.henderson@linaro.org>) id 1hOc8s-00072J-S7
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:02:56 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:33610)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hOc8q-00070S-5I
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:02:52 -0400
-Received: by mail-pf1-x441.google.com with SMTP id t87so730724pfa.2
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 23:02:52 -0700 (PDT)
+	id 1hOc8s-00071v-KM
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:02:54 -0400
+Received: by mail-pg1-x543.google.com with SMTP id h17so644618pgv.0
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 23:02:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-	:content-transfer-encoding;
-	bh=nXQKQmWv/YKHXQBl4iXWce1fvy4Q62aar83khsKjymg=;
-	b=Gbrikn+Vp37AnJo3jBEL6aMO5QmhCkB1IUb5phruLggUL4W557VUZq7rAwGZnHCUA6
-	za4LFYWuAdWIJWih/9HMtU6L89xJJwNnQSv5xobp8BuhQ+0x7YXV2j3euZ7zNR0YbRDG
-	gxBCkcXD/iqYQd8E+nwOD1/DVnwOWs2E6vGo1ZtQjVldh7K81FDzRTA0LlDcOWRHc7up
-	YRgqovz97WZkosVrG2udkZ2PZf+ynfW/Z6lAOXSfU4dn+RuLx/WflMxl0hk2mXgOuwyp
-	Vl00iT79kHSF2WiI3hky4twd3pYEDIO/gfvXDrGLNmTUtE1+NMa6OePRiAF2ZLMhOBGv
-	42xA==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=PI6csDpWdG6t7BSfq5z2Q2G3DWQrj5ohp4MLYzjDA0s=;
+	b=E0K/VCnQ8IkyAjXPhJRzukqiqRdOZ4GARKuGYsXIv2EtoxVs5esf/XNRaGFjfcecwP
+	NGDCf6ZmhkPl74xCzf4/1gT/aMdt3l84u5rjgvhreqpO3hO1w0CmMcsv2LmLf3TIL/02
+	wIWLGkXGCMC/kf5MqlgPHKdHPzUuiexfH6NoVihT9uJrBijwG+LED1Be3baUGc4ehHRS
+	4ESUH8H0ZNJdn+JjjTShWH17pSy4deebcQO/yn0SlVlhDNS3VjppAid2YnFjOhklwu3O
+	zBEK7vidYBvdEdGbsBCkjq6Kkitz7dRFJNMA/dQkJ5fKLNj2XDokBkSBV4yY4Bi1hHxl
+	KS/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=nXQKQmWv/YKHXQBl4iXWce1fvy4Q62aar83khsKjymg=;
-	b=ByLnalDKrOz0rWJ3hx199VCEgfM77S2SDgTF9GOIWG/Z9HAeC0fY8QIiJQ0NIHDQjq
-	L1UaGczpTRoB2TlBI5KtKQA0ZptP97ekIxpL98tmSvLNvRYROEiu7FDsKBzWeILcgxyX
-	eAzMLfBZdhTUDhDUNf/JZONs6WDI/9r2VqqQBJ4q82miZLHXdEwjYBs2laHX8n5ppC1O
-	veNRIJ46yVjbPCI3gyQf34Jj/hwTxX6LPoteB2I0UuKqOgkM6OcfWRg0Mqtv2n1GO4t+
-	eCte7ZrJJWBFJseRygg3jBPKYQmZlyNKTVrSty8QfwF9qy5ftrBdaTHA2m8dp4KovvAW
-	6B1w==
-X-Gm-Message-State: APjAAAUFBCxJOFrp9cre+wzlJdVwf+IiMio5xXUd51rSEt57xS+WsrZt
-	jgvYxgdw8pQzSn0y9cOI5A+WQw6GG8M=
-X-Google-Smtp-Source: APXvYqwxLyJcf3VjyVYHetPoRV8uQDqElVxts6+m+CYJszVNb9LEAq24bxhpA/0VVoF/Pk9dZuy9ug==
-X-Received: by 2002:a65:4489:: with SMTP id l9mr3084713pgq.1.1557381770916;
-	Wed, 08 May 2019 23:02:50 -0700 (PDT)
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=PI6csDpWdG6t7BSfq5z2Q2G3DWQrj5ohp4MLYzjDA0s=;
+	b=TzlYJWEIAurZk39gwlm3qSOjMJXPrX6gd/PAAHVBNmPWu7F0H4oaMEm7yk19IgtT8U
+	1a8wpBZv5UFCEw7zdAYrfNaOXau7u1mdf8xeNzKv89qUPBvaD0qel8hJ/B2WyPw1dVR0
+	Z+D4TEc5ctGEQV2OOUCC+8FuETenTqaX81irufQMv0ZQ+8IVYUXrC2LVl0JxlhmAbmNx
+	yr+vujXGChw2z3eygiNv/P9YBhSe+d3K1tR8e+D0So4hNNLNI8DM5Sk8WEy1Y+seMEG1
+	MYKk82a556nkgaGN0H7Io76sa9m16SoHoiY+k+T36Cwb7zrnTALLJOBRs0+RugNaJ02O
+	k/XA==
+X-Gm-Message-State: APjAAAV1sOmPQx0dLi3x9WXU7STZUPg6jFTuKw0xvedx9q8YQYKQYmdR
+	zhLyDJdQDq/JBEsDNepoU5vwS2K450k=
+X-Google-Smtp-Source: APXvYqzTkPecTsIKclsx3USilXL+3eyrdiYSw4qOhDyGvlJ1UPDFqBy7EKoAf/yzIO0z0MBwGrcqUw==
+X-Received: by 2002:a62:2fc7:: with SMTP id v190mr2581911pfv.10.1557381773267; 
+	Wed, 08 May 2019 23:02:53 -0700 (PDT)
 Received: from localhost.localdomain (97-113-27-95.tukw.qwest.net.
 	[97.113.27.95])
-	by smtp.gmail.com with ESMTPSA id n7sm1496109pff.45.2019.05.08.23.02.49
-	for <qemu-devel@nongnu.org>
+	by smtp.gmail.com with ESMTPSA id n7sm1496109pff.45.2019.05.08.23.02.52
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 08 May 2019 23:02:50 -0700 (PDT)
+	Wed, 08 May 2019 23:02:52 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  8 May 2019 23:02:21 -0700
-Message-Id: <20190509060246.4031-3-richard.henderson@linaro.org>
+Date: Wed,  8 May 2019 23:02:23 -0700
+Message-Id: <20190509060246.4031-5-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190509060246.4031-1-richard.henderson@linaro.org>
 References: <20190509060246.4031-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::441
-Subject: [Qemu-devel] [PATCH v2 02/27] target/alpha: Convert to
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: [Qemu-devel] [PATCH v2 04/27] target/cris: Convert to
  CPUClass::tlb_fill
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -96,146 +91,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "Edgar E . Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Remove dumping of cpu state.  Remove logging of PC, as that
+value is garbage until cpu_restore_state.
+
+Cc: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2: Keep user-only and system tlb_fill separate.
----
- target/alpha/cpu.h        |  5 +++--
- target/alpha/cpu.c        |  5 ++---
- target/alpha/helper.c     | 30 +++++++++++++++++++++---------
- target/alpha/mem_helper.c | 16 ----------------
- 4 files changed, 26 insertions(+), 30 deletions(-)
+ target/cris/cpu.h       |  5 +--
+ target/cris/cpu.c       |  5 ++-
+ target/cris/helper.c    | 67 +++++++++++++++++++++++------------------
+ target/cris/op_helper.c | 28 -----------------
+ 4 files changed, 42 insertions(+), 63 deletions(-)
 
-diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
-index 63bf3618ff..cf09112b6a 100644
---- a/target/alpha/cpu.h
-+++ b/target/alpha/cpu.h
-@@ -475,8 +475,9 @@ void alpha_cpu_list(void);
-    is returned if the signal was handled by the virtual CPU.  */
- int cpu_alpha_signal_handler(int host_signum, void *pinfo,
-                              void *puc);
--int alpha_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size, int rw,
--                               int mmu_idx);
-+bool alpha_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-+                        MMUAccessType access_type, int mmu_idx,
-+                        bool probe, uintptr_t retaddr);
- void QEMU_NORETURN dynamic_excp(CPUAlphaState *, uintptr_t, int, int);
- void QEMU_NORETURN arith_excp(CPUAlphaState *, uintptr_t, int, uint64_t);
- 
-diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
-index ad3588a44a..7c81be4111 100644
---- a/target/alpha/cpu.c
-+++ b/target/alpha/cpu.c
-@@ -225,9 +225,8 @@ static void alpha_cpu_class_init(ObjectClass *oc, void *data)
-     cc->set_pc = alpha_cpu_set_pc;
-     cc->gdb_read_register = alpha_cpu_gdb_read_register;
-     cc->gdb_write_register = alpha_cpu_gdb_write_register;
--#ifdef CONFIG_USER_ONLY
--    cc->handle_mmu_fault = alpha_cpu_handle_mmu_fault;
--#else
-+    cc->tlb_fill = alpha_cpu_tlb_fill;
-+#ifndef CONFIG_USER_ONLY
-     cc->do_transaction_failed = alpha_cpu_do_transaction_failed;
-     cc->do_unaligned_access = alpha_cpu_do_unaligned_access;
-     cc->get_phys_page_debug = alpha_cpu_get_phys_page_debug;
-diff --git a/target/alpha/helper.c b/target/alpha/helper.c
-index 7201576aae..929a217455 100644
---- a/target/alpha/helper.c
-+++ b/target/alpha/helper.c
-@@ -104,14 +104,15 @@ void cpu_alpha_store_gr(CPUAlphaState *env, unsigned reg, uint64_t val)
+diff --git a/target/cris/cpu.h b/target/cris/cpu.h
+index 0fbe771639..857de79e24 100644
+--- a/target/cris/cpu.h
++++ b/target/cris/cpu.h
+@@ -281,8 +281,9 @@ static inline int cpu_mmu_index (CPUCRISState *env, bool ifetch)
+ 	return !!(env->pregs[PR_CCS] & U_FLAG);
  }
  
- #if defined(CONFIG_USER_ONLY)
--int alpha_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
--                               int rw, int mmu_idx)
-+bool alpha_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-+                        MMUAccessType access_type, int mmu_idx,
-+                        bool probe, uintptr_t retaddr)
- {
-     AlphaCPU *cpu = ALPHA_CPU(cs);
+-int cris_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size, int rw,
+-                              int mmu_idx);
++bool cris_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                       MMUAccessType access_type, int mmu_idx,
++                       bool probe, uintptr_t retaddr);
  
-     cs->exception_index = EXCP_MMFAULT;
-     cpu->env.trap_arg0 = address;
+ /* Support function regs.  */
+ #define SFR_RW_GC_CFG      0][0
+diff --git a/target/cris/cpu.c b/target/cris/cpu.c
+index 75729bfdd5..4e5288ae80 100644
+--- a/target/cris/cpu.c
++++ b/target/cris/cpu.c
+@@ -269,9 +269,8 @@ static void cris_cpu_class_init(ObjectClass *oc, void *data)
+     cc->set_pc = cris_cpu_set_pc;
+     cc->gdb_read_register = cris_cpu_gdb_read_register;
+     cc->gdb_write_register = cris_cpu_gdb_write_register;
+-#ifdef CONFIG_USER_ONLY
+-    cc->handle_mmu_fault = cris_cpu_handle_mmu_fault;
+-#else
++    cc->tlb_fill = cris_cpu_tlb_fill;
++#ifndef CONFIG_USER_ONLY
+     cc->get_phys_page_debug = cris_cpu_get_phys_page_debug;
+     dc->vmsd = &vmstate_cris_cpu;
+ #endif
+diff --git a/target/cris/helper.c b/target/cris/helper.c
+index 3939603c73..69464837c8 100644
+--- a/target/cris/helper.c
++++ b/target/cris/helper.c
+@@ -24,6 +24,7 @@
+ #include "qemu/host-utils.h"
+ #include "exec/exec-all.h"
+ #include "exec/cpu_ldst.h"
++#include "exec/helper-proto.h"
+ 
+ 
+ //#define CRIS_HELPER_DEBUG
+@@ -53,15 +54,15 @@ void crisv10_cpu_do_interrupt(CPUState *cs)
+     cris_cpu_do_interrupt(cs);
+ }
+ 
+-int cris_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+-                              int mmu_idx)
++bool cris_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                       MMUAccessType access_type, int mmu_idx,
++                       bool probe, uintptr_t retaddr)
+ {
+     CRISCPU *cpu = CRIS_CPU(cs);
+ 
+     cs->exception_index = 0xaa;
+     cpu->env.pregs[PR_EDA] = address;
+-    cpu_dump_state(cs, stderr, 0);
 -    return 1;
 +    cpu_loop_exit_restore(cs, retaddr);
  }
- #else
- /* Returns the OSF/1 entMM failure indication, or -1 on success.  */
-@@ -248,26 +249,37 @@ hwaddr alpha_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-     return (fail >= 0 ? -1 : phys);
+ 
+ #else /* !CONFIG_USER_ONLY */
+@@ -76,33 +77,19 @@ static void cris_shift_ccs(CPUCRISState *env)
+     env->pregs[PR_CCS] = ccs;
  }
  
--int alpha_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size, int rw,
--                               int mmu_idx)
-+bool alpha_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
-+                        MMUAccessType access_type, int mmu_idx,
-+                        bool probe, uintptr_t retaddr)
+-int cris_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+-                              int mmu_idx)
++bool cris_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                       MMUAccessType access_type, int mmu_idx,
++                       bool probe, uintptr_t retaddr)
  {
-     AlphaCPU *cpu = ALPHA_CPU(cs);
-     CPUAlphaState *env = &cpu->env;
-     target_ulong phys;
-     int prot, fail;
+     CRISCPU *cpu = CRIS_CPU(cs);
+     CPUCRISState *env = &cpu->env;
+     struct cris_mmu_result res;
+     int prot, miss;
+-    int r = -1;
+     target_ulong phy;
  
--    fail = get_physical_address(env, addr, 1 << rw, mmu_idx, &phys, &prot);
-+    fail = get_physical_address(env, addr, 1 << access_type,
-+                                mmu_idx, &phys, &prot);
-     if (unlikely(fail >= 0)) {
-+        if (probe) {
-+            return false;
-+        }
-         cs->exception_index = EXCP_MMFAULT;
-         env->trap_arg0 = addr;
-         env->trap_arg1 = fail;
--        env->trap_arg2 = (rw == 2 ? -1 : rw);
--        return 1;
-+        env->trap_arg2 = (access_type == MMU_INST_FETCH ? -1 : access_type);
-+        cpu_loop_exit_restore(cs, retaddr);
+-    qemu_log_mask(CPU_LOG_MMU, "%s addr=%" VADDR_PRIx " pc=%x rw=%x\n",
+-            __func__, address, env->pc, rw);
+     miss = cris_mmu_translate(&res, env, address & TARGET_PAGE_MASK,
+-                              rw, mmu_idx, 0);
+-    if (miss) {
+-        if (cs->exception_index == EXCP_BUSFAULT) {
+-            cpu_abort(cs,
+-                      "CRIS: Illegal recursive bus fault."
+-                      "addr=%" VADDR_PRIx " rw=%d\n",
+-                      address, rw);
+-        }
+-
+-        env->pregs[PR_EDA] = address;
+-        cs->exception_index = EXCP_BUSFAULT;
+-        env->fault_vector = res.bf_vec;
+-        r = 1;
+-    } else {
++                              access_type, mmu_idx, 0);
++    if (likely(!miss)) {
+         /*
+          * Mask off the cache selection bit. The ETRAX busses do not
+          * see the top bit.
+@@ -111,15 +98,35 @@ int cris_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+         prot = res.prot;
+         tlb_set_page(cs, address & TARGET_PAGE_MASK, phy,
+                      prot, mmu_idx, TARGET_PAGE_SIZE);
+-        r = 0;
++        return true;
      }
- 
-     tlb_set_page(cs, addr & TARGET_PAGE_MASK, phys & TARGET_PAGE_MASK,
-                  prot, mmu_idx, TARGET_PAGE_SIZE);
--    return 0;
-+    return true;
+-    if (r > 0) {
+-        qemu_log_mask(CPU_LOG_MMU,
+-                "%s returns %d irqreq=%x addr=%" VADDR_PRIx " phy=%x vec=%x"
+-                " pc=%x\n", __func__, r, cs->interrupt_request, address,
+-                res.phy, res.bf_vec, env->pc);
++
++    if (probe) {
++        return false;
+     }
+-    return r;
++
++    if (cs->exception_index == EXCP_BUSFAULT) {
++        cpu_abort(cs, "CRIS: Illegal recursive bus fault."
++                      "addr=%" VADDR_PRIx " access_type=%d\n",
++                      address, access_type);
++    }
++
++    env->pregs[PR_EDA] = address;
++    cs->exception_index = EXCP_BUSFAULT;
++    env->fault_vector = res.bf_vec;
++    if (retaddr) {
++        if (cpu_restore_state(cs, retaddr, true)) {
++            /* Evaluate flags after retranslation. */
++            helper_top_evaluate_flags(env);
++        }
++    }
++    cpu_loop_exit(cs);
 +}
 +
 +void tlb_fill(CPUState *cs, target_ulong addr, int size,
 +              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
 +{
-+    alpha_cpu_tlb_fill(cs, addr, size, access_type, mmu_idx, false, retaddr);
++    cris_cpu_tlb_fill(cs, addr, size, access_type, mmu_idx, false, retaddr);
  }
- #endif /* USER_ONLY */
  
-diff --git a/target/alpha/mem_helper.c b/target/alpha/mem_helper.c
-index 011bc73dca..934faa1d6f 100644
---- a/target/alpha/mem_helper.c
-+++ b/target/alpha/mem_helper.c
-@@ -62,20 +62,4 @@ void alpha_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
-     env->error_code = 0;
-     cpu_loop_exit_restore(cs, retaddr);
- }
--
--/* try to fill the TLB and return an exception if error. If retaddr is
+ void crisv10_cpu_do_interrupt(CPUState *cs)
+diff --git a/target/cris/op_helper.c b/target/cris/op_helper.c
+index 0ee3a3117b..26a395b413 100644
+--- a/target/cris/op_helper.c
++++ b/target/cris/op_helper.c
+@@ -37,34 +37,6 @@
+ #define D_LOG(...) do { } while (0)
+ #endif
+ 
+-#if !defined(CONFIG_USER_ONLY)
+-/* Try to fill the TLB and return an exception if error. If retaddr is
 -   NULL, it means that the function was called in C code (i.e. not
 -   from generated code or from helper.c) */
--/* XXX: fix it to restore all registers */
 -void tlb_fill(CPUState *cs, target_ulong addr, int size,
 -              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
 -{
+-    CRISCPU *cpu = CRIS_CPU(cs);
+-    CPUCRISState *env = &cpu->env;
 -    int ret;
 -
--    ret = alpha_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
--    if (unlikely(ret != 0)) {
--        /* Exception index and error code are already set */
--        cpu_loop_exit_restore(cs, retaddr);
+-    D_LOG("%s pc=%x tpc=%x ra=%p\n", __func__,
+-          env->pc, env->pregs[PR_EDA], (void *)retaddr);
+-    ret = cris_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
+-    if (unlikely(ret)) {
+-        if (retaddr) {
+-            /* now we have a real cpu fault */
+-            if (cpu_restore_state(cs, retaddr, true)) {
+-                /* Evaluate flags after retranslation. */
+-                helper_top_evaluate_flags(env);
+-            }
+-        }
+-        cpu_loop_exit(cs);
 -    }
 -}
- #endif /* CONFIG_USER_ONLY */
+-
+-#endif
+-
+ void helper_raise_exception(CPUCRISState *env, uint32_t index)
+ {
+     CPUState *cs = CPU(cris_env_get_cpu(env));
 -- 
 2.17.1
 
