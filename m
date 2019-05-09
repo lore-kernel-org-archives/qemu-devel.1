@@ -4,81 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFC1FC04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 06:10:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4070C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 06:10:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A93E20675
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 06:10:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71A6420675
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 06:10:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uo0NjIK1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A93E20675
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UTDPg7E4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71A6420675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48652 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48673 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOcGB-00049A-LJ
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 02:10:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44904)
+	id 1hOcGH-0004Ep-Jz
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 02:10:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOc94-00063X-L0
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:03:08 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hOc98-00066w-NM
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:03:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOc93-000781-9r
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:03:06 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:41593)
+	(envelope-from <richard.henderson@linaro.org>) id 1hOc95-00079T-QT
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:03:10 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:36223)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hOc93-00077Z-3z
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:03:05 -0400
-Received: by mail-pf1-x441.google.com with SMTP id l132so715040pfc.8
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 23:03:05 -0700 (PDT)
+	id 1hOc95-000790-Ik
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:03:07 -0400
+Received: by mail-pl1-x643.google.com with SMTP id d21so591906plr.3
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 23:03:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=07wHa/xA9yiJWa4ShTDFiM4bI0/fgquttB2WDIhcNlI=;
-	b=uo0NjIK18+rwpny5vBRAv2imCPLqKp0zRGCaVI9E1fDaG4X/Wemi2ZJQekhdY/ov0q
-	rNWC3uiC7nyykvmebq7KjE2pMOp4POOv0Y0t49h+wn+iffTW4T1EbxeGgDBiNIOjYdnE
-	ydyOIqNn4XWVgbaU8QPMSAexvGIvu0yEgyX10Mv4Wgkw7lTVi+lGs/ggm1b5g/S+6bzm
-	eb5MAInqV3RK3MkN1H59/nxI//IeSeLZG+P6ipgJADb6KrUBWE/HbXynOamiLkoBmNcC
-	szMAbkFdS6nw9kJcPXzK63DE/2h9JrHfzOP+k13g9uu0zmozLaSsbZdFixgswaYYW4uM
-	0v8w==
+	bh=8egen5zzcY5oFOy4H1qXOj5SeE6rAeyMWy2A1ca7FKQ=;
+	b=UTDPg7E417IjOtNwyh3KfljIzXZ3kWxHIPPW1O/Q6YNrsZ8aZO4ZIni+ydHhskWbIl
+	TudV3CYaKtUaGuHOIA9k3MB4QJb0rff+0TgvkhxIvj2/s4uRWD560o6+8/KygIbtWUuz
+	OUbOcGjHNTcsvmsgj9UMee01QkkRAhLYtIMXfvcMSTqMI0oLTArjjut5dwUYPpQdqhHF
+	gLhcXt8+7Q/TN8uVKCs2EbktcXTyPnlr6BrHEe3ifZGnD1tSSQnfcGQAdjSZ7sn00e0w
+	EwjKnNCsxFMCilx+IUd5ogCot/R7925uOzuAUS+j+nZanjJ+bcq2/ig/Qsmc4jfxY3XG
+	9viw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=07wHa/xA9yiJWa4ShTDFiM4bI0/fgquttB2WDIhcNlI=;
-	b=DgqMVRBjOxQuhPe6eGiv4Vev7w/rpzeqT1Fw8L26tgluJxKKqTJk86d3lSXLjy7gBz
-	gzKPL+35J6N3WZUdxqq9P+d9nKkZO/uZ7Lq/wX2DNhMxlaUVafOfQQsLr8784AVzBb3Z
-	/tQJh6e7Z4mJj6ChB9Nqgqp88gPfkXfxUt7eH5W5TvQc8QnNi/K09iAUn7XPanvI4pxr
-	N3NDcSw2o6X7hcRdEtkSVm5pIEc3lStn4LiSJcctntNWoc1BN7OtX+oHgqe7hW2K0ICv
-	+XMh9MlweY04ebiBee1cRjvFAvv5uZm7nqRd/ui+/yfWuKSAD+BcuISSbCXKARMgx8aw
-	UDmQ==
-X-Gm-Message-State: APjAAAV8DoUMTtcJJCzpe0pYU7FolBe6NjFJb/+56/CpO7jrxvwrNFPi
-	/MSXR9Xj43/416n7HJx8J71+1Ab0rwA=
-X-Google-Smtp-Source: APXvYqxFTHMAKayYo/fpVXA/uVh1+fGoT8WUCtdlgWJ3mG5gQHWi9EbseGi18Xxff+otAE5hsOKF+w==
-X-Received: by 2002:aa7:92d5:: with SMTP id k21mr2561289pfa.223.1557381783851; 
-	Wed, 08 May 2019 23:03:03 -0700 (PDT)
+	bh=8egen5zzcY5oFOy4H1qXOj5SeE6rAeyMWy2A1ca7FKQ=;
+	b=J38SIuzKByDjxqrXOAUUejYjpGGGtGtf/trPZNr6of5+27Nz3mztQoMwivRIH+90+H
+	SbXnIgH7+iFMCabDpjEYxwMyATNBGWvTwyRKPIdA7BgNhN/4iUGfe9Vh5O1zctkzVAxD
+	/BLcNUJT8vmiCVN82jyAg1nOG+udw287S7i32kJhHTjAJma8M4wF05lqYOuxfEL05jyt
+	ryxhxQIL6oFhSrdDb7vTNBxM4oYCA6ywp3Xdx3K6WzmoI/0SFOobCOkrnyiGO9zLTC0A
+	oSB3eD4+CkcmAEh1rO6P97uA0CFLKQDh/Wmi7/yghCu/inFs5rlUvL+ue0/AJRdeGM/o
+	tqIQ==
+X-Gm-Message-State: APjAAAVVGYu9z29sV8pRatzFEc0hYgCkr443TWm1jm4hQUTgBjz9s+HM
+	vGp+w97mjtPZ7tmofdNaadk2RHmXbaY=
+X-Google-Smtp-Source: APXvYqwQrI6tRWl6deBbp3QlsO4KwViUFR++/C9QkvYULz3jq4RvnX2oxjboDpK+6M0G82s4klyuLA==
+X-Received: by 2002:a17:902:7205:: with SMTP id
+	ba5mr2693897plb.285.1557381786274; 
+	Wed, 08 May 2019 23:03:06 -0700 (PDT)
 Received: from localhost.localdomain (97-113-27-95.tukw.qwest.net.
 	[97.113.27.95])
-	by smtp.gmail.com with ESMTPSA id n7sm1496109pff.45.2019.05.08.23.03.02
+	by smtp.gmail.com with ESMTPSA id n7sm1496109pff.45.2019.05.08.23.03.05
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 08 May 2019 23:03:03 -0700 (PDT)
+	Wed, 08 May 2019 23:03:05 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  8 May 2019 23:02:31 -0700
-Message-Id: <20190509060246.4031-13-richard.henderson@linaro.org>
+Date: Wed,  8 May 2019 23:02:33 -0700
+Message-Id: <20190509060246.4031-15-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190509060246.4031-1-richard.henderson@linaro.org>
 References: <20190509060246.4031-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::441
-Subject: [Qemu-devel] [PATCH v2 12/27] target/mips: Convert to
+X-Received-From: 2607:f8b0:4864:20::643
+Subject: [Qemu-devel] [PATCH v2 14/27] target/nios2: Convert to
  CPUClass::tlb_fill
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -91,182 +91,281 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: Marek Vasut <marex@denx.de>, Chris Wulff <crwulff@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Note that env->active_tc.PC is removed from the qemu_log as that value
-is garbage.  The PC isn't recovered until cpu_restore_state, called from
-cpu_loop_exit_restore, called from do_raise_exception_err.
+Remove the leftover debugging cpu_dump_state.
 
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
+Cc: Chris Wulff <crwulff@gmail.com>
+Cc: Marek Vasut <marex@denx.de>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2: Split out other mips cleanups to simplify the diff
+v2: Keep user-only and system tlb_fill separate.
 ---
- target/mips/internal.h  |  5 +++--
- target/mips/cpu.c       |  5 ++---
- target/mips/helper.c    | 45 ++++++++++++++++++++++-------------------
- target/mips/op_helper.c | 15 --------------
- 4 files changed, 29 insertions(+), 41 deletions(-)
+ target/nios2/cpu.h    |   5 +-
+ target/nios2/cpu.c    |   5 +-
+ target/nios2/helper.c | 172 +++++++++++++++++++++---------------------
+ target/nios2/mmu.c    |  12 ---
+ 4 files changed, 91 insertions(+), 103 deletions(-)
 
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index 286e3888ab..b2b41a51ab 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -202,8 +202,9 @@ void cpu_mips_start_count(CPUMIPSState *env);
- void cpu_mips_stop_count(CPUMIPSState *env);
+diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
+index 881e7d58c9..60a916b2e5 100644
+--- a/target/nios2/cpu.h
++++ b/target/nios2/cpu.h
+@@ -252,8 +252,9 @@ static inline int cpu_mmu_index(CPUNios2State *env, bool ifetch)
+                                                   MMU_SUPERVISOR_IDX;
+ }
  
- /* helper.c */
--int mips_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size, int rw,
--                              int mmu_idx);
-+bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-+                       MMUAccessType access_type, int mmu_idx,
-+                       bool probe, uintptr_t retaddr);
+-int nios2_cpu_handle_mmu_fault(CPUState *env, vaddr address, int size,
+-                               int rw, int mmu_idx);
++bool nios2_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                        MMUAccessType access_type, int mmu_idx,
++                        bool probe, uintptr_t retaddr);
  
- /* op_helper.c */
- uint32_t float_class_s(uint32_t arg, float_status *fst);
-diff --git a/target/mips/cpu.c b/target/mips/cpu.c
-index e217fb3e36..ebdb834b97 100644
---- a/target/mips/cpu.c
-+++ b/target/mips/cpu.c
-@@ -197,9 +197,8 @@ static void mips_cpu_class_init(ObjectClass *c, void *data)
-     cc->synchronize_from_tb = mips_cpu_synchronize_from_tb;
-     cc->gdb_read_register = mips_cpu_gdb_read_register;
-     cc->gdb_write_register = mips_cpu_gdb_write_register;
--#ifdef CONFIG_USER_ONLY
--    cc->handle_mmu_fault = mips_cpu_handle_mmu_fault;
--#else
-+    cc->tlb_fill = mips_cpu_tlb_fill;
-+#ifndef CONFIG_USER_ONLY
-     cc->do_unassigned_access = mips_cpu_unassigned_access;
-     cc->do_unaligned_access = mips_cpu_do_unaligned_access;
-     cc->get_phys_page_debug = mips_cpu_get_phys_page_debug;
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index 86e622efb8..3a4917ce7b 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -874,31 +874,25 @@ refill:
- #endif
- #endif
- 
--int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
--                              int mmu_idx)
-+bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-+                       MMUAccessType access_type, int mmu_idx,
-+                       bool probe, uintptr_t retaddr)
+ static inline int cpu_interrupts_enabled(CPUNios2State *env)
  {
-     MIPSCPU *cpu = MIPS_CPU(cs);
-     CPUMIPSState *env = &cpu->env;
- #if !defined(CONFIG_USER_ONLY)
-     hwaddr physical;
-     int prot;
--    int access_type;
-+    int mips_access_type;
+diff --git a/target/nios2/cpu.c b/target/nios2/cpu.c
+index fbfaa2ce26..186af4913d 100644
+--- a/target/nios2/cpu.c
++++ b/target/nios2/cpu.c
+@@ -200,9 +200,8 @@ static void nios2_cpu_class_init(ObjectClass *oc, void *data)
+     cc->dump_state = nios2_cpu_dump_state;
+     cc->set_pc = nios2_cpu_set_pc;
+     cc->disas_set_info = nios2_cpu_disas_set_info;
+-#ifdef CONFIG_USER_ONLY
+-    cc->handle_mmu_fault = nios2_cpu_handle_mmu_fault;
+-#else
++    cc->tlb_fill = nios2_cpu_tlb_fill;
++#ifndef CONFIG_USER_ONLY
+     cc->do_unaligned_access = nios2_cpu_do_unaligned_access;
+     cc->get_phys_page_debug = nios2_cpu_get_phys_page_debug;
  #endif
-     int ret = TLBRET_BADADDR;
+diff --git a/target/nios2/helper.c b/target/nios2/helper.c
+index e01fc1ff3e..72884e4260 100644
+--- a/target/nios2/helper.c
++++ b/target/nios2/helper.c
+@@ -38,15 +38,16 @@ void nios2_cpu_do_interrupt(CPUState *cs)
+     env->regs[R_EA] = env->regs[R_PC] + 4;
+ }
  
--#if 0
--    log_cpu_state(cs, 0);
--#endif
--    qemu_log_mask(CPU_LOG_MMU,
--              "%s pc " TARGET_FMT_lx " ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
--              __func__, env->active_tc.PC, address, rw, mmu_idx);
+-int nios2_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
+-                               int rw, int mmu_idx)
++bool nios2_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                        MMUAccessType access_type, int mmu_idx,
++                        bool probe, uintptr_t retaddr)
+ {
+     cs->exception_index = 0xaa;
+     /* Page 0x1000 is kuser helper */
+     if (address < 0x1000 || address >= 0x2000) {
+         cpu_dump_state(cs, stderr, 0);
+     }
+-    return 1;
++    cpu_loop_exit_restore(cs, retaddr);
+ }
+ 
+ #else /* !CONFIG_USER_ONLY */
+@@ -203,89 +204,6 @@ void nios2_cpu_do_interrupt(CPUState *cs)
+     }
+ }
+ 
+-static int cpu_nios2_handle_virtual_page(
+-    CPUState *cs, target_ulong address, int rw, int mmu_idx)
+-{
+-    Nios2CPU *cpu = NIOS2_CPU(cs);
+-    CPUNios2State *env = &cpu->env;
+-    target_ulong vaddr, paddr;
+-    Nios2MMULookup lu;
+-    unsigned int hit;
+-    hit = mmu_translate(env, &lu, address, rw, mmu_idx);
+-    if (hit) {
+-        vaddr = address & TARGET_PAGE_MASK;
+-        paddr = lu.paddr + vaddr - lu.vaddr;
 -
-     /* data access */
- #if !defined(CONFIG_USER_ONLY)
-     /* XXX: put correct access by using cpu_restore_state() correctly */
--    access_type = ACCESS_INT;
--    ret = get_physical_address(env, &physical, &prot,
--                               address, rw, access_type, mmu_idx);
-+    mips_access_type = ACCESS_INT;
-+    ret = get_physical_address(env, &physical, &prot, address,
-+                               access_type, mips_access_type, mmu_idx);
-     switch (ret) {
-     case TLBRET_MATCH:
-         qemu_log_mask(CPU_LOG_MMU,
-@@ -915,7 +909,7 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
-         tlb_set_page(cs, address & TARGET_PAGE_MASK,
-                      physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
-                      mmu_idx, TARGET_PAGE_SIZE);
--        return 0;
+-        if (((rw == 0) && (lu.prot & PAGE_READ)) ||
+-            ((rw == 1) && (lu.prot & PAGE_WRITE)) ||
+-            ((rw == 2) && (lu.prot & PAGE_EXEC))) {
+-
+-            tlb_set_page(cs, vaddr, paddr, lu.prot,
+-                         mmu_idx, TARGET_PAGE_SIZE);
+-            return 0;
+-        } else {
+-            /* Permission violation */
+-            cs->exception_index = (rw == 0) ? EXCP_TLBR :
+-                                               ((rw == 1) ? EXCP_TLBW :
+-                                                            EXCP_TLBX);
+-        }
+-    } else {
+-        cs->exception_index = EXCP_TLBD;
+-    }
+-
+-    if (rw == 2) {
+-        env->regs[CR_TLBMISC] &= ~CR_TLBMISC_D;
+-    } else {
+-        env->regs[CR_TLBMISC] |= CR_TLBMISC_D;
+-    }
+-    env->regs[CR_PTEADDR] &= CR_PTEADDR_PTBASE_MASK;
+-    env->regs[CR_PTEADDR] |= (address >> 10) & CR_PTEADDR_VPN_MASK;
+-    env->mmu.pteaddr_wr = env->regs[CR_PTEADDR];
+-    env->regs[CR_BADADDR] = address;
+-    return 1;
+-}
+-
+-int nios2_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
+-                               int rw, int mmu_idx)
+-{
+-    Nios2CPU *cpu = NIOS2_CPU(cs);
+-    CPUNios2State *env = &cpu->env;
+-
+-    if (cpu->mmu_present) {
+-        if (MMU_SUPERVISOR_IDX == mmu_idx) {
+-            if (address >= 0xC0000000) {
+-                /* Kernel physical page - TLB bypassed */
+-                address &= TARGET_PAGE_MASK;
+-                tlb_set_page(cs, address, address, PAGE_BITS,
+-                             mmu_idx, TARGET_PAGE_SIZE);
+-            } else if (address >= 0x80000000) {
+-                /* Kernel virtual page */
+-                return cpu_nios2_handle_virtual_page(cs, address, rw, mmu_idx);
+-            } else {
+-                /* User virtual page */
+-                return cpu_nios2_handle_virtual_page(cs, address, rw, mmu_idx);
+-            }
+-        } else {
+-            if (address >= 0x80000000) {
+-                /* Illegal access from user mode */
+-                cs->exception_index = EXCP_SUPERA;
+-                env->regs[CR_BADADDR] = address;
+-                return 1;
+-            } else {
+-                /* User virtual page */
+-                return cpu_nios2_handle_virtual_page(cs, address, rw, mmu_idx);
+-            }
+-        }
+-    } else {
+-        /* No MMU */
+-        address &= TARGET_PAGE_MASK;
+-        tlb_set_page(cs, address, address, PAGE_BITS,
+-                     mmu_idx, TARGET_PAGE_SIZE);
+-    }
+-
+-    return 0;
+-}
+-
+ hwaddr nios2_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+ {
+     Nios2CPU *cpu = NIOS2_CPU(cs);
+@@ -321,4 +239,86 @@ void nios2_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+     env->regs[CR_EXCEPTION] = EXCP_UNALIGN << 2;
+     helper_raise_exception(env, EXCP_UNALIGN);
+ }
++
++bool nios2_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                        MMUAccessType access_type, int mmu_idx,
++                        bool probe, uintptr_t retaddr)
++{
++    Nios2CPU *cpu = NIOS2_CPU(cs);
++    CPUNios2State *env = &cpu->env;
++    unsigned int excp = EXCP_TLBD;
++    target_ulong vaddr, paddr;
++    Nios2MMULookup lu;
++    unsigned int hit;
++
++    if (!cpu->mmu_present) {
++        /* No MMU */
++        address &= TARGET_PAGE_MASK;
++        tlb_set_page(cs, address, address, PAGE_BITS,
++                     mmu_idx, TARGET_PAGE_SIZE);
 +        return true;
-     }
- #if !defined(TARGET_MIPS64)
-     if ((ret == TLBRET_NOMATCH) && (env->tlb->nb_tlb > 1)) {
-@@ -926,27 +920,36 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
-         int mode = (env->hflags & MIPS_HFLAG_KSU);
-         bool ret_walker;
-         env->hflags &= ~MIPS_HFLAG_KSU;
--        ret_walker = page_table_walk_refill(env, address, rw, mmu_idx);
-+        ret_walker = page_table_walk_refill(env, address, access_type, mmu_idx);
-         env->hflags |= mode;
-         if (ret_walker) {
--            ret = get_physical_address(env, &physical, &prot,
--                                       address, rw, access_type, mmu_idx);
-+            ret = get_physical_address(env, &physical, &prot, address,
-+                                       access_type, mips_access_type, mmu_idx);
-             if (ret == TLBRET_MATCH) {
-                 tlb_set_page(cs, address & TARGET_PAGE_MASK,
-                              physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
-                              mmu_idx, TARGET_PAGE_SIZE);
--                return 0;
-+                return true;
-             }
-         }
-     }
- #endif
++    }
++
++    if (MMU_SUPERVISOR_IDX == mmu_idx) {
++        if (address >= 0xC0000000) {
++            /* Kernel physical page - TLB bypassed */
++            address &= TARGET_PAGE_MASK;
++            tlb_set_page(cs, address, address, PAGE_BITS,
++                         mmu_idx, TARGET_PAGE_SIZE);
++            return true;
++        }
++    } else {
++        if (address >= 0x80000000) {
++            /* Illegal access from user mode */
++            if (probe) {
++                return false;
++            }
++            cs->exception_index = EXCP_SUPERA;
++            env->regs[CR_BADADDR] = address;
++            cpu_loop_exit_restore(cs, retaddr);
++        }
++    }
++
++    /* Virtual page.  */
++    hit = mmu_translate(env, &lu, address, access_type, mmu_idx);
++    if (hit) {
++        vaddr = address & TARGET_PAGE_MASK;
++        paddr = lu.paddr + vaddr - lu.vaddr;
++
++        if (((access_type == MMU_DATA_LOAD) && (lu.prot & PAGE_READ)) ||
++            ((access_type == MMU_DATA_STORE) && (lu.prot & PAGE_WRITE)) ||
++            ((access_type == MMU_INST_FETCH) && (lu.prot & PAGE_EXEC))) {
++            tlb_set_page(cs, vaddr, paddr, lu.prot,
++                         mmu_idx, TARGET_PAGE_SIZE);
++            return true;
++        }
++
++        /* Permission violation */
++        excp = (access_type == MMU_DATA_LOAD ? EXCP_TLBR :
++                access_type == MMU_DATA_STORE ? EXCP_TLBW : EXCP_TLBX);
++    }
++
 +    if (probe) {
 +        return false;
 +    }
- #endif
- 
--    raise_mmu_exception(env, address, rw, ret);
--    return 1;
-+    raise_mmu_exception(env, address, access_type, ret);
-+    do_raise_exception_err(env, cs->exception_index, env->error_code, retaddr);
++
++    if (access_type == MMU_INST_FETCH) {
++        env->regs[CR_TLBMISC] &= ~CR_TLBMISC_D;
++    } else {
++        env->regs[CR_TLBMISC] |= CR_TLBMISC_D;
++    }
++    env->regs[CR_PTEADDR] &= CR_PTEADDR_PTBASE_MASK;
++    env->regs[CR_PTEADDR] |= (address >> 10) & CR_PTEADDR_VPN_MASK;
++    env->mmu.pteaddr_wr = env->regs[CR_PTEADDR];
++
++    cs->exception_index = excp;
++    env->regs[CR_BADADDR] = address;
++    cpu_loop_exit_restore(cs, retaddr);
 +}
 +
-+#ifndef CONFIG_USER_ONLY
 +void tlb_fill(CPUState *cs, target_ulong addr, int size,
 +              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
 +{
-+    mips_cpu_tlb_fill(cs, addr, size, access_type, mmu_idx, false, retaddr);
- }
- 
--#if !defined(CONFIG_USER_ONLY)
- hwaddr cpu_mips_translate_address(CPUMIPSState *env, target_ulong address, int rw)
- {
-     hwaddr physical;
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 0f272a5b93..6d86912958 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -2669,21 +2669,6 @@ void mips_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-     do_raise_exception_err(env, excp, error_code, retaddr);
- }
++    nios2_cpu_tlb_fill(cs, addr, size, access_type, mmu_idx, false, retaddr);
++}
+ #endif /* !CONFIG_USER_ONLY */
+diff --git a/target/nios2/mmu.c b/target/nios2/mmu.c
+index 5acf442d8b..47fa474efb 100644
+--- a/target/nios2/mmu.c
++++ b/target/nios2/mmu.c
+@@ -36,18 +36,6 @@
+ #define MMU_LOG(x)
+ #endif
  
 -void tlb_fill(CPUState *cs, target_ulong addr, int size,
 -              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
 -{
 -    int ret;
 -
--    ret = mips_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
--    if (ret) {
--        MIPSCPU *cpu = MIPS_CPU(cs);
--        CPUMIPSState *env = &cpu->env;
--
--        do_raise_exception_err(env, cs->exception_index,
--                               env->error_code, retaddr);
+-    ret = nios2_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
+-    if (unlikely(ret)) {
+-        /* now we have a real cpu fault */
+-        cpu_loop_exit_restore(cs, retaddr);
 -    }
 -}
 -
- void mips_cpu_unassigned_access(CPUState *cs, hwaddr addr,
-                                 bool is_write, bool is_exec, int unused,
-                                 unsigned size)
+ void mmu_read_debug(CPUNios2State *env, uint32_t rn)
+ {
+     switch (rn) {
 -- 
 2.17.1
 
