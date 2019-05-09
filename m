@@ -4,50 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62DC2C04AB2
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 18:53:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6640AC46460
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 19:08:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23BBB217F5
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 18:53:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2510C20656
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 19:08:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="BKmCyVQ0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23BBB217F5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="bXdpXbBO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2510C20656
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59502 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59638 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOoAE-0003Bw-3z
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 14:53:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47809)
+	id 1hOoOf-00089e-TE
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 15:08:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50049)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1hOo9M-0002sv-5b
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 14:52:13 -0400
+	id 1hOoNp-0007qh-VQ
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 15:07:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1hOo9K-0007qn-8s
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 14:52:12 -0400
-Received: from mout.gmx.net ([212.227.17.22]:45229)
+	(envelope-from <n54@gmx.com>) id 1hOoNp-0001Du-0x
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 15:07:09 -0400
+Received: from mout.gmx.net ([212.227.17.20]:43127)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1hOo9J-0007q8-UB
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 14:52:10 -0400
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1hOoNo-0001Dk-MS
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 15:07:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-	s=badeba3b8450; t=1557427898;
-	bh=taU56wQr3iCTxfLVSZ7m0EBFzDHiFtZqGqu6+HhSL5U=;
+	s=badeba3b8450; t=1557428783;
+	bh=S85LzAoN57n9d6zwX8Fu8gq/h6tvzAhzgkUPPMXZMog=;
 	h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-	b=BKmCyVQ0iQIg6wi86f/KmBvCAPseieKSlccmmcLPrwp9TnR9boONDF2wYOPW0PuBX
-	apdGkVKnd9L5A+jYvKD/JugLOQrEDV3lU3rE2RyVqQ+SSJfTAxrUVJm1d7BvrBkdK/
-	4LjqDuOd3ZIBekyc1WnFkv0cI95YwixeAiL527J0=
+	b=bXdpXbBOMdettQLhstwJIgJbxcWgfPI8cJyfZxprBO42LV/5Va/D8Dtji96sQrfWT
+	BvbZnH1GJrVOyZ0n2RcpfGYhQpi038t/vqiZ2i0BF5rpxoiodKYxFidXGl5mzA8rOo
+	TlzAm8/J9mjz1ade1dddMpHLdJcTSKOCbGgsVdNs=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.0.241] ([89.71.135.231]) by mail.gmx.com (mrgmx104
-	[212.227.17.174]) with ESMTPSA (Nemesis) id 1McYCb-1gr7wt18IP-00cyxK;
-	Thu, 09 May 2019 20:51:38 +0200
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Received: from [192.168.0.241] ([89.71.135.231]) by mail.gmx.com (mrgmx105
+	[212.227.17.174]) with ESMTPSA (Nemesis) id 1MCbEp-1hYOsP2rUR-009k60;
+	Thu, 09 May 2019 21:06:22 +0200
+To: Richard Henderson <richard.henderson@linaro.org>,
+	Gerd Hoffmann <kraxel@redhat.com>
 References: <20190508085645.11595-1-kraxel@redhat.com>
+	<20190508085645.11595-12-kraxel@redhat.com>
+	<461b0a0f-2843-afc3-6289-db08d6415771@gmx.com>
+	<20190509064716.pcxsg3lbbfqv5ltl@sirius.home.kraxel.org>
+	<d4939e4c-4e31-4330-0180-8c3c73378d24@linaro.org>
 From: Kamil Rytarowski <n54@gmx.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=n54@gmx.com; prefer-encrypt=mutual; keydata=
@@ -93,38 +97,38 @@ Autocrypt: addr=n54@gmx.com; prefer-encrypt=mutual; keydata=
 	twffi7RYphRx0d9z5UZ1Yl5Rvl05vTaJ7YhhNC7xuE8yGOQmDUsPDwWqO/eXUDErJjCOBR5b
 	0yILqRPYNT0Fj/th9gtEbZy1Gp0TVBkZM3tfjDRu43Pn6iSKObO/j0rNuq1LwN/EMxDifeZO
 	4XSbcg==
-Message-ID: <afb9fa7b-64df-74e6-86b4-e6254d82555e@gmx.com>
-Date: Thu, 9 May 2019 20:52:23 +0200
+Message-ID: <229e601e-3b39-be2f-f6a0-59e3c959209e@gmx.com>
+Date: Thu, 9 May 2019 21:07:07 +0200
 User-Agent: Mozilla/5.0 (X11; NetBSD amd64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.0
 MIME-Version: 1.0
-In-Reply-To: <20190508085645.11595-1-kraxel@redhat.com>
+In-Reply-To: <d4939e4c-4e31-4330-0180-8c3c73378d24@linaro.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="hW3qivGdIMCqqanfIRNl6GfAAPYOrqbMm"
-X-Provags-ID: V03:K1:ZB+/yYQ0ijC0hxoKLrh+XndoAhXHMUWXHsJ/I43V5zeSSypjAv8
-	zwj/fsvskgkVSnflaS2ZRVy6iUJ5rdA9IR4PoVBFpS+9SGPfkHACgyLf7kGEvwtsdOqDTJw
-	HEy6dlXBSzPMVC/gk+aIQ9LLvisT73ZAm7oYzKJhqRy7PXTzCTvUxjOYC512wsccnmpxks0
-	3BSU+JtzH2aj/1xn1xWUg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:0iuZbTvQE2k=:qQEnURTWXO1M4pjM0hHyny
-	l9TiVK5hu8Y59suyqNVN507mT2oATD41ayzGLhfHYxbGStXendo+fxJWdAeg0qn99i9v+Lix3
-	ez47YBhVV3xih7LZ4i6stev8ufAc1ZqopoYNSDbkhAsV5egdI/lOUEbjDbFkwm+kNP4E2P3PH
-	leLBei9RV9Mzi/6c7jq5AYaps49ceKmRUOECGdVwRnf4arg7eSi/QvdhEiv34pkbzz9rgd3zh
-	ij+nSavOCxJwiY87a9ew9bGcclX+87KMwXboxe0xqRXyNeLhj0xGjTmfRFgy4mCDlqW49cNDt
-	tqlzB4DRLthiy2N6Usp1XKUIlgjAVMEDrQNchKkGFFAv9oMsCQS7Hfn6AvLgvwlCNjFVrmg6Z
-	5gvlncujyixQ+E6sgV7p9oRMJYABIvtCj4/Lp555ujeJY8sQYqTF5okOm2jws/aZvUehET89e
-	3M2no0svqZzmxVRPJsBk4fcL51TzfVNgY8zjBSynE7ggEiCq4MzCheOOTRek/wfuacEm9/yg1
-	Oj5+KGa83AIXP0MpAdVIzrnpcAm7WWa8DElduk7nQ25gt7qxx1GgZ+FO5/WY6TgeitMO0ap4P
-	qEb9Q4QyNNY0CRUqez0rGc9G9oy7IMTVxRrUjdzd4/epcPepwtDY8HaiE8TUyOSL5MxrDjdGK
-	fX4tFXXgSCLIkN0BxLbd6eNq+/3Ht1sQm9kKSGlxr1uiqrpl4JNSJIQhLuCWZ3DQhaAOB2YaA
-	x9cJK8vd5Sf0OhosO+VDSRHiRFKiI/DD8zHJ1oE8FtdSgvG2iST4+O3CKFhUBJ2WZVZs5TWL9
-	K0AfZbqyVnpowqa+I5r8JQOqiyGnmsyf2FSdl8YkYajaKXDbMgBtXL9nR6a+CGJ04esuCYozp
-	ucJajp7tqurwbFfKMyyOzinhC+W2j6f/hyhhEIN+Y=
+	boundary="THGesaAxzFOiKi1EEmHafLFPTqirUWZmo"
+X-Provags-ID: V03:K1:1Wy7Ne72XWwc3RNJWZaGf0mu9xop/PRrYGnBJpORt8l7vAc8BGB
+	q3/MvUcvH3oY6Qgm/IeuGGzWgMRaY3Si5saEYjwK4QIfzkoj4hPzjWrWhg4OYjEOKD/bgZs
+	YBGd28L9xkBtIHPMc6rmpodSkB6zOnk3dkR2EFzjiftICABBQyK6l++uYe7cl8mS5G4mgr/
+	zseQBsCQfZ9nguew2wPsA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:W3mXVA6gdrc=:S3sZYXN4KS/7KBgFflqNxa
+	FhULH06IuTy7b7YNYYgo93lYY8q5bB+Ofo7dtLt0FOj9qGGXlTgHp6j5JrhqO2evKTTu+4y41
+	LJ0C41JPW+17tipnm2yn64mxczkAkPsCbZf0T3QaqE0DRNenLiMA50UqNRp34j33g3PYmIO0r
+	ARxoAZwkqKYbiRt3l/fSiCGlgVvKJue5AviTe1gcR502YASyH7g6FHxulAaC3BrM0YVj6q3zU
+	hqDQwooFiUuQubZ9YK6KNlDmpCeB53FGry5GgB9BFcIWKuNtpl6n6Q6dDdqUwpsnOJ0t0KFG+
+	dY3kyc3Y0ZfU1O9gi9Xp3j67lt1B1IJMCsGj4LmVYvEJEB+EW1ay+7UCbknRlyHOJa8Ib1HqJ
+	iPy3CmunyzTvYryIWihn+p0zkgqhZU0JfamT82CjZKZg/Ju49DBKtcAS4IN9e9CLJyYqcL/HD
+	rg/VdZ5WK3XxYElbj/q4fMsrX1tGYHh2D2EFdbMODfp2HVRXafTDTH4+wGgXd6WO1PbxW7GQZ
+	39M8bnlDNi31xiUVV3qHxXLPqwCLkHSouiLmBVnu44HU7BKtjE10rqUcIEzZbR+lkPMiu84Ek
+	6QoQpiHCixSNw41tg33r2I8JhVWMDmeAiBFDjdLelPo5zqhRRHIrsYhbAnftDqtK/qnCn2Icf
+	6iaYFIBtxQUYfeiiy3OuLdOYdaBQEZOQXZ5WhTB4n4H0rR4IvqpQW3JWwaqiA8E1eOI4Pwv7d
+	ts+kP2gi6uTIYsruoGVDirdKESjK6urX9tuZH/SP2cpstrm1nD9XE/qy/ukHcCNQaRRW1H7IW
+	F2z+4jOSL2g55xUSybT5DaTMYNfmcTZQeePDGUIZlJJqRGukexcS4zotfSJODMe6BUQ4yj+2S
+	+Cpv53jsq/B51eeVp27INBaANn1c9/lsBLGg4cKTw=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.22
+X-Received-From: 212.227.17.20
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 00/13] tests/vm: serial console autoinstall,
- misc fixes.
+Subject: Re: [Qemu-devel] [PATCH 11/13] tests/vm: netbsd autoinstall,
+ using serial console
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -137,131 +141,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Kamil Rytarowski <kamil@netbsd.org>,
 	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	qemu-devel@nongnu.org, Kamil Rytarowski <kamil@netbsd.org>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
 	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hW3qivGdIMCqqanfIRNl6GfAAPYOrqbMm
+--THGesaAxzFOiKi1EEmHafLFPTqirUWZmo
 From: Kamil Rytarowski <n54@gmx.com>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Kamil Rytarowski <kamil@netbsd.org>,
  =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Kamil Rytarowski <kamil@netbsd.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
-Message-ID: <afb9fa7b-64df-74e6-86b4-e6254d82555e@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH 00/13] tests/vm: serial console autoinstall,
- misc fixes.
+Message-ID: <229e601e-3b39-be2f-f6a0-59e3c959209e@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH 11/13] tests/vm: netbsd autoinstall, using
+ serial console
 References: <20190508085645.11595-1-kraxel@redhat.com>
-In-Reply-To: <20190508085645.11595-1-kraxel@redhat.com>
+ <20190508085645.11595-12-kraxel@redhat.com>
+ <461b0a0f-2843-afc3-6289-db08d6415771@gmx.com>
+ <20190509064716.pcxsg3lbbfqv5ltl@sirius.home.kraxel.org>
+ <d4939e4c-4e31-4330-0180-8c3c73378d24@linaro.org>
+In-Reply-To: <d4939e4c-4e31-4330-0180-8c3c73378d24@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08.05.2019 10:56, Gerd Hoffmann wrote:
-> This patch series changes the way virtual machines for test builds are
-> managed.  They are created locally on the developer machine now.  The
-> installer is booted on the serial console and the scripts walks through=
+On 09.05.2019 18:39, Richard Henderson wrote:
+> On 5/8/19 11:47 PM, Gerd Hoffmann wrote:
+>> So, from looking at the patch it seems you need two mappings of the sa=
+me
+>> page, one writable and one executable.
+>>
+>> Or, maybe it is also possible with one mapping which is writable first=
 
-> the dialogs to install and configure the guest.
+>> when you fill it with code, then gets flipped over to executable when
+>> you are done with the initialization and want use it.
+>>
+>> Is that correct?
 >=20
-> That takes the download.patchew.org server out of the loop and makes it=
-
-> alot easier to tweak the guest images (adding build dependencies for
-> example).
+> That's certainly the way I read that patch.
 >=20
-> The install scripts take care to apply host proxy settings (from *_prox=
-y
-> environment variables) to the guest, so any package downloads will be
-> routed through the proxy and can be cached that way.  This also makes
-> them work behind strict firewalls.
+>> I suspect supporting that in tcg isn't exactly trivial.
 >=20
-> There are also a bunch of smaller tweaks for tests/vm to fix issues I
-> was struggling with.  See commit messages of individual patches for
-> details.
+> It shouldn't be too hard, if required.  All of the writing to the buffe=
+r is
+> isolated to a couple of inline functions.
 >=20
-> Known issue:  NetBSD package install is not working for me right now.
-> It did work a while ago.  Not sure what is going on here.
+> I do wonder if using paxctl -m as a part of the build process for affec=
+ted *BSD
+> isn't just as easy?
 >=20
 
-Error log? What is the command? pkgin install?
+paxctl(8) is available only for NetBSD.
 
-> Do we have accelerator support for the BSDs?
+paxctl(8) is the last resort solution and shall be avoided due to a
+security risk.
 
-KVM-style?
+Only few exceptions shall be allowed to switch mapping protection or
+request RWX mappings (mainly JIT and a process running under a debugger).=
 
-NetBSD does support HAXM (--accel hax) and in a downstream copy NVMM
-(-accel nvmm).
 
-http://blog.netbsd.org/tnf/entry/the_hardware_assisted_virtualization_cha=
-llenge
-
-http://blog.netbsd.org/tnf/entry/from_zero_to_nvmm
-
-Once NVMM will stabilize we intend to submit it upstream.
-
-There is no support for hardware assisted acceleration in qemu for any
-other BSD.
-
->  A "make check" for a full
-> build takes ages, and I suspect tcg being used is part of the problem.
-> I did my tests using "TARGET_LIST=3Dx86_64-softmmu" because of that.
 >=20
-> Gerd Hoffmann (13):
->   scripts: use git archive in archive-source
->   tests/vm: send proxy environment variables over ssh
->   tests/vm: send locale environment variables over ssh
->   tests/vm: use ssh with pty unconditionally
->   tests/vm: run test builds on snapshot
->   tests/vm: add vm-boot-{ssh,serial}-<guest> targets
->   tests/vm: add DEBUG=3D1 to help text
->   tests/vm: serial console support helpers
->   tests/vm: openbsd autoinstall, using serial console
->   tests/vm: freebsd autoinstall, using serial console
->   tests/vm: netbsd autoinstall, using serial console
->   tests/vm: fedora autoinstall, using serial console
->   tests/vm: ubuntu.i386: apt proxy setup
->=20
->  tests/vm/basevm.py        | 125 ++++++++++++++++++++++---
->  scripts/archive-source.sh |  72 +++++++--------
->  tests/vm/Makefile.include |  25 ++++-
->  tests/vm/fedora           | 187 ++++++++++++++++++++++++++++++++++++++=
-
->  tests/vm/freebsd          | 172 +++++++++++++++++++++++++++++++++--
->  tests/vm/netbsd           | 178 ++++++++++++++++++++++++++++++++++--
->  tests/vm/openbsd          | 150 +++++++++++++++++++++++++++---
->  tests/vm/ubuntu.i386      |   4 +
->  8 files changed, 830 insertions(+), 83 deletions(-)
->  create mode 100755 tests/vm/fedora
+> r~
 >=20
 
 
 
---hW3qivGdIMCqqanfIRNl6GfAAPYOrqbMm
+--THGesaAxzFOiKi1EEmHafLFPTqirUWZmo
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlzUducACgkQS7MI6bAu
-dmzpBA//T4kNCw+No+VAnpYvs6QICnTP2PxNlg2lBiFImapW6ffX3SUcFzeqjQBv
-QTwsGC5zRDpt0QSr3SJbnfbRzLMyN1/WwhkT5lpDgFs3lwtm0qLZ9RKMfrjDveAJ
-6WWxfla0wXfYNG7+cZFGgG93Qid8GUJ1vBhjq2DZW9NVo1QVb/WeRrqEnQcQZr27
-FedW/I1WTrYWn4ZRVdxwqsZBx1fDQldXXJc7FJnJuLHIqtUVZErd5UIDFCxVyL+B
-2ldsbJqCNdxIxZc9RbII78IBgNHbnbAHv2W+FPnOjIQye4MNH/4iIDCSGmwiWhkq
-RpOHJknp683AT7F6deVzTRzhMG1rezwgUNkFC8gj3fiz7HXer9rtOLQmbMti02bU
-LocOLcbeugZ8841/SamHgj6bxw3TK1eMVWJCEMommVY/CsdO568KRFA+AX1LJeW3
-KmX2ok3ODVtThzH0Kv6UOxfXKHUAsFFZCdLVEX3XuceP0VSjDmEMqRu+1I9FMxTT
-LhyBinptVlNPrhTbP6zt0rWZuGmBt/OP6b35eKu6UkIv2aIVNXuF7lwY9DjQSX3z
-tItSC1Ci0f06x69gWA7L4VcHfG54lZ+L22W+7RHsWK2Lq0WAe2OtC6CFMcrCkWoO
-S735XOvRI9fFHRCE3e1WOADdXRIHi2pb150DnT3iGMORwOTx6lc=
-=jKxT
+iQIzBAEBCAAdFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlzUelwACgkQS7MI6bAu
+dmxcNA//fU6Tyq0AYUy7nzZV2BhwexUwYF3K/B3t53S+MafEVweloZdEqOrV7QFg
+bZ4JWfi1AiQauuvITK3l2csjj83DjWVXdNy5tBf0hPxiCKZ71S6RVEzxxp/TqfQx
+Ddqf51fJBGR1exuoo6X/FQUCXFAgrq8atXZKstWbhduk2iRHcRTIogHU4C/fuDgf
+oNycH/Wv5sulomEzIDX0KlU7Xb2T24Fx13j/9afY/AodRc2AzJty3i80IRhnGz49
+hhBAwdINoLRrtGIxEQlBRwIBdRON1KwMwN59FY5bBwlO+srMwNFCN3JicFizsn5O
+bSIdX3ggcIu1vln6rfB2FQGkHesZRccLaorwlldatAAXcu6Kx8LkTKlnQWvoYJnO
+RcrfbHY3Z75PeXVPVCJcFkDOXSoYaOaRm7xE8QoXIzZ/Vvwhy4CbOA/X5rA/akjc
+KZq5O8SKKAvh/Uwh4TmXyIwD0nZgLwikTc07Wp96q11jPVAHXuzoujWbj3cbhQ8i
+XAod8xN/aTf+gbF1mApZ+bchm0bopDTR5UC96nBnQ8O009ATRPUBJU5+xBCNaGp5
+ycyMg1oUyQIotmBS1guNmkS8zA7o5F7lnlgg9v1Bo/6ACOxozlNy5Nk3M4wWKRhW
+iqJQWszlKhDKndXxYdjjTug7r3pzl7Zhxe4qzeHT1WmXD9kWX8c=
+=vCyU
 -----END PGP SIGNATURE-----
 
---hW3qivGdIMCqqanfIRNl6GfAAPYOrqbMm--
+--THGesaAxzFOiKi1EEmHafLFPTqirUWZmo--
 
