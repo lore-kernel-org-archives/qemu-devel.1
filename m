@@ -2,94 +2,82 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F8F8C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 18:15:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8ED7C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 18:19:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17D022177B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 18:15:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17D022177B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9A8AA2177E
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 18:19:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nm6ZRP0m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A8AA2177E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59120 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59164 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOnZU-0004Dr-DY
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 14:15:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39816)
+	id 1hOne3-0005XX-T4
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 14:19:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hOnXQ-00037T-MS
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 14:13:01 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hOnck-00055y-Vc
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 14:18:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hOnXP-0006oY-LE
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 14:13:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45098)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hOnXL-0006dW-Dh; Thu, 09 May 2019 14:12:55 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AECC47DCCA;
-	Thu,  9 May 2019 18:12:54 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-168.brq.redhat.com
-	[10.40.204.168])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4B59B5E7D0;
-	Thu,  9 May 2019 18:12:53 +0000 (UTC)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	qemu-devel@nongnu.org
-References: <20190509165912.10512-1-alex.bennee@linaro.org>
-	<20190509165912.10512-23-alex.bennee@linaro.org>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <2dcd2689-ca10-b014-e7f0-1967f4901fe2@redhat.com>
-Date: Thu, 9 May 2019 20:12:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <alistair23@gmail.com>) id 1hOncj-0006TL-Be
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 14:18:30 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:43621)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hOncj-0006SW-0r
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 14:18:29 -0400
+Received: by mail-lf1-x143.google.com with SMTP id u27so2237702lfg.10
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 11:18:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=IAzUceU8QIKC0XPK6ny375xF5EWr2WgFkpFkGtPjMj4=;
+	b=nm6ZRP0mZ0RdIgoGTWbv9YOpbdewYlQtotm2adaXiwwS/ISYJU7NUnQi1GnzTyPZYs
+	oJcV89HlN315zfarQCG3jJSWPrB+dp5gCq42TFWreJTNLNw9WCnlNiHMwLEWfAAPtC5d
+	tSY5zSpIKAZzzGwPn9jm/rOxwoeuTZb5tEs46KsSmQWn2AiaIwYlZEjrcN2FwRzu1fUF
+	8HdWjAha7w8vELqZKnagnMNVNqLMlSaqeXqbTIQBCr5WWjyMrHz51UtcmiAmXWzRDGgn
+	QiW4zhu5SsWxltt/UvGC+lsCsKhaO9kgsApNK1LFRdK35GbbfSICB7veN2FMUagPgu0w
+	3P0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=IAzUceU8QIKC0XPK6ny375xF5EWr2WgFkpFkGtPjMj4=;
+	b=cBs0ffg4sDTEpcvJg1QNgm4MCccd8Rf8K4VvJCnOPsBr1lKfXrGp3n6CoW78z62nbY
+	sRXumNqSxviE5zN2aprVoXaNiPEWXGYQH75otRIkegJBTnY1zf/psH5q8c7Y6Fu8zOjO
+	omB10uyvBnm5A0F4dmDnwglZIIjDmcO/VzKOoBdSROl11PdDMCtxyj/6nofKUjMo0kjw
+	QVrEiGcUVeSb1zD5zQQ+5od0dDysrWGqsBhSDZoHlJbUnVvd9B5CbpS9IsZNAyXa1b8m
+	KC5VlwUyVlWxEp77nPnaM9mf46kFYn3hjGCRtJ+zsaIM/hVdG2toavgfaLzb8GgRN8Ch
+	IrYg==
+X-Gm-Message-State: APjAAAVrQ2EOk24xQeQANKmNHMN7+n6RK4v/w3sQtMhg3vAbz4k8sAif
+	dIdnMVKTl5EswPQW0nTfAYV9ZmaGXAp2omuueHs=
+X-Google-Smtp-Source: APXvYqx3Kaz0LxG0pXEYlg1pudm6kPCzHn7NT4iSDMHNQVdJtD5S5hhvs+YfiiSUlhwT2vPmsz3JFvs4gvB8GAaXtIE=
+X-Received: by 2002:a05:6512:309:: with SMTP id
+	t9mr3256127lfp.103.1557425907447; 
+	Thu, 09 May 2019 11:18:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190509165912.10512-23-alex.bennee@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="qhslNKrnqE11et8oXcGPnP9ZFs5DcZUcS"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Thu, 09 May 2019 18:12:54 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v1 22/23] tests/qemu-iotests: re-format
- output to for make check-block
+References: <20190508000641.19090-1-richard.henderson@linaro.org>
+	<20190508000641.19090-17-richard.henderson@linaro.org>
+In-Reply-To: <20190508000641.19090-17-richard.henderson@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 9 May 2019 11:16:19 -0700
+Message-ID: <CAKmqyKM385p7Rq7m-zBjC2V_T50YjAg8wvRoidp=W8E_3iJcWg@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::143
+Subject: Re: [Qemu-devel] [PATCH v3 16/39] target/m68k: Use env_cpu,
+ env_archcpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,80 +89,323 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-arm@nongnu.org,
-	"open list:Block layer core" <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qhslNKrnqE11et8oXcGPnP9ZFs5DcZUcS
-From: Max Reitz <mreitz@redhat.com>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>
-Message-ID: <2dcd2689-ca10-b014-e7f0-1967f4901fe2@redhat.com>
-Subject: Re: [PATCH v1 22/23] tests/qemu-iotests: re-format output to for make
- check-block
-References: <20190509165912.10512-1-alex.bennee@linaro.org>
- <20190509165912.10512-23-alex.bennee@linaro.org>
-In-Reply-To: <20190509165912.10512-23-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, May 7, 2019 at 5:16 PM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-On 09.05.19 18:59, Alex Benn=C3=A9e wrote:
-> This attempts to clean-up the output to better match the output of the
-> rest of the QEMU check system. This includes:
->=20
->   - formatting as "  TEST    iotest: nnn"
->   - calculating time diff at the end
->   - only dumping config on failure
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Message-Id: <20190503143904.31211-1-alex.bennee@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
 > ---
->  tests/qemu-iotests/check | 101 +++++++++++++++++++++++----------------=
-
->  1 file changed, 61 insertions(+), 40 deletions(-)
-
-Hm, this makes every iotest print two lines:
-
-$ ./check -T -qcow2
-[...]
-001 [20:06:27] -> [20:06:27]
-001 0s (last 1s)
-002 [20:06:27] -> [20:06:28]
-002 1s (last 1s)
-003 [20:06:28] -> [20:06:29]
-003 1s (last 1s)
-004 [20:06:29] -> [20:06:29]
-004 0s (last 0s)
-005 [20:06:29] -> [20:06:29]
-005 0s (last 0s)
-[..]
-
-Which looks rather weird to me.
-
-Max
-
-
---qhslNKrnqE11et8oXcGPnP9ZFs5DcZUcS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzUbaMACgkQ9AfbAGHV
-z0Dlgwf/a+FFnGI1x//NS5mPnn8+wPvCgU47GMLr12hxS/1fTjrQPeKufBU21L9C
-ZXAi8u062wbk7LEK4zYa8jI3ETDHDrsHhUjwvLaffIZ+FZSxOcIvTCkP+Ky2vJyl
-q0drVYTsOdQgJtdG6A3JLIAm0uy42JgWZbYXyZdaZYIyipIqmii8Ypz4mjPmtw5k
-WvMDvuqBUlCJA7qRw/MfDYWI8rHXme3FZKPaICxg/CKRsA4qY5l4K8xolRZr2UzJ
-QMRYkwf42Zcw8jumQKZ88Bs8oohfYGqoTkd/2o6hRMqRi4USooAW9Scfzc0MmyYs
-cmlqEBnFMb9fMduY3LsBGCiPWmDoYw==
-=RdXh
------END PGP SIGNATURE-----
-
---qhslNKrnqE11et8oXcGPnP9ZFs5DcZUcS--
+>  linux-user/m68k/target_cpu.h |  2 +-
+>  target/m68k/cpu.h            |  5 -----
+>  linux-user/m68k-sim.c        |  3 +--
+>  linux-user/m68k/cpu_loop.c   |  2 +-
+>  target/m68k/helper.c         | 33 ++++++++++++---------------------
+>  target/m68k/m68k-semi.c      |  4 ++--
+>  target/m68k/op_helper.c      | 12 ++++++------
+>  target/m68k/translate.c      |  4 +---
+>  8 files changed, 24 insertions(+), 41 deletions(-)
+>
+> diff --git a/linux-user/m68k/target_cpu.h b/linux-user/m68k/target_cpu.h
+> index 7a26f3c3fc..bc7446fbaf 100644
+> --- a/linux-user/m68k/target_cpu.h
+> +++ b/linux-user/m68k/target_cpu.h
+> @@ -31,7 +31,7 @@ static inline void cpu_clone_regs(CPUM68KState *env, target_ulong newsp)
+>
+>  static inline void cpu_set_tls(CPUM68KState *env, target_ulong newtls)
+>  {
+> -    CPUState *cs = CPU(m68k_env_get_cpu(env));
+> +    CPUState *cs = env_cpu(env);
+>      TaskState *ts = cs->opaque;
+>
+>      ts->tp_value = newtls;
+> diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+> index 43ef30b7cb..f8d5a0819b 100644
+> --- a/target/m68k/cpu.h
+> +++ b/target/m68k/cpu.h
+> @@ -163,11 +163,6 @@ struct M68kCPU {
+>      CPUM68KState env;
+>  };
+>
+> -static inline M68kCPU *m68k_env_get_cpu(CPUM68KState *env)
+> -{
+> -    return container_of(env, M68kCPU, env);
+> -}
+> -
+>  #define ENV_OFFSET offsetof(M68kCPU, env)
+>
+>  void m68k_cpu_do_interrupt(CPUState *cpu);
+> diff --git a/linux-user/m68k-sim.c b/linux-user/m68k-sim.c
+> index 34d332d8b1..9bc6ff3d3a 100644
+> --- a/linux-user/m68k-sim.c
+> +++ b/linux-user/m68k-sim.c
+> @@ -91,7 +91,6 @@ static int translate_openflags(int flags)
+>  #define ARG(x) tswap32(args[x])
+>  void do_m68k_simcall(CPUM68KState *env, int nr)
+>  {
+> -    M68kCPU *cpu = m68k_env_get_cpu(env);
+>      uint32_t *args;
+>
+>      args = (uint32_t *)(unsigned long)(env->aregs[7] + 4);
+> @@ -159,6 +158,6 @@ void do_m68k_simcall(CPUM68KState *env, int nr)
+>          check_err(env, lseek(ARG(0), (int32_t)ARG(1), ARG(2)));
+>          break;
+>      default:
+> -        cpu_abort(CPU(cpu), "Unsupported m68k sim syscall %d\n", nr);
+> +        cpu_abort(env_cpu(env), "Unsupported m68k sim syscall %d\n", nr);
+>      }
+>  }
+> diff --git a/linux-user/m68k/cpu_loop.c b/linux-user/m68k/cpu_loop.c
+> index 42d8d841ea..f2c33057b3 100644
+> --- a/linux-user/m68k/cpu_loop.c
+> +++ b/linux-user/m68k/cpu_loop.c
+> @@ -23,7 +23,7 @@
+>
+>  void cpu_loop(CPUM68KState *env)
+>  {
+> -    CPUState *cs = CPU(m68k_env_get_cpu(env));
+> +    CPUState *cs = env_cpu(env);
+>      int trapnr;
+>      unsigned int n;
+>      target_siginfo_t info;
+> diff --git a/target/m68k/helper.c b/target/m68k/helper.c
+> index d958a34959..6699f056a4 100644
+> --- a/target/m68k/helper.c
+> +++ b/target/m68k/helper.c
+> @@ -168,8 +168,6 @@ void m68k_cpu_init_gdb(M68kCPU *cpu)
+>
+>  void HELPER(cf_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
+>  {
+> -    M68kCPU *cpu = m68k_env_get_cpu(env);
+> -
+>      switch (reg) {
+>      case M68K_CR_CACR:
+>          env->cacr = val;
+> @@ -186,7 +184,7 @@ void HELPER(cf_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
+>          break;
+>      /* TODO: Implement control registers.  */
+>      default:
+> -        cpu_abort(CPU(cpu),
+> +        cpu_abort(env_cpu(env),
+>                    "Unimplemented control register write 0x%x = 0x%x\n",
+>                    reg, val);
+>      }
+> @@ -194,8 +192,6 @@ void HELPER(cf_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
+>
+>  void HELPER(m68k_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
+>  {
+> -    M68kCPU *cpu = m68k_env_get_cpu(env);
+> -
+>      switch (reg) {
+>      /* MC680[1234]0 */
+>      case M68K_CR_SFC:
+> @@ -248,14 +244,13 @@ void HELPER(m68k_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
+>          env->mmu.ttr[M68K_DTTR1] = val;
+>          return;
+>      }
+> -    cpu_abort(CPU(cpu), "Unimplemented control register write 0x%x = 0x%x\n",
+> +    cpu_abort(env_cpu(env),
+> +              "Unimplemented control register write 0x%x = 0x%x\n",
+>                reg, val);
+>  }
+>
+>  uint32_t HELPER(m68k_movec_from)(CPUM68KState *env, uint32_t reg)
+>  {
+> -    M68kCPU *cpu = m68k_env_get_cpu(env);
+> -
+>      switch (reg) {
+>      /* MC680[1234]0 */
+>      case M68K_CR_SFC:
+> @@ -292,7 +287,7 @@ uint32_t HELPER(m68k_movec_from)(CPUM68KState *env, uint32_t reg)
+>      case M68K_CR_DTT1:
+>          return env->mmu.ttr[M68K_DTTR1];
+>      }
+> -    cpu_abort(CPU(cpu), "Unimplemented control register read 0x%x\n",
+> +    cpu_abort(env_cpu(env), "Unimplemented control register read 0x%x\n",
+>                reg);
+>  }
+>
+> @@ -401,8 +396,7 @@ static void dump_address_map(CPUM68KState *env, uint32_t root_pointer)
+>      uint32_t last_logical, last_physical;
+>      int32_t size;
+>      int last_attr = -1, attr = -1;
+> -    M68kCPU *cpu = m68k_env_get_cpu(env);
+> -    CPUState *cs = CPU(cpu);
+> +    CPUState *cs = env_cpu(env);
+>
+>      if (env->mmu.tcr & M68K_TCR_PAGE_8K) {
+>          /* 8k page */
+> @@ -635,8 +629,7 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
+>                                  int *prot, target_ulong address,
+>                                  int access_type, target_ulong *page_size)
+>  {
+> -    M68kCPU *cpu = m68k_env_get_cpu(env);
+> -    CPUState *cs = CPU(cpu);
+> +    CPUState *cs = env_cpu(env);
+>      uint32_t entry;
+>      uint32_t next;
+>      target_ulong page_mask;
+> @@ -1128,7 +1121,7 @@ void HELPER(mac_set_flags)(CPUM68KState *env, uint32_t acc)
+>          z = n;                                                             \
+>          break;                                                             \
+>      default:                                                               \
+> -        cpu_abort(CPU(m68k_env_get_cpu(env)), "Bad CC_OP %d", op);         \
+> +        cpu_abort(env_cpu(env), "Bad CC_OP %d", op);                       \
+>      }                                                                      \
+>  } while (0)
+>
+> @@ -1311,8 +1304,6 @@ void HELPER(set_mac_extu)(CPUM68KState *env, uint32_t val, uint32_t acc)
+>  #if defined(CONFIG_SOFTMMU)
+>  void HELPER(ptest)(CPUM68KState *env, uint32_t addr, uint32_t is_read)
+>  {
+> -    M68kCPU *cpu = m68k_env_get_cpu(env);
+> -    CPUState *cs = CPU(cpu);
+>      hwaddr physical;
+>      int access_type;
+>      int prot;
+> @@ -1337,7 +1328,7 @@ void HELPER(ptest)(CPUM68KState *env, uint32_t addr, uint32_t is_read)
+>      if (ret == 0) {
+>          addr &= TARGET_PAGE_MASK;
+>          physical += addr & (page_size - 1);
+> -        tlb_set_page(cs, addr, physical,
+> +        tlb_set_page(env_cpu(env), addr, physical,
+>                       prot, access_type & ACCESS_SUPER ?
+>                       MMU_KERNEL_IDX : MMU_USER_IDX, page_size);
+>      }
+> @@ -1345,18 +1336,18 @@ void HELPER(ptest)(CPUM68KState *env, uint32_t addr, uint32_t is_read)
+>
+>  void HELPER(pflush)(CPUM68KState *env, uint32_t addr, uint32_t opmode)
+>  {
+> -    M68kCPU *cpu = m68k_env_get_cpu(env);
+> +    CPUState *cs = env_cpu(env);
+>
+>      switch (opmode) {
+>      case 0: /* Flush page entry if not global */
+>      case 1: /* Flush page entry */
+> -        tlb_flush_page(CPU(cpu), addr);
+> +        tlb_flush_page(cs, addr);
+>          break;
+>      case 2: /* Flush all except global entries */
+> -        tlb_flush(CPU(cpu));
+> +        tlb_flush(cs);
+>          break;
+>      case 3: /* Flush all entries */
+> -        tlb_flush(CPU(cpu));
+> +        tlb_flush(cs);
+>          break;
+>      }
+>  }
+> diff --git a/target/m68k/m68k-semi.c b/target/m68k/m68k-semi.c
+> index 1402145c8f..6716b93b5a 100644
+> --- a/target/m68k/m68k-semi.c
+> +++ b/target/m68k/m68k-semi.c
+> @@ -421,7 +421,7 @@ void do_m68k_semihosting(CPUM68KState *env, int nr)
+>      case HOSTED_INIT_SIM:
+>  #if defined(CONFIG_USER_ONLY)
+>          {
+> -        CPUState *cs = CPU(m68k_env_get_cpu(env));
+> +        CPUState *cs = env_cpu(env);
+>          TaskState *ts = cs->opaque;
+>          /* Allocate the heap using sbrk.  */
+>          if (!ts->heap_limit) {
+> @@ -454,7 +454,7 @@ void do_m68k_semihosting(CPUM68KState *env, int nr)
+>  #endif
+>          return;
+>      default:
+> -        cpu_abort(CPU(m68k_env_get_cpu(env)), "Unsupported semihosting syscall %d\n", nr);
+> +        cpu_abort(env_cpu(env), "Unsupported semihosting syscall %d\n", nr);
+>          result = 0;
+>      }
+>  failed:
+> diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
+> index 13fcaa74ef..39aa9310e1 100644
+> --- a/target/m68k/op_helper.c
+> +++ b/target/m68k/op_helper.c
+> @@ -211,7 +211,7 @@ static const char *m68k_exception_name(int index)
+>
+>  static void cf_interrupt_all(CPUM68KState *env, int is_hw)
+>  {
+> -    CPUState *cs = CPU(m68k_env_get_cpu(env));
+> +    CPUState *cs = env_cpu(env);
+>      uint32_t sp;
+>      uint32_t sr;
+>      uint32_t fmt;
+> @@ -289,7 +289,7 @@ static inline void do_stack_frame(CPUM68KState *env, uint32_t *sp,
+>  {
+>      if (m68k_feature(env, M68K_FEATURE_QUAD_MULDIV)) {
+>          /*  all except 68000 */
+> -        CPUState *cs = CPU(m68k_env_get_cpu(env));
+> +        CPUState *cs = env_cpu(env);
+>          switch (format) {
+>          case 4:
+>              *sp -= 4;
+> @@ -314,7 +314,7 @@ static inline void do_stack_frame(CPUM68KState *env, uint32_t *sp,
+>
+>  static void m68k_interrupt_all(CPUM68KState *env, int is_hw)
+>  {
+> -    CPUState *cs = CPU(m68k_env_get_cpu(env));
+> +    CPUState *cs = env_cpu(env);
+>      uint32_t sp;
+>      uint32_t retaddr;
+>      uint32_t vector;
+> @@ -526,7 +526,7 @@ bool m68k_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+>
+>  static void raise_exception_ra(CPUM68KState *env, int tt, uintptr_t raddr)
+>  {
+> -    CPUState *cs = CPU(m68k_env_get_cpu(env));
+> +    CPUState *cs = env_cpu(env);
+>
+>      cs->exception_index = tt;
+>      cpu_loop_exit_restore(cs, raddr);
+> @@ -1056,7 +1056,7 @@ void HELPER(chk)(CPUM68KState *env, int32_t val, int32_t ub)
+>      env->cc_c = 0 <= ub ? val < 0 || val > ub : val > ub && val < 0;
+>
+>      if (val < 0 || val > ub) {
+> -        CPUState *cs = CPU(m68k_env_get_cpu(env));
+> +        CPUState *cs = env_cpu(env);
+>
+>          /* Recover PC and CC_OP for the beginning of the insn.  */
+>          cpu_restore_state(cs, GETPC(), true);
+> @@ -1087,7 +1087,7 @@ void HELPER(chk2)(CPUM68KState *env, int32_t val, int32_t lb, int32_t ub)
+>      env->cc_c = lb <= ub ? val < lb || val > ub : val > ub && val < lb;
+>
+>      if (env->cc_c) {
+> -        CPUState *cs = CPU(m68k_env_get_cpu(env));
+> +        CPUState *cs = env_cpu(env);
+>
+>          /* Recover PC and CC_OP for the beginning of the insn.  */
+>          cpu_restore_state(cs, GETPC(), true);
+> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+> index 58596278c2..e206b5e78a 100644
+> --- a/target/m68k/translate.c
+> +++ b/target/m68k/translate.c
+> @@ -4778,14 +4778,12 @@ DISAS_INSN(wddata)
+>
+>  DISAS_INSN(wdebug)
+>  {
+> -    M68kCPU *cpu = m68k_env_get_cpu(env);
+> -
+>      if (IS_USER(s)) {
+>          gen_exception(s, s->base.pc_next, EXCP_PRIVILEGE);
+>          return;
+>      }
+>      /* TODO: Implement wdebug.  */
+> -    cpu_abort(CPU(cpu), "WDEBUG not implemented");
+> +    cpu_abort(env_cpu(env), "WDEBUG not implemented");
+>  }
+>  #endif
+>
+> --
+> 2.17.1
+>
+>
 
