@@ -5,79 +5,79 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 077D9C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 20:57:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED639C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 20:59:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C049A2177B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 20:57:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A36042177B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 20:59:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BDF4gRkt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C049A2177B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U6dcIsiA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A36042177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60875 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60894 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOq70-0001VM-1T
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 16:57:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48242)
+	id 1hOq8I-0002Oy-19
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 16:59:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hOq6A-0001D7-CG
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 16:57:03 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hOq75-0001fF-2Z
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 16:58:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hOq68-00020D-Sd
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 16:57:02 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:34257)
+	(envelope-from <alistair23@gmail.com>) id 1hOq73-0002LO-8k
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 16:57:59 -0400
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:34770)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hOq68-0001zS-Fq; Thu, 09 May 2019 16:57:00 -0400
-Received: by mail-lj1-x242.google.com with SMTP id j24so2434721ljg.1;
-	Thu, 09 May 2019 13:56:59 -0700 (PDT)
+	id 1hOq71-0002JW-DU; Thu, 09 May 2019 16:57:56 -0400
+Received: by mail-lf1-x144.google.com with SMTP id v18so2588643lfi.1;
+	Thu, 09 May 2019 13:57:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
 	:cc:content-transfer-encoding;
-	bh=VYAcRdT/mb3BHhDgApPEA9BvSdyHhy6Gi1+JCxkx5oI=;
-	b=BDF4gRktlRQZFUXk23niQPLbuJDmanPaydeDWXJx4IwKiRJgYZ4UZdJbqqcWqrsuXD
-	SakAwUNklTfZ/4dlOuPYiDygKdPOppiC1UsMMJBe7Hw+p/UOIrymvtOYOZdtFiVI3IVn
-	f2dl/0Lmh/aXTxyKt2mnJVjc2GyPHcWPgzmzpxEWnIgcq4jviYraevuo/MACC7sQUL+e
-	kiiFwR7F9SetJwIXf6MxGPiHw9NoUiVGVAJtSelw+js+D8GnoRJqVJFvQMdlhIEzmVtO
-	/1BRNhALezCI/orWlHu3pLz1iQ5GZW37wDWmivmdmb1oBWvjfb5xSDIlxk7/bZ4VqqVL
-	fytQ==
+	bh=1gUsH8RD9e4/YMZn7Mv0dErig9AgWg5mBmnpGnGRHKI=;
+	b=U6dcIsiAWIxN5BWKQfjVWH09XLFotGbw4ZijEh08TE0qr1hcW3so8k4ConStN07TJn
+	1qJGxYq3eg9ZzbW/Q6awOlnd/yoIht9Qer0HymhCPLZ/xrdtkXMJKVXtRKG0cC2mshnK
+	jzhOWg72JYxSv1d4Pc75otQfqAC1YTMIGS2m4g0dB/OWOPiXFbQrLJKsYavp3PxjgokN
+	WpkNAeENQNfitL09VM01ulzOX+l0ZKH30BlZOgJ4y1HFKByAmH14bbl3IbSxWUZHt5yK
+	S5lHLiAxEjLVZ96andYrN750VcCjSgzsBCzsmSng+Pub8ULYmjGyfYTHQv7gbIDvISr9
+	K9ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=VYAcRdT/mb3BHhDgApPEA9BvSdyHhy6Gi1+JCxkx5oI=;
-	b=pALrfCxC9gWbb51j8D2/7vRJdWMSB8gq940nVQvkuKJnONQ2iYjYFevx0bIkv49hC4
-	wbtoo4D1hQUoVyoh4g3pTnBbhFhPPylVAXebewTyAfQgrH+hugetuf5Yo4PfT6GBfoCS
-	PEP/3JntWmZ4HrZ0TSkLedbChFTMPYPnycfH16Icrp3HnOr30SfLcgDDaX0bhJb5iUXd
-	7CO04MXISFKFTLwV4qr6UE00nWLLQO5gTy2TEkeggzzBq2Pf38EZQ3oleWao2bIiDWYB
-	w3IwnHGVHw/pNbg+Yz+xvVgMpYV+1K9vU8t7M/JbtdLA+NE3hjl1eV23V3yVg6LFLjuE
-	foXQ==
-X-Gm-Message-State: APjAAAX2rd5GXeW9M4w6dMl6ApiFLmhakhFyQlN9tqTp7Tuh/NRDEX2Z
-	qu6QrdhRwyVtFWIQ/ArhKp5sq7Xy4XIYQtKNbNM=
-X-Google-Smtp-Source: APXvYqwazAyvVzvZRaK9AqKEfl1MDLUv0JuYRxyDdww7IYSit0EQHBK9G1qKhoOtlrfJvOpIB4hf7Wrka2YVo/cHMm0=
-X-Received: by 2002:a2e:9692:: with SMTP id q18mr3418371lji.89.1557435417716; 
-	Thu, 09 May 2019 13:56:57 -0700 (PDT)
+	bh=1gUsH8RD9e4/YMZn7Mv0dErig9AgWg5mBmnpGnGRHKI=;
+	b=atFWgxgzEHY+tyrYXeQWMt7HTPTRtxD1eFtfFgSSbayAqAV54lDwcCnYa0AM9P62GE
+	iWA8TFvjbK/Xd7Hb0S/a8bd97zWrD4eS3RvmT9MXaNNLjYROHeauu6681yhHMjEGKVDI
+	yqPceOMWUrwaCZtSendQH/2uLsXKMxvHk9gBg+AXLU2zQ3HO9tIjNNtW6Gpq+A3DtIfk
+	jNXERQ62D4N7n7uKFiYwsSnNCABPMNVmMbrHNObP3JN0r+wJA77YK9MOOMyOznSXFgYh
+	iagsxzoNSbVNCR77GvfoyiVCUXLANHQRqtK39kgtYZzhGBETb1GnfJulBH4Ws23KHn7j
+	RIPg==
+X-Gm-Message-State: APjAAAVXjQBOCNrPImuTDtSirRRViUqyOtj3dKRJvptVLgsy+BlnvCHG
+	RrsMUgKmy+0v2SGpeG2ycEaCOu2TLNjbX5/LXBg=
+X-Google-Smtp-Source: APXvYqzlWAsL44wXHRxYI2Ee2C4Karx+HKhmdMziH5eALOZpvNDSVtJDmJ2iMun6soNNzqUvLpjM+YdwiNNL9dZIkrY=
+X-Received: by 2002:ac2:523a:: with SMTP id i26mr3634344lfl.118.1557435472816; 
+	Thu, 09 May 2019 13:57:52 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190507163416.24647-1-philmd@redhat.com>
-	<20190507163416.24647-5-philmd@redhat.com>
-In-Reply-To: <20190507163416.24647-5-philmd@redhat.com>
+	<20190507163416.24647-6-philmd@redhat.com>
+In-Reply-To: <20190507163416.24647-6-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 9 May 2019 13:54:50 -0700
-Message-ID: <CAKmqyKMzRiAsd+wazeY9ExAkWBs4p0DMsTHThKMMFciaLFED=w@mail.gmail.com>
+Date: Thu, 9 May 2019 13:55:45 -0700
+Message-ID: <CAKmqyKO+drSjQ1x9J6HkjA0kJZ3qdq2TZnMvB7=5Gf+qAZ4Bsg@mail.gmail.com>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH v2 04/16] hw/arm/bcm2835: Use TYPE_PL011
- instead of hardcoded string
+X-Received-From: 2a00:1450:4864:20::144
+Subject: Re: [Qemu-devel] [PATCH v2 05/16] hw/arm/bcm2835: Use
+ object_initialize() on PL011State
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -114,8 +114,15 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 7, 2019 at 9:41 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+On Tue, May 7, 2019 at 9:42 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
 om> wrote:
+>
+> To be coherent with the other peripherals contained in the
+> BCM2835PeripheralState structure, directly allocate the PL011State
+> (instead of using the pl011 uart as a pointer to a SysBusDevice).
+>
+> Initialize the PL011State with object_initialize() instead of
+> object_new().
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
@@ -124,36 +131,63 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/arm/bcm2835_peripherals.c         | 2 +-
->  include/hw/arm/bcm2835_peripherals.h | 1 +
->  2 files changed, 2 insertions(+), 1 deletion(-)
+>  hw/arm/bcm2835_peripherals.c         | 14 +++++++-------
+>  include/hw/arm/bcm2835_peripherals.h |  2 +-
+>  2 files changed, 8 insertions(+), 8 deletions(-)
 >
 > diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-> index 6be7660e8cb..7ffb51b6927 100644
+> index 7ffb51b6927..2931a82a25a 100644
 > --- a/hw/arm/bcm2835_peripherals.c
 > +++ b/hw/arm/bcm2835_peripherals.c
-> @@ -46,7 +46,7 @@ static void bcm2835_peripherals_init(Object *obj)
+> @@ -46,9 +46,9 @@ static void bcm2835_peripherals_init(Object *obj)
 >      qdev_set_parent_bus(DEVICE(&s->ic), sysbus_get_default());
 >
 >      /* UART0 */
-> -    s->uart0 =3D SYS_BUS_DEVICE(object_new("pl011"));
-> +    s->uart0 =3D SYS_BUS_DEVICE(object_new(TYPE_PL011));
->      object_property_add_child(obj, "uart0", OBJECT(s->uart0), NULL);
->      qdev_set_parent_bus(DEVICE(s->uart0), sysbus_get_default());
+> -    s->uart0 =3D SYS_BUS_DEVICE(object_new(TYPE_PL011));
+> -    object_property_add_child(obj, "uart0", OBJECT(s->uart0), NULL);
+> -    qdev_set_parent_bus(DEVICE(s->uart0), sysbus_get_default());
+> +    object_initialize(&s->uart0, sizeof(s->uart0), TYPE_PL011);
+> +    object_property_add_child(obj, "uart0", OBJECT(&s->uart0), NULL);
+> +    qdev_set_parent_bus(DEVICE(&s->uart0), sysbus_get_default());
 >
+>      /* AUX / UART1 */
+>      object_initialize(&s->aux, sizeof(s->aux), TYPE_BCM2835_AUX);
+> @@ -166,16 +166,16 @@ static void bcm2835_peripherals_realize(DeviceState=
+ *dev, Error **errp)
+>      sysbus_pass_irq(SYS_BUS_DEVICE(s), SYS_BUS_DEVICE(&s->ic));
+>
+>      /* UART0 */
+> -    qdev_prop_set_chr(DEVICE(s->uart0), "chardev", serial_hd(0));
+> -    object_property_set_bool(OBJECT(s->uart0), true, "realized", &err);
+> +    qdev_prop_set_chr(DEVICE(&s->uart0), "chardev", serial_hd(0));
+> +    object_property_set_bool(OBJECT(&s->uart0), true, "realized", &err);
+>      if (err) {
+>          error_propagate(errp, err);
+>          return;
+>      }
+>
+>      memory_region_add_subregion(&s->peri_mr, UART0_OFFSET,
+> -                                sysbus_mmio_get_region(s->uart0, 0));
+> -    sysbus_connect_irq(s->uart0, 0,
+> +                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->uart0), 0));
+> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->uart0), 0,
+>          qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
+>                                 INTERRUPT_UART));
+>      /* AUX / UART1 */
 > diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm283=
 5_peripherals.h
-> index f5b193f6707..959508d57dd 100644
+> index 959508d57dd..e79c21771fe 100644
 > --- a/include/hw/arm/bcm2835_peripherals.h
 > +++ b/include/hw/arm/bcm2835_peripherals.h
-> @@ -13,6 +13,7 @@
+> @@ -38,7 +38,7 @@ typedef struct BCM2835PeripheralState {
+>      MemoryRegion ram_alias[4];
+>      qemu_irq irq, fiq;
 >
->  #include "qemu-common.h"
->  #include "hw/sysbus.h"
-> +#include "hw/char/pl011.h"
->  #include "hw/char/bcm2835_aux.h"
->  #include "hw/display/bcm2835_fb.h"
->  #include "hw/dma/bcm2835_dma.h"
+> -    SysBusDevice *uart0;
+> +    PL011State uart0;
+>      BCM2835AuxState aux;
+>      BCM2835FBState fb;
+>      BCM2835DMAState dma;
 > --
 > 2.20.1
 >
