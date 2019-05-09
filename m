@@ -4,80 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D8F2C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 06:13:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F175C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 06:13:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49156208C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 06:13:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C74D208C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 06:13:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jDwQO+o4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49156208C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KKKprBxn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C74D208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48708 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48710 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOcIr-00071g-Dn
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 02:13:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44914)
+	id 1hOcIy-00077Q-9p
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 02:13:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOc95-00064N-Kz
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:03:08 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hOc9A-00069J-PK
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:03:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOc94-00078i-GQ
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:03:07 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:44025)
+	(envelope-from <richard.henderson@linaro.org>) id 1hOc99-0007Bk-2R
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:03:12 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:40909)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hOc94-00078I-AW
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:03:06 -0400
-Received: by mail-pg1-x544.google.com with SMTP id t22so619389pgi.10
-	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 23:03:06 -0700 (PDT)
+	id 1hOc98-0007BA-Sg
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:03:11 -0400
+Received: by mail-pf1-x444.google.com with SMTP id u17so718131pfn.7
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 23:03:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=SbdgfaYjW8ILfhiu0/mJqWKm/tBVnd5f44zvoNG8J24=;
-	b=jDwQO+o4P71Y4cY4cnQJeEsM1kiC9c3aZ+io9ORyRcq/WdPUtcEXUzJAYv2s4lGujG
-	fMQSrDFlbvxjOMr9pz5esRYICstDy7yr97zTTHoBoHilP/fq8JUreeW/m/7XX0Cu6YRR
-	meHzUNKLIbY1n4ATASKb5HAOMdks+u4OoNXdWH5KGtgqqUERny9aGNdjsGnY3keP0p01
-	Ni3jlhOEjxcRkk36wwaZM+rchm3JOg3g6MBeFAhV9c6jLtSd/SJQWBv6596fGxbJVfmw
-	Tb3SB6S6+0XWpMVEMKX+Fp6B5VVn01+wtcI0GCvmMoimI+fKG11C3raqPWZKp09OXoIV
-	6ZlA==
+	bh=jFiOLbzDz1sji7rdhiIl1UIG07vaIVhoy6dgsMAsHtw=;
+	b=KKKprBxnMvcxU8Zie6qY4KuYSEqkBnW9bXJr6F8B8B4qzvTCNiv20kitMdnJa+VuJI
+	qqp7c9Iom16ZRQBwaa/aZc10nbKC9eQMYn0Bfy89c2DEUP/xTZLa7tLPC3lo/kV0rSk3
+	mCgjc11u5IuonFBdK228hHyg6Vjv+Z3XSp/lnJtEGfjqI60VvgJ05vpGu/2I2a8zzxzI
+	hT/OC86A4jwMebTjnfUgiRocKdwNlTPpN/mEhDHX7I/6HLBpvrrQaJ9z5Tel9thSD3p7
+	Gw2xjGozhdHDAUT1RFiC91CVl/J4YF/LtulpVDrZeIPDOhAvzuAmJng4Uz+fvyfgW++b
+	A7eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=SbdgfaYjW8ILfhiu0/mJqWKm/tBVnd5f44zvoNG8J24=;
-	b=QZ3VU8KI3T/Hb0nvuRZ4IRtj5/t15OXYAKvGeiBO1/K+uaNprXmyVP8b8dTHq7uTTC
-	PZ3qF3r+dc5EIcPoZhv+z3a7CjWMglhqi5w/zV5+MsUw+0gC01k3hjU8SZ1c85fuL+J2
-	t8G8OFhCXZ07uG+rNhTY1Aj5mza9Pgd0grVvAJIG0iZE7ZeyljS5us00eDWaXCUNRyde
-	qbO/B7XPviDWYaEc44SqeRioiOLmiKy6wq8Icrg0zgzgh+pQNHlpW4ceyX9Eo8iXm0gp
-	6/bzaEi1IunG0P4c+XvAZc9sKD8g8v9xz1skocrfY/n1Z98f3XiNpeTg5ffjWaz+6UqA
-	qY4g==
-X-Gm-Message-State: APjAAAUqkzUzPtdO3DYxVKzG4jZru1jEiLcPleanJb/VAzd1LEKdywSz
-	WAll8fN76sWLrEsxg6jGBKydbxp/Zg4=
-X-Google-Smtp-Source: APXvYqxru0U+okKZnXv8HFwn+w6p8xaakgPOQ6BtRHZ+Qne6Hj4WSeMJvrhQs+C1T2xOUQvQylJWwQ==
-X-Received: by 2002:aa7:81d0:: with SMTP id c16mr2567292pfn.132.1557381785073; 
-	Wed, 08 May 2019 23:03:05 -0700 (PDT)
+	bh=jFiOLbzDz1sji7rdhiIl1UIG07vaIVhoy6dgsMAsHtw=;
+	b=eHFhUNXqMvioMFepz8O/cpcW090ZjDb5pR/rZ4GnrG3NXnAmamExPaaXDLWC1mv+dL
+	uPrcoDg9dQawacWvMxwlBmablso2b2uf92KySg4zowbvetzHLj5Nv5J+p3lON4+0cvnz
+	Lgn9PLxNfs1qi+s9d3dK9OgQbjwsGKqY8efbAe+oEZ3AL3lUzZ9RaCEHQDvq/QqW91ed
+	7NHfJ2iGOPCvVdhevEj7w4h+gnKOcdPNdXpsubGsJEPDBtFmd9y9+ojrjHeGEmc/WoCa
+	dZKOIq5ry/RJkUXVrT0ZemoMfYYHp6kkXwKDaUCLSoCziQUcwY2jtTq8H9lAAgGYWTtF
+	5HLg==
+X-Gm-Message-State: APjAAAUGdfvnII1CoV1SWgjJttE9z/W/biDpZnq+tRvkGxMme2oy5Wbu
+	gfq1XPVlzeC3/ZXSdhqMxlUvjnwMCq0=
+X-Google-Smtp-Source: APXvYqwwQHjNYzKjJTT3Jo8vsiXtDySrP8mo72+FHTj88IBXhnBNcWL6DpiYBaNgZlCxaCvJFHMErw==
+X-Received: by 2002:a63:5516:: with SMTP id j22mr2990498pgb.370.1557381789744; 
+	Wed, 08 May 2019 23:03:09 -0700 (PDT)
 Received: from localhost.localdomain (97-113-27-95.tukw.qwest.net.
 	[97.113.27.95])
-	by smtp.gmail.com with ESMTPSA id n7sm1496109pff.45.2019.05.08.23.03.03
+	by smtp.gmail.com with ESMTPSA id n7sm1496109pff.45.2019.05.08.23.03.08
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 08 May 2019 23:03:04 -0700 (PDT)
+	Wed, 08 May 2019 23:03:09 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  8 May 2019 23:02:32 -0700
-Message-Id: <20190509060246.4031-14-richard.henderson@linaro.org>
+Date: Wed,  8 May 2019 23:02:36 -0700
+Message-Id: <20190509060246.4031-18-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190509060246.4031-1-richard.henderson@linaro.org>
 References: <20190509060246.4031-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: [Qemu-devel] [PATCH v2 13/27] target/moxie: Convert to
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: [Qemu-devel] [PATCH v2 17/27] target/riscv: Convert to
  CPUClass::tlb_fill
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -90,151 +91,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anthony Green <green@moxielogic.com>
+Cc: Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Remove the user-only functions, as we don't have a user-only config.
-Fix the unconditional call to tlb_set_page, even if the translation
-failed.
+Note that env->pc is removed from the qemu_log as that value is garbage.
+The PC isn't recovered until cpu_restore_state, called from
+cpu_loop_exit_restore, called from riscv_raise_exception.
 
-Cc: Anthony Green <green@moxielogic.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-riscv@nongnu.org
+Cc: Palmer Dabbelt <palmer@sifive.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/moxie/cpu.h    |  5 ++--
- target/moxie/cpu.c    |  5 ++--
- target/moxie/helper.c | 61 ++++++++++---------------------------------
- 3 files changed, 19 insertions(+), 52 deletions(-)
+ target/riscv/cpu.h        |  5 +++--
+ target/riscv/cpu.c        |  5 ++---
+ target/riscv/cpu_helper.c | 46 ++++++++++++++++++---------------------
+ 3 files changed, 26 insertions(+), 30 deletions(-)
 
-diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
-index f3b6d83ae7..a63a96bc05 100644
---- a/target/moxie/cpu.h
-+++ b/target/moxie/cpu.h
-@@ -139,7 +139,8 @@ static inline void cpu_get_tb_cpu_state(CPUMoxieState *env, target_ulong *pc,
-     *flags = 0;
- }
- 
--int moxie_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size,
--                               int rw, int mmu_idx);
-+bool moxie_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 7d9f48973f..c17184f4e4 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -261,8 +261,9 @@ hwaddr riscv_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ void  riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+                                     MMUAccessType access_type, int mmu_idx,
+                                     uintptr_t retaddr);
+-int riscv_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size,
+-                              int rw, int mmu_idx);
++bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
 +                        MMUAccessType access_type, int mmu_idx,
 +                        bool probe, uintptr_t retaddr);
+ char *riscv_isa_string(RISCVCPU *cpu);
+ void riscv_cpu_list(void);
  
- #endif /* MOXIE_CPU_H */
-diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
-index 46434e65ba..02b2b47574 100644
---- a/target/moxie/cpu.c
-+++ b/target/moxie/cpu.c
-@@ -112,9 +112,8 @@ static void moxie_cpu_class_init(ObjectClass *oc, void *data)
-     cc->do_interrupt = moxie_cpu_do_interrupt;
-     cc->dump_state = moxie_cpu_dump_state;
-     cc->set_pc = moxie_cpu_set_pc;
--#ifdef CONFIG_USER_ONLY
--    cc->handle_mmu_fault = moxie_cpu_handle_mmu_fault;
--#else
-+    cc->tlb_fill = moxie_cpu_tlb_fill;
-+#ifndef CONFIG_USER_ONLY
-     cc->get_phys_page_debug = moxie_cpu_get_phys_page_debug;
-     cc->vmsd = &vmstate_moxie_cpu;
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 1bcf4eaeb8..34a54ef2ed 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -355,9 +355,8 @@ static void riscv_cpu_class_init(ObjectClass *c, void *data)
  #endif
-diff --git a/target/moxie/helper.c b/target/moxie/helper.c
-index 287a45232c..216cef057e 100644
---- a/target/moxie/helper.c
-+++ b/target/moxie/helper.c
-@@ -26,18 +26,10 @@
- #include "qemu/host-utils.h"
- #include "exec/helper-proto.h"
+     cc->gdb_stop_before_watchpoint = true;
+     cc->disas_set_info = riscv_cpu_disas_set_info;
+-#ifdef CONFIG_USER_ONLY
+-    cc->handle_mmu_fault = riscv_cpu_handle_mmu_fault;
+-#else
++    cc->tlb_fill = riscv_cpu_tlb_fill;
++#ifndef CONFIG_USER_ONLY
+     cc->do_unaligned_access = riscv_cpu_do_unaligned_access;
+     cc->get_phys_page_debug = riscv_cpu_get_phys_page_debug;
+ #endif
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index b17f169681..2535435260 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -379,53 +379,49 @@ void riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+     riscv_raise_exception(env, cs->exception_index, retaddr);
+ }
  
--/* Try to fill the TLB and return an exception if error. If retaddr is
--   NULL, it means that the function was called in C code (i.e. not
--   from generated code or from helper.c) */
+-/* called by qemu's softmmu to fill the qemu tlb */
  void tlb_fill(CPUState *cs, target_ulong addr, int size,
-               MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
+         MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
  {
 -    int ret;
--
--    ret = moxie_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
--    if (unlikely(ret)) {
--        cpu_loop_exit_restore(cs, retaddr);
+-    ret = riscv_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
+-    if (ret == TRANSLATE_FAIL) {
+-        RISCVCPU *cpu = RISCV_CPU(cs);
+-        CPURISCVState *env = &cpu->env;
+-        riscv_raise_exception(env, cs->exception_index, retaddr);
 -    }
-+    moxie_cpu_tlb_fill(cs, addr, size, access_type, mmu_idx, false, retaddr);
++    riscv_cpu_tlb_fill(cs, addr, size, access_type, mmu_idx, false, retaddr);
  }
+-
+ #endif
  
- void helper_raise_exception(CPUMoxieState *env, int ex)
-@@ -85,53 +77,29 @@ void helper_debug(CPUMoxieState *env)
-     cpu_loop_exit(cs);
- }
- 
--#if defined(CONFIG_USER_ONLY)
--
--void moxie_cpu_do_interrupt(CPUState *cs)
--{
--    CPUState *cs = CPU(moxie_env_get_cpu(env));
--
--    cs->exception_index = -1;
--}
--
--int moxie_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
--                               int rw, int mmu_idx)
--{
--    MoxieCPU *cpu = MOXIE_CPU(cs);
--
--    cs->exception_index = 0xaa;
--    cpu->env.debug1 = address;
--    cpu_dump_state(cs, stderr, 0);
--    return 1;
--}
--
--#else /* !CONFIG_USER_ONLY */
--
--int moxie_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
--                               int rw, int mmu_idx)
-+bool moxie_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+-int riscv_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
+-        int rw, int mmu_idx)
++bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
 +                        MMUAccessType access_type, int mmu_idx,
 +                        bool probe, uintptr_t retaddr)
  {
-     MoxieCPU *cpu = MOXIE_CPU(cs);
-     CPUMoxieState *env = &cpu->env;
-     MoxieMMUResult res;
-     int prot, miss;
--    target_ulong phy;
--    int r = 1;
- 
-     address &= TARGET_PAGE_MASK;
-     prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
--    miss = moxie_mmu_translate(&res, env, address, rw, mmu_idx);
--    if (miss) {
--        /* handle the miss.  */
--        phy = 0;
--        cs->exception_index = MOXIE_EX_MMU_MISS;
--    } else {
--        phy = res.phy;
--        r = 0;
-+    miss = moxie_mmu_translate(&res, env, address, access_type, mmu_idx);
-+    if (likely(!miss)) {
-+        tlb_set_page(cs, address, res.phy, prot, mmu_idx, TARGET_PAGE_SIZE);
-+        return true;
-+    }
-+    if (probe) {
-+        return false;
-     }
--    tlb_set_page(cs, address, phy, prot, mmu_idx, TARGET_PAGE_SIZE);
--    return r;
--}
- 
-+    cs->exception_index = MOXIE_EX_MMU_MISS;
-+    cpu_loop_exit_restore(cs, retaddr);
-+}
- 
- void moxie_cpu_do_interrupt(CPUState *cs)
- {
-@@ -156,4 +124,3 @@ hwaddr moxie_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-     }
-     return phy;
- }
++#ifndef CONFIG_USER_ONLY
+     RISCVCPU *cpu = RISCV_CPU(cs);
+     CPURISCVState *env = &cpu->env;
+-#if !defined(CONFIG_USER_ONLY)
+     hwaddr pa = 0;
+     int prot;
 -#endif
+     int ret = TRANSLATE_FAIL;
+ 
+-    qemu_log_mask(CPU_LOG_MMU,
+-            "%s pc " TARGET_FMT_lx " ad %" VADDR_PRIx " rw %d mmu_idx \
+-             %d\n", __func__, env->pc, address, rw, mmu_idx);
++    qemu_log_mask(CPU_LOG_MMU, "%s ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
++                  __func__, address, access_type, mmu_idx);
++
++    ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx);
+ 
+-#if !defined(CONFIG_USER_ONLY)
+-    ret = get_physical_address(env, &pa, &prot, address, rw, mmu_idx);
+     qemu_log_mask(CPU_LOG_MMU,
+-            "%s address=%" VADDR_PRIx " ret %d physical " TARGET_FMT_plx
+-             " prot %d\n", __func__, address, ret, pa, prot);
++                  "%s address=%" VADDR_PRIx " ret %d physical " TARGET_FMT_plx
++                  " prot %d\n", __func__, address, ret, pa, prot);
++
+     if (riscv_feature(env, RISCV_FEATURE_PMP) &&
+-        !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << rw)) {
++        !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type)) {
+         ret = TRANSLATE_FAIL;
+     }
+     if (ret == TRANSLATE_SUCCESS) {
+         tlb_set_page(cs, address & TARGET_PAGE_MASK, pa & TARGET_PAGE_MASK,
+                      prot, mmu_idx, TARGET_PAGE_SIZE);
+-    } else if (ret == TRANSLATE_FAIL) {
+-        raise_mmu_exception(env, address, rw);
++        return true;
++    } else if (probe) {
++        return false;
++    } else {
++        raise_mmu_exception(env, address, access_type);
++        riscv_raise_exception(env, cs->exception_index, retaddr);
+     }
+ #else
+-    switch (rw) {
++    switch (access_type) {
+     case MMU_INST_FETCH:
+         cs->exception_index = RISCV_EXCP_INST_PAGE_FAULT;
+         break;
+@@ -436,8 +432,8 @@ int riscv_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
+         cs->exception_index = RISCV_EXCP_STORE_PAGE_FAULT;
+         break;
+     }
++    cpu_loop_exit_restore(cs, retaddr);
+ #endif
+-    return ret;
+ }
+ 
+ /*
 -- 
 2.17.1
 
