@@ -2,91 +2,71 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 175EFC04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:09:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76A32C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:09:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D27B92173C
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:09:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aXYaB+vk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D27B92173C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 375632173C
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:09:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 375632173C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58107 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58110 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOmXU-0006tJ-0p
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 13:09:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49799)
+	id 1hOmXe-00074x-64
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 13:09:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hOmOE-00075n-2z
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:59:27 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hOmRC-0001i4-P2
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:02:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hOmOD-0004xl-0C
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:59:26 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:45063)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hOmOC-0004xD-Nn
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:59:24 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id s15so4009522wra.12
-	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 09:59:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=BruQFJSmyR8ZsEhlY42Yrz/6o7DH3AvksulnhVRaQWU=;
-	b=aXYaB+vktXvYqhzIAlcqMSfT3UIKylD4W5gN16cnli8OURj0OJJyRmSor8Sj9emZX5
-	bClYOyiRXpv4dUFnGmrIroJuV4hRkk5tJN3OY3NxYdQyoT7l76jgjZl4apJ2uF2Zbmp8
-	/xB6CXqlYcNb3EUo4VeTMoPeckhJzCRIGRpgO1wE+6ThS4KCjMZ2jBfPxY/wXtE8YNjJ
-	vRvUhtXq01KtB7VsiKqaUW+g4ihnuxNfFMMlzOAwfYCuojcYQxBO8NFmDvwa+OJhzNoE
-	b0iI1eUb9iiuW3C1iOzSKgGwl/KtVItZgoOeXLQHOG8idI6gmw51qmiCyzrdnGYTnHoC
-	0uTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=BruQFJSmyR8ZsEhlY42Yrz/6o7DH3AvksulnhVRaQWU=;
-	b=KbR7CRBELovGbD7mEn8H89pBBFquURuMJIywabjj4s6d20/hhEfIVJmDNHF2HnuG7e
-	6Lgk9zIaoDgj+6g48Ml95HF9WA95odMQ5tOhkSfVr1wVOiJgKZj36CYhzrTgh3hQkApG
-	Wv+bzrOeh5KTZnNHsZ57vU4LlJnPJEcV/cEcXN/WAbo3v83ilxXiWon5ZqlwjsTytWr7
-	V0zJJg8W/xHCkpcA5l6jeQBU4xHQQlvcMCUmmAfetvVo+z1RUguGirsiqKkCvJIjKF1K
-	C0i2XxqkSwc+kxxkU7E08drgdVRu9++5/mWjrQJp8ZPQDOrhxLfoVGkKGw/aPLtNr1Sl
-	hX7g==
-X-Gm-Message-State: APjAAAWzIpTXxinAq89+T3ApsVYM/GDDZRyzPga24ijV1UrgNahIjqB7
-	MkVBCtoi5ArAYy0XNgQTaVcERQ==
-X-Google-Smtp-Source: APXvYqxjt6iEJwNN/6oioj+FX0PZ2hz4SHpbbhqg/LcfylBgi+rJh32qmec+qRuChMRL2rvl32Ke7g==
-X-Received: by 2002:a5d:458e:: with SMTP id p14mr4043359wrq.318.1557421163682; 
-	Thu, 09 May 2019 09:59:23 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	z17sm3625846wrm.33.2019.05.09.09.59.17
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 09 May 2019 09:59:22 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 7423D1FF87;
-	Thu,  9 May 2019 17:59:13 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Thu,  9 May 2019 17:59:05 +0100
-Message-Id: <20190509165912.10512-18-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190509165912.10512-1-alex.bennee@linaro.org>
-References: <20190509165912.10512-1-alex.bennee@linaro.org>
+	(envelope-from <laurent@vivier.eu>) id 1hOmRB-0006c7-MP
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:02:30 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:49069)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hOmRB-0006bf-DD
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:02:29 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+	1MDyoW-1hWVg617P2-009wnW; Thu, 09 May 2019 19:02:18 +0200
+To: Giuseppe Musacchio <thatlemon@gmail.com>, qemu-devel@nongnu.org
+References: <20190503122007.lkjsvztgt4ycovac@debian>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <466e8902-df09-1f20-1c9e-9e625608744e@vivier.eu>
+Date: Thu, 9 May 2019 19:02:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::42d
-Subject: [Qemu-devel] [PATCH v1 17/23] tests/qemu-iotests/check: Pick a
- default machine if necessary
+In-Reply-To: <20190503122007.lkjsvztgt4ycovac@debian>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:jQVOXQQ9GYng1acHe89GwQNWYZj+tHoSJzGrxHWxUI8x4LPFXLg
+	NNxcT+SU1tXU1znxTdNynY005fDHrYmb2LTJOINBlBDWlmBaQW4GNn1pDrijdZUJ3bgf0wD
+	4WhvmQMorLOxini4IIdTPmM1CF/bIjM5GVS8GZXkjF1RuHqOV92w3DBs1DJJ59b9Vw9X4Uc
+	ylccJ+utLkQy3FG853+jw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:dywa3hX6Q6I=:S6g0RkvMFzJoDnPib75HVC
+	5rQ/ZFbV8WP0+SrVShVLhW/uUJFLtRMHpDvfg2j6NHOqJ72xvGHwJTPEgBMtCnpf7zWHK8sKO
+	f10dDnwNQ2uULCHufiWHLc7QJ6PNUoosgfYiZa07OXbU/chtCIcKnEoS9OHtD0kq2eUJjDEGg
+	QFWsB2FiIsYvNyVZu3aHyvX/Gn2GSnZ0tEpFSZemVc2nhAXNIpij7833VPHoMAVdvrHUoGSfM
+	sqWVWhcKMEe7Ses9fEOCL1na/J4yX885QkJ8ZhoQPGX8au9B2awqBgBqPc7WF7ZD8DSCBP1ID
+	WoUglz/G+86qvwhb/O3BrW+v5RJhldSIEuNasvAfXerL3zvvcv9yf5YLsilJWuhVnNQTBtJsh
+	KyYKdYbTfvL2wPiGLUIuipw6unKV7H5d+cRIoevVAzIN4nAXM9yPFiYSWPw1cbMQBoTzML21i
+	5GsTUWKxUkAm77gpHeTBONNSjtuetAXjMmhHIcp+/wd0WsL5xHODHzFAo0yjQveawaP+vcmR/
+	SZ9kErEtuxtjMGfPioo4o/vYCPVsrt+fTbkFP72jDCxgUeuYIXCTKQOH5+YFmrR7KxYfG0XZZ
+	ZsP30WD1ec99KekIspIAt1TvRuEOg/dv+qbE44japu1hfmYJt+BBisUI9HWJM9aZSP6nNNifn
+	h5NzQf/3EeSybz8DesVD3j1LzphEnTqJc5vljdQJJR6oJhWW5tuB7+9j2pM1JQQfmeVM1TqP0
+	RAl34hkMevynBpK8jq9+ONV9RoOOHV0VtHRqjdB1E1+JxZzTTdGj2HEr/Zg=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.134
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: elf: Map empty PT_LOAD
+ segments
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,65 +78,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	"open list:Block layer core" <qemu-block@nongnu.org>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Max Reitz <mreitz@redhat.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>, qemu-arm@nongnu.org,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: peter.maydell@linaro.org, riku.voipio@iki.fi
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+On 03/05/2019 14:20, Giuseppe Musacchio wrote:
+> Some PT_LOAD segments may be completely zeroed out and their p_filesize
+> is zero, in that case the loader should just allocate a page that's at
+> least p_memsz bytes large (plus eventual alignment padding).
+> 
+> Calling zero_bss does this job for us, all we have to do is make sure we
+> don't try to mmap a zero-length page.
+> 
+> Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>   linux-user/elfload.c | 18 +++++++++++++-----
+>   1 file changed, 13 insertions(+), 5 deletions(-)
+> 
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index c1a2602..138735b 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -2366,11 +2366,19 @@ static void load_elf_image(const char *image_name, int image_fd,
+>               vaddr_ps = TARGET_ELF_PAGESTART(vaddr);
+>               vaddr_len = TARGET_ELF_PAGELENGTH(eppnt->p_filesz + vaddr_po);
+>   
+> -            error = target_mmap(vaddr_ps, vaddr_len,
+> -                                elf_prot, MAP_PRIVATE | MAP_FIXED,
+> -                                image_fd, eppnt->p_offset - vaddr_po);
+> -            if (error == -1) {
+> -                goto exit_perror;
+> +            /*
+> +             * Some segments may be completely empty without any backing file
+> +             * segment, in that case just let zero_bss allocate an empty buffer
+> +             * for it.
+> +             */
+> +            if (eppnt->p_filesz != 0) {
+> +                error = target_mmap(vaddr_ps, vaddr_len, elf_prot,
+> +                                    MAP_PRIVATE | MAP_FIXED,
+> +                                    image_fd, eppnt->p_offset - vaddr_po);
+> +
+> +                if (error == -1) {
+> +                    goto exit_perror;
+> +                }
+>               }
+>   
+>               vaddr_ef = vaddr + eppnt->p_filesz;
+> 
 
-qemu-system-arm, qemu-system-aarch64 and qemu-system-tricore do not have
-a default machine, so when running the qemu-iotests with such a binary,
-lots of tests are failing. Fix it by picking a default machine in the
-"check" script instead.
+Applied to my linux-user branch.
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190502084506.8009-3-thuth@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/qemu-iotests/check | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index f9c24b6753c..922c5d1d3d3 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -130,7 +130,6 @@ export CACHEMODE="writeback"
- export QEMU_IO_OPTIONS=""
- export QEMU_IO_OPTIONS_NO_FMT=""
- export CACHEMODE_IS_DEFAULT=true
--export QEMU_OPTIONS="-nodefaults -machine accel=qtest"
- export VALGRIND_QEMU=
- export IMGKEYSECRET=
- export IMGOPTSSYNTAX=false
-@@ -564,6 +563,18 @@ then
- fi
- export QEMU_PROG="$(type -p "$QEMU_PROG")"
- 
-+case "$QEMU_PROG" in
-+    *qemu-system-arm|*qemu-system-aarch64)
-+        export QEMU_OPTIONS="-nodefaults -machine virt,accel=qtest"
-+        ;;
-+    *qemu-system-tricore)
-+        export QEMU_OPTIONS="-nodefaults -machine tricore_testboard,accel=qtest"
-+        ;;
-+    *)
-+        export QEMU_OPTIONS="-nodefaults -machine accel=qtest"
-+        ;;
-+esac
-+
- if [ -z "$QEMU_IMG_PROG" ]; then
-     if [ -x "$build_iotests/qemu-img" ]; then
-         export QEMU_IMG_PROG="$build_iotests/qemu-img"
--- 
-2.20.1
-
+Thanks,
+Laurent
 
