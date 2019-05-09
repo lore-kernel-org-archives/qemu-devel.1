@@ -6,52 +6,68 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEC7EC04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:03:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB07C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:06:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4879205C9
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:03:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4879205C9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3F70B205C9
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:06:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F70B205C9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56134 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56196 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOkZs-0006Uh-FZ
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 11:03:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42668)
+	id 1hOkdK-0000gm-9m
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 11:06:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brogers@suse.com>) id 1hOkYv-00060x-7b
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:02:22 -0400
+	(envelope-from <bounces@canonical.com>) id 1hOkc9-0007nI-JK
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:05:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brogers@suse.com>) id 1hOkYq-0004CR-6u
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:02:21 -0400
-Received: from prv-mh.provo.novell.com ([137.65.248.74]:34243)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brogers@suse.com>) id 1hOkYp-00045W-Tp
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:02:16 -0400
-Received: from INET-PRV-MTA by prv-mh.provo.novell.com
-	with Novell_GroupWise; Thu, 09 May 2019 09:02:11 -0600
-Message-Id: <5CD44158020000480009E63D@prv-mh.provo.novell.com>
-X-Mailer: Novell GroupWise Internet Agent 18.1.1 
-Date: Thu, 09 May 2019 09:03:52 -0600
-From: "Bruce Rogers" <brogers@suse.com>
-To: <qemu-devel@nongnu.org>,"Bruce Rogers" <BROGERS@suse.com>
-References: <20190411175138.12838-1-brogers@suse.com>
-In-Reply-To: <20190411175138.12838-1-brogers@suse.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <bounces@canonical.com>) id 1hOkc8-0006jL-FD
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:05:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49162)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hOkc8-0006iX-9x
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:05:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hOkc7-0005hx-79
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 15:05:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2D1B52E80C9
+	for <qemu-devel@nongnu.org>; Thu,  9 May 2019 15:05:39 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 137.65.248.74
-Subject: Re: [Qemu-devel] [PATCH] hw/smbios: handle both file formats
- regardless of machine type
+Date: Thu, 09 May 2019 14:59:24 -0000
+From: Brett Neumeier <1828429@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bneumeier pmaydell
+X-Launchpad-Bug-Reporter: Brett Neumeier (bneumeier)
+X-Launchpad-Bug-Modifier: Brett Neumeier (bneumeier)
+References: <155741248596.25660.12793938251081176084.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155741396464.16507.4964839745502258537.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18961";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: c0a694d1103a7cb4d2cb19012f1528dd8b244254
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1828429] Re: qemu-system-aarch64 crashes with
+ assertion failed while running GCC 9 test suite
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -60,128 +76,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Reply-To: Bug 1828429 <1828429@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
->>> On 4/11/2019 at 11:51 AM, Bruce Rogers <brogers@suse.com> wrote:
-> It's easy enough to handle either per=E2=80=91spec or legacy smbios =
-structures
-> in the smbios file input without regard to the machine type used, by
-> simply applying the basic smbios formatting rules. then depending on
-> what is detected. terminal numm bytes are added or removed for machine
-> type specific processing.
->=20
-> Signed=E2=80=91off=E2=80=91by: Bruce Rogers <brogers@suse.com>
-> =E2=80=91=E2=80=91=E2=80=91
->  hw/smbios/smbios.c | 43 +++++++++++++++++++++++++++++++++++++++=E2=80=91=
-=E2=80=91=E2=80=91=E2=80=91
->  1 file changed, 39 insertions(+), 4 deletions(=E2=80=91)
->=20
-> diff =E2=80=91=E2=80=91git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-> index 47be9071fa..d4b95ebc84 100644
-> =E2=80=91=E2=80=91=E2=80=91 a/hw/smbios/smbios.c
-> +++ b/hw/smbios/smbios.c
-> @@ =E2=80=91960,6 +960,7 @@ void smbios_entry_add(QemuOpts *opts, Error =
-**errp)
->          struct smbios_structure_header *header;
->          int size;
->          struct smbios_table *table; /* legacy mode only */
-> +        uint8_t *dbl_nulls, *orig_end;
-> =20
->          qemu_opts_validate(opts, qemu_smbios_file_opts, &err);
->          if (err) {
-> @@ =E2=80=91974,11 +975,21 @@ void smbios_entry_add(QemuOpts *opts, =
-Error **errp)
->          }
-> =20
->          /*
-> =E2=80=91         * NOTE: standard double '\0' terminator expected, per =
-smbios spec.
-> =E2=80=91         * (except in legacy mode, where the second '\0' is =
-implicit and
-> =E2=80=91         *  will be inserted by the BIOS).
-> +         * NOTE: standard double '\0' terminator expected, per smbios =
-spec,
-> +         * unless the data is formatted for legacy mode, which is used =
-by
-> +         * pc=E2=80=91i440fx=E2=80=912.0 and earlier machine types. =
-Legacy mode structures
-> +         * without strings have no '\0' terminators, and those with =
-strings
-> +         * also don't have an additional '\0' terminator at the end of =
-the
-> +         * final string '\0' terminator. The BIOS will add the '\0'=20
-> terminators
-> +         * to comply with the smbios spec.
-> +         * For greater compatibility, regardless of the machine type =
-used,
-> +         * either format is accepted.
->           */
-> =E2=80=91        smbios_tables =3D g_realloc(smbios_tables, smbios_tables=
-_len + size);
-> +        smbios_tables =3D g_realloc(smbios_tables, smbios_tables_len + =
-size +=20
-> 2);
-> +        orig_end =3D smbios_tables + smbios_tables_len + size;
-> +        /* add extra null bytes to end in case of legacy file data */
-> +        *orig_end =3D '\0';
-> +        *(orig_end + 1) =3D '\0';
->          header =3D (struct smbios_structure_header *)(smbios_tables +
->                                                      smbios_tables_len);
-> =20
-> @@ =E2=80=91993,6 +1004,19 @@ void smbios_entry_add(QemuOpts *opts, =
-Error **errp)
->                         header=E2=80=91>type);
->              return;
->          }
-> +        for (dbl_nulls =3D smbios_tables + smbios_tables_len + =
-header=E2=80=91>length;
-> +             dbl_nulls + 2 <=3D orig_end; dbl_nulls++) {
-> +            if (*dbl_nulls =3D=3D '\0' && *(dbl_nulls + 1) =3D=3D '\0') =
-{
-> +                break;
-> +            }
-> +        }
-> +        if (dbl_nulls + 2  < orig_end) {
-> +            error_setg(errp, "SMBIOS file data malformed");
-> +            return;
-> +        }
-> +        /* increase size by how many extra nulls were actually needed =
-*/
-> +        size +=3D dbl_nulls + 2 =E2=80=91 orig_end;
-> +        smbios_tables =3D g_realloc(smbios_tables, smbios_tables_len + =
-size);
->          set_bit(header=E2=80=91>type, have_binfile_bitmap);
-> =20
->          if (header=E2=80=91>type =3D=3D 4) {
-> @@ =E2=80=911013,6 +1037,17 @@ void smbios_entry_add(QemuOpts *opts, =
-Error **errp)
->           *       delete the one we don't need from smbios_set_defaults()=
-,
->           *       once we know which machine version has been requested.
->           */
-> +        if (dbl_nulls + 2 =3D=3D orig_end) {
-> +            /* chop off nulls to get legacy format */
-> +            if (header=E2=80=91>length + 2 =3D=3D size) {
-> +                size =E2=80=91=3D 2;
-> +            } else {
-> +                size =E2=80=91=3D 1;
-> +        
-    }
-> +        } else {
-> +            /* undo conversion from legacy format to per=E2=80=91spec =
-format */
-> +            size =E2=80=91=3D dbl_nulls + 2 =E2=80=91 orig_end;
-> +        }
->          if (!smbios_entries) {
->              smbios_entries_len =3D sizeof(uint16_t);
->              smbios_entries =3D g_malloc0(smbios_entries_len);
-> =E2=80=91=E2=80=91=20
-> 2.21.0
+I'm on it. Will follow up when I have a result.
 
-ping
+-- =
 
-- Bruce
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1828429
+
+Title:
+  qemu-system-aarch64 crashes with assertion failed while running GCC 9
+  test suite
+
+Status in QEMU:
+  New
+
+Bug description:
+  I am using QEMU 4.0.0 on an x86_64 Linux 4.19.0 host, the guest is an
+  Aarch64 linux 5.0.0 system. The same issue occurred on QEMU 3.1.0.
+
+  While running the GCC 9.1 test suite on the guest system, QEMU crashes
+  with:
+
+  qemu-system-aarch64: [...]/qemu-4.0.0/tcg/tcg.c:3952: tcg_gen_code:
+  Assertion `s->gen_insn_end_off[num_insns] =3D=3D off' failed.
+
+  I am able to reproduce the issue reliably, which is encouraging. The
+  full QEMU command line is:
+
+  qemu-system-aarch64 -kernel kernel-5.0.0cbl1 -append "root=3D/dev/vda1
+  ro init=3D/sbin/init console=3DttyAMA0" -name guest=3Dcbl -drive
+  file=3Dcbl.qcow2,index=3D0,media=3Ddisk,format=3Dqcow2 -drive
+  file=3Dswap.qcow2,index=3D1,media=3Ddisk,format=3Dqcow2 -machine virt -cpu
+  cortex-a57 -smp 4,sockets=3D1,cores=3D2,threads=3D2 -m size=3D8192 -netdev
+  tap,id=3Dnetwork0,ifname=3Dtapcbl2,script=3Dno,downscript=3Dno -device vi=
+rtio-
+  net-device,netdev=3Dnetwork0,mac=3Daa:bb:cc:dd:ee:02 -nographic
+
+  The specific GCC test that causes QEMU to crash is vldX.c run from
+  advsimd-intrinsics.exp; I can reproduce via "make check-gcc
+  RUNTESTFLAGS=3Dadvsimd-intrinsics.exp=3DvldX.c"
+
+  If there is anything I can do to further triage the issue, or gain
+  more insight into what is going on, please let me know! I am eager to
+  help however I can.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1828429/+subscriptions
 
