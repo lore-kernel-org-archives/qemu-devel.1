@@ -2,94 +2,81 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F962C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:58:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1293DC04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 18:01:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8DA42085A
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:58:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF5462085A
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 18:01:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H/gF1hGh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8DA42085A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="geecjAVu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF5462085A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58880 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58932 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOnJq-0007w5-7j
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 13:58:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35052)
+	id 1hOnMg-0002ud-RE
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 14:01:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOnEm-0003Uu-2A
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:53:45 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hOnJ3-0007Wy-Rw
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:58:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOnEk-0006gb-3g
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:53:43 -0400
-Received: from mail-pl1-x633.google.com ([2607:f8b0:4864:20::633]:45105)
+	(envelope-from <alistair23@gmail.com>) id 1hOnJ2-0000fp-DC
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:58:09 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:43537)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hOnEi-0006at-5D
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:53:41 -0400
-Received: by mail-pl1-x633.google.com with SMTP id a5so1486297pls.12
-	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 10:53:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=tZspNkHDi8B5NZIIUZTWWcNPDy926n62xxi1IYNKWpQ=;
-	b=H/gF1hGhcPgPCwni3wGQ3VFe2MBb/6CQYvgvF2L/ZYQ44H5slIfni5P9qotMqvkOq6
-	n3W8uJPEUg/FdBiVuWv0hRsvPEdQ7J4spMEVqPjrYW1uU4ezRROQSC7lL0npJbHVLNq5
-	p6ExPE+CffJF+Wu8LkR2Z4qXdlIhaeH7Uxf6sBN9vbQFooBFae+obsEY2GkZKhGwMqD2
-	ns8RUHq5CW9KcoGvUvHmAxumUGLJers2eBf7zqNhaaPwRc8MgndbHsvJ0JMpetfcoLPj
-	XVs38QOb8ZStZxuWOIXJXLpLj03Bgfy+Scqws70XHnDC2MxEJscEj47YzuwtKzTCKioL
-	7zdQ==
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hOnJ2-0000fR-5b
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:58:08 -0400
+Received: by mail-lf1-x141.google.com with SMTP id u27so2194806lfg.10
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 10:58:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=tzmKJLehJT89eW8ekZejP+oZP8e9ssWy9e+lkPe1YPU=;
+	b=geecjAVu6XtVVJ9NjC32Lg2uO8BCwpNod8Dd0N4vPPjkMPXdICiPMJgkcMWGGafByQ
+	XH9zT+061WAayNujJd1IkzKXBA7GYQIfgvlB6sMn7dJPZUJKpcOLbWWzZnMA1QM52anZ
+	2oj7aKRgZFAkfZAa3gOR85FptuhVstC65Rc3IdxCgYYP27YGhPcrh6AodXmVg5rEppTt
+	VycTIm4Ub5lgLu/2PFPRajMu11NvSW+u/8WFlKSyeUoucNjldA97etaiK2WgMVNrwKlY
+	bD12VZid9YfYwX5PI0LK2399LdE/kzGyFgOtTkSxj9AJM9BZS3iGr6ooigaPQh175TW5
+	3x3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=tZspNkHDi8B5NZIIUZTWWcNPDy926n62xxi1IYNKWpQ=;
-	b=UsxA998aKRf5Xddm1ofcd2DgNIA8SX0NKFS/7oiujG90j8tdlH3HbnCWt+S5I7O51e
-	ScX16f0Psu58u6EciCf0lJtugjVhszkJYQ/jyVG3cXnKZi3+vL/OZ+/bP7IhZ+XvhGxY
-	oKrYgEZ5G5czAOKGvyPoP045D0lobDKiLAC6R5QIpUA31t5HF1SYNmxs0RbA6aCcTk3W
-	qC1RfqhIhGZ1j1V+veiQGs9NlsXgqVb5YKBeaJy01Q1ju74EXKf67b2Uo3p+SzZ+xHW+
-	uGlXLJRjVlEpLFiMYceklVJ58+oWKfl1QPh3LoTxIsBM1l/TA7Kt/SvNHdjR/aOIN2Tt
-	Jc2A==
-X-Gm-Message-State: APjAAAUmQ8jDxFybY1k7mbrtvnw6wYAzYpHP4WtQkGWUnKpue3zRA/zd
-	9POmRNFynHgeI6EPlSiXVDLP/w==
-X-Google-Smtp-Source: APXvYqwmo/IyNC7Dy2evI+0thCJTFVfN03rAch6TRCyrTzuanFjUw9FP6rH/cdfOjb7Ci7EE142X+w==
-X-Received: by 2002:a17:902:521:: with SMTP id
-	30mr6810185plf.248.1557424410953; 
-	Thu, 09 May 2019 10:53:30 -0700 (PDT)
-Received: from [172.31.99.192] (50-248-210-99-static.hfc.comcastbusiness.net.
-	[50.248.210.99]) by smtp.gmail.com with ESMTPSA id
-	i27sm9531986pfk.162.2019.05.09.10.53.29
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 09 May 2019 10:53:29 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	qemu-devel@nongnu.org
-References: <20190509165912.10512-1-alex.bennee@linaro.org>
-	<20190509165912.10512-3-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <37051934-a02b-1461-537d-9f6ed93ae4a9@linaro.org>
-Date: Thu, 9 May 2019 10:53:27 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=tzmKJLehJT89eW8ekZejP+oZP8e9ssWy9e+lkPe1YPU=;
+	b=NuVLSHU9eehu3dXGTvOa9kSsiESH/uldt5L9JoFCZZSWbCnEnipl9/YGZlKkMHaayg
+	vJBjJl3b+sUOAGfP2YJdjkzvKEHMCXcsDYkcmFLU5OYULNIHqX36vuZTBwDTDNzWIYwo
+	UNNToZeyHafR70EvjD2mDmcxZswcXmaP8nBmMClgVx0cMf6RextoDcWXxGJpTY5jpchY
+	OTPCaUuzKq9To4y+Ycjq2vs1Bj81HiKzBfiF2uNgztcRTihf4TSHniS/796vEoyrtvAt
+	9Lu6maDeF6hcvS95j0pvvi0v6DcFshwhgBNRowueNzGkn/jvjEhrlmyKl+lF6ZL6j9ZR
+	XLJw==
+X-Gm-Message-State: APjAAAVukPUn16nAEYJNB7kiFSlU4bkEeWGZkd3Jn0EDRz49cJ6YtV5/
+	x07KLtrZ93eK/CjwETLx11IJuCBWm+Bkq9qA/QA=
+X-Google-Smtp-Source: APXvYqwIK87BsG80P0J+UHWh21fKL9UpyH5MzA505bvQFZYSSSHXmp8OjnP8CbQHP+Z8lchPG23l0ipswWAO30N2C04=
+X-Received: by 2002:a19:189:: with SMTP id 131mr3206800lfb.74.1557424686827;
+	Thu, 09 May 2019 10:58:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190509165912.10512-3-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20190508000641.19090-1-richard.henderson@linaro.org>
+	<20190508000641.19090-9-richard.henderson@linaro.org>
+In-Reply-To: <20190508000641.19090-9-richard.henderson@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 9 May 2019 10:56:00 -0700
+Message-ID: <CAKmqyKP8Qgbzv3V=hq4zktd0bDs-EnXRS_p=t6agd=CT37pjkQ@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::633
-Subject: Re: [Qemu-devel] [PATCH v1 02/23] tests/docker: Test more
- components on the Fedora default image
+X-Received-From: 2a00:1450:4864:20::141
+Subject: Re: [Qemu-devel] [PATCH v3 08/39] target/alpha: Use env_cpu,
+ env_archcpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,41 +88,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-arm@nongnu.org,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/9/19 9:58 AM, Alex Bennée wrote:
-> From: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
-> Install optional dependencies of QEMU to get better coverage.
-> 
-> The following components are now enabled:
-> 
->   $ ./configure
->   ...
->   Multipath support yes
->   VNC SASL support  yes
->   RDMA support      yes
->   PVRDMA support    yes
->   libiscsi support  yes
->   seccomp support   yes
->   libpmem support   yes
->   libudev           yes
-> 
-> Note: The udev-devel package is provided by systemd-devel.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Message-Id: <20190504055440.20406-1-philmd@redhat.com>
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+On Tue, May 7, 2019 at 5:07 PM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> With exactly one exception, most uses of alpha_env_get_cpu
+> were failures to use the more proper, ENV_GET_CPU macro,
+> now replaced by env_cpu.
+>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
 > ---
->  tests/docker/dockerfiles/fedora.docker | 7 +++++++
->  1 file changed, 7 insertions(+)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+>  target/alpha/cpu.h          | 5 -----
+>  linux-user/alpha/cpu_loop.c | 2 +-
+>  target/alpha/helper.c       | 8 +++-----
+>  target/alpha/sys_helper.c   | 8 ++++----
+>  4 files changed, 8 insertions(+), 15 deletions(-)
+>
+> diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
+> index 2c7f75f584..53c085f691 100644
+> --- a/target/alpha/cpu.h
+> +++ b/target/alpha/cpu.h
+> @@ -273,11 +273,6 @@ struct AlphaCPU {
+>      QEMUTimer *alarm_timer;
+>  };
+>
+> -static inline AlphaCPU *alpha_env_get_cpu(CPUAlphaState *env)
+> -{
+> -    return container_of(env, AlphaCPU, env);
+> -}
+> -
+>  #define ENV_OFFSET offsetof(AlphaCPU, env)
+>
+>  #ifndef CONFIG_USER_ONLY
+> diff --git a/linux-user/alpha/cpu_loop.c b/linux-user/alpha/cpu_loop.c
+> index 61992571e1..7a94eee84c 100644
+> --- a/linux-user/alpha/cpu_loop.c
+> +++ b/linux-user/alpha/cpu_loop.c
+> @@ -23,7 +23,7 @@
+>
+>  void cpu_loop(CPUAlphaState *env)
+>  {
+> -    CPUState *cs = CPU(alpha_env_get_cpu(env));
+> +    CPUState *cs = env_cpu(env);
+>      int trapnr;
+>      target_siginfo_t info;
+>      abi_long sysret;
+> diff --git a/target/alpha/helper.c b/target/alpha/helper.c
+> index 7201576aae..08dfb834a5 100644
+> --- a/target/alpha/helper.c
+> +++ b/target/alpha/helper.c
+> @@ -119,7 +119,7 @@ static int get_physical_address(CPUAlphaState *env, target_ulong addr,
+>                                  int prot_need, int mmu_idx,
+>                                  target_ulong *pphys, int *pprot)
+>  {
+> -    CPUState *cs = CPU(alpha_env_get_cpu(env));
+> +    CPUState *cs = env_cpu(env);
+>      target_long saddr = addr;
+>      target_ulong phys = 0;
+>      target_ulong L1pte, L2pte, L3pte;
+> @@ -463,8 +463,7 @@ void alpha_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+>     We expect that ENV->PC has already been updated.  */
+>  void QEMU_NORETURN helper_excp(CPUAlphaState *env, int excp, int error)
+>  {
+> -    AlphaCPU *cpu = alpha_env_get_cpu(env);
+> -    CPUState *cs = CPU(cpu);
+> +    CPUState *cs = env_cpu(env);
+>
+>      cs->exception_index = excp;
+>      env->error_code = error;
+> @@ -475,8 +474,7 @@ void QEMU_NORETURN helper_excp(CPUAlphaState *env, int excp, int error)
+>  void QEMU_NORETURN dynamic_excp(CPUAlphaState *env, uintptr_t retaddr,
+>                                  int excp, int error)
+>  {
+> -    AlphaCPU *cpu = alpha_env_get_cpu(env);
+> -    CPUState *cs = CPU(cpu);
+> +    CPUState *cs = env_cpu(env);
+>
+>      cs->exception_index = excp;
+>      env->error_code = error;
+> diff --git a/target/alpha/sys_helper.c b/target/alpha/sys_helper.c
+> index ac22323191..f9c34b1144 100644
+> --- a/target/alpha/sys_helper.c
+> +++ b/target/alpha/sys_helper.c
+> @@ -44,17 +44,17 @@ uint64_t helper_load_pcc(CPUAlphaState *env)
+>  #ifndef CONFIG_USER_ONLY
+>  void helper_tbia(CPUAlphaState *env)
+>  {
+> -    tlb_flush(CPU(alpha_env_get_cpu(env)));
+> +    tlb_flush(env_cpu(env));
+>  }
+>
+>  void helper_tbis(CPUAlphaState *env, uint64_t p)
+>  {
+> -    tlb_flush_page(CPU(alpha_env_get_cpu(env)), p);
+> +    tlb_flush_page(env_cpu(env), p);
+>  }
+>
+>  void helper_tb_flush(CPUAlphaState *env)
+>  {
+> -    tb_flush(CPU(alpha_env_get_cpu(env)));
+> +    tb_flush(env_cpu(env));
+>  }
+>
+>  void helper_halt(uint64_t restart)
+> @@ -78,7 +78,7 @@ uint64_t helper_get_walltime(void)
+>
+>  void helper_set_alarm(CPUAlphaState *env, uint64_t expire)
+>  {
+> -    AlphaCPU *cpu = alpha_env_get_cpu(env);
+> +    AlphaCPU *cpu = env_archcpu(env);
+>
+>      if (expire) {
+>          env->alarm_expire = expire;
+> --
+> 2.17.1
+>
+>
 
