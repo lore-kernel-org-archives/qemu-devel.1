@@ -2,68 +2,71 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C875BC04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C7E4C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:43:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E05D21479
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:38:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E05D21479
+	by mail.kernel.org (Postfix) with ESMTPS id 1128421479
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:43:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1128421479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50722 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50762 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOeZN-0000to-UY
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 04:38:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49713)
+	id 1hOeef-00033R-DG
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 04:43:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1hOeYa-0000XP-9a
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:37:37 -0400
+	(envelope-from <armbru@redhat.com>) id 1hOeds-0002jI-6O
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:43:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1hOeYZ-0004ZL-CY
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:37:36 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:33743)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1hOeYZ-0004Xc-88
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:37:35 -0400
-Received: by mail-ot1-f65.google.com with SMTP id 66so1575367otq.0
-	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 01:37:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=e/PyILm3rV4/mPYNBHUi46XeVj5tlfb4czietgdZ0hc=;
-	b=kXBL6EgyJ34eBdZ+v2c76rIrb/jTAc5xFTlaeNwVbTBbXzMhZ4weOpHRnjfPADujZw
-	qQ951W+QdMIPDRBizUsefv9iAnpHCDUi9/Fw/eSzL9XU38PE3mqyuwQKxbTnnkztflgU
-	a7dcbSxxp0i2wAKbPpSltni61J4Y1tjZwRfhbyqMIW0CcORsbZoEZLBjRIRHp2MHOkd0
-	xNKB5SFesSfpE9bfQTFqrIuHsS0kw8+JVxcoV4784sGiPVc+/7eXc1vtyNJbGEKu53Ng
-	U3j52D7oI035srC4jCbuvYfQuMj/DqD/1OKnoq5+yGLVPIjLIREVacbnV7pWqpIamGB3
-	r6IQ==
-X-Gm-Message-State: APjAAAWrY3nhh9Neff87CV9CP4ImoFP1ZesnXcd2j5xrD/VDYjWFAhy8
-	LucECowF2DlxUq93oCukn67HdfBsO8ZWYMGWFQxrDw==
-X-Google-Smtp-Source: APXvYqzoB/RCqSw8mCKxY7o4Mj90w1/nK1Xx3y7JLVRi8bUi655GtvuCwNhiFzhtiDkxSn/ukUpuyVkG7vf0upep71M=
-X-Received: by 2002:a9d:141:: with SMTP id 59mr1653195otu.158.1557391051756;
-	Thu, 09 May 2019 01:37:31 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1hOedr-0007K7-1b
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:43:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56074)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hOedq-0007Js-QM
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:43:02 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BA456307E057;
+	Thu,  9 May 2019 08:43:01 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
+	[10.36.116.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 30E8317CEB;
+	Thu,  9 May 2019 08:42:59 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id A82BB1132B35; Thu,  9 May 2019 10:42:57 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20190506213817.14344-1-ehabkost@redhat.com>
+	<20190507141345.GS27205@redhat.com>
+	<20190507144500.GK28722@habkost.net>
+	<87pnot2j2s.fsf@dusky.pond.sub.org>
+	<20190508175303.GA4189@habkost.net>
+Date: Thu, 09 May 2019 10:42:57 +0200
+In-Reply-To: <20190508175303.GA4189@habkost.net> (Eduardo Habkost's message of
+	"Wed, 8 May 2019 14:53:03 -0300")
+Message-ID: <87pnos588e.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-References: <20190503130034.24916-1-marcandre.lureau@redhat.com>
-	<20190503130034.24916-5-marcandre.lureau@redhat.com>
-	<20190509063220.cfahgzlujtcv5etr@sirius.home.kraxel.org>
-In-Reply-To: <20190509063220.cfahgzlujtcv5etr@sirius.home.kraxel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Thu, 9 May 2019 10:37:20 +0200
-Message-ID: <CAMxuvaw9kOt3yoRk4sWPeRyUmRLWboCCyrO00W0Se+W-OOrGRw@mail.gmail.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Thu, 09 May 2019 08:43:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.210.65
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] Add vhost-user-input-pci
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] tests: Force Python I/O encoding for
+ check-qapi-schema
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,53 +78,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-On Thu, May 9, 2019 at 8:32 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+> On Wed, May 08, 2019 at 03:04:43PM +0200, Markus Armbruster wrote:
+>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>>=20
+>> > On Tue, May 07, 2019 at 03:13:45PM +0100, Daniel P. Berrang=C3=A9 wrot=
+e:
+>> >> On Mon, May 06, 2019 at 06:38:17PM -0300, Eduardo Habkost wrote:
+>> >> > test-qapi.py doesn't force a specific encoding for stderr or
+>> >> > stdout, but the reference files used by check-qapi-schema are in
+>> >> > UTF-8.  This breaks check-qapi-schema under certain circumstances
+>> >> > (e.g. if using the C locale and Python < 3.7).
+>> >> >=20
+>> >> > We need to make sure test-qapi.py always generate UTF-8 output
+>> >> > somehow.  On Python 3.7+ we can do it using
+>> >> > `sys.stdout.reconfigure(...)`, but we need a solution that works
+>> >> > with older Python versions.
+>> >> >=20
+>> >> > Instead of trying a hack like reopening sys.stdout and
+>> >> > sys.stderr, we can just tell Python to use UTF-8 for I/O encoding
+>> >> > when running test-qapi.py.  Do it by setting PYTHONIOENCODING.
+>> >> >=20
+>> >> > Reported-by: Thomas Huth <thuth@redhat.com>
+>> >> > Tested-by: Thomas Huth <thuth@redhat.com>
+>> >> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>> >> > ---
+>> >> >  tests/Makefile.include | 2 +-
+>> >> >  1 file changed, 1 insertion(+), 1 deletion(-)
+>> >> >=20
+>> >> > diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> >> > index 7c8b9c84b2..af88ab6f8b 100644
+>> >> > --- a/tests/Makefile.include
+>> >> > +++ b/tests/Makefile.include
+>> >> > @@ -1103,7 +1103,7 @@ check-tests/qemu-iotests-quick.sh: tests/qemu=
+-iotests-quick.sh qemu-img$(EXESUF)
+>> >> >  .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
+>> >> >  $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SR=
+C_PATH)/%.json
+>> >> >  	$(call quiet-command, PYTHONPATH=3D$(SRC_PATH)/scripts \
+>> >> > -		$(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py \
+>> >> > +		PYTHONIOENCODING=3Dutf-8 $(PYTHON) $(SRC_PATH)/tests/qapi-schema=
+/test-qapi.py \
+>> >>=20
+>> >> I see PYTHONIOENCODING exists since 2.6 which is nice.
+>> >>=20
+>> >> How about we actually change $(PYTHON) so that it always includes
+>> >> PYTHONIOENCODING=3Dutf-8 ?
+>> >>=20
+>> >> That way we avoid continuing to play whack-a-mole with more utf-8
+>> >> bugs in future.
+>> >>=20
+>> >> It would also let us revert this:
+>> >>=20
+>> >>   commit de685ae5e9a4b523513033bd6cadc8187a227170
+>> >>   Author: Markus Armbruster <armbru@redhat.com>
+>> >>   Date:   Mon Jun 18 19:59:57 2018 +0200
+>> >>=20
+>> >>     qapi: Open files with encoding=3D'utf-8'
+>> >>=20
+>> >> which had to provide separate logic for py2 vs py3 :-(
+>>=20
+>> The separate logic will soon be history.  I'd welcome getting rid of the
+>> remainder anyway.
 >
->   Hi,
->
-> > +static const VirtioPCIDeviceTypeInfo vhost_user_input_pci_info = {
-> > +    .base_name = TYPE_VHOST_USER_INPUT_PCI,
-> > +    .generic_name = "vhost-user-input-pci",
-> > +    .transitional_name = "vhost-user-input-pci-transitional",
-> > +    .non_transitional_name = "vhost-user-input-pci-non-transitional",
->
-> virtio-input is virtio 1.0 only, so we don't need these variants.
-> Incremental fix below, if you ack that I can squash it for the pull req.
-> Or you send a v3 (in case you have other changes pending).
->
-> cheers,
->   Gerd
+> Which remainder?  Do you mean the encoding=3D'utf-8' arguments to
+> open()?
 
-ack, thanks
+I'd welcome a revert the whole commit.
 
+>> > Not every Python script in the QEMU tree is run by our makefiles
+>> > and scripts using $(PYTHON).  We need to ensure our scripts and
+>> > modules won't break when run directly from the command line, too.
+>> > Setting PYTHONIOENCODING everywhere would just hide these bugs
+>> > from us.
+>>=20
+>> I agree for Python scripts that are meant to be run that way (assuming
+>> such scripts exist).  [...]
 >
-> --- a/hw/virtio/vhost-user-input-pci.c
-> +++ b/hw/virtio/vhost-user-input-pci.c
-> @@ -13,7 +13,7 @@
+> All scripts inside ./scripts are meant to be run directly from
+> the command line, aren't they?
+
+Counter-example: you're welcome to run scripts/qapi-gen.py by hand for
+whatever purpose, but if you mess up your build that way, you're on your
+own.
+
+>>                [...]  For all the others (including all the QAPI-related
+>> scripts), I'd be quite fine with
+>>=20
+>> 1. Our build system runs all Python scripts with the
+>> PYTHONIOENCODING=3Dutf-8
+>>=20
+>> 2. If you run a Python script yourself, you get to specify the
+>> PYTHONIOENCODING=3Dutf-8, or use a suitable locale.  Enabling UTF-8 mode
+>> with PYTHONUTF8=3D1 or -X utf8 could also work.
 >
->  typedef struct VHostUserInputPCI VHostUserInputPCI;
->
-> -#define TYPE_VHOST_USER_INPUT_PCI "vhost-user-input-pci-base"
-> +#define TYPE_VHOST_USER_INPUT_PCI "vhost-user-input-pci"
->
->  #define VHOST_USER_INPUT_PCI(obj) \
->      OBJECT_CHECK(VHostUserInputPCI, (obj), TYPE_VHOST_USER_INPUT_PCI)
-> @@ -37,9 +37,7 @@ static void vhost_user_input_pci_instance_init(Object *obj)
->
->  static const VirtioPCIDeviceTypeInfo vhost_user_input_pci_info = {
->      .base_name = TYPE_VHOST_USER_INPUT_PCI,
-> -    .generic_name = "vhost-user-input-pci",
-> -    .transitional_name = "vhost-user-input-pci-transitional",
-> -    .non_transitional_name = "vhost-user-input-pci-non-transitional",
-> +    .generic_name = TYPE_VHOST_USER_INPUT_PCI,
->      .parent = TYPE_VIRTIO_INPUT_PCI,
->      .instance_size = sizeof(VHostUserInputPCI),
->      .instance_init = vhost_user_input_pci_instance_init,
+> I'm OK if we don't actively try to fix those bugs and just expect
+> people to set PYTHONIOENCODING.  But I don't think we should
+> reject patches that make the Python code work with non-utf8
+> locales if it's an easy fix.
+
+I'm not going to interfere with easy fixes to code I don't maintain :)
 
