@@ -2,108 +2,63 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.1 required=3.0 tests=DATE_IN_PAST_12_24,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 292BCC04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 07:10:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 458C9C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 07:16:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFE8721019
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 07:10:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFE8721019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 11F9221019
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 07:16:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11F9221019
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49447 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49549 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOdCW-0002Ip-1A
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 03:10:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54239)
+	id 1hOdIJ-0004L4-AL
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 03:16:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fiuczy@linux.ibm.com>) id 1hOcog-0007cQ-E3
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:46:07 -0400
+	(envelope-from <zhengxiang9@huawei.com>) id 1hOdHF-0003wR-71
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 03:15:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fiuczy@linux.ibm.com>) id 1hOcoe-0002V9-CR
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:46:06 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57588
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fiuczy@linux.ibm.com>)
-	id 1hOcoc-0002SB-BY
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 02:46:02 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x496irL4061989
-	for <qemu-devel@nongnu.org>; Thu, 9 May 2019 02:45:56 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2scf77g0t7-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 02:45:55 -0400
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <fiuczy@linux.ibm.com>;
-	Thu, 9 May 2019 07:45:53 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-	by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Thu, 9 May 2019 07:45:45 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
-	(b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x496jhIf55050456
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Thu, 9 May 2019 06:45:43 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5F056A4065;
-	Thu,  9 May 2019 06:45:43 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 534D2A4054;
-	Thu,  9 May 2019 06:45:42 +0000 (GMT)
-Received: from [10.0.2.15] (unknown [9.152.222.56])
-	by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-	Thu,  9 May 2019 06:45:42 +0000 (GMT)
-To: Alex Williamson <alex.williamson@redhat.com>,
-	Yan Zhao <yan.y.zhao@intel.com>, Halil Pasic <pasic@linux.ibm.com>,
-	Tony Krowiak <akrowiak@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
-References: <20190506014514.3555-1-yan.y.zhao@intel.com>
-	<20190506014904.3621-1-yan.y.zhao@intel.com>
-	<20190507151826.502be009@x1.home>
-	<20190508112740.GA24397@joy-OptiPlex-7040>
-	<20190508152242.4b54a5e7@x1.home>
-From: Boris Fiuczynski <fiuczy@linux.ibm.com>
-Date: Wed, 8 May 2019 17:27:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <zhengxiang9@huawei.com>) id 1hOdHD-000696-Vm
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 03:15:37 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:60916 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
+	id 1hOdH8-0005tg-Ku; Thu, 09 May 2019 03:15:32 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
+	by Forcepoint Email with ESMTP id 68786D0EF132576A9E3C;
+	Thu,  9 May 2019 15:15:16 +0800 (CST)
+Received: from [127.0.0.1] (10.177.29.32) by DGGEMS404-HUB.china.huawei.com
+	(10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Thu, 9 May 2019
+	15:15:09 +0800
+To: Markus Armbruster <armbru@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+References: <20190505070059.4664-1-zhengxiang9@huawei.com>
+	<87a7fyb0v7.fsf@dusky.pond.sub.org>
+	<72adbed8-f650-42df-98d5-e98154baec08@redhat.com>
+	<87h8a513sl.fsf@dusky.pond.sub.org>
+From: Xiang Zheng <zhengxiang9@huawei.com>
+Message-ID: <fb04cdb2-910d-58be-fb21-db7050cdc669@huawei.com>
+Date: Thu, 9 May 2019 15:14:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
+	Thunderbird/64.0
 MIME-Version: 1.0
-In-Reply-To: <20190508152242.4b54a5e7@x1.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <87h8a513sl.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19050906-0008-0000-0000-000002E4CB1B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050906-0009-0000-0000-000022514FBA
-Message-Id: <5eac912c-e753-b5f6-83a4-b646f991d858@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-09_02:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1905090043
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
-	mx0b-001b2d01.pphosted.com id x496irL4061989
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-X-Mailman-Approved-At: Thu, 09 May 2019 03:05:19 -0400
-Subject: Re: [Qemu-devel] [libvirt] [PATCH v2 1/2] vfio/mdev: add version
- attribute for mdev device
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.177.29.32]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 45.249.212.32
+Subject: Re: [Qemu-devel] [PATCH] pflash: Only read non-zero parts of
+ backend image
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -115,64 +70,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"aik@ozlabs.ru" <aik@ozlabs.ru>,
-	"Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-	"shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-	"eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
-	"eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
-	Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-	"pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-	"libvir-list@redhat.com" <libvir-list@redhat.com>,
-	"arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
-	"felipe@nutanix.com" <felipe@nutanix.com>,
-	"Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>,
-	"dgilbert@redhat.com" <dgilbert@redhat.com>,
-	"zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-	"jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-	"intel-gvt-dev@lists.freedesktop.org"
-	<intel-gvt-dev@lists.freedesktop.org>, "Liu,
-	Changpeng" <changpeng.liu@intel.com>,
-	"cohuck@redhat.com" <cohuck@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Wang, Zhi A" <zhi.a.wang@intel.com>,
-	"dinechin@redhat.com" <dinechin@redhat.com>, "He,
-	Shaopeng" <shaopeng.he@intel.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org,
+	ard.biesheuvel@linaro.org, qemu-devel@nongnu.org,
+	mreitz@redhat.com, stefanha@redhat.com, guoheyi@huawei.com,
+	wanghaibin.wang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/8/19 11:22 PM, Alex Williamson wrote:
->>> I thought there was a request to make this more specific to migration
->>> by renaming it to something like migration_version.  Also, as an
->>>  =20
->> so this attribute may not only include a mdev device's parent device i=
-nfo and
->> mdev type, but also include numeric software version of vendor specifi=
-c
->> migration code, right?
-> It's a vendor defined string, it should be considered opaque to the
-> user, the vendor can include whatever they feel is relevant.
->=20
-Would a vendor also be allowed to provide a string expressing required=20
-features as well as containing backend resource requirements which need=20
-to be compatible for a successful migration? Somehow a bit like a cpu=20
-model... maybe even as json or xml...
-I am asking this with vfio-ap in mind. In that context checking=20
-compatibility of two vfio-ap mdev devices is not as simple as checking=20
-if version A is smaller or equal to version B.
 
---=20
-Mit freundlichen Gr=C3=BC=C3=9Fen/Kind regards
-    Boris Fiuczynski
 
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Matthias Hartmann
-Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+On 2019/5/8 21:20, Markus Armbruster wrote:
+> Laszlo Ersek <lersek@redhat.com> writes:
+> 
+>> Hi Markus,
+>>
+>> On 05/07/19 20:01, Markus Armbruster wrote:
+>>> The subject is slightly misleading.  Holes read as zero.  So do
+>>> non-holes full of zeroes.  The patch avoids reading the former, but
+>>> still reads the latter.
+>>>
+>>> Xiang Zheng <zhengxiang9@huawei.com> writes:
+>>>
+>>>> Currently we fill the memory space with two 64MB NOR images when
+>>>> using persistent UEFI variables on virt board. Actually we only use
+>>>> a very small(non-zero) part of the memory while the rest significant
+>>>> large(zero) part of memory is wasted.
+>>>
+>>> Neglects to mention that the "virt board" is ARM.
+>>>
+>>>> So this patch checks the block status and only writes the non-zero part
+>>>> into memory. This requires pflash devices to use sparse files for
+>>>> backends.
+>>>
+>>> I started to draft an improved commit message, but then I realized this
+>>> patch can't work.
+>>>
+>>> The pflash_cfi01 device allocates its device memory like this:
+>>>
+>>>     memory_region_init_rom_device(
+>>>         &pfl->mem, OBJECT(dev),
+>>>         &pflash_cfi01_ops,
+>>>         pfl,
+>>>         pfl->name, total_len, &local_err);
+>>>
+>>> pflash_cfi02 is similar.
+>>>
+>>> memory_region_init_rom_device() calls
+>>> memory_region_init_rom_device_nomigrate() calls qemu_ram_alloc() calls
+>>> qemu_ram_alloc_internal() calls g_malloc0().  Thus, all the device
+>>> memory gets written to even with this patch.
+>>
+>> As far as I can see, qemu_ram_alloc_internal() calls g_malloc0() only to
+>> allocate the the new RAMBlock object called "new_block". The actual
+>> guest RAM allocation occurs inside ram_block_add(), which is also called
+>> by qemu_ram_alloc_internal().
+> 
+> You're right.  I should've read more attentively.
+> 
+>> One frame outwards the stack, qemu_ram_alloc() passes NULL to
+>> qemu_ram_alloc_internal(), for the 4th ("host") parameter. Therefore, in
+>> qemu_ram_alloc_internal(), we set "new_block->host" to NULL as well.
+>>
+>> Then in ram_block_add(), we take the (!new_block->host) branch, and call
+>> phys_mem_alloc().
+>>
+>> Unfortunately, "phys_mem_alloc" is a function pointer, set with
+>> phys_mem_set_alloc(). The phys_mem_set_alloc() function is called from
+>> "target/s390x/kvm.c" (setting the function pointer to
+>> legacy_s390_alloc()), so it doesn't apply in this case. Therefore we end
+>> up calling the default qemu_anon_ram_alloc() function, through the
+>> funcptr. (I think anyway.)
+>>
+>> And qemu_anon_ram_alloc() boils down to mmap() + MAP_ANONYMOUS, in
+>> qemu_ram_mmap(). (Even on PPC64 hosts, because qemu_anon_ram_alloc()
+>> passes (-1) for "fd".)
+>>
+>> I may have missed something, of course -- I obviously didn't test it,
+>> just speculated from the source.
+> 
+> Thanks for your sleuthing!
+> 
+>>> I'm afraid you neglected to test.
+> 
+> Accusation actually unsupported.  I apologize, and replace it by a
+> question: have you observed the improvement you're trying to achieve,
+> and if yes, how?
+> 
+
+Yes, we need to create sparse files as the backing images for pflash device.
+To create sparse files like:
+
+   dd of="QEMU_EFI-pflash.raw" if="/dev/zero" bs=1M seek=64 count=0
+   dd of="QEMU_EFI-pflash.raw" if="QEMU_EFI.fd" conv=notrunc
+
+   dd of="empty_VARS.fd" if="/dev/zero" bs=1M seek=64 count=0
+
+Start a VM with below commandline:
+
+    -drive file=/usr/share/edk2/aarch64/QEMU_EFI-pflash.raw,if=pflash,format=raw,unit=0,readonly=on\
+    -drive file=/usr/share/edk2/aarch64/empty_VARS.fd,if=pflash,format=raw,unit=1 \
+
+Then observe the memory usage of the qemu process (THP is on).
+
+1) Without this patch:
+# cat /proc/`pidof qemu-system-aarch64`/smaps | grep AnonHugePages: | grep -v ' 0 kB'
+AnonHugePages:    706560 kB
+AnonHugePages:      2048 kB
+AnonHugePages:     65536 kB    // pflash memory device
+AnonHugePages:     65536 kB    // pflash memory device
+AnonHugePages:      2048 kB
+
+# ps aux | grep qemu-system-aarch64
+RSS: 879684
+
+2) After applying this patch:
+# cat /proc/`pidof qemu-system-aarch64`/smaps | grep AnonHugePages: | grep -v ' 0 kB'
+AnonHugePages:    700416 kB
+AnonHugePages:      2048 kB
+AnonHugePages:      2048 kB    // pflash memory device
+AnonHugePages:      2048 kB    // pflash memory device
+AnonHugePages:      2048 kB
+
+# ps aux | grep qemu-system-aarch64
+RSS: 744380
+
+Obviously, there are at least 100MiB memory saved for each guest.
+
+-- 
+
+Thanks,
+Xiang
+
 
 
