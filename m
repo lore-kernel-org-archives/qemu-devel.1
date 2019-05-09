@@ -2,60 +2,53 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E886AC04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:00:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEC7EC04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:03:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDD4F2054F
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:00:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDD4F2054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C4879205C9
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:03:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4879205C9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56107 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56134 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOkXE-00054b-1O
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 11:00:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41930)
+	id 1hOkZs-0006Uh-FZ
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 11:03:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hOkWL-0004gw-FO
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:59:42 -0400
+	(envelope-from <brogers@suse.com>) id 1hOkYv-00060x-7b
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:02:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hOkWH-0002Vn-MZ
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:59:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:19881)
+	(envelope-from <brogers@suse.com>) id 1hOkYq-0004CR-6u
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:02:21 -0400
+Received: from prv-mh.provo.novell.com ([137.65.248.74]:34243)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>)
-	id 1hOkWD-0002UL-SM; Thu, 09 May 2019 10:59:34 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 55631307E05F;
-	Thu,  9 May 2019 14:59:30 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-116-227.ams2.redhat.com
-	[10.36.116.227])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A4CAD600C7;
-	Thu,  9 May 2019 14:59:28 +0000 (UTC)
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu,  9 May 2019 16:59:27 +0200
-Message-Id: <20190509145927.293369-1-sgarzare@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Thu, 09 May 2019 14:59:30 +0000 (UTC)
+	(Exim 4.71) (envelope-from <brogers@suse.com>) id 1hOkYp-00045W-Tp
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:02:16 -0400
+Received: from INET-PRV-MTA by prv-mh.provo.novell.com
+	with Novell_GroupWise; Thu, 09 May 2019 09:02:11 -0600
+Message-Id: <5CD44158020000480009E63D@prv-mh.provo.novell.com>
+X-Mailer: Novell GroupWise Internet Agent 18.1.1 
+Date: Thu, 09 May 2019 09:03:52 -0600
+From: "Bruce Rogers" <brogers@suse.com>
+To: <qemu-devel@nongnu.org>,"Bruce Rogers" <BROGERS@suse.com>
+References: <20190411175138.12838-1-brogers@suse.com>
+In-Reply-To: <20190411175138.12838-1-brogers@suse.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3] block/rbd: increase dynamically the image
- size
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 137.65.248.74
+Subject: Re: [Qemu-devel] [PATCH] hw/smbios: handle both file formats
+ regardless of machine type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,130 +60,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
-	Jason Dillaman <jdillama@redhat.com>, qemu-block@nongnu.org,
-	Max Reitz <mreitz@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RBD APIs don't allow us to write more than the size set with
-rbd_create() or rbd_resize().
-In order to support growing images (eg. qcow2), we resize the
-image before write operations that exceed the current size.
+>>> On 4/11/2019 at 11:51 AM, Bruce Rogers <brogers@suse.com> wrote:
+> It's easy enough to handle either per=E2=80=91spec or legacy smbios =
+structures
+> in the smbios file input without regard to the machine type used, by
+> simply applying the basic smbios formatting rules. then depending on
+> what is detected. terminal numm bytes are added or removed for machine
+> type specific processing.
+>=20
+> Signed=E2=80=91off=E2=80=91by: Bruce Rogers <brogers@suse.com>
+> =E2=80=91=E2=80=91=E2=80=91
+>  hw/smbios/smbios.c | 43 +++++++++++++++++++++++++++++++++++++++=E2=80=91=
+=E2=80=91=E2=80=91=E2=80=91
+>  1 file changed, 39 insertions(+), 4 deletions(=E2=80=91)
+>=20
+> diff =E2=80=91=E2=80=91git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+> index 47be9071fa..d4b95ebc84 100644
+> =E2=80=91=E2=80=91=E2=80=91 a/hw/smbios/smbios.c
+> +++ b/hw/smbios/smbios.c
+> @@ =E2=80=91960,6 +960,7 @@ void smbios_entry_add(QemuOpts *opts, Error =
+**errp)
+>          struct smbios_structure_header *header;
+>          int size;
+>          struct smbios_table *table; /* legacy mode only */
+> +        uint8_t *dbl_nulls, *orig_end;
+> =20
+>          qemu_opts_validate(opts, qemu_smbios_file_opts, &err);
+>          if (err) {
+> @@ =E2=80=91974,11 +975,21 @@ void smbios_entry_add(QemuOpts *opts, =
+Error **errp)
+>          }
+> =20
+>          /*
+> =E2=80=91         * NOTE: standard double '\0' terminator expected, per =
+smbios spec.
+> =E2=80=91         * (except in legacy mode, where the second '\0' is =
+implicit and
+> =E2=80=91         *  will be inserted by the BIOS).
+> +         * NOTE: standard double '\0' terminator expected, per smbios =
+spec,
+> +         * unless the data is formatted for legacy mode, which is used =
+by
+> +         * pc=E2=80=91i440fx=E2=80=912.0 and earlier machine types. =
+Legacy mode structures
+> +         * without strings have no '\0' terminators, and those with =
+strings
+> +         * also don't have an additional '\0' terminator at the end of =
+the
+> +         * final string '\0' terminator. The BIOS will add the '\0'=20
+> terminators
+> +         * to comply with the smbios spec.
+> +         * For greater compatibility, regardless of the machine type =
+used,
+> +         * either format is accepted.
+>           */
+> =E2=80=91        smbios_tables =3D g_realloc(smbios_tables, smbios_tables=
+_len + size);
+> +        smbios_tables =3D g_realloc(smbios_tables, smbios_tables_len + =
+size +=20
+> 2);
+> +        orig_end =3D smbios_tables + smbios_tables_len + size;
+> +        /* add extra null bytes to end in case of legacy file data */
+> +        *orig_end =3D '\0';
+> +        *(orig_end + 1) =3D '\0';
+>          header =3D (struct smbios_structure_header *)(smbios_tables +
+>                                                      smbios_tables_len);
+> =20
+> @@ =E2=80=91993,6 +1004,19 @@ void smbios_entry_add(QemuOpts *opts, =
+Error **errp)
+>                         header=E2=80=91>type);
+>              return;
+>          }
+> +        for (dbl_nulls =3D smbios_tables + smbios_tables_len + =
+header=E2=80=91>length;
+> +             dbl_nulls + 2 <=3D orig_end; dbl_nulls++) {
+> +            if (*dbl_nulls =3D=3D '\0' && *(dbl_nulls + 1) =3D=3D '\0') =
+{
+> +                break;
+> +            }
+> +        }
+> +        if (dbl_nulls + 2  < orig_end) {
+> +            error_setg(errp, "SMBIOS file data malformed");
+> +            return;
+> +        }
+> +        /* increase size by how many extra nulls were actually needed =
+*/
+> +        size +=3D dbl_nulls + 2 =E2=80=91 orig_end;
+> +        smbios_tables =3D g_realloc(smbios_tables, smbios_tables_len + =
+size);
+>          set_bit(header=E2=80=91>type, have_binfile_bitmap);
+> =20
+>          if (header=E2=80=91>type =3D=3D 4) {
+> @@ =E2=80=911013,6 +1037,17 @@ void smbios_entry_add(QemuOpts *opts, =
+Error **errp)
+>           *       delete the one we don't need from smbios_set_defaults()=
+,
+>           *       once we know which machine version has been requested.
+>           */
+> +        if (dbl_nulls + 2 =3D=3D orig_end) {
+> +            /* chop off nulls to get legacy format */
+> +            if (header=E2=80=91>length + 2 =3D=3D size) {
+> +                size =E2=80=91=3D 2;
+> +            } else {
+> +                size =E2=80=91=3D 1;
+> +        
+    }
+> +        } else {
+> +            /* undo conversion from legacy format to per=E2=80=91spec =
+format */
+> +            size =E2=80=91=3D dbl_nulls + 2 =E2=80=91 orig_end;
+> +        }
+>          if (!smbios_entries) {
+>              smbios_entries_len =3D sizeof(uint16_t);
+>              smbios_entries =3D g_malloc0(smbios_entries_len);
+> =E2=80=91=E2=80=91=20
+> 2.21.0
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
-v3:
-  - add 'image_size' field in the BDRVRBDState to keep track of the
-    current size of the RBD image [Jason, Kevin]
----
- block/rbd.c | 42 +++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 39 insertions(+), 3 deletions(-)
+ping
 
-diff --git a/block/rbd.c b/block/rbd.c
-index 0c549c9935..b0355a2ce0 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -102,6 +102,7 @@ typedef struct BDRVRBDState {
-     rbd_image_t image;
-     char *image_name;
-     char *snap;
-+    uint64_t image_size;
- } BDRVRBDState;
-=20
- static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
-@@ -777,6 +778,14 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict=
- *options, int flags,
-         goto failed_open;
-     }
-=20
-+    r =3D rbd_get_size(s->image, &s->image_size);
-+    if (r < 0) {
-+        error_setg_errno(errp, -r, "error getting image size from %s",
-+                         s->image_name);
-+        rbd_close(s->image);
-+        goto failed_open;
-+    }
-+
-     /* If we are using an rbd snapshot, we must be r/o, otherwise
-      * leave as-is */
-     if (s->snap !=3D NULL) {
-@@ -833,6 +842,22 @@ static void qemu_rbd_close(BlockDriverState *bs)
-     rados_shutdown(s->cluster);
- }
-=20
-+/* Resize the RBD image and update the 'image_size' with the current siz=
-e */
-+static int qemu_rbd_resize(BlockDriverState *bs, uint64_t size)
-+{
-+    BDRVRBDState *s =3D bs->opaque;
-+    int r;
-+
-+    r =3D rbd_resize(s->image, size);
-+    if (r < 0) {
-+        return r;
-+    }
-+
-+    s->image_size =3D size;
-+
-+    return 0;
-+}
-+
- static const AIOCBInfo rbd_aiocb_info =3D {
-     .aiocb_size =3D sizeof(RBDAIOCB),
- };
-@@ -934,13 +959,25 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *=
-bs,
-     }
-=20
-     switch (cmd) {
--    case RBD_AIO_WRITE:
-+    case RBD_AIO_WRITE: {
-+        /*
-+         * RBD APIs don't allow us to write more than actual size, so in=
- order
-+         * to support growing images, we resize the image before write
-+         * operations that exceed the current size.
-+         */
-+        if (off + size > s->image_size) {
-+            r =3D qemu_rbd_resize(bs, off + size);
-+            if (r < 0) {
-+                goto failed_completion;
-+            }
-+        }
- #ifdef LIBRBD_SUPPORTS_IOVEC
-             r =3D rbd_aio_writev(s->image, qiov->iov, qiov->niov, off, c=
-);
- #else
-             r =3D rbd_aio_write(s->image, off, size, rcb->buf, c);
- #endif
-         break;
-+    }
-     case RBD_AIO_READ:
- #ifdef LIBRBD_SUPPORTS_IOVEC
-             r =3D rbd_aio_readv(s->image, qiov->iov, qiov->niov, off, c)=
-;
-@@ -1051,7 +1088,6 @@ static int coroutine_fn qemu_rbd_co_truncate(BlockD=
-riverState *bs,
-                                              PreallocMode prealloc,
-                                              Error **errp)
- {
--    BDRVRBDState *s =3D bs->opaque;
-     int r;
-=20
-     if (prealloc !=3D PREALLOC_MODE_OFF) {
-@@ -1060,7 +1096,7 @@ static int coroutine_fn qemu_rbd_co_truncate(BlockD=
-riverState *bs,
-         return -ENOTSUP;
-     }
-=20
--    r =3D rbd_resize(s->image, offset);
-+    r =3D qemu_rbd_resize(bs, offset);
-     if (r < 0) {
-         error_setg_errno(errp, -r, "Failed to resize file");
-         return r;
---=20
-2.20.1
-
+- Bruce
 
