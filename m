@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FDCEC04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:27:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 047CAC04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:28:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0406F20863
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:27:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0406F20863
+	by mail.kernel.org (Postfix) with ESMTPS id BBCDF208C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:28:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBCDF208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50340 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50356 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOeOn-0001lV-7w
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 04:27:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44783)
+	id 1hOeQ3-0002kM-1X
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 04:28:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOeHb-0002DM-DP
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:20:05 -0400
+	(envelope-from <thuth@redhat.com>) id 1hOeHX-0002BB-5r
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:20:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOeHa-0000TW-3y
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:20:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38266)
+	(envelope-from <thuth@redhat.com>) id 1hOeHV-0000Qy-RS
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:19:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53754)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hOeHZ-0000T9-Si
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:20:02 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hOeHV-0000Qf-Jn
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:19:57 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3672285539;
-	Thu,  9 May 2019 08:20:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EBED1308425B;
+	Thu,  9 May 2019 08:19:56 +0000 (UTC)
 Received: from thuth.com (ovpn-116-115.ams2.redhat.com [10.36.116.115])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 321F25B680;
-	Thu,  9 May 2019 08:19:59 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id DEC9A5B680;
+	Thu,  9 May 2019 08:19:55 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Date: Thu,  9 May 2019 10:19:29 +0200
-Message-Id: <20190509081930.19081-14-thuth@redhat.com>
+Date: Thu,  9 May 2019 10:19:26 +0200
+Message-Id: <20190509081930.19081-11-thuth@redhat.com>
 In-Reply-To: <20190509081930.19081-1-thuth@redhat.com>
 References: <20190509081930.19081-1-thuth@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Thu, 09 May 2019 08:20:01 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Thu, 09 May 2019 08:19:56 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 13/14] target/sh4: Fix LGPL information in the
- file headers
+Subject: [Qemu-devel] [PULL 10/14] tests: qpci_unplug_acpi_device_test()
+ should not rely on global_qtest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,114 +74,187 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's either "GNU *Library* General Public License version 2" or "GNU
-Lesser General Public License version *2.1*", but there was no "version
-2.0" of the "Lesser" license. So assume that version 2.1 is meant here.
+libqos functions should not use functions that require global_qtest to
+be set, since such library functions could also be used by tests that
+deal with multiple test states. Add a parameter to this function to
+explicitly specify the test state.
 
-Message-Id: <1550073530-4138-1-git-send-email-thuth@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20190508143209.24350-1-thuth@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- linux-user/sh4/target_cpu.h     | 2 +-
- linux-user/sh4/target_structs.h | 2 +-
- target/sh4/cpu.h                | 2 +-
- target/sh4/gdbstub.c            | 2 +-
- target/sh4/helper.c             | 2 +-
- target/sh4/op_helper.c          | 2 +-
- target/sh4/translate.c          | 2 +-
- 7 files changed, 7 insertions(+), 7 deletions(-)
+ tests/e1000e-test.c     |  4 +++-
+ tests/ivshmem-test.c    |  9 ++++++---
+ tests/libqos/pci-pc.c   | 10 +++++-----
+ tests/libqos/pci.h      |  2 +-
+ tests/virtio-blk-test.c |  3 ++-
+ tests/virtio-net-test.c |  4 +++-
+ tests/virtio-rng-test.c |  5 ++++-
+ 7 files changed, 24 insertions(+), 13 deletions(-)
 
-diff --git a/linux-user/sh4/target_cpu.h b/linux-user/sh4/target_cpu.h
-index 1a647ddb98..b0be9a2c1b 100644
---- a/linux-user/sh4/target_cpu.h
-+++ b/linux-user/sh4/target_cpu.h
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/linux-user/sh4/target_structs.h b/linux-user/sh4/target_stru=
-cts.h
-index 3e832bf69a..00ac39478b 100644
---- a/linux-user/sh4/target_structs.h
-+++ b/linux-user/sh4/target_structs.h
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
-index 84b08ff640..1be36fe875 100644
---- a/target/sh4/cpu.h
-+++ b/target/sh4/cpu.h
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/sh4/gdbstub.c b/target/sh4/gdbstub.c
-index 13bea00d7d..54568e96f9 100644
---- a/target/sh4/gdbstub.c
-+++ b/target/sh4/gdbstub.c
-@@ -7,7 +7,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/sh4/helper.c b/target/sh4/helper.c
-index 2ff0cf4060..fa51269fb1 100644
---- a/target/sh4/helper.c
-+++ b/target/sh4/helper.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/sh4/op_helper.c b/target/sh4/op_helper.c
-index 4f825bae5a..28027f9e0b 100644
---- a/target/sh4/op_helper.c
-+++ b/target/sh4/op_helper.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index cdf0888490..5a7d8c4535 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
+index 77ba8095bb..6a946c0484 100644
+--- a/tests/e1000e-test.c
++++ b/tests/e1000e-test.c
+@@ -231,8 +231,10 @@ static void test_e1000e_multiple_transfers(void *obj=
+, void *data,
+=20
+ static void test_e1000e_hotplug(void *obj, void *data, QGuestAllocator *=
+ alloc)
+ {
++    QTestState *qts =3D global_qtest;  /* TODO: get rid of global_qtest =
+here */
++
+     qtest_qmp_device_add("e1000e", "e1000e_net", "{'addr': '0x06'}");
+-    qpci_unplug_acpi_device_test("e1000e_net", 0x06);
++    qpci_unplug_acpi_device_test(qts, "e1000e_net", 0x06);
+ }
+=20
+ static void data_test_clear(void *sockets)
+diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
+index 227561fbca..a467b8c03d 100644
+--- a/tests/ivshmem-test.c
++++ b/tests/ivshmem-test.c
+@@ -383,18 +383,21 @@ static void test_ivshmem_server(void)
+=20
+ static void test_ivshmem_hotplug(void)
+ {
++    QTestState *qts;
+     const char *arch =3D qtest_get_arch();
+=20
+-    qtest_start("-object memory-backend-ram,size=3D1M,id=3Dmb1");
++    qts =3D qtest_init("-object memory-backend-ram,size=3D1M,id=3Dmb1");
+=20
++    global_qtest =3D qts;  /* TODO: Get rid of global_qtest here */
+     qtest_qmp_device_add("ivshmem-plain", "iv1",
+                          "{'addr': %s, 'memdev': 'mb1'}",
+                          stringify(PCI_SLOT_HP));
+     if (strcmp(arch, "ppc64") !=3D 0) {
+-        qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
++        qpci_unplug_acpi_device_test(qts, "iv1", PCI_SLOT_HP);
+     }
+=20
+-    qtest_end();
++    qtest_quit(qts);
++    global_qtest =3D NULL;
+ }
+=20
+ static void test_ivshmem_memdev(void)
+diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
+index 407d8aff78..634fedd049 100644
+--- a/tests/libqos/pci-pc.c
++++ b/tests/libqos/pci-pc.c
+@@ -176,19 +176,19 @@ void qpci_free_pc(QPCIBus *bus)
+     g_free(s);
+ }
+=20
+-void qpci_unplug_acpi_device_test(const char *id, uint8_t slot)
++void qpci_unplug_acpi_device_test(QTestState *qts, const char *id, uint8=
+_t slot)
+ {
+     QDict *response;
+=20
+-    response =3D qmp("{'execute': 'device_del', 'arguments': {'id': %s}}=
+",
+-                   id);
++    response =3D qtest_qmp(qts, "{'execute': 'device_del',"
++                              " 'arguments': {'id': %s}}", id);
+     g_assert(response);
+     g_assert(!qdict_haskey(response, "error"));
+     qobject_unref(response);
+=20
+-    outb(ACPI_PCIHP_ADDR + PCI_EJ_BASE, 1 << slot);
++    qtest_outb(qts, ACPI_PCIHP_ADDR + PCI_EJ_BASE, 1 << slot);
+=20
+-    qmp_eventwait("DEVICE_DELETED");
++    qtest_qmp_eventwait(qts, "DEVICE_DELETED");
+ }
+=20
+ static void qpci_pc_register_nodes(void)
+diff --git a/tests/libqos/pci.h b/tests/libqos/pci.h
+index 8e1d292a7d..a5389a5845 100644
+--- a/tests/libqos/pci.h
++++ b/tests/libqos/pci.h
+@@ -123,7 +123,7 @@ QPCIBar qpci_iomap(QPCIDevice *dev, int barno, uint64=
+_t *sizeptr);
+ void qpci_iounmap(QPCIDevice *dev, QPCIBar addr);
+ QPCIBar qpci_legacy_iomap(QPCIDevice *dev, uint16_t addr);
+=20
+-void qpci_unplug_acpi_device_test(const char *id, uint8_t slot);
++void qpci_unplug_acpi_device_test(QTestState *qs, const char *id, uint8_=
+t slot);
+=20
+ void add_qpci_address(QOSGraphEdgeOptions *opts, QPCIAddress *addr);
+ #endif
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index b65365934b..fe1168a90a 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -679,6 +679,7 @@ static void pci_hotplug(void *obj, void *data, QGuest=
+Allocator *t_alloc)
+ {
+     QVirtioPCIDevice *dev1 =3D obj;
+     QVirtioPCIDevice *dev;
++    QTestState *qts =3D dev1->pdev->bus->qts;
+=20
+     /* plug secondary disk */
+     qtest_qmp_device_add("virtio-blk-pci", "drv1",
+@@ -693,7 +694,7 @@ static void pci_hotplug(void *obj, void *data, QGuest=
+Allocator *t_alloc)
+     qos_object_destroy((QOSGraphObject *)dev);
+=20
+     /* unplug secondary disk */
+-    qpci_unplug_acpi_device_test("drv1", PCI_SLOT_HP);
++    qpci_unplug_acpi_device_test(qts, "drv1", PCI_SLOT_HP);
+ }
+=20
+ /*
+diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
+index 0d956f36fe..163126cf07 100644
+--- a/tests/virtio-net-test.c
++++ b/tests/virtio-net-test.c
+@@ -162,13 +162,15 @@ static void stop_cont_test(void *obj, void *data, Q=
+GuestAllocator *t_alloc)
+=20
+ static void hotplug(void *obj, void *data, QGuestAllocator *t_alloc)
+ {
++    QVirtioPCIDevice *dev =3D obj;
++    QTestState *qts =3D dev->pdev->bus->qts;
+     const char *arch =3D qtest_get_arch();
+=20
+     qtest_qmp_device_add("virtio-net-pci", "net1",
+                          "{'addr': %s}", stringify(PCI_SLOT_HP));
+=20
+     if (strcmp(arch, "i386") =3D=3D 0 || strcmp(arch, "x86_64") =3D=3D 0=
+) {
+-        qpci_unplug_acpi_device_test("net1", PCI_SLOT_HP);
++        qpci_unplug_acpi_device_test(qts, "net1", PCI_SLOT_HP);
+     }
+ }
+=20
+diff --git a/tests/virtio-rng-test.c b/tests/virtio-rng-test.c
+index 5309c7c8ab..fcb22481bd 100644
+--- a/tests/virtio-rng-test.c
++++ b/tests/virtio-rng-test.c
+@@ -16,13 +16,16 @@
+=20
+ static void rng_hotplug(void *obj, void *data, QGuestAllocator *alloc)
+ {
++    QVirtioPCIDevice *dev =3D obj;
++    QTestState *qts =3D dev->pdev->bus->qts;
++
+     const char *arch =3D qtest_get_arch();
+=20
+     qtest_qmp_device_add("virtio-rng-pci", "rng1",
+                          "{'addr': %s}", stringify(PCI_SLOT_HP));
+=20
+     if (strcmp(arch, "i386") =3D=3D 0 || strcmp(arch, "x86_64") =3D=3D 0=
+) {
+-        qpci_unplug_acpi_device_test("rng1", PCI_SLOT_HP);
++        qpci_unplug_acpi_device_test(qts, "rng1", PCI_SLOT_HP);
+     }
+ }
+=20
 --=20
 2.21.0
 
