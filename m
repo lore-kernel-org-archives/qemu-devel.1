@@ -2,66 +2,97 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA27AC04AB3
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:55:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 842AEC04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:56:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 808ED2177E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:55:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 808ED2177E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 500002175B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:56:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Zhfekn5y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 500002175B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56927 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56932 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOlOb-0005mQ-Ql
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 11:55:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54938)
+	id 1hOlOx-0006Ao-Hv
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 11:56:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hOlNU-0005Fc-KG
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:54:37 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hOlNp-0005S2-EB
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:54:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hOlNT-0001SO-3u
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:54:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35937)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hOlNS-0001S6-Pd
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:54:34 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 22D1599C1D;
-	Thu,  9 May 2019 15:54:28 +0000 (UTC)
-Received: from gondolin (dhcp-192-213.str.redhat.com [10.33.192.213])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B360F1001E65;
-	Thu,  9 May 2019 15:54:06 +0000 (UTC)
-Date: Thu, 9 May 2019 17:54:04 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190509175404.512ae7aa.cohuck@redhat.com>
-In-Reply-To: <20190509154857.GF2868@work-vm>
-References: <20190506014514.3555-1-yan.y.zhao@intel.com>
-	<20190506014904.3621-1-yan.y.zhao@intel.com>
-	<20190507151826.502be009@x1.home>
-	<20190509173839.2b9b2b46.cohuck@redhat.com>
-	<20190509154857.GF2868@work-vm>
-Organization: Red Hat GmbH
+	(envelope-from <richard.henderson@linaro.org>) id 1hOlNo-0001Ze-JO
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:54:57 -0400
+Received: from mail-pf1-x42e.google.com ([2607:f8b0:4864:20::42e]:44596)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hOlNo-0001ZG-Be
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:54:56 -0400
+Received: by mail-pf1-x42e.google.com with SMTP id g9so1529057pfo.11
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 08:54:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=MnaDvoTwObsWhz1roI1y4mc4jP6h3T88yjbG9f9hsEk=;
+	b=Zhfekn5y3L+Lsn2XcW6rw1SoUehxqJP/fdGYq6odkkdgwPg2kEBxYdnM1WBcsxKEnP
+	SISOc6hsF6dw1AeD+yvvqtXpS6GIudRgICdyGdLqpTXP3YE0jkS7QlV0cl0v3gkEqzUO
+	QuyVNaO10UQ+H/w72qZXcDUW7m9YR7gvHy/iwbFoWJl14IFYAqfvGXaPaSDSDk5eZUMP
+	ap1pXkww/IygT7saA7eXG+BMtZqQi7ED0AMgTZvlr0XlwTjx1c3fdoIQ5iP5NCr4E1E6
+	+Q+0U3zhb5hWxqapSa7UTMHYLhVutvPtdJOPw8GDk/KPfDDb8OA5BVcswK27N3r09l8w
+	pNkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=MnaDvoTwObsWhz1roI1y4mc4jP6h3T88yjbG9f9hsEk=;
+	b=USLxanqndD4RSig4E6/Bu2kA7uFgCRHFfQGCBme4cfin/RL4Q8M5VPD/w1nWeN+9CT
+	a4IMvSH8Vwfaw8JKaAR3jajQaGOijHVf8/0D9bhFLKtFfNc/0Cv7FaDUFNyiyVHvd2g/
+	bOhlV3Pa+MfaywnQ2HU/SIWdmLOqlLP9ylt8aaG6tpQEwklijnU3uaj1qamVAId+BiLY
+	CwUlGKeNlrJWVyGR4o808ge5pH/XIxYr3x6nV4qbWa5XZRseZ84+ensJzPk5R2KwIGCw
+	v3bOvCiN5BfjSy46L1UskHNPGinui8s4JFxt/cU9PktK6+yiX/WCU5PAMVD+x3S2rvKC
+	BsoQ==
+X-Gm-Message-State: APjAAAXflZQssPpYcz4RbSTAqyNzxYEvLpgHxCycUzxHh22BpVVlEHis
+	LZvwaav2M9UZGiKI2nAwZnj8eKW+Wq8=
+X-Google-Smtp-Source: APXvYqx+9C7qOJfIDoSN+FYLi9txrbOkbbGcGkhHreNcQmAmpe9BMLi2gVaPtWNada4umnlpYI62oA==
+X-Received: by 2002:a62:2fc7:: with SMTP id v190mr6166367pfv.10.1557417294680; 
+	Thu, 09 May 2019 08:54:54 -0700 (PDT)
+Received: from [172.31.99.192] (50-248-210-99-static.hfc.comcastbusiness.net.
+	[50.248.210.99]) by smtp.gmail.com with ESMTPSA id
+	v82sm5314160pfa.170.2019.05.09.08.54.53
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 09 May 2019 08:54:54 -0700 (PDT)
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <20190118213122.22865-1-richard.henderson@linaro.org>
+	<20190118213122.22865-48-richard.henderson@linaro.org>
+	<86bae9b3-75c8-64df-92d1-b4efc35b646c@vivier.eu>
+	<c1dc5dbc-cbc7-16a3-9d14-c93b52c362fd@vivier.eu>
+	<2004b6c4-0aea-f535-d2bc-80d5c14537be@linaro.org>
+	<d0735945-f5de-5ddc-327a-53eaec40d0d1@linaro.org>
+	<48937430-bbb1-6c26-3fae-6cc841580555@linaro.org>
+	<8e4caba8-4e69-8af3-5c78-afafd9f8182c@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <66d2bcb8-4545-75f1-8f54-87c5291e37cf@linaro.org>
+Date: Thu, 9 May 2019 08:54:51 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <8e4caba8-4e69-8af3-5c78-afafd9f8182c@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Thu, 09 May 2019 15:54:33 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] vfio/mdev: add version attribute
- for mdev device
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::42e
+Subject: Re: [Qemu-devel] [PATCH v6 48/49] linux-user: Split out ioctl
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,61 +104,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cjia@nvidia.com, kvm@vger.kernel.org, aik@ozlabs.ru,
-	Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
-	qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com,
-	yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com,
-	mlevitsk@redhat.com, pasic@linux.ibm.com, libvir-list@redhat.com,
-	arei.gonglei@huawei.com, felipe@nutanix.com, Ken.Xue@amd.com,
-	kevin.tian@intel.com, Yan Zhao <yan.y.zhao@intel.com>,
-	zhenyuw@linux.intel.com, dinechin@redhat.com,
-	Alex Williamson <alex.williamson@redhat.com>,
-	intel-gvt-dev@lists.freedesktop.org, changpeng.liu@intel.com,
-	linux-kernel@vger.kernel.org, zhi.a.wang@intel.com,
-	jonathan.davies@nutanix.com, shaopeng.he@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 9 May 2019 16:48:57 +0100
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+On 5/9/19 8:44 AM, Laurent Vivier wrote:
+> Do you plan to send a new version of this series?
 
-> * Cornelia Huck (cohuck@redhat.com) wrote:
-> > On Tue, 7 May 2019 15:18:26 -0600
-> > Alex Williamson <alex.williamson@redhat.com> wrote:
-> >   
-> > > On Sun,  5 May 2019 21:49:04 -0400
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:  
-> >   
-> > > > +  Errno:
-> > > > +  If vendor driver wants to claim a mdev device incompatible to all other mdev
-> > > > +  devices, it should not register version attribute for this mdev device. But if
-> > > > +  a vendor driver has already registered version attribute and it wants to claim
-> > > > +  a mdev device incompatible to all other mdev devices, it needs to return
-> > > > +  -ENODEV on access to this mdev device's version attribute.
-> > > > +  If a mdev device is only incompatible to certain mdev devices, write of
-> > > > +  incompatible mdev devices's version strings to its version attribute should
-> > > > +  return -EINVAL;    
-> > > 
-> > > I think it's best not to define the specific errno returned for a
-> > > specific situation, let the vendor driver decide, userspace simply
-> > > needs to know that an errno on read indicates the device does not
-> > > support migration version comparison and that an errno on write
-> > > indicates the devices are incompatible or the target doesn't support
-> > > migration versions.  
-> > 
-> > I think I have to disagree here: It's probably valuable to have an
-> > agreed error for 'cannot migrate at all' vs 'cannot migrate between
-> > those two particular devices'. Userspace might want to do different
-> > things (e.g. trying with different device pairs).  
-> 
-> Trying to stuff these things down an errno seems a bad idea; we can't
-> get much information that way.
+Yes.  Soon(tm).
 
-So, what would be a reasonable approach? Userspace should first read
-the version attributes on both devices (to find out whether migration
-is supported at all), and only then figure out via writing whether they
-are compatible?
 
-(Or just go ahead and try, if it does not care about the reason.)
+r~
 
