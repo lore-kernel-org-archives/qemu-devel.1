@@ -2,91 +2,89 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93E56C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D2DC04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:01:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60A6020656
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:00:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 21636216C4
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:01:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DzbI1zvv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60A6020656
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RkifXN5H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21636216C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57993 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57997 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOmPg-0007xF-FZ
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 13:00:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49428)
+	id 1hOmQ6-0008LX-CY
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 13:01:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOmNw-0006sT-VZ
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:59:09 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hOmO4-0006w0-KO
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:59:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOmNw-0004nF-1A
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:59:08 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:34393)
+	(envelope-from <alex.bennee@linaro.org>) id 1hOmO3-0004pm-K0
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:59:16 -0400
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:51419)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hOmNv-0004mk-PR
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:59:07 -0400
-Received: by mail-pg1-x544.google.com with SMTP id c13so1528340pgt.1
-	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 09:59:07 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hOmO3-0004pI-CT
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:59:15 -0400
+Received: by mail-wm1-x32c.google.com with SMTP id o189so4179425wmb.1
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 09:59:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=7RuyQx//oo2EMwy5keSM46lL/6qbPwtXookn1XI1hcQ=;
-	b=DzbI1zvvwFFDr3j6gnuf0QauCmv1tIL+xE/PM3ITa1QPhhZyBT/ZMHGv/vnZoNjSXF
-	y81wUWroBaddYI/DegKTNXtapV+gzXI3vxGk7uee/NJ8/hgxciTj3Fcua82JJz5z6AtN
-	35gSv9RIwaOk3+WKTf42xy92iCpvhPxHtBvG4KtdeEfkAt0efmzvPMGQs02BJClpnFDA
-	I70fVstxpyQDBOwLaDadTr5tqemZ6ycnhEtW0zeTtaq8JUZS5X5WIhcdvAmbuQY9QYgy
-	aBaQXocDWUCr3zw5qAtB+kAo1mOG4wbiQckDSNVb/tyqYXRnNp9/V2P+Z2o2jlWaEZBV
-	umGw==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=GPWkl0UZnL+LwntGtFPT1SPNtCHAc7QYKT2apLIn060=;
+	b=RkifXN5H2o81L7Q9CxT0Xoqgl3MzoHci0nTItRsIciLS7azOnmr3X20Xt/KuPKBrUQ
+	cxSspFNBCB6rEfrvEiKYPhbNkHO3bFnRcz9TaS987NbrKb38ar5vxV1akgUsuCgRgWGN
+	Syq9EuqYWTrA5A/xeYQKEfN1t3qWxCxxHmaECqX5Dwy8Wow6AYKXVcp99SZw+7+dG6r4
+	qqq6qnb4EROqOhfK7P4cRydnJMj7VPk/vnHHsbLjY+0M4KTPp7YDg4AOoasU4Y9aiQ2z
+	QgDVe8fvNGor7Hj9iiD2pFCefOBoUULtYCQxVbCx35z8lPLEZ0zp5rcsEt6V+JmoSgBS
+	ofRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=7RuyQx//oo2EMwy5keSM46lL/6qbPwtXookn1XI1hcQ=;
-	b=azaTLhzTLGPQy/it4qUO5cPhkfNllCuUDwArC60IRgGzGDOg3wt7VOE98Ek1pD+dA/
-	ew0Sk15P887zUkWyDajWgBfgxWUec3374gROEA4Ul8x9ZXHUXrnWl8yxdtfIi8rRKvE2
-	pIW/sY03Q6uJ4igXO9D1Zej+Jawgp/UUm7yVzxM2jV91WPsed4ByO8m1dc/BTs0cwR6l
-	nWo6a4gKh1d6K3PzOSFK7UBoy6SgKD1tDxdemld9Cp8tJEmMjBHsT2TmA0Qo89imprLX
-	pvw7Ic92x6TWWKLkXy6ye3bA58GERNNhhzFFUp426nqPM2LA8pOHNQnye+9cVlpONk/G
-	/Hwg==
-X-Gm-Message-State: APjAAAXwSJiQyI1RUCgpIZQG37EOZTrjoDhz3JEFzVIoL3DtTE9Auw4m
-	ra6cNqOjZFKkSItkUaopA3b3yQ==
-X-Google-Smtp-Source: APXvYqzIv1Sn1yQJyVEEaf5iyqirAL3+SDH4uj3bBN7OzNu+s/NrOSvAulLOWE3Q4avkWzITVAqSOQ==
-X-Received: by 2002:a63:5f42:: with SMTP id t63mr6802560pgb.275.1557421146613; 
-	Thu, 09 May 2019 09:59:06 -0700 (PDT)
-Received: from [172.31.99.192] (50-248-210-99-static.hfc.comcastbusiness.net.
-	[50.248.210.99]) by smtp.gmail.com with ESMTPSA id
-	n64sm4422879pfb.38.2019.05.09.09.59.05
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 09 May 2019 09:59:05 -0700 (PDT)
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-References: <20190509142342.6132-1-lvivier@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <1a0649e8-b283-2cb5-9621-4eacf086d300@linaro.org>
-Date: Thu, 9 May 2019 09:59:03 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=GPWkl0UZnL+LwntGtFPT1SPNtCHAc7QYKT2apLIn060=;
+	b=jgbL6gw2zrLaisz7qGklbVtI3TlTEsP+vyVE5LT2/Tcv8HVBBgQ2cc/CBbLGC3SCPJ
+	qhmgyIT7VgpOwfdF3dYlS93GC0Ce1gP/Um5HRV2pII/NB7wqrCeYHvpfcsY6WpO2ZvBV
+	Sr3inScGP5aT3ri+c8mlVV0lXfsXJdLtEa92KHmKKznklsbouMLpjb7/9afibpPftYU8
+	ijChHTZKs5GeWDCjM0DTpbrKg6LnE8sasL+3QRm6oJTE8ZE5BDexZHznf4ztBsCiEySy
+	dGsB5zTPA9u4r1tFHkjDRmMbJUhE78voJdBNIfoVL2MitMQEbCcqhKjLtiNXa0HWw0Z5
+	0ZQg==
+X-Gm-Message-State: APjAAAUzGREPRubEzAIpan7GyN3NMb9ARmsQbsMB04w0tv9Tbd7V3wxe
+	WQh2uoYy5fTGoNaqQmMyr2q2Uw==
+X-Google-Smtp-Source: APXvYqxO4mrI+IZ8G6oo79UFvT+XfLjPHMDH6jzJuMPF67uoLomgBv+RNp5fRpIFDhvOsJkZVejksw==
+X-Received: by 2002:a7b:c3da:: with SMTP id t26mr3875216wmj.40.1557421154104; 
+	Thu, 09 May 2019 09:59:14 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	e16sm3494812wrw.24.2019.05.09.09.59.12
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 09 May 2019 09:59:12 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 1F4D41FF8C;
+	Thu,  9 May 2019 17:59:12 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Thu,  9 May 2019 17:58:49 +0100
+Message-Id: <20190509165912.10512-2-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190509165912.10512-1-alex.bennee@linaro.org>
+References: <20190509165912.10512-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190509142342.6132-1-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: Re: [Qemu-devel] [RFC] rng-builtin: add an RNG backend that uses
- qemu_guest_getrandom()
+X-Received-From: 2a00:1450:4864:20::32c
+Subject: [Qemu-devel] [PATCH  v1 01/23] tests/docker: add ubuntu 18.04
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,57 +96,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>, Amit Shah <amit@kernel.org>,
-	"Richard W . M . Jones" <rjones@redhat.com>,
-	Kashyap Chamarthy <kchamart@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	qemu-arm@nongnu.org,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/9/19 7:23 AM, Laurent Vivier wrote:
-> Add a new RNG backend using QEMU builtin getrandom function.
-> 
-> It can be created with "-object rng-builtin".
-> 
-> This patch applies on top of
-> "[PATCH v4 00/24] Add qemu_getrandom and ARMv8.5-RNG etc"
-> Based-on: <20190506173353.32206-1-richard.henderson@linaro.org>
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->  backends/Makefile.objs |  2 +-
->  backends/rng-builtin.c | 56 ++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 57 insertions(+), 1 deletion(-)
->  create mode 100644 backends/rng-builtin.c
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-Looks good.  Thanks for picking this up.
+Based on the ubuntu.docker file.
+Used to reproduce the build failure Peter was seeing.
+Others might find this useful too ;)
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-Id: <20190503070241.24786-1-kraxel@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/docker/dockerfiles/ubuntu1804.docker | 57 ++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
+ create mode 100644 tests/docker/dockerfiles/ubuntu1804.docker
 
-> +static void rng_builtin_request_entropy(RngBackend *b, RngRequest *req)
-> +{
-> +    RngBuiltin *s = RNG_BUILTIN(b);
-> +
-> +    while (!QSIMPLEQ_EMPTY(&s->parent.requests)) {
-> +        RngRequest *req = QSIMPLEQ_FIRST(&s->parent.requests);
-> +
-> +        qemu_guest_getrandom_nofail(req->data, req->size);
-> +
-> +        req->receive_entropy(req->opaque, req->data, req->size);
-> +
-> +        rng_backend_finalize_request(&s->parent, req);
-> +    }
-> +}
+diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/dockerfiles/ubuntu1804.docker
+new file mode 100644
+index 00000000000..2e2900150b0
+--- /dev/null
++++ b/tests/docker/dockerfiles/ubuntu1804.docker
+@@ -0,0 +1,57 @@
++FROM ubuntu:18.04
++ENV PACKAGES flex bison \
++    ccache \
++    clang \
++    gcc \
++    gettext \
++    git \
++    glusterfs-common \
++    libaio-dev \
++    libattr1-dev \
++    libbluetooth-dev \
++    libbrlapi-dev \
++    libbz2-dev \
++    libcacard-dev \
++    libcap-dev \
++    libcap-ng-dev \
++    libcurl4-gnutls-dev \
++    libdrm-dev \
++    libepoxy-dev \
++    libfdt-dev \
++    libgbm-dev \
++    libgtk-3-dev \
++    libibverbs-dev \
++    libiscsi-dev \
++    libjemalloc-dev \
++    libjpeg-turbo8-dev \
++    liblzo2-dev \
++    libncurses5-dev \
++    libncursesw5-dev \
++    libnfs-dev \
++    libnss3-dev \
++    libnuma-dev \
++    libpixman-1-dev \
++    librados-dev \
++    librbd-dev \
++    librdmacm-dev \
++    libsasl2-dev \
++    libsdl2-dev \
++    libseccomp-dev \
++    libsnappy-dev \
++    libspice-protocol-dev \
++    libspice-server-dev \
++    libssh2-1-dev \
++    libusb-1.0-0-dev \
++    libusbredirhost-dev \
++    libvdeplug-dev \
++    libvte-2.91-dev \
++    libxen-dev \
++    make \
++    python-yaml \
++    sparse \
++    texinfo \
++    xfslibs-dev
++RUN apt-get update && \
++    apt-get -y install $PACKAGES
++RUN dpkg -l $PACKAGES | sort > /packages.txt
++ENV FEATURES clang pyyaml sdl2
+-- 
+2.20.1
 
-As an aside, with all of the callbacks involved, does anyone know if this gets
-processed on the same thread as issued the cpu that issued the i/o operation?
-
-The question is only relevant to debugging mode (w/ -seed), in that if we're
-processing this from an i/o worker thread we won't have completely
-deterministic results, as we may compete with other cpus for the same RNG.
-
-There's probably not much that can reasonably be done if this does cross
-threads, and certainly it would not affect normal usage, but I just wondered.
-
-
-r~
 
