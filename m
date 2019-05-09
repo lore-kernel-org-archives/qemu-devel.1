@@ -2,72 +2,80 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF8EC46460
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:57:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 574E7C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:57:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9EDE21783
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:57:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9EDE21783
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 266C82085A
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:57:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aVFkrmHj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 266C82085A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58863 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58866 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOnIA-0006Z6-Sm
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 13:57:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35737)
+	id 1hOnIk-0006zi-DW
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 13:57:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hOnGi-00053V-Va
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:55:46 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hOnFU-00040G-2g
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:54:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hOnGh-00088u-Us
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:55:44 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:59479)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hOnGh-00088R-MP
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:55:43 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1N0Zfg-1gSaUs0fDA-00wXBy; Thu, 09 May 2019 19:55:10 +0200
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-References: <1556905846-14074-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1556905846-14074-2-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <f23a5f3f-6536-ab15-13cc-656f641b84a4@vivier.eu>
-Date: Thu, 9 May 2019 19:55:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <alistair23@gmail.com>) id 1hOnFT-00074d-5P
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:54:28 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:45503)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hOnFS-000747-Ud
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:54:27 -0400
+Received: by mail-lj1-x243.google.com with SMTP id r76so2760861lja.12
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 10:54:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=Uim8SC4aabEl7ZG6h3dDZRMI/ptirZ7TMkOpDhSx6ao=;
+	b=aVFkrmHj31RZytXTXSfFKcT4bbHtY98GijvZ9fob1DSl7bCtRv2akip4y+Jw5S6kjp
+	5C1is+09iVe8hoiFLC3hmoBrdQkfaS88aPOerHaZUMI7+Cbmq2Tju9fBSWiaaYestjs3
+	LSxUAiglI/Ww7fbvVgpDe+qqfagiHJCyJ980djTvqjiRoWVG2Qm1nPcEB3QGaMvOoklk
+	0dMJE84gQ9ei6rh2ibRyRJNPmTNmHbj8AqrQ2PxOs0drZX3qS10ZmIz4fc1821ahaKtR
+	e3bsaanlapqds5Fcuq+KMXZN70BUb9FiCXwm1J+i6C7f3uRwHCz5AhTZGhKSd/skG/Ey
+	0RJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=Uim8SC4aabEl7ZG6h3dDZRMI/ptirZ7TMkOpDhSx6ao=;
+	b=mhDH+eLkntHEX9lRkOk31tWMNxqBa4lRGxUT7+7a/wTvlr9A4L2hOu4iHHQWjlS+mY
+	U5u+v664s9qKD0bdWFxRCj12AJnbUaMbkDY6CD6VID86sGVSLfizlTu3AhHnNkJdKcmn
+	ZHePL78KLpYVWWUq14EgYHcsdOLPZnl8V/YcmhUfcetfQg78CfSMAj0/gq1+Bw7D5Uml
+	IXurPXgoeICf6hDRWg+Vk5DWSV2NoKk2JbT0sqbtnbvsXOFTjzapquDXk8wWHqX9pQU0
+	PzTfLSQh4JR+7cZy8u/DYosiGnAhm8rJxbtHLcNYyDMm/jrr5dj82jv8jpQzdK/FkQGV
+	7MLA==
+X-Gm-Message-State: APjAAAXHptZQap4zsTlblimsHeA4ZRwH83opvTUbN2Sn3IX3Wm2Xz+xv
+	ekF2sHmXTjU1lr0H/zr+4oMaFhrozsjj+WjjV/I=
+X-Google-Smtp-Source: APXvYqysOMNQFZr5zbhW9gPOivtAJzPXHExGjoppWGmZtFakC7ogRQi45bJRVBQI9zT4nNwDXyKlalAEYwV+0TAP5Zc=
+X-Received: by 2002:a2e:9ed3:: with SMTP id h19mr3170910ljk.129.1557424465642; 
+	Thu, 09 May 2019 10:54:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1556905846-14074-2-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:hh/RhXH0OY3U7OHBwSBwmw8211QjDoNmhwGLs2aksUopDRO3G2n
-	WD0N00w+s5n3v+jOSWsvql97HpW6nf1Rt9nbhsJ/AeaMX17Efdk/faCLMOp5nR9uBoW7civ
-	vNzxes689bBzry+9x8HWaIzRW4rJ4MT3nwwG/9yIHJrW7qkiVtr82lsnc+nxn1qjcRQNxcl
-	uLMWrnOmPtSxcpoKWDvDw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:XybKPSXskKY=:4Wv1KOPyNhZ5Rp/juDt/Yx
-	S0SsD2mEn2YVeRcLgq5NkUt1aGpdDX2sVzix+Ck70+VRkt+P84WfvguP1S+kWMUM29fS194oS
-	IlodyM59LsFgurTclg1PlU5qzzPYC5gcSEoYh2B+IBJqHX4/P97VURVHJYCPEBXOFgfrZLm/g
-	Ne3ChVzBthOzTs12dkTcwNAEhKYLm52NoWV6MRDID3ipmJXseOYU/kh8iOHGIi6DzR2humUO1
-	JrKpEGudTcarnUO8chFTdr3uXRQI6/woByTcmAhBFnnEGQi6VTPlnFjbiqyOdmerVCozgLc3R
-	QNMcy6VuF+sag9/W1r6RzQQQcv8oHL5deJu6PCG1hVCmvNVpyWZ9hn7QXoXq+wjnlMU4t/aMq
-	CiIExtg+gH5JInuo8OgcRB1wxBGg++Hr1BZh/YMj6uu6WBHkRWL5ofRi8egn1Z7O2qAOdk4t+
-	VtYq7o4y3/o0TCDdiJnpwl6X2trdGjYTwiwsfKSnI4RyAldVRAnsCwmI5S1HrjjIMzn9kyCvC
-	p5WYpdXQ7tPLfWzcCzIrg52wooKUjQCjuseLRJv1ZHIJlgg6SOlnBDjeGSQZgfKpch6hoqcaq
-	kFfx4Siy/DB7xUCvONXMrLt37FYwt919vMmd4HS6eQsaYRDTkh8vA+oIF5RnL3xgAYIl3yjUP
-	Dt9OYroI1HMfol3JVv2p7eBL+pqrQbrMTM6jyowdfEO7bdvedPepcGW5/zlTMOPPptAn0VtV8
-	S+82unOjZnE7ysvGDq8XHlfS7fApxHIDQ3yEw+nwkbv40surPQvwx+8HnVw=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.135
-Subject: Re: [Qemu-devel] [PATCH v4 1/5] linux-user: Fix support for the
- SIOCATMARK and SIOCGPGRP ioctls for xtensa
+References: <20190508000641.19090-1-richard.henderson@linaro.org>
+	<20190508000641.19090-8-richard.henderson@linaro.org>
+In-Reply-To: <20190508000641.19090-8-richard.henderson@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 9 May 2019 10:52:12 -0700
+Message-ID: <CAKmqyKNRGVhoyrL2tH5Nwixvm+d1yT2anrjimU=pfKL6Q86j+w@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::243
+Subject: Re: [Qemu-devel] [PATCH v3 07/39] cpu: Introduce env_archcpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,67 +87,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, thuth@redhat.com, daniel.santos@pobox.com,
-	arikalo@wavecomp.com, jcmvbkbc@gmail.com, amarkovic@wavecomp.com,
-	nchen@wavecomp.com, philmd@redhat.com, aurelien@aurel32.net
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/05/2019 19:50, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> 
-> Fix support for the SIOCATMARK and SIOCGPGRP ioctls for xtensa by
-> correcting corresponding macro definition.
-> 
-> Values for TARGET_SIOCATMARK and TARGET_SIOCGPGRP are determined by
-> Linux kernel. Following relevant lines (obtained by grep) are from
-> the kernel source tree:
-> 
-> arch/ia64/include/uapi/asm/sockios.h:#define SIOCATMARK    0x8905
-> arch/mips/include/uapi/asm/sockios.h:#define SIOCATMARK    _IOR('s', 7, int)
-> arch/parisc/include/uapi/asm/sockios.h:#define SIOCATMARK  0x8905
-> arch/sh/include/uapi/asm/sockios.h:#define SIOCATMARK      _IOR('s', 7, int)
-> arch/xtensa/include/uapi/asm/sockios.h:#define SIOCATMARK  _IOR('s', 7, int)
-> arch/alpha/include/uapi/asm/sockios.h:#define SIOCATMARK   _IOR('s', 7, int)
-> arch/sparc/include/uapi/asm/sockios.h:#define SIOCATMARK   0x8905
-> include/uapi/asm-generic/sockios.h:#define SIOCATMARK	   0x8905
-> 
-> arch/ia64/include/uapi/asm/sockios.h:#define SIOCGPGRP     0x8904
-> arch/mips/include/uapi/asm/sockios.h:#define SIOCGPGRP     _IOR('s', 9, pid_t)
-> arch/parisc/include/uapi/asm/sockios.h:#define SIOCGPGRP   0x8904
-> arch/sh/include/uapi/asm/sockios.h:#define SIOCGPGRP       _IOR('s', 9, pid_t)
-> arch/xtensa/include/uapi/asm/sockios.h:#define SIOCGPGRP   _IOR('s', 9, pid_t)
-> arch/alpha/include/uapi/asm/sockios.h:#define SIOCGPGRP    _IOR('s', 9, pid_t)
-> arch/sparc/include/uapi/asm/sockios.h:#define SIOCGPGRP    0x8904
-> include/uapi/asm-generic/sockios.h:#define SIOCGPGRP       0x8904
-> 
-> It is visible from above that xtensa should have the same definitions
-> as alpha, mips and sh4 already do. This patch brings QEMU to the accurate
-> state wrt these two ioctls.
-> 
-> Acked-by: Max Filippov <jcmvbkbc@gmail.com>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+On Tue, May 7, 2019 at 5:07 PM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> This will replace foo_env_get_cpu with a generic definition.
+> No changes to the target specific code so far.
+>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
 > ---
->   linux-user/syscall_defs.h | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index 12c8407..1e86fb9 100644
-> --- a/linux-user/syscall_defs.h
-> +++ b/linux-user/syscall_defs.h
-> @@ -736,7 +736,8 @@ struct target_pollfd {
->   #define TARGET_KDSETLED        0x4B32	/* set led state [lights, not flags] */
->   #define TARGET_KDSIGACCEPT     0x4B4E
->   
-> -#if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4)
-> +#if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
-> +       defined(TARGET_XTENSA)
->   #define TARGET_SIOCATMARK      TARGET_IOR('s', 7, int)
->   #define TARGET_SIOCGPGRP       TARGET_IOR('s', 9, pid_t)
->   #else
-> 
-
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-
+>  include/exec/cpu-all.h | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+> index 454f6d663f..c62f07b354 100644
+> --- a/include/exec/cpu-all.h
+> +++ b/include/exec/cpu-all.h
+> @@ -371,6 +371,17 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
+>
+>  int cpu_exec(CPUState *cpu);
+>
+> +/**
+> + * env_archcpu(env)
+> + * @env: The architecture environment
+> + *
+> + * Return the ArchCPU associated with the environment.
+> + */
+> +static inline ArchCPU *env_archcpu(CPUArchState *env)
+> +{
+> +    return container_of(env, ArchCPU, env);
+> +}
+> +
+>  /**
+>   * env_cpu(env)
+>   * @env: The architecture environment
+> @@ -379,8 +390,7 @@ int cpu_exec(CPUState *cpu);
+>   */
+>  static inline CPUState *env_cpu(CPUArchState *env)
+>  {
+> -    ArchCPU *arch_cpu = container_of(env, ArchCPU, env);
+> -    return &arch_cpu->parent_obj;
+> +    return &env_archcpu(env)->parent_obj;
+>  }
+>
+>  #endif /* CPU_ALL_H */
+> --
+> 2.17.1
+>
+>
 
