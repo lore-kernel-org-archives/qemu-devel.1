@@ -1,142 +1,80 @@
-Return-Path: <SRS0=nSo8=TI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D29ACC04A6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 22:56:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96058C04A6B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 00:17:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93C0321530
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 May 2019 22:56:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93C0321530
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4CACF214AF
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 00:17:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tw4XYoHz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CACF214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44769 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45473 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOVTq-0008Ry-NS
-	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 18:56:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43757)
+	id 1hOWkE-0002xL-3o
+	for qemu-devel@archiver.kernel.org; Wed, 08 May 2019 20:17:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hOVT0-0007iJ-KJ
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 18:55:15 -0400
+	(envelope-from <hqm03ster@gmail.com>) id 1hOWjJ-0002eY-6A
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 20:16:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hOVSz-00074c-EO
-	for qemu-devel@nongnu.org; Wed, 08 May 2019 18:55:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42732)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
-	id 1hOVSv-00071F-LV; Wed, 08 May 2019 18:55:09 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 083B530018FC;
-	Wed,  8 May 2019 22:55:06 +0000 (UTC)
-Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id F300860C82;
-	Wed,  8 May 2019 22:55:04 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190506203344.30781-1-jsnow@redhat.com>
-	<20190507085021.GB5808@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-Message-ID: <a7ce7d95-7c77-b087-372f-a22b4dc8bfcd@redhat.com>
-Date: Wed, 8 May 2019 18:55:04 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <hqm03ster@gmail.com>) id 1hOWjG-0001kw-MB
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 20:16:09 -0400
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:37788)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hqm03ster@gmail.com>) id 1hOWjG-0001kC-Ee
+	for qemu-devel@nongnu.org; Wed, 08 May 2019 20:16:06 -0400
+Received: by mail-qk1-x741.google.com with SMTP id c1so430212qkk.4
+	for <qemu-devel@nongnu.org>; Wed, 08 May 2019 17:16:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=JzoqpO9MLDdp0DJGgTsCMnF2KGJktUQDl4iixfJ2GgM=;
+	b=tw4XYoHz1yGs11K/RIKoZgkrU5m8rb+qcpfmsk+DIdRntaKVkYAbXlbRtNmD1Aa9gA
+	wiwuVpRoxrP5KPg/5b2jOw/FGKWDMVg1dqZt49bI63xHkAg1KcOCOlBZAV5yDgRd5Rvj
+	iXqg4hvNThQQ1WA8SSRfMViRJZbvbpr+cPBvOSgFZ4OEU8EMSnCoaDyGGNtfgKmYw2c2
+	EkPR5pnppYKLIhMUyUhB0oDQKqz92qq70M+YsFxXBuicQbfLkLX6dDOAPfvIUTnBiVsu
+	XiAGwkknZsgY5LGFz9OCBnW2gV87x/wqoFH0QLadvKqYGAgthT56m4hgYVRAr3sMjx9z
+	xM7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=JzoqpO9MLDdp0DJGgTsCMnF2KGJktUQDl4iixfJ2GgM=;
+	b=PHiTCu6SAr6PRZiK8O2AAFfn0TDDEuYjwM2tGGwvPYbOHmia/yQEi+ofVCwdSOXN4G
+	zZuJQ33hQLYdKtCJUxqf5Z5wF4JxOBIufNdGLd5YqI7Rtr1fVQ/qQFcJdV0zMyIXprTF
+	RCmqQ0pOeW6iKBcdUVVjcS1vvCw7jSPW3vBdTDZgB3408te0RGqTequxF1jLKwFC7kED
+	ODhW0xzf6n6ptB3bXGWqhTlppMNnAiv1zJ8Ib2Cz4HReC9LWNHESO0Emkr1UT9fxTonv
+	g7m4OlikDtn0iQeMKI0wgeq4G7iRva/dtTDzMj2o8zwzv/s/9HN67yKVeBCbP4rCcnXn
+	pOLA==
+X-Gm-Message-State: APjAAAVh0l4G7o8PFqawPkJKeWghn3ai4M6wzJkZAp2vmNRICnFGdyKz
+	6lJZsZdIHgSbuTdteqDbdwjZYJC5QAJyFGlikSw3eqP/
+X-Google-Smtp-Source: APXvYqzlimfLBW+8TvKzF4vGGZsWhHAlm2HVYChhCg0F2NRbSVpTtjAp7etoXkZNOOteDIOKNmRwYZfrjH4VyRI2Dr0=
+X-Received: by 2002:a37:2d81:: with SMTP id t123mr691530qkh.316.1557360963625; 
+	Wed, 08 May 2019 17:16:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190507085021.GB5808@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Wed, 08 May 2019 22:55:06 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] blockdev-backup: don't check aio_context
- too early
+References: <CABSdmrnNW6f=P64PviPP8CTJ5SVfYS8_6kmAtpw9yPObTEkpxg@mail.gmail.com>
+In-Reply-To: <CABSdmrnNW6f=P64PviPP8CTJ5SVfYS8_6kmAtpw9yPObTEkpxg@mail.gmail.com>
+From: Hou Qiming <hqm03ster@gmail.com>
+Date: Thu, 9 May 2019 08:15:44 +0800
+Message-ID: <CABSdmrnocrqLKWncgy_Lak33__GRPYfs-RzSA14e=vh4cRn2ag@mail.gmail.com>
+To: qemu-devel@nongnu.org
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::741
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: [Qemu-devel] [PATCH] Multiple ramfb enhancements
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -148,79 +86,291 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aihua liang <aliang@redhat.com>, qemu-block@nongnu.org,
-	qemu-devel@nongnu.org, qemu-stable@nongnu.org,
-	Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Pulled back the `qemu_create_displaysurface_guestmem` function to create
+the display surface so that the guest memory gets properly unmaped.
 
-On 5/7/19 4:50 AM, Kevin Wolf wrote:
-> Am 06.05.2019 um 22:33 hat John Snow geschrieben:
->> in blockdev_backup_prepare, we check to make sure that the target is
->> associated with a compatible aio context. However, do_blockdev_backup is
->> called later and has some logic to move the target to a compatible
->> aio_context. The transaction version will fail certain commands
->> needlessly early as a result.
->>
->> Allow blockdev_backup_prepare to simply call do_blockdev_backup, which
->> will ultimately decide if the contexts are compatible or not.
->>
->> Note: the transaction version has always disallowed this operation since
->> its initial commit bd8baecd (2014), whereas the version of
->> qmp_blockdev_backup at the time, from commit c29c1dd312f, tried to
->> enforce the aio_context switch instead. It's not clear, and I can't see
->> from the mailing list archives at the time, why the two functions take a
->> different approach. It wasn't until later in efd7556708b (2016) that the
->> standalone version tried to determine if it could set the context or
->> not.
->>
->> Reported-by: aihua liang <aliang@redhat.com>
->> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1683498
-> 
-> Signed-off-by is missing, and a testcase, too. :-)
-> 
->> diff --git a/blockdev.c b/blockdev.c
->> index 79fbac8450..a81d88980c 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -1872,10 +1872,6 @@ static void blockdev_backup_prepare(BlkActionState *common, Error **errp)
->>      }
->>  
->>      aio_context = bdrv_get_aio_context(bs);
->> -    if (aio_context != bdrv_get_aio_context(target)) {
->> -        error_setg(errp, "Backup between two IO threads is not implemented");
->> -        return;
->> -    }
->>      aio_context_acquire(aio_context);
->>      state->bs = bs;
-> 
-> The actual change looks good to me.
-> 
-> Kevin
-> 
+Only allow one resolution change per guest boot, which prevents a
+crash when the guest writes garbage to the configuration space (e.g.
+when rebooting).
 
-(See the Red Hat BZ for details on the test I am more or less trying to
-replicate in iotests -- but the jist of it is using an iothread on one
-device and not specifying one for the other, then backing up both to two
-blockdev-add created nodes not attached to any device.)
+Write an initial resolution to the configuration space on guest reset,
+which a later BIOS / OVMF patch can take advantage of.
 
-Is there some trick to getting this to fail with accel=qtest? I'm
-noticing that if the VM is paused or if I use accel=qtest, the iothread
-contexts for the drives appear to go ... unresolved? and the test passes.
+Signed-off-by: HOU Qiming <hqm03ster@gmail.com>
+---
+ hw/display/ramfb-standalone.c | 12 ++++-
+ hw/display/ramfb.c            | 91 +++++++++++++++++++++++++++++------
+ hw/vfio/display.c             |  4 +-
+ hw/vfio/pci.c                 |  6 ++-
+ include/hw/display/ramfb.h    |  2 +-
+ stubs/ramfb.c                 |  2 +-
+ 6 files changed, 96 insertions(+), 21 deletions(-)
 
-I've only had luck (so far) reproducing this with accel=kvm on a running
-VM (the drives can be empty) and I don't actually know why that is just
-yet -- I guess these aio_context objects get resolved at runtime?
+diff --git a/hw/display/ramfb-standalone.c b/hw/display/ramfb-standalone.c
+index da3229a..6441449 100644
+--- a/hw/display/ramfb-standalone.c
++++ b/hw/display/ramfb-standalone.c
+@@ -1,6 +1,7 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "hw/loader.h"
++#include "hw/isa/isa.h"
+ #include "hw/display/ramfb.h"
+ #include "ui/console.h"
+ #include "sysemu/sysemu.h"
+@@ -11,6 +12,8 @@ typedef struct RAMFBStandaloneState {
+     SysBusDevice parent_obj;
+     QemuConsole *con;
+     RAMFBState *state;
++    uint32_t xres;
++    uint32_t yres;
+ } RAMFBStandaloneState;
 
-Anyway, this seems to be a little tricky so far, maybe you have some
-advice for me?
+ static void display_update_wrapper(void *dev)
+@@ -33,15 +36,22 @@ static void ramfb_realizefn(DeviceState *dev, Error
+**errp)
+     RAMFBStandaloneState *ramfb = RAMFB(dev);
 
---js
+     ramfb->con = graphic_console_init(dev, 0, &wrapper_ops, dev);
+-    ramfb->state = ramfb_setup(errp);
++    ramfb->state = ramfb_setup(dev, errp);
+ }
 
-(Also note: doing a full backup and an incremental backup for two
-perfectly empty 64GB qcow2 drives takes over 6 seconds in total. It
-probably shouldn't, right? There's something about the initial backup
-that appears to take a pretty long time.)
++static Property ramfb_properties[] = {
++    DEFINE_PROP_UINT32("xres", RAMFBStandaloneState, xres, 0),
++    DEFINE_PROP_UINT32("yres", RAMFBStandaloneState, yres, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void ramfb_class_initfn(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
 
+     set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
+     dc->realize = ramfb_realizefn;
++    dc->props = ramfb_properties;
+     dc->desc = "ram framebuffer standalone device";
+     dc->user_creatable = true;
+ }
+diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
+index 25c8ad7..0033ac8 100644
+--- a/hw/display/ramfb.c
++++ b/hw/display/ramfb.c
+@@ -12,6 +12,7 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qemu/option.h"
+ #include "hw/loader.h"
+ #include "hw/display/ramfb.h"
+ #include "ui/console.h"
+@@ -29,18 +30,57 @@ struct QEMU_PACKED RAMFBCfg {
+ struct RAMFBState {
+     DisplaySurface *ds;
+     uint32_t width, height;
++    uint32_t starting_width, starting_height;
++    hwaddr addr, length;
+     struct RAMFBCfg cfg;
++    bool locked;
+ };
+
++static void qemu_unmap_displaysurface_guestmem(pixman_image_t *image,
++                                               void *unused)
++{
++    void *data = pixman_image_get_data(image);
++    uint32_t size = pixman_image_get_stride(image) *
++        pixman_image_get_height(image);
++    cpu_physical_memory_unmap(data, size, 0, 0);
++}
++
++static DisplaySurface *qemu_create_displaysurface_guestmem(
++    int width, int height,
++    pixman_format_code_t format,
++    int linesize, uint64_t addr)
++{
++    DisplaySurface *surface;
++    hwaddr size;
++    void *data;
++
++    if (linesize == 0) {
++        linesize = width * PIXMAN_FORMAT_BPP(format) / 8;
++    }
++
++    size = (hwaddr)linesize * height;
++    data = cpu_physical_memory_map(addr, &size, 0);
++    if (size != (hwaddr)linesize * height) {
++        cpu_physical_memory_unmap(data, size, 0, 0);
++        return NULL;
++    }
++
++    surface = qemu_create_displaysurface_from
++        (width, height, format, linesize, data);
++    pixman_image_set_destroy_function
++        (surface->image, qemu_unmap_displaysurface_guestmem, NULL);
++
++    return surface;
++}
++
+ static void ramfb_fw_cfg_write(void *dev, off_t offset, size_t len)
+ {
+     RAMFBState *s = dev;
+-    void *framebuffer;
+-    uint32_t fourcc, format;
++    uint32_t fourcc, format, width, height;
+     hwaddr stride, addr, length;
+
+-    s->width  = be32_to_cpu(s->cfg.width);
+-    s->height = be32_to_cpu(s->cfg.height);
++    width     = be32_to_cpu(s->cfg.width);
++    height    = be32_to_cpu(s->cfg.height);
+     stride    = be32_to_cpu(s->cfg.stride);
+     fourcc    = be32_to_cpu(s->cfg.fourcc);
+     addr      = be64_to_cpu(s->cfg.addr);
+@@ -48,17 +88,18 @@ static void ramfb_fw_cfg_write(void *dev, off_t offset,
+size_t len)
+     format    = qemu_drm_format_to_pixman(fourcc);
+
+     fprintf(stderr, "%s: %dx%d @ 0x%" PRIx64 "\n", __func__,
+-            s->width, s->height, addr);
+-    framebuffer = address_space_map(&address_space_memory,
+-                                    addr, &length, false,
+-                                    MEMTXATTRS_UNSPECIFIED);
+-    if (!framebuffer || length < stride * s->height) {
+-        s->width = 0;
+-        s->height = 0;
++            width, height, addr);
++    if (s->locked) {
++        fprintf(stderr, "%s: resolution locked, change rejected\n",
+__func__);
+         return;
+     }
+-    s->ds = qemu_create_displaysurface_from(s->width, s->height,
+-                                            format, stride, framebuffer);
++    s->locked = true;
++    s->addr = addr;
++    s->length = length;
++    s->width = width;
++    s->height = height;
++    s->ds = qemu_create_displaysurface_guestmem(s->width, s->height,
++                                                format, stride, s->addr);
+ }
+
+ void ramfb_display_update(QemuConsole *con, RAMFBState *s)
+@@ -76,7 +117,16 @@ void ramfb_display_update(QemuConsole *con, RAMFBState
+*s)
+     dpy_gfx_update_full(con);
+ }
+
+-RAMFBState *ramfb_setup(Error **errp)
++static void ramfb_reset(void *opaque)
++{
++    RAMFBState *s = (RAMFBState *)opaque;
++    s->locked = false;
++    memset(&s->cfg, 0, sizeof(s->cfg));
++    s->cfg.width = s->starting_width;
++    s->cfg.height = s->starting_height;
++}
++
++RAMFBState *ramfb_setup(DeviceState* dev, Error **errp)
+ {
+     FWCfgState *fw_cfg = fw_cfg_find();
+     RAMFBState *s;
+@@ -88,9 +138,22 @@ RAMFBState *ramfb_setup(Error **errp)
+
+     s = g_new0(RAMFBState, 1);
+
++    const char *s_fb_width = qemu_opt_get(dev->opts, "xres");
++    const char *s_fb_height = qemu_opt_get(dev->opts, "yres");
++    if (s_fb_width) {
++        s->cfg.width = atoi(s_fb_width);
++        s->starting_width = s->cfg.width;
++    }
++    if (s_fb_height) {
++        s->cfg.height = atoi(s_fb_height);
++        s->starting_height = s->cfg.height;
++    }
++    s->locked = false;
++
+     rom_add_vga("vgabios-ramfb.bin");
+     fw_cfg_add_file_callback(fw_cfg, "etc/ramfb",
+                              NULL, ramfb_fw_cfg_write, s,
+                              &s->cfg, sizeof(s->cfg), false);
++    qemu_register_reset(ramfb_reset, s);
+     return s;
+ }
+diff --git a/hw/vfio/display.c b/hw/vfio/display.c
+index a3d9c8f..2c2d3e5 100644
+--- a/hw/vfio/display.c
++++ b/hw/vfio/display.c
+@@ -352,7 +352,7 @@ static int vfio_display_dmabuf_init(VFIOPCIDevice
+*vdev, Error **errp)
+                                           &vfio_display_dmabuf_ops,
+                                           vdev);
+     if (vdev->enable_ramfb) {
+-        vdev->dpy->ramfb = ramfb_setup(errp);
++        vdev->dpy->ramfb = ramfb_setup(DEVICE(vdev), errp);
+     }
+     vfio_display_edid_init(vdev);
+     return 0;
+@@ -478,7 +478,7 @@ static int vfio_display_region_init(VFIOPCIDevice
+*vdev, Error **errp)
+                                           &vfio_display_region_ops,
+                                           vdev);
+     if (vdev->enable_ramfb) {
+-        vdev->dpy->ramfb = ramfb_setup(errp);
++        vdev->dpy->ramfb = ramfb_setup(DEVICE(vdev), errp);
+     }
+     return 0;
+ }
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 8cecb53..5d64daa 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -3080,8 +3080,10 @@ static void vfio_realize(PCIDevice *pdev, Error
+**errp)
+             error_setg(errp, "xres and yres properties require
+display=on");
+             goto out_teardown;
+         }
+-        if (vdev->dpy->edid_regs == NULL) {
+-            error_setg(errp, "xres and yres properties need edid support");
++        if (vdev->dpy->edid_regs == NULL && !vdev->enable_ramfb) {
++            error_setg(errp,
++                       "xres and yres properties need edid support"
++                       " or ramfb=on");
+             goto out_teardown;
+         }
+     }
+diff --git a/include/hw/display/ramfb.h b/include/hw/display/ramfb.h
+index b33a2c4..f6c2de9 100644
+--- a/include/hw/display/ramfb.h
++++ b/include/hw/display/ramfb.h
+@@ -4,7 +4,7 @@
+ /* ramfb.c */
+ typedef struct RAMFBState RAMFBState;
+ void ramfb_display_update(QemuConsole *con, RAMFBState *s);
+-RAMFBState *ramfb_setup(Error **errp);
++RAMFBState *ramfb_setup(DeviceState *dev, Error **errp);
+
+ /* ramfb-standalone.c */
+ #define TYPE_RAMFB_DEVICE "ramfb"
+diff --git a/stubs/ramfb.c b/stubs/ramfb.c
+index 48143f3..0799093 100644
+--- a/stubs/ramfb.c
++++ b/stubs/ramfb.c
+@@ -6,7 +6,7 @@ void ramfb_display_update(QemuConsole *con, RAMFBState *s)
+ {
+ }
+
+-RAMFBState *ramfb_setup(Error **errp)
++RAMFBState *ramfb_setup(DeviceState* dev, Error **errp)
+ {
+     error_setg(errp, "ramfb support not available");
+     return NULL;
+-- 
+2.17.1
