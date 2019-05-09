@@ -2,76 +2,96 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16662C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 16:46:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08546C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 16:48:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDEA121019
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 16:46:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDEA121019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D0D7C21019
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 16:48:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0D7C21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57818 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57828 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOmBq-0000rS-5t
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 12:46:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45486)
+	id 1hOmDl-0001p3-3X
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 12:48:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hOmAr-0000FV-1j
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:45:38 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hOmB4-0000QE-SC
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:45:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hOmAp-0003V7-Vm
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:45:37 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57958)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hOmAp-0003Uu-Pw
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:45:35 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hOmAp-0007VG-42
-	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 16:45:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1ABAE2E800F
-	for <qemu-devel@nongnu.org>; Thu,  9 May 2019 16:45:35 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1hOmB4-0003aA-1t
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 12:45:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37656)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hOmAy-0003Y5-3x; Thu, 09 May 2019 12:45:45 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0B851C0568FE;
+	Thu,  9 May 2019 16:45:42 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-168.brq.redhat.com
+	[10.40.204.168])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C930960C62;
+	Thu,  9 May 2019 16:45:40 +0000 (UTC)
+To: qemu-block@nongnu.org
+References: <20190508140139.32722-1-mreitz@redhat.com>
+	<20190508140139.32722-4-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <b3d8f9f4-a6a4-0f64-1ac4-56f62e1439a4@redhat.com>
+Date: Thu, 9 May 2019 18:45:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 May 2019 16:35:47 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Tags: compilation gcc9
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange pmaydell sathnaga
-X-Launchpad-Bug-Reporter: Satheesh Rajendran (sathnaga)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <155507354518.20682.14175680260454866144.malonedeb@soybean.canonical.com>
-Message-Id: <155741974716.32166.530786529094036840.malone@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18961";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: a024e4317f178017f9449e1cb414e66e01785708
+In-Reply-To: <20190508140139.32722-4-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vZVCzSbq0DXzEFYB6zywXzRcADEWHNa0m"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.32]);
+	Thu, 09 May 2019 16:45:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] =?utf-8?q?=5BBug_1824528=5D_Re=3A_qemu_fails_to_comp?=
- =?utf-8?q?ile_on_gcc_9_=60error=3A_taking_address_of_packed_member_of_?=
- =?utf-8?q?=E2=80=98struct_=3Canonymous=3E=E2=80=99_may_result_in_an_unali?=
- =?utf-8?q?gned_pointer_value_=5B-Werror=3Daddress-of-packed-member=5D=60?=
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] iotests: Add test for rebase
+ without input base
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,55 +100,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1824528 <1824528@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The fixes for this issue in dev-mtp.c are now in QEMU git master and
-will be in the 4.1 release.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vZVCzSbq0DXzEFYB6zywXzRcADEWHNa0m
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <b3d8f9f4-a6a4-0f64-1ac4-56f62e1439a4@redhat.com>
+Subject: Re: [PATCH v2 3/3] iotests: Add test for rebase without input base
+References: <20190508140139.32722-1-mreitz@redhat.com>
+ <20190508140139.32722-4-mreitz@redhat.com>
+In-Reply-To: <20190508140139.32722-4-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 08.05.19 16:01, Max Reitz wrote:
+> This patch adds a test for rebasing an image that currently does not
+> have a backing file.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/024     | 70 ++++++++++++++++++++++++++++++++++++++=
+
+>  tests/qemu-iotests/024.out | 37 ++++++++++++++++++++
+>  2 files changed, 107 insertions(+)
+
+This test requires zero clusters, so it doesn=E2=80=99t work with qed and=
+ qcow2
+v2.  I=E2=80=99ll put it into a separate file.
+
+Max
 
 
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+--vZVCzSbq0DXzEFYB6zywXzRcADEWHNa0m
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- =
+-----BEGIN PGP SIGNATURE-----
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1824528
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzUWTMACgkQ9AfbAGHV
+z0AFfgf/evCJTNmePaHON5jsCRSk+SdYo9MUT6g0v4O/Iparm5AayFQ0ln17xj3A
+SF8Gc+RHMRaWdHxj3SWPj0yTzqZA7wIeZKtun5l68RxUmaUu7k65ioJKtbgLg0DS
+FlHnPxWXB+4feLc31SUtx4Kbn8AsQF2iO18/x39n9QEbHYtUVU1zYQ3P/59LHfCx
+3HcQ9DCpxE+/b/gKCPh5r/uf6O+D+5howNZoDsldQ+G9bPR7nx5/QDRavLZ0mViL
+VDHbvUwtHge1YOyfWrZAw0tKBYbIAqosce3sdUDXRuJOY24WZ6RNiyJMVfZ6yGsG
+Ua3BAWvLFKJ9oH5WPH4ZhKhGDlf65Q==
+=FKiN
+-----END PGP SIGNATURE-----
 
-Title:
-  qemu fails to compile on gcc 9 `error: taking address of packed member
-  of =E2=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointe=
-r value
-  [-Werror=3Daddress-of-packed-member]`
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  Qemu compilation fails with below error on ppc64le host with gcc 9(9.0.1 =
-20190328)
-  repo: https://github.com/qemu/qemu.git
-  branch: master
-  commit e1be98540ee672ef93292b65a986055512237c35
-
-  =
-
-    CC      net/dump.o
-  hw/usb/dev-mtp.c: In function =E2=80=98usb_mtp_write_metadata=E2=80=99:
-  hw/usb/dev-mtp.c:1708:36: error: taking address of packed member of =E2=
-=80=98struct <anonymous>=E2=80=99 may result in an unaligned pointer value =
-[-Werror=3Daddress-of-packed-member]
-   1708 |                             dataset->filename);
-        |                             ~~~~~~~^~~~~~~~~~
-  cc1: all warnings being treated as errors
-    CC      net/eth.o
-  make: *** [/home/kvmci/qemu-main/rules.mak:69: hw/usb/dev-mtp.o] Error 1
-  make: *** Waiting for unfinished jobs....
-    CC      net/announce.o
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1824528/+subscriptions
+--vZVCzSbq0DXzEFYB6zywXzRcADEWHNa0m--
 
