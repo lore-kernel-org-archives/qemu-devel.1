@@ -2,69 +2,64 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18DFBC04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 09:25:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A4E0C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 09:25:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E009721479
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 09:25:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E009721479
+	by mail.kernel.org (Postfix) with ESMTPS id 1D3DC2173C
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 09:25:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D3DC2173C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51272 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51277 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOfJ5-0004yD-So
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 05:25:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59515)
+	id 1hOfJN-0005Ei-Hr
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 05:25:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hOfHv-0004T2-Vw
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 05:24:29 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hOfI6-0004Y3-6O
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 05:24:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hOfHu-000870-S2
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 05:24:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56924)
+	(envelope-from <kwolf@redhat.com>) id 1hOfI5-0008Ao-2T
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 05:24:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:28015)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hOfHu-00086R-ML
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 05:24:26 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1hOfI4-0008Ad-TI
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 05:24:37 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0C84BE3E00
-	for <qemu-devel@nongnu.org>; Thu,  9 May 2019 09:24:25 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
-	[10.36.117.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 79E765D710;
-	Thu,  9 May 2019 09:24:19 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 98A6311AA3; Thu,  9 May 2019 11:24:18 +0200 (CEST)
-Date: Thu, 9 May 2019 11:24:18 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <20190509092418.65ftbkyy4qzki7jk@sirius.home.kraxel.org>
-References: <20190503130034.24916-1-marcandre.lureau@redhat.com>
-	<20190503130034.24916-5-marcandre.lureau@redhat.com>
-	<20190509063220.cfahgzlujtcv5etr@sirius.home.kraxel.org>
-	<CAMxuvaw9kOt3yoRk4sWPeRyUmRLWboCCyrO00W0Se+W-OOrGRw@mail.gmail.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 3A32930026B2;
+	Thu,  9 May 2019 09:24:36 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-186.ams2.redhat.com
+	[10.36.116.186])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 73DBA61D1B;
+	Thu,  9 May 2019 09:24:27 +0000 (UTC)
+Date: Thu, 9 May 2019 11:24:25 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190509092425.GB6850@localhost.localdomain>
+References: <20190508182339.22447-1-ehabkost@redhat.com>
+	<87ftpo89le.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMxuvaw9kOt3yoRk4sWPeRyUmRLWboCCyrO00W0Se+W-OOrGRw@mail.gmail.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <87ftpo89le.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Thu, 09 May 2019 09:24:25 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.47]);
+	Thu, 09 May 2019 09:24:36 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] Add vhost-user-input-pci
+Subject: Re: [Qemu-devel] [PATCH] configure: Require python3 >= 3.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,44 +71,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+	Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+	Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 09, 2019 at 10:37:20AM +0200, Marc-Andr=E9 Lureau wrote:
-> Hi
->=20
-> On Thu, May 9, 2019 at 8:32 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
-> >
-> >   Hi,
-> >
-> > > +static const VirtioPCIDeviceTypeInfo vhost_user_input_pci_info =3D=
- {
-> > > +    .base_name =3D TYPE_VHOST_USER_INPUT_PCI,
-> > > +    .generic_name =3D "vhost-user-input-pci",
-> > > +    .transitional_name =3D "vhost-user-input-pci-transitional",
-> > > +    .non_transitional_name =3D "vhost-user-input-pci-non-transitio=
-nal",
-> >
-> > virtio-input is virtio 1.0 only, so we don't need these variants.
-> > Incremental fix below, if you ack that I can squash it for the pull r=
-eq.
-> > Or you send a v3 (in case you have other changes pending).
-> >
-> > cheers,
-> >   Gerd
->=20
-> ack, thanks
+Am 09.05.2019 um 07:45 hat Markus Armbruster geschrieben:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+> > diff --git a/.travis.yml b/.travis.yml
+> > index 66448d99d6..0f6986b3f1 100644
+> > --- a/.travis.yml
+> > +++ b/.travis.yml
+> > @@ -211,7 +211,7 @@ matrix:
+> >          - CONFIG="--target-list=x86_64-softmmu"
+> >        language: python
+> >        python:
+> > -        - "3.4"
+> > +        - "3.5"
+> >  
+> >  
+> >      - env:
+> 
+> Easily missed, good work.
+> 
+> My grep for similar references to Python versions we don't support found
+> a few 2.x, x < 7.  Not this patch's problem, of course, but let me show
+> them anyway:
 
-Spoke too soon, patch failed tests.
-New version (with some virtio-input-host fixes on top) pushed to:
+I'm sure that we have a few more instances of Python 2 compatibility
+code in qemu-iotests that can be removed after this is merged. These are
+what I could find quickly, but there are probably more:
 
-	https://git.kraxel.org/cgit/qemu/log/?h=3Dtesting/vhost-input
+    242:        # Read one byte in a way compatible with Python 2
+    iotests.py:        # Python < 3.4 needs to know not to add whitespace when pretty-printing:
 
-Can you please verify?
+    149:from __future__ import print_function
+    165:from __future__ import print_function
+    iotests.py:from __future__ import print_function
+    nbd-fault-injector.py:from __future__ import print_function
+    qcow2.py:from __future__ import print_function
+    qed.py:from __future__ import print_function
 
-thanks,
-  Gerd
+    044:if sys.version_info.major == 2:
+    163:if sys.version_info.major == 2:
+    iotests.py:    if sys.version_info.major >= 3:
+    iotests.py:        if sys.version_info.major >= 3:
+    nbd-fault-injector.py:if sys.version_info.major >= 3:
 
+I'm planning to take care of the qemu-iotests ones.
+
+Also, with Python 3.5 as the new minimum, I think I'd like to add type
+hints to iotests.py and possibly the qemu package (for QEMUQtestMachine
+and friends). The syntax isn't as nice as if we could go straight to
+3.6, but still, finally some type checking instead of running into
+stupid runtime bugs!
+
+Kevin
 
