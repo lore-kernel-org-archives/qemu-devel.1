@@ -2,64 +2,110 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 480E7C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:57:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1666C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:58:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 199F420675
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:57:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 199F420675
+	by mail.kernel.org (Postfix) with ESMTPS id C8D4B2089E
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:58:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8D4B2089E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54969 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54977 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOjXx-0003ic-Cx
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 09:57:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54783)
+	id 1hOjZA-0004UF-35
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 09:58:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hOjX6-0003Iy-G6
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:56:25 -0400
+	(envelope-from <thuth@redhat.com>) id 1hOjYN-00048u-SS
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:57:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hOjX5-0006k9-Cz
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:56:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:31694)
+	(envelope-from <thuth@redhat.com>) id 1hOjYN-00076l-01
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:57:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56680)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hOjX5-0006jx-5H
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:56:23 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hOjYM-00071U-EC
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:57:42 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 62EC181243;
-	Thu,  9 May 2019 13:56:20 +0000 (UTC)
-Received: from localhost (ovpn-116-61.gru2.redhat.com [10.97.116.61])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E43CC600C7;
-	Thu,  9 May 2019 13:56:19 +0000 (UTC)
-Date: Thu, 9 May 2019 10:56:17 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Jiri Denemark <jdenemar@redhat.com>
-Message-ID: <20190509135617.GH4189@habkost.net>
-References: <20190422234742.15780-1-ehabkost@redhat.com>
-	<20190509133537.GK7181@orkuz.int.mamuti.net>
+	by mx1.redhat.com (Postfix) with ESMTPS id 854E1C045129;
+	Thu,  9 May 2019 13:57:26 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-115.ams2.redhat.com [10.36.116.115])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A089E5D717;
+	Thu,  9 May 2019 13:57:19 +0000 (UTC)
+To: Gerd Hoffmann <kraxel@redhat.com>
+References: <20190508085645.11595-1-kraxel@redhat.com>
+	<38ea2334-b819-a439-7a43-92b52263b402@redhat.com>
+	<20190509135022.z5yjsrghixfrv2ta@sirius.home.kraxel.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <4b26be42-d066-386d-fa28-8b1e5503bf9d@redhat.com>
+Date: Thu, 9 May 2019 15:57:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190509133537.GK7181@orkuz.int.mamuti.net>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20190509135022.z5yjsrghixfrv2ta@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Thu, 09 May 2019 13:56:20 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.32]);
+	Thu, 09 May 2019 13:57:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/2] i386: "unavailable-features" QOM
- property
+Subject: Re: [Qemu-devel] [PATCH 00/13] tests/vm: serial console autoinstall,
+ misc fixes.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,74 +117,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
-	qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org, Kamil Rytarowski <kamil@netbsd.org>,
+	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 09, 2019 at 03:35:37PM +0200, Jiri Denemark wrote:
-> On Mon, Apr 22, 2019 at 20:47:40 -0300, Eduardo Habkost wrote:
-> > Currently, libvirt uses the "filtered-features" QOM property at
-> > runtime to ensure no feature was accidentally disabled on VCPUs
-> > because it's not available on the host.
-> > 
-> > However, the code for "feature-words" assumes that all missing
-> > features have a corresponding CPUID bit, which is not true for
-> > MSR-based features like the ones at FEAT_ARCH_CAPABILITIES.
-> > 
-> > We could extend X86CPUFeatureWordInfo to include information
-> > about MSR features, but it's impossible to do that while keeping
-> > compatibility with clients that (reasonably) expect all elements
-> > of "filtered-features" to have the cpuid-* fields.
-> > 
-> > We have a field in "query-cpu-definitions" that already describes
-> > all features that are missing on a CPU, including MSR features:
-> > CpuDefinitionInfo.unavailable-features.  The existing code for
-> > building the unavailable-features array even uses
-> > X86CPU::filtered_features to build the feature list.
-> > 
-> > This series adds a "unavailable-features" QOM property to X86CPU
-> > objects that have the same semantics of "unavailable-features" on
-> > query-cpu-definitions.  The new property has the same goal of
-> > "filtered-features", but is generic enough to let any kind of CPU
-> > feature to be listed there without relying on low level details
-> > like CPUID leaves or MSR numbers.
+On 09/05/2019 15.50, Gerd Hoffmann wrote:
+>   Hi,
 > 
-> Thanks.
+>>> Do we have accelerator support for the BSDs?  A "make check" for a full
+>>> build takes ages, and I suspect tcg being used is part of the problem.
+>>> I did my tests using "TARGET_LIST=x86_64-softmmu" because of that.
+>>
+>> I think they should be running with "--enable-kvm".
 > 
-> Would this unavailable-features property contain only canonical names of
-> the features or all possible aliases of all features? For example,
-> "tsc-adjust" can also be spelled as "tsc_adjust". When calling
-> query-cpu-model-expansion, we have a way to request all variants by
-> running full expansion on the result of a previous static expansion. Can
-> we get something like this for unavailable-features too?
+> The images themself yes, but the tests running *inside* (on make check) don't.
 
-I'd like to avoid that, and refer only to the canonical names.
+No, we don't have accelerator support for *BSD, as far as I know. But we
+also do not run that much TCG tests during "make check" that you should
+see such a big difference here. And for me, the compilation step is
+already way slower than on the host, so I think the problem is likely
+something else...
 
-Could you explain the use case you have in mind, so we can look
-for alternatives?
-
-> 
-> As you mentioned, there are two interesting QOM properties:
-> filtered-features and feature-words and both are used by libvirt. We use
-> feature-words to get CPU features which were enabled in the guest CPU on
-> top of what we expected. This is the case of, e.g., a feature added to a
-> given CPU model for new machine types. I guess we could switch to
-> checking QOM properties for individual features as a replacement for
-> feature-words which covers both CPUID and MSR features.
-
-I guess it depends on your goal:
-
-If your just want to know if one specific feature is missing for
-some reason, you can check the QOM properties directly.  That's
-OK, and it's even better than checking the `feature-words`
-property.
-
-If you want to be 100% sure no property was missing when starting
-the VM (e.g. emulate the behavior of the "enforce" option), I
-suggest you check if `unavailable-features` is empty.
-
--- 
-Eduardo
+ Thomas
 
