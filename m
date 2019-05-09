@@ -6,105 +6,66 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B06C4C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 11:54:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 150C8C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 12:00:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 712A72089E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 11:54:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 712A72089E
+	by mail.kernel.org (Postfix) with ESMTPS id CBD4D2089E
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 12:00:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBD4D2089E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52885 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53121 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOhdC-0004wu-2r
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 07:54:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57999)
+	id 1hOhjN-0006sW-2A
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 08:00:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOhcO-0004fr-BY
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 07:53:45 -0400
+	(envelope-from <armbru@redhat.com>) id 1hOhiO-0006Oc-KV
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 07:59:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOhcN-0005Am-5s
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 07:53:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46788)
+	(envelope-from <armbru@redhat.com>) id 1hOhiN-0007sq-20
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 07:59:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55182)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hOhcM-0005AK-V1
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 07:53:43 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>)
+	id 1hOhiI-0007qg-QI; Thu, 09 May 2019 07:59:50 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 890D53079B74;
-	Thu,  9 May 2019 11:53:41 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-115.ams2.redhat.com [10.36.116.115])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 886DE10027C1;
-	Thu,  9 May 2019 11:53:34 +0000 (UTC)
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20190508085645.11595-1-kraxel@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <38ea2334-b819-a439-7a43-92b52263b402@redhat.com>
-Date: Thu, 9 May 2019 13:53:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id E0970307D910;
+	Thu,  9 May 2019 11:59:47 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
+	[10.36.116.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 61F321001E6D;
+	Thu,  9 May 2019 11:59:47 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id DAD471132B35; Thu,  9 May 2019 13:59:45 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Xiang Zheng <zhengxiang9@huawei.com>
+References: <20190505070059.4664-1-zhengxiang9@huawei.com>
+	<87a7fyb0v7.fsf@dusky.pond.sub.org>
+	<72adbed8-f650-42df-98d5-e98154baec08@redhat.com>
+	<87h8a513sl.fsf@dusky.pond.sub.org>
+	<fb04cdb2-910d-58be-fb21-db7050cdc669@huawei.com>
+Date: Thu, 09 May 2019 13:59:45 +0200
+In-Reply-To: <fb04cdb2-910d-58be-fb21-db7050cdc669@huawei.com> (Xiang Zheng's
+	message of "Thu, 9 May 2019 15:14:43 +0800")
+Message-ID: <87ef574z4e.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20190508085645.11595-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Thu, 09 May 2019 11:53:41 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.48]);
+	Thu, 09 May 2019 11:59:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 00/13] tests/vm: serial console autoinstall,
- misc fixes.
+Subject: Re: [Qemu-devel] [PATCH] pflash: Only read non-zero parts of
+ backend image
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -116,58 +77,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Kamil Rytarowski <kamil@netbsd.org>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org,
+	ard.biesheuvel@linaro.org, qemu-devel@nongnu.org,
+	mreitz@redhat.com, stefanha@redhat.com, guoheyi@huawei.com,
+	wanghaibin.wang@huawei.com, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/05/2019 10.56, Gerd Hoffmann wrote:
-> This patch series changes the way virtual machines for test builds are
-> managed.  They are created locally on the developer machine now.  The
-> installer is booted on the serial console and the scripts walks through
-> the dialogs to install and configure the guest.
->=20
-> That takes the download.patchew.org server out of the loop and makes it
-> alot easier to tweak the guest images (adding build dependencies for
-> example).
->=20
-> The install scripts take care to apply host proxy settings (from *_prox=
-y
-> environment variables) to the guest, so any package downloads will be
-> routed through the proxy and can be cached that way.  This also makes
-> them work behind strict firewalls.
->=20
-> There are also a bunch of smaller tweaks for tests/vm to fix issues I
-> was struggling with.  See commit messages of individual patches for
-> details.
->=20
-> Known issue:  NetBSD package install is not working for me right now.
-> It did work a while ago.  Not sure what is going on here.
+Xiang Zheng <zhengxiang9@huawei.com> writes:
 
-I now gave your series another try and replaced patch 3 with the python3
-fix from Eduardo locally here. FreeBSD works great. OpenBSD is fine too,
-except for the known issue that the "gmake check" does not work - but
-this issue has been there before already. NetBSD also does not work for
-me, so I guess you should hold off that patch for now?
+> On 2019/5/8 21:20, Markus Armbruster wrote:
+>> Laszlo Ersek <lersek@redhat.com> writes:
+>> 
+>>> Hi Markus,
+>>>
+>>> On 05/07/19 20:01, Markus Armbruster wrote:
+>>>> The subject is slightly misleading.  Holes read as zero.  So do
+>>>> non-holes full of zeroes.  The patch avoids reading the former, but
+>>>> still reads the latter.
+>>>>
+>>>> Xiang Zheng <zhengxiang9@huawei.com> writes:
+>>>>
+>>>>> Currently we fill the memory space with two 64MB NOR images when
+>>>>> using persistent UEFI variables on virt board. Actually we only use
+>>>>> a very small(non-zero) part of the memory while the rest significant
+>>>>> large(zero) part of memory is wasted.
+>>>>
+>>>> Neglects to mention that the "virt board" is ARM.
+>>>>
+>>>>> So this patch checks the block status and only writes the non-zero part
+>>>>> into memory. This requires pflash devices to use sparse files for
+>>>>> backends.
+>>>>
+>>>> I started to draft an improved commit message, but then I realized this
+>>>> patch can't work.
+>>>>
+>>>> The pflash_cfi01 device allocates its device memory like this:
+>>>>
+>>>>     memory_region_init_rom_device(
+>>>>         &pfl->mem, OBJECT(dev),
+>>>>         &pflash_cfi01_ops,
+>>>>         pfl,
+>>>>         pfl->name, total_len, &local_err);
+>>>>
+>>>> pflash_cfi02 is similar.
+>>>>
+>>>> memory_region_init_rom_device() calls
+>>>> memory_region_init_rom_device_nomigrate() calls qemu_ram_alloc() calls
+>>>> qemu_ram_alloc_internal() calls g_malloc0().  Thus, all the device
+>>>> memory gets written to even with this patch.
+>>>
+>>> As far as I can see, qemu_ram_alloc_internal() calls g_malloc0() only to
+>>> allocate the the new RAMBlock object called "new_block". The actual
+>>> guest RAM allocation occurs inside ram_block_add(), which is also called
+>>> by qemu_ram_alloc_internal().
+>> 
+>> You're right.  I should've read more attentively.
+>> 
+>>> One frame outwards the stack, qemu_ram_alloc() passes NULL to
+>>> qemu_ram_alloc_internal(), for the 4th ("host") parameter. Therefore, in
+>>> qemu_ram_alloc_internal(), we set "new_block->host" to NULL as well.
+>>>
+>>> Then in ram_block_add(), we take the (!new_block->host) branch, and call
+>>> phys_mem_alloc().
+>>>
+>>> Unfortunately, "phys_mem_alloc" is a function pointer, set with
+>>> phys_mem_set_alloc(). The phys_mem_set_alloc() function is called from
+>>> "target/s390x/kvm.c" (setting the function pointer to
+>>> legacy_s390_alloc()), so it doesn't apply in this case. Therefore we end
+>>> up calling the default qemu_anon_ram_alloc() function, through the
+>>> funcptr. (I think anyway.)
+>>>
+>>> And qemu_anon_ram_alloc() boils down to mmap() + MAP_ANONYMOUS, in
+>>> qemu_ram_mmap(). (Even on PPC64 hosts, because qemu_anon_ram_alloc()
+>>> passes (-1) for "fd".)
+>>>
+>>> I may have missed something, of course -- I obviously didn't test it,
+>>> just speculated from the source.
+>> 
+>> Thanks for your sleuthing!
+>> 
+>>>> I'm afraid you neglected to test.
+>> 
+>> Accusation actually unsupported.  I apologize, and replace it by a
+>> question: have you observed the improvement you're trying to achieve,
+>> and if yes, how?
+>> 
+>
+> Yes, we need to create sparse files as the backing images for pflash device.
+> To create sparse files like:
+>
+>    dd of="QEMU_EFI-pflash.raw" if="/dev/zero" bs=1M seek=64 count=0
+>    dd of="QEMU_EFI-pflash.raw" if="QEMU_EFI.fd" conv=notrunc
 
-So for patches 1, 2 and 4 - 10 (I did not check the Linux images yet):
+This creates a copy of firmware binary QEMU_EFI.fd padded with a hole to
+64MiB.
 
-Tested-by: Thomas Huth <thuth@redhat.com>
+>    dd of="empty_VARS.fd" if="/dev/zero" bs=1M seek=64 count=0
 
-> Do we have accelerator support for the BSDs?  A "make check" for a full
-> build takes ages, and I suspect tcg being used is part of the problem.
-> I did my tests using "TARGET_LIST=3Dx86_64-softmmu" because of that.
+This creates the varstore as a 64MiB hole.  As far as I know (very
+little), you should use the varstore template that comes with the
+firmware binary.
 
-I think they should be running with "--enable-kvm". Did you make sure
-that you've enabled multiple CPUs with J=3D8 for example? ... but for me,
-the compilation is also quite a bit slower, indeed. I think part of the
-problem might be clang which is compiling a little bit slower than GCC
-as far as I know...?
+I use
 
- Thomas
+    cp --sparse=always bld/pc-bios/edk2-arm-vars.fd .
+    cp --sparse=always bld/pc-bios/edk2-aarch64-code.fd .
+
+These guys are already zero-padded, and I use cp to sparsify.
+
+> Start a VM with below commandline:
+>
+>     -drive file=/usr/share/edk2/aarch64/QEMU_EFI-pflash.raw,if=pflash,format=raw,unit=0,readonly=on\
+>     -drive file=/usr/share/edk2/aarch64/empty_VARS.fd,if=pflash,format=raw,unit=1 \
+>
+> Then observe the memory usage of the qemu process (THP is on).
+>
+> 1) Without this patch:
+> # cat /proc/`pidof qemu-system-aarch64`/smaps | grep AnonHugePages: | grep -v ' 0 kB'
+> AnonHugePages:    706560 kB
+> AnonHugePages:      2048 kB
+> AnonHugePages:     65536 kB    // pflash memory device
+> AnonHugePages:     65536 kB    // pflash memory device
+> AnonHugePages:      2048 kB
+>
+> # ps aux | grep qemu-system-aarch64
+> RSS: 879684
+>
+> 2) After applying this patch:
+> # cat /proc/`pidof qemu-system-aarch64`/smaps | grep AnonHugePages: | grep -v ' 0 kB'
+> AnonHugePages:    700416 kB
+> AnonHugePages:      2048 kB
+> AnonHugePages:      2048 kB    // pflash memory device
+> AnonHugePages:      2048 kB    // pflash memory device
+> AnonHugePages:      2048 kB
+>
+> # ps aux | grep qemu-system-aarch64
+> RSS: 744380
+
+Okay, this demonstrates the patch succeeds at mapping parts of the
+pflash memory as holes.
+
+Do the guests in these QEMU processes run?
+
+> Obviously, there are at least 100MiB memory saved for each guest.
+
+For a definition of "memory".
+
+Next question: what impact on system performance do you observe?
+
+Let me explain.
+
+Virtual memory holes get filled in by demand paging on access.  In other
+words, they remain holes only as long as nothing accesses the memory.
+
+Without your patch, we allocate pages at image read time and fill them
+with zeroes. If we don't access them again, the kernel will eventually
+page them out (assuming you're running with swap).  So the steady state
+is "we waste some swap space", not "we waste some physical RAM".
+
+Your patch lets us map pflash memory pages containing only zeros as
+holes.
+
+For pages that never get accessed, your patch avoids page allocation,
+filling with zeroes, writing to swap (all one-time costs), and saves
+some swap space (not commonly an issue).
+
+For pflash memory that gets accessed, your patch merely delays page
+allocation from image read time to first access.
+
+I wonder how these savings and delays affect actual system performance.
+Without an observable change in system performance, all we'd accomplish
+is changing a bunch of numers in /proc/$pid/.
+
+What improvement(s) can you observe?
+
+I guess the best case for your patch is many guests with relatively
+small RAM sizes.
 
