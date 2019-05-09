@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=FROM_EXCESS_BASE64,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB4B4C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 12:22:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD019C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 12:23:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D941216C4
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 12:22:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D941216C4
+	by mail.kernel.org (Postfix) with ESMTPS id 81854216C4
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 12:23:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81854216C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53630 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53634 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOi4W-0002LR-R1
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 08:22:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35226)
+	id 1hOi5E-0002q8-Qt
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 08:23:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hOi3J-0001hh-Br
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 08:21:34 -0400
+	(envelope-from <berrange@redhat.com>) id 1hOi45-0002Cg-RM
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 08:22:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hOi3I-0007AS-4G
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 08:21:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36872)
+	(envelope-from <berrange@redhat.com>) id 1hOi44-0007Zd-3r
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 08:22:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44006)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hOi3H-00079Q-V4
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 08:21:32 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hOi43-0007ZE-Mx
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 08:22:19 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CE0FD3001C60;
-	Thu,  9 May 2019 12:21:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id ED7633084295;
+	Thu,  9 May 2019 12:22:18 +0000 (UTC)
 Received: from redhat.com (ovpn-112-55.ams2.redhat.com [10.36.112.55])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 497751001E67;
-	Thu,  9 May 2019 12:21:23 +0000 (UTC)
-Date: Thu, 9 May 2019 13:21:20 +0100
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F9671001E7C;
+	Thu,  9 May 2019 12:22:10 +0000 (UTC)
+Date: Thu, 9 May 2019 13:22:08 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190509122120.GO31299@redhat.com>
+Message-ID: <20190509122208.GP31299@redhat.com>
 References: <20190509121820.16294-1-stefanha@redhat.com>
-	<20190509121820.16294-3-stefanha@redhat.com>
+	<20190509121820.16294-2-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190509121820.16294-3-stefanha@redhat.com>
+In-Reply-To: <20190509121820.16294-2-stefanha@redhat.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Thu, 09 May 2019 12:21:30 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Thu, 09 May 2019 12:22:19 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] docs: add Security chapter to the
- documentation
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] docs: add Secure Coding Practices
+ to developer docs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -81,25 +81,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 09, 2019 at 01:18:20PM +0100, Stefan Hajnoczi wrote:
-> This new chapter in the QEMU documentation covers the security
-> requirements that QEMU is designed to meet and principles for securely
-> deploying QEMU.
+On Thu, May 09, 2019 at 01:18:19PM +0100, Stefan Hajnoczi wrote:
+> At KVM Forum 2018 I gave a presentation on security in QEMU:
+> https://www.youtube.com/watch?v=3DYAdRf_hwxU8 (video)
+> https://vmsplice.net/~stefan/stefanha-kvm-forum-2018.pdf (slides)
 >=20
-> It is just a starting point that can be extended in the future with mor=
-e
-> information.
+> This patch adds a guide to secure coding practices.  This document
+> covers things that developers should know about security in QEMU.  It i=
+s
+> just a starting point that we can expand on later.  I hope it will be
+> useful as a resource for new contributors and will save code reviewers
+> from explaining the same concepts many times.
 >=20
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > Acked-by: Stefano Garzarella <sgarzare@redhat.com>
 > Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  Makefile           |   2 +-
->  docs/security.texi | 131 +++++++++++++++++++++++++++++++++++++++++++++
->  qemu-doc.texi      |   3 ++
->  3 files changed, 135 insertions(+), 1 deletion(-)
->  create mode 100644 docs/security.texi
+>  docs/devel/index.rst                   |   1 +
+>  docs/devel/secure-coding-practices.rst | 106 +++++++++++++++++++++++++
+>  2 files changed, 107 insertions(+)
+>  create mode 100644 docs/devel/secure-coding-practices.rst
 
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
