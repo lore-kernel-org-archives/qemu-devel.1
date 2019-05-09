@@ -2,65 +2,80 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72BE2C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:27:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87A79C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:32:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 492212089E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:27:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 492212089E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4D3312085A
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 15:32:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DaTL66Z9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D3312085A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56510 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56566 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOkx0-00015W-Jl
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 11:27:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47958)
+	id 1hOl1b-0002HY-JP
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 11:31:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jdenemar@redhat.com>) id 1hOkw9-0000eo-5J
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:26:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hOl0h-0001df-8e
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:31:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jdenemar@redhat.com>) id 1hOkw7-0002H9-Vj
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:26:21 -0400
-Received: from smtp.vivo.cz ([185.219.166.8]:52072)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jdenemar@redhat.com>) id 1hOkw6-0002ER-8Q
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:26:19 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by smtp.vivo.cz (Postfix) with ESMTP id 90E091843359;
-	Thu,  9 May 2019 17:26:15 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at vivo.cz
-Received: from smtp.vivo.cz ([127.0.0.1])
-	by localhost (smtp.vivo.cz [127.0.0.1]) (amavisd-new, port 10024)
-	with LMTP id qUifiEJx-0F2; Thu,  9 May 2019 17:26:14 +0200 (CEST)
-Received: from orkuz.int.mamuti.net (185-219-164-37-static.vivo.cz
-	[185.219.164.37])
-	by smtp.vivo.cz (Postfix) with ESMTPS id 631131843322;
-	Thu,  9 May 2019 17:26:14 +0200 (CEST)
-Received: by orkuz.int.mamuti.net (Postfix, from userid 500)
-	id 7308D2A0B8B; Thu,  9 May 2019 17:26:16 +0200 (CEST)
-Date: Thu, 9 May 2019 17:26:16 +0200
-From: Jiri Denemark <jdenemar@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190509152616.GL7181@orkuz.int.mamuti.net>
-References: <20190422234742.15780-1-ehabkost@redhat.com>
-	<20190509133537.GK7181@orkuz.int.mamuti.net>
-	<20190509135617.GH4189@habkost.net>
+	(envelope-from <peter.maydell@linaro.org>) id 1hOl0g-0005In-2V
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:31:03 -0400
+Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:42933)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hOl0f-0005IY-TC
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 11:31:02 -0400
+Received: by mail-oi1-x233.google.com with SMTP id k9so2197423oig.9
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 08:31:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=RQajKTWSjVKSV0mGLeCniKsbLuCfAXsICDUoxuOIKKk=;
+	b=DaTL66Z98APYirqPD9kidPrGCM3ArbCMOxSUP7GnGecVslfi+xTS+Evzt+gF3D4z0D
+	51JwJeFOl2Zmp1SYCmeHFaFTuH9FD8cqGFi8WYXzsCtFELiAvR51U0OdpwKsx470PKSJ
+	EoLj6vROUvOgeTux4Ohn5TyL/s09mNzPvw9uQaxcdPvbxXMPOQ1vcCvLEOTmR54kpL0/
+	TftqT7ofua2Xlw2lF6HxPk7KIxkomzf1RbPQfClmD0H9COdJyOC/UQWh7kXA0S8kJo+5
+	9pzF3FfX+MwvI2ThgL4C/CM0YjCex4T3IVrU7m8/R+lJKN+ASshGgNgIwhF8as/LVamH
+	PyWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=RQajKTWSjVKSV0mGLeCniKsbLuCfAXsICDUoxuOIKKk=;
+	b=CYeVkayJsHmzkBp9wm44fK5BU7IFslUFsiEFTA23ghMywi/UinLF/q2DRgC0aeFz3Y
+	jjtBMl0ehqOuW88wp4ncHL6XSdlOskj35f3sT3Xn/XPsX2wsNe8i8mHQ7WNBX9qp08t5
+	05/rbaqHoqcVTgZSMg/IeYDV8tHAgcI1DNV2e8l3i0EtPZmh/irUSL93OQvu0l+fCk4Z
+	4aw7trCKXKNqnJ5lmi8h5o78BTwWIRh3qdHzMN2vBcotUDjnNIzh13Khc4ylIRYhJ8sg
+	HgKT1MHGxKNyx7QRIzCla15OXLMOxcWHH1Kl61UZISJwuktMKJrslRFtsYoHqkKXLHoT
+	km5g==
+X-Gm-Message-State: APjAAAXMuxtwNZPy+p/aHwVV0mf9OCkqQtzfcykLi/euCazxuL0iCaxQ
+	RbN1QxsaM0mHKSGZOL1SQqRchDaI0HirjbE4+q5x5g==
+X-Google-Smtp-Source: APXvYqxDcgYZfgeD+eOloB6dmm8sKH/kLNxzun0rUSANwnUj5gzNolIUmoyPIzd+DEeRrFMApoXzl0MaTLUd9QBWA0s=
+X-Received: by 2002:aca:110f:: with SMTP id 15mr1883505oir.163.1557415860738; 
+	Thu, 09 May 2019 08:31:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190509135617.GH4189@habkost.net>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 185.219.166.8
-Subject: Re: [Qemu-devel] [PATCH 0/2] i386: "unavailable-features" QOM
- property
+References: <20190509081930.19081-1-thuth@redhat.com>
+In-Reply-To: <20190509081930.19081-1-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 9 May 2019 16:30:49 +0100
+Message-ID: <CAFEAcA-YnC21fxXmb+6Ha8rAKbStiAN92uOSg6izVQgsjZa00g@mail.gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::233
+Subject: Re: [Qemu-devel] [PULL 00/14] qtests,
+ copyright statement clarifications and misc patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,81 +87,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
-	qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+	Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 09, 2019 at 10:56:17 -0300, Eduardo Habkost wrote:
-> On Thu, May 09, 2019 at 03:35:37PM +0200, Jiri Denemark wrote:
-> > Would this unavailable-features property contain only canonical names of
-> > the features or all possible aliases of all features? For example,
-> > "tsc-adjust" can also be spelled as "tsc_adjust". When calling
-> > query-cpu-model-expansion, we have a way to request all variants by
-> > running full expansion on the result of a previous static expansion. Can
-> > we get something like this for unavailable-features too?
-> 
-> I'd like to avoid that, and refer only to the canonical names.
-> 
-> Could you explain the use case you have in mind, so we can look
-> for alternatives?
+On Thu, 9 May 2019 at 09:19, Thomas Huth <thuth@redhat.com> wrote:
+>
+>  Hi Peter,
+>
+> the following changes since commit 629d166994725773dea9cef843fcb0ae5f3585fe:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190507' into staging (2019-05-08 00:06:43 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/huth/qemu.git tags/pull-request-2019-05-09
+>
+> for you to fetch changes up to 2c8fcd8f9ef2394b9933a52c157df4ef67ca1eba:
+>
+>   include/exec/poison: Mark TARGET_FMT_lu as poisoned, too (2019-05-09 09:37:09 +0200)
+>
+> ----------------------------------------------------------------
+> - Fix "make check" problem that occurred with LANG=C and Python 3.5 / 3.6
+> - Get rid of some more dependencies on the global_qtest variable in the qtests
+> - Some other small test clean-ups
+> - Some copyright statement clarifications
+> - Mark TARGET_FMT_lu as poisoned
+> ----------------------------------------------------------------
 
-Libvirt only knows about a single spelling for each CPU feature and
-quite often it is not the canonical variant. Thus libvirt would only
-recognize features for which the name known by libvirt is the canonical
-name.
 
-We could theoretically make the translation in libvirt, but it's not
-going to be future proof. If a new spelling is introduced, it's because
-the old one is not considered correct and the new one becomes the
-canonical version. When libvirt doesn't have the translation (libvirt is
-older or just didn't catch up yet) we have a big problem.
+Applied, thanks.
 
-I guess a good alternative would be some way of querying all CPU feature
-names and their aliases. If I'm not mistaken, we can either get a list
-of canonical names or all names, but without any clue which names
-actually refer to a single feature.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
-> > As you mentioned, there are two interesting QOM properties:
-> > filtered-features and feature-words and both are used by libvirt. We use
-> > feature-words to get CPU features which were enabled in the guest CPU on
-> > top of what we expected. This is the case of, e.g., a feature added to a
-> > given CPU model for new machine types. I guess we could switch to
-> > checking QOM properties for individual features as a replacement for
-> > feature-words which covers both CPUID and MSR features.
-> 
-> I guess it depends on your goal:
-> 
-> If your just want to know if one specific feature is missing for
-> some reason, you can check the QOM properties directly.  That's
-> OK, and it's even better than checking the `feature-words`
-> property.
-> 
-> If you want to be 100% sure no property was missing when starting
-> the VM (e.g. emulate the behavior of the "enforce" option), I
-> suggest you check if `unavailable-features` is empty.
-
-That's what filtered-features is used for.
-
-As I tried to explain (and apparently failed :-)) we use feature-words
-for a different thing. I guess it will be more clear using a specific
-example. For example, when arat CPU feature was introduced, it was added
-into several existing CPU models and thus libvirt's version of the CPU
-model differs from the one in QEMU. (This is actually safer and better
-then changing the libvirt's CPU model too since migration relies on both
-hosts having the same definition of the CPU model used by a domain.) So,
-for example, when a domain with Broadwell CPU model is started, libvirt
-checks feature-words to see whether some CPU features not defined in
-libvirt's definition of Broadwell CPU model were enabled. And it will
-see arat. As a result the live domain definition will actually be
-changed to Broadwell+arat to make sure arat is not lost after migration.
-
-Is the usage clear now?
-
-Anyway, I think we can just check all features we know about via CPU
-properties to get the same result. It's not going to be as nice as using
-feature-words, but it's doable.
-
-Jirka
+-- PMM
 
