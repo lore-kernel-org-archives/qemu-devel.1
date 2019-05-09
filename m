@@ -2,85 +2,84 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E81C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 22:28:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D860C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 22:28:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 479FD2173B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 22:28:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0618C2173B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 22:28:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MAy7FrQw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 479FD2173B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yrmaTw1i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0618C2173B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33444 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33446 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOrWc-0000Ff-D8
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 18:28:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:32800)
+	id 1hOrWx-0000Wx-4g
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 18:28:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:32990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOrUr-0007Vh-8e
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 18:26:40 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hOrV6-0007ju-Im
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 18:26:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOrUp-0005Md-UN
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 18:26:37 -0400
-Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:35075)
+	(envelope-from <richard.henderson@linaro.org>) id 1hOrV5-0005VB-Dk
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 18:26:52 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:34376)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hOrUp-0005MK-OB
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 18:26:35 -0400
-Received: by mail-pg1-x52f.google.com with SMTP id h1so1929983pgs.2
-	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 15:26:35 -0700 (PDT)
+	id 1hOrV5-0005Uo-7E
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 18:26:51 -0400
+Received: by mail-pf1-x443.google.com with SMTP id n19so2057572pfa.1
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 15:26:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=b55pa33Xm1bhNPUAg34/r/VYsd0l2E8AyIFTi5SXEyw=;
-	b=MAy7FrQwlQlFfECCzNPkWDHll7YbyJ1DAXd9zbxfnAUZ58txopH6ZT288yyfwoP7JW
-	r3gbTKjfi15gdJpTlRd873PLnuFfR+Rr87gkvRRXUaNmnEetOBTxaZcPm31p0Jgqe1ys
-	ZgSOjLUD5/oA7/VR81lEUfreKTE7jKV+b+I8kosub0OHGHiYSGJ8AdnWSvq8xsGvbROc
-	whuDM59EYTVOI7BGQSwq3Ub+qn3J0bvZcsCxn0x1322hrHk4vhMJV0b12mktYdswXoPZ
-	4WKJx49d7TXshPBWJeZHMkQn/dNDXD6DY75AOQUEsbxQ9q5evV5Fh0vKvBvYl7ndxWwB
-	YdWw==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=SbdgfaYjW8ILfhiu0/mJqWKm/tBVnd5f44zvoNG8J24=;
+	b=yrmaTw1isYlaWL0h+7ulMQ5InyN7qPN1b6Vv8b3I86iMq+GoPcz0+KSzsakznlng0B
+	JDD5fj8I4FK3bxucKKhEpvlWt+7wCYbD6jHWh6fI49PU8Sd9OKat5nuo2w3taJSvOkkI
+	8GNDqQjYUPDWUnOgHgwt/C2DzyeHctU07jK++Vdg6v9Gmr9bdcO445CPlddAN885sMqr
+	WLW9oSlyEDJw8+FN9SQ2D8gRQw45siWMhhLMNF+TIp7PC9EaDWGTywBsRHOP4n5TiCxr
+	OyVJkoB4mv7eodqTpo+N6/d7uMfpBWr+N+bx7ZGe7I7IFpjRvxKRFo+ZdUPwTHkHlryt
+	/VrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=b55pa33Xm1bhNPUAg34/r/VYsd0l2E8AyIFTi5SXEyw=;
-	b=oy0Gydmse7CCCtL7MbTb4LJ31uKFLPWu+nK17jN2nbzcvyAUpUdUAI3dFjPXSpOcRg
-	jswDuB5Z3CZANQAQJ4afiBsBzevlP8A93ofsbw6i4dsU8xtFQuFs8+XLQqqkCMQqwwXM
-	qdReTjDArR2IsuLOUl5iHs+MQ638qSKWVneM9zRekHwJym+O1/MpoOvpbdCG1HmAe9rx
-	DxMoVoXmBQ2vS9RrUIPhawi+Lxlv8jdAU0g6HlABJF57KfAp/keRA8YKZzVs5hfZsg14
-	y5Zhhq3qRVud4T4IO1z3Mvm+/I3b7HCZaR4O5/0QrWBBpyyPY12Qy8x7YeKeG1/LoELO
-	eV8A==
-X-Gm-Message-State: APjAAAV7p+3anJ9FYvw6ePOpKO66P0vpYgIZcNo9FrWtqPdXpBWtlYkg
-	byRI7y5QZgq4tn5WLQeuEW560s+oeok=
-X-Google-Smtp-Source: APXvYqxuxKjN8y2vmIsW3TlDMiocvrBfBZXroO+YNEnbkcUmiyohhbxfM+Y65c9NuOVnRmwFYChrHQ==
-X-Received: by 2002:a63:2d41:: with SMTP id t62mr9064008pgt.113.1557440794103; 
-	Thu, 09 May 2019 15:26:34 -0700 (PDT)
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=SbdgfaYjW8ILfhiu0/mJqWKm/tBVnd5f44zvoNG8J24=;
+	b=HucpIPX2+9GhkFk9PWJr1hW+BuSqN6lWnr2MOdGQx+KQ0fdIgjzEwpiypQGwyV/mbX
+	l9QeccyquBIdkiaJd6tY5FE3Sk9RCsROkxb6DKEu4RttjLypXw4L98MfYjncSh80n05P
+	NUlW3J8TfdH7x8UCALEnfDkexQEXpqWPmiWUHCnXPfirfdAYQOt7LrbQSKfdk8GN2uPj
+	HA7ENbSDbGpRH/RbELY3jXp/IjWhvd0/C3ICQZ2YpBFdtsc000RzD965RfhZuBpvBHsx
+	WPAcQYRBdA3idtWm9kUWx3cFLzkfZbMpc5Uro/HaXaSxIBCuypoEOwEUYs0uxLdXkuSo
+	iv9g==
+X-Gm-Message-State: APjAAAVk/v6VrvXSFZ1Es5ZI/rnRQAXfaWsmmLZyatkHyeWNnwApib+I
+	sGAkP8hcQd/wUH/5N1dCX3655bvr9do=
+X-Google-Smtp-Source: APXvYqwpxgHkkUFlnOasIkZ8iKDO2JPj61Cs4qqWju6M7Zvv4H4rixRKjU6369WnXE0MfMbzdUYWZg==
+X-Received: by 2002:aa7:8ec6:: with SMTP id b6mr8882550pfr.234.1557440809813; 
+	Thu, 09 May 2019 15:26:49 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id m2sm4490521pfi.24.2019.05.09.15.26.32
-	for <qemu-devel@nongnu.org>
+	by smtp.gmail.com with ESMTPSA id m2sm4490521pfi.24.2019.05.09.15.26.48
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 09 May 2019 15:26:32 -0700 (PDT)
+	Thu, 09 May 2019 15:26:49 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu,  9 May 2019 15:26:04 -0700
-Message-Id: <20190509222631.14271-1-richard.henderson@linaro.org>
+Date: Thu,  9 May 2019 15:26:17 -0700
+Message-Id: <20190509222631.14271-14-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190509222631.14271-1-richard.henderson@linaro.org>
+References: <20190509222631.14271-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::52f
-Subject: [Qemu-devel] [PATCH v3 00/27] tcg: Add CPUClass::tlb_fill
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: [Qemu-devel] [PATCH v3 13/27] target/moxie: Convert to
+ CPUClass::tlb_fill
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,159 +91,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Anthony Green <green@moxielogic.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Changes from v2:
-  * Re-remove the cpu_dump_state from nios-linux-user.
-  * Assert !probe for sparc32, undoing other mmureg changes.
-  * Better describe the SVE bug fixed by the final patch.
+Remove the user-only functions, as we don't have a user-only config.
+Fix the unconditional call to tlb_set_page, even if the translation
+failed.
 
-Patches without review:
-0014-target-nios2-Convert-to-CPUClass-tlb_fill.patch
-0020-target-sparc-Convert-to-CPUClass-tlb_fill.patch
+Cc: Anthony Green <green@moxielogic.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/moxie/cpu.h    |  5 ++--
+ target/moxie/cpu.c    |  5 ++--
+ target/moxie/helper.c | 61 ++++++++++---------------------------------
+ 3 files changed, 19 insertions(+), 52 deletions(-)
 
-Changes from v1:
-  * Do not unify user-only and system tlb_fill functions
-    (alpha, microblaze, nios2, s390x, sparc, xtensa).
-  * Split the mips patch into multiple.
-  * Other random changes per review.
-
-Blurb from v1:
-
-There is currently a lot of confusion between foo_cpu_handle_mmu_fault
-and tlb_fill.
-
-In particular, foo_cpu_handle_mmu_fault was only defined for user-only,
-and its only valid action was to set up the cpu for cpu_loop_exit so
-that we can deliver a SIGSEGV to the guest.  And yet, we had code that
-tried to return from the host SIGSEGV handler to retry the instruction.
-
-We had, for some targets, a definition of foo_cpu_handle_mmu_fault
-for softmmu.  Sometimes this was called from tlb_fill, sometimes not.
-
-Finally, we have a use case for SVE that wants a non-faulting tlb_fill,
-so while we're changing the interface, let's go ahead and include that.
-
-
-r~
-
-
-Richard Henderson (27):
-  tcg: Add CPUClass::tlb_fill
-  target/alpha: Convert to CPUClass::tlb_fill
-  target/arm: Convert to CPUClass::tlb_fill
-  target/cris: Convert to CPUClass::tlb_fill
-  target/hppa: Convert to CPUClass::tlb_fill
-  target/i386: Convert to CPUClass::tlb_fill
-  target/lm32: Convert to CPUClass::tlb_fill
-  target/m68k: Convert to CPUClass::tlb_fill
-  target/microblaze: Convert to CPUClass::tlb_fill
-  target/mips: Pass a valid error to raise_mmu_exception for user-only
-  target/mips: Tidy control flow in mips_cpu_handle_mmu_fault
-  target/mips: Convert to CPUClass::tlb_fill
-  target/moxie: Convert to CPUClass::tlb_fill
-  target/nios2: Convert to CPUClass::tlb_fill
-  target/openrisc: Convert to CPUClass::tlb_fill
-  target/ppc: Convert to CPUClass::tlb_fill
-  target/riscv: Convert to CPUClass::tlb_fill
-  target/s390x: Convert to CPUClass::tlb_fill
-  target/sh4: Convert to CPUClass::tlb_fill
-  target/sparc: Convert to CPUClass::tlb_fill
-  target/tilegx: Convert to CPUClass::tlb_fill
-  target/tricore: Convert to CPUClass::tlb_fill
-  target/unicore32: Convert to CPUClass::tlb_fill
-  target/xtensa: Convert to CPUClass::tlb_fill
-  tcg: Use CPUClass::tlb_fill in cputlb.c
-  tcg: Remove CPUClass::handle_mmu_fault
-  tcg: Use tlb_fill probe from tlb_vaddr_to_host
-
- include/exec/cpu_ldst.h         |  50 ++-------
- include/exec/exec-all.h         |   9 --
- include/qom/cpu.h               |  12 +-
- target/alpha/cpu.h              |   5 +-
- target/arm/internals.h          |  10 +-
- target/cris/cpu.h               |   5 +-
- target/hppa/cpu.h               |   8 +-
- target/i386/cpu.h               |   5 +-
- target/lm32/cpu.h               |   5 +-
- target/m68k/cpu.h               |   5 +-
- target/microblaze/cpu.h         |   5 +-
- target/mips/internal.h          |   5 +-
- target/moxie/cpu.h              |   5 +-
- target/nios2/cpu.h              |   5 +-
- target/openrisc/cpu.h           |   5 +-
- target/ppc/cpu.h                |   7 +-
- target/riscv/cpu.h              |   5 +-
- target/s390x/internal.h         |   5 +-
- target/sh4/cpu.h                |   5 +-
- target/sparc/cpu.h              |   5 +-
- target/tricore/cpu.h            |   6 +-
- target/unicore32/cpu.h          |   5 +-
- target/xtensa/cpu.h             |   5 +-
- accel/tcg/cputlb.c              |  88 +++++++++++++--
- accel/tcg/user-exec.c           |  36 ++----
- target/alpha/cpu.c              |   5 +-
- target/alpha/helper.c           |  24 ++--
- target/alpha/mem_helper.c       |  16 ---
- target/arm/cpu.c                |  22 +---
- target/arm/helper.c             |  90 ++++++++-------
- target/arm/op_helper.c          |  29 +----
- target/arm/sve_helper.c         |   6 +-
- target/cris/cpu.c               |   5 +-
- target/cris/helper.c            |  61 ++++++-----
- target/cris/op_helper.c         |  28 -----
- target/hppa/cpu.c               |   5 +-
- target/hppa/mem_helper.c        |  16 ++-
- target/i386/cpu.c               |   5 +-
- target/i386/excp_helper.c       |  53 +++++----
- target/i386/mem_helper.c        |  21 ----
- target/lm32/cpu.c               |   5 +-
- target/lm32/helper.c            |   8 +-
- target/lm32/op_helper.c         |  16 ---
- target/m68k/cpu.c               |   2 +-
- target/m68k/helper.c            |  89 ++++++++-------
- target/m68k/op_helper.c         |  15 ---
- target/microblaze/cpu.c         |   5 +-
- target/microblaze/helper.c      | 101 ++++++++---------
- target/microblaze/op_helper.c   |  19 ----
- target/mips/cpu.c               |   5 +-
- target/mips/helper.c            |  81 ++++++--------
- target/mips/op_helper.c         |  15 ---
- target/moxie/cpu.c              |   5 +-
- target/moxie/helper.c           |  65 +++--------
- target/nios2/cpu.c              |   5 +-
- target/nios2/helper.c           | 170 ++++++++++++++--------------
- target/nios2/mmu.c              |  12 --
- target/openrisc/cpu.c           |   5 +-
- target/openrisc/mmu.c           |  69 ++++++------
- target/ppc/mmu_helper.c         |  16 ++-
- target/ppc/translate_init.inc.c |   5 +-
- target/ppc/user_only_helper.c   |  14 ++-
- target/riscv/cpu.c              |   5 +-
- target/riscv/cpu_helper.c       |  50 ++++-----
- target/s390x/cpu.c              |   5 +-
- target/s390x/excp_helper.c      |  67 +++++++----
- target/s390x/mem_helper.c       |  16 ---
- target/sh4/cpu.c                |   5 +-
- target/sh4/helper.c             | 189 +++++++++++++++-----------------
- target/sh4/op_helper.c          |  12 --
- target/sparc/cpu.c              |   5 +-
- target/sparc/ldst_helper.c      |  15 ---
- target/sparc/mmu_helper.c       |  58 ++++++----
- target/tilegx/cpu.c             |  10 +-
- target/tricore/cpu.c            |   1 +
- target/tricore/helper.c         |  23 ++--
- target/tricore/op_helper.c      |  26 -----
- target/unicore32/cpu.c          |   5 +-
- target/unicore32/helper.c       |  23 ----
- target/unicore32/op_helper.c    |  14 ---
- target/unicore32/softmmu.c      |  13 ++-
- target/xtensa/cpu.c             |   5 +-
- target/xtensa/helper.c          |  33 +++---
- 83 files changed, 868 insertions(+), 1131 deletions(-)
-
+diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
+index f3b6d83ae7..a63a96bc05 100644
+--- a/target/moxie/cpu.h
++++ b/target/moxie/cpu.h
+@@ -139,7 +139,8 @@ static inline void cpu_get_tb_cpu_state(CPUMoxieState *env, target_ulong *pc,
+     *flags = 0;
+ }
+ 
+-int moxie_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size,
+-                               int rw, int mmu_idx);
++bool moxie_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                        MMUAccessType access_type, int mmu_idx,
++                        bool probe, uintptr_t retaddr);
+ 
+ #endif /* MOXIE_CPU_H */
+diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
+index 46434e65ba..02b2b47574 100644
+--- a/target/moxie/cpu.c
++++ b/target/moxie/cpu.c
+@@ -112,9 +112,8 @@ static void moxie_cpu_class_init(ObjectClass *oc, void *data)
+     cc->do_interrupt = moxie_cpu_do_interrupt;
+     cc->dump_state = moxie_cpu_dump_state;
+     cc->set_pc = moxie_cpu_set_pc;
+-#ifdef CONFIG_USER_ONLY
+-    cc->handle_mmu_fault = moxie_cpu_handle_mmu_fault;
+-#else
++    cc->tlb_fill = moxie_cpu_tlb_fill;
++#ifndef CONFIG_USER_ONLY
+     cc->get_phys_page_debug = moxie_cpu_get_phys_page_debug;
+     cc->vmsd = &vmstate_moxie_cpu;
+ #endif
+diff --git a/target/moxie/helper.c b/target/moxie/helper.c
+index 287a45232c..216cef057e 100644
+--- a/target/moxie/helper.c
++++ b/target/moxie/helper.c
+@@ -26,18 +26,10 @@
+ #include "qemu/host-utils.h"
+ #include "exec/helper-proto.h"
+ 
+-/* Try to fill the TLB and return an exception if error. If retaddr is
+-   NULL, it means that the function was called in C code (i.e. not
+-   from generated code or from helper.c) */
+ void tlb_fill(CPUState *cs, target_ulong addr, int size,
+               MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
+ {
+-    int ret;
+-
+-    ret = moxie_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
+-    if (unlikely(ret)) {
+-        cpu_loop_exit_restore(cs, retaddr);
+-    }
++    moxie_cpu_tlb_fill(cs, addr, size, access_type, mmu_idx, false, retaddr);
+ }
+ 
+ void helper_raise_exception(CPUMoxieState *env, int ex)
+@@ -85,53 +77,29 @@ void helper_debug(CPUMoxieState *env)
+     cpu_loop_exit(cs);
+ }
+ 
+-#if defined(CONFIG_USER_ONLY)
+-
+-void moxie_cpu_do_interrupt(CPUState *cs)
+-{
+-    CPUState *cs = CPU(moxie_env_get_cpu(env));
+-
+-    cs->exception_index = -1;
+-}
+-
+-int moxie_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
+-                               int rw, int mmu_idx)
+-{
+-    MoxieCPU *cpu = MOXIE_CPU(cs);
+-
+-    cs->exception_index = 0xaa;
+-    cpu->env.debug1 = address;
+-    cpu_dump_state(cs, stderr, 0);
+-    return 1;
+-}
+-
+-#else /* !CONFIG_USER_ONLY */
+-
+-int moxie_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
+-                               int rw, int mmu_idx)
++bool moxie_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                        MMUAccessType access_type, int mmu_idx,
++                        bool probe, uintptr_t retaddr)
+ {
+     MoxieCPU *cpu = MOXIE_CPU(cs);
+     CPUMoxieState *env = &cpu->env;
+     MoxieMMUResult res;
+     int prot, miss;
+-    target_ulong phy;
+-    int r = 1;
+ 
+     address &= TARGET_PAGE_MASK;
+     prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+-    miss = moxie_mmu_translate(&res, env, address, rw, mmu_idx);
+-    if (miss) {
+-        /* handle the miss.  */
+-        phy = 0;
+-        cs->exception_index = MOXIE_EX_MMU_MISS;
+-    } else {
+-        phy = res.phy;
+-        r = 0;
++    miss = moxie_mmu_translate(&res, env, address, access_type, mmu_idx);
++    if (likely(!miss)) {
++        tlb_set_page(cs, address, res.phy, prot, mmu_idx, TARGET_PAGE_SIZE);
++        return true;
++    }
++    if (probe) {
++        return false;
+     }
+-    tlb_set_page(cs, address, phy, prot, mmu_idx, TARGET_PAGE_SIZE);
+-    return r;
+-}
+ 
++    cs->exception_index = MOXIE_EX_MMU_MISS;
++    cpu_loop_exit_restore(cs, retaddr);
++}
+ 
+ void moxie_cpu_do_interrupt(CPUState *cs)
+ {
+@@ -156,4 +124,3 @@ hwaddr moxie_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+     }
+     return phy;
+ }
+-#endif
 -- 
 2.17.1
 
