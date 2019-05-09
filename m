@@ -6,68 +6,91 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2369C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 14:57:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35070C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 14:58:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93C282054F
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 14:57:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93C282054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0A2222054F
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 14:58:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A2222054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56055 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56059 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOkUT-0003Qd-U0
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 10:57:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40722)
+	id 1hOkUz-0003mX-8W
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 10:58:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hOkSW-0002KR-Qz
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:55:45 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hOkTk-000389-Np
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:57:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hOkSV-0000jO-Gi
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:55:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45122)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hOkSV-0000iw-B6
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:55:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hOkSQ-0003Yy-0T
-	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 14:55:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 060432E80CC
-	for <qemu-devel@nongnu.org>; Thu,  9 May 2019 14:55:33 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1hOkTh-0001Kp-Uc
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 10:57:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hOkTf-0001JS-EU; Thu, 09 May 2019 10:56:55 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DB8173078ABD;
+	Thu,  9 May 2019 14:56:50 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-168.brq.redhat.com
+	[10.40.204.168])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 903F860FE6;
+	Thu,  9 May 2019 14:56:48 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190506142741.41731-1-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <5a643d95-3732-e22d-7cc5-122ae5792641@redhat.com>
+Date: Thu, 9 May 2019 16:56:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 May 2019 14:49:37 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bneumeier pmaydell
-X-Launchpad-Bug-Reporter: Brett Neumeier (bneumeier)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <155741248596.25660.12793938251081176084.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155741337710.32090.13896191550251426644.malone@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18961";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 07c8cb5de5cea47ce0e3a42dad732f0c78ecd325
+In-Reply-To: <20190506142741.41731-1-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="jff3sLgP2iVO0yPsmqkAJYqt8f98vOzJM"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.48]);
+	Thu, 09 May 2019 14:56:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1828429] Re: qemu-system-aarch64 crashes with
- assertion failed while running GCC 9 test suite
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v6 0/8] qcow2: encryption threads
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,58 +99,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1828429 <1828429@bugs.launchpad.net>
+Cc: kwolf@redhat.com, pbonzini@redhat.com, berto@igalia.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi -- this looks rather like bug #1824853, which exists in QEMU 4.0 but
-which we have fixed in git. Could you try with a build of QEMU from
-current head-of-git to confirm that it's fixed there ?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jff3sLgP2iVO0yPsmqkAJYqt8f98vOzJM
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, berto@igalia.com, pbonzini@redhat.com,
+ berrange@redhat.com, den@openvz.org
+Message-ID: <5a643d95-3732-e22d-7cc5-122ae5792641@redhat.com>
+Subject: Re: [PATCH v6 0/8] qcow2: encryption threads
+References: <20190506142741.41731-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190506142741.41731-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 06.05.19 16:27, Vladimir Sementsov-Ogievskiy wrote:
+> v6:
+>  - Rebase on master, so 02 changed to reflect changes in
+>    qcow2_compress(), keep r-b.
+>  - Rewrite 06 to even simpler locking [Max], drop r-b
+>    Drop following
+>    "qcow2: qcow2_co_preadv: skip using hd_qiov when possible", I'll do
+>    it in my other coming soon series, and it is actually unrelated to
+>    current.
+>  - Drop controversial perf test, hope I'll return to this topic, but no=
+t
+>    in context of these series.
+>  - Add Max's r-b's to all here, except 06
+>=20
+> Vladimir Sementsov-Ogievskiy (8):
+>   qcow2.h: add missing include
+>   qcow2: add separate file for threaded data processing functions
+>   qcow2-threads: use thread_pool_submit_co
+>   qcow2-threads: qcow2_co_do_compress: protect queuing by mutex
+>   qcow2-threads: split out generic path
+>   qcow2: qcow2_co_preadv: improve locking
+>   qcow2: bdrv_co_pwritev: move encryption code out of the lock
+>   qcow2: do encryption in threads
+>=20
+>  block/qcow2.h          |  20 ++-
+>  block/qcow2-bitmap.c   |   1 -
+>  block/qcow2-cache.c    |   1 -
+>  block/qcow2-cluster.c  |   8 +-
+>  block/qcow2-refcount.c |   1 -
+>  block/qcow2-snapshot.c |   1 -
+>  block/qcow2-threads.c  | 268 +++++++++++++++++++++++++++++++++++++++++=
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1828429
+>  block/qcow2.c          | 241 +++++-------------------------------
+>  block/Makefile.objs    |   2 +-
+>  9 files changed, 321 insertions(+), 222 deletions(-)
+>  create mode 100644 block/qcow2-threads.c
 
-Title:
-  qemu-system-aarch64 crashes with assertion failed while running GCC 9
-  test suite
+Thanks, applied to my block branch:
 
-Status in QEMU:
-  New
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
-Bug description:
-  I am using QEMU 4.0.0 on an x86_64 Linux 4.19.0 host, the guest is an
-  Aarch64 linux 5.0.0 system. The same issue occurred on QEMU 3.1.0.
+Max
 
-  While running the GCC 9.1 test suite on the guest system, QEMU crashes
-  with:
 
-  qemu-system-aarch64: [...]/qemu-4.0.0/tcg/tcg.c:3952: tcg_gen_code:
-  Assertion `s->gen_insn_end_off[num_insns] =3D=3D off' failed.
+--jff3sLgP2iVO0yPsmqkAJYqt8f98vOzJM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  I am able to reproduce the issue reliably, which is encouraging. The
-  full QEMU command line is:
+-----BEGIN PGP SIGNATURE-----
 
-  qemu-system-aarch64 -kernel kernel-5.0.0cbl1 -append "root=3D/dev/vda1
-  ro init=3D/sbin/init console=3DttyAMA0" -name guest=3Dcbl -drive
-  file=3Dcbl.qcow2,index=3D0,media=3Ddisk,format=3Dqcow2 -drive
-  file=3Dswap.qcow2,index=3D1,media=3Ddisk,format=3Dqcow2 -machine virt -cpu
-  cortex-a57 -smp 4,sockets=3D1,cores=3D2,threads=3D2 -m size=3D8192 -netdev
-  tap,id=3Dnetwork0,ifname=3Dtapcbl2,script=3Dno,downscript=3Dno -device vi=
-rtio-
-  net-device,netdev=3Dnetwork0,mac=3Daa:bb:cc:dd:ee:02 -nographic
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzUP64ACgkQ9AfbAGHV
+z0DZNgf+MGUD2gl3dFrYQLH5bQHYY5pXifXit0Po65mGL1Bpdr8g+RwA3S4V7iUg
+2SowSHlf8zo4OHwS7PhEVOKmVj1gNJaNbN/Q33OtYATjszIVAVdg39WEXKvWF6Q3
+jbwRfmrPtW7LH5+WbxC7TuoSwyWmP1aD+JXE14+AFC39m8p5J4xJsRKx19N40hMT
+pbx8s653m1hFLA/nW2ZMnzBrhQ5G56/0RECPDWR1mjagyd5rgNNcvXgYOhAvk4lg
+Gjr5dUruLbRTpTxHNol8HeAYAXSrxDJ35TKE01YcXfVsLBtjx9kskuu97w7qgOs1
+hmZUvkMQy0IFR0cdfkWO1KpG4vQGYg==
+=Xi62
+-----END PGP SIGNATURE-----
 
-  The specific GCC test that causes QEMU to crash is vldX.c run from
-  advsimd-intrinsics.exp; I can reproduce via "make check-gcc
-  RUNTESTFLAGS=3Dadvsimd-intrinsics.exp=3DvldX.c"
-
-  If there is anything I can do to further triage the issue, or gain
-  more insight into what is going on, please let me know! I am eager to
-  help however I can.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1828429/+subscriptions
+--jff3sLgP2iVO0yPsmqkAJYqt8f98vOzJM--
 
