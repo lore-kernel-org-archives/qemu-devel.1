@@ -4,87 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C3A7C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 22:42:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC11C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 22:43:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D80E821744
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 22:42:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06FE221744
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 22:43:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k4sHyyoI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D80E821744
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cAhr9Lg+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06FE221744
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33651 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33684 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOrjk-00049I-2W
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 18:42:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33251)
+	id 1hOrlQ-0005ZP-71
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 18:43:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:32928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOrVR-00081V-0f
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 18:27:14 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hOrV0-0007di-RT
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 18:26:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOrVP-0005eD-Iw
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 18:27:12 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36144)
+	(envelope-from <richard.henderson@linaro.org>) id 1hOrUz-0005SX-IY
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 18:26:46 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41937)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hOrVP-0005dl-2E
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 18:27:11 -0400
-Received: by mail-pg1-x542.google.com with SMTP id a3so1926741pgb.3
-	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 15:27:10 -0700 (PDT)
+	id 1hOrUz-0005SJ-BJ
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 18:26:45 -0400
+Received: by mail-pf1-x442.google.com with SMTP id l132so2041176pfc.8
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 15:26:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-	:content-transfer-encoding;
-	bh=g3xnMlX0kQIIsZFf0jn7V0Z3ghhMjOB9lPUnQDGY3Jc=;
-	b=k4sHyyoIY8KL33M+u+uAPHFbeyMOYET+ZBPf8krxWJw3y3FfyOcJsO1Pw2aryidZP2
-	IF88MWUL32XgK6NEAUXBe/kiQZQ7W8s/rTL96l5bo9bg42hKSA2RFn5z76yEx5qPB5ao
-	zt8os/f2HAd9vLlKUxa1JDNEBMoo9Mgl6psZyZI1iiXkS3qWeGFYbIUEVwc0IL1PY/2z
-	49O4ZmrVzXYeXD7Vrros5v+n8NV3LKy8NcfPnlI/ORGEwGSWjw1cggrJsOaDUxvhjubj
-	D7PsQ4NqbZumsIrXiIJiAh9sCP9zv7JH9FPulcIXwI+rAROfEcPm3NTmKU0EtiXTwsIS
-	awRw==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=epdYlBTiLaV9VQx6jCDpGmNhfjLLlYzffabxUVX4RgQ=;
+	b=cAhr9Lg+v2BVuh68BTLHS1TLe8IlJdh1TBMtrxB985BXS4VUn0TVAs/Pwp/8YL9izK
+	r1J/YFSmdIDMlOUuWoqIJyBRaLitMtarkNDiBce5Ld+lhI7XxZJmb5G3E45oAVw6K+dG
+	4oyIvNntKg67qxQg3kVutyyPrGbWawtgI9li22NNyA4A+73q1UrX8ztdxj2wkEP2/Ilc
+	9ZVB9IXRptq1xyGHUn4XwEQJ0ddmKtNrpUfsvkePxAvMcPazEqQ1yCH83ivEsj8g7mrZ
+	oos0/hAPvVbNR0/wp0/n2ObV5byRcKPTTidK4O1aY8JkY/HQ0iX2ZS04iP52D5rByVQ+
+	euvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=g3xnMlX0kQIIsZFf0jn7V0Z3ghhMjOB9lPUnQDGY3Jc=;
-	b=Kr/i8A7mZY6w9UVi7uULn2zPtaYdkmEj7sBLXPna4qQ2n3pfbCLfQUR5anpooz6uH9
-	5ZdeftMdncbZto3mJeIk5JM2PHmR+dBbOehefAS2U+mGw2NNxpw9cVxywoem60ow0An/
-	tEFs6HmqIOO4cxI6JglI/oWcDXoIcUGgdmfGjkPaqFbCrQtuXT/9K8ZjK6w9/DuHBEe1
-	N+ZB1mfJtCtWRjdLtaGpuY+0byZt5XgxTodXj6EeF1UprwYt4uEPEPQLZglzbfur2OIt
-	LgTV/ORCVCNNLTYa6Gnrd2zmTSaBdz5m+CRAKCkbUpXGrKH9vr5ynsyZk/otQUVfezcY
-	8EaQ==
-X-Gm-Message-State: APjAAAUIfyA/2FQbgfzxUOSzVTAy2sttU80lgOYB7ItbzZDIkfWu+U1F
-	QhckQYoPvuy0EqMhowM/Bf9c9mwqcgs=
-X-Google-Smtp-Source: APXvYqz7TgSVUAlewtf5/Nc60IqQGia8I5OgHD1rKqgXKSlJxAAQ0A9mUQ6+Q5C9d+QmXM5BtLAmwg==
-X-Received: by 2002:a62:2703:: with SMTP id n3mr8887158pfn.199.1557440829250; 
-	Thu, 09 May 2019 15:27:09 -0700 (PDT)
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=epdYlBTiLaV9VQx6jCDpGmNhfjLLlYzffabxUVX4RgQ=;
+	b=QsrjpbEbLFrt+Rm78cQFvLTQz74VV1qCTqWzhvUOnDoblzrT8piUCun+QNRniBLLoQ
+	iD8faomEDMfSUIkojcfHZ/Wuuj5ECssIRjbsTCiHIZpIX3j8O5iUqfiirtFRSz72Yzu0
+	0hx4XVqQCwTxmpSqzfOHuriCUqo2VeiqzSeMvzUly2+1WTJ3ABipsbh9gglnpgqdebhq
+	qOD5NWWGH/ppZHF7AUOqNqgyY8w7cOi9rdMmwBuOkiHIUdY2wTnBNSHwJOLCm0L3dDB0
+	Anz9JGEzFJ2i3gtHlnA0d2DNECiZfLaGy5oxMNcsolvnKKCSEvstziKZM4Izc+kX8fyI
+	pt3w==
+X-Gm-Message-State: APjAAAXuw9qGDGcKtS9bQ0SRiWR0kku3Y3sz/Ce0L2tSFfnaEq6ejlxF
+	UO+4O0tsI4u/Hb3Wm/fDg7+GHZyY63g=
+X-Google-Smtp-Source: APXvYqz6Zyw/vsikI8lE53+BFSZ2evJ1mHfQefuFFm7KK8GpyECv3xKCar/jx97AxZ+zzAhulF9x9w==
+X-Received: by 2002:a62:ee05:: with SMTP id e5mr7210282pfi.117.1557440804035; 
+	Thu, 09 May 2019 15:26:44 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id m2sm4490521pfi.24.2019.05.09.15.27.08
-	for <qemu-devel@nongnu.org>
+	by smtp.gmail.com with ESMTPSA id m2sm4490521pfi.24.2019.05.09.15.26.42
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 09 May 2019 15:27:08 -0700 (PDT)
+	Thu, 09 May 2019 15:26:43 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu,  9 May 2019 15:26:31 -0700
-Message-Id: <20190509222631.14271-28-richard.henderson@linaro.org>
+Date: Thu,  9 May 2019 15:26:12 -0700
+Message-Id: <20190509222631.14271-9-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190509222631.14271-1-richard.henderson@linaro.org>
 References: <20190509222631.14271-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::542
-Subject: [Qemu-devel] [PATCH v3 27/27] tcg: Use tlb_fill probe from
- tlb_vaddr_to_host
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: [Qemu-devel] [PATCH v3 08/27] target/m68k: Convert to
+ CPUClass::tlb_fill
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,209 +90,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Most of the existing users would continue around a loop which
-would fault the tlb entry in via a normal load/store.
-
-But for AArch64 SVE we have an existing emulation bug wherein we
-would mark the first element of a no-fault vector load as faulted
-(within the FFR, not via exception) just because we did not have
-its address in the TLB.  Now we can properly only mark it as faulted
-if there really is no valid, readable translation, while still not
-raising an exception.  (Note that beyond the first element of the
-vector, the hardware may report a fault for any reason whatsoever;
-with at least one element loaded, forward progress is guaranteed.)
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2: Update function docs comment.
----
- include/exec/cpu_ldst.h | 50 ++++++-----------------------
- accel/tcg/cputlb.c      | 69 ++++++++++++++++++++++++++++++++++++-----
- target/arm/sve_helper.c |  6 +---
- 3 files changed, 72 insertions(+), 53 deletions(-)
+ target/m68k/cpu.h       |  5 ++-
+ target/m68k/cpu.c       |  2 +-
+ target/m68k/helper.c    | 87 ++++++++++++++++++++++-------------------
+ target/m68k/op_helper.c | 15 -------
+ 4 files changed, 50 insertions(+), 59 deletions(-)
 
-diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-index d78041d7a0..7b28a839d2 100644
---- a/include/exec/cpu_ldst.h
-+++ b/include/exec/cpu_ldst.h
-@@ -433,50 +433,20 @@ static inline CPUTLBEntry *tlb_entry(CPUArchState *env, uintptr_t mmu_idx,
-  * @mmu_idx: MMU index to use for lookup
-  *
-  * Look up the specified guest virtual index in the TCG softmmu TLB.
-- * If the TLB contains a host virtual address suitable for direct RAM
-- * access, then return it. Otherwise (TLB miss, TLB entry is for an
-- * I/O access, etc) return NULL.
-- *
-- * This is the equivalent of the initial fast-path code used by
-- * TCG backends for guest load and store accesses.
-+ * If we can translate a host virtual address suitable for direct RAM
-+ * access, without causing a guest exception, then return it.
-+ * Otherwise (TLB entry is for an I/O access, guest software
-+ * TLB fill required, etc) return NULL.
-  */
-+#ifdef CONFIG_USER_ONLY
- static inline void *tlb_vaddr_to_host(CPUArchState *env, abi_ptr addr,
--                                      int access_type, int mmu_idx)
-+                                      MMUAccessType access_type, int mmu_idx)
- {
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index ad41608341..683d3e2f79 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -542,8 +542,9 @@ static inline int cpu_mmu_index (CPUM68KState *env, bool ifetch)
+     return (env->sr & SR_S) == 0 ? 1 : 0;
+ }
+ 
+-int m68k_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size, int rw,
+-                              int mmu_idx);
++bool m68k_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                       MMUAccessType access_type, int mmu_idx,
++                       bool probe, uintptr_t retaddr);
+ void m68k_cpu_unassigned_access(CPUState *cs, hwaddr addr,
+                                 bool is_write, bool is_exec, int is_asi,
+                                 unsigned size);
+diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+index 582e3a73b3..6f441bc973 100644
+--- a/target/m68k/cpu.c
++++ b/target/m68k/cpu.c
+@@ -269,7 +269,7 @@ static void m68k_cpu_class_init(ObjectClass *c, void *data)
+     cc->set_pc = m68k_cpu_set_pc;
+     cc->gdb_read_register = m68k_cpu_gdb_read_register;
+     cc->gdb_write_register = m68k_cpu_gdb_write_register;
+-    cc->handle_mmu_fault = m68k_cpu_handle_mmu_fault;
++    cc->tlb_fill = m68k_cpu_tlb_fill;
+ #if defined(CONFIG_SOFTMMU)
+     cc->do_unassigned_access = m68k_cpu_unassigned_access;
+     cc->get_phys_page_debug = m68k_cpu_get_phys_page_debug;
+diff --git a/target/m68k/helper.c b/target/m68k/helper.c
+index d958a34959..862f955f7b 100644
+--- a/target/m68k/helper.c
++++ b/target/m68k/helper.c
+@@ -353,20 +353,7 @@ void m68k_switch_sp(CPUM68KState *env)
+     env->current_sp = new_sp;
+ }
+ 
 -#if defined(CONFIG_USER_ONLY)
-     return g2h(addr);
+-
+-int m68k_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+-                              int mmu_idx)
+-{
+-    M68kCPU *cpu = M68K_CPU(cs);
+-
+-    cs->exception_index = EXCP_ACCESS;
+-    cpu->env.mmu.ar = address;
+-    return 1;
+-}
+-
 -#else
--    CPUTLBEntry *tlbentry = tlb_entry(env, mmu_idx, addr);
--    abi_ptr tlb_addr;
--    uintptr_t haddr;
 -
--    switch (access_type) {
--    case 0:
--        tlb_addr = tlbentry->addr_read;
--        break;
--    case 1:
--        tlb_addr = tlb_addr_write(tlbentry);
--        break;
--    case 2:
--        tlb_addr = tlbentry->addr_code;
--        break;
--    default:
--        g_assert_not_reached();
--    }
--
--    if (!tlb_hit(tlb_addr, addr)) {
--        /* TLB entry is for a different page */
--        return NULL;
--    }
--
--    if (tlb_addr & ~TARGET_PAGE_MASK) {
--        /* IO access */
--        return NULL;
--    }
--
--    haddr = addr + tlbentry->addend;
--    return (void *)haddr;
--#endif /* defined(CONFIG_USER_ONLY) */
- }
-+#else
-+void *tlb_vaddr_to_host(CPUArchState *env, abi_ptr addr,
-+                        MMUAccessType access_type, int mmu_idx);
-+#endif
++#if !defined(CONFIG_USER_ONLY)
+ /* MMU: 68040 only */
  
- #endif /* CPU_LDST_H */
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index dfcd9ae168..45a5c4e123 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -1007,6 +1007,16 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-     }
+ static void print_address_zone(uint32_t logical, uint32_t physical,
+@@ -795,11 +782,36 @@ hwaddr m68k_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+     return phys_addr;
  }
  
-+static inline target_ulong tlb_read_ofs(CPUTLBEntry *entry, size_t ofs)
+-int m68k_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+-                              int mmu_idx)
++/*
++ * Notify CPU of a pending interrupt.  Prioritization and vectoring should
++ * be handled by the interrupt controller.  Real hardware only requests
++ * the vector when the interrupt is acknowledged by the CPU.  For
++ * simplicity we calculate it when the interrupt is signalled.
++ */
++void m68k_set_irq_level(M68kCPU *cpu, int level, uint8_t vector)
 +{
-+#if TCG_OVERSIZED_GUEST
-+    return *(target_ulong *)((uintptr_t)entry + ofs);
-+#else
-+    /* ofs might correspond to .addr_write, so use atomic_read */
-+    return atomic_read((target_ulong *)((uintptr_t)entry + ofs));
-+#endif
++    CPUState *cs = CPU(cpu);
++    CPUM68KState *env = &cpu->env;
++
++    env->pending_level = level;
++    env->pending_vector = vector;
++    if (level) {
++        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
++    } else {
++        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
++    }
 +}
 +
- /* Return true if ADDR is present in the victim tlb, and has been copied
-    back to the main tlb.  */
- static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
-@@ -1017,14 +1027,7 @@ static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
-     assert_cpu_is_self(ENV_GET_CPU(env));
-     for (vidx = 0; vidx < CPU_VTLB_SIZE; ++vidx) {
-         CPUTLBEntry *vtlb = &env->tlb_v_table[mmu_idx][vidx];
--        target_ulong cmp;
--
--        /* elt_ofs might correspond to .addr_write, so use atomic_read */
--#if TCG_OVERSIZED_GUEST
--        cmp = *(target_ulong *)((uintptr_t)vtlb + elt_ofs);
--#else
--        cmp = atomic_read((target_ulong *)((uintptr_t)vtlb + elt_ofs));
--#endif
-+        target_ulong cmp = tlb_read_ofs(vtlb, elt_ofs);
- 
-         if (cmp == page) {
-             /* Found entry in victim tlb, swap tlb and iotlb.  */
-@@ -1108,6 +1111,56 @@ void probe_write(CPUArchState *env, target_ulong addr, int size, int mmu_idx,
++#endif
++
++bool m68k_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                       MMUAccessType qemu_access_type, int mmu_idx,
++                       bool probe, uintptr_t retaddr)
+ {
+     M68kCPU *cpu = M68K_CPU(cs);
+     CPUM68KState *env = &cpu->env;
++
++#ifndef CONFIG_USER_ONLY
+     hwaddr physical;
+     int prot;
+     int access_type;
+@@ -812,32 +824,35 @@ int m68k_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+                      address & TARGET_PAGE_MASK,
+                      PAGE_READ | PAGE_WRITE | PAGE_EXEC,
+                      mmu_idx, TARGET_PAGE_SIZE);
+-        return 0;
++        return true;
      }
+ 
+-    if (rw == 2) {
++    if (qemu_access_type == MMU_INST_FETCH) {
+         access_type = ACCESS_CODE;
+-        rw = 0;
+     } else {
+         access_type = ACCESS_DATA;
+-        if (rw) {
++        if (qemu_access_type == MMU_DATA_STORE) {
+             access_type |= ACCESS_STORE;
+         }
+     }
+-
+     if (mmu_idx != MMU_USER_IDX) {
+         access_type |= ACCESS_SUPER;
+     }
+ 
+     ret = get_physical_address(&cpu->env, &physical, &prot,
+                                address, access_type, &page_size);
+-    if (ret == 0) {
++    if (likely(ret == 0)) {
+         address &= TARGET_PAGE_MASK;
+         physical += address & (page_size - 1);
+         tlb_set_page(cs, address, physical,
+                      prot, mmu_idx, TARGET_PAGE_SIZE);
+-        return 0;
++        return true;
+     }
++
++    if (probe) {
++        return false;
++    }
++
+     /* page fault */
+     env->mmu.ssw = M68K_ATC_040;
+     switch (size) {
+@@ -862,29 +877,19 @@ int m68k_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+     if (!(access_type & ACCESS_STORE)) {
+         env->mmu.ssw |= M68K_RW_040;
+     }
+-    env->mmu.ar = address;
++#endif
++
+     cs->exception_index = EXCP_ACCESS;
+-    return 1;
++    env->mmu.ar = address;
++    cpu_loop_exit_restore(cs, retaddr);
  }
  
-+void *tlb_vaddr_to_host(CPUArchState *env, abi_ptr addr,
-+                        MMUAccessType access_type, int mmu_idx)
-+{
-+    CPUTLBEntry *entry = tlb_entry(env, mmu_idx, addr);
-+    uintptr_t tlb_addr, page;
-+    size_t elt_ofs;
-+
-+    switch (access_type) {
-+    case MMU_DATA_LOAD:
-+        elt_ofs = offsetof(CPUTLBEntry, addr_read);
-+        break;
-+    case MMU_DATA_STORE:
-+        elt_ofs = offsetof(CPUTLBEntry, addr_write);
-+        break;
-+    case MMU_INST_FETCH:
-+        elt_ofs = offsetof(CPUTLBEntry, addr_code);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    page = addr & TARGET_PAGE_MASK;
-+    tlb_addr = tlb_read_ofs(entry, elt_ofs);
-+
-+    if (!tlb_hit_page(tlb_addr, page)) {
-+        uintptr_t index = tlb_index(env, mmu_idx, addr);
-+
-+        if (!victim_tlb_hit(env, mmu_idx, index, elt_ofs, page)) {
-+            CPUState *cs = ENV_GET_CPU(env);
-+            CPUClass *cc = CPU_GET_CLASS(cs);
-+
-+            if (!cc->tlb_fill(cs, addr, 0, access_type, mmu_idx, true, 0)) {
-+                /* Non-faulting page table read failed.  */
-+                return NULL;
-+            }
-+
-+            /* TLB resize via tlb_fill may have moved the entry.  */
-+            entry = tlb_entry(env, mmu_idx, addr);
-+        }
-+        tlb_addr = tlb_read_ofs(entry, elt_ofs);
-+    }
-+
-+    if (tlb_addr & ~TARGET_PAGE_MASK) {
-+        /* IO access */
-+        return NULL;
-+    }
-+
-+    return (void *)(addr + entry->addend);
-+}
-+
- /* Probe for a read-modify-write atomic operation.  Do not allow unaligned
-  * operations, or io operations to proceed.  Return the host address.  */
- static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index bc847250dd..fd434c66ea 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -4598,11 +4598,7 @@ static void sve_ldnf1_r(CPUARMState *env, void *vg, const target_ulong addr,
-      * in the real world, obviously.)
-      *
-      * Then there are the annoying special cases with watchpoints...
--     *
--     * TODO: Add a form of tlb_fill that does not raise an exception,
--     * with a form of tlb_vaddr_to_host and a set of loads to match.
--     * The non_fault_vaddr_to_host would handle everything, usually,
--     * and the loads would handle the iomem path for watchpoints.
-+     * TODO: Add a form of non-faulting loads using cc->tlb_fill(probe=true).
-      */
-     host = tlb_vaddr_to_host(env, addr + mem_off, MMU_DATA_LOAD, mmu_idx);
-     split = max_for_page(addr, mem_off, mem_max);
+-/* Notify CPU of a pending interrupt.  Prioritization and vectoring should
+-   be handled by the interrupt controller.  Real hardware only requests
+-   the vector when the interrupt is acknowledged by the CPU.  For
+-   simplicitly we calculate it when the interrupt is signalled.  */
+-void m68k_set_irq_level(M68kCPU *cpu, int level, uint8_t vector)
++#ifndef CONFIG_USER_ONLY
++void tlb_fill(CPUState *cs, target_ulong addr, int size,
++              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
+ {
+-    CPUState *cs = CPU(cpu);
+-    CPUM68KState *env = &cpu->env;
+-
+-    env->pending_level = level;
+-    env->pending_vector = vector;
+-    if (level) {
+-        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
+-    } else {
+-        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
+-    }
++    m68k_cpu_tlb_fill(cs, addr, size, access_type, mmu_idx, false, retaddr);
+ }
+-
+ #endif
+ 
+ uint32_t HELPER(bitrev)(uint32_t x)
+diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
+index 76f439985a..d421614727 100644
+--- a/target/m68k/op_helper.c
++++ b/target/m68k/op_helper.c
+@@ -36,21 +36,6 @@ static inline void do_interrupt_m68k_hardirq(CPUM68KState *env)
+ 
+ #else
+ 
+-/* Try to fill the TLB and return an exception if error. If retaddr is
+-   NULL, it means that the function was called in C code (i.e. not
+-   from generated code or from helper.c) */
+-void tlb_fill(CPUState *cs, target_ulong addr, int size,
+-              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
+-{
+-    int ret;
+-
+-    ret = m68k_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
+-    if (unlikely(ret)) {
+-        /* now we have a real cpu fault */
+-        cpu_loop_exit_restore(cs, retaddr);
+-    }
+-}
+-
+ static void cf_rte(CPUM68KState *env)
+ {
+     uint32_t sp;
 -- 
 2.17.1
 
