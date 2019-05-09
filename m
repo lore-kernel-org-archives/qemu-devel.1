@@ -2,71 +2,84 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C7E4C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95401C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:48:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1128421479
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:43:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1128421479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 623F821479
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:48:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e/2G7eDo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 623F821479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50762 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50813 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOeef-00033R-DG
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 04:43:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50656)
+	id 1hOeik-0004wf-M6
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 04:48:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hOeds-0002jI-6O
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:43:05 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hOeha-0004YV-6I
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:46:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hOedr-0007K7-1b
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:43:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56074)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hOedq-0007Js-QM
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:43:02 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BA456307E057;
-	Thu,  9 May 2019 08:43:01 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
-	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 30E8317CEB;
-	Thu,  9 May 2019 08:42:59 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id A82BB1132B35; Thu,  9 May 2019 10:42:57 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20190506213817.14344-1-ehabkost@redhat.com>
-	<20190507141345.GS27205@redhat.com>
-	<20190507144500.GK28722@habkost.net>
-	<87pnot2j2s.fsf@dusky.pond.sub.org>
-	<20190508175303.GA4189@habkost.net>
-Date: Thu, 09 May 2019 10:42:57 +0200
-In-Reply-To: <20190508175303.GA4189@habkost.net> (Eduardo Habkost's message of
-	"Wed, 8 May 2019 14:53:03 -0300")
-Message-ID: <87pnos588e.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(envelope-from <peter.maydell@linaro.org>) id 1hOehZ-0000nl-7G
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:46:54 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33201)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hOehY-0000ms-VP
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:46:53 -0400
+Received: by mail-ot1-x342.google.com with SMTP id 66so1596396otq.0
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 01:46:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=JHYBFKd1AZr+xd/gkTPrhACdzrTh+rusGyVuFp13Mps=;
+	b=e/2G7eDoz56jKeA35wWCMFmD1rbNObRMffjkpkDmFXtVW7Z3VYhVgq4I+Jm/MXbUCY
+	7Q6OVRBz2a8cRMCEqto6LFBmhnP+N5Fkj4wEPfl+VofHnLzSha+PJ986q3dsXeRLhzlG
+	E/596zkn8v+q+Ysb/You5YOZGZdWywfBrAsshn4BV8G2djEyaSdswLWkLN6zaUXBL9e8
+	rQtPW3x3725lFGi/ipuK975FZjQTdN5ADSXbL3Akkb1pbMtcXQ8a7UAdu2nMoNO38/Nf
+	qoL79T337Ja93rT3oCTGoOCZCV60YfkYizduS/i2n4Jd6lMKDyAGomjIRQ/96smJY0n5
+	US/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=JHYBFKd1AZr+xd/gkTPrhACdzrTh+rusGyVuFp13Mps=;
+	b=osLP3MLySUeeIre+bp36WImb4yEhE7uPGmj8k46ZDX1yVOq3j2fgN0Q294eEnTWc1x
+	PYqHIDX8WyDeopV+oRocolnpU6/xJo8xiiakms0aQR7nZsQHXNwlyqyAAZKucgaiRD1v
+	iCvIxbZ05lO34OY+lDRVr+7R08RUVyZpVjh6P2ruwGE7FPklVT9zUQbefoxcV8vpOBvr
+	SPucLGTPCPj8UWg5dUPj48z7RwuBl/OzL/by+c/zkQk/HCaDdu9ae8oyBsln+Z0bIVVt
+	mNTdLN45otlU4E6SjZwmL1RTM9omOvKSMiaU/uhuaUqR8PawLHI7XP71hWjdx52kQmyC
+	NWEQ==
+X-Gm-Message-State: APjAAAX0lDqkf9SOS9vs8pboZMyQjaiiCELTULo0F3XrzppP8cqLLXyY
+	XpgdcED/Tc8z54qc5akeSSoHv+u2jjPaiGRPBijaJQ==
+X-Google-Smtp-Source: APXvYqzaB7gh6bUenRBp9lP+ok8lFEvoynJtHWtvcSk651aSy5+M1/YjWfs9mCUmcd/CbX+QzXZDKdOGWmOVC6CrCoI=
+X-Received: by 2002:a05:6830:1258:: with SMTP id
+	s24mr1632534otp.238.1557391611191; 
+	Thu, 09 May 2019 01:46:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Thu, 09 May 2019 08:43:01 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] tests: Force Python I/O encoding for
- check-qapi-schema
+References: <1555560291-3415-1-git-send-email-hongbo.zhang@linaro.org>
+	<1555560291-3415-3-git-send-email-hongbo.zhang@linaro.org>
+	<CAFEAcA-poCxPqPtfhx4mUJ5pcOjn1Hz-WNxEt29f=JgpFMi4Kg@mail.gmail.com>
+	<CAHmQWvB4AZGM+MV0LP-vtfoW0kG4RFkf0R6NoRWm8WrFuum+Og@mail.gmail.com>
+	<CAEK-wKkiyNYjKKsJzukC_LLi163ngWV4P18-47Z6xxF0azB2uw@mail.gmail.com>
+In-Reply-To: <CAEK-wKkiyNYjKKsJzukC_LLi163ngWV4P18-47Z6xxF0azB2uw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 9 May 2019 09:46:39 +0100
+Message-ID: <CAFEAcA_2fkXSBaLaFX-FPA8AxEhqMF+mzNpZwwy1Ns2Y6Q=0yA@mail.gmail.com>
+To: Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v7 2/2] hw/arm: Add arm SBSA reference
+ machine, devices part
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,112 +91,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Cleber Rosa <crosa@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Hongbo Zhang <hongbo.zhang@linaro.org>,
+	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+	Markus Armbruster <armbru@redhat.com>,
+	Leif Lindholm <leif.lindholm@linaro.org>,
+	QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
-
-> On Wed, May 08, 2019 at 03:04:43PM +0200, Markus Armbruster wrote:
->> Eduardo Habkost <ehabkost@redhat.com> writes:
->>=20
->> > On Tue, May 07, 2019 at 03:13:45PM +0100, Daniel P. Berrang=C3=A9 wrot=
-e:
->> >> On Mon, May 06, 2019 at 06:38:17PM -0300, Eduardo Habkost wrote:
->> >> > test-qapi.py doesn't force a specific encoding for stderr or
->> >> > stdout, but the reference files used by check-qapi-schema are in
->> >> > UTF-8.  This breaks check-qapi-schema under certain circumstances
->> >> > (e.g. if using the C locale and Python < 3.7).
->> >> >=20
->> >> > We need to make sure test-qapi.py always generate UTF-8 output
->> >> > somehow.  On Python 3.7+ we can do it using
->> >> > `sys.stdout.reconfigure(...)`, but we need a solution that works
->> >> > with older Python versions.
->> >> >=20
->> >> > Instead of trying a hack like reopening sys.stdout and
->> >> > sys.stderr, we can just tell Python to use UTF-8 for I/O encoding
->> >> > when running test-qapi.py.  Do it by setting PYTHONIOENCODING.
->> >> >=20
->> >> > Reported-by: Thomas Huth <thuth@redhat.com>
->> >> > Tested-by: Thomas Huth <thuth@redhat.com>
->> >> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->> >> > ---
->> >> >  tests/Makefile.include | 2 +-
->> >> >  1 file changed, 1 insertion(+), 1 deletion(-)
->> >> >=20
->> >> > diff --git a/tests/Makefile.include b/tests/Makefile.include
->> >> > index 7c8b9c84b2..af88ab6f8b 100644
->> >> > --- a/tests/Makefile.include
->> >> > +++ b/tests/Makefile.include
->> >> > @@ -1103,7 +1103,7 @@ check-tests/qemu-iotests-quick.sh: tests/qemu=
--iotests-quick.sh qemu-img$(EXESUF)
->> >> >  .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
->> >> >  $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SR=
-C_PATH)/%.json
->> >> >  	$(call quiet-command, PYTHONPATH=3D$(SRC_PATH)/scripts \
->> >> > -		$(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py \
->> >> > +		PYTHONIOENCODING=3Dutf-8 $(PYTHON) $(SRC_PATH)/tests/qapi-schema=
-/test-qapi.py \
->> >>=20
->> >> I see PYTHONIOENCODING exists since 2.6 which is nice.
->> >>=20
->> >> How about we actually change $(PYTHON) so that it always includes
->> >> PYTHONIOENCODING=3Dutf-8 ?
->> >>=20
->> >> That way we avoid continuing to play whack-a-mole with more utf-8
->> >> bugs in future.
->> >>=20
->> >> It would also let us revert this:
->> >>=20
->> >>   commit de685ae5e9a4b523513033bd6cadc8187a227170
->> >>   Author: Markus Armbruster <armbru@redhat.com>
->> >>   Date:   Mon Jun 18 19:59:57 2018 +0200
->> >>=20
->> >>     qapi: Open files with encoding=3D'utf-8'
->> >>=20
->> >> which had to provide separate logic for py2 vs py3 :-(
->>=20
->> The separate logic will soon be history.  I'd welcome getting rid of the
->> remainder anyway.
+On Wed, 8 May 2019 at 18:48, Radoslaw Biernacki
+<radoslaw.biernacki@linaro.org> wrote:
 >
-> Which remainder?  Do you mean the encoding=3D'utf-8' arguments to
-> open()?
-
-I'd welcome a revert the whole commit.
-
->> > Not every Python script in the QEMU tree is run by our makefiles
->> > and scripts using $(PYTHON).  We need to ensure our scripts and
->> > modules won't break when run directly from the command line, too.
->> > Setting PYTHONIOENCODING everywhere would just hide these bugs
->> > from us.
->>=20
->> I agree for Python scripts that are meant to be run that way (assuming
->> such scripts exist).  [...]
 >
-> All scripts inside ./scripts are meant to be run directly from
-> the command line, aren't they?
-
-Counter-example: you're welcome to run scripts/qapi-gen.py by hand for
-whatever purpose, but if you mess up your build that way, you're on your
-own.
-
->>                [...]  For all the others (including all the QAPI-related
->> scripts), I'd be quite fine with
->>=20
->> 1. Our build system runs all Python scripts with the
->> PYTHONIOENCODING=3Dutf-8
->>=20
->> 2. If you run a Python script yourself, you get to specify the
->> PYTHONIOENCODING=3Dutf-8, or use a suitable locale.  Enabling UTF-8 mode
->> with PYTHONUTF8=3D1 or -X utf8 could also work.
 >
-> I'm OK if we don't actively try to fix those bugs and just expect
-> people to set PYTHONIOENCODING.  But I don't think we should
-> reject patches that make the Python code work with non-utf8
-> locales if it's an easy fix.
+> On Wed, 8 May 2019 at 13:30, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+>>
+>> On Tue, 30 Apr 2019 at 22:17, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> > I don't think we should automatically create the usb keyboard
+>> > and mouse devices. The user can do it on the command line if they
+>> > want them.
+>> >
+>> OK.
+>
+>
+> Actually I need to rise an objection to this one.
+> As we trying to make SBSA machine as close as possible to real machine, we should have keyboard and mouse.
+> Those have the same requirement as for VGA. It's just an expected piece of HW when you for e.g. installing a server.
+> We also do a lot of FW work so it is expected to have keyboard (and even mouse) in UEFI.
 
-I'm not going to interfere with easy fixes to code I don't maintain :)
+Real hardware doesn't have the keyboard and mouse built in --
+when you unpack the machine from the box you have to plug in
+the keyboard and mouse yourself (and often you have to
+buy the keyboard and mouse and monitor and maybe the
+PCI video card separately).
+
+But more seriously, the philosophy of the QEMU command line
+is not "do what the user probably wants automatically". It
+is "provide the user with full manual control of everything,
+using a complicated but orthogonal set of options". We expect
+that if users want a more "friendly" interface to setting
+up VMs then they will use a "management layer" on top of
+QEMU (such as libvirt).
+
+thanks
+-- PMM
 
