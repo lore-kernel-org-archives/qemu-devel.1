@@ -2,71 +2,91 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCD33C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:25:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EA7FC04AB3
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:26:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6563C20656
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:25:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6563C20656
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id F0EE621019
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 17:26:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ibiMJ0eA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0EE621019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58414 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58476 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOmn4-0003ub-79
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 13:25:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53320)
+	id 1hOmoc-0005Yf-80
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 13:26:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hOmXY-0007Lq-87
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:09:05 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hOmU5-0003nN-Ji
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:05:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hOmXX-000286-Ec
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:09:04 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:36541)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hOmXX-00027f-4u
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:09:03 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1MNKuI-1h5R8r2APq-00Opy4; Thu, 09 May 2019 19:08:51 +0200
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	qemu-devel@nongnu.org
-References: <20190502092728.32727-1-alex.bennee@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <93276dfb-3495-8f98-0da1-6c97962bd826@vivier.eu>
-Date: Thu, 9 May 2019 19:08:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <alex.bennee@linaro.org>) id 1hOmU4-0008BA-3v
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:05:29 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50286)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hOmU3-00088H-RW
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 13:05:27 -0400
+Received: by mail-wm1-x342.google.com with SMTP id y17so3237912wmj.0
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 10:05:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=3OsvAqRpGCpyIsZPwRA2TrRs2ee15ZUjq1ExWCyXpJs=;
+	b=ibiMJ0eAd6Rc8gH7ufafmwKVLWzWEnig8fbShtf9FiNsWFKRJFaxe6jFZ788hjpmzG
+	iDZ/V/D6E0thUxiFRNsoHO/ca+ZL8abITKpxiZlFTD0hFRAdDCSBtIl7YGlPwQARUZlK
+	S4d0905179gJHMTSvYHNLFvLcBisUasWHGIWzfGWr8wLlXJjD3Pw38xCq2KozwRC8a6Y
+	jBrtkrg8w/nUOiuqt6vC9vFpz86TEafDv71ja//34asZSadzbXuaddk4+jkfReONi3Ah
+	YpkmSQjS+2nGwDzqb3xngsdNOCVIDsah3b8zdn+W7IILt9Wm+kKXaDtJ9ltgWHvKneYf
+	883g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=3OsvAqRpGCpyIsZPwRA2TrRs2ee15ZUjq1ExWCyXpJs=;
+	b=LXWha3sSy3oWhCHz7wlV2QhwFXfNkLg0oGJvuSWOTf6hOcnx85HUc/xN8U/PVNFyGo
+	KDXXCbw2SfpZYShxPExBY0ugU+5HHoOQGuZRY9ZhvHAt2cowGVS8GcrY58CCo7u/5uAZ
+	DW6j8zM5rxX7N/D1EtU/1pGPNSyekr788YfSmwUVxiwxfAwDKsSyNSJmUojS/RLKDJ8W
+	D/qScvoIsGPcZR/ZHpNOnvISwCKaY/PhVu7vzb4YEFf9rADlp7PnRo5sVBGbxxuBME1T
+	RuKit2+rf19GPXPK6ho/+Q4mVQTyfIuwBB2nOlX/EfYu18+b6vl9fU6nXDJe2lS4BOhy
+	a35g==
+X-Gm-Message-State: APjAAAWkcMCzIFlUf6tGFTMNZtsxF0suleZO/bbrTL8r7fOyhA2XES/g
+	cWz8GSc49nYiIKmFS/XhqHvY7Zhuz0I=
+X-Google-Smtp-Source: APXvYqx/uBp+aJJNZSEQ/2FTaQhQMC9Mxwy9gNE9S2MUiN00r5MvXvt6IlWIZuLJh0aCPCqRkrVr7g==
+X-Received: by 2002:a7b:c053:: with SMTP id u19mr3595551wmc.63.1557421523804; 
+	Thu, 09 May 2019 10:05:23 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	h24sm4458598wmb.40.2019.05.09.10.05.21
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 09 May 2019 10:05:21 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 395F41FF9E;
+	Thu,  9 May 2019 17:59:13 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Thu,  9 May 2019 17:59:02 +0100
+Message-Id: <20190509165912.10512-15-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190509165912.10512-1-alex.bennee@linaro.org>
+References: <20190509165912.10512-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190502092728.32727-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:8OH2y38lrXOIrDkK2lFwEUWAcFLS/HptobO3A2aynLVCjqOsRec
-	z9wbbZZngG6LMnoOr5Y+NfKcJ80JLl2YpawmDcAndkvDxXC1znQKVYc8hmoVTg9c7bIHwmI
-	2540rUALa/2Kax6pyUQprMiTWYx168p/P1eguS4weX26hkv7/Xb45kcKSTSeeJWwGi5l8dz
-	gGXy/7kGPTL4SnXtwARlQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:SqrOAipiP2M=:7eQQKtttVt0ylucaxidv88
-	3TdgL0v0KImSiluLY06hMtr07R8SDgt4wl1MRWEtzETzbqdfycmB13CHGRVgGKRMLl+juX1Yl
-	6ZflNfncJBH9Letvn0fqMyGW1VvJFnWULxwS/ZUCkglfEotEOxOPFuuAnCpJ2t5HedI0CHsIo
-	fVvVjgD4CdQoZnfSHEN4ERoL3KJD0DsWAiuj/oZnLyijhik1O90Mf2R8KptJz6xi6sTIcEVSb
-	s88yEIMc82+Rj3/9MSoq8F465cZ5Vq/MgQrwLmrYNfsz9bWMo06ZHXsl7bKLB6pGjoE9VzKVY
-	2aek1F2a/eK9wXd5PGKrCUkcvwfbQAzYxF+vqVGBD9BIfGcr6oVotDqrSjdUlCT/VfbdETdtl
-	ukoRSdEVaJYUiCkB8v6YLQ8AEV2Qks0yx03xbxR0dDcy6jTo+TVkS075MK3G2TRjP2c80OwZq
-	a1uJn/EZCdTluF6NKGyiubW4h4p9C5/EjuWamv97B0qXNkwgMLDBcMjoYXS4/iurR34DMwy0w
-	wIxeXV43yCT286qnXFOH36DyDdmedsFdCfRDx8lGg6ywPOdzrOQjzM1HB1xV/UrMaT7Pe5ng2
-	XiONaIaajC93aW7yzoq7Dmhy7GPyXpjSE4BDbMh4IX8M3N+Zy5Xubs9O91lm03YDpk8wJuAQV
-	Q+XF2XMm4uX7DyccfahZJRxVMZAKKesgBv4d+5MQ0i+0bR43iaStlLnrFM6eQ1JcFdgwLjMfI
-	ZKjnPXs/l8wePSIUPrYRB0pQlbO3LyMetcC+/lcjrgMXV7esayN4U1KB/y8=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
-Subject: Re: [Qemu-devel] [PATCH] linux-user: fix GPROF build failure
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PATCH v1 14/23] Makefile: include per-target build
+ directories in coverage report
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,54 +98,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/05/2019 11:27, Alex Bennée wrote:
-> When linux-user/exit was introduced we failed to move the gprof
-> include at the same time. The CI didn't notice because it only builds
-> system emulation. Fix it for those that still find gprof useful.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->   linux-user/exit.c    | 3 +++
->   linux-user/syscall.c | 3 ---
->   2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/linux-user/exit.c b/linux-user/exit.c
-> index 14e94e28fa..bdda720553 100644
-> --- a/linux-user/exit.c
-> +++ b/linux-user/exit.c
-> @@ -18,6 +18,9 @@
->    */
->   #include "qemu/osdep.h"
->   #include "qemu.h"
-> +#ifdef TARGET_GPROF
-> +#include <sys/gmon.h>
-> +#endif
->   
->   #ifdef CONFIG_GCOV
->   extern void __gcov_dump(void);
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 96cd4bf86d..f2d9883aef 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -59,9 +59,6 @@
->   #ifdef CONFIG_TIMERFD
->   #include <sys/timerfd.h>
->   #endif
-> -#ifdef TARGET_GPROF
-> -#include <sys/gmon.h>
-> -#endif
->   #ifdef CONFIG_EVENTFD
->   #include <sys/eventfd.h>
->   #endif
-> 
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Applied to my linux-user branch.
+diff --git a/Makefile b/Makefile
+index 78d83244849..a1c844eb87a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -995,7 +995,9 @@ $(filter %.1 %.7 %.8,$(DOCS)): scripts/texi2pod.pl
+ %/coverage-report.html:
+ 	@mkdir -p $*
+ 	$(call quiet-command,\
+-		gcovr -r $(SRC_PATH) --object-directory $(BUILD_DIR) \
++		gcovr -r $(SRC_PATH) \
++		$(foreach t, $(TARGET_DIRS), --object-directory $(BUILD_DIR)/$(t)) \
++		 --object-directory $(BUILD_DIR) \
+ 		-p --html --html-details -o $@, \
+ 		"GEN", "coverage-report.html")
+ 
+-- 
+2.20.1
 
-Thanks,
-Laurent
 
