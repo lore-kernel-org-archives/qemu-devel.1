@@ -2,80 +2,62 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E113C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF5EFC04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:54:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E702B204FD
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:52:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="azxAu7Ah"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E702B204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9EAA6216C4
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:54:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EAA6216C4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50873 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50884 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOen5-0007V3-7U
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 04:52:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52336)
+	id 1hOeoe-0008WP-JB
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 04:54:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hOem6-0006oX-0o
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:51:34 -0400
+	(envelope-from <groug@kaod.org>) id 1hOemJ-0006w0-8o
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:51:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hOem4-0004Vl-UH
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:51:33 -0400
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:44232)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hOem2-0004UT-I3
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:51:31 -0400
-Received: by mail-ot1-x32b.google.com with SMTP id g18so1351205otj.11
-	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 01:51:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=SUQDvLXub66SmTLB5kPWL99Xoj8+DJYO1pbuhVRCM0I=;
-	b=azxAu7Ah77zyZ5qcsZ3Xg+kafzWPO8dl3NsLlgu001DHUz8k23yNy3VTt6WlKAeLtL
-	1RCZiu4a/ZEvXfIJ24zlb38jNduqKmoTd3w+ACpyGT6QQs6xLMRDw7UieIeZR636H59Z
-	YNvvAbw3ay7jfNZJpRxMlnJF03nY+YZlWrTCmfwN/2wHiJC7pbgjffNGx2Zplr+X1icv
-	FaBZWBUnSMTqvTz9Gcm+06aUztFk1yLJ+1qGWggB748muChBCKS3eVUdV+F2vul0QNA4
-	QE1i9NybiEuzRg8q7Gh83gjWkjsj4LuRrHwQV8p/LHGqm2d/j8d6fZb42wU6OzLd5h/9
-	E4Ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=SUQDvLXub66SmTLB5kPWL99Xoj8+DJYO1pbuhVRCM0I=;
-	b=Ic0a7bljEw28F2kY5j6aXNW/qLPO7CPVJIzNqPl1ZTGv2mB6X8iVCZHORm80m3pGyU
-	WgltOZS17zQoEqIkkaX1gonNMXwPfNGUmBk7pXHfb9QadGW70ShLlAFnweooU56mDkDT
-	AhrzJJyrTTbCt5kbt/x7/OATuUFBe08fiwNMSI4dO09WbTm35fLkLygNqtbvicRzQct7
-	SoMokfOMo5t/ilhJ2wrHfykBwhUnbWGilaNYcya6yutp+opTJjlNRd7GBzonbGyySFFz
-	GrqDnyKWyj4RmTxSZhffZT3kFxehVrGViRy+5thI9saYQ+1qkNRhoGizDZG1nzdouVgr
-	zyiw==
-X-Gm-Message-State: APjAAAVErBNOTXUfNckGm9mPCF7RcT7+OfY+bblmqHwyPe56DQypc0AF
-	+8yEOpendZYVvGw4yGCjsX3LiR7VRtGSe9POn5GJ0T7giFk=
-X-Google-Smtp-Source: APXvYqwElnrIdcRwCo8EjDOJbydhchynKxgGBKyQbPIFi1QQflz4KELYQgkQX7+0eqTiuy5SRbSZit7+b4xH2WeRXT4=
-X-Received: by 2002:a9d:404:: with SMTP id 4mr1609953otc.352.1557391889796;
-	Thu, 09 May 2019 01:51:29 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1hOemG-0004ic-Jt
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:51:46 -0400
+Received: from 6.mo68.mail-out.ovh.net ([46.105.63.100]:60067)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hOemF-0004gc-8v
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:51:43 -0400
+Received: from player735.ha.ovh.net (unknown [10.108.42.82])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id B87B0124F1E
+	for <qemu-devel@nongnu.org>; Thu,  9 May 2019 10:51:39 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player735.ha.ovh.net (Postfix) with ESMTPSA id 35207592B288;
+	Thu,  9 May 2019 08:51:36 +0000 (UTC)
+Date: Thu, 9 May 2019 10:51:35 +0200
+From: Greg Kurz <groug@kaod.org>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Message-ID: <20190509105135.387d99c5@bahia.lan>
+In-Reply-To: <20190508171946.657-3-clg@kaod.org>
+References: <20190508171946.657-1-clg@kaod.org>
+	<20190508171946.657-3-clg@kaod.org>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20190503112654.4393-1-laurent@vivier.eu>
-	<80fb3313-239a-5828-94fa-d27137bfcb05@vivier.eu>
-	<CAFEAcA_y24gpugttDTR-QrJ0fA7JCQeC0XXsR6pjm2rQ19rfCA@mail.gmail.com>
-In-Reply-To: <CAFEAcA_y24gpugttDTR-QrJ0fA7JCQeC0XXsR6pjm2rQ19rfCA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 9 May 2019 09:51:18 +0100
-Message-ID: <CAFEAcA9ZRSxPK17Zgx0WuhvjyVATL5-0Mp7LvBtv5O4+UGRVyg@mail.gmail.com>
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::32b
-Subject: Re: [Qemu-devel] [PULL v2 00/12] Trivial branch patches
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 16869076833006229899
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrkeehgddtlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.63.100
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 2/3] spapr/xive: fix EQ page
+ addresses above 64GB
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,32 +69,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	Jason Wang <jasowang@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Fabien Chouteau <chouteau@adacore.com>,
-	Michael Roth <mdroth@linux.vnet.ibm.com>,
-	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>,
-	Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 7 May 2019 at 21:48, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Tue, 7 May 2019 at 20:10, Laurent Vivier <laurent@vivier.eu> wrote:
-> >
-> > Ping ?
->
-> This is in my queue to process, but there are still a bunch of
-> other pullreqs in the queue too; I am working through them.
+On Wed,  8 May 2019 19:19:45 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-Wait, I'm confused now. Looking back through my emails you
-said "Forget this series, the send has been aborted for an
-unknown reason.". So should I be applying something ?
+> The high order bits of the address of the OS event queue is stored in
+> bits [4-31] of word2 of the XIVE END internal structures and the low
+> order bits in word3. This structure is using Big Endian ordering and
+> computing the value requires some simple arithmetic which happens to
+> be wrong. The mask removing bits [0-3] of word2 is applied to the
+> wrong value and the resulting address is bogus when above 64GB.
+>=20
+> Guests with more than 64GB of RAM will allocate pages for the OS event
+> queues which will reside above the 64GB limit. In this case, the XIVE
+> device model will wake up the CPUs in case of a notification, such as
+> IPIs, but the update of the event queue will be written at the wrong
+> place in memory. The result is uncertain as the guest memory is
+> trashed and IPI are not delivered.
+>=20
+> Introduce a helper xive_end_qaddr() to compute this value correctly in
+> all places where it is used.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
 
-thanks
--- PMM
+I guess this patch should have a Fixes: tag and Cc qemu-stable as well
+since QEMU 4.0 has the issue.
+
+Apart from that, LGTM.
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  include/hw/ppc/xive_regs.h | 6 ++++++
+>  hw/intc/spapr_xive.c       | 3 +--
+>  hw/intc/xive.c             | 9 +++------
+>  3 files changed, 10 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
+> index bf36678a242c..1a8c5b5e64f0 100644
+> --- a/include/hw/ppc/xive_regs.h
+> +++ b/include/hw/ppc/xive_regs.h
+> @@ -208,6 +208,12 @@ typedef struct XiveEND {
+>  #define xive_end_is_backlog(end)  (be32_to_cpu((end)->w0) & END_W0_BACKL=
+OG)
+>  #define xive_end_is_escalate(end) (be32_to_cpu((end)->w0) & END_W0_ESCAL=
+ATE_CTL)
+> =20
+> +static inline uint64_t xive_end_qaddr(XiveEND *end)
+> +{
+> +    return ((uint64_t) be32_to_cpu(end->w2) & 0x0fffffff) << 32 |
+> +        be32_to_cpu(end->w3);
+> +}
+> +
+>  /* Notification Virtual Target (NVT) */
+>  typedef struct XiveNVT {
+>          uint32_t        w0;
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index 666e24e9b447..810435c30cc7 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -1150,8 +1150,7 @@ static target_ulong h_int_get_queue_config(PowerPCC=
+PU *cpu,
+>      }
+> =20
+>      if (xive_end_is_enqueue(end)) {
+> -        args[1] =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff) << 32
+> -            | be32_to_cpu(end->w3);
+> +        args[1] =3D xive_end_qaddr(end);
+>          args[2] =3D xive_get_field32(END_W0_QSIZE, end->w0) + 12;
+>      } else {
+>          args[1] =3D 0;
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index a0b87001da25..dcf2fcd10893 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -1042,8 +1042,7 @@ static const TypeInfo xive_source_info =3D {
+> =20
+>  void xive_end_queue_pic_print_info(XiveEND *end, uint32_t width, Monitor=
+ *mon)
+>  {
+> -    uint64_t qaddr_base =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff)=
+ << 32
+> -        | be32_to_cpu(end->w3);
+> +    uint64_t qaddr_base =3D xive_end_qaddr(end);
+>      uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
+>      uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
+>      uint32_t qentries =3D 1 << (qsize + 10);
+> @@ -1072,8 +1071,7 @@ void xive_end_queue_pic_print_info(XiveEND *end, ui=
+nt32_t width, Monitor *mon)
+> =20
+>  void xive_end_pic_print_info(XiveEND *end, uint32_t end_idx, Monitor *mo=
+n)
+>  {
+> -    uint64_t qaddr_base =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff)=
+ << 32
+> -        | be32_to_cpu(end->w3);
+> +    uint64_t qaddr_base =3D xive_end_qaddr(end);
+>      uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
+>      uint32_t qgen =3D xive_get_field32(END_W1_GENERATION, end->w1);
+>      uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
+> @@ -1101,8 +1099,7 @@ void xive_end_pic_print_info(XiveEND *end, uint32_t=
+ end_idx, Monitor *mon)
+> =20
+>  static void xive_end_enqueue(XiveEND *end, uint32_t data)
+>  {
+> -    uint64_t qaddr_base =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff)=
+ << 32
+> -        | be32_to_cpu(end->w3);
+> +    uint64_t qaddr_base =3D xive_end_qaddr(end);
+>      uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
+>      uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
+>      uint32_t qgen =3D xive_get_field32(END_W1_GENERATION, end->w1);
+
 
