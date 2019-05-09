@@ -2,67 +2,87 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8790CC04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:51:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03620C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:54:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E8AB205C9
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:51:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E8AB205C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C266720675
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 13:54:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C0P+aEwQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C266720675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54891 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54917 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOjSR-0000uQ-Ib
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 09:51:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53515)
+	id 1hOjVJ-0001zs-1t
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 09:54:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hOjRM-0008QE-Mv
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:50:29 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hOjUV-0001is-Le
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:53:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hOjRL-0003ME-UI
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:50:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47618)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hOjRL-0003Lz-PO
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:50:27 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E94F43087BD2;
-	Thu,  9 May 2019 13:50:26 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
-	[10.36.117.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4D19E60BF3;
-	Thu,  9 May 2019 13:50:24 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 82A2C11AA3; Thu,  9 May 2019 15:50:22 +0200 (CEST)
-Date: Thu, 9 May 2019 15:50:22 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Message-ID: <20190509135022.z5yjsrghixfrv2ta@sirius.home.kraxel.org>
-References: <20190508085645.11595-1-kraxel@redhat.com>
-	<38ea2334-b819-a439-7a43-92b52263b402@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1hOjUP-0005SQ-Ko
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:53:43 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53984)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hOjUJ-00056h-GB
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 09:53:32 -0400
+Received: by mail-wm1-x341.google.com with SMTP id 198so3373420wme.3
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 06:53:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=date:from:to:cc:subject:message-id:references:mime-version
+	:content-disposition:in-reply-to:user-agent;
+	bh=m5bv1+lGLOEyQrAwYfQqLnYlP4D6TKEP1An7v5r9cxY=;
+	b=C0P+aEwQgtPY7iEN1zvZ+NFgRQ8PqY8WtxlltfzMNNuYyxEmLrLTtZTDD06wdOpReV
+	IWU9nZJZI6ez6zbWWT5Nrlpr1eI+q2SUuKPnz/1lL2iT36MTuFOf3Z0c+rCbMf7i/VIZ
+	5lFaLcRHjqzzrmqqoXRROdTbPhQjBlgp5obx/buFZfNJKtSdisD5vI60fvY6C9eQ+D6n
+	GcbIMmy7JbwQ+7GIxi4POccmpPB1Fx0LUxJFw1aXAKa3IZPHTdCsXLYBWfWzMkdeydNN
+	s6wj3pXJyqE2Dk5bqhASaW0iH7eqnTrlEPMlg0vt6QFQWismM8FOYvKJ15H15M6tza8E
+	cv4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=m5bv1+lGLOEyQrAwYfQqLnYlP4D6TKEP1An7v5r9cxY=;
+	b=JI7g7989z4NTDJLk3X9n9Gi/33MywqYd0Zjys4TjgmjtPyf6u96/P6Ak80jKCfuOYQ
+	kQ+toYO9G1t/Uu+e4YuJf6LnNVeCM+2bz+qcMXMCuk8lPzBIEQQh5/3/elX/ZFPd8NsG
+	4bx2WU3ACYBMPqmQDQR6XlNcoGT1wmLKkN65wjTSYju3ybrgr193aj4cp0qJe1ugeaJj
+	U/nBG6QKUIcDmleDPYnApEN9xeEwYniZn28ajkOL3tpo+X4vdkmrju+JEM7of6wcj8Z+
+	T0g2E+PiBQVemkQ5IhwtXsV1Tix4aaqY6ZEyOqslkaAEB74OUajgWefRqpEuEEGzq+JZ
+	XJ5g==
+X-Gm-Message-State: APjAAAX2+4IPRrxK6b4aW2X1a2zBu7IXQVcCPwet3djn66vNDhCm3xPY
+	FALvppPM1hAFVV74cebR8j0=
+X-Google-Smtp-Source: APXvYqxF9t3n+Qd4+wN6AQ4lHjPNSv3dA7GQ9eiP78FgCMtX2SzEnAM87DFsahi2AIhqhzzD9JOcZQ==
+X-Received: by 2002:a1c:9689:: with SMTP id y131mr3247916wmd.74.1557410001929; 
+	Thu, 09 May 2019 06:53:21 -0700 (PDT)
+Received: from localhost ([51.15.41.238]) by smtp.gmail.com with ESMTPSA id
+	d17sm1347529wrw.73.2019.05.09.06.53.20
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 09 May 2019 06:53:20 -0700 (PDT)
+Date: Thu, 9 May 2019 14:53:20 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20190509135320.GE17133@stefanha-x1.localdomain>
+References: <20190503154613.4192-1-kchamart@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="2qXFWqzzG3v1+95a"
 Content-Disposition: inline
-In-Reply-To: <38ea2334-b819-a439-7a43-92b52263b402@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Thu, 09 May 2019 13:50:27 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 00/13] tests/vm: serial console autoinstall,
- misc fixes.
+In-Reply-To: <20190503154613.4192-1-kchamart@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH] VirtIO-RNG: Update default entropy source
+ to `/dev/urandom`
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,27 +94,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org, Kamil Rytarowski <kamil@netbsd.org>,
-	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
+Cc: armbru@redhat.com, amit@kernel.org, qemu-devel@nongnu.org,
+	rjones@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
 
-> > Do we have accelerator support for the BSDs?  A "make check" for a full
-> > build takes ages, and I suspect tcg being used is part of the problem.
-> > I did my tests using "TARGET_LIST=x86_64-softmmu" because of that.
-> 
-> I think they should be running with "--enable-kvm".
+--2qXFWqzzG3v1+95a
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The images themself yes, but the tests running *inside* (on make check) don't.
+On Fri, May 03, 2019 at 05:46:12PM +0200, Kashyap Chamarthy wrote:
+> When QEMU exposes a VirtIO-RNG device to the guest, that device needs a
+> source of entropy, and that source needs to be "non-blocking", like
+> `/dev/urandom`.  However, currently QEMU defaults to the problematic
+> `/dev/random`, which is "blocking" (as in, it waits until sufficient
+> entropy is available).
+>=20
+> So change the entropy source to the recommended `/dev/urandom`.
 
-cheers,
-  Gerd
+Why is /dev/urandom "recommended"?
 
+I understand the requirement for instant random numbers, but what about
+the concerns about quality?  Have you decided that the consumers of
+these random numbers are safe with /dev/urandom?
+
+>=20
+> Related discussion in these[1][2] past threads.
+>=20
+> [1] https://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg08335.html
+>     -- "RNG: Any reason QEMU doesn't default to `/dev/urandom`?"
+> [2] https://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg02724.html
+>     -- "[RFC] Virtio RNG: Consider changing the default entropy source to
+>        /dev/urandom"
+
+Please include actual justification in the commit description instead of
+linking to email threads that need to be read and interpreted.
+
+Stefan
+
+--2qXFWqzzG3v1+95a
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzUMM8ACgkQnKSrs4Gr
+c8iQwwf+KjLlClpI+ycFWYiXsFUqKKE8sKek82Uq+NinqAPTipE61q+Hir3kzZUl
+ZQjE3kt+9q2MZoLNYYnPTHEtQgGLUFokxRqW592gDaCXph41IyIg4Qa+sN3Q0A7K
+FBQex1NpTgfpAWm1C3i7T7Ox3XOPSWblBKIg8OwKf/7jC3eMZ2JRydhU4AmZukCe
+B8AZG7SIgMQq3QaaUJwZjBQ9QtLBgMFS8ejCmChhFjEWPFKZM7cJATII6CV+7xty
++htBkmF0jK7TiHq37+u6Gko8HGGFPgESJDo1Lz4vSlUZS8iqWeffloZCKEysBYRN
+lKIpCXwJxG8vEWGnbs2aRBjp5E1ZYQ==
+=e4Br
+-----END PGP SIGNATURE-----
+
+--2qXFWqzzG3v1+95a--
 
