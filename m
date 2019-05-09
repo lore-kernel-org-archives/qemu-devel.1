@@ -2,62 +2,76 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B768C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:29:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5954CC04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:29:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71DB1208C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:29:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71DB1208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 1C6F1208C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:29:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C6F1208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50358 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50360 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOeQK-00030A-Kq
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 04:29:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44722)
+	id 1hOeR0-0003Wf-BD
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 04:29:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOeHV-000281-Kd
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:19:58 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hOeOD-0001bY-06
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:26:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOeHU-0000P2-DH
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:19:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60293)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hOeHU-0000Ok-68
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:19:56 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8369B3066497;
-	Thu,  9 May 2019 08:19:55 +0000 (UTC)
-Received: from thuth.com (ovpn-116-115.ams2.redhat.com [10.36.116.115])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 72D555B680;
-	Thu,  9 May 2019 08:19:54 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Date: Thu,  9 May 2019 10:19:25 +0200
-Message-Id: <20190509081930.19081-10-thuth@redhat.com>
-In-Reply-To: <20190509081930.19081-1-thuth@redhat.com>
-References: <20190509081930.19081-1-thuth@redhat.com>
+	(envelope-from <sgarzare@redhat.com>) id 1hOeOB-0005gS-K6
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:26:52 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:37400)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hOeOB-0005fr-Do
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:26:51 -0400
+Received: by mail-wm1-f67.google.com with SMTP id y5so1989705wma.2
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 01:26:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=dIARWU2C6vwWQhEwoqdu+eSEzCP1J09c4Eb6k1zy/MY=;
+	b=FPtfETVz/rV1JwvxdKCQKqk5evMytRVfdZWWNYL1fEPtyArM6vb6ZUW2IOlTYxVS5T
+	jJVh4EafH60S7pwAKmyB9raUkHAzO76wwtdPw4exic4RQk1eBWEnaV4qySq7dhHKU02m
+	r+W4KoVyFsF4C5yrrGOcAWrtewJWtb+d/wKh0gIxEVRXvd+TlvZB90t5IKrGUTEs+8Sp
+	7rNk6cR+aLjku1UiCjMHEjFgeV7Yr4x9lh4l2KDMkDogrymgFPWhhaaXFdHh8Zn5pNSA
+	j7baw8RqLhgA3QAWDLRyV6/ezwKm17bVQe08Z7Eeu8eYY+jlbVs6ZX+uvUoVV+5yAmjP
+	nb0g==
+X-Gm-Message-State: APjAAAWFZXkiqxCgeLX+qN1IPeLVyqI2s/g+zwzGt3eb/kHj3Lqu2Opp
+	4pwfOGo3FIuqXv/jiBIFW34gNg==
+X-Google-Smtp-Source: APXvYqxrqie+HNWtMp07iiaCp37Z7hXQavoT7AZfv7dRvml6+EFci4kKFEV3g7WlGrlESjuphZiy3w==
+X-Received: by 2002:a7b:c304:: with SMTP id k4mr1963293wmj.22.1557390410088;
+	Thu, 09 May 2019 01:26:50 -0700 (PDT)
+Received: from steredhat (host151-251-static.12-87-b.business.telecomitalia.it.
+	[87.12.251.151]) by smtp.gmail.com with ESMTPSA id
+	s22sm1886603wmh.45.2019.05.09.01.26.48
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 09 May 2019 01:26:49 -0700 (PDT)
+Date: Thu, 9 May 2019 10:26:46 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190509082646.lrfllcqszjlmnyfe@steredhat>
+References: <20190427113625.46594-1-sgarzare@redhat.com>
+	<877eb2hiwk.fsf@dusky.pond.sub.org>
+	<20190507083615.as7shlq7fwjgwz54@steredhat>
+	<8736lp5fxg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Thu, 09 May 2019 08:19:55 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8736lp5fxg.fsf@dusky.pond.sub.org>
+User-Agent: NeoMutt/20180716
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 09/14] tests/drive_del-test: Use qtest_init()
- instead of qtest_start()
+	[fuzzy]
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] Use of PreallocMode in block drivers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,173 +83,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
+	Peter Krempa <pkrempa@redhat.com>, qemu-block@nongnu.org,
+	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qtest_start() + qtest_end() should be avoided, since they use the
-global_qtest variable that we want to get rid of in the long run
-Use qtest_init() and qtest_quit() instead.
+On Wed, May 08, 2019 at 01:44:27PM +0200, Markus Armbruster wrote:
+> Stefano Garzarella <sgarzare@redhat.com> writes:
+> 
+> > On Tue, May 07, 2019 at 08:34:51AM +0200, Markus Armbruster wrote:
+> >> Cc: Peter for a libvirt perspective.
+> >> 
+> >> Stefano Garzarella <sgarzare@redhat.com> writes:
+> >> 
+> >> > This patch adds the support of preallocation (off/full) for the RBD
+> >> > block driver.
+> >> > If available, we use rbd_writesame() to quickly fill the image when
+> >> > full preallocation is required.
+> >> >
+> >> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> >> > ---
+> >> >  block/rbd.c          | 149 ++++++++++++++++++++++++++++++++++++++-----
+> >> >  qapi/block-core.json |   4 +-
+> >> >  2 files changed, 136 insertions(+), 17 deletions(-)
+> >> >
+> >> > diff --git a/block/rbd.c b/block/rbd.c
+> >> > index 0c549c9935..29dd1bb040 100644
+> >> > --- a/block/rbd.c
+> >> > +++ b/block/rbd.c
+> >> > @@ -13,6 +13,7 @@
+> >> >  
+> >> >  #include "qemu/osdep.h"
+> >> >  
+> >> > +#include "qemu/units.h"
+> >> >  #include <rbd/librbd.h>
+> >> >  #include "qapi/error.h"
+> >> >  #include "qemu/error-report.h"
+> >> > @@ -331,6 +332,110 @@ static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
+> >> >      }
+> >> >  }
+> >> >  
+> >> > +static int qemu_rbd_do_truncate(rbd_image_t image, int64_t offset,
+> >> > +                                PreallocMode prealloc, Error **errp)
+> >> > +{
+> >> > +    uint64_t current_length;
+> >> > +    char *buf = NULL;
+> >> > +    int ret;
+> >> > +
+> >> > +    ret = rbd_get_size(image, &current_length);
+> >> > +    if (ret < 0) {
+> >> > +        error_setg_errno(errp, -ret, "Failed to get file length");
+> >> > +        goto out;
+> >> > +    }
+> >> > +
+> >> > +    if (current_length > offset && prealloc != PREALLOC_MODE_OFF) {
+> >> > +        error_setg(errp, "Cannot use preallocation for shrinking files");
+> >> > +        ret = -ENOTSUP;
+> >> > +        goto out;
+> >> > +    }
+> >> > +
+> >> > +    switch (prealloc) {
+> >> > +    case PREALLOC_MODE_FULL: {
+> >> [...]
+> >> > +    case PREALLOC_MODE_OFF:
+> >> [...]
+> >> > +    default:
+> >> > +        error_setg(errp, "Unsupported preallocation mode: %s",
+> >> > +                   PreallocMode_str(prealloc));
+> >> > +        ret = -ENOTSUP;
+> >> > +        goto out;
+> >> > +    }
+> >> 
+> >> Other block drivers also accept only some values of PreallocMode.  Okay.
+> >> 
+> >> I wonder whether management applications need to know which values are
+> >> supported.
+> >
+> > Good point!
+> 
+> We can continue to assume they don't until somebody tells us otherwise.
+> 
+> >> Let me review support in drivers:
+> >> 
+> >> * file (file-win32.c)
+> >> * iscsi
+> >> * nfs
+> >> * qed
+> >> * ssh
+> >> 
+> >>   - Reject all but PREALLOC_MODE_OFF
+> >> 
+> >> * copy-on-read
+> >> * luks (crypto.c)
+> >> * raw
+> >> 
+> >>   - Pass through only
+> >> 
+> >> * file host_cdrom host_device (file-posix.c)
+> >> 
+> >>   - Reject all but PREALLOC_MODE_OFF when shrinking and for non-regular
+> >>     files
+> >>   - Reject PREALLOC_MODE_FALLOC unless CONFIG_POSIX_FALLOCATE
+> >>   - Reject PREALLOC_MODE_METADATA
+> >> 
+> >> * gluster
+> >> 
+> >>   - Reject all but PREALLOC_MODE_OFF when shrinking
+> >>   - Reject PREALLOC_MODE_FALLOC unless CONFIG_GLUSTERFS_FALLOCATE
+> >>   - Reject PREALLOC_MODE_FULL unless CONFIG_GLUSTERFS_ZEROFILL
+> >>   - Reject PREALLOC_MODE_METADATA
+> >> 
+> >> * qcow2
+> >> 
+> >>   - Reject all but PREALLOC_MODE_OFF when shrinking and with a backing
+> >>     file
+> >>   
+> >> * rbd with this patch
+> >> 
+> >>   - Reject all but PREALLOC_MODE_OFF when shrinking
+> >>   - Reject PREALLOC_MODE_METADATA and PREALLOC_MODE_FALLOC
+> >> 
+> >> * sheepdog
+> >> 
+> >>   - Reject PREALLOC_MODE_METADATA and PREALLOC_MODE_FALLOC
+> >>   - Doesn't support shrinking
+> >> 
+> >> * vdi
+> >> 
+> >>   - Reject PREALLOC_MODE_FALLOC and PREALLOC_MODE_FULL
+> >>   - Doesn't support shrinking
+> >> 
+> >> * blkdebug
+> >> * blklogwrites
+> >> * blkverify
+> >> * bochs
+> >> * cloop
+> >> * dmg
+> >> * ftp
+> >> * ftps
+> >> * http
+> >> * https
+> >> * luks
+> >> * nbd
+> >> * null-aio
+> >> * null-co
+> >> * nvme
+> >> * parallels
+> >> * qcow
+> >> * quorum
+> >> * replication
+> >> * throttle
+> >> * vhdx
+> >> * vmdk
+> >> * vpc
+> >> * vvfat
+> >> * vxhs
+> >> 
+> >>   - These appear not to use PreallocMode: they don't implement
+> >>     .bdrv_co_truncate(), and either don't implement .bdrv_co_create() or
+> >>     implement it without a prealloc parameter.
+> >> 
+> >> Looks good to me.
+> >>
+> >
+> > Thanks for the analysis!
+> >
+> >> > +
+> >> > +    ret = 0;
+> >> > +
+> >> > +out:
+> >> > +    g_free(buf);
+> >> > +    return ret;
+> >> > +}
+> >> > +
+> >> >  static QemuOptsList runtime_opts = {
+> >> >      .name = "rbd",
+> >> >      .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+> >> [...]
+> >> > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> >> > index 7ccbfff9d0..db25a4065b 100644
+> >> > --- a/qapi/block-core.json
+> >> > +++ b/qapi/block-core.json
+> >> > @@ -4277,13 +4277,15 @@
+> >> >  #                   point to a snapshot.
+> >> >  # @size             Size of the virtual disk in bytes
+> >> >  # @cluster-size     RBD object size
+> >> > +# @preallocation    Preallocation mode (allowed values: off, full)
+> >> >  #
+> >> >  # Since: 2.12
+> >> >  ##
+> >> >  { 'struct': 'BlockdevCreateOptionsRbd',
+> >> >    'data': { 'location':         'BlockdevOptionsRbd',
+> >> >              'size':             'size',
+> >> > -            '*cluster-size' :   'size' } }
+> >> > +            '*cluster-size' :   'size',
+> >> > +            '*preallocation':   'PreallocMode' } }
+> >> >  
+> >> >  ##
+> >> >  # @BlockdevVmdkSubformat:
+> >> 
+> >> The non-support of values 'metadata' and 'falloc' is not visible in
+> >> introspection, only in documentation.  No reason to block this patch, as
+> >> the other block drivers have the same introspection weakness (only
+> >> sheepdog and vdi bother to document).
+> >> 
+> >> Should we address the introspection weakness?  Only if there's a use for
+> >> the information, I think.
+> >
+> > If the management applications will use that information (or maybe also
+> > our help pages), could be useful to have an array of 'PreallocMode'
+> > supported per-driver.
+> 
+> Ideally, query-qmp-schema would show only the supported values.
+> 
+> Not hard to do, just tedious: we'd get a number of sub-enums in addition
+> to the full one, and we'd have to map from sub-enum to the full one.
+> 
+> QAPI language support for sub-enums would remove most of the tedium.
+> Not worthwhile unless the need for sub-enums is actually common.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20190508142153.21555-1-thuth@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/drive_del-test.c | 63 +++++++++++++++++++++---------------------
- 1 file changed, 32 insertions(+), 31 deletions(-)
+I should study better the QMP and QAPI to understand how to implement
+the sub-enums.
 
-diff --git a/tests/drive_del-test.c b/tests/drive_del-test.c
-index 2f9474e03c..b56b223fc2 100644
---- a/tests/drive_del-test.c
-+++ b/tests/drive_del-test.c
-@@ -16,32 +16,32 @@
- #include "qapi/qmp/qdict.h"
-=20
- /* TODO actually test the results and get rid of this */
--#define qmp_discard_response(...) qobject_unref(qmp(__VA_ARGS__))
-+#define qmp_discard_response(q, ...) qobject_unref(qtest_qmp(q, __VA_ARG=
-S__))
-=20
--static void drive_add(void)
-+static void drive_add(QTestState *qts)
- {
--    char *resp =3D hmp("drive_add 0 if=3Dnone,id=3Ddrive0");
-+    char *resp =3D qtest_hmp(qts, "drive_add 0 if=3Dnone,id=3Ddrive0");
-=20
-     g_assert_cmpstr(resp, =3D=3D, "OK\r\n");
-     g_free(resp);
- }
-=20
--static void drive_del(void)
-+static void drive_del(QTestState *qts)
- {
--    char *resp =3D hmp("drive_del drive0");
-+    char *resp =3D qtest_hmp(qts, "drive_del drive0");
-=20
-     g_assert_cmpstr(resp, =3D=3D, "");
-     g_free(resp);
- }
-=20
--static void device_del(void)
-+static void device_del(QTestState *qts)
- {
-     QDict *response;
-=20
-     /* Complication: ignore DEVICE_DELETED event */
--    qmp_discard_response("{'execute': 'device_del',"
-+    qmp_discard_response(qts, "{'execute': 'device_del',"
-                          " 'arguments': { 'id': 'dev0' } }");
--    response =3D qmp_receive();
-+    response =3D qtest_qmp_receive(qts);
-     g_assert(response);
-     g_assert(qdict_haskey(response, "return"));
-     qobject_unref(response);
-@@ -49,18 +49,20 @@ static void device_del(void)
-=20
- static void test_drive_without_dev(void)
- {
-+    QTestState *qts;
-+
-     /* Start with an empty drive */
--    qtest_start("-drive if=3Dnone,id=3Ddrive0");
-+    qts =3D qtest_init("-drive if=3Dnone,id=3Ddrive0");
-=20
-     /* Delete the drive */
--    drive_del();
-+    drive_del(qts);
-=20
-     /* Ensure re-adding the drive works - there should be no duplicate I=
-D error
-      * because the old drive must be gone.
-      */
--    drive_add();
-+    drive_add(qts);
-=20
--    qtest_end();
-+    qtest_quit(qts);
- }
-=20
- /*
-@@ -85,54 +87,53 @@ static void test_after_failed_device_add(void)
- {
-     char driver[32];
-     QDict *response;
-+    QTestState *qts;
-=20
-     snprintf(driver, sizeof(driver), "virtio-blk-%s",
-              qvirtio_get_dev_type());
-=20
--    qtest_start("-drive if=3Dnone,id=3Ddrive0");
-+    qts =3D qtest_init("-drive if=3Dnone,id=3Ddrive0");
-=20
-     /* Make device_add fail. If this leaks the virtio-blk device then a
-      * reference to drive0 will also be held (via qdev properties).
-      */
--    response =3D qmp("{'execute': 'device_add',"
--                   " 'arguments': {"
--                   "   'driver': %s,"
--                   "   'drive': 'drive0'"
--                   "}}", driver);
-+    response =3D qtest_qmp(qts, "{'execute': 'device_add',"
-+                              " 'arguments': {"
-+                              "   'driver': %s,"
-+                              "   'drive': 'drive0'"
-+                              "}}", driver);
-     g_assert(response);
-     qmp_assert_error_class(response, "GenericError");
-=20
-     /* Delete the drive */
--    drive_del();
-+    drive_del(qts);
-=20
-     /* Try to re-add the drive.  This fails with duplicate IDs if a leak=
-ed
-      * virtio-blk device exists that holds a reference to the old drive0=
-.
-      */
--    drive_add();
-+    drive_add(qts);
-=20
--    qtest_end();
-+    qtest_quit(qts);
- }
-=20
- static void test_drive_del_device_del(void)
- {
--    char *args;
-+    QTestState *qts;
-=20
-     /* Start with a drive used by a device that unplugs instantaneously =
-*/
--    args =3D g_strdup_printf("-drive if=3Dnone,id=3Ddrive0,file=3Dnull-c=
-o://,format=3Draw"
--                           " -device virtio-scsi-%s"
--                           " -device scsi-hd,drive=3Ddrive0,id=3Ddev0",
--                           qvirtio_get_dev_type());
--    qtest_start(args);
-+    qts =3D qtest_initf("-drive if=3Dnone,id=3Ddrive0,file=3Dnull-co://,=
-format=3Draw"
-+                      " -device virtio-scsi-%s"
-+                      " -device scsi-hd,drive=3Ddrive0,id=3Ddev0",
-+                      qvirtio_get_dev_type());
-=20
-     /*
-      * Delete the drive, and then the device
-      * Doing it in this order takes notoriously tricky special paths
-      */
--    drive_del();
--    device_del();
-+    drive_del(qts);
-+    device_del(qts);
-=20
--    qtest_end();
--    g_free(args);
-+    qtest_quit(qts);
- }
-=20
- int main(int argc, char **argv)
---=20
-2.21.0
+If you agree, I'll put it as a background task, until somebody from
+management applications tell us his interest.
 
+> 
+> >> Should we improve documentation for the other block drivers?
+> >> 
+> >
+> > Yes, e.g. for Gluster it is not updated.
+> > If you agree, I can check and update the documentation of all drivers following
+> > your analysis.
+> 
+> Yes, please!
+
+Okay, I'll send a patch to update it.
+
+Thanks,
+Stefano
 
