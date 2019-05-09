@@ -2,69 +2,62 @@ Return-Path: <SRS0=nSdt=TJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65310C04AB1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42301C04AB1
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:21:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30B0F216C4
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:19:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30B0F216C4
+	by mail.kernel.org (Postfix) with ESMTPS id 12542216C4
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 May 2019 08:21:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12542216C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50215 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50258 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOeGr-00015E-7q
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 04:19:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44332)
+	id 1hOeIx-0004HI-3B
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 04:21:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hOeFx-0000lu-8t
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:18:22 -0400
+	(envelope-from <thuth@redhat.com>) id 1hOeHC-0001Wz-Ry
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:19:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hOeFw-0007U8-Ao
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:18:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39460)
+	(envelope-from <thuth@redhat.com>) id 1hOeHB-0000Af-KC
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:19:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56874)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hOeFw-0007RV-5e
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:18:20 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hOeHB-00009O-A5
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 04:19:37 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 53B493079B73;
-	Thu,  9 May 2019 08:18:18 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
-	[10.36.117.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8C9005B680;
-	Thu,  9 May 2019 08:18:15 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id C301111AA3; Thu,  9 May 2019 10:18:14 +0200 (CEST)
-Date: Thu, 9 May 2019 10:18:14 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Message-ID: <20190509081814.dptmmhw7fkqazud3@sirius.home.kraxel.org>
-References: <20190508085645.11595-1-kraxel@redhat.com>
-	<20190508085645.11595-4-kraxel@redhat.com>
-	<53e70dc0-db41-9949-4014-b5efed2fe79f@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 9DA40308793F;
+	Thu,  9 May 2019 08:19:36 +0000 (UTC)
+Received: from thuth.com (ovpn-116-115.ams2.redhat.com [10.36.116.115])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2FBFA5B680;
+	Thu,  9 May 2019 08:19:33 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+	qemu-devel@nongnu.org
+Date: Thu,  9 May 2019 10:19:16 +0200
+Message-Id: <20190509081930.19081-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <53e70dc0-db41-9949-4014-b5efed2fe79f@redhat.com>
-User-Agent: NeoMutt/20180716
+Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Thu, 09 May 2019 08:18:18 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.45]);
+	Thu, 09 May 2019 08:19:36 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 03/13] tests/vm: send locale environment
- variables over ssh
+Subject: [Qemu-devel] [PULL 00/14] qtests,
+ copyright statement clarifications and misc patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,40 +69,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org, Kamil Rytarowski <kamil@netbsd.org>,
-	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
+Cc: ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
+ Hi Peter,
 
-> "gmake check" then also finally failed:
->=20
-> --- /home/qemu/qemu-test.AOvcgx/src/tests/qapi-schema/unicode-str.err
-> 2019-05-09 05:56:17.000000000 +0000
-> +++ -	2019-05-09 06:12:54.451392000 +0000
-> @@ -1 +1 @@
-> -tests/qapi-schema/unicode-str.json:2: 'command' uses invalid name '=E9=
-'
-> +tests/qapi-schema/unicode-str.json:2: 'command' uses invalid name '\xe=
-9'
+the following changes since commit 629d166994725773dea9cef843fcb0ae5f3585=
+fe:
 
-Well, that failure disappeared in my tests.  But that'll probably only wo=
-rks
-in case the guest actually has support for the given locale.
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+90507' into staging (2019-05-08 00:06:43 +0100)
 
-> Note that if you just wanted to fix the python3 utf-8 problem with this
-> patch here, there is a separate fix available for that problem already:
->=20
->  https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01247.html
+are available in the Git repository at:
 
-Ah, ok.  Guess I can drop the patch then.
+  https://gitlab.com/huth/qemu.git tags/pull-request-2019-05-09
 
-cheers,
-  Gerd
+for you to fetch changes up to 2c8fcd8f9ef2394b9933a52c157df4ef67ca1eba:
 
+  include/exec/poison: Mark TARGET_FMT_lu as poisoned, too (2019-05-09 09=
+:37:09 +0200)
+
+----------------------------------------------------------------
+- Fix "make check" problem that occurred with LANG=3DC and Python 3.5 / 3=
+.6
+- Get rid of some more dependencies on the global_qtest variable in the q=
+tests
+- Some other small test clean-ups
+- Some copyright statement clarifications
+- Mark TARGET_FMT_lu as poisoned
+----------------------------------------------------------------
+
+Eduardo Habkost (1):
+      tests: Force Python I/O encoding for check-qapi-schema
+
+Thomas Huth (13):
+      tests/tco: Make test independent of global_qtest
+      tests/megasas: Make test independent of global_qtest
+      tests/qmp-cmd-test: Use qtest_init() instead of qtest_start()
+      tests/test-hmp: Use qtest_init() instead of qtest_start()
+      tests/ide-test: Make test independent of global_qtest
+      tests/tpm-tests: Use g_test_skip() to mark skipped tests
+      tests/Makefile: Remove unused test-obj-y variable
+      tests/drive_del-test: Use qtest_init() instead of qtest_start()
+      tests: qpci_unplug_acpi_device_test() should not rely on global_qte=
+st
+      hw/i2c/smbus_ich9: Fix the confusing contributions-after-2012 state=
+ment
+      target/openrisc: Fix LGPL information in the file headers
+      target/sh4: Fix LGPL information in the file headers
+      include/exec/poison: Mark TARGET_FMT_lu as poisoned, too
+
+ hw/i2c/smbus_ich9.c                  |  21 +--
+ hw/openrisc/cputimer.c               |   2 +-
+ hw/openrisc/openrisc_sim.c           |   2 +-
+ hw/openrisc/pic_cpu.c                |   2 +-
+ include/exec/poison.h                |   1 +
+ linux-user/openrisc/target_cpu.h     |   2 +-
+ linux-user/openrisc/target_structs.h |   2 +-
+ linux-user/sh4/target_cpu.h          |   2 +-
+ linux-user/sh4/target_structs.h      |   2 +-
+ target/openrisc/cpu.h                |   2 +-
+ target/openrisc/exception.c          |   2 +-
+ target/openrisc/exception_helper.c   |   2 +-
+ target/openrisc/fpu_helper.c         |   2 +-
+ target/openrisc/insns.decode         |   2 +-
+ target/openrisc/interrupt.c          |   2 +-
+ target/openrisc/machine.c            |   2 +-
+ target/openrisc/mmu.c                |   2 +-
+ target/sh4/cpu.h                     |   2 +-
+ target/sh4/gdbstub.c                 |   2 +-
+ target/sh4/helper.c                  |   2 +-
+ target/sh4/op_helper.c               |   2 +-
+ target/sh4/translate.c               |   2 +-
+ tests/Makefile.include               |  21 +--
+ tests/drive_del-test.c               |  63 ++++----
+ tests/e1000e-test.c                  |   4 +-
+ tests/ide-test.c                     | 284 ++++++++++++++++++++---------=
+------
+ tests/ivshmem-test.c                 |   9 +-
+ tests/libqos/pci-pc.c                |  10 +-
+ tests/libqos/pci.h                   |   2 +-
+ tests/megasas-test.c                 |   2 +-
+ tests/qmp-cmd-test.c                 |  15 +-
+ tests/tco-test.c                     |  63 ++++----
+ tests/test-hmp.c                     |  19 +--
+ tests/tpm-tests.c                    |   2 +-
+ tests/virtio-blk-test.c              |   3 +-
+ tests/virtio-net-test.c              |   4 +-
+ tests/virtio-rng-test.c              |   5 +-
+ 37 files changed, 298 insertions(+), 270 deletions(-)
 
