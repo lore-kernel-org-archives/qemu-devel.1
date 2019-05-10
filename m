@@ -3,61 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B331CC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CE3AC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:06:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 823C020882
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:04:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 823C020882
+	by mail.kernel.org (Postfix) with ESMTPS id 1ABC0217D6
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:06:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ABC0217D6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45836 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45932 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP80G-0004iQ-Hb
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:04:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35777)
+	id 1hP824-00068j-Ag
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:06:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hP7rO-0005fb-0q
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:54:59 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hP7rj-00063t-AI
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:55:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hP7rN-0002gw-0j
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:54:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42482)
+	(envelope-from <pagupta@redhat.com>) id 1hP7ri-0003Gs-DB
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:55:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43322)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hP7rL-0002ch-4h
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:54:55 -0400
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hP7ri-0003Fs-7L
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:55:18 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 66BDC3087924;
-	Fri, 10 May 2019 15:54:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 38D3D4E93D;
+	Fri, 10 May 2019 15:55:17 +0000 (UTC)
 Received: from dhcp201-121.englab.pnq.redhat.com (unknown [10.65.16.148])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 436D560BFB;
-	Fri, 10 May 2019 15:54:20 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id DB1A660BFB;
+	Fri, 10 May 2019 15:54:53 +0000 (UTC)
 From: Pankaj Gupta <pagupta@redhat.com>
 To: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
 	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
 	qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
 	linux-xfs@vger.kernel.org
-Date: Fri, 10 May 2019 21:22:01 +0530
-Message-Id: <20190510155202.14737-6-pagupta@redhat.com>
+Date: Fri, 10 May 2019 21:22:02 +0530
+Message-Id: <20190510155202.14737-7-pagupta@redhat.com>
 In-Reply-To: <20190510155202.14737-1-pagupta@redhat.com>
 References: <20190510155202.14737-1-pagupta@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Fri, 10 May 2019 15:54:53 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.38]);
+	Fri, 10 May 2019 15:55:17 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v8 5/6] ext4: disable map_sync for async flush
+Subject: [Qemu-devel] [PATCH v8 6/6] xfs: disable map_sync for async flush
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,40 +88,36 @@ Sender: "Qemu-devel"
 Dont support 'MAP_SYNC' with non-DAX files and DAX files
 with asynchronous dax_device. Virtio pmem provides
 asynchronous host page cache flush mechanism. We don't
-support 'MAP_SYNC' with virtio pmem and ext4.
+support 'MAP_SYNC' with virtio pmem and xfs.
 
 Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
 ---
- fs/ext4/file.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ fs/xfs/xfs_file.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/fs/ext4/file.c b/fs/ext4/file.c
-index 98ec11f69cd4..dee549339e13 100644
---- a/fs/ext4/file.c
-+++ b/fs/ext4/file.c
-@@ -360,15 +360,17 @@ static const struct vm_operations_struct ext4_file_vm_ops = {
- static int ext4_file_mmap(struct file *file, struct vm_area_struct *vma)
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index a7ceae90110e..f17652cca5ff 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -1203,11 +1203,14 @@ xfs_file_mmap(
+ 	struct file	*filp,
+ 	struct vm_area_struct *vma)
  {
- 	struct inode *inode = file->f_mapping->host;
-+	struct ext4_sb_info *sbi = EXT4_SB(inode->i_sb);
-+	struct dax_device *dax_dev = sbi->s_daxdev;
- 
--	if (unlikely(ext4_forced_shutdown(EXT4_SB(inode->i_sb))))
-+	if (unlikely(ext4_forced_shutdown(sbi)))
- 		return -EIO;
- 
++	struct dax_device 	*dax_dev;
++
++	dax_dev = xfs_find_daxdev_for_inode(file_inode(filp));
  	/*
 -	 * We don't support synchronous mappings for non-DAX files. At least
 -	 * until someone comes with a sensible use case.
 +	 * We don't support synchronous mappings for non-DAX files and
 +	 * for DAX files if underneath dax_device is not synchronous.
  	 */
--	if (!IS_DAX(file_inode(file)) && (vma->vm_flags & VM_SYNC))
+-	if (!IS_DAX(file_inode(filp)) && (vma->vm_flags & VM_SYNC))
 +	if (!daxdev_mapping_supported(vma, dax_dev))
  		return -EOPNOTSUPP;
  
- 	file_accessed(file);
+ 	file_accessed(filp);
 -- 
 2.20.1
 
