@@ -6,139 +6,61 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4803DC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 14:01:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1CA2C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 14:03:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08BF221479
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 14:01:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08BF221479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 848A521479
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 14:03:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 848A521479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43891 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43903 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP65l-00076C-Bm
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 10:01:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40089)
+	id 1hP67Q-0000Rh-Os
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 10:03:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hP641-0005sS-Jp
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:59:54 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hP65G-00075m-PS
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 10:01:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hP640-000186-2W
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:59:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48422)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1hP63z-00016n-Ou
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:59:51 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4ADrbsg117087
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 09:59:48 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2sda04242a-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 09:59:48 -0400
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 10 May 2019 14:59:46 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-	by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Fri, 10 May 2019 14:59:42 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
-	[9.149.105.60])
-	by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x4ADxfee33292356
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Fri, 10 May 2019 13:59:41 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3F2804204C;
-	Fri, 10 May 2019 13:59:41 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EED2F42047;
-	Fri, 10 May 2019 13:59:40 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.96.15])
-	by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-	Fri, 10 May 2019 13:59:40 +0000 (GMT)
-To: Thomas Huth <thuth@redhat.com>, cohuck@redhat.com, qemu-s390x@nongnu.org
-References: <20190508094857.21145-1-thuth@redhat.com>
-	<20190508094857.21145-3-thuth@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
-	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
-	syiRa+UVlsKmx1hsEg==
-Date: Fri, 10 May 2019 15:59:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <kraxel@redhat.com>) id 1hP65F-00020P-OV
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 10:01:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59274)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hP65F-0001zx-EQ
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 10:01:09 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C2995309E9B2
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 14:01:08 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
+	[10.36.117.74])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id F059F1001E78;
+	Fri, 10 May 2019 14:01:03 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id 3250EA1E4; Fri, 10 May 2019 16:01:03 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 10 May 2019 16:00:56 +0200
+Message-Id: <20190510140103.3834-2-kraxel@redhat.com>
+In-Reply-To: <20190510140103.3834-1-kraxel@redhat.com>
+References: <20190510140103.3834-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190508094857.21145-3-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19051013-0008-0000-0000-000002E55447
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051013-0009-0000-0000-00002251E033
-Message-Id: <04ebd3c0-34e2-d21c-2b04-616d52056a86@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-09_02:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1905100097
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: Re: [Qemu-devel] [PULL SUBSYSTEM s390x 2/3] s390-bios: Skip bootmap
- signature entries
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.49]);
+	Fri, 10 May 2019 14:01:08 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 1/8] libvhost-user: fix
+ -Waddress-of-packed-member
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -150,95 +72,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jjherne@linux.ibm.com, qemu-devel@nongnu.org, armbru@redhat.com
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Shall we cc stable this?
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-On 08.05.19 11:48, Thomas Huth wrote:
-> From: "Jason J. Herne" <jjherne@linux.ibm.com>
-> 
-> Newer versions of zipl have the ability to write signature entries to the boot
-> script for secure boot. We don't yet support secure boot, but we need to skip
-> over signature entries while reading the boot script in order to maintain our
-> ability to boot guest operating systems that have a secure bootloader.
-> 
-> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
-> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
-> Message-Id: <1556543381-12671-1-git-send-email-jjherne@linux.ibm.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  pc-bios/s390-ccw/bootmap.c | 19 +++++++++++++++++--
->  pc-bios/s390-ccw/bootmap.h | 10 ++++++----
->  2 files changed, 23 insertions(+), 6 deletions(-)
-> 
-> diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-> index 7aef65ab67..d13b7cbd15 100644
-> --- a/pc-bios/s390-ccw/bootmap.c
-> +++ b/pc-bios/s390-ccw/bootmap.c
-> @@ -254,7 +254,14 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr,
->      memset(sec, FREE_SPACE_FILLER, sizeof(sec));
->      read_block(block_nr, sec, "Cannot read Boot Map Script");
->  
-> -    for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD; i++) {
-> +    for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD ||
-> +                bms->entry[i].type == BOOT_SCRIPT_SIGNATURE; i++) {
-> +
-> +        /* We don't support secure boot yet, so we skip signature entries */
-> +        if (bms->entry[i].type == BOOT_SCRIPT_SIGNATURE) {
-> +            continue;
-> +        }
-> +
->          address = bms->entry[i].address.load_address;
->          block_nr = eckd_block_num(&bms->entry[i].blkptr.xeckd.bptr.chs);
->  
-> @@ -489,7 +496,15 @@ static void zipl_run(ScsiBlockPtr *pte)
->  
->      /* Load image(s) into RAM */
->      entry = (ComponentEntry *)(&header[1]);
-> -    while (entry->component_type == ZIPL_COMP_ENTRY_LOAD) {
-> +    while (entry->component_type == ZIPL_COMP_ENTRY_LOAD ||
-> +           entry->component_type == ZIPL_COMP_ENTRY_SIGNATURE) {
-> +
-> +        /* We don't support secure boot yet, so we skip signature entries */
-> +        if (entry->component_type == ZIPL_COMP_ENTRY_SIGNATURE) {
-> +            entry++;
-> +            continue;
-> +        }
-> +
->          zipl_load_segment(entry);
->  
->          entry++;
-> diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-> index a085212077..94f53a5f1e 100644
-> --- a/pc-bios/s390-ccw/bootmap.h
-> +++ b/pc-bios/s390-ccw/bootmap.h
-> @@ -98,8 +98,9 @@ typedef struct ScsiMbr {
->  #define ZIPL_COMP_HEADER_IPL    0x00
->  #define ZIPL_COMP_HEADER_DUMP   0x01
->  
-> -#define ZIPL_COMP_ENTRY_LOAD    0x02
-> -#define ZIPL_COMP_ENTRY_EXEC    0x01
-> +#define ZIPL_COMP_ENTRY_EXEC      0x01
-> +#define ZIPL_COMP_ENTRY_LOAD      0x02
-> +#define ZIPL_COMP_ENTRY_SIGNATURE 0x03
->  
->  typedef struct XEckdMbr {
->      uint8_t magic[4];   /* == "xIPL"        */
-> @@ -117,8 +118,9 @@ typedef struct BootMapScriptEntry {
->      BootMapPointer blkptr;
->      uint8_t pad[7];
->      uint8_t type;   /* == BOOT_SCRIPT_* */
-> -#define BOOT_SCRIPT_EXEC 0x01
-> -#define BOOT_SCRIPT_LOAD 0x02
-> +#define BOOT_SCRIPT_EXEC      0x01
-> +#define BOOT_SCRIPT_LOAD      0x02
-> +#define BOOT_SCRIPT_SIGNATURE 0x03
->      union {
->          uint64_t load_address;
->          uint64_t load_psw;
-> 
+/home/elmarco/src/qemu/contrib/libvhost-user/libvhost-user.c: In function=
+ =E2=80=98vu_set_mem_table_exec_postcopy=E2=80=99:
+/home/elmarco/src/qemu/contrib/libvhost-user/libvhost-user.c:546:31: warn=
+ing: taking address of packed member of =E2=80=98struct VhostUserMsg=E2=80=
+=99 may result in an unaligned pointer value [-Waddress-of-packed-member]
+  546 |     VhostUserMemory *memory =3D &vmsg->payload.memory;
+      |                               ^~~~~~~~~~~~~~~~~~~~~
+/home/elmarco/src/qemu/contrib/libvhost-user/libvhost-user.c: In function=
+ =E2=80=98vu_set_mem_table_exec=E2=80=99:
+/home/elmarco/src/qemu/contrib/libvhost-user/libvhost-user.c:688:31: warn=
+ing: taking address of packed member of =E2=80=98struct VhostUserMsg=E2=80=
+=99 may result in an unaligned pointer value [-Waddress-of-packed-member]
+  688 |     VhostUserMemory *memory =3D &vmsg->payload.memory;
+      |                               ^~~~~~~~~~~~~~~~~~~~~
+/home/elmarco/src/qemu/contrib/libvhost-user/libvhost-user.c: In function=
+ =E2=80=98vu_set_vring_addr_exec=E2=80=99:
+/home/elmarco/src/qemu/contrib/libvhost-user/libvhost-user.c:817:36: warn=
+ing: taking address of packed member of =E2=80=98struct VhostUserMsg=E2=80=
+=99 may result in an unaligned pointer value [-Waddress-of-packed-member]
+  817 |     struct vhost_vring_addr *vra =3D &vmsg->payload.addr;
+      |                                    ^~~~~~~~~~~~~~~~~~~
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-id: 20190503130034.24916-2-marcandre.lureau@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ contrib/libvhost-user/libvhost-user.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+index e08d6c7b9741..dcf4a969f238 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -542,7 +542,7 @@ static bool
+ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
+ {
+     int i;
+-    VhostUserMemory *memory =3D &vmsg->payload.memory;
++    VhostUserMemory m =3D vmsg->payload.memory, *memory =3D &m;
+     dev->nregions =3D memory->nregions;
+=20
+     DPRINT("Nregions: %d\n", memory->nregions);
+@@ -684,7 +684,7 @@ static bool
+ vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)
+ {
+     int i;
+-    VhostUserMemory *memory =3D &vmsg->payload.memory;
++    VhostUserMemory m =3D vmsg->payload.memory, *memory =3D &m;
+=20
+     for (i =3D 0; i < dev->nregions; i++) {
+         VuDevRegion *r =3D &dev->regions[i];
+@@ -813,7 +813,7 @@ vu_set_vring_num_exec(VuDev *dev, VhostUserMsg *vmsg)
+ static bool
+ vu_set_vring_addr_exec(VuDev *dev, VhostUserMsg *vmsg)
+ {
+-    struct vhost_vring_addr *vra =3D &vmsg->payload.addr;
++    struct vhost_vring_addr addr =3D vmsg->payload.addr, *vra =3D &addr;
+     unsigned int index =3D vra->index;
+     VuVirtq *vq =3D &dev->vq[index];
+=20
+--=20
+2.18.1
 
 
