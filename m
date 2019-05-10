@@ -2,84 +2,64 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A6E8C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 06:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A097CC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 06:53:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6D0E2085A
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 06:42:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 52A2E2175B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 06:53:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iU4bG9jR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6D0E2085A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="n2eIEY5F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52A2E2175B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37809 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37899 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOzEs-0002Eb-4W
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 02:42:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44598)
+	id 1hOzPY-0005Qr-GK
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 02:53:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hqm03ster@gmail.com>) id 1hOzE7-0001hv-Ns
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 02:41:52 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hOzNz-0004GQ-Jd
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 02:52:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hqm03ster@gmail.com>) id 1hOzE6-0000IH-KJ
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 02:41:51 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:39379)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hqm03ster@gmail.com>) id 1hOzE6-0000Ht-G4
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 02:41:50 -0400
-Received: by mail-qt1-x842.google.com with SMTP id y42so5391247qtk.6
-	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 23:41:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=I8DVTPiEajXY09+yUGkYAl0QbaDnG9OnuYAgYLszVH4=;
-	b=iU4bG9jRVF/GFXFnqkxrqq7M+byBQh8opcK+1MVDaYZ7N1DktVOPoIt3Ru7IBNjk72
-	fnArNMs9QtypG5WqDzrFMd7wB6GGTCw/1OzjdjWW0XnMyYp2EbPrTVC2aSJkyoQppPTQ
-	84+m/PCVglSe9betoAogd/T7KNqdp8EhiUWvCylBeWJy9DgvPhLobGHjiGcnbvFKCxSd
-	8gI1n4KR1XKTnYF3k5wRRTQt5G7ig3LfEI4YE1wXp+3bjJBUVoqrnWPzb0lZbCsSOU9B
-	bo7rknXptgbxHrN4v3g3pJwpk419Np4g0HlxGHF3rjtI0ze8RtYkCV2tyJoAxOt+a1ST
-	zsGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=I8DVTPiEajXY09+yUGkYAl0QbaDnG9OnuYAgYLszVH4=;
-	b=r19qqQztEAKbJFb0V8CUtKZ7E/N7J7325uJFE1ojeJV8An1oQhTlB313zc+exdAlCb
-	s7nTeqA4LiO+AAEwBUtelL1Zd89u2fX0ZoyS6UzyGX/SgRKKimTKZvwuEAURqaS1jOk2
-	n0tRwlsO0LDrlG7g2LRmSWqsu2N+oXYrevrcgehszDgd7bJdH+kZO3IfWPUPZWw0eP5k
-	ovx4491l/FXdYk+O6z5JmkFWjE1YZCo6SeNCEaCFMQxFNGZ1AlXAj4kjiaArEXSCYBP8
-	Z6gb7DHeVuovywj6PuzUCSHCMZiInQMbzaNsEdIdbs+2sT0nrLs+0P6BQ+fzP66FPvIA
-	RaXQ==
-X-Gm-Message-State: APjAAAUSIUPoUwrLEOtYXILG/I7R6wSEBsBRVONUhIc8ALPTp1XQs4q/
-	SbIWjDZve0jrTUFnRpOXLprrb7kOt9+/kUp3oCs=
-X-Google-Smtp-Source: APXvYqzRRG7QiUV+7JyzMGizT/+xMwPgF9sXPcH08gPbjfCNM+v+KC6xgTN784IEoDDaZVYIlNEAGI0FtS4T/Kkk0mU=
-X-Received: by 2002:aed:224d:: with SMTP id o13mr7786915qtc.56.1557470509747; 
-	Thu, 09 May 2019 23:41:49 -0700 (PDT)
+	(envelope-from <dgibson@ozlabs.org>) id 1hOzNx-0005ai-37
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 02:52:02 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:60151 helo=ozlabs.org)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+	id 1hOzNw-0005Zx-Dc; Fri, 10 May 2019 02:52:01 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 450gqY6Gvvz9sMM; Fri, 10 May 2019 16:51:53 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1557471113;
+	bh=yrF/2PsA7qhR6pp+ry5x8aqC0PCzrS1QbFawARHTp8w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n2eIEY5FsKdEoftI2A1+de9DSw9t66z4f+y7sjzVYp7RzNMe8kG7+tqK3IsVnFKkK
+	3rqWETJ/4iNq9cmi1/KlXUCuW2xopcsOHaRapGCWRN/E9/JvQUx85+rV5JgYvzlBw9
+	RceSrgazvbHSyBwyXlW60V+js3m+aCrH50F6+gJE=
+Date: Fri, 10 May 2019 16:51:44 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Message-ID: <20190510065144.GM20559@umbus.fritz.box>
+References: <155591636364.20338.844048953355207313.stgit@aravinda>
+	<155591662496.20338.3862565585716109724.stgit@aravinda>
 MIME-Version: 1.0
-References: <CABSdmrnNW6f=P64PviPP8CTJ5SVfYS8_6kmAtpw9yPObTEkpxg@mail.gmail.com>
-	<CABSdmrnocrqLKWncgy_Lak33__GRPYfs-RzSA14e=vh4cRn2ag@mail.gmail.com>
-	<20190509064848.wjhchsfov7q6komj@sirius.home.kraxel.org>
-	<CABSdmrmm+wJ=+Ccav=X5Gw_oueQvPRejCWVG2SQeCw=K4BM9EA@mail.gmail.com>
-	<CABSdmrn073Y6UTbbgs00y5-DCdF1ROK9zAg5JURD4SoUZAk2Mw@mail.gmail.com>
-	<20190510050139.jpxrghxzahejpteu@sirius.home.kraxel.org>
-In-Reply-To: <20190510050139.jpxrghxzahejpteu@sirius.home.kraxel.org>
-From: Hou Qiming <hqm03ster@gmail.com>
-Date: Fri, 10 May 2019 14:41:36 +0800
-Message-ID: <CABSdmrmU7FK90Bupq_ySowcc9Uk=8nQxNLHgzvDsNYdp_QLogA@mail.gmail.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="2YJj5f1P6Th4nBRw"
+Content-Disposition: inline
+In-Reply-To: <155591662496.20338.3862565585716109724.stgit@aravinda>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::842
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 2/3] ramfb enhancement
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PATCH v8 6/6] migration: Block migration while
+ handling machine check
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,32 +71,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: paulus@ozlabs.org, qemu-ppc@nongnu.org, aik@au1.ibm.com,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> Only allow one resolution change per guest boot, which prevents a
 
-> > crash when the guest writes garbage to the configuration space (e.g.
-> > when rebooting).
->
-> Hmm?  Did you see that happen in practice?
-> It is not easy to write to fw_cfg by accident ...
->
->
-Yes, this does happen in practice. It's observed in KVMGT setups by another
-github user and me, when the guest Intel driver loads or when the guest
-reboots. Link:
-https://github.com/intel/gvt-linux/issues/23#issuecomment-483651476
+--2YJj5f1P6Th4nBRw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Now that you mentioned it, I start to feel that it's not accidental. A
-closer look at the "garbage" in that post shows that the overwriting
-content are valid resolution values in the wrong endian. It could be a
-misguided attempt to "resize ramfb" by the guest Intel driver.
+On Mon, Apr 22, 2019 at 12:33:45PM +0530, Aravinda Prasad wrote:
+> Block VM migration requests until the machine check
+> error handling is complete as (i) these errors are
+> specific to the source hardware and is irrelevant on
+> the target hardware, (ii) these errors cause data
+> corruption and should be handled before migration.
+>=20
+> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+> ---
+>  hw/ppc/spapr_events.c  |   17 +++++++++++++++++
+>  hw/ppc/spapr_rtas.c    |    4 ++++
+>  include/hw/ppc/spapr.h |    3 +++
+>  3 files changed, 24 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index 4032db0..45b990c 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -41,6 +41,7 @@
+>  #include "qemu/bcd.h"
+>  #include "hw/ppc/spapr_ovec.h"
+>  #include <libfdt.h>
+> +#include "migration/blocker.h"
+> =20
+>  #define RTAS_LOG_VERSION_MASK                   0xff000000
+>  #define   RTAS_LOG_VERSION_6                    0x06000000
+> @@ -864,6 +865,22 @@ static void spapr_mce_dispatch_elog(PowerPCCPU *cpu,=
+ bool recovered)
+>  void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+>  {
+>      SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+> +    int ret;
+> +    Error *local_err =3D NULL;
+> +
+> +    error_setg(&spapr->migration_blocker,
+> +            "Live migration not supported during machine check handling"=
+);
+> +    ret =3D migrate_add_blocker(spapr->migration_blocker, &local_err);
+> +    if (ret < 0) {
+> +        /*
+> +         * We don't want to abort and let the migration to continue. In a
+> +         * rare case, the machine check handler will run on the target
+> +         * hardware. Though this is not preferable, it is better than ab=
+orting
+> +         * the migration or killing the VM.
+> +         */
+> +        error_free(spapr->migration_blocker);
+> +        fprintf(stderr, "Warning: Machine check during VM migration\n");
 
------
+Use report_err() instead of a raw fprintf().
 
-I'll fix the addr / length thing and remove the test part in vfio-pci in V2.
+> +    }
+> =20
+>      while (spapr->mc_status !=3D -1) {
+>          /*
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index 997cf19..1229a0e 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -50,6 +50,7 @@
+>  #include "target/ppc/mmu-hash64.h"
+>  #include "target/ppc/mmu-book3s-v3.h"
+>  #include "kvm_ppc.h"
+> +#include "migration/blocker.h"
+> =20
+>  static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *s=
+papr,
+>                                     uint32_t token, uint32_t nargs,
+> @@ -396,6 +397,9 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+>          spapr->mc_status =3D -1;
+>          qemu_cond_signal(&spapr->mc_delivery_cond);
+>          rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+> +        migrate_del_blocker(spapr->migration_blocker);
+> +        error_free(spapr->migration_blocker);
+> +        spapr->migration_blocker =3D NULL;
+>      }
+>  }
+> =20
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 9d16ad1..dda5fd2 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -10,6 +10,7 @@
+>  #include "hw/ppc/spapr_irq.h"
+>  #include "hw/ppc/spapr_xive.h"  /* For SpaprXive */
+>  #include "hw/ppc/xics.h"        /* For ICSState */
+> +#include "qapi/error.h"
+> =20
+>  struct SpaprVioBus;
+>  struct SpaprPhbState;
+> @@ -213,6 +214,8 @@ struct SpaprMachineState {
+>      SpaprCapabilities def, eff, mig;
+> =20
+>      unsigned gpu_numa_id;
+> +
+> +    Error *migration_blocker;
 
-Qiming
+This name doesn't seem good - it's specific to fwnmi, not any other
+migration blockers we might have in future.  It also always contains
+the same string - could you just initialize that in a global and just
+do the migrate_add_blocker() / migrate_del_blocker() instead?
+
+>  };
+> =20
+>  #define H_SUCCESS         0
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--2YJj5f1P6Th4nBRw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzVH4AACgkQbDjKyiDZ
+s5IYOg/8DGmFNmMsZeTK2r4V4ORgh9i0oFZFbu4iN4I0W8a0CJ764NmcqjSwLIZ4
+ZmUaSGTIDpQdBWAwKLgZtUx6EqLHco1mmpFqwwAhQIkfrElPM15XpqUAFf3puLt4
+frAS3ROJA81lZRO6FTeqlfX+yDUEtnv1BxxGZWJQJfRmN/638kSxhJyGSYKkmPTs
+U2Twd0hv0CG+LThaOtbKdFiybOI3Qc0xjTE2njVSZ+NUfcPqZQvMyR0abhWADO6j
+2JF+p/4iHQqwedyIx/UTrqQXnPbtIpbed+PoKFlDZewV6F+adm/MsVvbj3mD/6mZ
+hrskRhcfYqeVCwAWZxgpKNdKelNbe19XylFqrRiGYBXYjkWLslTs3MSdGHJPwLk/
+ryYSf1wWgz4wGwTxQJDHwkYknRx3tKISgJyR6Kx+tivhiJh0WmUzQ3dW3URZ07J7
+v7SQmLOSbqy6JcKbrAiZb4+gcJ32ZMnrMFCzvfJJVsQJHHJNyw/blzxmcMAoz9iW
+k0c9hE0zoEuJ2oTpDSv862wdkzzOEYC4pKh1ngNI6fSwhXrbWOQjWPd6hmTbkMDS
+/1MWH3RUVlCUotRFYE2ONYmtquRJYm+hJ0ksqyOrdrT0p8IOp9J0o1+ACSVzaIQb
+ggqapU8S9DZNdia0/Jrj2W+AOVGlrZvU+lAu04oEph16QksCsRM=
+=AZD+
+-----END PGP SIGNATURE-----
+
+--2YJj5f1P6Th4nBRw--
+
