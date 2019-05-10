@@ -2,78 +2,111 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27C60C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 08:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5E69C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 08:47:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED7292087E
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 08:41:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED7292087E
+	by mail.kernel.org (Postfix) with ESMTPS id A8981208C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 08:47:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8981208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39063 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39122 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP15b-00051m-94
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 04:41:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:32781)
+	id 1hP1CB-00078B-15
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 04:47:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hP13T-0003V8-Hv
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:39:00 -0400
+	(envelope-from <thuth@redhat.com>) id 1hP1BJ-0006m1-FQ
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:47:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hP13S-0000zb-AO
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:38:59 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:38314)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hP13R-0000yj-VA
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:38:58 -0400
-Received: by mail-wm1-f68.google.com with SMTP id f2so6484387wmj.3
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 01:38:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=hTXgwz1IQ+e5bYrpOulSTXrXedtopLsbIHu+29rgw+M=;
-	b=AKir7bPLPGClfMbwhJIQGKwHfM4/lGymMIYEpaa6OxwTyH8TXGdFQqtGnJa2HfvLfI
-	wqdn/l2b5GOZc8A9OSR+8H4dPa2MrHHbliap2ZUgaV4LeySb5ibKzsU1Ko97tvnp+vQq
-	Xl7udbtGdWF2+wkCYi2M7boZ2iOk8Yz9zKRO3WUFCV6K/fEzz9KV4OczKDOftOTq4MrZ
-	0CXccnE4c3bULfOqWBBrOHXl9a3ySNeUuZbytBXclZR098fIToKkqSVUY4PtHqjU3Cay
-	YRHWQothXQ3tQJhf9v2rXO+5I/o7WKi3b4GUJmudHk0gfTuz6WZS8xXKxnTlzny/bwJY
-	Y56w==
-X-Gm-Message-State: APjAAAUXCB5T3QoUK0AfpRgaJPXCVeX/3lUU4ZOgBrgE37ORca1eGsR2
-	sPU1WxaKtYliwsRNCdq5/Afdpg==
-X-Google-Smtp-Source: APXvYqwUVVuurEehu6oOml1kOd4tVvfqhWYj5IMQDJwO6tZ40jMWD9Iy6QUezdYj7aEuUsLko/PcRQ==
-X-Received: by 2002:a7b:c04b:: with SMTP id u11mr5775953wmc.95.1557477536724; 
-	Fri, 10 May 2019 01:38:56 -0700 (PDT)
-Received: from steredhat (host151-251-static.12-87-b.business.telecomitalia.it.
-	[87.12.251.151]) by smtp.gmail.com with ESMTPSA id
-	d14sm3124727wre.78.2019.05.10.01.38.55
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 10 May 2019 01:38:55 -0700 (PDT)
-Date: Fri, 10 May 2019 10:38:53 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Peter Krempa <pkrempa@redhat.com>
-Message-ID: <20190510083853.q5bdem64e4y3kyeh@steredhat>
-References: <20190427113625.46594-1-sgarzare@redhat.com>
-	<877eb2hiwk.fsf@dusky.pond.sub.org>
-	<20190507083615.as7shlq7fwjgwz54@steredhat>
-	<8736lp5fxg.fsf@dusky.pond.sub.org>
-	<20190509082646.lrfllcqszjlmnyfe@steredhat>
-	<20190509132913.GF10858@angien.pipo.sk>
+	(envelope-from <thuth@redhat.com>) id 1hP1BI-00060d-Ba
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:47:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hP1BF-0005zs-Fi; Fri, 10 May 2019 04:47:01 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 622153082E10;
+	Fri, 10 May 2019 08:47:00 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-72.ams2.redhat.com [10.36.116.72])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 80F7260C81;
+	Fri, 10 May 2019 08:46:59 +0000 (UTC)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	qemu-devel@nongnu.org
+References: <20190509165912.10512-1-alex.bennee@linaro.org>
+	<20190509165912.10512-24-alex.bennee@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <9dd37620-091e-cc58-be5b-cea01d916d07@redhat.com>
+Date: Fri, 10 May 2019 10:46:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190509132913.GF10858@angien.pipo.sk>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20190509165912.10512-24-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Fri, 10 May 2019 08:47:00 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] Use of PreallocMode in block drivers
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v1 23/23] tests: Run the iotests during
+ "make check" again
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -85,80 +118,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
-	qemu-block@nongnu.org, qemu-devel@nongnu.org,
-	Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 09, 2019 at 03:29:13PM +0200, Peter Krempa wrote:
-> On Thu, May 09, 2019 at 10:26:46 +0200, Stefano Garzarella wrote:
-> > On Wed, May 08, 2019 at 01:44:27PM +0200, Markus Armbruster wrote:
-> > > Stefano Garzarella <sgarzare@redhat.com> writes:
-> > > 
-> > > > On Tue, May 07, 2019 at 08:34:51AM +0200, Markus Armbruster wrote:
-> > > >> Cc: Peter for a libvirt perspective.
-> > > >> 
-> > > >> Stefano Garzarella <sgarzare@redhat.com> writes:
-> > > >> 
-> > > >> > This patch adds the support of preallocation (off/full) for the RBD
-> > > >> > block driver.
-> > > >> > If available, we use rbd_writesame() to quickly fill the image when
-> > > >> > full preallocation is required.
-> > > >> >
-> > > >> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > > >> > ---
-> > > >> >  block/rbd.c          | 149 ++++++++++++++++++++++++++++++++++++++-----
-> > > >> >  qapi/block-core.json |   4 +-
-> > > >> >  2 files changed, 136 insertions(+), 17 deletions(-)
-> 
-> [...]
-> 
-> 
-> > > >> >  ##
-> > > >> >  # @BlockdevVmdkSubformat:
-> > > >> 
-> > > >> The non-support of values 'metadata' and 'falloc' is not visible in
-> > > >> introspection, only in documentation.  No reason to block this patch, as
-> > > >> the other block drivers have the same introspection weakness (only
-> > > >> sheepdog and vdi bother to document).
-> > > >> 
-> > > >> Should we address the introspection weakness?  Only if there's a use for
-> > > >> the information, I think.
-> > > >
-> > > > If the management applications will use that information (or maybe also
-> > > > our help pages), could be useful to have an array of 'PreallocMode'
-> > > > supported per-driver.
-> > > 
-> > > Ideally, query-qmp-schema would show only the supported values.
-> > > 
-> > > Not hard to do, just tedious: we'd get a number of sub-enums in addition
-> > > to the full one, and we'd have to map from sub-enum to the full one.
-> > > 
-> > > QAPI language support for sub-enums would remove most of the tedium.
-> > > Not worthwhile unless the need for sub-enums is actually common.
-> > 
-> > I should study better the QMP and QAPI to understand how to implement
-> > the sub-enums.
-> > 
-> > If you agree, I'll put it as a background task, until somebody from
-> > management applications tell us his interest.
-> 
-> Sorry for the late response. Libvirt currently does not deal that much
-> with the preallocation settings. Preallocation isn't in current state
-> implemented at all for 'blockdev-create' and only the 'metadata' and
-> 'falloc' modes are used in the storage driver via qemu-img.
-> 
-> We currently hardcode the knowledge for which formats actually support
-> it internally.
-> 
-> I'd say it's not criticall to expose this in the QMP schema but
-> obviously if we'll ever need to use it for a recent enough qemu it's
-> welcome to have a way to check.
+On 09/05/2019 18.59, Alex Benn=C3=A9e wrote:
+> From: Thomas Huth <thuth@redhat.com>
+>=20
+> People often forget to run the iotests before submitting patches or
+> pull requests - this is likely due to the fact that we do not run the
+> tests during our mandatory "make check" tests yet. Now that we've got
+> a proper "auto" group of iotests that should be fine to run in every
+> environment, we can enable the iotests during "make check" again by
+> running the "auto" tests by default from the check-block.sh script.
+>=20
+> Some cases still need to be checked first, though: iotests need bash
+> and GNU sed (otherwise they fail), and if gprof is enabled, it spoils
+> the output of some test cases causing them to fail. So if we detect
+> that one of the required programs is missing or that gprof is enabled,
+> we still have to skip the iotests to avoid failures.
+>=20
+> And finally, since we are using check-block.sh now again, this patch al=
+so
+> removes the qemu-iotests-quick.sh script since we do not need that anym=
+ore
+> (and having two shell wrapper scripts around the block tests seem
+> rather confusing than helpful).
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Message-Id: <20190502084506.8009-8-thuth@redhat.com>
+> [AJB: add -pretty to check-block.sh]
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  tests/Makefile.include      |  8 +++----
+>  tests/check-block.sh        | 44 ++++++++++++++++++++++++++++---------
+>  tests/qemu-iotests-quick.sh |  8 -------
+>  3 files changed, 38 insertions(+), 22 deletions(-)
+>  delete mode 100755 tests/qemu-iotests-quick.sh
+>=20
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 60de085ee1f..e865daaa897 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -140,7 +140,7 @@ check-unit-y +=3D tests/test-uuid$(EXESUF)
+>  check-unit-y +=3D tests/ptimer-test$(EXESUF)
+>  check-unit-y +=3D tests/test-qapi-util$(EXESUF)
+> =20
+> -check-block-$(CONFIG_POSIX) +=3D tests/qemu-iotests-quick.sh
+> +check-block-$(CONFIG_POSIX) +=3D tests/check-block.sh
+> =20
+>  # All QTests for now are POSIX-only, but the dependencies are
+>  # really in libqtest, not in the testcases themselves.
+> @@ -1077,8 +1077,8 @@ clean-tcg: $(CLEAN_TCG_TARGET_RULES)
+> =20
+>  QEMU_IOTESTS_HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) =3D=
+ tests/qemu-iotests/socket_scm_helper$(EXESUF)
+> =20
+> -.PHONY: check-tests/qemu-iotests-quick.sh
+> -check-tests/qemu-iotests-quick.sh: tests/qemu-iotests-quick.sh qemu-im=
+g$(EXESUF) qemu-io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y)
+> +.PHONY: check-tests/check-block.sh
+> +check-tests/check-block.sh: tests/check-block.sh qemu-img$(EXESUF) qem=
+u-io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y)
+>  	$<
+> =20
+>  .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
+> @@ -1152,7 +1152,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+>  check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check=
+-tests/qapi-schema/doc-good.texi
+>  check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+>  check-block: $(patsubst %,check-%, $(check-block-y))
+> -check: check-qapi-schema check-unit check-softfloat check-qtest check-=
+decodetree
+> +check: check-qapi-schema check-unit check-softfloat check-qtest check-=
+decodetree check-block
 
-Thank you for sharing this information!
+Could you please move "check-block" to the beginning of the list
+instead? I just noticed that the total runtime of "make check" will be
+shorter that way when running the tests in parallel with "-j...".
 
-Cheers,
-Stefano
+Reason: check-block is the test with the longest runtime. So if the
+other shorter tests are started first, they will occupy all CPUs for a
+short amount of time, and check-block will be running more or less alone
+in the end. Now if you start check-block first, it can run for the whole
+time, while the shorter tests are scheduled to the remaining CPU jobs
+instead.
+
+ Thomas
 
