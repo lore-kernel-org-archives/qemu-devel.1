@@ -2,72 +2,76 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BFB8C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:10:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C693AC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:13:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D9582070D
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:10:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D9582070D
+	by mail.kernel.org (Postfix) with ESMTPS id 8DBC42070D
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:13:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DBC42070D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46023 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46071 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP85z-0000Cn-JQ
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:10:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38478)
+	id 1hP89d-00025v-NM
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:13:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hP83b-0007P3-M9
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:07:36 -0400
+	(envelope-from <mst@redhat.com>) id 1hP88e-0001Cj-Nd
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:12:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hP83Z-0001R2-OH
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:07:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42320)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hP83U-0001KV-9p; Fri, 10 May 2019 12:07:29 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3CD9E3079B91;
-	Fri, 10 May 2019 16:07:26 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-183.ams2.redhat.com
-	[10.36.116.183])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 187D75ED2B;
-	Fri, 10 May 2019 16:07:18 +0000 (UTC)
-Date: Fri, 10 May 2019 18:07:17 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190510160717.GD5887@localhost.localdomain>
-References: <20190502084506.8009-1-thuth@redhat.com>
-	<20190502084506.8009-7-thuth@redhat.com>
-	<87ef5acsce.fsf@dusky.pond.sub.org>
-	<b53b7591-44fa-2982-6674-91137f69be63@redhat.com>
-	<3741b9b6-632a-b517-7533-818727ef75a7@redhat.com>
-	<44a3ebee-c717-d953-8e89-c24da99209a6@redhat.com>
-	<f39169a4-3916-9d1a-b3a5-b667e8775217@redhat.com>
-	<20190510142122.GC5887@localhost.localdomain>
-	<87d0kql449.fsf@dusky.pond.sub.org>
+	(envelope-from <mst@redhat.com>) id 1hP88d-0005dT-Fr
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:12:48 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:35926)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hP88d-0005cf-BS
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:12:47 -0400
+Received: by mail-qk1-f196.google.com with SMTP id c14so4011863qke.3
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 09:12:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:content-transfer-encoding
+	:in-reply-to;
+	bh=O9jWEPRSdNQojQ6Xbqh2HQtr0aZwZ7qiR3MYEcuQ0qQ=;
+	b=cF3j4n/mRd2kuzzYjedU9oNOSvmASr178nldb60fBKzZC2rEvHe5BvYmAdH06n4Dn/
+	WVYyBun18IFjfB+SmIQcVbBmjAC8X2HisouJbKoWMPdPz3NoQrybyvgraL7neEM041AA
+	E5Vj1s7i6faj4eO6sdDQbVieVBJD2DLM424AAYWuAA6XIibLr3WX0fmcckZq1AkvLKh8
+	sXWLCupRCc9g5aL3k1A2E0PegpBk4LQpe058BiqVYfNzfmJA+kccpuGBaTUv8a2CuTnC
+	qV3YBHDa7UvPxxy6zZMelwws7k5+BC3FWnTAJlk98LSK6zFdI/sFE0dNcBiPGSGkN1+t
+	41eA==
+X-Gm-Message-State: APjAAAWyXL8mIhLZryLiX/fqOyDyEnhEjH53tDvOPGLgcqPdDvvXfA72
+	iQuZu2/hwSVEK6lHFOxyPauDUw==
+X-Google-Smtp-Source: APXvYqyI9n2x66khrK9jdbnNtRaJCEEDGHd7I1/vtdoYldtJ6iNFG+etk1B1+S+Z+cm52f6jp2v0Jg==
+X-Received: by 2002:a37:49ce:: with SMTP id w197mr9272136qka.330.1557504765892;
+	Fri, 10 May 2019 09:12:45 -0700 (PDT)
+Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
+	[173.76.105.71]) by smtp.gmail.com with ESMTPSA id
+	n201sm2637506qka.10.2019.05.10.09.12.43
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Fri, 10 May 2019 09:12:44 -0700 (PDT)
+Date: Fri, 10 May 2019 12:12:41 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <20190510121135-mutt-send-email-mst@kernel.org>
+References: <20190510134203.24012-1-lvivier@redhat.com>
+	<20190510134203.24012-2-lvivier@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <87d0kql449.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Fri, 10 May 2019 16:07:26 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190510134203.24012-2-lvivier@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] tests/qemu-iotests/group: Re-use
- the "auto" group for tests that can always run
+	[fuzzy]
+X-Received-From: 209.85.222.196
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] VirtIO-RNG: Update default entropy
+ source to `/dev/urandom`
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,110 +83,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
-	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
-	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-	qemu-devel@nongnu.org, Christophe Fergeau <cfergeau@redhat.com>,
-	Max Reitz <mreitz@redhat.com>,
-	Wainer dos Santos Moschetta <wainersm@redhat.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
-	Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+	Amit Shah <amit@kernel.org>, Kashyap Chamarthy <kchamart@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+	"Richard W . M . Jones" <rjones@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 10.05.2019 um 17:29 hat Markus Armbruster geschrieben:
-> Kevin Wolf <kwolf@redhat.com> writes:
+On Fri, May 10, 2019 at 03:42:01PM +0200, Laurent Vivier wrote:
+> From: Kashyap Chamarthy <kchamart@redhat.com>
 > 
-> > Am 10.05.2019 um 10:55 hat Thomas Huth geschrieben:
-> >> On 08/05/2019 07.47, Thomas Huth wrote:
-> >> > On 07/05/2019 17.50, Eric Blake wrote:
-> >> >> On 5/7/19 10:22 AM, Thomas Huth wrote:
-> >> >>> On 07/05/2019 15.22, Markus Armbruster wrote:
-> >> >>>> Thomas Huth <thuth@redhat.com> writes:
-> >> >>>>
-> >> >>>>> Currently, all tests are in the "auto" group. This is a little bit pointless.
-> >> >>>>> OTOH, we need a group for the tests that we can automatically run during
-> >> >>>>> "make check" each time, too. Tests in this new group are supposed to run
-> >> >>>>> with every possible QEMU configuration, for example they must run with every
-> >> >>>>> QEMU binary (also non-x86), without failing when an optional features is
-> >> >>>>> missing (but reporting "skip" is ok), and be able to run on all kind of host
-> >> >>>>> filesystems and users (i.e. also as "nobody" or "root").
-> >> >>>>> So let's use the "auto" group for this class of tests now. The initial
-> >> >>>>> list has been determined by running the iotests with non-x86 QEMU targets
-> >> >>>>> and with our CI pipelines on Gitlab, Cirrus-CI and Travis (i.e. including
-> >> >>>>> macOS and FreeBSD).
-> >> >>>>
-> >> >>>> I wonder whether we should additionally limit "make check" to "quick"
-> >> >>>> tests.  How slow are the non-quick auto tests for you?
-> >> >>>
-> >> >>> I already sorted out some of the tests that run veeeery long, since the
-> >> >>> run time on gitlab, cirrus-ci and travis is limited. "make check-block"
-> >> >>> currently takes 3 minutes on my laptop, I think that's still ok?
-> >> >>>
-> >> >>> When I run the tests from the auto group that are not in the quick
-> >> >>> group, I currently get:
-> >> >>>
-> >> >>
-> >> >> My personal threshold is about 5 seconds for quick, so:
-> >> >>
-> >> >>> 003 1s ...
-> >> >>> 007 2s ...
-> >> >>
-> >> >> Should these be moved to quick?
-> >> > 
-> >> > I'll leave that decision up to the blocklayer folks ... I thought that
-> >> > there might have been a different reason that these have not been put
-> >> > into "quick" yet...?
-> >> > 
-> >> >>> 013 5s ...
-> >> >>
-> >> >> this one is borderline
-> >> >>
-> >> >>> 014 15s ...
-> >> >>> 015 9s ...
-> >> >>
-> >> >> Definitely not quick, but if you think they are still okay for auto, I
-> >> >> can live with that.
-> >> >>
-> >> >>> 022 1s ...
-> >> >>
-> >> >> Another candidate for quick?
-> >> >>
-> >> >>> 023 18s ...
-> >> >>
-> >> >> Even longer than 14. Okay for auto?
-> >> > 
-> >> > I think I'd give it a try. If people are complaining later that "make
-> >> > check" is running now way too long, we still can refine the list later.
-> >> 
-> >> Thinking about this again, "make check" now runs quite a bit longer
-> >> indeed. So I now rather tend to remove the tests that run longer than 5s
-> >> from the auto group instead... I think I'll send a v4 of this patch
-> >> where I'll remove them from the auto group.
-> >
-> > I don't think time is everything. We should also consider how much
-> > the tests contribute to basic code coverage. There is no point in
-> > removing a test from the list because it takes 10 seconds, but if I
-> > split it in two tests taking each 5 seconds, you would include both
-> > halves.
-> >
-> > For example, 030, 040 and 041 are not that quick (14/11/42 seconds,
-> > respectively), but they are the most important tests for block jobs and
-> > covering a lot. Sure, 42 seconds is a lot, but I'd keep 030 and 040 at
-> > least.
+> When QEMU exposes a VirtIO-RNG device to the guest, that device needs a
+> source of entropy, and that source needs to be "non-blocking", like
+> `/dev/urandom`.  However, currently QEMU defaults to the problematic
+> `/dev/random`, which is "blocking" (as in, it waits until sufficient
+> entropy is available).
 > 
-> Yes, we want block jobs covered.  However, 42 seconds is a lot indeed.
-> Can you think of ways to get a useful part of the full coverage in five
-> seconds or less?
+> Why prefer `/dev/urandom` over `/dev/random`?
+> ---------------------------------------------
+> 
+> The man pages of urandom(4) and random(4) state:
+> 
+>     "The /dev/random device is a legacy interface which dates back to a
+>     time where the cryptographic primitives used in the implementation
+>     of /dev/urandom were not widely trusted.  It will return random
+>     bytes only within the estimated number of bits of fresh noise in the
+>     entropy pool, blocking if necessary.  /dev/random is suitable for
+>     applications that need high quality randomness, and can afford
+>     indeterminate delays."
+> 
+> Further, the "Usage" section of the said man pages state:
+> 
+>     "The /dev/random interface is considered a legacy interface, and
+>     /dev/urandom is preferred and sufficient in all use cases, with the
+>     exception of applications which require randomness during early boot
+>     time; for these applications, getrandom(2) must be used instead,
+>     because it will block until the entropy pool is initialized.
 
-I'm not even sure which part of the test is taking so long. Maybe it's
-only one of the 88 test functions that's taking long. Or we're
-duplicating a lot of tests because we test all combinations of setups
-where testing only certain combinations would give enough coverage.
+So how about just using getrandom then?
 
-Answering this will probably take some effort checking what the exact
-cases tested are and how long each one takes.
-
-Kevin
+> 
+>     "If a seed file is saved across reboots as recommended below (all
+>     major Linux distributions have done this since 2000 at least), the
+>     output is cryptographically secure against attackers without local
+>     root access as soon as it is reloaded in the boot sequence, and
+>     perfectly adequate for network encryption session keys.  Since reads
+>     from /dev/random may block, users will usually want to open it in
+>     nonblocking mode (or perform a read with timeout), and provide some
+>     sort of user notification if the desired entropy is not immediately
+>     available."
+> 
+> And refer to random(7) for a comparison of `/dev/random` and
+> `/dev/urandom`.
+> 
+>     - - -
+> 
+> Given the above, change the entropy source for VirtIO-RNG device to
+> `/dev/urandom`.
+> 
+> Related discussion in these[1][2] past threads.
+> 
+> [1] https://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg08335.html
+>     -- "RNG: Any reason QEMU doesn't default to `/dev/urandom`?"
+> [2] https://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg02724.html
+>     -- "[RFC] Virtio RNG: Consider changing the default entropy source to
+>        /dev/urandom"
+> 
+> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+> Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
+>  backends/rng-random.c | 2 +-
+>  qemu-options.hx       | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/backends/rng-random.c b/backends/rng-random.c
+> index e2a49b0571d7..eff36ef14084 100644
+> --- a/backends/rng-random.c
+> +++ b/backends/rng-random.c
+> @@ -112,7 +112,7 @@ static void rng_random_init(Object *obj)
+>                              rng_random_set_filename,
+>                              NULL);
+>  
+> -    s->filename = g_strdup("/dev/random");
+> +    s->filename = g_strdup("/dev/urandom");
+>      s->fd = -1;
+>  }
+>  
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 0191ef8b1eb7..4df0ea3aed5c 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -4286,7 +4286,7 @@ Creates a random number generator backend which obtains entropy from
+>  a device on the host. The @option{id} parameter is a unique ID that
+>  will be used to reference this entropy backend from the @option{virtio-rng}
+>  device. The @option{filename} parameter specifies which file to obtain
+> -entropy from and if omitted defaults to @option{/dev/random}.
+> +entropy from and if omitted defaults to @option{/dev/urandom}.
+>  
+>  @item -object rng-egd,id=@var{id},chardev=@var{chardevid}
+>  
+> -- 
+> 2.20.1
 
