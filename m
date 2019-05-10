@@ -2,59 +2,110 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0030DC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 11:18:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 257C0C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 11:29:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5C9820989
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 11:18:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5C9820989
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kent.ac.uk
+	by mail.kernel.org (Postfix) with ESMTPS id EC4572177B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 11:29:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC4572177B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41400 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41496 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP3XY-0007se-1E
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 07:18:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36827)
+	id 1hP3iH-0003Si-V7
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 07:29:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <S.E.Harris@kent.ac.uk>) id 1hP3W3-0006y1-EE
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 07:16:40 -0400
+	(envelope-from <thuth@redhat.com>) id 1hP3hS-00037C-5a
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 07:28:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <S.E.Harris@kent.ac.uk>) id 1hP3W2-0001EW-6T
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 07:16:39 -0400
-Received: from mx4.kent.ac.uk ([129.12.21.35]:54593)
+	(envelope-from <thuth@redhat.com>) id 1hP3hR-0000Qr-BR
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 07:28:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46822)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <S.E.Harris@kent.ac.uk>)
-	id 1hP3W2-0001Bg-0B
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 07:16:38 -0400
-Received: from edue0c6.kent.ac.uk ([129.12.224.198] helo=cadance)
-	by mx4.kent.ac.uk with esmtpsa
-	(TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256) (Exim 4.91)
-	(envelope-from <S.E.Harris@kent.ac.uk>)
-	id 1hP3Vy-000EzI-HF; Fri, 10 May 2019 12:16:34 +0100
-Date: Fri, 10 May 2019 12:17:32 +0100
-From: Sarah Harris <S.E.Harris@kent.ac.uk>
-To: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20190510121732.de0aa4075bcf6962a7414054@kent.ac.uk>
-In-Reply-To: <CAK4993h0yCqpjBFzPy7GHt3kbSK43nLD6EXh4WFd_STHu15DTA@mail.gmail.com>
-References: <20190504083638.13380-1-S.E.Harris@kent.ac.uk>
-	<20190504083638.13380-9-S.E.Harris@kent.ac.uk>
-	<c05b4876-c55e-fd82-46d0-83be1b128cee@linaro.org>
-	<CAK4993h0yCqpjBFzPy7GHt3kbSK43nLD6EXh4WFd_STHu15DTA@mail.gmail.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.32; x86_64-unknown-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hP3hO-0000Pk-46; Fri, 10 May 2019 07:28:23 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 06DFF811DC;
+	Fri, 10 May 2019 11:28:21 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-72.ams2.redhat.com [10.36.116.72])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 500D4646B1;
+	Fri, 10 May 2019 11:28:19 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	qemu-devel@nongnu.org
+References: <20190510102918.2705-1-alex.bennee@linaro.org>
+	<55dd9cf4-cb06-48b1-0cec-ff03113c7c17@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
+	yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
+	4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
+	tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
+	0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
+	O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
+	0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
+	gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
+	3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
+	zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABzRxUaG9tYXMgSHV0
+	aCA8dGguaHV0aEBnbXguZGU+wsF7BBMBAgAlAhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIX
+	gAUCUfuWKwIZAQAKCRAu2dd0/nAttbe/EACb9hafyOb2FmhUqeAiBORSsUifFacQ7laVjcgR
+	I4um8CSHvxijYftpkM2EdAtmXIKgbNDpQoXcWLXB9lu9mLgTO4DVT00TRR65ikn3FCWcyT74
+	ENTOzRKyKLsDCjhXKPblTPIQbYAUCOWElcyAPm0ERd62fA/rKNxgIiNo/l4UODOMoOJm2/Ox
+	ZoTckW68Eqv7k9L7m7j+Hn3hoDTjAmcCBJt+j7pOhzWvCbqoNOIH8C8qvPaNlrba+R/K6jkO
+	6jZkTbYQpGIofEQJ/TNn38IsNGpI1ALTHWFtoMxp3j2Imz0REO6dRE2fHRN8sVlHgkoeGhmY
+	NbDsDE1jFQOEObFnu0euk//7BXU7tGOHckVAZ8T1smiRPHfQU7UEH2a/grndxJ+PNeM5w7n2
+	l+FN3cf2KgPotCK2s9MjSdZA7C5e3rFYO8lqiqTJKvc62vqp3e7B0Kjyy5/QtzSOejBij2QL
+	xkKSFNtxIz4MtuxN8e3IDQNxsKry3nF7R4MDvouXlMo6wP9KuyNWb+vFJt9GtbgfDMIFVamp
+	ZfhEWzWRJH4VgksENA4K/BzjEHCcbTUb1TFsiB1VRnBPJ0SqlvifnfKk6HcpkDk6Pg8Q5FOJ
+	gbNHrdgXsm+m/9GF2zUUr+rOlhVbK23TUqKqPfwnD7uxjpakVcJnsVCFqJpZi1F/ga9IN87B
+	TQRR+3lMARAAtp831HniPHb9AuKq3wj83ujZK8lH5RLrfVsB4X1wi47bwo56BqhXpR/zxPTR
+	eOFT0gnbw9UkphVc7uk/alnXMDEmgvnuxv89PwIQX6k3qLABeV7ykJQG/WT5HQ6+2DdGtVw3
+	2vjYAPiWQeETsgWRRQMDR0/hwp8s8tL/UodwYCScH6Vxx9pdy353L1fK4Bb9G73a+9FPjp9l
+	x+WwKTsltVqSBuSjyZQ3c3EE8qbTidXZxB38JwARH8yN3TX+t65cbBqLl/zRUUUTapHQpUEd
+	yoAsHIml32e4q+3xdLtTdlLi7FgPBItSazcqZPjEcYW73UAuLcmQmfJlQ5PkDiuqcitn+KzH
+	/1pqsTU7QFZjbmSMJyXY0TDErOFuMOjf20b6arcpEqse1V3IKrb+nqqA2azboRm3pEANLAJw
+	iVTwK3qwGRgK5ut6N/Znv20VEHkFUsRAZoOusrIRfR5HFDxlXguAdEz8M/hxXFYYXqOoaCYy
+	6pJxTjy0Y/tIfmS/g9Bnp8qg9wsrsnk0+XRnDVPak++G3Uq9tJPwpJbyO0vcqEI3vAXkAB7X
+	VXLzvFwi66RrsPUoDkuzj+aCNumtOePDOCpXQGPpKl+l1aYRMN/+lNSk3+1sVuc2C07WnYyE
+	gV/cbEVklPmKrNwu6DeUyD0qI/bVzKMWZAiB1r56hsGeyYcAEQEAAcLBXwQYAQIACQUCUft5
+	TAIbDAAKCRAu2dd0/nAttYTwEACLAS/THRqXRKb17PQmKwZHerUvZm2klo+lwQ3wNQBHUJAT
+	p2R9ULexyXrJPqjUpy7+voz+FcKiuQBTKyieiIxO46oMxsbXGZ70o3gxjxdYdgimUD6U8PPd
+	JH8tfAL4BR5FZNjspcnscN2jgbF4OrpDeOLyBaj6HPmElNPtECHWCaf1xbIFsZxSDGMA6cUh
+	0uX3Q8VI7JN1AR2cfiIRY7NrIlWYucJxyKjO3ivWm69nCtsHiJ0wcF8KlVo7F2eLaufo0K8A
+	ynL8SHMF3VEyxsXOP2f1UR9T2Ur30MXcTBpjUxml1TX3RWY5uH89Js/jlIugBwuAmacJ7JYh
+	lTg6sF/GNc4nPb4kk2yktNWTade+TzsllYlJPaorD2Qe8qX0iFUhFC6y9+O6mP4ZvWoYapp9
+	ezYNuebMgEr93ob1+4sFg3812wNP01WqsGtWCJHnPv/JoonFdMzD/bIkXGEJMk6ks2kxQQZq
+	g6Ik/s/vxOfao/xCn8nHt7GwvVy41795hzK6tbSl+BuyCRp0vfPRP34OnK7+jR2nvQpJu/pU
+	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
+	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
+Organization: Red Hat
+Message-ID: <b8b1c003-ed0d-d6f2-f970-9fb36165afb7@redhat.com>
+Date: Fri, 10 May 2019 13:28:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <55dd9cf4-cb06-48b1-0cec-ff03113c7c17@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.27]);
+	Fri, 10 May 2019 11:28:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 129.12.21.35
-Subject: Re: [Qemu-devel] [PATCH v1 8/8] target/avr: Register AVR support
- with the rest of QEMU, the build system, and the MAINTAINERS file
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3] tests/qemu-iotests: re-format output to
+ for make check-block
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,52 +117,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: E.J.C.Robbins@kent.ac.uk, Sarah Harris <S.E.Harris@kent.ac.uk>,
-	Michael Rolnik <mrolnik@gmail.com>,
-	QEMU Developers <qemu-devel@nongnu.org>, A.M.King@kent.ac.uk
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Richard,
-
-Having discussed with my colleagues, we don't have the resources to maintain this.
-If you wanted to take up Michael's offer then I'm happy to respond to queries and provide minor fixes.
-Otherwise, we will make our repository publicly available in the near future for anyone who wants to use it.
-
-Kind regards,
-Sarah Harris
-
-On Sun, 5 May 2019 09:10:00 -0700
-Michael Rolnik <mrolnik@gmail.com> wrote:
-
-> Hi Richard.
+On 10/05/2019 12.48, Thomas Huth wrote:
+[...]
 > 
-> I can maintain it
-> 
-> Sent from my cell phone, please ignore typos
-> 
-> On Sun, May 5, 2019, 8:57 AM Richard Henderson <richard.henderson@linaro.org>
-> wrote:
-> 
-> > On 5/4/19 1:36 AM, Sarah Harris wrote:
-> > > Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
-> > ...
-> > >
-> > > +AVR
-> > > +M: Michael Rolnik <mrolnik@gmail.com>
-> > > +S: Odd Fixes
-> > > +F: target-avr/
-> > > +F: hw/avr/
-> > > +
-> >
-> > This is not how things work.  Michael wasn't up to maintaining the code 2
-> > years
-> > ago; that's why it was never committed.
-> >
-> > You would need to maintain this yourself, and for more than "Odd Fixes".
-> >
-> >
-> > r~
-> >
+> I think the "make check" mode should only print out one time for each
+> test, preferable at the end, like the other tests (like qtests) are
+> doing it...?
+
+s/preferable at the end/preferably at the beginning/
+
+... I think the makefile rules for the other tests are printing out
+"  TEST xyz" *before* the test is started. And the iotests "check"
+script should do the same.
+
+ Thomas
+
+
 
