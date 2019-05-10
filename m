@@ -2,70 +2,62 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B559C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:54:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 101DDC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:54:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3C9520881
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:54:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3C9520881
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id DA0C920881
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:54:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA0C920881
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41037 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41039 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP3AY-0005oa-6t
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 06:54:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59560)
+	id 1hP3Al-0005yZ-2H
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 06:54:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hP32F-0007CF-3c
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:52 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hP333-0008Iu-SV
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:46:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hP32E-0003Xj-51
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:51 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:48533)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hP32D-0003Wz-T4
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:50 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
-	mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA
-	(Nemesis)
-	id 1MxYT3-1gVq0t3NyD-00xtYQ; Fri, 10 May 2019 12:45:43 +0200
-From: Laurent Vivier <laurent@vivier.eu>
+	(envelope-from <kraxel@redhat.com>) id 1hP332-00043d-M6
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:46:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41586)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hP332-000436-Ex
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:46:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BB163D77F2;
+	Fri, 10 May 2019 10:46:39 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
+	[10.36.117.74])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4209E646BB;
+	Fri, 10 May 2019 10:46:34 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id 65D16A1E4; Fri, 10 May 2019 12:46:33 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 12:45:31 +0200
-Message-Id: <20190510104536.17483-3-laurent@vivier.eu>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190510104536.17483-1-laurent@vivier.eu>
-References: <20190510104536.17483-1-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:B18h2bbB+DvXy/LsGfaQGDwqnqdRjV9ivPqai/M0fqd84uX/P47
-	jwYv/rOJRgznf2CrQR/vv5QmaMFSm6U8YhB3u0ms7w6p6WyUvspTWCNUzylrBnOWewi82rw
-	tKGIvSwr1+SRAROvHF1kB0Un78QHb1q+/VdO8e8/Zb6aDrqyP9Qczhp0wK71EQ4lAoPecXH
-	iBd8J0GYzVbrsyaNNMD6Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:IfQqvT2QTQk=:dxB6v6qyZjcCCBdsBN6crE
-	RsQkbGYXKbITCpSXR6oZhAZ0lHW5twErXvSyV6vPQN9eqpuVM4vBN3XnsjOpTvedYL8cMByOK
-	sGpAYLlt6KLtKDbI1YVySJTPm2Ru7vLSiNj8yUZYOVSOsp0WqwptTMPIhURsics4b/Hw5kWQ7
-	N92m4nUs5xiPKrvyMqjh8Qusa654rLLEAWBcCLmp25hq3PZMrGFWY4FtZ4Ae+7gbIiA67XNrm
-	zh2OQBvtb72DApweYlki5kpLbJxh2/17ySn1beHJjlT0BcP/aPQvVzttxH6x3h+zuGZ1KJDmI
-	kJHKR2sSLtnrVjFlwaA8bRaBZcBnkp9GKVlmETndhRjgt6b+i+ZO40v+GiWC916Li1/YhS5eh
-	XhBu2uVh9Z/0M7pkcHb1fTwG6yY84PV5U01a+abEjNrR97nC/ZI9QBeqFRCDTwsisszifcASo
-	qRT0fRmO61t5kNPr4c/yhIYnLzRZo2KM/g2NXgx2nq7h9r8TZiazZ7Qli2ejKGPXbBvYqea5S
-	DVzlAQhU7sQe0wmMcXhmmlOpWvuDR+B4scgQdy40MbFnjTTslGBzHAVo2WfkOvZACWuzxkfvm
-	sbU0PGgvdnSN2ONHcA+3/aT/xraMWLVIf7NwdU0G17D4R7s66iXnrdkW/2FIunCgEq/HdbqQu
-	4IUFTnV+V1pOhOAspMwGcNVkWHsRGYXk5jGEDbzSPcPbmu9nX5ohqlapDw2r/eS9s3/GV35jQ
-	pcybh9ZS9wbnGziBFmw5HEpTMtepQl3RQevUqjbfKOShRF5b2+Lgqt/ThuU=
+Date: Fri, 10 May 2019 12:46:21 +0200
+Message-Id: <20190510104633.9428-2-kraxel@redhat.com>
+In-Reply-To: <20190510104633.9428-1-kraxel@redhat.com>
+References: <20190510104633.9428-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.38]);
+	Fri, 10 May 2019 10:46:39 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.134
-Subject: [Qemu-devel] [PULL v2 2/7] linux-user/elfload: Fix GCC 9 build
- warnings
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 01/13] scripts: use git archive in
+ archive-source
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,48 +69,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
-	Riku Voipio <riku.voipio@iki.fi>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Laurent Vivier <laurent@vivier.eu>
+Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alistair Francis <Alistair.Francis@wdc.com>
+Use git archive to create tarballs of qemu and submodules instead of
+cloning the repository and the submodules.  This is a order of magnitude
+faster because it doesn't fetch the submodules from the internet each
+time the script runs.
 
-Fix this warning when building with GCC9 on Fedora 30:
-In function ‘strncpy’,
-    inlined from ‘fill_psinfo’ at /home/alistair/qemu/linux-user/elfload.c:3208:12,
-    inlined from ‘fill_note_info’ at /home/alistair/qemu/linux-user/elfload.c:3390:5,
-    inlined from ‘elf_core_dump’ at /home/alistair/qemu/linux-user/elfload.c:3539:9:
-/usr/include/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ specified bound 16 equals destination size [-Werror=stringop-truncation]
-  106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
-      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <c4d2b1de9efadcf1c900b91361af9302823a72a9.1556666645.git.alistair.francis@wdc.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- linux-user/elfload.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/archive-source.sh | 72 +++++++++++++++++----------------------
+ 1 file changed, 31 insertions(+), 41 deletions(-)
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index c1a26021f8d7..d08fe2346683 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2872,7 +2872,7 @@ struct target_elf_prpsinfo {
-     target_gid_t pr_gid;
-     target_pid_t pr_pid, pr_ppid, pr_pgrp, pr_sid;
-     /* Lots missing */
--    char    pr_fname[16];           /* filename of executable */
-+    char    pr_fname[16] QEMU_NONSTRING; /* filename of executable */
-     char    pr_psargs[ELF_PRARGSZ]; /* initial part of arg list */
- };
+diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
+index 8b8994826000..93a48d2063f9 100755
+--- a/scripts/archive-source.sh
++++ b/scripts/archive-source.sh
+@@ -19,16 +19,25 @@ if test $# -lt 1; then
+ fi
  
+ tar_file=$(realpath "$1")
+-list_file="${tar_file}.list"
+-vroot_dir="${tar_file}.vroot"
++sub_tdir=$(mktemp -d "${tar_file%.tar}.sub.XXXXXXXX")
++sub_file="${sub_tdir}/submodule.tar"
+ 
+ # We want a predictable list of submodules for builds, that is
+ # independent of what the developer currently has initialized
+ # in their checkout, because the build environment is completely
+ # different to the host OS.
+ submodules="dtc slirp ui/keycodemapdb tests/fp/berkeley-softfloat-3 tests/fp/berkeley-testfloat-3"
++sub_deinit=""
+ 
+-trap "status=$?; rm -rf \"$list_file\" \"$vroot_dir\"; exit \$status" 0 1 2 3 15
++function cleanup() {
++    local status=$?
++    rm -rf "$sub_tdir"
++    if test "$sub_deinit" != ""; then
++	git submodule deinit $sub_deinit
++    fi
++    exit $status
++}
++trap "cleanup" 0 1 2 3 15
+ 
+ if git diff-index --quiet HEAD -- &>/dev/null
+ then
+@@ -36,45 +45,26 @@ then
+ else
+     HEAD=$(git stash create)
+ fi
+-git clone --shared . "$vroot_dir"
+-test $? -ne 0 && error "failed to clone into '$vroot_dir'"
+-for sm in $submodules; do
+-    if test -d "$sm/.git"
+-    then
+-       git clone --shared "$sm" "$vroot_dir/$sm"
+-       test $? -ne 0 && error "failed to clone submodule $sm"
+-    fi
+-done
+-
+-cd "$vroot_dir"
+-test $? -ne 0 && error "failed to change into '$vroot_dir'"
+-
+-git checkout $HEAD
+-test $? -ne 0 && error "failed to checkout $HEAD revision"
+ 
++git archive --format tar $HEAD > "$tar_file"
++test $? -ne 0 && error "failed to archive qemu"
+ for sm in $submodules; do
+-    git submodule update --init $sm
+-    test $? -ne 0 && error "failed to init submodule $sm"
++    status="$(git submodule status "$sm")"
++    smhash="${status#[ +-]}"
++    smhash="${smhash%% *}"
++    case "$status" in
++	-*)
++	    sub_deinit="$sub_deinit $sm"
++	    git submodule update --init "$sm"
++	    test $? -ne 0 && error "failed to update submodule $sm"
++	    ;;
++	+*)
++	    echo "WARNING: submodule $sm is out of sync"
++	    ;;
++    esac
++    (cd $sm; git archive --format tar --prefix "$sm/" $smhash) > "$sub_file"
++    test $? -ne 0 && error "failed to archive submodule $sm ($smhash)"
++    tar --concatenate --file "$tar_file" "$sub_file"
++    test $? -ne 0 && error "failed append submodule $sm to $tar_file"
+ done
+-
+-if test -n "$submodules"; then
+-    {
+-        git ls-files || error "git ls-files failed"
+-        for sm in $submodules; do
+-            (cd $sm; git ls-files) | sed "s:^:$sm/:"
+-            if test "${PIPESTATUS[*]}" != "0 0"; then
+-                error "git ls-files in submodule $sm failed"
+-            fi
+-        done
+-    } | grep -x -v $(for sm in $submodules; do echo "-e $sm"; done) > "$list_file"
+-else
+-    git ls-files > "$list_file"
+-fi
+-
+-if test $? -ne 0; then
+-    error "failed to generate list file"
+-fi
+-
+-tar -cf "$tar_file" -T "$list_file" || error "failed to create tar file"
+-
+ exit 0
 -- 
-2.20.1
+2.18.1
 
 
