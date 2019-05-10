@@ -2,59 +2,83 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B5FBC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22598C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:24:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41D362177B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:22:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41D362177B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CBAAA2053B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:24:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wRHDNs9M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBAAA2053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45001 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45026 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP7ML-0001Oc-DK
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 11:22:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55415)
+	id 1hP7O4-0003RD-0c
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 11:24:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hP7HK-00062k-4M
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:17:43 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hP7JV-0007St-Ca
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:19:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hP7HJ-0006LD-3l
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:17:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45596)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hP7HG-0006Ik-Tc; Fri, 10 May 2019 11:17:39 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 40B5180F6D;
-	Fri, 10 May 2019 15:17:38 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A19051001E86;
-	Fri, 10 May 2019 15:17:37 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hP7JU-0008Oh-2Q
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:19:57 -0400
+Received: from mail-pl1-x632.google.com ([2607:f8b0:4864:20::632]:35855)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hP7JT-0008My-SK
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:19:56 -0400
+Received: by mail-pl1-x632.google.com with SMTP id d21so3002737plr.3
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 08:19:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=s87CuOmfhyfGLXIPM91Iv48ElcI94bqoXpVc6e0DK1o=;
+	b=wRHDNs9M8gJ4f3SIGelLWIcpVo0JF7TP9xoi97E4O+rS4EdcreMwqicJKIK/KUZz1w
+	Bh51hKNPKPPzUzX70dTM6bAOOlymFTNS6dpndAM/UhKdlaEQ+MRKrtLzA5UvvUBAesXQ
+	qfgi7ML1Y4lSUDcVJC6hQXS731VOgEUkc0zuMHG3X9JjvUZuN0Rf4xYDtdZmlZ9cFd/y
+	ndwYXzytYLp6tmtwMF8bAP6u0WOUGpkmaWc66m0rOffQQMy5HMp0+knmpfISo85JH1xz
+	JKJxZFKbVTo8ctCj19s7OzzYO4WPDahWINAi/dcN/L3qbR1aaqhLn/SAszzAoHuoazS1
+	6QXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=s87CuOmfhyfGLXIPM91Iv48ElcI94bqoXpVc6e0DK1o=;
+	b=Hzw1dBHjOO0XC9pM0mx4zXQb3a8+3Xkdf//1p8PCY68iv3JORFhhiqNefpeSk8S+N/
+	kYddEMRcn1ee0uq8BZKQwzZ5YEid2gAhDYHapdt/5FJl1KNKT2TtK2d+Cz9GDcjG80eN
+	+r1TROAiUlrGd3QKX6SRsJFRqnc3mWnKOSbJ3wIIuPfhpWdCzpVuhPgSI5PObxV98VEM
+	qdL8aawh7ItxSMw/glD7IM3RIosAfd/MhvjYduvuYn2RQDUJ3bgcU/5OI4FYhMJdcHh3
+	4yAgQyNzI+q/HMbdKE2RD5UMYWUKQKT8kWh5FupOBqwo3eWW/F6ZluRmXWqTzEgunE8f
+	H7mw==
+X-Gm-Message-State: APjAAAVPnWohhL4Tcf3+wdauzkEboS719aww+8CCbL1bjhGA0IYwb7gP
+	LJDVQTR6mzER0sqLc16Kjce2ygMivUk=
+X-Google-Smtp-Source: APXvYqzYDf6vEGvZWPBEx4IKu2Qln7cuP4OSey/yPIUVPVBjFwbETpUH7kVNTfNIpYb8gRpwyxXZ6A==
+X-Received: by 2002:a17:902:8698:: with SMTP id
+	g24mr14293071plo.151.1557501594578; 
+	Fri, 10 May 2019 08:19:54 -0700 (PDT)
+Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
+	[97.113.13.231])
+	by smtp.gmail.com with ESMTPSA id 19sm5920517pgz.24.2019.05.10.08.19.53
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 10 May 2019 08:19:53 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 10:17:35 -0500
-Message-Id: <20190510151735.29687-1-eblake@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Fri, 10 May 2019 15:17:38 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] nbd/server: Nicer spelling of max BLOCK_STATUS
- reply length
+Date: Fri, 10 May 2019 08:19:23 -0700
+Message-Id: <20190510151944.22981-7-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190510151944.22981-1-richard.henderson@linaro.org>
+References: <20190510151944.22981-1-richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::632
+Subject: [Qemu-devel] [PULL 06/27] target/i386: Convert to CPUClass::tlb_fill
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,78 +90,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com,
-	"open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: peter.maydell@linaro.org, Eduardo Habkost <ehabkost@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit 3d068aff (3.0) introduced NBD_MAX_BITMAP_EXTENTS as a limit on
-how large we would allow a reply to NBD_CMD_BLOCK_STATUS to grow when
-it is visiting a qemu:dirty-bitmap: context.  Later, commit fb7afc79
-(3.1) reused the constant to limit base:allocation context replies,
-although the name is now less appropriate in that situation.
+We do not support probing, but we do not need it yet either.
 
-Rename things, and improve the macro to use units.h for better
-legibility. Then reformat the comment to comply with checkpatch rules
-added in the meantime. No semantic change.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- nbd/server.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ target/i386/cpu.h         |  5 ++--
+ target/i386/cpu.c         |  5 ++--
+ target/i386/excp_helper.c | 61 +++++++++++++++++++++++++--------------
+ target/i386/mem_helper.c  | 21 --------------
+ 4 files changed, 44 insertions(+), 48 deletions(-)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index e21bd501dc6..2c49744fc43 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -21,15 +21,18 @@
- #include "qapi/error.h"
- #include "trace.h"
- #include "nbd-internal.h"
-+#include "qemu/units.h"
-
- #define NBD_META_ID_BASE_ALLOCATION 0
- #define NBD_META_ID_DIRTY_BITMAP 1
-
--/* NBD_MAX_BITMAP_EXTENTS: 1 mb of extents data. An empirical
-+/*
-+ * NBD_MAX_BLOCK_STATUS_EXTENTS: 1 mb of extents data. An empirical
-  * constant. If an increase is needed, note that the NBD protocol
-  * recommends no larger than 32 mb, so that the client won't consider
-- * the reply as a denial of service attack. */
--#define NBD_MAX_BITMAP_EXTENTS (0x100000 / 8)
-+ * the reply as a denial of service attack.
-+ */
-+#define NBD_MAX_BLOCK_STATUS_EXTENTS (1 * MiB / 8)
-
- static int system_errno_to_nbd_errno(int err)
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 0128910661..fce6660bac 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1656,8 +1656,9 @@ void host_cpuid(uint32_t function, uint32_t count,
+ void host_vendor_fms(char *vendor, int *family, int *model, int *stepping);
+ 
+ /* helper.c */
+-int x86_cpu_handle_mmu_fault(CPUState *cpu, vaddr addr, int size,
+-                             int is_write, int mmu_idx);
++bool x86_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                      MMUAccessType access_type, int mmu_idx,
++                      bool probe, uintptr_t retaddr);
+ void x86_cpu_set_a20(X86CPU *cpu, int a20_state);
+ 
+ #ifndef CONFIG_USER_ONLY
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 722c5514d4..3c98869577 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5915,9 +5915,8 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+     cc->gdb_write_register = x86_cpu_gdb_write_register;
+     cc->get_arch_id = x86_cpu_get_arch_id;
+     cc->get_paging_enabled = x86_cpu_get_paging_enabled;
+-#ifdef CONFIG_USER_ONLY
+-    cc->handle_mmu_fault = x86_cpu_handle_mmu_fault;
+-#else
++    cc->tlb_fill = x86_cpu_tlb_fill;
++#ifndef CONFIG_USER_ONLY
+     cc->asidx_from_attrs = x86_asidx_from_attrs;
+     cc->get_memory_mapping = x86_cpu_get_memory_mapping;
+     cc->get_phys_page_debug = x86_cpu_get_phys_page_debug;
+diff --git a/target/i386/excp_helper.c b/target/i386/excp_helper.c
+index 49231f6b69..68bf8e3f7c 100644
+--- a/target/i386/excp_helper.c
++++ b/target/i386/excp_helper.c
+@@ -137,26 +137,7 @@ void raise_exception_ra(CPUX86State *env, int exception_index, uintptr_t retaddr
+     raise_interrupt2(env, exception_index, 0, 0, 0, retaddr);
+ }
+ 
+-#if defined(CONFIG_USER_ONLY)
+-int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+-                             int is_write, int mmu_idx)
+-{
+-    X86CPU *cpu = X86_CPU(cs);
+-    CPUX86State *env = &cpu->env;
+-
+-    /* user mode only emulation */
+-    is_write &= 1;
+-    env->cr[2] = addr;
+-    env->error_code = (is_write << PG_ERROR_W_BIT);
+-    env->error_code |= PG_ERROR_U_MASK;
+-    cs->exception_index = EXCP0E_PAGE;
+-    env->exception_is_int = 0;
+-    env->exception_next_eip = -1;
+-    return 1;
+-}
+-
+-#else
+-
++#if !defined(CONFIG_USER_ONLY)
+ static hwaddr get_hphys(CPUState *cs, hwaddr gphys, MMUAccessType access_type,
+                         int *prot)
  {
-@@ -1958,7 +1961,7 @@ static int nbd_co_send_block_status(NBDClient *clie=
-nt, uint64_t handle,
-                                     Error **errp)
+@@ -365,8 +346,8 @@ static hwaddr get_hphys(CPUState *cs, hwaddr gphys, MMUAccessType access_type,
+  * 0  = nothing more to do
+  * 1  = generate PF fault
+  */
+-int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+-                             int is_write1, int mmu_idx)
++static int handle_mmu_fault(CPUState *cs, vaddr addr, int size,
++                            int is_write1, int mmu_idx)
  {
-     int ret;
--    unsigned int nb_extents =3D dont_fragment ? 1 : NBD_MAX_BITMAP_EXTEN=
-TS;
-+    unsigned int nb_extents =3D dont_fragment ? 1 : NBD_MAX_BLOCK_STATUS=
-_EXTENTS;
-     NBDExtent *extents =3D g_new(NBDExtent, nb_extents);
-     uint64_t final_length =3D length;
-
-@@ -2043,7 +2046,7 @@ static int nbd_co_send_bitmap(NBDClient *client, ui=
-nt64_t handle,
-                               uint32_t context_id, Error **errp)
- {
-     int ret;
--    unsigned int nb_extents =3D dont_fragment ? 1 : NBD_MAX_BITMAP_EXTEN=
-TS;
-+    unsigned int nb_extents =3D dont_fragment ? 1 : NBD_MAX_BLOCK_STATUS=
-_EXTENTS;
-     NBDExtent *extents =3D g_new(NBDExtent, nb_extents);
-     uint64_t final_length =3D length;
-
---=20
-2.20.1
+     X86CPU *cpu = X86_CPU(cs);
+     CPUX86State *env = &cpu->env;
+@@ -691,3 +672,39 @@ do_check_protect_pse36:
+     return 1;
+ }
+ #endif
++
++bool x86_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
++                      MMUAccessType access_type, int mmu_idx,
++                      bool probe, uintptr_t retaddr)
++{
++    X86CPU *cpu = X86_CPU(cs);
++    CPUX86State *env = &cpu->env;
++
++#ifdef CONFIG_USER_ONLY
++    /* user mode only emulation */
++    env->cr[2] = addr;
++    env->error_code = (access_type == MMU_DATA_STORE) << PG_ERROR_W_BIT;
++    env->error_code |= PG_ERROR_U_MASK;
++    cs->exception_index = EXCP0E_PAGE;
++    env->exception_is_int = 0;
++    env->exception_next_eip = -1;
++    cpu_loop_exit_restore(cs, retaddr);
++#else
++    env->retaddr = retaddr;
++    if (handle_mmu_fault(cs, addr, size, access_type, mmu_idx)) {
++        /* FIXME: On error in get_hphys we have already jumped out.  */
++        g_assert(!probe);
++        raise_exception_err_ra(env, cs->exception_index,
++                               env->error_code, retaddr);
++    }
++    return true;
++#endif
++}
++
++#if !defined(CONFIG_USER_ONLY)
++void tlb_fill(CPUState *cs, target_ulong addr, int size,
++              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
++{
++    x86_cpu_tlb_fill(cs, addr, size, access_type, mmu_idx, false, retaddr);
++}
++#endif
+diff --git a/target/i386/mem_helper.c b/target/i386/mem_helper.c
+index 6cc53bcb40..1885df29d2 100644
+--- a/target/i386/mem_helper.c
++++ b/target/i386/mem_helper.c
+@@ -191,24 +191,3 @@ void helper_boundl(CPUX86State *env, target_ulong a0, int v)
+         raise_exception_ra(env, EXCP05_BOUND, GETPC());
+     }
+ }
+-
+-#if !defined(CONFIG_USER_ONLY)
+-/* try to fill the TLB and return an exception if error. If retaddr is
+- * NULL, it means that the function was called in C code (i.e. not
+- * from generated code or from helper.c)
+- */
+-/* XXX: fix it to restore all registers */
+-void tlb_fill(CPUState *cs, target_ulong addr, int size,
+-              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
+-{
+-    X86CPU *cpu = X86_CPU(cs);
+-    CPUX86State *env = &cpu->env;
+-    int ret;
+-
+-    env->retaddr = retaddr;
+-    ret = x86_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
+-    if (ret) {
+-        raise_exception_err_ra(env, cs->exception_index, env->error_code, retaddr);
+-    }
+-}
+-#endif
+-- 
+2.17.1
 
 
