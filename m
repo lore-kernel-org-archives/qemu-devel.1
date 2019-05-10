@@ -2,62 +2,82 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A780C04AB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 00:57:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A7B3C04AB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 01:13:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CA5E2173B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 00:57:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CA5E2173B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4B6D12175B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 01:13:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R1QIfPr7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B6D12175B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34792 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34894 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOtqr-0008Ob-76
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 20:57:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55290)
+	id 1hOu5w-00038C-7w
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 21:13:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hOtq4-00085s-Mh
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 20:56:41 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1hOu54-0002hX-Ox
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 21:12:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hOtq3-00072z-Gp
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 20:56:40 -0400
-Received: from mga18.intel.com ([134.134.136.126]:7350)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <like.xu@linux.intel.com>)
-	id 1hOtq3-00063F-8Z
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 20:56:39 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-	by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	09 May 2019 17:55:31 -0700
-Received: from unknown (HELO [10.239.196.183]) ([10.239.196.183])
-	by orsmga008-auth.jf.intel.com with ESMTP/TLS/AES256-SHA;
-	09 May 2019 17:55:28 -0700
-From: Like Xu <like.xu@linux.intel.com>
-To: qemu-devel@nongnu.org
-References: <1557131596-25403-1-git-send-email-like.xu@linux.intel.com>
-Organization: Intel OTC
-Message-ID: <1faa2ddf-2a52-07e7-00e3-ab1959d304f9@linux.intel.com>
-Date: Fri, 10 May 2019 08:55:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <liq3ea@gmail.com>) id 1hOu52-0001Un-BI
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 21:12:10 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38195)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hOu51-0001UH-Vz
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 21:12:08 -0400
+Received: by mail-oi1-x244.google.com with SMTP id u199so3376454oie.5
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 18:12:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=EGuxRRu7B8lpqvtk+XV624WlTyzXWDItZRHnjrpiXMg=;
+	b=R1QIfPr7bcsNnQrjnPToSJx7ADujyXSuFxEZ+e1PgnCXQ6a88koG/MskWYFREC4+ML
+	twYcu2y46C7C0duv0vUObyL3LCkhFnZYG+jfJ7G3uMmn8fY0Z1+Fbl7fEsNuxehYUgwo
+	Z4PDPwOZmjEc86XwxN5g3Pxh5goJHOl0bsP3Oaqtn6ndQqzbK2yEztR1HX9sIYtxi3JA
+	vyscUEelI6U9gmfhfYQ+2GYxb6Z6UxPd5C+Ng1BTwLr97nrqMe5YlMjwrFoUF87McskH
+	VLSjRGBRQpzzEmvwtsVdPoy0vRFhGlD66I9/OMg46weIy3qZyegvynT7ffXfLNQ8BkDV
+	EMkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=EGuxRRu7B8lpqvtk+XV624WlTyzXWDItZRHnjrpiXMg=;
+	b=c53BKbn0GHnXVDw/Vi6xK4Vi7CgZ+MR56U7HR0Zkek96lJrcWNPRJ9Aa91rmxreXIm
+	zYyX6ouP0G8hpJ+v/z/kpE7gRmXXbnrgT/z7F5arSQ9kNc9lsuZH6s2lTRhuQC8P0/yI
+	LiLCpU/WiwiuUtwxd0qFUHNN5sJSSsUCptKtiMwXrKwc+rPJU7RM+/TiZrSs/uMoQT07
+	VzWQeyr8HuD0VokWDk/yRP8v1aZ4uo2ZUnE1F1BII+pX2NOMhzWElAGTH6VYp/l181Rm
+	84aIg0XG93Z362iSBi41xxsIFW13hxOWbm0bXKmdJHKipBJnck1Uomyyz9oTfDyGHe+4
+	3cng==
+X-Gm-Message-State: APjAAAUfoOaaAPfhkCYoDglb83L/T29JDDzSXn2QSWDjWd5lv2rp6/qi
+	196NaIUPraMzfY18yiv5R2MfyGSeU0NxjrXabiw=
+X-Google-Smtp-Source: APXvYqxEUaqfL8cBgs2te+0PKl+WPXUpIByhKqV8Q+3XBXNO5uc3YR00RXnmWfqjITK4NiDYdWoHfiW7zM+iJMmX07k=
+X-Received: by 2002:aca:fd45:: with SMTP id b66mr1740228oii.157.1557450726668; 
+	Thu, 09 May 2019 18:12:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1557131596-25403-1-git-send-email-like.xu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190509121820.16294-1-stefanha@redhat.com>
+	<20190509121820.16294-2-stefanha@redhat.com>
+In-Reply-To: <20190509121820.16294-2-stefanha@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Fri, 10 May 2019 09:11:30 +0800
+Message-ID: <CAKXe6SL9SUhV-kpQj5rFtVZp+8x4ggWhbDSvg1Ee-xztym--=w@mail.gmail.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 134.134.136.126
-Subject: Re: [Qemu-devel] [PATCH v2 00/10] refactor cpu topo into machine
- properties
+X-Received-From: 2607:f8b0:4864:20::244
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] docs: add Secure Coding Practices
+ to developer docs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,116 +90,205 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Alistair Francis <alistair23@gmail.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Richard Henderson <rth@twiddle.net>
+	Stefano Garzarella <sgarzare@redhat.com>,
+	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+	Qemu Developers <qemu-devel@nongnu.org>,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019/5/6 16:33, Like Xu wrote:
-> This patch series make existing cores/threads/sockets into machine
-> properties and get rid of global smp_* variables they use currently.
-> 
-> The purpose of getting rid of globals is disentangle layer violations and
-> let's do it one step at a time by replacing the smp_foo with qdev_get_machine()
-> as few calls as possible and delay other related refactoring efforts.
-> 
+Stefan Hajnoczi <stefanha@redhat.com> =E4=BA=8E2019=E5=B9=B45=E6=9C=889=E6=
+=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=888:20=E5=86=99=E9=81=93=EF=BC=9A
 
-It looks like the changelog is missing and here it is:
+> At KVM Forum 2018 I gave a presentation on security in QEMU:
+> https://www.youtube.com/watch?v=3DYAdRf_hwxU8 (video)
+> https://vmsplice.net/~stefan/stefanha-kvm-forum-2018.pdf (slides)
+>
+> This patch adds a guide to secure coding practices.  This document
+> covers things that developers should know about security in QEMU.  It is
+> just a starting point that we can expand on later.  I hope it will be
+> useful as a resource for new contributors and will save code reviewers
+> from explaining the same concepts many times.
+>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
 
-==changelog==
-
-v2:
-- pass MachineState via call chain with trivial fixups
-- replace smp_cpus directly at places if it's only used once
-- s/topo/smp/ and drop smp_ prefix inside CpuTopology structure
-- add more commit messages to explaining what patch does
-- fix Patchew build failure for xen usage
-- use macs rather than ms in migration context for MigrationState
-- cleanup unrelated and redundant changes
-- spilt OpenRISC and RISC-V related patches
-
-v1: https://patchwork.kernel.org/cover/10876667/
-
-> Like Xu (10):
->    hw/boards: add struct CpuTopology to MachineState
->    cpu/topology: related call chains refactoring to pass MachineState
->    cpu/topology: replace global smp variables by MachineState in general path
->    cpu/topology: add uncommon arch support for smp machine properties
->    cpu/topology: add hw/ppc support for smp machine properties
->    cpu/topology: add hw/riscv support for smp machine properties
->    cpu/topology: add hw/s390x support for smp machine properties
->    cpu/topology: add hw/i386 support for smp machine properties
->    cpu/topology: add hw/arm support for smp machine properties
->    cpu/topology: replace smp global variables with smp machine properties
-> 
->   accel/kvm/kvm-all.c          |  4 ++--
->   backends/hostmem.c           |  6 ++++--
->   cpus.c                       |  6 ++++--
->   exec.c                       |  3 ++-
->   gdbstub.c                    |  4 ++++
->   hw/alpha/dp264.c             |  1 +
->   hw/arm/fsl-imx6.c            |  6 +++++-
->   hw/arm/fsl-imx6ul.c          |  6 +++++-
->   hw/arm/fsl-imx7.c            |  7 +++++--
->   hw/arm/highbank.c            |  1 +
->   hw/arm/mcimx6ul-evk.c        |  2 +-
->   hw/arm/mcimx7d-sabre.c       |  2 +-
->   hw/arm/raspi.c               |  4 ++--
->   hw/arm/realview.c            |  1 +
->   hw/arm/sabrelite.c           |  2 +-
->   hw/arm/vexpress.c            | 16 ++++++++------
->   hw/arm/virt.c                | 10 +++++++--
->   hw/arm/xlnx-zynqmp.c         | 16 ++++++++------
->   hw/cpu/core.c                |  4 +++-
->   hw/hppa/machine.c            |  4 +++-
->   hw/i386/acpi-build.c         | 13 +++++++-----
->   hw/i386/kvmvapic.c           |  7 +++++--
->   hw/i386/pc.c                 | 33 ++++++++++++++++-------------
->   hw/i386/xen/xen-hvm.c        |  4 ++++
->   hw/mips/boston.c             |  2 +-
->   hw/mips/mips_malta.c         | 23 +++++++++++---------
->   hw/openrisc/openrisc_sim.c   |  1 +
->   hw/ppc/e500.c                |  3 +++
->   hw/ppc/mac_newworld.c        |  3 ++-
->   hw/ppc/mac_oldworld.c        |  3 ++-
->   hw/ppc/pnv.c                 |  9 ++++----
->   hw/ppc/prep.c                |  4 ++--
->   hw/ppc/spapr.c               | 37 +++++++++++++++++++++++---------
->   hw/ppc/spapr_rtas.c          |  4 +++-
->   hw/riscv/sifive_e.c          |  6 ++++--
->   hw/riscv/sifive_plic.c       |  3 +++
->   hw/riscv/sifive_u.c          |  6 ++++--
->   hw/riscv/spike.c             |  2 ++
->   hw/riscv/virt.c              |  1 +
->   hw/s390x/s390-virtio-ccw.c   |  9 ++++----
->   hw/s390x/sclp.c              |  2 +-
->   hw/smbios/smbios.c           | 26 +++++++++++++----------
->   hw/sparc/sun4m.c             |  2 ++
->   hw/sparc64/sun4u.c           |  4 ++--
->   hw/xtensa/sim.c              |  2 +-
->   hw/xtensa/xtfpga.c           |  1 +
->   include/hw/boards.h          | 19 +++++++++++++++--
->   include/hw/firmware/smbios.h |  5 +++--
->   include/hw/i386/pc.h         |  2 +-
->   migration/postcopy-ram.c     |  8 ++++++-
->   numa.c                       |  1 +
->   qmp.c                        |  2 +-
->   target/arm/cpu.c             |  8 ++++++-
->   target/i386/cpu.c            |  4 +++-
->   target/openrisc/sys_helper.c |  6 +++++-
->   target/s390x/cpu.c           |  3 +++
->   target/s390x/excp_helper.c   |  5 +++++
->   tcg/tcg.c                    | 13 +++++++++++-
->   vl.c                         | 50 ++++++++++++++++++++++++--------------------
->   59 files changed, 301 insertions(+), 140 deletions(-)
-> 
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
 
+
+
+> ---
+>  docs/devel/index.rst                   |   1 +
+>  docs/devel/secure-coding-practices.rst | 106 +++++++++++++++++++++++++
+>  2 files changed, 107 insertions(+)
+>  create mode 100644 docs/devel/secure-coding-practices.rst
+>
+> diff --git a/docs/devel/index.rst b/docs/devel/index.rst
+> index ebbab636ce..2a4ddf40ad 100644
+> --- a/docs/devel/index.rst
+> +++ b/docs/devel/index.rst
+> @@ -20,3 +20,4 @@ Contents:
+>     stable-process
+>     testing
+>     decodetree
+> +   secure-coding-practices
+> diff --git a/docs/devel/secure-coding-practices.rst
+> b/docs/devel/secure-coding-practices.rst
+> new file mode 100644
+> index 0000000000..cbfc8af67e
+> --- /dev/null
+> +++ b/docs/devel/secure-coding-practices.rst
+> @@ -0,0 +1,106 @@
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +Secure Coding Practices
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +This document covers topics that both developers and security researcher=
+s
+> must
+> +be aware of so that they can develop safe code and audit existing code
+> +properly.
+> +
+> +Reporting Security Bugs
+> +-----------------------
+> +For details on how to report security bugs or ask questions about
+> potential
+> +security bugs, see the `Security Process wiki page
+> +<https://wiki.qemu.org/SecurityProcess>`_.
+> +
+> +General Secure C Coding Practices
+> +---------------------------------
+> +Most CVEs (security bugs) reported against QEMU are not specific to
+> +virtualization or emulation.  They are simply C programming bugs.
+> Therefore
+> +it's critical to be aware of common classes of security bugs.
+> +
+> +There is a wide selection of resources available covering secure C
+> coding.  For
+> +example, the `CERT C Coding Standard
+> +<https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standar=
+d
+> >`_
+> +covers the most important classes of security bugs.
+> +
+> +Instead of describing them in detail here, only the names of the most
+> important
+> +classes of security bugs are mentioned:
+> +
+> +* Buffer overflows
+> +* Use-after-free and double-free
+> +* Integer overflows
+> +* Format string vulnerabilities
+> +
+> +Some of these classes of bugs can be detected by analyzers.  Static
+> analysis is
+> +performed regularly by Coverity and the most obvious of these bugs are
+> even
+> +reported by compilers.  Dynamic analysis is possible with valgrind, tsan=
+,
+> and
+> +asan.
+> +
+> +Input Validation
+> +----------------
+> +Inputs from the guest or external sources (e.g. network, files) cannot b=
+e
+> +trusted and may be invalid.  Inputs must be checked before using them in
+> a way
+> +that could crash the program, expose host memory to the guest, or
+> otherwise be
+> +exploitable by an attacker.
+> +
+> +The most sensitive attack surface is device emulation.  All hardware
+> register
+> +accesses and data read from guest memory must be validated.  A typical
+> example
+> +is a device that contains multiple units that are selectable by the gues=
+t
+> via
+> +an index register::
+> +
+> +  typedef struct {
+> +      ProcessingUnit unit[2];
+> +      ...
+> +  } MyDeviceState;
+> +
+> +  static void mydev_writel(void *opaque, uint32_t addr, uint32_t val)
+> +  {
+> +      MyDeviceState *mydev =3D opaque;
+> +      ProcessingUnit *unit;
+> +
+> +      switch (addr) {
+> +      case MYDEV_SELECT_UNIT:
+> +          unit =3D &mydev->unit[val];   <-- this input wasn't validated!
+> +          ...
+> +      }
+> +  }
+> +
+> +If ``val`` is not in range [0, 1] then an out-of-bounds memory access
+> will take
+> +place when ``unit`` is dereferenced.  The code must check that ``val`` i=
+s
+> 0 or
+> +1 and handle the case where it is invalid.
+> +
+> +Unexpected Device Accesses
+> +--------------------------
+> +The guest may access device registers in unusual orders or at unexpected
+> +moments.  Device emulation code must not assume that the guest follows t=
+he
+> +typical "theory of operation" presented in driver writer manuals.  The
+> guest
+> +may make nonsense accesses to device registers such as starting operatio=
+ns
+> +before the device has been fully initialized.
+> +
+> +A related issue is that device emulation code must be prepared for
+> unexpected
+> +device register accesses while asynchronous operations are in progress. =
+ A
+> +well-behaved guest might wait for a completion interrupt before accessin=
+g
+> +certain device registers.  Device emulation code must handle the case
+> where the
+> +guest overwrites registers or submits further requests before an ongoing
+> +request completes.  Unexpected accesses must not cause memory corruption
+> or
+> +leaks in QEMU.
+> +
+> +Invalid device register accesses can be reported with
+> +``qemu_log_mask(LOG_GUEST_ERROR, ...)``.  The ``-d guest_errors``
+> command-line
+> +option enables these log messages.
+> +
+> +Live Migration
+> +--------------
+> +Device state can be saved to disk image files and shared with other user=
+s.
+> +Live migration code must validate inputs when loading device state so an
+> +attacker cannot gain control by crafting invalid device states.  Device
+> state
+> +is therefore considered untrusted even though it is typically generated
+> by QEMU
+> +itself.
+> +
+> +Guest Memory Access Races
+> +-------------------------
+> +Guests with multiple vCPUs may modify guest RAM while device emulation
+> code is
+> +running.  Device emulation code must copy in descriptors and other guest
+> RAM
+> +structures and only process the local copy.  This prevents
+> +time-of-check-to-time-of-use (TOCTOU) race conditions that could cause
+> QEMU to
+> +crash when a vCPU thread modifies guest RAM while device emulation is
+> +processing it.
+> --
+> 2.21.0
+>
+>
+>
