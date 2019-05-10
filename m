@@ -7,83 +7,79 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22D21C04AB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 03:31:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 197CFC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 03:32:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D27AF2084A
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 03:31:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8CCB2084A
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 03:32:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gz4GjQPt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D27AF2084A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q0hnwXp9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8CCB2084A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36176 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36178 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOwGK-00072s-1c
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 23:31:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48071)
+	id 1hOwGP-00077P-1E
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 23:32:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOwBq-0002wZ-OE
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 23:27:20 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hOwBu-0002zm-AA
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 23:27:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOwBp-0001PC-66
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 23:27:18 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41502)
+	(envelope-from <richard.henderson@linaro.org>) id 1hOwBs-0001S3-TV
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 23:27:22 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35104)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hOwBo-0001Ok-UX
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 23:27:17 -0400
-Received: by mail-pf1-x442.google.com with SMTP id l132so2407808pfc.8
-	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 20:27:16 -0700 (PDT)
+	id 1hOwBs-0001Rh-Lo
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 23:27:20 -0400
+Received: by mail-pg1-x543.google.com with SMTP id h1so2280575pgs.2
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 20:27:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=XUS5O0Wsp1uZAHY7PV259DmtfHHmlKN4309ndxqVouY=;
-	b=Gz4GjQPtL1E3Yv539k/vYUvTN3tWGTYXHEvkcVeoA1qOmXra+knF5YYuTtM5+Pa8ot
-	/XqjuJhTd1eEhmEtfkSSB5MNzWs9zkRfKoh0LtMyfbzF2DY20GMbfcaoyHBte9CZ1uP8
-	+NEhEEGucCpOeYWtd1Rwhb3BSfXDLiX0se8VkKEy20MDFyXVEYQpy83dwDC8OzAbi3n9
-	gX+73q2ar5plCpX6alf2PCqkwTTB1WPjAftUwKxKtLyStOQwjrlw/51+pTqn5kBjHLQm
-	XiZkIPWv5QWnkFvY0Ab0IN67mJTFocsb4aektpcoPMclD56oCgzda7i2i6TW3PsZSLYf
-	hirA==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=Ad7p0XpmVmGXkoTgniD57oGcto4g8MS55uU7nmfGDcA=;
+	b=q0hnwXp9Tfw4d5QG11EwUDzE9zUw5uI0Lx0bbdh1ZLV/YfvOwwvjuBPieBDcf9GQhn
+	pMgMZKZBLIYtvWB3BvOOg8KrPsB7dNADCc+7Jp0K0f0GLmtjdfKydLZTvz1oTB112DCP
+	rGB14g8vUMD8tA6OLnxM9u5DfY75mKOItvD80QGk7AFP1IbkKgAWzS0L8T4BhTGEdEK7
+	x8zP08o4ZS/a844dap/gyeDANVF4ZTf6hXo8kW9BCIZVK5IHY1QPBABUv7tVzXC65TWG
+	2KIlDz8QK0D7b/Oviw40/7S7qFX098biMlm41YPDSPKlbWOJzIGfwwbbglvezOyGjZ9d
+	wNLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=XUS5O0Wsp1uZAHY7PV259DmtfHHmlKN4309ndxqVouY=;
-	b=fbZeXsJ566qB7Yf5hkRq1FlPIvVYHAn2L3mv+NigGDbapa3zr3QFfncoFtv+sBrdqJ
-	7FgXjLtwqy9/z+1Dh8uzUzkMSwHfqTP2D9udqrFAsz81TykLLeqTrvWMlhySYSVQP8da
-	/QWoDuq+0tpsPJXU9R1V/ytWL8TKHi4SvrnwQ3Y8clITC2cIby6nnIUQpsPU+5uhP4cA
-	J+Tzj9T2JZsQu0mB2z7/iBI/fhC5m4oIIFrNUgi1t1mN9Pb6PitWy8jFyUrYCxBY2yef
-	iv+yHidkPwjUsTlJChncEiK94EsyGUgBRUTd1wBf2WTmBRUZpYe4nw2GNMGzGE/X6tsF
-	HArA==
-X-Gm-Message-State: APjAAAX7KUosf8Ms0s3jPnfjpa2jWct+iDDyArHpxKaiLLiKN9VIaC5g
-	eyF/rBoh0tK58u4QW13RJhgWOcJswD4=
-X-Google-Smtp-Source: APXvYqyB7JgPJGAhFvGELy32mTKrNXZrS6u2/CJYCVt/pJwzm7LqTJ5SzxZCIHjLLl4neUK1W1LLPg==
-X-Received: by 2002:a63:e550:: with SMTP id z16mr10692500pgj.329.1557458835613;
-	Thu, 09 May 2019 20:27:15 -0700 (PDT)
+	:references;
+	bh=Ad7p0XpmVmGXkoTgniD57oGcto4g8MS55uU7nmfGDcA=;
+	b=NNpiCP0/biSaqi6pQrnNfq0QnK0DZtGpzfomBzZfys1R2ME5zTIPfU1eXQHmGXXQJL
+	+QjskRnXyT6wV5wHwzv08cutjDgRpd199oIyaAipdQBNjDYBXFxBouzvI353NJ85BG+A
+	JgK/j4Enm1sKbHgQdlQ7gqHA31Iz9f4/wPTD30Mvs67LTSAfZfwDt5zufkX76PUGna++
+	wvdizzbgwt9yY2Xzxvjxr8jepqeXWmfLOWT1kPd7fXsTehnIE4v9XRqJmsgTq5/b2+Fp
+	u3RMVQJBow2d4Y3cRs8rGimkqlXp/5vYsjZ+gMg3xPI5T4RJ0E9glKbR5XvMrdxisxP/
+	ehcw==
+X-Gm-Message-State: APjAAAV5UDADh50HNIY7x4OnwfJKFdiSoQIYm7h2I2iUiEbJqyw91bI+
+	dtbrQNszN4/CozWf6EONwVwVSJP+N0Q=
+X-Google-Smtp-Source: APXvYqzGEkQlut5b0Raaz8TykR12mjwVrW4Zg+IC0C1Cy6hyTJATLgpMevUqgFU/lAFLC5/B/TyS/A==
+X-Received: by 2002:aa7:82cd:: with SMTP id f13mr10522384pfn.203.1557458839287;
+	Thu, 09 May 2019 20:27:19 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231]) by smtp.gmail.com with ESMTPSA id
-	t26sm6259695pgk.62.2019.05.09.20.27.14
+	t26sm6259695pgk.62.2019.05.09.20.27.18
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 09 May 2019 20:27:14 -0700 (PDT)
+	Thu, 09 May 2019 20:27:18 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu,  9 May 2019 20:27:04 -0700
-Message-Id: <20190510032710.23910-3-richard.henderson@linaro.org>
+Date: Thu,  9 May 2019 20:27:07 -0700
+Message-Id: <20190510032710.23910-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190510032710.23910-1-richard.henderson@linaro.org>
 References: <20190510032710.23910-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: [Qemu-devel] [PATCH v2 2/8] linux-user: Pass the parent env to
- cpu_clone_regs
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: [Qemu-devel] [PATCH v2 5/8] linux-user/sparc: Use WREG constants in
+ sparc/signal.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,300 +96,220 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implementing clone for sparc requires that we make modifications
-to both the parent and child cpu state.  In all other cases, the
-new argument can be ignored.
+Remove the incorrectly defined UREG constants.
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Maddeningly, in some cases we used the correct constant getting
+the env register wrong, and in other cases we used the incorrect
+constant getting the env register right.
+
+In the case of getcontext/setcontext, we are aided by the fact
+that the "other" constant, e.g. SPARC_MC_O0, is correct.  So we
+can easily guess that the WREG_* constant on the other side
+should also be O0.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/aarch64/target_cpu.h    | 3 ++-
- linux-user/alpha/target_cpu.h      | 3 ++-
- linux-user/arm/target_cpu.h        | 3 ++-
- linux-user/cris/target_cpu.h       | 3 ++-
- linux-user/hppa/target_cpu.h       | 3 ++-
- linux-user/i386/target_cpu.h       | 3 ++-
- linux-user/m68k/target_cpu.h       | 3 ++-
- linux-user/microblaze/target_cpu.h | 3 ++-
- linux-user/mips/target_cpu.h       | 3 ++-
- linux-user/nios2/target_cpu.h      | 3 ++-
- linux-user/openrisc/target_cpu.h   | 4 +++-
- linux-user/ppc/target_cpu.h        | 3 ++-
- linux-user/riscv/target_cpu.h      | 3 ++-
- linux-user/s390x/target_cpu.h      | 3 ++-
- linux-user/sh4/target_cpu.h        | 3 ++-
- linux-user/sparc/target_cpu.h      | 3 ++-
- linux-user/tilegx/target_cpu.h     | 3 ++-
- linux-user/xtensa/target_cpu.h     | 3 ++-
- linux-user/syscall.c               | 2 +-
- 19 files changed, 38 insertions(+), 19 deletions(-)
+ linux-user/sparc/signal.c | 96 +++++++++++++--------------------------
+ 1 file changed, 32 insertions(+), 64 deletions(-)
 
-diff --git a/linux-user/aarch64/target_cpu.h b/linux-user/aarch64/target_cpu.h
-index a021c95fa4..130177115e 100644
---- a/linux-user/aarch64/target_cpu.h
-+++ b/linux-user/aarch64/target_cpu.h
-@@ -19,7 +19,8 @@
- #ifndef AARCH64_TARGET_CPU_H
- #define AARCH64_TARGET_CPU_H
+diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
+index ead169fbaa..243f237528 100644
+--- a/linux-user/sparc/signal.c
++++ b/linux-user/sparc/signal.c
+@@ -104,20 +104,6 @@ struct target_rt_signal_frame {
+     qemu_siginfo_fpu_t  fpu_state;
+ };
  
--static inline void cpu_clone_regs(CPUARMState *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUARMState *env, CPUARMState *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->xregs[31] = newsp;
-diff --git a/linux-user/alpha/target_cpu.h b/linux-user/alpha/target_cpu.h
-index ac4d255ae7..750ffb50d7 100644
---- a/linux-user/alpha/target_cpu.h
-+++ b/linux-user/alpha/target_cpu.h
-@@ -19,7 +19,8 @@
- #ifndef ALPHA_TARGET_CPU_H
- #define ALPHA_TARGET_CPU_H
+-#define UREG_O0        16
+-#define UREG_O6        22
+-#define UREG_I0        0
+-#define UREG_I1        1
+-#define UREG_I2        2
+-#define UREG_I3        3
+-#define UREG_I4        4
+-#define UREG_I5        5
+-#define UREG_I6        6
+-#define UREG_I7        7
+-#define UREG_L0        8
+-#define UREG_FP        UREG_I6
+-#define UREG_SP        UREG_O6
+-
+ static inline abi_ulong get_sigframe(struct target_sigaction *sa, 
+                                      CPUSPARCState *env,
+                                      unsigned long framesize)
+@@ -159,30 +145,12 @@ setup___siginfo(__siginfo_t *si, CPUSPARCState *env, abi_ulong mask)
+         __put_user(env->gregs[i], &si->si_regs.u_regs[i]);
+     }
+     for (i=0; i < 8; i++) {
+-        __put_user(env->regwptr[UREG_I0 + i], &si->si_regs.u_regs[i+8]);
++        __put_user(env->regwptr[WREG_O0 + i], &si->si_regs.u_regs[i+8]);
+     }
+     __put_user(mask, &si->si_mask);
+     return err;
+ }
  
--static inline void cpu_clone_regs(CPUAlphaState *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUAlphaState *env, CPUAlphaState *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->ir[IR_SP] = newsp;
-diff --git a/linux-user/arm/target_cpu.h b/linux-user/arm/target_cpu.h
-index 8a3764919a..5538b6cb29 100644
---- a/linux-user/arm/target_cpu.h
-+++ b/linux-user/arm/target_cpu.h
-@@ -23,7 +23,8 @@
-    See validate_guest_space in linux-user/elfload.c.  */
- #define MAX_RESERVED_VA  0xffff0000ul
+-#if 0
+-static int
+-setup_sigcontext(struct target_sigcontext *sc, /*struct _fpstate *fpstate,*/
+-                 CPUSPARCState *env, unsigned long mask)
+-{
+-    int err = 0;
+-
+-    __put_user(mask, &sc->sigc_mask);
+-    __put_user(env->regwptr[UREG_SP], &sc->sigc_sp);
+-    __put_user(env->pc, &sc->sigc_pc);
+-    __put_user(env->npc, &sc->sigc_npc);
+-    __put_user(env->psr, &sc->sigc_psr);
+-    __put_user(env->gregs[1], &sc->sigc_g1);
+-    __put_user(env->regwptr[UREG_O0], &sc->sigc_o0);
+-
+-    return err;
+-}
+-#endif
+ #define NF_ALIGNEDSZ  (((sizeof(struct target_signal_frame) + 7) & (~7)))
  
--static inline void cpu_clone_regs(CPUARMState *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUARMState *env, CPUARMState *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->regs[13] = newsp;
-diff --git a/linux-user/cris/target_cpu.h b/linux-user/cris/target_cpu.h
-index 2309343979..baf842b400 100644
---- a/linux-user/cris/target_cpu.h
-+++ b/linux-user/cris/target_cpu.h
-@@ -20,7 +20,8 @@
- #ifndef CRIS_TARGET_CPU_H
- #define CRIS_TARGET_CPU_H
+ void setup_frame(int sig, struct target_sigaction *ka,
+@@ -221,20 +189,20 @@ void setup_frame(int sig, struct target_sigaction *ka,
+     }
  
--static inline void cpu_clone_regs(CPUCRISState *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUCRISState *env, CPUCRISState *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->regs[14] = newsp;
-diff --git a/linux-user/hppa/target_cpu.h b/linux-user/hppa/target_cpu.h
-index 1c539bdbd6..7cd8d168a7 100644
---- a/linux-user/hppa/target_cpu.h
-+++ b/linux-user/hppa/target_cpu.h
-@@ -19,7 +19,8 @@
- #ifndef HPPA_TARGET_CPU_H
- #define HPPA_TARGET_CPU_H
+     for (i = 0; i < 8; i++) {
+-        __put_user(env->regwptr[i + UREG_L0], &sf->ss.locals[i]);
++        __put_user(env->regwptr[i + WREG_L0], &sf->ss.locals[i]);
+     }
+     for (i = 0; i < 8; i++) {
+-        __put_user(env->regwptr[i + UREG_I0], &sf->ss.ins[i]);
++        __put_user(env->regwptr[i + WREG_I0], &sf->ss.ins[i]);
+     }
+     if (err)
+         goto sigsegv;
  
--static inline void cpu_clone_regs(CPUHPPAState *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUHPPAState *env, CPUHPPAState *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->gr[30] = newsp;
-diff --git a/linux-user/i386/target_cpu.h b/linux-user/i386/target_cpu.h
-index ece04d0966..8fbe36670f 100644
---- a/linux-user/i386/target_cpu.h
-+++ b/linux-user/i386/target_cpu.h
-@@ -20,7 +20,8 @@
- #ifndef I386_TARGET_CPU_H
- #define I386_TARGET_CPU_H
+     /* 3. signal handler back-trampoline and parameters */
+-    env->regwptr[UREG_FP] = sf_addr;
+-    env->regwptr[UREG_I0] = sig;
+-    env->regwptr[UREG_I1] = sf_addr +
++    env->regwptr[WREG_FP] = sf_addr;
++    env->regwptr[WREG_I0] = sig;
++    env->regwptr[WREG_I1] = sf_addr +
+             offsetof(struct target_signal_frame, info);
+-    env->regwptr[UREG_I2] = sf_addr +
++    env->regwptr[WREG_I2] = sf_addr +
+             offsetof(struct target_signal_frame, info);
  
--static inline void cpu_clone_regs(CPUX86State *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUX86State *env, CPUX86State *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->regs[R_ESP] = newsp;
-diff --git a/linux-user/m68k/target_cpu.h b/linux-user/m68k/target_cpu.h
-index 7a26f3c3fc..00b3535fae 100644
---- a/linux-user/m68k/target_cpu.h
-+++ b/linux-user/m68k/target_cpu.h
-@@ -21,7 +21,8 @@
- #ifndef M68K_TARGET_CPU_H
- #define M68K_TARGET_CPU_H
+     /* 4. signal handler */
+@@ -242,11 +210,11 @@ void setup_frame(int sig, struct target_sigaction *ka,
+     env->npc = (env->pc + 4);
+     /* 5. return to kernel instructions */
+     if (ka->ka_restorer) {
+-        env->regwptr[UREG_I7] = ka->ka_restorer;
++        env->regwptr[WREG_I7] = ka->ka_restorer;
+     } else {
+         uint32_t val32;
  
--static inline void cpu_clone_regs(CPUM68KState *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUM68KState *env, CPUM68KState *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->aregs[7] = newsp;
-diff --git a/linux-user/microblaze/target_cpu.h b/linux-user/microblaze/target_cpu.h
-index 73e139938c..3394e98918 100644
---- a/linux-user/microblaze/target_cpu.h
-+++ b/linux-user/microblaze/target_cpu.h
-@@ -19,7 +19,8 @@
- #ifndef MICROBLAZE_TARGET_CPU_H
- #define MICROBLAZE_TARGET_CPU_H
+-        env->regwptr[UREG_I7] = sf_addr +
++        env->regwptr[WREG_I7] = sf_addr +
+                 offsetof(struct target_signal_frame, insns) - 2 * 4;
  
--static inline void cpu_clone_regs(CPUMBState *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUMBState *env, CPUMBState *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->regs[R_SP] = newsp;
-diff --git a/linux-user/mips/target_cpu.h b/linux-user/mips/target_cpu.h
-index 02cf5eeff7..109348a5c9 100644
---- a/linux-user/mips/target_cpu.h
-+++ b/linux-user/mips/target_cpu.h
-@@ -19,7 +19,8 @@
- #ifndef MIPS_TARGET_CPU_H
- #define MIPS_TARGET_CPU_H
+         /* mov __NR_sigreturn, %g1 */
+@@ -284,7 +252,7 @@ long do_sigreturn(CPUSPARCState *env)
+     sigset_t host_set;
+     int i;
  
--static inline void cpu_clone_regs(CPUMIPSState *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUMIPSState *env, CPUMIPSState *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->active_tc.gpr[29] = newsp;
-diff --git a/linux-user/nios2/target_cpu.h b/linux-user/nios2/target_cpu.h
-index 14f63338fa..09d2db74dc 100644
---- a/linux-user/nios2/target_cpu.h
-+++ b/linux-user/nios2/target_cpu.h
-@@ -20,7 +20,8 @@
- #ifndef TARGET_CPU_H
- #define TARGET_CPU_H
+-    sf_addr = env->regwptr[UREG_FP];
++    sf_addr = env->regwptr[WREG_SP];
+     trace_user_do_sigreturn(env, sf_addr);
+     if (!lock_user_struct(VERIFY_READ, sf, sf_addr, 1)) {
+         goto segv_and_exit;
+@@ -316,7 +284,7 @@ long do_sigreturn(CPUSPARCState *env)
+         __get_user(env->gregs[i], &sf->info.si_regs.u_regs[i]);
+     }
+     for (i=0; i < 8; i++) {
+-        __get_user(env->regwptr[i + UREG_I0], &sf->info.si_regs.u_regs[i+8]);
++        __get_user(env->regwptr[i + WREG_O0], &sf->info.si_regs.u_regs[i+8]);
+     }
  
--static inline void cpu_clone_regs(CPUNios2State *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUNios2State *env, CPUNios2State *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->regs[R_SP] = newsp;
-diff --git a/linux-user/openrisc/target_cpu.h b/linux-user/openrisc/target_cpu.h
-index 32ff135089..361b192735 100644
---- a/linux-user/openrisc/target_cpu.h
-+++ b/linux-user/openrisc/target_cpu.h
-@@ -20,7 +20,9 @@
- #ifndef OPENRISC_TARGET_CPU_H
- #define OPENRISC_TARGET_CPU_H
+     /* FIXME: implement FPU save/restore:
+@@ -433,7 +401,7 @@ void sparc64_set_context(CPUSPARCState *env)
+     abi_ulong fp, i7, w_addr;
+     unsigned int i;
  
--static inline void cpu_clone_regs(CPUOpenRISCState *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUOpenRISCState *env,
-+                                  CPUOpenRISCState *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         cpu_set_gpr(env, 1, newsp);
-diff --git a/linux-user/ppc/target_cpu.h b/linux-user/ppc/target_cpu.h
-index c4641834e7..f42e266047 100644
---- a/linux-user/ppc/target_cpu.h
-+++ b/linux-user/ppc/target_cpu.h
-@@ -19,7 +19,8 @@
- #ifndef PPC_TARGET_CPU_H
- #define PPC_TARGET_CPU_H
+-    ucp_addr = env->regwptr[UREG_I0];
++    ucp_addr = env->regwptr[WREG_O0];
+     if (!lock_user_struct(VERIFY_READ, ucp, ucp_addr, 1)) {
+         goto do_sigsegv;
+     }
+@@ -443,7 +411,7 @@ void sparc64_set_context(CPUSPARCState *env)
+     if ((pc | npc) & 3) {
+         goto do_sigsegv;
+     }
+-    if (env->regwptr[UREG_I1]) {
++    if (env->regwptr[WREG_O1]) {
+         target_sigset_t target_set;
+         sigset_t set;
  
--static inline void cpu_clone_regs(CPUPPCState *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUPPCState *env, CPUPPCState *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->gpr[1] = newsp;
-diff --git a/linux-user/riscv/target_cpu.h b/linux-user/riscv/target_cpu.h
-index 7e090f376a..b112832d95 100644
---- a/linux-user/riscv/target_cpu.h
-+++ b/linux-user/riscv/target_cpu.h
-@@ -1,7 +1,8 @@
- #ifndef TARGET_CPU_H
- #define TARGET_CPU_H
+@@ -474,19 +442,19 @@ void sparc64_set_context(CPUSPARCState *env)
+     __get_user(env->gregs[5], (&(*grp)[SPARC_MC_G5]));
+     __get_user(env->gregs[6], (&(*grp)[SPARC_MC_G6]));
+     __get_user(env->gregs[7], (&(*grp)[SPARC_MC_G7]));
+-    __get_user(env->regwptr[UREG_I0], (&(*grp)[SPARC_MC_O0]));
+-    __get_user(env->regwptr[UREG_I1], (&(*grp)[SPARC_MC_O1]));
+-    __get_user(env->regwptr[UREG_I2], (&(*grp)[SPARC_MC_O2]));
+-    __get_user(env->regwptr[UREG_I3], (&(*grp)[SPARC_MC_O3]));
+-    __get_user(env->regwptr[UREG_I4], (&(*grp)[SPARC_MC_O4]));
+-    __get_user(env->regwptr[UREG_I5], (&(*grp)[SPARC_MC_O5]));
+-    __get_user(env->regwptr[UREG_I6], (&(*grp)[SPARC_MC_O6]));
+-    __get_user(env->regwptr[UREG_I7], (&(*grp)[SPARC_MC_O7]));
++    __get_user(env->regwptr[WREG_O0], (&(*grp)[SPARC_MC_O0]));
++    __get_user(env->regwptr[WREG_O1], (&(*grp)[SPARC_MC_O1]));
++    __get_user(env->regwptr[WREG_O2], (&(*grp)[SPARC_MC_O2]));
++    __get_user(env->regwptr[WREG_O3], (&(*grp)[SPARC_MC_O3]));
++    __get_user(env->regwptr[WREG_O4], (&(*grp)[SPARC_MC_O4]));
++    __get_user(env->regwptr[WREG_O5], (&(*grp)[SPARC_MC_O5]));
++    __get_user(env->regwptr[WREG_O6], (&(*grp)[SPARC_MC_O6]));
++    __get_user(env->regwptr[WREG_O7], (&(*grp)[SPARC_MC_O7]));
  
--static inline void cpu_clone_regs(CPURISCVState *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPURISCVState *env, CPURISCVState *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->gpr[xSP] = newsp;
-diff --git a/linux-user/s390x/target_cpu.h b/linux-user/s390x/target_cpu.h
-index aa181ceaee..31d9d9d75f 100644
---- a/linux-user/s390x/target_cpu.h
-+++ b/linux-user/s390x/target_cpu.h
-@@ -19,7 +19,8 @@
- #ifndef S390X_TARGET_CPU_H
- #define S390X_TARGET_CPU_H
+     __get_user(fp, &(ucp->tuc_mcontext.mc_fp));
+     __get_user(i7, &(ucp->tuc_mcontext.mc_i7));
  
--static inline void cpu_clone_regs(CPUS390XState *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUS390XState *env, CPUS390XState *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->regs[15] = newsp;
-diff --git a/linux-user/sh4/target_cpu.h b/linux-user/sh4/target_cpu.h
-index b0be9a2c1b..ca0d1bb0bb 100644
---- a/linux-user/sh4/target_cpu.h
-+++ b/linux-user/sh4/target_cpu.h
-@@ -19,7 +19,8 @@
- #ifndef SH4_TARGET_CPU_H
- #define SH4_TARGET_CPU_H
+-    w_addr = TARGET_STACK_BIAS+env->regwptr[UREG_I6];
++    w_addr = TARGET_STACK_BIAS + env->regwptr[WREG_FP];
+     if (put_user(fp, w_addr + offsetof(struct target_reg_window, ins[6]),
+                  abi_ulong) != 0) {
+         goto do_sigsegv;
+@@ -534,7 +502,7 @@ void sparc64_get_context(CPUSPARCState *env)
+     target_sigset_t target_set;
+     sigset_t set;
  
--static inline void cpu_clone_regs(CPUSH4State *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUSH4State *env, CPUSH4State *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->gregs[15] = newsp;
-diff --git a/linux-user/sparc/target_cpu.h b/linux-user/sparc/target_cpu.h
-index 1ffc0ae9f2..a92748cae3 100644
---- a/linux-user/sparc/target_cpu.h
-+++ b/linux-user/sparc/target_cpu.h
-@@ -20,7 +20,8 @@
- #ifndef SPARC_TARGET_CPU_H
- #define SPARC_TARGET_CPU_H
+-    ucp_addr = env->regwptr[UREG_I0];
++    ucp_addr = env->regwptr[WREG_O0];
+     if (!lock_user_struct(VERIFY_WRITE, ucp, ucp_addr, 0)) {
+         goto do_sigsegv;
+     }
+@@ -580,16 +548,16 @@ void sparc64_get_context(CPUSPARCState *env)
+     __put_user(env->gregs[5], &((*grp)[SPARC_MC_G5]));
+     __put_user(env->gregs[6], &((*grp)[SPARC_MC_G6]));
+     __put_user(env->gregs[7], &((*grp)[SPARC_MC_G7]));
+-    __put_user(env->regwptr[UREG_I0], &((*grp)[SPARC_MC_O0]));
+-    __put_user(env->regwptr[UREG_I1], &((*grp)[SPARC_MC_O1]));
+-    __put_user(env->regwptr[UREG_I2], &((*grp)[SPARC_MC_O2]));
+-    __put_user(env->regwptr[UREG_I3], &((*grp)[SPARC_MC_O3]));
+-    __put_user(env->regwptr[UREG_I4], &((*grp)[SPARC_MC_O4]));
+-    __put_user(env->regwptr[UREG_I5], &((*grp)[SPARC_MC_O5]));
+-    __put_user(env->regwptr[UREG_I6], &((*grp)[SPARC_MC_O6]));
+-    __put_user(env->regwptr[UREG_I7], &((*grp)[SPARC_MC_O7]));
++    __put_user(env->regwptr[WREG_O0], &((*grp)[SPARC_MC_O0]));
++    __put_user(env->regwptr[WREG_O1], &((*grp)[SPARC_MC_O1]));
++    __put_user(env->regwptr[WREG_O2], &((*grp)[SPARC_MC_O2]));
++    __put_user(env->regwptr[WREG_O3], &((*grp)[SPARC_MC_O3]));
++    __put_user(env->regwptr[WREG_O4], &((*grp)[SPARC_MC_O4]));
++    __put_user(env->regwptr[WREG_O5], &((*grp)[SPARC_MC_O5]));
++    __put_user(env->regwptr[WREG_O6], &((*grp)[SPARC_MC_O6]));
++    __put_user(env->regwptr[WREG_O7], &((*grp)[SPARC_MC_O7]));
  
--static inline void cpu_clone_regs(CPUSPARCState *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUSPARCState *env, CPUSPARCState *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->regwptr[22] = newsp;
-diff --git a/linux-user/tilegx/target_cpu.h b/linux-user/tilegx/target_cpu.h
-index d1aa5824f2..35100a3d43 100644
---- a/linux-user/tilegx/target_cpu.h
-+++ b/linux-user/tilegx/target_cpu.h
-@@ -19,7 +19,8 @@
- #ifndef TILEGX_TARGET_CPU_H
- #define TILEGX_TARGET_CPU_H
- 
--static inline void cpu_clone_regs(CPUTLGState *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUTLGState *env, CPUTLGState *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->regs[TILEGX_R_SP] = newsp;
-diff --git a/linux-user/xtensa/target_cpu.h b/linux-user/xtensa/target_cpu.h
-index e31efe3ea0..0e9681e9f9 100644
---- a/linux-user/xtensa/target_cpu.h
-+++ b/linux-user/xtensa/target_cpu.h
-@@ -4,7 +4,8 @@
- #ifndef XTENSA_TARGET_CPU_H
- #define XTENSA_TARGET_CPU_H
- 
--static inline void cpu_clone_regs(CPUXtensaState *env, target_ulong newsp)
-+static inline void cpu_clone_regs(CPUXtensaState *env, CPUXtensaState *old_env,
-+                                  target_ulong newsp)
- {
-     if (newsp) {
-         env->regs[1] = newsp;
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index f7d0754c8d..80d7f3788e 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -5493,7 +5493,7 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
-         /* we create a new CPU instance. */
-         new_env = cpu_copy(env);
-         /* Init regs that differ from the parent.  */
--        cpu_clone_regs(new_env, newsp);
-+        cpu_clone_regs(new_env, env, newsp);
-         new_cpu = ENV_GET_CPU(new_env);
-         new_cpu->opaque = ts;
-         ts->bprm = parent_ts->bprm;
+-    w_addr = TARGET_STACK_BIAS+env->regwptr[UREG_I6];
++    w_addr = TARGET_STACK_BIAS + env->regwptr[WREG_FP];
+     fp = i7 = 0;
+     if (get_user(fp, w_addr + offsetof(struct target_reg_window, ins[6]),
+                  abi_ulong) != 0) {
 -- 
 2.17.1
 
