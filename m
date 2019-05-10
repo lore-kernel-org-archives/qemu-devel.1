@@ -2,80 +2,79 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A72C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:57:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E80C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:58:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D32172070D
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:57:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D32172070D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 43A612070D
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:58:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fWXqvhpH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43A612070D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46907 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46949 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP8pU-0000Ll-2w
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:57:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49817)
+	id 1hP8qg-000295-K9
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:58:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hP8ns-0007Ry-4W
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:55:25 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hP8iL-0000my-Cn
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:49:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hP8nq-0001Ox-Tq
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:55:24 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:43755)
+	(envelope-from <peter.maydell@linaro.org>) id 1hP8iK-0005gc-Fh
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:49:41 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:41031)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hP8nq-0001MU-Pk
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:55:22 -0400
-Received: by mail-qt1-f195.google.com with SMTP id r3so7337299qtp.10
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 09:55:22 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hP8iK-0005g8-96
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:49:40 -0400
+Received: by mail-oi1-x242.google.com with SMTP id y10so4990576oia.8
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 09:49:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=gCX+seDemu8LJPPgW5WuGOwnjcJKRB79k4K8XCw1BT4=;
+	b=fWXqvhpH0fVitQT36Y+CZG9+X9EFLkxRGjmv5cJnnhAdM9AMkYOaY7h4GBDvd4WWz/
+	9qdIk2WdTQYhUKZ0JdnQYSdoPZk0USGqpCoSf3/g+EfKRbDF3uq3O8jbujtPs/w0MknM
+	+7m01BfmrfrZy8SWbbuiQKQCdG/xES4PByXrtUHB249CdACw1mbJxrMpRHnDGAsW5TN8
+	520oIWL9gKDlVkT3DPUZJ4hAz19gzaoIQgNk3e+SVB3wyXRKozxDkGkxvaYmIFvIcifD
+	6Nw6S9n8NbGW2LnhTd3zIYyRMBVQcZvbQyyK1GFwuQtLMIYaB1Qldxf/achR4TNdwwa0
+	jCYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:content-transfer-encoding
-	:in-reply-to;
-	bh=zBBybsEO/90v9Y7tTC5Cis3b4wxdo55wRnHxYazFoio=;
-	b=P2rudfw9cF2f2FY/knLft1HoeUJKOQSCgTRxllxuvyZmzuMLQdRCAHjBrPn50wjY8v
-	l8YE7IGPF55zQHSRhbbZvMa1A2VNVFW58HjJl/Y4ziyxmnt4x1QP9DW4UrqdP56Ufdu6
-	YbQjYMDYK87iHldsL28Bkv/M/QpO+tggvucaqXfoBEWVI/wLFXsjF6dgoFoCpESfzXtM
-	VIntzVRlnStYeXvgC2jWSzcimePnhUbqG8ogmu2pAunYBkWm05SirKUGgJcanz64E7+H
-	ed3jwNfyXT7Po2Lb7Oibm1wm/dR0GFkREUysoV6BVEnUhJeqdZeE3uZtojkmzNPPP8NO
-	3wtw==
-X-Gm-Message-State: APjAAAVXWHyR+pnqgEIL/8Znxetp5AkaTTopSZ5zmn5lhVYEVtQVEGAJ
-	papy9JeCkS2fApxGe9nGxHcOZQ==
-X-Google-Smtp-Source: APXvYqxh7vqfREnIXLphmIaQkRDCTeGvY71lcU4wUTWumuKAqtNv53nJfsV3XrfXo0TjrMdiVZOgjw==
-X-Received: by 2002:ac8:3862:: with SMTP id r31mr10562565qtb.26.1557507321161; 
-	Fri, 10 May 2019 09:55:21 -0700 (PDT)
-Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
-	[173.76.105.71]) by smtp.gmail.com with ESMTPSA id
-	t63sm2793230qka.33.2019.05.10.09.55.19
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Fri, 10 May 2019 09:55:20 -0700 (PDT)
-Date: Fri, 10 May 2019 12:55:18 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Message-ID: <20190510125323-mutt-send-email-mst@kernel.org>
-References: <20190510134203.24012-1-lvivier@redhat.com>
-	<20190510134203.24012-2-lvivier@redhat.com>
-	<20190510121135-mutt-send-email-mst@kernel.org>
-	<20190510161644.GP7671@redhat.com>
-	<20190510121939-mutt-send-email-mst@kernel.org>
-	<20190510162554.GQ7671@redhat.com>
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=gCX+seDemu8LJPPgW5WuGOwnjcJKRB79k4K8XCw1BT4=;
+	b=SxVgCaf4uuNKo8NwmQ1X3iIZ/s4huFoSgVhSxCM1lM72ckBHynBUDp3wlpYmQEiLqB
+	1y9ZHFIN4R3EjioZeA9zY+14KLNspw29bRLm8bqYnos6GLITeueivOZBCdZE899UlZjP
+	UdNwhieoJcpreWN+eDuYq0gom0FH4m5uaruAum7QkDS9QvU8+LuPbB1C8fTnnvjsFs1X
+	3SGxQXgcaVNCFUdultJXOct9FDPjsK4IaSRcTrWFWd9/Rs7tXWFPAiTuqvQXK920jkS5
+	Nr/SIdk3LPylufzQdPAYlm796Qtrqp64NBiIxiifYzF8t8vRNwLDrCEL77mhix/q7YO7
+	rKDA==
+X-Gm-Message-State: APjAAAUnvak3Ve169Xs3NHbgf2P7Vv81jwkFPMq0OC4KvLzZuUUeWWpx
+	tJlSJ1cvtL6h1FoYfhtetBBtE2M4qMc59DWH6tIptg==
+X-Google-Smtp-Source: APXvYqxxznaOj0KQ57jzIBYNB2SwLVqDywtBH3Er9UIsY3yOkiiyjPZS9CtqdI1mYltMaraMZ9DQZvJE/bhynXTdU/Q=
+X-Received: by 2002:aca:5785:: with SMTP id l127mr5358148oib.48.1557506979339; 
+	Fri, 10 May 2019 09:49:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190510162554.GQ7671@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.160.195
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] VirtIO-RNG: Update default entropy
- source to `/dev/urandom`
+References: <20190510163536.4242-1-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20190510163536.4242-1-mark.cave-ayland@ilande.co.uk>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 10 May 2019 17:49:28 +0100
+Message-ID: <CAFEAcA8tHGciDGyDwCZ02S5km8XNf32PfgSbtbRzqLxcT9JWhA@mail.gmail.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::242
+Subject: Re: [Qemu-devel] [PATCH] configure: copy MacOS NDRV driver into
+ sharedir for out-of-tree builds
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,81 +86,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
-	Kashyap Chamarthy <kchamart@redhat.com>, Amit Shah <amit@kernel.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
-	"Richard W . M . Jones" <rjones@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Howard Spoelstra <hsp.cat7@gmail.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 10, 2019 at 05:25:54PM +0100, Daniel P. Berrangé wrote:
-> On Fri, May 10, 2019 at 12:21:19PM -0400, Michael S. Tsirkin wrote:
-> > On Fri, May 10, 2019 at 05:16:44PM +0100, Daniel P. Berrangé wrote:
-> > > On Fri, May 10, 2019 at 12:12:41PM -0400, Michael S. Tsirkin wrote:
-> > > > On Fri, May 10, 2019 at 03:42:01PM +0200, Laurent Vivier wrote:
-> > > > > From: Kashyap Chamarthy <kchamart@redhat.com>
-> > > > > 
-> > > > > When QEMU exposes a VirtIO-RNG device to the guest, that device needs a
-> > > > > source of entropy, and that source needs to be "non-blocking", like
-> > > > > `/dev/urandom`.  However, currently QEMU defaults to the problematic
-> > > > > `/dev/random`, which is "blocking" (as in, it waits until sufficient
-> > > > > entropy is available).
-> > > > > 
-> > > > > Why prefer `/dev/urandom` over `/dev/random`?
-> > > > > ---------------------------------------------
-> > > > > 
-> > > > > The man pages of urandom(4) and random(4) state:
-> > > > > 
-> > > > >     "The /dev/random device is a legacy interface which dates back to a
-> > > > >     time where the cryptographic primitives used in the implementation
-> > > > >     of /dev/urandom were not widely trusted.  It will return random
-> > > > >     bytes only within the estimated number of bits of fresh noise in the
-> > > > >     entropy pool, blocking if necessary.  /dev/random is suitable for
-> > > > >     applications that need high quality randomness, and can afford
-> > > > >     indeterminate delays."
-> > > > > 
-> > > > > Further, the "Usage" section of the said man pages state:
-> > > > > 
-> > > > >     "The /dev/random interface is considered a legacy interface, and
-> > > > >     /dev/urandom is preferred and sufficient in all use cases, with the
-> > > > >     exception of applications which require randomness during early boot
-> > > > >     time; for these applications, getrandom(2) must be used instead,
-> > > > >     because it will block until the entropy pool is initialized.
-> > > > 
-> > > > So how about just using getrandom then?
-> > > 
-> > > The 3rd patch in this series addresses that.
-> > 
-> > It seems to use qemu_guest_getrandom which in turn
-> > with patch 1 calls /dev/urandom...
-> > Did I miss something?
-> 
-> qemu_guest_getrandom will preferentially use the crypto library random
-> APIs (gnutls, or gcrypt). If both are compiled out that it will use
-> getrandom() if supported by the C library and current kernel. If that
-> fails then it will try /dev/urandom if it exists, finally /dev/random. 
-> On Windows it uses their native crypto API. See this dependant series:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg02237.html
-> 
-> Regards,
-> Daniel
+On Fri, 10 May 2019 at 17:37, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+>
+> Make sure that we include *.ndrv files with those being copied to sharedir
+> during out-of-tree builds. This ensures that the MacOS driver is correctly
+> located and loaded by qemu-system-ppc.
+>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  configure | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/configure b/configure
+> index 63f312bd1f..9493537301 100755
+> --- a/configure
+> +++ b/configure
+> @@ -7886,6 +7886,7 @@ for bios_file in \
+>      $source_path/pc-bios/*.dtb \
+>      $source_path/pc-bios/*.img \
+>      $source_path/pc-bios/openbios-* \
+> +    $source_path/pc-bios/*.ndrv \
+>      $source_path/pc-bios/u-boot.* \
+>      $source_path/pc-bios/edk2-*.fd.bz2 \
+>      $source_path/pc-bios/palcode-*
 
-In particular
+The comment above this bit of code says:
 
-https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg02238.html
+# Caution: do not add files or directories here using wildcards. This
+# will result in problems later if a new file matching the wildcard is
+# added to the source tree -- nothing will cause configure to be rerun
+# so the build tree will be missing the link back to the new file, and
+# tests might fail.
 
+The pc-bios/ directory is awkward legacy which we
+can't really apply the next part of the comment to
+("Prefer to keep the relevant files in their own
+directory and symlink the directory instead"), but since
+there is only one *.ndrv file we can at least avoid the
+wildcard by writing "qemu_vga.ndrv" instead of "*.ndrv".
 
-maybe clarify this is just for systems without getrandom then.
-
-
-
-
-> -- 
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+thanks
+-- PMM
 
