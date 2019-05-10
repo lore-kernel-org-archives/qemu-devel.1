@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D7E0C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:44:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4E08C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:44:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0044020850
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:44:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7181E2177B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:44:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ofUkvA8D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0044020850
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gF0ARZK4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7181E2177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45329 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45332 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP7hI-0005dL-AX
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 11:44:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56202)
+	id 1hP7hR-0005jb-Mx
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 11:44:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hP7Jg-0007ea-Be
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:20:12 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hP7Jo-0007pq-SG
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:20:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hP7Jf-00005B-57
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:20:08 -0400
-Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:42390)
+	(envelope-from <richard.henderson@linaro.org>) id 1hP7Jn-0000GT-LK
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:20:16 -0400
+Received: from mail-pg1-x535.google.com ([2607:f8b0:4864:20::535]:33187)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hP7Je-0008WP-VF
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:20:07 -0400
-Received: by mail-pg1-x52f.google.com with SMTP id 145so3174133pgg.9
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 08:20:06 -0700 (PDT)
+	id 1hP7Jn-0000Fq-F3
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:20:15 -0400
+Received: by mail-pg1-x535.google.com with SMTP id h17so3194448pgv.0
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 08:20:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=pyOmNQehrxQ+vJN1rBIdXnxr1kqTHPzFsWgERMP7ALs=;
-	b=ofUkvA8DKRJRBhSyTfuTP4CJrRpdtlPCRQ9u7qkB5GMg7qmgw5oSq3PloxFex8kwbZ
-	kMDWQIjHFpstu6XI/zrz+mBSvb2DGowu4QXP4kbz9pFoqM/4xFTZ7JYnVadKJ6TkGxXP
-	tL86OhSpxXTBYben9oI7QllprBrC9kEOBm/861TKqNbT+knqXCmWr5uaBZEyEof/mYI1
-	WD5KZyrg7NzCaZ+13njqy4mNnTOaSoPZlvBQlp9OWd93nHx+ru1+eBd9TZOZf95SknAb
-	ZKGwjaVh/0oMavUez1jmQicq7xBvhJ78aGA2Rxn4hsss9Jtzm140IS4c+Mty7pupyfOY
-	Ek5g==
+	bh=m8b1TfwrtSp/bIRpBWvKs+DLGDtPKUANT8NhwLlWDyg=;
+	b=gF0ARZK4cj+gkEGp7aUCbIQDNiAp18oKWD7gfsU78opsuT47nUJZtOmJYr7nPxfJX9
+	Ul0yMY5hebWanfg0/i0OF0L6vgDPi9ZnqHyH8NfovNd7SWUOVRt8tDxGTiQIi5EvCKKR
+	K+ZFJOf9idlQlpApCVHa8HjlWXUtqsiLH9Xc7e88JLUSeSrbDT+4TamjhbUrTHsxqxSm
+	2lNvLl2+ePXsSfwYUfIzR0XSva94DsBhKTt/MP8jf+Z1uQBB98T4bD1xsp9m/iuU6Cq0
+	p1jNz44mcNCZqV6Ug12oVVaPKtj2zH+t25LQRGwsEqksyajqb4115OLHH66HiGT/hMAg
+	Q4cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=pyOmNQehrxQ+vJN1rBIdXnxr1kqTHPzFsWgERMP7ALs=;
-	b=kqBg2nSytpgFV9k0J+HtpqygaKVzWFXJOtfAFkVgoLNPgCK3N4ed0pBtF+TLCsnyZB
-	qlPa5eosyzbKfC7B/3LnV8YAzjrfWXlyLUeS9N9f0/uobDQR8HhS904fJUkl+8y//wCc
-	9MRcH6IIEOv0Tx4kw8t0qv4LBM/sFC0Hg6fi/eEjW+4Q9XHG7dNWeGlsbXMKtZa0FMbW
-	wisuBApvBsDe3TdS99azvIPnDKiHjMzHuMJpuks31xg9+4C/93wJ+/pMWryeoPjxLpHg
-	uTOcjbyZFTaIbDsbbNWYvc1HPdV+9uRVEFVYWc3XPGXvssPMXxC4kdOXe1X1vSe9aPQL
-	+Png==
-X-Gm-Message-State: APjAAAU8dOMG1cOTVThTinjBs4F1tj9Q4gterLwVjXNz6RYpX0S85AYO
-	w70IRACCuFRTLss1WfywR0fxanJrcjY=
-X-Google-Smtp-Source: APXvYqxXpRbJyiovJlkp9WTm0Q+nxSPFLo2ost9doVl6R2NVxRkDCJ9N7u+NhgbnYkvqbtan4A0F5Q==
-X-Received: by 2002:aa7:8554:: with SMTP id y20mr14945470pfn.258.1557501605638;
-	Fri, 10 May 2019 08:20:05 -0700 (PDT)
+	bh=m8b1TfwrtSp/bIRpBWvKs+DLGDtPKUANT8NhwLlWDyg=;
+	b=JLZOsbikiDdk0w/ZLgo+wGH6Qoy1H8x9bo0wqOVkvv+ygUHzZDd5c+zi+ydWwy45WQ
+	OuMYKkx0Hv7l1ZSJUqcfgCMJ8y4BeQqd8sOHjyHdVOARIxftm/oHXQnQ1q4Xo/kCvZkQ
+	RgKzSSRn7njouscLt0mw0S9x+pSKX4kyRxf4u5XzcTo1LKlQPrAb8Gc9+bRFoUnAprjR
+	sN7YoFWbxcQI4Lf1nOpVj/faTKcNaCgeZcaM+jC3oEfp/C5d66NEhYlljocttROB5lNb
+	9I4pBFjDpUyYAStovSmkHBjshP7vKe5BON1m4Saq7C4PREXl0C0+FL4bcHR++svLQnm/
+	oL3g==
+X-Gm-Message-State: APjAAAWB6Mthdq5G5JUuGYv5BmAv0HM3ki+ruJC1JSC1e3OcKNhtynBH
+	x0UlHp2rqNwBEijhqmpE9n7W8WIFAfY=
+X-Google-Smtp-Source: APXvYqzE1nlFj+QtNdjseMRqawBjCtuv0vRBXn+jh3p4vcqIGOB8FQu5z1k4cc9lcLyW+bAgebl+Sg==
+X-Received: by 2002:aa7:9116:: with SMTP id 22mr14842707pfh.165.1557501614042; 
+	Fri, 10 May 2019 08:20:14 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id 19sm5920517pgz.24.2019.05.10.08.20.04
+	by smtp.gmail.com with ESMTPSA id 19sm5920517pgz.24.2019.05.10.08.20.12
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 10 May 2019 08:20:04 -0700 (PDT)
+	Fri, 10 May 2019 08:20:13 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 08:19:32 -0700
-Message-Id: <20190510151944.22981-16-richard.henderson@linaro.org>
+Date: Fri, 10 May 2019 08:19:39 -0700
+Message-Id: <20190510151944.22981-23-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190510151944.22981-1-richard.henderson@linaro.org>
 References: <20190510151944.22981-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::52f
-Subject: [Qemu-devel] [PULL 15/27] target/openrisc: Convert to
+X-Received-From: 2607:f8b0:4864:20::535
+Subject: [Qemu-devel] [PULL 22/27] target/tricore: Convert to
  CPUClass::tlb_fill
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -91,137 +91,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Stafford Horne <shorne@gmail.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc: Stafford Horne <shorne@gmail.com>
+Acked-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/openrisc/cpu.h |  5 ++--
- target/openrisc/cpu.c |  5 ++--
- target/openrisc/mmu.c | 65 ++++++++++++++++++++++---------------------
- 3 files changed, 39 insertions(+), 36 deletions(-)
+ target/tricore/cpu.h       |  6 +++---
+ target/tricore/cpu.c       |  1 +
+ target/tricore/helper.c    | 27 +++++++++++++++++++--------
+ target/tricore/op_helper.c | 26 --------------------------
+ 4 files changed, 23 insertions(+), 37 deletions(-)
 
-diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-index 88a8c70092..9473d94d0c 100644
---- a/target/openrisc/cpu.h
-+++ b/target/openrisc/cpu.h
-@@ -344,8 +344,9 @@ hwaddr openrisc_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
- int openrisc_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
- int openrisc_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
- void openrisc_translate_init(void);
--int openrisc_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size,
--                                  int rw, int mmu_idx);
-+bool openrisc_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-+                           MMUAccessType access_type, int mmu_idx,
-+                           bool probe, uintptr_t retaddr);
- int cpu_openrisc_signal_handler(int host_signum, void *pinfo, void *puc);
- int print_insn_or1k(bfd_vma addr, disassemble_info *info);
+diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
+index 64d1a9c75e..287f4328a3 100644
+--- a/target/tricore/cpu.h
++++ b/target/tricore/cpu.h
+@@ -417,8 +417,8 @@ static inline void cpu_get_tb_cpu_state(CPUTriCoreState *env, target_ulong *pc,
+ #define CPU_RESOLVING_TYPE TYPE_TRICORE_CPU
  
-diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
-index d125236977..3816baee70 100644
---- a/target/openrisc/cpu.c
-+++ b/target/openrisc/cpu.c
-@@ -149,9 +149,8 @@ static void openrisc_cpu_class_init(ObjectClass *oc, void *data)
-     cc->set_pc = openrisc_cpu_set_pc;
-     cc->gdb_read_register = openrisc_cpu_gdb_read_register;
-     cc->gdb_write_register = openrisc_cpu_gdb_write_register;
--#ifdef CONFIG_USER_ONLY
--    cc->handle_mmu_fault = openrisc_cpu_handle_mmu_fault;
--#else
-+    cc->tlb_fill = openrisc_cpu_tlb_fill;
-+#ifndef CONFIG_USER_ONLY
-     cc->get_phys_page_debug = openrisc_cpu_get_phys_page_debug;
-     dc->vmsd = &vmstate_openrisc_cpu;
- #endif
-diff --git a/target/openrisc/mmu.c b/target/openrisc/mmu.c
-index 5dec68dcff..94c65a25fa 100644
---- a/target/openrisc/mmu.c
-+++ b/target/openrisc/mmu.c
-@@ -107,16 +107,42 @@ static void raise_mmu_exception(OpenRISCCPU *cpu, target_ulong address,
-     cpu->env.lock_addr = -1;
+ /* helpers.c */
+-int cpu_tricore_handle_mmu_fault(CPUState *cpu, target_ulong address,
+-                                 int rw, int mmu_idx);
+-#define cpu_handle_mmu_fault cpu_tricore_handle_mmu_fault
++bool tricore_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                          MMUAccessType access_type, int mmu_idx,
++                          bool probe, uintptr_t retaddr);
+ 
+ #endif /* TRICORE_CPU_H */
+diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
+index e8d37e4040..ea1199d27e 100644
+--- a/target/tricore/cpu.c
++++ b/target/tricore/cpu.c
+@@ -166,6 +166,7 @@ static void tricore_cpu_class_init(ObjectClass *c, void *data)
+     cc->synchronize_from_tb = tricore_cpu_synchronize_from_tb;
+     cc->get_phys_page_attrs_debug = tricore_cpu_get_phys_page_attrs_debug;
+     cc->tcg_initialize = tricore_tcg_init;
++    cc->tlb_fill = tricore_cpu_tlb_fill;
  }
  
--int openrisc_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
--                                  int rw, int mmu_idx)
-+bool openrisc_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
-+                           MMUAccessType access_type, int mmu_idx,
-+                           bool probe, uintptr_t retaddr)
+ #define DEFINE_TRICORE_CPU_TYPE(cpu_model, initfn) \
+diff --git a/target/tricore/helper.c b/target/tricore/helper.c
+index 78ee87c9ea..ed184fee3a 100644
+--- a/target/tricore/helper.c
++++ b/target/tricore/helper.c
+@@ -50,8 +50,9 @@ static void raise_mmu_exception(CPUTriCoreState *env, target_ulong address,
  {
--#ifdef CONFIG_USER_ONLY
-     OpenRISCCPU *cpu = OPENRISC_CPU(cs);
--    raise_mmu_exception(cpu, address, EXCP_DPF);
--    return 1;
--#else
--    g_assert_not_reached();
-+    int excp = EXCP_DPF;
+ }
+ 
+-int cpu_tricore_handle_mmu_fault(CPUState *cs, target_ulong address,
+-                                 int rw, int mmu_idx)
++bool tricore_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                          MMUAccessType rw, int mmu_idx,
++                          bool probe, uintptr_t retaddr)
+ {
+     TriCoreCPU *cpu = TRICORE_CPU(cs);
+     CPUTriCoreState *env = &cpu->env;
+@@ -64,20 +65,30 @@ int cpu_tricore_handle_mmu_fault(CPUState *cs, target_ulong address,
+     access_type = ACCESS_INT;
+     ret = get_physical_address(env, &physical, &prot,
+                                address, rw, access_type);
+-    qemu_log_mask(CPU_LOG_MMU, "%s address=" TARGET_FMT_lx " ret %d physical " TARGET_FMT_plx
+-                  " prot %d\n", __func__, address, ret, physical, prot);
 +
-+#ifndef CONFIG_USER_ONLY
-+    int prot;
-+    hwaddr phys_addr;
-+
-+    if (mmu_idx == MMU_NOMMU_IDX) {
-+        /* The mmu is disabled; lookups never fail.  */
-+        get_phys_nommu(&phys_addr, &prot, addr);
-+        excp = 0;
-+    } else {
-+        bool super = mmu_idx == MMU_SUPERVISOR_IDX;
-+        int need = (access_type == MMU_INST_FETCH ? PAGE_EXEC
-+                    : access_type == MMU_DATA_STORE ? PAGE_WRITE
-+                    : PAGE_READ);
-+        excp = get_phys_mmu(cpu, &phys_addr, &prot, addr, need, super);
-+    }
-+
-+    if (likely(excp == 0)) {
-+        tlb_set_page(cs, addr & TARGET_PAGE_MASK,
-+                     phys_addr & TARGET_PAGE_MASK, prot,
-+                     mmu_idx, TARGET_PAGE_SIZE);
++    qemu_log_mask(CPU_LOG_MMU, "%s address=" TARGET_FMT_lx " ret %d physical "
++                  TARGET_FMT_plx " prot %d\n",
++                  __func__, (target_ulong)address, ret, physical, prot);
+ 
+     if (ret == TLBRET_MATCH) {
+         tlb_set_page(cs, address & TARGET_PAGE_MASK,
+                      physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
+                      mmu_idx, TARGET_PAGE_SIZE);
+-        ret = 0;
+-    } else if (ret < 0) {
 +        return true;
-+    }
-+    if (probe) {
-+        return false;
-+    }
- #endif
-+
-+    raise_mmu_exception(cpu, addr, excp);
-+    cpu_loop_exit_restore(cs, retaddr);
++    } else {
++        assert(ret < 0);
++        if (probe) {
++            return false;
++        }
+         raise_mmu_exception(env, address, rw, ret);
+-        ret = 1;
++        cpu_loop_exit_restore(cs, retaddr);
+     }
++}
+ 
+-    return ret;
++void tlb_fill(CPUState *cs, target_ulong addr, int size,
++              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
++{
++    tricore_cpu_tlb_fill(cs, addr, size, access_type, mmu_idx, false, retaddr);
  }
  
- #ifndef CONFIG_USER_ONLY
-@@ -156,29 +182,6 @@ hwaddr openrisc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
- void tlb_fill(CPUState *cs, target_ulong addr, int size,
-               MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
+ static void tricore_cpu_list_entry(gpointer data, gpointer user_data)
+diff --git a/target/tricore/op_helper.c b/target/tricore/op_helper.c
+index ed9dc0c83e..601e92f92a 100644
+--- a/target/tricore/op_helper.c
++++ b/target/tricore/op_helper.c
+@@ -2793,29 +2793,3 @@ uint32_t helper_psw_read(CPUTriCoreState *env)
  {
--    OpenRISCCPU *cpu = OPENRISC_CPU(cs);
--    int prot, excp;
--    hwaddr phys_addr;
--
--    if (mmu_idx == MMU_NOMMU_IDX) {
--        /* The mmu is disabled; lookups never fail.  */
--        get_phys_nommu(&phys_addr, &prot, addr);
--        excp = 0;
--    } else {
--        bool super = mmu_idx == MMU_SUPERVISOR_IDX;
--        int need = (access_type == MMU_INST_FETCH ? PAGE_EXEC
--                    : access_type == MMU_DATA_STORE ? PAGE_WRITE
--                    : PAGE_READ);
--        excp = get_phys_mmu(cpu, &phys_addr, &prot, addr, need, super);
--    }
--
--    if (unlikely(excp)) {
--        raise_mmu_exception(cpu, addr, excp);
--        cpu_loop_exit_restore(cs, retaddr);
--    }
--
--    tlb_set_page(cs, addr & TARGET_PAGE_MASK,
--                 phys_addr & TARGET_PAGE_MASK, prot,
--                 mmu_idx, TARGET_PAGE_SIZE);
-+    openrisc_cpu_tlb_fill(cs, addr, size, access_type, mmu_idx, 0, retaddr);
+     return psw_read(env);
  }
- #endif
+-
+-
+-static inline void QEMU_NORETURN do_raise_exception_err(CPUTriCoreState *env,
+-                                                        uint32_t exception,
+-                                                        int error_code,
+-                                                        uintptr_t pc)
+-{
+-    CPUState *cs = CPU(tricore_env_get_cpu(env));
+-    cs->exception_index = exception;
+-    env->error_code = error_code;
+-    /* now we have a real cpu fault */
+-    cpu_loop_exit_restore(cs, pc);
+-}
+-
+-void tlb_fill(CPUState *cs, target_ulong addr, int size,
+-              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
+-{
+-    int ret;
+-    ret = cpu_tricore_handle_mmu_fault(cs, addr, access_type, mmu_idx);
+-    if (ret) {
+-        TriCoreCPU *cpu = TRICORE_CPU(cs);
+-        CPUTriCoreState *env = &cpu->env;
+-        do_raise_exception_err(env, cs->exception_index,
+-                               env->error_code, retaddr);
+-    }
+-}
 -- 
 2.17.1
 
