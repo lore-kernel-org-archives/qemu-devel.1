@@ -2,72 +2,64 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C5D0C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:00:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1400EC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:01:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B181216C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:00:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B181216C4
+	by mail.kernel.org (Postfix) with ESMTPS id DD905216C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:01:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD905216C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39281 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39294 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP1OK-0004iB-CT
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 05:00:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35539)
+	id 1hP1PW-0005xl-7Z
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 05:01:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hP1Ne-0004Pz-Hd
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:59:51 -0400
+	(envelope-from <berrange@redhat.com>) id 1hP1OT-0004wK-Ea
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:00:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hP1Nd-0004IL-P4
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:59:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45236)
+	(envelope-from <berrange@redhat.com>) id 1hP1OO-0005Jj-8E
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:00:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56562)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hP1Nd-0004Hq-Jg
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:59:49 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hP1ON-0005JS-UR
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:00:36 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8353D3084295;
-	Fri, 10 May 2019 08:59:48 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
-	[10.36.117.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 42BEF379C;
-	Fri, 10 May 2019 08:59:48 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 79B10A1E1; Fri, 10 May 2019 10:59:47 +0200 (CEST)
-Date: Fri, 10 May 2019 10:59:47 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <20190510085947.y62lttdtrg5cxx6b@sirius.home.kraxel.org>
-References: <CABSdmrnNW6f=P64PviPP8CTJ5SVfYS8_6kmAtpw9yPObTEkpxg@mail.gmail.com>
-	<CABSdmrnocrqLKWncgy_Lak33__GRPYfs-RzSA14e=vh4cRn2ag@mail.gmail.com>
-	<20190509064848.wjhchsfov7q6komj@sirius.home.kraxel.org>
-	<CABSdmrmm+wJ=+Ccav=X5Gw_oueQvPRejCWVG2SQeCw=K4BM9EA@mail.gmail.com>
-	<CABSdmrndpONH_fVHbktHbBXvXPKESeRfis06TjrNRRfBpJzXLA@mail.gmail.com>
-	<b6064b77-5ca4-03e1-80ef-027313096cb2@gmail.com>
-	<CABSdmrkW6G23ZGDA7iLucM45vL0HHGsr2F76H0Mf8S0xkhPnsQ@mail.gmail.com>
-	<3e619b5c-8fb3-2655-2d92-37598db098d8@gmail.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 271E780F6D;
+	Fri, 10 May 2019 09:00:35 +0000 (UTC)
+Received: from redhat.com (ovpn-112-68.ams2.redhat.com [10.36.112.68])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 243DF6013A;
+	Fri, 10 May 2019 09:00:30 +0000 (UTC)
+Date: Fri, 10 May 2019 10:00:28 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20190510090028.GF7671@redhat.com>
+References: <20190510081526.15507-1-kchamart@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <3e619b5c-8fb3-2655-2d92-37598db098d8@gmail.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20190510081526.15507-1-kchamart@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Fri, 10 May 2019 08:59:48 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.27]);
+	Fri, 10 May 2019 09:00:35 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/3] ramfb enhancement
+Subject: Re: [Qemu-devel] [PATCH v2] VirtIO-RNG: Update default entropy
+ source to `/dev/urandom`
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,22 +71,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Hou Qiming <hqm03ster@gmail.com>, qemu-devel@nongnu.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: armbru@redhat.com, rjones@redhat.com, qemu-devel@nongnu.org,
+	stefanha@redhat.com, amit@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
+On Fri, May 10, 2019 at 10:15:25AM +0200, Kashyap Chamarthy wrote:
+> When QEMU exposes a VirtIO-RNG device to the guest, that device needs a
+> source of entropy, and that source needs to be "non-blocking", like
+> `/dev/urandom`.  However, currently QEMU defaults to the problematic
+> `/dev/random`, which is "blocking" (as in, it waits until sufficient
+> entropy is available).
+>=20
+> Why prefer `/dev/urandom` over `/dev/random`?
+> ---------------------------------------------
+>=20
+> The man pages of urandom(4) and random(4) state:
+>=20
+>     "The /dev/random device is a legacy interface which dates back to a
+>     time where the cryptographic primitives used in the implementation
+>     of /dev/urandom were not widely trusted.  It will return random
+>     bytes only within the estimated number of bits of fresh noise in th=
+e
+>     entropy pool, blocking if necessary.  /dev/random is suitable for
+>     applications that need high quality randomness, and can afford
+>     indeterminate delays."
+>=20
+> Further, the "Usage" section of the said man pages state:
+>=20
+>     "The /dev/random interface is considered a legacy interface, and
+>     /dev/urandom is preferred and sufficient in all use cases, with the
+>     exception of applications which require randomness during early boo=
+t
+>     time; for these applications, getrandom(2) must be used instead,
+>     because it will block until the entropy pool is initialized.
+>=20
+>     "If a seed file is saved across reboots as recommended below (all
+>     major Linux distributions have done this since 2000 at least), the
+>     output is cryptographically secure against attackers without local
+>     root access as soon as it is reloaded in the boot sequence, and
+>     perfectly adequate for network encryption session keys.  Since read=
+s
+>     from /dev/random may block, users will usually want to open it in
+>     nonblocking mode (or perform a read with timeout), and provide some
+>     sort of user notification if the desired entropy is not immediately
+>     available."
+>=20
+> And refer to random(7) for a comparison of `/dev/random` and
+> `/dev/urandom`.
+>=20
+>     - - -
+>=20
+> Given the above, change the entropy source for VirtIO-RNG device to
+> `/dev/urandom`.
+>=20
+> Related discussion in these[1][2] past threads.
+>=20
+> [1] https://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg08335.h=
+tml
+>     -- "RNG: Any reason QEMU doesn't default to `/dev/urandom`?"
+> [2] https://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg02724.h=
+tml
+>     -- "[RFC] Virtio RNG: Consider changing the default entropy source =
+to
+>        /dev/urandom"
+>=20
+> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+> ---
+> v2:
+>  - Update commit message to mention justification for preferring
+>    `/dev/urandom` over `/dev/random` [stefanha]
+> ---
+>  backends/rng-random.c | 2 +-
+>  qemu-options.hx       | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
-> Got it, thanks. Is a pity ramfb is not a PCI device :), it was worth the
-> question anyway.
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-If you look for a simple pci display device check out bochs-display.
-It's simliar to stdvga (so ovmf and bochs-drm.ko can drive it just
-fine), but without legacy vga emulation, only a linear framebuffer is
-supported.  And code size is a fraction of stdvga ...
 
-cheers,
-  Gerd
-
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
