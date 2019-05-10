@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A7B3C04AB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 01:13:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E509C04AB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 01:20:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B6D12175B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 01:13:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AFF4D217F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 01:20:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R1QIfPr7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B6D12175B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ICYAV5C0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFF4D217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34894 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34970 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOu5w-00038C-7w
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 21:13:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56825)
+	id 1hOuDM-0004XR-1B
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 21:20:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hOu54-0002hX-Ox
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 21:12:12 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1hOuCM-0004B8-BV
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 21:19:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hOu52-0001Un-BI
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 21:12:10 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38195)
+	(envelope-from <liq3ea@gmail.com>) id 1hOuCJ-0005lG-Qo
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 21:19:42 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42215)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hOu51-0001UH-Vz
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 21:12:08 -0400
-Received: by mail-oi1-x244.google.com with SMTP id u199so3376454oie.5
-	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 18:12:07 -0700 (PDT)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hOuCJ-0005kf-H6
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 21:19:39 -0400
+Received: by mail-ot1-x343.google.com with SMTP id f23so4105897otl.9
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 18:19:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=EGuxRRu7B8lpqvtk+XV624WlTyzXWDItZRHnjrpiXMg=;
-	b=R1QIfPr7bcsNnQrjnPToSJx7ADujyXSuFxEZ+e1PgnCXQ6a88koG/MskWYFREC4+ML
-	twYcu2y46C7C0duv0vUObyL3LCkhFnZYG+jfJ7G3uMmn8fY0Z1+Fbl7fEsNuxehYUgwo
-	Z4PDPwOZmjEc86XwxN5g3Pxh5goJHOl0bsP3Oaqtn6ndQqzbK2yEztR1HX9sIYtxi3JA
-	vyscUEelI6U9gmfhfYQ+2GYxb6Z6UxPd5C+Ng1BTwLr97nrqMe5YlMjwrFoUF87McskH
-	VLSjRGBRQpzzEmvwtsVdPoy0vRFhGlD66I9/OMg46weIy3qZyegvynT7ffXfLNQ8BkDV
-	EMkw==
+	:cc; bh=TirtAnEAr4dgD8ssSzW1QtvGdF697OhhsmL9O53O67w=;
+	b=ICYAV5C0SD1w8STmvUbIeJypZFJrzMMqgm4EkrVFA8pVHxcel6a4zyxgPnyySSx8Ym
+	Xcgydlx+hRZErAs0oEiF9Vi8meK/bO5MBqJK4Yhh3SIlUdGwI1fHGDXW2TQwG2RSsc0L
+	2FXdpXfu1b0YDm8QZgfngy3Ic10GqMgS4CT8S++U09zXulsqAZY1MVlWiWDEyspfruhs
+	GplaD2+WbywhtekylW0hGWeE6wzHJHAGvpAFYgO8n+zc9DQ9hpE5Q5GHcIrcRFU2nU66
+	tCingf1/7PlXTxjDQbKrGnihWNXDdLe/U5604Laa03gxwLNiS3cAAeWVg53+KR5kIwMS
+	XaFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc;
-	bh=EGuxRRu7B8lpqvtk+XV624WlTyzXWDItZRHnjrpiXMg=;
-	b=c53BKbn0GHnXVDw/Vi6xK4Vi7CgZ+MR56U7HR0Zkek96lJrcWNPRJ9Aa91rmxreXIm
-	zYyX6ouP0G8hpJ+v/z/kpE7gRmXXbnrgT/z7F5arSQ9kNc9lsuZH6s2lTRhuQC8P0/yI
-	LiLCpU/WiwiuUtwxd0qFUHNN5sJSSsUCptKtiMwXrKwc+rPJU7RM+/TiZrSs/uMoQT07
-	VzWQeyr8HuD0VokWDk/yRP8v1aZ4uo2ZUnE1F1BII+pX2NOMhzWElAGTH6VYp/l181Rm
-	84aIg0XG93Z362iSBi41xxsIFW13hxOWbm0bXKmdJHKipBJnck1Uomyyz9oTfDyGHe+4
-	3cng==
-X-Gm-Message-State: APjAAAUfoOaaAPfhkCYoDglb83L/T29JDDzSXn2QSWDjWd5lv2rp6/qi
-	196NaIUPraMzfY18yiv5R2MfyGSeU0NxjrXabiw=
-X-Google-Smtp-Source: APXvYqxEUaqfL8cBgs2te+0PKl+WPXUpIByhKqV8Q+3XBXNO5uc3YR00RXnmWfqjITK4NiDYdWoHfiW7zM+iJMmX07k=
-X-Received: by 2002:aca:fd45:: with SMTP id b66mr1740228oii.157.1557450726668; 
-	Thu, 09 May 2019 18:12:06 -0700 (PDT)
+	bh=TirtAnEAr4dgD8ssSzW1QtvGdF697OhhsmL9O53O67w=;
+	b=IrFzOldSqRRrWpZ4Jg4/T9ulIhK1xuEvafgTnpHuvrMY1VzueDMdnvFSwnmWY2eU4X
+	ud0bqX2UQpUIIrEL8dnYQ71+r0Ty9TxPYb9MOebc4SX3iQVmhoyqpzFjf12t9dzgc9iF
+	6kbA+b8kif3f+JT2beP/irAtp1TggKUtcxXi2NE0wVtcCoVweKxT0N2FFuO+UQ4P90+T
+	m+IhFBI9ZEu8aP2WK4Z6jOuof4ybpoGfSon/eUHeMMrmwO4U6MxGdyUCMz+SmV9ECrSF
+	gltBzPeK5ihcMZreqMrDSuOfE9hC3KL24zexjltQMbPe8aXyLsoJDYH6YUd5RcLUxOAa
+	iogQ==
+X-Gm-Message-State: APjAAAV5K/aqbNBGdid8w0K6rBqXsy9ycFuXIgUFV4KymWYFHpUWZ8g/
+	mRjTgm/ciJsOK/Kz56VWYklMiAb9s1zcAixv+e4=
+X-Google-Smtp-Source: APXvYqxDyQk2zUhy3U3iMBZ4n310cTXIUiYLnzc0QI1NbtX9/6nYU8UCtUxmpZaFJXiH1qSqiwc/KcPEyXsoSaM0yJM=
+X-Received: by 2002:a05:6830:14cd:: with SMTP id
+	t13mr4685022otq.25.1557451178585; 
+	Thu, 09 May 2019 18:19:38 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190509121820.16294-1-stefanha@redhat.com>
-	<20190509121820.16294-2-stefanha@redhat.com>
-In-Reply-To: <20190509121820.16294-2-stefanha@redhat.com>
+	<20190509121820.16294-3-stefanha@redhat.com>
+In-Reply-To: <20190509121820.16294-3-stefanha@redhat.com>
 From: Li Qiang <liq3ea@gmail.com>
-Date: Fri, 10 May 2019 09:11:30 +0800
-Message-ID: <CAKXe6SL9SUhV-kpQj5rFtVZp+8x4ggWhbDSvg1Ee-xztym--=w@mail.gmail.com>
+Date: Fri, 10 May 2019 09:19:02 +0800
+Message-ID: <CAKXe6SLH=SKwOvvYUucXd4AoGfkFe7y8__b1RQRMd7ivikNgCw@mail.gmail.com>
 To: Stefan Hajnoczi <stefanha@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+X-Received-From: 2607:f8b0:4864:20::343
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] docs: add Secure Coding Practices
- to developer docs
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] docs: add Security chapter to the
+ documentation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,192 +102,270 @@ Sender: "Qemu-devel"
 Stefan Hajnoczi <stefanha@redhat.com> =E4=BA=8E2019=E5=B9=B45=E6=9C=889=E6=
 =97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=888:20=E5=86=99=E9=81=93=EF=BC=9A
 
-> At KVM Forum 2018 I gave a presentation on security in QEMU:
-> https://www.youtube.com/watch?v=3DYAdRf_hwxU8 (video)
-> https://vmsplice.net/~stefan/stefanha-kvm-forum-2018.pdf (slides)
+> This new chapter in the QEMU documentation covers the security
+> requirements that QEMU is designed to meet and principles for securely
+> deploying QEMU.
 >
-> This patch adds a guide to secure coding practices.  This document
-> covers things that developers should know about security in QEMU.  It is
-> just a starting point that we can expand on later.  I hope it will be
-> useful as a resource for new contributors and will save code reviewers
-> from explaining the same concepts many times.
+> It is just a starting point that can be extended in the future with more
+> information.
 >
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > Acked-by: Stefano Garzarella <sgarzare@redhat.com>
 > Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
 >
+
 
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
 
 
 
-> ---
->  docs/devel/index.rst                   |   1 +
->  docs/devel/secure-coding-practices.rst | 106 +++++++++++++++++++++++++
->  2 files changed, 107 insertions(+)
->  create mode 100644 docs/devel/secure-coding-practices.rst
+>  Makefile           |   2 +-
+>  docs/security.texi | 131 +++++++++++++++++++++++++++++++++++++++++++++
+>  qemu-doc.texi      |   3 ++
+>  3 files changed, 135 insertions(+), 1 deletion(-)
+>  create mode 100644 docs/security.texi
 >
-> diff --git a/docs/devel/index.rst b/docs/devel/index.rst
-> index ebbab636ce..2a4ddf40ad 100644
-> --- a/docs/devel/index.rst
-> +++ b/docs/devel/index.rst
-> @@ -20,3 +20,4 @@ Contents:
->     stable-process
->     testing
->     decodetree
-> +   secure-coding-practices
-> diff --git a/docs/devel/secure-coding-practices.rst
-> b/docs/devel/secure-coding-practices.rst
+> diff --git a/Makefile b/Makefile
+> index d372493042..e2bc9c8c9d 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -973,7 +973,7 @@ qemu-doc.html qemu-doc.info qemu-doc.pdf
+> qemu-doc.txt: \
+>         qemu-img.texi qemu-nbd.texi qemu-options.texi
+> qemu-option-trace.texi \
+>         qemu-deprecated.texi qemu-monitor.texi qemu-img-cmds.texi
+> qemu-ga.texi \
+>         qemu-monitor-info.texi docs/qemu-block-drivers.texi \
+> -       docs/qemu-cpu-models.texi
+> +       docs/qemu-cpu-models.texi docs/security.texi
+>
+>  docs/interop/qemu-ga-ref.dvi docs/interop/qemu-ga-ref.html \
+>      docs/interop/qemu-ga-ref.info docs/interop/qemu-ga-ref.pdf \
+> diff --git a/docs/security.texi b/docs/security.texi
 > new file mode 100644
-> index 0000000000..cbfc8af67e
+> index 0000000000..927764f1e6
 > --- /dev/null
-> +++ b/docs/devel/secure-coding-practices.rst
-> @@ -0,0 +1,106 @@
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +Secure Coding Practices
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +This document covers topics that both developers and security researcher=
+> +++ b/docs/security.texi
+> @@ -0,0 +1,131 @@
+> +@node Security
+> +@chapter Security
+> +
+> +@section Overview
+> +
+> +This chapter explains the security requirements that QEMU is designed to
+> meet
+> +and principles for securely deploying QEMU.
+> +
+> +@section Security Requirements
+> +
+> +QEMU supports many different use cases, some of which have stricter
+> security
+> +requirements than others.  The community has agreed on the overall
+> security
+> +requirements that users may depend on.  These requirements define what i=
 s
-> must
-> +be aware of so that they can develop safe code and audit existing code
-> +properly.
+> +considered supported from a security perspective.
 > +
-> +Reporting Security Bugs
-> +-----------------------
-> +For details on how to report security bugs or ask questions about
-> potential
-> +security bugs, see the `Security Process wiki page
-> +<https://wiki.qemu.org/SecurityProcess>`_.
+> +@subsection Virtualization Use Case
 > +
-> +General Secure C Coding Practices
-> +---------------------------------
-> +Most CVEs (security bugs) reported against QEMU are not specific to
-> +virtualization or emulation.  They are simply C programming bugs.
-> Therefore
-> +it's critical to be aware of common classes of security bugs.
+> +The virtualization use case covers cloud and virtual private server (VPS=
+)
+> +hosting, as well as traditional data center and desktop virtualization.
+> These
+> +use cases rely on hardware virtualization extensions to execute guest co=
+de
+> +safely on the physical CPU at close-to-native speed.
 > +
-> +There is a wide selection of resources available covering secure C
-> coding.  For
-> +example, the `CERT C Coding Standard
-> +<https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standar=
-d
-> >`_
-> +covers the most important classes of security bugs.
+> +The following entities are untrusted, meaning that they may be buggy or
+> +malicious:
 > +
-> +Instead of describing them in detail here, only the names of the most
-> important
-> +classes of security bugs are mentioned:
+> +@itemize
+> +@item Guest
+> +@item User-facing interfaces (e.g. VNC, SPICE, WebSocket)
+> +@item Network protocols (e.g. NBD, live migration)
+> +@item User-supplied files (e.g. disk images, kernels, device trees)
+> +@item Passthrough devices (e.g. PCI, USB)
+> +@end itemize
 > +
-> +* Buffer overflows
-> +* Use-after-free and double-free
-> +* Integer overflows
-> +* Format string vulnerabilities
+> +Bugs affecting these entities are evaluated on whether they can cause
+> damage in
+> +real-world use cases and treated as security bugs if this is the case.
 > +
-> +Some of these classes of bugs can be detected by analyzers.  Static
-> analysis is
-> +performed regularly by Coverity and the most obvious of these bugs are
-> even
-> +reported by compilers.  Dynamic analysis is possible with valgrind, tsan=
-,
-> and
-> +asan.
+> +@subsection Non-virtualization Use Case
 > +
-> +Input Validation
-> +----------------
-> +Inputs from the guest or external sources (e.g. network, files) cannot b=
+> +The non-virtualization use case covers emulation using the Tiny Code
+> Generator
+> +(TCG).  In principle the TCG and device emulation code used in
+> conjunction with
+> +the non-virtualization use case should meet the same security
+> requirements as
+> +the virtualization use case.  However, for historical reasons much of th=
 e
-> +trusted and may be invalid.  Inputs must be checked before using them in
-> a way
-> +that could crash the program, expose host memory to the guest, or
-> otherwise be
-> +exploitable by an attacker.
+> +non-virtualization use case code was not written with these security
+> +requirements in mind.
 > +
-> +The most sensitive attack surface is device emulation.  All hardware
-> register
-> +accesses and data read from guest memory must be validated.  A typical
-> example
-> +is a device that contains multiple units that are selectable by the gues=
-t
-> via
-> +an index register::
+> +Bugs affecting the non-virtualization use case are not considered securi=
+ty
+> +bugs at this time.  Users with non-virtualization use cases must not rel=
+y
+> on
+> +QEMU to provide guest isolation or any security guarantees.
 > +
-> +  typedef struct {
-> +      ProcessingUnit unit[2];
-> +      ...
-> +  } MyDeviceState;
+> +@section Architecture
 > +
-> +  static void mydev_writel(void *opaque, uint32_t addr, uint32_t val)
-> +  {
-> +      MyDeviceState *mydev =3D opaque;
-> +      ProcessingUnit *unit;
+> +This section describes the design principles that ensure the security
+> +requirements are met.
 > +
-> +      switch (addr) {
-> +      case MYDEV_SELECT_UNIT:
-> +          unit =3D &mydev->unit[val];   <-- this input wasn't validated!
-> +          ...
-> +      }
-> +  }
+> +@subsection Guest Isolation
 > +
-> +If ``val`` is not in range [0, 1] then an out-of-bounds memory access
-> will take
-> +place when ``unit`` is dereferenced.  The code must check that ``val`` i=
-s
-> 0 or
-> +1 and handle the case where it is invalid.
-> +
-> +Unexpected Device Accesses
-> +--------------------------
-> +The guest may access device registers in unusual orders or at unexpected
-> +moments.  Device emulation code must not assume that the guest follows t=
-he
-> +typical "theory of operation" presented in driver writer manuals.  The
-> guest
-> +may make nonsense accesses to device registers such as starting operatio=
-ns
-> +before the device has been fully initialized.
-> +
-> +A related issue is that device emulation code must be prepared for
-> unexpected
-> +device register accesses while asynchronous operations are in progress. =
- A
-> +well-behaved guest might wait for a completion interrupt before accessin=
+> +Guest isolation is the confinement of guest code to the virtual machine.
+> When
+> +guest code gains control of execution on the host this is called escapin=
 g
-> +certain device registers.  Device emulation code must handle the case
-> where the
-> +guest overwrites registers or submits further requests before an ongoing
-> +request completes.  Unexpected accesses must not cause memory corruption
-> or
-> +leaks in QEMU.
+> the
+> +virtual machine.  Isolation also includes resource limits such as
+> throttling of
+> +CPU, memory, disk, or network.  Guests must be unable to exceed their
+> resource
+> +limits.
 > +
-> +Invalid device register accesses can be reported with
-> +``qemu_log_mask(LOG_GUEST_ERROR, ...)``.  The ``-d guest_errors``
-> command-line
-> +option enables these log messages.
+> +QEMU presents an attack surface to the guest in the form of emulated
+> devices.
+> +The guest must not be able to gain control of QEMU.  Bugs in emulated
+> devices
+> +could allow malicious guests to gain code execution in QEMU.  At this
+> point the
+> +guest has escaped the virtual machine and is able to act in the context
+> of the
+> +QEMU process on the host.
 > +
-> +Live Migration
-> +--------------
-> +Device state can be saved to disk image files and shared with other user=
-s.
-> +Live migration code must validate inputs when loading device state so an
-> +attacker cannot gain control by crafting invalid device states.  Device
-> state
-> +is therefore considered untrusted even though it is typically generated
-> by QEMU
-> +itself.
+> +Guests often interact with other guests and share resources with them.  =
+A
+> +malicious guest must not gain control of other guests or access their
+> data.
+> +Disk image files and network traffic must be protected from other guests
+> unless
+> +explicitly shared between them by the user.
 > +
-> +Guest Memory Access Races
-> +-------------------------
-> +Guests with multiple vCPUs may modify guest RAM while device emulation
-> code is
-> +running.  Device emulation code must copy in descriptors and other guest
-> RAM
-> +structures and only process the local copy.  This prevents
-> +time-of-check-to-time-of-use (TOCTOU) race conditions that could cause
-> QEMU to
-> +crash when a vCPU thread modifies guest RAM while device emulation is
-> +processing it.
+> +@subsection Principle of Least Privilege
+> +
+> +The principle of least privilege states that each component only has
+> access to
+> +the privileges necessary for its function.  In the case of QEMU this
+> means that
+> +each process only has access to resources belonging to the guest.
+> +
+> +The QEMU process should not have access to any resources that are
+> inaccessible
+> +to the guest.  This way the guest does not gain anything by escaping int=
+o
+> the
+> +QEMU process since it already has access to those same resources from
+> within
+> +the guest.
+> +
+> +Following the principle of least privilege immediately fulfills guest
+> isolation
+> +requirements.  For example, guest A only has access to its own disk imag=
+e
+> file
+> +@code{a.img} and not guest B's disk image file @code{b.img}.
+> +
+> +In reality certain resources are inaccessible to the guest but must be
+> +available to QEMU to perform its function.  For example, host system
+> calls are
+> +necessary for QEMU but are not exposed to guests.  A guest that escapes
+> into
+> +the QEMU process can then begin invoking host system calls.
+> +
+> +New features must be designed to follow the principle of least privilege=
+.
+> +Should this not be possible for technical reasons, the security risk mus=
+t
+> be
+> +clearly documented so users are aware of the trade-off of enabling the
+> feature.
+> +
+> +@subsection Isolation mechanisms
+> +
+> +Several isolation mechanisms are available to realize this architecture =
+of
+> +guest isolation and the principle of least privilege.  With the exceptio=
+n
+> of
+> +Linux seccomp, these mechanisms are all deployed by management tools tha=
+t
+> +launch QEMU, such as libvirt.  They are also platform-specific so they
+> are only
+> +described briefly for Linux here.
+> +
+> +The fundamental isolation mechanism is that QEMU processes must run as
+> +unprivileged users.  Sometimes it seems more convenient to launch QEMU a=
+s
+> +root to give it access to host devices (e.g. @code{/dev/net/tun}) but
+> this poses a
+> +huge security risk.  File descriptor passing can be used to give an
+> otherwise
+> +unprivileged QEMU process access to host devices without running QEMU as
+> root.
+> +It is also possible to launch QEMU as a non-root user and configure UNIX
+> groups
+> +for access to @code{/dev/kvm}, @code{/dev/net/tun}, and other device
+> nodes.
+> +Some Linux distros already ship with UNIX groups for these devices by
+> default.
+> +
+> +@itemize
+> +@item SELinux and AppArmor make it possible to confine processes beyond
+> the
+> +traditional UNIX process and file permissions model.  They restrict the
+> QEMU
+> +process from accessing processes and files on the host system that are n=
+ot
+> +needed by QEMU.
+> +
+> +@item Resource limits and cgroup controllers provide throughput and
+> utilization
+> +limits on key resources such as CPU time, memory, and I/O bandwidth.
+> +
+> +@item Linux namespaces can be used to make process, file system, and
+> other system
+> +resources unavailable to QEMU.  A namespaced QEMU process is restricted
+> to only
+> +those resources that were granted to it.
+> +
+> +@item Linux seccomp is available via the QEMU @option{--sandbox} option.
+> It disables
+> +system calls that are not needed by QEMU, thereby reducing the host kern=
+el
+> +attack surface.
+> +@end itemize
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index ae3c3f9632..577d1e8376 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -38,6 +38,7 @@
+>  * QEMU Guest Agent::
+>  * QEMU User space emulator::
+>  * System requirements::
+> +* Security::
+>  * Implementation notes::
+>  * Deprecated features::
+>  * Supported build platforms::
+> @@ -2878,6 +2879,8 @@ added with Linux 4.5 which is supported by the majo=
+r
+> distros. And even
+>  if RHEL7 has kernel 3.10, KVM there has the required functionality there
+>  to make it close to a 4.5 or newer kernel.
+>
+> +@include docs/security.texi
+> +
+>  @include qemu-tech.texi
+>
+>  @include qemu-deprecated.texi
 > --
 > 2.21.0
 >
