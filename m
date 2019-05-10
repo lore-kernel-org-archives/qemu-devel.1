@@ -2,69 +2,78 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F29FC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 08:36:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E572DC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 08:37:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D71CA20850
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 08:36:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D71CA20850
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id A60802087E
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 08:37:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A60802087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38999 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39007 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP11U-0002UR-W6
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 04:36:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60469)
+	id 1hP12R-00035c-0B
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 04:37:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1hP10V-0001lU-Mj
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:35:57 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hP11D-0002UX-1Y
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:36:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1hP10U-00088u-1B
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:35:55 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:45402 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1hP0zh-0007R7-Pt; Fri, 10 May 2019 04:35:49 -0400
-Received: from lhreml701-cah.china.huawei.com (unknown [172.18.7.108])
-	by Forcepoint Email with ESMTP id E16C175825FC1EB19DB1;
-	Fri, 10 May 2019 09:34:58 +0100 (IST)
-Received: from LHREML524-MBS.china.huawei.com ([169.254.2.137]) by
-	lhreml701-cah.china.huawei.com ([10.201.108.42]) with mapi id
-	14.03.0415.000; Fri, 10 May 2019 09:34:50 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Thread-Topic: [Question] Memory hotplug clarification for Qemu ARM/virt
-Thread-Index: AQHVBZyqsUtUKaKFrky+uGhe7FD3haZhnJEAgAFR1ACAAFdrgIAAw4ww
-Date: Fri, 10 May 2019 08:34:50 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA83F1DDFE5@lhreml524-mbs.china.huawei.com>
-References: <5FC3163CFD30C246ABAA99954A238FA83F1B6A66@lhreml524-mbs.china.huawei.com>
-	<ca5f7231-6924-0720-73a5-766eb13ee331@arm.com>
-	<190831a5-297d-addb-ea56-645afb169efb@redhat.com>
-	<20190509183520.6dc47f2e@Igors-MacBook-Pro>
-	<cd2aa867-5367-b470-0a2b-33897697c23f@redhat.com>
-In-Reply-To: <cd2aa867-5367-b470-0a2b-33897697c23f@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.237]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <sgarzare@redhat.com>) id 1hP11B-0008Ow-By
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:36:39 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43641)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hP11B-0008Og-2R
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:36:37 -0400
+Received: by mail-wr1-f65.google.com with SMTP id r4so6704385wro.10
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 01:36:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=lsbd6bql17kRkrC1yusUvgL1wdr7xQqjrMhaj4j0aDU=;
+	b=tDpNGTcHHZxM3YROrV7crY9jhmeezFJ8HeYYxyJl2c6QhL1CcHfPJYRo7NG5F1Makj
+	GkDABW69MWruDhmnY73MP/mYww6TMHJoid8rLsYs1Evx99MOIcMeJsS4dM1ewjS25M1g
+	62odOQFhpwF9CJNtJUcIc5Vr/fIAUrg646X1gpMnPAG2RZAS256s7MDcPitAwbxQM7eX
+	9cHrVkJ3RE9ZPWhnXFnuStCKsy/c+vXkp9tkoeiVItWhgMFZhbXmM74f8IdTdpSKV4BL
+	p39EEqulmBFPzUobxXt0F1kry6ZGGjgAk6zwfMKc5Cbs3TLY8sGu/vosv+z5EPBI5nwH
+	9QLA==
+X-Gm-Message-State: APjAAAXXN6kxmPsDp9MTltIdIGhFPaCSRkehFIJgpGGH13SoUwFSSNZz
+	wNCMfoR1KmR8QsOuSs9ActConw==
+X-Google-Smtp-Source: APXvYqxXLzLobYf8M7xwDqJLoX89cIArwSe68yElJSrZOQcffGuLEGZzV4m+dN53UJ3Ng0mRvhQN9Q==
+X-Received: by 2002:a5d:4648:: with SMTP id j8mr4025407wrs.53.1557477395981;
+	Fri, 10 May 2019 01:36:35 -0700 (PDT)
+Received: from steredhat (host151-251-static.12-87-b.business.telecomitalia.it.
+	[87.12.251.151]) by smtp.gmail.com with ESMTPSA id
+	i17sm1465969wrr.46.2019.05.10.01.36.34
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Fri, 10 May 2019 01:36:35 -0700 (PDT)
+Date: Fri, 10 May 2019 10:36:27 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190510083627.gumo2f72vdmzv6tx@steredhat>
+References: <20190427113625.46594-1-sgarzare@redhat.com>
+	<877eb2hiwk.fsf@dusky.pond.sub.org>
+	<20190507083615.as7shlq7fwjgwz54@steredhat>
+	<8736lp5fxg.fsf@dusky.pond.sub.org>
+	<20190509082646.lrfllcqszjlmnyfe@steredhat>
+	<87a7fv4yrd.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a7fv4yrd.fsf@dusky.pond.sub.org>
+User-Agent: NeoMutt/20180716
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 185.176.76.210
-Subject: Re: [Qemu-devel] [Question] Memory hotplug clarification for Qemu
- ARM/virt
+	[fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] Use of PreallocMode in block drivers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,182 +85,272 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"xuwei \(O\)" <xuwei5@huawei.com>, Anshuman
-	Khandual <anshuman.khandual@arm.com>,
-	Catalin Marinas <Catalin.Marinas@arm.com>,
-	"ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>,
-	"will.deacon@arm.com" <will.deacon@arm.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	Linuxarm <linuxarm@huawei.com>, linux-mm <linux-mm@kvack.org>,
-	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Robin Murphy <robin.murphy@arm.com>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
+	Peter Krempa <pkrempa@redhat.com>, qemu-block@nongnu.org,
+	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTGFzemxvIEVyc2VrIFtt
-YWlsdG86bGVyc2VrQHJlZGhhdC5jb21dDQo+IFNlbnQ6IDA5IE1heSAyMDE5IDIyOjQ4DQo+IFRv
-OiBJZ29yIE1hbW1lZG92IDxpbWFtbWVkb0ByZWRoYXQuY29tPg0KPiBDYzogUm9iaW4gTXVycGh5
-IDxyb2Jpbi5tdXJwaHlAYXJtLmNvbT47IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkNCj4gPHNo
-YW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT47IHdpbGwuZGVhY29uQGFybS5jb207
-IENhdGFsaW4NCj4gTWFyaW5hcyA8Q2F0YWxpbi5NYXJpbmFzQGFybS5jb20+OyBBbnNodW1hbiBL
-aGFuZHVhbA0KPiA8YW5zaHVtYW4ua2hhbmR1YWxAYXJtLmNvbT47IGxpbnV4LWFybS1rZXJuZWxA
-bGlzdHMuaW5mcmFkZWFkLm9yZzsNCj4gbGludXgtbW0gPGxpbnV4LW1tQGt2YWNrLm9yZz47IHFl
-bXUtZGV2ZWxAbm9uZ251Lm9yZzsNCj4gcWVtdS1hcm1Abm9uZ251Lm9yZzsgZXJpYy5hdWdlckBy
-ZWRoYXQuY29tOyBwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc7DQo+IExpbnV4YXJtIDxsaW51eGFy
-bUBodWF3ZWkuY29tPjsgYXJkLmJpZXNoZXV2ZWxAbGluYXJvLm9yZzsgSm9uYXRoYW4NCj4gQ2Ft
-ZXJvbiA8am9uYXRoYW4uY2FtZXJvbkBodWF3ZWkuY29tPjsgeHV3ZWkgKE8pIDx4dXdlaTVAaHVh
-d2VpLmNvbT4NCj4gU3ViamVjdDogUmU6IFtRdWVzdGlvbl0gTWVtb3J5IGhvdHBsdWcgY2xhcmlm
-aWNhdGlvbiBmb3IgUWVtdSBBUk0vdmlydA0KPiANCj4gT24gMDUvMDkvMTkgMTg6MzUsIElnb3Ig
-TWFtbWVkb3Ygd3JvdGU6DQo+ID4gT24gV2VkLCA4IE1heSAyMDE5IDIyOjI2OjEyICswMjAwDQo+
-ID4gTGFzemxvIEVyc2VrIDxsZXJzZWtAcmVkaGF0LmNvbT4gd3JvdGU6DQo+ID4NCj4gPj4gT24g
-MDUvMDgvMTkgMTQ6NTAsIFJvYmluIE11cnBoeSB3cm90ZToNCj4gPj4+IEhpIFNoYW1lZXIsDQo+
-ID4+Pg0KPiA+Pj4gT24gMDgvMDUvMjAxOSAxMToxNSwgU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9k
-aSB3cm90ZToNCj4gPj4+PiBIaSwNCj4gPj4+Pg0KPiA+Pj4+IFRoaXMgc2VyaWVzIGhlcmVbMF0g
-YXR0ZW1wdHMgdG8gYWRkIHN1cHBvcnQgZm9yIFBDRElNTSBpbiBRRU1VIGZvcg0KPiA+Pj4+IEFS
-TS9WaXJ0IHBsYXRmb3JtIGFuZCBoYXMgc3R1bWJsZWQgdXBvbiBhbiBpc3N1ZSBhcyBpdCBpcyBu
-b3QgY2xlYXIoYXQNCj4gPj4+PiBsZWFzdA0KPiA+Pj4+IGZyb20gUWVtdS9FREsyIHBvaW50IG9m
-IHZpZXcpIGhvdyBpbiBwaHlzaWNhbCB3b3JsZCB0aGUgaG90cGx1Z2dhYmxlDQo+ID4+Pj4gbWVt
-b3J5IGlzIGhhbmRsZWQgYnkga2VybmVsLg0KPiA+Pj4+DQo+ID4+Pj4gVGhlIHByb3Bvc2VkIGlt
-cGxlbWVudGF0aW9uIGluIFFlbXUsIGJ1aWxkcyB0aGUgU1JBVCBhbmQgRFNEVCBwYXJ0cw0KPiA+
-Pj4+IGFuZCB1c2VzIEdFRCBkZXZpY2UgdG8gdHJpZ2dlciB0aGUgaG90cGx1Zy4gVGhpcyB3b3Jr
-cyBmaW5lLg0KPiA+Pj4+DQo+ID4+Pj4gQnV0IHdoZW4gd2UgYWRkZWQgdGhlIERUIG5vZGUgY29y
-cmVzcG9uZGluZyB0byB0aGUgUENESU1NKGNvbGQgcGx1Zw0KPiA+Pj4+IHNjZW5hcmlvKSwgd2Ug
-bm90aWNlZCB0aGF0IEd1ZXN0IGtlcm5lbCBzZWUgdGhpcyBtZW1vcnkgZHVyaW5nIGVhcmx5DQo+
-IGJvb3QNCj4gPj4+PiBldmVuIGlmIHdlIGFyZSBib290aW5nIHdpdGggQUNQSS4gQmVjYXVzZSBv
-ZiB0aGlzLCBob3RwbHVnZ2FibGUgbWVtb3J5DQo+ID4+Pj4gbWF5IGVuZCB1cCBpbiB6b25lIG5v
-cm1hbCBhbmQgbWFrZSBpdCBub24taG90LXVuLXBsdWdnYWJsZSBldmVuIGlmDQo+IEd1ZXN0DQo+
-ID4+Pj4gYm9vdHMgd2l0aCBBQ1BJLg0KPiA+Pj4+DQo+ID4+Pj4gRnVydGhlciBkaXNjdXNzaW9u
-c1sxXSByZXZlYWxlZCB0aGF0LCBFREsyIFVFRkkgaGFzIG5vIG1lYW5zIHRvDQo+ID4+Pj4gaW50
-ZXJwcmV0IHRoZQ0KPiA+Pj4+IEFDUEkgY29udGVudCBmcm9tIFFlbXUodGhpcyBpcyBkZXNpZ25l
-ZCB0byBkbyBzbykgYW5kIHVzZXMgRFQgaW5mbyB0bw0KPiA+Pj4+IGJ1aWxkIHRoZSBHZXRNZW1v
-cnlNYXAoKS4gVG8gc29sdmUgdGhpcywgaW50cm9kdWNlZCAiaG90cGx1Z2dhYmxlIg0KPiA+Pj4+
-IHByb3BlcnR5DQo+ID4+Pj4gdG8gRFQgbWVtb3J5IG5vZGUocGF0Y2hlcyAjNyAmICM4IGZyb20g
-WzBdKSBzbyB0aGF0IFVFRkkgY2FuDQo+ID4+Pj4gZGlmZmVyZW50aWF0ZQ0KPiA+Pj4+IHRoZSBu
-b2RlcyBhbmQgZXhjbHVkZSB0aGUgaG90cGx1Z2dhYmxlIG9uZXMgZnJvbSBHZXRNZW1vcnlNYXAo
-KS4NCj4gPj4+Pg0KPiA+Pj4+IEJ1dCB0aGVuIExhc3psbyByaWdodGx5IHBvaW50ZWQgb3V0IHRo
-YXQgaW4gb3JkZXIgdG8gYWNjb21tb2RhdGUgdGhlDQo+ID4+Pj4gY2hhbmdlcw0KPiA+Pj4+IGlu
-dG8gVUVGSSB3ZSBuZWVkIHRvIGtub3cgaG93IGV4YWN0bHkgTGludXggZXhwZWN0cy9oYW5kbGVz
-IGFsbCB0aGUNCj4gPj4+PiBob3RwbHVnZ2FibGUgbWVtb3J5IHNjZW5hcmlvcy4gUGxlYXNlIGZp
-bmQgdGhlIGRpc2N1c3Npb24gaGVyZVsyXS4NCj4gPj4+Pg0KPiA+Pj4+IEZvciBlYXNlLCBJIGFt
-IGp1c3QgY29weWluZyB0aGUgcmVsZXZhbnQgY29tbWVudCBmcm9tIExhc3psbyBiZWxvdywNCj4g
-Pj4+Pg0KPiA+Pj4+IC8qKioqKioNCj4gPj4+PiAiR2l2ZW4gcGF0Y2hlcyAjNyBhbmQgIzgsIGFz
-IEkgdW5kZXJzdGFuZCB0aGVtLCB0aGUgZmlybXdhcmUgY2Fubm90DQo+ID4+Pj4gZGlzdGluZ3Vp
-c2gNCj4gPj4+PiDCoCBob3RwbHVnZ2FibGUgJiBwcmVzZW50LCBmcm9tIGhvdHBsdWdnYWJsZSAm
-IGFic2VudC4gVGhlIGZpcm13YXJlDQo+IGNhbg0KPiA+Pj4+IG9ubHkNCj4gPj4+PiDCoCBza2lw
-IGJvdGggaG90cGx1Z2dhYmxlIGNhc2VzLiBUaGF0J3MgZmluZSBpbiB0aGF0IHRoZSBmaXJtd2Fy
-ZSB3aWxsDQo+ID4+Pj4gaG9nIG5laXRoZXINCj4gPj4+PiDCoCB0eXBlIC0tIGJ1dCBpcyB0aGF0
-IE9LIGZvciB0aGUgT1MgYXMgd2VsbCwgZm9yIGJvdGggQUNQSSBib290IGFuZCBEVA0KPiA+Pj4+
-IGJvb3Q/DQo+ID4+Pj4NCj4gPj4+PiBDb25zaWRlciBpbiBwYXJ0aWN1bGFyIHRoZSAiaG90cGx1
-Z2dhYmxlICYgcHJlc2VudCwgQUNQSSBib290IiBjYXNlLg0KPiA+Pj4+IEFzc3VtaW5nDQo+ID4+
-Pj4gd2UgbW9kaWZ5IHRoZSBmaXJtd2FyZSB0byBza2lwICJob3RwbHVnZ2FibGUiIGFsdG9nZXRo
-ZXIsIHRoZSBVRUZJDQo+IG1lbW1hcA0KPiA+Pj4+IHdpbGwgbm90IGluY2x1ZGUgdGhlIHJhbmdl
-IGRlc3BpdGUgaXQgYmVpbmcgcHJlc2VudCBhdCBib290Lg0KPiA+Pj4+IFByZXN1bWFibHksIEFD
-UEkNCj4gPj4+PiB3aWxsIHJlZmVyIHRvIHRoZSByYW5nZSBzb21laG93LCBob3dldmVyLiBXaWxs
-IHRoYXQgbm90IGNvbmZ1c2UgdGhlIE9TPw0KPiA+Pj4+DQo+ID4+Pj4gV2hlbiBJZ29yIHJhaXNl
-ZCB0aGlzIGVhcmxpZXIsIEkgc3VnZ2VzdGVkIHRoYXQNCj4gPj4+PiBob3RwbHVnZ2FibGUtYW5k
-LXByZXNlbnQgc2hvdWxkDQo+ID4+Pj4gYmUgYWRkZWQgYnkgdGhlIGZpcm13YXJlLCBidXQgYWxz
-byBhbGxvY2F0ZWQgaW1tZWRpYXRlbHksIGFzDQo+ID4+Pj4gRWZpQm9vdFNlcnZpY2VzRGF0YQ0K
-PiA+Pj4+IHR5cGUgbWVtb3J5LiBUaGlzIHdpbGwgcHJldmVudCBvdGhlciBkcml2ZXJzIGluIHRo
-ZSBmaXJtd2FyZSBmcm9tDQo+ID4+Pj4gYWxsb2NhdGluZyBBY3BpTlZTDQo+ID4+Pj4gb3IgUmVz
-ZXJ2ZWQgY2h1bmtzIGZyb20gdGhlIHNhbWUgbWVtb3J5IHJhbmdlLCB0aGUgVUVGSSBtZW1tYXAg
-d2lsbA0KPiA+Pj4+IGNvbnRhaW4NCj4gPj4+PiB0aGUgcmFuZ2UgYXMgRWZpQm9vdFNlcnZpY2Vz
-RGF0YSwgYW5kIHRoZW4gdGhlIE9TIGNhbiByZWxlYXNlIHRoYXQNCj4gPj4+PiBhbGxvY2F0aW9u
-IGluDQo+ID4+Pj4gb25lIGdvIGVhcmx5IGR1cmluZyBib290Lg0KPiA+Pj4+DQo+ID4+Pj4gQnV0
-IHRoaXMgcmVhbGx5IGhhcyB0byBiZSBjbGFyaWZpZWQgZnJvbSB0aGUgTGludXgga2VybmVsJ3MN
-Cj4gPj4+PiBleHBlY3RhdGlvbnMuIFBsZWFzZQ0KPiA+Pj4+IGZvcm1hbGl6ZSBhbGwgb2YgdGhl
-IGZvbGxvd2luZyBjYXNlczoNCj4gPj4+Pg0KPiA+Pj4+IE9TIGJvb3QgKERUL0FDUEkpwqAgaG90
-cGx1Z2dhYmxlICYgLi4uwqAgR2V0TWVtb3J5TWFwKCkgc2hvdWxkIHJlcG9ydA0KPiA+Pj4+IGFz
-wqAgRFQvQUNQSSBzaG91bGQgcmVwb3J0IGFzDQo+ID4+Pj4gLS0tLS0tLS0tLS0tLS0tLS3CoCAt
-LS0tLS0tLS0tLS0tLS0tLS0NCj4gPj4+PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-wqAgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ID4+Pj4NCj4gRFTCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCBwcmVzZW50wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgID8NCj4gwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgPw0KPiA+Pj4+DQo+IERUwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgYWJzZW50wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgPw0KPiDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgID8NCj4gPj4+Pg0KPiBBQ1BJwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCBwcmVzZW50wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgID8NCj4gwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgPw0KPiA+Pj4+DQo+IEFDUEnCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgIGFic2VudMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgID8NCj4gwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgPw0KPiA+Pj4+DQo+ID4+Pj4gQWdhaW4sIHRoaXMgdGFibGUgaXMg
-ZGljdGF0ZWQgYnkgTGludXguIg0KPiA+Pj4+DQo+ID4+Pj4gKioqKioqLw0KPiA+Pj4+DQo+ID4+
-Pj4gQ291bGQgeW91IHBsZWFzZSB0YWtlIGEgbG9vayBhdCB0aGlzIGFuZCBsZXQgdXMga25vdyB3
-aGF0IGlzIGV4cGVjdGVkDQo+ID4+Pj4gaGVyZSBmcm9tDQo+ID4+Pj4gYSBMaW51eCBrZXJuZWwg
-dmlldyBwb2ludC4NCj4gPj4+DQo+ID4+PiBGb3IgYXJtNjQsIHNvIGZhciB3ZSd2ZSBub3QgZXZl
-biBiZWVuIGNvbnNpZGVyaW5nIERULWJhc2VkIGhvdHBsdWcgLSBhcw0KPiA+Pj4gZmFyIGFzIEkn
-bSBhd2FyZSB0aGVyZSB3b3VsZCBzdGlsbCBiZSBhIGJpZyBvcGVuIHF1ZXN0aW9uIHRoZXJlIGFy
-b3VuZA0KPiA+Pj4gbm90aWZpY2F0aW9uIG1lY2hhbmlzbXMgYW5kIGhvdyB0byBkZXNjcmliZSB0
-aGVtLiBUaGUgRFQgc3R1ZmYgc28gZmFyDQo+ID4+PiBoYXMgY29tZSBmcm9tIHRoZSBQb3dlclBD
-IGZvbGtzLCBzbyBpdCdzIHByb2JhYmx5IHdvcnRoIHNlZWluZyB3aGF0DQo+ID4+PiB0aGVpciBp
-ZGVhcyBhcmUuDQo+ID4+Pg0KPiA+Pj4gQUNQSS13aXNlIEkndmUgYWx3YXlzIGFzc3VtZWQvaG9w
-ZWQgdGhhdCBob3RwbHVnLXJlbGF0ZWQgdGhpbmdzIHNob3VsZA0KPiA+Pj4gYmUgc3VmZmljaWVu
-dGx5IHdlbGwtc3BlY2lmaWVkIGluIFVFRkkgdGhhdCAiZG8gd2hhdGV2ZXIgeDg2L0lBLTY0IGRv
-Ig0KPiA+Pj4gd291bGQgYmUgZW5vdWdoIGZvciB1cy4NCj4gPj4NCj4gPj4gQXMgZmFyIGFzIEkg
-Y2FuIHNlZSBpbiBVRUZJIHYyLjggLS0gYW5kIEkgaGFkIGNoZWNrZWQgdGhlIHNwZWMgYmVmb3Jl
-DQo+ID4+IGR1bXBpbmcgdGhlIHRhYmxlIHdpdGggdGhlIG1hbnkgcXVlc3Rpb24gbWFya3Mgb24g
-U2hhbWVlciAtLSwgYWxsIHRoZQ0KPiA+PiBob3QtcGx1ZyBsYW5ndWFnZSBpbiB0aGUgc3BlYyBy
-ZWZlcnMgdG8gVVNCIGFuZCBQQ0kgaG90LXBsdWcgaW4gdGhlDQo+ID4+IHByZWJvb3QgZW52aXJv
-bm1lbnQuIFRoZXJlIGlzIG5vdCBhIHNpbmdsZSB3b3JkIGFib3V0IGhvdC1wbHVnIGF0IE9TDQo+
-ID4+IHJ1bnRpbWUgKHJlZ2FyZGluZyBhbnkgZGV2aWNlIG9yIGNvbXBvbmVudCB0eXBlKSwgbm9y
-IGFib3V0IG1lbW9yeQ0KPiA+PiBob3QtcGx1ZyAoYXQgYW55IHRpbWUpLg0KPiA+Pg0KPiA+PiBM
-b29raW5nIHRvIHg4NiBhcHBlYXJzIHZhbGlkIC0tIHNvIHdoYXQgZG9lcyB0aGUgTGludXgga2Vy
-bmVsIGV4cGVjdCBvbg0KPiA+PiB0aGF0IGFyY2hpdGVjdHVyZSwgaW4gdGhlICJBQ1BJIiByb3dz
-IG9mIHRoZSB0YWJsZT8NCj4gPg0KPiA+IEkgY291bGQgb25seSBhbnN3ZXIgZnJvbSBRRU1VIHg4
-NiBwZXJzcGVjdGl2ZS4NCj4gPiBRRU1VIGZvciB4ODYgZ3Vlc3RzIGN1cnJlbnRseSBkb2Vzbid0
-IGFkZCBob3QtcGx1Z2dhYmxlIFJBTSBpbnRvIEU4MjANCj4gPiBiZWNhdXNlIG9mIGRpZmZlcmVu
-dCBsaW51eCBndWVzdHMgdGVuZCB0byBjYW5uaWJhbGl6ZSBpdCwgbWFraW5nIGl0IG5vbg0KPiA+
-IHVucGx1Z2dhYmxlLiBUaGUgbGFzdCBjdWxwcml0IEkgcmVjYWxsIHdhcyBLQVNMUi4NCj4gPg0K
-PiA+IFNvIEknZCByZWZyYWluIGZyb20gcmVwb3J0aW5nIGhvdHBsdWdnYWJsZSBSQU0gaW4gR2V0
-TWVtb3J5TWFwKCkgaWYNCj4gPiBpdCdzIHBvc3NpYmxlIChpdCdzIHByb2JhYmx5IGhhY2sgKHNw
-ZWMgZGVvc24ndCBzYXkgYW55dGhpbmcgYWJvdXQgaXQpDQo+ID4gYnV0IGl0IG1vc3RseSB3b3Jr
-cyBmb3IgTGludXggKHBsdWcvdW5wbHVnKSBhbmQgV2luZG93cyBndWVzdCBhbHNvDQo+ID4gZmlu
-ZSB3aXRoIHBsdWcgcGFydCAobm8gdW5wbHVnIHRoZXJlKSkuDQo+IA0KPiBJIGNhbiBhY2NlcHQg
-dGhpcyBhcyBhIHBlcmZlY3RseSB2YWxpZCBkZXNpZ24uIFdoaWNoIHdvdWxkIG1lYW4sIFFFTVUg
-c2hvdWxkDQo+IG1hcmsgZWFjaCBob3RwbHVnZ2FibGUgUkFNIHJhbmdlIGluIHRoZSBEVEIgZm9y
-IHRoZSBmaXJtd2FyZSB3aXRoIHRoZQ0KPiBzcGVjaWFsIG5ldyBwcm9wZXJ0eSwgcmVnYXJkbGVz
-cyBvZiBpdHMgaW5pdGlhbCAoImNvbGQiKSBwbHVnZ2VkLW5lc3MsIGFuZCB0aGVuDQo+IHRoZSBm
-aXJtd2FyZSB3aWxsIG5vdCBleHBvc2UgdGhlIHJhbmdlIGluIHRoZSBHQ0QgbWVtb3J5IHNwYWNl
-IG1hcCwgYW5kDQo+IGNvbnNlcXVlbnRseSBpbiB0aGUgVUVGSSBtZW1tYXAgZWl0aGVyLg0KPiAN
-Cj4gSU9XLCBvdXIgdGFibGUgaXMsIHRodXMgZmFyOg0KPiANCj4gT1MgYm9vdCAoRFQvQUNQSSkg
-IGhvdHBsdWdnYWJsZSAmIC4uLiAgR2V0TWVtb3J5TWFwKCkgc2hvdWxkIHJlcG9ydCBhcw0KPiBE
-VC9BQ1BJIHNob3VsZCByZXBvcnQgYXMNCj4gLS0tLS0tLS0tLS0tLS0tLS0gIC0tLS0tLS0tLS0t
-LS0tLS0tLSAgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSAgLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tDQo+IERUICAgICAgICAgICAgICAgICBwcmVzZW50DQo+IEFCU0VOVCAgICAgICAg
-ICAgICAgICAgICAgICAgICAgID8NCj4gRFQgICAgICAgICAgICAgICAgIGFic2VudA0KPiBBQlNF
-TlQgICAgICAgICAgICAgICAgICAgICAgICAgICA/DQo+IEFDUEkgICAgICAgICAgICAgICBwcmVz
-ZW50ICAgICAgICAgICAgIEFCU0VOVA0KPiBQUkVTRU5UDQo+IEFDUEkgICAgICAgICAgICAgICBh
-YnNlbnQgICAgICAgICAgICAgIEFCU0VOVA0KPiBBQlNFTlQNCj4gSW4gdGhlIGZpcm13YXJlLCBJ
-IG9ubHkgbmVlZCB0byBjYXJlIGFib3V0IHRoZSBHZXRNZW1vcnlNYXAoKSBjb2x1bW4sIHNvIEkN
-Cj4gY2FuIHdvcmsgd2l0aCB0aGlzLg0KDQpUaGFuayB5b3UgYWxsIGZvciB0aGUgaW5wdXRzLg0K
-DQpJIGFzc3VtZSB3ZSB3aWxsIHN0aWxsIHJlcG9ydCB0aGUgRFQgY29sZCBwbHVnIGNhc2UgdG8g
-a2VybmVsKGhvdHBsdWdnYWJsZSAmIHByZXNlbnQpLg0Kc28gdGhlIHRhYmxlIHdpbGwgYmUgc29t
-ZXRoaW5nIGxpa2UgdGhpcywNCg0KT1MgYm9vdCAoRFQvQUNQSSkgIGhvdHBsdWdnYWJsZSAmIC4u
-LiAgR2V0TWVtb3J5TWFwKCkgc2hvdWxkIHJlcG9ydCBhcyAgRFQvQUNQSSBzaG91bGQgcmVwb3J0
-IGFzDQotLS0tLS0tLS0tLS0tLS0tLSAgLS0tLS0tLS0tLS0tLS0tLS0tICAtLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tICAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCkRUICAgICAgICAg
-ICAgICAgICBwcmVzZW50ICAgICAgICAgICAgIEFCU0VOVCAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIFBSRVNFTlQNCkRUICAgICAgICAgICAgICAgICBhYnNlbnQgICAgICAgICAgICAgIEFCU0VO
-VCAgICAgICAgICAgICAgICAgICAgICAgICAgIEFCU0VOVA0KQUNQSSAgICAgICAgICAgICAgIHBy
-ZXNlbnQgICAgICAgICAgICAgQUJTRU5UICAgICAgICAgICAgICAgICAgICAgICAgICAgUFJFU0VO
-VA0KQUNQSSAgICAgICAgICAgICAgIGFic2VudCAgICAgICAgICAgICAgQUJTRU5UICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgQUJTRU5UIA0KDQoNCiBDYW4gc29tZW9uZSBwbGVhc2UgZmlsZSBh
-IGZlYXR1cmUgcmVxdWVzdCBhdA0KPiA8aHR0cHM6Ly9idWd6aWxsYS50aWFub2NvcmUub3JnLz4s
-IGZvciB0aGUgQXJtVmlydFBrZyBQYWNrYWdlLCB3aXRoIHRoZXNlDQo+IGRldGFpcz8NCg0KT2su
-IEkgd2lsbCBkbyB0aGF0Lg0KDQpUaGFua3MsDQpTaGFtZWVyDQoNCj4gVGhhbmtzDQo+IExhc3ps
-bw0KPiANCj4gPg0KPiA+IEFzIGZvciBwaHlzaWNhbCBzeXN0ZW1zLCB0aGVyZSBhcmUgb3V0IHRo
-ZXJlIG9uZXMgdGhhdCBkbyByZXBvcnQNCj4gPiBob3RwbHVnZ2FibGUgUkFNIGluIEdldE1lbW9y
-eU1hcCgpLg0KPiA+DQo+ID4+IFNoYW1lZXI6IGlmIHlvdSAoSHVhd2VpKSBhcmUgcmVwcmVzZW50
-ZWQgb24gdGhlIFVTV0cgLyBBU1dHLCBJIHN1Z2dlc3QNCj4gPj4gcmUtcmFpc2luZyB0aGUgcXVl
-c3Rpb24gb24gdGhvc2UgbGlzdHMgdG9vOyBhdCBsZWFzdCB0aGUgIkFDUEkiIHJvd3Mgb2YNCj4g
-Pj4gdGhlIHRhYmxlLg0KPiA+Pg0KPiA+PiBUaGFua3MhDQo+ID4+IExhc3psbw0KPiA+Pg0KPiA+
-Pj4NCj4gPj4+IFJvYmluLg0KPiA+Pj4NCj4gPj4+PiAoSGkgTGFzemxvL0lnb3IvRXJpYywgcGxl
-YXNlIGZlZWwgZnJlZSB0byBhZGQvY2hhbmdlIGlmIEkgaGF2ZSBtaXNzZWQNCj4gPj4+PiBhbnkg
-dmFsaWQNCj4gPj4+PiBwb2ludHMgYWJvdmUpLg0KPiA+Pj4+DQo+ID4+Pj4gVGhhbmtzLA0KPiA+
-Pj4+IFNoYW1lZXINCj4gPj4+PiBbMF0gaHR0cHM6Ly9wYXRjaHdvcmsua2VybmVsLm9yZy9jb3Zl
-ci8xMDg5MDkxOS8NCj4gPj4+PiBbMV0gaHR0cHM6Ly9wYXRjaHdvcmsua2VybmVsLm9yZy9wYXRj
-aC8xMDg2MzI5OS8NCj4gPj4+PiBbMl0gaHR0cHM6Ly9wYXRjaHdvcmsua2VybmVsLm9yZy9wYXRj
-aC8xMDg5MDkzNy8NCj4gPj4+Pg0KPiA+Pj4+DQo+ID4+DQo+ID4NCg0K
+On Thu, May 09, 2019 at 02:07:34PM +0200, Markus Armbruster wrote:
+> Stefano Garzarella <sgarzare@redhat.com> writes:
+> 
+> > On Wed, May 08, 2019 at 01:44:27PM +0200, Markus Armbruster wrote:
+> >> Stefano Garzarella <sgarzare@redhat.com> writes:
+> >> 
+> >> > On Tue, May 07, 2019 at 08:34:51AM +0200, Markus Armbruster wrote:
+> >> >> Cc: Peter for a libvirt perspective.
+> >> >> 
+> >> >> Stefano Garzarella <sgarzare@redhat.com> writes:
+> >> >> 
+> >> >> > This patch adds the support of preallocation (off/full) for the RBD
+> >> >> > block driver.
+> >> >> > If available, we use rbd_writesame() to quickly fill the image when
+> >> >> > full preallocation is required.
+> >> >> >
+> >> >> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> >> >> > ---
+> >> >> >  block/rbd.c          | 149 ++++++++++++++++++++++++++++++++++++++-----
+> >> >> >  qapi/block-core.json |   4 +-
+> >> >> >  2 files changed, 136 insertions(+), 17 deletions(-)
+> >> >> >
+> >> >> > diff --git a/block/rbd.c b/block/rbd.c
+> >> >> > index 0c549c9935..29dd1bb040 100644
+> >> >> > --- a/block/rbd.c
+> >> >> > +++ b/block/rbd.c
+> >> >> > @@ -13,6 +13,7 @@
+> >> >> >  
+> >> >> >  #include "qemu/osdep.h"
+> >> >> >  
+> >> >> > +#include "qemu/units.h"
+> >> >> >  #include <rbd/librbd.h>
+> >> >> >  #include "qapi/error.h"
+> >> >> >  #include "qemu/error-report.h"
+> >> >> > @@ -331,6 +332,110 @@ static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
+> >> >> >      }
+> >> >> >  }
+> >> >> >  
+> >> >> > +static int qemu_rbd_do_truncate(rbd_image_t image, int64_t offset,
+> >> >> > +                                PreallocMode prealloc, Error **errp)
+> >> >> > +{
+> >> >> > +    uint64_t current_length;
+> >> >> > +    char *buf = NULL;
+> >> >> > +    int ret;
+> >> >> > +
+> >> >> > +    ret = rbd_get_size(image, &current_length);
+> >> >> > +    if (ret < 0) {
+> >> >> > +        error_setg_errno(errp, -ret, "Failed to get file length");
+> >> >> > +        goto out;
+> >> >> > +    }
+> >> >> > +
+> >> >> > +    if (current_length > offset && prealloc != PREALLOC_MODE_OFF) {
+> >> >> > +        error_setg(errp, "Cannot use preallocation for shrinking files");
+> >> >> > +        ret = -ENOTSUP;
+> >> >> > +        goto out;
+> >> >> > +    }
+> >> >> > +
+> >> >> > +    switch (prealloc) {
+> >> >> > +    case PREALLOC_MODE_FULL: {
+> >> >> [...]
+> >> >> > +    case PREALLOC_MODE_OFF:
+> >> >> [...]
+> >> >> > +    default:
+> >> >> > +        error_setg(errp, "Unsupported preallocation mode: %s",
+> >> >> > +                   PreallocMode_str(prealloc));
+> >> >> > +        ret = -ENOTSUP;
+> >> >> > +        goto out;
+> >> >> > +    }
+> >> >> 
+> >> >> Other block drivers also accept only some values of PreallocMode.  Okay.
+> >> >> 
+> >> >> I wonder whether management applications need to know which values are
+> >> >> supported.
+> >> >
+> >> > Good point!
+> >> 
+> >> We can continue to assume they don't until somebody tells us otherwise.
+> >> 
+> >> >> Let me review support in drivers:
+> >> >> 
+> >> >> * file (file-win32.c)
+> >> >> * iscsi
+> >> >> * nfs
+> >> >> * qed
+> >> >> * ssh
+> >> >> 
+> >> >>   - Reject all but PREALLOC_MODE_OFF
+> >> >> 
+> >> >> * copy-on-read
+> >> >> * luks (crypto.c)
+> >> >> * raw
+> >> >> 
+> >> >>   - Pass through only
+> >> >> 
+> >> >> * file host_cdrom host_device (file-posix.c)
+> >> >> 
+> >> >>   - Reject all but PREALLOC_MODE_OFF when shrinking and for non-regular
+> >> >>     files
+> >> >>   - Reject PREALLOC_MODE_FALLOC unless CONFIG_POSIX_FALLOCATE
+> >> >>   - Reject PREALLOC_MODE_METADATA
+> >> >> 
+> >> >> * gluster
+> >> >> 
+> >> >>   - Reject all but PREALLOC_MODE_OFF when shrinking
+> >> >>   - Reject PREALLOC_MODE_FALLOC unless CONFIG_GLUSTERFS_FALLOCATE
+> >> >>   - Reject PREALLOC_MODE_FULL unless CONFIG_GLUSTERFS_ZEROFILL
+> >> >>   - Reject PREALLOC_MODE_METADATA
+> >> >> 
+> >> >> * qcow2
+> >> >> 
+> >> >>   - Reject all but PREALLOC_MODE_OFF when shrinking and with a backing
+> >> >>     file
+> >> >>   
+> >> >> * rbd with this patch
+> >> >> 
+> >> >>   - Reject all but PREALLOC_MODE_OFF when shrinking
+> >> >>   - Reject PREALLOC_MODE_METADATA and PREALLOC_MODE_FALLOC
+> >> >> 
+> >> >> * sheepdog
+> >> >> 
+> >> >>   - Reject PREALLOC_MODE_METADATA and PREALLOC_MODE_FALLOC
+> >> >>   - Doesn't support shrinking
+> >> >> 
+> >> >> * vdi
+> >> >> 
+> >> >>   - Reject PREALLOC_MODE_FALLOC and PREALLOC_MODE_FULL
+> >> >>   - Doesn't support shrinking
+> >> >> 
+> >> >> * blkdebug
+> >> >> * blklogwrites
+> >> >> * blkverify
+> >> >> * bochs
+> >> >> * cloop
+> >> >> * dmg
+> >> >> * ftp
+> >> >> * ftps
+> >> >> * http
+> >> >> * https
+> >> >> * luks
+> >> >> * nbd
+> >> >> * null-aio
+> >> >> * null-co
+> >> >> * nvme
+> >> >> * parallels
+> >> >> * qcow
+> >> >> * quorum
+> >> >> * replication
+> >> >> * throttle
+> >> >> * vhdx
+> >> >> * vmdk
+> >> >> * vpc
+> >> >> * vvfat
+> >> >> * vxhs
+> >> >> 
+> >> >>   - These appear not to use PreallocMode: they don't implement
+> >> >>     .bdrv_co_truncate(), and either don't implement .bdrv_co_create() or
+> >> >>     implement it without a prealloc parameter.
+> >> >> 
+> >> >> Looks good to me.
+> >> >>
+> >> >
+> >> > Thanks for the analysis!
+> >> >
+> >> >> > +
+> >> >> > +    ret = 0;
+> >> >> > +
+> >> >> > +out:
+> >> >> > +    g_free(buf);
+> >> >> > +    return ret;
+> >> >> > +}
+> >> >> > +
+> >> >> >  static QemuOptsList runtime_opts = {
+> >> >> >      .name = "rbd",
+> >> >> >      .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+> >> >> [...]
+> >> >> > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> >> >> > index 7ccbfff9d0..db25a4065b 100644
+> >> >> > --- a/qapi/block-core.json
+> >> >> > +++ b/qapi/block-core.json
+> >> >> > @@ -4277,13 +4277,15 @@
+> >> >> >  #                   point to a snapshot.
+> >> >> >  # @size             Size of the virtual disk in bytes
+> >> >> >  # @cluster-size     RBD object size
+> >> >> > +# @preallocation    Preallocation mode (allowed values: off, full)
+> >> >> >  #
+> >> >> >  # Since: 2.12
+> >> >> >  ##
+> >> >> >  { 'struct': 'BlockdevCreateOptionsRbd',
+> >> >> >    'data': { 'location':         'BlockdevOptionsRbd',
+> >> >> >              'size':             'size',
+> >> >> > -            '*cluster-size' :   'size' } }
+> >> >> > +            '*cluster-size' :   'size',
+> >> >> > +            '*preallocation':   'PreallocMode' } }
+> >> >> >  
+> >> >> >  ##
+> >> >> >  # @BlockdevVmdkSubformat:
+> >> >> 
+> >> >> The non-support of values 'metadata' and 'falloc' is not visible in
+> >> >> introspection, only in documentation.  No reason to block this patch, as
+> >> >> the other block drivers have the same introspection weakness (only
+> >> >> sheepdog and vdi bother to document).
+> >> >> 
+> >> >> Should we address the introspection weakness?  Only if there's a use for
+> >> >> the information, I think.
+> >> >
+> >> > If the management applications will use that information (or maybe also
+> >> > our help pages), could be useful to have an array of 'PreallocMode'
+> >> > supported per-driver.
+> >> 
+> >> Ideally, query-qmp-schema would show only the supported values.
+> >> 
+> >> Not hard to do, just tedious: we'd get a number of sub-enums in addition
+> >> to the full one, and we'd have to map from sub-enum to the full one.
+> >> 
+> >> QAPI language support for sub-enums would remove most of the tedium.
+> >> Not worthwhile unless the need for sub-enums is actually common.
+> >
+> > I should study better the QMP and QAPI to understand how to implement
+> > the sub-enums.
+> 
+> Sub-enums of
+> 
+>     { 'enum': 'PreallocMode',
+>       'data': [ 'off', 'metadata', 'falloc', 'full' ] }
+> 
+> done the obvious way:
+> 
+>     { 'enum': 'PreallocModeOff',
+>       'data': [ 'off' ] }
+>     { 'enum': 'PreallocModeOffPosix',
+>       'data': [ 'off', 'metadata',
+>                  { 'name': 'falloc', 'if': 'defined(CONFIG_POSIX_FALLOCATE)' },
+>                  'full' ] }
+> 
+> and so forth.
+> 
+> This generates a bunch of different C enum types in addition to
+> PreallocMode: PreallocModeOff, PreallocModePosix, ...
+> 
+> Common C code continues to use just PreallocMode.  The QMP command
+> handlers using sub-enums will have to map between the sub-enums and
+> PreallocMode.
+> 
+> Tedious.
+> 
+> With QAPI language support for sub-enums, we could eliminate the
+> additional C enums.
+> 
+
+Okay, I understood your idea.
+Thanks for the explanation!
+
+> > If you agree, I'll put it as a background task, until somebody from
+> > management applications tell us his interest.
+> 
+> Only act if there's a compelling use case.
+
+Sure.
+
+Thanks,
+Stefano
 
