@@ -2,67 +2,81 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5F9EC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:32:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3803AC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:35:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0A4B20850
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:32:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0A4B20850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0238920850
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:35:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qB3wHsq5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0238920850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49569 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49611 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hPCCQ-0000wh-Ul
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 16:32:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38709)
+	id 1hPCFE-0001jY-8M
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 16:35:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hPCBc-0000UI-NX
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:32:10 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hPCER-0001MS-9C
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:35:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hPCBb-0006Q0-P8
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:32:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45026)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hPCBb-0006K1-Jk
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:32:07 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 63136309B16C;
-	Fri, 10 May 2019 20:32:05 +0000 (UTC)
-Received: from localhost (ovpn-116-40.gru2.redhat.com [10.97.116.40])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D51561001E78;
-	Fri, 10 May 2019 20:32:04 +0000 (UTC)
-Date: Fri, 10 May 2019 17:32:03 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Jiri Denemark <jdenemar@redhat.com>
-Message-ID: <20190510203203.GW4189@habkost.net>
-References: <20190422234742.15780-1-ehabkost@redhat.com>
-	<20190509133537.GK7181@orkuz.int.mamuti.net>
-	<20190509135617.GH4189@habkost.net>
-	<20190509180603.424c8277@Igors-MacBook-Pro>
-	<20190509163618.GN7181@orkuz.int.mamuti.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190509163618.GN7181@orkuz.int.mamuti.net>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Fri, 10 May 2019 20:32:05 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/2] i386: "unavailable-features" QOM
- property
+	(envelope-from <richard.henderson@linaro.org>) id 1hPCEP-0007Kf-UR
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:35:03 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:40932)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hPCEL-0006yA-HK
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:34:58 -0400
+Received: by mail-pl1-x644.google.com with SMTP id b3so3336563plr.7
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 13:34:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id;
+	bh=7vmrE3P4TVjsKYtNMDaI+6ptGlXtemIm7wnPvGwAlNA=;
+	b=qB3wHsq5erdNmHHbOpbqLEJ+iTx0bpJVqbYNNslsP0ONg3d/xbGP5AXR3GMB0o9WyG
+	+V3K8iQbZjfJf73VHsfZ69r18E1Tca/QtkVyZwZIP4HsH6luq6oCmYe/VT4AOAW5UC9M
+	FLBoG2GYTXnQFOYD7NzwwGudJFXdoI/YVbSNWiwZRrew+KmmdLqIHMFSgugKe9LRcluJ
+	JjXyhIWXUAeIw7AupJ23V8GChscYGRXWBgb0ZovYNMIE+Jaex/LEHAIIgfVp2kBxUbTo
+	hKb5B/5tsEhjOxHqyXfroYiqKK4Yu8/NmbpFYQCVtxR9QIiRXRUD9tS1O98jjSC7gnaS
+	B90Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id;
+	bh=7vmrE3P4TVjsKYtNMDaI+6ptGlXtemIm7wnPvGwAlNA=;
+	b=bGLKu49cfnFOdZS4HuKeVNnKCLE33FEFkXy1mMaRiltM9qmi8PokOvTQcABMtOLGvm
+	4ULSKmpYqHxnT+N1ZYy1JpnLNNLEylT6JLRmLyS7FgfKWACYtVTgc1OXfJRLB5fWZgHd
+	126NjHAOzWyboqZSNS3fpZaVMKur3nrd0+ylJenUoVoXuJknhUKHXOJglTH8AgQq7l+E
+	MXEnMlNSWv+gfLhf1/yktQ5x9XKkjDTtGTXnOEc4XR+h3+7TRz0OH7+ieOjibQdW/Xwt
+	7P+KYDuQkysYxj9cN3rmE+qYEExIQyTP2dPH/opZdr5sS9gp4o1w7+ATHH7CuFo5qQUH
+	MDhg==
+X-Gm-Message-State: APjAAAXCVNXd2x1TkuMGr82XI2U0D1DgZTv6zduqk0UBJbR8h+sAeiCe
+	Rg6kjsPrJc2t0LQsB0xrbAzVRpxzmkg=
+X-Google-Smtp-Source: APXvYqwzzbmul2zgolOopYx1TSLmSLdFFBXttDC4UFuPAbo3kt+oFF1sPyo8q3dkeQmd1yVUxmteqg==
+X-Received: by 2002:a17:902:8e88:: with SMTP id
+	bg8mr15390485plb.173.1557520494550; 
+	Fri, 10 May 2019 13:34:54 -0700 (PDT)
+Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
+	[97.113.13.231]) by smtp.gmail.com with ESMTPSA id
+	a129sm7739200pfa.152.2019.05.10.13.34.53
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 10 May 2019 13:34:53 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Fri, 10 May 2019 13:34:52 -0700
+Message-Id: <20190510203452.11870-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: [Qemu-devel] [PATCH] configure: Disable slirp if --disable-system
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,37 +88,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>,
-	qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: marcandre.lureau@redhat.com, samuel.thibault@ens-lyon.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 09, 2019 at 06:36:18PM +0200, Jiri Denemark wrote:
-> On Thu, May 09, 2019 at 18:06:03 +0200, Igor Mammedov wrote:
-> > On Thu, 9 May 2019 10:56:17 -0300
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > 
-> > > On Thu, May 09, 2019 at 03:35:37PM +0200, Jiri Denemark wrote:
-> > > > Would this unavailable-features property contain only canonical names of
-> > > > the features or all possible aliases of all features? For example,
-> > > > "tsc-adjust" can also be spelled as "tsc_adjust". When calling
-> > > > query-cpu-model-expansion, we have a way to request all variants by
-> > > > running full expansion on the result of a previous static expansion. Can
-> > > > we get something like this for unavailable-features too?
-> > > 
-> > > I'd like to avoid that, and refer only to the canonical names.
-> > 
-> > Can we deprecate aliases to avoid confusion in future?
-> > (there aren't that many of them that used pre-QOM name format)
-> 
-> If you come up with a way libvirt could use to detect which name it
-> should use when talking to QEMU...
+For linux-user, there is no need to add slirp to the set of
+git modules checked out, nor build it.
 
-The property names are part of the API, and deprecation would
-just be documented in the QEMU documentation.  Why would you need
-to enumerate them dynamically at runtime?
+This also avoids a makefile bug wrt insufficient dependencies
+on subdir-slirp.  If slirp/ is not initially present, the
+dependencies that check it out are associated with softmmu,
+which then generates a build error on slirp/ not present.
 
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ configure | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/configure b/configure
+index 63f312bd1f..9de7e43a80 100755
+--- a/configure
++++ b/configure
+@@ -5878,6 +5878,10 @@ fi
+ ##########################################
+ # check for slirp
+ 
++if test "$softmmu" = "no"; then
++    slirp=no
++fi
++
+ case "$slirp" in
+   "" | yes)
+     if $pkg_config slirp; then
 -- 
-Eduardo
+2.17.1
+
 
