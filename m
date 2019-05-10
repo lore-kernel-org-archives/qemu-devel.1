@@ -7,59 +7,58 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2905CC04AB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 02:59:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D8BC04AB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 02:59:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9F5A2182B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 02:59:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0CB72182B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 02:59:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="j7koJyrK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9F5A2182B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="l6ulGiU3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0CB72182B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35843 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35845 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOvl4-0001ak-19
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 22:59:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44126)
+	id 1hOvl7-0001cp-Ty
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 22:59:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hOvjJ-0000Ul-Ew
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 22:57:50 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hOvjK-0000Un-Er
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 22:57:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hOvjI-00019M-4r
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 22:57:49 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:59757 helo=ozlabs.org)
+	(envelope-from <dgibson@ozlabs.org>) id 1hOvjJ-0001AJ-Ac
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 22:57:50 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:56291 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hOvjH-00015w-CT; Thu, 09 May 2019 22:57:48 -0400
+	id 1hOvjH-00015x-CU; Thu, 09 May 2019 22:57:49 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 450ZdM1l7Xz9sNm; Fri, 10 May 2019 12:57:42 +1000 (AEST)
+	id 450ZdM2T1Zz9sNq; Fri, 10 May 2019 12:57:42 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
 	d=gibson.dropbear.id.au; s=201602; t=1557457063;
-	bh=Ns1db8FlMwXt7WCGWY8UcGaO1YT9pMk1HBSxHSCDXuI=;
+	bh=JMjV6FjoI7KqIh+84RB+yrE5kSTPePKdJe9czfYbvAQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j7koJyrKGTAs46UTeR5OnCxA3IzA9u/1l9Eyx8qvcBXdCS3y2x3gA8ENvFF8pKsA2
-	1bFw9VN97gSd2k4nOCLR2W84OReK5IOIWhrL0y4VWQrASfyIFPlVNlrsHuCTfuK9CD
-	IIqbn3xwCqO5rKynSZPJxJhLZNVicxNieNwnF6Ho=
-Date: Fri, 10 May 2019 12:11:21 +1000
+	b=l6ulGiU3FgQyOwPFpAjvTIO/JEwWCP0e/3myP5qD7rUI50m9fjr/p+eEDTvD6eyg9
+	UmBF9dxa4kyQlW9IvTz3n91jKz/TSKEHLA/359SLlTo/tfmF8NGUTT7+lw+nIMaSVx
+	lzF6NzDMEOUVsh6rk2wz/0m1NWuEXeK95ixl+OHc=
+Date: Fri, 10 May 2019 12:01:43 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Message-ID: <20190510021121.GB20559@umbus.fritz.box>
-References: <20190503055316.6441-1-sjitindarsingh@gmail.com>
-	<20190503055316.6441-7-sjitindarsingh@gmail.com>
+To: sathnaga@linux.vnet.ibm.com
+Message-ID: <20190510020143.GA7073@umbus.fritz.box>
+References: <20190509080750.21999-1-sathnaga@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="61jdw2sOBCFtR2d/"
+	protocol="application/pgp-signature"; boundary="va9XEZk9/dJ5GUjX"
 Content-Disposition: inline
-In-Reply-To: <20190503055316.6441-7-sjitindarsingh@gmail.com>
+In-Reply-To: <20190509080750.21999-1-sathnaga@linux.vnet.ibm.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH 06/13] target/ppc: Enforce that
- the root page directory size must be at least 5
+Subject: Re: [Qemu-devel] [PATCH] Fix typo on "info pic" monitor cmd output
+ for xive
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,46 +70,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---61jdw2sOBCFtR2d/
+--va9XEZk9/dJ5GUjX
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 03, 2019 at 03:53:09PM +1000, Suraj Jitindar Singh wrote:
-> According to the ISA the root page directory size of a radix tree for
-> either process or partition scoped translation must be >=3D 5.
+On Thu, May 09, 2019 at 01:37:50PM +0530, sathnaga@linux.vnet.ibm.com wrote:
+> From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 >=20
-> Thus add this to the list of conditions checked when validating the
-> partition table entry in validate_pate();
+> Instead of LISN i.e "Logical Interrupt Source Number" as per
+> Xive PAPR document "info pic" prints as LSIN, let's fix it.
 >=20
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> Signed-off-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Applied to ppc-for-4.1, thanks.
 
 > ---
->  target/ppc/mmu-radix64.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  hw/intc/spapr_xive.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
-> index a6ab290323..afa5ba506a 100644
-> --- a/target/ppc/mmu-radix64.c
-> +++ b/target/ppc/mmu-radix64.c
-> @@ -249,6 +249,8 @@ static bool validate_pate(PowerPCCPU *cpu, uint64_t l=
-pid, ppc_v3_pate_t *pate)
->      if (lpid =3D=3D 0 && !msr_hv) {
->          return false;
->      }
-> +    if ((pate->dw0 & PATE1_R_PRTS) < 5)
-> +        return false;
->      /* More checks ... */
->      return true;
->  }
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index 7faf03b1fb..df3c879826 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -141,7 +141,7 @@ void spapr_xive_pic_print_info(SpaprXive *xive, Monit=
+or *mon)
+>      XiveSource *xsrc =3D &xive->source;
+>      int i;
+> =20
+> -    monitor_printf(mon, "  LSIN         PQ    EISN     CPU/PRIO EQ\n");
+> +    monitor_printf(mon, "  LISN         PQ    EISN     CPU/PRIO EQ\n");
+> =20
+>      for (i =3D 0; i < xive->nr_irqs; i++) {
+>          uint8_t pq =3D xive_source_esb_get(xsrc, i);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -118,25 +116,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---61jdw2sOBCFtR2d/
+--va9XEZk9/dJ5GUjX
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzU3ckACgkQbDjKyiDZ
-s5JeAg//bjLQa4EnA7TnRijJrK9Fiq3XCwQ4K4r4aFn/b2kTBvKBdNxzBZqFq2CG
-96G7tFNXc+PYiGXgF1NwITuPVNSZe3SXnU2l4UxL3BqN6Yn1gDO7D3NAzzXXuDOZ
-tpOWGkjTGS2s6VdSwIwWTb27XEVnN5109EgpG6GIipzOSZj9O9DDH4m8Uuu0sQRk
-8Li9Yitp82WSjjsoWKzW500KstnJbCXUxom8yniFmw9niShatRL2YJKXx6nTkuqx
-8FDCOJrYCJbLuQz0qAbvkEPj2R1QcejLFSY3ADmRgaBhycoQnwW3PZu13sEeKIyE
-g15SnaH2yBK8sCYPFUDGBnAsVEQMahfeJoVp7GfcElm0AnFIBVRiWKHsf+axzYqf
-b+9VtM94wS1iCPMNRZrUNWrdGzwy8gi855jJLEtWRdJU9uHGxmY8hEsJDPDgQzJ2
-wxl9ENo8t11GjXyql2hu5aX8k/GWPMH0nC9Dp9y3qzUGZ23jjgRmt9WGB/wmqBD/
-+01tzWTGFSFgpjQ0zus+7Uf/k7RGRnbB/WrJxmLWR9sKkaARTJghTaneAD17acux
-3s2IdHzE1cE3H8zrMFWhwSkA4Tn+8zBICwUYecaoJRV9lWC6qBK+56+SmWBpTGi8
-uaRRP++fXuGlk2Z1NpHGQkMlCwbLq6hVFB2T/gT9c4CKKahFfwY=
-=qPpx
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzU24cACgkQbDjKyiDZ
+s5L8Sw//bPx4JlJ2QRMnBBUnWTeJb0CQWRR1XxsbBt6+HUGGEhy7ca2zayGS2oK2
+bSmi8KYkTMbo1YS/6Gnj3HU2DlJIq3XIrjhyzmjYfT8K5+c77hCZSM2zv30KIBMP
+jLa0BYevzOX7pbu5W1+ALpZGBsi0K+iTBPrxquLUkMGhLwSe1jRLDyBEB01Dt3jg
+dgpkObsrpz+Q+gtB/AEz+8LYMJ3uSOWoAO2hF7oJT+k4TjWCByBnqIDJ3IoxTwFB
+IHGD/L/wDZBRq/nTqpx12nxPdnN8Qzp/ZSf6CweTTJU6KC4044kkejG3BMgj6jrl
+mUWIIvJO9Y6AoOXcS52m7bWTto1juqkqeyeLYZuDMP+yKkQYBobzgoWwW/S0o6cm
+2YN7V/8yqPnlyHary8Sn2viM4kN0Cess8gh5+O5r6Q7W68ig2/w+v4fNWAan9jS9
+mByh+J+w7RpwpN71Nuka29Op7zq0l39g/qHwlLs07v6YB4pj8XhLdXBUC+HoIXXY
+/uVBUp1mZtBQy70ZUwCM4I9PRbmhPKm2yj5IEaJxBU9RueSid0LiwuJEqzLDWLUa
+anCS9xbeWkxUxib5pa6nxucMS6Rn8Zz17LekKJCX8YEFcuqgH7OBDjKr5Xpp+t6B
+sh+8um8975dc8w/HPQABsGpynOd3atptfUigmlHYG5nFa3v1jWY=
+=Ckat
 -----END PGP SIGNATURE-----
 
---61jdw2sOBCFtR2d/--
+--va9XEZk9/dJ5GUjX--
 
