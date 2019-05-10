@@ -2,91 +2,66 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D212AC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 11:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F01CDC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 12:04:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97CCE20989
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 11:59:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dcvFpyR3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97CCE20989
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id C4B7520989
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 12:04:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4B7520989
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41856 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42347 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP4BV-0001C5-Rx
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 07:59:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42823)
+	id 1hP4GW-000379-UK
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 08:04:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hP496-00085Z-Ft
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 07:57:01 -0400
+	(envelope-from <armbru@redhat.com>) id 1hP4FZ-0002oF-JT
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 08:03:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hP495-00019P-Mo
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 07:57:00 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42300)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hP495-00017L-H2
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 07:56:59 -0400
-Received: by mail-wr1-x443.google.com with SMTP id l2so7552321wrb.9
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 04:56:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=ft+/1Fmo2fKzbbcBOYigLmMl0lRnapKdieGqd1xvaUQ=;
-	b=dcvFpyR3pzJLJ4BBTYi9WG5N24kNHm3l9GNetmghOBznZg+8UK3hnI/ziblWVyQUVL
-	wPBca7VEmeZxmDfsanqZcjCrpqsthTeFMErf/HeCYT1yUiDPZSz/m6W6z/Zvb5O7wJ9i
-	JwD/8MHJ6+NgiTU1gl75llRjvoebKMmxdFZfXTlFIbAQ5pZEyB+6G//Tpx8OpmUwQDun
-	XQ02WPK+PXajcauXu/dpJArGg5XEQ0IHA9GlX4ak78Z5L5J03d+WVJVEUiquQ36I260h
-	eak4CG6rkMzl/lpEEIfiW1G5ec9N/sNvM3PRDStIHh0n1ccY5gkhut+Dc810W3DKPmsi
-	MRNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=ft+/1Fmo2fKzbbcBOYigLmMl0lRnapKdieGqd1xvaUQ=;
-	b=rhxiNHQZSVOkfz3fA7orn8t6IU3gwVnmfOO8DVpDFbesSNy7N0JDisyOXZ3UDSQKbY
-	m3Bh9sV4IzNi9S71CZ89rLTPI9QAt4nOIH7weceuZnYbItl6ed8csvIJsfV8KI8Jvfst
-	VI5HhQVqyAchzDqD05WV2yZIJxFmAYWfwTsIzMT6XaQJLnS/E/Id4oii2SS5EPHanM4Y
-	kEQIDKG2CRRUV2kuYud/W+zYMO2EcMDQ7hTN6CKx/VnicEugLcWg74lkBBCux3yTEYJT
-	ivsl7GXFFtJoyoeTUwsecEYsVsfhF0RbAgvrzhllIKGzhU3GV/0uKh1+3OI5oX1TifwY
-	iHEA==
-X-Gm-Message-State: APjAAAVGsTxz5i6dUv0248Dv7nGpbKy4492IhtIVArkF0hNWKYxK1aHz
-	M21P6IFxRycJlvWa3LGCH4eWvQ==
-X-Google-Smtp-Source: APXvYqyQNiAvbi/HAbFbCRq5284sFiHZ+irrw5sKs3ecW32lJRlup7qQekhiZBIWRfRZvIzjcYuNjQ==
-X-Received: by 2002:adf:ee8d:: with SMTP id b13mr7124954wro.219.1557489417978; 
-	Fri, 10 May 2019 04:56:57 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id z7sm6410263wme.26.2019.05.10.04.56.57
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 10 May 2019 04:56:57 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id F3B0D1FF87;
-	Fri, 10 May 2019 12:56:56 +0100 (BST)
-References: <20190510102918.2705-1-alex.bennee@linaro.org>
-	<55dd9cf4-cb06-48b1-0cec-ff03113c7c17@redhat.com>
-	<b8b1c003-ed0d-d6f2-f970-9fb36165afb7@redhat.com>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Thomas Huth <thuth@redhat.com>
-In-reply-to: <b8b1c003-ed0d-d6f2-f970-9fb36165afb7@redhat.com>
-Date: Fri, 10 May 2019 12:56:56 +0100
-Message-ID: <87k1ey4j5j.fsf@zen.linaroharston>
+	(envelope-from <armbru@redhat.com>) id 1hP4FX-0006KW-IW
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 08:03:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38254)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hP4FX-0006IE-BQ
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 08:03:39 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 169F03082137;
+	Fri, 10 May 2019 12:03:36 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
+	[10.36.116.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C2AF55D9D5;
+	Fri, 10 May 2019 12:03:34 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 4972E1132B35; Fri, 10 May 2019 14:03:33 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kashyap Chamarthy <kchamart@redhat.com>
+References: <20190510081526.15507-1-kchamart@redhat.com>
+Date: Fri, 10 May 2019 14:03:33 +0200
+In-Reply-To: <20190510081526.15507-1-kchamart@redhat.com> (Kashyap Chamarthy's
+	message of "Fri, 10 May 2019 10:15:25 +0200")
+Message-ID: <874l62sei2.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH v3] tests/qemu-iotests: re-format output to
- for make check-block
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Fri, 10 May 2019 12:03:36 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2] VirtIO-RNG: Update default entropy
+ source to `/dev/urandom`
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,40 +73,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
-	mreitz@redhat.com
+Cc: rjones@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+	amit@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Kashyap Chamarthy <kchamart@redhat.com> writes:
 
-Thomas Huth <thuth@redhat.com> writes:
-
-> On 10/05/2019 12.48, Thomas Huth wrote:
-> [...]
->>
->> I think the "make check" mode should only print out one time for each
->> test, preferable at the end, like the other tests (like qtests) are
->> doing it...?
+> When QEMU exposes a VirtIO-RNG device to the guest, that device needs a
+> source of entropy, and that source needs to be "non-blocking", like
+> `/dev/urandom`.  However, currently QEMU defaults to the problematic
+> `/dev/random`, which is "blocking" (as in, it waits until sufficient
+> entropy is available).
 >
-> s/preferable at the end/preferably at the beginning/
+> Why prefer `/dev/urandom` over `/dev/random`?
+> ---------------------------------------------
 >
-> ... I think the makefile rules for the other tests are printing out
-> "  TEST xyz" *before* the test is started. And the iotests "check"
-> script should do the same.
-
-That mean dropping the execution time (and previous execution time and
-possible failure). We could just duplicate on failure modes so you get:
-
-  TEST    iotest: 007
-  TEST    iotest: 007 [not run] not suitable for this image format: raw
-
-when there is something other than a passed test to report.
-
+> The man pages of urandom(4) and random(4) state:
+>     "The /dev/random device is a legacy interface which dates back to a
+>     time where the cryptographic primitives used in the implementation
+>     of /dev/urandom were not widely trusted.  It will return random
+>     bytes only within the estimated number of bits of fresh noise in the
+>     entropy pool, blocking if necessary.  /dev/random is suitable for
+>     applications that need high quality randomness, and can afford
+>     indeterminate delays."
 >
->  Thomas
+> Further, the "Usage" section of the said man pages state:
+>
+>     "The /dev/random interface is considered a legacy interface, and
+>     /dev/urandom is preferred and sufficient in all use cases, with the
+>     exception of applications which require randomness during early boot
+>     time; for these applications, getrandom(2) must be used instead,
+>     because it will block until the entropy pool is initialized.
+>
+>     "If a seed file is saved across reboots as recommended below (all
+>     major Linux distributions have done this since 2000 at least), the
+>     output is cryptographically secure against attackers without local
+>     root access as soon as it is reloaded in the boot sequence, and
+>     perfectly adequate for network encryption session keys.  Since reads
+>     from /dev/random may block, users will usually want to open it in
+>     nonblocking mode (or perform a read with timeout), and provide some
+>     sort of user notification if the desired entropy is not immediately
+>     available."
+>
+> And refer to random(7) for a comparison of `/dev/random` and
+> `/dev/urandom`.
 
+This is Linux.  What about other supported POSIX[*] hosts?  If any such
+host has /dev/random that works here, but not /dev/urandom, we regress.
 
---
-Alex Benn=C3=A9e
+*If* there's an actual regression risk: a simple & stupid way to reduce
+it risk could be falling back to /dev/random when opening /dev/urandom
+fails.  Perhaps only when it fails with ENOENT.
+
+Possible implementation: instead of setting a default filename in
+rng_random_init(), change rng_random_opened() to try /dev/urandom, then
+/dev/random when filename is still null.
+
+Aside: "opened" sounds like a predicate.  Goes back to commit
+a9b7b2ad7b0.
+
+> Given the above, change the entropy source for VirtIO-RNG device to
+> `/dev/urandom`.
+>
+> Related discussion in these[1][2] past threads.
+>
+> [1] https://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg08335.html
+>     -- "RNG: Any reason QEMU doesn't default to `/dev/urandom`?"
+> [2] https://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg02724.html
+>     -- "[RFC] Virtio RNG: Consider changing the default entropy source to
+>        /dev/urandom"
+>
+> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+
+[*] POSIX because
+common-obj-$(CONFIG_POSIX) += rng-random.o
 
