@@ -6,58 +6,57 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94C33C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 13:08:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CE57C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 13:09:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B4E521479
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 13:08:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B4E521479
+	by mail.kernel.org (Postfix) with ESMTPS id D6B2F2177B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 13:09:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6B2F2177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43015 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43033 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP5Fu-0000MX-J1
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 09:08:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52952)
+	id 1hP5Gy-0001A1-5A
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 09:09:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hP5BS-0004kV-1O
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:03:31 -0400
+	(envelope-from <stefanha@redhat.com>) id 1hP5Av-0004MD-NW
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:02:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hP5BQ-0004pO-Bq
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:03:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56418)
+	(envelope-from <stefanha@redhat.com>) id 1hP5Au-0004AH-Ht
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:02:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56062)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanha@redhat.com>)
-	id 1hP5BI-0004gS-OJ; Fri, 10 May 2019 09:03:20 -0400
+	id 1hP5Ar-00044l-SB; Fri, 10 May 2019 09:02:54 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 038CE70D64;
-	Fri, 10 May 2019 13:03:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 26C8B821EF;
+	Fri, 10 May 2019 13:02:53 +0000 (UTC)
 Received: from localhost (ovpn-116-89.ams2.redhat.com [10.36.116.89])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 469711001E82;
-	Fri, 10 May 2019 13:03:12 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id ADFF21001E86;
+	Fri, 10 May 2019 13:02:52 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 14:02:42 +0100
-Message-Id: <20190510130243.8887-8-stefanha@redhat.com>
+Date: Fri, 10 May 2019 14:02:37 +0100
+Message-Id: <20190510130243.8887-3-stefanha@redhat.com>
 In-Reply-To: <20190510130243.8887-1-stefanha@redhat.com>
 References: <20190510130243.8887-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
 	(mx1.redhat.com [10.5.110.28]);
-	Fri, 10 May 2019 13:03:20 +0000 (UTC)
+	Fri, 10 May 2019 13:02:53 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 7/8] docs: add Secure Coding Practices to
- developer docs
+Subject: [Qemu-devel] [PULL 2/8] util: readline: replace tab indent by four
+ spaces to fix checkpatch errors
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,197 +69,185 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
-	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-	qemu-block@nongnu.org,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Li Qiang <liq3ea@gmail.com>, Max Reitz <mreitz@redhat.com>,
+	Jules Irenge <jbi.octave@gmail.com>, qemu-block@nongnu.org,
+	Thomas Huth <thuth@redhat.com>, Max Reitz <mreitz@redhat.com>,
 	Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Kevin Wolf <kwolf@redhat.com>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Stefano Garzarella <sgarzare@redhat.com>
+	Kevin Wolf <kwolf@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-At KVM Forum 2018 I gave a presentation on security in QEMU:
-https://www.youtube.com/watch?v=3DYAdRf_hwxU8 (video)
-https://vmsplice.net/~stefan/stefanha-kvm-forum-2018.pdf (slides)
+From: Jules Irenge <jbi.octave@gmail.com>
 
-This patch adds a guide to secure coding practices.  This document
-covers things that developers should know about security in QEMU.  It is
-just a starting point that we can expand on later.  I hope it will be
-useful as a resource for new contributors and will save code reviewers
-from explaining the same concepts many times.
+Replace tab indent by four spaces to fix errors issued by checkpatch.pl t=
+ool
+"ERROR: code indent should never use tabs" within "util/readline.c" file.
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Acked-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Message-id: 20190509121820.16294-2-stefanha@redhat.com
-Message-Id: <20190509121820.16294-2-stefanha@redhat.com>
+Signed-off-by: Jules Irenge <jbi.octave@gmail.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-id: 20190401024406.10819-3-jbi.octave@gmail.com
+Message-Id: <20190401024406.10819-3-jbi.octave@gmail.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- docs/devel/index.rst                   |   1 +
- docs/devel/secure-coding-practices.rst | 106 +++++++++++++++++++++++++
- 2 files changed, 107 insertions(+)
- create mode 100644 docs/devel/secure-coding-practices.rst
+ util/readline.c | 98 ++++++++++++++++++++++++-------------------------
+ 1 file changed, 49 insertions(+), 49 deletions(-)
 
-diff --git a/docs/devel/index.rst b/docs/devel/index.rst
-index ebbab636ce..2a4ddf40ad 100644
---- a/docs/devel/index.rst
-+++ b/docs/devel/index.rst
-@@ -20,3 +20,4 @@ Contents:
-    stable-process
-    testing
-    decodetree
-+   secure-coding-practices
-diff --git a/docs/devel/secure-coding-practices.rst b/docs/devel/secure-c=
-oding-practices.rst
-new file mode 100644
-index 0000000000..cbfc8af67e
---- /dev/null
-+++ b/docs/devel/secure-coding-practices.rst
-@@ -0,0 +1,106 @@
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Secure Coding Practices
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+This document covers topics that both developers and security researcher=
-s must
-+be aware of so that they can develop safe code and audit existing code
-+properly.
-+
-+Reporting Security Bugs
-+-----------------------
-+For details on how to report security bugs or ask questions about potent=
-ial
-+security bugs, see the `Security Process wiki page
-+<https://wiki.qemu.org/SecurityProcess>`_.
-+
-+General Secure C Coding Practices
-+---------------------------------
-+Most CVEs (security bugs) reported against QEMU are not specific to
-+virtualization or emulation.  They are simply C programming bugs.  There=
-fore
-+it's critical to be aware of common classes of security bugs.
-+
-+There is a wide selection of resources available covering secure C codin=
-g.  For
-+example, the `CERT C Coding Standard
-+<https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standar=
-d>`_
-+covers the most important classes of security bugs.
-+
-+Instead of describing them in detail here, only the names of the most im=
-portant
-+classes of security bugs are mentioned:
-+
-+* Buffer overflows
-+* Use-after-free and double-free
-+* Integer overflows
-+* Format string vulnerabilities
-+
-+Some of these classes of bugs can be detected by analyzers.  Static anal=
-ysis is
-+performed regularly by Coverity and the most obvious of these bugs are e=
-ven
-+reported by compilers.  Dynamic analysis is possible with valgrind, tsan=
-, and
-+asan.
-+
-+Input Validation
-+----------------
-+Inputs from the guest or external sources (e.g. network, files) cannot b=
-e
-+trusted and may be invalid.  Inputs must be checked before using them in=
- a way
-+that could crash the program, expose host memory to the guest, or otherw=
-ise be
-+exploitable by an attacker.
-+
-+The most sensitive attack surface is device emulation.  All hardware reg=
-ister
-+accesses and data read from guest memory must be validated.  A typical e=
-xample
-+is a device that contains multiple units that are selectable by the gues=
-t via
-+an index register::
-+
-+  typedef struct {
-+      ProcessingUnit unit[2];
-+      ...
-+  } MyDeviceState;
-+
-+  static void mydev_writel(void *opaque, uint32_t addr, uint32_t val)
-+  {
-+      MyDeviceState *mydev =3D opaque;
-+      ProcessingUnit *unit;
-+
-+      switch (addr) {
-+      case MYDEV_SELECT_UNIT:
-+          unit =3D &mydev->unit[val];   <-- this input wasn't validated!
-+          ...
-+      }
-+  }
-+
-+If ``val`` is not in range [0, 1] then an out-of-bounds memory access wi=
-ll take
-+place when ``unit`` is dereferenced.  The code must check that ``val`` i=
-s 0 or
-+1 and handle the case where it is invalid.
-+
-+Unexpected Device Accesses
-+--------------------------
-+The guest may access device registers in unusual orders or at unexpected
-+moments.  Device emulation code must not assume that the guest follows t=
-he
-+typical "theory of operation" presented in driver writer manuals.  The g=
-uest
-+may make nonsense accesses to device registers such as starting operatio=
-ns
-+before the device has been fully initialized.
-+
-+A related issue is that device emulation code must be prepared for unexp=
-ected
-+device register accesses while asynchronous operations are in progress. =
- A
-+well-behaved guest might wait for a completion interrupt before accessin=
-g
-+certain device registers.  Device emulation code must handle the case wh=
-ere the
-+guest overwrites registers or submits further requests before an ongoing
-+request completes.  Unexpected accesses must not cause memory corruption=
- or
-+leaks in QEMU.
-+
-+Invalid device register accesses can be reported with
-+``qemu_log_mask(LOG_GUEST_ERROR, ...)``.  The ``-d guest_errors`` comman=
-d-line
-+option enables these log messages.
-+
-+Live Migration
-+--------------
-+Device state can be saved to disk image files and shared with other user=
-s.
-+Live migration code must validate inputs when loading device state so an
-+attacker cannot gain control by crafting invalid device states.  Device =
-state
-+is therefore considered untrusted even though it is typically generated =
-by QEMU
-+itself.
-+
-+Guest Memory Access Races
-+-------------------------
-+Guests with multiple vCPUs may modify guest RAM while device emulation c=
-ode is
-+running.  Device emulation code must copy in descriptors and other guest=
- RAM
-+structures and only process the local copy.  This prevents
-+time-of-check-to-time-of-use (TOCTOU) race conditions that could cause Q=
-EMU to
-+crash when a vCPU thread modifies guest RAM while device emulation is
-+processing it.
+diff --git a/util/readline.c b/util/readline.c
+index db399d3948..3eb5a66dfc 100644
+--- a/util/readline.c
++++ b/util/readline.c
+@@ -179,20 +179,20 @@ static void readline_up_char(ReadLineState *rs)
+     int idx;
+=20
+     if (rs->hist_entry =3D=3D 0)
+-	return;
++        return;
+     if (rs->hist_entry =3D=3D -1) {
+-	/* Find latest entry */
+-	for (idx =3D 0; idx < READLINE_MAX_CMDS; idx++) {
+-	    if (rs->history[idx] =3D=3D NULL)
+-		break;
+-	}
+-	rs->hist_entry =3D idx;
++        /* Find latest entry */
++        for (idx =3D 0; idx < READLINE_MAX_CMDS; idx++) {
++            if (rs->history[idx] =3D=3D NULL)
++                break;
++        }
++        rs->hist_entry =3D idx;
+     }
+     rs->hist_entry--;
+     if (rs->hist_entry >=3D 0) {
+-	pstrcpy(rs->cmd_buf, sizeof(rs->cmd_buf),
++        pstrcpy(rs->cmd_buf, sizeof(rs->cmd_buf),
+                 rs->history[rs->hist_entry]);
+-	rs->cmd_buf_index =3D rs->cmd_buf_size =3D strlen(rs->cmd_buf);
++        rs->cmd_buf_index =3D rs->cmd_buf_size =3D strlen(rs->cmd_buf);
+     }
+ }
+=20
+@@ -202,11 +202,11 @@ static void readline_down_char(ReadLineState *rs)
+         return;
+     if (rs->hist_entry < READLINE_MAX_CMDS - 1 &&
+         rs->history[++rs->hist_entry] !=3D NULL) {
+-	pstrcpy(rs->cmd_buf, sizeof(rs->cmd_buf),
++        pstrcpy(rs->cmd_buf, sizeof(rs->cmd_buf),
+                 rs->history[rs->hist_entry]);
+     } else {
+         rs->cmd_buf[0] =3D 0;
+-	rs->hist_entry =3D -1;
++        rs->hist_entry =3D -1;
+     }
+     rs->cmd_buf_index =3D rs->cmd_buf_size =3D strlen(rs->cmd_buf);
+ }
+@@ -217,42 +217,42 @@ static void readline_hist_add(ReadLineState *rs, co=
+nst char *cmdline)
+     int idx;
+=20
+     if (cmdline[0] =3D=3D '\0')
+-	return;
++        return;
+     new_entry =3D NULL;
+     if (rs->hist_entry !=3D -1) {
+-	/* We were editing an existing history entry: replace it */
+-	hist_entry =3D rs->history[rs->hist_entry];
+-	idx =3D rs->hist_entry;
+-	if (strcmp(hist_entry, cmdline) =3D=3D 0) {
+-	    goto same_entry;
+-	}
++        /* We were editing an existing history entry: replace it */
++        hist_entry =3D rs->history[rs->hist_entry];
++        idx =3D rs->hist_entry;
++        if (strcmp(hist_entry, cmdline) =3D=3D 0) {
++            goto same_entry;
++        }
+     }
+     /* Search cmdline in history buffers */
+     for (idx =3D 0; idx < READLINE_MAX_CMDS; idx++) {
+-	hist_entry =3D rs->history[idx];
+-	if (hist_entry =3D=3D NULL)
+-	    break;
+-	if (strcmp(hist_entry, cmdline) =3D=3D 0) {
+-	same_entry:
+-	    new_entry =3D hist_entry;
+-	    /* Put this entry at the end of history */
+-	    memmove(&rs->history[idx], &rs->history[idx + 1],
+-		    (READLINE_MAX_CMDS - (idx + 1)) * sizeof(char *));
+-	    rs->history[READLINE_MAX_CMDS - 1] =3D NULL;
+-	    for (; idx < READLINE_MAX_CMDS; idx++) {
+-		if (rs->history[idx] =3D=3D NULL)
+-		    break;
+-	    }
+-	    break;
+-	}
++        hist_entry =3D rs->history[idx];
++        if (hist_entry =3D=3D NULL)
++            break;
++        if (strcmp(hist_entry, cmdline) =3D=3D 0) {
++        same_entry:
++            new_entry =3D hist_entry;
++            /* Put this entry at the end of history */
++            memmove(&rs->history[idx], &rs->history[idx + 1],
++                    (READLINE_MAX_CMDS - (idx + 1)) * sizeof(char *));
++            rs->history[READLINE_MAX_CMDS - 1] =3D NULL;
++            for (; idx < READLINE_MAX_CMDS; idx++) {
++                if (rs->history[idx] =3D=3D NULL)
++                    break;
++            }
++            break;
++        }
+     }
+     if (idx =3D=3D READLINE_MAX_CMDS) {
+-	/* Need to get one free slot */
++        /* Need to get one free slot */
+         g_free(rs->history[0]);
+-	memmove(rs->history, &rs->history[1],
+-	        (READLINE_MAX_CMDS - 1) * sizeof(char *));
+-	rs->history[READLINE_MAX_CMDS - 1] =3D NULL;
+-	idx =3D READLINE_MAX_CMDS - 1;
++        memmove(rs->history, &rs->history[1],
++                (READLINE_MAX_CMDS - 1) * sizeof(char *));
++        rs->history[READLINE_MAX_CMDS - 1] =3D NULL;
++        idx =3D READLINE_MAX_CMDS - 1;
+     }
+     if (new_entry =3D=3D NULL)
+         new_entry =3D g_strdup(cmdline);
+@@ -403,9 +403,9 @@ void readline_handle_byte(ReadLineState *rs, int ch)
+         case 8:
+             readline_backspace(rs);
+             break;
+-	case 155:
++        case 155:
+             rs->esc_state =3D IS_CSI;
+-	    break;
++            break;
+         default:
+             if (ch >=3D 32) {
+                 readline_insert_char(rs, ch);
+@@ -426,14 +426,14 @@ void readline_handle_byte(ReadLineState *rs, int ch=
+)
+         break;
+     case IS_CSI:
+         switch (ch) {
+-	case 'A':
+-	case 'F':
+-	    readline_up_char(rs);
+-	    break;
+-	case 'B':
+-	case 'E':
+-	    readline_down_char(rs);
+-	    break;
++        case 'A':
++        case 'F':
++            readline_up_char(rs);
++            break;
++        case 'B':
++        case 'E':
++            readline_down_char(rs);
++            break;
+         case 'D':
+             readline_backward_char(rs);
+             break;
 --=20
 2.21.0
 
