@@ -2,80 +2,72 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D75DC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 08:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C5D0C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:00:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34F80216C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 08:59:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XtPGaQk7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34F80216C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2B181216C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:00:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B181216C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39248 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39281 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP1N4-00044e-HB
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 04:59:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35334)
+	id 1hP1OK-0004iB-CT
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 05:00:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hP1MJ-0003kh-Ai
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:58:28 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hP1Ne-0004Pz-Hd
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:59:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hP1MI-0003mX-DJ
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:58:27 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43762)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hP1MI-0003lw-6x
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:58:26 -0400
-Received: by mail-oi1-x241.google.com with SMTP id t187so676576oie.10
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 01:58:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=R0CYBy45P62CYPJd2SVkb1XFFLimvyPkwi+qTI6OSMA=;
-	b=XtPGaQk7FvCesHaB8R264j0zk93ElyIDN46eoI16IetrW/7XA/ddprUczwZzzLyIRm
-	LJq99gPkajSXnzNHDHcat++z+ED6sztjSIVrVKxJQuT2Fczwinsu8c5K9o3XHZ/HxT5L
-	mAuAtbZFotK8eaUnm3midIY/9fSeszZSkVuWvNxnqCX28TuHsEYLLJuXI7tYjXgkMMhC
-	q1uSGbOZ4sGger03qKDKXvAIU9R0UH6daYUcOaImPls+9079iXHIDiu1gOpafqhdkovU
-	MWzsFxwDzy5/hEa2FML1lnbeXWaL4dj0bkLVebbmmykQAHGAg1GAib0pKKqtnuT4elOW
-	l0NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=R0CYBy45P62CYPJd2SVkb1XFFLimvyPkwi+qTI6OSMA=;
-	b=gzconQawhnw3rtpD8PL2soMj1vazSDnFOoxRXKxnj11sxoB5UZnHQXyssgUD7yhn1E
-	81JCwkg0nt6b+C0RYGW4/EwtGzWbxC9UF55noFDFx0iPtzMwnYGPkzdFG+2QOSSRJ0GH
-	LVIZlwG/y8Oo3+rT1qxMtjcQWFmgTABMJIf90bveGMxTQliJAUL6XQ62XLoLHYWx66Xg
-	ym5IulAYRyYKaN+ojXX1Dw2nBgFX2gMI18TVJhvcwPMNE3TxIgi24tSGoOnD6uWihOsG
-	QLILu2QFQdYNVTD4RObDK7QpL0cBppZHrLPbTy2eewxWY+2d7JE3blqy1/NKfM7sVtDT
-	G+2w==
-X-Gm-Message-State: APjAAAWp3KkoAYU9d/heZtMG2f3TfCnxV/aOCaJUZ2mx16ukfxI7njeu
-	oQyU18sG8ZY9MzxVmsvb4AIaR6VqfyrIevyoB5rnZw==
-X-Google-Smtp-Source: APXvYqxQ18attBmsoiihnOwmb5HuYxPc68ry9Oc5kIsnY143DTV/uGRg0bFx2ABS+Ja2zxdxTSiupL8pJHGb+vWKmaY=
-X-Received: by 2002:aca:110f:: with SMTP id 15mr4444937oir.163.1557478704177; 
-	Fri, 10 May 2019 01:58:24 -0700 (PDT)
+	(envelope-from <kraxel@redhat.com>) id 1hP1Nd-0004IL-P4
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:59:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45236)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hP1Nd-0004Hq-Jg
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:59:49 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8353D3084295;
+	Fri, 10 May 2019 08:59:48 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
+	[10.36.117.74])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 42BEF379C;
+	Fri, 10 May 2019 08:59:48 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id 79B10A1E1; Fri, 10 May 2019 10:59:47 +0200 (CEST)
+Date: Fri, 10 May 2019 10:59:47 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <20190510085947.y62lttdtrg5cxx6b@sirius.home.kraxel.org>
+References: <CABSdmrnNW6f=P64PviPP8CTJ5SVfYS8_6kmAtpw9yPObTEkpxg@mail.gmail.com>
+	<CABSdmrnocrqLKWncgy_Lak33__GRPYfs-RzSA14e=vh4cRn2ag@mail.gmail.com>
+	<20190509064848.wjhchsfov7q6komj@sirius.home.kraxel.org>
+	<CABSdmrmm+wJ=+Ccav=X5Gw_oueQvPRejCWVG2SQeCw=K4BM9EA@mail.gmail.com>
+	<CABSdmrndpONH_fVHbktHbBXvXPKESeRfis06TjrNRRfBpJzXLA@mail.gmail.com>
+	<b6064b77-5ca4-03e1-80ef-027313096cb2@gmail.com>
+	<CABSdmrkW6G23ZGDA7iLucM45vL0HHGsr2F76H0Mf8S0xkhPnsQ@mail.gmail.com>
+	<3e619b5c-8fb3-2655-2d92-37598db098d8@gmail.com>
 MIME-Version: 1.0
-References: <20190509222631.14271-1-richard.henderson@linaro.org>
-	<20190509222631.14271-15-richard.henderson@linaro.org>
-In-Reply-To: <20190509222631.14271-15-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 10 May 2019 09:58:13 +0100
-Message-ID: <CAFEAcA-GiD1OegiQexBx5JAP7yqKGZp+JWUbzPm92LXKT=LvTw@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH v3 14/27] target/nios2: Convert to
- CPUClass::tlb_fill
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3e619b5c-8fb3-2655-2d92-37598db098d8@gmail.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Fri, 10 May 2019 08:59:48 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/3] ramfb enhancement
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,26 +79,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marek Vasut <marex@denx.de>, Chris Wulff <crwulff@gmail.com>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: Hou Qiming <hqm03ster@gmail.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 9 May 2019 at 23:35, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Remove the leftover debugging cpu_dump_state.
->
-> Cc: Chris Wulff <crwulff@gmail.com>
-> Cc: Marek Vasut <marex@denx.de>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
-> v2: Keep user-only and system tlb_fill separate.
-> ---
+  Hi,
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Got it, thanks. Is a pity ramfb is not a PCI device :), it was worth the
+> question anyway.
 
-thanks
--- PMM
+If you look for a simple pci display device check out bochs-display.
+It's simliar to stdvga (so ovmf and bochs-drm.ko can drive it just
+fine), but without legacy vga emulation, only a linear framebuffer is
+supported.  And code size is a fraction of stdvga ...
+
+cheers,
+  Gerd
+
 
