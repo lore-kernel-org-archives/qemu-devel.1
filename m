@@ -2,64 +2,65 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9CF9C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:38:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C877EC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:41:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F29E20989
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:38:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F29E20989
+	by mail.kernel.org (Postfix) with ESMTPS id 4AEFB20989
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:41:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AEFB20989
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39682 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39724 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP1yg-0005mf-SQ
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 05:38:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46849)
+	id 1hP22J-0007YX-9d
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 05:41:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hP1xK-0004z9-4i
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:36:44 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hP21V-00078D-TN
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:41:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hP1xJ-0005TA-1W
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:36:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35604)
+	(envelope-from <kwolf@redhat.com>) id 1hP21P-0008G2-Lm
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:41:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35588)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hP1xI-0005Sl-PN
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:36:40 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hP21L-0008Bc-Dl; Fri, 10 May 2019 05:40:51 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2575F86675;
-	Fri, 10 May 2019 09:36:40 +0000 (UTC)
-Received: from localhost (ovpn-117-147.ams2.redhat.com [10.36.117.147])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id AB2865D717;
-	Fri, 10 May 2019 09:36:39 +0000 (UTC)
-Date: Fri, 10 May 2019 10:36:37 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20190510093637.GA22311@stefanha-x1.localdomain>
-References: <20190510081526.15507-1-kchamart@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id F05AA3B722;
+	Fri, 10 May 2019 09:40:48 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-183.ams2.redhat.com
+	[10.36.116.183])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B888C1001E65;
+	Fri, 10 May 2019 09:40:47 +0000 (UTC)
+Date: Fri, 10 May 2019 11:40:46 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190510094046.GA5887@localhost.localdomain>
+References: <20190509175237.19363-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="EVF5PPMfhYS0aIcm"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190510081526.15507-1-kchamart@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20190509175237.19363-1-mreitz@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Fri, 10 May 2019 09:36:40 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.30]);
+	Fri, 10 May 2019 09:40:49 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2] VirtIO-RNG: Update default entropy
- source to `/dev/urandom`
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] qemu-img: Allow rebase with no
+ input base
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,98 +72,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: armbru@redhat.com, rjones@redhat.com, berrange@redhat.com,
-	qemu-devel@nongnu.org, amit@kernel.org
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Am 09.05.2019 um 19:52 hat Max Reitz geschrieben:
+> This series allows using qemu-img rebase (without -u) on images that do
+> not have a backing file.  Right now, this fails with the rather cryptic
+> error message:
+>=20
+> $ qemu-img rebase -b base.qcow2 foo.qcow2
+> qemu-img: Could not open old backing file '': The 'file' block driver r=
+equires a file name
+>=20
+> Yeah, well, OK.
+>=20
+> With how rebase currently works, this would lead to the overlay being
+> filled with zeroes, however.  This is where patch 2 comes in and instea=
+d
+> makes rebase use blk_pwrite_zeroes() whenever it handles an area past
+> the input=E2=80=99s backing file=E2=80=99s EOF.
+>=20
+> (Note that additionally we could try to punch holes in the overlay
+> whenever it matches the new backing file, but that=E2=80=99s something =
+I=E2=80=99ll put
+> off for later.  (We don=E2=80=99t even have a reliable method for punch=
+ing holes
+> into an overlay yet, although I would like to have such because it coul=
+d
+> make active commit more efficient.))
+>=20
+>=20
+> And patch 3 adds the usual test.
+>=20
+>=20
+> v3:
+> - Patch 3: Move test to own file so it doesn=E2=80=99t run for qed or q=
+cow2 v2
+>   (because it can=E2=80=99t, it requires zero clusters)
 
---EVF5PPMfhYS0aIcm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks, updated in the block branch.
 
-On Fri, May 10, 2019 at 10:15:25AM +0200, Kashyap Chamarthy wrote:
-> When QEMU exposes a VirtIO-RNG device to the guest, that device needs a
-> source of entropy, and that source needs to be "non-blocking", like
-> `/dev/urandom`.  However, currently QEMU defaults to the problematic
-> `/dev/random`, which is "blocking" (as in, it waits until sufficient
-> entropy is available).
->=20
-> Why prefer `/dev/urandom` over `/dev/random`?
-> ---------------------------------------------
->=20
-> The man pages of urandom(4) and random(4) state:
->=20
->     "The /dev/random device is a legacy interface which dates back to a
->     time where the cryptographic primitives used in the implementation
->     of /dev/urandom were not widely trusted.  It will return random
->     bytes only within the estimated number of bits of fresh noise in the
->     entropy pool, blocking if necessary.  /dev/random is suitable for
->     applications that need high quality randomness, and can afford
->     indeterminate delays."
->=20
-> Further, the "Usage" section of the said man pages state:
->=20
->     "The /dev/random interface is considered a legacy interface, and
->     /dev/urandom is preferred and sufficient in all use cases, with the
->     exception of applications which require randomness during early boot
->     time; for these applications, getrandom(2) must be used instead,
->     because it will block until the entropy pool is initialized.
->=20
->     "If a seed file is saved across reboots as recommended below (all
->     major Linux distributions have done this since 2000 at least), the
->     output is cryptographically secure against attackers without local
->     root access as soon as it is reloaded in the boot sequence, and
->     perfectly adequate for network encryption session keys.  Since reads
->     from /dev/random may block, users will usually want to open it in
->     nonblocking mode (or perform a read with timeout), and provide some
->     sort of user notification if the desired entropy is not immediately
->     available."
->=20
-> And refer to random(7) for a comparison of `/dev/random` and
-> `/dev/urandom`.
->=20
->     - - -
->=20
-> Given the above, change the entropy source for VirtIO-RNG device to
-> `/dev/urandom`.
->=20
-> Related discussion in these[1][2] past threads.
->=20
-> [1] https://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg08335.html
->     -- "RNG: Any reason QEMU doesn't default to `/dev/urandom`?"
-> [2] https://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg02724.html
->     -- "[RFC] Virtio RNG: Consider changing the default entropy source to
->        /dev/urandom"
->=20
-> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
-> ---
-> v2:
->  - Update commit message to mention justification for preferring
->    `/dev/urandom` over `/dev/random` [stefanha]
-> ---
->  backends/rng-random.c | 2 +-
->  qemu-options.hx       | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---EVF5PPMfhYS0aIcm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzVRiUACgkQnKSrs4Gr
-c8iPtQgArz4dly2f5lcX4md1qBL9hHEoPsXrWo/q2AV+md2BS4nXc6Hxtwc27AFC
-DJyMcgahNT18NbWv9mOEsS466u/MUvHw73UVJ9QRlZJd0rW3ky+EXkyFU/Scs2Vv
-YvUxVV55v9cNJz2uijYiUBs8AcIiY86KFq5l61UnIKT4WdLre8zCMoafsMbDIl0f
-yANh704WqZuKzpZnwI7tS+bKvVc8yq4Mnv2tlCWi3FnG9lxAg4p7zoBLfBnA993z
-84YmcJZENR6EQ1DciM61VHgnfkbgitqbKK8aTyIv0FP3fYV50A8ZId6HBVYE/qUb
-IXBCsirygCu7brSeL3r/VoCUtKLB7w==
-=LMC5
------END PGP SIGNATURE-----
-
---EVF5PPMfhYS0aIcm--
+Kevin
 
