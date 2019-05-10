@@ -6,57 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A3EC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 13:07:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94C33C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 13:08:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7E632173B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 13:07:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7E632173B
+	by mail.kernel.org (Postfix) with ESMTPS id 5B4E521479
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 13:08:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B4E521479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43013 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43015 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP5F4-0007nK-U8
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 09:07:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52766)
+	id 1hP5Fu-0000MX-J1
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 09:08:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hP5BE-0004XE-1Q
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:03:17 -0400
+	(envelope-from <stefanha@redhat.com>) id 1hP5BS-0004kV-1O
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:03:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hP5BC-0004ab-Sm
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:03:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53856)
+	(envelope-from <stefanha@redhat.com>) id 1hP5BQ-0004pO-Bq
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:03:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56418)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanha@redhat.com>)
-	id 1hP5B8-0004Ve-LB; Fri, 10 May 2019 09:03:10 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	id 1hP5BI-0004gS-OJ; Fri, 10 May 2019 09:03:20 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E8F9B30254A1;
-	Fri, 10 May 2019 13:03:09 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 038CE70D64;
+	Fri, 10 May 2019 13:03:20 +0000 (UTC)
 Received: from localhost (ovpn-116-89.ams2.redhat.com [10.36.116.89])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9D40F60126;
-	Fri, 10 May 2019 13:03:06 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 469711001E82;
+	Fri, 10 May 2019 13:03:12 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 14:02:41 +0100
-Message-Id: <20190510130243.8887-7-stefanha@redhat.com>
+Date: Fri, 10 May 2019 14:02:42 +0100
+Message-Id: <20190510130243.8887-8-stefanha@redhat.com>
 In-Reply-To: <20190510130243.8887-1-stefanha@redhat.com>
 References: <20190510130243.8887-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Fri, 10 May 2019 13:03:10 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.28]);
+	Fri, 10 May 2019 13:03:20 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 6/8] aio-posix: ensure poll mode is left when
- aio_notify is called
+Subject: [Qemu-devel] [PULL 7/8] docs: add Secure Coding Practices to
+ developer docs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,87 +70,197 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
-	Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org,
-	Stefan Hajnoczi <stefanha@gmail.com>, Max Reitz <mreitz@redhat.com>,
+	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	qemu-block@nongnu.org,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Li Qiang <liq3ea@gmail.com>, Max Reitz <mreitz@redhat.com>,
 	Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Kevin Wolf <kwolf@redhat.com>
+	Kevin Wolf <kwolf@redhat.com>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+At KVM Forum 2018 I gave a presentation on security in QEMU:
+https://www.youtube.com/watch?v=3DYAdRf_hwxU8 (video)
+https://vmsplice.net/~stefan/stefanha-kvm-forum-2018.pdf (slides)
 
-With aio=3Dthread, adaptive polling makes latency worse rather than
-better, because it delays the execution of the ThreadPool's
-completion bottom half.
+This patch adds a guide to secure coding practices.  This document
+covers things that developers should know about security in QEMU.  It is
+just a starting point that we can expand on later.  I hope it will be
+useful as a resource for new contributors and will save code reviewers
+from explaining the same concepts many times.
 
-event_notifier_poll() does run while polling, detecting that
-a bottom half was scheduled by a worker thread, but because
-ctx->notifier is explicitly ignored in run_poll_handlers_once(),
-scheduling the BH does not count as making progress and
-run_poll_handlers() keeps running.  Fix this by recomputing
-the deadline after *timeout could have changed.
-
-With this change, ThreadPool still cannot participate in polling
-but at least it does not suffer from extra latency.
-
-Reported-by: Sergio Lopez <slp@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-id: 20190409122823.12416-1-pbonzini@redhat.com
-Cc: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1553692145-86728-1-git-send-email-pbonzini@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20190409122823.12416-1-pbonzini@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Message-id: 20190509121820.16294-2-stefanha@redhat.com
+Message-Id: <20190509121820.16294-2-stefanha@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- util/aio-posix.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ docs/devel/index.rst                   |   1 +
+ docs/devel/secure-coding-practices.rst | 106 +++++++++++++++++++++++++
+ 2 files changed, 107 insertions(+)
+ create mode 100644 docs/devel/secure-coding-practices.rst
 
-diff --git a/util/aio-posix.c b/util/aio-posix.c
-index 6fbfa7924f..db11021287 100644
---- a/util/aio-posix.c
-+++ b/util/aio-posix.c
-@@ -519,6 +519,10 @@ static bool run_poll_handlers_once(AioContext *ctx, =
-int64_t *timeout)
-         if (!node->deleted && node->io_poll &&
-             aio_node_check(ctx, node->is_external) &&
-             node->io_poll(node->opaque)) {
-+            /*
-+             * Polling was successful, exit try_poll_mode immediately
-+             * to adjust the next polling time.
-+             */
-             *timeout =3D 0;
-             if (node->opaque !=3D &ctx->notifier) {
-                 progress =3D true;
-@@ -558,8 +562,9 @@ static bool run_poll_handlers(AioContext *ctx, int64_=
-t max_ns, int64_t *timeout)
-     do {
-         progress =3D run_poll_handlers_once(ctx, timeout);
-         elapsed_time =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - start_=
-time;
--    } while (!progress && elapsed_time < max_ns
--             && !atomic_read(&ctx->poll_disable_cnt));
-+        max_ns =3D qemu_soonest_timeout(*timeout, max_ns);
-+        assert(!(max_ns && progress));
-+    } while (elapsed_time < max_ns && !atomic_read(&ctx->poll_disable_cn=
-t));
-=20
-     /* If time has passed with no successful polling, adjust *timeout to
-      * keep the same ending time.
-@@ -585,8 +590,7 @@ static bool run_poll_handlers(AioContext *ctx, int64_=
-t max_ns, int64_t *timeout)
-  */
- static bool try_poll_mode(AioContext *ctx, int64_t *timeout)
- {
--    /* See qemu_soonest_timeout() uint64_t hack */
--    int64_t max_ns =3D MIN((uint64_t)*timeout, (uint64_t)ctx->poll_ns);
-+    int64_t max_ns =3D qemu_soonest_timeout(*timeout, ctx->poll_ns);
-=20
-     if (max_ns && !atomic_read(&ctx->poll_disable_cnt)) {
-         poll_set_started(ctx, true);
+diff --git a/docs/devel/index.rst b/docs/devel/index.rst
+index ebbab636ce..2a4ddf40ad 100644
+--- a/docs/devel/index.rst
++++ b/docs/devel/index.rst
+@@ -20,3 +20,4 @@ Contents:
+    stable-process
+    testing
+    decodetree
++   secure-coding-practices
+diff --git a/docs/devel/secure-coding-practices.rst b/docs/devel/secure-c=
+oding-practices.rst
+new file mode 100644
+index 0000000000..cbfc8af67e
+--- /dev/null
++++ b/docs/devel/secure-coding-practices.rst
+@@ -0,0 +1,106 @@
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++Secure Coding Practices
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++This document covers topics that both developers and security researcher=
+s must
++be aware of so that they can develop safe code and audit existing code
++properly.
++
++Reporting Security Bugs
++-----------------------
++For details on how to report security bugs or ask questions about potent=
+ial
++security bugs, see the `Security Process wiki page
++<https://wiki.qemu.org/SecurityProcess>`_.
++
++General Secure C Coding Practices
++---------------------------------
++Most CVEs (security bugs) reported against QEMU are not specific to
++virtualization or emulation.  They are simply C programming bugs.  There=
+fore
++it's critical to be aware of common classes of security bugs.
++
++There is a wide selection of resources available covering secure C codin=
+g.  For
++example, the `CERT C Coding Standard
++<https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standar=
+d>`_
++covers the most important classes of security bugs.
++
++Instead of describing them in detail here, only the names of the most im=
+portant
++classes of security bugs are mentioned:
++
++* Buffer overflows
++* Use-after-free and double-free
++* Integer overflows
++* Format string vulnerabilities
++
++Some of these classes of bugs can be detected by analyzers.  Static anal=
+ysis is
++performed regularly by Coverity and the most obvious of these bugs are e=
+ven
++reported by compilers.  Dynamic analysis is possible with valgrind, tsan=
+, and
++asan.
++
++Input Validation
++----------------
++Inputs from the guest or external sources (e.g. network, files) cannot b=
+e
++trusted and may be invalid.  Inputs must be checked before using them in=
+ a way
++that could crash the program, expose host memory to the guest, or otherw=
+ise be
++exploitable by an attacker.
++
++The most sensitive attack surface is device emulation.  All hardware reg=
+ister
++accesses and data read from guest memory must be validated.  A typical e=
+xample
++is a device that contains multiple units that are selectable by the gues=
+t via
++an index register::
++
++  typedef struct {
++      ProcessingUnit unit[2];
++      ...
++  } MyDeviceState;
++
++  static void mydev_writel(void *opaque, uint32_t addr, uint32_t val)
++  {
++      MyDeviceState *mydev =3D opaque;
++      ProcessingUnit *unit;
++
++      switch (addr) {
++      case MYDEV_SELECT_UNIT:
++          unit =3D &mydev->unit[val];   <-- this input wasn't validated!
++          ...
++      }
++  }
++
++If ``val`` is not in range [0, 1] then an out-of-bounds memory access wi=
+ll take
++place when ``unit`` is dereferenced.  The code must check that ``val`` i=
+s 0 or
++1 and handle the case where it is invalid.
++
++Unexpected Device Accesses
++--------------------------
++The guest may access device registers in unusual orders or at unexpected
++moments.  Device emulation code must not assume that the guest follows t=
+he
++typical "theory of operation" presented in driver writer manuals.  The g=
+uest
++may make nonsense accesses to device registers such as starting operatio=
+ns
++before the device has been fully initialized.
++
++A related issue is that device emulation code must be prepared for unexp=
+ected
++device register accesses while asynchronous operations are in progress. =
+ A
++well-behaved guest might wait for a completion interrupt before accessin=
+g
++certain device registers.  Device emulation code must handle the case wh=
+ere the
++guest overwrites registers or submits further requests before an ongoing
++request completes.  Unexpected accesses must not cause memory corruption=
+ or
++leaks in QEMU.
++
++Invalid device register accesses can be reported with
++``qemu_log_mask(LOG_GUEST_ERROR, ...)``.  The ``-d guest_errors`` comman=
+d-line
++option enables these log messages.
++
++Live Migration
++--------------
++Device state can be saved to disk image files and shared with other user=
+s.
++Live migration code must validate inputs when loading device state so an
++attacker cannot gain control by crafting invalid device states.  Device =
+state
++is therefore considered untrusted even though it is typically generated =
+by QEMU
++itself.
++
++Guest Memory Access Races
++-------------------------
++Guests with multiple vCPUs may modify guest RAM while device emulation c=
+ode is
++running.  Device emulation code must copy in descriptors and other guest=
+ RAM
++structures and only process the local copy.  This prevents
++time-of-check-to-time-of-use (TOCTOU) race conditions that could cause Q=
+EMU to
++crash when a vCPU thread modifies guest RAM while device emulation is
++processing it.
 --=20
 2.21.0
 
