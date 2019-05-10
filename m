@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C82EC04AB3
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:54:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D085BC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:54:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67579217F5
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:54:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B4F1208C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:54:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lLB+U6uj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67579217F5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Fj0nTSks"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B4F1208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47814 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47824 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP9iy-0004IW-N5
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 13:54:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59312)
+	id 1hP9jB-0004V4-RH
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 13:54:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hP9Mg-0007br-3A
+	(envelope-from <richard.henderson@linaro.org>) id 1hP9Mh-0007cc-1B
 	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:31:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hP9Mf-0006EJ-48
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:31:22 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:44200)
+	(envelope-from <richard.henderson@linaro.org>) id 1hP9Mg-0006Eu-51
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:31:23 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:40823)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hP9Me-0006E7-UY
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:31:21 -0400
-Received: by mail-pl1-x642.google.com with SMTP id d3so3130070plj.11
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 10:31:20 -0700 (PDT)
+	id 1hP9Mf-0006Ed-VH
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:31:22 -0400
+Received: by mail-pl1-x642.google.com with SMTP id b3so3138221plr.7
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 10:31:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:subject:date:message-id:in-reply-to:references;
-	bh=U7V1DU2sIBLR4xyyuIblisrMELcV0ZOXk8BQM7uyeGA=;
-	b=lLB+U6ujZVJ6L4XThI1HmZzsFwQkCilJF2kR0pCk0VB700ZOMTfW+27s5Lcr3dCz4o
-	lUU7mlOdzzySUgVSVl6cJgm/3y/yoDVJdD+zgmYM/qwfqKWQVhYiWnbspflLxb3LQThX
-	x2i32RAZncGat5Uw512Yv6XoK3sVBKo49XLawnjVvA0BFoDcT4qBkGDphdyb/cDcUJkm
-	zH/0yTvkGHC0Qq5ujjkWa3K3+JBMLDVf6ERFuVfjFgMu6TR+JltjLkEhX3Bm+mmyFH6W
-	epYmWhNCJFVi9ooIOVovD45qcxExbPAl8HQEPuWmHnFZmjmwuCIs5HuurcNmpPkIusDC
-	Fk0A==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=3/XT/GNbTz9t3be4QG6qS3S59cCXuga8GczXPdJ1EMM=;
+	b=Fj0nTSksTM4fN1HQhx5uGxgNCq/HKYp0ojeEbcEI65djDLBJWYutwPjsmKSw8WB+uZ
+	VoFRNfzbIvehNcc8KgAKWcm1EChcnteZxXjtTnkpkMsrnaHMNQcc91SX1nD/7oD/UdcL
+	zCmMQctVdb5AmiC6HalqkhPbGjeCLIEEWba6C/JxkjDYwyO7CKWRXHNikicEjCy0pdas
+	a/ERAkmLB2ouKdtheeWUj+HbV+V70yCAOo+ifobiFk1SchHM4u4NbGreB2LLvGqW5A5f
+	ISauxo0DZwOvz5no/1BTgH7y1JamXDBezY7WgrBXuIKOq4zLSGuONPVujG7HBMbkXVCG
+	2JEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=U7V1DU2sIBLR4xyyuIblisrMELcV0ZOXk8BQM7uyeGA=;
-	b=t8mx7XkjJCRJRSdNNzlRxod4v6QMChokG1cd410aStSbm6DvNhZ5EeHRhThBlqw+d2
-	OOTn/G7uqXp3N494xONLzZWjKDpqrJ9YZGTb9UuFGi0dkSqwAe0rnhj6RV0QTNYF6cfy
-	0RspP6X1l7xfIGN8ZM6DqVyp1H+yKeSmHcaBh2BnTvxL1Iom9u8kytcEB64EwXzhen1B
-	DngnHlsrbAF3r5MpZOXbaDQwcW+8O5xITFpo44OTgfFoN8LSYzA36LXRcfdkd5lPbdaY
-	NEKtTZyBF5FtK7a0E+uh9J/IaG5RnF1abAV6m4UxGsgqeHuhJ4LpRjPh638Rl6s0XMSL
-	Ex6w==
-X-Gm-Message-State: APjAAAU6znQBfIXyHn2QgAldJrAxaI+SbGCEFN7FcVbAM2RcsGRiysa4
-	+aoueLEhpbsq63c7FSxRiAXpsUHBRos=
-X-Google-Smtp-Source: APXvYqy2vnGtD31v8PeCkAUuA9XOgxfT/4xnOzMkOrdB9nborCshQpjVz2ay5+hFcqZTKku/0ay6IA==
-X-Received: by 2002:a17:902:2b87:: with SMTP id
-	l7mr10116770plb.11.1557509479776; 
-	Fri, 10 May 2019 10:31:19 -0700 (PDT)
+	bh=3/XT/GNbTz9t3be4QG6qS3S59cCXuga8GczXPdJ1EMM=;
+	b=FrM/Gq5JmwhafrNM7O7MxMRNNXHZXfhuJfmXRkKWKaTyV5xaeVQsVmk29bhYK2qYzz
+	Kp8HgcrsL48mEMIzQCaP38eRi3tGLuDNbXIbenpDEPd9HWKVYktvClbFLEskhe2JfsSH
+	kRvR3C33g2zoPA5ehdoYktKukpe/ROB2UH7mknmphYZQgsVxZOJ7OAHmoW9X4gVZqFtk
+	JBfEqN69SNSUcGI2VLCf6o0kmah2eUiyRodHnynBr0MUjLLyZL97CJhNiFWKSx22BhSC
+	R+bpJ5tADgK7JOEzIdGm1E5e6R4Xm5eIaHVxBi4fXTVxLPgUrX1M2X7qz1wi4x+DaDWE
+	mD/Q==
+X-Gm-Message-State: APjAAAWSx4260p4o58NFcW94nIRV1PdbvyatsUnyV3FgKh+XyCB+NewO
+	Y+if1gV4gDZBnY97Jo+y4idaWRosRVE=
+X-Google-Smtp-Source: APXvYqyxAalJ7+Qny5idoBn36QbyQfkIYJy64xiwdisR9O6FTb6r4MFIWVKUgu45u4zWBap034IAHg==
+X-Received: by 2002:a17:902:8b8a:: with SMTP id
+	ay10mr6272032plb.74.1557509480814; 
+	Fri, 10 May 2019 10:31:20 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231]) by smtp.gmail.com with ESMTPSA id
-	v64sm7936792pfv.106.2019.05.10.10.31.18 for <qemu-devel@nongnu.org>
+	v64sm7936792pfv.106.2019.05.10.10.31.19
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 10 May 2019 10:31:19 -0700 (PDT)
+	Fri, 10 May 2019 10:31:20 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 10:30:47 -0700
-Message-Id: <20190510173049.28171-24-richard.henderson@linaro.org>
+Date: Fri, 10 May 2019 10:30:48 -0700
+Message-Id: <20190510173049.28171-25-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190510173049.28171-1-richard.henderson@linaro.org>
 References: <20190510173049.28171-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2607:f8b0:4864:20::642
-Subject: [Qemu-devel] [PATCH v6 23/25] target/ppc: Use qemu_guest_getrandom
- for DARN
+Subject: [Qemu-devel] [PATCH v6 24/25] target/ppc: Use gen_io_start/end
+ around DARN
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,85 +92,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We now have an interface for guest visible random numbers.
+Generating a random number counts as I/O, as it cannot be
+replayed and produce the same results.
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v5: Do not loop for darn64; use sizeof.
----
- target/ppc/int_helper.c | 39 +++++++++++++++++++++++++++------------
- 1 file changed, 27 insertions(+), 12 deletions(-)
+ target/ppc/translate.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index f6a088ac08..9af779ad38 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -23,6 +23,8 @@
- #include "exec/helper-proto.h"
- #include "crypto/aes.h"
- #include "fpu/softfloat.h"
-+#include "qapi/error.h"
-+#include "qemu/guest-random.h"
- 
- #include "helper_regs.h"
- /*****************************************************************************/
-@@ -158,25 +160,38 @@ uint32_t helper_cmpeqb(target_ulong ra, target_ulong rb)
- #undef hasvalue
- 
- /*
-- * Return invalid random number.
-- *
-- * FIXME: Add rng backend or other mechanism to get cryptographically suitable
-- * random number
-+ * Return a random number.
-  */
--target_ulong helper_darn32(void)
-+uint64_t helper_darn32(void)
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 8d08625c33..76628df6dd 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -1847,13 +1847,22 @@ static void gen_darn(DisasContext *ctx)
  {
--    return -1;
-+    Error *err = NULL;
-+    uint32_t ret;
-+
-+    if (qemu_guest_getrandom(&ret, sizeof(ret), &err) < 0) {
-+        qemu_log_mask(LOG_UNIMP, "darn: Crypto failure: %s",
-+                      error_get_pretty(err));
-+        error_free(err);
-+        return -1;
-+    }
-+
-+    return ret;
+     int l = L(ctx->opcode);
+ 
+-    if (l == 0) {
+-        gen_helper_darn32(cpu_gpr[rD(ctx->opcode)]);
+-    } else if (l <= 2) {
+-        /* Return 64-bit random for both CRN and RRN */
+-        gen_helper_darn64(cpu_gpr[rD(ctx->opcode)]);
+-    } else {
++    if (l > 2) {
+         tcg_gen_movi_i64(cpu_gpr[rD(ctx->opcode)], -1);
++    } else {
++        if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
++            gen_io_start();
++        }
++        if (l == 0) {
++            gen_helper_darn32(cpu_gpr[rD(ctx->opcode)]);
++        } else {
++            /* Return 64-bit random for both CRN and RRN */
++            gen_helper_darn64(cpu_gpr[rD(ctx->opcode)]);
++        }
++        if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
++            gen_io_end();
++            gen_stop_exception(ctx);
++        }
+     }
  }
- 
--target_ulong helper_darn64(void)
-+uint64_t helper_darn64(void)
- {
--    return -1;
-+    Error *err = NULL;
-+    uint64_t ret;
-+
-+    if (qemu_guest_getrandom(&ret, sizeof(ret), &err) < 0) {
-+        qemu_log_mask(LOG_UNIMP, "darn: Crypto failure: %s",
-+                      error_get_pretty(err));
-+        error_free(err);
-+        return -1;
-+    }
-+
-+    return ret;
- }
- 
--#endif
--
--#if defined(TARGET_PPC64)
--
- uint64_t helper_bpermd(uint64_t rs, uint64_t rb)
- {
-     int i;
+ #endif
 -- 
 2.17.1
 
