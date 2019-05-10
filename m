@@ -2,65 +2,70 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29566C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29FE3C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:51:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E68202070D
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:51:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="l/0wIknV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E68202070D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
+	by mail.kernel.org (Postfix) with ESMTPS id F1EAA2070D
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:51:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1EAA2070D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46790 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46796 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP8jm-0001hB-5R
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:51:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47326)
+	id 1hP8kW-0002TA-7f
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:51:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hP8cz-0004ak-M3
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:44:10 -0400
+	(envelope-from <bounces@canonical.com>) id 1hP8Ug-00068N-IN
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:35:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hP8cx-0002TU-QY
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:44:09 -0400
-Received: from m12-13.163.com ([220.181.12.13]:45776)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hP8cu-0002Pk-2o
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:44:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=kxuIpJk2r7Juck7G70
-	d+qocmrMBCV3MS7stIkFMR5A4=; b=l/0wIknVPSbCN0rI9HE2lBlB9V90xEPsvr
-	c16OfViGgVQkkmvpeusGyX+JTT2OhCC5QIlOu1UzzXpjRNOFlyzJi/RsYoGWeryE
-	ZC94rBXplXzajT2j4xmvT25oGhPSXjsawaMYq7QuJ871ev+XHDwFWFemu+lO0S0z
-	7/m0vJj/s=
-Received: from localhost.localdomain (unknown [183.159.64.133])
-	by smtp9 (Coremail) with SMTP id DcCowAB3fTFLqtVcVYWnCg--.3399S2;
-	Sat, 11 May 2019 00:43:56 +0800 (CST)
-From: Li Qiang <liq3ea@163.com>
-To: pbonzini@redhat.com,
-	jslaby@suse.cz
-Date: Fri, 10 May 2019 09:43:46 -0700
-Message-Id: <20190510164349.81507-1-liq3ea@163.com>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: DcCowAB3fTFLqtVcVYWnCg--.3399S2
-X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvj4RKJPEDUUUU
-X-Originating-IP: [183.159.64.133]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBZg2wbVaD1aHidAAAsB
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 220.181.12.13
-Subject: [Qemu-devel] [PATCH v4 0/3] hw: edu: some fixes
+	(envelope-from <bounces@canonical.com>) id 1hP8Uf-0006y6-H3
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:35:34 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57962)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hP8Uf-0006xi-BU
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:35:33 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hP8Ue-0007xu-9e
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 16:35:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 47DCB2E806D
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 16:35:32 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 10 May 2019 16:24:55 -0000
+From: Anisse Astier <1828608@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: anisse berrange
+X-Launchpad-Bug-Reporter: Anisse Astier (anisse)
+X-Launchpad-Bug-Modifier: Anisse Astier (anisse)
+Message-Id: <155750549613.15038.5455007066011551794.malonedeb@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18962";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 0965b70af1c42320743ad79608125fc5a4ed2861
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1828608] [NEW] Chardev websocket might not
+ support pasting more than a few chars
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -69,34 +74,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liq3ea@gmail.com, philmd@redhat.com, qemu-devel@nongnu.org,
-	Li Qiang <liq3ea@163.com>
+Reply-To: Bug 1828608 <1828608@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Recently I am considering write a driver for edu device.
-After reading the spec, I found these three small issue.
-Two first two related the MMIO access and the third is
-related the DMA operation.
+Public bug reported:
 
-Change since v2:
-Fix an error in patch 2
-Fix some commit message and title.
+When sending more than 4-5 characters on the websocket serial console
+(with pasting for example), the guest might not receive all of them, or
+worse interpret the input as Magic SysRq keys.
 
-Change since v1:
-Fix format compile error
+This might be due to the io loop not checking the backend readiness
+before calling the read function.
 
-Li Qiang (3):
-  edu: mmio: allow 64-bit access
-  edu: mmio: allow 64-bit access in read dispatch
-  edu: uses uint64_t in dma operation
+Attached patched fixes the problem on my system. I'm not sure it's the
+proper approach, this is just to start discussion.
 
- hw/misc/edu.c | 32 +++++++++++++++++++++++---------
- 1 file changed, 23 insertions(+), 9 deletions(-)
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
--- 
-2.17.1
+** Patch added: "0001-socket-check-char-backend-readiness-before-sending-i.=
+patch"
+   https://bugs.launchpad.net/bugs/1828608/+attachment/5262964/+files/0001-=
+socket-check-char-backend-readiness-before-sending-i.patch
 
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1828608
+
+Title:
+  Chardev websocket might not support pasting more than a few chars
+
+Status in QEMU:
+  New
+
+Bug description:
+  When sending more than 4-5 characters on the websocket serial console
+  (with pasting for example), the guest might not receive all of them,
+  or worse interpret the input as Magic SysRq keys.
+
+  This might be due to the io loop not checking the backend readiness
+  before calling the read function.
+
+  Attached patched fixes the problem on my system. I'm not sure it's the
+  proper approach, this is just to start discussion.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1828608/+subscriptions
 
