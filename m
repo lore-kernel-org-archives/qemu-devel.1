@@ -2,65 +2,64 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 068EAC04AB1
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 02:49:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2905CC04AB1
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 02:59:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0D1320675
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 02:49:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0D1320675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id E9F5A2182B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 02:59:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="j7koJyrK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9F5A2182B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35759 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35843 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOvbi-0007F4-3F
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 22:49:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42283)
+	id 1hOvl4-0001ak-19
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 22:59:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1hOvas-0006wu-0Z
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 22:49:07 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hOvjJ-0000Ul-Ew
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 22:57:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1hOvaq-0004zH-CC
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 22:49:05 -0400
-Received: from mga06.intel.com ([134.134.136.31]:38016)
+	(envelope-from <dgibson@ozlabs.org>) id 1hOvjI-00019M-4r
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 22:57:49 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:59757 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
-	id 1hOvaq-0004uL-1A
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 22:49:04 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-	by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	09 May 2019 19:48:57 -0700
-X-ExtLoop1: 1
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
-	([10.239.13.9])
-	by fmsmga005.fm.intel.com with ESMTP; 09 May 2019 19:48:53 -0700
-Date: Thu, 9 May 2019 22:43:15 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190510024315.GH24397@joy-OptiPlex-7040>
-References: <20190506014514.3555-1-yan.y.zhao@intel.com>
-	<20190506014904.3621-1-yan.y.zhao@intel.com>
-	<20190507111954.43d477c3.cohuck@redhat.com>
-	<20190508115704.GB24397@joy-OptiPlex-7040>
-	<20190509172449.723a048b.cohuck@redhat.com>
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+	id 1hOvjH-00015w-CT; Thu, 09 May 2019 22:57:48 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 450ZdM1l7Xz9sNm; Fri, 10 May 2019 12:57:42 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1557457063;
+	bh=Ns1db8FlMwXt7WCGWY8UcGaO1YT9pMk1HBSxHSCDXuI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=j7koJyrKGTAs46UTeR5OnCxA3IzA9u/1l9Eyx8qvcBXdCS3y2x3gA8ENvFF8pKsA2
+	1bFw9VN97gSd2k4nOCLR2W84OReK5IOIWhrL0y4VWQrASfyIFPlVNlrsHuCTfuK9CD
+	IIqbn3xwCqO5rKynSZPJxJhLZNVicxNieNwnF6Ho=
+Date: Fri, 10 May 2019 12:11:21 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Message-ID: <20190510021121.GB20559@umbus.fritz.box>
+References: <20190503055316.6441-1-sjitindarsingh@gmail.com>
+	<20190503055316.6441-7-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="61jdw2sOBCFtR2d/"
 Content-Disposition: inline
-In-Reply-To: <20190509172449.723a048b.cohuck@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 134.134.136.31
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] vfio/mdev: add version attribute
- for mdev device
+In-Reply-To: <20190503055316.6441-7-sjitindarsingh@gmail.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH 06/13] target/ppc: Enforce that
+ the root page directory size must be at least 5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,199 +71,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"aik@ozlabs.ru" <aik@ozlabs.ru>,
-	"Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-	"shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-	"eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
-	"eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
-	Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-	"pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-	"libvir-list@redhat.com" <libvir-list@redhat.com>,
-	"arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
-	"felipe@nutanix.com" <felipe@nutanix.com>,
-	"Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>,
-	"dgilbert@redhat.com" <dgilbert@redhat.com>,
-	"zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-	"dinechin@redhat.com" <dinechin@redhat.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"intel-gvt-dev@lists.freedesktop.org"
-	<intel-gvt-dev@lists.freedesktop.org>, "Liu,
-	Changpeng" <changpeng.liu@intel.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Wang, Zhi A" <zhi.a.wang@intel.com>,
-	"jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "He,
-	Shaopeng" <shaopeng.he@intel.com>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 09, 2019 at 11:24:49PM +0800, Cornelia Huck wrote:
-> On Wed, 8 May 2019 07:57:05 -0400
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > On Tue, May 07, 2019 at 05:19:54PM +0800, Cornelia Huck wrote:
-> > > On Sun,  5 May 2019 21:49:04 -0400
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >   
-> > > > version attribute is used to check two mdev devices' compatibility.
-> > > > 
-> > > > The key point of this version attribute is that it's rw.
-> > > > User space has no need to understand internal of device version and no
-> > > > need to compare versions by itself.
-> > > > Compared to reading version strings from both two mdev devices being
-> > > > checked, user space only reads from one mdev device's version attribute.
-> > > > After getting its version string, user space writes this string into the
-> > > > other mdev device's version attribute. Vendor driver of mdev device
-> > > > whose version attribute being written will check device compatibility of
-> > > > the two mdev devices for user space and return success for compatibility
-> > > > or errno for incompatibility.  
-> > > 
-> > > I'm still missing a bit _what_ is actually supposed to be
-> > > compatible/incompatible. I'd assume some internal state descriptions
-> > > (even if this is not actually limited to migration).
-> > >  
-> > right.
-> > originally, I thought this attribute should only contain a device's hardware
-> > compatibility info. But seems also including vendor specific software migration
-> > version is more reasonable, because general VFIO migration code cannot know
-> > version of vendor specific software migration code until migration data is
-> > transferring to the target vm. Then renaming it to migration_version is more
-> > appropriate.
-> > :)
-> 
-> Nod.
-> 
-> (...)
-> 
-> > > > @@ -246,6 +249,143 @@ Directories and files under the sysfs for Each Physical Device
-> > > >    This attribute should show the number of devices of type <type-id> that can be
-> > > >    created.
-> > > >  
-> > > > +* version
-> > > > +
-> > > > +  This attribute is rw, and is optional.
-> > > > +  It is used to check device compatibility between two mdev devices and is
-> > > > +  accessed in pairs between the two mdev devices being checked.
-> > > > +  The intent of this attribute is to make an mdev device's version opaque to
-> > > > +  user space, so instead of reading two mdev devices' version strings and
-> > > > +  comparing in userspace, user space should only read one mdev device's version
-> > > > +  attribute, and writes this version string into the other mdev device's version
-> > > > +  attribute. Then vendor driver of mdev device whose version attribute being
-> > > > +  written would check the incoming version string and tell user space whether
-> > > > +  the two mdev devices are compatible via return value. That's why this
-> > > > +  attribute is writable.  
-> > > 
-> > > I would reword this a bit:
-> > > 
-> > > "This attribute provides a way to check device compatibility between
-> > > two mdev devices from userspace. The intended usage is for userspace to
-> > > read the version attribute from one mdev device and then writing that
-> > > value to the version attribute of the other mdev device. The second
-> > > mdev device indicates compatibility via the return code of the write
-> > > operation. This makes compatibility between mdev devices completely
-> > > vendor-defined and opaque to userspace."
-> > > 
-> > > We still should explain _what_ compatibility we're talking about here,
-> > > though.
-> > >   
-> > Thanks. It's much better than mine:) 
-> > Then I'll change compatibility --> migration compatibility.
-> 
-> Ok, with that it should be clear enough.
-> 
-> > 
-> > > > +
-> > > > +  when reading this attribute, it should show device version string of
-> > > > +  the device of type <type-id>.
-> > > > +
-> > > > +  This string is private to vendor driver itself. Vendor driver is able to
-> > > > +  freely define format and length of device version string.
-> > > > +  e.g. It can use a combination of pciid of parent device + mdev type.
-> > > > +
-> > > > +  When writing a string to this attribute, vendor driver should analyze this
-> > > > +  string and check whether the mdev device being identified by this string is
-> > > > +  compatible with the mdev device for this attribute. vendor driver should then
-> > > > +  return written string's length if it regards the two mdev devices are
-> > > > +  compatible; vendor driver should return negative errno if it regards the two
-> > > > +  mdev devices are not compatible.
-> > > > +
-> > > > +  User space should treat ANY of below conditions as two mdev devices not
-> > > > +  compatible:
-> > > > +  (1) any one of the two mdev devices does not have a version attribute
-> > > > +  (2) error when read from one mdev device's version attribute  
-> > > 
-> > > s/read/reading/
-> > >   
-> > > > +  (3) error when write one mdev device's version string to the other mdev  
-> > > 
-> > > s/write/writing/
-> > >   
-> > > > +  device's version attribute
-> > > > +
-> > > > +  User space should regard two mdev devices compatible when ALL of below
-> > > > +  conditions are met:
-> > > > +  (1) success when read from one mdev device's version attribute.  
-> > > 
-> > > s/read/reading/
-> > >   
-> > > > +  (2) success when write one mdev device's version string to the other mdev  
-> > > 
-> > > s/write/writing/  
-> > got it. thanks for pointing them out:)
-> > >   
-> > > > +  device's version attribute
-> > > > +
-> > > > +  Errno:
-> > > > +  If vendor driver wants to claim a mdev device incompatible to all other mdev  
-> > > 
-> > > "If the vendor driver wants to designate a mdev device..."
-> > >   
-> > ok. thanks:)
-> > > > +  devices, it should not register version attribute for this mdev device. But if
-> > > > +  a vendor driver has already registered version attribute and it wants to claim
-> > > > +  a mdev device incompatible to all other mdev devices, it needs to return
-> > > > +  -ENODEV on access to this mdev device's version attribute.
-> > > > +  If a mdev device is only incompatible to certain mdev devices, write of
-> > > > +  incompatible mdev devices's version strings to its version attribute should
-> > > > +  return -EINVAL;  
-> > > 
-> > > 
-> > > Maybe put the defined return code into a bulleted list instead? But
-> > > this looks reasonable as well.
-> > >   
-> > as user space have no idea of those errno and only gets 0/1 as return code from
-> > read/write. maybe I can move this description of errno to patch 2/2 as an
-> > example?
-> 
-> Confused. They should get -EINVAL/-ENODEV/... all right, shouldn't they?
->
-sorry. my previous statement is not right.
-read(2)/write(2) return -1 on error, error cause is returned through errno.
-So, it's also fine if we can get an agreement in this doc that
--ENODEV meaning a mdev device is not compatible to all devices,
--EINVAL meaning a mdev device is not compatible to specified device.
 
+--61jdw2sOBCFtR2d/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > 
-> > > > +
-> > > > +  This attribute can be taken advantage of by live migration.
-> > > > +  If user space detects two mdev devices are compatible through version
-> > > > +  attribute, it can start migration between the two mdev devices, otherwise it
-> > > > +  should abort its migration attempts between the two mdev devices.  
-> > > 
-> > > (...)
-> > > _______________________________________________
-> > > intel-gvt-dev mailing list
-> > > intel-gvt-dev@lists.freedesktop.org
-> > > https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev  
-> 
-> _______________________________________________
-> intel-gvt-dev mailing list
-> intel-gvt-dev@lists.freedesktop.org
-> https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
+On Fri, May 03, 2019 at 03:53:09PM +1000, Suraj Jitindar Singh wrote:
+> According to the ISA the root page directory size of a radix tree for
+> either process or partition scoped translation must be >=3D 5.
+>=20
+> Thus add this to the list of conditions checked when validating the
+> partition table entry in validate_pate();
+>=20
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  target/ppc/mmu-radix64.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
+> index a6ab290323..afa5ba506a 100644
+> --- a/target/ppc/mmu-radix64.c
+> +++ b/target/ppc/mmu-radix64.c
+> @@ -249,6 +249,8 @@ static bool validate_pate(PowerPCCPU *cpu, uint64_t l=
+pid, ppc_v3_pate_t *pate)
+>      if (lpid =3D=3D 0 && !msr_hv) {
+>          return false;
+>      }
+> +    if ((pate->dw0 & PATE1_R_PRTS) < 5)
+> +        return false;
+>      /* More checks ... */
+>      return true;
+>  }
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--61jdw2sOBCFtR2d/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzU3ckACgkQbDjKyiDZ
+s5JeAg//bjLQa4EnA7TnRijJrK9Fiq3XCwQ4K4r4aFn/b2kTBvKBdNxzBZqFq2CG
+96G7tFNXc+PYiGXgF1NwITuPVNSZe3SXnU2l4UxL3BqN6Yn1gDO7D3NAzzXXuDOZ
+tpOWGkjTGS2s6VdSwIwWTb27XEVnN5109EgpG6GIipzOSZj9O9DDH4m8Uuu0sQRk
+8Li9Yitp82WSjjsoWKzW500KstnJbCXUxom8yniFmw9niShatRL2YJKXx6nTkuqx
+8FDCOJrYCJbLuQz0qAbvkEPj2R1QcejLFSY3ADmRgaBhycoQnwW3PZu13sEeKIyE
+g15SnaH2yBK8sCYPFUDGBnAsVEQMahfeJoVp7GfcElm0AnFIBVRiWKHsf+axzYqf
+b+9VtM94wS1iCPMNRZrUNWrdGzwy8gi855jJLEtWRdJU9uHGxmY8hEsJDPDgQzJ2
+wxl9ENo8t11GjXyql2hu5aX8k/GWPMH0nC9Dp9y3qzUGZ23jjgRmt9WGB/wmqBD/
++01tzWTGFSFgpjQ0zus+7Uf/k7RGRnbB/WrJxmLWR9sKkaARTJghTaneAD17acux
+3s2IdHzE1cE3H8zrMFWhwSkA4Tn+8zBICwUYecaoJRV9lWC6qBK+56+SmWBpTGi8
+uaRRP++fXuGlk2Z1NpHGQkMlCwbLq6hVFB2T/gT9c4CKKahFfwY=
+=qPpx
+-----END PGP SIGNATURE-----
+
+--61jdw2sOBCFtR2d/--
 
