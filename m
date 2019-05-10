@@ -2,83 +2,68 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DC93C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:23:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AAB0C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:24:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9883217D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:23:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hTUNia0D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9883217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id DE4122182B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:24:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE4122182B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49484 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49488 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hPC3d-0005HB-5C
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 16:23:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37365)
+	id 1hPC4S-0005q7-5e
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 16:24:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hPC2S-0004lX-GJ
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:22:42 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hPC35-00058U-Ms
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:23:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hPC2Q-00021I-Q9
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:22:40 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:42146)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hPC2Q-0001vD-7U; Fri, 10 May 2019 16:22:38 -0400
-Received: by mail-lf1-x141.google.com with SMTP id w23so5009593lfc.9;
-	Fri, 10 May 2019 13:22:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=dG+5XkjYpfb31n9hDGIgexMD8T01cWAi4HgH6rmltFg=;
-	b=hTUNia0DyFa9Mzgppxdw3wd9VxM9XFmeXnTMH5XttnariS+eZ737S034QlZxGbC+SN
-	RH0vYgWRQeenA751UrG/aLsqgYyGpjpf7R6X/IwOJ/V5QBglRR7kP1mJCUMIvQ3UdNP9
-	veb8cCD0NgafeD758q2i7IK0RnM6uoIm93nuElenn5O2PWiJaEBjaehIL8ge6o2Ls9ps
-	y/UmQF9P4tFNv7aL+zfOHHrb2Zcl/P2adi1H3vEvqwCnK2z6R+k5z9Z69c0pc/H+pGI2
-	ASqaIuwrWqMiu1TZ9/eZIZhEjPBQFLfh2ykW540oFcMIxKBpJC4BGvKDx7054EQWAfs9
-	IMlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=dG+5XkjYpfb31n9hDGIgexMD8T01cWAi4HgH6rmltFg=;
-	b=fyNhuQXZK9U0PsYakwYk90lz/h45TjfthM6G9w5N3VCf+ItWnHcgiPxog9TgrwHNNg
-	TBmZiqzOTTUOLNqh6cFlzqYdbILkdnbbN89iucNJNrvGgdKuFmQ+7knw0R0rRsLCXq0T
-	xyVDMIQhHC7YSoncy6G+bkY9YloTStQArPHkerJU94oZEhmomYNrkwy45JAICkhgbXvJ
-	YsLwNo1BObiF/+Il+ac73utB/PMAgfoYnC+4NOV0aAS7nzSpxjGM5ynTU/5HpP9NKLeA
-	Tfb5ESuYGVNwm3AeOnhTPOvECKN8Gt0ijSBcvjgIvY3nztVzEXwKcKdtJ0sWsRHCRr74
-	AchA==
-X-Gm-Message-State: APjAAAXly2VMBy+Ek7ouZizmDFiUZHi5uLK4g1nhDa0UI0wCE8xwB9Hz
-	tZSsEHTlWuFoZSNx7ObqzRsirSYCc5c4kcGpfxA=
-X-Google-Smtp-Source: APXvYqxmrvlvP9a9QedzbXHONiJf9Q/zJ2kEPci0RWtCS343Ynk+tp6QAxYkwX5HjBoOohm+yoTJyqzFhiP/LiK99Wc=
-X-Received: by 2002:a05:6512:309:: with SMTP id
-	t9mr6967971lfp.103.1557519756228; 
-	Fri, 10 May 2019 13:22:36 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1hPC34-0003iK-I8
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:23:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36780)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hPC34-0003el-AS
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:23:18 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E304E87620;
+	Fri, 10 May 2019 20:23:16 +0000 (UTC)
+Received: from localhost (ovpn-116-40.gru2.redhat.com [10.97.116.40])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7138C1802B;
+	Fri, 10 May 2019 20:23:16 +0000 (UTC)
+Date: Fri, 10 May 2019 17:23:13 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Jiri Denemark <jdenemar@redhat.com>
+Message-ID: <20190510202313.GV4189@habkost.net>
+References: <20190422234742.15780-1-ehabkost@redhat.com>
+	<20190509133537.GK7181@orkuz.int.mamuti.net>
+	<20190509135617.GH4189@habkost.net>
+	<20190509152616.GL7181@orkuz.int.mamuti.net>
+	<20190509160825.GL4189@habkost.net>
+	<20190510113303.GQ7181@orkuz.int.mamuti.net>
 MIME-Version: 1.0
-References: <20190507163416.24647-1-philmd@redhat.com>
-	<20190507163416.24647-7-philmd@redhat.com>
-In-Reply-To: <20190507163416.24647-7-philmd@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 10 May 2019 13:20:28 -0700
-Message-ID: <CAKmqyKNYHOiHX-Eh6EYm4ZYYhSQAMLqwkHiUs1pwDYFZY0Kfcw@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::141
-Subject: Re: [Qemu-devel] [PATCH v2 06/16] hw/arm/bcm2835: Use
- object_initialize_child for correct ref. counting
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190510113303.GQ7181@orkuz.int.mamuti.net>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.26]);
+	Fri, 10 May 2019 20:23:16 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/2] i386: "unavailable-features" QOM
+ property
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,249 +75,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-	Paul Burton <pburton@wavecomp.com>,
-	Aleksandar Rikalo <arikalo@wavecomp.com>,
-	Markus Armbruster <armbru@redhat.com>, Joel Stanley <joel@jms.id.au>,
-	Antony Pavlov <antonynpavlov@gmail.com>, Thomas Huth <thuth@redhat.com>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Alistair Francis <alistair@alistair23.me>, qemu-arm <qemu-arm@nongnu.org>,
-	Peter Chubb <peter.chubb@nicta.com.au>,
-	=?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	Andrew Jeffery <andrew@aj.id.au>,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
-	Andrew Baumann <Andrew.Baumann@microsoft.com>,
-	Jean-Christophe Dubois <jcd@tribudubois.net>,
-	"open list:New World" <qemu-ppc@nongnu.org>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Aurelien Jarno <aurelien@aurel32.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+	qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 7, 2019 at 9:36 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
-om> wrote:
->
-> As explained in commit aff39be0ed97:
->
->   Both functions, object_initialize() and object_property_add_child()
->   increase the reference counter of the new object, so one of the
->   references has to be dropped afterwards to get the reference
->   counting right. Otherwise the child object will not be properly
->   cleaned up when the parent gets destroyed.
->   Thus let's use now object_initialize_child() instead to get the
->   reference counting here right.
->
-> This patch was generated using the following Coccinelle script
-> (with a bit of manual fix-up for overly long lines):
->
->  @use_object_initialize_child@
->  expression parent_obj;
->  expression child_ptr;
->  expression child_name;
->  expression child_type;
->  expression child_size;
->  expression errp;
->  @@
->  (
->  -   object_initialize(child_ptr, child_size, child_type);
->  +   object_initialize_child(parent_obj, child_name,  child_ptr, child_si=
-ze,
->  +                           child_type, &error_abort, NULL);
->      ... when !=3D parent_obj
->  -   object_property_add_child(parent_obj, child_name, OBJECT(child_ptr),=
- NULL);
->      ...
->  ?-  object_unref(OBJECT(child_ptr));
->  |
->  -   object_initialize(child_ptr, child_size, child_type);
->  +   object_initialize_child(parent_obj, child_name,  child_ptr, child_si=
-ze,
->  +                            child_type, errp, NULL);
->      ... when !=3D parent_obj
->  -   object_property_add_child(parent_obj, child_name, OBJECT(child_ptr),=
- errp);
->      ...
->  ?-  object_unref(OBJECT(child_ptr));
->  )
->
->  @use_sysbus_init_child_obj@
->  expression parent_obj;
->  expression dev;
->  expression child_ptr;
->  expression child_name;
->  expression child_type;
->  expression child_size;
->  expression errp;
->  @@
->  (
->  -   object_initialize_child(parent_obj, child_name, child_ptr, child_siz=
-e,
->  -                           child_type, errp, NULL);
->  +   sysbus_init_child_obj(parent_obj, child_name, child_ptr, child_size,
->  +                         child_type);
->      ...
->  -   qdev_set_parent_bus(DEVICE(child_ptr), sysbus_get_default());
->  |
->  -   object_initialize_child(parent_obj, child_name, child_ptr, child_siz=
-e,
->  -                           child_type, errp, NULL);
->  +   sysbus_init_child_obj(parent_obj, child_name, child_ptr, child_size,
->  +                         child_type);
->  -   dev =3D DEVICE(child_ptr);
->  -   qdev_set_parent_bus(dev, sysbus_get_default());
->  )
->
-> While the object_initialize() function doesn't take an
-> 'Error *errp' argument, the object_initialize_child() does.
-> Since this code is used when a machine is created (and is not
-> yet running), we deliberately choose to use the &error_abort
-> argument instead of ignoring errors if an object creation failed.
-> This choice also matches when using sysbus_init_child_obj(),
-> since its code is:
->
->   void sysbus_init_child_obj(Object *parent,
->                              const char *childname, void *child,
->                              size_t childsize, const char *childtype)
->   {
->       object_initialize_child(parent, childname, child, childsize,
->                               childtype, &error_abort, NULL);
->
->       qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
->   }
->
-> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> Inspired-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On Fri, May 10, 2019 at 01:33:03PM +0200, Jiri Denemark wrote:
+> On Thu, May 09, 2019 at 13:08:25 -0300, Eduardo Habkost wrote:
+> > On Thu, May 09, 2019 at 05:26:16PM +0200, Jiri Denemark wrote:
+> > > On Thu, May 09, 2019 at 10:56:17 -0300, Eduardo Habkost wrote:
+> > > > On Thu, May 09, 2019 at 03:35:37PM +0200, Jiri Denemark wrote:
+> > > > > Would this unavailable-features property contain only canonical names of
+> > > > > the features or all possible aliases of all features? For example,
+> > > > > "tsc-adjust" can also be spelled as "tsc_adjust". When calling
+> > > > > query-cpu-model-expansion, we have a way to request all variants by
+> > > > > running full expansion on the result of a previous static expansion. Can
+> > > > > we get something like this for unavailable-features too?
+> > > > 
+> > > > I'd like to avoid that, and refer only to the canonical names.
+> > > > 
+> > > > Could you explain the use case you have in mind, so we can look
+> > > > for alternatives?
+> > > 
+> > > Libvirt only knows about a single spelling for each CPU feature and
+> > > quite often it is not the canonical variant. Thus libvirt would only
+> > > recognize features for which the name known by libvirt is the canonical
+> > > name.
+> > > 
+> > > We could theoretically make the translation in libvirt, but it's not
+> > > going to be future proof. If a new spelling is introduced, it's because
+> > > the old one is not considered correct and the new one becomes the
+> > > canonical version. When libvirt doesn't have the translation (libvirt is
+> > > older or just didn't catch up yet) we have a big problem.
+> > > 
+> > > I guess a good alternative would be some way of querying all CPU feature
+> > > names and their aliases. If I'm not mistaken, we can either get a list
+> > > of canonical names or all names, but without any clue which names
+> > > actually refer to a single feature.
+> > 
+> > Right.  But (as described below) if you want to know the status a
+> > specific feature you already know about (even if you are using
+> > the old spelling), qom-get should work for you.
+> 
+> Yeah, since we'll be checking all features anyway, we can detect enabled
+> and disabled features at the same time. However, we don't know whether a
+> specific feature was disabled because we did not ask for it to be
+> enabled (remember, CPU model definition may differ between libvirt and
+> QEMU) or because it was filtered out.
+> 
+> Depending on the domain XML used to start a domain, libvirt may not (and
+> usually will not) refuse to start a domain for which QEMU filtered out
+> some CPU features. Of course, once the domain is running, the checking
+> becomes very strict and libvirt would refuse to start the domain on
+> another host during migration if any feature is filtered out.
+> 
+> Thus libvirt stores all features QEMU filtered out when a domain was
+> started in the non-strict way. So we need to match the features in the
+> unavailable-features list with our features. Just checking for the list
+> being empty is not sufficient.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+OK, I understand you want to translate the canonical names on
+unavailable-features back to the old names on some cases.
 
-Alistair
+But I really prefer Igor's suggestion of deprecating aliases and
+getting rid of them in the future, instead of increasing the
+complexity of our QMP interfaces just to accommodate the existing
+aliases.
 
-> ---
->  hw/arm/bcm2835_peripherals.c | 53 ++++++++++++++----------------------
->  1 file changed, 20 insertions(+), 33 deletions(-)
->
-> diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-> index 2931a82a25a..0fb54c7964e 100644
-> --- a/hw/arm/bcm2835_peripherals.c
-> +++ b/hw/arm/bcm2835_peripherals.c
-> @@ -41,44 +41,36 @@ static void bcm2835_peripherals_init(Object *obj)
->                         MBOX_CHAN_COUNT << MBOX_AS_CHAN_SHIFT);
->
->      /* Interrupt Controller */
-> -    object_initialize(&s->ic, sizeof(s->ic), TYPE_BCM2835_IC);
-> -    object_property_add_child(obj, "ic", OBJECT(&s->ic), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->ic), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "ic", &s->ic, sizeof(s->ic), TYPE_BCM2835=
-_IC);
->
->      /* UART0 */
-> -    object_initialize(&s->uart0, sizeof(s->uart0), TYPE_PL011);
-> -    object_property_add_child(obj, "uart0", OBJECT(&s->uart0), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->uart0), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "uart0", &s->uart0, sizeof(s->uart0),
-> +                          TYPE_PL011);
->
->      /* AUX / UART1 */
-> -    object_initialize(&s->aux, sizeof(s->aux), TYPE_BCM2835_AUX);
-> -    object_property_add_child(obj, "aux", OBJECT(&s->aux), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->aux), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "aux", &s->aux, sizeof(s->aux),
-> +                          TYPE_BCM2835_AUX);
->
->      /* Mailboxes */
-> -    object_initialize(&s->mboxes, sizeof(s->mboxes), TYPE_BCM2835_MBOX);
-> -    object_property_add_child(obj, "mbox", OBJECT(&s->mboxes), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->mboxes), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "mbox", &s->mboxes, sizeof(s->mboxes),
-> +                          TYPE_BCM2835_MBOX);
->
->      object_property_add_const_link(OBJECT(&s->mboxes), "mbox-mr",
->                                     OBJECT(&s->mbox_mr), &error_abort);
->
->      /* Framebuffer */
-> -    object_initialize(&s->fb, sizeof(s->fb), TYPE_BCM2835_FB);
-> -    object_property_add_child(obj, "fb", OBJECT(&s->fb), NULL);
-> +    sysbus_init_child_obj(obj, "fb", &s->fb, sizeof(s->fb), TYPE_BCM2835=
-_FB);
->      object_property_add_alias(obj, "vcram-size", OBJECT(&s->fb), "vcram-=
-size",
->                                &error_abort);
-> -    qdev_set_parent_bus(DEVICE(&s->fb), sysbus_get_default());
->
->      object_property_add_const_link(OBJECT(&s->fb), "dma-mr",
->                                     OBJECT(&s->gpu_bus_mr), &error_abort)=
-;
->
->      /* Property channel */
-> -    object_initialize(&s->property, sizeof(s->property), TYPE_BCM2835_PR=
-OPERTY);
-> -    object_property_add_child(obj, "property", OBJECT(&s->property), NUL=
-L);
-> +    sysbus_init_child_obj(obj, "property", &s->property, sizeof(s->prope=
-rty),
-> +                          TYPE_BCM2835_PROPERTY);
->      object_property_add_alias(obj, "board-rev", OBJECT(&s->property),
->                                "board-rev", &error_abort);
-> -    qdev_set_parent_bus(DEVICE(&s->property), sysbus_get_default());
->
->      object_property_add_const_link(OBJECT(&s->property), "fb",
->                                     OBJECT(&s->fb), &error_abort);
-> @@ -86,32 +78,27 @@ static void bcm2835_peripherals_init(Object *obj)
->                                     OBJECT(&s->gpu_bus_mr), &error_abort)=
-;
->
->      /* Random Number Generator */
-> -    object_initialize(&s->rng, sizeof(s->rng), TYPE_BCM2835_RNG);
-> -    object_property_add_child(obj, "rng", OBJECT(&s->rng), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->rng), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "rng", &s->rng, sizeof(s->rng),
-> +                          TYPE_BCM2835_RNG);
->
->      /* Extended Mass Media Controller */
-> -    object_initialize(&s->sdhci, sizeof(s->sdhci), TYPE_SYSBUS_SDHCI);
-> -    object_property_add_child(obj, "sdhci", OBJECT(&s->sdhci), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->sdhci), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "sdhci", &s->sdhci, sizeof(s->sdhci),
-> +                          TYPE_SYSBUS_SDHCI);
->
->      /* SDHOST */
-> -    object_initialize(&s->sdhost, sizeof(s->sdhost), TYPE_BCM2835_SDHOST=
-);
-> -    object_property_add_child(obj, "sdhost", OBJECT(&s->sdhost), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->sdhost), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "sdhost", &s->sdhost, sizeof(s->sdhost),
-> +                          TYPE_BCM2835_SDHOST);
->
->      /* DMA Channels */
-> -    object_initialize(&s->dma, sizeof(s->dma), TYPE_BCM2835_DMA);
-> -    object_property_add_child(obj, "dma", OBJECT(&s->dma), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->dma), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "dma", &s->dma, sizeof(s->dma),
-> +                          TYPE_BCM2835_DMA);
->
->      object_property_add_const_link(OBJECT(&s->dma), "dma-mr",
->                                     OBJECT(&s->gpu_bus_mr), &error_abort)=
-;
->
->      /* GPIO */
-> -    object_initialize(&s->gpio, sizeof(s->gpio), TYPE_BCM2835_GPIO);
-> -    object_property_add_child(obj, "gpio", OBJECT(&s->gpio), NULL);
-> -    qdev_set_parent_bus(DEVICE(&s->gpio), sysbus_get_default());
-> +    sysbus_init_child_obj(obj, "gpio", &s->gpio, sizeof(s->gpio),
-> +                          TYPE_BCM2835_GPIO);
->
->      object_property_add_const_link(OBJECT(&s->gpio), "sdbus-sdhci",
->                                     OBJECT(&s->sdhci.sdbus), &error_abort=
-);
-> --
-> 2.20.1
->
->
+-- 
+Eduardo
 
