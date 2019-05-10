@@ -2,113 +2,66 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF44C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 08:56:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E679C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 08:57:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 372FE216C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 08:56:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 372FE216C4
+	by mail.kernel.org (Postfix) with ESMTPS id E7EE0216C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 08:57:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7EE0216C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39234 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39238 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP1Kh-0002t2-EF
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 04:56:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34813)
+	id 1hP1LB-0003FT-6v
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 04:57:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hP1Je-0001jT-Az
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:55:43 -0400
+	(envelope-from <berrange@redhat.com>) id 1hP1K0-0002SU-Rz
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:56:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hP1Jd-0001SN-AT
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:55:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36492)
+	(envelope-from <berrange@redhat.com>) id 1hP1Jz-0001k4-Je
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:56:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37066)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hP1Ja-0001RJ-Uw; Fri, 10 May 2019 04:55:39 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hP1Jz-0001jo-EB
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 04:56:03 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 338A6C0005DA;
-	Fri, 10 May 2019 08:55:38 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-72.ams2.redhat.com [10.36.116.72])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3FAC95D962;
-	Fri, 10 May 2019 08:55:28 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-References: <20190502084506.8009-1-thuth@redhat.com>
-	<20190502084506.8009-7-thuth@redhat.com>
-	<87ef5acsce.fsf@dusky.pond.sub.org>
-	<b53b7591-44fa-2982-6674-91137f69be63@redhat.com>
-	<3741b9b6-632a-b517-7533-818727ef75a7@redhat.com>
-	<44a3ebee-c717-d953-8e89-c24da99209a6@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <f39169a4-3916-9d1a-b3a5-b667e8775217@redhat.com>
-Date: Fri, 10 May 2019 10:55:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 8A9993079B82;
+	Fri, 10 May 2019 08:56:02 +0000 (UTC)
+Received: from redhat.com (ovpn-112-68.ams2.redhat.com [10.36.112.68])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DFE7646BA;
+	Fri, 10 May 2019 08:56:01 +0000 (UTC)
+Date: Fri, 10 May 2019 09:55:58 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20190510085558.GE7671@redhat.com>
+References: <20190510012458.22706-1-richard.henderson@linaro.org>
+	<20190510012458.22706-3-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <44a3ebee-c717-d953-8e89-c24da99209a6@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Disposition: inline
+In-Reply-To: <20190510012458.22706-3-richard.henderson@linaro.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Fri, 10 May 2019 08:55:38 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Fri, 10 May 2019 08:56:02 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] tests/qemu-iotests/group: Re-use
- the "auto" group for tests that can always run
+Subject: Re: [Qemu-devel] [PATCH v5 02/24] crypto: Merge crypto-obj-y into
+ libqemuutil.a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -120,95 +73,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
-	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	qemu-devel@nongnu.org, Christophe Fergeau <cfergeau@redhat.com>,
-	Max Reitz <mreitz@redhat.com>,
-	Wainer dos Santos Moschetta <wainersm@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Li-Wen Hsu <lwhsu@freebsd.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/05/2019 07.47, Thomas Huth wrote:
-> On 07/05/2019 17.50, Eric Blake wrote:
->> On 5/7/19 10:22 AM, Thomas Huth wrote:
->>> On 07/05/2019 15.22, Markus Armbruster wrote:
->>>> Thomas Huth <thuth@redhat.com> writes:
->>>>
->>>>> Currently, all tests are in the "auto" group. This is a little bit =
-pointless.
->>>>> OTOH, we need a group for the tests that we can automatically run d=
-uring
->>>>> "make check" each time, too. Tests in this new group are supposed t=
-o run
->>>>> with every possible QEMU configuration, for example they must run w=
-ith every
->>>>> QEMU binary (also non-x86), without failing when an optional featur=
-es is
->>>>> missing (but reporting "skip" is ok), and be able to run on all kin=
-d of host
->>>>> filesystems and users (i.e. also as "nobody" or "root").
->>>>> So let's use the "auto" group for this class of tests now. The init=
-ial
->>>>> list has been determined by running the iotests with non-x86 QEMU t=
-argets
->>>>> and with our CI pipelines on Gitlab, Cirrus-CI and Travis (i.e. inc=
-luding
->>>>> macOS and FreeBSD).
->>>>
->>>> I wonder whether we should additionally limit "make check" to "quick=
-"
->>>> tests.  How slow are the non-quick auto tests for you?
->>>
->>> I already sorted out some of the tests that run veeeery long, since t=
-he
->>> run time on gitlab, cirrus-ci and travis is limited. "make check-bloc=
-k"
->>> currently takes 3 minutes on my laptop, I think that's still ok?
->>>
->>> When I run the tests from the auto group that are not in the quick
->>> group, I currently get:
->>>
->>
->> My personal threshold is about 5 seconds for quick, so:
->>
->>> 003 1s ...
->>> 007 2s ...
->>
->> Should these be moved to quick?
+On Thu, May 09, 2019 at 06:24:36PM -0700, Richard Henderson wrote:
+> We will shortly need this in the user-only binaries, so drop the split
+> into system and tools binaries.  This also means that crypto-aes-obj-y
+> can be merged back into crypto-obj-y.
 >=20
-> I'll leave that decision up to the blocklayer folks ... I thought that
-> there might have been a different reason that these have not been put
-> into "quick" yet...?
+> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  Makefile             | 12 +++++-------
+>  Makefile.objs        |  8 ++------
+>  Makefile.target      |  4 ----
+>  configure            |  9 +++------
+>  crypto/Makefile.objs |  5 +----
+>  5 files changed, 11 insertions(+), 27 deletions(-)
 >=20
->>> 013 5s ...
->>
->> this one is borderline
->>
->>> 014 15s ...
->>> 015 9s ...
->>
->> Definitely not quick, but if you think they are still okay for auto, I
->> can live with that.
->>
->>> 022 1s ...
->>
->> Another candidate for quick?
->>
->>> 023 18s ...
->>
->> Even longer than 14. Okay for auto?
->=20
-> I think I'd give it a try. If people are complaining later that "make
-> check" is running now way too long, we still can refine the list later.
+> diff --git a/Makefile b/Makefile
+> index a971247cac..7c9c208207 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -410,7 +410,6 @@ dummy :=3D $(call unnest-vars,, \
+>                  block-obj-y \
+>                  block-obj-m \
+>                  crypto-obj-y \
+> -                crypto-aes-obj-y \
+>                  qom-obj-y \
+>                  io-obj-y \
+>                  common-obj-y \
+> @@ -446,7 +445,6 @@ SOFTMMU_SUBDIR_RULES=3D$(filter %-softmmu,$(SUBDIR_=
+RULES))
+> =20
+>  $(SOFTMMU_SUBDIR_RULES): $(authz-obj-y)
+>  $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
+> -$(SOFTMMU_SUBDIR_RULES): $(crypto-obj-y)
+>  $(SOFTMMU_SUBDIR_RULES): $(io-obj-y)
+>  $(SOFTMMU_SUBDIR_RULES): config-all-devices.mak
+>  $(SOFTMMU_SUBDIR_RULES): $(edk2-decompressed)
+> @@ -502,7 +500,7 @@ Makefile: $(version-obj-y)
+>  ######################################################################
+>  # Build libraries
+> =20
+> -libqemuutil.a: $(util-obj-y) $(trace-obj-y) $(stub-obj-y)
+> +libqemuutil.a: $(util-obj-y) $(trace-obj-y) $(stub-obj-y) $(crypto-obj=
+-y)
 
-Thinking about this again, "make check" now runs quite a bit longer
-indeed. So I now rather tend to remove the tests that run longer than 5s
-from the auto group instead... I think I'll send a v4 of this patch
-where I'll remove them from the auto group.
+The main reason for a separate crypto-obj-y variable was that it was only
+built into some pieces of QEMU. Since we're building into libqemuutil.a
+now, we might as well just add all the crypto object files directly
+to the util-obj-y variable & drop crypto-obj-y entirely.
 
- Thomas
+That said, what you've done here is fine, so don't feel this comment
+is mandatory. Its just an idea for a cleanup if you need to repost
+again for another reason.
+
+
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
