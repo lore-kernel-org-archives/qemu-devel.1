@@ -7,78 +7,80 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AFC0C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:28:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF805C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:28:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25C5520578
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:28:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A70020578
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:28:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cwWa+SIw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25C5520578
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IkX0aFuO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A70020578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45087 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45089 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP7Rj-00073S-E2
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 11:28:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56085)
+	id 1hP7Rm-00076Q-KW
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 11:28:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hP7JX-0007Uw-5z
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:20:00 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hP7Jk-0007hf-5M
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:20:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hP7JV-0008Pr-CE
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:19:59 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:34396)
+	(envelope-from <richard.henderson@linaro.org>) id 1hP7Ji-0000A9-M6
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:20:12 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37935)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hP7JV-0008P5-51
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:19:57 -0400
-Received: by mail-pg1-x541.google.com with SMTP id c13so3193942pgt.1
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 08:19:57 -0700 (PDT)
+	id 1hP7Ji-00008M-F6
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:20:10 -0400
+Received: by mail-pl1-x642.google.com with SMTP id a59so2995958pla.5
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 08:20:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=KDWMmeXDxeYaDrbtpgauY6pAF7pSEhxca7JLZhrlUgE=;
-	b=cwWa+SIwBw5dOd9/wbWsoKFwNFkrAtqi60EkVXvqjl+VKTTmnabBZj22+flfUQL0a+
-	YnpDT0RGjNxamlEOigRg8FJTE2qD4PSBd4HJB/Mi/PXHD/RndmFp3PokXfJOTeVQTvY9
-	xerrI0E2L7gQ8OM3dUtMOGuvm0o1VBEqasw70TQoK/+JIZ1WPmL6kC+3WWHbnA920h9z
-	BkCcCycyo5/IgalVQHi7ljn9zdUe2QywL0zvEr52BduCd1aozjR2CaVIVdo2PjW8SxjH
-	YsLlrFw0uiMLjEDLOtKxQqxUfh+JQH17XxsWq7/8uOleKbwKJBwJgnaXS33dQv+4JMHd
-	PccQ==
+	bh=Cwj55cO5HKZwNrpsoxflAQ5QTjmy2fkdQhNi3dY/lrE=;
+	b=IkX0aFuOezqfkj6/cXESKv7W+IlP/alcDnzHuyooEHs8+vqUazjbSMtog/yjrP0PRN
+	ut3wihWmDTCwTniClOccEi1d5k6slIV7ZCBO7jypfOS3VyO4L5Vn0Rcm/xYUIgjPf2So
+	Y2cijEicUK3Js8DCqsqtLSWdt7oMcFbC6pM/3r81I/CHGEgcXFYQZTgQaMyKYvSmIgb4
+	UdurhOXBBsa1wa8hUAw35YX4gM9JgHnmd2WKCCgY9Ip0XWhufDf4HnV5O6/P/cW5BhR1
+	lK+6fKAYZV4dx+63uPuvJQ6zE74TTxtSQ1Ai/ZyJiVZv8WlNgDiRbwKw8z3ENqrMxCJV
+	3gLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=KDWMmeXDxeYaDrbtpgauY6pAF7pSEhxca7JLZhrlUgE=;
-	b=isEF2AEfzIY4YlL2SFGC89Q/lFQtUvWe6S3QzV+amHKd2Iv4GjhjCjeoIuIFvJT6ok
-	epd5hfntUIp73t4RQNfS0r0bExEMsRImKVoC855lQHQweL8cKnH0BM3PKKnwobbe43QI
-	xkt+4v39LwQzroGIsoi3uwgojr9apg92+tp4h7LHzkeNUN3cq4ObtLgTfpSixS7HvHww
-	nJDfPs9d9cuLbJixP4CNEpu8AeqkVTojh+bWpUwRfboKRVBvymgpgQ6Tm1f7Q3AlMyGg
-	uddW88fcJGkloKbHqeaUp6Lrg4ATsO4N5UWNT/Ovs6JeV0cEZ7bFRZewazh8Fb94ISi4
-	5OHQ==
-X-Gm-Message-State: APjAAAV4n8R4VxRUKWm5j4ba2XChWBTfTbVxY8GQsRf5RWOYuzZkkrAo
-	fIJtJiyjjlo5czp1+BIYn0suL6EEPEo=
-X-Google-Smtp-Source: APXvYqyhwn9RCuyz0s3DamSGJ13n8Rv5Swh0WxgZKo2TK4JDTfSQ4XvrD9nTHTzgPstZh2GtL3fiBQ==
-X-Received: by 2002:a62:5653:: with SMTP id k80mr14676038pfb.144.1557501595860;
-	Fri, 10 May 2019 08:19:55 -0700 (PDT)
+	bh=Cwj55cO5HKZwNrpsoxflAQ5QTjmy2fkdQhNi3dY/lrE=;
+	b=jDbHzmGMKDCp+N+R5zhQ9uu/PzaDj5e6iwbcrl2YZ7pL+8LWVv8ctxjBMpnZtpgJ/O
+	xHde+cOdEQ19DRPpsExjPJm4Orvx3zxd0tFQvn+VWX3mx1SLdSPejzPQOWbl1gZ0xGpz
+	yxRLrjcbH6p7SyKM2uzzurf/s7Y8wt6WmvWUxKJf8N34dhdX+2FPxciPKbLD/LRN+Omw
+	0wfACzW9Wjkv8WkHDJGsHOWS2s9TlXj9h2Z691hfLQHil3ibUOUSzvfJnBUDZ8n8mnPg
+	eyMRcgxufmsVV0KNPGZOT8Pa6BgVSoziPnlyyMyv+ybHQ4bjpb2dXewr9/17AWQTfPXq
+	zpSQ==
+X-Gm-Message-State: APjAAAU+1ppLfxOXWh1QErtK3KawQabZE8uKf9NEBm58xNqEP2cM/tJ2
+	cTBRUXgakx6GWX9L6ONLCIRTqm7NdHg=
+X-Google-Smtp-Source: APXvYqyTUO4S4GkXSvjhNCYLJ9vh0t79LFv4D0YK6hNK7VwrbjrELeQdJH+rr9ciBIEiioif6QtJpA==
+X-Received: by 2002:a17:902:2907:: with SMTP id
+	g7mr13723060plb.238.1557501609204; 
+	Fri, 10 May 2019 08:20:09 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id 19sm5920517pgz.24.2019.05.10.08.19.54
+	by smtp.gmail.com with ESMTPSA id 19sm5920517pgz.24.2019.05.10.08.20.08
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 10 May 2019 08:19:54 -0700 (PDT)
+	Fri, 10 May 2019 08:20:08 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 08:19:24 -0700
-Message-Id: <20190510151944.22981-8-richard.henderson@linaro.org>
+Date: Fri, 10 May 2019 08:19:35 -0700
+Message-Id: <20190510151944.22981-19-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190510151944.22981-1-richard.henderson@linaro.org>
 References: <20190510151944.22981-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: [Qemu-devel] [PULL 07/27] target/lm32: Convert to CPUClass::tlb_fill
+X-Received-From: 2607:f8b0:4864:20::642
+Subject: [Qemu-devel] [PULL 18/27] target/s390x: Convert to
+ CPUClass::tlb_fill
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,110 +92,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Michael Walle <michael@walle.cc>
+Cc: peter.maydell@linaro.org, qemu-s390x@nongnu.org,
+	Cornelia Huck <cohuck@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc: Michael Walle <michael@walle.cc>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-s390x@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/lm32/cpu.h       |  5 +++--
- target/lm32/cpu.c       |  5 ++---
- target/lm32/helper.c    | 12 +++++++++---
- target/lm32/op_helper.c | 16 ----------------
- 4 files changed, 14 insertions(+), 24 deletions(-)
+ target/s390x/internal.h    |  5 +--
+ target/s390x/cpu.c         |  5 ++-
+ target/s390x/excp_helper.c | 73 ++++++++++++++++++++++++++------------
+ target/s390x/mem_helper.c  | 16 ---------
+ 4 files changed, 55 insertions(+), 44 deletions(-)
 
-diff --git a/target/lm32/cpu.h b/target/lm32/cpu.h
-index 9b1e6c2d58..d224d4426e 100644
---- a/target/lm32/cpu.h
-+++ b/target/lm32/cpu.h
-@@ -261,8 +261,9 @@ bool lm32_cpu_do_semihosting(CPUState *cs);
- #define cpu_list lm32_cpu_list
- #define cpu_signal_handler cpu_lm32_signal_handler
- 
--int lm32_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size, int rw,
+diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+index 26575f2130..56534b38e0 100644
+--- a/target/s390x/internal.h
++++ b/target/s390x/internal.h
+@@ -263,8 +263,9 @@ ObjectClass *s390_cpu_class_by_name(const char *name);
+ void s390x_cpu_debug_excp_handler(CPUState *cs);
+ void s390_cpu_do_interrupt(CPUState *cpu);
+ bool s390_cpu_exec_interrupt(CPUState *cpu, int int_req);
+-int s390_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size, int rw,
 -                              int mmu_idx);
-+bool lm32_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
 +                       MMUAccessType access_type, int mmu_idx,
 +                       bool probe, uintptr_t retaddr);
- 
- #include "exec/cpu-all.h"
- 
-diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
-index 282da19994..57c50c1578 100644
---- a/target/lm32/cpu.c
-+++ b/target/lm32/cpu.c
-@@ -231,9 +231,8 @@ static void lm32_cpu_class_init(ObjectClass *oc, void *data)
-     cc->set_pc = lm32_cpu_set_pc;
-     cc->gdb_read_register = lm32_cpu_gdb_read_register;
-     cc->gdb_write_register = lm32_cpu_gdb_write_register;
+ void s390x_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+                                    MMUAccessType access_type,
+                                    int mmu_idx, uintptr_t retaddr);
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index b58ef0a8ef..e28939032b 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -478,9 +478,8 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
+     cc->set_pc = s390_cpu_set_pc;
+     cc->gdb_read_register = s390_cpu_gdb_read_register;
+     cc->gdb_write_register = s390_cpu_gdb_write_register;
 -#ifdef CONFIG_USER_ONLY
--    cc->handle_mmu_fault = lm32_cpu_handle_mmu_fault;
+-    cc->handle_mmu_fault = s390_cpu_handle_mmu_fault;
 -#else
-+    cc->tlb_fill = lm32_cpu_tlb_fill;
++    cc->tlb_fill = s390_cpu_tlb_fill;
 +#ifndef CONFIG_USER_ONLY
-     cc->get_phys_page_debug = lm32_cpu_get_phys_page_debug;
-     cc->vmsd = &vmstate_lm32_cpu;
- #endif
-diff --git a/target/lm32/helper.c b/target/lm32/helper.c
-index a039a993ff..1db9a5562e 100644
---- a/target/lm32/helper.c
-+++ b/target/lm32/helper.c
-@@ -25,8 +25,9 @@
- #include "exec/semihost.h"
- #include "exec/log.h"
+     cc->get_phys_page_debug = s390_cpu_get_phys_page_debug;
+     cc->vmsd = &vmstate_s390_cpu;
+     cc->write_elf64_note = s390_cpu_write_elf64_note;
+diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+index f84bfb1284..a4e134bcab 100644
+--- a/target/s390x/excp_helper.c
++++ b/target/s390x/excp_helper.c
+@@ -74,8 +74,9 @@ void s390_cpu_do_interrupt(CPUState *cs)
+     cs->exception_index = -1;
+ }
  
--int lm32_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
--                              int mmu_idx)
-+bool lm32_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+-int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
+-                              int rw, int mmu_idx)
++bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
 +                       MMUAccessType access_type, int mmu_idx,
 +                       bool probe, uintptr_t retaddr)
  {
-     LM32CPU *cpu = LM32_CPU(cs);
-     CPULM32State *env = &cpu->env;
-@@ -40,8 +41,13 @@ int lm32_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
-     } else {
-         tlb_set_page(cs, address, address, prot, mmu_idx, TARGET_PAGE_SIZE);
+     S390CPU *cpu = S390_CPU(cs);
+ 
+@@ -83,7 +84,7 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size,
+     /* On real machines this value is dropped into LowMem.  Since this
+        is userland, simply put this someplace that cpu_loop can find it.  */
+     cpu->env.__excp_addr = address;
+-    return 1;
++    cpu_loop_exit_restore(cs, retaddr);
+ }
+ 
+ #else /* !CONFIG_USER_ONLY */
+@@ -102,19 +103,20 @@ static inline uint64_t cpu_mmu_idx_to_asc(int mmu_idx)
      }
-+    return true;
-+}
+ }
+ 
+-int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr, int size,
+-                              int rw, int mmu_idx)
++bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                       MMUAccessType access_type, int mmu_idx,
++                       bool probe, uintptr_t retaddr)
+ {
+     S390CPU *cpu = S390_CPU(cs);
+     CPUS390XState *env = &cpu->env;
+     target_ulong vaddr, raddr;
+     uint64_t asc;
+-    int prot;
++    int prot, fail;
+ 
+     qemu_log_mask(CPU_LOG_MMU, "%s: addr 0x%" VADDR_PRIx " rw %d mmu_idx %d\n",
+-                  __func__, orig_vaddr, rw, mmu_idx);
++                  __func__, address, access_type, mmu_idx);
+ 
+-    vaddr = orig_vaddr;
++    vaddr = address;
+ 
+     if (mmu_idx < MMU_REAL_IDX) {
+         asc = cpu_mmu_idx_to_asc(mmu_idx);
+@@ -122,39 +124,64 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr, int size,
+         if (!(env->psw.mask & PSW_MASK_64)) {
+             vaddr &= 0x7fffffff;
+         }
+-        if (mmu_translate(env, vaddr, rw, asc, &raddr, &prot, true)) {
+-            return 1;
+-        }
++        fail = mmu_translate(env, vaddr, access_type, asc, &raddr, &prot, true);
+     } else if (mmu_idx == MMU_REAL_IDX) {
+         /* 31-Bit mode */
+         if (!(env->psw.mask & PSW_MASK_64)) {
+             vaddr &= 0x7fffffff;
+         }
+-        if (mmu_translate_real(env, vaddr, rw, &raddr, &prot)) {
+-            return 1;
+-        }
++        fail = mmu_translate_real(env, vaddr, access_type, &raddr, &prot);
+     } else {
+-        abort();
++        g_assert_not_reached();
+     }
+ 
+     /* check out of RAM access */
+-    if (!address_space_access_valid(&address_space_memory, raddr,
+-                                    TARGET_PAGE_SIZE, rw,
++    if (!fail &&
++        !address_space_access_valid(&address_space_memory, raddr,
++                                    TARGET_PAGE_SIZE, access_type,
+                                     MEMTXATTRS_UNSPECIFIED)) {
+         qemu_log_mask(CPU_LOG_MMU,
+                       "%s: raddr %" PRIx64 " > ram_size %" PRIx64 "\n",
+                       __func__, (uint64_t)raddr, (uint64_t)ram_size);
+         trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_AUTO);
+-        return 1;
++        fail = 1;
+     }
+ 
+-    qemu_log_mask(CPU_LOG_MMU, "%s: set tlb %" PRIx64 " -> %" PRIx64 " (%x)\n",
+-            __func__, (uint64_t)vaddr, (uint64_t)raddr, prot);
++    if (!fail) {
++        qemu_log_mask(CPU_LOG_MMU,
++                      "%s: set tlb %" PRIx64 " -> %" PRIx64 " (%x)\n",
++                      __func__, (uint64_t)vaddr, (uint64_t)raddr, prot);
++        tlb_set_page(cs, address & TARGET_PAGE_MASK, raddr, prot,
++                     mmu_idx, TARGET_PAGE_SIZE);
++        return true;
++    }
++    if (probe) {
++        return false;
++    }
+ 
+-    tlb_set_page(cs, orig_vaddr & TARGET_PAGE_MASK, raddr, prot,
+-                 mmu_idx, TARGET_PAGE_SIZE);
++    cpu_restore_state(cs, retaddr, true);
  
 -    return 0;
++    /*
++     * The ILC value for code accesses is undefined.  The important
++     * thing here is to *not* leave env->int_pgm_ilen set to ILEN_AUTO,
++     * which would cause do_program_interrupt to attempt to read from
++     * env->psw.addr again.  C.f. the condition in trigger_page_fault,
++     * but is not universally applied.
++     *
++     * ??? If we remove ILEN_AUTO, by moving the computation of ILEN
++     * into cpu_restore_state, then we may remove this entirely.
++     */
++    if (access_type == MMU_INST_FETCH) {
++        env->int_pgm_ilen = 2;
++    }
++
++    cpu_loop_exit(cs);
++}
++
 +void tlb_fill(CPUState *cs, target_ulong addr, int size,
 +              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
 +{
-+    lm32_cpu_tlb_fill(cs, addr, size, access_type, mmu_idx, false, retaddr);
++    s390_cpu_tlb_fill(cs, addr, size, access_type, mmu_idx, false, retaddr);
  }
  
- hwaddr lm32_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-diff --git a/target/lm32/op_helper.c b/target/lm32/op_helper.c
-index 234d55e056..be12b11b02 100644
---- a/target/lm32/op_helper.c
-+++ b/target/lm32/op_helper.c
-@@ -143,21 +143,5 @@ uint32_t HELPER(rcsr_jrx)(CPULM32State *env)
- {
-     return lm32_juart_get_jrx(env->juart_state);
- }
+ static void do_program_interrupt(CPUS390XState *env)
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 3f76a8abfd..ffd5f02fbe 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -33,22 +33,6 @@
+ 
+ /*****************************************************************************/
+ /* Softmmu support */
+-#if !defined(CONFIG_USER_ONLY)
 -
--/* Try to fill the TLB and return an exception if error. If retaddr is
-- * NULL, it means that the function was called in C code (i.e. not
-- * from generated code or from helper.c)
-- */
+-/* try to fill the TLB and return an exception if error. If retaddr is
+-   NULL, it means that the function was called in C code (i.e. not
+-   from generated code or from helper.c) */
+-/* XXX: fix it to restore all registers */
 -void tlb_fill(CPUState *cs, target_ulong addr, int size,
 -              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
 -{
--    int ret;
--
--    ret = lm32_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
--    if (unlikely(ret)) {
--        /* now we have a real cpu fault */
+-    int ret = s390_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
+-    if (unlikely(ret != 0)) {
 -        cpu_loop_exit_restore(cs, retaddr);
 -    }
 -}
- #endif
+-
+-#endif
  
+ /* #define DEBUG_HELPER */
+ #ifdef DEBUG_HELPER
 -- 
 2.17.1
 
