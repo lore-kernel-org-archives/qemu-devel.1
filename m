@@ -6,64 +6,56 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D95EC04AB3
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 21:46:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67375C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 21:53:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3476120989
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 21:46:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3476120989
+	by mail.kernel.org (Postfix) with ESMTPS id 3C608217F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 21:53:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C608217F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50449 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50524 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hPDM2-0007kn-9U
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 17:46:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51158)
+	id 1hPDSD-0003CP-21
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 17:53:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1hPDKb-000718-Hk
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:45:30 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hPDRG-0002lS-Iq
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:52:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1hPDKa-0005VZ-5w
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:45:29 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:35810)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1hPDKZ-0005VI-Vl
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:45:28 -0400
-Received: by mail-ot1-f65.google.com with SMTP id g24so2351626otq.2
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 14:45:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=43NYLwxONwClH8AZ1JUyLaHaDe7yyRR4mnz83zjnBaU=;
-	b=K6ZBNi161Z8L+KSfpod09ZXc3G3Ugsr/xXZ6MCBcQ5UXgYV4bRNxLq2R6hVIoWq+bN
-	4mfLWB8UOUhEMcZ1J46zdsypQoXY0yvmw8h/ITowwt6vZuVBi1DD6jptnchvu6q2u+MO
-	7ODM2gobuHeZDZcMjTp+ZBKuVGANWdOYmrBE2tTIMAzP3XQ0+FNusxqt235gH9sCQZ0D
-	EXazgW4BVbE+O8vnF0z3FxsURW2MwxLqWbVEGiAee5PMv7b4chPz8bUM8/LuF2aOcmne
-	ZH28GeulPQbPuHq3I1eWdohLhzgZv0xSqd2WejI751E5y68O949fRYu6caFko+jdzNTU
-	FisA==
-X-Gm-Message-State: APjAAAUTpjlogyXN5VfviSORK96IIdDjQEKSI6S+V5CxUqQdBpJy+Fkl
-	ijHmgyrmfaJwy7pRHWq78AdD+RiYKODm6PchT5lkTw==
-X-Google-Smtp-Source: APXvYqzgRLi0sSofV73+liDfsHh22wSs0Y4BGB2Ssig250BfJM7uXtgOiI7ZK+0ymrqY/MdyGlBTsE7HRPSIMn6DI4Q=
-X-Received: by 2002:a9d:361:: with SMTP id 88mr8202852otv.361.1557524726824;
-	Fri, 10 May 2019 14:45:26 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1hPDRF-0000fs-H0
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:52:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51454)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
+	id 1hPDRD-0000d7-AH; Fri, 10 May 2019 17:52:19 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 761F63DDBE;
+	Fri, 10 May 2019 21:52:18 +0000 (UTC)
+Received: from probe.bos.redhat.com (dhcp-17-164.bos.redhat.com [10.18.17.164])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6CD575D962;
+	Fri, 10 May 2019 21:52:13 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: qemu-block@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Fri, 10 May 2019 17:52:12 -0400
+Message-Id: <20190510215212.8413-1-jsnow@redhat.com>
 MIME-Version: 1.0
-References: <20190510211954.29574-1-mreitz@redhat.com>
-In-Reply-To: <20190510211954.29574-1-mreitz@redhat.com>
-From: Nir Soffer <nsoffer@redhat.com>
-Date: Sat, 11 May 2019 00:45:13 +0300
-Message-ID: <CAMRbyytDVz=tTgPKOxZNBR=suohjw6bi7EsP=u5682ZRCsHfag@mail.gmail.com>
-To: Max Reitz <mreitz@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.29]);
+	Fri, 10 May 2019 21:52:18 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.210.65
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH] iotests: Filter 175's allocation
- information
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] blockdev: fix missed target unref for
+ drive-backup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,123 +67,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, aihua liang <aliang@redhat.com>,
+	John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, May 11, 2019 at 12:19 AM Max Reitz <mreitz@redhat.com> wrote:
+If the bitmap can't be used for whatever reason, we skip putting down
+the reference. Fix that.
 
-> It is possible for an empty file to take up blocks on a filesystem.
-> Make iotest 175 take this into account.
->
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/175     | 15 +++++++++++----
->  tests/qemu-iotests/175.out |  8 ++++----
->  2 files changed, 15 insertions(+), 8 deletions(-)
->
-> diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
-> index d0ffc495c2..b5652a3889 100755
-> --- a/tests/qemu-iotests/175
-> +++ b/tests/qemu-iotests/175
-> @@ -28,7 +28,8 @@ status=1      # failure is the default!
->
->  _cleanup()
->  {
-> -       _cleanup_test_img
-> +    _cleanup_test_img
-> +    rm -f "$TEST_DIR/empty"
->  }
->  trap "_cleanup; exit \$status" 0 1 2 3 15
->
-> @@ -40,18 +41,24 @@ _supported_fmt raw
->  _supported_proto file
->  _supported_os Linux
->
-> -size=1m
-> +size=$((1 * 1024 * 1024))
+In practice, this means that if you attempt to gracefully exit QEMU
+after a backup command being rejected, bdrv_close_all will fail and
+tell you some unpleasant things via assert().
 
-+
-> +touch "$TEST_DIR/empty"
-> +empty_blocks=$(stat -c '%b' "$TEST_DIR/empty")
->
+Reported-by: aihua liang <aliang@redhat.com>
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1703916
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ blockdev.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-Maybe extra_blocks?
-
- echo
->  echo "== creating image with default preallocation =="
->  _make_test_img $size | _filter_imgfmt
-> -stat -c "size=%s, blocks=%b" $TEST_IMG
-> +stat -c "size=%s, blocks=%b" $TEST_IMG \
-> +    | sed -e "s/blocks=$empty_blocks/nothing allocated/"
->
->  for mode in off full falloc; do
->      echo
->      echo "== creating image with preallocation $mode =="
->      IMGOPTS=preallocation=$mode _make_test_img $size | _filter_imgfmt
-> -    stat -c "size=%s, blocks=%b" $TEST_IMG
-> +    stat -c "size=%s, blocks=%b" $TEST_IMG \
-> +        | sed -e "s/blocks=$empty_blocks/nothing allocated/" \
-> +        | sed -e "s/blocks=$((empty_blocks + size / 512))/everything
-> allocated/"
->
-
-"fully allocated"?
-
-Maybe add a helper like this:
-
-_filter_blocks() {
-        # Some file systems sometimes allocate extra blocks
-        sed -e "s/blocks=$empty_blocks/nothing allocated/" \
-               -e "s/blocks=$((empty_blocks + size / 512))/everything
-allocated/"
-}
-
-So we can do:
-
-    stat -c "size=%s, blocks=%b" $TEST_IMG | _filter_blocks
-
-And it is also clear why we need to run sed without looking up the commit
-message.
+diff --git a/blockdev.c b/blockdev.c
+index 79fbac8450..278ecdd122 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3525,8 +3525,7 @@ static BlockJob *do_drive_backup(DriveBackup *backu=
+p, JobTxn *txn,
+     if (set_backing_hd) {
+         bdrv_set_backing_hd(target_bs, source, &local_err);
+         if (local_err) {
+-            bdrv_unref(target_bs);
+-            goto out;
++            goto unref;
+         }
+     }
+=20
+@@ -3534,11 +3533,10 @@ static BlockJob *do_drive_backup(DriveBackup *bac=
+kup, JobTxn *txn,
+         bmap =3D bdrv_find_dirty_bitmap(bs, backup->bitmap);
+         if (!bmap) {
+             error_setg(errp, "Bitmap '%s' could not be found", backup->b=
+itmap);
+-            bdrv_unref(target_bs);
+-            goto out;
++            goto unref;
+         }
+         if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_DEFAULT, errp)) {
+-            goto out;
++            goto unref;
+         }
+     }
+     if (!backup->auto_finalize) {
+@@ -3552,12 +3550,12 @@ static BlockJob *do_drive_backup(DriveBackup *bac=
+kup, JobTxn *txn,
+                             backup->sync, bmap, backup->compress,
+                             backup->on_source_error, backup->on_target_e=
+rror,
+                             job_flags, NULL, NULL, txn, &local_err);
+-    bdrv_unref(target_bs);
+     if (local_err !=3D NULL) {
+         error_propagate(errp, local_err);
+-        goto out;
+     }
+=20
++unref:
++    bdrv_unref(target_bs);
+ out:
+     aio_context_release(aio_context);
+     return job;
+--=20
+2.20.1
 
 
->  done
->
->  # success, all done
-> diff --git a/tests/qemu-iotests/175.out b/tests/qemu-iotests/175.out
-> index 76c02c6a57..6d9a5ed84e 100644
-> --- a/tests/qemu-iotests/175.out
-> +++ b/tests/qemu-iotests/175.out
-> @@ -2,17 +2,17 @@ QA output created by 175
->
->  == creating image with default preallocation ==
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-> -size=1048576, blocks=0
-> +size=1048576, nothing allocated
->
->  == creating image with preallocation off ==
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=off
-> -size=1048576, blocks=0
-> +size=1048576, nothing allocated
->
->  == creating image with preallocation full ==
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=full
-> -size=1048576, blocks=2048
-> +size=1048576, everything allocated
->
->  == creating image with preallocation falloc ==
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-> preallocation=falloc
-> -size=1048576, blocks=2048
-> +size=1048576, everything allocated
->   *** done
-> --
-> 2.21.0
->
-
-Otherwise looks good.
-
-Nir
