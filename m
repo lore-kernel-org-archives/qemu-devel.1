@@ -4,82 +4,84 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB33BC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:34:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7263CC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:34:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F7202070D
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:34:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2DB182070D
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:34:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QW0okPle"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F7202070D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NDxtRjIT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DB182070D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45172 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45174 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP7Xb-0004KB-MX
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 11:34:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56151)
+	id 1hP7Xn-0004RP-At
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 11:34:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hP7Jb-0007a7-LO
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:20:08 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hP7JU-0007Rq-6u
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:19:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hP7JW-0008Qr-GT
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:20:03 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:39497)
+	(envelope-from <richard.henderson@linaro.org>) id 1hP7JS-0008Lg-Vv
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:19:56 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:41797)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hP7JW-0008QD-AH
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:19:58 -0400
-Received: by mail-pl1-x643.google.com with SMTP id g9so2996119plm.6
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 08:19:58 -0700 (PDT)
+	id 1hP7JS-0008JL-P1
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:19:54 -0400
+Received: by mail-pg1-x542.google.com with SMTP id z3so3174853pgp.8
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 08:19:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=epdYlBTiLaV9VQx6jCDpGmNhfjLLlYzffabxUVX4RgQ=;
-	b=QW0okPleQujLTUlxcqDQUK0x+NfYr1wLiEpXpUc95jvPzeKAmnCfFWeEiGzJ17qXO9
-	XkivkzLWsVeloBcgsnow1dBVhpJOiF69V5+QJSRs1ZLeDMZYDJKUhvx8Gsw4bxlu0McG
-	5xRplWCO+S2AL1ehbKIYM2ge/R7oSkPPdldZ0XkZ74+IPt2GWRg4m4YEghfH8JqqovVx
-	lRUCOpCzWVPuMNpb82P9J+Rv/dtKRQDnQwTwd/566O1wkUAt6N4NPOJIsMToAkiD+YGI
-	Mpyb+BQeHv4GLRaYiuJuHt6vOlGOLtRFczmnpnj7yGrQT+TQT+r0T9qE6jrjjLEUjYIQ
-	EFFg==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=w7l/Pbs/dkuyE6y60mYyZzngNGSZYjs+O6jEPehbb2U=;
+	b=NDxtRjIT9OwOwhQuz62GbKxNx3/1UWV99hQDQbrbUl+wF85WhiunFo3gRQe5HTaM2z
+	yaEKk8KC6PV2P/UGYI2RSFDhDZq75/roQ6mZuJJNRZc/XosJQzWWuuB0Wug6gKqc2mV0
+	8sJ8SM83s2wKVm1JrUy11/3lyp/0SdU+9XqUnoj+Hgn7EtwXAIexBd6m4pbyj/6TJ7tJ
+	uovo/1e0mRAd3KOb8ZcG73XEE09pohPxEbE6HsRwnpPrGFRKOkf9cH9YIIXTRUQfdtyT
+	ZR/q0DVxrRwMouujnEU7+bivGIx+lQfnYRq08TAKACRX9AWZ3JGqVxdQuparR3GUtozD
+	ehzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=epdYlBTiLaV9VQx6jCDpGmNhfjLLlYzffabxUVX4RgQ=;
-	b=UVoHpM1iFrnC0HJ3DVk3qUUcLhDdVz/cg7Uq9WW8MCutYnHcCLkT7whhiBXFHjEgUf
-	A33lv0vh79stk/vt0vDamXMiyAIK6OdKdNGNEBiBQyVLyGy72TcB5I9Zihx9uv0fldog
-	rGuVwiiKx18CEXBfCdQCvBMYNuR9qZOXGdENav2fomSL+FFzq6fnbREfVEhaZRSmNMY0
-	ZS483CFnBRUH3ifTgeK6TdmH5XJZGe0rnTrXsfcBYLkHjlXFp++3tsnr55YPT+WulQFF
-	onjI2ffWUFyJpDnXG7EKKfltOZ8YxPdGuuH2mt1CeJTsVBjDROWkPWDR9w4Rj1sOnF1H
-	Sr3g==
-X-Gm-Message-State: APjAAAWGOE+vnIpYpmEyB5wf/JjeTrYw4YAxZP5bnmaQ9XYxTOwBjYpZ
-	ZbeljjPEc+uAKjfakri2aFYyFC9J+q0=
-X-Google-Smtp-Source: APXvYqwJEQayE/urDGFQ3krsMl0yjOXhIVIzbFcEoUVaidbOPXR0bgH8bVjclRdi+vn/ndWR+Fldgg==
-X-Received: by 2002:a17:902:f24:: with SMTP id
-	33mr13743282ply.33.1557501596967; 
-	Fri, 10 May 2019 08:19:56 -0700 (PDT)
+	:references:mime-version:content-transfer-encoding;
+	bh=w7l/Pbs/dkuyE6y60mYyZzngNGSZYjs+O6jEPehbb2U=;
+	b=q09N78clsZDPD0PRmY7m5RgtdUJ2f5Fkwihl9+2wHU3HH7YS5Or21CoJ+WsdD7a5eb
+	Ljp9XIS4rEXWGJtBPrYlX8XDUKUo3/gY7LN7gXGk4yq0I3/TbEsDX57f7K2xuYi6eTg7
+	6J8m/PzNsXFpBegQnYgB6drFVoivA/cVt9eA3NS2Ol94J6ZgDPdmj65lp8+q2NevxX4u
+	cnjtU7ocqkOxQ1T2Bv6WExPzYrsao1L53s7XwrlNhX0cN9GF+dhxCxyqWhsxYKrwq+xl
+	8mwzP0uOUaIrX4W8FJTiLpYYn2u2qjbSJ682UenWeiXHyI6xoic+qVB2iT+IsjphMGSo
+	9JTA==
+X-Gm-Message-State: APjAAAXmJqtjHqtOAKk63EaBXokM/N9v5doALf622BlIOANavrJUPNmq
+	GemwRpr7mNUkb7IDQ6yVep1L3xTq8qM=
+X-Google-Smtp-Source: APXvYqzWafCd/DDsaPUDKIDQn0EvgAPR3qNeP+mUCy5aDGehTHZ8ALdsIw9n+rKSszC7hnTCFlSL9Q==
+X-Received: by 2002:a63:4852:: with SMTP id x18mr980020pgk.14.1557501593469;
+	Fri, 10 May 2019 08:19:53 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id 19sm5920517pgz.24.2019.05.10.08.19.55
+	by smtp.gmail.com with ESMTPSA id 19sm5920517pgz.24.2019.05.10.08.19.51
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 10 May 2019 08:19:56 -0700 (PDT)
+	Fri, 10 May 2019 08:19:52 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 08:19:25 -0700
-Message-Id: <20190510151944.22981-9-richard.henderson@linaro.org>
+Date: Fri, 10 May 2019 08:19:22 -0700
+Message-Id: <20190510151944.22981-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190510151944.22981-1-richard.henderson@linaro.org>
 References: <20190510151944.22981-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::643
-Subject: [Qemu-devel] [PULL 08/27] target/m68k: Convert to CPUClass::tlb_fill
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: [Qemu-devel] [PULL 05/27] target/hppa: Convert to CPUClass::tlb_fill
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,222 +93,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Laurent Vivier <laurent@vivier.eu>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/m68k/cpu.h       |  5 ++-
- target/m68k/cpu.c       |  2 +-
- target/m68k/helper.c    | 87 ++++++++++++++++++++++-------------------
- target/m68k/op_helper.c | 15 -------
- 4 files changed, 50 insertions(+), 59 deletions(-)
+ target/hppa/cpu.h        |  8 ++++----
+ target/hppa/cpu.c        |  5 ++---
+ target/hppa/mem_helper.c | 22 +++++++++++++++++-----
+ 3 files changed, 23 insertions(+), 12 deletions(-)
 
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index ad41608341..683d3e2f79 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -542,8 +542,9 @@ static inline int cpu_mmu_index (CPUM68KState *env, bool ifetch)
-     return (env->sr & SR_S) == 0 ? 1 : 0;
- }
- 
--int m68k_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size, int rw,
--                              int mmu_idx);
-+bool m68k_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+index 923346adb6..c1e0215e66 100644
+--- a/target/hppa/cpu.h
++++ b/target/hppa/cpu.h
+@@ -360,10 +360,10 @@ int hppa_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+ void hppa_cpu_do_interrupt(CPUState *cpu);
+ bool hppa_cpu_exec_interrupt(CPUState *cpu, int int_req);
+ void hppa_cpu_dump_state(CPUState *cs, FILE *f, int);
+-#ifdef CONFIG_USER_ONLY
+-int hppa_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size,
+-                              int rw, int midx);
+-#else
++bool hppa_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
 +                       MMUAccessType access_type, int mmu_idx,
 +                       bool probe, uintptr_t retaddr);
- void m68k_cpu_unassigned_access(CPUState *cs, hwaddr addr,
-                                 bool is_write, bool is_exec, int is_asi,
-                                 unsigned size);
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index 582e3a73b3..6f441bc973 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -269,7 +269,7 @@ static void m68k_cpu_class_init(ObjectClass *c, void *data)
-     cc->set_pc = m68k_cpu_set_pc;
-     cc->gdb_read_register = m68k_cpu_gdb_read_register;
-     cc->gdb_write_register = m68k_cpu_gdb_write_register;
--    cc->handle_mmu_fault = m68k_cpu_handle_mmu_fault;
-+    cc->tlb_fill = m68k_cpu_tlb_fill;
- #if defined(CONFIG_SOFTMMU)
-     cc->do_unassigned_access = m68k_cpu_unassigned_access;
-     cc->get_phys_page_debug = m68k_cpu_get_phys_page_debug;
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index d958a34959..862f955f7b 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -353,20 +353,7 @@ void m68k_switch_sp(CPUM68KState *env)
-     env->current_sp = new_sp;
- }
- 
--#if defined(CONFIG_USER_ONLY)
--
--int m68k_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
--                              int mmu_idx)
--{
--    M68kCPU *cpu = M68K_CPU(cs);
--
--    cs->exception_index = EXCP_ACCESS;
--    cpu->env.mmu.ar = address;
--    return 1;
--}
--
++#ifndef CONFIG_USER_ONLY
+ int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx,
+                               int type, hwaddr *pphys, int *pprot);
+ extern const MemoryRegionOps hppa_io_eir_ops;
+diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
+index e64f48581e..9717ea1798 100644
+--- a/target/hppa/cpu.c
++++ b/target/hppa/cpu.c
+@@ -163,9 +163,8 @@ static void hppa_cpu_class_init(ObjectClass *oc, void *data)
+     cc->synchronize_from_tb = hppa_cpu_synchronize_from_tb;
+     cc->gdb_read_register = hppa_cpu_gdb_read_register;
+     cc->gdb_write_register = hppa_cpu_gdb_write_register;
+-#ifdef CONFIG_USER_ONLY
+-    cc->handle_mmu_fault = hppa_cpu_handle_mmu_fault;
 -#else
--
-+#if !defined(CONFIG_USER_ONLY)
- /* MMU: 68040 only */
++    cc->tlb_fill = hppa_cpu_tlb_fill;
++#ifndef CONFIG_USER_ONLY
+     cc->get_phys_page_debug = hppa_cpu_get_phys_page_debug;
+     dc->vmsd = &vmstate_hppa_cpu;
+ #endif
+diff --git a/target/hppa/mem_helper.c b/target/hppa/mem_helper.c
+index 77fb544838..5cee0c19b1 100644
+--- a/target/hppa/mem_helper.c
++++ b/target/hppa/mem_helper.c
+@@ -25,8 +25,9 @@
+ #include "trace.h"
  
- static void print_address_zone(uint32_t logical, uint32_t physical,
-@@ -795,11 +782,36 @@ hwaddr m68k_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-     return phys_addr;
- }
- 
--int m68k_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
--                              int mmu_idx)
-+/*
-+ * Notify CPU of a pending interrupt.  Prioritization and vectoring should
-+ * be handled by the interrupt controller.  Real hardware only requests
-+ * the vector when the interrupt is acknowledged by the CPU.  For
-+ * simplicity we calculate it when the interrupt is signalled.
-+ */
-+void m68k_set_irq_level(M68kCPU *cpu, int level, uint8_t vector)
-+{
-+    CPUState *cs = CPU(cpu);
-+    CPUM68KState *env = &cpu->env;
-+
-+    env->pending_level = level;
-+    env->pending_vector = vector;
-+    if (level) {
-+        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
-+    } else {
-+        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
-+    }
-+}
-+
-+#endif
-+
-+bool m68k_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-+                       MMUAccessType qemu_access_type, int mmu_idx,
+ #ifdef CONFIG_USER_ONLY
+-int hppa_cpu_handle_mmu_fault(CPUState *cs, vaddr address,
+-                              int size, int rw, int mmu_idx)
++bool hppa_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
++                       MMUAccessType access_type, int mmu_idx,
 +                       bool probe, uintptr_t retaddr)
  {
-     M68kCPU *cpu = M68K_CPU(cs);
-     CPUM68KState *env = &cpu->env;
-+
-+#ifndef CONFIG_USER_ONLY
-     hwaddr physical;
-     int prot;
-     int access_type;
-@@ -812,32 +824,35 @@ int m68k_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
-                      address & TARGET_PAGE_MASK,
-                      PAGE_READ | PAGE_WRITE | PAGE_EXEC,
-                      mmu_idx, TARGET_PAGE_SIZE);
--        return 0;
-+        return true;
-     }
+     HPPACPU *cpu = HPPA_CPU(cs);
  
--    if (rw == 2) {
-+    if (qemu_access_type == MMU_INST_FETCH) {
-         access_type = ACCESS_CODE;
--        rw = 0;
-     } else {
-         access_type = ACCESS_DATA;
--        if (rw) {
-+        if (qemu_access_type == MMU_DATA_STORE) {
-             access_type |= ACCESS_STORE;
-         }
-     }
--
-     if (mmu_idx != MMU_USER_IDX) {
-         access_type |= ACCESS_SUPER;
-     }
- 
-     ret = get_physical_address(&cpu->env, &physical, &prot,
-                                address, access_type, &page_size);
--    if (ret == 0) {
-+    if (likely(ret == 0)) {
-         address &= TARGET_PAGE_MASK;
-         physical += address & (page_size - 1);
-         tlb_set_page(cs, address, physical,
-                      prot, mmu_idx, TARGET_PAGE_SIZE);
--        return 0;
-+        return true;
-     }
-+
-+    if (probe) {
-+        return false;
-+    }
-+
-     /* page fault */
-     env->mmu.ssw = M68K_ATC_040;
-     switch (size) {
-@@ -862,29 +877,19 @@ int m68k_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
-     if (!(access_type & ACCESS_STORE)) {
-         env->mmu.ssw |= M68K_RW_040;
-     }
--    env->mmu.ar = address;
-+#endif
-+
-     cs->exception_index = EXCP_ACCESS;
+@@ -34,7 +35,7 @@ int hppa_cpu_handle_mmu_fault(CPUState *cs, vaddr address,
+        which would affect si_code.  */
+     cs->exception_index = EXCP_DMP;
+     cpu->env.cr[CR_IOR] = address;
 -    return 1;
-+    env->mmu.ar = address;
 +    cpu_loop_exit_restore(cs, retaddr);
  }
- 
--/* Notify CPU of a pending interrupt.  Prioritization and vectoring should
--   be handled by the interrupt controller.  Real hardware only requests
--   the vector when the interrupt is acknowledged by the CPU.  For
--   simplicitly we calculate it when the interrupt is signalled.  */
--void m68k_set_irq_level(M68kCPU *cpu, int level, uint8_t vector)
-+#ifndef CONFIG_USER_ONLY
-+void tlb_fill(CPUState *cs, target_ulong addr, int size,
-+              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
- {
--    CPUState *cs = CPU(cpu);
--    CPUM68KState *env = &cpu->env;
--
--    env->pending_level = level;
--    env->pending_vector = vector;
--    if (level) {
--        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
--    } else {
--        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
--    }
-+    m68k_cpu_tlb_fill(cs, addr, size, access_type, mmu_idx, false, retaddr);
- }
--
- #endif
- 
- uint32_t HELPER(bitrev)(uint32_t x)
-diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
-index 76f439985a..d421614727 100644
---- a/target/m68k/op_helper.c
-+++ b/target/m68k/op_helper.c
-@@ -36,21 +36,6 @@ static inline void do_interrupt_m68k_hardirq(CPUM68KState *env)
- 
  #else
+ static hppa_tlb_entry *hppa_find_tlb(CPUHPPAState *env, vaddr addr)
+@@ -213,8 +214,9 @@ hwaddr hppa_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+     return excp == EXCP_DTLB_MISS ? -1 : phys;
+ }
  
--/* Try to fill the TLB and return an exception if error. If retaddr is
--   NULL, it means that the function was called in C code (i.e. not
--   from generated code or from helper.c) */
 -void tlb_fill(CPUState *cs, target_ulong addr, int size,
--              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
--{
--    int ret;
--
--    ret = m68k_cpu_handle_mmu_fault(cs, addr, size, access_type, mmu_idx);
--    if (unlikely(ret)) {
--        /* now we have a real cpu fault */
--        cpu_loop_exit_restore(cs, retaddr);
--    }
--}
--
- static void cf_rte(CPUM68KState *env)
+-              MMUAccessType type, int mmu_idx, uintptr_t retaddr)
++bool hppa_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
++                       MMUAccessType type, int mmu_idx,
++                       bool probe, uintptr_t retaddr)
  {
-     uint32_t sp;
+     HPPACPU *cpu = HPPA_CPU(cs);
+     CPUHPPAState *env = &cpu->env;
+@@ -236,6 +238,9 @@ void tlb_fill(CPUState *cs, target_ulong addr, int size,
+     excp = hppa_get_physical_address(env, addr, mmu_idx,
+                                      a_prot, &phys, &prot);
+     if (unlikely(excp >= 0)) {
++        if (probe) {
++            return false;
++        }
+         trace_hppa_tlb_fill_excp(env, addr, size, type, mmu_idx);
+         /* Failure.  Raise the indicated exception.  */
+         cs->exception_index = excp;
+@@ -252,6 +257,13 @@ void tlb_fill(CPUState *cs, target_ulong addr, int size,
+     /* Success!  Store the translation into the QEMU TLB.  */
+     tlb_set_page(cs, addr & TARGET_PAGE_MASK, phys & TARGET_PAGE_MASK,
+                  prot, mmu_idx, TARGET_PAGE_SIZE);
++    return true;
++}
++
++void tlb_fill(CPUState *cs, target_ulong addr, int size,
++              MMUAccessType type, int mmu_idx, uintptr_t retaddr)
++{
++    hppa_cpu_tlb_fill(cs, addr, size, type, mmu_idx, false, retaddr);
+ }
+ 
+ /* Insert (Insn/Data) TLB Address.  Note this is PA 1.1 only.  */
 -- 
 2.17.1
 
