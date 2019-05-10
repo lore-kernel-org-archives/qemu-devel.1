@@ -5,78 +5,77 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6A24C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 21:01:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7912EC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 21:02:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75D3820989
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 21:01:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 287A220989
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 21:02:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="llfmX01S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75D3820989
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i3PNS14Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 287A220989
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49960 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49964 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hPCdp-0006la-Mh
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 17:01:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44170)
+	id 1hPCeo-0007fQ-HV
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 17:02:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hPCcj-00067a-HF
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:00:11 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hPCdP-0006WS-Tp
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:00:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hPCch-0006iG-5F
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:00:09 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:44301)
+	(envelope-from <alistair23@gmail.com>) id 1hPCdO-00089p-11
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:00:51 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:36280)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hPCcg-0006g6-Nd
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:00:07 -0400
-Received: by mail-lf1-x142.google.com with SMTP id n134so5064320lfn.11
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 14:00:06 -0700 (PDT)
+	id 1hPCdN-00086U-KC
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:00:49 -0400
+Received: by mail-lj1-x242.google.com with SMTP id z1so6224848ljb.3
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 14:00:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=Fa/yI+Xq8NRDoEe29kIA9xmQTwxnSPBLkAiSeakgt8s=;
-	b=llfmX01SO8VhQTPqpkQGnsq4SSjh+GV66qm+uEUvV1Fu2FIqZKtRkOgQi109gMfe85
-	4QySherjamX5tz3S7Cq6qs8FJc7Ew3n8R0GXdhAiL3NAXJyqU0Me1YtZUf6epoc6V2WG
-	ug+HUbLUtZVrqhPBx3Rok6hEZep64LkUo4IXgeRZNi479hhZSapc5elDaQlaBVADilee
-	dOfSJLiBoCTe2tAidKNBfcd/5Hdu9X7EsErbYHKa0wqBCpASxJOlgF/Atko39aAaIi0b
-	5VgEitv9ZHmjFMBW+Mg+MmGYnY7J+2Wq8rDyLY/3AO+UVCfYGx1cVXqyLAofQ5db8CEE
-	PHXg==
+	:cc; bh=MYHj9Dbdit1cXIh7hx+IMUwz06aV7NYzbZYioQsb2Ps=;
+	b=i3PNS14Y9BG2os/R4t82u0msCO3tOdcFnOyZetoMbujDaV63ET9N+/p4NpyfWGOAvS
+	bu1SZG6dxciXxeQJ581JtBWzcBb75W43E8JEsFW/RqxBAsEO2KF2lqFtp8JHM+6MeC+R
+	4rPrYJE5U7/HtB0fXpV3coSXQxfO+OXVd8kFJvNEEUydbGvjhZw4Dvk6q53CuiQ/w72m
+	jIcm03L+0woTBGFV1rM34LsW/BRU6IxHps3pyHLD9GdSMXxYUuzoxQLk7EGTqt2d4tM6
+	G9yWAXltNRc47F4EEY9wzw2T+YzwcJpEm4vRLqRkdBBT9U1K0NhJjr2YA2tdbQtzcjmr
+	rfEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc;
-	bh=Fa/yI+Xq8NRDoEe29kIA9xmQTwxnSPBLkAiSeakgt8s=;
-	b=mIDfEIyAEgGcP+E1WchkE0MMukJiuNVUOwiE6eiD6bwERi4d8WWCekeHoiSo5x6QY+
-	8O67H5NkQD6ZieGeOKtAoGc6QVhpzuO5mpQqxVc3dwVB3LIWwoGvStcJbweEaKCDGUkh
-	fUagsxGPNBtCk1oNO/UoXH+bJecY8qwXhiyjnLm0V+wR+lAFlDUpWXBjN7h+lXyZIskU
-	1cxvps2t2vg5Tev2hUY2pKabyxUDVXIf6FZDl2a6E9X+oOHFbebijYLHACbFESAVRRZW
-	I58nNsARkH1AeRMIlLz1SgC3klztV1wcvdUgOxWlMOKRrIsLw4tEcrSAxHHe8f13s33E
-	FXJw==
-X-Gm-Message-State: APjAAAUHt8xDRRJHZf3WXPaEO7HXh1HjvAPKa5YNEvwO+JTg9fYbtgEa
-	KlfEl9yIaGPsgxwxpWt4Est1Twg9Oh/VzFc9QYs=
-X-Google-Smtp-Source: APXvYqyXlKKk2jRLJV3Iyf1hz26q4fom7ZuEuJswQaGmSv9PZ3zU+cTpuJlAOOyEsyjr7e4mXaYJDOpx63ZuGokRPws=
-X-Received: by 2002:ac2:4205:: with SMTP id y5mr6973820lfh.15.1557522004583;
-	Fri, 10 May 2019 14:00:04 -0700 (PDT)
+	bh=MYHj9Dbdit1cXIh7hx+IMUwz06aV7NYzbZYioQsb2Ps=;
+	b=s5Lot+Ry8Vr8FcH+oYeHq2YaWlICIJ/R6PfxXVZB18zvlqUCQ6Lywb3iNe0U6w6uFQ
+	GFEhrjvVFUkLXNE9//WOW9P4BOcxD7pG6VCypjIG6KlLan1RwhSCvINZR2fCFC7q7J/3
+	RXTcbEFxUQuVtN7x9uM0d+2IMuH8zeIJhQ/jkQeoKLLHXHtqoQSdGVlekIwySymCin1E
+	QP2Nj6GHrIfYa7Ulzf1by9392+3AoKJSojnxNjfrvrDp8P5eoNQKG1xFecuOVIrVmcA1
+	FlDtckKUQbGk4dy/p3SJWQ8s7U30LVVFGzbmdhxrTHQLagnmHMkkoYYqGduPav/1En5Q
+	m/oA==
+X-Gm-Message-State: APjAAAXAi3BnGWjN4NSpmVpP2WgALYAo2GxREIYoirQfUocncK2qX50+
+	WSiW8wqa3iXecdKDtzQXJYPkBU7URvRHdDbkUrK91Tzs
+X-Google-Smtp-Source: APXvYqwu9AO+PjLuBJN0AFsakf99YdE5a2lZ3BEYwDBiy0+eShIwcIydo98XoY76+iYhv9CK9l0fSN4akb7+q5O9vNs=
+X-Received: by 2002:a2e:824b:: with SMTP id j11mr6848747ljh.197.1557522047948; 
+	Fri, 10 May 2019 14:00:47 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190508000641.19090-1-richard.henderson@linaro.org>
-	<20190508000641.19090-36-richard.henderson@linaro.org>
-In-Reply-To: <20190508000641.19090-36-richard.henderson@linaro.org>
+	<20190508000641.19090-37-richard.henderson@linaro.org>
+In-Reply-To: <20190508000641.19090-37-richard.henderson@linaro.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 10 May 2019 13:57:56 -0700
-Message-ID: <CAKmqyKNTHOR+J1rHapedjp1-iw+Nfg1Fn7usHxn_o3Bx3g43jQ@mail.gmail.com>
+Date: Fri, 10 May 2019 13:58:39 -0700
+Message-ID: <CAKmqyKNy4o2MqD4wBSUOhbU0FXTD8e7BRuapPQZkFvUsoaHtUw@mail.gmail.com>
 To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::142
-Subject: Re: [Qemu-devel] [PATCH v3 35/39] cpu: Move the softmmu tlb to
- CPUNegativeOffsetState
+X-Received-From: 2a00:1450:4864:20::242
+Subject: Re: [Qemu-devel] [PATCH v3 36/39] cpu: Remove CPU_COMMON
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,13 +92,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 7, 2019 at 5:29 PM Richard Henderson
+On Tue, May 7, 2019 at 5:32 PM Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
-> We have for some time had code within the tcg backends to
-> handle large positive offsets from env.  This move makes
-> sure that need not happen.  Indeed, we are able to assert
-> at build time that simple offsets suffice for all hosts.
+> This macro is now always empty, so remove it.  This leaves the
+> entire contents of CPUArchState under the control of the guest
+> architecture.
 >
 > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
@@ -109,467 +107,325 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  include/exec/cpu-defs.h      | 22 +++++++++++++-------
->  tcg/aarch64/tcg-target.inc.c | 29 ++++++--------------------
->  tcg/arm/tcg-target.inc.c     | 40 ++++++++----------------------------
->  tcg/i386/tcg-target.inc.c    |  6 ++++--
->  tcg/mips/tcg-target.inc.c    | 39 ++++++++---------------------------
->  tcg/ppc/tcg-target.inc.c     | 30 ++++++++-------------------
->  tcg/riscv/tcg-target.inc.c   | 31 +++++++---------------------
->  tcg/s390/tcg-target.inc.c    | 11 +++++-----
->  tcg/sparc/tcg-target.inc.c   | 32 +++++++++--------------------
->  9 files changed, 74 insertions(+), 166 deletions(-)
+>  include/exec/cpu-defs.h | 2 --
+>  target/alpha/cpu.h      | 3 ---
+>  target/arm/cpu.h        | 4 +---
+>  target/cris/cpu.h       | 2 --
+>  target/hppa/cpu.h       | 3 ---
+>  target/i386/cpu.h       | 4 +---
+>  target/lm32/cpu.h       | 2 --
+>  target/m68k/cpu.h       | 2 --
+>  target/microblaze/cpu.h | 2 --
+>  target/mips/cpu.h       | 2 --
+>  target/moxie/cpu.h      | 3 ---
+>  target/nios2/cpu.h      | 2 --
+>  target/openrisc/cpu.h   | 2 --
+>  target/ppc/cpu.h        | 2 --
+>  target/riscv/cpu.h      | 4 ----
+>  target/s390x/cpu.h      | 2 --
+>  target/sh4/cpu.h        | 2 --
+>  target/sparc/cpu.h      | 2 --
+>  target/tilegx/cpu.h     | 2 --
+>  target/tricore/cpu.h    | 2 --
+>  target/unicore32/cpu.h  | 2 --
+>  target/xtensa/cpu.h     | 2 --
+>  22 files changed, 2 insertions(+), 51 deletions(-)
 >
 > diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-> index 3971910653..4cde7d611c 100644
+> index 4cde7d611c..1f75a97701 100644
 > --- a/include/exec/cpu-defs.h
 > +++ b/include/exec/cpu-defs.h
-> @@ -178,13 +178,14 @@ typedef struct CPUTLBDesc {
->
->  /*
->   * Data elements that are per MMU mode, accessed by the fast path.
-> + * The structure is aligned to aid loading the pair with one insn.
->   */
->  typedef struct CPUTLBDescFast {
->      /* Contains (n_entries - 1) << CPU_TLB_ENTRY_BITS */
->      uintptr_t mask;
->      /* The array of tlb entries itself. */
->      CPUTLBEntry *table;
-> -} CPUTLBDescFast;
-> +} CPUTLBDescFast QEMU_ALIGNED(2 * sizeof(void *));
->
->  /*
->   * Data elements that are shared between all MMU modes.
-> @@ -211,28 +212,35 @@ typedef struct CPUTLBCommon {
->  /*
->   * The entire softmmu tlb, for all MMU modes.
->   * The meaning of each of the MMU modes is defined in the target code.
-> + * Since this is placed within CPUNegativeOffsetState, the smallest
-> + * negative offsets are at the end of the struct.
->   */
->  typedef struct CPUTLB {
-> -    CPUTLBDescFast f[NB_MMU_MODES];
-> -    CPUTLBDesc d[NB_MMU_MODES];
->      CPUTLBCommon c;
-> +    CPUTLBDesc d[NB_MMU_MODES];
-> +    CPUTLBDescFast f[NB_MMU_MODES];
->  } CPUTLB;
->
-> -/* There are target-specific members named "tlb".  This is temporary.  */
-> -#define CPU_COMMON    CPUTLB tlb_;
-> -#define env_tlb(ENV)  (&(ENV)->tlb_)
-> +#define env_tlb(ENV)  (&env_neg(ENV)->tlb)
-> +
-> +/* This will be used by TCG backends to compute offsets.  */
-> +#define TLB_MASK_TABLE_OFS(IDX) \
-> +    ((int)offsetof(ArchCPU, neg.tlb.f[IDX]) - (int)offsetof(ArchCPU, env))
->
->  #else
->
-> -#define CPU_COMMON  /* Nothing */
-> +typedef struct CPUTLB { } CPUTLB;
+> @@ -233,8 +233,6 @@ typedef struct CPUTLB { } CPUTLB;
 >
 >  #endif  /* !CONFIG_USER_ONLY && CONFIG_TCG */
 >
-> +#define CPU_COMMON  /* Nothing */
-> +
+> -#define CPU_COMMON  /* Nothing */
+> -
 >  /*
 >   * This structure must be placed in ArchCPU immedately
 >   * before CPUArchState, as a field named "neg".
->   */
->  typedef struct CPUNegativeOffsetState {
-> +    CPUTLB tlb;
->      IcountDecr icount_decr;
->  } CPUNegativeOffsetState;
+> diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
+> index f4bb67c101..5bd90b7ce5 100644
+> --- a/target/alpha/cpu.h
+> +++ b/target/alpha/cpu.h
+> @@ -246,9 +246,6 @@ struct CPUAlphaState {
+>      /* This alarm doesn't exist in real hardware; we wish it did.  */
+>      uint64_t alarm_expire;
 >
-> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-> index 72cf4c5ff8..afac018301 100644
-> --- a/tcg/aarch64/tcg-target.inc.c
-> +++ b/tcg/aarch64/tcg-target.inc.c
-> @@ -1455,9 +1455,9 @@ static void add_qemu_ldst_label(TCGContext *s, bool is_ld, TCGMemOpIdx oi,
->      label->label_ptr[0] = label_ptr;
->  }
->
-> -/* We expect to use a 24-bit unsigned offset from ENV.  */
-> -QEMU_BUILD_BUG_ON(offsetof(CPUArchState, tlb_.f[NB_MMU_MODES - 1].table)
-> -                  > 0xffffff);
-> +/* We expect to use a 7-bit scaled negative offset from ENV.  */
-> +QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) > 0);
-> +QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) < -512);
->
->  /* Load and compare a TLB entry, emitting the conditional jump to the
->     slow path for the failure case, which will be patched later when finalizing
-> @@ -1467,8 +1467,9 @@ static void tcg_out_tlb_read(TCGContext *s, TCGReg addr_reg, TCGMemOp opc,
->                               tcg_insn_unit **label_ptr, int mem_index,
->                               bool is_read)
->  {
-> -    int mask_ofs = offsetof(CPUArchState, tlb_.f[mem_index].mask);
-> -    int table_ofs = offsetof(CPUArchState, tlb_.f[mem_index].table);
-> +    int fast_ofs = TLB_MASK_TABLE_OFS(mem_index);
-> +    int mask_ofs = fast_ofs + offsetof(CPUTLBDescFast, mask);
-> +    int table_ofs = fast_ofs + offsetof(CPUTLBDescFast, table);
->      unsigned a_bits = get_alignment_bits(opc);
->      unsigned s_bits = opc & MO_SIZE;
->      unsigned a_mask = (1u << a_bits) - 1;
-> @@ -1477,24 +1478,6 @@ static void tcg_out_tlb_read(TCGContext *s, TCGReg addr_reg, TCGMemOp opc,
->      TCGType mask_type;
->      uint64_t compare_mask;
->
-> -    if (table_ofs > 0xfff) {
-> -        int table_hi = table_ofs & ~0xfff;
-> -        int mask_hi = mask_ofs & ~0xfff;
+> -    /* Those resources are used only in QEMU core */
+> -    CPU_COMMON
 > -
-> -        table_base = TCG_REG_X1;
-> -        if (mask_hi == table_hi) {
-> -            mask_base = table_base;
-> -        } else if (mask_hi) {
-> -            mask_base = TCG_REG_X0;
-> -            tcg_out_insn(s, 3401, ADDI, TCG_TYPE_I64,
-> -                         mask_base, TCG_AREG0, mask_hi);
-> -        }
-> -        tcg_out_insn(s, 3401, ADDI, TCG_TYPE_I64,
-> -                     table_base, TCG_AREG0, table_hi);
-> -        mask_ofs -= mask_hi;
-> -        table_ofs -= table_hi;
-> -    }
+>      int error_code;
+>
+>      uint32_t features;
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 909cb4604d..135a16a351 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -643,9 +643,7 @@ typedef struct CPUARMState {
+>      /* Fields up to this point are cleared by a CPU reset */
+>      struct {} end_reset_fields;
+>
+> -    CPU_COMMON
 > -
->      mask_type = (TARGET_PAGE_BITS + CPU_TLB_DYN_MAX_BITS > 32
->                   ? TCG_TYPE_I64 : TCG_TYPE_I32);
+> -    /* Fields after CPU_COMMON are preserved across CPU reset. */
+> +    /* Fields after this point are preserved across CPU reset. */
 >
-> diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-> index 28b911e550..ad32b04e13 100644
-> --- a/tcg/arm/tcg-target.inc.c
-> +++ b/tcg/arm/tcg-target.inc.c
-> @@ -1220,9 +1220,9 @@ static TCGReg tcg_out_arg_reg64(TCGContext *s, TCGReg argreg,
+>      /* Internal CPU feature flags.  */
+>      uint64_t features;
+> diff --git a/target/cris/cpu.h b/target/cris/cpu.h
+> index eeab483dba..6dc4502e9a 100644
+> --- a/target/cris/cpu.h
+> +++ b/target/cris/cpu.h
+> @@ -163,8 +163,6 @@ typedef struct CPUCRISState {
+>          /* Fields up to this point are cleared by a CPU reset */
+>          struct {} end_reset_fields;
 >
->  #define TLB_SHIFT      (CPU_TLB_ENTRY_BITS + CPU_TLB_BITS)
->
-> -/* We expect to use a 20-bit unsigned offset from ENV.  */
-> -QEMU_BUILD_BUG_ON(offsetof(CPUArchState, tlb_.f[NB_MMU_MODES - 1].table)
-> -                  > 0xfffff);
-> +/* We expect to use an 9-bit sign-magnitude negative offset from ENV.  */
-> +QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) > 0);
-> +QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) < -256);
->
->  /* Load and compare a TLB entry, leaving the flags set.  Returns the register
->     containing the addend of the tlb entry.  Clobbers R0, R1, R2, TMP.  */
-> @@ -1232,39 +1232,15 @@ static TCGReg tcg_out_tlb_read(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
->  {
->      int cmp_off = (is_load ? offsetof(CPUTLBEntry, addr_read)
->                     : offsetof(CPUTLBEntry, addr_write));
-> -    int mask_off = offsetof(CPUArchState, tlb_.f[mem_index].mask);
-> -    int table_off = offsetof(CPUArchState, tlb_.f[mem_index].table);
-> -    TCGReg mask_base = TCG_AREG0, table_base = TCG_AREG0;
-> +    int fast_off = TLB_MASK_TABLE_OFS(mem_index);
-> +    int mask_off = fast_off + offsetof(CPUTLBDescFast, mask);
-> +    int table_off = fast_off + offsetof(CPUTLBDescFast, table);
->      unsigned s_bits = opc & MO_SIZE;
->      unsigned a_bits = get_alignment_bits(opc);
->
-> -    if (table_off > 0xfff) {
-> -        int mask_hi = mask_off & ~0xfff;
-> -        int table_hi = table_off & ~0xfff;
-> -        int rot;
+> -        CPU_COMMON
 > -
-> -        table_base = TCG_REG_R2;
-> -        if (mask_hi == table_hi) {
-> -            mask_base = table_base;
-> -        } else if (mask_hi) {
-> -            mask_base = TCG_REG_TMP;
-> -            rot = encode_imm(mask_hi);
-> -            assert(rot >= 0);
-> -            tcg_out_dat_imm(s, COND_AL, ARITH_ADD, mask_base, TCG_AREG0,
-> -                            rotl(mask_hi, rot) | (rot << 7));
-> -        }
-> -        rot = encode_imm(table_hi);
-> -        assert(rot >= 0);
-> -        tcg_out_dat_imm(s, COND_AL, ARITH_ADD, table_base, TCG_AREG0,
-> -                        rotl(table_hi, rot) | (rot << 7));
+>          /* Members from load_info on are preserved across resets.  */
+>          void *load_info;
+>  } CPUCRISState;
+> diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+> index 0661ff60c1..3ed2ac3c25 100644
+> --- a/target/hppa/cpu.h
+> +++ b/target/hppa/cpu.h
+> @@ -197,9 +197,6 @@ struct CPUHPPAState {
+>      target_ureg cr_back[2];  /* back of cr17/cr18 */
+>      target_ureg shadow[7];   /* shadow registers */
+>
+> -    /* Those resources are used only in QEMU core */
+> -    CPU_COMMON
 > -
-> -        mask_off -= mask_hi;
-> -        table_off -= table_hi;
-> -    }
+>      /* ??? The number of entries isn't specified by the architecture.  */
+>      /* ??? Implement a unified itlb/dtlb for the moment.  */
+>      /* ??? We should use a more intelligent data structure.  */
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 43bb6ab841..8069e5b19d 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1288,9 +1288,7 @@ typedef struct CPUX86State {
+>      /* Fields up to this point are cleared by a CPU reset */
+>      struct {} end_reset_fields;
+>
+> -    CPU_COMMON
 > -
->      /* Load tlb_mask[mmu_idx] and tlb_table[mmu_idx].  */
-> -    tcg_out_ld(s, TCG_TYPE_I32, TCG_REG_TMP, mask_base, mask_off);
-> -    tcg_out_ld(s, TCG_TYPE_I32, TCG_REG_R2, table_base, table_off);
-> +    tcg_out_ld(s, TCG_TYPE_I32, TCG_REG_TMP, TCG_AREG0, mask_off);
-> +    tcg_out_ld(s, TCG_TYPE_I32, TCG_REG_R2, TCG_AREG0, table_off);
+> -    /* Fields after CPU_COMMON are preserved across CPU reset. */
+> +    /* Fields after this point are preserved across CPU reset. */
 >
->      /* Extract the tlb index from the address into TMP.  */
->      tcg_out_dat_reg(s, COND_AL, ARITH_AND, TCG_REG_TMP, TCG_REG_TMP, addrlo,
-> diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-> index b2e11a4b7c..fd6a9160ac 100644
-> --- a/tcg/i386/tcg-target.inc.c
-> +++ b/tcg/i386/tcg-target.inc.c
-> @@ -1655,10 +1655,12 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
->                     TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS);
+>      /* processor features (e.g. for CPUID insn) */
+>      /* Minimum level/xlevel/xlevel2, based on CPU model + features */
+> diff --git a/target/lm32/cpu.h b/target/lm32/cpu.h
+> index 0ec898eb1d..563600a30a 100644
+> --- a/target/lm32/cpu.h
+> +++ b/target/lm32/cpu.h
+> @@ -159,8 +159,6 @@ struct CPULM32State {
+>      /* Fields up to this point are cleared by a CPU reset */
+>      struct {} end_reset_fields;
 >
->      tcg_out_modrm_offset(s, OPC_AND_GvEv + trexw, r0, TCG_AREG0,
-> -                         offsetof(CPUArchState, tlb_.f[mem_index].mask));
-> +                         TLB_MASK_TABLE_OFS(mem_index) +
-> +                         offsetof(CPUTLBDescFast, mask));
->
->      tcg_out_modrm_offset(s, OPC_ADD_GvEv + hrexw, r0, TCG_AREG0,
-> -                         offsetof(CPUArchState, tlb_.f[mem_index].table));
-> +                         TLB_MASK_TABLE_OFS(mem_index) +
-> +                         offsetof(CPUTLBDescFast, table));
->
->      /* If the required alignment is at least as large as the access, simply
->         copy the address and mask.  For lesser alignments, check that we don't
-> diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-> index 45b26e596f..46f7749cbc 100644
-> --- a/tcg/mips/tcg-target.inc.c
-> +++ b/tcg/mips/tcg-target.inc.c
-> @@ -1201,6 +1201,10 @@ static int tcg_out_call_iarg_reg2(TCGContext *s, int i, TCGReg al, TCGReg ah)
->      return i;
->  }
->
-> +/* We expect to use a 16-bit negative offset from ENV.  */
-> +QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) > 0);
-> +QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) < -32768);
-> +
->  /*
->   * Perform the tlb comparison operation.
->   * The complete host address is placed in BASE.
-> @@ -1214,42 +1218,17 @@ static void tcg_out_tlb_load(TCGContext *s, TCGReg base, TCGReg addrl,
->      unsigned s_bits = opc & MO_SIZE;
->      unsigned a_bits = get_alignment_bits(opc);
->      int mem_index = get_mmuidx(oi);
-> -    int mask_off = offsetof(CPUArchState, tlb_.f[mem_index].mask);
-> -    int table_off = offsetof(CPUArchState, tlb_.f[mem_index].mask);
-> +    int fast_off = TLB_MASK_TABLE_OFS(mem_index);
-> +    int mask_off = fast_off + offsetof(CPUTLBDescFast, mask);
-> +    int table_off = fast_off + offsetof(CPUTLBDescFast, table);
->      int add_off = offsetof(CPUTLBEntry, addend);
->      int cmp_off = (is_load ? offsetof(CPUTLBEntry, addr_read)
->                     : offsetof(CPUTLBEntry, addr_write));
-> -    TCGReg mask_base = TCG_AREG0, table_base = TCG_AREG0;
->      target_ulong mask;
->
-> -    if (table_off > 0x7fff) {
-> -        int mask_hi = mask_off - (int16_t)mask_off;
-> -        int table_hi = table_off - (int16_t)table_off;
+> -    CPU_COMMON
 > -
-> -        table_base = TCG_TMP1;
-> -        if (likely(mask_hi == table_hi)) {
-> -            mask_base = table_base;
-> -            tcg_out_opc_imm(s, OPC_LUI, mask_base, TCG_REG_ZERO, mask_hi >> 16);
-> -            tcg_out_opc_reg(s, ALIAS_PADD, mask_base, mask_base, TCG_AREG0);
-> -            mask_off -= mask_hi;
-> -            table_off -= mask_hi;
-> -        } else {
-> -            if (mask_hi != 0) {
-> -                mask_base = TCG_TMP0;
-> -                tcg_out_opc_imm(s, OPC_LUI,
-> -                                mask_base, TCG_REG_ZERO, mask_hi >> 16);
-> -                tcg_out_opc_reg(s, ALIAS_PADD,
-> -                                mask_base, mask_base, TCG_AREG0);
-> -            }
-> -            table_off -= mask_off;
-> -            mask_off -= mask_hi;
-> -            tcg_out_opc_imm(s, ALIAS_PADDI, table_base, mask_base, mask_off);
-> -        }
-> -    }
-> -
->      /* Load tlb_mask[mmu_idx] and tlb_table[mmu_idx].  */
-> -    tcg_out_ld(s, TCG_TYPE_PTR, TCG_TMP0, mask_base, mask_off);
-> -    tcg_out_ld(s, TCG_TYPE_PTR, TCG_TMP1, table_base, table_off);
-> +    tcg_out_ld(s, TCG_TYPE_PTR, TCG_TMP0, TCG_AREG0, mask_off);
-> +    tcg_out_ld(s, TCG_TYPE_PTR, TCG_TMP1, TCG_AREG0, table_off);
+>      /* Fields from here on are preserved across CPU reset. */
+>      uint32_t eba;       /* exception base address */
+>      uint32_t deba;      /* debug exception base address */
+> diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+> index 096d1eb588..4e27ff677f 100644
+> --- a/target/m68k/cpu.h
+> +++ b/target/m68k/cpu.h
+> @@ -143,8 +143,6 @@ typedef struct CPUM68KState {
+>      /* Fields up to this point are cleared by a CPU reset */
+>      struct {} end_reset_fields;
 >
->      /* Extract the TLB index from the address into TMP3.  */
->      tcg_out_opc_sa(s, ALIAS_TSRL, TCG_TMP3, addrl,
-> diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-> index a248603bc5..400cee31ce 100644
-> --- a/tcg/ppc/tcg-target.inc.c
-> +++ b/tcg/ppc/tcg-target.inc.c
-> @@ -1497,6 +1497,10 @@ static void * const qemu_st_helpers[16] = {
->      [MO_BEQ]  = helper_be_stq_mmu,
+> -    CPU_COMMON
+> -
+>      /* Fields from here on are preserved across CPU reset. */
+>      uint32_t features;
+>  } CPUM68KState;
+> diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+> index 732653caed..6a470a2492 100644
+> --- a/target/microblaze/cpu.h
+> +++ b/target/microblaze/cpu.h
+> @@ -266,8 +266,6 @@ struct CPUMBState {
+>      /* Fields up to this point are cleared by a CPU reset */
+>      struct {} end_reset_fields;
+>
+> -    CPU_COMMON
+> -
+>      /* These fields are preserved on reset.  */
+>
+>      struct {
+> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> index 2d9c5f26eb..b9e58ed883 100644
+> --- a/target/mips/cpu.h
+> +++ b/target/mips/cpu.h
+> @@ -1021,8 +1021,6 @@ struct CPUMIPSState {
+>      /* Fields up to this point are cleared by a CPU reset */
+>      struct {} end_reset_fields;
+>
+> -    CPU_COMMON
+> -
+>      /* Fields from here on are preserved across CPU reset. */
+>      CPUMIPSMVPContext *mvp;
+>  #if !defined(CONFIG_USER_ONLY)
+> diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
+> index f5ee8a02f4..a62cca1817 100644
+> --- a/target/moxie/cpu.h
+> +++ b/target/moxie/cpu.h
+> @@ -45,9 +45,6 @@ typedef struct CPUMoxieState {
+>
+>      /* Fields up to this point are cleared by a CPU reset */
+>      struct {} end_reset_fields;
+> -
+> -    CPU_COMMON
+> -
+>  } CPUMoxieState;
+>
+>  #include "qom/cpu.h"
+> diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
+> index cd06a2ef41..75ea964632 100644
+> --- a/target/nios2/cpu.h
+> +++ b/target/nios2/cpu.h
+> @@ -166,8 +166,6 @@ struct CPUNios2State {
+>
+>      uint32_t irq_pending;
+>  #endif
+> -
+> -    CPU_COMMON
 >  };
 >
-> +/* We expect to use a 16-bit negative offset from ENV.  */
-> +QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) > 0);
-> +QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) < -32768);
-> +
->  /* Perform the TLB load and compare.  Places the result of the comparison
->     in CR7, loads the addend of the TLB into R3, and returns the register
->     containing the guest address (zero-extended into R4).  Clobbers R0 and R2. */
-> @@ -1509,31 +1513,15 @@ static TCGReg tcg_out_tlb_read(TCGContext *s, TCGMemOp opc,
->          = (is_read
->             ? offsetof(CPUTLBEntry, addr_read)
->             : offsetof(CPUTLBEntry, addr_write));
-> -    int mask_off = offsetof(CPUArchState, tlb_.f[mem_index].mask);
-> -    int table_off = offsetof(CPUArchState, tlb_.f[mem_index].table);
-> -    TCGReg mask_base = TCG_AREG0, table_base = TCG_AREG0;
-> +    int fast_off = TLB_MASK_TABLE_OFS(mem_index);
-> +    int mask_off = fast_off + offsetof(CPUTLBDescFast, mask);
-> +    int table_off = fast_off + offsetof(CPUTLBDescFast, table);
->      unsigned s_bits = opc & MO_SIZE;
->      unsigned a_bits = get_alignment_bits(opc);
+>  /**
+> diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+> index e1acd48652..e3ffa618c9 100644
+> --- a/target/openrisc/cpu.h
+> +++ b/target/openrisc/cpu.h
+> @@ -286,8 +286,6 @@ typedef struct CPUOpenRISCState {
+>      /* Fields up to this point are cleared by a CPU reset */
+>      struct {} end_reset_fields;
 >
-> -    if (table_off > 0x7fff) {
-> -        int mask_hi = mask_off - (int16_t)mask_off;
-> -        int table_hi = table_off - (int16_t)table_off;
+> -    CPU_COMMON
 > -
-> -        table_base = TCG_REG_R4;
-> -        if (mask_hi == table_hi) {
-> -            mask_base = table_base;
-> -        } else if (mask_hi) {
-> -            mask_base = TCG_REG_R3;
-> -            tcg_out32(s, ADDIS | TAI(mask_base, TCG_AREG0, mask_hi >> 16));
-> -        }
-> -        tcg_out32(s, ADDIS | TAI(table_base, TCG_AREG0, table_hi >> 16));
-> -        mask_off -= mask_hi;
-> -        table_off -= table_hi;
-> -    }
+>      /* Fields from here on are preserved across CPU reset. */
+>      uint32_t cpucfgr;         /* CPU configure register */
+>
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index bb57496212..bbc8eb0cfc 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -999,8 +999,6 @@ struct CPUPPCState {
+>      /* when a memory exception occurs, the access type is stored here */
+>      int access_type;
+>
+> -    CPU_COMMON
 > -
->      /* Load tlb_mask[mmu_idx] and tlb_table[mmu_idx].  */
-> -    tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_R3, mask_base, mask_off);
-> -    tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_R4, table_base, table_off);
-> +    tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_R3, TCG_AREG0, mask_off);
-> +    tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_R4, TCG_AREG0, table_off);
+>      /* MMU context - only relevant for full system emulation */
+>  #if !defined(CONFIG_USER_ONLY)
+>  #if defined(TARGET_PPC64)
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index 30a01e8386..7086b336c6 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -169,10 +169,6 @@ struct CPURISCVState {
 >
->      /* Extract the page index, shifted into place for tlb index.  */
->      if (TCG_TARGET_REG_BITS == 32) {
-> diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
-> index 85acbb9514..029d9a0fb2 100644
-> --- a/tcg/riscv/tcg-target.inc.c
-> +++ b/tcg/riscv/tcg-target.inc.c
-> @@ -961,6 +961,10 @@ static void * const qemu_st_helpers[16] = {
->  /* We don't support oversize guests */
->  QEMU_BUILD_BUG_ON(TCG_TARGET_REG_BITS < TARGET_LONG_BITS);
+>      float_status fp_status;
 >
-> +/* We expect to use a 12-bit negative offset from ENV.  */
-> +QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) > 0);
-> +QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) < -(1 << 11));
-> +
->  static void tcg_out_tlb_load(TCGContext *s, TCGReg addrl,
->                               TCGReg addrh, TCGMemOpIdx oi,
->                               tcg_insn_unit **label_ptr, bool is_load)
-> @@ -970,32 +974,11 @@ static void tcg_out_tlb_load(TCGContext *s, TCGReg addrl,
->      unsigned a_bits = get_alignment_bits(opc);
->      tcg_target_long compare_mask;
->      int mem_index = get_mmuidx(oi);
-> -    int mask_off, table_off;
-> +    int fast_ofs = TLB_MASK_TABLE_OFS(mem_index);
-> +    int mask_ofs = fast_ofs + offsetof(CPUTLBDescFast, mask);
-> +    int table_ofs = fast_ofs + offsetof(CPUTLBDescFast, table);
->      TCGReg mask_base = TCG_AREG0, table_base = TCG_AREG0;
->
-> -    mask_off = offsetof(CPUArchState, tlb_.f[mem_index].mask);
-> -    table_off = offsetof(CPUArchState, tlb_.f[mem_index].table);
-> -    if (table_off > 0x7ff) {
-> -        int mask_hi = mask_off - sextreg(mask_off, 0, 12);
-> -        int table_hi = table_off - sextreg(table_off, 0, 12);
+> -    /* QEMU */
+> -    CPU_COMMON
 > -
-> -        if (likely(mask_hi == table_hi)) {
-> -            mask_base = table_base = TCG_REG_TMP1;
-> -            tcg_out_opc_upper(s, OPC_LUI, mask_base, mask_hi);
-> -            tcg_out_opc_reg(s, OPC_ADD, mask_base, mask_base, TCG_AREG0);
-> -            mask_off -= mask_hi;
-> -            table_off -= mask_hi;
-> -        } else {
-> -            mask_base = TCG_REG_TMP0;
-> -            table_base = TCG_REG_TMP1;
-> -            tcg_out_opc_upper(s, OPC_LUI, mask_base, mask_hi);
-> -            tcg_out_opc_reg(s, OPC_ADD, mask_base, mask_base, TCG_AREG0);
-> -            table_off -= mask_off;
-> -            mask_off -= mask_hi;
-> -            tcg_out_opc_imm(s, OPC_ADDI, table_base, mask_base, mask_off);
-> -        }
-> -    }
+> -    /* Fields from here on are preserved across CPU reset. */
+>      QEMUTimer *timer; /* Internal timer */
+>  };
+>
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index ebcf7863e4..17d54f9587 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -114,8 +114,6 @@ struct CPUS390XState {
+>      /* Fields up to this point are cleared by a CPU reset */
+>      struct {} end_reset_fields;
+>
+> -    CPU_COMMON
 > -
->      tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_TMP0, mask_base, mask_off);
->      tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_TMP1, table_base, table_off);
+>  #if !defined(CONFIG_USER_ONLY)
+>      uint32_t core_id; /* PoP "CPU address", same as cpu_index */
+>      uint64_t cpuid;
+> diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
+> index 944854dbe0..974d46aae1 100644
+> --- a/target/sh4/cpu.h
+> +++ b/target/sh4/cpu.h
+> @@ -179,8 +179,6 @@ typedef struct CPUSH4State {
+>      /* Fields up to this point are cleared by a CPU reset */
+>      struct {} end_reset_fields;
 >
-> diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
-> index 1f578ea980..0ce129a369 100644
-> --- a/tcg/s390/tcg-target.inc.c
-> +++ b/tcg/s390/tcg-target.inc.c
-> @@ -1537,9 +1537,9 @@ static void tcg_out_qemu_st_direct(TCGContext *s, TCGMemOp opc, TCGReg data,
->  #if defined(CONFIG_SOFTMMU)
->  #include "tcg-ldst.inc.c"
->
-> -/* We're expecting to use a 20-bit signed offset on the tlb memory ops.  */
-> -QEMU_BUILD_BUG_ON(offsetof(CPUArchState, tlb_.f[NB_MMU_MODES - 1].table)
-> -                  > 0x7ffff);
-> +/* We're expecting to use a 20-bit negative offset on the tlb memory ops.  */
-> +QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) > 0);
-> +QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) < -(1 << 19));
->
->  /* Load and compare a TLB entry, leaving the flags set.  Loads the TLB
->     addend into R2.  Returns a register with the santitized guest address.  */
-> @@ -1550,8 +1550,9 @@ static TCGReg tcg_out_tlb_read(TCGContext* s, TCGReg addr_reg, TCGMemOp opc,
->      unsigned a_bits = get_alignment_bits(opc);
->      unsigned s_mask = (1 << s_bits) - 1;
->      unsigned a_mask = (1 << a_bits) - 1;
-> -    int mask_off = offsetof(CPUArchState, tlb_.f[mem_index].mask);
-> -    int table_off = offsetof(CPUArchState, tlb_.f[mem_index].table);
-> +    int fast_off = TLB_MASK_TABLE_OFS(mem_index);
-> +    int mask_off = fast_off + offsetof(CPUTLBDescFast, mask);
-> +    int table_off = fast_off + offsetof(CPUTLBDescFast, table);
->      int ofs, a_off;
->      uint64_t tlb_mask;
->
-> diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
-> index be10124e11..fe7524a802 100644
-> --- a/tcg/sparc/tcg-target.inc.c
-> +++ b/tcg/sparc/tcg-target.inc.c
-> @@ -1061,6 +1061,11 @@ static void tcg_out_nop_fill(tcg_insn_unit *p, int count)
->  }
->
->  #if defined(CONFIG_SOFTMMU)
-> +
-> +/* We expect to use a 13-bit negative offset from ENV.  */
-> +QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) > 0);
-> +QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) < -(1 << 12));
-> +
->  /* Perform the TLB load and compare.
->
->     Inputs:
-> @@ -1077,9 +1082,9 @@ static void tcg_out_nop_fill(tcg_insn_unit *p, int count)
->  static TCGReg tcg_out_tlb_load(TCGContext *s, TCGReg addr, int mem_index,
->                                 TCGMemOp opc, int which)
->  {
-> -    int mask_off = offsetof(CPUArchState, tlb_.f[mem_index].mask);
-> -    int table_off = offsetof(CPUArchState, tlb_.f[mem_index].table);
-> -    TCGReg base = TCG_AREG0;
-> +    int fast_off = TLB_MASK_TABLE_OFS(mem_index);
-> +    int mask_off = fast_off + offsetof(CPUTLBDescFast, mask);
-> +    int table_off = fast_off + offsetof(CPUTLBDescFast, table);
->      const TCGReg r0 = TCG_REG_O0;
->      const TCGReg r1 = TCG_REG_O1;
->      const TCGReg r2 = TCG_REG_O2;
-> @@ -1087,26 +1092,9 @@ static TCGReg tcg_out_tlb_load(TCGContext *s, TCGReg addr, int mem_index,
->      unsigned a_bits = get_alignment_bits(opc);
->      tcg_target_long compare_mask;
->
-> -    if (!check_fit_i32(table_off, 13)) {
-> -        int table_hi;
+> -    CPU_COMMON
 > -
-> -        base = r1;
-> -        if (table_off <= 2 * 0xfff) {
-> -            table_hi = 0xfff;
-> -            tcg_out_arithi(s, base, TCG_AREG0, table_hi, ARITH_ADD);
-> -        } else {
-> -            table_hi = table_off & ~0x3ff;
-> -            tcg_out_sethi(s, base, table_hi);
-> -            tcg_out_arith(s, base, TCG_AREG0, base, ARITH_ADD);
-> -        }
-> -        mask_off -= table_hi;
-> -        table_off -= table_hi;
-> -        tcg_debug_assert(check_fit_i32(mask_off, 13));
-> -    }
-> -
->      /* Load tlb_mask[mmu_idx] and tlb_table[mmu_idx].  */
-> -    tcg_out_ld(s, TCG_TYPE_PTR, r0, base, mask_off);
-> -    tcg_out_ld(s, TCG_TYPE_PTR, r1, base, table_off);
-> +    tcg_out_ld(s, TCG_TYPE_PTR, r0, TCG_AREG0, mask_off);
-> +    tcg_out_ld(s, TCG_TYPE_PTR, r1, TCG_AREG0, table_off);
+>      /* Fields from here on are preserved over CPU reset. */
+>      int id;                    /* CPU model */
 >
->      /* Extract the page index, shifted into place for tlb index.  */
->      tcg_out_arithi(s, r2, addr, TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS,
+> diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+> index ae9ac07a9d..69e2199569 100644
+> --- a/target/sparc/cpu.h
+> +++ b/target/sparc/cpu.h
+> @@ -446,8 +446,6 @@ struct CPUSPARCState {
+>      /* Fields up to this point are cleared by a CPU reset */
+>      struct {} end_reset_fields;
+>
+> -    CPU_COMMON
+> -
+>      /* Fields from here on are preserved across CPU reset. */
+>      target_ulong version;
+>      uint32_t nwindows;
+> diff --git a/target/tilegx/cpu.h b/target/tilegx/cpu.h
+> index deb3e836ea..c2acb43c2b 100644
+> --- a/target/tilegx/cpu.h
+> +++ b/target/tilegx/cpu.h
+> @@ -93,8 +93,6 @@ typedef struct CPUTLGState {
+>
+>      /* Fields up to this point are cleared by a CPU reset */
+>      struct {} end_reset_fields;
+> -
+> -    CPU_COMMON
+>  } CPUTLGState;
+>
+>  #include "qom/cpu.h"
+> diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
+> index 43ef29b6bd..9fe501f98f 100644
+> --- a/target/tricore/cpu.h
+> +++ b/target/tricore/cpu.h
+> @@ -184,8 +184,6 @@ struct CPUTriCoreState {
+>      int error_code;
+>      uint32_t hflags;    /* CPU State */
+>
+> -    CPU_COMMON
+> -
+>      /* Internal CPU feature flags.  */
+>      uint64_t features;
+>
+> diff --git a/target/unicore32/cpu.h b/target/unicore32/cpu.h
+> index 140c590ec1..1ae0d78f4f 100644
+> --- a/target/unicore32/cpu.h
+> +++ b/target/unicore32/cpu.h
+> @@ -55,8 +55,6 @@ typedef struct CPUUniCore32State {
+>          float_status fp_status;
+>      } ucf64;
+>
+> -    CPU_COMMON
+> -
+>      /* Internal CPU feature flags.  */
+>      uint32_t features;
+>
+> diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+> index 1bbb839bed..4e289dfa6e 100644
+> --- a/target/xtensa/cpu.h
+> +++ b/target/xtensa/cpu.h
+> @@ -511,8 +511,6 @@ typedef struct CPUXtensaState {
+>
+>      /* Watchpoints for DBREAK registers */
+>      struct CPUWatchpoint *cpu_watchpoint[MAX_NDBREAK];
+> -
+> -    CPU_COMMON
+>  } CPUXtensaState;
+>
+>  /**
 > --
 > 2.17.1
 >
