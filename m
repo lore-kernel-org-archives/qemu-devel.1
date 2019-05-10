@@ -2,90 +2,75 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 286CEC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:37:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B996CC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:40:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D724E2175B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:37:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CG4Mp6TW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D724E2175B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8EDE92175B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:40:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EDE92175B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40838 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40852 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP2uM-0002SZ-Sk
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 06:37:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57985)
+	id 1hP2we-0003ts-Sl
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 06:40:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hP2tJ-0001mi-Tz
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:36:39 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hP2vh-0003Qz-J2
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:39:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hP2tI-00009m-In
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:36:37 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:32908)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hP2tI-00007p-C0
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:36:36 -0400
-Received: by mail-wm1-x342.google.com with SMTP id c66so1008540wme.0
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 03:36:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=zL0HfdXj5UJR09d/1wah2l7x4DyuET1nQE6879mt9wk=;
-	b=CG4Mp6TW2M0u9KhdxDQkGFrt2/plWl2x2S+8LfF06nxwCHQsj6fIjGh+I4gKI9p+LW
-	fij84Hj7VgPW7DJ8pP+r1zF1YCZLP8+EJSaoHA/JY4UYjbl/Uj9YjJ589yYhNKY5upS4
-	3ocNhtLIahxK2Q9twKMgB9dLT0P6gBed1f+d94c6M8qTMcWamOHkKr/ceba0AOfNt8OD
-	ECzE4jqhlxjv1+WOoFbIVJDfc/RaF0tQWez9/SFOQh7Viyb5xaPOSGfAxuiC8lW3UHuw
-	N/9NOlp7DgexYUTaNum7D028Dmh8Jphf1aJGbSbV10SA+9T5G7+Il4O8VQMEBkrBFNoH
-	W0AQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=zL0HfdXj5UJR09d/1wah2l7x4DyuET1nQE6879mt9wk=;
-	b=lt3NKOOsa9KZiJ73/UQSRkSjV7xEVOjIrHGnI1QLZRcKHZVGmDO07Ais2jD2Q84E8Z
-	mZEyRMKCgDKZOAtFCAoDrrTbtPR+6IRdN5N/vAZ8sbkVz5fMO4GUdKt2k1eEI/EbOaUL
-	QgFIMei40c2OvUAQbitFmykqi+LUKYeG3IoEWzVbtap95xzg9HRv55/3cC0lZE7QErfV
-	C3VrRSoOQyxsBw1qGd8H0R9f6EXuRxeVU0iz8HxRogUMR4d0MsTr2/9gyIAoIZOY6kQW
-	XMTydDjBZ/j2bDoQECxGNn8qPmFRBNkE1QgZP43u1jb0edZ+XdDIYcBCPBDBwKQe7erO
-	wefg==
-X-Gm-Message-State: APjAAAUPV1H6k0HIHow6GOpY14vD6aR4A5OuGwuOgANPe3+oA25Bw7TS
-	NRSEf/nFwyarJMAMTky/ZYOgSg==
-X-Google-Smtp-Source: APXvYqw7UEYAklpnSjb3qTOoVC5Vbju3Pnn1a8MvbyEYSA7n+A2OK9o8n9FWzLOO3/qC/X7C+3VBJQ==
-X-Received: by 2002:a1c:e144:: with SMTP id y65mr6363416wmg.147.1557484594980; 
-	Fri, 10 May 2019 03:36:34 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	q26sm4656151wmq.25.2019.05.10.03.36.34
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 10 May 2019 03:36:34 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id AFD4D1FF87;
-	Fri, 10 May 2019 11:36:33 +0100 (BST)
-References: <20190430165234.32272-1-alex.bennee@linaro.org>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190430165234.32272-1-alex.bennee@linaro.org>
-Date: Fri, 10 May 2019 11:36:33 +0100
-Message-ID: <87muju4mvi.fsf@zen.linaroharston>
+	(envelope-from <kraxel@redhat.com>) id 1hP2vg-0003yy-Lb
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:39:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60825)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hP2vg-0003wK-Dr
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:39:04 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 90E0AC05001C;
+	Fri, 10 May 2019 10:39:02 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
+	[10.36.117.74])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 47E2F1001E81;
+	Fri, 10 May 2019 10:39:02 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id 0C86BA1E1; Fri, 10 May 2019 12:39:01 +0200 (CEST)
+Date: Fri, 10 May 2019 12:39:00 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <20190510103900.botgnbbo2ii4jxgo@sirius.home.kraxel.org>
+References: <CABSdmrnNW6f=P64PviPP8CTJ5SVfYS8_6kmAtpw9yPObTEkpxg@mail.gmail.com>
+	<CABSdmrnocrqLKWncgy_Lak33__GRPYfs-RzSA14e=vh4cRn2ag@mail.gmail.com>
+	<20190509064848.wjhchsfov7q6komj@sirius.home.kraxel.org>
+	<CABSdmrmm+wJ=+Ccav=X5Gw_oueQvPRejCWVG2SQeCw=K4BM9EA@mail.gmail.com>
+	<CABSdmrndpONH_fVHbktHbBXvXPKESeRfis06TjrNRRfBpJzXLA@mail.gmail.com>
+	<b6064b77-5ca4-03e1-80ef-027313096cb2@gmail.com>
+	<CABSdmrkW6G23ZGDA7iLucM45vL0HHGsr2F76H0Mf8S0xkhPnsQ@mail.gmail.com>
+	<3e619b5c-8fb3-2655-2d92-37598db098d8@gmail.com>
+	<20190510085947.y62lttdtrg5cxx6b@sirius.home.kraxel.org>
+	<3fb8b79d-9f68-2342-d3ae-3aefa873109b@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <3fb8b79d-9f68-2342-d3ae-3aefa873109b@gmail.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.31]);
+	Fri, 10 May 2019 10:39:02 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v5 00/15] demacro softmmu (plus
- tests/coverage)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/3] ramfb enhancement
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,144 +82,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, mark.cave-ayland@ilande.co.uk, cota@braap.org
+Cc: Hou Qiming <hqm03ster@gmail.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, May 10, 2019 at 12:20:56PM +0300, Marcel Apfelbaum wrote:
+> Hi Gerd,
+>=20
+> On 5/10/19 11:59 AM, Gerd Hoffmann wrote:
+> >    Hi,
+> >=20
+> > > Got it, thanks. Is a pity ramfb is not a PCI device :), it was wort=
+h the
+> > > question anyway.
+> > If you look for a simple pci display device check out bochs-display.
+> > It's simliar to stdvga (so ovmf and bochs-drm.ko can drive it just
+> > fine), but without legacy vga emulation, only a linear framebuffer is
+> > supported.  And code size is a fraction of stdvga ...
+>=20
+> I actually need the ramfb display in conjunction with kvmgt.
+>=20
+> I want to be able to save the VM state to disk, which is actually a kin=
+d
+> of 'live migration' as far as I understand, but live-migration can't wo=
+rk
+> since
+> we use device assignment=A0 (vfio-pci-nohotplug device).
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+vfio live migration is being worked on btw.
 
-> Hi,
->
-> This is the latest iteration of the softmmu demacro series. The main
-> changes from the last submission are some updates from Richard.
+> I was hoping to be able to hot-unplug/hot-plug the vfio device,
+> but as the name suggests, can't do so since
+> the ramfb display uses fw-config to pass the configuration to firmware.
 
-Ping Emilio/Mark
+Yes, fw_cfg files can't be hotplugged, that is where this restriction
+comes from.
 
-Would you be able to re-run your tests to check there are no other
-regressions? I can then get the PR prepared for merging ;-)
+> How hard/possible is to make ramfb display a PCI device and move the
+> configuration from fw-config to PCI configuration space?
 
-> Some
-> are merged into the main demacro patch (mostly casting cleanups) and
-> then a series of 3 patches to out of line some of the less hot code to
-> keep the main access functions a reasonable size. For example:
->
->   readelf -s aarch64-softmmu/accel/tcg/cputlb.o | ag helper |\
->     ag -v atomic | ag mmu | tr -s ' ' | cut -d ' ' -f 4,9 | sort -n
->
-> Before:
->
->   16 helper_be_ldsl_mmu
->   16 helper_le_ldsl_mmu
->   18 helper_be_ldsw_mmu
->   18 helper_le_ldsw_mmu
->   18 helper_ret_ldsb_mmu
->   535 helper_ret_ldub_mmu
->   556 helper_ret_ldb_cmmu
->   586 helper_ret_stb_mmu
->   679 helper_le_ldul_mmu
->   681 helper_be_ldul_mmu
->   685 helper_le_ldq_mmu
->   688 helper_be_ldq_mmu
->   688 helper_le_lduw_mmu
->   693 helper_le_ldl_cmmu
->   701 helper_le_ldq_cmmu
->   701 helper_le_ldw_cmmu
->   703 helper_be_ldl_cmmu
->   704 helper_be_ldq_cmmu
->   708 helper_be_lduw_mmu
->   713 helper_be_ldw_cmmu
->   943 helper_le_stw_mmu
->   944 helper_le_stl_mmu
->   952 helper_be_stl_mmu
->   952 helper_le_stq_mmu
->   959 helper_be_stw_mmu
->   960 helper_be_stq_mmu
->
-> After:
->
->   5 helper_be_ldul_mmu
->   5 helper_be_lduw_mmu
->   5 helper_le_ldul_mmu
->   5 helper_le_lduw_mmu
->   5 helper_ret_ldub_mmu
->   14 helper_be_ldl_cmmu
->   14 helper_be_ldw_cmmu
->   14 helper_le_ldl_cmmu
->   14 helper_le_ldw_cmmu
->   16 helper_be_ldsl_mmu
->   16 helper_le_ldsl_mmu
->   18 helper_be_ldsw_mmu
->   18 helper_le_ldsw_mmu
->   18 helper_ret_ldsb_mmu
->   783 helper_ret_stb_mmu
->   785 helper_ret_ldb_cmmu
->   881 helper_be_ldq_mmu
->   881 helper_le_ldq_mmu
->   889 helper_le_ldq_cmmu
->   897 helper_be_ldq_cmmu
->   1150 helper_be_stw_mmu
->   1150 helper_le_stw_mmu
->   1151 helper_be_stq_mmu
->   1151 helper_le_stl_mmu
->   1151 helper_le_stq_mmu
->   1159 helper_be_stl_mmu
->
-> I've also moved the existing system memory test and made it multiarch
-> and added the bootstrapping for aarch64 system tests. I would like to
-> add support for Big Endian as well but I didn't want to delay the
-> posting of the series. It would also be nice to exercise the
-> ioread/write paths and other handling but I leave this as an exercise
-> for later.
->
-> There are also some minor tweaks for the code coverage reports now I'm
-> running with out-of-tree builds.
->
-> Alex Benn=C3=A9e (11):
->   tests/tcg/multiarch: add support for multiarch system tests
->   tests/tcg/multiarch: add hello world system test
->   tests/tcg/aarch64: add system boot.S
->   tests/tcg/multiarch: move the system memory test
->   tests/tcg/minilib: support %c format char
->   tests/tcg/multiarch: expand system memory test to cover more
->   accel/tcg: demacro cputlb
->   accel/tcg: remove softmmu_template.h
->   Makefile: fix coverage-report reference to BUILD_DIR
->   Makefile: include per-target build directories in coverage report
->   Makefile.target: support per-target coverage reports
->
-> Richard Henderson (4):
->   cputlb: Move TLB_RECHECK handling into load/store_helper
->   cputlb: Drop attribute flatten
->   cputlb: Do unaligned load recursion to outermost function
->   cputlb: Do unaligned store recursion to outermost function
->
->  Makefile                                      |   4 +-
->  Makefile.target                               |  16 +
->  accel/tcg/cputlb.c                            | 626 +++++++++++++++---
->  accel/tcg/softmmu_template.h                  | 454 -------------
->  tests/tcg/Makefile                            |   1 +
->  tests/tcg/aarch64/Makefile.softmmu-target     |  32 +
->  tests/tcg/aarch64/system/boot.S               | 200 ++++++
->  tests/tcg/aarch64/system/kernel.ld            |  22 +
->  tests/tcg/i386/Makefile.softmmu-target        |   2 +-
->  tests/tcg/i386/system/memory.c                | 243 -------
->  tests/tcg/minilib/printf.c                    |   6 +-
->  .../multiarch/system/Makefile.softmmu-target  |  14 +
->  tests/tcg/{i386 =3D> multiarch}/system/hello.c  |   0
->  tests/tcg/multiarch/system/memory.c           | 427 ++++++++++++
->  14 files changed, 1267 insertions(+), 780 deletions(-)
->  delete mode 100644 accel/tcg/softmmu_template.h
->  create mode 100644 tests/tcg/aarch64/Makefile.softmmu-target
->  create mode 100644 tests/tcg/aarch64/system/boot.S
->  create mode 100644 tests/tcg/aarch64/system/kernel.ld
->  delete mode 100644 tests/tcg/i386/system/memory.c
->  create mode 100644 tests/tcg/multiarch/system/Makefile.softmmu-target
->  rename tests/tcg/{i386 =3D> multiarch}/system/hello.c (100%)
->  create mode 100644 tests/tcg/multiarch/system/memory.c
+Well, the whole point of using ramfb is that it is *not* a pci device,
+but something you can attach to other devices as boot display.  Right
+now we have that for vfio only, in theory it can likewise be done for
+virtio (so you can use virtio-ramfb instead of virtio-vga for bios
+display support).  Prototype exists.  Given that OVMF has a full
+virtio-gpu driver there isn't much need for that though ...
 
+Piggyback on the pci config space of the device you are attaching ramfb
+to isn't going to work very well for unknown devices (i.e. vfio case).
+For virtio it would have worked without too much trouble probably, using
+a vendor capability to grab some register space.
 
---
-Alex Benn=C3=A9e
+For a separate pci device you can just use bochs-display.  Maybe add
+some logic for the automagic display switching (i.e. if vfio has a valid
+framebuffer use that and bochs-display otherwise).
+
+cheers,
+  Gerd
+
 
