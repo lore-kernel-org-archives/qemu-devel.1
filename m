@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B78B0C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:48:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D40A8C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:49:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B6A520881
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:48:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 993F620881
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:49:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="syE0Tz9z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B6A520881
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cqQhDXCI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 993F620881
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49725 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49738 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hPCRF-0006bZ-7U
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 16:48:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40893)
+	id 1hPCSS-0007Fc-Pq
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 16:49:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hPCQ2-0005dH-VR
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:47:04 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hPCR6-0006ea-JH
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:48:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hPCQ0-0005ue-ST
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:47:02 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:43586)
+	(envelope-from <alistair23@gmail.com>) id 1hPCR5-0007bW-GU
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:48:08 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:47099)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hPCQ0-0005r1-GZ; Fri, 10 May 2019 16:47:00 -0400
-Received: by mail-lf1-x142.google.com with SMTP id u27so5040135lfg.10;
-	Fri, 10 May 2019 13:46:59 -0700 (PDT)
+	id 1hPCR5-0007Zv-8c; Fri, 10 May 2019 16:48:07 -0400
+Received: by mail-lj1-x244.google.com with SMTP id h21so4433503ljk.13;
+	Fri, 10 May 2019 13:48:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
 	:cc:content-transfer-encoding;
-	bh=UVkrA+yZxM5eUicTpGAnPTCbWprivFcVAHXVqoYE3mc=;
-	b=syE0Tz9z1g4pJwVwOEMKONGAunATkQVmld6EMuWakiiR75vAo6W7B6wBMgqO89sgLO
-	3DWrA1GaSVflZAsl/4AYC98UF/Zv1xZ4IR6sP7HmoWBDZcwRiyO91X2W2r5pdgdoFayN
-	BRHKIQ2YvWitKOfmIyCJLXp3hMxtYRo4EGDqtYZdASjyCrhSRTqSfbg/UWkoJ9wYIunZ
-	a1x9eC/ep5obCjgXFRy6G1SJVpyym87IKemlG1hp0/7pw9ckKuO3yP+jiDJ1FH+gx/3W
-	t3ISwQfGjCLQ+282AAa/OEEANnOyTYnUNwQLC8yffLTz8cf45dfU7J7KCXOlwVch9u+s
-	pkqQ==
+	bh=FmDjixwQhU9nkAwdFYTF0HykPupEcoXYxwdLuzkmB/Y=;
+	b=cqQhDXCImzNGI3rqG2tXUcys/pr0wnOoOQWiaOh8AR+lQud29R/gm8C3JYwbeP0C7p
+	jeghWOIAnlL3uijgXot+n3KJbj+x+1queuKq5miPQ6xUCuCPLrkjcQGM4gUNX9Ki3z0N
+	FR6HXqjiW4t7NfDxfhnGh531+7JP5i1u6qcgaSJw6VuuykEmBFvQ/y0R247xZFeX4CRN
+	pC8XiBCyGC2B0IkreGkBV82kkN5agssKQh44GWt3ATC4Fh+g2Ank+HEePOJmNzcW4v3B
+	R6quVHwAnBU4QZ3IHZsPQmilTmVX8K8qFJFuNqDL5fW5nt3ZNN124tOrkYMpiqEacPrh
+	nPpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=UVkrA+yZxM5eUicTpGAnPTCbWprivFcVAHXVqoYE3mc=;
-	b=ZZoJviEg+/OP0cuCvxSLISzToc6xmbRwQd2mU52TgVUzZlUb8KI4BATfS3JqjqMCOa
-	OFwdMGpHvi06tCAruUCzs3Ils1Uh6rZXnSDa9pTS04JBoWzG2LPBvM0GvQfkM5JBfdvh
-	0OCgoQ0BuFAZ39swLK8h7NbYfPBIAu/lnL8vqwAq9XcruWvpb1SG60o0YmWzUHYDhCLM
-	SSy2VTfK6O4nTJbikQHlq0aTwfc8+Y6vonJm3ehBYoTVXpy5JJm83M8zEfdm7m7ZWut+
-	gNEmOPLcW/IUCSqLbEbS5hYyc3nQ8wSyODfPDnMXsTIHJwjeF9q+vvzT/fQqRj6DVjf9
-	VEJw==
-X-Gm-Message-State: APjAAAVitfdrpS91TCbagj08D7HLn7TDwL/Z52WX5PSmaE7mrr09INSb
-	Y7GZJRnq3kL9bPbQNWjp79tdvmYgbiX+XzxrE3Q=
-X-Google-Smtp-Source: APXvYqyyM1sv+ziTBT6YP5BcoOgRwbe5tsrzXPN4G4vwt5RUWZ6TXABVzlyGkzn5Qaz4mG6n3b+Uc47xcjrhMBnzq1Q=
-X-Received: by 2002:a19:a40f:: with SMTP id q15mr6529493lfc.121.1557521218123; 
-	Fri, 10 May 2019 13:46:58 -0700 (PDT)
+	bh=FmDjixwQhU9nkAwdFYTF0HykPupEcoXYxwdLuzkmB/Y=;
+	b=NYXMnJB6GzEPeBw9nDznX6J10F0FavxSDaLklUDxpE1RmuiSFYOyWK0wR8+4+kToU0
+	xx1XZPMq2CH2U9JayLo17qe33v6RMSTIsJr1Hxea2EmyuCs5+fJp/ohBlaDo1z5PLuIB
+	TgkojZFzYSjzxjMWAeicBMI03oNajk2qzY6q9TZFUou1K+rncJoGxbgVhvvCayvqvkgn
+	fgEnoptVU+oLJc4hULs5U+Feaf8JgW8AuR7mAbIXduB51IvDONXua9D8FWt1MgZ62ZWW
+	TuKh5BSlL+SKaSVgBGMdqNYz8Sjnl+GhmJjfJW24czxiNt69U6D3Uh0xAGBtREk6vzYU
+	nbzw==
+X-Gm-Message-State: APjAAAX8F4Awk9AxnfHgDW8eseU+noGG7kVEgT9MhUjf6TafOcVW2hI4
+	0ImFq024wQ4aj0SMBWZvG0IuFTeZ8FRtH7tWnMQ=
+X-Google-Smtp-Source: APXvYqxNKWSH8odmyb90sq2BvG5zvGKL40SrEJ/j2P39JPOGt9uyYVicJ0uddXPQRc24gKe1FAolwgmeVj/I33DHFUk=
+X-Received: by 2002:a2e:9c89:: with SMTP id x9mr6997593lji.28.1557521285772;
+	Fri, 10 May 2019 13:48:05 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190507163416.24647-1-philmd@redhat.com>
-	<20190507163416.24647-9-philmd@redhat.com>
-In-Reply-To: <20190507163416.24647-9-philmd@redhat.com>
+	<20190507163416.24647-12-philmd@redhat.com>
+In-Reply-To: <20190507163416.24647-12-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 10 May 2019 13:44:49 -0700
-Message-ID: <CAKmqyKOSDqLz-nPB17jk+03ZwLnhU0aiEixtj3RT_aJH8uuDQw@mail.gmail.com>
+Date: Fri, 10 May 2019 13:45:57 -0700
+Message-ID: <CAKmqyKPnBM-Xoty5P8=FHgyhSqMU4no3B08FkQeJjVNTuHkrzw@mail.gmail.com>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::142
-Subject: Re: [Qemu-devel] [PATCH v2 08/16] hw/arm: Use
- object_initialize_child for correct reference counting
+X-Received-From: 2a00:1450:4864:20::244
+Subject: Re: [Qemu-devel] [PATCH v2 11/16] hw/microblaze/zynqmp: Move the
+ IPI state into the PMUSoC state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -114,99 +114,17 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 7, 2019 at 9:47 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+On Tue, May 7, 2019 at 9:43 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
 om> wrote:
 >
-> As explained in commit aff39be0ed97:
+> The Inter Processor Interrupt is a block part of the SoC, not the
+> "machine" (talking about machine is borderline with the PMU, since
+> it is embedded into the ZynqMP SoC, but currentl QEMU doesn't
+> support multi-arch cores).
 >
->   Both functions, object_initialize() and object_property_add_child()
->   increase the reference counter of the new object, so one of the
->   references has to be dropped afterwards to get the reference
->   counting right. Otherwise the child object will not be properly
->   cleaned up when the parent gets destroyed.
->   Thus let's use now object_initialize_child() instead to get the
->   reference counting here right.
+> Move the IPI state to the SoC state, this will simplify the review
+> of the next patch.
 >
-> This patch was generated using the following Coccinelle script
-> (with a bit of manual fix-up for overly long lines):
->
->  @use_object_initialize_child@
->  expression parent_obj;
->  expression child_ptr;
->  expression child_name;
->  expression child_type;
->  expression child_size;
->  expression errp;
->  @@
->  (
->  -   object_initialize(child_ptr, child_size, child_type);
->  +   object_initialize_child(parent_obj, child_name,  child_ptr, child_si=
-ze,
->  +                           child_type, &error_abort, NULL);
->      ... when !=3D parent_obj
->  -   object_property_add_child(parent_obj, child_name, OBJECT(child_ptr),=
- NULL);
->      ...
->  ?-  object_unref(OBJECT(child_ptr));
->  |
->  -   object_initialize(child_ptr, child_size, child_type);
->  +   object_initialize_child(parent_obj, child_name,  child_ptr, child_si=
-ze,
->  +                            child_type, errp, NULL);
->      ... when !=3D parent_obj
->  -   object_property_add_child(parent_obj, child_name, OBJECT(child_ptr),=
- errp);
->      ...
->  ?-  object_unref(OBJECT(child_ptr));
->  )
->
->  @use_sysbus_init_child_obj@
->  expression parent_obj;
->  expression dev;
->  expression child_ptr;
->  expression child_name;
->  expression child_type;
->  expression child_size;
->  expression errp;
->  @@
->  (
->  -   object_initialize_child(parent_obj, child_name, child_ptr, child_siz=
-e,
->  -                           child_type, errp, NULL);
->  +   sysbus_init_child_obj(parent_obj, child_name, child_ptr, child_size,
->  +                         child_type);
->      ...
->  -   qdev_set_parent_bus(DEVICE(child_ptr), sysbus_get_default());
->  |
->  -   object_initialize_child(parent_obj, child_name, child_ptr, child_siz=
-e,
->  -                           child_type, errp, NULL);
->  +   sysbus_init_child_obj(parent_obj, child_name, child_ptr, child_size,
->  +                         child_type);
->  -   dev =3D DEVICE(child_ptr);
->  -   qdev_set_parent_bus(dev, sysbus_get_default());
->  )
->
-> While the object_initialize() function doesn't take an
-> 'Error *errp' argument, the object_initialize_child() does.
-> Since this code is used when a machine is created (and is not
-> yet running), we deliberately choose to use the &error_abort
-> argument instead of ignoring errors if an object creation failed.
-> This choice also matches when using sysbus_init_child_obj(),
-> since its code is:
->
->   void sysbus_init_child_obj(Object *parent,
->                              const char *childname, void *child,
->                              size_t childsize, const char *childtype)
->   {
->       object_initialize_child(parent, childname, child, childsize,
->                               childtype, &error_abort, NULL);
->
->       qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
->   }
->
-> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> Inspired-by: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
@@ -214,174 +132,57 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
-> v2:
->  - Tweaked cocci to improve digic_init (Thomas)
->  - Described new use of &error_abort (Markus)
-> ---
->  hw/arm/digic.c       | 17 ++++++-----------
->  hw/arm/imx25_pdk.c   |  5 ++---
->  hw/arm/kzm.c         |  5 ++---
->  hw/arm/raspi.c       |  7 +++----
->  hw/arm/sabrelite.c   |  5 ++---
->  hw/arm/xlnx-zcu102.c |  5 ++---
->  hw/arm/xlnx-zynqmp.c |  8 ++++----
->  7 files changed, 21 insertions(+), 31 deletions(-)
+>  hw/microblaze/xlnx-zynqmp-pmu.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 >
-> diff --git a/hw/arm/digic.c b/hw/arm/digic.c
-> index 726abb9b485..6ef26c6bac3 100644
-> --- a/hw/arm/digic.c
-> +++ b/hw/arm/digic.c
-> @@ -32,27 +32,22 @@
->  static void digic_init(Object *obj)
->  {
->      DigicState *s =3D DIGIC(obj);
-> -    DeviceState *dev;
+> diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-=
+pmu.c
+> index 57dc1ccd429..eba9945c19b 100644
+> --- a/hw/microblaze/xlnx-zynqmp-pmu.c
+> +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
+> @@ -55,6 +55,7 @@ typedef struct XlnxZynqMPPMUSoCState {
+>      /*< public >*/
+>      MicroBlazeCPU cpu;
+>      XlnxPMUIOIntc intc;
+> +    XlnxZynqMPIPI ipi[XLNX_ZYNQMP_PMU_NUM_IPIS];
+>  }  XlnxZynqMPPMUSoCState;
+>
+>
+> @@ -144,7 +145,6 @@ static void xlnx_zynqmp_pmu_init(MachineState *machin=
+e)
+>      MemoryRegion *address_space_mem =3D get_system_memory();
+>      MemoryRegion *pmu_rom =3D g_new(MemoryRegion, 1);
+>      MemoryRegion *pmu_ram =3D g_new(MemoryRegion, 1);
+> -    XlnxZynqMPIPI *ipi[XLNX_ZYNQMP_PMU_NUM_IPIS];
+>      qemu_irq irq[32];
 >      int i;
 >
-> -    object_initialize(&s->cpu, sizeof(s->cpu), "arm946-" TYPE_ARM_CPU);
-> -    object_property_add_child(obj, "cpu", OBJECT(&s->cpu), NULL);
-> +    object_initialize_child(obj, "cpu", &s->cpu, sizeof(s->cpu),
-> +                            "arm946-" TYPE_ARM_CPU, &error_abort, NULL);
+> @@ -172,16 +172,16 @@ static void xlnx_zynqmp_pmu_init(MachineState *mach=
+ine)
 >
->      for (i =3D 0; i < DIGIC4_NB_TIMERS; i++) {
->  #define DIGIC_TIMER_NAME_MLEN    11
->          char name[DIGIC_TIMER_NAME_MLEN];
->
-> -        object_initialize(&s->timer[i], sizeof(s->timer[i]), TYPE_DIGIC_=
-TIMER);
-> -        dev =3D DEVICE(&s->timer[i]);
-> -        qdev_set_parent_bus(dev, sysbus_get_default());
->          snprintf(name, DIGIC_TIMER_NAME_MLEN, "timer[%d]", i);
-> -        object_property_add_child(obj, name, OBJECT(&s->timer[i]), NULL)=
-;
-> +        sysbus_init_child_obj(obj, name, &s->timer[i], sizeof(s->timer[i=
-]),
-> +                              TYPE_DIGIC_TIMER);
+>      /* Create and connect the IPI device */
+>      for (i =3D 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
+> -        ipi[i] =3D g_new0(XlnxZynqMPIPI, 1);
+> -        object_initialize(ipi[i], sizeof(XlnxZynqMPIPI), TYPE_XLNX_ZYNQM=
+P_IPI);
+> -        qdev_set_parent_bus(DEVICE(ipi[i]), sysbus_get_default());
+> +        object_initialize(&pmu->ipi[i], sizeof(XlnxZynqMPIPI),
+> +                          TYPE_XLNX_ZYNQMP_IPI);
+> +        qdev_set_parent_bus(DEVICE(&pmu->ipi[i]), sysbus_get_default());
 >      }
 >
-> -    object_initialize(&s->uart, sizeof(s->uart), TYPE_DIGIC_UART);
-> -    dev =3D DEVICE(&s->uart);
-> -    qdev_set_parent_bus(dev, sysbus_get_default());
-> -    object_property_add_child(obj, "uart", OBJECT(&s->uart), NULL);
-> +    sysbus_init_child_obj(obj, "uart", &s->uart, sizeof(s->uart),
-> +                          TYPE_DIGIC_UART);
->  }
->
->  static void digic_realize(DeviceState *dev, Error **errp)
-> diff --git a/hw/arm/imx25_pdk.c b/hw/arm/imx25_pdk.c
-> index 9f3ee147390..eef1b184b0d 100644
-> --- a/hw/arm/imx25_pdk.c
-> +++ b/hw/arm/imx25_pdk.c
-> @@ -72,9 +72,8 @@ static void imx25_pdk_init(MachineState *machine)
->      unsigned int alias_offset;
->      int i;
->
-> -    object_initialize(&s->soc, sizeof(s->soc), TYPE_FSL_IMX25);
-> -    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
-> -                              &error_abort);
-> +    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->s=
-oc),
-> +                            TYPE_FSL_IMX25, &error_abort, NULL);
->
->      object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_f=
-atal);
->
-> diff --git a/hw/arm/kzm.c b/hw/arm/kzm.c
-> index 139934c4ecf..44cba8782bf 100644
-> --- a/hw/arm/kzm.c
-> +++ b/hw/arm/kzm.c
-> @@ -71,9 +71,8 @@ static void kzm_init(MachineState *machine)
->      unsigned int alias_offset;
->      unsigned int i;
->
-> -    object_initialize(&s->soc, sizeof(s->soc), TYPE_FSL_IMX31);
-> -    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
-> -                              &error_abort);
-> +    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->s=
-oc),
-> +                            TYPE_FSL_IMX31, &error_abort, NULL);
->
->      object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_f=
-atal);
->
-> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-> index 66899c28dc1..0a6244096cc 100644
-> --- a/hw/arm/raspi.c
-> +++ b/hw/arm/raspi.c
-> @@ -175,10 +175,9 @@ static void raspi_init(MachineState *machine, int ve=
-rsion)
->      BusState *bus;
->      DeviceState *carddev;
->
-> -    object_initialize(&s->soc, sizeof(s->soc),
-> -                      version =3D=3D 3 ? TYPE_BCM2837 : TYPE_BCM2836);
-> -    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
-> -                              &error_abort);
-> +    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->s=
-oc),
-> +                            version =3D=3D 3 ? TYPE_BCM2837 : TYPE_BCM28=
-36,
-> +                            &error_abort, NULL);
->
->      /* Allocate and map RAM */
->      memory_region_allocate_system_memory(&s->ram, OBJECT(machine), "ram"=
-,
-> diff --git a/hw/arm/sabrelite.c b/hw/arm/sabrelite.c
-> index ee140e5d9eb..f1b00de2294 100644
-> --- a/hw/arm/sabrelite.c
-> +++ b/hw/arm/sabrelite.c
-> @@ -55,9 +55,8 @@ static void sabrelite_init(MachineState *machine)
->          exit(1);
+>      for (i =3D 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
+> -        object_property_set_bool(OBJECT(ipi[i]), true, "realized",
+> +        object_property_set_bool(OBJECT(&pmu->ipi[i]), true, "realized",
+>                                   &error_abort);
+> -        sysbus_mmio_map(SYS_BUS_DEVICE(ipi[i]), 0, ipi_addr[i]);
+> -        sysbus_connect_irq(SYS_BUS_DEVICE(ipi[i]), 0, irq[ipi_irq[i]]);
+> +        sysbus_mmio_map(SYS_BUS_DEVICE(&pmu->ipi[i]), 0, ipi_addr[i]);
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(&pmu->ipi[i]), 0, irq[ipi_irq[=
+i]]);
 >      }
 >
-> -    object_initialize(&s->soc, sizeof(s->soc), TYPE_FSL_IMX6);
-> -    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
-> -                              &error_abort);
-> +    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->s=
-oc),
-> +                            TYPE_FSL_IMX6, &error_abort, NULL);
->
->      object_property_set_bool(OBJECT(&s->soc), true, "realized", &err);
->      if (err !=3D NULL) {
-> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-> index b6bc6a93b89..c802f26fbdf 100644
-> --- a/hw/arm/xlnx-zcu102.c
-> +++ b/hw/arm/xlnx-zcu102.c
-> @@ -91,9 +91,8 @@ static void xlnx_zcu102_init(MachineState *machine)
->      memory_region_allocate_system_memory(&s->ddr_ram, NULL, "ddr-ram",
->                                           ram_size);
->
-> -    object_initialize(&s->soc, sizeof(s->soc), TYPE_XLNX_ZYNQMP);
-> -    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
-> -                              &error_abort);
-> +    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->s=
-oc),
-> +                            TYPE_XLNX_ZYNQMP, &error_abort, NULL);
->
->      object_property_set_link(OBJECT(&s->soc), OBJECT(&s->ddr_ram),
->                           "ddr-ram", &error_abort);
-> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-> index 4f8bc41d9d4..6e991903022 100644
-> --- a/hw/arm/xlnx-zynqmp.c
-> +++ b/hw/arm/xlnx-zynqmp.c
-> @@ -191,10 +191,10 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState =
-*s, const char *boot_cpu,
->      for (i =3D 0; i < num_rpus; i++) {
->          char *name;
->
-> -        object_initialize(&s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
-> -                          "cortex-r5f-" TYPE_ARM_CPU);
-> -        object_property_add_child(OBJECT(&s->rpu_cluster), "rpu-cpu[*]",
-> -                                  OBJECT(&s->rpu_cpu[i]), &error_abort);
-> +        object_initialize_child(OBJECT(&s->rpu_cluster), "rpu-cpu[*]",
-> +                                &s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
-> +                                "cortex-r5f-" TYPE_ARM_CPU, &error_abort=
-,
-> +                                NULL);
->
->          name =3D object_get_canonical_path_component(OBJECT(&s->rpu_cpu[=
-i]));
->          if (strcmp(name, boot_cpu)) {
+>      /* Load the kernel */
 > --
 > 2.20.1
 >
