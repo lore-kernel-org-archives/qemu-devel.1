@@ -2,69 +2,111 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE96C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 07:24:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 549FAC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 07:53:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFC282175B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 07:24:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFC282175B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 1930A217D6
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 07:53:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1930A217D6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38260 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38512 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOzt3-0003w0-V2
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 03:24:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49119)
+	id 1hP0Lf-0003hR-1b
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 03:53:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hOzlU-0005oB-0C
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 03:16:20 -0400
+	(envelope-from <thuth@redhat.com>) id 1hP0Kl-0003JP-BM
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 03:52:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hOzlT-0001lA-11
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 03:16:19 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:45747)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hOzlS-0001kV-OF
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 03:16:18 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
-	mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA
-	(Nemesis)
-	id 1N7iKq-1gdL8x21jO-014nGL; Fri, 10 May 2019 09:16:05 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 09:15:52 +0200
-Message-Id: <20190510071557.30126-3-laurent@vivier.eu>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190510071557.30126-1-laurent@vivier.eu>
-References: <20190510071557.30126-1-laurent@vivier.eu>
+	(envelope-from <thuth@redhat.com>) id 1hP0Kk-0005g1-DO
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 03:52:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44362)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hP0Kg-0005am-2z; Fri, 10 May 2019 03:52:42 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 699E13082AED;
+	Fri, 10 May 2019 07:52:40 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-72.ams2.redhat.com [10.36.116.72])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 633CF600C7;
+	Fri, 10 May 2019 07:52:33 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>
+References: <20190507134521.31044-1-thuth@redhat.com>
+	<CAFEAcA-j+wQXjPW+puxk=foi2T8O=MzXHtxdWJ6E5P7o89WQSg@mail.gmail.com>
+	<c0cda8fc-cc68-eadd-0750-cc9eeca094a4@redhat.com>
+	<CAFEAcA8RoJ-ZSsn3Lhzj5hd3oYOE7Uxy8MvUUWrzhNfBmD=AWQ@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <a5711506-3f6a-bc5e-f991-9d730d2f7dee@redhat.com>
+Date: Fri, 10 May 2019 09:52:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:owK2vc3S+Zw1Nlmut8ymxmTtbgoD+kYzp7L9DFd/pAjXX+mxpyA
-	pujHFa5TnhOOpW4ML+bDkADDLoF67o3xyGhz6oAabkjv5aUb7vpNkURYGtLAa84pNJQ1H7K
-	+2bePamZRCfmTT/9ogxTsXwscjsdj6d8nFxu4N/REzfBHsapeMZGTu61qrfoSoLLWpc3P7L
-	+A+TJLyoPrauuBAlRwMCw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:xaT1F1bhi4A=:mf5Ib+j+dNJwtuzChqNqVP
-	whV1x85qqLQE3ZJmS/DUTbiGSKVMHIEsB899VmcdGf5cyMrc1qRQFmkI0bvo53vla+rPrOVFO
-	N8AgOpi87NP4bR86r5cBzehGQj9ALDEhfMO+j1nG5vUiWH3DbkbbLmbEbPtj5qV5kHP0Zd0Uy
-	VUiTXg2yEg/TabXgFV3jhcZCe6/gc2dWY1zfnPmaOOfQMVaY9dDLu7XpJCqkj8x6bJLrrjAmD
-	Ct5j713YZ9tbX8rDA+HhJTzfR0/URyCvbJcjTH4XRiYPrugQPgVZVqUNz6xkwQpnYDaZceplD
-	q6IK1JY92Trz86bhr6J/4ImWq1WBY30Ud0nPig53z75PpABVg+/qa7n0vZAFQLFM+c4sqHKdz
-	okyaIVP/oNlZ6fK4XoKE+0PH2/LyP1PC4ISNwVwaCFc05hfAptsbGV0YtU1Z/3Obs7Mkstr0T
-	jLTBI6cWcWYtQfIUQcEf3hh6cezljI95Sf5WqPFCMZftF+bMV8XKfMTkO75mTLUpA7x3bpey/
-	7wb6/jlPATA3MCdh55Szuw6UH94ogOdwOIYtex4ycsj5TjMAndqd4RL6AJL45RACzvezbIuJM
-	xfotMTZrjP+/xpcR9TSbD/3vLwovhigarKr+1uFuG9xmwMqnMPm9P+Sz0XYiKZWxO53PIbkP6
-	82S0bzCqGuxQzhe5CihpkSUciJ1+toWjSSjFocO+RJxtTTJ8jNBf54jiZlCqmBkzgrg0ay6dn
-	zqqY3ADTm4OOfm0OjFW6u+F767qD9KK/CvHmffu7C0KzHi1ME86KyA5QFuI=
+In-Reply-To: <CAFEAcA8RoJ-ZSsn3Lhzj5hd3oYOE7Uxy8MvUUWrzhNfBmD=AWQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Fri, 10 May 2019 07:52:40 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
-Subject: [Qemu-devel] [PULL 2/7] linux-user/elfload: Fix GCC 9 build warnings
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL v2 00/28] Kconfig for Arm machines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,48 +118,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
-	Riku Voipio <riku.voipio@iki.fi>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-arm <qemu-arm@nongnu.org>, John Snow <jsnow@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alistair Francis <Alistair.Francis@wdc.com>
+On 09/05/2019 18.54, Peter Maydell wrote:
+> On Wed, 8 May 2019 at 16:33, Thomas Huth <thuth@redhat.com> wrote:
+>>
+>> On 08/05/2019 17.09, Peter Maydell wrote:
+>>> On Tue, 7 May 2019 at 14:45, Thomas Huth <thuth@redhat.com> wrote:
+>>>> ----------------------------------------------------------------
+>>>> Kconfig settings for the Arm machines
+>>>> (v2: Fix the dependency of q35 to AHCI_ICH9 in the second patch)
+>>>> ----------------------------------------------------------------
+>>>
+>>> Hi -- this is still failing in the build test where I 'make clean'
+>>
+>> Very weird. What is running before the "make clean"? Could you provide
+>> me with the content of i386-softmmu/config-devices.mak please?
+>=20
+> Nothing runs before make clean -- my scripts effectively just do
+> a git merge, then make clean, then make, then make check.
 
-Fix this warning when building with GCC9 on Fedora 30:
-In function ‘strncpy’,
-    inlined from ‘fill_psinfo’ at /home/alistair/qemu/linux-user/elfload.c:3208:12,
-    inlined from ‘fill_note_info’ at /home/alistair/qemu/linux-user/elfload.c:3390:5,
-    inlined from ‘elf_core_dump’ at /home/alistair/qemu/linux-user/elfload.c:3539:9:
-/usr/include/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ specified bound 16 equals destination size [-Werror=stringop-truncation]
-  106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
-      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+I tried to reproduce it for a while, but for me, switching between
+master and the kconfig-for-arm tree always triggers a "configure" run
+and thus the dependencies get regenerated right...
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <c4d2b1de9efadcf1c900b91361af9302823a72a9.1556666645.git.alistair.francis@wdc.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/elfload.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> I notice that "make clean" does not delete config-devices.mak,
+> and "make" doesn't cause anything to update it, either.
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index c1a26021f8d7..d08fe2346683 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2872,7 +2872,7 @@ struct target_elf_prpsinfo {
-     target_gid_t pr_gid;
-     target_pid_t pr_pid, pr_ppid, pr_pgrp, pr_sid;
-     /* Lots missing */
--    char    pr_fname[16];           /* filename of executable */
-+    char    pr_fname[16] QEMU_NONSTRING; /* filename of executable */
-     char    pr_psargs[ELF_PRARGSZ]; /* initial part of arg list */
- };
- 
--- 
-2.20.1
+They are only removed during "distclean", but not for "clean" (which is
+what we want, IMHO).
 
+> Further, if I "touch hw/i386/Kconfig" and then run make, nothing
+> is rebuilt at all, so something seems to be wrong with our
+> makefile dependencies somewhere.
+
+Now that's a good hint. There is definitely something wrong with the
+dependencies here. I can see that I've got a file called
+"x86_64-softmmu-config.devices.mak.d" in my build directory, but
+apparently the Makefile tries to include
+x86_64-softmmu/config-devices.mak.d via the SUBDIR_DEVICES_MAK_DEP
+variable instead. Since that file does not exist, the dependencies are
+completely ignored... Paolo, what was the intention here? Should the
+dependencies always be generated in the *softmmu folders instead?
+
+ Thomas
 
