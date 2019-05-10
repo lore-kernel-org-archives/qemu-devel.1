@@ -2,92 +2,62 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EAC8C04AB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20FAFC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:39:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE6C2217D6
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:38:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f4eiruZu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE6C2217D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D7B8621479
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:39:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7B8621479
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46480 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46494 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP8Xs-0008VO-2n
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:38:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43486)
+	id 1hP8Yb-0000kY-3t
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:39:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hqm03ster@gmail.com>) id 1hP8Or-00010d-K6
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:29:34 -0400
+	(envelope-from <groug@kaod.org>) id 1hP8MB-00074T-Nu
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:26:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hqm03ster@gmail.com>) id 1hP8Oq-0003iR-4H
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:29:33 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:46331)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hqm03ster@gmail.com>) id 1hP8Op-0003hQ-U0
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:29:32 -0400
-Received: by mail-qt1-x843.google.com with SMTP id i31so7218775qti.13
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 09:29:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=w8JGVpuHGo+uhEjuFvHrCYkHRVhdiYlJuc2gGsqrCIA=;
-	b=f4eiruZuoJLKSAbD7mZD0KnDay4EkbSaQA2/fIltAp0xDNmXVK6YNNNXcma41wIL8k
-	W9B5rMw5IB7A+kqC86yheyJuoTOEwRThBgLRBJuRvpvs12MjFtVKO9WcKoRc5+9I9o/j
-	zadZd5ubAMP0eCPtllBUYnzDKZBWnOcQ0Z2TfnmXmfNjZ+LxAKaHefMX0joEa+BjYVf6
-	6dza8xQ/B/ES8Pmu4a88QNjqcfo7DMnMnxZuMU2Yj2BVsUU7qx/8ZPKViTEwwXr1IB0G
-	UQ2yXa7nnmASO5U+XSCDeIx6yS7KcTg74qtCHQNhllgyiolQEHwl2CrmSTuhHwvbsZY/
-	yp5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=w8JGVpuHGo+uhEjuFvHrCYkHRVhdiYlJuc2gGsqrCIA=;
-	b=YymsJz3wD8w+BfsqWWdzjG3otcIekIxrVCvAzM/7Y1la570n/2fACkKlS5WaLYk3pS
-	oYmzfYr/D0t0R0M2ndqjuEjcoPIisVpx3Vs2iu7bcx0pwVlfbTWJU/zFbR3o410hYwHZ
-	a204PXIdc505icC5LhFz68rkFsl1vgE1pB9y8kqY1dr1Qih8AkURBpVtgF5EqzDeoPrr
-	38+Eh1Z/ULWh+WEjmg7++46KaKqPhKa9hbPusf4dhwrdA9xNp/ji99b62xCGkgSYxIVc
-	G3cOxvY2NY47YbAt+SiLUbK/1kl5Dzk9KuSfMCipvd0iBfg2UA6+oU1OZkmtB6zxBiki
-	WVsA==
-X-Gm-Message-State: APjAAAUDYfuYGFAsWydMU9VI5P0ofI/JVjPp4v44L8Hd0zKKr2fEcWgH
-	axFXdVF9R5P/DCxC8dvi/EieFMOIZASHJayFFsLOcjzj
-X-Google-Smtp-Source: APXvYqz/46wYvi86q3FnjQobiOJ4keKOwdOIUyeyowyW2BtstNboCoSZK+pyT2oynSjk7WZ3pjHpEmXMvUsgw+MqKXs=
-X-Received: by 2002:aed:224d:: with SMTP id o13mr10291759qtc.56.1557505768608; 
-	Fri, 10 May 2019 09:29:28 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1hP8MA-000283-8u
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:26:47 -0400
+Received: from 16.mo5.mail-out.ovh.net ([87.98.174.144]:52378)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hP8MA-00026U-0w
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:26:46 -0400
+Received: from player789.ha.ovh.net (unknown [10.108.54.209])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id DB3B122F670
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 18:26:43 +0200 (CEST)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+	(Authenticated sender: groug@kaod.org)
+	by player789.ha.ovh.net (Postfix) with ESMTPSA id A79AB595BCE5;
+	Fri, 10 May 2019 16:26:32 +0000 (UTC)
+Date: Fri, 10 May 2019 18:25:41 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Message-ID: <20190510182541.1c2e81ac@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <155591659639.20338.6078212293519133016.stgit@aravinda>
+References: <155591636364.20338.844048953355207313.stgit@aravinda>
+	<155591659639.20338.6078212293519133016.stgit@aravinda>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <CABSdmrnNW6f=P64PviPP8CTJ5SVfYS8_6kmAtpw9yPObTEkpxg@mail.gmail.com>
-	<CABSdmrnocrqLKWncgy_Lak33__GRPYfs-RzSA14e=vh4cRn2ag@mail.gmail.com>
-	<20190509064848.wjhchsfov7q6komj@sirius.home.kraxel.org>
-	<CABSdmrmm+wJ=+Ccav=X5Gw_oueQvPRejCWVG2SQeCw=K4BM9EA@mail.gmail.com>
-	<CABSdmrndpONH_fVHbktHbBXvXPKESeRfis06TjrNRRfBpJzXLA@mail.gmail.com>
-	<b6064b77-5ca4-03e1-80ef-027313096cb2@gmail.com>
-	<CABSdmrkW6G23ZGDA7iLucM45vL0HHGsr2F76H0Mf8S0xkhPnsQ@mail.gmail.com>
-	<3e619b5c-8fb3-2655-2d92-37598db098d8@gmail.com>
-	<20190510085947.y62lttdtrg5cxx6b@sirius.home.kraxel.org>
-	<3fb8b79d-9f68-2342-d3ae-3aefa873109b@gmail.com>
-	<20190510103900.botgnbbo2ii4jxgo@sirius.home.kraxel.org>
-	<01de4824-5c19-6b6c-5b75-fa54a883ab4a@gmail.com>
-	<CABSdmrnVzi5ZTF58tnt8T8=gsVe2ZNqtZKCBcbZQ9Lb+CCCkdg@mail.gmail.com>
-In-Reply-To: <CABSdmrnVzi5ZTF58tnt8T8=gsVe2ZNqtZKCBcbZQ9Lb+CCCkdg@mail.gmail.com>
-From: Hou Qiming <hqm03ster@gmail.com>
-Date: Sat, 11 May 2019 00:29:00 +0800
-Message-ID: <CABSdmrmesDkUH0ALpM-8cGtyG5qD6Rn-=6f8=7L5zX-ae8PO7w@mail.gmail.com>
-To: qemu-devel@nongnu.org
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::843
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: [Qemu-devel] [PATCH v2 2/3] hw/display/ramfb: lock guest resolution
- after it's set
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 11980419436914317716
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrkeekgddutdefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 87.98.174.144
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v8 3/6] target/ppc: Handle NMI
+ guest exit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,91 +69,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org,
+	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Only allow one resolution change per guest boot, which prevents a
-crash when the guest writes garbage to the configuration space (e.g.
-when rebooting).
+On Mon, 22 Apr 2019 12:33:16 +0530
+Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
 
-Signed-off-by: HOU Qiming <hqm03ster@gmail.com>
----
- hw/display/ramfb.c | 26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
+> Memory error such as bit flips that cannot be corrected
+> by hardware are passed on to the kernel for handling.
+> If the memory address in error belongs to guest then
+> the guest kernel is responsible for taking suitable action.
+> Patch [1] enhances KVM to exit guest with exit reason
+> set to KVM_EXIT_NMI in such cases. This patch handles
+> KVM_EXIT_NMI exit.
+> 
+> [1] https://www.spinics.net/lists/kvm-ppc/msg12637.html
+>     (e20bbd3d and related commits)
+> 
+> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+> ---
+>  hw/ppc/spapr.c          |    3 +++
+>  hw/ppc/spapr_events.c   |   22 ++++++++++++++++++++++
+>  hw/ppc/spapr_rtas.c     |    5 +++++
+>  include/hw/ppc/spapr.h  |    6 ++++++
+>  target/ppc/kvm.c        |   16 ++++++++++++++++
+>  target/ppc/kvm_ppc.h    |    2 ++
+>  target/ppc/trace-events |    2 ++
+>  7 files changed, 56 insertions(+)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 6642cb5..2779efe 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1806,6 +1806,7 @@ static void spapr_machine_reset(void)
+>  
+>      spapr->cas_reboot = false;
+>  
+> +    spapr->mc_status = -1;
+>      spapr->guest_machine_check_addr = -1;
+>  
+>      /* Signal all vCPUs waiting on this condition */
+> @@ -2106,6 +2107,7 @@ static const VMStateDescription vmstate_spapr_machine_check = {
+>      .minimum_version_id = 1,
+>      .fields = (VMStateField[]) {
+>          VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
+> +        VMSTATE_INT32(mc_status, SpaprMachineState),
+>          VMSTATE_END_OF_LIST()
+>      },
+>  };
+> @@ -3085,6 +3087,7 @@ static void spapr_machine_init(MachineState *machine)
+>          kvmppc_spapr_enable_inkernel_multitce();
+>      }
+>  
+> +    spapr->mc_status = -1;
 
-diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
-index 98703f7..d255ddc 100644
---- a/hw/display/ramfb.c
-+++ b/hw/display/ramfb.c
-@@ -30,6 +30,7 @@ struct RAMFBState {
-     DisplaySurface *ds;
-     uint32_t width, height;
-     struct RAMFBCfg cfg;
-+    bool locked;
- };
+Since this is done at reset, do we need it here ?
 
- static void qemu_unmap_displaysurface_guestmem(pixman_image_t *image,
-@@ -72,18 +73,25 @@ static DisplaySurface
-*qemu_create_displaysurface_guestmem(
- static void ramfb_fw_cfg_write(void *dev, off_t offset, size_t len)
- {
-     RAMFBState *s = dev;
--    uint32_t fourcc, format;
-+    uint32_t fourcc, format, width, height;
-     hwaddr stride, addr;
+>      qemu_cond_init(&spapr->mc_delivery_cond);
+>  }
+>  
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index ae0f093..9922a23 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -620,6 +620,28 @@ void spapr_hotplug_req_remove_by_count_indexed(SpaprDrcType drc_type,
+>                              RTAS_LOG_V6_HP_ACTION_REMOVE, drc_type, &drc_id);
+>  }
+>  
+> +void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+> +{
+> +    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+> +
+> +    while (spapr->mc_status != -1) {
+> +        /*
+> +         * Check whether the same CPU got machine check error
+> +         * while still handling the mc error (i.e., before
+> +         * that CPU called "ibm,nmi-interlock"
 
--    s->width  = be32_to_cpu(s->cfg.width);
--    s->height = be32_to_cpu(s->cfg.height);
-+    width     = be32_to_cpu(s->cfg.width);
-+    height    = be32_to_cpu(s->cfg.height);
-     stride    = be32_to_cpu(s->cfg.stride);
-     fourcc    = be32_to_cpu(s->cfg.fourcc);
-     addr      = be64_to_cpu(s->cfg.addr);
-     format    = qemu_drm_format_to_pixman(fourcc);
+Missing )
 
-     fprintf(stderr, "%s: %dx%d @ 0x%" PRIx64 "\n", __func__,
--            s->width, s->height, addr);
-+            width, height, addr);
-+    if (s->locked) {
-+        fprintf(stderr, "%s: resolution locked, change rejected\n",
-__func__);
-+        return;
-+    }
-+    s->locked = true;
-+    s->width = width;
-+    s->height = height;
-     s->ds = qemu_create_displaysurface_guestmem(s->width, s->height,
-                                                 format, stride, addr);
- }
-@@ -103,6 +111,13 @@ void ramfb_display_update(QemuConsole *con, RAMFBState
-*s)
-     dpy_gfx_update_full(con);
- }
+> +         */
+> +        if (spapr->mc_status == cpu->vcpu_id) {
+> +            qemu_system_guest_panicked(NULL);
 
-+static void ramfb_reset(void *opaque)
-+{
-+    RAMFBState *s = (RAMFBState *)opaque;
-+    s->locked = false;
-+    memset(&s->cfg, 0, sizeof(s->cfg));
-+}
-+
- RAMFBState *ramfb_setup(Error **errp)
- {
-     FWCfgState *fw_cfg = fw_cfg_find();
-@@ -115,9 +130,12 @@ RAMFBState *ramfb_setup(Error **errp)
+If we don't also return, is there a chance we end up stuck in
+qemu_cond_wait_iothread() below ?
 
-     s = g_new0(RAMFBState, 1);
+> +        }
+> +        qemu_cond_wait_iothread(&spapr->mc_delivery_cond);
+> +        /* Meanwhile if the system is reset, then just return */
+> +        if (spapr->guest_machine_check_addr == -1) {
+> +            return;
+> +        }
+> +    }
+> +    spapr->mc_status = cpu->vcpu_id;
+> +}
+> +
+>  static void check_exception(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>                              uint32_t token, uint32_t nargs,
+>                              target_ulong args,
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index c2f3991..d3499f9 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -375,6 +375,11 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+>          /* NMI register not called */
+>          rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+>      } else {
+> +        /*
+> +         * vCPU issuing "ibm,nmi-interlock" is done with NMI handling,
+> +         * hence unset mc_status.
+> +         */
+> +        spapr->mc_status = -1;
+>          qemu_cond_signal(&spapr->mc_delivery_cond);
+>          rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>      }
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index ec6f33e..f7204d0 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -189,6 +189,11 @@ struct SpaprMachineState {
+>  
+>      /* State related to "ibm,nmi-register" and "ibm,nmi-interlock" calls */
+>      target_ulong guest_machine_check_addr;
+> +    /*
+> +     * mc_status is set to -1 if mc is not in progress, else is set to the CPU
+> +     * handling the mc.
+> +     */
+> +    int mc_status;
+>      QemuCond mc_delivery_cond;
+>  
+>      /*< public >*/
+> @@ -792,6 +797,7 @@ void spapr_clear_pending_events(SpaprMachineState *spapr);
+>  int spapr_max_server_number(SpaprMachineState *spapr);
+>  void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
+>                        uint64_t pte0, uint64_t pte1);
+> +void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered);
+>  
+>  /* DRC callbacks. */
+>  void spapr_core_release(DeviceState *dev);
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 9e86db0..5eedce8 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -1759,6 +1759,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+>          ret = 0;
+>          break;
+>  
+> +    case KVM_EXIT_NMI:
+> +        trace_kvm_handle_nmi_exception();
+> +        ret = kvm_handle_nmi(cpu, run);
+> +        break;
+> +
+>      default:
+>          fprintf(stderr, "KVM: unknown exit reason %d\n", run->exit_reason);
+>          ret = -1;
+> @@ -2837,6 +2842,17 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+>      return data & 0xffff;
+>  }
+>  
+> +int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run)
+> +{
+> +    bool recovered = run->flags & KVM_RUN_PPC_NMI_DISP_FULLY_RECOV;
+> +
+> +    cpu_synchronize_state(CPU(cpu));
+> +
+> +    spapr_mce_req_event(cpu, recovered);
+> +
+> +    return 0;
+> +}
+> +
+>  int kvmppc_enable_hwrng(void)
+>  {
+>      if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CAP_PPC_HWRNG)) {
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index 2238513..6edc42f 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -80,6 +80,8 @@ bool kvmppc_hpt_needs_host_contiguous_pages(void);
+>  void kvm_check_mmu(PowerPCCPU *cpu, Error **errp);
+>  void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu, unsigned int online);
+>  
+> +int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run);
+> +
+>  #else
+>  
+>  static inline uint32_t kvmppc_get_tbfreq(void)
+> diff --git a/target/ppc/trace-events b/target/ppc/trace-events
+> index 7b3cfe1..d5691d2 100644
+> --- a/target/ppc/trace-events
+> +++ b/target/ppc/trace-events
+> @@ -28,3 +28,5 @@ kvm_handle_papr_hcall(void) "handle PAPR hypercall"
+>  kvm_handle_epr(void) "handle epr"
+>  kvm_handle_watchdog_expiry(void) "handle watchdog expiry"
+>  kvm_handle_debug_exception(void) "handle debug exception"
+> +kvm_handle_nmi_exception(void) "handle NMI exception"
+> +
 
-+    s->locked = false;
-+
-     rom_add_vga("vgabios-ramfb.bin");
-     fw_cfg_add_file_callback(fw_cfg, "etc/ramfb",
-                              NULL, ramfb_fw_cfg_write, s,
-                              &s->cfg, sizeof(s->cfg), false);
-+    qemu_register_reset(ramfb_reset, s);
-     return s;
- }
--- 
-2.17.1
+new blank line at EOF.
+
+> 
+> 
+
+
