@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B089C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:24:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AEDCC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:25:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4109920882
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:24:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4109920882
+	by mail.kernel.org (Postfix) with ESMTPS id BF07120882
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:25:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF07120882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46245 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46249 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP8K5-0003uy-EW
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:24:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40164)
+	id 1hP8Kk-0004Te-Vm
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:25:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hP8Cb-0004Pv-MC
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:16:56 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hP8Cn-0004dQ-4g
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:17:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hP8Ca-0000GQ-FM
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:16:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54180)
+	(envelope-from <kwolf@redhat.com>) id 1hP8Cj-0000UD-EO
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:17:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52132)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hP8CV-000067-Nr; Fri, 10 May 2019 12:16:47 -0400
+	id 1hP8Cd-0000Id-LR; Fri, 10 May 2019 12:16:55 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0841C30842A9;
-	Fri, 10 May 2019 16:16:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3655A10C6E;
+	Fri, 10 May 2019 16:16:54 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-116-183.ams2.redhat.com
 	[10.36.116.183])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1BA1218504;
-	Fri, 10 May 2019 16:16:45 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 50FFE18504;
+	Fri, 10 May 2019 16:16:53 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Date: Fri, 10 May 2019 18:16:08 +0200
-Message-Id: <20190510161614.23236-10-kwolf@redhat.com>
+Date: Fri, 10 May 2019 18:16:14 +0200
+Message-Id: <20190510161614.23236-16-kwolf@redhat.com>
 In-Reply-To: <20190510161614.23236-1-kwolf@redhat.com>
 References: <20190510161614.23236-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Fri, 10 May 2019 16:16:47 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.38]);
+	Fri, 10 May 2019 16:16:54 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 09/15] vdi: Replace bdrv_{read,
- write}() with bdrv_{pread, pwrite}()
+Subject: [Qemu-devel] [PULL 15/15] iotests: Add test for rebase without
+ input base
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,79 +74,210 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alberto Garcia <berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
 
-There's only a couple of bdrv_read() and bdrv_write() calls left in
-the vdi code, and they can be trivially replaced with the byte-based
-bdrv_pread() and bdrv_pwrite().
+This patch adds a test for rebasing an image that currently does not
+have a backing file.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/vdi.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ tests/qemu-iotests/252     | 124 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/252.out |  39 ++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 164 insertions(+)
+ create mode 100755 tests/qemu-iotests/252
+ create mode 100644 tests/qemu-iotests/252.out
 
-diff --git a/block/vdi.c b/block/vdi.c
-index e1c42ad732..d7ef6628e7 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -171,6 +171,8 @@ typedef struct {
-     uint64_t unused2[7];
- } QEMU_PACKED VdiHeader;
-=20
-+QEMU_BUILD_BUG_ON(sizeof(VdiHeader) !=3D 512);
+diff --git a/tests/qemu-iotests/252 b/tests/qemu-iotests/252
+new file mode 100755
+index 0000000000..f6c8f71444
+--- /dev/null
++++ b/tests/qemu-iotests/252
+@@ -0,0 +1,124 @@
++#!/usr/bin/env bash
++#
++# Tests for rebasing COW images that require zero cluster support
++#
++# Copyright (C) 2019 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
- typedef struct {
-     /* The block map entries are little endian (even in memory). */
-     uint32_t *bmap;
-@@ -384,7 +386,7 @@ static int vdi_open(BlockDriverState *bs, QDict *opti=
-ons, int flags,
-=20
-     logout("\n");
-=20
--    ret =3D bdrv_read(bs->file, 0, (uint8_t *)&header, 1);
-+    ret =3D bdrv_pread(bs->file, 0, &header, sizeof(header));
-     if (ret < 0) {
-         goto fail;
-     }
-@@ -484,8 +486,8 @@ static int vdi_open(BlockDriverState *bs, QDict *opti=
-ons, int flags,
-         goto fail;
-     }
-=20
--    ret =3D bdrv_read(bs->file, s->bmap_sector, (uint8_t *)s->bmap,
--                    bmap_size);
-+    ret =3D bdrv_pread(bs->file, header.offset_bmap, s->bmap,
-+                     bmap_size * SECTOR_SIZE);
-     if (ret < 0) {
-         goto fail_free_bmap;
-     }
-@@ -704,7 +706,7 @@ nonallocating_write:
-         assert(VDI_IS_ALLOCATED(bmap_first));
-         *header =3D s->header;
-         vdi_header_to_le(header);
--        ret =3D bdrv_write(bs->file, 0, block, 1);
-+        ret =3D bdrv_pwrite(bs->file, 0, block, sizeof(VdiHeader));
-         g_free(block);
-         block =3D NULL;
-=20
-@@ -722,10 +724,11 @@ nonallocating_write:
-         base =3D ((uint8_t *)&s->bmap[0]) + bmap_first * SECTOR_SIZE;
-         logout("will write %u block map sectors starting from entry %u\n=
-",
-                n_sectors, bmap_first);
--        ret =3D bdrv_write(bs->file, offset, base, n_sectors);
-+        ret =3D bdrv_pwrite(bs->file, offset * SECTOR_SIZE, base,
-+                          n_sectors * SECTOR_SIZE);
-     }
-=20
--    return ret;
-+    return ret < 0 ? ret : 0;
- }
-=20
- static int coroutine_fn vdi_co_do_create(BlockdevCreateOptions *create_o=
-ptions,
++# creator
++owner=3Dmreitz@redhat.com
++
++seq=3D$(basename $0)
++echo "QA output created by $seq"
++
++status=3D1	# failure is the default!
++
++_cleanup()
++{
++    _cleanup_test_img
++    rm -f "$TEST_IMG.base_new"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.pattern
++
++# Currently only qcow2 and qed support rebasing, and only qcow2 v3 has
++# zero cluster support
++_supported_fmt qcow2
++_unsupported_imgopts 'compat=3D0.10'
++_supported_proto file
++_supported_os Linux
++
++CLUSTER_SIZE=3D65536
++
++echo
++echo "=3D=3D=3D Test rebase without input base =3D=3D=3D"
++echo
++
++# Cluster allocations to be tested:
++#
++# Backing (new) 11 -- 11 -- 11 --
++# COW image     22 22 11 11 -- --
++#
++# Expected result:
++#
++# COW image     22 22 11 11 00 --
++#
++# (Cluster 2 might be "--" after the rebase, too, but rebase just
++#  compares the new backing file to the old one and disregards the
++#  overlay.  Therefore, it will never discard overlay clusters.)
++
++_make_test_img $((6 * CLUSTER_SIZE))
++TEST_IMG=3D"$TEST_IMG.base_new" _make_test_img $((6 * CLUSTER_SIZE))
++
++echo
++
++$QEMU_IO "$TEST_IMG" \
++    -c "write -P 0x22 $((0 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
++    -c "write -P 0x11 $((2 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
++    | _filter_qemu_io
++
++$QEMU_IO "$TEST_IMG.base_new" \
++    -c "write -P 0x11 $((0 * CLUSTER_SIZE)) $CLUSTER_SIZE" \
++    -c "write -P 0x11 $((2 * CLUSTER_SIZE)) $CLUSTER_SIZE" \
++    -c "write -P 0x11 $((4 * CLUSTER_SIZE)) $CLUSTER_SIZE" \
++    | _filter_qemu_io
++
++echo
++
++# This should be a no-op
++$QEMU_IMG rebase -b "" "$TEST_IMG"
++
++# Verify the data is correct
++$QEMU_IO "$TEST_IMG" \
++    -c "read -P 0x22 $((0 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
++    -c "read -P 0x11 $((2 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
++    -c "read -P 0x00 $((4 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
++    | _filter_qemu_io
++
++echo
++
++# Verify the allocation status (first four cluster should be allocated
++# in TEST_IMG, clusters 4 and 5 should be unallocated (marked as zero
++# clusters here because there is no backing file))
++$QEMU_IMG map --output=3Djson "$TEST_IMG" | _filter_qemu_img_map
++
++echo
++
++$QEMU_IMG rebase -b "$TEST_IMG.base_new" "$TEST_IMG"
++
++# Verify the data is correct
++$QEMU_IO "$TEST_IMG" \
++    -c "read -P 0x22 $((0 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
++    -c "read -P 0x11 $((2 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
++    -c "read -P 0x00 $((4 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
++    | _filter_qemu_io
++
++echo
++
++# Verify the allocation status (first four cluster should be allocated
++# in TEST_IMG, cluster 4 should be zero, and cluster 5 should be
++# unallocated (signified by '"depth": 1'))
++$QEMU_IMG map --output=3Djson "$TEST_IMG" | _filter_qemu_img_map
++
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=3D0
+diff --git a/tests/qemu-iotests/252.out b/tests/qemu-iotests/252.out
+new file mode 100644
+index 0000000000..12dce889f8
+--- /dev/null
++++ b/tests/qemu-iotests/252.out
+@@ -0,0 +1,39 @@
++QA output created by 252
++
++=3D=3D=3D Test rebase without input base =3D=3D=3D
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D393216
++Formatting 'TEST_DIR/t.IMGFMT.base_new', fmt=3DIMGFMT size=3D393216
++
++wrote 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 131072/131072 bytes at offset 131072
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 0
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 131072
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 262144
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++read 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 131072/131072 bytes at offset 131072
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 131072/131072 bytes at offset 262144
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++[{ "start": 0, "length": 262144, "depth": 0, "zero": false, "data": true=
+, "offset": OFFSET},
++{ "start": 262144, "length": 131072, "depth": 0, "zero": true, "data": f=
+alse}]
++
++read 131072/131072 bytes at offset 0
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 131072/131072 bytes at offset 131072
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 131072/131072 bytes at offset 262144
++128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++[{ "start": 0, "length": 262144, "depth": 0, "zero": false, "data": true=
+, "offset": OFFSET},
++{ "start": 262144, "length": 65536, "depth": 0, "zero": true, "data": fa=
+lse},
++{ "start": 327680, "length": 65536, "depth": 1, "zero": true, "data": fa=
+lse}]
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 7ac9a5ea4a..00e474ab0a 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -249,3 +249,4 @@
+ 247 rw auto quick
+ 248 rw auto quick
+ 249 rw auto quick
++252 rw auto backing quick
 --=20
 2.20.1
 
