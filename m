@@ -2,68 +2,72 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29FE3C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:51:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41350C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:52:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1EAA2070D
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:51:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1EAA2070D
+	by mail.kernel.org (Postfix) with ESMTPS id 1621821019
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:52:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1621821019
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46796 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46802 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP8kW-0002TA-7f
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:51:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45193)
+	id 1hP8l5-0003GD-87
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:52:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hP8Ug-00068N-IN
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:35:37 -0400
+	(envelope-from <bounces@canonical.com>) id 1hP8jU-0001lj-W4
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:50:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hP8Uf-0006y6-H3
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:35:34 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57962)
+	(envelope-from <bounces@canonical.com>) id 1hP8jU-0007EY-2S
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:50:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40052)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hP8Uf-0006xi-BU
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:35:33 -0400
+	id 1hP8jT-0007EL-Tf
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:50:52 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hP8Ue-0007xu-9e
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 16:35:32 +0000
+	id 1hP8jS-0003Tc-Nt
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 16:50:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 47DCB2E806D
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 16:35:32 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id ADA1B2E80CB
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 16:50:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 10 May 2019 16:24:55 -0000
-From: Anisse Astier <1828608@bugs.launchpad.net>
+Date: Fri, 10 May 2019 16:40:51 -0000
+From: Erik Kline <1814352@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug-Tags: linux-user
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: anisse berrange
-X-Launchpad-Bug-Reporter: Anisse Astier (anisse)
-X-Launchpad-Bug-Modifier: Anisse Astier (anisse)
-Message-Id: <155750549613.15038.5455007066011551794.malonedeb@wampee.canonical.com>
+X-Launchpad-Bug-Commenters: ekline pmaydell
+X-Launchpad-Bug-Reporter: Erik Kline (ekline)
+X-Launchpad-Bug-Modifier: Erik Kline (ekline)
+References: <154907151753.31178.12938166708527410326.malonedeb@gac.canonical.com>
+Message-Id: <155750645168.26633.1285763542066636816.malone@soybean.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18962";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 0965b70af1c42320743ad79608125fc5a4ed2861
+X-Launchpad-Hash: 4dc514e4d1cd65ae1fc705e75ab1e6aa9cedddff
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1828608] [NEW] Chardev websocket might not
- support pasting more than a few chars
+Subject: [Qemu-devel] [Bug 1814352] Re: SIOCGIFNAME takes a struct ifreq not
+ an integer
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -74,55 +78,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1828608 <1828608@bugs.launchpad.net>
+Reply-To: Bug 1814352 <1814352@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+Thank you, all.
 
-When sending more than 4-5 characters on the websocket serial console
-(with pasting for example), the guest might not receive all of them, or
-worse interpret the input as Magic SysRq keys.
-
-This might be due to the io loop not checking the backend readiness
-before calling the read function.
-
-Attached patched fixes the problem on my system. I'm not sure it's the
-proper approach, this is just to start discussion.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Patch added: "0001-socket-check-char-backend-readiness-before-sending-i.=
-patch"
-   https://bugs.launchpad.net/bugs/1828608/+attachment/5262964/+files/0001-=
-socket-check-char-backend-readiness-before-sending-i.patch
+** Changed in: qemu
+       Status: Confirmed =3D> Fix Committed
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1828608
+https://bugs.launchpad.net/bugs/1814352
 
 Title:
-  Chardev websocket might not support pasting more than a few chars
+  SIOCGIFNAME takes a struct ifreq not an integer
 
 Status in QEMU:
-  New
+  Fix Committed
 
 Bug description:
-  When sending more than 4-5 characters on the websocket serial console
-  (with pasting for example), the guest might not receive all of them,
-  or worse interpret the input as Magic SysRq keys.
+  The ioctl SIOCGIFNAME takes a pointer to a struct ifreq, not an
+  integer.  This leads to if_indextoname() not correctly returning
+  interface names (well, not if they're longer than 4 characters
+  including the trailing NULL ;-).
 
-  This might be due to the io loop not checking the backend readiness
-  before calling the read function.
+  This is observed on v3.1.0.
 
-  Attached patched fixes the problem on my system. I'm not sure it's the
-  proper approach, this is just to start discussion.
+  The following one-line patch will be sent to the qemu-devel mailing
+  list:
+
+  """
+  diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+  index ae8951625f..37501f575c 100644
+  --- a/linux-user/ioctls.h
+  +++ b/linux-user/ioctls.h
+  @@ -178,7 +178,7 @@
+   #endif /* CONFIG_USBFS */
+   =
+
+     IOCTL(SIOCATMARK, IOC_R, MK_PTR(TYPE_INT))
+  -  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(TYPE_INT))
+  +  IOCTL(SIOCGIFNAME, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
+     IOCTL(SIOCGIFFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq=
+)))
+     IOCTL(SIOCSIFFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+     IOCTL(SIOCGIFADDR, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifr=
+eq)))
+  """
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1828608/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1814352/+subscriptions
 
