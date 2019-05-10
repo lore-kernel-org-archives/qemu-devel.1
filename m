@@ -2,80 +2,79 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82FB7C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:15:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B99AC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:16:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A0E32182B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:15:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5089F2182B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:16:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="yf8U/Vwd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A0E32182B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="WEeqre45"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5089F2182B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49405 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49434 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hPBvG-0002Jc-HO
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 16:15:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36190)
+	id 1hPBwb-0003Wb-LI
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 16:16:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1hPBuV-000203-Fs
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:14:28 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1hPBvi-0002dD-8A
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:15:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1hPBuU-0002nc-KH
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:14:27 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35128)
+	(envelope-from <dan.j.williams@intel.com>) id 1hPBvh-0006pJ-GH
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:15:42 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45840)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1hPBuT-0002Oq-UB
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:14:26 -0400
-Received: by mail-oi1-x241.google.com with SMTP id a132so5455734oib.2
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 13:14:18 -0700 (PDT)
+	id 1hPBvh-0006mH-BY
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:15:41 -0400
+Received: by mail-ot1-x342.google.com with SMTP id a10so4388594otl.12
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 13:15:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=intel-com.20150623.gappssmtp.com; s=20150623;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=glYXor0GQ9DfKpghbnKPKxe+zUzoJeb7GoYJ26Vk6ps=;
-	b=yf8U/VwdNl5tfgFPEKe5qh3THkRWZb9un60SOgkfJ/5LhvAwk90OALPbQmqH8NGPZg
-	Cr23IQd+McBJGud2E9ep2+5K3niud5mH6fhTcdytKwGg0ifP80vvI1KiLl0J9xx4xwjq
-	TEllzhY/P52SG7Zgqu0zO0TcVHYyKzcfJiA7uwMKIIPnUXohIrhjvrd+s0fzp7fbWFpQ
-	y62fi/8hXK8LlUhb+lV4PauDhwTsmzrWQoEzPH1EBWKu2DNHNpcM/c0ugQiTxq1CS/Pn
-	ELZfOgWViQuoOxYDdqZ2L8n4KiCZbfdn+ONJLYDNxFTBB6M7dS0ALwRsezeWWJXIVakV
-	lNVg==
+	:cc; bh=haQb/JJEXbzGwY8djXGgfBZiIn+/x5Yv5AUgQ4m38OM=;
+	b=WEeqre45hj7sSv58I/e7A5coRY+GxRJHinyFbk3h7U4aJrBJYpdYkhq9T1r4+5or5d
+	jRR3GR4Z+c950AiPGFzXe4QQXlx4J3RcgRXk7RadE4sRSsQK7+mC+RHs2IEhRwKUI7Zy
+	/T1NcmREZZ/qpW4sfz6npTMRE2tie3uif+puXikMYRBthExnMytzYTF00hoiHxBr5/P0
+	7jNqauenyRbY3EQ6raNfL+QovOy++Rd9rquniNrMmi7pGZFEPwXRnlT7u+kZ42rUMzcD
+	v4eAUwbD5Njo6W9aRbjgU1OhGsIT/fgW+T3LVLT6M51FFHqJTii+xqDcL8xDANdQWGtc
+	2Dxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc;
-	bh=glYXor0GQ9DfKpghbnKPKxe+zUzoJeb7GoYJ26Vk6ps=;
-	b=uZoQmQUvVUsOi5TWgzWcIwfMsIkfNxIZhA79i4DdQ38p34GLekekOCTMr7O1kIlSeF
-	GH5ivaasYj362/iZnmjge37Mwqe/KrLaPMeO2e+va+rhgJ9kuvgJx0pLbbIIXaYQB4FR
-	UU+ZxH8slMyWjI5CQVw21JUwpio7XBzGrYwWmFodpbNceS8Wyt2rQbfsD8vWiJnse6wN
-	s1zjZ3WiGAWtSHEEvPrYlOBomRAxneAEFE92M9WHev2ToFf68+zgoGhoR3m3hUPFH1V1
-	6C5WKAg0poPcJVYVYtcjW/Yhl/Lz0zOOrvttum/5MBgOvyQMc+38VbPzqKmviXrPXXOP
-	th3Q==
-X-Gm-Message-State: APjAAAXp0jQ0NmzyujTLzkgvwbdWKYtVpL/kXLVUYbPz4ftwknUEHZTC
-	8PDX7lOz5LZ3RTfhoyLH0UEUz2ZSlvcXe1+tGOtJdw==
-X-Google-Smtp-Source: APXvYqx7Iy3DOMIV9DNLu2fGaxr7KgtVySuDwyKCLAPX5/jruFRFKJ7CbI+68cxoMCTMjkHKJ+jW3/SnCYNqZpzsnJI=
-X-Received: by 2002:aca:4208:: with SMTP id p8mr6821131oia.105.1557519257995; 
-	Fri, 10 May 2019 13:14:17 -0700 (PDT)
+	bh=haQb/JJEXbzGwY8djXGgfBZiIn+/x5Yv5AUgQ4m38OM=;
+	b=Va1eOjOSjdLlKZ23G8Swua3MnjXHSNpmHOTe7mGwSEfaWEjvurVTPdJYno9m2p+K4o
+	E58WxMQ0bTkWi3PG3BwOVaKGhnVVAsU5gNWFLMeP2srNJuI3vDBlW0FUy0ZdExPdjFmB
+	Ag3LWOfcVIwxX+7UIRWIYLwfSu7imeZt29ELYvg3GKwP2wSKyj77qnS5m5TzW0fWfP+4
+	LKGi816mkMmqoYYDiQR1XP+Pw82zwtmxmoKW0Gyea6vqDtSb/sOBJJWz24LsIX/mhdls
+	kYtpxmtmafDC7U3iYVgH+FgLxY3X6TVRetuGX7bjmG9ZteIPIHzgPR8CE1J7XjepTE5C
+	5KGg==
+X-Gm-Message-State: APjAAAWyTF4ORIMJfz+U59rRu1f9LmoJRdB52sg9p1o7cIsZ772CtGgF
+	XSzpgi5qbWWfckL7q7nnppQCDtiP+zeejdHzCgzktA==
+X-Google-Smtp-Source: APXvYqzGzV4vCYOWqp7L7v2b9h2jjvTQectDwMiq79aWZo81gT17ipgMl7EwlMGGL3BIVEygxWA2BmYfTI9FLFAVAXk=
+X-Received: by 2002:a9d:6f19:: with SMTP id n25mr2918893otq.367.1557519340452; 
+	Fri, 10 May 2019 13:15:40 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190510155202.14737-1-pagupta@redhat.com>
-	<20190510155202.14737-4-pagupta@redhat.com>
-In-Reply-To: <20190510155202.14737-4-pagupta@redhat.com>
+In-Reply-To: <20190510155202.14737-1-pagupta@redhat.com>
 From: Dan Williams <dan.j.williams@intel.com>
-Date: Fri, 10 May 2019 13:14:07 -0700
-Message-ID: <CAPcyv4hbVNRFSyS2CTbmO88uhnbeH4eiukAng2cxgbDzLfizwg@mail.gmail.com>
+Date: Fri, 10 May 2019 13:15:29 -0700
+Message-ID: <CAPcyv4joEZaePvzc__N9Q3nozoHgQn7hNFPjBVo5BP6cc4rkEA@mail.gmail.com>
 To: Pankaj Gupta <pagupta@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH v8 3/6] libnvdimm: add dax_dev sync flag
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v8 0/6] virtio pmem driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -118,41 +117,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 10, 2019 at 8:53 AM Pankaj Gupta <pagupta@redhat.com> wrote:
+On Fri, May 10, 2019 at 8:52 AM Pankaj Gupta <pagupta@redhat.com> wrote:
 >
-> This patch adds 'DAXDEV_SYNC' flag which is set
-> for nd_region doing synchronous flush. This later
-> is used to disable MAP_SYNC functionality for
-> ext4 & xfs filesystem for devices don't support
-> synchronous flush.
+>  Hi Michael & Dan,
 >
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> ---
->  drivers/dax/bus.c            |  2 +-
->  drivers/dax/super.c          | 13 ++++++++++++-
->  drivers/md/dm.c              |  3 ++-
->  drivers/nvdimm/pmem.c        |  5 ++++-
->  drivers/nvdimm/region_devs.c |  7 +++++++
->  include/linux/dax.h          |  8 ++++++--
->  include/linux/libnvdimm.h    |  1 +
->  7 files changed, 33 insertions(+), 6 deletions(-)
-[..]
-> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> index 043f0761e4a0..ee007b75d9fd 100644
-> --- a/drivers/md/dm.c
-> +++ b/drivers/md/dm.c
-> @@ -1969,7 +1969,8 @@ static struct mapped_device *alloc_dev(int minor)
->         sprintf(md->disk->disk_name, "dm-%d", minor);
->
->         if (IS_ENABLED(CONFIG_DAX_DRIVER)) {
-> -               dax_dev = alloc_dax(md, md->disk->disk_name, &dm_dax_ops);
-> +               dax_dev = alloc_dax(md, md->disk->disk_name, &dm_dax_ops,
-> +                                                        DAXDEV_F_SYNC);
+>  Please review/ack the patch series from LIBNVDIMM & VIRTIO side.
+>  We have ack on ext4, xfs patches(4, 5 & 6) patch 2. Still need
+>  your ack on nvdimm patches(1 & 3) & virtio patch 2.
 
-Apologies for not realizing this until now, but this is broken.
-Imaging a device-mapper configuration composed of both 'async'
-virtio-pmem and 'sync' pmem. The 'sync' flag needs to be unified
-across all members. I would change this argument to '0' and then
-arrange for it to be set at dm_table_supports_dax() time after
-validating that all components support synchronous dax.
+I was planning to merge these via the nvdimm tree, not ack them. Did
+you have another maintainer lined up to take these patches?
 
