@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D40A8C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:49:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C04C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:50:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 993F620881
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:49:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CB5220881
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:50:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cqQhDXCI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 993F620881
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KPRu5lP7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CB5220881
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49738 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49780 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hPCSS-0007Fc-Pq
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 16:49:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41097)
+	id 1hPCTg-0008DT-Al
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 16:50:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hPCR6-0006ea-JH
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:48:09 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hPCS2-0007DG-Pb
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:49:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hPCR5-0007bW-GU
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:48:08 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:47099)
+	(envelope-from <alistair23@gmail.com>) id 1hPCS1-0000Ow-KL
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:49:06 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:35786)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hPCR5-0007Zv-8c; Fri, 10 May 2019 16:48:07 -0400
-Received: by mail-lj1-x244.google.com with SMTP id h21so4433503ljk.13;
-	Fri, 10 May 2019 13:48:07 -0700 (PDT)
+	id 1hPCS1-0000Nk-CA; Fri, 10 May 2019 16:49:05 -0400
+Received: by mail-lf1-x143.google.com with SMTP id j20so5079344lfh.2;
+	Fri, 10 May 2019 13:49:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
 	:cc:content-transfer-encoding;
-	bh=FmDjixwQhU9nkAwdFYTF0HykPupEcoXYxwdLuzkmB/Y=;
-	b=cqQhDXCImzNGI3rqG2tXUcys/pr0wnOoOQWiaOh8AR+lQud29R/gm8C3JYwbeP0C7p
-	jeghWOIAnlL3uijgXot+n3KJbj+x+1queuKq5miPQ6xUCuCPLrkjcQGM4gUNX9Ki3z0N
-	FR6HXqjiW4t7NfDxfhnGh531+7JP5i1u6qcgaSJw6VuuykEmBFvQ/y0R247xZFeX4CRN
-	pC8XiBCyGC2B0IkreGkBV82kkN5agssKQh44GWt3ATC4Fh+g2Ank+HEePOJmNzcW4v3B
-	R6quVHwAnBU4QZ3IHZsPQmilTmVX8K8qFJFuNqDL5fW5nt3ZNN124tOrkYMpiqEacPrh
-	nPpQ==
+	bh=VDkQKWlV6ZTnKcdg6K7qxGSte2YLGr4/JYENnSUzBPA=;
+	b=KPRu5lP7MMIe/5/62S9LVetjwaZkeYg5rwi3RJ/PcvUTwUZjom54F78ucLaLa2rRU/
+	Zi/f5jqBAf/7zaxLcoA7zgTV06jvOIFg3F1qC3ZGAWJ1io4XbMhDxlITfMB21i92gZ6x
+	yG+5hApn36Axu1bGKDKrC+Qh/Oj0SNhWNo/36yvlQyOEcf/NMG9/sFXV/dpEtYkPFwto
+	FKeYSjfgOd94z1uja/KGO2t9WCAsgAPhiu3HjmhOVLWOcnFZ7Ev9cofALcDm/9cHUo3D
+	OEGF8od/NPT38fuCrWlL52UuETQ+W96lgHgLaHPa57lT/bK3bANcH3PZhmLxlYMp0ezq
+	3Jnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=FmDjixwQhU9nkAwdFYTF0HykPupEcoXYxwdLuzkmB/Y=;
-	b=NYXMnJB6GzEPeBw9nDznX6J10F0FavxSDaLklUDxpE1RmuiSFYOyWK0wR8+4+kToU0
-	xx1XZPMq2CH2U9JayLo17qe33v6RMSTIsJr1Hxea2EmyuCs5+fJp/ohBlaDo1z5PLuIB
-	TgkojZFzYSjzxjMWAeicBMI03oNajk2qzY6q9TZFUou1K+rncJoGxbgVhvvCayvqvkgn
-	fgEnoptVU+oLJc4hULs5U+Feaf8JgW8AuR7mAbIXduB51IvDONXua9D8FWt1MgZ62ZWW
-	TuKh5BSlL+SKaSVgBGMdqNYz8Sjnl+GhmJjfJW24czxiNt69U6D3Uh0xAGBtREk6vzYU
-	nbzw==
-X-Gm-Message-State: APjAAAX8F4Awk9AxnfHgDW8eseU+noGG7kVEgT9MhUjf6TafOcVW2hI4
-	0ImFq024wQ4aj0SMBWZvG0IuFTeZ8FRtH7tWnMQ=
-X-Google-Smtp-Source: APXvYqxNKWSH8odmyb90sq2BvG5zvGKL40SrEJ/j2P39JPOGt9uyYVicJ0uddXPQRc24gKe1FAolwgmeVj/I33DHFUk=
-X-Received: by 2002:a2e:9c89:: with SMTP id x9mr6997593lji.28.1557521285772;
-	Fri, 10 May 2019 13:48:05 -0700 (PDT)
+	bh=VDkQKWlV6ZTnKcdg6K7qxGSte2YLGr4/JYENnSUzBPA=;
+	b=jjlOeIJjmnCJZz4NIfh37XI/m/Z2+8w7R7XaUPBV2mgpQHiJHIlgQje2xhTRHadgOi
+	wI9VF79lVxlexK58kSk7xbpj7MfAccncgCpSZ7B0gyblbdpIcE0N1e5Hn04Cs22ryjGY
+	aZxBIIgch+TCo3w6FteKtsgTDSagCMp3jLWrILHctOMu4ZxwCsJ7Lxg0hiSeZh4MQZ+E
+	4iaZQIm1GgalsM3sFHrdHeL2i5D+sTrpDNCu4yFG11xYlz3a58qZT7LBa5RAqApCjFS3
+	CZbOHf7O7y7PfMWQ7cW7ccigCfXF9lG4jRGh8/YdeM/zn/ydJR6W0tU67I0gUvYkuNZJ
+	4KNg==
+X-Gm-Message-State: APjAAAUPydQdFWxsIJY3Ne1Rg51rBNpB99RiubtrWX5tbtPKuCtDLcu7
+	6uF4wxb/rNQ0PN490jBR2L3g8HbAt1Uw3YmoE3c=
+X-Google-Smtp-Source: APXvYqxwWoYAIMGQDmcwAL/ucP7+kNzKTlQvrZ9RFbH17YbxI+CgykI0CO++fDLebU5es/heO3PlLD6BkwLsgO+nmW8=
+X-Received: by 2002:ac2:4205:: with SMTP id y5mr6956108lfh.15.1557521344132;
+	Fri, 10 May 2019 13:49:04 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190507163416.24647-1-philmd@redhat.com>
-	<20190507163416.24647-12-philmd@redhat.com>
-In-Reply-To: <20190507163416.24647-12-philmd@redhat.com>
+	<20190507163416.24647-13-philmd@redhat.com>
+In-Reply-To: <20190507163416.24647-13-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 10 May 2019 13:45:57 -0700
-Message-ID: <CAKmqyKPnBM-Xoty5P8=FHgyhSqMU4no3B08FkQeJjVNTuHkrzw@mail.gmail.com>
+Date: Fri, 10 May 2019 13:46:55 -0700
+Message-ID: <CAKmqyKOKNOuy5s=OXZJwbM9weA0edoFUyGgPDnNWYApOK5gqUw@mail.gmail.com>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::244
-Subject: Re: [Qemu-devel] [PATCH v2 11/16] hw/microblaze/zynqmp: Move the
- IPI state into the PMUSoC state
+X-Received-From: 2a00:1450:4864:20::143
+Subject: Re: [Qemu-devel] [PATCH v2 12/16] hw/microblaze/zynqmp: Let the SoC
+ manage the IPI devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -114,16 +114,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 7, 2019 at 9:43 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+On Tue, May 7, 2019 at 9:39 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
 om> wrote:
 >
 > The Inter Processor Interrupt is a block part of the SoC, not the
-> "machine" (talking about machine is borderline with the PMU, since
-> it is embedded into the ZynqMP SoC, but currentl QEMU doesn't
-> support multi-arch cores).
+> "machine" (See Zynq UltraScale+ Device TRM UG1085, "Platform
+> Management Unit", Power Domains and Islands).
 >
-> Move the IPI state to the SoC state, this will simplify the review
-> of the next patch.
+> Move the IPI management from the machine to the SoC.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
@@ -132,57 +130,85 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/microblaze/xlnx-zynqmp-pmu.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
+>  hw/microblaze/xlnx-zynqmp-pmu.c | 36 +++++++++++++++------------------
+>  1 file changed, 16 insertions(+), 20 deletions(-)
 >
 > diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-=
 pmu.c
-> index 57dc1ccd429..eba9945c19b 100644
+> index eba9945c19b..20e973edf5f 100644
 > --- a/hw/microblaze/xlnx-zynqmp-pmu.c
 > +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
-> @@ -55,6 +55,7 @@ typedef struct XlnxZynqMPPMUSoCState {
->      /*< public >*/
->      MicroBlazeCPU cpu;
->      XlnxPMUIOIntc intc;
-> +    XlnxZynqMPIPI ipi[XLNX_ZYNQMP_PMU_NUM_IPIS];
->  }  XlnxZynqMPPMUSoCState;
+> @@ -68,6 +68,13 @@ static void xlnx_zynqmp_pmu_soc_init(Object *obj)
 >
+>      sysbus_init_child_obj(obj, "intc", &s->intc, sizeof(s->intc),
+>                            TYPE_XLNX_PMU_IO_INTC);
+> +
+> +    /* Create the IPI device */
+> +    for (int i =3D 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
+> +        object_initialize(&s->ipi[i], sizeof(XlnxZynqMPIPI),
+> +                          TYPE_XLNX_ZYNQMP_IPI);
+> +        qdev_set_parent_bus(DEVICE(&s->ipi[i]), sysbus_get_default());
+> +    }
+>  }
 >
-> @@ -144,7 +145,6 @@ static void xlnx_zynqmp_pmu_init(MachineState *machin=
+>  static void xlnx_zynqmp_pmu_soc_realize(DeviceState *dev, Error **errp)
+> @@ -113,6 +120,15 @@ static void xlnx_zynqmp_pmu_soc_realize(DeviceState =
+*dev, Error **errp)
+>      sysbus_mmio_map(SYS_BUS_DEVICE(&s->intc), 0, XLNX_ZYNQMP_PMU_INTC_AD=
+DR);
+>      sysbus_connect_irq(SYS_BUS_DEVICE(&s->intc), 0,
+>                         qdev_get_gpio_in(DEVICE(&s->cpu), MB_CPU_IRQ));
+> +
+> +    /* Connect the IPI device */
+> +    for (int i =3D 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
+> +        object_property_set_bool(OBJECT(&s->ipi[i]), true, "realized",
+> +                                 &error_abort);
+> +        sysbus_mmio_map(SYS_BUS_DEVICE(&s->ipi[i]), 0, ipi_addr[i]);
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->ipi[i]), 0,
+> +                           qdev_get_gpio_in(DEVICE(&s->intc), ipi_irq[i]=
+));
+> +    }
+>  }
+>
+>  static void xlnx_zynqmp_pmu_soc_class_init(ObjectClass *oc, void *data)
+> @@ -145,8 +161,6 @@ static void xlnx_zynqmp_pmu_init(MachineState *machin=
 e)
 >      MemoryRegion *address_space_mem =3D get_system_memory();
 >      MemoryRegion *pmu_rom =3D g_new(MemoryRegion, 1);
 >      MemoryRegion *pmu_ram =3D g_new(MemoryRegion, 1);
-> -    XlnxZynqMPIPI *ipi[XLNX_ZYNQMP_PMU_NUM_IPIS];
->      qemu_irq irq[32];
->      int i;
+> -    qemu_irq irq[32];
+> -    int i;
 >
-> @@ -172,16 +172,16 @@ static void xlnx_zynqmp_pmu_init(MachineState *mach=
-ine)
+>      /* Create the ROM */
+>      memory_region_init_rom(pmu_rom, NULL, "xlnx-zynqmp-pmu.rom",
+> @@ -166,24 +180,6 @@ static void xlnx_zynqmp_pmu_init(MachineState *machi=
+ne)
+>                                &error_abort);
+>      object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal=
+);
 >
->      /* Create and connect the IPI device */
->      for (i =3D 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
-> -        ipi[i] =3D g_new0(XlnxZynqMPIPI, 1);
-> -        object_initialize(ipi[i], sizeof(XlnxZynqMPIPI), TYPE_XLNX_ZYNQM=
-P_IPI);
-> -        qdev_set_parent_bus(DEVICE(ipi[i]), sysbus_get_default());
-> +        object_initialize(&pmu->ipi[i], sizeof(XlnxZynqMPIPI),
-> +                          TYPE_XLNX_ZYNQMP_IPI);
-> +        qdev_set_parent_bus(DEVICE(&pmu->ipi[i]), sysbus_get_default());
->      }
->
->      for (i =3D 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
-> -        object_property_set_bool(OBJECT(ipi[i]), true, "realized",
-> +        object_property_set_bool(OBJECT(&pmu->ipi[i]), true, "realized",
->                                   &error_abort);
-> -        sysbus_mmio_map(SYS_BUS_DEVICE(ipi[i]), 0, ipi_addr[i]);
-> -        sysbus_connect_irq(SYS_BUS_DEVICE(ipi[i]), 0, irq[ipi_irq[i]]);
-> +        sysbus_mmio_map(SYS_BUS_DEVICE(&pmu->ipi[i]), 0, ipi_addr[i]);
-> +        sysbus_connect_irq(SYS_BUS_DEVICE(&pmu->ipi[i]), 0, irq[ipi_irq[=
+> -    for (i =3D 0; i < 32; i++) {
+> -        irq[i] =3D qdev_get_gpio_in(DEVICE(&pmu->intc), i);
+> -    }
+> -
+> -    /* Create and connect the IPI device */
+> -    for (i =3D 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
+> -        object_initialize(&pmu->ipi[i], sizeof(XlnxZynqMPIPI),
+> -                          TYPE_XLNX_ZYNQMP_IPI);
+> -        qdev_set_parent_bus(DEVICE(&pmu->ipi[i]), sysbus_get_default());
+> -    }
+> -
+> -    for (i =3D 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
+> -        object_property_set_bool(OBJECT(&pmu->ipi[i]), true, "realized",
+> -                                 &error_abort);
+> -        sysbus_mmio_map(SYS_BUS_DEVICE(&pmu->ipi[i]), 0, ipi_addr[i]);
+> -        sysbus_connect_irq(SYS_BUS_DEVICE(&pmu->ipi[i]), 0, irq[ipi_irq[=
 i]]);
->      }
->
+> -    }
+> -
 >      /* Load the kernel */
+>      microblaze_load_kernel(&pmu->cpu, XLNX_ZYNQMP_PMU_RAM_ADDR,
+>                             machine->ram_size,
 > --
 > 2.20.1
 >
