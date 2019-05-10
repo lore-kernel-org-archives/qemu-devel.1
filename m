@@ -2,64 +2,80 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CD6DC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44601C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:56:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 439762173B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:56:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 439762173B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 103A22173B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:56:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fnWoM83C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 103A22173B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40353 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40361 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP2G2-0004p8-Jl
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 05:56:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51774)
+	id 1hP2Gg-0005lF-E3
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 05:56:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hP2Ey-0004LP-UU
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:54:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hP2FS-0004dI-58
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:55:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hP2Ex-0000rq-PT
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:54:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51182)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hP2Ex-0000rH-Jv
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:54:55 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 64C3B3082B46;
-	Fri, 10 May 2019 09:54:54 +0000 (UTC)
-Received: from localhost (ovpn-117-147.ams2.redhat.com [10.36.117.147])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9313360C81;
-	Fri, 10 May 2019 09:54:48 +0000 (UTC)
-Date: Fri, 10 May 2019 10:54:47 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190510095447.GC22311@stefanha-x1.localdomain>
-References: <20190509121820.16294-1-stefanha@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hP2FQ-0001Jd-VP
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:55:26 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:38391)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hP2FQ-0001HZ-PP
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:55:24 -0400
+Received: by mail-oi1-x243.google.com with SMTP id u199so4104670oie.5
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 02:55:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=d4hkzUnPrAUDfEs1lvZJFmyKt2aBL6Qbgr1y2Q5UyE0=;
+	b=fnWoM83C109HoD85qUOKyRRT2WgU+ys8Cr0WrnjLYFsMo+dXVT2jH+Iv6sjchixUvF
+	JesyhAgRt7Z4+91MWc/DJ7IZ7V4SfXMLVZzVN25bSb8oTJV97WegRWMreTA2kzI6Vse+
+	sekdOEo0PVfK290OszQCm0udz+ejcE4/AeGQzyQPVUwFIYhc6RFtGIyXY7zNFFPVyhXW
+	83cA/uXKQj2lYhd53fmFgK1xvdElaA7/9gREAmFm1NLxpoXpClMlN1umAgUTeGztYrxb
+	eBB4GSd/e+AaJFEtM33qZVUImxIhsa2MTVRgqfAjuBtC/al6yXG/nsO19mP+Y8WJHm2a
+	djOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=d4hkzUnPrAUDfEs1lvZJFmyKt2aBL6Qbgr1y2Q5UyE0=;
+	b=fP7QqyuB5mOWdW/xNDFvlCgsch4UclC9DrTA327uaqq+TrgDoLAIQEFzYqsUCGuIg/
+	9Km/ZpW73TB0o5iu0FiBdn47FLqLXhBqwJRN6e7whB83KM4kNUYDrHSf85UwaK5kLl35
+	8J/xgijUDaCX3Vf0TfPgHg93aG8gSO1KoCHAgLUPK5q49LPCEkPqHkV4EiBVGGmy/Alc
+	myDXAh07sW9PCVmW4AYhoSdxkmtJBABLEpo12RybkBbWoPpKIAWE1Eh8fkKYf3f5S7Ke
+	DD7N0BHbnZKmnIACuQ633gS27yw7wpsLSj4EVk6tS/1VpSoy/nhTvhXK+DrJ5FkTL7la
+	13yA==
+X-Gm-Message-State: APjAAAVuPO3vI1nDopsXxu1fzblGQaEkPTH092lTaio5BR5vuI0hUrju
+	aFFvYZCHtiU/FoGGBUSEVq1omgJGjQaBNSn3vcCXhA==
+X-Google-Smtp-Source: APXvYqwzkjL4L5STvjjay73tFBlOWvS5LiwH9ubwYPUNYPS68ptGSI95/ZnmqHhifcGOAeU3crw4YeYv/XVlHaSoksI=
+X-Received: by 2002:aca:b783:: with SMTP id h125mr4555547oif.146.1557482123537;
+	Fri, 10 May 2019 02:55:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="S1BNGpv0yoYahz37"
-Content-Disposition: inline
-In-Reply-To: <20190509121820.16294-1-stefanha@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Fri, 10 May 2019 09:54:54 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] security.rst: add Security Guide to
- developer docs
+References: <20190509222631.14271-1-richard.henderson@linaro.org>
+	<20190509222631.14271-21-richard.henderson@linaro.org>
+In-Reply-To: <20190509222631.14271-21-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 10 May 2019 10:55:12 +0100
+Message-ID: <CAFEAcA-pGmH0VOhRnmcBGGM_bfmF8pBobJg2u4s=XKwV6HnFxA@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::243
+Subject: Re: [Qemu-devel] [PATCH v3 20/27] target/sparc: Convert to
+ CPUClass::tlb_fill
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,78 +87,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Daniel Berrange <berrange@redhat.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
-	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-	Stefano Garzarella <sgarzare@redhat.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 9 May 2019 at 23:52, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+> v2: Keep user-only, sparc32, and sparc64 tlb_fill separate.
+> v3: Assert !probe for sparc32.
 
---S1BNGpv0yoYahz37
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 09, 2019 at 01:18:18PM +0100, Stefan Hajnoczi wrote:
-> v3:
->  * Split into security.texi for qemu-doc and secure-coding-practices.rst =
-for
->    the developer documentation [danpb]
->  * Mentioned that QEMU can be started as non-root using UNIX groups on
->    /dev/kvm, /dev/net/tun, etc [Alex Bennee]
->  * Kept Acked-by and Reviewed-by since the v3 changes are minor
-> v2:
->  * Added mention of passthrough USB and PCI devices [philmd]
->  * Reworded resource limits [philmd]
->  * Added qemu_log_mask(LOG_GUEST_ERROR) [philmd]
->=20
-> At KVM Forum 2018 I gave a presentation on security in QEMU:
-> https://www.youtube.com/watch?v=3DYAdRf_hwxU8 (video)
-> https://vmsplice.net/~stefan/stefanha-kvm-forum-2018.pdf (slides)
->=20
-> This patch series extends the QEMU documentation to cover security topics,
-> though this is just the beginning and we could flesh it out more in the f=
-uture.
->=20
-> Stefan Hajnoczi (2):
->   docs: add Secure Coding Practices to developer docs
->   docs: add Security chapter to the documentation
->=20
->  Makefile                               |   2 +-
->  docs/devel/index.rst                   |   1 +
->  docs/devel/secure-coding-practices.rst | 106 ++++++++++++++++++++
->  docs/security.texi                     | 131 +++++++++++++++++++++++++
->  qemu-doc.texi                          |   3 +
->  5 files changed, 242 insertions(+), 1 deletion(-)
->  create mode 100644 docs/devel/secure-coding-practices.rst
->  create mode 100644 docs/security.texi
->=20
-> --=20
-> 2.21.0
->=20
+Applied, thanks.
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
-Stefan
-
---S1BNGpv0yoYahz37
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzVSmcACgkQnKSrs4Gr
-c8i0tgf9HrowlLyQqLZHFEayNv+IMUhvMo4vKMTsnVGN8qUBNq8U75EZdgjE2Zkf
-zS0EtGUwGynItcBMnkenY1HKhUrmYMgDm3QSbVTf/XEJHg3h3NXPF5SYXOAlGAwn
-++lIqPTmD+QCemeodYX92Ba3ide0Ifh4KNQDo+MrmULtw7HeRfL+TQ2B0AP/GQZZ
-YfljjMTrRcAMNkkSvE/1XcsoomZzHBLwjgQ6rmTR71R4ZxlAROvGeCpH9vRoSTOX
-llgS61Ou+AJc5OhNjjjm47yzqbKKvCeReLilfq/HmkS2Xx6CD0tl/I6v/PWCu7oZ
-tfs0N16PE4J8bDvhBVUzYF8CUSVxZg==
-=ejiG
------END PGP SIGNATURE-----
-
---S1BNGpv0yoYahz37--
+-- PMM
 
