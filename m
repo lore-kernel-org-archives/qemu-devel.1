@@ -2,84 +2,84 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83A29C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 03:29:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27E1DC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 03:29:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 420C62182B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 03:29:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E90042084A
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 03:29:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yYL35neT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 420C62182B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yjT0simJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E90042084A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36124 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36126 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOwDf-00044F-Dq
-	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 23:29:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48049)
+	id 1hOwDh-000476-4N
+	for qemu-devel@archiver.kernel.org; Thu, 09 May 2019 23:29:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOwBo-0002w0-Bc
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 23:27:17 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hOwBr-0002wt-7D
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 23:27:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hOwBn-0001M6-3W
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 23:27:16 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:42344)
+	(envelope-from <richard.henderson@linaro.org>) id 1hOwBq-0001QX-EP
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 23:27:19 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:35591)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hOwBm-0001KP-Ta
-	for qemu-devel@nongnu.org; Thu, 09 May 2019 23:27:15 -0400
-Received: by mail-pf1-x443.google.com with SMTP id 13so2408375pfw.9
-	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 20:27:14 -0700 (PDT)
+	id 1hOwBq-0001PJ-9B
+	for qemu-devel@nongnu.org; Thu, 09 May 2019 23:27:18 -0400
+Received: by mail-pl1-x644.google.com with SMTP id g5so2133892plt.2
+	for <qemu-devel@nongnu.org>; Thu, 09 May 2019 20:27:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=kYPvR/+3oXoM1cgriFFufz2gVs7DQlnW5GngOT7E9H8=;
-	b=yYL35neTghlReS1E0H4blVXqlra6l8YuWplq0b0FCOswSQnBFlJjkScr+IGCK2mmRr
-	hoAa62HQ8ckBe0VY8wJ+Gw9XD1c0g7ikv39uq54pvVqPWhPDCMMWiSvM2sq5EJCqVSba
-	/dlaoPJQAKb2EfyEC7/RL3F/9Sp7GUvXhQ9atTyMafJQVYnn+++FZN03Tn6CTH0qdLz2
-	r/G9KM8zQRUaxQjx0gH1pl0HJjCdNauFwJibFbtSjGsY1cJfRmxUKuSXKhJA7NoYPMFA
-	F1CAuRhwiT5HRyW5CYagJC2JtPQZ/ZN2s3dntg8X5Axlb33B+UIGt4S4Ddaj6m8Gm5VT
-	otwA==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=ynany7TpuwIOWZBHNBqsv0L1yKHGvVYa7cOFengyx/8=;
+	b=yjT0simJO9u2OuwMQdQp6mWSIr/NSNxCUkdo/UGM6kQ7Lqqyfy1RVOjW9p0fcorW+o
+	WgkEmCt874s6HU4n+oXj9Ub3A1J1ArN4erWkQAX8VuuNdf2+ZIV5prdaZei0I/O1Q9Xd
+	adPuiLjPINlXBfZfqeNIRurnRQMBexi7csVqe8q8f4/TuZ4ILuqEyjB8Y8bssTIfnVol
+	LJP1nVtK08TmONJQgF8Keon25pFt+iV+pScAKPrGJhYypyk4YSWkJyAgh9/Zd8q/u9dI
+	L2S4Jxh6UWs7qSdrc+2eSl6MR1Zrpm+FJjVehn+WPfayu5rJryxAWQNkiK2dqNVuq1H/
+	frSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=kYPvR/+3oXoM1cgriFFufz2gVs7DQlnW5GngOT7E9H8=;
-	b=C0369nkNsjRhEBmXSPD6SDwtwUIMMbybayaG/Yz7lSZ+XApTymn3fqWGlaMr4h9818
-	yTtxhJDEMybkcrvuSGyCre8vDAXN5A2uVZPT3F/FexFKXIedjifnkixAWjmsb+rFj5Yg
-	iR8PH8GRelEskCaZ4v5qm70eLtpYZgt61oGNm+l/eHLCtJeqgVdrlUcKc5SgrOl/W3gm
-	/gKmHllWf/bhiUYePiCdkEB08N0l3Q+FVE3L5X/Yig8hVyz+8Erg7EE26jZlZH7A8q5j
-	1MFfKtNlv9gBka8vEV4ZcUHxcBAm+o9vSCE/fksgb10a4qjeZ+31PQLO3LCuKaNenzSf
-	YPWw==
-X-Gm-Message-State: APjAAAXmyBKWlYi6LuqWxY0KfkrtnhZYXADT6v5pobVY5qoFhFiRTbHA
-	h4xguUOAqvH4j+dxpf1kJEFGxaw5t6s=
-X-Google-Smtp-Source: APXvYqxp7UI/3P7GBlisd0dK6fnsWbvJD2oIvqyOn+RQR0K5rq78WIZPmTWPaHDAF4/npqfP8xn7cQ==
-X-Received: by 2002:a63:a84c:: with SMTP id i12mr10862267pgp.115.1557458833034;
-	Thu, 09 May 2019 20:27:13 -0700 (PDT)
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=ynany7TpuwIOWZBHNBqsv0L1yKHGvVYa7cOFengyx/8=;
+	b=h0EdQw9MUaMYUCX0KJQ5kiWralzkRtSxMBsI4X2aLdw2iEQWE5JK1jYkL/fFs83A8N
+	PppyBecbinLG8exrqhYDfdtE+Pj/mFypPfSGILqtXc/gWRsr8TXMXRhKnN0bvTM0sF8z
+	zd3/oirPmxpQ2KLRNRX0kwVxnbyHYd8ihp7cSFVH9j5ysK3L3514vxM3VLuH/EnoW5Pm
+	ePxL4kXndzlQG7jzDushB/okjM9ElUlLl6M+00W3xtFvxnAmVqKX+07NDw7gjKtYSReZ
+	gSgcf+dXrn16HntbAhWxtZ9OSNiaaq+bvMDEIDvWe1Dx5ZbJ6h0RIFbRQM9jzgJS+qzF
+	b+XQ==
+X-Gm-Message-State: APjAAAUcguASXjzvcC+K/zvVf12K2uuHb9EwsoGz1w5qOAWF1xujkbJa
+	FJQW8/vPvmN/3xnZ18AbfJCmqFTo00c=
+X-Google-Smtp-Source: APXvYqwMcKgpSE2r788iiQxW5LBAz7RRtw2q3ryosUWSzsWQSXeNhAYt9UCC0bgtg4hRItIe1ibQBA==
+X-Received: by 2002:a17:902:b412:: with SMTP id
+	x18mr10205522plr.304.1557458836901; 
+	Thu, 09 May 2019 20:27:16 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231]) by smtp.gmail.com with ESMTPSA id
-	t26sm6259695pgk.62.2019.05.09.20.27.11
+	t26sm6259695pgk.62.2019.05.09.20.27.15
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 09 May 2019 20:27:12 -0700 (PDT)
+	Thu, 09 May 2019 20:27:16 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu,  9 May 2019 20:27:02 -0700
-Message-Id: <20190510032710.23910-1-richard.henderson@linaro.org>
+Date: Thu,  9 May 2019 20:27:05 -0700
+Message-Id: <20190510032710.23910-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190510032710.23910-1-richard.henderson@linaro.org>
+References: <20190510032710.23910-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::443
-Subject: [Qemu-devel] [PATCH v2 0/8] linux-user sparc fixes
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: [Qemu-devel] [PATCH v2 3/8] target/sparc: Define an enumeration for
+ accessing env->regwptr
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,79 +96,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Version 1 was posted back in July 2018.  Oops.  ;-)
-
-https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg05788.html
-
---- v1 cover letter
-
-There are at least 4 separate bugs preventing clone from working.
-
-(1) cpu_copy left both cpus sharing the same register window (!)
-
-(2) cpu_clone_regs did not initialize %o1, so the new thread path
-    in the guest __clone was always taken, even for the parent
-    (old %o1 value was newsp, and so non-zero).
-
-(3) cpu_clone_regs did not advance the pc past the syscall in the
-    child, which meant that the child re-executed the syscall
-    (and because of (1), with essentially random inputs).
-
-(4) clone did not flush register windows, which would cause the
-    parent stack to be clobbered by the child writing out old
-    windows in order to allocate a new one.
-    
-This is enough for Alex's atomic-test to make progress, but not
-quite enough for it to actually work.  What I'm seeing now is a
-legitimate SEGV for a write to a r-xp memory segment.  I'll need
-to examine the testcase further to see why that is happening.
-
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
+ target/sparc/cpu.h | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-I have now traced the remaining problem to cpu_clone_regs putting the
-newsp into the frame pointer, not the stack pointer.  In fixing this,
-I define a set of WREG_* constants in target/sparc/cpu.h, and then go
-on to fix some related problems in linux-user/sparc/signal.c.
-
-
-r~
-
-
-Richard Henderson (8):
-  linux-user: Disallow setting newsp for fork
-  linux-user: Pass the parent env to cpu_clone_regs
-  target/sparc: Define an enumeration for accessing env->regwptr
-  linux-user/sparc: Use WREG constants in sparc/target_cpu.h
-  linux-user/sparc: Use WREG constants in sparc/signal.c
-  linux-user/sparc: Fix cpu_clone_regs
-  linux-user/sparc: Flush register windows before clone
-  scripts/qemu-binfmt-conf: Update for sparc64
-
- linux-user/aarch64/target_cpu.h    |  3 +-
- linux-user/alpha/target_cpu.h      |  3 +-
- linux-user/arm/target_cpu.h        |  3 +-
- linux-user/cris/target_cpu.h       |  3 +-
- linux-user/hppa/target_cpu.h       |  3 +-
- linux-user/i386/target_cpu.h       |  3 +-
- linux-user/m68k/target_cpu.h       |  3 +-
- linux-user/microblaze/target_cpu.h |  3 +-
- linux-user/mips/target_cpu.h       |  3 +-
- linux-user/nios2/target_cpu.h      |  3 +-
- linux-user/openrisc/target_cpu.h   |  4 +-
- linux-user/ppc/target_cpu.h        |  3 +-
- linux-user/riscv/target_cpu.h      |  3 +-
- linux-user/s390x/target_cpu.h      |  3 +-
- linux-user/sh4/target_cpu.h        |  3 +-
- linux-user/sparc/target_cpu.h      | 41 ++++++++-----
- linux-user/tilegx/target_cpu.h     |  3 +-
- linux-user/xtensa/target_cpu.h     |  3 +-
- target/sparc/cpu.h                 | 33 ++++++++++
- linux-user/sparc/cpu_loop.c        |  3 +
- linux-user/sparc/signal.c          | 96 ++++++++++--------------------
- linux-user/syscall.c               |  9 ++-
- scripts/qemu-binfmt-conf.sh        |  8 ++-
- 23 files changed, 141 insertions(+), 101 deletions(-)
-
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index 85b9665ccc..08f7d1a3c6 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -31,6 +31,39 @@
+ 
+ /*#define EXCP_INTERRUPT 0x100*/
+ 
++/* Windowed register indexes.  */
++enum {
++    WREG_O0,
++    WREG_O1,
++    WREG_O2,
++    WREG_O3,
++    WREG_O4,
++    WREG_O5,
++    WREG_O6,
++    WREG_O7,
++
++    WREG_L0,
++    WREG_L1,
++    WREG_L2,
++    WREG_L3,
++    WREG_L4,
++    WREG_L5,
++    WREG_L6,
++    WREG_L7,
++
++    WREG_I0,
++    WREG_I1,
++    WREG_I2,
++    WREG_I3,
++    WREG_I4,
++    WREG_I5,
++    WREG_I6,
++    WREG_I7,
++
++    WREG_SP = WREG_O6,
++    WREG_FP = WREG_I6,
++};
++
+ /* trap definitions */
+ #ifndef TARGET_SPARC64
+ #define TT_TFAULT   0x01
 -- 
 2.17.1
 
