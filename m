@@ -2,89 +2,85 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94F0EC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:52:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C82EC04AB3
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:54:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DFA7208C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:52:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 67579217F5
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:54:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PXx8MWkT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DFA7208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lLB+U6uj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67579217F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47787 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47814 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP9gm-0002Bq-IO
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 13:52:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60730)
+	id 1hP9iy-0004IW-N5
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 13:54:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eroken1@gmail.com>) id 1hP9SX-0004wV-56
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:37:26 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hP9Mg-0007br-3A
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:31:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eroken1@gmail.com>) id 1hP9SV-0001Ji-9I
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:37:24 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43199)
+	(envelope-from <richard.henderson@linaro.org>) id 1hP9Mf-0006EJ-48
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:31:22 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:44200)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <eroken1@gmail.com>) id 1hP9SR-0001GF-HG
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:37:21 -0400
-Received: by mail-wr1-x442.google.com with SMTP id r4so8765454wro.10
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 10:37:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=date:from:to:cc:subject:message-id:references:mime-version
-	:content-disposition:in-reply-to:user-agent;
-	bh=IXYisd2zHrZjUov5dKVWL1eEl+9YXG6q5gEQ9uzRqSI=;
-	b=PXx8MWkTJwiIyTOuh+UkpjObu//iP9V8KspNuR8IKKHGPiqDP6W9ZhutB/PWRULfh9
-	c95uhWHhurG6a62Fus0O9ykwhbTfYTlYuxfz332vvQtKkplBluOHAB8QKl56VFZ7UcKj
-	vSvJEfeJSY28aIEfSbXxKepuHLdfMDY/AwIwzUh+xieGr3TKEDtPGowURoogjSmkY94e
-	86ye5x6RyJtixOlU3hZMFksppvDTxHYVbl58UUoFBqdgn4g2S3DX+KTmGEsrUwliHPat
-	fG7uBQeOWr7cWMGc7zEYKUZu+jImf9TPAMtqTaoKl+euMlbf/2HubcrnLrNoJ1smaICt
-	MaIQ==
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hP9Me-0006E7-UY
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:31:21 -0400
+Received: by mail-pl1-x642.google.com with SMTP id d3so3130070plj.11
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 10:31:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:subject:date:message-id:in-reply-to:references;
+	bh=U7V1DU2sIBLR4xyyuIblisrMELcV0ZOXk8BQM7uyeGA=;
+	b=lLB+U6ujZVJ6L4XThI1HmZzsFwQkCilJF2kR0pCk0VB700ZOMTfW+27s5Lcr3dCz4o
+	lUU7mlOdzzySUgVSVl6cJgm/3y/yoDVJdD+zgmYM/qwfqKWQVhYiWnbspflLxb3LQThX
+	x2i32RAZncGat5Uw512Yv6XoK3sVBKo49XLawnjVvA0BFoDcT4qBkGDphdyb/cDcUJkm
+	zH/0yTvkGHC0Qq5ujjkWa3K3+JBMLDVf6ERFuVfjFgMu6TR+JltjLkEhX3Bm+mmyFH6W
+	epYmWhNCJFVi9ooIOVovD45qcxExbPAl8HQEPuWmHnFZmjmwuCIs5HuurcNmpPkIusDC
+	Fk0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=IXYisd2zHrZjUov5dKVWL1eEl+9YXG6q5gEQ9uzRqSI=;
-	b=CGWxXQpUTLjvxPXPD0jYaHXgj7jGwuPPZy7Oiq8pjENeyTKybwMW6mf0hivQJTy4U6
-	y1wwerFka0zAmLclK9HiClLbCzVDQIzzeS9uruFCszwMatt9oaDfHDVvPwSyxZXWn+bL
-	fVvXUgEFzqo1+kT64fHTA+Gh6grQGLao7va/yJB6zmiCAlTNC4lUJ9zS0afLcAAFZhNm
-	RPTPnMj44YKDy7fO9D5igpMHASGKXmmKEnbog2XNykBY+x7mXYPSVz0I3gz3WLqKrFpg
-	cDHRtBTMjQUdk1q/DTkBxNJ4HgiV20EmWt+gFxMruB28a6N5Xy4EeSNMTt61deaqUaKE
-	1zGQ==
-X-Gm-Message-State: APjAAAXLOAqYri8FXr8SYuWuhUmL/q11I9jSopRVmi2bMmEgMaE90xvV
-	Y/eMlE+FDoqew4dc8r022mA=
-X-Google-Smtp-Source: APXvYqwRLTGx7edHduAMkjc3v4GNu8gaK2Og3b/hL/LNRiH6A5kxYycpy3MBDWjDJ41Y1wXksVt0Vw==
-X-Received: by 2002:adf:ba43:: with SMTP id t3mr180510wrg.188.1557509837039;
-	Fri, 10 May 2019 10:37:17 -0700 (PDT)
-Received: from erokenlabserver ([41.203.78.145])
-	by smtp.gmail.com with ESMTPSA id
-	c139sm8598492wmd.26.2019.05.10.10.37.13
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Fri, 10 May 2019 10:37:15 -0700 (PDT)
-Date: Fri, 10 May 2019 18:38:36 +0100
-From: Ernest Esene <eroken1@gmail.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190510173836.GB1927@erokenlabserver>
-References: <20190504181119.GA3317@erokenlabserver>
-	<20190509130056.GA17133@stefanha-x1.localdomain>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="H1spWtNR+x+ondvy"
-Content-Disposition: inline
-In-Reply-To: <20190509130056.GA17133@stefanha-x1.localdomain>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+	:references;
+	bh=U7V1DU2sIBLR4xyyuIblisrMELcV0ZOXk8BQM7uyeGA=;
+	b=t8mx7XkjJCRJRSdNNzlRxod4v6QMChokG1cd410aStSbm6DvNhZ5EeHRhThBlqw+d2
+	OOTn/G7uqXp3N494xONLzZWjKDpqrJ9YZGTb9UuFGi0dkSqwAe0rnhj6RV0QTNYF6cfy
+	0RspP6X1l7xfIGN8ZM6DqVyp1H+yKeSmHcaBh2BnTvxL1Iom9u8kytcEB64EwXzhen1B
+	DngnHlsrbAF3r5MpZOXbaDQwcW+8O5xITFpo44OTgfFoN8LSYzA36LXRcfdkd5lPbdaY
+	NEKtTZyBF5FtK7a0E+uh9J/IaG5RnF1abAV6m4UxGsgqeHuhJ4LpRjPh638Rl6s0XMSL
+	Ex6w==
+X-Gm-Message-State: APjAAAU6znQBfIXyHn2QgAldJrAxaI+SbGCEFN7FcVbAM2RcsGRiysa4
+	+aoueLEhpbsq63c7FSxRiAXpsUHBRos=
+X-Google-Smtp-Source: APXvYqy2vnGtD31v8PeCkAUuA9XOgxfT/4xnOzMkOrdB9nborCshQpjVz2ay5+hFcqZTKku/0ay6IA==
+X-Received: by 2002:a17:902:2b87:: with SMTP id
+	l7mr10116770plb.11.1557509479776; 
+	Fri, 10 May 2019 10:31:19 -0700 (PDT)
+Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
+	[97.113.13.231]) by smtp.gmail.com with ESMTPSA id
+	v64sm7936792pfv.106.2019.05.10.10.31.18 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 10 May 2019 10:31:19 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Fri, 10 May 2019 10:30:47 -0700
+Message-Id: <20190510173049.28171-24-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190510173049.28171-1-richard.henderson@linaro.org>
+References: <20190510173049.28171-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH v2] chardev/char-i2c: Implement Linux I2C
- character device
+X-Received-From: 2607:f8b0:4864:20::642
+Subject: [Qemu-devel] [PATCH v6 23/25] target/ppc: Use qemu_guest_getrandom
+ for DARN
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,64 +92,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+We now have an interface for guest visible random numbers.
 
---H1spWtNR+x+ondvy
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+v5: Do not loop for darn64; use sizeof.
+---
+ target/ppc/int_helper.c | 39 +++++++++++++++++++++++++++------------
+ 1 file changed, 27 insertions(+), 12 deletions(-)
 
-On Thu, May 09, 2019 at 02:00:56PM +0100, Stefan Hajnoczi wrote:
-> On Sat, May 04, 2019 at 07:11:19PM +0100, Ernest Esene wrote:
-> > Add support for Linux I2C character device for I2C device passthrough
-> > For example:
-> > -chardev linux-i2c,address=3D0x46,path=3D/dev/i2c-N,id=3Di2c-chardev
->=20
-> There is a mixture of "linux-i2c" and "char-i2c" names in this patch,
-> which I find confusing.  Maybe you changed your mind while writing this
-> code.  There are two options:
->=20
-> 1. Call it "linux-i2c".  Other host operating systems will need their
->    own equivalent objects.
->=20
-> 2. Call it "char-i2c" and make all the parameters optional since they
->    are likely to work differently on other host operating systems.
->=20
-> I tend towards the second approach because I think I2C is simple enough
-> that a single user-visible object can work on all host operating
-> systems.
->=20
-> Please make the naming consistent in the next revision of this patch.
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index f6a088ac08..9af779ad38 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -23,6 +23,8 @@
+ #include "exec/helper-proto.h"
+ #include "crypto/aes.h"
+ #include "fpu/softfloat.h"
++#include "qapi/error.h"
++#include "qemu/guest-random.h"
+ 
+ #include "helper_regs.h"
+ /*****************************************************************************/
+@@ -158,25 +160,38 @@ uint32_t helper_cmpeqb(target_ulong ra, target_ulong rb)
+ #undef hasvalue
+ 
+ /*
+- * Return invalid random number.
+- *
+- * FIXME: Add rng backend or other mechanism to get cryptographically suitable
+- * random number
++ * Return a random number.
+  */
+-target_ulong helper_darn32(void)
++uint64_t helper_darn32(void)
+ {
+-    return -1;
++    Error *err = NULL;
++    uint32_t ret;
++
++    if (qemu_guest_getrandom(&ret, sizeof(ret), &err) < 0) {
++        qemu_log_mask(LOG_UNIMP, "darn: Crypto failure: %s",
++                      error_get_pretty(err));
++        error_free(err);
++        return -1;
++    }
++
++    return ret;
+ }
+ 
+-target_ulong helper_darn64(void)
++uint64_t helper_darn64(void)
+ {
+-    return -1;
++    Error *err = NULL;
++    uint64_t ret;
++
++    if (qemu_guest_getrandom(&ret, sizeof(ret), &err) < 0) {
++        qemu_log_mask(LOG_UNIMP, "darn: Crypto failure: %s",
++                      error_get_pretty(err));
++        error_free(err);
++        return -1;
++    }
++
++    return ret;
+ }
+ 
+-#endif
+-
+-#if defined(TARGET_PPC64)
+-
+ uint64_t helper_bpermd(uint64_t rs, uint64_t rb)
+ {
+     int i;
+-- 
+2.17.1
 
-My coding skills is limited to only Linux, I prefer the first approach
-as is makes it easy.
-
---H1spWtNR+x+ondvy
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEFkNmxXgplc+HqgQGJZ4JoaCvxKoFAlzVtxQACgkQJZ4JoaCv
-xKqotQ//cvT5BcR9WRnb/nl4Ei3/c0+w5Sibkv2eTEnQcS4O5RmK3b8heOWOhFl9
-wJroDidcSmmtMmotPgs/K3758d5QLsE7DmkoBi1Oy720R01Ol0JjGpttQFQ/VkQf
-6O71CHr3Mc1Rag7wTMyN7H+4P0SNLub6wSqAjQoR1DaBgVZIpOBxT1l/mXAUHyGi
-Z/ZLOngMEC6gvKccFFfKVvivV59Ol0pgAaCKcbfy1/LMeEKlTvxBrv56nQzTY38V
-Ikqtz/0+MLnFhhVPMvix+e9tS30Hslf+WwThtqkoIptBTumeTk42Bg/MDBQl+dMO
-kLdN+ruxMCfktCOeYVqeRds4lHYcy7fZTIgdax5s3x5oMySjcejT9Uw/vBIeVG3y
-KlZlNqIrlTJ7CAgKDatBW4VWnz0LvDqKhmVkfgcE7i3pKFPuWT89rmaKO0bqu0eV
-S/nDZHiqm1FpSkYmOGaH7MTXiN0SPD0J9xdes7BESN8rjX1unthPiWnQVyVCZLjf
-TjuYMZFGAtfaeZ3krRiofLwVpTOr8j1vmgwFCnrTZGq7UcXku4i1yb3jAR/1DwlY
-t6WU2dbmbCwzCFUlSUhGgtz4HakUpQPEGvbj9e19tqwhGdoqeRRDGsR5v0URX5eI
-jUAM9P69FYSWglsIRpJsQdAtEZBdYJdXjTOR8tdvgjjcLrIzDlQ=
-=CTzZ
------END PGP SIGNATURE-----
-
---H1spWtNR+x+ondvy--
 
