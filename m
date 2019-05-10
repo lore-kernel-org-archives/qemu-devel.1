@@ -6,86 +6,66 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 881D5C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:00:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D712FC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:06:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A3512175B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:00:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A3512175B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id AABD02175B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:06:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AABD02175B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44671 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44782 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP70G-0003yG-Mv
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 11:00:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51250)
+	id 1hP76b-0000G4-UY
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 11:06:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hP6zN-0003C8-5f
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 10:59:10 -0400
+	(envelope-from <armbru@redhat.com>) id 1hP754-0006WZ-Nk
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:05:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hP6zM-0007mB-B4
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 10:59:09 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:45722
-	helo=mail.default.ilande.uk0.bigv.io)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hP6zK-0006lT-BM; Fri, 10 May 2019 10:59:06 -0400
-Received: from host109-147-184-225.range109-147.btcentralplus.com
-	([109.147.184.225] helo=[192.168.1.65])
-	by mail.default.ilande.uk0.bigv.io with esmtpsa
-	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hP6vZ-0000gq-89; Fri, 10 May 2019 15:55:13 +0100
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	qemu-devel@nongnu.org
-References: <20190430165234.32272-1-alex.bennee@linaro.org>
-	<87muju4mvi.fsf@zen.linaroharston>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
-	mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
-	3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
-	E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
-	PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
-	PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
-	AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
-	OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
-	NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
-	mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
-	z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
-	T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
-	DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
-	y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
-	2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
-	14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
-	YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
-	Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
-	BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
-	opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
-	NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
-	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
-	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
-	imgcU9TTGC5qd9g=
-Message-ID: <98b34bae-c62f-8195-df93-80422ae2e58d@ilande.co.uk>
-Date: Fri, 10 May 2019 15:55:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <armbru@redhat.com>) id 1hP753-0006Cf-MW
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:05:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53332)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>)
+	id 1hP752-00067S-Jk; Fri, 10 May 2019 11:05:01 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B9AD33002619;
+	Fri, 10 May 2019 15:04:48 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
+	[10.36.116.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id CF2C16684B;
+	Fri, 10 May 2019 15:04:43 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 53E4A11385E4; Fri, 10 May 2019 17:04:42 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190502185835.15185-1-laurent@vivier.eu>
+	<CAFEAcA9-hAU5dxUmSWtbvrPEXE-nCP1uLvLbOby-_EXZ27o+8g@mail.gmail.com>
+	<87sgtv4wjo.fsf@zen.linaroharston> <87imulaude.fsf@dusky.pond.sub.org>
+	<87tve53sy7.fsf@zen.linaroharston> <87zhnw58pa.fsf@dusky.pond.sub.org>
+	<CAFEAcA-s0UYr0VW3ccG07r=BiGCVtDHkRb6yW0X_ev-zAkOxvw@mail.gmail.com>
+Date: Fri, 10 May 2019 17:04:42 +0200
+In-Reply-To: <CAFEAcA-s0UYr0VW3ccG07r=BiGCVtDHkRb6yW0X_ev-zAkOxvw@mail.gmail.com>
+	(Peter Maydell's message of "Thu, 9 May 2019 09:53:20 +0100")
+Message-ID: <87o94amjud.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <87muju4mvi.fsf@zen.linaroharston>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 109.147.184.225
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Fri, 10 May 2019 15:04:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH v5 00/15] demacro softmmu (plus
- tests/coverage)
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL 00/13] Trivial branch patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,34 +77,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, cota@braap.org
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	Michael Roth <mdroth@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
+	QEMU Trivial <qemu-trivial@nongnu.org>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	Jason Wang <jasowang@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+	Laurent Vivier <laurent@vivier.eu>, Fabien Chouteau <chouteau@adacore.com>,
+	QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>,
+	Aurelien Jarno <aurelien@aurel32.net>,
+	Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/05/2019 11:36, Alex Bennée wrote:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> Alex Bennée <alex.bennee@linaro.org> writes:
-> 
->> Hi,
+> On Thu, 9 May 2019 at 09:32, Markus Armbruster <armbru@redhat.com> wrote:
 >>
->> This is the latest iteration of the softmmu demacro series. The main
->> changes from the last submission are some updates from Richard.
-> 
-> Ping Emilio/Mark
-> 
-> Would you be able to re-run your tests to check there are no other
-> regressions? I can then get the PR prepared for merging ;-)
+>> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+>> > I couldn't replicate the bug with access to my s390 account so I think
+>> > it might be existing build artefact related which is odd.
+>>
+>> Any ideas on how to debug this further?
+>
+> It's consistently failed for me both times I've tried
+> to merge the pullreq, on both s390 and ppc (which is
+> doing a straightforward 'git merge, then do an incremental
+> build out-of-tree'). Alex has access to the s390 box,
+> and there's a ppc box in the gcc compile farm...
 
-Hi Alex,
+I tried to reproduce on a ppc64 box in the gcc compile farm, no dice.  I
+double-checked config-host.h has #define HOST_WORDS_BIGENDIAN 1.
 
-Sorry for the delay - I've run this through my complete set of PPC/SPARC32/SPARC64
-test images and no regressions as far as I can see with this latest version.
-
-Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-
-ATB,
-
-Mark.
+Clutching at straws...  you say you tried "an incremental build
+out-of-tree".  I also built out-of-tree, but it wasn't incremental.
+Could you try a non-incremental build just to exclude the possibility
+something wonky in your build tree is breaking "make check" for you?
 
