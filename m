@@ -6,64 +6,65 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CCAAC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F87C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:47:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE9AA217D6
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:47:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE9AA217D6
+	by mail.kernel.org (Postfix) with ESMTPS id A6ECE217D6
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:47:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6ECE217D6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40952 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40954 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP347-0000KO-2E
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 06:47:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59521)
+	id 1hP34B-0000Py-Tl
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 06:47:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hP32B-00077o-63
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:48 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hP32D-000788-Kl
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hP32A-0003UN-75
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:47 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:36897)
+	(envelope-from <laurent@vivier.eu>) id 1hP32C-0003Vc-Lk
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:49 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:44149)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hP329-0003TT-V0
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:46 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hP32C-0003Uz-DW
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:48 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA
 	(Nemesis)
-	id 1Mkn8B-1h0CTq3NMN-00mIgu; Fri, 10 May 2019 12:45:42 +0200
+	id 1MmQUL-1gyY3M2LI1-00iS8Y; Fri, 10 May 2019 12:45:45 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 12:45:30 +0200
-Message-Id: <20190510104536.17483-2-laurent@vivier.eu>
+Date: Fri, 10 May 2019 12:45:36 +0200
+Message-Id: <20190510104536.17483-8-laurent@vivier.eu>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190510104536.17483-1-laurent@vivier.eu>
 References: <20190510104536.17483-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:1cemR1IMCoutiFI0WkuqLwest01H/jxjryGQJ8RRL8GxmqvQtnK
-	kE58QL5EQJqPqb5sc3WsmPgZROT/P8euEFvsAtYZnkRbfVxoPe4/oRytQdE5auFDlLe5TtF
-	sN4HNOvH4kDLyne38fj9dIiwMhi2fiMtH6gBVArHTdujuLmn8WoJ2d+Wa1a6QnhnGiAU5aK
-	+rUlnELk7pMR+nGcI70dg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Kr8g74zSNac=:tTU5MkHXAAhPgICqCNTzzW
-	AV0Q8FfHaVsnxL9ry33kc0IdRQlDe1VgS5kj1HmfvnMPl7cOsDG2ZIcNS5BGoV2hTeLiFca+y
-	/wfLFMKv0q3hW+/BHUl7DK+DdpALe3TH5ziOesGDU537pAEdNLuX9XhZsdPiDaSXT4rs1ybVw
-	OWNa6Yb3JRT03D9U5Gt1rZmCLpm2A4IoOpiwPLYtzkQpX4sOASL42R+a3sRmvSQ00w7GhON6v
-	AmNGzYqeQNFvS75lLzDXJYXXFiir5wMSMhrz9n64RHODUBnhMMBKUjG0n4Pob6zipoEOEC9uO
-	chL0hHbque3Cip+pJWMlRWipswtbKmv+gFWl4KM15X3YZsDF2gtLkGR57FC7KJqi5ScNP8KaA
-	P800wJdiIgMf3QsfEzmjkd407tqATaNKYA10ADm93fR8U6bW3WOCi/kW9mMs59hQwpApCvMHE
-	Wr7xGhk9RITp/xHLi3CsFpnPuy0o8YcHkYnWsx8/d68ogR4Y6R+LFr3lQlgbS9ZAZvQToSwbu
-	NHFEvtEXHeUrxWWjGyNhsGlEtDPG/M8ROLvCPPZlxT/SoZYQdnDyj2bW5JJE6q+BQ+XANDYnw
-	CdKlrW5PR8TnjUdQOa6eBNkS0G0sqeGtoUSB8Y+/8bTrxrUvyz0hURE+Ss0RR6BUNScZh3tmX
-	EDc7lEqPz9+aK+3zG0TGYyimTC//hw1N/rJ7/aXxIX48P03pQUL7KMasZn67/gmyM5BFNcNtA
-	x3adDLxxCXoWuYo4H4o76U2KVbV7wQkwbjHHHg==
+X-Provags-ID: V03:K1:Vnp9sO9bsBtHY23Rv87ruW1IedEDylnTSw/JngGbdN+Sn+v5ue6
+	V+vY+jfX4MHALsCDR5+cSVm9jteOu4TnUaidu0wb7TGmOjJpdzoxTKuQmp4aZzEgCTMVRVI
+	otWkieotbHPkf/5TUQcyOpglPAZFMJnUCErtN4u0Rk1k8jq6cOb0bDsPlqSJpcE/F1TLRsD
+	Q+fhbx0p7qBnpkKUHt5TQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ehbUMQwMp48=:lTlwX7co5kT9WRvo/BOo0I
+	WgSoBguHeSS0rVG3VI91IKeekgoaM6d0sbEWZE5lZ0FXnGnaCbUqVBMmuYeIAvxEzOxrZ3NwG
+	3nD2crBA1+qz9v/RNEE3oUsA92t7IuZxf58EgEuKMT4aOA5mmXSHDeEEK9q3fBRSTwySFb5wF
+	WEMC7gPFRpPi4nEtkaHsFoV7CYV67jsFqF1Bx7qolzn/6NsszqxzTJGOwRaNBL79RDXPU7zf9
+	ZpcA5Ld5EuJx/0uvw7zdVsyU/DaJgabnFlw/ImPLDT1Oy0SkqhHlG1VrrQwsJ0Ir5gY5dnTlF
+	W1E0zCqTYoarhOvLXyubdSASFaf6MPQXHhj/LuYRFfxeEHQ2KaOvEWO0irC7ru5fIBAoiKw2u
+	9nE87HQNYjvb9JuajqOOFeKlXmjmTKIS2aaqjB4LuesSfExUvTxlxg0sZjEyuOCxm6NsN8UNm
+	TVnpe3PhhuKc9xpVGn6N3dxui6uy24KxWSWrn5jMdrNxhR+ESyASN719BrYCVu1SrpwLskeU6
+	Je+SnPamx5g4D09O3wKkKLVuXiuVsZlZ8DTmdCX2o0Mh9rWy7I3WKQZDdeZWTKRVj1CbwnmPe
+	T/rwVbR6a0nwbCwsEKKc1Z1+4g8x3+tMLf2ZUcOAe/1iu+mhdc4HiK49rW3Q3pJsfB2G2Efds
+	3cc3UwkBtaTlsCg5TYgPIKgV9/HULAU+SDbM72pHOkg4DKkbsbz1vvFq2kVG8AkSvjZ3P6C9A
+	u1pRWJ9kThY+vbQa1iLor9p3mjsUENQA6CbwqiApyPZiR8ZyywBTnKxXklg=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
-Subject: [Qemu-devel] [PULL v2 1/7] linux-user: Add missing IPV6 sockopts
+X-Received-From: 212.227.126.131
+Subject: [Qemu-devel] [PULL v2 7/7] linux-user: fix GPROF build failure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,89 +76,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>, Riku Voipio <riku.voipio@iki.fi>,
+Cc: Laurent Desnogues <laurent.desnogues@gmail.com>,
+	Riku Voipio <riku.voipio@iki.fi>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Helge Deller <deller@gmx.de>
+From: Alex Bennée <alex.bennee@linaro.org>
 
-When running ssh over IPv6 with linux-user I faced this warning:
- Unsupported setsockopt level=41 optname=67
- setsockopt IPV6_TCLASS 32: Protocol not available:
+When linux-user/exit was introduced we failed to move the gprof
+include at the same time. The CI didn't notice because it only builds
+system emulation. Fix it for those that still find gprof useful.
 
-This patch adds code to the linux-user emulatation for setting and
-retrieving of a few missing IPV6 options, including IPV6_TCLASS.
-
-Signed-off-by: Helge Deller <deller@gmx.de>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Message-Id: <20190502092728.32727-1-alex.bennee@linaro.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/syscall.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+ linux-user/exit.c    | 3 +++
+ linux-user/syscall.c | 3 ---
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/linux-user/exit.c b/linux-user/exit.c
+index 14e94e28faf8..bdda7205532e 100644
+--- a/linux-user/exit.c
++++ b/linux-user/exit.c
+@@ -18,6 +18,9 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
++#ifdef TARGET_GPROF
++#include <sys/gmon.h>
++#endif
+ 
+ #ifdef CONFIG_GCOV
+ extern void __gcov_dump(void);
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 96cd4bf86dd3..44b593b81161 100644
+index 44b593b81161..f5ff6f5dc8a8 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -1864,6 +1864,28 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
-         case IPV6_RECVHOPLIMIT:
-         case IPV6_2292HOPLIMIT:
-         case IPV6_CHECKSUM:
-+        case IPV6_ADDRFORM:
-+        case IPV6_2292PKTINFO:
-+        case IPV6_RECVTCLASS:
-+        case IPV6_RECVRTHDR:
-+        case IPV6_2292RTHDR:
-+        case IPV6_RECVHOPOPTS:
-+        case IPV6_2292HOPOPTS:
-+        case IPV6_RECVDSTOPTS:
-+        case IPV6_2292DSTOPTS:
-+        case IPV6_TCLASS:
-+#ifdef IPV6_RECVPATHMTU
-+        case IPV6_RECVPATHMTU:
-+#endif
-+#ifdef IPV6_TRANSPARENT
-+        case IPV6_TRANSPARENT:
-+#endif
-+#ifdef IPV6_FREEBIND
-+        case IPV6_FREEBIND:
-+#endif
-+#ifdef IPV6_RECVORIGDSTADDR
-+        case IPV6_RECVORIGDSTADDR:
-+#endif
-             val = 0;
-             if (optlen < sizeof(uint32_t)) {
-                 return -TARGET_EINVAL;
-@@ -2358,6 +2380,28 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
-         case IPV6_RECVHOPLIMIT:
-         case IPV6_2292HOPLIMIT:
-         case IPV6_CHECKSUM:
-+        case IPV6_ADDRFORM:
-+        case IPV6_2292PKTINFO:
-+        case IPV6_RECVTCLASS:
-+        case IPV6_RECVRTHDR:
-+        case IPV6_2292RTHDR:
-+        case IPV6_RECVHOPOPTS:
-+        case IPV6_2292HOPOPTS:
-+        case IPV6_RECVDSTOPTS:
-+        case IPV6_2292DSTOPTS:
-+        case IPV6_TCLASS:
-+#ifdef IPV6_RECVPATHMTU
-+        case IPV6_RECVPATHMTU:
-+#endif
-+#ifdef IPV6_TRANSPARENT
-+        case IPV6_TRANSPARENT:
-+#endif
-+#ifdef IPV6_FREEBIND
-+        case IPV6_FREEBIND:
-+#endif
-+#ifdef IPV6_RECVORIGDSTADDR
-+        case IPV6_RECVORIGDSTADDR:
-+#endif
-             if (get_user_u32(len, optlen))
-                 return -TARGET_EFAULT;
-             if (len < 0)
+@@ -59,9 +59,6 @@
+ #ifdef CONFIG_TIMERFD
+ #include <sys/timerfd.h>
+ #endif
+-#ifdef TARGET_GPROF
+-#include <sys/gmon.h>
+-#endif
+ #ifdef CONFIG_EVENTFD
+ #include <sys/eventfd.h>
+ #endif
 -- 
 2.20.1
 
