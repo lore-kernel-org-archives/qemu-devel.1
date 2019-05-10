@@ -2,64 +2,63 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FEC2C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 14:08:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA4F7C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 14:10:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 344CD2175B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 14:08:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 344CD2175B
+	by mail.kernel.org (Postfix) with ESMTPS id 77B202175B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 14:10:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77B202175B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43969 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44019 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP6C8-0004Hc-Rx
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 10:08:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40470)
+	id 1hP6EW-0006Si-6T
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 10:10:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hP65K-00079Q-UM
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 10:01:20 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hP65G-00075f-K0
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 10:01:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hP65J-00022V-9P
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 10:01:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58002)
+	(envelope-from <kraxel@redhat.com>) id 1hP65F-00020F-Gq
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 10:01:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32853)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hP65J-00021z-1A
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 10:01:13 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hP65F-0001zs-Bh
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 10:01:09 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 62953C0624BF
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 14:01:12 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B44303084029
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 14:01:08 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
 	[10.36.117.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 083636108C;
-	Fri, 10 May 2019 14:01:04 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E59AD1001E65;
+	Fri, 10 May 2019 14:01:03 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 58B58A1EA; Fri, 10 May 2019 16:01:03 +0200 (CEST)
+	id 2AB6EA1E0; Fri, 10 May 2019 16:01:03 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 16:00:59 +0200
-Message-Id: <20190510140103.3834-5-kraxel@redhat.com>
-In-Reply-To: <20190510140103.3834-1-kraxel@redhat.com>
-References: <20190510140103.3834-1-kraxel@redhat.com>
+Date: Fri, 10 May 2019 16:00:55 +0200
+Message-Id: <20190510140103.3834-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Fri, 10 May 2019 14:01:12 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Fri, 10 May 2019 14:01:08 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 4/8] Add vhost-user-input-pci
+Subject: [Qemu-devel] [PULL 0/8] Input 20190510 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,338 +70,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
-	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
 	Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+The following changes since commit 812b835fb4d23dd108b2f9802158472d50b735=
+79:
 
-Add a new virtio-input device, which connects to a vhost-user
-backend.
+  Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2019-05-=
+07' into staging (2019-05-09 16:31:12 +0100)
 
-Instead of reading configuration directly from an input device /
-evdev (like virtio-input-host), it reads it over vhost-user protocol
-with {SET,GET}_CONFIG messages. The vhost-user-backend handles the
-queues & events setup.
+are available in the Git repository at:
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-id: 20190503130034.24916-5-marcandre.lureau@redhat.com
+  git://git.kraxel.org/qemu tags/input-20190510-pull-request
 
-[ kraxel: drop -{non-,}transitional variants ]
-[ kraxel: fix "make check" on !linux ]
+for you to fetch changes up to 7fb6e5a839bc625fd64c32d167f231ecd6f2b3e2:
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/hw/virtio/virtio-input.h |  14 ++++
- hw/input/vhost-user-input.c      | 129 +++++++++++++++++++++++++++++++
- hw/virtio/vhost-user-input-pci.c |  50 ++++++++++++
- MAINTAINERS                      |   1 +
- hw/input/Kconfig                 |   5 ++
- hw/input/Makefile.objs           |   1 +
- hw/virtio/Makefile.objs          |   1 +
- 7 files changed, 201 insertions(+)
+  virtio-input: fix Kconfig dependency and Makefile (2019-05-10 14:54:11 =
++0200)
+
+----------------------------------------------------------------
+input: add vhost-user-input, virtio-input fixes.
+
+----------------------------------------------------------------
+
+Gerd Hoffmann (2):
+  virtio-input-host-pci: cleanup types
+  virtio-input: fix Kconfig dependency and Makefile
+
+Marc-Andr=C3=A9 Lureau (6):
+  libvhost-user: fix -Waddress-of-packed-member
+  libvhost-user: add PROTOCOL_F_CONFIG if {set, get}_config
+  Add vhost-user-backend
+  Add vhost-user-input-pci
+  util: simplify unix_listen()
+  contrib: add vhost-user-input
+
+ Makefile                               |  11 +
+ Makefile.objs                          |   1 +
+ include/hw/virtio/virtio-input.h       |  14 +
+ include/sysemu/vhost-user-backend.h    |  57 ++++
+ backends/vhost-user.c                  | 209 +++++++++++++
+ contrib/libvhost-user/libvhost-user.c  |  10 +-
+ contrib/vhost-user-input/main.c        | 393 +++++++++++++++++++++++++
+ hw/input/vhost-user-input.c            | 129 ++++++++
+ hw/virtio/vhost-user-input-pci.c       |  50 ++++
+ hw/virtio/virtio-input-host-pci.c      |   7 +-
+ util/qemu-sockets.c                    |  18 +-
+ MAINTAINERS                            |   4 +
+ backends/Makefile.objs                 |   2 +
+ contrib/vhost-user-input/Makefile.objs |   1 +
+ hw/input/Kconfig                       |   7 +-
+ hw/input/Makefile.objs                 |   5 +-
+ hw/virtio/Makefile.objs                |   1 +
+ 17 files changed, 891 insertions(+), 28 deletions(-)
+ create mode 100644 include/sysemu/vhost-user-backend.h
+ create mode 100644 backends/vhost-user.c
+ create mode 100644 contrib/vhost-user-input/main.c
  create mode 100644 hw/input/vhost-user-input.c
  create mode 100644 hw/virtio/vhost-user-input-pci.c
+ create mode 100644 contrib/vhost-user-input/Makefile.objs
 
-diff --git a/include/hw/virtio/virtio-input.h b/include/hw/virtio/virtio-=
-input.h
-index 054c38836f11..4fca03e7969e 100644
---- a/include/hw/virtio/virtio-input.h
-+++ b/include/hw/virtio/virtio-input.h
-@@ -2,6 +2,7 @@
- #define QEMU_VIRTIO_INPUT_H
-=20
- #include "ui/input.h"
-+#include "sysemu/vhost-user-backend.h"
-=20
- /* ----------------------------------------------------------------- */
- /* virtio input protocol                                             */
-@@ -42,11 +43,18 @@ typedef struct virtio_input_event virtio_input_event;
- #define VIRTIO_INPUT_HOST_GET_PARENT_CLASS(obj) \
-         OBJECT_GET_PARENT_CLASS(obj, TYPE_VIRTIO_INPUT_HOST)
-=20
-+#define TYPE_VHOST_USER_INPUT   "vhost-user-input"
-+#define VHOST_USER_INPUT(obj)                              \
-+    OBJECT_CHECK(VHostUserInput, (obj), TYPE_VHOST_USER_INPUT)
-+#define VHOST_USER_INPUT_GET_PARENT_CLASS(obj)             \
-+    OBJECT_GET_PARENT_CLASS(obj, TYPE_VHOST_USER_INPUT)
-+
- typedef struct VirtIOInput VirtIOInput;
- typedef struct VirtIOInputClass VirtIOInputClass;
- typedef struct VirtIOInputConfig VirtIOInputConfig;
- typedef struct VirtIOInputHID VirtIOInputHID;
- typedef struct VirtIOInputHost VirtIOInputHost;
-+typedef struct VHostUserInput VHostUserInput;
-=20
- struct VirtIOInputConfig {
-     virtio_input_config               config;
-@@ -98,6 +106,12 @@ struct VirtIOInputHost {
-     int                               fd;
- };
-=20
-+struct VHostUserInput {
-+    VirtIOInput                       parent_obj;
-+
-+    VhostUserBackend                  *vhost;
-+};
-+
- void virtio_input_send(VirtIOInput *vinput, virtio_input_event *event);
- void virtio_input_init_config(VirtIOInput *vinput,
-                               virtio_input_config *config);
-diff --git a/hw/input/vhost-user-input.c b/hw/input/vhost-user-input.c
-new file mode 100644
-index 000000000000..6da497b1a8a9
---- /dev/null
-+++ b/hw/input/vhost-user-input.c
-@@ -0,0 +1,129 @@
-+/*
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
-+
-+#include "hw/qdev.h"
-+#include "hw/virtio/virtio-input.h"
-+
-+static int vhost_input_config_change(struct vhost_dev *dev)
-+{
-+    error_report("vhost-user-input: unhandled backend config change");
-+    return -1;
-+}
-+
-+static const VhostDevConfigOps config_ops =3D {
-+    .vhost_dev_config_notifier =3D vhost_input_config_change,
-+};
-+
-+static void vhost_input_realize(DeviceState *dev, Error **errp)
-+{
-+    VHostUserInput *vhi =3D VHOST_USER_INPUT(dev);
-+    VirtIOInput *vinput =3D VIRTIO_INPUT(dev);
-+    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
-+
-+    vhost_dev_set_config_notifier(&vhi->vhost->dev, &config_ops);
-+    vinput->cfg_size =3D sizeof_field(virtio_input_config, u);
-+    if (vhost_user_backend_dev_init(vhi->vhost, vdev, 2, errp) =3D=3D -1=
-) {
-+        return;
-+    }
-+}
-+
-+static void vhost_input_change_active(VirtIOInput *vinput)
-+{
-+    VHostUserInput *vhi =3D VHOST_USER_INPUT(vinput);
-+
-+    if (vinput->active) {
-+        vhost_user_backend_start(vhi->vhost);
-+    } else {
-+        vhost_user_backend_stop(vhi->vhost);
-+    }
-+}
-+
-+static void vhost_input_get_config(VirtIODevice *vdev, uint8_t *config_d=
-ata)
-+{
-+    VirtIOInput *vinput =3D VIRTIO_INPUT(vdev);
-+    VHostUserInput *vhi =3D VHOST_USER_INPUT(vdev);
-+    int ret;
-+
-+    memset(config_data, 0, vinput->cfg_size);
-+
-+    ret =3D vhost_dev_get_config(&vhi->vhost->dev, config_data, vinput->=
-cfg_size);
-+    if (ret) {
-+        error_report("vhost-user-input: get device config space failed")=
-;
-+        return;
-+    }
-+}
-+
-+static void vhost_input_set_config(VirtIODevice *vdev,
-+                                   const uint8_t *config_data)
-+{
-+    VHostUserInput *vhi =3D VHOST_USER_INPUT(vdev);
-+    int ret;
-+
-+    ret =3D vhost_dev_set_config(&vhi->vhost->dev, config_data,
-+                               0, sizeof(virtio_input_config),
-+                               VHOST_SET_CONFIG_TYPE_MASTER);
-+    if (ret) {
-+        error_report("vhost-user-input: set device config space failed")=
-;
-+        return;
-+    }
-+
-+    virtio_notify_config(vdev);
-+}
-+
-+static const VMStateDescription vmstate_vhost_input =3D {
-+    .name =3D "vhost-user-input",
-+    .unmigratable =3D 1,
-+};
-+
-+static void vhost_input_class_init(ObjectClass *klass, void *data)
-+{
-+    VirtIOInputClass *vic =3D VIRTIO_INPUT_CLASS(klass);
-+    VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_CLASS(klass);
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->vmsd =3D &vmstate_vhost_input;
-+    vdc->get_config =3D vhost_input_get_config;
-+    vdc->set_config =3D vhost_input_set_config;
-+    vic->realize =3D vhost_input_realize;
-+    vic->change_active =3D vhost_input_change_active;
-+}
-+
-+static void vhost_input_init(Object *obj)
-+{
-+    VHostUserInput *vhi =3D VHOST_USER_INPUT(obj);
-+
-+    vhi->vhost =3D VHOST_USER_BACKEND(object_new(TYPE_VHOST_USER_BACKEND=
-));
-+    object_property_add_alias(obj, "chardev",
-+                              OBJECT(vhi->vhost), "chardev", &error_abor=
-t);
-+}
-+
-+static void vhost_input_finalize(Object *obj)
-+{
-+    VHostUserInput *vhi =3D VHOST_USER_INPUT(obj);
-+
-+    object_unref(OBJECT(vhi->vhost));
-+}
-+
-+static const TypeInfo vhost_input_info =3D {
-+    .name          =3D TYPE_VHOST_USER_INPUT,
-+    .parent        =3D TYPE_VIRTIO_INPUT,
-+    .instance_size =3D sizeof(VHostUserInput),
-+    .instance_init =3D vhost_input_init,
-+    .instance_finalize =3D vhost_input_finalize,
-+    .class_init    =3D vhost_input_class_init,
-+};
-+
-+static void vhost_input_register_types(void)
-+{
-+    type_register_static(&vhost_input_info);
-+}
-+
-+type_init(vhost_input_register_types)
-diff --git a/hw/virtio/vhost-user-input-pci.c b/hw/virtio/vhost-user-inpu=
-t-pci.c
-new file mode 100644
-index 000000000000..ae9cff9aed5e
---- /dev/null
-+++ b/hw/virtio/vhost-user-input-pci.c
-@@ -0,0 +1,50 @@
-+/*
-+ * This work is licensed under the terms of the GNU LGPL, version 2 or
-+ * later.  See the COPYING.LIB file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "hw/virtio/virtio.h"
-+#include "hw/virtio/virtio-input.h"
-+#include "qapi/error.h"
-+#include "qemu/error-report.h"
-+#include "virtio-pci.h"
-+
-+typedef struct VHostUserInputPCI VHostUserInputPCI;
-+
-+#define TYPE_VHOST_USER_INPUT_PCI "vhost-user-input-pci"
-+
-+#define VHOST_USER_INPUT_PCI(obj) \
-+    OBJECT_CHECK(VHostUserInputPCI, (obj), TYPE_VHOST_USER_INPUT_PCI)
-+
-+struct VHostUserInputPCI {
-+    VirtIOPCIProxy parent_obj;
-+    VHostUserInput vhi;
-+};
-+
-+static void vhost_user_input_pci_instance_init(Object *obj)
-+{
-+    VHostUserInputPCI *dev =3D VHOST_USER_INPUT_PCI(obj);
-+
-+    virtio_instance_init_common(obj, &dev->vhi, sizeof(dev->vhi),
-+                                TYPE_VHOST_USER_INPUT);
-+
-+    object_property_add_alias(obj, "chardev",
-+                              OBJECT(&dev->vhi), "chardev",
-+                              &error_abort);
-+}
-+
-+static const VirtioPCIDeviceTypeInfo vhost_user_input_pci_info =3D {
-+    .generic_name =3D TYPE_VHOST_USER_INPUT_PCI,
-+    .parent =3D TYPE_VIRTIO_INPUT_PCI,
-+    .instance_size =3D sizeof(VHostUserInputPCI),
-+    .instance_init =3D vhost_user_input_pci_instance_init,
-+};
-+
-+static void vhost_user_input_pci_register(void)
-+{
-+    virtio_pci_types_register(&vhost_user_input_pci_info);
-+}
-+
-+type_init(vhost_user_input_pci_register)
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 2e40390ebcdb..6d4a10b3903f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1521,6 +1521,7 @@ L: qemu-s390x@nongnu.org
- virtio-input
- M: Gerd Hoffmann <kraxel@redhat.com>
- S: Maintained
-+F: hw/input/vhost-user-input.c
- F: hw/input/virtio-input*.c
- F: include/hw/virtio/virtio-input.h
-=20
-diff --git a/hw/input/Kconfig b/hw/input/Kconfig
-index e2e66f085862..50e55e353847 100644
---- a/hw/input/Kconfig
-+++ b/hw/input/Kconfig
-@@ -29,5 +29,10 @@ config VIRTIO_INPUT_HOST
-     default y
-     depends on VIRTIO && LINUX
-=20
-+config VHOST_USER_INPUT
-+    bool
-+    default y
-+    depends on VIRTIO_INPUT && VHOST_USER
-+
- config TSC210X
-     bool
-diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
-index c8b00f71ec50..3eddf00f2bba 100644
---- a/hw/input/Makefile.objs
-+++ b/hw/input/Makefile.objs
-@@ -12,6 +12,7 @@ common-obj-$(CONFIG_VIRTIO_INPUT) +=3D virtio-input-hid=
-.o
- ifeq ($(CONFIG_LINUX),y)
- common-obj-$(CONFIG_VIRTIO_INPUT) +=3D virtio-input-host.o
- endif
-+common-obj-$(CONFIG_VHOST_USER_INPUT) +=3D vhost-user-input.o
-=20
- obj-$(CONFIG_MILKYMIST) +=3D milkymist-softusb.o
- obj-$(CONFIG_PXA2XX) +=3D pxa2xx_keypad.o
-diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index f2ab667a2118..5570ea8df805 100644
---- a/hw/virtio/Makefile.objs
-+++ b/hw/virtio/Makefile.objs
-@@ -17,6 +17,7 @@ obj-$(CONFIG_VHOST_VSOCK) +=3D vhost-vsock.o
- ifeq ($(CONFIG_VIRTIO_PCI),y)
- obj-$(CONFIG_VHOST_VSOCK) +=3D vhost-vsock-pci.o
- obj-$(CONFIG_VHOST_USER_BLK) +=3D vhost-user-blk-pci.o
-+obj-$(CONFIG_VHOST_USER_INPUT) +=3D vhost-user-input-pci.o
- obj-$(CONFIG_VHOST_USER_SCSI) +=3D vhost-user-scsi-pci.o
- obj-$(CONFIG_VHOST_SCSI) +=3D vhost-scsi-pci.o
- obj-$(CONFIG_VIRTIO_INPUT_HOST) +=3D virtio-input-host-pci.o
 --=20
 2.18.1
 
