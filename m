@@ -2,64 +2,87 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B4E0C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 19:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EE6DC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:02:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CFDC217D6
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 19:17:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CFDC217D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 63A2F217F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 20:02:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xZnsmCd+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63A2F217F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48868 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49289 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hPB1m-0000Oh-HU
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 15:17:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55740)
+	id 1hPBjJ-0003JL-DN
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 16:02:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hPB0s-00005M-Rz
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 15:16:59 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hPBhj-0002S1-7b
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:01:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hPB0q-00071p-HY
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 15:16:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58814)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hPB0q-00070k-9y
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 15:16:56 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F3574307D849;
-	Fri, 10 May 2019 19:16:54 +0000 (UTC)
-Received: from work-vm (ovpn-117-163.ams2.redhat.com [10.36.117.163])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B59DF22711;
-	Fri, 10 May 2019 19:16:51 +0000 (UTC)
-Date: Fri, 10 May 2019 20:16:49 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <20190510191648.GB2895@work-vm>
-References: <20190510185620.15757-1-ehabkost@redhat.com>
-	<ffe6be45-7c22-1264-08f2-faa21ab9db69@linaro.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1hPBhd-0002Rz-S8
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:01:12 -0400
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:41636)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hPBhc-0002NK-IO
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 16:01:09 -0400
+Received: by mail-wr1-x432.google.com with SMTP id d12so9113875wrm.8
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 13:01:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=DDiN+MMrpUN/LmlEEKX6L2Ablxv7aphx+aWfipYbLho=;
+	b=xZnsmCd+GozDlS9njK54HLAR/wWNjeLjOCWq0eo21VkDS/Lwt2vwPxwrmLkfXmEd78
+	V13jxMTICWAgiodWz7yHK3UzNfYxbAavn8HnZxbXC6WGx2TcM2xWE14ut+57/vaHgnzm
+	gycbz7HUoIDdTd2zT3OyN4NT7fJtcwmGI1bSm2OuJ5Xal3dITd8KlrjDDVfXgLjla2pd
+	UkVPB/6ry0GadQIQLa5VKIWCKG70nA3U4DQOnSmojnA8eH9ugWS8D/Th0lv1nss3hr+n
+	sCUglpVS5H6SFn/11/arSnMH1EnWi3KGVL/ESUcs8dssRDXVaTiCfSlw8jon2ysTvHIA
+	Jolw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=DDiN+MMrpUN/LmlEEKX6L2Ablxv7aphx+aWfipYbLho=;
+	b=YM9oIQ0IMFiojo0ECa/3oij3i7MRAQEqyleLG3Jwphhh5VhqCVz6ezH+xaZPeOZbBs
+	QsQmxKvDLXsT58pKctQnMSBuLIWLrutwI6AfLvHJjFnJJKMWj/LkN+CcaZ+f3JYnfUXL
+	O2BNsMVvxDK3j7iLz4Le+VnDTaCZEcY5Rsj8zeqZApRCO2Nxvzd9b98QXSqRE14FiKtd
+	WNhlfsgEGaWBMGaGNpmYYpZTxwPQsGOH1jn52hCmJsqsu0tIgvwox1S6Jun4UceKH/ng
+	543g6UlArQ31DkOsB+/uByRPN08yT0qwg3j6N5bCQtQpDFANta26KhR939sO7NvXWg6T
+	iM7w==
+X-Gm-Message-State: APjAAAVJJiBLzq4Ts5+4sNVaxH5aLssQc7p+O9ds134/5GOri33jkoAB
+	L3hHUM5UFeKDC7W7odLKnHhtvw==
+X-Google-Smtp-Source: APXvYqz9yMGzPQ6I0hxfjZ5NYfZi9qkY+yqLOG+uQ0DMRs6mhmlrQtJg88cK2UJRPfUyzLT9Yz+zeQ==
+X-Received: by 2002:a5d:54cc:: with SMTP id x12mr9247530wrv.303.1557518463270; 
+	Fri, 10 May 2019 13:01:03 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id b8sm5518418wrr.64.2019.05.10.13.01.02
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Fri, 10 May 2019 13:01:02 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id C6C891FF87;
+	Fri, 10 May 2019 21:01:01 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Date: Fri, 10 May 2019 21:00:56 +0100
+Message-Id: <20190510200101.31096-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ffe6be45-7c22-1264-08f2-faa21ab9db69@linaro.org>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Fri, 10 May 2019 19:16:55 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] monitor: Call mon_get_cpu() only once at
- hmp_gva2gpa()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::432
+Subject: [Qemu-devel] [PULL 0/5] demacro SoftMMU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,36 +94,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Richard Henderson (richard.henderson@linaro.org) wrote:
-> On 5/10/19 11:56 AM, Eduardo Habkost wrote:
-> > hmp_gva2gpa() calls mon_get_cpu() twice, which is unnecessary.
-> > Not an actual bug, but this is reported as a defect by Coverity
-> > Scan (CID 1401346).
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  monitor.c | 3 +--
-> >  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> 
-> I was about to send the same patch.  ;-)
+The following changes since commit a6ae23831b05a11880b40f7d58e332c45a6b04f7:
 
-I did :-)
+  Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-request' into staging (2019-05-03 15:26:09 +0100)
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+are available in the Git repository at:
 
-> 
-> 
-> r~
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  https://github.com/stsquad/qemu.git tags/pull-demacro-softmmu-100519-1
+
+for you to fetch changes up to 4601f8d10d7628bcaf2a8179af36e04b42879e91:
+
+  cputlb: Do unaligned store recursion to outermost function (2019-05-10 20:23:21 +0100)
+
+----------------------------------------------------------------
+Demacrofy the SoftMMU
+
+  - the demacro itself
+  - refactor TLB_RECHECK and fix bug
+  - move unaligned handler out
+
+----------------------------------------------------------------
+Alex Bennée (1):
+      accel/tcg: demacro cputlb
+
+Richard Henderson (4):
+      cputlb: Move TLB_RECHECK handling into load/store_helper
+      cputlb: Drop attribute flatten
+      cputlb: Do unaligned load recursion to outermost function
+      cputlb: Do unaligned store recursion to outermost function
+
+ accel/tcg/cputlb.c           | 626 +++++++++++++++++++++++++++++++++++++------
+ accel/tcg/softmmu_template.h | 454 -------------------------------
+ 2 files changed, 546 insertions(+), 534 deletions(-)
+ delete mode 100644 accel/tcg/softmmu_template.h
+
+-- 
+2.20.1
+
 
