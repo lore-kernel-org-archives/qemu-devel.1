@@ -2,69 +2,68 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.9 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F87C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:47:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2868C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:47:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6ECE217D6
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:47:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6ECE217D6
+	by mail.kernel.org (Postfix) with ESMTPS id CB212217D6
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:47:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB212217D6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40954 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40956 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP34B-0000Py-Tl
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 06:47:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59545)
+	id 1hP34F-0000SB-3m
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 06:47:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hP32D-000788-Kl
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:50 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hP32F-0007Ce-F5
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hP32C-0003Vc-Lk
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:49 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:44149)
+	(envelope-from <laurent@vivier.eu>) id 1hP32E-0003Y0-K4
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:51 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:44049)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hP32C-0003Uz-DW
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:48 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hP32E-0003XI-BD
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:50 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA
 	(Nemesis)
-	id 1MmQUL-1gyY3M2LI1-00iS8Y; Fri, 10 May 2019 12:45:45 +0200
+	id 1M1rGy-1hRFxV1MJU-002CQV; Fri, 10 May 2019 12:45:41 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 12:45:36 +0200
-Message-Id: <20190510104536.17483-8-laurent@vivier.eu>
+Date: Fri, 10 May 2019 12:45:29 +0200
+Message-Id: <20190510104536.17483-1-laurent@vivier.eu>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190510104536.17483-1-laurent@vivier.eu>
-References: <20190510104536.17483-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Vnp9sO9bsBtHY23Rv87ruW1IedEDylnTSw/JngGbdN+Sn+v5ue6
-	V+vY+jfX4MHALsCDR5+cSVm9jteOu4TnUaidu0wb7TGmOjJpdzoxTKuQmp4aZzEgCTMVRVI
-	otWkieotbHPkf/5TUQcyOpglPAZFMJnUCErtN4u0Rk1k8jq6cOb0bDsPlqSJpcE/F1TLRsD
-	Q+fhbx0p7qBnpkKUHt5TQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ehbUMQwMp48=:lTlwX7co5kT9WRvo/BOo0I
-	WgSoBguHeSS0rVG3VI91IKeekgoaM6d0sbEWZE5lZ0FXnGnaCbUqVBMmuYeIAvxEzOxrZ3NwG
-	3nD2crBA1+qz9v/RNEE3oUsA92t7IuZxf58EgEuKMT4aOA5mmXSHDeEEK9q3fBRSTwySFb5wF
-	WEMC7gPFRpPi4nEtkaHsFoV7CYV67jsFqF1Bx7qolzn/6NsszqxzTJGOwRaNBL79RDXPU7zf9
-	ZpcA5Ld5EuJx/0uvw7zdVsyU/DaJgabnFlw/ImPLDT1Oy0SkqhHlG1VrrQwsJ0Ir5gY5dnTlF
-	W1E0zCqTYoarhOvLXyubdSASFaf6MPQXHhj/LuYRFfxeEHQ2KaOvEWO0irC7ru5fIBAoiKw2u
-	9nE87HQNYjvb9JuajqOOFeKlXmjmTKIS2aaqjB4LuesSfExUvTxlxg0sZjEyuOCxm6NsN8UNm
-	TVnpe3PhhuKc9xpVGn6N3dxui6uy24KxWSWrn5jMdrNxhR+ESyASN719BrYCVu1SrpwLskeU6
-	Je+SnPamx5g4D09O3wKkKLVuXiuVsZlZ8DTmdCX2o0Mh9rWy7I3WKQZDdeZWTKRVj1CbwnmPe
-	T/rwVbR6a0nwbCwsEKKc1Z1+4g8x3+tMLf2ZUcOAe/1iu+mhdc4HiK49rW3Q3pJsfB2G2Efds
-	3cc3UwkBtaTlsCg5TYgPIKgV9/HULAU+SDbM72pHOkg4DKkbsbz1vvFq2kVG8AkSvjZ3P6C9A
-	u1pRWJ9kThY+vbQa1iLor9p3mjsUENQA6CbwqiApyPZiR8ZyywBTnKxXklg=
+X-Provags-ID: V03:K1:JYW73IJ+lj+rMHJQvV7ka1Suk2Jv6pUx30fUcLseC9yUmQ9CxH1
+	b+6DZc8TioB39W008rtvSZZO0R8jDaunAz5wOv1/x+t/1q24FzpslzPAbhA/fyu1IMPiJ1G
+	2bZod33Emh/4x+RZ8z9t5a2x2nIu99KWlusKJL551Fjhl1YSZsCO9Nu6/WZz3TyaFM1PJmX
+	+nEHwJkbXZofAWt3PT3Yg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:zlFck5dwJSc=:0OwlCVpTtPbY2KawymZo/X
+	woSjvk8aNnVxCTqGv1qABOiNQ/raI1gXCSaVKgopCXfUH3OPdqouKLeH6ZFDUubiC0HIaCuQE
+	ab4i77VoOftFDozv3JRmCzs6cuB+WsS5ilEAya0VcBc3fGAYJttfGVLoetlZQaDn9fF3elQ0t
+	Llt3YqAvGQTNUuS08gN+X52HZvfAPbrSxyibBIBZB30fUYUNCISr6NZ0a9TQQbs5jFw+gcHu+
+	jL4T5kmGPESSlCoLjxshSiTRbMNGXvaQe2ljktcUwklbbzt4w/aPJDZqgUu0S5anoX0QLq91u
+	Ifa+irCnb9H8Qr/sT93xwDJcOdJ275n4jIZgqKAivbUze2FXYfrNItyb4fIFM2xsza+DmjytN
+	PiqcN2AyaZ9IedggeYAr3u3aZGxOmEkMe9nPp5xZrMGnAXfzybHJsgfP5oEZiDdWxdZdYeV2L
+	qcPcc3SCrylWtIIMU86wQUFxSj2GPkcx21EeJ0uzcYHmFm/VINyVc91pXPfAGN5mo472BzUlU
+	ks1gc6Ppsqitxvhzogr4VT34a5weaJVn1/pz+5muLQnZy1Om/tjkdIq3Bm8giMHHvB9R0CdIA
+	LSEnHeHATf5U1RHuS+jmtaNfnNIKwhjgPiVsuJ2lAq3bOTc5/4Grd173CaPq8itL7cdUNkj1j
+	VmFTwbmV+dEuQOlp5zRn0vqNpDB1tZFNWThNhmnoLVJAvh/mmiS+nVISA/GgY/ggG8+erk/4W
+	AnC3BVsQhxRpLBaQ3+ZLYoRJql8jd4acwd9xYXNIBgf2icxUbz5mjE8r1Mw=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
-Subject: [Qemu-devel] [PULL v2 7/7] linux-user: fix GPROF build failure
+X-Received-From: 212.227.126.133
+Subject: [Qemu-devel] [PULL v2 0/7] Linux user for 4.1 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,57 +75,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Desnogues <laurent.desnogues@gmail.com>,
-	Riku Voipio <riku.voipio@iki.fi>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alex Bennée <alex.bennee@linaro.org>
+The following changes since commit 68a7b9724fe80bedb85060bde605213ce3f9baec:
 
-When linux-user/exit was introduced we failed to move the gprof
-include at the same time. The CI didn't notice because it only builds
-system emulation. Fix it for those that still find gprof useful.
+  Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-pull-request' into staging (2019-05-09 13:36:10 +0100)
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Message-Id: <20190502092728.32727-1-alex.bennee@linaro.org>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/exit.c    | 3 +++
- linux-user/syscall.c | 3 ---
- 2 files changed, 3 insertions(+), 3 deletions(-)
+are available in the Git repository at:
 
-diff --git a/linux-user/exit.c b/linux-user/exit.c
-index 14e94e28faf8..bdda7205532e 100644
---- a/linux-user/exit.c
-+++ b/linux-user/exit.c
-@@ -18,6 +18,9 @@
-  */
- #include "qemu/osdep.h"
- #include "qemu.h"
-+#ifdef TARGET_GPROF
-+#include <sys/gmon.h>
-+#endif
- 
- #ifdef CONFIG_GCOV
- extern void __gcov_dump(void);
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 44b593b81161..f5ff6f5dc8a8 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -59,9 +59,6 @@
- #ifdef CONFIG_TIMERFD
- #include <sys/timerfd.h>
- #endif
--#ifdef TARGET_GPROF
--#include <sys/gmon.h>
--#endif
- #ifdef CONFIG_EVENTFD
- #include <sys/eventfd.h>
- #endif
+  git://github.com/vivier/qemu.git tags/linux-user-for-4.1-pull-request
+
+for you to fetch changes up to 9b21a36cd333f3f9a1acb379f5f4f4928ad84a06:
+
+  linux-user: fix GPROF build failure (2019-05-10 12:44:23 +0200)
+
+----------------------------------------------------------------
+GPROF fixes, GCC9 fixes, SIOCGIFNAME fix, new IPV6 sockopts, elf fix
+
+----------------------------------------------------------------
+
+Alex Bennée (2):
+  linux-user: avoid treading on gprof's SIGPROF signals
+  linux-user: fix GPROF build failure
+
+Alistair Francis (1):
+  linux-user/elfload: Fix GCC 9 build warnings
+
+Daniel P. Berrangé (1):
+  linux-user: avoid string truncation warnings in uname field copying
+
+Erik Kline (1):
+  The ioctl(SIOCGIFNAME) call requires a struct ifreq.
+
+Giuseppe Musacchio (1):
+  linux-user: elf: Map empty PT_LOAD segments
+
+Helge Deller (1):
+  linux-user: Add missing IPV6 sockopts
+
+ linux-user/ioctls.h  |  2 +-
+ linux-user/elfload.c | 20 +++++++++++++------
+ linux-user/exit.c    |  3 +++
+ linux-user/signal.c  |  5 +++++
+ linux-user/syscall.c | 47 +++++++++++++++++++++++++++++++++++++++++---
+ linux-user/uname.c   |  5 ++---
+ 6 files changed, 69 insertions(+), 13 deletions(-)
+
 -- 
 2.20.1
 
