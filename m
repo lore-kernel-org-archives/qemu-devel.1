@@ -2,96 +2,60 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 876D3C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 13:39:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7915FC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 13:43:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A9A720882
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 13:39:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A9A720882
+	by mail.kernel.org (Postfix) with ESMTPS id 4AC6E216C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 13:43:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AC6E216C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43515 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43568 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP5kR-00012R-Kj
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 09:39:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34636)
+	id 1hP5o6-00035S-Jg
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 09:43:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hP5jS-0000Y2-E3
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:38:39 -0400
+	(envelope-from <lvivier@redhat.com>) id 1hP5mw-0002TP-9e
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:42:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hP5jR-0005vB-B0
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:38:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60046)
+	(envelope-from <lvivier@redhat.com>) id 1hP5mv-0007TM-BZ
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:42:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57656)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hP5jO-0005tr-Vo; Fri, 10 May 2019 09:38:35 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hP5mv-0007T1-6r
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:42:13 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4B02830842CE;
-	Fri, 10 May 2019 13:38:34 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-59.brq.redhat.com
-	[10.40.204.59])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id CBCAC608C2;
-	Fri, 10 May 2019 13:38:26 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20190502084506.8009-1-thuth@redhat.com>
-	<20190502084506.8009-8-thuth@redhat.com>
-	<413645a6-385c-e112-ad9c-8525ef3d9e52@redhat.com>
-	<eda4c5c1-45b8-79d2-1337-f5ee4c68f759@redhat.com>
-	<a3ef5755-4c5d-98d9-3f22-e776d5b48b73@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <e3abe1d0-d22b-75b7-648e-b60c966f1b1b@redhat.com>
-Date: Fri, 10 May 2019 15:38:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id D2A503D37;
+	Fri, 10 May 2019 13:42:10 +0000 (UTC)
+Received: from thinkpad.redhat.com (unknown [10.40.205.9])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 083B61001E65;
+	Fri, 10 May 2019 13:42:04 +0000 (UTC)
+From: Laurent Vivier <lvivier@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 10 May 2019 15:42:00 +0200
+Message-Id: <20190510134203.24012-1-lvivier@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a3ef5755-4c5d-98d9-3f22-e776d5b48b73@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="e4RYtST2TshJHBKopZAmA5I0k1TY4oBeu"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Fri, 10 May 2019 13:38:34 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.29]);
+	Fri, 10 May 2019 13:42:10 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v3 7/7] tests: Run the iotests during "make
- check" again
+Subject: [Qemu-devel] [PATCH v3 0/3] rng-builtin: add an RNG backend that
+ uses qemu_guest_getrandom()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -103,119 +67,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
-	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
-	Markus Armbruster <armbru@redhat.com>,
-	Christophe Fergeau <cfergeau@redhat.com>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Wainer dos Santos Moschetta <wainersm@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Kashyap Chamarthy <kchamart@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Markus Armbruster <armbru@redhat.com>, Amit Shah <amit@kernel.org>,
+	"Richard W . M . Jones" <rjones@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---e4RYtST2TshJHBKopZAmA5I0k1TY4oBeu
-From: Max Reitz <mreitz@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org,
- Christophe Fergeau <cfergeau@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Kevin Wolf <kwolf@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Message-ID: <e3abe1d0-d22b-75b7-648e-b60c966f1b1b@redhat.com>
-Subject: Re: [PATCH v3 7/7] tests: Run the iotests during "make check" again
-References: <20190502084506.8009-1-thuth@redhat.com>
- <20190502084506.8009-8-thuth@redhat.com>
- <413645a6-385c-e112-ad9c-8525ef3d9e52@redhat.com>
- <eda4c5c1-45b8-79d2-1337-f5ee4c68f759@redhat.com>
- <a3ef5755-4c5d-98d9-3f22-e776d5b48b73@redhat.com>
-In-Reply-To: <a3ef5755-4c5d-98d9-3f22-e776d5b48b73@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Add a new RNG backend using QEMU builtin getrandom function.
 
-On 10.05.19 15:34, Max Reitz wrote:
-> On 10.05.19 06:29, Thomas Huth wrote:
->> On 09/05/2019 20.08, Max Reitz wrote:
->>> On 02.05.19 10:45, Thomas Huth wrote:
->>>> People often forget to run the iotests before submitting patches or
->>>> pull requests - this is likely due to the fact that we do not run th=
-e
->>>> tests during our mandatory "make check" tests yet. Now that we've go=
-t
->>>> a proper "auto" group of iotests that should be fine to run in every=
+This patch applies on top of
+    "[PATCH v5 00/24] Add qemu_getrandom and ARMv8.5-RNG etc"
+Based-on: 20190510012458.22706-1-richard.henderson@linaro.org
 
->>>> environment, we can enable the iotests during "make check" again by
->>>> running the "auto" tests by default from the check-block.sh script.
->>>>
->>>> Some cases still need to be checked first, though: iotests need bash=
+v3: Include Kashyap's patch in the series
+    Add a patch to change virtio-rng default backend to rng-builtin
 
->>>> and GNU sed (otherwise they fail), and if gprof is enabled, it spoil=
-s
->>>> the output of some test cases causing them to fail. So if we detect
->>>> that one of the required programs is missing or that gprof is enable=
-d,
->>>> we still have to skip the iotests to avoid failures.
->>>>
->>>> And finally, since we are using check-block.sh now again, this patch=
- also
->>>> removes the qemu-iotests-quick.sh script since we do not need that a=
-nymore
->>>> (and having two shell wrapper scripts around the block tests seem
->>>> rather confusing than helpful).
->>>>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>> ---
->>>>  tests/Makefile.include      |  8 +++----
->>>>  tests/check-block.sh        | 44 ++++++++++++++++++++++++++++------=
----
->>>>  tests/qemu-iotests-quick.sh |  8 -------
->>>>  3 files changed, 38 insertions(+), 22 deletions(-)
->>>>  delete mode 100755 tests/qemu-iotests-quick.sh
->>>
->>> Can I interest you in a Makefile target that explicitly excludes
->>> check-block?  I run the iotests anyway, but I also run make check.
->>> Running some iotests twice would be a bit pointless.
->>
->> Can't you simply run
->>
->>  ./check -qcow2 -x auto
->>
->> instead?
->=20
-> I don=E2=80=99t run just qcow2 tests.  I run qcow2, qcow2 with compat=3D=
-0.10,
-> qcow2 with refcount_bits=3D1, raw, nbd, qed, vmdk, vhdx, ...  A lot.
->=20
-> So for which of the protocol/format combinations do I exclude the auto
-> group?  check-block.sh says it runs raw, qcow2, qed, vmdk, and vpc.  Bu=
-t
-> may that not be subject to change?
+v2: Update qemu-options.hx
+    describe the new backend and specify virtio-rng uses the
+    rng-random by default
 
-Oh, and furthermore I prefer to run the tests on tmpfs.
+Kashyap Chamarthy (1):
+  VirtIO-RNG: Update default entropy source to `/dev/urandom`
 
-Max
+Laurent Vivier (2):
+  rng-builtin: add an RNG backend that uses qemu_guest_getrandom()
+  virtio-rng: change default backend to rng-builtin
 
+ backends/Makefile.objs         |  2 +-
+ backends/rng-builtin.c         | 54 ++++++++++++++++++++++++++++++++++
+ backends/rng-random.c          |  2 +-
+ hw/virtio/virtio-rng.c         |  2 +-
+ include/hw/virtio/virtio-rng.h |  4 +--
+ include/sysemu/rng-builtin.h   | 17 +++++++++++
+ qemu-options.hx                |  9 +++++-
+ 7 files changed, 84 insertions(+), 6 deletions(-)
+ create mode 100644 backends/rng-builtin.c
+ create mode 100644 include/sysemu/rng-builtin.h
 
---e4RYtST2TshJHBKopZAmA5I0k1TY4oBeu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+--=20
+2.20.1
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzVftEACgkQ9AfbAGHV
-z0CgZQf+L14/SU23MkSMtSJRhoM7RIQqSuE99tskm8Mg93elVNXuiTFCAq59WkVU
-FfJOwQLY/dBXLfSJEX93UiNERh/N8dgWnfSv3ImqA6lEnh2Hf8shtQY5K6UGrKOH
-25TdVVnw2OorhqMtTNaayIYX2c3FdPak20snxI3g/3i1edg0pa41St94aTJ28JN5
-emuy9VsP118Nne+O9OO/fCh4rfCChk7Eus47Y7bEImFggV4o1e5zOUX/+OhGTyVU
-hV9losgG5JRcPm3GG9vRywEGx7nXJrmTyeMEm4hwT8ttKV86dFqtXUjejA6wGZO4
-1lAZJESk/M4KNDuuogLALrYIdV47QQ==
-=9iry
------END PGP SIGNATURE-----
-
---e4RYtST2TshJHBKopZAmA5I0k1TY4oBeu--
 
