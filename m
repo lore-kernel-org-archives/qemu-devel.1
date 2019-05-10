@@ -2,80 +2,97 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5FE5C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:18:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9051C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:22:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FC3121479
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:18:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A748208C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:22:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FW+SN7+A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FC3121479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lK4Jq5F8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A748208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39472 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39526 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP1g6-0005v6-Om
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 05:18:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43555)
+	id 1hP1jI-00089r-K8
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 05:22:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hP1eA-0003q7-A3
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:16:55 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hP1iH-0007hl-C4
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:21:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hP1e7-0000Ja-I1
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:16:53 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:40225)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hP1iB-0002so-C2
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:21:05 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42123)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hP1e5-0000HO-Rk
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:16:50 -0400
-Received: by mail-ot1-x343.google.com with SMTP id w6so4947765otl.7
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 02:16:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=JT1gDJekzHKbnMdRbVfyHbxZONCIOc1jr/u/6nkz3aA=;
-	b=FW+SN7+AJFTfkDxZYpLeN1X7PropI3RsSA4UzqRznvHi1Cf/+5950uw2SJIxEjIIwX
-	FzAjHhpSnDrb7WAABGV1aHrLh9lIwwYqwVHDxlNcHpQnBaE43ieF/PQLgX+ogyMbVNzl
-	zFrnZjY80TM4xwj7WxTygX3F0aAAC9oEcTW8gnDr62uYhqi5SzladU1YJjqvgaJfCSSa
-	ARLdX98r6S7q2rIUPznLySOmWMrHIbGYzOOjLCI4MsjbFZlUsjilGT8MdBpx+hy7JdNk
-	rPT3tGUIaKgP6w4yR0y1lEdYzoPCFtqhsqKfoAo6NpovbUal3NG66XuoYgCGY0sZnHaK
-	WKZw==
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1hP1iA-0002pw-9u
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:21:03 -0400
+Received: by mail-wr1-x443.google.com with SMTP id l2so6907841wrb.9
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 02:20:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=subject:to:cc:references:from:message-id:date:user-agent
+	:mime-version:in-reply-to:content-transfer-encoding:content-language;
+	bh=k/XUqm90+eMcWm1U7/Bf7hjCL68GWmY87Y0I5RgNxJw=;
+	b=lK4Jq5F8ufKE7SvUpEcMhkfSu/jEQ96KgZTLbfzyrJxQNAtckkZ+Zmf0IUiKMchSWM
+	niVwNtqXjd3eYYHTlXB7CkjIIZcUEXAfrw6b2Ib+8ggXYHRE4ua2TQa5Dv+W2wgkcx+x
+	U+VqFgHfWVBy8gkPvKwPaO/7xwwfhrCufygskLKQvsFqAy8xERdzOaqyb1pYV4p/ZZpE
+	jFCYR951Kut5Z46raiYrr3bJNDdZ0y2QdpUliqAJoq8N2agNRdcXrUQPLuB6qK2fx05V
+	22oQyx5i9/p4h3XlFEO6Txo4wbxDy1eClITnFlEmqDIBYHILZ3+5tC3R3TzkxSPpVsWQ
+	XZGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=JT1gDJekzHKbnMdRbVfyHbxZONCIOc1jr/u/6nkz3aA=;
-	b=nykHdUH8mDeKclyBfjZwyjIn6gT1FGflrLLqk0pvjnJlrvUufx6mgacPZy59nOZ839
-	HKQZ6hT5ZMjHEWaz0qVPE5yNyKWk4KuOrc4Ho/pv3mjh/ZaHiEJ1SYA2t/26jnXRHNqV
-	9CVrsxNTLR1Z/x/3MuT3CgYHc7A0GVobYH6tYOgmm9x1GeR8m/R2akwKJ3VFAHZvyX+T
-	Et5TZETdFDmUeleQHaHR06tQ33hXIeduigGknSCLI+VBrfcYhMPD93WKT1u+HprMclL1
-	3afEPRVnpcUfSNpGdfoLqlud275jNKaNAwCFFZQKvU7QRo2GV/YFkG8p5NaP/OjCQZmC
-	VFiw==
-X-Gm-Message-State: APjAAAVYjx+7ZCA4ObGjTGjQDJes7fmYhMTllefmlmuv80T+pYW0RyaS
-	FaZeO7Iwt6T/0q7danz5cgg8us0uWA2nZRmzKXjYLg==
-X-Google-Smtp-Source: APXvYqwcbk/g4RqLKiqNVBYfLnBmqH4OEVvugsNoC5fB/tCK1DuUg4mR2qstLat1OnEFsdxuRi5gW1P50cU0A1tpqGw=
-X-Received: by 2002:a9d:6855:: with SMTP id c21mr5022687oto.151.1557479807630; 
-	Fri, 10 May 2019 02:16:47 -0700 (PDT)
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-transfer-encoding
+	:content-language;
+	bh=k/XUqm90+eMcWm1U7/Bf7hjCL68GWmY87Y0I5RgNxJw=;
+	b=Lywbajp+iFeUz1t1rCf0/uHG6EnwiTA4EoT9hEuL8jp5m1PC5QIkaReDSAxiLNdnyN
+	zTsTinHB2f0UjDVXSvSj/WRFf55f69T5ugxjap5dofIaWVPflObgeTn9Mv3Eg43t7Auw
+	/RrucrNf20P4OyGNVNUQ9TXEHFwVrJ6hUjVRx4DnWxTeHTBu9uBg3/wrW1NAgnnTli+t
+	fub7SHHs4/KSfJqDbMs1aRzZgALp0picerJkevPu3NIcie30fziJx4/KbQm0Ge5qwwdJ
+	2WhRvS4w0f150JXPpesLYoQ79X7a8zFf+j/Zk6+3bovPJ3mqRmbdvqL06642VpZWQfXL
+	9AQw==
+X-Gm-Message-State: APjAAAW1UPFGNxuYuZlD0/IReLCg22wrNrTZAtaps7MmZHEWiwKqiPnz
+	tB7LYw0Er6sKGQZjMhTDRIiBvLUTgow=
+X-Google-Smtp-Source: APXvYqyEzCMoNDBhUMk/1pBMutuDrkiPitO66Ns1x3ps59VSjyJTQ9osPru70ucfES9ChB+YaHr6tQ==
+X-Received: by 2002:adf:f90c:: with SMTP id b12mr6665963wrr.63.1557480057957; 
+	Fri, 10 May 2019 02:20:57 -0700 (PDT)
+Received: from localhost.localdomain ([2a02:2f0d:c0b:ba00:6fce:9bd8:fb12:6a42])
+	by smtp.gmail.com with ESMTPSA id 7sm7135659wro.85.2019.05.10.02.20.56
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Fri, 10 May 2019 02:20:57 -0700 (PDT)
+To: Gerd Hoffmann <kraxel@redhat.com>
+References: <CABSdmrnNW6f=P64PviPP8CTJ5SVfYS8_6kmAtpw9yPObTEkpxg@mail.gmail.com>
+	<CABSdmrnocrqLKWncgy_Lak33__GRPYfs-RzSA14e=vh4cRn2ag@mail.gmail.com>
+	<20190509064848.wjhchsfov7q6komj@sirius.home.kraxel.org>
+	<CABSdmrmm+wJ=+Ccav=X5Gw_oueQvPRejCWVG2SQeCw=K4BM9EA@mail.gmail.com>
+	<CABSdmrndpONH_fVHbktHbBXvXPKESeRfis06TjrNRRfBpJzXLA@mail.gmail.com>
+	<b6064b77-5ca4-03e1-80ef-027313096cb2@gmail.com>
+	<CABSdmrkW6G23ZGDA7iLucM45vL0HHGsr2F76H0Mf8S0xkhPnsQ@mail.gmail.com>
+	<3e619b5c-8fb3-2655-2d92-37598db098d8@gmail.com>
+	<20190510085947.y62lttdtrg5cxx6b@sirius.home.kraxel.org>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <3fb8b79d-9f68-2342-d3ae-3aefa873109b@gmail.com>
+Date: Fri, 10 May 2019 12:20:56 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <20190510071557.30126-1-laurent@vivier.eu>
-In-Reply-To: <20190510071557.30126-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 10 May 2019 10:16:36 +0100
-Message-ID: <CAFEAcA8BAoqwdP-3cECUL2sLXQr_PxbdYBzMmZVEan3HcE8YVw@mail.gmail.com>
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190510085947.y62lttdtrg5cxx6b@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PULL 0/7] Linux user for 4.1 patches
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH 3/3] ramfb enhancement
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,58 +104,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Hou Qiming <hqm03ster@gmail.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 10 May 2019 at 08:18, Laurent Vivier <laurent@vivier.eu> wrote:
->
-> The following changes since commit 68a7b9724fe80bedb85060bde605213ce3f9ba=
-ec:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-pull-=
-request' into staging (2019-05-09 13:36:10 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu.git tags/linux-user-for-4.1-pull-request
->
-> for you to fetch changes up to 6b333239ab1a4fa98f07f907f6268484a8514d1e:
->
->   linux-user: fix GPROF build failure (2019-05-09 19:08:13 +0200)
->
-> ----------------------------------------------------------------
-> GPROF fixes, GCC9 fixes, SIOCGIFNAME fix, new IPV6 sockopts, elf fix
->
-> ----------------------------------------------------------------
->
-> Alex Benn=C3=A9e (2):
->   linux-user: avoid treading on gprof's SIGPROF signals
->   linux-user: fix GPROF build failure
->
-> Alistair Francis (1):
->   linux-user/elfload: Fix GCC 9 build warnings
->
-> Daniel P. Berrang=C3=A9 (1):
->   linux-user: avoid string truncation warnings in uname field copying
->
-> Erik Kline via Qemu-devel (1):
->   The ioctl(SIOCGIFNAME) call requires a struct ifreq.
+Hi Gerd,
 
-Hi Laurent -- it looks like you forgot to fix up the
-author email in this patch, so my pullreq-application
-script complains:
+On 5/10/19 11:59 AM, Gerd Hoffmann wrote:
+>    Hi,
+>
+>> Got it, thanks. Is a pity ramfb is not a PCI device :), it was worth the
+>> question anyway.
+> If you look for a simple pci display device check out bochs-display.
+> It's simliar to stdvga (so ovmf and bochs-drm.ko can drive it just
+> fine), but without legacy vga emulation, only a linear framebuffer is
+> supported.  And code size is a fraction of stdvga ...
 
-[staging 181447e27a] Merge remote-tracking branch
-'remotes/vivier2/tags/linux-user-for-4.1-pull-request' into staging
- Date: Fri May 10 10:06:35 2019 +0100
-Erik Kline via Qemu-devel (1):
-      The ioctl(SIOCGIFNAME) call requires a struct ifreq.
-ERROR: pull request includes commits attributed to list
+I actually need the ramfb display in conjunction with kvmgt.
 
-Could you fix it up and resubmit the pull, please?
+I want to be able to save the VM state to disk, which is actually a kind
+of 'live migration' as far as I understand, but live-migration can't 
+work since
+we use device assignment  (vfio-pci-nohotplug device).
 
-thanks
--- PMM
+I was hoping to be able to hot-unplug/hot-plug the vfio device,
+but as the name suggests, can't do so since
+the ramfb display uses fw-config to pass the configuration to firmware.
+
+How hard/possible is to make ramfb display a PCI device and move the
+configuration from fw-config to PCI configuration space?
+
+Thanks,
+Marcel
+
+> cheers,
+>    Gerd
+>
+
 
