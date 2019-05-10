@@ -2,59 +2,89 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D6F2C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:27:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 187A9C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:30:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1FE720989
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:27:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1FE720989
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C02E420989
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:30:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RyCnxBMH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C02E420989
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40736 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40778 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP2kb-0007xz-MK
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 06:27:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56692)
+	id 1hP2nF-0000Qm-1b
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 06:30:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hP2jk-0007Tg-JH
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:26:45 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hP2mN-0008UE-NZ
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:29:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hP2ji-0000Mg-L1
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:26:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36898)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hP2ji-0000K5-Dq
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:26:42 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B5B32A4D21;
-	Fri, 10 May 2019 10:26:40 +0000 (UTC)
-Received: from thinkpad.redhat.com (unknown [10.40.205.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 61E1C5D70D;
-	Fri, 10 May 2019 10:26:38 +0000 (UTC)
-From: Laurent Vivier <lvivier@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1hP2mM-0002FW-DC
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:29:27 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51730)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hP2mM-0002EW-4x
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:29:26 -0400
+Received: by mail-wm1-x342.google.com with SMTP id o189so6980092wmb.1
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 03:29:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=auocvdW0EldqE7PJbYf+YXK+U72ZdztjsoSifzZ1BvU=;
+	b=RyCnxBMH5YbUSRstC/CfnwE72TS+QMrZf50tHluTFZKGunXYGl3nlBCiX/R0YFgO0z
+	HWvfNbnSHy0HUjnU7/Ak0yyom0LBAdni55NFIVXKpO2LRrysUp0VlHOoRS8llEbQcJKb
+	DNGpGki/ap9C6SsTC4VzHu5x12nBcIg1dS352SrsCV/rFHzUgrRiby9qAp07BlW+yqGQ
+	KKkDeorq58iWpw5ko0Z21/3pDAXspIvR/RgIxLJU6bDzl7bgi84oKfibkDxQbWEuE+Zc
+	2Vl/NI+kE/zFp1Ie/gJg2yStiD+OthjMSuU8pjpIezWYSU+OssjMdSW/HfaqLLgQuwFQ
+	fkPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=auocvdW0EldqE7PJbYf+YXK+U72ZdztjsoSifzZ1BvU=;
+	b=i7QuhVdjao2nngAIhHeGkrgS+bB+ogHIMS3x21f/YtMmDCE6z5nbac90KDx2xXg9jf
+	S2zGWmeGGxwlNrqv2/lz15ar2RGKezz2N8VPE0GHXB8F87ve4lnnxYQE+X7MvdQrnzwR
+	gFDZlZWab21R2BSviaiyTRX1Egpzd9y4R1px3plOr1LTSpazilF4+Ixe/7CcKHiXHELO
+	3pLONAYVV4P643mnnqBXkoPtggIHqqSceGsqVIgTSaym8jIsy7wg3u/4oXtBntkFQA6W
+	aqDT004Gh508xrMpl0o+Uq2DjGvq70hSuTcTGltehz2LohFndKEra7PQP9nyPm91NUuv
+	cVqg==
+X-Gm-Message-State: APjAAAU8KKYwUihuPeQpo5sBXkXcDApxyrMt+HY97ktxKeLgImy5xSpp
+	QBHgoK2CpUqmgqdREJaDw9vQzw==
+X-Google-Smtp-Source: APXvYqzaobI31aTHzDZsydkyVLuQUoD8uhEq3/2Ixs7/gl7MGkXn1BQOtaxoAA/+SyCL5hILXWpylQ==
+X-Received: by 2002:a1c:1a47:: with SMTP id a68mr6736796wma.88.1557484164423; 
+	Fri, 10 May 2019 03:29:24 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	d11sm3369109wmb.39.2019.05.10.03.29.23
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Fri, 10 May 2019 03:29:23 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 117701FF87;
+	Fri, 10 May 2019 11:29:23 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 12:26:37 +0200
-Message-Id: <20190510102637.10209-1-lvivier@redhat.com>
+Date: Fri, 10 May 2019 11:29:18 +0100
+Message-Id: <20190510102918.2705-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Fri, 10 May 2019 10:26:40 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2] rng-builtin: add an RNG backend that uses
- qemu_guest_getrandom()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PATCH v3] tests/qemu-iotests: re-format output to for
+ make check-block
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,146 +96,250 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
-	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-	Kashyap Chamarthy <kchamart@redhat.com>, Amit Shah <amit@kernel.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Markus Armbruster <armbru@redhat.com>,
-	"Richard W . M . Jones" <rjones@redhat.com>
+Cc: kwolf@redhat.com, thuth@redhat.com, qemu-block@nongnu.org,
+	mreitz@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a new RNG backend using QEMU builtin getrandom function.
+This attempts to clean-up the output to better match the output of the
+rest of the QEMU check system when called with -pretty. This includes:
 
-It can be created and used with something like:
+  - formatting as "  TEST    iotest: nnn"
+  - calculating time diff at the end
+  - only dumping config on failure (when -pretty enabled)
 
-    ... -object rng-builtin,id=3Drng0 -device virtio-rng,rng=3Drng0 ...
+The existing output is mostly preserved although the dumping of the
+old time at the start "Ns ..." was removed to keep the logic simple.
+The timestamp mode can still be used to see which tests are "hanging".
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <20190503143904.31211-1-alex.bennee@linaro.org>
+
 ---
+v3
+  - revert echo to printf
+  - add _report_test_start
+---
+ tests/qemu-iotests/check | 101 ++++++++++++++++++++++++++-------------
+ 1 file changed, 68 insertions(+), 33 deletions(-)
 
-Notes:
-    This patch applies on top of
-    "[PATCH v5 00/24] Add qemu_getrandom and ARMv8.5-RNG etc"
-    Based-on: 20190510012458.22706-1-richard.henderson@linaro.org
-   =20
-    v2: Update qemu-options.hx
-        describe the new backend and specify virtio-rng uses the
-        rng-random by default (do we want to change this?)
-
- backends/Makefile.objs |  2 +-
- backends/rng-builtin.c | 56 ++++++++++++++++++++++++++++++++++++++++++
- qemu-options.hx        | 10 +++++++-
- 3 files changed, 66 insertions(+), 2 deletions(-)
- create mode 100644 backends/rng-builtin.c
-
-diff --git a/backends/Makefile.objs b/backends/Makefile.objs
-index ff619d31b461..8da4a508d97b 100644
---- a/backends/Makefile.objs
-+++ b/backends/Makefile.objs
-@@ -1,4 +1,4 @@
--common-obj-y +=3D rng.o rng-egd.o
-+common-obj-y +=3D rng.o rng-egd.o rng-builtin.o
- common-obj-$(CONFIG_POSIX) +=3D rng-random.o
-=20
- common-obj-$(CONFIG_TPM) +=3D tpm.o
-diff --git a/backends/rng-builtin.c b/backends/rng-builtin.c
-new file mode 100644
-index 000000000000..b1264b745407
---- /dev/null
-+++ b/backends/rng-builtin.c
-@@ -0,0 +1,56 @@
-+/*
-+ * QEMU Builtin Random Number Generator Backend
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "sysemu/rng.h"
-+#include "qapi/error.h"
-+#include "qapi/qmp/qerror.h"
-+#include "qemu/main-loop.h"
-+#include "qemu/guest-random.h"
-+
-+#define TYPE_RNG_BUILTIN "rng-builtin"
-+#define RNG_BUILTIN(obj) OBJECT_CHECK(RngBuiltin, (obj), TYPE_RNG_BUILTI=
-N)
-+
-+typedef struct RngBuiltin {
-+    RngBackend parent;
-+} RngBuiltin;
-+
-+static void rng_builtin_request_entropy(RngBackend *b, RngRequest *req)
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index 922c5d1d3d3..ac481f905bf 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -27,6 +27,7 @@ bad=""
+ notrun=""
+ casenotrun=""
+ interrupt=true
++pretty=false
+ 
+ # by default don't output timestamps
+ timestamp=${TIMESTAMP:=false}
+@@ -88,6 +89,22 @@ _full_platform_details()
+     echo "$os/$platform $host $kernel"
+ }
+ 
++_full_env_details()
 +{
-+    RngBuiltin *s =3D RNG_BUILTIN(b);
++    cat <<EOF
++QEMU          -- "$QEMU_PROG" $QEMU_OPTIONS
++QEMU_IMG      -- "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS
++QEMU_IO       -- "$QEMU_IO_PROG" $QEMU_IO_OPTIONS
++QEMU_NBD      -- "$QEMU_NBD_PROG" $QEMU_NBD_OPTIONS
++IMGFMT        -- $FULL_IMGFMT_DETAILS
++IMGPROTO      -- $IMGPROTO
++PLATFORM      -- $FULL_HOST_DETAILS
++TEST_DIR      -- $TEST_DIR
++SOCKET_SCM_HELPER -- $SOCKET_SCM_HELPER
 +
-+    while (!QSIMPLEQ_EMPTY(&s->parent.requests)) {
-+        RngRequest *req =3D QSIMPLEQ_FIRST(&s->parent.requests);
-+
-+        qemu_guest_getrandom_nofail(req->data, req->size);
-+
-+        req->receive_entropy(req->opaque, req->data, req->size);
-+
-+        rng_backend_finalize_request(&s->parent, req);
-+    }
++EOF
 +}
 +
-+static void rng_builtin_class_init(ObjectClass *klass, void *data)
+ # $1 = prog to look for
+ set_prog_path()
+ {
+@@ -256,6 +273,7 @@ other options
+     -o options          -o options to pass to qemu-img create/convert
+     -T                  output timestamps
+     -c mode             cache mode
++    -pretty             pretty print output for make check
+ 
+ testlist options
+     -g group[,group...]        include tests from these groups
+@@ -403,7 +421,10 @@ testlist options
+                 command -v xxdiff >/dev/null 2>&1 && diff=xxdiff
+             fi
+             ;;
+-
++        -pretty)   # pretty print output
++            pretty=true
++            xpand=false
++            ;;
+         -n)        # show me, don't do it
+             showme=true
+             xpand=false
+@@ -704,23 +725,30 @@ END        { if (NR > 0) {
+ 
+ trap "_wrapup; exit \$status" 0 1 2 3 15
+ 
++# Report the test start and results, optionally pretty printing for make
++# args: $seq
++_report_test_start()
 +{
-+    RngBackendClass *rbc =3D RNG_BACKEND_CLASS(klass);
-+
-+    rbc->request_entropy =3D rng_builtin_request_entropy;
++    if $pretty; then
++        printf "  TEST    iotest: %s" "$1"
++    else
++        printf "%s" "$1"
++    fi
++}
++# args: output
++_report_test_result()
++{
++    printf "%s\n" "$1"
 +}
 +
-+static const TypeInfo rng_builtin_info =3D {
-+    .name =3D TYPE_RNG_BUILTIN,
-+    .parent =3D TYPE_RNG_BACKEND,
-+    .instance_size =3D sizeof(RngBuiltin),
-+    .class_init =3D rng_builtin_class_init,
-+};
+ [ -f $TIMESTAMP_FILE ] || touch $TIMESTAMP_FILE
+ 
+ FULL_IMGFMT_DETAILS=$(_full_imgfmt_details)
+ FULL_HOST_DETAILS=$(_full_platform_details)
+ 
+-cat <<EOF
+-QEMU          -- "$QEMU_PROG" $QEMU_OPTIONS
+-QEMU_IMG      -- "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS
+-QEMU_IO       -- "$QEMU_IO_PROG" $QEMU_IO_OPTIONS
+-QEMU_NBD      -- "$QEMU_NBD_PROG" $QEMU_NBD_OPTIONS
+-IMGFMT        -- $FULL_IMGFMT_DETAILS
+-IMGPROTO      -- $IMGPROTO
+-PLATFORM      -- $FULL_HOST_DETAILS
+-TEST_DIR      -- $TEST_DIR
+-SOCKET_SCM_HELPER -- $SOCKET_SCM_HELPER
+-
+-EOF
++if ! $pretty; then
++    _full_env_details
++fi
+ 
+ seq="check"
+ 
+@@ -728,8 +756,11 @@ seq="check"
+ 
+ for seq in $list
+ do
+-    err=false
+-    printf %s "$seq"
++    _report_test_start $seq
++    err=false     # error flag
++    reason=""     # reason for error
++    results=""    # results for non-error/skip
 +
-+static void register_types(void)
-+{
-+    type_register_static(&rng_builtin_info);
-+}
+     if [ -n "$TESTS_REMAINING_LOG" ] ; then
+         sed -e "s/$seq//" -e 's/  / /' -e 's/^ *//' $TESTS_REMAINING_LOG > $TESTS_REMAINING_LOG.tmp
+         mv $TESTS_REMAINING_LOG.tmp $TESTS_REMAINING_LOG
+@@ -738,7 +769,6 @@ do
+ 
+     if $showme
+     then
+-        echo
+         continue
+     elif [ -f expunged ] && $expunge && egrep "^$seq([         ]|\$)" expunged >/dev/null
+     then
+@@ -753,17 +783,11 @@ do
+         # really going to try and run this one
+         #
+         rm -f $seq.out.bad
+-        lasttime=$(sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE)
+-        if [ "X$lasttime" != X ]; then
+-                printf %s " ${lasttime}s ..."
+-        else
+-                printf "        "        # prettier output with timestamps.
+-        fi
+         rm -f core $seq.notrun
+         rm -f $seq.casenotrun
+ 
+         start=$(_wallclock)
+-        $timestamp && printf %s "        [$(date "+%T")]"
++        $timestamp && _timestamp
+ 
+         if [ "$(head -n 1 "$source_iotests/$seq")" == "#!/usr/bin/env python" ]; then
+             run_command="$PYTHON $seq"
+@@ -786,21 +810,19 @@ do
+ 
+         if [ -f core ]
+         then
+-            printf " [dumped core]"
+             mv core $seq.core
++            reason="[dumped core] $seq.core"
+             err=true
+         fi
+ 
+         if [ -f $seq.notrun ]
+         then
+-            $timestamp || printf " [not run] "
+-            $timestamp && echo " [not run]" && printf %s "        $seq -- "
+-            cat $seq.notrun
+-            notrun="$notrun $seq"
++            # overwrites timestamp output
++            results="[not run] $(cat $seq.notrun)"
+         else
+             if [ $sts -ne 0 ]
+             then
+-                printf %s " [failed, exit status $sts]"
++                reason=$(printf %s "[failed, exit status $sts]")
+                 err=true
+             fi
+ 
+@@ -821,22 +843,29 @@ do
+ 
+             if [ ! -f "$reference" ]
+             then
+-                echo " - no qualified output"
++                reason="- no qualified output"
+                 err=true
+             else
+                 if diff -w "$reference" $tmp.out >/dev/null 2>&1
+                 then
+-                    echo ""
+                     if $err
+                     then
+                         :
+                     else
+-                        echo "$seq $(expr $stop - $start)" >>$tmp.time
++                        lasttime=$(sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE)
++                        thistime=$(expr $stop - $start)
++                        echo "$seq $thistime" >>$tmp.time
 +
-+type_init(register_types);
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 0191ef8b1eb7..3e2a51c691b0 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4280,13 +4280,21 @@ other options.
-=20
- The @option{share} boolean option is @var{on} by default with memfd.
-=20
-+@item -object rng-builtin,id=3D@var{id}
-+
-+Creates a random number generator backend which obtains entropy from
-+QEMU builtin functions. The @option{id} parameter is a unique ID that
-+will be used to reference this entropy backend from the @option{virtio-r=
-ng}
-+device.
-+
- @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/random}
-=20
- Creates a random number generator backend which obtains entropy from
- a device on the host. The @option{id} parameter is a unique ID that
- will be used to reference this entropy backend from the @option{virtio-r=
-ng}
- device. The @option{filename} parameter specifies which file to obtain
--entropy from and if omitted defaults to @option{/dev/random}.
-+entropy from and if omitted defaults to @option{/dev/random}. By default=
-,
-+the @option{virtio-rng} device uses this RNG backend.
-=20
- @item -object rng-egd,id=3D@var{id},chardev=3D@var{chardevid}
-=20
---=20
++                        if [ "X$lasttime" != X ]; then
++                            results="${results}${thistime}s (last ${lasttime}s)"
++                        else
++                            results="${results}${thistime}s"
++                        fi
+                     fi
+                 else
+-                    echo " - output mismatch (see $seq.out.bad)"
+                     mv $tmp.out $seq.out.bad
+                     $diff -w "$reference" "$PWD"/$seq.out.bad
++                    reason="- output mismatch (see $seq.out.bad)"
+                     err=true
+                 fi
+             fi
+@@ -852,9 +881,15 @@ do
+     #
+     if $err
+     then
++        _report_test_result " FAILED $reason"
++        if $pretty; then
++            _full_env_details
++        fi
+         bad="$bad $seq"
+         n_bad=$(expr $n_bad + 1)
+         quick=false
++    else
++        _report_test_result " $results"
+     fi
+     [ -f $seq.notrun ] || try=$(expr $try + 1)
+ 
+-- 
 2.20.1
 
 
