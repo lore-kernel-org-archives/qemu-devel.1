@@ -3,67 +3,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4CD1C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 07:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5C90C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 07:23:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77A98217D6
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 07:22:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77A98217D6
+	by mail.kernel.org (Postfix) with ESMTPS id ABD532175B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 07:23:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABD532175B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38243 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38258 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOzrC-0002UJ-IG
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 03:22:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49090)
+	id 1hOzsM-0003S0-V1
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 03:23:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hOzlS-0005mo-IC
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 03:16:19 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hOzlT-0005nq-Pi
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 03:16:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hOzlR-0001jv-Jc
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 03:16:18 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:52555)
+	(envelope-from <laurent@vivier.eu>) id 1hOzlS-0001l0-Tu
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 03:16:19 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:44547)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hOzlR-0001jB-Ag
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 03:16:17 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hOzlS-0001kT-KI
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 03:16:18 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA
 	(Nemesis)
-	id 1MaIvT-1hAT2I1WKb-00WH7u; Fri, 10 May 2019 09:16:07 +0200
+	id 1MPXpU-1h3dQ418gE-00Mcjx; Fri, 10 May 2019 09:16:06 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 09:15:55 +0200
-Message-Id: <20190510071557.30126-6-laurent@vivier.eu>
+Date: Fri, 10 May 2019 09:15:53 +0200
+Message-Id: <20190510071557.30126-4-laurent@vivier.eu>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190510071557.30126-1-laurent@vivier.eu>
 References: <20190510071557.30126-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:h4K/Muix8nnOwDYsE8KmBPWIKOFAWv/R08FoTG5nkbPg0twbLH6
-	ts2MLG4HJ1ZvWs03fnf9VgPT3dijKAW2YyN0w7rgXLp4pY1C+CnXZZaaLZBz7MRN1ebK5dq
-	GoxIiCSj2m4YdZJq+YIZiPhKugG+Hj2k31o0uNHhX5Hu3m6bnjamu6ybvzGTXUualvlpk25
-	jzNI6RHaMfPjCF0yZBBzQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:NSI+UmOAKto=:Xt4sAnAwAyhn6puOUhOoZA
-	M2u/+iDSCiv9xbq6DgTqlguI4bbX7RcmHmCqZzwFUkqVZ0MmKGs5ozti1+GcqH6nB6Qixb7q3
-	D3hnYHpV7pDGUqTt2iPG6Bqhp/mbEolhpTuA2RdyofqWtoikIbqTBPyVDibS5rqBe8lvFX214
-	NgMSuw8NVU8nJ5G6cH58XNBzaNS+QWNCuMb5gLhPo0HH1xoso8dsuliGgEt61Z+pq0dr8hh1P
-	YTWIeEt4I1omTQzeViPP+T7x3k3irqf9+m9LanWgrTxN8BqDcMUtMjRxwabyHwCN9sezGUr6B
-	fFWt6U+A4y6mksvsOCBBiiCPANVAh6JO5TsSAj+uBis/pdVcxELdrun5hI+B195ja6Yb9aAnC
-	33UAoox80w8ck1K4cSlweiCZ8sIV8euQBZ164oZJrL9ZN6euYZsTZGDveDC/N0rq0Ou5AlEys
-	zq4XAjPJE50AasaA4nzYee7l5VAMLR3A6skZlQxg026TZ9ZgJcTYTZHRlJQdEN6c2hPHOTOjV
-	CfBIcbm3UoKTrwcnCMUdpo4rkmNKTxpk+YuwS2SIuFjUPUojhHVoef3grol3p9LNUgeLRaWXw
-	0VIIVH3njBuGKZ20BdbE5ARsnREd96n9EIZhjqE/eCIB/yzrkjK20abL7PRqOTFu8A8byIuTM
-	KYZnqlDHbOCsfJVsnWB+zE3YPF52wRGK/gkVQ0i0I+O8LOCh85ivING5BmgB9X/tNf+tVRcB2
-	cAr5KtAB5bFyFcWuqUUqoVds2UNS/Us2Jru43w==
+X-Provags-ID: V03:K1:MmIg/GBEgOPrGam1T82sI5ZEbuQbmmLb0GqQFWMMcebxb5G8aO9
+	/q/4VO1vas7qd6C+B1nH8YojBViw+puG0zMG04yyO2aFYpFN1VVLis+UtbQpZAMdJBN+y3D
+	GEqqwpWl8WJPKAVh24cZYJKHWkVBctGCq9E+xm7KIfDGP/MPNE7ApYCrFu6KTMAYQO/EBSi
+	Z8V9Bdpim3xwmnzfNYWgQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:39ZglJTmz5A=:74csuOgxyu29sjQw6RrW86
+	1fIUhodlqy6do/obfo/WyhPxxFvFXrOE8tL8zz4aybr3xsTzo4hN48CBgRZDecdGaj9guL2K2
+	ARYnAcr6xzex5Flugtx91Jjyl/bwQFrpadXZFNQuq9UiBc/PJWsgb3/IeIzJJedsN/8WzgvdN
+	My3tPI70wYfuA504ugbPOvlAzVyGprhk3O4ie5VFiaJ2iU9sl6Bp+bTl8n68LTZ0FxZsVlQXj
+	6LlXc5eo3gR8R+frVMAsovdnOGVrClrko1W7KZ/O6vH3uv6XggK0emW3o4iOQYL9PaZsxpxzp
+	+48bRRGas6zI35HKE/LQAaL74wTv5auM/jSR+xfQDmOU0Gq+1Jc69FnsdkGBrz8Xd2jD0M46H
+	b6b7HbPxTRWNKmfH3S702xPz/DRbzkz1pfF7ijh3NPGtbj8gM43VBQrSHGnisw3hr5G9nXLc5
+	hGZcQsBSFhB9pAOVcrD9Yol0cyqlVEpfd08n8P3BXg+jRa8lAbLamcw4sqGKSPjpUNzZ0eDXW
+	hg59o/uWAgXzODRBsea4tB3Q8a8RvvtzhTRGN8r9W1+CJg2R76WA8YT8fEV0z7JrT1iMhEQl9
+	Do4/eK8yAdO3zPwSkKw8XFZ/PGcSxOqcTLlL9kwqv/MVsSrSmdzTjO7YzAIGeYsK6WDrDRy46
+	CWGAgZMFPGhMkC0SBj5IiQfa4iFlsdhF/BFG9UCly+dcC2xb3AJprFURg/wv2P0mUIfB6CkkE
+	YZmBHdvHNOmI16xt01mSLJSe3QI9hlZSjc70unZ6iHP/OEhf37Y+/VboOUs=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
-Subject: [Qemu-devel] [PULL 5/7] linux-user: elf: Map empty PT_LOAD segments
+X-Received-From: 212.227.17.24
+Subject: [Qemu-devel] [PULL 3/7] linux-user: avoid string truncation
+ warnings in uname field copying
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,59 +77,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Giuseppe Musacchio <thatlemon@gmail.com>,
-	Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
-	Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Giuseppe Musacchio <thatlemon@gmail.com>
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-Some PT_LOAD segments may be completely zeroed out and their p_filesize
-is zero, in that case the loader should just allocate a page that's at
-least p_memsz bytes large (plus eventual alignment padding).
+In file included from /usr/include/string.h:494,
+                 from include/qemu/osdep.h:101,
+                 from linux-user/uname.c:20:
+In function ‘strncpy’,
+    inlined from ‘sys_uname’ at linux-user/uname.c:94:3:
+/usr/include/bits/string_fortified.h:106:10: warning: ‘__builtin_strncpy’ output may be truncated copying 64 bytes from a string of length 64 [-Wstringop-truncation]
+  106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Calling zero_bss does this job for us, all we have to do is make sure we
-don't try to mmap a zero-length page.
+We don't care where the NUL terminator in the original uname
+field was. It suffices to copy the entire original field and
+simply force a NUL terminator at the end of the new field.
 
-Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20190503122007.lkjsvztgt4ycovac@debian>
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190501144646.4851-1-berrange@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/elfload.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ linux-user/uname.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index d08fe2346683..ef42e02d8233 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2366,11 +2366,19 @@ static void load_elf_image(const char *image_name, int image_fd,
-             vaddr_ps = TARGET_ELF_PAGESTART(vaddr);
-             vaddr_len = TARGET_ELF_PAGELENGTH(eppnt->p_filesz + vaddr_po);
+diff --git a/linux-user/uname.c b/linux-user/uname.c
+index 313b79dbad47..1c05f95387f4 100644
+--- a/linux-user/uname.c
++++ b/linux-user/uname.c
+@@ -72,9 +72,8 @@ const char *cpu_to_uname_machine(void *cpu_env)
  
--            error = target_mmap(vaddr_ps, vaddr_len,
--                                elf_prot, MAP_PRIVATE | MAP_FIXED,
--                                image_fd, eppnt->p_offset - vaddr_po);
--            if (error == -1) {
--                goto exit_perror;
-+            /*
-+             * Some segments may be completely empty without any backing file
-+             * segment, in that case just let zero_bss allocate an empty buffer
-+             * for it.
-+             */
-+            if (eppnt->p_filesz != 0) {
-+                error = target_mmap(vaddr_ps, vaddr_len, elf_prot,
-+                                    MAP_PRIVATE | MAP_FIXED,
-+                                    image_fd, eppnt->p_offset - vaddr_po);
-+
-+                if (error == -1) {
-+                    goto exit_perror;
-+                }
-             }
+ #define COPY_UTSNAME_FIELD(dest, src) \
+   do { \
+-      /* __NEW_UTS_LEN doesn't include terminating null */ \
+-      (void) strncpy((dest), (src), __NEW_UTS_LEN); \
+-      (dest)[__NEW_UTS_LEN] = '\0'; \
++      memcpy((dest), (src), MIN(sizeof(src), sizeof(dest))); \
++      (dest)[sizeof(dest) - 1] = '\0'; \
+   } while (0)
  
-             vaddr_ef = vaddr + eppnt->p_filesz;
+ int sys_uname(struct new_utsname *buf)
 -- 
 2.20.1
 
