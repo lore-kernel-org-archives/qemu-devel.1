@@ -6,45 +6,43 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 006DBC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:09:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2541BC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:15:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8546216C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:09:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8546216C4
+	by mail.kernel.org (Postfix) with ESMTPS id EF7F1216C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:15:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF7F1216C4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44807 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44881 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP78u-0001h9-1Z
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 11:09:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53044)
+	id 1hP7Eq-0003wC-LU
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 11:15:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hP77W-00012l-Dh
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:07:35 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hP7Du-0003Y8-KC
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:14:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hP77V-0008Mj-AF
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:07:34 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:45770
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hP7Dt-0003a6-HC
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:14:10 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:45812
 	helo=mail.default.ilande.uk0.bigv.io)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hP77S-0008Kx-D1; Fri, 10 May 2019 11:07:30 -0400
+	id 1hP7Dt-0003ZE-AT; Fri, 10 May 2019 11:14:09 -0400
 Received: from host109-147-184-225.range109-147.btcentralplus.com
 	([109.147.184.225] helo=[192.168.1.65])
 	by mail.default.ilande.uk0.bigv.io with esmtpsa
 	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
 	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hP76o-0000kF-M4; Fri, 10 May 2019 16:06:51 +0100
-To: Anton Blanchard <anton@ozlabs.org>
+	id 1hP7B5-0000mV-Uf; Fri, 10 May 2019 16:11:16 +0100
+To: Anton Blanchard <anton@ozlabs.org>, qemu-ppc@nongnu.org,
+	qemu-devel@nongnu.org
 References: <20190507004811.29968-1-anton@ozlabs.org>
 	<20190507004811.29968-4-anton@ozlabs.org>
-	<20190507052815.GK7073@umbus.fritz.box>
-	<c69c4513-417b-8415-c48b-61d0a05c1680@ilande.co.uk>
-	<20190509103545.4a7fa71a@kryten>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
@@ -71,12 +69,12 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
 	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
 	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
 	imgcU9TTGC5qd9g=
-Message-ID: <960497f1-299c-131c-21a7-b62b9fe59868@ilande.co.uk>
-Date: Fri, 10 May 2019 16:07:27 +0100
+Message-ID: <c1d2a4cf-a9a7-4dfa-ed80-987118043f08@ilande.co.uk>
+Date: Fri, 10 May 2019 16:11:53 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190509103545.4a7fa71a@kryten>
+In-Reply-To: <20190507004811.29968-4-anton@ozlabs.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
@@ -86,8 +84,8 @@ X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: Optimise VSX_LOAD_SCALAR_DS
- and VSX_VECTOR_LOAD_STORE
+Subject: Re: [Qemu-devel] [PATCH 4/9] target/ppc: Fix lxvw4x,
+ lxvh8x and lxvb16x
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,138 +98,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: ego@linux.vnet.ibm.com, sandipandas1990@gmail.com,
-	richard.henderson@linaro.org, f4bug@amsat.org,
-	qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
-	David Gibson <david@gibson.dropbear.id.au>
+	richard.henderson@linaro.org, f4bug@amsat.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/05/2019 01:35, Anton Blanchard wrote:
+On 07/05/2019 01:48, Anton Blanchard wrote:
 
-> A few small optimisations:
+> During the conversion these instructions were incorrectly treated as
+> stores. We need to use set_cpu_vsr* and not get_cpu_vsr*.
 > 
-> In VSX_LOAD_SCALAR_DS() we can don't need to read the VSR via
-> get_cpu_vsrh().
-> 
-> Split VSX_VECTOR_LOAD_STORE() into two functions. Loads only need to
-> write the VSRs (set_cpu_vsr*()) and stores only need to read the VSRs
-> (get_cpu_vsr*())
-> 
-> Thanks to Mark Cave-Ayland for the suggestions.
-> 
+> Fixes: 8b3b2d75c7c0 ("introduce get_cpu_vsr{l,h}() and set_cpu_vsr{l,h}() helpers for VSR register access")
 > Signed-off-by: Anton Blanchard <anton@ozlabs.org>
 > ---
->  target/ppc/translate/vsx-impl.inc.c | 68 ++++++++++++++++++++++++-----
->  1 file changed, 58 insertions(+), 10 deletions(-)
+>  target/ppc/translate/vsx-impl.inc.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
 > 
 > diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-> index 4b7627f53b..cdb44b8b70 100644
+> index 05b75105be..c13f84e745 100644
 > --- a/target/ppc/translate/vsx-impl.inc.c
 > +++ b/target/ppc/translate/vsx-impl.inc.c
-> @@ -228,7 +228,7 @@ static void gen_lxvb16x(DisasContext *ctx)
+> @@ -102,8 +102,7 @@ static void gen_lxvw4x(DisasContext *ctx)
+>      }
+>      xth = tcg_temp_new_i64();
+>      xtl = tcg_temp_new_i64();
+> -    get_cpu_vsrh(xth, xT(ctx->opcode));
+> -    get_cpu_vsrl(xtl, xT(ctx->opcode));
+> +
+>      gen_set_access_type(ctx, ACCESS_INT);
+>      EA = tcg_temp_new();
+>  
+> @@ -126,6 +125,8 @@ static void gen_lxvw4x(DisasContext *ctx)
+>          tcg_gen_addi_tl(EA, EA, 8);
+>          tcg_gen_qemu_ld_i64(xtl, EA, ctx->mem_idx, MO_BEQ);
+>      }
+> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+>      tcg_temp_free(EA);
+>      tcg_temp_free_i64(xth);
 >      tcg_temp_free_i64(xtl);
->  }
+> @@ -185,8 +186,6 @@ static void gen_lxvh8x(DisasContext *ctx)
+>      }
+>      xth = tcg_temp_new_i64();
+>      xtl = tcg_temp_new_i64();
+> -    get_cpu_vsrh(xth, xT(ctx->opcode));
+> -    get_cpu_vsrl(xtl, xT(ctx->opcode));
+>      gen_set_access_type(ctx, ACCESS_INT);
 >  
-> -#define VSX_VECTOR_LOAD_STORE(name, op, indexed)            \
-> +#define VSX_VECTOR_LOAD(name, op, indexed)                  \
->  static void gen_##name(DisasContext *ctx)                   \
->  {                                                           \
->      int xt;                                                 \
-> @@ -255,8 +255,6 @@ static void gen_##name(DisasContext *ctx)                   \
->      }                                                       \
->      xth = tcg_temp_new_i64();                               \
->      xtl = tcg_temp_new_i64();                               \
-> -    get_cpu_vsrh(xth, xt);                                  \
-> -    get_cpu_vsrl(xtl, xt);                                  \
->      gen_set_access_type(ctx, ACCESS_INT);                   \
->      EA = tcg_temp_new();                                    \
->      if (indexed) {                                          \
-> @@ -282,10 +280,61 @@ static void gen_##name(DisasContext *ctx)                   \
->      tcg_temp_free_i64(xtl);                                 \
->  }
->  
-> -VSX_VECTOR_LOAD_STORE(lxv, ld_i64, 0)
-> -VSX_VECTOR_LOAD_STORE(stxv, st_i64, 0)
-> -VSX_VECTOR_LOAD_STORE(lxvx, ld_i64, 1)
-> -VSX_VECTOR_LOAD_STORE(stxvx, st_i64, 1)
-> +VSX_VECTOR_LOAD(lxv, ld_i64, 0)
-> +VSX_VECTOR_LOAD(lxvx, ld_i64, 1)
-> +
-> +#define VSX_VECTOR_STORE(name, op, indexed)                 \
-> +static void gen_##name(DisasContext *ctx)                   \
-> +{                                                           \
-> +    int xt;                                                 \
-> +    TCGv EA;                                                \
-> +    TCGv_i64 xth;                                           \
-> +    TCGv_i64 xtl;                                           \
-> +                                                            \
-> +    if (indexed) {                                          \
-> +        xt = xT(ctx->opcode);                               \
-> +    } else {                                                \
-> +        xt = DQxT(ctx->opcode);                             \
-> +    }                                                       \
-> +                                                            \
-> +    if (xt < 32) {                                          \
-> +        if (unlikely(!ctx->vsx_enabled)) {                  \
-> +            gen_exception(ctx, POWERPC_EXCP_VSXU);          \
-> +            return;                                         \
-> +        }                                                   \
-> +    } else {                                                \
-> +        if (unlikely(!ctx->altivec_enabled)) {              \
-> +            gen_exception(ctx, POWERPC_EXCP_VPU);           \
-> +            return;                                         \
-> +        }                                                   \
-> +    }                                                       \
-> +    xth = tcg_temp_new_i64();                               \
-> +    xtl = tcg_temp_new_i64();                               \
-> +    get_cpu_vsrh(xth, xt);                                  \
-> +    get_cpu_vsrl(xtl, xt);                                  \
-> +    gen_set_access_type(ctx, ACCESS_INT);                   \
-> +    EA = tcg_temp_new();                                    \
-> +    if (indexed) {                                          \
-> +        gen_addr_reg_index(ctx, EA);                        \
-> +    } else {                                                \
-> +        gen_addr_imm_index(ctx, EA, 0x0F);                  \
-> +    }                                                       \
-> +    if (ctx->le_mode) {                                     \
-> +        tcg_gen_qemu_##op(xtl, EA, ctx->mem_idx, MO_LEQ);   \
-> +        tcg_gen_addi_tl(EA, EA, 8);                         \
-> +        tcg_gen_qemu_##op(xth, EA, ctx->mem_idx, MO_LEQ);   \
-> +    } else {                                                \
-> +        tcg_gen_qemu_##op(xth, EA, ctx->mem_idx, MO_BEQ);   \
-> +        tcg_gen_addi_tl(EA, EA, 8);                         \
-> +        tcg_gen_qemu_##op(xtl, EA, ctx->mem_idx, MO_BEQ);   \
-> +    }                                                       \
-> +    tcg_temp_free(EA);                                      \
-> +    tcg_temp_free_i64(xth);                                 \
-> +    tcg_temp_free_i64(xtl);                                 \
-> +}
-> +
-> +VSX_VECTOR_STORE(stxv, st_i64, 0)
-> +VSX_VECTOR_STORE(stxvx, st_i64, 1)
->  
->  #ifdef TARGET_PPC64
->  #define VSX_VECTOR_LOAD_STORE_LENGTH(name)                      \
-> @@ -330,7 +379,6 @@ static void gen_##name(DisasContext *ctx)                         \
->          return;                                                   \
->      }                                                             \
->      xth = tcg_temp_new_i64();                                     \
-> -    get_cpu_vsrh(xth, rD(ctx->opcode) + 32);                      \
->      gen_set_access_type(ctx, ACCESS_INT);                         \
->      EA = tcg_temp_new();                                          \
->      gen_addr_imm_index(ctx, EA, 0x03);                            \
-> @@ -514,8 +562,8 @@ static void gen_##name(DisasContext *ctx)                         \
->      tcg_temp_free_i64(xth);                                       \
->  }
->  
-> -VSX_LOAD_SCALAR_DS(stxsd, st64_i64)
-> -VSX_LOAD_SCALAR_DS(stxssp, st32fs)
-> +VSX_STORE_SCALAR_DS(stxsd, st64_i64)
-> +VSX_STORE_SCALAR_DS(stxssp, st32fs)
->  
->  static void gen_mfvsrwz(DisasContext *ctx)
->  {
+>      EA = tcg_temp_new();
+> @@ -197,6 +196,8 @@ static void gen_lxvh8x(DisasContext *ctx)
+>      if (ctx->le_mode) {
+>          gen_bswap16x8(xth, xtl, xth, xtl);
+>      }
+> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+>      tcg_temp_free(EA);
+>      tcg_temp_free_i64(xth);
+>      tcg_temp_free_i64(xtl);
+> @@ -214,14 +215,14 @@ static void gen_lxvb16x(DisasContext *ctx)
+>      }
+>      xth = tcg_temp_new_i64();
+>      xtl = tcg_temp_new_i64();
+> -    get_cpu_vsrh(xth, xT(ctx->opcode));
+> -    get_cpu_vsrl(xtl, xT(ctx->opcode));
+>      gen_set_access_type(ctx, ACCESS_INT);
+>      EA = tcg_temp_new();
+>      gen_addr_reg_index(ctx, EA);
+>      tcg_gen_qemu_ld_i64(xth, EA, ctx->mem_idx, MO_BEQ);
+>      tcg_gen_addi_tl(EA, EA, 8);
+>      tcg_gen_qemu_ld_i64(xtl, EA, ctx->mem_idx, MO_BEQ);
+> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+>      tcg_temp_free(EA);
+>      tcg_temp_free_i64(xth);
+>      tcg_temp_free_i64(xtl);
+
+I've now had a bit of time to look through this and I believe it is correct, so:
 
 Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
