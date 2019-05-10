@@ -3,48 +3,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F74EC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 04:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93079C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 04:46:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06B7A217F5
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 04:31:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06B7A217F5
+	by mail.kernel.org (Postfix) with ESMTPS id 67868217F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 04:46:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67868217F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36666 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36805 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hOxBe-0003wt-6S
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 00:31:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55594)
+	id 1hOxQW-0007T3-FR
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 00:46:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOxAk-0003Lm-Jj
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 00:30:15 -0400
+	(envelope-from <thuth@redhat.com>) id 1hOxPJ-0006y4-DZ
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 00:45:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hOxAj-0002Pg-Kt
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 00:30:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49664)
+	(envelope-from <thuth@redhat.com>) id 1hOxPI-0002Qg-GI
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 00:45:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57415)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hOxAZ-0002KE-SJ; Fri, 10 May 2019 00:30:05 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1hOxPE-0002MT-1K; Fri, 10 May 2019 00:45:12 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D8B833082E10;
-	Fri, 10 May 2019 04:30:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 98B843087BA9;
+	Fri, 10 May 2019 04:45:10 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-72.ams2.redhat.com [10.36.116.72])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5D042665E6;
-	Fri, 10 May 2019 04:29:53 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-References: <20190502084506.8009-1-thuth@redhat.com>
-	<20190502084506.8009-8-thuth@redhat.com>
-	<413645a6-385c-e112-ad9c-8525ef3d9e52@redhat.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5593017A61;
+	Fri, 10 May 2019 04:45:04 +0000 (UTC)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	qemu-devel@nongnu.org
+References: <20190509165912.10512-1-alex.bennee@linaro.org>
+	<20190509165912.10512-23-alex.bennee@linaro.org>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -90,23 +90,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <eda4c5c1-45b8-79d2-1337-f5ee4c68f759@redhat.com>
-Date: Fri, 10 May 2019 06:29:47 +0200
+Message-ID: <8cac9b0f-1fb9-a3f6-742d-b897e99859bc@redhat.com>
+Date: Fri, 10 May 2019 06:45:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <413645a6-385c-e112-ad9c-8525ef3d9e52@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="u73zGRSf1wIyYMTi3mB8K9evVksVmqvAg"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20190509165912.10512-23-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Fri, 10 May 2019 04:30:00 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.45]);
+	Fri, 10 May 2019 04:45:10 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 7/7] tests: Run the iotests during "make
- check" again
+Subject: Re: [Qemu-devel] [PATCH v1 22/23] tests/qemu-iotests: re-format
+ output to for make check-block
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -118,91 +118,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
-	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
-	Markus Armbruster <armbru@redhat.com>,
-	Christophe Fergeau <cfergeau@redhat.com>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Wainer dos Santos Moschetta <wainersm@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-arm@nongnu.org,
+	"open list:Block layer core" <qemu-block@nongnu.org>,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---u73zGRSf1wIyYMTi3mB8K9evVksVmqvAg
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 09/05/2019 20.08, Max Reitz wrote:
-> On 02.05.19 10:45, Thomas Huth wrote:
->> People often forget to run the iotests before submitting patches or
->> pull requests - this is likely due to the fact that we do not run the
->> tests during our mandatory "make check" tests yet. Now that we've got
->> a proper "auto" group of iotests that should be fine to run in every
->> environment, we can enable the iotests during "make check" again by
->> running the "auto" tests by default from the check-block.sh script.
->>
->> Some cases still need to be checked first, though: iotests need bash
->> and GNU sed (otherwise they fail), and if gprof is enabled, it spoils
->> the output of some test cases causing them to fail. So if we detect
->> that one of the required programs is missing or that gprof is enabled,=
-
->> we still have to skip the iotests to avoid failures.
->>
->> And finally, since we are using check-block.sh now again, this patch a=
-lso
->> removes the qemu-iotests-quick.sh script since we do not need that any=
-more
->> (and having two shell wrapper scripts around the block tests seem
->> rather confusing than helpful).
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  tests/Makefile.include      |  8 +++----
->>  tests/check-block.sh        | 44 ++++++++++++++++++++++++++++--------=
--
->>  tests/qemu-iotests-quick.sh |  8 -------
->>  3 files changed, 38 insertions(+), 22 deletions(-)
->>  delete mode 100755 tests/qemu-iotests-quick.sh
+On 09/05/2019 18.59, Alex Benn=C3=A9e wrote:
+> This attempts to clean-up the output to better match the output of the
+> rest of the QEMU check system. This includes:
 >=20
-> Can I interest you in a Makefile target that explicitly excludes
-> check-block?  I run the iotests anyway, but I also run make check.
-> Running some iotests twice would be a bit pointless.
+>   - formatting as "  TEST    iotest: nnn"
+>   - calculating time diff at the end
+>   - only dumping config on failure
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Message-Id: <20190503143904.31211-1-alex.bennee@linaro.org>
+> ---
+>  tests/qemu-iotests/check | 101 +++++++++++++++++++++++----------------
+>  1 file changed, 61 insertions(+), 40 deletions(-)
+[...]
+> -cat <<EOF
+> -QEMU          -- "$QEMU_PROG" $QEMU_OPTIONS
+> -QEMU_IMG      -- "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS
+> -QEMU_IO       -- "$QEMU_IO_PROG" $QEMU_IO_OPTIONS
+> -QEMU_NBD      -- "$QEMU_NBD_PROG" $QEMU_NBD_OPTIONS
+> -IMGFMT        -- $FULL_IMGFMT_DETAILS
+> -IMGPROTO      -- $IMGPROTO
+> -PLATFORM      -- $FULL_HOST_DETAILS
+> -TEST_DIR      -- $TEST_DIR
+> -SOCKET_SCM_HELPER -- $SOCKET_SCM_HELPER
+> -
+> -EOF
+> +if ! $pretty; then
+> +    _full_env_details
+> +fi
+> =20
+>  seq=3D"check"
+[...]
+> @@ -852,9 +869,13 @@ do
+>      #
+>      if $err
+>      then
+> +        _report_test_result $seq "FAILED $reason"
+> +        _full_env_details
 
-Can't you simply run
+I'd suggest to wrap the _full_env_details with a "if $pretty" statement,
+otherwise the env will be printed out twice, one time at the beginning,
+and one time in case of an error.
 
- ./check -qcow2 -x auto
-
-instead?
+>          bad=3D"$bad $seq"
+>          n_bad=3D$(expr $n_bad + 1)
+>          quick=3Dfalse
+> +    else
+> +        _report_test_result $seq "$results"
+>      fi
+>      [ -f $seq.notrun ] || try=3D$(expr $try + 1)
+> =20
+>=20
 
  Thomas
-
-
---u73zGRSf1wIyYMTi3mB8K9evVksVmqvAg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJc1P5AAAoJEC7Z13T+cC21vIAP/0wBceil/ueFQ1dmt6FNtfXe
-DksmT5rCEsjIZvkeot+WOFt/vD7m48j94ZQFhYYfVLYZLt4l4OYX0MTTLy8/MmVB
-CeCRaZFvxvooRKCkKZXuXASjuO7LEIf4hBwmuQt8O9wummsUdjC+n5uGj4424ytq
-PMw85crx12V6xFW7wPUZluMkoqT9STvk60Yz+5Z3TjrQEgNjjLapiIlrrTpvBGUw
-0szPngkKsSNbi2o/cyoo3mFh3oHCbe4JjBZ8K/xPX0kZlFbY62y4qeF40qA0hMPu
-xdqopRL5MZntIHxFbb88gvR50mBm2pDQDAjgG7pNghjdZIJwiord/+B0/pJopkNC
-XhZ5Qm73qTst7AQM8cB+W5l3iQB6uZQZBxEnfJ3r/0YfkayNbeLD3jucub+WbTQ0
-/wPiM+laDhLfYVvfmqIAexsl/QgpgePi9RqXHWO2tk1xPtQJDh2ODBuOTWj7EP4B
-LDMH3uvcuhSNcUcunM6HintwEcOR7fg959+nUPCTBK0ktoy7mUm5AAGZszebL4I7
-DZy4sdFmmAaRnb3mTuWBHy27Le/oqXEUcXpfr2CK2VnTZQfVmWiSCv9KKqk4CCZ8
-BV1uHChvhRoAqlBTf/v8mZG2sAL55GPvzpamknT7EIrIF7gNwFN/JJb9kQxcLYFw
-own8tgAlyJfz20lTyEps
-=Tequ
------END PGP SIGNATURE-----
-
---u73zGRSf1wIyYMTi3mB8K9evVksVmqvAg--
 
