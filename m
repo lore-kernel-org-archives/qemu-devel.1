@@ -2,90 +2,73 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1118C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:04:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54678C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:04:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 830D42084E
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:04:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 830D42084E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=braap.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1266A2084E
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:04:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1266A2084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47061 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47063 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP8wD-0005HO-O6
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 13:04:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51384)
+	id 1hP8x4-00064o-8z
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 13:04:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1hP8u6-000416-8I
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:01:51 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hP8vl-0005D7-PI
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:03:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1hP8u5-0004RJ-Ce
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:01:50 -0400
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:53341)
+	(envelope-from <ehabkost@redhat.com>) id 1hP8vk-0005Cc-Ct
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:03:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43768)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>)
-	id 1hP8u2-0004Pt-Tv; Fri, 10 May 2019 13:01:47 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-	by mailout.west.internal (Postfix) with ESMTP id 291393E4;
-	Fri, 10 May 2019 13:01:44 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-	by compute4.internal (MEProxy); Fri, 10 May 2019 13:01:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=braap.org; h=
-	date:from:to:cc:subject:message-id:references:mime-version
-	:content-type:content-transfer-encoding:in-reply-to; s=mesmtp;
-	bh=HAc61hZVPwMI44DNxHAee1xNkXKfQn9mb6hUsdxLP3k=; b=0tdz4EV4dk/P
-	QwCMjB92FLTUHWyaFfcTMrpS5y2ywKgHLPSsYtA7vzNChnFVRFKB7uVw7u4DOo69
-	ZP5rzDMdul0QnG53QfMf/q7QjdPD5kgIzafDDSU+T234VQvQHPmfc8efzRfRKpyU
-	/IQKh4k+bKhMukurQqGZINP0svy86xs=
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:content-transfer-encoding:content-type
-	:date:from:in-reply-to:message-id:mime-version:references
-	:subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm2; bh=HAc61hZVPwMI44DNxHAee1xNkXKfQn9mb6hUsdxLP
-	3k=; b=fzFpRsSh6yf12POjeGdjnjKM+SVM0AXWcOaHu8Ixdu/D/RAMBjklPa5o/
-	KV40Jk/PBB1VAJwrXTvEFZjGXWQAdY0q4VE7uts2gsZ+8+7lKWWcVaH/KC2tKEsz
-	X1unvHtfhMCj+l1JxXh6/i6/+MxdGKsUU0PC+sWfAoAdLlJn5M3NQFRQsaeKn8ST
-	x6UBVFca3TliSas6xgTUH36yeejW3ODz5ZMNiY0/UEjnlGgUi33oPdzl48msWqZ1
-	tSLLYb+5NBEozxpZqf6bUKk4OK93u7ZqlmiS5wTs+BD2zCvB1vuT6PTHZk2r8VyG
-	nIhdzrJzIWZQt/HeGYqF6W0Ka3OeA==
-X-ME-Sender: <xms:d67VXMdoGG_zSUvNaITYdrbFjrA9EEXNfITv5HClU1QnIhMiiItBmw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduuddrkeekgdduuddtucetufdoteggodetrfdotf
-	fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-	uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-	cujfgurhepfffhvffukfhfgggtugfgjggfsehtkeertddtredunecuhfhrohhmpedfgfhm
-	ihhlihhoucfirdcuvehothgrfdcuoegtohhtrgessghrrggrphdrohhrgheqnecukfhppe
-	duvdekrdehledrvddtrddvudeinecurfgrrhgrmhepmhgrihhlfhhrohhmpegtohhtrges
-	sghrrggrphdrohhrghenucevlhhushhtvghrufhiiigvpedt
-X-ME-Proxy: <xmx:d67VXPEqDvQb0jaa39XVizmD-RpDlPHPyMSLvLMdfvVSC4O60xCyXg>
-	<xmx:d67VXOj7hTWPS-F0h8ErW7wII31Kpw9JwpBzSoBnjtE1k4v0Ud_p9g>
-	<xmx:d67VXD5FeGFDEF1ZAPmmzzgZBM7jJnj6yMrGYJAh_cRXi9VwMP_dgw>
-	<xmx:d67VXCjRUzSEjJMpkXpXMSLCJpv7rWDe965D8A36pnz0ArgUiFsXcA>
-Received: from localhost (flamenco.cs.columbia.edu [128.59.20.216])
-	by mail.messagingengine.com (Postfix) with ESMTPA id 1E1D38005A;
-	Fri, 10 May 2019 13:01:43 -0400 (EDT)
-Date: Fri, 10 May 2019 13:01:42 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Message-ID: <20190510170142.GA21309@flamenco>
-References: <20190430165234.32272-1-alex.bennee@linaro.org>
-	<87muju4mvi.fsf@zen.linaroharston>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hP8vk-0005CC-4Q
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:03:32 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 650D3C4EA9
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 17:03:31 +0000 (UTC)
+Received: from localhost (ovpn-116-40.gru2.redhat.com [10.97.116.40])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E74CF5ED34;
+	Fri, 10 May 2019 17:03:30 +0000 (UTC)
+Date: Fri, 10 May 2019 14:03:28 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190510170328.GR4189@habkost.net>
+References: <87imumj1jb.fsf@dusky.pond.sub.org>
+	<20190507161845.GL28722@habkost.net>
+	<87lfzh5mrh.fsf@dusky.pond.sub.org>
+	<20190508202830.GF4189@habkost.net>
+	<874l646nbh.fsf@dusky.pond.sub.org>
+	<20190509091452.GF31299@redhat.com>
+	<20190509155247.GJ4189@habkost.net>
+	<20190509160811.GL31299@redhat.com>
+	<20190509174432.GM4189@habkost.net>
+	<874l62x1qj.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87muju4mvi.fsf@zen.linaroharston>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <874l62x1qj.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.38]);
+	Fri, 10 May 2019 17:03:31 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 64.147.123.25
-Subject: Re: [Qemu-devel] [PATCH v5 00/15] demacro softmmu (plus
- tests/coverage)
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/3] Export machine type deprecation info
+ through QMP
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,23 +80,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org
+Cc: mprivozn@redhat.com,
+	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+	qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 10, 2019 at 11:36:33 +0100, Alex Bennée wrote:
-> Ping Emilio/Mark
-> 
-> Would you be able to re-run your tests to check there are no other
-> regressions? I can then get the PR prepared for merging ;-)
+On Fri, May 10, 2019 at 08:28:04AM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+>=20
+> > On Thu, May 09, 2019 at 05:08:11PM +0100, Daniel P. Berrang=E9 wrote:
+> >> On Thu, May 09, 2019 at 12:52:47PM -0300, Eduardo Habkost wrote:
+> >> > On Thu, May 09, 2019 at 10:14:52AM +0100, Daniel P. Berrang=E9 wro=
+te:
+> >> > > On Thu, May 09, 2019 at 10:31:46AM +0200, Markus Armbruster wrot=
+e:
+> >> > > > We've wandered into the QAPI vs. QOM swamp.  Cc: Paolo.
+> >> > > >=20
+> >> > > > Eduardo Habkost <ehabkost@redhat.com> writes:
+> >> > > >=20
+> >> > > > > On Wed, May 08, 2019 at 11:16:50AM +0200, Markus Armbruster =
+wrote:
+> [...]
+> >> > > > >> I agree we should point to a preferred replacement whenever=
+ we deprecate
+> >> > > > >> something.
+> >> > > > >>=20
+> >> > > > >> We have to do it in documentation.  And we generally do, in
+> >> > > > >> qemu-deprecated.texi.
+> >> > > > >>=20
+> >> > > > >> How useful would doing it in QMP as well be?  Depends on wh=
+at management
+> >> > > > >> applications can do with the additional information.
+> >> > > > >
+> >> > > > > I expect it to be useful for things that have obvious
+> >> > > > > replacements, like old machine type or CPU model versions.
+> >> > > >=20
+> >> > > > I doubt a management application should apply suggested replac=
+ements
+> >> > > > automatically, and I doubt libvirt would.  Not even when QEMU =
+developers
+> >> > > > deem them "obvious".
+> >> > >=20
+> >> > > We certainly won't apply the suggested replacement as in many ca=
+ses
+> >> > > it is not going to be a functionally equivalent drop-in.
+> >> >=20
+> >> > Who's "we"?
+> >>=20
+> >> I was refering to libvirt here.
+> >>=20
+> >> > > If QEMU logs it to stderr, it will end up in the per-VM log file
+> >> > > libvirt has under /var/log/libvirt/qemu/$GUESTNAME.log.  If QEMU
+> >> > > doesn't log it to stderr, then libvirt would just write it to
+> >> > > that same log file itself.
+> >> > >=20
+> >> > > If libvirt gains some API or event for notifying apps of depreca=
+tion
+> >> > > we might bubble it up to the mgmt app that way.
+> >> > >=20
+> >> > > I still feel it is useful to have the suggested replacement in t=
+he
+> >> > > logs, rather  than only leaving it in qemu-deprecated.texi.  Thi=
+s
+> >> > > way the info is immediately visible to both app developers and a=
+ny
+> >> > > support person dealing with bugs.
+> >> > >=20
+> >> > > If the app dev see the suggested replacement upfront they're mor=
+e
+> >> > > likely to make an immediate decision to update their code if the
+> >> > > suggestion is trivial. If they need to go find the QEMU docs to
+> >> > > lookup what action is required I feel they'll more likely just
+> >> > > put the item on their long todo list where it will languish.
+> >> >=20
+> >> > Agreed.  However, note that the audience for deprecation
+> >> > information is not just developers and support people.  End users
+> >> > need to know when they are relying on a deprecated feature, and
+> >> > applications should make it as easy as possible for them to
+> >> > update their configurations.
+> >> >=20
+> >> > I'm not suggesting the alternative would be applied
+> >> > automatically.  But having the alternative available in a
+> >> > machine-friendly way may be the difference between a unhelpful UI
+> >> > that just tells the user there's some problem but can't give a
+> >> > solution, and one that can really assist the user to fix the
+> >> > problem.
+> >>=20
+> >> For some aspects of QEMU it might be possible, but considering the
+> >> broader set of things which can be deprecated, I don't think it is
+> >> possible to expose a machine consumable "suggestion".
+> >>=20
+> >> Consider the deprecation of the ACL feature. We deprecated monitor
+> >> commands "acl_add", "acl_policy", "acl_reset", etc. The suggested
+> >> replacement is to use one of the many possible QAuthZ types combined
+> >> with the -object arg. Even if we invented some way to express this
+> >> in the schema, I don't think any app would usefully consume it.
+> >
+> > No problem, we don't need to suggest a machine consumable
+> > alternative for everything.
+>=20
+> Sure, but we need to get enough value out of it to justify its cost.
+>=20
+> > I'm thinking about features that are visible to the end user and
+> > require user action to fix their configuration, like machine type
+> > versions or CPU model versions.
+>=20
+> Even those may need translation as we cross layers of the stack.
+>=20
+> The fewer cases we have where the machinery for machine-readable
+> deprecation advice is actually useful, the worse its cost / benefit
+> ratio is going to be.
 
-I'll try to run some tests next week, but I am not sure I'll
-have time to do so. If I were you I'd go ahead with the PR --
-it's best to have these type of changes merged early in the
-development cycle.
+Are you arguing the cost is unreasonably large?  I still don't
+see what the problem is, here.
 
-Thanks,
-
-		Emilio
+--=20
+Eduardo
 
