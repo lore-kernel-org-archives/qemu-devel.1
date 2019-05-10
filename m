@@ -2,60 +2,61 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF03DC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:36:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1BC6C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:37:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 538E221479
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:36:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="q0C7xZDt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 538E221479
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	by mail.kernel.org (Postfix) with ESMTPS id A515521479
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:37:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A515521479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46462 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46468 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP8Vq-0006XK-JC
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:36:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42138)
+	id 1hP8Wa-0007Op-Rw
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:37:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hP8JA-0003TE-Jd
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:23:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hP8Cj-0004ZW-E2
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:17:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hP8J9-0007J5-GI
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:23:40 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:46149)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>)
-	id 1hP8J8-0006yM-Tq; Fri, 10 May 2019 12:23:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Message-Id:Date:Subject:Cc:To:From;
-	bh=91sFCodM9pLXbNdaRNQnNcfrAYNV5Ra/NXos9gA7MJE=; 
-	b=q0C7xZDt2tMX7nyt/CAEGL50fysltZxnDz7DLJkNailv4sxtr8AxleZpNDMISS7qf3uNsH6DNEoUWgypbP7F+7kzTBvJNX+IbQZOizBcUvGmNtE4wTKcTMnBsMdIZqkELIWQB0RSR58vWWAEnNVbpAHeXYVhA6hyFEG/XjaFWrECMLZb+s4dXzTwiYgGIh/aulRbqK6N4jl7u+2xfAragVkgtrB0j4spb4ovL+VZCgitLeQej50wTjkeY5kf3VVYFvt8zqYdyV5pTPXSl8voIN//RsupOUOQEYMd3gyxkcHjfGO4V+W5rf8P3mMFLHR8tCLIREaz5k7/fPD/fTJ1DA==;
-Received: from 87-92-6-174.bb.dnainternet.fi ([87.92.6.174] helo=perseus.local)
-	by fanzine.igalia.com with esmtpsa 
-	(Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
-	id 1hP8Ip-0001p6-Kk; Fri, 10 May 2019 18:23:19 +0200
-Received: from berto by perseus.local with local (Exim 4.89)
-	(envelope-from <berto@igalia.com>)
-	id 1hP8Ia-00028G-T9; Fri, 10 May 2019 19:23:04 +0300
-From: Alberto Garcia <berto@igalia.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 19:22:54 +0300
-Message-Id: <20190510162254.8152-1-berto@igalia.com>
-X-Mailer: git-send-email 2.11.0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
-	timestamps) [generic] [fuzzy]
-X-Received-From: 91.117.99.155
-Subject: [Qemu-devel] [PATCH] qcow2: Define and use
- QCOW2_COMPRESSED_SECTOR_SIZE
+	(envelope-from <kwolf@redhat.com>) id 1hP8Ch-0000SM-HT
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:17:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48216)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hP8Cb-0000Fv-Nv; Fri, 10 May 2019 12:16:55 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CCE2D307DA31;
+	Fri, 10 May 2019 16:16:51 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-116-183.ams2.redhat.com
+	[10.36.116.183])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E0C6517797;
+	Fri, 10 May 2019 16:16:50 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Date: Fri, 10 May 2019 18:16:12 +0200
+Message-Id: <20190510161614.23236-14-kwolf@redhat.com>
+In-Reply-To: <20190510161614.23236-1-kwolf@redhat.com>
+References: <20190510161614.23236-1-kwolf@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.48]);
+	Fri, 10 May 2019 16:16:51 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 13/15] qemu-img: Allow rebase with no input base
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,124 +68,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
-	qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When an L2 table entry points to a compressed cluster the space used
-by the data is specified in 512-byte sectors. This size is independent
-from BDRV_SECTOR_SIZE and is specific to the qcow2 file format.
+From: Max Reitz <mreitz@redhat.com>
 
-The QCOW2_COMPRESSED_SECTOR_SIZE constant defined in this patch makes
-this explicit.
+Currently, without -u, you cannot add a backing file to an image when it
+currently has none:
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
+$ qemu-img rebase -b base.qcow2 foo.qcow2
+qemu-img: Could not open old backing file '': The 'file' block driver
+requires a file name
+
+It is really simple to allow this, though (effectively by setting
+old_backing_size to 0), so this patch does just that.
+
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/qcow2-cluster.c  |  5 +++--
- block/qcow2-refcount.c | 25 ++++++++++++++-----------
- block/qcow2.c          |  3 ++-
- block/qcow2.h          |  4 ++++
- 4 files changed, 23 insertions(+), 14 deletions(-)
+ qemu-img.c | 61 ++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 34 insertions(+), 27 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 974a4e8656..b36f4aa84a 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -796,8 +796,9 @@ int qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
-         return cluster_offset;
-     }
- 
--    nb_csectors = ((cluster_offset + compressed_size - 1) >> 9) -
--                  (cluster_offset >> 9);
-+    nb_csectors =
-+        (cluster_offset + compressed_size - 1) / QCOW2_COMPRESSED_SECTOR_SIZE -
-+        (cluster_offset / QCOW2_COMPRESSED_SECTOR_SIZE);
- 
-     cluster_offset |= QCOW_OFLAG_COMPRESSED |
-                       ((uint64_t)nb_csectors << s->csize_shift);
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index fa7ac1f7cb..780bd49a00 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1172,12 +1172,11 @@ void qcow2_free_any_clusters(BlockDriverState *bs, uint64_t l2_entry,
-     switch (ctype) {
-     case QCOW2_CLUSTER_COMPRESSED:
-         {
--            int nb_csectors;
--            nb_csectors = ((l2_entry >> s->csize_shift) &
--                           s->csize_mask) + 1;
--            qcow2_free_clusters(bs,
--                (l2_entry & s->cluster_offset_mask) & ~511,
--                nb_csectors * 512, type);
-+            int64_t offset = (l2_entry & s->cluster_offset_mask)
-+                & QCOW2_COMPRESSED_SECTOR_MASK;
-+            int size = QCOW2_COMPRESSED_SECTOR_SIZE *
-+                (((l2_entry >> s->csize_shift) & s->csize_mask) + 1);
-+            qcow2_free_clusters(bs, offset, size, type);
-         }
-         break;
-     case QCOW2_CLUSTER_NORMAL:
-@@ -1317,9 +1316,12 @@ int qcow2_update_snapshot_refcount(BlockDriverState *bs,
-                         nb_csectors = ((entry >> s->csize_shift) &
-                                        s->csize_mask) + 1;
-                         if (addend != 0) {
-+                            uint64_t coffset = (entry & s->cluster_offset_mask)
-+                                & QCOW2_COMPRESSED_SECTOR_MASK;
-                             ret = update_refcount(
--                                bs, (entry & s->cluster_offset_mask) & ~511,
--                                nb_csectors * 512, abs(addend), addend < 0,
-+                                bs, coffset,
-+                                nb_csectors * QCOW2_COMPRESSED_SECTOR_SIZE,
-+                                abs(addend), addend < 0,
-                                 QCOW2_DISCARD_SNAPSHOT);
-                             if (ret < 0) {
-                                 goto fail;
-@@ -1635,9 +1637,10 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-             nb_csectors = ((l2_entry >> s->csize_shift) &
-                            s->csize_mask) + 1;
-             l2_entry &= s->cluster_offset_mask;
--            ret = qcow2_inc_refcounts_imrt(bs, res,
--                                           refcount_table, refcount_table_size,
--                                           l2_entry & ~511, nb_csectors * 512);
-+            ret = qcow2_inc_refcounts_imrt(
-+                bs, res, refcount_table, refcount_table_size,
-+                l2_entry & QCOW2_COMPRESSED_SECTOR_MASK,
-+                nb_csectors * QCOW2_COMPRESSED_SECTOR_SIZE);
-             if (ret < 0) {
-                 goto fail;
+diff --git a/qemu-img.c b/qemu-img.c
+index 71c92f142a..cfa44b4153 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -3312,26 +3312,30 @@ static int img_rebase(int argc, char **argv)
+         char backing_name[PATH_MAX];
+         QDict *options =3D NULL;
+=20
+-        if (bs->backing_format[0] !=3D '\0') {
+-            options =3D qdict_new();
+-            qdict_put_str(options, "driver", bs->backing_format);
+-        }
+-
+-        if (force_share) {
+-            if (!options) {
++        if (bs->backing) {
++            if (bs->backing_format[0] !=3D '\0') {
+                 options =3D qdict_new();
++                qdict_put_str(options, "driver", bs->backing_format);
              }
-diff --git a/block/qcow2.c b/block/qcow2.c
-index a520d116ef..80679a84d2 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4188,7 +4188,8 @@ qcow2_co_preadv_compressed(BlockDriverState *bs,
- 
-     coffset = file_cluster_offset & s->cluster_offset_mask;
-     nb_csectors = ((file_cluster_offset >> s->csize_shift) & s->csize_mask) + 1;
--    csize = nb_csectors * 512 - (coffset & 511);
-+    csize = nb_csectors * QCOW2_COMPRESSED_SECTOR_SIZE -
-+        (coffset & ~QCOW2_COMPRESSED_SECTOR_MASK);
- 
-     buf = g_try_malloc(csize);
-     if (!buf) {
-diff --git a/block/qcow2.h b/block/qcow2.h
-index fdee297f33..7e796877d6 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -74,6 +74,10 @@
- #define MIN_CLUSTER_BITS 9
- #define MAX_CLUSTER_BITS 21
- 
-+/* Defined in the qcow2 spec (compressed cluster descriptor) */
-+#define QCOW2_COMPRESSED_SECTOR_SIZE 512U
-+#define QCOW2_COMPRESSED_SECTOR_MASK (~(QCOW2_COMPRESSED_SECTOR_SIZE - 1))
+-            qdict_put_bool(options, BDRV_OPT_FORCE_SHARE, true);
+-        }
+-        bdrv_get_backing_filename(bs, backing_name, sizeof(backing_name)=
+);
+-        blk_old_backing =3D blk_new_open(backing_name, NULL,
+-                                       options, src_flags, &local_err);
+-        if (!blk_old_backing) {
+-            error_reportf_err(local_err,
+-                              "Could not open old backing file '%s': ",
+-                              backing_name);
+-            ret =3D -1;
+-            goto out;
 +
- /* Must be at least 2 to cover COW */
- #define MIN_L2_CACHE_SIZE 2 /* cache entries */
- 
--- 
-2.11.0
++            if (force_share) {
++                if (!options) {
++                    options =3D qdict_new();
++                }
++                qdict_put_bool(options, BDRV_OPT_FORCE_SHARE, true);
++            }
++            bdrv_get_backing_filename(bs, backing_name, sizeof(backing_n=
+ame));
++            blk_old_backing =3D blk_new_open(backing_name, NULL,
++                                           options, src_flags, &local_er=
+r);
++            if (!blk_old_backing) {
++                error_reportf_err(local_err,
++                                  "Could not open old backing file '%s':=
+ ",
++                                  backing_name);
++                ret =3D -1;
++                goto out;
++            }
++        } else {
++            blk_old_backing =3D NULL;
+         }
+=20
+         if (out_baseimg[0]) {
+@@ -3384,7 +3388,7 @@ static int img_rebase(int argc, char **argv)
+      */
+     if (!unsafe) {
+         int64_t size;
+-        int64_t old_backing_size;
++        int64_t old_backing_size =3D 0;
+         int64_t new_backing_size =3D 0;
+         uint64_t offset;
+         int64_t n;
+@@ -3400,15 +3404,18 @@ static int img_rebase(int argc, char **argv)
+             ret =3D -1;
+             goto out;
+         }
+-        old_backing_size =3D blk_getlength(blk_old_backing);
+-        if (old_backing_size < 0) {
+-            char backing_name[PATH_MAX];
++        if (blk_old_backing) {
++            old_backing_size =3D blk_getlength(blk_old_backing);
++            if (old_backing_size < 0) {
++                char backing_name[PATH_MAX];
+=20
+-            bdrv_get_backing_filename(bs, backing_name, sizeof(backing_n=
+ame));
+-            error_report("Could not get size of '%s': %s",
+-                         backing_name, strerror(-old_backing_size));
+-            ret =3D -1;
+-            goto out;
++                bdrv_get_backing_filename(bs, backing_name,
++                                          sizeof(backing_name));
++                error_report("Could not get size of '%s': %s",
++                             backing_name, strerror(-old_backing_size));
++                ret =3D -1;
++                goto out;
++            }
+         }
+         if (blk_new_backing) {
+             new_backing_size =3D blk_getlength(blk_new_backing);
+--=20
+2.20.1
 
 
