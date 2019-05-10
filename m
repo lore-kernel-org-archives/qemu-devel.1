@@ -2,60 +2,69 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67375C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 21:53:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 577D5C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 23:34:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C608217F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 21:53:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C608217F9
+	by mail.kernel.org (Postfix) with ESMTPS id 13377217F5
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 23:34:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13377217F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50524 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51360 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hPDSD-0003CP-21
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 17:53:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52113)
+	id 1hPF1c-0005OF-0D
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 19:34:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hPDRG-0002lS-Iq
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:52:23 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hPF0m-00054x-4w
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 19:33:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hPDRF-0000fs-H0
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:52:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51454)
+	(envelope-from <pagupta@redhat.com>) id 1hPF0l-0001VI-BI
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 19:33:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58948)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
-	id 1hPDRD-0000d7-AH; Fri, 10 May 2019 17:52:19 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hPF0l-0001Uj-5v
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 19:33:07 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 761F63DDBE;
-	Fri, 10 May 2019 21:52:18 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-164.bos.redhat.com [10.18.17.164])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6CD575D962;
-	Fri, 10 May 2019 21:52:13 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-block@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 17:52:12 -0400
-Message-Id: <20190510215212.8413-1-jsnow@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 5778B81DEB;
+	Fri, 10 May 2019 23:33:05 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+	(colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C15C86013A;
+	Fri, 10 May 2019 23:33:04 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com
+	(zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+	by colo-mx.corp.redhat.com (Postfix) with ESMTP id E768741F56;
+	Fri, 10 May 2019 23:33:03 +0000 (UTC)
+Date: Fri, 10 May 2019 19:33:03 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Message-ID: <1909759746.28039539.1557531183427.JavaMail.zimbra@redhat.com>
+In-Reply-To: <CAPcyv4joEZaePvzc__N9Q3nozoHgQn7hNFPjBVo5BP6cc4rkEA@mail.gmail.com>
+References: <20190510155202.14737-1-pagupta@redhat.com>
+	<CAPcyv4joEZaePvzc__N9Q3nozoHgQn7hNFPjBVo5BP6cc4rkEA@mail.gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.14, 10.4.195.9]
+Thread-Topic: virtio pmem driver
+Thread-Index: rsQ5JHWz0G3j576+ZiuD0XgeGIYzZQ==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Fri, 10 May 2019 21:52:18 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.25]);
+	Fri, 10 May 2019 23:33:05 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] blockdev: fix missed target unref for
- drive-backup
+Subject: Re: [Qemu-devel] [PATCH v8 0/6] virtio pmem driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,76 +76,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, aihua liang <aliang@redhat.com>,
-	John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>,
-	Max Reitz <mreitz@redhat.com>
+Cc: cohuck@redhat.com, Jan Kara <jack@suse.cz>, KVM list <kvm@vger.kernel.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, david <david@fromorbit.com>,
+	Qemu Developers <qemu-devel@nongnu.org>,
+	virtualization@lists.linux-foundation.org,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Ross Zwisler <zwisler@kernel.org>, Andrea Arcangeli <aarcange@redhat.com>,
+	Dave Jiang <dave.jiang@intel.com>, jstaron@google.com,
+	linux-nvdimm <linux-nvdimm@lists.01.org>,
+	Vishal L Verma <vishal.l.verma@intel.com>,
+	David Hildenbrand <david@redhat.com>, Matthew Wilcox <willy@infradead.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Linux ACPI <linux-acpi@vger.kernel.org>, jmoyer <jmoyer@redhat.com>,
+	linux-ext4 <linux-ext4@vger.kernel.org>,
+	Len Brown <lenb@kernel.org>, Adam Borowski <kilobyte@angband.pl>,
+	Rik van Riel <riel@surriel.com>, yuval shaia <yuval.shaia@oracle.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
+	Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>,
+	Theodore Ts'o <tytso@mit.edu>,
+	Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+	"Darrick J. Wong" <darrick.wong@oracle.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-xfs <linux-xfs@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the bitmap can't be used for whatever reason, we skip putting down
-the reference. Fix that.
 
-In practice, this means that if you attempt to gracefully exit QEMU
-after a backup command being rejected, bdrv_close_all will fail and
-tell you some unpleasant things via assert().
+> >
+> >  Hi Michael & Dan,
+> >
+> >  Please review/ack the patch series from LIBNVDIMM & VIRTIO side.
+> >  We have ack on ext4, xfs patches(4, 5 & 6) patch 2. Still need
+> >  your ack on nvdimm patches(1 & 3) & virtio patch 2.
+> 
+> I was planning to merge these via the nvdimm tree, not ack them. Did
+> you have another maintainer lined up to take these patches?
 
-Reported-by: aihua liang <aliang@redhat.com>
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1703916
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- blockdev.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+Sorry! for not being clear on this. I wanted to say same.
 
-diff --git a/blockdev.c b/blockdev.c
-index 79fbac8450..278ecdd122 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3525,8 +3525,7 @@ static BlockJob *do_drive_backup(DriveBackup *backu=
-p, JobTxn *txn,
-     if (set_backing_hd) {
-         bdrv_set_backing_hd(target_bs, source, &local_err);
-         if (local_err) {
--            bdrv_unref(target_bs);
--            goto out;
-+            goto unref;
-         }
-     }
-=20
-@@ -3534,11 +3533,10 @@ static BlockJob *do_drive_backup(DriveBackup *bac=
-kup, JobTxn *txn,
-         bmap =3D bdrv_find_dirty_bitmap(bs, backup->bitmap);
-         if (!bmap) {
-             error_setg(errp, "Bitmap '%s' could not be found", backup->b=
-itmap);
--            bdrv_unref(target_bs);
--            goto out;
-+            goto unref;
-         }
-         if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_DEFAULT, errp)) {
--            goto out;
-+            goto unref;
-         }
-     }
-     if (!backup->auto_finalize) {
-@@ -3552,12 +3550,12 @@ static BlockJob *do_drive_backup(DriveBackup *bac=
-kup, JobTxn *txn,
-                             backup->sync, bmap, backup->compress,
-                             backup->on_source_error, backup->on_target_e=
-rror,
-                             job_flags, NULL, NULL, txn, &local_err);
--    bdrv_unref(target_bs);
-     if (local_err !=3D NULL) {
-         error_propagate(errp, local_err);
--        goto out;
-     }
-=20
-+unref:
-+    bdrv_unref(target_bs);
- out:
-     aio_context_release(aio_context);
-     return job;
---=20
-2.20.1
+Proposed the patch series to be merged via nvdimm tree as kindly agreed
+by you. We only need an ack on virtio patch 2 from Micahel.
 
+Thank you for all your help.
+
+Best regards,
+Pankaj Gupta
+
+> 
 
