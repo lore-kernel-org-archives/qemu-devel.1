@@ -2,62 +2,69 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 198ACC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:08:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45131C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:09:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA68E20850
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:08:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA68E20850
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1952E20850
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 09:09:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1952E20850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39352 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39360 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP1Vq-0000ah-43
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 05:08:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41415)
+	id 1hP1XO-0001M6-6g
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 05:09:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hP1Ts-000835-Pv
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:06:19 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hP1Wa-000140-1N
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:09:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hP1Tr-0001nV-E2
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:06:16 -0400
-Received: from 1.mo177.mail-out.ovh.net ([178.33.107.143]:46494)
+	(envelope-from <cohuck@redhat.com>) id 1hP1WW-0004Dm-Op
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:09:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44156)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hP1Tr-0001jA-8U
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:06:15 -0400
-Received: from player793.ha.ovh.net (unknown [10.108.57.211])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 7F3C5F2AB8
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 11:06:12 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
-	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
-	by player793.ha.ovh.net (Postfix) with ESMTPSA id 272C25AEDF6B;
-	Fri, 10 May 2019 09:06:05 +0000 (UTC)
-Date: Fri, 10 May 2019 11:06:04 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Message-ID: <20190510110604.67c0d18d@bahia.lan>
-In-Reply-To: <155591657807.20338.12115795588476734752.stgit@aravinda>
-References: <155591636364.20338.844048953355207313.stgit@aravinda>
-	<155591657807.20338.12115795588476734752.stgit@aravinda>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hP1WU-0004Ba-8L
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 05:08:59 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 23BC3C058CAF;
+	Fri, 10 May 2019 09:08:55 +0000 (UTC)
+Received: from gondolin (dhcp-192-213.str.redhat.com [10.33.192.213])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0C3A35D962;
+	Fri, 10 May 2019 09:08:40 +0000 (UTC)
+Date: Fri, 10 May 2019 11:08:38 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190510110838.2df4c4d0.cohuck@redhat.com>
+In-Reply-To: <20190509164825.GG2868@work-vm>
+References: <20190506014514.3555-1-yan.y.zhao@intel.com>
+	<20190506014904.3621-1-yan.y.zhao@intel.com>
+	<20190507151826.502be009@x1.home>
+	<20190509173839.2b9b2b46.cohuck@redhat.com>
+	<20190509154857.GF2868@work-vm>
+	<20190509175404.512ae7aa.cohuck@redhat.com>
+	<20190509164825.GG2868@work-vm>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 4540754327804483988
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrkeekgddufecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.32]);
+	Fri, 10 May 2019 09:08:55 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.107.143
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v8 1/6] ppc: spapr: Handle "ibm,
- nmi-register" and "ibm, nmi-interlock" RTAS calls
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] vfio/mdev: add version attribute
+ for mdev device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,233 +76,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org,
-	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: cjia@nvidia.com, kvm@vger.kernel.org, aik@ozlabs.ru,
+	Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+	qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com,
+	yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com,
+	mlevitsk@redhat.com, pasic@linux.ibm.com, libvir-list@redhat.com,
+	arei.gonglei@huawei.com, felipe@nutanix.com, Ken.Xue@amd.com,
+	kevin.tian@intel.com, Yan Zhao <yan.y.zhao@intel.com>,
+	zhenyuw@linux.intel.com, dinechin@redhat.com,
+	Alex Williamson <alex.williamson@redhat.com>,
+	intel-gvt-dev@lists.freedesktop.org, changpeng.liu@intel.com,
+	berrange@redhat.com, linux-kernel@vger.kernel.org,
+	zhi.a.wang@intel.com, jonathan.davies@nutanix.com, shaopeng.he@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 22 Apr 2019 12:32:58 +0530
-Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
+On Thu, 9 May 2019 17:48:26 +0100
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-> This patch adds support in QEMU to handle "ibm,nmi-register"
-> and "ibm,nmi-interlock" RTAS calls.
+> * Cornelia Huck (cohuck@redhat.com) wrote:
+> > On Thu, 9 May 2019 16:48:57 +0100
+> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >   
+> > > * Cornelia Huck (cohuck@redhat.com) wrote:  
+> > > > On Tue, 7 May 2019 15:18:26 -0600
+> > > > Alex Williamson <alex.williamson@redhat.com> wrote:
+> > > >     
+> > > > > On Sun,  5 May 2019 21:49:04 -0400
+> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:    
+> > > >     
+> > > > > > +  Errno:
+> > > > > > +  If vendor driver wants to claim a mdev device incompatible to all other mdev
+> > > > > > +  devices, it should not register version attribute for this mdev device. But if
+> > > > > > +  a vendor driver has already registered version attribute and it wants to claim
+> > > > > > +  a mdev device incompatible to all other mdev devices, it needs to return
+> > > > > > +  -ENODEV on access to this mdev device's version attribute.
+> > > > > > +  If a mdev device is only incompatible to certain mdev devices, write of
+> > > > > > +  incompatible mdev devices's version strings to its version attribute should
+> > > > > > +  return -EINVAL;      
+> > > > > 
+> > > > > I think it's best not to define the specific errno returned for a
+> > > > > specific situation, let the vendor driver decide, userspace simply
+> > > > > needs to know that an errno on read indicates the device does not
+> > > > > support migration version comparison and that an errno on write
+> > > > > indicates the devices are incompatible or the target doesn't support
+> > > > > migration versions.    
+> > > > 
+> > > > I think I have to disagree here: It's probably valuable to have an
+> > > > agreed error for 'cannot migrate at all' vs 'cannot migrate between
+> > > > those two particular devices'. Userspace might want to do different
+> > > > things (e.g. trying with different device pairs).    
+> > > 
+> > > Trying to stuff these things down an errno seems a bad idea; we can't
+> > > get much information that way.  
+> > 
+> > So, what would be a reasonable approach? Userspace should first read
+> > the version attributes on both devices (to find out whether migration
+> > is supported at all), and only then figure out via writing whether they
+> > are compatible?
+> > 
+> > (Or just go ahead and try, if it does not care about the reason.)  
 > 
-> The machine check notification address is saved when the
-> OS issues "ibm,nmi-register" RTAS call.
-> 
-> This patch also handles the case when multiple processors
-> experience machine check at or about the same time by
-> handling "ibm,nmi-interlock" call. In such cases, as per
-> PAPR, subsequent processors serialize waiting for the first
-> processor to issue the "ibm,nmi-interlock" call. The second
-> processor that also received a machine check error waits
-> till the first processor is done reading the error log.
-> The first processor issues "ibm,nmi-interlock" call
-> when the error log is consumed. This patch implements the
-> releasing part of the error-log while subsequent patch
-> (which builds error log) handles the locking part.
-> 
-> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-> ---
->  hw/ppc/spapr.c         |   18 ++++++++++++++
->  hw/ppc/spapr_rtas.c    |   61 ++++++++++++++++++++++++++++++++++++++++++++++++
->  include/hw/ppc/spapr.h |    9 ++++++-
->  3 files changed, 87 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index c56939a..6642cb5 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1805,6 +1805,11 @@ static void spapr_machine_reset(void)
->      first_ppc_cpu->env.gpr[5] = 0;
->  
->      spapr->cas_reboot = false;
-> +
-> +    spapr->guest_machine_check_addr = -1;
-> +
-> +    /* Signal all vCPUs waiting on this condition */
-> +    qemu_cond_broadcast(&spapr->mc_delivery_cond);
->  }
->  
->  static void spapr_create_nvram(SpaprMachineState *spapr)
-> @@ -2095,6 +2100,16 @@ static const VMStateDescription vmstate_spapr_dtb = {
->      },
->  };
->  
-> +static const VMStateDescription vmstate_spapr_machine_check = {
-> +    .name = "spapr_machine_check",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
-> +        VMSTATE_END_OF_LIST()
-> +    },
+> Well, I'm OK with something like writing to test whether it's
+> compatible, it's just we need a better way of saying 'no'.
+> I'm not sure if that involves reading back from somewhere after
+> the write or what.
 
-This VMState descriptor is missing a .needed field because we only want
-to migrate the subsection if the guest has called NMI register, ie.
-spapr->guest_machine_check_addr != (target_ulong) -1.
+Hm, so I basically see two ways of doing that:
+- standardize on some error codes... problem: error codes can be hard
+  to fit to reasons
+- make the error available in some attribute that can be read
 
-> +};
-> +
->  static const VMStateDescription vmstate_spapr = {
->      .name = "spapr",
->      .version_id = 3,
-> @@ -2127,6 +2142,7 @@ static const VMStateDescription vmstate_spapr = {
->          &vmstate_spapr_dtb,
->          &vmstate_spapr_cap_large_decr,
->          &vmstate_spapr_cap_ccf_assist,
-> +        &vmstate_spapr_machine_check,
->          NULL
->      }
->  };
-> @@ -3068,6 +3084,8 @@ static void spapr_machine_init(MachineState *machine)
->  
->          kvmppc_spapr_enable_inkernel_multitce();
->      }
-> +
-> +    qemu_cond_init(&spapr->mc_delivery_cond);
->  }
->  
->  static int spapr_kvm_type(MachineState *machine, const char *vm_type)
-> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> index ee24212..c2f3991 100644
-> --- a/hw/ppc/spapr_rtas.c
-> +++ b/hw/ppc/spapr_rtas.c
-> @@ -348,6 +348,39 @@ static void rtas_get_power_level(PowerPCCPU *cpu, SpaprMachineState *spapr,
->      rtas_st(rets, 1, 100);
->  }
->  
-> +static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
-> +                                  SpaprMachineState *spapr,
-> +                                  uint32_t token, uint32_t nargs,
-> +                                  target_ulong args,
-> +                                  uint32_t nret, target_ulong rets)
-> +{
-> +    uint64_t rtas_addr = spapr_get_rtas_addr();
-> +
-> +    if (!rtas_addr) {
-> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
-> +        return;
-> +    }
-> +
-> +    spapr->guest_machine_check_addr = rtas_ld(args, 1);
-> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-> +}
-> +
-> +static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
-> +                                   SpaprMachineState *spapr,
-> +                                   uint32_t token, uint32_t nargs,
-> +                                   target_ulong args,
-> +                                   uint32_t nret, target_ulong rets)
-> +{
-> +    if (!spapr->guest_machine_check_addr) {
+I'm not sure how we can serialize the readback with the last write,
+though (this looks inherently racy).
 
-Hmm... the default value is -1. It looks like the check should rather be:
-
-    if (spapr->guest_machine_check_addr == (target_ulong) -1) {
-
-
-> +        /* NMI register not called */
-> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-> +    } else {
-> +        qemu_cond_signal(&spapr->mc_delivery_cond);
-> +        rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-> +    }
-> +}
-> +
-> +
->  static struct rtas_call {
->      const char *name;
->      spapr_rtas_fn fn;
-> @@ -466,6 +499,30 @@ void spapr_load_rtas(SpaprMachineState *spapr, void *fdt, hwaddr addr)
->      }
->  }
->  
-> +uint64_t spapr_get_rtas_addr(void)
-
-Shouldn't this be hwaddr instead of uint64_t ?
-
-> +{
-> +    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-> +    int rtas_node;
-> +    const struct fdt_property *rtas_addr_prop;
-> +    void *fdt = spapr->fdt_blob;
-> +    uint32_t rtas_addr;
-> +
-> +    /* fetch rtas addr from fdt */
-> +    rtas_node = fdt_path_offset(fdt, "/rtas");
-> +    if (rtas_node == 0) {
-> +        return 0;
-> +    }
-> +
-> +    rtas_addr_prop = fdt_get_property(fdt, rtas_node, "linux,rtas-base", NULL);
-> +    if (!rtas_addr_prop) {
-
-Just for curiosity: this is ok for linux, but what about other OSes (eg. AIX) ?
-
-> +        return 0;
-> +    }
-> +
-> +    rtas_addr = fdt32_to_cpu(*(uint32_t *)rtas_addr_prop->data);
-
-Also this assumes the OS called RTAS instantiate-rtas, but some other
-OS might have called RTAS instantiate-rtas-64 instead. I guess it is
-ok for now because SLOF only provides the 32-bit variant, but a
-comment would certainly help IMHO.
-
-> +    return (uint64_t)rtas_addr;
-> +}
-> +
-> +
->  static void core_rtas_register_types(void)
->  {
->      spapr_rtas_register(RTAS_DISPLAY_CHARACTER, "display-character",
-> @@ -489,6 +546,10 @@ static void core_rtas_register_types(void)
->                          rtas_set_power_level);
->      spapr_rtas_register(RTAS_GET_POWER_LEVEL, "get-power-level",
->                          rtas_get_power_level);
-> +    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
-> +                        rtas_ibm_nmi_register);
-> +    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
-> +                        rtas_ibm_nmi_interlock);
->  }
->  
->  type_init(core_rtas_register_types)
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 7e32f30..ec6f33e 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -187,6 +187,10 @@ struct SpaprMachineState {
->       * occurs during the unplug process. */
->      QTAILQ_HEAD(, SpaprDimmState) pending_dimm_unplugs;
->  
-> +    /* State related to "ibm,nmi-register" and "ibm,nmi-interlock" calls */
-> +    target_ulong guest_machine_check_addr;
-> +    QemuCond mc_delivery_cond;
-> +
->      /*< public >*/
->      char *kvm_type;
->      char *host_model;
-> @@ -623,8 +627,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
->  #define RTAS_IBM_CREATE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x27)
->  #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
->  #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
-> +#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x2A)
-> +#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x2B)
->  
-> -#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2A)
-> +#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2C)
->  
->  /* RTAS ibm,get-system-parameter token values */
->  #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
-> @@ -874,4 +880,5 @@ void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
->  #define SPAPR_OV5_XIVE_BOTH     0x80 /* Only to advertise on the platform */
->  
->  void spapr_set_all_lpcrs(target_ulong value, target_ulong mask);
-> +uint64_t spapr_get_rtas_addr(void);
->  #endif /* HW_SPAPR_H */
-> 
-> 
-
+How important is detailed error reporting here?
 
