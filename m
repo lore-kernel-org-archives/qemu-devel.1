@@ -2,65 +2,93 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D1DC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:27:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3353BC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:28:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 660E520882
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:27:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 660E520882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F13BF208C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:28:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FyQOGMsv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F13BF208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46298 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46304 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP8Mj-0007CD-Ht
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:27:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40233)
+	id 1hP8NN-0007k9-5I
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:28:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hP8Cf-0004Vk-Ko
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:16:58 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hP8D0-0004o9-Bg
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:17:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hP8Cd-0000LB-SX
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:16:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33290)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hP8Cd-0000Ii-LQ
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:16:55 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 432A6163F;
-	Fri, 10 May 2019 16:16:54 +0000 (UTC)
-Received: from redhat.com (ovpn-112-68.ams2.redhat.com [10.36.112.68])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id AD9791001E6D;
-	Fri, 10 May 2019 16:16:47 +0000 (UTC)
-Date: Fri, 10 May 2019 17:16:44 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190510161644.GP7671@redhat.com>
-References: <20190510134203.24012-1-lvivier@redhat.com>
-	<20190510134203.24012-2-lvivier@redhat.com>
-	<20190510121135-mutt-send-email-mst@kernel.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1hP8Cz-0000jh-Dw
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:17:18 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:41438)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hP8Cz-0000if-6l
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:17:17 -0400
+Received: by mail-pl1-x641.google.com with SMTP id f12so1036269plt.8
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 09:17:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=1yWDOpNYnn7RE5roKzHhAppICNQzXylMOJNgQpdiiZ4=;
+	b=FyQOGMsvbXacwPKUHKnds0NIL6d0EUPIoOnk58AZjwgxkLOXJQCZxhjftrgEGnAzou
+	GeBHjV4mWCqCDTC52mtk9CcB0lT49jZg3UE+SL2CPcu9jIVNGkgt/JcckH0c3e0+bnXp
+	9X4rXPDMVigipASwOOBf12+2ZVnRNGrKJ3+G+Ned30CYy7C/TelqK19G4zBApECd3d38
+	4nj1TkSSD5AQrz1av6PPz3dKOr1VOBypbHndMnEe587waws9Hob6b4bYykz8BcFqcQ1z
+	wivli62EMKRMHL5ty0RHZk2+Q0V1b5r5oi5QwXSezx8pWl65cy1GdqUxAtELdnUMFxWu
+	9xZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=1yWDOpNYnn7RE5roKzHhAppICNQzXylMOJNgQpdiiZ4=;
+	b=HCO7M+bqMHin2m3xqXg5skfdvS23tmLgp896Pw1DQ3eQFIM73HHAyqI6U/qohW20Xr
+	rBUQufXhum9sblKDRkLBbLARkUKlaXmDA/vq2Ad5lWSSjKGt+rd2sTF3NKg1lYgBCVqO
+	uyKKellVN99c0Mk7b6i/z9NUwlQQWAqdgpSrZjUHcE6ZYIthjRAiFxB72CjsTpe2p8f5
+	8u1alqc3t1hZ/HSWztCDC+iLHulOA4hvFimusG+C4F7mmRsJCaoWvlu1dCetLQc2P0+h
+	lAIQGeEKUEEdxl+73POp8ZIP7t+DxMVFrE6vtke8gQ+NsYk1h73lr/WaSk3zazRig2XD
+	W/pQ==
+X-Gm-Message-State: APjAAAUpoIMpI8fP46GKG5BodmK/lNhCBGBn39/wm14eJqk6HTj5/kDU
+	Y4v+dblz+sMz8bSLJxc5l4QbCQ==
+X-Google-Smtp-Source: APXvYqwHb6QPsXfhwixY8A5zRJVeMNKbxwFODP7DpBOo8oCWOWIPwu/J0ObokpsOdEPMic0Z/g2Xdg==
+X-Received: by 2002:a17:902:8698:: with SMTP id
+	g24mr14755195plo.151.1557505035983; 
+	Fri, 10 May 2019 09:17:15 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
+	by smtp.gmail.com with ESMTPSA id
+	m2sm7993808pfi.24.2019.05.10.09.17.14
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 10 May 2019 09:17:15 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190510012458.22706-1-richard.henderson@linaro.org>
+	<20190510012458.22706-23-richard.henderson@linaro.org>
+	<CAFEAcA9uwaev+Q=BgLBz+fgO6C7VGmw4Nxcozg2vm6TOm+LJww@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <dd180f6d-27e8-2f2b-a7ac-ed1d8bbc9498@linaro.org>
+Date: Fri, 10 May 2019 09:17:13 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9uwaev+Q=BgLBz+fgO6C7VGmw4Nxcozg2vm6TOm+LJww@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190510121135-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Fri, 10 May 2019 16:16:54 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] VirtIO-RNG: Update default entropy
- source to `/dev/urandom`
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: Re: [Qemu-devel] [PATCH v5 22/24] target/arm: Implement ARMv8.5-RNG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,57 +100,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>,
-	Kashyap Chamarthy <kchamart@redhat.com>, Amit Shah <amit@kernel.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
-	"Richard W . M . Jones" <rjones@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 10, 2019 at 12:12:41PM -0400, Michael S. Tsirkin wrote:
-> On Fri, May 10, 2019 at 03:42:01PM +0200, Laurent Vivier wrote:
-> > From: Kashyap Chamarthy <kchamart@redhat.com>
-> > 
-> > When QEMU exposes a VirtIO-RNG device to the guest, that device needs a
-> > source of entropy, and that source needs to be "non-blocking", like
-> > `/dev/urandom`.  However, currently QEMU defaults to the problematic
-> > `/dev/random`, which is "blocking" (as in, it waits until sufficient
-> > entropy is available).
-> > 
-> > Why prefer `/dev/urandom` over `/dev/random`?
-> > ---------------------------------------------
-> > 
-> > The man pages of urandom(4) and random(4) state:
-> > 
-> >     "The /dev/random device is a legacy interface which dates back to a
-> >     time where the cryptographic primitives used in the implementation
-> >     of /dev/urandom were not widely trusted.  It will return random
-> >     bytes only within the estimated number of bits of fresh noise in the
-> >     entropy pool, blocking if necessary.  /dev/random is suitable for
-> >     applications that need high quality randomness, and can afford
-> >     indeterminate delays."
-> > 
-> > Further, the "Usage" section of the said man pages state:
-> > 
-> >     "The /dev/random interface is considered a legacy interface, and
-> >     /dev/urandom is preferred and sufficient in all use cases, with the
-> >     exception of applications which require randomness during early boot
-> >     time; for these applications, getrandom(2) must be used instead,
-> >     because it will block until the entropy pool is initialized.
+On 5/10/19 9:01 AM, Peter Maydell wrote:
+> On Fri, 10 May 2019 at 02:25, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> Cc: qemu-arm@nongnu.org
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>> v3: Log errors with -d unimp, for lack of a better flag.
+>> ---
+>>  target/arm/cpu.h    |  5 +++++
+>>  target/arm/cpu64.c  |  1 +
+>>  target/arm/helper.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>>  3 files changed, 50 insertions(+)
 > 
-> So how about just using getrandom then?
+>> +/* We do not support re-seeding, so the two registers operate the same.  */
+>> +static const ARMCPRegInfo rndr_reginfo[] = {
+>> +    { .name = "RNDR", .state = ARM_CP_STATE_AA64,
+>> +      .type = ARM_CP_NO_RAW | ARM_CP_SUPPRESS_TB_END,
+>> +      .opc0 = 3, .opc1 = 3, .crn = 2, .crm = 4, .opc2 = 0,
+>> +      .access = PL0_R, .readfn = rndr_readfn },
+>> +    { .name = "RNDRRS", .state = ARM_CP_STATE_AA64,
+>> +      .type = ARM_CP_NO_RAW | ARM_CP_SUPPRESS_TB_END,
+>> +      .opc0 = 3, .opc1 = 3, .crn = 2, .crm = 4, .opc2 = 1,
+>> +      .access = PL0_R, .readfn = rndr_readfn },
+> 
+> Don't these need to be marked ARM_CP_IO for the benefit
+> of -icount ?
 
-The 3rd patch in this series addresses that.
+I don't think so.  There's no lock taken, as for mmio devices.  It's not not
+related to time, virtual or otherwise.  There are no possible exceptions.  I
+can't think of anything that would make icount care.
+
+Have I missed something?
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+r~
+
 
