@@ -2,92 +2,72 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01886C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:00:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07BB0C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:02:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE03C2070D
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:00:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uawn0eRW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE03C2070D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D039A2070D
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:02:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D039A2070D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47019 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47038 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP8t2-00030O-1Z
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 13:00:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50958)
+	id 1hP8uS-0004Ok-4j
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 13:02:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hP8sA-0002ev-DO
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:59:51 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hP8tK-0003ZS-Hz
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:01:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hP8s9-0003ZE-EI
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:59:50 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51376)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hP8s9-0003Y4-70
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:59:49 -0400
-Received: by mail-wm1-x342.google.com with SMTP id o189so8344349wmb.1
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 09:59:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=k6TxiI/rYAa2sdWfRcGuvApguTy8/i+roGMq4e+FTS4=;
-	b=uawn0eRWUX53z8dKMoEWGQE0b9Tu1d55oX23ttgeS/1mlRpcrwLObDlqpWXSJW842g
-	nwJYYKE9/mP6coughF6lWo+JoAK2BKuU6DBNFohKsnUPHNqCoU60Cta+JgLxtzvdHmVE
-	Ha6mwp3sYkGqWQ0i2RhMUEfUViE+OWPxSEhvNpOFeEXu2HJ8LL23zKPJnDtAGUpN3JA2
-	hmangFml3w6V511V5tvlplLBJI/+pZtBNGDsfsxPIOeDysE+z3M32k5wqFyOV7gNSizu
-	QBOUslwQvoQ77Z+CSjcqbIfGw6bVUhvXKl4mreq17Vu+ROEOyWe1YWFaba1XGHRyX1fj
-	uVbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=k6TxiI/rYAa2sdWfRcGuvApguTy8/i+roGMq4e+FTS4=;
-	b=rChb8pMrCqd2mGU0XQzR4ghD3nEuyVcrq5A1h0+XMbfOPIwJNfJLclG/g4zIRGZ4Lc
-	hQFKXyHHnvna74BEJKUfTcfOuD7x3/1Gb3sX9lyUScDrm/inXGRN+m/8neFBE4f1i/nA
-	GWt91cGW66wEhBh8qDgkUapWOW7WG5mzae+Nvl1atiM2Tkpm3jcWbb+1nxUzHFmYHNqP
-	bnDy3YcB5PJNoAT+FP19GkYlzS9oN0/JIXLd6xffMPUhMufC5KXb3n2s7CICI32veXEy
-	E4zSTb3f0GgDGuonqlnjPmbhFOssEBvBqoY2Ncd63Yqgg51KoVoAbqgLr7z+DJRiNnD7
-	vnwA==
-X-Gm-Message-State: APjAAAW+T0Mcf5h4gdFazQCyW34rEJ0GQI8xitkoTMSJPEPpKncxSuKJ
-	WvaZ2H/Lk9FOA+wKNKycpwcw3g==
-X-Google-Smtp-Source: APXvYqyc7VZuaDWnKGW6f74XjzlRQtV0r65l21I0Voq3wzTopDbFuNKaavLbX4vek90ZmZlqdAYLog==
-X-Received: by 2002:a1c:ab09:: with SMTP id u9mr7334865wme.29.1557507587153;
-	Fri, 10 May 2019 09:59:47 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	j190sm8376252wmb.19.2019.05.10.09.59.46
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 10 May 2019 09:59:46 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id A64391FF87;
-	Fri, 10 May 2019 17:59:45 +0100 (BST)
-References: <20190509165912.10512-1-alex.bennee@linaro.org>
-	<20190509165912.10512-6-alex.bennee@linaro.org>
-	<CAFEAcA8Dsdp2rnORnzqemWspfFxfhVwkAz=2EXdupo8iDj_=Hw@mail.gmail.com>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-In-reply-to: <CAFEAcA8Dsdp2rnORnzqemWspfFxfhVwkAz=2EXdupo8iDj_=Hw@mail.gmail.com>
-Date: Fri, 10 May 2019 17:59:45 +0100
-Message-ID: <87tve2b5z2.fsf@zen.linaroharston>
+	(envelope-from <ehabkost@redhat.com>) id 1hP8tF-00047y-4S
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:01:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45060)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hP8tE-000476-Pu
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:00:56 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D0C3F30025F1
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 17:00:54 +0000 (UTC)
+Received: from localhost (ovpn-116-40.gru2.redhat.com [10.97.116.40])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5E9A117791;
+	Fri, 10 May 2019 17:00:54 +0000 (UTC)
+Date: Fri, 10 May 2019 14:00:52 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190510170052.GQ4189@habkost.net>
+References: <20190423212246.3542-1-ehabkost@redhat.com>
+	<87imumj1jb.fsf@dusky.pond.sub.org>
+	<20190507161845.GL28722@habkost.net>
+	<87lfzh5mrh.fsf@dusky.pond.sub.org>
+	<20190508202830.GF4189@habkost.net>
+	<874l646nbh.fsf@dusky.pond.sub.org>
+	<20190509091452.GF31299@redhat.com>
+	<20190509155247.GJ4189@habkost.net>
+	<87a7fux247.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <87a7fux247.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Fri, 10 May 2019 17:00:54 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v1 05/23] semihosting: enable chardev
- backed output
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/3] Export machine type deprecation info
+ through QMP
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,46 +79,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: mprivozn@redhat.com,
+	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+	qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, May 10, 2019 at 08:19:52AM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+>=20
+> > On Thu, May 09, 2019 at 10:14:52AM +0100, Daniel P. Berrang=E9 wrote:
+> >> On Thu, May 09, 2019 at 10:31:46AM +0200, Markus Armbruster wrote:
+> >> > We've wandered into the QAPI vs. QOM swamp.  Cc: Paolo.
+> >> >=20
+> >> > Eduardo Habkost <ehabkost@redhat.com> writes:
+> >> >=20
+> >> > > On Wed, May 08, 2019 at 11:16:50AM +0200, Markus Armbruster wrot=
+e:
+> [...]
+> >> > >> I agree we should point to a preferred replacement whenever we =
+deprecate
+> >> > >> something.
+> >> > >>=20
+> >> > >> We have to do it in documentation.  And we generally do, in
+> >> > >> qemu-deprecated.texi.
+> >> > >>=20
+> >> > >> How useful would doing it in QMP as well be?  Depends on what m=
+anagement
+> >> > >> applications can do with the additional information.
+> >> > >
+> >> > > I expect it to be useful for things that have obvious
+> >> > > replacements, like old machine type or CPU model versions.
+> >> >=20
+> >> > I doubt a management application should apply suggested replacemen=
+ts
+> >> > automatically, and I doubt libvirt would.  Not even when QEMU deve=
+lopers
+> >> > deem them "obvious".
+> >>=20
+> >> We certainly won't apply the suggested replacement as in many cases
+> >> it is not going to be a functionally equivalent drop-in.
+> >
+> > Who's "we"?
+> >
+> >>=20
+> >> If QEMU logs it to stderr, it will end up in the per-VM log file
+> >> libvirt has under /var/log/libvirt/qemu/$GUESTNAME.log.  If QEMU
+> >> doesn't log it to stderr, then libvirt would just write it to
+> >> that same log file itself.
+> >>=20
+> >> If libvirt gains some API or event for notifying apps of deprecation
+> >> we might bubble it up to the mgmt app that way.
+> >>=20
+> >> I still feel it is useful to have the suggested replacement in the
+> >> logs, rather  than only leaving it in qemu-deprecated.texi.  This
+> >> way the info is immediately visible to both app developers and any
+> >> support person dealing with bugs.
+> >>=20
+> >> If the app dev see the suggested replacement upfront they're more
+> >> likely to make an immediate decision to update their code if the
+> >> suggestion is trivial. If they need to go find the QEMU docs to
+> >> lookup what action is required I feel they'll more likely just
+> >> put the item on their long todo list where it will languish.
+> >
+> > Agreed.  However, note that the audience for deprecation
+> > information is not just developers and support people.  End users
+> > need to know when they are relying on a deprecated feature, and
+> > applications should make it as easy as possible for them to
+> > update their configurations.
+> >
+> > I'm not suggesting the alternative would be applied
+> > automatically.  But having the alternative available in a
+> > machine-friendly way may be the difference between a unhelpful UI
+> > that just tells the user there's some problem but can't give a
+> > solution, and one that can really assist the user to fix the
+> > problem.
+>=20
+> I'm skeptical.
+>=20
+> For the management application to assist its users, it has to translate
+> both the deprecated QEMU interface and its replacement into its own
+> interfaces (because those are the ones the users actually use).
+> Management applications routinely translate in the other direction.  I
+> doubt anyone would build reverse translation capabilities just for
+> helping users update deprecated configurations.  So unless such
+> capabilities get built for other purposes, machine-friendliness will
+> remain unused.
+>=20
+> If the management application's user is another machine, another
+> translation is needed.  And so forth until we reach the guy who's
+> supposed to update configuration.
+>=20
+> Such a game of telephone is unlikely to produce anything but confusion,
+> except for specific cases we test across the whole stack.
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+I don't see how that applies to machine type and CPU model names.
+Machine type and CPU model names are often exposed directly to
+the end user.
 
-> On Thu, 9 May 2019 at 17:59, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
-ote:
->>
->> For running system tests we want to be able to re-direct output to a
->> file like we do with serial output. This does the wiring to allow us
->> to treat semihosting like just another character output device.
->>
->> diff --git a/qemu-options.hx b/qemu-options.hx
->> index 51802cbb266..6aa3a08c2fb 100644
->> --- a/qemu-options.hx
->> +++ b/qemu-options.hx
->> @@ -3975,12 +3975,12 @@ STEXI
->>  Enable semihosting mode (ARM, M68K, Xtensa, MIPS, Nios II only).
->>  ETEXI
->>  DEF("semihosting-config", HAS_ARG, QEMU_OPTION_semihosting_config,
->> -    "-semihosting-config [enable=3Don|off][,target=3Dnative|gdb|auto][,=
-arg=3Dstr[,...]]\n" \
->> +    "-semihosting-config [enable=3Don|off][,target=3Dnative|gdb|auto][,=
-chardev=3Did][,arg=3Dstr[,...]]\n" \
->>      "                semihosting configuration\n",
->>  QEMU_ARCH_ARM | QEMU_ARCH_M68K | QEMU_ARCH_XTENSA | QEMU_ARCH_LM32 |
->>  QEMU_ARCH_MIPS | QEMU_ARCH_NIOS2)
->
-> As you can see in the docs here, semihosting is supported on
-> five guest architectures, so we should implement this new
-> feature for all of them, not just arm.
-
-As I've introduced this for testing I see no reason not to add support
-for other architectures. However I was hoping this is something that
-could be done organically as other system tests get enabled.
-
---
-Alex Benn=C3=A9e
+--=20
+Eduardo
 
