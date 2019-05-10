@@ -2,72 +2,73 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C07BDC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 14:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4803DC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 14:01:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84C2221479
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 14:00:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84C2221479
+	by mail.kernel.org (Postfix) with ESMTPS id 08BF221479
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 14:01:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08BF221479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43845 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43891 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP64H-0005rk-PE
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 10:00:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39943)
+	id 1hP65l-00076C-Bm
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 10:01:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hP63O-0005VM-OA
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:59:15 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hP641-0005sS-Jp
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:59:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hP63N-0000n4-IZ
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:59:14 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41936)
+	(envelope-from <borntraeger@de.ibm.com>) id 1hP640-000186-2W
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:59:53 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48422)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1hP63N-0000ma-Ai
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:59:13 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	id 1hP63z-00016n-Ou
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:59:51 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4ADrmT7144204
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 09:59:11 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2sd76ksk3r-1
+	x4ADrbsg117087
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 09:59:48 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2sda04242a-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 09:59:10 -0400
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 09:59:48 -0400
 Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 10 May 2019 14:59:03 +0100
+	Fri, 10 May 2019 14:59:46 +0100
 Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-	by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+	by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
 	Authorized Use Only! Violators will be prosecuted; 
 	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Fri, 10 May 2019 14:59:02 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+	Fri, 10 May 2019 14:59:42 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
+	[9.149.105.60])
 	by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x4ADx1RB48824574
+	ESMTP id x4ADxfee33292356
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Fri, 10 May 2019 13:59:01 GMT
+	verify=OK); Fri, 10 May 2019 13:59:41 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 77A6642041;
-	Fri, 10 May 2019 13:59:01 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 3F2804204C;
+	Fri, 10 May 2019 13:59:41 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 32DC14203F;
-	Fri, 10 May 2019 13:59:01 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id EED2F42047;
+	Fri, 10 May 2019 13:59:40 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.96.15])
 	by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-	Fri, 10 May 2019 13:59:01 +0000 (GMT)
+	Fri, 10 May 2019 13:59:40 +0000 (GMT)
 To: Thomas Huth <thuth@redhat.com>, cohuck@redhat.com, qemu-s390x@nongnu.org
 References: <20190508094857.21145-1-thuth@redhat.com>
+	<20190508094857.21145-3-thuth@redhat.com>
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
@@ -113,31 +114,31 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
 	RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
 	oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
 	syiRa+UVlsKmx1hsEg==
-Date: Fri, 10 May 2019 15:59:00 +0200
+Date: Fri, 10 May 2019 15:59:40 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190508094857.21145-1-thuth@redhat.com>
+In-Reply-To: <20190508094857.21145-3-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19051013-0028-0000-0000-0000036C5B25
+x-cbid: 19051013-0008-0000-0000-000002E55447
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051013-0029-0000-0000-0000242BE14B
-Message-Id: <2737a744-3636-ee97-0c6b-a1f7237c58b6@de.ibm.com>
+x-cbparentid: 19051013-0009-0000-0000-00002251E033
+Message-Id: <04ebd3c0-34e2-d21c-2b04-616d52056a86@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
 	definitions=2019-05-09_02:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
 	priorityscore=1501
-	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
 	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
 	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
 	scancount=1 engine=8.0.1-1810050000 definitions=main-1905100097
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 148.163.156.1
-Subject: Re: [Qemu-devel] [PULL SUBSYSTEM s390x 0/3] s390-ccw-bios: Skip
- bootmap signature entries
+Subject: Re: [Qemu-devel] [PULL SUBSYSTEM s390x 2/3] s390-bios: Skip bootmap
+ signature entries
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -154,45 +155,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Shall we actually CC stable that feature?
+Shall we cc stable this?
 
 On 08.05.19 11:48, Thomas Huth wrote:
-> This pull request is not for master.
+> From: "Jason J. Herne" <jjherne@linux.ibm.com>
 > 
+> Newer versions of zipl have the ability to write signature entries to the boot
+> script for secure boot. We don't yet support secure boot, but we need to skip
+> over signature entries while reading the boot script in order to maintain our
+> ability to boot guest operating systems that have a secure bootloader.
 > 
->  Hi Cornelia,
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+> Message-Id: <1556543381-12671-1-git-send-email-jjherne@linux.ibm.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  pc-bios/s390-ccw/bootmap.c | 19 +++++++++++++++++--
+>  pc-bios/s390-ccw/bootmap.h | 10 ++++++----
+>  2 files changed, 23 insertions(+), 6 deletions(-)
 > 
-> the following changes since commit a6f6d24757a73f7176989134b97284a1a7df11e5:
-> 
->   Merge remote-tracking branch 'remotes/kraxel/tags/vga-20190507-pull-request' into staging (2019-05-07 21:39:28 +0100)
-> 
-> are available in the Git repository at:
-> 
->   https://gitlab.com/huth/qemu.git tags/s390-ccw-bios-2019-05-08
-> 
-> for you to fetch changes up to f7a339a5ba48a8a5c5bf4f1fdb1463bf8ac5f5bb:
-> 
->   pc-bios/s390: Update firmware image with "Skip bootmap signature entries" fix (2019-05-08 11:26:01 +0200)
-> 
-> ----------------------------------------------------------------
-> Skip unsupported bootmap signature entries instead of aborting the boot process
-> ----------------------------------------------------------------
-> 
-> Jason J. Herne (1):
->       s390-bios: Skip bootmap signature entries
-> 
-> Markus Armbruster (1):
->       pc-bios/s390-ccw: Clean up harmless misuse of isdigit()
-> 
-> Thomas Huth (1):
->       pc-bios/s390: Update firmware image with "Skip bootmap signature entries" fix
-> 
->  pc-bios/s390-ccw.img       | Bin 42608 -> 42608 bytes
->  pc-bios/s390-ccw/bootmap.c |  19 +++++++++++++++++--
->  pc-bios/s390-ccw/bootmap.h |  10 ++++++----
->  pc-bios/s390-ccw/libc.c    |   2 +-
->  pc-bios/s390-ccw/menu.c    |   2 +-
->  5 files changed, 25 insertions(+), 8 deletions(-)
+> diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+> index 7aef65ab67..d13b7cbd15 100644
+> --- a/pc-bios/s390-ccw/bootmap.c
+> +++ b/pc-bios/s390-ccw/bootmap.c
+> @@ -254,7 +254,14 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr,
+>      memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+>      read_block(block_nr, sec, "Cannot read Boot Map Script");
+>  
+> -    for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD; i++) {
+> +    for (i = 0; bms->entry[i].type == BOOT_SCRIPT_LOAD ||
+> +                bms->entry[i].type == BOOT_SCRIPT_SIGNATURE; i++) {
+> +
+> +        /* We don't support secure boot yet, so we skip signature entries */
+> +        if (bms->entry[i].type == BOOT_SCRIPT_SIGNATURE) {
+> +            continue;
+> +        }
+> +
+>          address = bms->entry[i].address.load_address;
+>          block_nr = eckd_block_num(&bms->entry[i].blkptr.xeckd.bptr.chs);
+>  
+> @@ -489,7 +496,15 @@ static void zipl_run(ScsiBlockPtr *pte)
+>  
+>      /* Load image(s) into RAM */
+>      entry = (ComponentEntry *)(&header[1]);
+> -    while (entry->component_type == ZIPL_COMP_ENTRY_LOAD) {
+> +    while (entry->component_type == ZIPL_COMP_ENTRY_LOAD ||
+> +           entry->component_type == ZIPL_COMP_ENTRY_SIGNATURE) {
+> +
+> +        /* We don't support secure boot yet, so we skip signature entries */
+> +        if (entry->component_type == ZIPL_COMP_ENTRY_SIGNATURE) {
+> +            entry++;
+> +            continue;
+> +        }
+> +
+>          zipl_load_segment(entry);
+>  
+>          entry++;
+> diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
+> index a085212077..94f53a5f1e 100644
+> --- a/pc-bios/s390-ccw/bootmap.h
+> +++ b/pc-bios/s390-ccw/bootmap.h
+> @@ -98,8 +98,9 @@ typedef struct ScsiMbr {
+>  #define ZIPL_COMP_HEADER_IPL    0x00
+>  #define ZIPL_COMP_HEADER_DUMP   0x01
+>  
+> -#define ZIPL_COMP_ENTRY_LOAD    0x02
+> -#define ZIPL_COMP_ENTRY_EXEC    0x01
+> +#define ZIPL_COMP_ENTRY_EXEC      0x01
+> +#define ZIPL_COMP_ENTRY_LOAD      0x02
+> +#define ZIPL_COMP_ENTRY_SIGNATURE 0x03
+>  
+>  typedef struct XEckdMbr {
+>      uint8_t magic[4];   /* == "xIPL"        */
+> @@ -117,8 +118,9 @@ typedef struct BootMapScriptEntry {
+>      BootMapPointer blkptr;
+>      uint8_t pad[7];
+>      uint8_t type;   /* == BOOT_SCRIPT_* */
+> -#define BOOT_SCRIPT_EXEC 0x01
+> -#define BOOT_SCRIPT_LOAD 0x02
+> +#define BOOT_SCRIPT_EXEC      0x01
+> +#define BOOT_SCRIPT_LOAD      0x02
+> +#define BOOT_SCRIPT_SIGNATURE 0x03
+>      union {
+>          uint64_t load_address;
+>          uint64_t load_psw;
 > 
 
 
