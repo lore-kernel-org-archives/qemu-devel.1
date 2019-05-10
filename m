@@ -2,89 +2,70 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88912C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:18:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C61CC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:18:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E629208C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:18:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E629208C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 402E1208C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 17:18:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 402E1208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47311 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47313 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP9A8-0001XX-Dh
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 13:18:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56651)
+	id 1hP9AS-0001kL-Hm
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 13:18:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hP98b-0000px-Ae
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:16:50 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hP993-00010R-SF
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:17:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hP98a-000692-7z
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:16:49 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:46182
-	helo=mail.default.ilande.uk0.bigv.io)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hP98a-000648-1E; Fri, 10 May 2019 13:16:48 -0400
-Received: from host109-147-184-225.range109-147.btcentralplus.com
-	([109.147.184.225] helo=[192.168.1.65])
-	by mail.default.ilande.uk0.bigv.io with esmtpsa
-	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hP97r-0001FD-O7; Fri, 10 May 2019 18:16:04 +0100
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190510163536.4242-1-mark.cave-ayland@ilande.co.uk>
-	<CAFEAcA8tHGciDGyDwCZ02S5km8XNf32PfgSbtbRzqLxcT9JWhA@mail.gmail.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
-	mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
-	3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
-	E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
-	PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
-	PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
-	AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
-	OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
-	NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
-	mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
-	z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
-	T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
-	DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
-	y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
-	2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
-	14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
-	YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
-	Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
-	BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
-	opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
-	NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
-	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
-	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
-	imgcU9TTGC5qd9g=
-Message-ID: <4232e4b8-45fb-8fd8-3740-d6955dbf1e19@ilande.co.uk>
-Date: Fri, 10 May 2019 18:16:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <ehabkost@redhat.com>) id 1hP992-0006Zu-Cp
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:17:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55062)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hP992-0006XG-3G
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 13:17:16 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 60978285BE
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 17:17:15 +0000 (UTC)
+Received: from localhost (ovpn-116-40.gru2.redhat.com [10.97.116.40])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E5A9A17791;
+	Fri, 10 May 2019 17:17:14 +0000 (UTC)
+Date: Fri, 10 May 2019 14:17:11 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190510171711.GS4189@habkost.net>
+References: <20190423212246.3542-1-ehabkost@redhat.com>
+	<87imumj1jb.fsf@dusky.pond.sub.org>
+	<20190507161845.GL28722@habkost.net>
+	<87lfzh5mrh.fsf@dusky.pond.sub.org>
+	<20190508202830.GF4189@habkost.net>
+	<874l646nbh.fsf@dusky.pond.sub.org>
+	<20190509181906.GN4189@habkost.net>
+	<87o94au06m.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8tHGciDGyDwCZ02S5km8XNf32PfgSbtbRzqLxcT9JWhA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 109.147.184.225
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87o94au06m.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.30]);
+	Fri, 10 May 2019 17:17:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH] configure: copy MacOS NDRV driver into
- sharedir for out-of-tree builds
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/3] Export machine type deprecation info
+ through QMP
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,66 +77,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc <qemu-ppc@nongnu.org>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Howard Spoelstra <hsp.cat7@gmail.com>
+Cc: mprivozn@redhat.com, qemu-devel@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/05/2019 17:49, Peter Maydell wrote:
-
-> On Fri, 10 May 2019 at 17:37, Mark Cave-Ayland
-> <mark.cave-ayland@ilande.co.uk> wrote:
->>
->> Make sure that we include *.ndrv files with those being copied to sharedir
->> during out-of-tree builds. This ensures that the MacOS driver is correctly
->> located and loaded by qemu-system-ppc.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> ---
->>  configure | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/configure b/configure
->> index 63f312bd1f..9493537301 100755
->> --- a/configure
->> +++ b/configure
->> @@ -7886,6 +7886,7 @@ for bios_file in \
->>      $source_path/pc-bios/*.dtb \
->>      $source_path/pc-bios/*.img \
->>      $source_path/pc-bios/openbios-* \
->> +    $source_path/pc-bios/*.ndrv \
->>      $source_path/pc-bios/u-boot.* \
->>      $source_path/pc-bios/edk2-*.fd.bz2 \
->>      $source_path/pc-bios/palcode-*
+On Fri, May 10, 2019 at 11:29:53AM +0200, Markus Armbruster wrote:
+[...]
+> >> >> > We could extend QAPI introspection to return that if necessary,
+> >> >> > right?
+> >> >> 
+> >> >> I'm confident we can come up with *something*.  It might kill the neat
+> >> >> and simple "use QAPI features to communicate deprecation" idea, though.
+> >> >
+> >> > If something is important enough to be communicated through
+> >> > stderr, it's important enough to be communicated through QMP.
+> >> 
+> >> Mostly.  Differences are due to the different consumers.
+> >> 
+> >> stderr is primarily for human users.  We print stuff useful to human
+> >> users.
+> >
+> > We have users that don't have access to stderr.  They might have
+> > access to log files, but log files are pretty bad user
+> > interfaces.  If it's important for some set of human users, apps
+> > using libvirt or QMP need access to that information so they can
+> > show it to their human users too.
 > 
-> The comment above this bit of code says:
+> Command line means stderr.
+
+I disagree.
+
 > 
-> # Caution: do not add files or directories here using wildcards. This
-> # will result in problems later if a new file matching the wildcard is
-> # added to the source tree -- nothing will cause configure to be rerun
-> # so the build tree will be missing the link back to the new file, and
-> # tests might fail.
+> I'm afraid our command line is awkward both for machines and for humans,
+> albeit for different reasons.
 > 
-> The pc-bios/ directory is awkward legacy which we
-> can't really apply the next part of the comment to
-> ("Prefer to keep the relevant files in their own
-> directory and symlink the directory instead"), but since
-> there is only one *.ndrv file we can at least avoid the
-> wildcard by writing "qemu_vga.ndrv" instead of "*.ndrv".
+> For humans doing simple things, the command line is okay.  But beyond
+> that, it gets forbiddingly unwieldy[2].
+> 
+> Machines are fine with that kind of unwieldy, but would prefer something
+> with more structure, both on input (talking to QEMU) and even more so on
+> output (QEMU talking back).
+> 
+> Ideally, we'd support machines do their work in (structured) QMP,
+> resorting to the command line only to set up a QMP monitor.  We're not
+> anywhere close to this.
+> 
+> As long as management applications use the command line in not-trivial
+> ways, they have to deal with configuration errors reported via stderr.
 
-I did spot that, but figured that it was outdated because no-one else was really
-following it. The reason for adding the explicit wildcard is that the driver build
-produces 2 separate .ndrv files - debug, and non-debug - and so it saves me a bit of
-effort after a rebase and rebuild.
+That's only true if we want to.
 
-Should we say up front as part of the conversion to o-o-t builds that all files must
-be explicitly listed in that section as per the comment? Or should each type of
-driver live in its own subdirectory?
+Command line is an interface usable by machines.  Not the ideal,
+but it works.
+
+Messages on stderr are not an interface for machines.  We must
+provide something better, and I don't think "wait until we
+convert everything to QMP" is a reasonable answer.
 
 
-ATB,
+> 
+> >> QMP is primarily for machines, secondarily for the humans building these
+> >> machines.  We send stuff useful to the machines themselves, and stuff
+> >> the machines can use to be more useful for their users (which may be
+> >> machines or humans).  We can also send stuff to help the humans building
+> >> the machines.
+> >>
+> >> In any case, the information we provide is limited by the cost to
+> >> provide it.
+> >
+> > Absolutely.
+> >
+> >> 
+> >> > Is that enough reason to provide something more complex?
+> >> 
+> >> We need to consider cost / benefit.
+> >> 
+> >> On benefit, I'd like to know what libvirt would do with the additional
+> >> information beyond logging it.
+> >
+> > I'd say it should provide it to apps, otherwise this won't be
+> > more useful than the existing log files.
+> 
+> A management application simply showing its user whatever error QEMU
+> reports or hint it provides is bound to be confusing: since QEMU talks
+> in QEMU terms, its errors and hints generally need translation to make
+> sense at higher layers.  Translation involves recognizing specific
+> messages, which means it's limited to special cases (and painfully
+> brittle).
+> 
+> The farther you propagate QEMU's messages up the stack, the less sense
+> they'll likely make.
+> 
+> Management applications logging QEMU's messages is useful anyway, mainly
+> because it's better than nothing.
+> 
+> I doubt logging them some more further up the stack would be all that
+> useful, but I might be wrong.
+> 
+> Discussed further elsewhere in this thread.
+> 
+> >> Is the additional information you propose to provide static or dynamic?
+> >> 
+> >> By "static", I mean each occurence of a feature in the QAPI schema is
+> >> tied to one fixed instance of "additional information".
+> >
+> > I don't think I understand this description of "static".  I
+> > expect the data to be fixed at build time, but I expect it to be
+> > different in downstream distributions of QEMU.
+> 
+> Let me try differently.
+> 
+> QAPI features as currently envisaged convey one bit of information:
+> there / not there.  The information is fixed at build time.  It is tied
+> to a specific QAPI entity (command, object type, enumeration value,
+> ...).
+> 
+> My question is about the difference between this and what you have in
+> mind.  Specifically, is the difference only the amount of information
+> (one bit vs. a pair of string literals), or is there more?
 
-Mark.
+Right now, it's only in the amount of information.
+
+> 
+> "More" includes string values that can vary at run time or between
+> different uses of the QAPI entity in the schema.
+
+Right now, it includes string values that are fixed at build
+time, but collected dynamically at run time (because we are
+describing QOM types, which are collected dynamically).
+
+> 
+> >> > Do we need QAPI features to be just strings?  Can't they be a
+> >> > more complex type, like a QAPI alternate?
+> >> 
+> >> Adds complexity.
+> >> 
+> >> We currently imagine QAPI features enum-like, i.e. a list of strings,
+> >> optionally with conditions.  The conditions are evaluated at QAPI
+> >> generation time, and not visible in introspection.
+> >> 
+> >> This is probably the stupidest solution that could possibly work.  The
+> >> structure of features is trivial.
+> >> 
+> >> More expressive solutions include:
+> >> 
+> >> * List of 'any'.  Feels like a bad idea, because it's completely
+> >>   unstructured.
+> >
+> > Agreed.
+> >
+> >> 
+> >> * List of some 'QapiFeatures' object type.  Lets us expose the variable
+> >>   structure of features in introspection.
+> >> 
+> >> * List of some 'QapiFeatures' alternate type.  Like the previous, but
+> >>   permits coding simple feature flags as strings.
+> >> 
+> >> All of the more expressive solutions I listed treat the additional
+> >> information as dynamic.  Overly general in case the information is
+> >> actually always static.
+> >
+> > The static vs. dynamic distinction is getting me confused.  Why
+> > are the more expressive solutions more dynamic than "list of
+> > strings"?  Can you give examples?
+> 
+> Insufficiently precise thinking leads to vague and confusing prose.  Let
+> me try again.
+> 
+> The scenario I had in mind is having only the (static) structure of the
+> additional information in query-qmp-schema, and the actual (possibly
+> dynamic) information elsewhere, say in query-machines, or a new member
+> of the QMP success response.
+
+The structure of the additional information can be part of the
+schema, yes.  The actual information needs to be collected at
+runtime so we won't be able to make it part of the QAPI schema.
+
+> 
+> > Also, why do we want to place all info inside the same "features"
+> > attribute instead of just adding new fields to SchemaInfoObject?
+> >
+> > i.e. why are these options:
+> >
+> >   { "members" [ ... ],
+> >     "features": [ "dynamic-read-only", "deprecated" ] }
+> >
+> >   { "members" [ ... ],
+> >     "features": [ "dynamic-read-only",
+> >                   { "deprecated": true, "hint": "FOO" } ] }
+> >
+> > better than these options:
+> >
+> >   { "members" [ ... ],
+> >     "features": [ "dynamic-read-only" ],
+> >     "deprecated": true }
+> >
+> >   { "members" [ ... ],
+> >     "features": [ "dynamic-read-only" ],
+> >     "deprecation-info": { "deprecated": true, "hint": "FOO" } }
+> 
+> I wouldn't claim "better".  I merely observe it takes its own QAPI
+> language extension, unlike the 'neat and simple "use QAPI features to
+> communicate deprecation" idea'.
+
+I agree that "neat and simple" is a nice goal.  But it's not a
+requirement, right?
+
+> [...]
+
+-- 
+Eduardo
 
