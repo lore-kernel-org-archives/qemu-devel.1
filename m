@@ -2,60 +2,68 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B61D5C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:53:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A59CFC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:53:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DE1620881
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:53:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DE1620881
+	by mail.kernel.org (Postfix) with ESMTPS id 79F8020881
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 15:53:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79F8020881
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45477 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45479 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP7pa-0003qn-R6
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 11:53:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59559)
+	id 1hP7q7-0004Ds-Nh
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 11:53:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hP7X3-0004G1-Up
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:33:58 -0400
+	(envelope-from <armbru@redhat.com>) id 1hP7oc-0003HY-KG
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:52:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hP7X2-0002vy-OA
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:33:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48320)
+	(envelope-from <armbru@redhat.com>) id 1hP7oX-0007H8-63
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:52:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59628)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>)
-	id 1hP7Ww-0002qQ-MT; Fri, 10 May 2019 11:33:50 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hP7oW-0007Fb-UW
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 11:52:01 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 88639308FBAF;
-	Fri, 10 May 2019 15:33:49 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-117-202.ams2.redhat.com
-	[10.36.117.202])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 829E85D9D4;
-	Fri, 10 May 2019 15:33:47 +0000 (UTC)
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 17:33:46 +0200
-Message-Id: <20190510153346.238366-1-sgarzare@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 1059181F19;
+	Fri, 10 May 2019 15:52:00 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
+	[10.36.116.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A07E61001DF3;
+	Fri, 10 May 2019 15:51:54 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 2648A11385E4; Fri, 10 May 2019 17:51:53 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Ernest Esene <eroken1@gmail.com>
+References: <20190504181119.GA3317@erokenlabserver>
+	<87ftpqb25m.fsf@dusky.pond.sub.org>
+	<20190510141945.GA1927@erokenlabserver>
+Date: Fri, 10 May 2019 17:51:53 +0200
+In-Reply-To: <20190510141945.GA1927@erokenlabserver> (Ernest Esene's message
+	of "Fri, 10 May 2019 15:19:45 +0100")
+Message-ID: <875zqil33a.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Fri, 10 May 2019 15:33:49 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.25]);
+	Fri, 10 May 2019 15:52:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2] block/rbd: implement
- .bdrv_get_allocated_file_size callback
+Subject: Re: [Qemu-devel] [PATCH v2] chardev/char-i2c: Implement Linux I2C
+ character device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,103 +75,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
-	Jason Dillaman <jdillama@redhat.com>, qemu-block@nongnu.org,
-	Max Reitz <mreitz@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+	qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch allows 'qemu-img info' to show the 'disk size' for
-the RBD images that have the fast-diff feature enabled.
+Ernest Esene <eroken1@gmail.com> writes:
 
-If this feature is enabled, we use the rbd_diff_iterate2() API
-to calculate the allocated size for the image.
+> On Tue, May 07, 2019 at 07:33:09PM +0200, Markus Armbruster wrote:
+>> Ernest Esene <eroken1@gmail.com> writes:
+>> 
+>> > Add support for Linux I2C character device for I2C device passthrough
+>> > For example:
+>> > -chardev linux-i2c,address=0x46,path=/dev/i2c-N,id=i2c-chardev
+>> >
+>> > Signed-off-by: Ernest Esene <eroken1@gmail.com>
+>> 
+>> Could you explain briefly how passing through a host's I2C device can be
+>> useful?
+> QEMU supports emulation of I2C devices in software but currently can't
+> passthrough to real I2C devices. This feature is needed by developers
+> using QEMU for writing and testing software for I2C devices.
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
-v2:
-  - calculate the actual usage only if the fast-diff feature is
-    enabled [Jason]
----
- block/rbd.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+Please work that into your commit message.  Remember, you commit message
+is also your patch's sales pitch.
 
-diff --git a/block/rbd.c b/block/rbd.c
-index 0c549c9935..f1bc76ab80 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -1046,6 +1046,59 @@ static int64_t qemu_rbd_getlength(BlockDriverState=
- *bs)
-     return info.size;
- }
-=20
-+static int rbd_allocated_size_cb(uint64_t offset, size_t len, int exists=
-,
-+                                 void *arg)
-+{
-+    int64_t *alloc_size =3D (int64_t *) arg;
-+
-+    if (exists) {
-+        (*alloc_size) +=3D len;
-+    }
-+
-+    return 0;
-+}
-+
-+static int64_t qemu_rbd_get_allocated_file_size(BlockDriverState *bs)
-+{
-+    BDRVRBDState *s =3D bs->opaque;
-+    uint64_t flags, features;
-+    int64_t alloc_size =3D 0;
-+    int r;
-+
-+    r =3D rbd_get_flags(s->image, &flags);
-+    if (r < 0) {
-+        return r;
-+    }
-+
-+    r =3D rbd_get_features(s->image, &features);
-+    if (r < 0) {
-+        return r;
-+    }
-+
-+    /*
-+     * We use rbd_diff_iterate2() only if the RBD image have fast-diff
-+     * feature enabled. If it is disabled, rbd_diff_iterate2() could be
-+     * very slow on a big image.
-+     */
-+    if (!(features & RBD_FEATURE_FAST_DIFF) ||
-+        (flags & RBD_FLAG_FAST_DIFF_INVALID)) {
-+        return -1;
-+    }
-+
-+    /*
-+     * rbd_diff_iterate2(), if the source snapshot name is NULL, invokes
-+     * the callback on all allocated regions of the image.
-+     */
-+    r =3D rbd_diff_iterate2(s->image, NULL, 0,
-+                          bs->total_sectors * BDRV_SECTOR_SIZE, 0, 1,
-+                          &rbd_allocated_size_cb, &alloc_size);
-+    if (r < 0) {
-+        return r;
-+    }
-+
-+    return alloc_size;
-+}
-+
- static int coroutine_fn qemu_rbd_co_truncate(BlockDriverState *bs,
-                                              int64_t offset,
-                                              PreallocMode prealloc,
-@@ -1254,6 +1307,7 @@ static BlockDriver bdrv_rbd =3D {
-     .bdrv_get_info          =3D qemu_rbd_getinfo,
-     .create_opts            =3D &qemu_rbd_create_opts,
-     .bdrv_getlength         =3D qemu_rbd_getlength,
-+    .bdrv_get_allocated_file_size =3D qemu_rbd_get_allocated_file_size,
-     .bdrv_co_truncate       =3D qemu_rbd_co_truncate,
-     .protocol_name          =3D "rbd",
-=20
---=20
-2.20.1
+>> Any particular reason not to use GPLv2+?
+> No, I used the wrong script. I'll update the licence.
 
+Thanks!
+
+>> > +
+>> > +        if (addr > CHR_I2C_ADDR_7BIT_MAX) {
+>> > +            /*
+>> > +             * TODO: check if adapter support 10-bit addr
+>> > +             * I2C_FUNC_10BIT_ADDR
+>> > +             */
+>> 
+>> What's the impact of not having done this TODO?
+> Not all I2C adapters supports 10-bit address.
+>> Should it be mentioned in the commit message?
+> I have handled it already.
+
+Cool.
+
+>> > +        return;
+>> > +    }
+>> > +    qemu_set_block(fd);
+>> 
+>> Sure we want *blocking* I/O?  No other character device does.
+> No, it is a mistake.
+>> 
+>> > +    qemu_chr_open_fd(chr, fd, fd);
+>> > +    addr = (void *) (long) i2c->address;
+>> 
+>> 
+>> Why not make option "addr" QEMU_OPT_NUMBER and use
+>> qemu_opt_get_number()?
+> I never knew QEMU_OPT_NUMBER can handle inputs such: "0x08 and 8",
+> appropriately.
+>> 
+>> Missing: documentation update for qemu-options.hx.
+> I don't know much about this format (.hx), I'll be happy to have any
+> useful documentation on this.
+
+I don't think we have any documentation on it, let alone useful
+documentation.
+
+Here's what you need to do there for your new chardev backend type,
+using your voodoo coding skills.
+
+Find this line:
+DEFHEADING(Character device options:)
+
+This is where option -chardev is defined and documented.
+
+Now pick an existing chardev backend.  Picking one that's vaguely
+similar to yours is best.  Let's pick "serial", because it also passes
+through a host device.
+
+First occurence is this:
+
+    #ifdef _WIN32
+        "-chardev console,id=id[,mux=on|off][,logfile=PATH][,logappend=on|off]\n"
+        "-chardev serial,id=id,path=path[,mux=on|off][,logfile=PATH][,logappend=on|off]\n"
+    #else
+        "-chardev pty,id=id[,mux=on|off][,logfile=PATH][,logappend=on|off]\n"
+        "-chardev stdio,id=id[,mux=on|off][,signal=on|off][,logfile=PATH][,logappend=on|off]\n"
+    #endif
+
+You see _WIN32, and immediately skip to the next one:
+
+    #if defined(__linux__) || defined(__sun__) || defined(__FreeBSD__) \
+            || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+        "-chardev serial,id=id,path=path[,mux=on|off][,logfile=PATH][,logappend=on|off]\n"
+        "-chardev tty,id=id,path=path[,mux=on|off][,logfile=PATH][,logappend=on|off]\n"
+    #endif
+
+
+Using your vodoo coding skills, you add
+
+    #ifdef CONFIG_POSIX
+        "-chardev i2c,id=id,path=path,address=address[,mux=on|off][,logfile=PATH][,logappend=on|off]\n"
+    #endif
+
+CONFIG_POSIX, because that's what you used in Makefile.objs.  Your
+commit message says "Linux I2C character device", so maybe you should
+use CONFIG_LINUX instead of CONFIG_POSIX throughout, but what do I know.
+
+The next occurence is
+
+    The general form of a character device option is:
+    @table @option
+    @item -chardev @var{backend},id=@var{id}[,mux=on|off][,@var{options}]
+    @findex -chardev
+    Backend is one of:
+    @option{null},
+    @option{socket},
+    @option{udp},
+    @option{msmouse},
+    @option{vc},
+    @option{ringbuf},
+    @option{file},
+    @option{pipe},
+    @option{console},
+    @option{serial},
+
+So you add
+
+    @option{i2c},
+
+I think you get the idea.  If not, the time-honored way to get more help
+is to post a patch that's not quite right ;)
 
