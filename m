@@ -2,66 +2,59 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6182AC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:04:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D6F2C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:27:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FC0D2173B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:04:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FC0D2173B
+	by mail.kernel.org (Postfix) with ESMTPS id D1FE720989
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:27:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1FE720989
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40477 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40736 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP2O6-0001Qh-FF
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 06:04:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53476)
+	id 1hP2kb-0007xz-MK
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 06:27:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hP2N8-00015C-Dv
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:03:23 -0400
+	(envelope-from <lvivier@redhat.com>) id 1hP2jk-0007Tg-JH
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:26:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hP2N7-0002im-89
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:03:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46746)
+	(envelope-from <lvivier@redhat.com>) id 1hP2ji-0000Mg-L1
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:26:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36898)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hP2N7-0002hg-1v
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:03:21 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hP2ji-0000K5-Dq
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:26:42 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 64D32811DE;
-	Fri, 10 May 2019 10:03:19 +0000 (UTC)
-Received: from [10.40.205.9] (unknown [10.40.205.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6A50617789;
-	Fri, 10 May 2019 10:03:02 +0000 (UTC)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190510012458.22706-1-richard.henderson@linaro.org>
-	<20190510012458.22706-14-richard.henderson@linaro.org>
+	by mx1.redhat.com (Postfix) with ESMTPS id B5B32A4D21;
+	Fri, 10 May 2019 10:26:40 +0000 (UTC)
+Received: from thinkpad.redhat.com (unknown [10.40.205.9])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 61E1C5D70D;
+	Fri, 10 May 2019 10:26:38 +0000 (UTC)
 From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <78969d48-bdd2-9fa4-e6b7-3df5b7060a75@redhat.com>
-Date: Fri, 10 May 2019 12:03:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+To: qemu-devel@nongnu.org
+Date: Fri, 10 May 2019 12:26:37 +0200
+Message-Id: <20190510102637.10209-1-lvivier@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190510012458.22706-14-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Fri, 10 May 2019 10:03:19 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.38]);
+	Fri, 10 May 2019 10:26:40 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 13/24] linux-user: Call qcrypto_init if
- not using -seed
+Subject: [Qemu-devel] [PATCH v2] rng-builtin: add an RNG backend that uses
+ qemu_guest_getrandom()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,21 +66,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Kashyap Chamarthy <kchamart@redhat.com>, Amit Shah <amit@kernel.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Markus Armbruster <armbru@redhat.com>,
+	"Richard W . M . Jones" <rjones@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/05/2019 03:24, Richard Henderson wrote:
-> Cc: Laurent Vivier <laurent@vivier.eu>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->   linux-user/main.c | 29 ++++++++++++++++++++---------
->   1 file changed, 20 insertions(+), 9 deletions(-)
->=20
+Add a new RNG backend using QEMU builtin getrandom function.
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+It can be created and used with something like:
 
+    ... -object rng-builtin,id=3Drng0 -device virtio-rng,rng=3Drng0 ...
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+---
+
+Notes:
+    This patch applies on top of
+    "[PATCH v5 00/24] Add qemu_getrandom and ARMv8.5-RNG etc"
+    Based-on: 20190510012458.22706-1-richard.henderson@linaro.org
+   =20
+    v2: Update qemu-options.hx
+        describe the new backend and specify virtio-rng uses the
+        rng-random by default (do we want to change this?)
+
+ backends/Makefile.objs |  2 +-
+ backends/rng-builtin.c | 56 ++++++++++++++++++++++++++++++++++++++++++
+ qemu-options.hx        | 10 +++++++-
+ 3 files changed, 66 insertions(+), 2 deletions(-)
+ create mode 100644 backends/rng-builtin.c
+
+diff --git a/backends/Makefile.objs b/backends/Makefile.objs
+index ff619d31b461..8da4a508d97b 100644
+--- a/backends/Makefile.objs
++++ b/backends/Makefile.objs
+@@ -1,4 +1,4 @@
+-common-obj-y +=3D rng.o rng-egd.o
++common-obj-y +=3D rng.o rng-egd.o rng-builtin.o
+ common-obj-$(CONFIG_POSIX) +=3D rng-random.o
+=20
+ common-obj-$(CONFIG_TPM) +=3D tpm.o
+diff --git a/backends/rng-builtin.c b/backends/rng-builtin.c
+new file mode 100644
+index 000000000000..b1264b745407
+--- /dev/null
++++ b/backends/rng-builtin.c
+@@ -0,0 +1,56 @@
++/*
++ * QEMU Builtin Random Number Generator Backend
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "sysemu/rng.h"
++#include "qapi/error.h"
++#include "qapi/qmp/qerror.h"
++#include "qemu/main-loop.h"
++#include "qemu/guest-random.h"
++
++#define TYPE_RNG_BUILTIN "rng-builtin"
++#define RNG_BUILTIN(obj) OBJECT_CHECK(RngBuiltin, (obj), TYPE_RNG_BUILTI=
+N)
++
++typedef struct RngBuiltin {
++    RngBackend parent;
++} RngBuiltin;
++
++static void rng_builtin_request_entropy(RngBackend *b, RngRequest *req)
++{
++    RngBuiltin *s =3D RNG_BUILTIN(b);
++
++    while (!QSIMPLEQ_EMPTY(&s->parent.requests)) {
++        RngRequest *req =3D QSIMPLEQ_FIRST(&s->parent.requests);
++
++        qemu_guest_getrandom_nofail(req->data, req->size);
++
++        req->receive_entropy(req->opaque, req->data, req->size);
++
++        rng_backend_finalize_request(&s->parent, req);
++    }
++}
++
++static void rng_builtin_class_init(ObjectClass *klass, void *data)
++{
++    RngBackendClass *rbc =3D RNG_BACKEND_CLASS(klass);
++
++    rbc->request_entropy =3D rng_builtin_request_entropy;
++}
++
++static const TypeInfo rng_builtin_info =3D {
++    .name =3D TYPE_RNG_BUILTIN,
++    .parent =3D TYPE_RNG_BACKEND,
++    .instance_size =3D sizeof(RngBuiltin),
++    .class_init =3D rng_builtin_class_init,
++};
++
++static void register_types(void)
++{
++    type_register_static(&rng_builtin_info);
++}
++
++type_init(register_types);
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 0191ef8b1eb7..3e2a51c691b0 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4280,13 +4280,21 @@ other options.
+=20
+ The @option{share} boolean option is @var{on} by default with memfd.
+=20
++@item -object rng-builtin,id=3D@var{id}
++
++Creates a random number generator backend which obtains entropy from
++QEMU builtin functions. The @option{id} parameter is a unique ID that
++will be used to reference this entropy backend from the @option{virtio-r=
+ng}
++device.
++
+ @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/random}
+=20
+ Creates a random number generator backend which obtains entropy from
+ a device on the host. The @option{id} parameter is a unique ID that
+ will be used to reference this entropy backend from the @option{virtio-r=
+ng}
+ device. The @option{filename} parameter specifies which file to obtain
+-entropy from and if omitted defaults to @option{/dev/random}.
++entropy from and if omitted defaults to @option{/dev/random}. By default=
+,
++the @option{virtio-rng} device uses this RNG backend.
+=20
+ @item -object rng-egd,id=3D@var{id},chardev=3D@var{chardevid}
+=20
+--=20
+2.20.1
 
 
