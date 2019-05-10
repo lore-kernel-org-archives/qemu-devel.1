@@ -2,100 +2,62 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48712C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 11:01:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C79BFC04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 11:03:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 127C420881
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 11:01:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XbhterWM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 127C420881
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8DA1721479
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 11:03:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DA1721479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41163 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41182 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP3HN-0003xD-8z
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 07:01:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:32793)
+	id 1hP3JF-000629-P8
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 07:03:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hP393-0004yq-KN
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:52:54 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hP33A-0008Sq-Vp
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:46:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hP392-0001Nu-JM
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:52:53 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36594)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1hP392-0001N9-D5
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:52:52 -0400
-Received: by mail-wr1-x444.google.com with SMTP id o4so7329080wra.3
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 03:52:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=subject:to:cc:references:from:message-id:date:user-agent
-	:mime-version:in-reply-to:content-transfer-encoding:content-language;
-	bh=xHNdFnVAuh6l8PENFLVrR1X5PKoTCZIAYaFqvyp6FNg=;
-	b=XbhterWMPdtEUlPW0lxU2Lx58uOa06XCdwuyG3dQ1H4p4GhQ6aot6hrAj4ktCNTiAf
-	SugJVpIDJtWDo/ICxc6i6EK5+hg3jKwQSu6FB6WQOm9vw6q2td+trcv1SN5yzPoc1Uas
-	6pPw+GuORr2MlZ0F6e8M2v1wvnJQJDIHWGZQCmQwfbIOlg3Ab7Un1RdboB7uUOzEE/1x
-	Y09A8gLNkz9jIXYxLDPvLLyZZtfThMpkF7RdTdVvp2+g1IAMLzwC2L7E+1ANJ6BW66c4
-	QHqUwivoifUybH+wabULPS8qgTmh2boDlxOcxp8Ks9LQ0dW5H24ItZk02DFnRcZ9bvEP
-	kGUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-	:user-agent:mime-version:in-reply-to:content-transfer-encoding
-	:content-language;
-	bh=xHNdFnVAuh6l8PENFLVrR1X5PKoTCZIAYaFqvyp6FNg=;
-	b=jpaXJ8BGRRxcuA3DVfThEcG1irC2kCS3AzbER7RVsRDXwIoIC+kIDp4EHpDIqyrtDP
-	jJcPtFI7gG2/UdyovGhXJQxOdjrCDNNk2CAw6CMuGRq362H5/Rg0KYfcYHw2BJzhlZd8
-	ngeta3qauLqZR97KkD5dtOWTq3jI6lKK5KLe63eAW8J9jXHQARw3nuy9SSbNmZn4JF+1
-	f58gWsADkKrwGgeTNyE6Rmb9frDyAcootSlBJPFxF8tj3l1rbb8Q/IurrMIHVwn2DBJT
-	IGcyQsoZrwKTM6MOtnwGqXpw4qtqBRwLZHGu28Wy/bBjpaH8X8RFwIIIqbwRF139RKBw
-	Xwxg==
-X-Gm-Message-State: APjAAAVx9x2d8xWKy9Mli+iHYNBkb8TH5FZtdLlT9T9KC71dO3e5BeJU
-	TZc494M9viUEDhPWlRh4u6ubqvLNaVo=
-X-Google-Smtp-Source: APXvYqyqydfw2YhiIW3Q27CmhnE1czyUm92kcKP8mRSIjaBQekhNSzBI5j7ZSweuM1hXGC9hd2A7Jw==
-X-Received: by 2002:a5d:4712:: with SMTP id y18mr6907619wrq.23.1557485570478; 
-	Fri, 10 May 2019 03:52:50 -0700 (PDT)
-Received: from localhost.localdomain ([2a02:2f0d:c0b:ba00:6fce:9bd8:fb12:6a42])
-	by smtp.gmail.com with ESMTPSA id
-	h11sm2136246wrr.44.2019.05.10.03.52.49
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Fri, 10 May 2019 03:52:49 -0700 (PDT)
-To: Gerd Hoffmann <kraxel@redhat.com>
-References: <CABSdmrnNW6f=P64PviPP8CTJ5SVfYS8_6kmAtpw9yPObTEkpxg@mail.gmail.com>
-	<CABSdmrnocrqLKWncgy_Lak33__GRPYfs-RzSA14e=vh4cRn2ag@mail.gmail.com>
-	<20190509064848.wjhchsfov7q6komj@sirius.home.kraxel.org>
-	<CABSdmrmm+wJ=+Ccav=X5Gw_oueQvPRejCWVG2SQeCw=K4BM9EA@mail.gmail.com>
-	<CABSdmrndpONH_fVHbktHbBXvXPKESeRfis06TjrNRRfBpJzXLA@mail.gmail.com>
-	<b6064b77-5ca4-03e1-80ef-027313096cb2@gmail.com>
-	<CABSdmrkW6G23ZGDA7iLucM45vL0HHGsr2F76H0Mf8S0xkhPnsQ@mail.gmail.com>
-	<3e619b5c-8fb3-2655-2d92-37598db098d8@gmail.com>
-	<20190510085947.y62lttdtrg5cxx6b@sirius.home.kraxel.org>
-	<3fb8b79d-9f68-2342-d3ae-3aefa873109b@gmail.com>
-	<20190510103900.botgnbbo2ii4jxgo@sirius.home.kraxel.org>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <01de4824-5c19-6b6c-5b75-fa54a883ab4a@gmail.com>
-Date: Fri, 10 May 2019 13:52:48 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20190510103900.botgnbbo2ii4jxgo@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH 3/3] ramfb enhancement
+	(envelope-from <kraxel@redhat.com>) id 1hP339-0004F4-D4
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:46:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34040)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hP339-0004Dj-5P
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:46:47 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6B3768830A;
+	Fri, 10 May 2019 10:46:46 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
+	[10.36.117.74])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1C80557A1;
+	Fri, 10 May 2019 10:46:41 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id C73AA9DB6; Fri, 10 May 2019 12:46:33 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 10 May 2019 12:46:32 +0200
+Message-Id: <20190510104633.9428-13-kraxel@redhat.com>
+In-Reply-To: <20190510104633.9428-1-kraxel@redhat.com>
+References: <20190510104633.9428-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.28]);
+	Fri, 10 May 2019 10:46:46 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 12/13] tests/vm: fedora autoinstall,
+ using serial console
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -107,66 +69,287 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Hou Qiming <hqm03ster@gmail.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Gerd,
+Download the install iso and prepare the image locally.  Install to
+disk, using the serial console.  Create qemu user, configure ssh login.
+Install packages needed for qemu builds.
 
-On 5/10/19 1:39 PM, Gerd Hoffmann wrote:
-> On Fri, May 10, 2019 at 12:20:56PM +0300, Marcel Apfelbaum wrote:
->> Hi Gerd,
->>
->> On 5/10/19 11:59 AM, Gerd Hoffmann wrote:
->>>     Hi,
->>>
->>>> Got it, thanks. Is a pity ramfb is not a PCI device :), it was worth the
->>>> question anyway.
->>> If you look for a simple pci display device check out bochs-display.
->>> It's simliar to stdvga (so ovmf and bochs-drm.ko can drive it just
->>> fine), but without legacy vga emulation, only a linear framebuffer is
->>> supported.  And code size is a fraction of stdvga ...
->> I actually need the ramfb display in conjunction with kvmgt.
->>
->> I want to be able to save the VM state to disk, which is actually a kind
->> of 'live migration' as far as I understand, but live-migration can't work
->> since
->> we use device assignment  (vfio-pci-nohotplug device).
-> vfio live migration is being worked on btw.
->
->> I was hoping to be able to hot-unplug/hot-plug the vfio device,
->> but as the name suggests, can't do so since
->> the ramfb display uses fw-config to pass the configuration to firmware.
-> Yes, fw_cfg files can't be hotplugged, that is where this restriction
-> comes from.
->
->> How hard/possible is to make ramfb display a PCI device and move the
->> configuration from fw-config to PCI configuration space?
-> Well, the whole point of using ramfb is that it is *not* a pci device,
-> but something you can attach to other devices as boot display.  Right
-> now we have that for vfio only, in theory it can likewise be done for
-> virtio (so you can use virtio-ramfb instead of virtio-vga for bios
-> display support).  Prototype exists.  Given that OVMF has a full
-> virtio-gpu driver there isn't much need for that though ...
->
-> Piggyback on the pci config space of the device you are attaching ramfb
-> to isn't going to work very well for unknown devices (i.e. vfio case).
-> For virtio it would have worked without too much trouble probably, using
-> a vendor capability to grab some register space.
->
-> For a separate pci device you can just use bochs-display.  Maybe add
-> some logic for the automagic display switching (i.e. if vfio has a valid
-> framebuffer use that and bochs-display otherwise).
+Yes, we have docker images for fedora.  But for trouble-shooting it
+might be helpful to have a vm too.  When vm builds fail you can use
+it to figure whenever the vm setup or the guest os is the problem.
 
-Thanks for the explanation and the pointers!
-I'll try to come up with something.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ tests/vm/basevm.py        |   9 +-
+ tests/vm/Makefile.include |   3 +-
+ tests/vm/fedora           | 187 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 197 insertions(+), 2 deletions(-)
+ create mode 100755 tests/vm/fedora
 
-Thanks,
-Marcel
-
-> cheers,
->    Gerd
->
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index c4f67ee4c065..9cec3af7cc7e 100755
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -204,7 +204,7 @@ class BaseVM(object):
+             # log console line
+             sys.stderr.write("con recv: %s\n" % line)
+ 
+-    def console_wait(self, expect):
++    def console_wait(self, expect, expectalt = None):
+         vm = self._guest
+         output = ""
+         while True:
+@@ -213,6 +213,8 @@ class BaseVM(object):
+             except socket.timeout:
+                 sys.stderr.write("console: *** read timeout ***\n")
+                 sys.stderr.write("console: waiting for: '%s'\n" % expect)
++                if not expectalt is None:
++                    sys.stderr.write("console: waiting for: '%s' (alt)\n" % expectalt)
+                 sys.stderr.write("console: line buffer:\n")
+                 sys.stderr.write("\n")
+                 self.console_log(output.rstrip())
+@@ -221,6 +223,8 @@ class BaseVM(object):
+             output += chars
+             if expect in output:
+                 break
++            if not expectalt is None and expectalt in output:
++                break
+             if "\r" in output or "\n" in output:
+                 lines = re.split("[\r\n]", output)
+                 output = lines.pop()
+@@ -228,6 +232,9 @@ class BaseVM(object):
+                     self.console_log("\n".join(lines))
+         if self.debug:
+             self.console_log(output)
++        if not expectalt is None and expectalt in output:
++            return False
++        return True
+ 
+     def console_send(self, command):
+         vm = self._guest
+diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+index 8714b5947958..6e24ee786910 100644
+--- a/tests/vm/Makefile.include
++++ b/tests/vm/Makefile.include
+@@ -2,7 +2,7 @@
+ 
+ .PHONY: vm-build-all vm-clean-all
+ 
+-IMAGES := ubuntu.i386 freebsd netbsd openbsd centos
++IMAGES := ubuntu.i386 freebsd netbsd openbsd centos fedora
+ IMAGES_DIR := $(HOME)/.cache/qemu-vm/images
+ IMAGE_FILES := $(patsubst %, $(IMAGES_DIR)/%.img, $(IMAGES))
+ 
+@@ -16,6 +16,7 @@ vm-test:
+ 	@echo "  vm-build-netbsd                 - Build QEMU in NetBSD VM"
+ 	@echo "  vm-build-openbsd                - Build QEMU in OpenBSD VM"
+ 	@echo "  vm-build-centos                 - Build QEMU in CentOS VM, with Docker"
++	@echo "  vm-build-fedora                 - Build QEMU in Fedora VM"
+ 	@echo ""
+ 	@echo "  vm-build-all                    - Build QEMU in all VMs"
+ 	@echo "  vm-clean-all                    - Clean up VM images"
+diff --git a/tests/vm/fedora b/tests/vm/fedora
+new file mode 100755
+index 000000000000..c5621d083221
+--- /dev/null
++++ b/tests/vm/fedora
+@@ -0,0 +1,187 @@
++#!/usr/bin/env python
++#
++# Fedora VM image
++#
++# Copyright 2019 Red Hat Inc.
++#
++# Authors:
++#  Gerd Hoffmann <kraxel@redhat.com>
++#
++# This code is licensed under the GPL version 2 or later.  See
++# the COPYING file in the top-level directory.
++#
++
++import os
++import re
++import sys
++import time
++import socket
++import subprocess
++import basevm
++
++class FedoraVM(basevm.BaseVM):
++    name = "fedora"
++    arch = "x86_64"
++
++    base = "http://dl.fedoraproject.org/pub/fedora/linux/releases/30/"
++    link = base + "Server/x86_64/iso/Fedora-Server-netinst-x86_64-30-1.2.iso"
++    repo = base + "Server/x86_64/os/"
++    full = base + "Everything/x86_64/os/"
++    csum = "5e4eac4566d8c572bfb3bcf54b7d6c82006ec3c6c882a2c9235c6d3494d7b100"
++    size = "20G"
++    pkgs = [
++        # tools
++        'git-core',
++        'flex', 'bison',
++        'gcc', 'binutils', 'make',
++
++        # perl
++        'perl-Test-Harness',
++
++        # libs: usb
++        '"pkgconfig(libusb-1.0)"',
++        '"pkgconfig(libusbredirparser-0.5)"',
++
++        # libs: crypto
++        '"pkgconfig(gnutls)"',
++
++        # libs: ui
++        '"pkgconfig(sdl2)"',
++        '"pkgconfig(gtk+-3.0)"',
++        '"pkgconfig(ncursesw)"',
++
++        # libs: audio
++        '"pkgconfig(libpulse)"',
++        '"pkgconfig(alsa)"',
++    ]
++
++    BUILD_SCRIPT = """
++        set -e;
++        rm -rf /home/qemu/qemu-test.*
++        cd $(mktemp -d /home/qemu/qemu-test.XXXXXX);
++        mkdir src build; cd src;
++        tar -xf /dev/vdb;
++        cd ../build
++        ../src/configure --python=python3 {configure_opts};
++        gmake --output-sync -j{jobs} {target} {verbose};
++    """
++
++    def build_image(self, img):
++        self.print_step("Downloading install iso")
++        cimg = self._download_with_cache(self.link, sha256sum=self.csum)
++        img_tmp = img + ".tmp"
++        iso = img + ".install.iso"
++
++        self.print_step("Preparing iso and disk image")
++        subprocess.check_call(["cp", "-f", cimg, iso])
++        subprocess.check_call(["qemu-img", "create", "-f", "qcow2",
++                               img_tmp, self.size])
++
++        self.print_step("Booting installer")
++        self.boot(img_tmp, extra_args = [
++            "-machine", "graphics=off",
++            "-cdrom", iso
++        ])
++        self.console_init(300)
++        self.console_wait("installation process.")
++        time.sleep(0.3)
++        self.console_send("\t")
++        time.sleep(0.3)
++        self.console_send(" console=ttyS0")
++        proxy = os.environ.get("http_proxy")
++        if not proxy is None:
++            self.console_send(" proxy=%s" % proxy)
++        self.console_send(" inst.repo=%s" % self.repo)
++        self.console_send("\n")
++
++        self.console_wait_send("2) Use text mode",         "2\n")
++
++        self.console_wait_send("5) [!] Installation Dest", "5\n")
++        self.console_wait_send("1) [x]",                   "c\n")
++        self.console_wait_send("2) [ ] Use All Space",     "2\n")
++        self.console_wait_send("2) [x] Use All Space",     "c\n")
++        self.console_wait_send("1) [ ] Standard Part",     "1\n")
++        self.console_wait_send("1) [x] Standard Part",     "c\n")
++
++        self.console_wait_send("7) [!] Root password",     "7\n")
++        self.console_wait("Password:")
++        self.console_send("%s\n" % self.ROOT_PASS)
++        self.console_wait("Password (confirm):")
++        self.console_send("%s\n" % self.ROOT_PASS)
++
++        self.console_wait_send("8) [ ] User creation",     "8\n")
++        self.console_wait_send("1) [ ] Create user",       "1\n")
++        self.console_wait_send("3) User name",             "3\n")
++        self.console_wait_send("ENTER:", "%s\n" % self.GUEST_USER)
++        self.console_wait_send("4) [ ] Use password",      "4\n")
++        self.console_wait_send("5) Password",              "5\n")
++        self.console_wait("Password:")
++        self.console_send("%s\n" % self.GUEST_PASS)
++        self.console_wait("Password (confirm):")
++        self.console_send("%s\n" % self.GUEST_PASS)
++        self.console_wait_send("7) Groups",                "c\n")
++
++        while True:
++            good = self.console_wait("3) [x] Installation",
++                                     "3) [!] Installation")
++            self.console_send("r\n")
++            if good:
++                break
++            time.sleep(10)
++
++        while True:
++            good = self.console_wait("4) [x] Software",
++                                     "4) [!] Software")
++            self.console_send("r\n")
++            if good:
++                break
++            time.sleep(10)
++            self.console_send("r\n" % self.GUEST_PASS)
++
++        self.console_wait_send("'b' to begin install",     "b\n")
++
++        self.print_step("Installation started now, this will take a while")
++
++        self.console_wait_send("Installation complete",    "\n")
++        self.print_step("Installation finished, rebooting")
++
++        # setup qemu user
++        prompt = " ~]$"
++        self.console_ssh_init(prompt, self.GUEST_USER, self.GUEST_PASS)
++        self.console_wait_send(prompt, "exit\n")
++
++        # setup root user
++        prompt = " ~]#"
++        self.console_ssh_init(prompt, "root", self.ROOT_PASS)
++        self.console_sshd_config(prompt)
++
++        # setup virtio-blk #1 (tarfile)
++        self.console_wait(prompt)
++        self.console_send("echo 'KERNEL==\"vdb\" MODE=\"666\"' >> %s\n" %
++                          "/etc/udev/rules.d/99-qemu.rules")
++
++        self.print_step("Configuration finished, rebooting")
++        self.console_wait_send(prompt, "reboot\n")
++        self.console_wait("login:")
++        self.wait_ssh()
++
++        self.print_step("Installing packages")
++        self.ssh_root_check("rm -vf /etc/yum.repos.d/fedora*.repo\n")
++        self.ssh_root_check("echo '[fedora]' >> /etc/yum.repos.d/qemu.repo\n")
++        self.ssh_root_check("echo 'baseurl=%s' >> /etc/yum.repos.d/qemu.repo\n" % self.full)
++        self.ssh_root_check("echo 'gpgcheck=0' >> /etc/yum.repos.d/qemu.repo\n")
++        self.ssh_root_check("dnf install -y %s\n" % " ".join(self.pkgs))
++
++        # shutdown
++        self.ssh_root(self.poweroff)
++        self.console_wait("sleep state S5")
++        self.wait()
++
++        if os.path.exists(img):
++            os.remove(img)
++        os.rename(img_tmp, img)
++        os.remove(iso)
++        self.print_step("All done")
++
++if __name__ == "__main__":
++    sys.exit(basevm.main(FedoraVM))
+-- 
+2.18.1
 
 
