@@ -2,62 +2,70 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 899FFC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:52:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B559C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:54:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FBE42070D
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:52:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FBE42070D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F3C9520881
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 10:54:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3C9520881
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41013 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41037 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP38g-00043p-EP
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 06:52:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59800)
+	id 1hP3AY-0005oa-6t
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 06:54:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hP336-0008MF-0P
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:46:45 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hP32F-0007CF-3c
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hP334-00045g-9m
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:46:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37948)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hP334-00044O-1g
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:46:42 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4E87B3DE10;
-	Fri, 10 May 2019 10:46:41 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
-	[10.36.117.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 88B991001DFE;
-	Fri, 10 May 2019 10:46:40 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id B2F579DB4; Fri, 10 May 2019 12:46:33 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1hP32E-0003Xj-51
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:51 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:48533)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hP32D-0003Wz-T4
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 06:45:50 -0400
+Received: from localhost.localdomain ([78.238.229.36]) by
+	mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA
+	(Nemesis)
+	id 1MxYT3-1gVq0t3NyD-00xtYQ; Fri, 10 May 2019 12:45:43 +0200
+From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Fri, 10 May 2019 12:46:30 +0200
-Message-Id: <20190510104633.9428-11-kraxel@redhat.com>
-In-Reply-To: <20190510104633.9428-1-kraxel@redhat.com>
-References: <20190510104633.9428-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Fri, 10 May 2019 10:46:41 +0000 (UTC)
+Date: Fri, 10 May 2019 12:45:31 +0200
+Message-Id: <20190510104536.17483-3-laurent@vivier.eu>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190510104536.17483-1-laurent@vivier.eu>
+References: <20190510104536.17483-1-laurent@vivier.eu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:B18h2bbB+DvXy/LsGfaQGDwqnqdRjV9ivPqai/M0fqd84uX/P47
+	jwYv/rOJRgznf2CrQR/vv5QmaMFSm6U8YhB3u0ms7w6p6WyUvspTWCNUzylrBnOWewi82rw
+	tKGIvSwr1+SRAROvHF1kB0Un78QHb1q+/VdO8e8/Zb6aDrqyP9Qczhp0wK71EQ4lAoPecXH
+	iBd8J0GYzVbrsyaNNMD6Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:IfQqvT2QTQk=:dxB6v6qyZjcCCBdsBN6crE
+	RsQkbGYXKbITCpSXR6oZhAZ0lHW5twErXvSyV6vPQN9eqpuVM4vBN3XnsjOpTvedYL8cMByOK
+	sGpAYLlt6KLtKDbI1YVySJTPm2Ru7vLSiNj8yUZYOVSOsp0WqwptTMPIhURsics4b/Hw5kWQ7
+	N92m4nUs5xiPKrvyMqjh8Qusa654rLLEAWBcCLmp25hq3PZMrGFWY4FtZ4Ae+7gbIiA67XNrm
+	zh2OQBvtb72DApweYlki5kpLbJxh2/17ySn1beHJjlT0BcP/aPQvVzttxH6x3h+zuGZ1KJDmI
+	kJHKR2sSLtnrVjFlwaA8bRaBZcBnkp9GKVlmETndhRjgt6b+i+ZO40v+GiWC916Li1/YhS5eh
+	XhBu2uVh9Z/0M7pkcHb1fTwG6yY84PV5U01a+abEjNrR97nC/ZI9QBeqFRCDTwsisszifcASo
+	qRT0fRmO61t5kNPr4c/yhIYnLzRZo2KM/g2NXgx2nq7h9r8TZiazZ7Qli2ejKGPXbBvYqea5S
+	DVzlAQhU7sQe0wmMcXhmmlOpWvuDR+B4scgQdy40MbFnjTTslGBzHAVo2WfkOvZACWuzxkfvm
+	sbU0PGgvdnSN2ONHcA+3/aT/xraMWLVIf7NwdU0G17D4R7s66iXnrdkW/2FIunCgEq/HdbqQu
+	4IUFTnV+V1pOhOAspMwGcNVkWHsRGYXk5jGEDbzSPcPbmu9nX5ohqlapDw2r/eS9s3/GV35jQ
+	pcybh9ZS9wbnGziBFmw5HEpTMtepQl3RQevUqjbfKOShRF5b2+Lgqt/ThuU=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 10/13] tests/vm: freebsd autoinstall,
- using serial console
+X-Received-From: 212.227.126.134
+Subject: [Qemu-devel] [PULL v2 2/7] linux-user/elfload: Fix GCC 9 build
+ warnings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,244 +77,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+	Riku Voipio <riku.voipio@iki.fi>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead of fetching the prebuilt image from patchew download the install
-iso and prepare the image locally.  Install to disk, using the serial
-console.  Create qemu user, configure ssh login.  Install packages
-needed for qemu builds.
+From: Alistair Francis <Alistair.Francis@wdc.com>
 
-Note that freebsd package downloads are delivered as non-cachable
-content, so I had to configure squid with "ignore-no-store
-ignore-private ignore-reload" for pkgmir.geo.freebsd.org to make the
-caching actually work.
+Fix this warning when building with GCC9 on Fedora 30:
+In function ‘strncpy’,
+    inlined from ‘fill_psinfo’ at /home/alistair/qemu/linux-user/elfload.c:3208:12,
+    inlined from ‘fill_note_info’ at /home/alistair/qemu/linux-user/elfload.c:3390:5,
+    inlined from ‘elf_core_dump’ at /home/alistair/qemu/linux-user/elfload.c:3539:9:
+/usr/include/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ specified bound 16 equals destination size [-Werror=stringop-truncation]
+  106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <c4d2b1de9efadcf1c900b91361af9302823a72a9.1556666645.git.alistair.francis@wdc.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- tests/vm/freebsd | 175 ++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 165 insertions(+), 10 deletions(-)
+ linux-user/elfload.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/vm/freebsd b/tests/vm/freebsd
-index b0066017a617..57e5c97f3b26 100755
---- a/tests/vm/freebsd
-+++ b/tests/vm/freebsd
-@@ -2,43 +2,198 @@
- #
- # FreeBSD VM image
- #
--# Copyright 2017 Red Hat Inc.
-+# Copyright 2017-2019 Red Hat Inc.
- #
- # Authors:
- #  Fam Zheng <famz@redhat.com>
-+#  Gerd Hoffmann <kraxel@redhat.com>
- #
- # This code is licensed under the GPL version 2 or later.  See
- # the COPYING file in the top-level directory.
- #
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index c1a26021f8d7..d08fe2346683 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -2872,7 +2872,7 @@ struct target_elf_prpsinfo {
+     target_gid_t pr_gid;
+     target_pid_t pr_pid, pr_ppid, pr_pgrp, pr_sid;
+     /* Lots missing */
+-    char    pr_fname[16];           /* filename of executable */
++    char    pr_fname[16] QEMU_NONSTRING; /* filename of executable */
+     char    pr_psargs[ELF_PRARGSZ]; /* initial part of arg list */
+ };
  
- import os
-+import re
- import sys
-+import time
-+import socket
- import subprocess
- import basevm
- 
- class FreeBSDVM(basevm.BaseVM):
-     name = "freebsd"
-     arch = "x86_64"
-+
-+    link = "https://download.freebsd.org/ftp/releases/ISO-IMAGES/12.0/FreeBSD-12.0-RELEASE-amd64-disc1.iso.xz"
-+    csum = "1d40015bea89d05b8bd13e2ed80c40b522a9ec1abd8e7c8b80954fb485fb99db"
-+    size = "20G"
-+    pkgs = [
-+        # build tools
-+        "git",
-+        "pkgconf",
-+        "bzip2",
-+
-+        # gnu tools
-+        "bash",
-+        "gmake",
-+        "gsed",
-+        "flex", "bison",
-+
-+        # libs: crypto
-+        "gnutls",
-+
-+        # libs: images
-+        "jpeg-turbo",
-+        "png",
-+
-+        # libs: ui
-+        "sdl2",
-+        "gtk3",
-+        "libxkbcommon",
-+
-+        # libs: opengl
-+        "libepoxy",
-+        "mesa-libs",
-+    ]
-+
-     BUILD_SCRIPT = """
-         set -e;
--        rm -rf /var/tmp/qemu-test.*
--        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-+        rm -rf /home/qemu/qemu-test.*
-+        cd $(mktemp -d /home/qemu/qemu-test.XXXXXX);
-+        mkdir src build; cd src;
-         tar -xf /dev/vtbd1;
--        ./configure {configure_opts};
-+        cd ../build
-+        ../src/configure --python=python3.6 {configure_opts};
-         gmake --output-sync -j{jobs} {target} {verbose};
-     """
- 
-+    def console_boot_serial(self):
-+        self.console_wait_send("Autoboot", "3")
-+        self.console_wait_send("OK", "set console=comconsole\n")
-+        self.console_wait_send("OK", "boot\n")
-+
-     def build_image(self, img):
--        cimg = self._download_with_cache("http://download.patchew.org/freebsd-11.1-amd64.img.xz",
--                sha256sum='adcb771549b37bc63826c501f05121a206ed3d9f55f49145908f7e1432d65891')
--        img_tmp_xz = img + ".tmp.xz"
-+        self.print_step("Downloading install iso")
-+        cimg = self._download_with_cache(self.link, sha256sum=self.csum)
-         img_tmp = img + ".tmp"
--        sys.stderr.write("Extracting the image...\n")
--        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
--        subprocess.check_call(["xz", "-dvf", img_tmp_xz])
-+        iso = img + ".install.iso"
-+        iso_xz = iso + ".xz"
-+
-+        self.print_step("Preparing iso and disk image")
-+        subprocess.check_call(["cp", "-f", cimg, iso_xz])
-+        subprocess.check_call(["xz", "-dvf", iso_xz])
-+        subprocess.check_call(["qemu-img", "create", "-f", "qcow2",
-+                               img_tmp, self.size])
-+
-+        self.print_step("Booting installer")
-+        self.boot(img_tmp, extra_args = [
-+            "-machine", "graphics=off",
-+            "-cdrom", iso
-+        ])
-+        self.console_init()
-+        self.console_boot_serial()
-+        self.console_wait_send("Console type",          "xterm\n")
-+
-+        # pre-install configuration
-+        self.console_wait_send("Welcome",               "\n")
-+        self.console_wait_send("Keymap Selection",      "\n")
-+        self.console_wait_send("Set Hostname",          "freebsd\n")
-+        self.console_wait_send("Distribution Select",   "\n")
-+        self.console_wait_send("Partitioning",          "\n")
-+        self.console_wait_send("Partition",             "\n")
-+        self.console_wait_send("Scheme",                "\n")
-+        self.console_wait_send("Editor",                "f")
-+        self.console_wait_send("Confirmation",          "c")
-+
-+        self.print_step("Installation started now, this will take a while")
-+
-+        # post-install configuration
-+        self.console_wait("New Password:")
-+        self.console_send("%s\n" % self.ROOT_PASS)
-+        self.console_wait("Retype New Password:")
-+        self.console_send("%s\n" % self.ROOT_PASS)
-+
-+        self.console_wait_send("Network Configuration", "\n")
-+        self.console_wait_send("IPv4",                  "y")
-+        self.console_wait_send("DHCP",                  "y")
-+        self.console_wait_send("IPv6",                  "n")
-+        self.console_wait_send("Resolver",              "\n")
-+
-+        self.console_wait_send("Time Zone Selector",    "a\n")
-+        self.console_wait_send("Confirmation",          "y")
-+        self.console_wait_send("Time & Date",           "\n")
-+        self.console_wait_send("Time & Date",           "\n")
-+
-+        self.console_wait_send("System Configuration",  "\n")
-+        self.console_wait_send("System Hardening",      "\n")
-+
-+        # qemu user
-+        self.console_wait_send("Add User Accounts", "y")
-+        self.console_wait("Username")
-+        self.console_send("%s\n" % self.GUEST_USER)
-+        self.console_wait("Full name")
-+        self.console_send("%s\n" % self.GUEST_USER)
-+        self.console_wait_send("Uid",                   "\n")
-+        self.console_wait_send("Login group",           "\n")
-+        self.console_wait_send("Login group",           "\n")
-+        self.console_wait_send("Login class",           "\n")
-+        self.console_wait_send("Shell",                 "\n")
-+        self.console_wait_send("Home directory",        "\n")
-+        self.console_wait_send("Home directory perm",   "\n")
-+        self.console_wait_send("Use password",          "\n")
-+        self.console_wait_send("Use an empty password", "\n")
-+        self.console_wait_send("Use a random password", "\n")
-+        self.console_wait("Enter password:")
-+        self.console_send("%s\n" % self.GUEST_PASS)
-+        self.console_wait("Enter password again:")
-+        self.console_send("%s\n" % self.GUEST_PASS)
-+        self.console_wait_send("Lock out",              "\n")
-+        self.console_wait_send("OK",                    "yes\n")
-+        self.console_wait_send("Add another user",      "no\n")
-+
-+        self.console_wait_send("Final Configuration",   "\n")
-+        self.console_wait_send("Manual Configuration",  "\n")
-+        self.console_wait_send("Complete",              "\n")
-+
-+        self.print_step("Installation finished, rebooting")
-+        self.console_boot_serial()
-+
-+        # setup qemu user
-+        prompt = "$"
-+        self.console_ssh_init(prompt, self.GUEST_USER, self.GUEST_PASS)
-+        self.console_wait_send(prompt, "exit\n")
-+
-+        # setup root user
-+        prompt = "root@freebsd:~ #"
-+        self.console_ssh_init(prompt, "root", self.ROOT_PASS)
-+        self.console_sshd_config(prompt)
-+
-+        # setup serial console
-+        self.console_wait(prompt)
-+        self.console_send("echo 'console=comconsole' >> /boot/loader.conf\n")
-+
-+        # setup virtio-blk #1 (tarfile)
-+        self.console_wait(prompt)
-+        self.console_send("echo 'chmod 666 /dev/vtbd1' >> /etc/rc.local\n")
-+
-+        self.print_step("Configuration finished, rebooting")
-+        self.console_wait_send(prompt, "reboot\n")
-+        self.console_wait("login:")
-+        self.wait_ssh()
-+
-+        self.print_step("Installing packages")
-+        self.ssh_root_check("pkg install -y %s\n" % " ".join(self.pkgs))
-+
-+        # shutdown
-+        self.ssh_root(self.poweroff)
-+        self.console_wait("Uptime:")
-+        self.wait()
-+
-         if os.path.exists(img):
-             os.remove(img)
-         os.rename(img_tmp, img)
-+        os.remove(iso)
-+        self.print_step("All done")
- 
- if __name__ == "__main__":
-     sys.exit(basevm.main(FreeBSDVM))
 -- 
-2.18.1
+2.20.1
 
 
