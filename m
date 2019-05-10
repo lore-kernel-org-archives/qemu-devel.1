@@ -2,94 +2,91 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC1BEC04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:40:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63CE0C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:41:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86BC6216C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:40:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E21F21479
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 16:41:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZJq5voqt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86BC6216C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XjVS2ET6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E21F21479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46546 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46577 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP8ZY-0001XX-Qp
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:40:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41653)
+	id 1hP8aU-0002J3-Ev
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 12:41:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hP8HV-0000ON-PJ
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:21:58 -0400
+	(envelope-from <hqm03ster@gmail.com>) id 1hP8Ni-0008RD-O2
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:28:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hP8HV-0005pG-12
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:21:57 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33308)
+	(envelope-from <hqm03ster@gmail.com>) id 1hP8Nh-0003BP-G4
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:28:22 -0400
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:40795)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hP8HU-0005oU-QG
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:21:56 -0400
-Received: by mail-pg1-x542.google.com with SMTP id h17so3267405pgv.0
-	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 09:21:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=LYwXj/zIKGqLD1lzPG3utwcn8WPCNvZ+A5GG/rMQKTU=;
-	b=ZJq5voqtjhaaVMisl5B7cEwu4L0v+QMhTuvb4Gx82D8PtmetqWaSPZuJxSshA9CMpH
-	hfqjiaOBaoRxHxaM2YZBA2MuoAXBK05sR3muNh6ExAHsEAiAwkbmke0Zd7JZUW5+Xo+P
-	S3VRBPYTbA6qDnt1F09iDizKt7i+Uev4nCZwYVJl8TiOgfnw2IWtiUcb5a/3UvnM4Ik4
-	qEKAcGCK299At8s3GKdvYIvMP6GkQHPyutBSjiCi0Kso4WB/IDOHm2ZDtgjEJhFuTO7H
-	e+dzTC/KP2N7gMbOcdBJKBtq+E58lWpUugEDkYpxJayiInQoJiqux3qDMi7TSOHf7v98
-	9drg==
+	(Exim 4.71) (envelope-from <hqm03ster@gmail.com>) id 1hP8Nh-0003B6-BP
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 12:28:21 -0400
+Received: by mail-qk1-x741.google.com with SMTP id w20so4014223qka.7
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 09:28:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=pajFOVN2jwVk6oanPLNaIV/SoTrhlAKI9cBxsW51JCM=;
+	b=XjVS2ET6auZxKldc/TYTgyW/lbxv7KyjesbQhi4OxIRJz0O+B+HRKeYJW8/lnSkfSj
+	yfqkvQsDQZmXf7Z9VJrrewi6dL13F4bbknjQZbW96N32ZfawbScFxQ/hSZvsjvVtrbs0
+	xEJkAXuGeskl1cjhu0DVKyyy+QPIe2ies7ulzX/W2oHYsrGgn5memWl8vkmtavu1cE1b
+	2FXkLikDLsJCQLElaFWwYxE4wJhR9DAQzVP6aYTRz20VnaQVqHV5BH+IANIVGlI2rW1l
+	MXchmGM2WhrTmGx0DUWJ6NmwsIYYckhxosvV+2TF382r6wxz5KfLDUGhu1RSf4TclSBq
+	zj0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=LYwXj/zIKGqLD1lzPG3utwcn8WPCNvZ+A5GG/rMQKTU=;
-	b=cyB6JLlMILvWaPBL7hj27C7CyoXRzWPioWlLPtgYuAZPeZ2X+EjfhjISx+Xk/j5xkN
-	4EGiFkdL8QKdri4aSQ2DjiSe5FpdEu6je2+KjIKt3BEzkyAuhdaAKW+Jw7gXEGnu0r36
-	BavZIe6i56Fs1Ephvjr9drIhdJitLIN0NRladfPsPOA1/8AnwWbUnVw6bPW6rfbNkrM1
-	N3q+GhEYiLey+Sqp7LasrTKoudZkH35m6dGP5XP8qIjZrFk/IvaPHGhz/qt7nq9EQ1Z6
-	f+dub99z0K0ms1TGXDqSk9AOBkGHhkfpYxJgGy7ur23moOlDFcfmgydUS2HHkt7aujuT
-	j0Lw==
-X-Gm-Message-State: APjAAAXtjR3nS2ZyPeP/w3VVf8RiqsK2RYT1Ure2G9mDhLmd28d7nPt2
-	/zYvkYb76KESDUcGKnHTtotXdg==
-X-Google-Smtp-Source: APXvYqw40WVmTA1jf6NPiKD8Q59utQVpnYBztYbHMloPWhzYRUngFxQNMUiL+nwZqri2taBpwgYlng==
-X-Received: by 2002:a62:579b:: with SMTP id i27mr15796721pfj.205.1557505315450;
-	Fri, 10 May 2019 09:21:55 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id
-	s78sm16069720pfs.187.2019.05.10.09.21.54
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 10 May 2019 09:21:54 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190510012458.22706-1-richard.henderson@linaro.org>
-	<20190510012458.22706-23-richard.henderson@linaro.org>
-	<CAFEAcA9uwaev+Q=BgLBz+fgO6C7VGmw4Nxcozg2vm6TOm+LJww@mail.gmail.com>
-	<dd180f6d-27e8-2f2b-a7ac-ed1d8bbc9498@linaro.org>
-	<CAFEAcA-wXNKoen0bn8a7D=GzsyM38F1uummVbfVQ=B8haswCDA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <73e7038c-b40d-0f60-68ef-b3555c4e7576@linaro.org>
-Date: Fri, 10 May 2019 09:21:52 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=pajFOVN2jwVk6oanPLNaIV/SoTrhlAKI9cBxsW51JCM=;
+	b=dzR1nuZJTNYDHKTtSXMdSWA4oRNvRBk6ywEMSpqxEvPa6EFLttbvqNai0GejMkFWIt
+	nqRM0lLcLuTo0oavFFSuizbi6U7BoKL14e6ga7NdskvfOythk2kIVZHAYXPnyd69cAZZ
+	Bz8f+LISJo5+WAsD1LDqIPXeuA3DxRCDIA8rjbHhiDAJy8/Fvy3TOWn4PmTUyWnF1k8Y
+	aX7XRvMRUAXmQ/vsUKK/cphwI6pTnVWH9rqWceQtxL3PgApaujYL/NOCroHY4qdPoPJa
+	YWkaq1QiXSE9PavBh64AuYPJJPlr9jSR4Kt5keRZVBClna1zrsiW2HIH313MPPf+aVvG
+	niPQ==
+X-Gm-Message-State: APjAAAV0UsjP8dpQBJ9hiioDemwpomp0uRT3v3tS32dnD+DHEqeOgrpd
+	N0Ste9sU97GKhuPQhHyT4FBqnPKHBXKY5Egx9qTqn9Hi
+X-Google-Smtp-Source: APXvYqzuishv7O28/B2wbm0CWJ1A/w4gMRShYT2jDWX19anghzDGU8TJZPdhkfdnkfb9hQ3ZZ5MS/sNPFQTwKcMvuLE=
+X-Received: by 2002:a37:9587:: with SMTP id x129mr9914122qkd.9.1557505699768; 
+	Fri, 10 May 2019 09:28:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-wXNKoen0bn8a7D=GzsyM38F1uummVbfVQ=B8haswCDA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <CABSdmrnNW6f=P64PviPP8CTJ5SVfYS8_6kmAtpw9yPObTEkpxg@mail.gmail.com>
+	<CABSdmrnocrqLKWncgy_Lak33__GRPYfs-RzSA14e=vh4cRn2ag@mail.gmail.com>
+	<20190509064848.wjhchsfov7q6komj@sirius.home.kraxel.org>
+	<CABSdmrmm+wJ=+Ccav=X5Gw_oueQvPRejCWVG2SQeCw=K4BM9EA@mail.gmail.com>
+	<CABSdmrndpONH_fVHbktHbBXvXPKESeRfis06TjrNRRfBpJzXLA@mail.gmail.com>
+	<b6064b77-5ca4-03e1-80ef-027313096cb2@gmail.com>
+	<CABSdmrkW6G23ZGDA7iLucM45vL0HHGsr2F76H0Mf8S0xkhPnsQ@mail.gmail.com>
+	<3e619b5c-8fb3-2655-2d92-37598db098d8@gmail.com>
+	<20190510085947.y62lttdtrg5cxx6b@sirius.home.kraxel.org>
+	<3fb8b79d-9f68-2342-d3ae-3aefa873109b@gmail.com>
+	<20190510103900.botgnbbo2ii4jxgo@sirius.home.kraxel.org>
+	<01de4824-5c19-6b6c-5b75-fa54a883ab4a@gmail.com>
+In-Reply-To: <01de4824-5c19-6b6c-5b75-fa54a883ab4a@gmail.com>
+From: Hou Qiming <hqm03ster@gmail.com>
+Date: Sat, 11 May 2019 00:28:04 +0800
+Message-ID: <CABSdmrnVzi5ZTF58tnt8T8=gsVe2ZNqtZKCBcbZQ9Lb+CCCkdg@mail.gmail.com>
+To: qemu-devel@nongnu.org
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::542
-Subject: Re: [Qemu-devel] [PATCH v5 22/24] target/arm: Implement ARMv8.5-RNG
+X-Received-From: 2607:f8b0:4864:20::741
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: [Qemu-devel] [PATCH v2 1/3] hw/display/ramfb: fix guest memory
+ un-mapping
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,31 +98,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/10/19 9:20 AM, Peter Maydell wrote:
-> On Fri, 10 May 2019 at 17:17, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> On 5/10/19 9:01 AM, Peter Maydell wrote:
->>> Don't these need to be marked ARM_CP_IO for the benefit
->>> of -icount ?
->>
->> I don't think so.  There's no lock taken, as for mmio devices.  It's not not
->> related to time, virtual or otherwise.  There are no possible exceptions.  I
->> can't think of anything that would make icount care.
->>
->> Have I missed something?
-> 
-> If icount decides it needs to replay execution of the TB
-> which the RNDR access is in, won't it get a different
-> number back the second time it executes ?
+Pulled back the `qemu_create_displaysurface_guestmem` function to create
+the display surface so that the guest memory gets properly unmapped.
 
-Yes, it will.  I forgot about replay.
+Signed-off-by: HOU Qiming <hqm03ster@gmail.com>
+---
+ hw/display/ramfb.c | 53 ++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 40 insertions(+), 13 deletions(-)
 
+diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
+index 25c8ad7..98703f7 100644
+--- a/hw/display/ramfb.c
++++ b/hw/display/ramfb.c
+@@ -32,33 +32,60 @@ struct RAMFBState {
+     struct RAMFBCfg cfg;
+ };
 
-r~
++static void qemu_unmap_displaysurface_guestmem(pixman_image_t *image,
++                                               void *unused)
++{
++    void *data = pixman_image_get_data(image);
++    uint32_t size = pixman_image_get_stride(image) *
++        pixman_image_get_height(image);
++    cpu_physical_memory_unmap(data, size, 0, 0);
++}
++
++static DisplaySurface *qemu_create_displaysurface_guestmem(
++    int width, int height,
++    pixman_format_code_t format,
++    int linesize, uint64_t addr)
++{
++    DisplaySurface *surface;
++    hwaddr size;
++    void *data;
++
++    if (linesize == 0) {
++        linesize = width * PIXMAN_FORMAT_BPP(format) / 8;
++    }
++
++    size = (hwaddr)linesize * height;
++    data = cpu_physical_memory_map(addr, &size, 0);
++    if (size != (hwaddr)linesize * height) {
++        cpu_physical_memory_unmap(data, size, 0, 0);
++        return NULL;
++    }
++
++    surface = qemu_create_displaysurface_from
++        (width, height, format, linesize, data);
++    pixman_image_set_destroy_function
++        (surface->image, qemu_unmap_displaysurface_guestmem, NULL);
++
++    return surface;
++}
++
+ static void ramfb_fw_cfg_write(void *dev, off_t offset, size_t len)
+ {
+     RAMFBState *s = dev;
+-    void *framebuffer;
+     uint32_t fourcc, format;
+-    hwaddr stride, addr, length;
++    hwaddr stride, addr;
 
+     s->width  = be32_to_cpu(s->cfg.width);
+     s->height = be32_to_cpu(s->cfg.height);
+     stride    = be32_to_cpu(s->cfg.stride);
+     fourcc    = be32_to_cpu(s->cfg.fourcc);
+     addr      = be64_to_cpu(s->cfg.addr);
+-    length    = stride * s->height;
+     format    = qemu_drm_format_to_pixman(fourcc);
+
+     fprintf(stderr, "%s: %dx%d @ 0x%" PRIx64 "\n", __func__,
+             s->width, s->height, addr);
+-    framebuffer = address_space_map(&address_space_memory,
+-                                    addr, &length, false,
+-                                    MEMTXATTRS_UNSPECIFIED);
+-    if (!framebuffer || length < stride * s->height) {
+-        s->width = 0;
+-        s->height = 0;
+-        return;
+-    }
+-    s->ds = qemu_create_displaysurface_from(s->width, s->height,
+-                                            format, stride, framebuffer);
++    s->ds = qemu_create_displaysurface_guestmem(s->width, s->height,
++                                                format, stride, addr);
+ }
+
+ void ramfb_display_update(QemuConsole *con, RAMFBState *s)
+-- 
+2.17.1
