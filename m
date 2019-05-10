@@ -2,66 +2,95 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DATE_IN_PAST_03_06,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B1D8C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 13:34:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD5B7C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 13:36:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57473217D6
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 13:34:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gSjTjhTF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57473217D6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 853CB2177B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 13:36:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 853CB2177B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43421 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43493 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hP5fP-0005EP-IM
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 09:34:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:32807)
+	id 1hP5hl-00085t-MY
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 09:36:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hP5dP-00046P-V4
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:32:25 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hP5fq-0005yI-SM
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:34:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hP5dO-0001Z6-8y
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:32:23 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:40097 helo=ozlabs.org)
+	(envelope-from <mreitz@redhat.com>) id 1hP5fp-0003Dp-S3
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 09:34:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49912)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hP5dN-0001XQ-5y; Fri, 10 May 2019 09:32:22 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 450rjX5TnYz9sBr; Fri, 10 May 2019 23:32:16 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1557495136;
-	bh=C51wn5AT7X10cFwBUwuzjoeQqweqFl7d/ueqaqsTNd8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gSjTjhTFopdqYNL0xPBncAvArb7IDfvkqWLlVzU/vb8XKj4QauW1D5aHUBi4I2GZw
-	8CNK0tDdWnOe/Nh9VkbLTVEQBjzxZDEEdA3b2hB3+uK260GQs4ec6vD3BrY028I/8c
-	m59H5LL9x5HlBCiRf9KlFwL6F1CjSXE60HKHteKk=
-Date: Fri, 10 May 2019 19:53:21 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Message-ID: <20190510095321.GB5030@umbus.fritz.box>
-References: <155591636364.20338.844048953355207313.stgit@aravinda>
-	<155591661564.20338.10693276428550708820.stgit@aravinda>
-	<20190510064620.GL20559@umbus.fritz.box>
-	<fa3f0f81-17bc-ce71-7fa0-e0bc706b3c17@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hP5fn-0003CA-2w; Fri, 10 May 2019 09:34:51 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 29E633079B95;
+	Fri, 10 May 2019 13:34:49 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-59.brq.redhat.com
+	[10.40.204.59])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B1BB1081313;
+	Fri, 10 May 2019 13:34:41 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20190502084506.8009-1-thuth@redhat.com>
+	<20190502084506.8009-8-thuth@redhat.com>
+	<413645a6-385c-e112-ad9c-8525ef3d9e52@redhat.com>
+	<eda4c5c1-45b8-79d2-1337-f5ee4c68f759@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <a3ef5755-4c5d-98d9-3f22-e776d5b48b73@redhat.com>
+Date: Fri, 10 May 2019 15:34:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <eda4c5c1-45b8-79d2-1337-f5ee4c68f759@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="5/uDoXvLw7AC5HRs"
-Content-Disposition: inline
-In-Reply-To: <fa3f0f81-17bc-ce71-7fa0-e0bc706b3c17@linux.vnet.ibm.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+	protocol="application/pgp-signature";
+	boundary="PLEEVX0CXwS5ToPznKtON9lRI20UZo8yp"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.41]);
+	Fri, 10 May 2019 13:34:49 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v8 5/6] ppc: spapr: Enable FWNMI
- capability
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v3 7/7] tests: Run the iotests during "make
+ check" again
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,286 +102,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: paulus@ozlabs.org, aik@au1.ibm.com, qemu-ppc@nongnu.org,
-	qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+	Ed Maste <emaste@freebsd.org>, qemu-block@nongnu.org,
+	Markus Armbruster <armbru@redhat.com>,
+	Christophe Fergeau <cfergeau@redhat.com>,
+	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	Wainer dos Santos Moschetta <wainersm@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---5/uDoXvLw7AC5HRs
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PLEEVX0CXwS5ToPznKtON9lRI20UZo8yp
+From: Max Reitz <mreitz@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org,
+ Christophe Fergeau <cfergeau@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Kevin Wolf <kwolf@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Message-ID: <a3ef5755-4c5d-98d9-3f22-e776d5b48b73@redhat.com>
+Subject: Re: [PATCH v3 7/7] tests: Run the iotests during "make check" again
+References: <20190502084506.8009-1-thuth@redhat.com>
+ <20190502084506.8009-8-thuth@redhat.com>
+ <413645a6-385c-e112-ad9c-8525ef3d9e52@redhat.com>
+ <eda4c5c1-45b8-79d2-1337-f5ee4c68f759@redhat.com>
+In-Reply-To: <eda4c5c1-45b8-79d2-1337-f5ee4c68f759@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 10, 2019 at 12:45:29PM +0530, Aravinda Prasad wrote:
->=20
->=20
-> On Friday 10 May 2019 12:16 PM, David Gibson wrote:
-> > On Mon, Apr 22, 2019 at 12:33:35PM +0530, Aravinda Prasad wrote:
-> >> Enable the KVM capability KVM_CAP_PPC_FWNMI so that
-> >> the KVM causes guest exit with NMI as exit reason
-> >> when it encounters a machine check exception on the
-> >> address belonging to a guest. Without this capability
-> >> enabled, KVM redirects machine check exceptions to
-> >> guest's 0x200 vector.
-> >>
-> >> This patch also deals with the case when a guest with
-> >> the KVM_CAP_PPC_FWNMI capability enabled is attempted
-> >> to migrate to a host that does not support this
-> >> capability.
-> >>
-> >> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-> >> ---
-> >>  hw/ppc/spapr.c         |    1 +
-> >>  hw/ppc/spapr_caps.c    |   26 ++++++++++++++++++++++++++
-> >>  hw/ppc/spapr_rtas.c    |   14 ++++++++++++++
-> >>  include/hw/ppc/spapr.h |    4 +++-
-> >>  target/ppc/kvm.c       |   14 ++++++++++++++
-> >>  target/ppc/kvm_ppc.h   |    6 ++++++
-> >>  6 files changed, 64 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >> index ffd1715..44e09bb 100644
-> >> --- a/hw/ppc/spapr.c
-> >> +++ b/hw/ppc/spapr.c
-> >> @@ -4372,6 +4372,7 @@ static void spapr_machine_class_init(ObjectClass=
- *oc, void *data)
-> >>      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D SPAPR_CAP_OFF;
-> >>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_CAP=
-_ON;
-> >>      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_OFF;
-> >> +    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] =3D SPAPR_CAP_OFF;
-> >>      spapr_caps_add_properties(smc, &error_abort);
-> >>      smc->irq =3D &spapr_irq_xics;
-> >>      smc->dr_phb_enabled =3D true;
-> >> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> >> index edc5ed0..5b3af04 100644
-> >> --- a/hw/ppc/spapr_caps.c
-> >> +++ b/hw/ppc/spapr_caps.c
-> >> @@ -473,6 +473,22 @@ static void cap_ccf_assist_apply(SpaprMachineStat=
-e *spapr, uint8_t val,
-> >>      }
-> >>  }
-> >> =20
-> >> +static void cap_fwnmi_mce_apply(SpaprMachineState *spapr, uint8_t val,
-> >> +                                Error **errp)
-> >> +{
-> >> +    PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
-> >> +
-> >> +    if (!val) {
-> >> +        return; /* Disabled by default */
-> >> +    }
-> >> +
-> >> +    if (kvm_enabled()) {
-> >> +        if (kvmppc_fwnmi_enable(cpu)) {
-> >> +            error_setg(errp, "Requested fwnmi capability not support =
-by KVM");
-> >> +        }
-> >> +    }
-> >> +}
-> >> +
-> >>  SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
-> >>      [SPAPR_CAP_HTM] =3D {
-> >>          .name =3D "htm",
-> >> @@ -571,6 +587,15 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NU=
-M] =3D {
-> >>          .type =3D "bool",
-> >>          .apply =3D cap_ccf_assist_apply,
-> >>      },
-> >> +    [SPAPR_CAP_FWNMI_MCE] =3D {
-> >> +        .name =3D "fwnmi-mce",
-> >> +        .description =3D "Handle fwnmi machine check exceptions",
-> >> +        .index =3D SPAPR_CAP_FWNMI_MCE,
-> >> +        .get =3D spapr_cap_get_bool,
-> >> +        .set =3D spapr_cap_set_bool,
-> >> +        .type =3D "bool",
-> >> +        .apply =3D cap_fwnmi_mce_apply,
-> >> +    },
-> >>  };
-> >> =20
-> >>  static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spa=
-pr,
-> >> @@ -706,6 +731,7 @@ SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
-> >>  SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
-> >>  SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
-> >>  SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
-> >> +SPAPR_CAP_MIG_STATE(fwnmi, SPAPR_CAP_FWNMI_MCE);
-> >> =20
-> >>  void spapr_caps_init(SpaprMachineState *spapr)
-> >>  {
-> >> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> >> index d3499f9..997cf19 100644
-> >> --- a/hw/ppc/spapr_rtas.c
-> >> +++ b/hw/ppc/spapr_rtas.c
-> >> @@ -49,6 +49,7 @@
-> >>  #include "hw/ppc/fdt.h"
-> >>  #include "target/ppc/mmu-hash64.h"
-> >>  #include "target/ppc/mmu-book3s-v3.h"
-> >> +#include "kvm_ppc.h"
-> >> =20
-> >>  static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState=
- *spapr,
-> >>                                     uint32_t token, uint32_t nargs,
-> >> @@ -354,6 +355,7 @@ static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
-> >>                                    target_ulong args,
-> >>                                    uint32_t nret, target_ulong rets)
-> >>  {
-> >> +    int ret;
-> >>      uint64_t rtas_addr =3D spapr_get_rtas_addr();
-> >> =20
-> >>      if (!rtas_addr) {
-> >> @@ -361,6 +363,18 @@ static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
-> >>          return;
-> >>      }
-> >> =20
-> >> +    ret =3D kvmppc_fwnmi_enable(cpu);
-> >=20
-> > You shouldn't need this here as well as in cap_fwnmi_mce_apply().
-> >=20
-> > Instead, you should unconditionally fail the nmi-register if the
-> > capability is not enabled.
->=20
-> cap_fwnmi is not enabled by default, because if it is enabled by default
-> them KVM will start routing machine check exceptions via guest exit
-> instead of routing it to guest's 0x200.
->=20
-> During early boot since guest has not yet issued nmi-register, KVM is
-> expected to route exceptions to 0x200. Therefore we enable cap_fwnmi
-> only when a guest issues nmi-register.
+On 10.05.19 06:29, Thomas Huth wrote:
+> On 09/05/2019 20.08, Max Reitz wrote:
+>> On 02.05.19 10:45, Thomas Huth wrote:
+>>> People often forget to run the iotests before submitting patches or
+>>> pull requests - this is likely due to the fact that we do not run the=
 
-Except that's not true - you enable it in cap_fwnmi_mce_apply() which
-will be executed whenever the machine capability is enabled.
+>>> tests during our mandatory "make check" tests yet. Now that we've got=
 
-> Or we should take the approach of enabling this capability by default
-> and then from QEMU route the error to 0x200 if guest has not issued
-> nmi-register.
+>>> a proper "auto" group of iotests that should be fine to run in every
+>>> environment, we can enable the iotests during "make check" again by
+>>> running the "auto" tests by default from the check-block.sh script.
+>>>
+>>> Some cases still need to be checked first, though: iotests need bash
+>>> and GNU sed (otherwise they fail), and if gprof is enabled, it spoils=
+
+>>> the output of some test cases causing them to fail. So if we detect
+>>> that one of the required programs is missing or that gprof is enabled=
+,
+>>> we still have to skip the iotests to avoid failures.
+>>>
+>>> And finally, since we are using check-block.sh now again, this patch =
+also
+>>> removes the qemu-iotests-quick.sh script since we do not need that an=
+ymore
+>>> (and having two shell wrapper scripts around the block tests seem
+>>> rather confusing than helpful).
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  tests/Makefile.include      |  8 +++----
+>>>  tests/check-block.sh        | 44 ++++++++++++++++++++++++++++-------=
+--
+>>>  tests/qemu-iotests-quick.sh |  8 -------
+>>>  3 files changed, 38 insertions(+), 22 deletions(-)
+>>>  delete mode 100755 tests/qemu-iotests-quick.sh
+>>
+>> Can I interest you in a Makefile target that explicitly excludes
+>> check-block?  I run the iotests anyway, but I also run make check.
+>> Running some iotests twice would be a bit pointless.
 >=20
-> >=20
-> >> +    if (ret =3D=3D 1) {
-> >> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    if (ret < 0) {
-> >> +        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-> >> +        return;
-> >> +    }
-> >> +
-> >>      spapr->guest_machine_check_addr =3D rtas_ld(args, 1);
-> >>      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-> >>  }
-> >> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> >> index 03f34bf..9d16ad1 100644
-> >> --- a/include/hw/ppc/spapr.h
-> >> +++ b/include/hw/ppc/spapr.h
-> >> @@ -78,8 +78,10 @@ typedef enum {
-> >>  #define SPAPR_CAP_LARGE_DECREMENTER     0x08
-> >>  /* Count Cache Flush Assist HW Instruction */
-> >>  #define SPAPR_CAP_CCF_ASSIST            0x09
-> >> +/* FWNMI machine check handling */
-> >> +#define SPAPR_CAP_FWNMI_MCE             0x0A
-> >>  /* Num Caps */
-> >> -#define SPAPR_CAP_NUM                   (SPAPR_CAP_CCF_ASSIST + 1)
-> >> +#define SPAPR_CAP_NUM                   (SPAPR_CAP_FWNMI_MCE + 1)
-> >> =20
-> >>  /*
-> >>   * Capability Values
-> >> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> >> index 5eedce8..9c7b71d 100644
-> >> --- a/target/ppc/kvm.c
-> >> +++ b/target/ppc/kvm.c
-> >> @@ -83,6 +83,7 @@ static int cap_ppc_safe_indirect_branch;
-> >>  static int cap_ppc_count_cache_flush_assist;
-> >>  static int cap_ppc_nested_kvm_hv;
-> >>  static int cap_large_decr;
-> >> +static int cap_ppc_fwnmi;
-> >> =20
-> >>  static uint32_t debug_inst_opcode;
-> >> =20
-> >> @@ -150,6 +151,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-> >>      kvmppc_get_cpu_characteristics(s);
-> >>      cap_ppc_nested_kvm_hv =3D kvm_vm_check_extension(s, KVM_CAP_PPC_N=
-ESTED_HV);
-> >>      cap_large_decr =3D kvmppc_get_dec_bits();
-> >> +    cap_ppc_fwnmi =3D kvm_check_extension(s, KVM_CAP_PPC_FWNMI);
-> >>      /*
-> >>       * Note: setting it to false because there is not such capability
-> >>       * in KVM at this moment.
-> >> @@ -2117,6 +2119,18 @@ void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int=
- mpic_proxy)
-> >>      }
-> >>  }
-> >> =20
-> >> +int kvmppc_fwnmi_enable(PowerPCCPU *cpu)
-> >> +{
-> >> +    CPUState *cs =3D CPU(cpu);
-> >> +
-> >> +    if (!cap_ppc_fwnmi) {
-> >> +        return 1;
-> >> +    }
-> >> +
-> >> +    return kvm_vcpu_enable_cap(cs, KVM_CAP_PPC_FWNMI, 0);
-> >> +}
-> >> +
-> >> +
-> >>  int kvmppc_smt_threads(void)
-> >>  {
-> >>      return cap_ppc_smt ? cap_ppc_smt : 1;
-> >> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> >> index 6edc42f..28919d3 100644
-> >> --- a/target/ppc/kvm_ppc.h
-> >> +++ b/target/ppc/kvm_ppc.h
-> >> @@ -27,6 +27,7 @@ void kvmppc_enable_h_page_init(void);
-> >>  void kvmppc_set_papr(PowerPCCPU *cpu);
-> >>  int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
-> >>  void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
-> >> +int kvmppc_fwnmi_enable(PowerPCCPU *cpu);
-> >>  int kvmppc_smt_threads(void);
-> >>  void kvmppc_hint_smt_possible(Error **errp);
-> >>  int kvmppc_set_smt_threads(int smt);
-> >> @@ -159,6 +160,11 @@ static inline void kvmppc_set_mpic_proxy(PowerPCC=
-PU *cpu, int mpic_proxy)
-> >>  {
-> >>  }
-> >> =20
-> >> +static inline int kvmppc_fwnmi_enable(PowerPCCPU *cpu)
-> >> +{
-> >> +    return 1;
-> >> +}
-> >> +
-> >>  static inline int kvmppc_smt_threads(void)
-> >>  {
-> >>      return 1;
-> >>
-> >=20
+> Can't you simply run
 >=20
+>  ./check -qcow2 -x auto
+>=20
+> instead?
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+I don=E2=80=99t run just qcow2 tests.  I run qcow2, qcow2 with compat=3D0=
+=2E10,
+qcow2 with refcount_bits=3D1, raw, nbd, qed, vmdk, vhdx, ...  A lot.
 
---5/uDoXvLw7AC5HRs
+So for which of the protocol/format combinations do I exclude the auto
+group?  check-block.sh says it runs raw, qcow2, qed, vmdk, and vpc.  But
+may that not be subject to change?
+
+Max
+
+
+--PLEEVX0CXwS5ToPznKtON9lRI20UZo8yp
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzVShEACgkQbDjKyiDZ
-s5J9tQ/9H8BowS+J6FZtqjQGq0LENenuKnHIgINi121SvbnE+qubWysnjwjWTUQZ
-CEz+4ldFF63OOyCxq3gWOCNWeCK2sXxv7QIN95kIo+Fxysz/KNvB8Lyn3FxjKnVJ
-OY2O4vL3WRhRV68kYvpeCZch10A750T5AaHxAPD/JLW5IJ1aj7boM2jYRjyYwdYU
-jELU8yqemelxJBkEYGU2d2zOHJCYjYDG8yjfnSEerE5c2pbqHsNfIanZWTotvXIf
-pRm7T5H5TE1nMHstBtbLUn5Xi/8PMSgUDwx6SA+pmrjQ/eEACeuLPFJHvohjuysA
-soUHJQ3zeQNhjqu4u+bipgYVLLEMiQnfsDvTsoqcY55ytv5fjhaG67W9NmgU7AzO
-m/Zol93BFcju8VU0XpqVm/PGWNSv//IfODGi4zojx7t18IrhE9xHKIVJPYEIbgJy
-S4w6QOSsSHtVupS1agf5FEBzWrWblc8V2GsiJoSYSQtyXqYB9Y2lLz7PvIQE5gjJ
-jC3FdllO8pzdlNLSIU9NSwp0Io4EbMmnUDT2r41y4qldpsasfcUxNgzwOtuO1qu9
-3VTmck5LMz4Jdi4zNpuCslrZTkC8N17iA8JV0qXRyjL3KkuCYas8tPT/yvZSr7qI
-toCbbBPrtojtGMTRKxwqZUg18wqFuXm09oiSLh8abHRBjTHDkFc=
-=uz1v
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzVfe8ACgkQ9AfbAGHV
+z0Av+gf+KqDdQKn0lADYqJHj/CRmKD8LkmwBt5sWeSijOqK0DrwC/y2gJhjhTJ9K
+9NM2X762oLQ8GXGVqWBRCPqlJ15SZnxyJApu1JlRxLR21jPvZC63LZwXWttNhw0S
+lAMBmLM1IZRAYKbXRZPsK3zhFl6AeLVR5pV0j6jnuOmVrqZvKtf9AolKM5DVmS86
+qfx1lChSGoAbEAbVA0KVCi7uQarLjlxwiDKUun5Jb39xvsA+9gqLEdpPmxa2l/gS
+lTLIuVYNf0TQFYQOJMlZapRMYA60gGgou0r0EQxBQp4fsPorrnI7ikMAbQbP05rk
+Cfx8nX8GGU1Ovf4PoT7B0A1mb1/wLw==
+=b2Zg
 -----END PGP SIGNATURE-----
 
---5/uDoXvLw7AC5HRs--
+--PLEEVX0CXwS5ToPznKtON9lRI20UZo8yp--
 
