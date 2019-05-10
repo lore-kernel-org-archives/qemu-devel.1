@@ -2,59 +2,71 @@ Return-Path: <SRS0=xKZ8=TK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BAE7C04A6B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 21:14:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6383C04A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 21:16:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CC0F20896
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 21:14:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CC0F20896
+	by mail.kernel.org (Postfix) with ESMTPS id 6EB3720896
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 May 2019 21:16:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EB3720896
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50085 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50127 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hPCr2-0005RE-II
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 17:14:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46442)
+	id 1hPCsv-0006RH-Oz
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 17:16:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hPCp0-0004FK-0U
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:12:50 -0400
+	(envelope-from <nsoffer@redhat.com>) id 1hPCrv-0005wo-St
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:15:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hPCoz-0002p4-5S
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:12:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43462)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hPCox-0002nh-5L; Fri, 10 May 2019 17:12:47 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7B17A3082206;
-	Fri, 10 May 2019 21:12:46 +0000 (UTC)
-Received: from localhost (ovpn-204-59.brq.redhat.com [10.40.204.59])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 13ACE1A267;
-	Fri, 10 May 2019 21:12:45 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Fri, 10 May 2019 23:12:44 +0200
-Message-Id: <20190510211244.26461-1-mreitz@redhat.com>
+	(envelope-from <nsoffer@redhat.com>) id 1hPCru-000511-DJ
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:15:51 -0400
+Received: from mail-oi1-f174.google.com ([209.85.167.174]:39177)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1hPCru-000503-6W
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 17:15:50 -0400
+Received: by mail-oi1-f174.google.com with SMTP id v2so2116692oie.6
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 14:15:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=35IeoSCSHMgwNqlDgzQKgC46QY1T04kechgEPuAEDqw=;
+	b=WVE0sJmwBgb1uMvnmoIb1v3gytUGWGdIqPxlKiDFXofldcRIkkuz8flulx1+dXslKN
+	42VMnY+rOGR7pP4cqy34U3sxqrZrAG6s2Gucdd3jQRndzqUTuTm/mm1WQELR+edH6Ylf
+	p8RhQdduS/nD0oE4ZHmjO9WHsrQi08TbxFjmy4T+vM52o3JaWPawN84yUdHAUa/xmMIj
+	J5tFTSZHDAnmShc1t//lLhOrLPz6yitiBBzEYdHbm+ZkT3ivDUFgaxC7Q3smyxycvzbm
+	7qkmBS4W1lbS5MauI+ewPZrZtCU4LDsalZWKWy3vrKsMGgIPIrFYujJVURspgHHfOWmY
+	zziA==
+X-Gm-Message-State: APjAAAVYm3eU8PLC5ehF7gXI256Llkm7Bt9cKPre9I43/PvNavBrv1bp
+	87A/qO9JYh2OYQZwCoDdsKLJ7e/nZ6tWD3B+F40w2Q==
+X-Google-Smtp-Source: APXvYqzz2QO/9jQK5l/NOi6BQ5qxsvNbxNZsvrS38OQlLnsBshOkwSPnktlYdEwvCNnfn4ayrJdxz/ITyhM7eBHVyTg=
+X-Received: by 2002:a54:4d9d:: with SMTP id y29mr6448784oix.135.1557522948143; 
+	Fri, 10 May 2019 14:15:48 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Fri, 10 May 2019 21:12:46 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+References: <68cc5bbc-ed6f-e001-e376-ccd986683b88@redhat.com>
+	<f1dfe2c3-2d61-e477-ac3d-37ad26d9236d@redhat.com>
+	<61685a48-b84e-c379-7193-f456e82635ba@redhat.com>
+	<67a38513-89af-7f54-2fc8-05b5777983ca@redhat.com>
+	<CAMr-obv28mp9bABmm906tnwfkBp93ATeEsuaUt-o=Ti75N_1DQ@mail.gmail.com>
+In-Reply-To: <CAMr-obv28mp9bABmm906tnwfkBp93ATeEsuaUt-o=Ti75N_1DQ@mail.gmail.com>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Sat, 11 May 2019 00:15:34 +0300
+Message-ID: <CAMRbyyv7etEykB456u9-MVWtBo97kUhsCOGrOXM+UPo-p9f6qA@mail.gmail.com>
+To: Nir Soffer <nirsof@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] block/file-posix: Truncate in
- xfs_write_zeroes()
+	[fuzzy]
+X-Received-From: 209.85.167.174
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [Qemu-block] Failing QEMU iotest 175
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,58 +78,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
-	Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	qemu-block <qemu-block@nongnu.org>,
+	QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-XFS_IOC_ZERO_RANGE does not increase the file length:
-$ touch foo
-$ xfs_io -c 'zero 0 65536' foo
-$ stat -c "size=3D%s, blocks=3D%b" foo
-size=3D0, blocks=3D128
+On Sat, May 4, 2019 at 12:32 AM Nir Soffer <nirsof@gmail.com> wrote:
 
-We do want writes beyond the EOF to automatically increase the file
-length, however.  This is evidenced by the fact that iotest 061 is
-broken on XFS since qcow2's check implementation checks for blocks
-beyond the EOF.
+>
+>
+> On Fri, May 3, 2019, 23:21 Eric Blake <eblake@redhat.com> wrote:
+>
+>> ...
+>> >>>  == creating image with preallocation off ==
+>> >>>  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+>> preallocation=off
+>> >>> -size=1048576, blocks=0
+>> >>> +size=1048576, blocks=2
+>> >>>
+>> >>>  == creating image with preallocation full ==
+>> >>>  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+>> preallocation=full
+>> >>> -size=1048576, blocks=2048
+>> >>> +size=1048576, blocks=2050
+>> >>
+>> >> 2048/2050, so we DO have some indication of whether the file is sparse
+>> >> or fully allocated.
+>> >
+>> > Maybe we could check that the value after "blocks=" is a single digit in
+>> > the first case, and matches "blocks=20.." in the second case?
+>>
+>> I wonder if 'qemu-img map --output=json $TEST_IMG' might be any more
+>> reliable (at least for ignoring any extra block allocations associated
+>> with the file, if it is some journaling option or xattr or other reason
+>> why your files seem to occupy more disk sectors than just the size of
+>> the file would imply).
+>>
+>
+> I think it should work better and is more correct, testing actual
+> sparsness instead of underlying file system implementation.
+>
+> I can send a fix next week.
+>
 
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/file-posix.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+I tested this change:
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 1cf4ee49eb..e09e15bbf8 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1444,9 +1444,22 @@ out:
- #ifdef CONFIG_XFS
- static int xfs_write_zeroes(BDRVRawState *s, int64_t offset, uint64_t by=
-tes)
- {
-+    int64_t len;
-     struct xfs_flock64 fl;
-     int err;
-=20
-+    len =3D lseek(s->fd, 0, SEEK_END);
-+    if (len < 0) {
-+        return -errno;
-+    }
-+
-+    if (offset + bytes > len) {
-+        /* XFS_IOC_ZERO_RANGE does not increase the file length */
-+        if (ftruncate(s->fd, offset + bytes) < 0) {
-+            return -errno;
-+        }
-+    }
-+
-     memset(&fl, 0, sizeof(fl));
-     fl.l_whence =3D SEEK_SET;
-     fl.l_start =3D offset;
---=20
-2.21.0
+$ git diff
+diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
+index d0ffc495c2..0e3faa50e4 100755
+--- a/tests/qemu-iotests/175
++++ b/tests/qemu-iotests/175
+@@ -43,17 +43,17 @@ _supported_os Linux
+ size=1m
 
+ echo
+ echo "== creating image with default preallocation =="
+ _make_test_img $size | _filter_imgfmt
+-stat -c "size=%s, blocks=%b" $TEST_IMG
++$QEMU_IMG map -f $IMGFMT --output json "$TEST_IMG"
 
+ for mode in off full falloc; do
+     echo
+     echo "== creating image with preallocation $mode =="
+     IMGOPTS=preallocation=$mode _make_test_img $size | _filter_imgfmt
+-    stat -c "size=%s, blocks=%b" $TEST_IMG
++    $QEMU_IMG map -f $IMGFMT --output json "$TEST_IMG"
+ done
+
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+
+It almost works:
+$ ./check -raw 175
+QEMU          --
+"/home/nsoffer/src/qemu/build/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64"
+-nodefaults -machine accel=qtest
+QEMU_IMG      --
+"/home/nsoffer/src/qemu/build/tests/qemu-iotests/../../qemu-img"
+QEMU_IO       --
+"/home/nsoffer/src/qemu/build/tests/qemu-iotests/../../qemu-io"  --cache
+writeback -f raw
+QEMU_NBD      --
+"/home/nsoffer/src/qemu/build/tests/qemu-iotests/../../qemu-nbd"
+IMGFMT        -- raw
+IMGPROTO      -- file
+PLATFORM      -- Linux/x86_64 lean 5.0.11-100.fc28.x86_64
+TEST_DIR      -- /home/nsoffer/src/qemu/build/tests/qemu-iotests/scratch
+SOCKET_SCM_HELPER --
+/home/nsoffer/src/qemu/build/tests/qemu-iotests/socket_scm_helper
+
+175         - output mismatch (see 175.out.bad)
+--- /home/nsoffer/src/qemu/tests/qemu-iotests/175.out 2019-03-23
+18:35:17.788177871 +0200
++++ /home/nsoffer/src/qemu/build/tests/qemu-iotests/175.out.bad 2019-05-11
+00:06:09.515873624 +0300
+@@ -2,17 +2,17 @@
+
+ == creating image with default preallocation ==
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+-size=1048576, blocks=0
++[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": false,
+"offset": 0}]
+
+ == creating image with preallocation off ==
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=off
+-size=1048576, blocks=0
++[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": false,
+"offset": 0}]
+
+ == creating image with preallocation full ==
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=full
+-size=1048576, blocks=2048
++[{ "start": 0, "length": 1048576, "depth": 0, "zero": false, "data": true,
+"offset": 0}]
+
+ == creating image with preallocation falloc ==
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+preallocation=falloc
+-size=1048576, blocks=2048
++[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": false,
+"offset": 0}]
+The "falloc" test looks exactly like "off", qemu-img map does not report
+the allocation
+status.
+Nir
