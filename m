@@ -2,66 +2,86 @@ Return-Path: <SRS0=nJ0+=TL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACDBAC04AB1
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 08:39:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85BA1C04AB1
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 12:48:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42C4A217D6
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 08:39:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42C4A217D6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 49A0121841
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 12:48:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hYbCclxo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49A0121841
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55996 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58468 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hPNXN-0005sx-5u
-	for qemu-devel@archiver.kernel.org; Sat, 11 May 2019 04:39:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48145)
+	id 1hPRQ3-0006IL-GD
+	for qemu-devel@archiver.kernel.org; Sat, 11 May 2019 08:48:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhengxiang9@huawei.com>) id 1hPNWZ-0005YG-Gi
-	for qemu-devel@nongnu.org; Sat, 11 May 2019 04:38:33 -0400
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hPRPD-0005zj-Qd
+	for qemu-devel@nongnu.org; Sat, 11 May 2019 08:47:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhengxiang9@huawei.com>) id 1hPNWX-0001HI-MY
-	for qemu-devel@nongnu.org; Sat, 11 May 2019 04:38:31 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2267 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
-	id 1hPNWQ-00017p-PW; Sat, 11 May 2019 04:38:24 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
-	by Forcepoint Email with ESMTP id 65C1429B63FE61EA5D61;
-	Sat, 11 May 2019 16:38:15 +0800 (CST)
-Received: from [127.0.0.1] (10.177.29.32) by DGGEMS406-HUB.china.huawei.com
-	(10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Sat, 11 May 2019
-	16:38:08 +0800
-To: Markus Armbruster <armbru@redhat.com>
-References: <20190505070059.4664-1-zhengxiang9@huawei.com>
-	<87a7fyb0v7.fsf@dusky.pond.sub.org>
-	<72adbed8-f650-42df-98d5-e98154baec08@redhat.com>
-	<87h8a513sl.fsf@dusky.pond.sub.org>
-	<fb04cdb2-910d-58be-fb21-db7050cdc669@huawei.com>
-	<87ef574z4e.fsf@dusky.pond.sub.org>
-	<ac4ac85f-67ae-a526-9172-fef190fdc23a@huawei.com>
-	<87ef56mjbi.fsf@dusky.pond.sub.org>
-From: Xiang Zheng <zhengxiang9@huawei.com>
-Message-ID: <bfa0d642-e425-f90c-f776-9e7e25e66c25@huawei.com>
-Date: Sat, 11 May 2019 16:36:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
-	Thunderbird/64.0
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hPRPC-0006E7-Oy
+	for qemu-devel@nongnu.org; Sat, 11 May 2019 08:47:11 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:45964)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1hPRPC-0006DU-I6
+	for qemu-devel@nongnu.org; Sat, 11 May 2019 08:47:10 -0400
+Received: by mail-oi1-x244.google.com with SMTP id w144so881830oie.12
+	for <qemu-devel@nongnu.org>; Sat, 11 May 2019 05:47:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+	:cc; bh=hgG7cQlxNr5O/sNft0LqiL5+KSA7wdJgK4jTSKQjL1E=;
+	b=hYbCclxoCalDUEVpvtIVpeNA6RjpVxIDVRt0hn8m+a5XCBjBUdkBYJrO5OWceFigwd
+	tO5xrle5rhspu1IG0lho009sHb4qqO+Ia2iU3pM++/z4SDkTF1wNHF60KP2JsnvuHDOl
+	yrvmgF/Mpyovsn/34Ak1/+I3UA1RjY/YjRp/lrxwpprN+io4QqhcbzyEhiLsX13iY4wR
+	poBkTsxHhKiE9l9K7/upgli1EWC9S0k+S5a+HRdMZLzWQ0lki/K5OpU5HWsq+6BXKOnC
+	Rqz76WKwh3KB7cMNYbuTinSme4byNGplOTrFs0aiM1HGAZkUGkGHjRcTOvu6iD79jdgB
+	ovKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+	:message-id:subject:to:cc;
+	bh=hgG7cQlxNr5O/sNft0LqiL5+KSA7wdJgK4jTSKQjL1E=;
+	b=J2Z/DQKDBp0AS66TAsCKwFYnYrUL4KPkeGmawWJUc/JfMqFhBYs3ikAzM5Z03duiVM
+	CfvgL/XyoJRvZnzJnFSA28b4FWAzcsfc5sgRGmjVL6QlMVkzJPp8UGkcM7a2I1OpGYgd
+	Y0Fho9TpzGc9Z3eDZoSF5wYz+OccDFDhV4Pd9IoNACIOxhu5S/TxukTV1A3rzIJr8yzH
+	QwAfL30dQXevTLMy3sTjwQ6zuqzUx14JPn0s1vtnysAp6cItZe0SdVjqSrNd5FpD7EcS
+	x/McgVHfdc/L2MQx3SPgM75U5ZvMs+hmgr7M93q5coZRWGvZzPc2rR3r2PdB0Bnbo6Kg
+	10xw==
+X-Gm-Message-State: APjAAAWWipb5tFvGj37fyfiEgXtwVMTyj7v6aPSYDWNxwdGIX0ZDPr7b
+	A2oc5SN5HwT8n9TjV55jW9zGiRzjb2+Kiq+b97g=
+X-Google-Smtp-Source: APXvYqzb6CQziAf7ZXD9DxScHY3zX6/RUFy5ZLdF6us5ALCAeJOQq+jHGUYmyEqk/FUvj6yyo7WN9Wp2FY7WiGxRKp4=
+X-Received: by 2002:aca:6086:: with SMTP id u128mr7539306oib.79.1557578828713; 
+	Sat, 11 May 2019 05:47:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87ef56mjbi.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.177.29.32]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.191
-Subject: Re: [Qemu-devel] [PATCH] pflash: Only read non-zero parts of
- backend image
+Received: by 2002:a9d:3be5:0:0:0:0:0 with HTTP; Sat, 11 May 2019 05:47:07
+	-0700 (PDT)
+Received: by 2002:a9d:3be5:0:0:0:0:0 with HTTP; Sat, 11 May 2019 05:47:07
+	-0700 (PDT)
+In-Reply-To: <20190510203452.11870-1-richard.henderson@linaro.org>
+References: <20190510203452.11870-1-richard.henderson@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Sat, 11 May 2019 14:47:07 +0200
+Message-ID: <CAL1e-=hE4zMwDewsbD6=Kc32Ss9wcB-AyOtY-G=HhDKS9YMOoQ@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::244
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH] configure: Disable slirp if
+ --disable-system
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,233 +93,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org,
-	ard.biesheuvel@linaro.org, qemu-devel@nongnu.org,
-	mreitz@redhat.com, stefanha@redhat.com, guoheyi@huawei.com,
-	wanghaibin.wang@huawei.com, Laszlo Ersek <lersek@redhat.com>
+Cc: samuel.thibault@ens-lyon.org, qemu-devel@nongnu.org,
+	marcandre.lureau@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On May 10, 2019 10:36 PM, "Richard Henderson" <richard.henderson@linaro.org=
+>
+wrote:
+>
+> For linux-user, there is no need to add slirp to the set of
+> git modules checked out, nor build it.
+>
+> This also avoids a makefile bug wrt insufficient dependencies
+> on subdir-slirp.  If slirp/ is not initially present, the
+> dependencies that check it out are associated with softmmu,
+> which then generates a build error on slirp/ not present.
+>
 
-On 2019/5/10 23:16, Markus Armbruster wrote:
-> Xiang Zheng <zhengxiang9@huawei.com> writes:
-> 
->> On 2019/5/9 19:59, Markus Armbruster wrote:
->>> Xiang Zheng <zhengxiang9@huawei.com> writes:
->>>
->>>> On 2019/5/8 21:20, Markus Armbruster wrote:
->>>>> Laszlo Ersek <lersek@redhat.com> writes:
->>>>>
->>>>>> Hi Markus,
->>>>>>
->>>>>> On 05/07/19 20:01, Markus Armbruster wrote:
->>>>>>> The subject is slightly misleading.  Holes read as zero.  So do
->>>>>>> non-holes full of zeroes.  The patch avoids reading the former, but
->>>>>>> still reads the latter.
->>>>>>>
->>>>>>> Xiang Zheng <zhengxiang9@huawei.com> writes:
->>>>>>>
->>>>>>>> Currently we fill the memory space with two 64MB NOR images when
->>>>>>>> using persistent UEFI variables on virt board. Actually we only use
->>>>>>>> a very small(non-zero) part of the memory while the rest significant
->>>>>>>> large(zero) part of memory is wasted.
->>>>>>>
->>>>>>> Neglects to mention that the "virt board" is ARM.
->>>>>>>
->>>>>>>> So this patch checks the block status and only writes the non-zero part
->>>>>>>> into memory. This requires pflash devices to use sparse files for
->>>>>>>> backends.
->>>>>>>
->>>>>>> I started to draft an improved commit message, but then I realized this
->>>>>>> patch can't work.
->>>>>>>
->>>>>>> The pflash_cfi01 device allocates its device memory like this:
->>>>>>>
->>>>>>>     memory_region_init_rom_device(
->>>>>>>         &pfl->mem, OBJECT(dev),
->>>>>>>         &pflash_cfi01_ops,
->>>>>>>         pfl,
->>>>>>>         pfl->name, total_len, &local_err);
->>>>>>>
->>>>>>> pflash_cfi02 is similar.
->>>>>>>
->>>>>>> memory_region_init_rom_device() calls
->>>>>>> memory_region_init_rom_device_nomigrate() calls qemu_ram_alloc() calls
->>>>>>> qemu_ram_alloc_internal() calls g_malloc0().  Thus, all the device
->>>>>>> memory gets written to even with this patch.
->>>>>>
->>>>>> As far as I can see, qemu_ram_alloc_internal() calls g_malloc0() only to
->>>>>> allocate the the new RAMBlock object called "new_block". The actual
->>>>>> guest RAM allocation occurs inside ram_block_add(), which is also called
->>>>>> by qemu_ram_alloc_internal().
->>>>>
->>>>> You're right.  I should've read more attentively.
->>>>>
->>>>>> One frame outwards the stack, qemu_ram_alloc() passes NULL to
->>>>>> qemu_ram_alloc_internal(), for the 4th ("host") parameter. Therefore, in
->>>>>> qemu_ram_alloc_internal(), we set "new_block->host" to NULL as well.
->>>>>>
->>>>>> Then in ram_block_add(), we take the (!new_block->host) branch, and call
->>>>>> phys_mem_alloc().
->>>>>>
->>>>>> Unfortunately, "phys_mem_alloc" is a function pointer, set with
->>>>>> phys_mem_set_alloc(). The phys_mem_set_alloc() function is called from
->>>>>> "target/s390x/kvm.c" (setting the function pointer to
->>>>>> legacy_s390_alloc()), so it doesn't apply in this case. Therefore we end
->>>>>> up calling the default qemu_anon_ram_alloc() function, through the
->>>>>> funcptr. (I think anyway.)
->>>>>>
->>>>>> And qemu_anon_ram_alloc() boils down to mmap() + MAP_ANONYMOUS, in
->>>>>> qemu_ram_mmap(). (Even on PPC64 hosts, because qemu_anon_ram_alloc()
->>>>>> passes (-1) for "fd".)
->>>>>>
->>>>>> I may have missed something, of course -- I obviously didn't test it,
->>>>>> just speculated from the source.
->>>>>
->>>>> Thanks for your sleuthing!
->>>>>
->>>>>>> I'm afraid you neglected to test.
->>>>>
->>>>> Accusation actually unsupported.  I apologize, and replace it by a
->>>>> question: have you observed the improvement you're trying to achieve,
->>>>> and if yes, how?
->>>>>
->>>>
->>>> Yes, we need to create sparse files as the backing images for pflash device.
->>>> To create sparse files like:
->>>>
->>>>    dd of="QEMU_EFI-pflash.raw" if="/dev/zero" bs=1M seek=64 count=0
->>>>    dd of="QEMU_EFI-pflash.raw" if="QEMU_EFI.fd" conv=notrunc
->>>
->>> This creates a copy of firmware binary QEMU_EFI.fd padded with a hole to
->>> 64MiB.
->>>
->>>>    dd of="empty_VARS.fd" if="/dev/zero" bs=1M seek=64 count=0
->>>
->>> This creates the varstore as a 64MiB hole.  As far as I know (very
->>> little), you should use the varstore template that comes with the
->>> firmware binary.
->>>
->>> I use
->>>
->>>     cp --sparse=always bld/pc-bios/edk2-arm-vars.fd .
->>>     cp --sparse=always bld/pc-bios/edk2-aarch64-code.fd .
->>>
->>> These guys are already zero-padded, and I use cp to sparsify.
->>>
->>>> Start a VM with below commandline:
->>>>
->>>>     -drive file=/usr/share/edk2/aarch64/QEMU_EFI-pflash.raw,if=pflash,format=raw,unit=0,readonly=on\
->>>>     -drive file=/usr/share/edk2/aarch64/empty_VARS.fd,if=pflash,format=raw,unit=1 \
->>>>
->>>> Then observe the memory usage of the qemu process (THP is on).
->>>>
->>>> 1) Without this patch:
->>>> # cat /proc/`pidof qemu-system-aarch64`/smaps | grep AnonHugePages: | grep -v ' 0 kB'
->>>> AnonHugePages:    706560 kB
->>>> AnonHugePages:      2048 kB
->>>> AnonHugePages:     65536 kB    // pflash memory device
->>>> AnonHugePages:     65536 kB    // pflash memory device
->>>> AnonHugePages:      2048 kB
->>>>
->>>> # ps aux | grep qemu-system-aarch64
->>>> RSS: 879684
->>>>
->>>> 2) After applying this patch:
->>>> # cat /proc/`pidof qemu-system-aarch64`/smaps | grep AnonHugePages: | grep -v ' 0 kB'
->>>> AnonHugePages:    700416 kB
->>>> AnonHugePages:      2048 kB
->>>> AnonHugePages:      2048 kB    // pflash memory device
->>>> AnonHugePages:      2048 kB    // pflash memory device
->>>> AnonHugePages:      2048 kB
->>>>
->>>> # ps aux | grep qemu-system-aarch64
->>>> RSS: 744380
->>>
->>> Okay, this demonstrates the patch succeeds at mapping parts of the
->>> pflash memory as holes.
->>>
->>> Do the guests in these QEMU processes run?
->>
->> Yes.
-> 
-> Good to know, thanks.
-> 
->>>> Obviously, there are at least 100MiB memory saved for each guest.
->>>
->>> For a definition of "memory".
->>>
->>> Next question: what impact on system performance do you observe?
->>>
->>> Let me explain.
->>>
->>> Virtual memory holes get filled in by demand paging on access.  In other
->>> words, they remain holes only as long as nothing accesses the memory.
->>>
->>> Without your patch, we allocate pages at image read time and fill them
->>> with zeroes. If we don't access them again, the kernel will eventually
->>> page them out (assuming you're running with swap).  So the steady state
->>> is "we waste some swap space", not "we waste some physical RAM".
->>>
->>
->> Not everybody wants to run with swap because it may cause low performance.
-> 
-> Someone running without swap because he heard someone say someone said
-> swap may be slow is probably throwing away performance.
-> 
-> But I assume you mean people running without swap because they measured
-> their workload and found it more performant without swap.  Legitimate.
+Hi,
 
-Yes, and I had ever suffered from the high IO waits with swap.:)
-
-> 
->>> Your patch lets us map pflash memory pages containing only zeros as
->>> holes.
->>>
->>> For pages that never get accessed, your patch avoids page allocation,
->>> filling with zeroes, writing to swap (all one-time costs), and saves
->>> some swap space (not commonly an issue).
->>>
->>> For pflash memory that gets accessed, your patch merely delays page
->>> allocation from image read time to first access.
->>>
->>> I wonder how these savings and delays affect actual system performance.
->>> Without an observable change in system performance, all we'd accomplish
->>> is changing a bunch of numers in /proc/$pid/.
->>>
->>> What improvement(s) can you observe?
->>
->> We only use pflash device for UEFI, and we hardly care about the performance.
->> I think the bottleneck of the performance is the MMIO emulation, even this
->> patch would delay page allocation at the first access.
-> 
-> I wasn't inquiring about the performance of the pflash device.  I was
-> inquiring about *system* performance.  But let me rephrase my question.
-> 
-> Doing work to save resources is only worthwhile if something valuable
-> gets better in a measurable way.  I'm asking you
-> 
-> (1) to explain what exactly you value, and 
-> 
-> (2) to provide measurements that show improvement.
-> 
-
-What we exactly value is the cost of memory resources and it is the only
-thing that this patch aims to resolve.
-
-I am confused that why you think it will impact the system performance? Did I
-neglect something?
-
->>> I guess the best case for your patch is many guests with relatively
->>> small RAM sizes.
-> 
-> .
-> 
--- 
+Does this work if only user mode targets are specified via =CB=8A--target-l=
+ist=CB=8A
+switch? If no, the patch shoud be amended. If yes, the commit message
+should be extended.
 
 Thanks,
-Xiang
+Aleksandar
 
-
-
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  configure | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/configure b/configure
+> index 63f312bd1f..9de7e43a80 100755
+> --- a/configure
+> +++ b/configure
+> @@ -5878,6 +5878,10 @@ fi
+>  ##########################################
+>  # check for slirp
+>
+> +if test "$softmmu" =3D "no"; then
+> +    slirp=3Dno
+> +fi
+> +
+>  case "$slirp" in
+>    "" | yes)
+>      if $pkg_config slirp; then
+> --
+> 2.17.1
+>
+>
