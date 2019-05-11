@@ -2,72 +2,112 @@ Return-Path: <SRS0=nJ0+=TL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D55CC04AB1
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 06:05:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58BA0C04AB1
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 06:06:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48B1C2173B
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 06:05:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48B1C2173B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 2C9112173B
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 06:06:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C9112173B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54828 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54830 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hPL8r-00088P-6B
-	for qemu-devel@archiver.kernel.org; Sat, 11 May 2019 02:05:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56310)
+	id 1hPL96-0008Lt-Fp
+	for qemu-devel@archiver.kernel.org; Sat, 11 May 2019 02:06:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hPL7l-0007Fe-GP
-	for qemu-devel@nongnu.org; Sat, 11 May 2019 02:04:46 -0400
+	(envelope-from <thuth@redhat.com>) id 1hPL7w-0007RP-AM
+	for qemu-devel@nongnu.org; Sat, 11 May 2019 02:04:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hPKu8-00013T-1m
-	for qemu-devel@nongnu.org; Sat, 11 May 2019 01:50:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49682)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hPKu4-00011J-Ri
-	for qemu-devel@nongnu.org; Sat, 11 May 2019 01:50:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hPKu2-0008A1-MA
-	for <qemu-devel@nongnu.org>; Sat, 11 May 2019 05:50:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5EA082E80CB
-	for <qemu-devel@nongnu.org>; Sat, 11 May 2019 05:50:34 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1hPKsD-0006VQ-6Y
+	for qemu-devel@nongnu.org; Sat, 11 May 2019 01:48:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45760)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hPKsC-0006Um-V8
+	for qemu-devel@nongnu.org; Sat, 11 May 2019 01:48:41 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 802233082206;
+	Sat, 11 May 2019 05:48:39 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-38.ams2.redhat.com [10.36.116.38])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0282B5E7AC;
+	Sat, 11 May 2019 05:48:35 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190510203452.11870-1-richard.henderson@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <d8ede866-6615-92d8-d2a8-f0a94b75df72@redhat.com>
+Date: Sat, 11 May 2019 07:48:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 11 May 2019 05:43:42 -0000
-From: Thomas Huth <1828507@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: ppc
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: asurati
-X-Launchpad-Bug-Reporter: Amol Surati (asurati)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <155746816636.22030.3977137421670178751.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155755342283.26633.8014043887418027832.launchpad@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18962";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: d4b96bb60dcc2214d4832cbb73c089f367341bbc
+In-Reply-To: <20190510203452.11870-1-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Sat, 11 May 2019 05:48:39 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1828507] Re: qemu-system-ppc64 smp crash on
- manual reset
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] configure: Disable slirp if
+ --disable-system
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,76 +116,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1828507 <1828507@bugs.launchpad.net>
+Cc: marcandre.lureau@redhat.com, samuel.thibault@ens-lyon.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags added: ppc
+On 10/05/2019 22.34, Richard Henderson wrote:
+> For linux-user, there is no need to add slirp to the set of
+> git modules checked out, nor build it.
+> 
+> This also avoids a makefile bug wrt insufficient dependencies
+> on subdir-slirp.  If slirp/ is not initially present, the
+> dependencies that check it out are associated with softmmu,
+> which then generates a build error on slirp/ not present.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  configure | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/configure b/configure
+> index 63f312bd1f..9de7e43a80 100755
+> --- a/configure
+> +++ b/configure
+> @@ -5878,6 +5878,10 @@ fi
+>  ##########################################
+>  # check for slirp
+>  
+> +if test "$softmmu" = "no"; then
+> +    slirp=no
+> +fi
 
--- =
+Maybe also check that the user did not try to run configure with both,
+--disable-system and --enable-slirp? I.e. that $slirp != "yes" ?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1828507
-
-Title:
-  qemu-system-ppc64 smp crash on manual reset
-
-Status in QEMU:
-  New
-
-Bug description:
-  Host Environment:
-     x86_64 Linux v5.0.2
-     QEMU emulator version 4.0.50 (v4.0.0-354-g812b835fb4)
-     SLOF:
-         Build Date =3D Jan 14 2019 18:00:39
-         FW Version =3D git-a5b428e1c1eae703
-
-  Problem: Qemu crash immediately after a manual reset
-           (this is not the initial reset which launches the guest).
-
-  Steps:
-
-  1. Download Debian ppc64el mini.iso:
-     http://ftp.debian.org/debian/dists/sid/main/installer-ppc64el/current/=
-images/netboot/mini.iso
-  2. Run qemu on the host. Ensure that it runs with more than one CPUs. Wit=
-h a single CPU, I was unable
-     to reproduce the crash.
-     qemu-system-ppc64 -M pseries -cpu power9 -smp 2 -m 512 -cdrom mini.iso
-  3. SLOF prints the version info on the serial device, and proceeds to boo=
-t.
-  4. After a few seconds, the GRUB menu appears on the VGA screen.
-  5. Select one of the install options (I have tested with Default and Expe=
-rt), and wait
-     for the Debian's text-mode installer (blue-gray-red) screen to appear.
-  6. Click Machine->Reset (or enter system_reset on the qemu monitor).
-  7. Notice that, on the serial device, SLOF has printed the version info. =
-That is, the system
-     has reset and is attempting to boot again.
-  8. On the host cmd prompt, qemu dies after printing this fatal error and =
-spewing the
-     contents of the CPU registers:
-
-     qemu: fatal: Trying to deliver HV exception (MSR) 70 with no HV support
-     <CPU contents> (See attached out.txt for details)
-     Aborted (core dumped)
-
-  =
-
-  The HV exception is either
-     (a) 70 =3D HISI, which occurs when NIP contains an outright bogus or i=
-naccessible value, or
-     (b) 69 =3D HDSI, which occurs when NIP happens to contain a somewhat s=
-aner value, and
-         the cpu attempts to run the instruction at that address.
-
-  The exception can occur on either of the CPUs. It occurs when qemu is run=
-ning the SLOF
-  code.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1828507/+subscriptions
+ Thomas
 
