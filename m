@@ -2,47 +2,49 @@ Return-Path: <SRS0=nJ0+=TL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58BA0C04AB1
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 06:06:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B20A0C04AB1
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 06:16:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C9112173B
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 06:06:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C9112173B
+	by mail.kernel.org (Postfix) with ESMTPS id 80318216C4
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 06:16:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80318216C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54830 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54917 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hPL96-0008Lt-Fp
-	for qemu-devel@archiver.kernel.org; Sat, 11 May 2019 02:06:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56433)
+	id 1hPLIy-0003ai-3d
+	for qemu-devel@archiver.kernel.org; Sat, 11 May 2019 02:16:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hPL7w-0007RP-AM
-	for qemu-devel@nongnu.org; Sat, 11 May 2019 02:04:57 -0400
+	(envelope-from <thuth@redhat.com>) id 1hPLI9-0003Gi-Kw
+	for qemu-devel@nongnu.org; Sat, 11 May 2019 02:15:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hPKsD-0006VQ-6Y
-	for qemu-devel@nongnu.org; Sat, 11 May 2019 01:48:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45760)
+	(envelope-from <thuth@redhat.com>) id 1hPLI7-0008CF-8b
+	for qemu-devel@nongnu.org; Sat, 11 May 2019 02:15:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54972)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hPKsC-0006Um-V8
-	for qemu-devel@nongnu.org; Sat, 11 May 2019 01:48:41 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hPLI5-00086I-PC; Sat, 11 May 2019 02:15:26 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 802233082206;
-	Sat, 11 May 2019 05:48:39 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A539A30842D1;
+	Sat, 11 May 2019 06:15:23 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-38.ams2.redhat.com [10.36.116.38])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0282B5E7AC;
-	Sat, 11 May 2019 05:48:35 +0000 (UTC)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190510203452.11870-1-richard.henderson@linaro.org>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1BB2F619A6;
+	Sat, 11 May 2019 06:15:21 +0000 (UTC)
+To: Christian Borntraeger <borntraeger@de.ibm.com>, cohuck@redhat.com,
+	qemu-s390x@nongnu.org
+References: <20190508094857.21145-1-thuth@redhat.com>
+	<20190508094857.21145-3-thuth@redhat.com>
+	<04ebd3c0-34e2-d21c-2b04-616d52056a86@de.ibm.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -88,23 +90,23 @@ Autocrypt: addr=thuth@redhat.com; keydata=
 	rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
 	WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <d8ede866-6615-92d8-d2a8-f0a94b75df72@redhat.com>
-Date: Sat, 11 May 2019 07:48:34 +0200
+Message-ID: <3c34e021-9bc5-08c0-2aad-f643470fe35f@redhat.com>
+Date: Sat, 11 May 2019 08:15:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190510203452.11870-1-richard.henderson@linaro.org>
+In-Reply-To: <04ebd3c0-34e2-d21c-2b04-616d52056a86@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Sat, 11 May 2019 05:48:39 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Sat, 11 May 2019 06:15:23 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] configure: Disable slirp if
- --disable-system
+Subject: Re: [Qemu-devel] [qemu-s390x] [PULL SUBSYSTEM s390x 2/3] s390-bios:
+ Skip bootmap signature entries
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -116,39 +118,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, samuel.thibault@ens-lyon.org
+Cc: jjherne@linux.ibm.com, qemu-devel@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/05/2019 22.34, Richard Henderson wrote:
-> For linux-user, there is no need to add slirp to the set of
-> git modules checked out, nor build it.
-> 
-> This also avoids a makefile bug wrt insufficient dependencies
-> on subdir-slirp.  If slirp/ is not initially present, the
-> dependencies that check it out are associated with softmmu,
-> which then generates a build error on slirp/ not present.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  configure | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/configure b/configure
-> index 63f312bd1f..9de7e43a80 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5878,6 +5878,10 @@ fi
->  ##########################################
->  # check for slirp
->  
-> +if test "$softmmu" = "no"; then
-> +    slirp=no
-> +fi
+On 10/05/2019 15.59, Christian Borntraeger wrote:
+> Shall we cc stable this?
 
-Maybe also check that the user did not try to run configure with both,
---disable-system and --enable-slirp? I.e. that $slirp != "yes" ?
+I think I'd rather not do it unless someone really speaks up that they
+urgently need it. If we could use the binary from the master branch, I'd
+say go for it, but in this case we'd need to build a separate
+s390-ccw.img for this (without the DASD passthrough patches), and since
+the stable branch does not get that much testing attention from all the
+s390x developers, you'd end up with a firmware binary in the stable
+branch that is not very well tested... This does not sound very
+appealing to me.
 
  Thomas
 
