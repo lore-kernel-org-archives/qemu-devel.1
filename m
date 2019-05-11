@@ -2,91 +2,93 @@ Return-Path: <SRS0=nJ0+=TL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86C3CC04AB1
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 17:37:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00102C04AB1
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 18:05:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36B6E2183F
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 17:37:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACE95216C4
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 18:05:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mCVBYaRG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36B6E2183F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ft1lIHnu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACE95216C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33568 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33843 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hPVwX-0007ls-Eu
-	for qemu-devel@archiver.kernel.org; Sat, 11 May 2019 13:37:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35030)
+	id 1hPWNN-00063X-Rx
+	for qemu-devel@archiver.kernel.org; Sat, 11 May 2019 14:05:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1hPVuf-00064F-HB
-	for qemu-devel@nongnu.org; Sat, 11 May 2019 13:35:58 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hPWMO-0005bV-5j
+	for qemu-devel@nongnu.org; Sat, 11 May 2019 14:04:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1hPVgg-0008I7-6e
-	for qemu-devel@nongnu.org; Sat, 11 May 2019 13:21:31 -0400
-Received: from mail-it1-x144.google.com ([2607:f8b0:4864:20::144]:35607)
+	(envelope-from <alex.bennee@linaro.org>) id 1hPWMM-0002Rc-WA
+	for qemu-devel@nongnu.org; Sat, 11 May 2019 14:04:36 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39284)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1hPVgg-0008Hr-20
-	for qemu-devel@nongnu.org; Sat, 11 May 2019 13:21:30 -0400
-Received: by mail-it1-x144.google.com with SMTP id u186so14241191ith.0
-	for <qemu-devel@nongnu.org>; Sat, 11 May 2019 10:21:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:subject:from:in-reply-to:date:cc
-	:content-transfer-encoding:message-id:references:to;
-	bh=/OifHYoeKQau5UtsD7K3eTkae4+wBLh8zoKgk6VfuTo=;
-	b=mCVBYaRGbPCxOQxni/yHlrpDZWfjAyDrvSNpQtlvKT2glbHH+B/S7MuYJligcz2D+K
-	muI931T/Ktk8FCcDWY5u63Us+SLljrBodxBo/4u0u5QBQzhlzYn5hyChlooZSAURdgv4
-	JJV0WmlLyxOlnxJkRUBGnOYsS/AYOjW+bBJXVb1sUo1YTRZWDL6a7K5hhugRkzNUwoV9
-	aVycl6slTkRISo9X06KCj4UCgQu5D408EwlXZeisNhqzKZjiD8C0Ud6PM1vnZnJ6GchP
-	N1xIMJoFBK2L6tRyGq1Zn8voXj8uY40OEqvTCxU7G7Id/bVxBQDNnA83hxJXfhmRVqLU
-	1dqg==
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hPWMM-0002QH-Mq
+	for qemu-devel@nongnu.org; Sat, 11 May 2019 14:04:34 -0400
+Received: by mail-wr1-x442.google.com with SMTP id w8so8574494wrl.6
+	for <qemu-devel@nongnu.org>; Sat, 11 May 2019 11:04:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=ZkvUf5Hj12cIlJwyquElwcTj+b6mH1VKWrPlAIcigaE=;
+	b=ft1lIHnuvXKvWiQP0cqIptIPULMeaQxL2tkqyoA5PNXDXj5QPtyKOZz+yN30sS6tSz
+	Us/1W2cE3HNyy0V5OpF4kWH81mtE0uSMvRF3/vpPgPZL7fY9MkrBI2l1s/tVjTivnt5v
+	S2uKjzHPisTwWUOv7GxYDRdIOm3CPNrJoadB7xXz3/P8Yg1dnRk2/Su5K/ZtW8gLHrLA
+	Xx0BgXGV4NCxD0nNI9bfuWXCPAhB2oB0JiZ9USwkd7ebCVu8p39yt8zvQjbQLpaq0DOZ
+	AvsZn0loFDFUiJMF6Qi4r1ACpgk+RspkwGxwicpPVlfeBMYtaoPkYaxhyggZQolvuzHk
+	SLeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-	:content-transfer-encoding:message-id:references:to;
-	bh=/OifHYoeKQau5UtsD7K3eTkae4+wBLh8zoKgk6VfuTo=;
-	b=K2R/b+ib4DUo/L7eS5W6kyQ31uZRXpdqWQr2yRq2zzeo/Nro8oogvO//BgNtnErlkf
-	wjCIBRl/TmyLTdwvBq4xCT+k31hxHBxRj1o7lieMCr4xmyuKVgzYztMANvEdZc9YIfYb
-	t3x2zdwn/HMAhRSk5SBDfppBnU3g1FLFGEot0ja4tH+oAVfVONPKAlK0f1kYMM1AcSsl
-	5RwC06clDJfvHeCDeXQs4UTVIz1ugV55161HmdScIAKz/hylKzXrLG7n5ERoUj6G8Iis
-	n09thQidwuCjpbK50I7VyXoSHCFPPScB2OWR9FFSgDSi7KPleI9No4G0dG0iGEZ5dR0O
-	sa2g==
-X-Gm-Message-State: APjAAAXqVJ7i0lkh9jnvGQz/1RK9zKulIaeQkxq/yQmLb9zlkg9Hvmac
-	btZK78wevBzs2FEycSLbyu4=
-X-Google-Smtp-Source: APXvYqxtz/beoD55luz4G9PT2HiWHjAb5e3y/QglLGq9uEjjRiFj8EaHdR9ufCKVCxcuyGs9TsO+Ag==
-X-Received: by 2002:a24:6d2:: with SMTP id 201mr12239631itv.75.1557595288692; 
-	Sat, 11 May 2019 10:21:28 -0700 (PDT)
-Received: from [192.168.0.2] (d14-69-20-184.try.wideopenwest.com.
-	[69.14.184.20])
-	by smtp.gmail.com with ESMTPSA id c3sm2632238iob.80.2019.05.11.10.21.27
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sat, 11 May 2019 10:21:27 -0700 (PDT)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <1c4c309a-b785-64d2-60ce-4f0501fcc415@redhat.com>
-Date: Sat, 11 May 2019 13:21:25 -0400
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=ZkvUf5Hj12cIlJwyquElwcTj+b6mH1VKWrPlAIcigaE=;
+	b=KRTUeaswGNkVa1eJrJJLbXYkS2WDWumE0bERHIdOOLCRLdi237OG/na4AGG9ACcvEm
+	4YV9VbpJzHi/gq/RH2sjU31sQMvdX+GemSpXy0hA/RF/R5i76XVuA+6TFyWwoiMUA1Ln
+	eM2zZVP4SyiuD/tAcBJPtlhpt1gXDd3Hg05S3YKMj6bEFOqXdRM/UP7iqEiiq+DhMINI
+	ZF3GAIF2aNb6v0tXVRP4yLMwavDYgd3iE7ckNDpGzZUDeTxTIqTdMGKRtNRf3Qcwdzxq
+	pHuZzSOgf6SsW8TAttF9HD9yAPCBr3QNenAPyulahinvPlWjVZDm/qKzBJ9CuetBNVJv
+	QCBQ==
+X-Gm-Message-State: APjAAAVS+s/FzYZn1cezdmA59xKf1h1TiAX7B39yt6o6hB3EziEGIQFo
+	8/iDt1khbV0Nnwm1aRAF2fxr7A==
+X-Google-Smtp-Source: APXvYqx/mHLhaB6fjJwz9lAheUPf7Of+MRBWV4e7EWDEDo3FuzOCv5LWhzYZp2BPXzsmIjgK+6ri2w==
+X-Received: by 2002:adf:eac6:: with SMTP id o6mr3250352wrn.222.1557597872874; 
+	Sat, 11 May 2019 11:04:32 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id r9sm7013765wrv.82.2019.05.11.11.04.31
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Sat, 11 May 2019 11:04:32 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 94F381FF87;
+	Sat, 11 May 2019 19:04:31 +0100 (BST)
+References: <20190509165912.10512-1-alex.bennee@linaro.org>
+	<20190509165912.10512-6-alex.bennee@linaro.org>
+	<CAFEAcA8Dsdp2rnORnzqemWspfFxfhVwkAz=2EXdupo8iDj_=Hw@mail.gmail.com>
+	<87tve2b5z2.fsf@zen.linaroharston>
+	<CAFEAcA9q9n24wZF9nRM=norAK+tPv9LL4LM4-8gwH8F+0D0umw@mail.gmail.com>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+In-reply-to: <CAFEAcA9q9n24wZF9nRM=norAK+tPv9LL4LM4-8gwH8F+0D0umw@mail.gmail.com>
+Date: Sat, 11 May 2019 19:04:31 +0100
+Message-ID: <87k1ewrhow.fsf@zen.linaroharston>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <E694EDDC-BFF1-4BE9-BFCC-43B303DE6BF7@gmail.com>
-References: <20190418224706.14014-1-programmingkidx@gmail.com>
-	<723372ae-a37a-d7cd-098f-452c7513ce8a@redhat.com>
-	<4B73E5E6-2129-43B8-A35E-0CF7DCAE163B@gmail.com>
-	<1c4c309a-b785-64d2-60ce-4f0501fcc415@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-X-Mailer: Apple Mail (2.3273)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::144
-Subject: Re: [Qemu-devel] [PATCH] configure: Change capstone's default state
- to disabled
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH v1 05/23] semihosting: enable chardev
+ backed output
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,192 +100,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
-	=?utf-8?B?IkRhbmllbCBQLiBCZXJyYW5nw6ki?= <berrange@redhat.com>,
-	qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-> On Apr 20, 2019, at 6:40 AM, Thomas Huth <thuth@redhat.com> wrote:
->=20
-> On 19/04/2019 15.44, G 3 wrote:
->>=20
->> On Apr 19, 2019, at 3:10 AM, Thomas Huth wrote:
->>=20
->>> On 19/04/2019 00.47, John Arbuckle wrote:
->>>> Capstone is not necessary in order to use QEMU. Disable it by =
-default.
->>>> This will save the user the pain of having to figure why QEMU isn't
->>>> building when this library is missing.
->>>>=20
->>>> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
->>>> ---
->>>>  configure | 2 +-
->>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>=20
->>>> diff --git a/configure b/configure
->>>> index 1c563a7027..77d7967f92 100755
->>>> --- a/configure
->>>> +++ b/configure
->>>> @@ -433,7 +433,7 @@ opengl_dmabuf=3D"no"
->>>>  cpuid_h=3D"no"
->>>>  avx2_opt=3D""
->>>>  zlib=3D"yes"
->>>> -capstone=3D""
->>>> +capstone=3D"no"
->>>>  lzo=3D""
->>>>  snappy=3D""
->>>>  bzip2=3D""
->>>=20
->>> AFAIK we ship capstone as a submodule, so how can this be missing? =
-Also,
->>> our philosophy is to keep everything enabled by default if possible, =
-so
->>> that the code paths don't bitrot. Thus I don't think that disabling =
-this
->>> by default is a good idea. ... so if you've got a problem here, =
-there
->>> must be another solution (e.g. is the system capstone detection not
->>> working right on your system?).
->>>=20
->>>  Thomas
->>=20
->> Thank you for replying. Capstone comes with QEMU? Every time I try to
->> compile QEMU I see an error relating to Capstone not being on my =
-system.
->> Why do you feel that disabling Capstone by default is not a good =
-idea?
->>=20
->> Here is the error message I see when compiling QEMU:
->>=20
->> CHK version_gen.h
->> make[1]: *** No rule to make target
->> `/Users/John/qemu-git/capstone/libcapstone.a'.  Stop.
->> make: *** [subdir-capstone] Error 2
->=20
-> I assume you're using a git checkout here, right? For git checkouts, =
-the
-> Makefile should take care of calling the scripts/git-submodule.sh =
-script
-> which should initialize the submodule in the capstone directory.
->=20
-> What's the content of your .git-submodule-status file? What does
-> "configure" say about capstone support on your system?
->=20
-> Thomas
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Yes I use a git checkout.
+> On Fri, 10 May 2019 at 17:59, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>>
+>>
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>
+>> > On Thu, 9 May 2019 at 17:59, Alex Benn=C3=A9e <alex.bennee@linaro.org>=
+ wrote:
+>> >>
+>> >> For running system tests we want to be able to re-direct output to a
+>> >> file like we do with serial output. This does the wiring to allow us
+>> >> to treat semihosting like just another character output device.
+>> >>
+>> >> diff --git a/qemu-options.hx b/qemu-options.hx
+>> >> index 51802cbb266..6aa3a08c2fb 100644
+>> >> --- a/qemu-options.hx
+>> >> +++ b/qemu-options.hx
+>> >> @@ -3975,12 +3975,12 @@ STEXI
+>> >>  Enable semihosting mode (ARM, M68K, Xtensa, MIPS, Nios II only).
+>> >>  ETEXI
+>> >>  DEF("semihosting-config", HAS_ARG, QEMU_OPTION_semihosting_config,
+>> >> -    "-semihosting-config [enable=3Don|off][,target=3Dnative|gdb|auto=
+][,arg=3Dstr[,...]]\n" \
+>> >> +    "-semihosting-config [enable=3Don|off][,target=3Dnative|gdb|auto=
+][,chardev=3Did][,arg=3Dstr[,...]]\n" \
+>> >>      "                semihosting configuration\n",
+>> >>  QEMU_ARCH_ARM | QEMU_ARCH_M68K | QEMU_ARCH_XTENSA | QEMU_ARCH_LM32 |
+>> >>  QEMU_ARCH_MIPS | QEMU_ARCH_NIOS2)
+>> >
+>> > As you can see in the docs here, semihosting is supported on
+>> > five guest architectures, so we should implement this new
+>> > feature for all of them, not just arm.
+>>
+>> As I've introduced this for testing I see no reason not to add support
+>> for other architectures. However I was hoping this is something that
+>> could be done organically as other system tests get enabled.
+>
+> IME transitions done "organically" really means "slowly, and
+> nobody ever gets round to actually completing them".
+> Semihosting is a user-facing feature, so if we want to add
+> the user feature of allowing output to go to a chardev we
+> should add it properly, I think.
 
-This is the contents of my .git-submodule-status file:
-#!/bin/sh
-#
-# This code is licensed under the GPL version 2 or later.  See
-# the COPYING file in the top-level directory.
+So a quick review of the current semi output:
 
-substat=3D".git-submodule-status"
+  - MIPS
+    This has a fairly generalised open/read/write support with special
+    handling for open/close on /dev/std[out/err/in]. There is also a
+    UHI_plog which currently just printf's to stdout
 
-command=3D$1
-shift
-maybe_modules=3D"$@"
+  - xtensa
+    This already has support for a sim_console char device as part of
+    the xtensa sim platform. Otherwise the TARGET_SYS_open can open
+    paths directly (which I assume could include stdio) which then
+    read/write.
 
-test -z "$GIT" && GIT=3Dgit
+  - m68k
+    This has the usual open/read/write/close support directly to the
+    FD's as well as support for integrating with the gdbstub via
+    gdb_do_syscall.
 
-error() {
-    echo "$0: $*"
-    echo
-    echo "Unable to automatically checkout GIT submodules '$modules'."
-    echo "If you require use of an alternative GIT binary (for example =
-to"
-    echo "enable use of a transparent proxy), then please specify it by"
-    echo "running configure by with the '--with-git' argument. e.g."
-    echo
-    echo " $ ./configure --with-git=3D'tsocks git'"
-    echo
-    echo "Alternatively you may disable automatic GIT submodule =
-checkout"
-    echo "with:"
-    echo
-    echo " $ ./configure --disable-git-update"
-    echo
-    echo "and then manually update submodules prior to running make, =
-with:"
-    echo
-    echo " $ scripts/git-submodule.sh update $modules"
-    echo
-    exit 1
-}
+  - lm32
+    Although based on the m68k semithosting support it lacks the gdbstub
+    integration. It has the usual open/read/write/close stuff.
 
-modules=3D""
-for m in $maybe_modules
-do
-    $GIT submodule status $m 1> /dev/null 2>&1
-    if test $? =3D 0
-    then
-        modules=3D"$modules $m"
-    else
-        echo "warn: ignoring non-existent submodule $m"
-    fi
-done
+  - NIOS2
+    Again based on the m68k semihosting but looks like it was taken
+    later because it retains the gdbsub integration support.
 
-if test -n "$maybe_modules" && ! test -e ".git"
-then
-    echo "$0: unexpectedly called with submodules but no git checkout =
-exists"
-    exit 1
-fi
+Generally all the other semihosting stuff looks a lot cleaner - probably
+an indication of being done later and avoiding some of the warts of the
+early arm semihosting code.
 
-case "$command" in
-status)
-    if test -z "$maybe_modules"
-    then
-         test -s ${substat} && exit 1 || exit 0
-    fi
+One difference with ARM is it has specific calls aside from the
+open/read/write/close (WRITEC/WRITE0) which are specifically aimed at
+"console" type logging. They don't seem to require an explicit open at
+the start and assume you can write to them from the get go.
 
-    test -f "$substat" || exit 1
-    CURSTATUS=3D$($GIT submodule status $modules)
-    OLDSTATUS=3D$(cat $substat)
-    test "$CURSTATUS" =3D "$OLDSTATUS"
-    exit $?
-    ;;
-update)
-    if test -z "$maybe_modules"
-    then
-        test -e $substat || touch $substat
-        exit 0
-    fi
+One question that would need to be answered is should the chardev
+support be generalised for all semihosts that can read/write to the
+stdio outputs or should we restrict it to the "console" log operations
+(xtensa sim, mips plog and ARM)?
 
-    $GIT submodule update --init $modules 1>/dev/null
-    test $? -ne 0 && error "failed to update modules"
-
-    $GIT submodule status $modules > "${substat}"
-    test $? -ne 0 && error "failed to save git submodule status" >&2
-    ;;
-esac
-
-exit 0
-
-
-
-The Configure command says:
-capstone          git
-
-I did a 'make clean' followed by a 'make distclean'. Then tried building =
-again using this command line:
-
-./configure --target-list=3Dppc-softmmu,i386-softmmu,x86_64-softmmu
-make -j 4
-
-Here is the error message I see:
-
-make[1]: *** No rule to make target =
-`/Users/John/Documents/Development/Projects/Qemu/qemu-git/capstone/libcaps=
-tone.a'.  Stop.
-make: *** [subdir-capstone] Error 2
-
-I took a look at the capstone folder. There is no 'make' file in this =
-folder. Should there be one?
-
-Thank you.=
+--
+Alex Benn=C3=A9e
 
