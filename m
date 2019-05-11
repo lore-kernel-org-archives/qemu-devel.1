@@ -2,88 +2,81 @@ Return-Path: <SRS0=nJ0+=TL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB34EC04A6B
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 00:12:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAB96C04A6B
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 00:41:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F1A7217D7
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 00:12:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 832862175B
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 May 2019 00:41:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FqaSsG8D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F1A7217D7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M7kXoDaS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 832862175B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51803 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52010 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hPFcN-00011G-Ea
-	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 20:11:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42466)
+	id 1hPG5C-0007xO-R0
+	for qemu-devel@archiver.kernel.org; Fri, 10 May 2019 20:41:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hPFbU-0000Qx-Px
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 20:11:05 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1hPG4R-0007Wx-Uc
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 20:41:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hPFbU-0002d7-1R
-	for qemu-devel@nongnu.org; Fri, 10 May 2019 20:11:04 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:35654)
+	(envelope-from <liq3ea@gmail.com>) id 1hPG4Q-0001mq-S1
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 20:40:59 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:41972)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
-	id 1hPFbT-0002cc-Rl; Fri, 10 May 2019 20:11:03 -0400
-Received: by mail-ed1-x542.google.com with SMTP id p26so7421041edr.2;
-	Fri, 10 May 2019 17:11:03 -0700 (PDT)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hPG4Q-0001mR-Me
+	for qemu-devel@nongnu.org; Fri, 10 May 2019 20:40:58 -0400
+Received: by mail-oi1-x243.google.com with SMTP id y10so5755969oia.8
+	for <qemu-devel@nongnu.org>; Fri, 10 May 2019 17:40:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
-	:content-disposition:in-reply-to:user-agent;
-	bh=GA4jyekjY6xXU5QxQG4iMKgvD1YOHe3YtFrceeyDa4g=;
-	b=FqaSsG8D8FnVfT8nSZcZfALbZvbSvx8J3Nwzv3ZwiyklEp0VSK9e4arKfJdQ6Ngvcs
-	6hnb0qBH8fanYwxBbMZhSJ0CIxlOy7oOa6FSVPfHex7bw1LHsg1y/rYXGliJjevDY/vm
-	cnp6VlZp3VWFoaiZHsb0LN0o9MKhO0Wl947+OqVsTFQg/5RwnPiMJFCLx+OuCwHOyoBx
-	yL+sFSnq0iPNzCWKF0+iOKV9LywexGfRsEoxuLKBN13y/7PsEqCFLTPvBfqSmNEyaAMz
-	I+9AOFB6vW0gWGzo+I1k8rTTMIL5bEAsWFxq/jKw4hDZWanZHtJyW3Nu+Ng5sH4VXPao
-	Jw/A==
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=wpdyIx6fw8GcocafXBGJR+mi5onmJJCGWxlKTOW+9cw=;
+	b=M7kXoDaSChDHQyGM/Z0w6BvME3UjnXNAOesbOF5SCt71qPTDeDKQre8P9tntJffASC
+	B+v8WsE+zXAfTO/toWA155+0QL6fdIo9U+dOeCIHhahxpuz0i73hUWD+wgy1PkZS9CuC
+	7iG9snPPp3nCIlS3GL0zNSwKo/jPAxfCChQSz8KOoy2EIpJWcmgmDcK6TC4buZqimDvM
+	teQavb1c1+KGXSY7PIdEVQ3obHWghGrDDThYtmQ/YgH+E5Aq79B0kKUdylJGWNJpj83N
+	Ayvj5gnSwX9WxE8bdW9Yd8JBxqrJ3ajPTsu/kLfzVuujbGOSbo368vHUoYTPBV1PhcVx
+	7HEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
-	:references:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=GA4jyekjY6xXU5QxQG4iMKgvD1YOHe3YtFrceeyDa4g=;
-	b=mjG6hrBTJcUpdbIsTWSUzm1wum3mcjRmo6IaLk/80uWnIu+WJg29Eqj54ZmjghdCUz
-	QrqDhne6mp6fxiqLKmZRBOyNZtzuu1wT54e0+K59CmfQWXgcfxWwy2/cvSIg+8TfNhdD
-	/uic6jg3flKtu7zHeZLslndn9zuzJcsQhcwaJyk9RGnx7UO/N1rDKvx1dMJiUocEpHVa
-	bzCDOcqJoY5kEEmiEOHEWP7kLPV8g+FmtjfixHvRgdhzffkQl4nJZWq0hEJSW/P1HgAk
-	IBGroEhUIQzhZsU4N+DzkKgA/dHoXnMbN+U6hgs6EBMRPkFYoh9EtF7N/kWrdjVXcFVf
-	t9cA==
-X-Gm-Message-State: APjAAAX/hrSFpms1f3ULLlFUhYS18J/728Pow/IU8aswaxLOk8Ck546C
-	H4q3/2uFh9mzEuoQLGZcQPA=
-X-Google-Smtp-Source: APXvYqykI0OTs4kH+e6Rz/og8QU+cJFqA1RsZPFTNQEiPFjrGQ5H5P4h0JvHM7K3MsWXLiU+0OxyVg==
-X-Received: by 2002:a17:906:6408:: with SMTP id
-	d8mr11393182ejm.185.1557533462408; 
-	Fri, 10 May 2019 17:11:02 -0700 (PDT)
-Received: from localhost ([185.92.221.13])
-	by smtp.gmail.com with ESMTPSA id 65sm1819643edk.88.2019.05.10.17.10.58
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 10 May 2019 17:11:01 -0700 (PDT)
-Date: Sat, 11 May 2019 00:10:56 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190511001056.o3owpr3kll4unnic@master>
-References: <20190419003053.8260-1-richardw.yang@linux.intel.com>
-	<20190510212210.4ao2zoikky7jivwc@master>
-	<20190510195932-mutt-send-email-mst@kernel.org>
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=wpdyIx6fw8GcocafXBGJR+mi5onmJJCGWxlKTOW+9cw=;
+	b=No7Xcm3LQ2wkbZzmfmVTpW6manTiIthEnMcA3E/nYCiTuB7493A5aCYhA1EpwFEwjC
+	WrjN0e0pLv4p7O6xkrQabjoXCwZrBU7uGMUv5jRpPvAHqbbUQhqh2U5oylkRLdU6VA4Q
+	SEc/3NPSIuQPjSmDaq1WrpHolRwu2R002VWfw1kAEYI2CGw96iCw2MBSTZhZIi9VU7X9
+	ztn7NACA5hmzYgSI3kUpf9F5DiaJ81PV0hjtw2b2HyQwYNEWnUB3NZ+7ZpuNl6rH5fhQ
+	0q2AFiqVJkywr08X7L7abRIIMwtNFSN0uth5Pj8HR5f+t5GpZU16JFbNT7zm95PLkTQK
+	L0iA==
+X-Gm-Message-State: APjAAAW+8JCVgbmOMU6hIgNQ+aYi6ZF3HDjiLq+fT+lF1kLKHOkL0HYI
+	DV0tB9OcgWrPXlDlMhlrB5G0D8Y8LIvlGVpncRo=
+X-Google-Smtp-Source: APXvYqxoZf2RkHabm5uPrAn6svP20vc0FpeoDBeCASYme+WO+M7G0HvZBnO0ARn10rr9DmiykVs/2k+cVyuLuTku5Dw=
+X-Received: by 2002:aca:1807:: with SMTP id h7mr3007451oih.150.1557535257384; 
+	Fri, 10 May 2019 17:40:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190510195932-mutt-send-email-mst@kernel.org>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <20190510164349.81507-1-liq3ea@163.com>
+	<20190510235318.GO18465@xz-x1>
+In-Reply-To: <20190510235318.GO18465@xz-x1>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Sat, 11 May 2019 08:40:21 +0800
+Message-ID: <CAKXe6S+8yL7=trJqcXmCe+Z+mNabBP-6q3bzW2zEyoen=wM0Kw@mail.gmail.com>
+To: Peter Xu <peterx@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::542
-Subject: Re: [Qemu-devel] [PATCH v4 0/6] Extract build_mcfg
+X-Received-From: 2607:f8b0:4864:20::243
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v4 0/3] hw: edu: some fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,22 +88,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, qemu-devel@nongnu.org,
-	Wei Yang <richard.weiyang@gmail.com>, shannon.zhaosl@gmail.com,
-	qemu-arm@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
-	imammedo@redhat.com, philmd@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
+	Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 10, 2019 at 07:59:43PM -0400, Michael S. Tsirkin wrote:
->I merged this will send pull request soon.
+Peter Xu <peterx@redhat.com> =E4=BA=8E2019=E5=B9=B45=E6=9C=8811=E6=97=A5=E5=
+=91=A8=E5=85=AD =E4=B8=8A=E5=8D=887:53=E5=86=99=E9=81=93=EF=BC=9A
+
+> On Fri, May 10, 2019 at 09:43:46AM -0700, Li Qiang wrote:
+> > Recently I am considering write a driver for edu device.
+>
+> I don't know why you wanted to write it, but there's one (though I
+> don't even remember whether it's working or not)...
+>
+>
+This is a simple device, once I used it to debug and  make clear some
+hardware-related stuff of PCI device,
+such as PCI interrupt routing, interrupt linking device, interrupt raise
+and the process of injecting.
+I think if there is a driver, I can do this inspection more easily.
+
+
+
+>
+> https://github.com/xzpeter/clibs/blob/master/gpl/linux_kernel/edu_device_=
+driver/edu.c
+>
 >
 
-Ah, Thanks :-)
+Great!
 
--- 
-Wei Yang
-Help you, Help me
+Thanks,
+Li Qiang
 
+
+
+> Regards,
+>
+> --
+> Peter Xu
+>
