@@ -2,73 +2,102 @@ Return-Path: <SRS0=55mG=TM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 715FAC04A6B
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 May 2019 04:09:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF93C04A6B
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 May 2019 08:15:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F463208C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 May 2019 04:09:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F463208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4B3E221019
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 May 2019 08:15:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="giWaUyNn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B3E221019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38395 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40287 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hPfnK-0007AQ-7e
-	for qemu-devel@archiver.kernel.org; Sun, 12 May 2019 00:09:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43178)
+	id 1hPje8-00086Q-7l
+	for qemu-devel@archiver.kernel.org; Sun, 12 May 2019 04:15:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hPfmY-0006qW-AV
-	for qemu-devel@nongnu.org; Sun, 12 May 2019 00:08:15 -0400
+	(envelope-from <shmuel.eiderman@oracle.com>) id 1hPjdD-0007b1-6K
+	for qemu-devel@nongnu.org; Sun, 12 May 2019 04:14:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hPfmX-0004mK-B1
-	for qemu-devel@nongnu.org; Sun, 12 May 2019 00:08:14 -0400
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:43953)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hPfmX-0004lP-76
-	for qemu-devel@nongnu.org; Sun, 12 May 2019 00:08:13 -0400
-Received: by mail-qk1-f194.google.com with SMTP id z6so5288915qkl.10
-	for <qemu-devel@nongnu.org>; Sat, 11 May 2019 21:08:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to;
-	bh=ReYpWdW16EKWy93jkDwYJITPppZs5ymrGV9MlBnki+w=;
-	b=k72s+4OjH4bUJZ8zeEfSOOxTuiH0hx9CnUqiVnEomjx6J4ja12DbKI1r7+/NMFsbpg
-	+crFidsd/fzElWYuzf9CKM7AtookRKIxFS19BxCnYN1OKgnMBA95AVsEKBeyQHWi3/lN
-	hqqXqV5oKEFX1RVJk3Id6Bb3QBhmvBy8CGL/vCssxW1EIPg0Y0LGrnP+3yOIdulU6jiF
-	poMN0BgL/KoXT1uVh11vrI1MEC+IAvPGXL2cvwOVt6zTABRSVHe951CAzuIjRYFzfzJG
-	+jmRTJK8YQvPbnKCk9cYoViB6rXRH9lUw9fb6PSVWkAvy9lDU3ObL6OdVmW3VkHJSQer
-	504w==
-X-Gm-Message-State: APjAAAWXLex7cusijnhcIRIp7Uh5jaqy8sAploxOcAibW5WD0Citg4oT
-	zxxX6sKEjBD71zYjNatAuy1qfQ==
-X-Google-Smtp-Source: APXvYqyEcuoHGklwgLcr9hq1jsXu6P/79xk2E7aimOhmR0KnA3ryoVL2cB/SJKCWzOH2hjTIFKJCXg==
-X-Received: by 2002:a37:5ac4:: with SMTP id
-	o187mr16697167qkb.356.1557634091091; 
-	Sat, 11 May 2019 21:08:11 -0700 (PDT)
-Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
-	[173.76.105.71]) by smtp.gmail.com with ESMTPSA id
-	l127sm4580713qkc.81.2019.05.11.21.08.09
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Sat, 11 May 2019 21:08:09 -0700 (PDT)
-Date: Sun, 12 May 2019 00:08:07 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190512000756-mutt-send-email-mst@kernel.org>
-References: <20190510105137.17481-1-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190510105137.17481-1-kraxel@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.222.194
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] virtio-input-host-pci: cleanup types
+	(envelope-from <shmuel.eiderman@oracle.com>) id 1hPjdB-00019w-6M
+	for qemu-devel@nongnu.org; Sun, 12 May 2019 04:14:51 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:35680)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+	id 1hPjd6-00015o-Gn; Sun, 12 May 2019 04:14:45 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+	by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4C88ru4142499; Sun, 12 May 2019 08:14:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=from : message-id :
+	content-type : mime-version : subject : date : in-reply-to : cc : to :
+	references; s=corp-2018-07-02;
+	bh=zbZAYH+lzFdxtMXZKeT3AMmhd8SECW22VefYEquuBag=;
+	b=giWaUyNnf0pH94HlC/Ech2qafbTd9PmrN5X6Tfb7adW4/jVMHp1PxGtTZu1QwmNyONRi
+	S3BzDQ9SmytNOkfOOM5X8v9QPQdPuwVVWpc8haDInP0RYKiPDAp1IrkmVfEKQ4ioFTgX
+	9QL6MM5UWThsyY58VJZs+gwpjRTQGLp0mIITsRwyVjiO0PgXMSRK16NKfGtFKzEbP3v6
+	/Oada3esKbD86g/IXDgoCNKM48Z38N93MQiMj0t3B0SOXwoeGYX4ue8q4Skm9AqUuzQe
+	rPgWotO+PokYLMkAk+AnwTI3YNJEFDMSagNoLoTHrXYhU0oQaYAoaqhjrHWoGHpyXzVy
+	7A== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+	by aserp2130.oracle.com with ESMTP id 2sdkwdanq1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 12 May 2019 08:14:27 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+	by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4C8DoIY136920; Sun, 12 May 2019 08:14:27 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+	by aserp3020.oracle.com with ESMTP id 2se0tv5dc1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 12 May 2019 08:14:27 +0000
+Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
+	by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4C8EP7a013691;
+	Sun, 12 May 2019 08:14:26 GMT
+Received: from [10.0.5.147] (/213.57.127.10)
+	by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Sun, 12 May 2019 08:14:25 +0000
+From: Sam <shmuel.eiderman@oracle.com>
+Message-Id: <7687F664-4BC3-47B9-A6CB-1B9B72ED80C2@oracle.com>
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Date: Sun, 12 May 2019 11:14:21 +0300
+In-Reply-To: <20190424074901.31430-1-shmuel.eiderman@oracle.com>
+To: fam@euphon.net, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>,
+	qemu-block@nongnu.org
+References: <20190424074901.31430-1-shmuel.eiderman@oracle.com>
+X-Mailer: Apple Mail (2.3445.104.8)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9254
+	signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1905120061
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9254
+	signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1905120061
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.79
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH 0/2]: vmdk: Add read-only support for the
+ new seSparse format
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,50 +109,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: eyal.moscovici@oracle.com, Arbel Moshe <arbel.moshe@oracle.com>,
+	yuchenlin@synology.com, qemu-devel@nongnu.org,
+	liran.alon@oracle.com, Karl Heubaum <karl.heubaum@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 10, 2019 at 12:51:36PM +0200, Gerd Hoffmann wrote:
-> virtio input is virtio-1.0 only, so we don't need the -transitional and
-> -non-transitional variants.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Gentle ping on "[PATCH 2/2] vmdk: Add read-only support for seSparse =
+snapshots=E2=80=9D.
+Yuchenlin reviewed "[PATCH 1/2] vmdk: Fix comment regarding max l1_size =
+coverage=E2=80=9D.
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Thanks, Sam
 
-I assume you are merging this?
-
-> ---
->  hw/virtio/virtio-input-host-pci.c | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/virtio/virtio-input-host-pci.c b/hw/virtio/virtio-input-host-pci.c
-> index 725a51ad30b4..124c4f344742 100644
-> --- a/hw/virtio/virtio-input-host-pci.c
-> +++ b/hw/virtio/virtio-input-host-pci.c
-> @@ -13,7 +13,7 @@
->  
->  typedef struct VirtIOInputHostPCI VirtIOInputHostPCI;
->  
-> -#define TYPE_VIRTIO_INPUT_HOST_PCI "virtio-input-host-pci-base"
-> +#define TYPE_VIRTIO_INPUT_HOST_PCI "virtio-input-host-pci"
->  #define VIRTIO_INPUT_HOST_PCI(obj) \
->          OBJECT_CHECK(VirtIOInputHostPCI, (obj), TYPE_VIRTIO_INPUT_HOST_PCI)
->  
-> @@ -31,10 +31,7 @@ static void virtio_host_initfn(Object *obj)
->  }
->  
->  static const VirtioPCIDeviceTypeInfo virtio_input_host_pci_info = {
-> -    .base_name             = TYPE_VIRTIO_INPUT_HOST_PCI,
-> -    .generic_name          = "virtio-input-host-pci",
-> -    .transitional_name     = "virtio-input-host-pci-transitional",
-> -    .non_transitional_name = "virtio-input-host-pci-non-transitional",
-> +    .generic_name  = TYPE_VIRTIO_INPUT_HOST_PCI,
->      .parent        = TYPE_VIRTIO_INPUT_PCI,
->      .instance_size = sizeof(VirtIOInputHostPCI),
->      .instance_init = virtio_host_initfn,
-> -- 
-> 2.18.1
+> On 24 Apr 2019, at 10:48, Sam Eiderman <shmuel.eiderman@oracle.com> =
+wrote:
+>=20
+> VMware introduced a new snapshot format in VMFS6 - seSparse (Space
+> Efficient Sparse) which is the default format available in ESXi 6.7.
+> Add read-only support for the new snapshot format.
+>=20
 
