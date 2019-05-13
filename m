@@ -2,72 +2,65 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB05EC04AB1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 08:27:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3459DC04AB4
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 08:28:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB31020989
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 08:27:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB31020989
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id EEC7520989
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 08:28:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEC7520989
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53070 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53078 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQ6Ip-0003Lm-0Y
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 04:27:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56055)
+	id 1hQ6Jg-00042s-9L
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 04:28:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hQ6HO-0002HI-JJ
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 04:25:51 -0400
+	(envelope-from <armbru@redhat.com>) id 1hQ6Ad-0004ec-4t
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 04:18:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hQ6HM-0003Kq-Ng
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 04:25:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55946)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hQ6HL-0003Iy-M2
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 04:25:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hQ6HI-0006bc-Iz
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 08:25:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8D3B92E8024
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 08:25:44 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 May 2019 08:16:40 -0000
-From: Anisse Astier <1828608@bugs.launchpad.net>
+	(envelope-from <armbru@redhat.com>) id 1hQ6Ab-0007eC-Ar
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 04:18:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40390)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hQ6Ab-0007d8-1d
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 04:18:49 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 62E693084248
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 08:18:48 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
+	[10.36.116.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 09E971750E
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 08:18:48 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id E873E113303E; Mon, 13 May 2019 10:18:44 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: anisse berrange
-X-Launchpad-Bug-Reporter: Anisse Astier (anisse)
-X-Launchpad-Bug-Modifier: Anisse Astier (anisse)
-References: <155750549613.15038.5455007066011551794.malonedeb@wampee.canonical.com>
-Message-Id: <155773540027.14554.6407046734054940516.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18962";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 6367e874046cd5358dd605b5bfc44cb10c03a670
+Date: Mon, 13 May 2019 10:18:44 +0200
+Message-Id: <20190513081844.26699-10-armbru@redhat.com>
+In-Reply-To: <20190513081844.26699-1-armbru@redhat.com>
+References: <20190513081844.26699-1-armbru@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Mon, 13 May 2019 08:18:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1828608] Re: Chardev websocket might not support
- pasting more than a few chars
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 9/9] Clean up decorations and whitespace around
+ header guards
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,47 +69,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1828608 <1828608@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I wrote a websocket client to help reproduce the bug without a browser:
-https://github.com/anisse/websocktty
+Cleaned up with scripts/clean-header-guards.pl.
 
-You can install it to your $GOPATH/bin (defaults to ~/go/bin) with "go
-get github.com/anisse/websocktty"
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20190315145123.28030-9-armbru@redhat.com>
+---
+ hw/ide/ahci_internal.h              | 2 +-
+ include/block/aio-wait.h            | 2 +-
+ include/exec/translator.h           | 2 +-
+ include/hw/arm/nrf51_soc.h          | 1 -
+ include/hw/arm/smmu-common.h        | 2 +-
+ include/hw/misc/imx2_wdt.h          | 2 +-
+ include/hw/misc/nrf51_rng.h         | 3 ++-
+ include/hw/pci-host/designware.h    | 2 +-
+ include/hw/riscv/sifive_plic.h      | 1 -
+ include/qemu/pmem.h                 | 2 +-
+ target/xtensa/xtensa-isa-internal.h | 2 +-
+ tests/acpi-utils.h                  | 2 +-
+ tests/tpm-emu.h                     | 2 +-
+ 13 files changed, 12 insertions(+), 13 deletions(-)
 
-I can reproduce the bug with it by simply pasting a long-enough (5 to 20
-characters) string.
+diff --git a/hw/ide/ahci_internal.h b/hw/ide/ahci_internal.h
+index 9b7fa8fc7d..95ecddcd3c 100644
+--- a/hw/ide/ahci_internal.h
++++ b/hw/ide/ahci_internal.h
+@@ -394,4 +394,4 @@ void ahci_reset(AHCIState *s);
+ 
+ #define SYSBUS_AHCI(obj) OBJECT_CHECK(SysbusAHCIState, (obj), TYPE_SYSBUS_AHCI)
+ 
+-#endif /* HW_IDE_AHCI_H */
++#endif /* HW_IDE_AHCI_INTERNAL_H */
+diff --git a/include/block/aio-wait.h b/include/block/aio-wait.h
+index afd0ff7eb8..afeeb18f95 100644
+--- a/include/block/aio-wait.h
++++ b/include/block/aio-wait.h
+@@ -124,4 +124,4 @@ void aio_wait_kick(void);
+  */
+ void aio_wait_bh_oneshot(AioContext *ctx, QEMUBHFunc *cb, void *opaque);
+ 
+-#endif /* QEMU_AIO_WAIT */
++#endif /* QEMU_AIO_WAIT_H */
+diff --git a/include/exec/translator.h b/include/exec/translator.h
+index 66dfe906c4..180c51d509 100644
+--- a/include/exec/translator.h
++++ b/include/exec/translator.h
+@@ -142,4 +142,4 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
+ 
+ void translator_loop_temp_check(DisasContextBase *db);
+ 
+-#endif  /* EXEC__TRANSLATOR_H */
++#endif /* EXEC__TRANSLATOR_H */
+diff --git a/include/hw/arm/nrf51_soc.h b/include/hw/arm/nrf51_soc.h
+index fd7fcc71a5..0cb78aafea 100644
+--- a/include/hw/arm/nrf51_soc.h
++++ b/include/hw/arm/nrf51_soc.h
+@@ -53,4 +53,3 @@ typedef struct NRF51State {
+ } NRF51State;
+ 
+ #endif
+-
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index 2c7fbf4202..1f37844e5c 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -163,4 +163,4 @@ void smmu_inv_notifiers_all(SMMUState *s);
+ /* Unmap the range of all the notifiers registered to @mr */
+ void smmu_inv_notifiers_mr(IOMMUMemoryRegion *mr);
+ 
+-#endif  /* HW_ARM_SMMU_COMMON */
++#endif /* HW_ARM_SMMU_COMMON_H */
+diff --git a/include/hw/misc/imx2_wdt.h b/include/hw/misc/imx2_wdt.h
+index 8afc99a10e..b91b002528 100644
+--- a/include/hw/misc/imx2_wdt.h
++++ b/include/hw/misc/imx2_wdt.h
+@@ -30,4 +30,4 @@ typedef struct IMX2WdtState {
+     MemoryRegion mmio;
+ } IMX2WdtState;
+ 
+-#endif /* IMX7_SNVS_H */
++#endif /* IMX2_WDT_H */
+diff --git a/include/hw/misc/nrf51_rng.h b/include/hw/misc/nrf51_rng.h
+index 3d6bf79997..b0133bf665 100644
+--- a/include/hw/misc/nrf51_rng.h
++++ b/include/hw/misc/nrf51_rng.h
+@@ -30,6 +30,7 @@
+  * the COPYING file in the top-level directory.
+  *
+  */
++
+ #ifndef NRF51_RNG_H
+ #define NRF51_RNG_H
+ 
+@@ -80,4 +81,4 @@ typedef struct {
+ } NRF51RNGState;
+ 
+ 
+-#endif /* NRF51_RNG_H_ */
++#endif /* NRF51_RNG_H */
+diff --git a/include/hw/pci-host/designware.h b/include/hw/pci-host/designware.h
+index a4f2c0695b..186bb36238 100644
+--- a/include/hw/pci-host/designware.h
++++ b/include/hw/pci-host/designware.h
+@@ -99,4 +99,4 @@ typedef struct DesignwarePCIEHost {
+     MemoryRegion mmio;
+ } DesignwarePCIEHost;
+ 
+-#endif  /* DESIGNWARE_H */
++#endif /* DESIGNWARE_H */
+diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_plic.h
+index 688cd97f82..ce8907f6aa 100644
+--- a/include/hw/riscv/sifive_plic.h
++++ b/include/hw/riscv/sifive_plic.h
+@@ -80,4 +80,3 @@ DeviceState *sifive_plic_create(hwaddr addr, char *hart_config,
+     uint32_t aperture_size);
+ 
+ #endif
+-
+diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
+index dfb6d0da62..d2d7ad085c 100644
+--- a/include/qemu/pmem.h
++++ b/include/qemu/pmem.h
+@@ -33,4 +33,4 @@ pmem_persist(const void *addr, size_t len)
+ 
+ #endif /* CONFIG_LIBPMEM */
+ 
+-#endif /* !QEMU_PMEM_H */
++#endif /* QEMU_PMEM_H */
+diff --git a/target/xtensa/xtensa-isa-internal.h b/target/xtensa/xtensa-isa-internal.h
+index c29295ff96..40dd8bac96 100644
+--- a/target/xtensa/xtensa-isa-internal.h
++++ b/target/xtensa/xtensa-isa-internal.h
+@@ -228,4 +228,4 @@ int xtensa_isa_name_compare(const void *, const void *);
+ extern xtensa_isa_status xtisa_errno;
+ extern char xtisa_error_msg[];
+ 
+-#endif /* !XTENSA_ISA_INTERNAL_H */
++#endif /* XTENSA_ISA_INTERNAL_H */
+diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+index ef388bbf12..73fe24f044 100644
+--- a/tests/acpi-utils.h
++++ b/tests/acpi-utils.h
+@@ -52,4 +52,4 @@ void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
+                       const uint8_t *addr_ptr, const char *sig,
+                       bool verify_checksum);
+ 
+-#endif  /* TEST_ACPI_UTILS_H */
++#endif /* TEST_ACPI_UTILS_H */
+diff --git a/tests/tpm-emu.h b/tests/tpm-emu.h
+index 8eb802a79e..a4f1d64226 100644
+--- a/tests/tpm-emu.h
++++ b/tests/tpm-emu.h
+@@ -36,4 +36,4 @@ typedef struct TestState {
+ void tpm_emu_test_wait_cond(TestState *s);
+ void *tpm_emu_ctrl_thread(void *data);
+ 
+-#endif /* TEST_TPM_EMU_H */
++#endif /* TESTS_TPM_EMU_H */
+-- 
+2.17.2
 
-I could not reproduce the bug with qemu's  "-serial tcp" and netcat, so
-this problem might indeed be limited to the websock channel
-implementation.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1828608
-
-Title:
-  Chardev websocket might not support pasting more than a few chars
-
-Status in QEMU:
-  New
-
-Bug description:
-  When sending more than 4-5 characters on the websocket serial console
-  (with pasting for example), the guest might not receive all of them,
-  or worse interpret the input as Magic SysRq keys.
-
-  This might be due to the io loop not checking the backend readiness
-  before calling the read function.
-
-  Attached patched fixes the problem on my system. I'm not sure it's the
-  proper approach, this is just to start discussion.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1828608/+subscriptions
 
