@@ -3,64 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE0FDC04AB1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 08:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4FEFC04AB3
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 08:20:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C03FD208C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 08:20:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C03FD208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 6FC7F208C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 08:20:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FC7F208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52967 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52971 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQ6CN-000602-Vf
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 04:20:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54368)
+	id 1hQ6CP-00061v-Li
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 04:20:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hQ6Ac-0004eX-98
+	(envelope-from <armbru@redhat.com>) id 1hQ6Ac-0004ea-Ms
 	for qemu-devel@nongnu.org; Mon, 13 May 2019 04:18:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hQ6Aa-0007dR-PY
+	(envelope-from <armbru@redhat.com>) id 1hQ6Ab-0007dn-74
 	for qemu-devel@nongnu.org; Mon, 13 May 2019 04:18:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32970)
+Received: from mx1.redhat.com ([209.132.183.28]:38118)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hQ6Aa-0007cC-GK
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 04:18:48 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hQ6Aa-0007cj-Th
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 04:18:49 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BEE5481DF6
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 08:18:46 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3FFFB307D91E
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 08:18:48 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
 	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 63FDC63BB2
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 08:18:46 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id DBA5219C70
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 08:18:47 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id D6BD31138538; Mon, 13 May 2019 10:18:44 +0200 (CEST)
+	id DA4221138407; Mon, 13 May 2019 10:18:44 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 13 May 2019 10:18:39 +0200
-Message-Id: <20190513081844.26699-5-armbru@redhat.com>
+Date: Mon, 13 May 2019 10:18:40 +0200
+Message-Id: <20190513081844.26699-6-armbru@redhat.com>
 In-Reply-To: <20190513081844.26699-1-armbru@redhat.com>
 References: <20190513081844.26699-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Mon, 13 May 2019 08:18:46 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.48]);
+	Mon, 13 May 2019 08:18:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 4/9] linux-user/nios2 linux-user/riscv: Clean up
- header guards
+Subject: [Qemu-devel] [PULL 5/9] target/xtensa: Clean up core-isa.h header
+ guards
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,150 +73,118 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reuse of the same guard symbol in multiple headers is okay as long as
-they cannot be included together.  scripts/clean-header-guards.pl
-can't tell, so it warns.
+scripts/clean-header-guards.pl warns these headers use reserved
+identifier _XTENSA_CORE_CONFIGURATION_H as header guard symbol.  It
+additionally warns the guard doesn't match the file name.
 
-Since we can avoid guard symbol reuse easily, do so: use guard symbol
-${target^^}_${fname^^} for linux-user/$target/$fname, just like we did
-in commit a9c94277f0..3500385697.
+Reuse of the same guard symbol in multiple headers is okay as long as
+they cannot be included together.
+
+Since we can avoid guard symbol reuse easily, do so: use the guard
+symbol scripts/clean-header-guards.pl picks, less the TARGET_ prefix.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20190315145123.28030-4-armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20190315145123.28030-5-armbru@redhat.com>
 ---
- linux-user/nios2/target_cpu.h     | 4 ++--
- linux-user/nios2/target_signal.h  | 6 +++---
- linux-user/nios2/target_structs.h | 4 ++--
- linux-user/nios2/target_syscall.h | 6 +++---
- linux-user/riscv/target_cpu.h     | 4 ++--
- linux-user/riscv/target_signal.h  | 6 +++---
- linux-user/riscv/target_structs.h | 4 ++--
- 7 files changed, 17 insertions(+), 17 deletions(-)
+ target/xtensa/core-de212/core-isa.h             | 8 +++-----
+ target/xtensa/core-sample_controller/core-isa.h | 8 +++-----
+ target/xtensa/core-test_kc705_be/core-isa.h     | 8 +++-----
+ target/xtensa/core-test_mmuhifi_c3/core-isa.h   | 8 +++-----
+ 4 files changed, 12 insertions(+), 20 deletions(-)
 
-diff --git a/linux-user/nios2/target_cpu.h b/linux-user/nios2/target_cpu.=
-h
-index 14f63338fa..5596c05c9c 100644
---- a/linux-user/nios2/target_cpu.h
-+++ b/linux-user/nios2/target_cpu.h
-@@ -17,8 +17,8 @@
-  * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
+diff --git a/target/xtensa/core-de212/core-isa.h b/target/xtensa/core-de212/core-isa.h
+index 78e7f38310..90ac329230 100644
+--- a/target/xtensa/core-de212/core-isa.h
++++ b/target/xtensa/core-de212/core-isa.h
+@@ -28,9 +28,8 @@
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+ 
+-#ifndef _XTENSA_CORE_CONFIGURATION_H
+-#define _XTENSA_CORE_CONFIGURATION_H
+-
++#ifndef XTENSA_CORE_DE212_CORE_ISA_H
++#define XTENSA_CORE_DE212_CORE_ISA_H
+ 
+ /****************************************************************************
+ 	    Parameters Useful for Any Code, USER or PRIVILEGED
+@@ -618,5 +617,4 @@
+ #endif /* !XTENSA_HAL_NON_PRIVILEGED_ONLY */
+ 
+ 
+-#endif /* _XTENSA_CORE_CONFIGURATION_H */
+-
++#endif /* XTENSA_CORE_DE212_CORE_ISA_H */
+diff --git a/target/xtensa/core-sample_controller/core-isa.h b/target/xtensa/core-sample_controller/core-isa.h
+index e681e43209..d53dca8665 100644
+--- a/target/xtensa/core-sample_controller/core-isa.h
++++ b/target/xtensa/core-sample_controller/core-isa.h
+@@ -28,9 +28,8 @@
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+ 
+-#ifndef _XTENSA_CORE_CONFIGURATION_H
+-#define _XTENSA_CORE_CONFIGURATION_H
+-
++#ifndef XTENSA_CORE_SAMPLE_CONTROLLER_CORE_ISA_H
++#define XTENSA_CORE_SAMPLE_CONTROLLER_CORE_ISA_H
+ 
+ /****************************************************************************
+ 	    Parameters Useful for Any Code, USER or PRIVILEGED
+@@ -640,5 +639,4 @@
+ #endif /* !XTENSA_HAL_NON_PRIVILEGED_ONLY */
+ 
+ 
+-#endif /* _XTENSA_CORE_CONFIGURATION_H */
+-
++#endif /* XTENSA_CORE_SAMPLE_CONTROLLER_CORE_ISA_H */
+diff --git a/target/xtensa/core-test_kc705_be/core-isa.h b/target/xtensa/core-test_kc705_be/core-isa.h
+index a4ebdf7197..408fed871d 100644
+--- a/target/xtensa/core-test_kc705_be/core-isa.h
++++ b/target/xtensa/core-test_kc705_be/core-isa.h
+@@ -28,9 +28,8 @@
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+ 
+-#ifndef _XTENSA_CORE_CONFIGURATION_H
+-#define _XTENSA_CORE_CONFIGURATION_H
+-
++#ifndef XTENSA_CORE_TEST_KC705_BE_CORE_ISA_H
++#define XTENSA_CORE_TEST_KC705_BE_CORE_ISA_H
+ 
+ /****************************************************************************
+ 	    Parameters Useful for Any Code, USER or PRIVILEGED
+@@ -571,5 +570,4 @@
+ #endif /* !XTENSA_HAL_NON_PRIVILEGED_ONLY */
+ 
+ 
+-#endif /* _XTENSA_CORE_CONFIGURATION_H */
+-
++#endif /* XTENSA_CORE_TEST_KC705_BE_CORE_ISA_H */
+diff --git a/target/xtensa/core-test_mmuhifi_c3/core-isa.h b/target/xtensa/core-test_mmuhifi_c3/core-isa.h
+index 309caa1a32..704a31f7c8 100644
+--- a/target/xtensa/core-test_mmuhifi_c3/core-isa.h
++++ b/target/xtensa/core-test_mmuhifi_c3/core-isa.h
+@@ -7,9 +7,8 @@
+  * Copyright (c) 1999-2009 Tensilica Inc.
   */
-=20
--#ifndef TARGET_CPU_H
--#define TARGET_CPU_H
-+#ifndef NIOS2_TARGET_CPU_H
-+#define NIOS2_TARGET_CPU_H
-=20
- static inline void cpu_clone_regs(CPUNios2State *env, target_ulong newsp=
-)
- {
-diff --git a/linux-user/nios2/target_signal.h b/linux-user/nios2/target_s=
-ignal.h
-index 7776bcdbfd..fe48721b3d 100644
---- a/linux-user/nios2/target_signal.h
-+++ b/linux-user/nios2/target_signal.h
-@@ -1,5 +1,5 @@
--#ifndef TARGET_SIGNAL_H
--#define TARGET_SIGNAL_H
-+#ifndef NIOS2_TARGET_SIGNAL_H
-+#define NIOS2_TARGET_SIGNAL_H
-=20
- /* this struct defines a stack used during syscall handling */
-=20
-@@ -18,4 +18,4 @@ typedef struct target_sigaltstack {
-=20
- #include "../generic/signal.h"
-=20
--#endif /* TARGET_SIGNAL_H */
-+#endif /* NIOS2_TARGET_SIGNAL_H */
-diff --git a/linux-user/nios2/target_structs.h b/linux-user/nios2/target_=
-structs.h
-index 8713772089..7145251706 100644
---- a/linux-user/nios2/target_structs.h
-+++ b/linux-user/nios2/target_structs.h
-@@ -16,8 +16,8 @@
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-  */
--#ifndef TARGET_STRUCTS_H
--#define TARGET_STRUCTS_H
-+#ifndef NIOS2_TARGET_STRUCTS_H
-+#define NIOS2_TARGET_STRUCTS_H
-=20
- struct target_ipc_perm {
-     abi_int __key;                      /* Key.  */
-diff --git a/linux-user/nios2/target_syscall.h b/linux-user/nios2/target_=
-syscall.h
-index ca6b7e69f6..f3b2a500f4 100644
---- a/linux-user/nios2/target_syscall.h
-+++ b/linux-user/nios2/target_syscall.h
-@@ -1,5 +1,5 @@
--#ifndef TARGET_SYSCALL_H
--#define TARGET_SYSCALL_H
-+#ifndef NIOS2_TARGET_SYSCALL_H
-+#define NIOS2_TARGET_SYSCALL_H
-=20
- #define UNAME_MACHINE "nios2"
- #define UNAME_MINIMUM_RELEASE "3.19.0"
-@@ -34,4 +34,4 @@ struct target_pt_regs {
- #define TARGET_MLOCKALL_MCL_CURRENT 1
- #define TARGET_MLOCKALL_MCL_FUTURE  2
-=20
--#endif  /* TARGET_SYSCALL_H */
-+#endif /* NIOS2_TARGET_SYSCALL_H */
-diff --git a/linux-user/riscv/target_cpu.h b/linux-user/riscv/target_cpu.=
-h
-index 7e090f376a..90f9a4171e 100644
---- a/linux-user/riscv/target_cpu.h
-+++ b/linux-user/riscv/target_cpu.h
-@@ -1,5 +1,5 @@
--#ifndef TARGET_CPU_H
--#define TARGET_CPU_H
-+#ifndef RISCV_TARGET_CPU_H
-+#define RISCV_TARGET_CPU_H
-=20
- static inline void cpu_clone_regs(CPURISCVState *env, target_ulong newsp=
-)
- {
-diff --git a/linux-user/riscv/target_signal.h b/linux-user/riscv/target_s=
-ignal.h
-index c8b1455800..f113ba9a55 100644
---- a/linux-user/riscv/target_signal.h
-+++ b/linux-user/riscv/target_signal.h
-@@ -1,5 +1,5 @@
--#ifndef TARGET_SIGNAL_H
--#define TARGET_SIGNAL_H
-+#ifndef RISCV_TARGET_SIGNAL_H
-+#define RISCV_TARGET_SIGNAL_H
-=20
- typedef struct target_sigaltstack {
-     abi_ulong ss_sp;
-@@ -15,4 +15,4 @@ typedef struct target_sigaltstack {
-=20
- #include "../generic/signal.h"
-=20
--#endif /* TARGET_SIGNAL_H */
-+#endif /* RISCV_TARGET_SIGNAL_H */
-diff --git a/linux-user/riscv/target_structs.h b/linux-user/riscv/target_=
-structs.h
-index 4f0462c497..ea3e5ed17e 100644
---- a/linux-user/riscv/target_structs.h
-+++ b/linux-user/riscv/target_structs.h
-@@ -4,8 +4,8 @@
-  * This is a copy of ../aarch64/target_structs.h atm.
-  *
-  */
--#ifndef TARGET_STRUCTS_H
--#define TARGET_STRUCTS_H
-+#ifndef RISCV_TARGET_STRUCTS_H
-+#define RISCV_TARGET_STRUCTS_H
-=20
- struct target_ipc_perm {
-     abi_int __key;                      /* Key.  */
---=20
+ 
+-#ifndef _XTENSA_CORE_CONFIGURATION_H
+-#define _XTENSA_CORE_CONFIGURATION_H
+-
++#ifndef XTENSA_CORE_TEST_MMUHIFI_C3_CORE_ISA_H
++#define XTENSA_CORE_TEST_MMUHIFI_C3_CORE_ISA_H
+ 
+ /****************************************************************************
+ 	    Parameters Useful for Any Code, USER or PRIVILEGED
+@@ -380,5 +379,4 @@
+ #endif /* !XTENSA_HAL_NON_PRIVILEGED_ONLY */
+ 
+ 
+-#endif /* _XTENSA_CORE_CONFIGURATION_H */
+-
++#endif /* XTENSA_CORE_TEST_MMUHIFI_C3_CORE_ISA_H */
+-- 
 2.17.2
 
 
