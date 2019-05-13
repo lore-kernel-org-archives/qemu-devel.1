@@ -2,59 +2,64 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA086C04AB1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 06:42:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C6A0C04AB1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 07:10:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EAAC2084E
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 06:42:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EAAC2084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id F216220989
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 07:10:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F216220989
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52019 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52236 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQ4fF-0007H8-RV
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 02:42:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37356)
+	id 1hQ56A-0003er-VA
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 03:10:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hQ4Zy-0002mj-6t
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 02:36:55 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hQ54E-0002ST-70
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 03:08:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hQ4K5-0004mx-1y
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 02:20:30 -0400
-Received: from mga07.intel.com ([134.134.136.100]:24552)
+	(envelope-from <kraxel@redhat.com>) id 1hQ4pv-0002Jq-3B
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 02:53:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43466)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hQ4K4-0004ds-QY
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 02:20:28 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-	by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	12 May 2019 23:20:28 -0700
-X-ExtLoop1: 1
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by orsmga003.jf.intel.com with ESMTP; 12 May 2019 23:20:26 -0700
-From: Wei Yang <richardw.yang@linux.intel.com>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hQ4pt-0002Hv-35
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 02:53:22 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1DA44882F0
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 06:53:18 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
+	[10.36.117.74])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A759019C6A;
+	Mon, 13 May 2019 06:53:16 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id 6986BA208; Mon, 13 May 2019 08:53:10 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 13 May 2019 14:19:08 +0800
-Message-Id: <20190513061913.9284-5-richardw.yang@linux.intel.com>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190513061913.9284-1-richardw.yang@linux.intel.com>
-References: <20190513061913.9284-1-richardw.yang@linux.intel.com>
+Date: Mon, 13 May 2019 08:53:08 +0200
+Message-Id: <20190513065310.10263-6-kraxel@redhat.com>
+In-Reply-To: <20190513065310.10263-1-kraxel@redhat.com>
+References: <20190513065310.10263-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 134.134.136.100
-Subject: [Qemu-devel] [RFC PATCH 4/9] hw/acpi: implement
- madt_sub[ACPI_APIC_IO]
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.28]);
+	Mon, 13 May 2019 06:53:18 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 5/7] util: simplify unix_listen()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,68 +71,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, ehabkost@redhat.com, mst@redhat.com,
-	Wei Yang <richardw.yang@linux.intel.com>, pbonzini@redhat.com,
-	imammedo@redhat.com, rth@twiddle.net
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
----
- hw/i386/acpi-build.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 4b480efff9..a661fff51d 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -339,9 +339,22 @@ static void pc_madt_x2apic_entry(GArray *entry, void *opaque)
-     }
+The only caller of unix_listen() left is qga/channel-posix.c.
+
+There is no need to deal with legacy coma-trailing options ",...".
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Message-id: 20190503130034.24916-6-marcandre.lureau@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ util/qemu-sockets.c | 18 ++----------------
+ 1 file changed, 2 insertions(+), 16 deletions(-)
+
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index ba6335e71a95..8850a280a84b 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -970,26 +970,12 @@ static int unix_connect_saddr(UnixSocketAddress *sa=
+ddr, Error **errp)
+ /* compatibility wrapper */
+ int unix_listen(const char *str, Error **errp)
+ {
+-    char *path, *optstr;
+-    int sock, len;
+     UnixSocketAddress *saddr;
++    int sock;
+=20
+     saddr =3D g_new0(UnixSocketAddress, 1);
+-
+-    optstr =3D strchr(str, ',');
+-    if (optstr) {
+-        len =3D optstr - str;
+-        if (len) {
+-            path =3D g_malloc(len+1);
+-            snprintf(path, len+1, "%.*s", len, str);
+-            saddr->path =3D path;
+-        }
+-    } else {
+-        saddr->path =3D g_strdup(str);
+-    }
+-
++    saddr->path =3D g_strdup(str);
+     sock =3D unix_listen_saddr(saddr, errp);
+-
+     qapi_free_UnixSocketAddress(saddr);
+     return sock;
  }
- 
-+static void pc_madt_io_entry(GArray *entry, void *opaque)
-+{
-+    AcpiMadtIoApic *io_apic;
-+
-+    io_apic = acpi_data_push(entry, sizeof *io_apic);
-+    io_apic->type = ACPI_APIC_IO;
-+    io_apic->length = sizeof(*io_apic);
-+    io_apic->io_apic_id = ACPI_BUILD_IOAPIC_ID;
-+    io_apic->address = cpu_to_le32(IO_APIC_DEFAULT_ADDRESS);
-+    io_apic->interrupt = cpu_to_le32(0);
-+}
-+
- madt_operations i386_madt_sub = {
-     [ACPI_APIC_PROCESSOR] = pc_madt_apic_entry,
-     [ACPI_APIC_LOCAL_X2APIC] = pc_madt_x2apic_entry,
-+    [ACPI_APIC_IO] = pc_madt_io_entry,
- };
- 
- static void
-@@ -355,7 +368,6 @@ build_madt(GArray *table_data, BIOSLinker *linker, PCMachineState *pcms)
-     bool x2apic_mode = false;
- 
-     AcpiMultipleApicTable *madt;
--    AcpiMadtIoApic *io_apic;
-     AcpiMadtIntsrcovr *intsrcovr;
-     int i;
- 
-@@ -376,12 +388,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, PCMachineState *pcms)
-         }
-     }
- 
--    io_apic = acpi_data_push(table_data, sizeof *io_apic);
--    io_apic->type = ACPI_APIC_IO;
--    io_apic->length = sizeof(*io_apic);
--    io_apic->io_apic_id = ACPI_BUILD_IOAPIC_ID;
--    io_apic->address = cpu_to_le32(IO_APIC_DEFAULT_ADDRESS);
--    io_apic->interrupt = cpu_to_le32(0);
-+    adevc->madt_sub[ACPI_APIC_IO](table_data, NULL);
- 
-     if (pcms->apic_xrupt_override) {
-         intsrcovr = acpi_data_push(table_data, sizeof *intsrcovr);
--- 
-2.19.1
+--=20
+2.18.1
 
 
