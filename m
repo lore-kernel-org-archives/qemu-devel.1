@@ -2,66 +2,60 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DAD0C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 16:01:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F720C04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 16:02:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07D3320873
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 16:01:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="A8tm14XH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07D3320873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1C3AA2084E
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 16:02:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C3AA2084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59587 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59591 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQDOk-0000C2-T1
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 12:01:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56387)
+	id 1hQDPT-0000gu-CT
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 12:02:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hQDJw-00057S-17
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:56:56 -0400
+	(envelope-from <thuth@redhat.com>) id 1hQDK5-0005Fz-C2
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:57:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hQDGA-0002gq-65
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:53:03 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:59044)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>)
-	id 1hQDG7-0002dK-IH; Mon, 13 May 2019 11:53:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; 
-	h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
-	bh=Q/Vw9NDFO9dgvlEIHA7x7WdDVKxx+5ud2KagsvnvcqY=; 
-	b=A8tm14XHM6HejF1UPzfQUYmm0rEhQx/hNazyEapGLEiolui2kP22lNtiQl/XDtpII/l+1l4KOV0Joi+FZWBralLHuk0Emn1EJuSPjDeVnsBBBbDfFAX6n4vYwPW8dwSk61JearGjS6QM9ETepfywJeuTRm0+TG0bLBKgKxxtzA/BocZkTc9OMMppOYH+I4NJeSYVtdhI0FE6UM93kSrSXLxuiOlhO4c4J0i7ADPtDpi4JURjUHCabTC+daCh4RAMMDckDVoPGWfQIiSJY7MIwV8q0UfrQNio8wqALLuP+LQ7k8wF43/aoyZ64O2h106KC+UsrN6jI9WtArvYDyE2wg==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
-	by fanzine.igalia.com with esmtps 
-	(Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
-	id 1hQDG4-0001S8-Gy; Mon, 13 May 2019 17:52:56 +0200
-Received: from berto by mail.igalia.com with local (Exim)
-	id 1hQDG4-0003Tz-E9; Mon, 13 May 2019 17:52:56 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-In-Reply-To: <5783a050-5866-80d5-4699-7ea0bf122398@redhat.com>
-References: <cover.1557754872.git.berto@igalia.com>
-	<20dfb3d9ccec559cdd1a9690146abad5d204a186.1557754872.git.berto@igalia.com>
-	<5783a050-5866-80d5-4699-7ea0bf122398@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
-	(i586-pc-linux-gnu)
-Date: Mon, 13 May 2019 17:52:56 +0200
-Message-ID: <w51r292pd0n.fsf@maestria.local.igalia.com>
+	(envelope-from <thuth@redhat.com>) id 1hQDBN-0008Aa-Pp
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:48:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48358)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hQDBN-00089x-K3; Mon, 13 May 2019 11:48:05 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 13541308A968;
+	Mon, 13 May 2019 15:48:04 +0000 (UTC)
+Received: from thuth.com (ovpn-116-122.ams2.redhat.com [10.36.116.122])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id EB87819C6A;
+	Mon, 13 May 2019 15:48:02 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org,
+	Laurent Vivier <lvivier@redhat.com>
+Date: Mon, 13 May 2019 17:47:59 +0200
+Message-Id: <20190513154759.24973-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
-	timestamps) [generic] [fuzzy]
-X-Received-From: 91.117.99.155
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] block: Make
- bdrv_root_attach_child() unref child_bs on failure
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.41]);
+	Mon, 13 May 2019 15:48:04 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] tests/libqtest: Fix description of
+ qtest_vinitf() and qtest_initf()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,28 +67,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon 13 May 2019 04:31:16 PM CEST, Max Reitz wrote:
->> @@ -2569,10 +2582,6 @@ BdrvChild *bdrv_open_child(const char *filename,
->>      }
->>  
->>      c = bdrv_attach_child(parent, bs, bdref_key, child_role, errp);
->> -    if (!c) {
->> -        bdrv_unref(bs);
->> -        return NULL;
->> -    }
->>  
->>      return c;
->>  }
->
-> (That could have been simplified even further. *shrug*)
+These functions are convenience wrappers of qtest_init() and not of
+qtest_start().
 
-Right, we can remove the 'c' variable altogether. Feel free to edit the
-commit if you want.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/libqtest.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Berto
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index 3f7675fcf0..a98ea15b7d 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -29,7 +29,7 @@ extern QTestState *global_qtest;
+  * @fmt...: Format for creating other arguments to pass to QEMU, formatt=
+ed
+  * like sprintf().
+  *
+- * Convenience wrapper around qtest_start().
++ * Convenience wrapper around qtest_init().
+  *
+  * Returns: #QTestState instance.
+  */
+@@ -41,7 +41,7 @@ QTestState *qtest_initf(const char *fmt, ...) GCC_FMT_A=
+TTR(1, 2);
+  * like vsprintf().
+  * @ap: Format arguments.
+  *
+- * Convenience wrapper around qtest_start().
++ * Convenience wrapper around qtest_init().
+  *
+  * Returns: #QTestState instance.
+  */
+--=20
+2.21.0
+
 
