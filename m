@@ -2,63 +2,91 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B4B0C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 18:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E83D8C04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 18:52:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBC682070D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 18:50:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBC682070D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BA07D2085A
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 18:52:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i/VFDbkM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA07D2085A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33573 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33602 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQG1s-0007Ro-0u
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 14:50:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57853)
+	id 1hQG3n-00010T-0G
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 14:52:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hQFxF-000407-9e
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:45:43 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hQFy8-0004l1-W5
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:46:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hQFxD-0004G5-8X
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:45:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1hQFxC-0004FN-W7
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:45:39 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 57983301988B
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 18:45:38 +0000 (UTC)
-Received: from localhost (unknown [10.36.112.10])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 33E8D5DE01;
-	Mon, 13 May 2019 18:45:30 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 13 May 2019 20:44:32 +0200
-Message-Id: <20190513184433.21038-8-marcandre.lureau@redhat.com>
-In-Reply-To: <20190513184433.21038-1-marcandre.lureau@redhat.com>
-References: <20190513184433.21038-1-marcandre.lureau@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hQFy7-00056I-CU
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:46:36 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:41050)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hQFy7-00052X-2O
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:46:35 -0400
+Received: by mail-pg1-x544.google.com with SMTP id z3so7213359pgp.8
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 11:46:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=mfztUT8HThQnL4EPiJVtdwKXVUVQdkxXqoa2KIl4nV4=;
+	b=i/VFDbkMoQMJoX6pEeyVAe8gvd+PLxjrK9EEd0yaRjTN19LXINYNbiLCOdA4oN1sxF
+	4I/Li3TAC0YQu3sRb82FoCTfA5CXvhZz5CYmv+U7Zoy/BSE8f30eCfv/q0dZies4KDHH
+	Hnta+8WoZTWbXmD7Ck4605xo0No7Qg/VxbrnarbwFh+V4Otv4mQP/VrOpLgf6DIDEnTD
+	J5VGAd9FrnDxp5MTrcPVTpT7gnMzmbjn4QAjz1fDowvAzDtxVG1lJ6M0rjOshkxoTfZP
+	+viWE3s1xcV6yo+tfIKDjrBlUoospK/HggGXGO1fsdDRcVlWXgXSoJTcFujtBvbQJqWc
+	KXjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=mfztUT8HThQnL4EPiJVtdwKXVUVQdkxXqoa2KIl4nV4=;
+	b=bFyCHmfNDTMuvgB67FHBHZUT1rw+/sB93S2w8QutssKJzlgHq0B32B+O7geDTT7tqM
+	CohqFbXA0rb83xrCCtP7fGa2s9egqjGFc6agRu69/WoxaGrGUaYAWdo95IO8OC6p2Kf3
+	JgOtRx+w0QrzEmMdVMTEmZZ9qR8nd63fyvhGfTJ4ecoFmR6bPBwhZ9WwlE3869oTqbvd
+	VgiboCsLniFtPOM8iDx/qpWQBJIX+98wroU4RwWJWuEBamNhC0lhTnwpv3wcwehT4DX0
+	aIcZhE8mb/V1RKDeb19yXcLzEEYozVKbnGNZ07ZvtzzPyvfOdKJH1+rU/Qkl+gke6yzS
+	ZxyA==
+X-Gm-Message-State: APjAAAU+OaSbY+lPHMFcVkPHWHPA/37cJ6tzcAH23rHF+CH2OTkeC0Q4
+	ttOyXMmPIo3SaosE8sQCE5nJ6w==
+X-Google-Smtp-Source: APXvYqzeGm6Y0Hi9OkOkxhjsX58wH4dH6UD4wYD+cmmIFZU3uyMZVni2lFc2S3lh5plE/x6eVCwdOw==
+X-Received: by 2002:a63:1a42:: with SMTP id a2mr32676995pgm.358.1557773191927; 
+	Mon, 13 May 2019 11:46:31 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
+	by smtp.gmail.com with ESMTPSA id
+	m123sm25519294pfm.39.2019.05.13.11.46.30
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 13 May 2019 11:46:31 -0700 (PDT)
+To: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org
+References: <20190512083624.8916-1-drjones@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <fa220ee2-b4bc-cdfa-ddde-90206e417cf3@linaro.org>
+Date: Mon, 13 May 2019 11:46:29 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Mon, 13 May 2019 18:45:38 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v7 7/8] virtio-gpu: split virtio-gpu-pci &
- virtio-vga
+In-Reply-To: <20190512083624.8916-1-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::544
+Subject: Re: [Qemu-devel] [PATCH 00/13] target/arm/kvm: enable SVE in guests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,455 +98,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>
+Cc: peter.maydell@linaro.org, abologna@redhat.com, armbru@redhat.com,
+	alex.bennee@linaro.org, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add base classes that are common to vhost-user-gpu-pci and
-vhost-user-vga.
+On 5/12/19 1:36 AM, Andrew Jones wrote:
+>    CPU type | accel | sve-max-vq | sve-vls-map
+>    -------------------------------------------
+>  1)     max | tcg   |  $MAX_VQ   |  $VLS_MAP
+>  2)     max | kvm   |  $MAX_VQ   |  $VLS_MAP
+>  3)    host | kvm   |  N/A       |  $VLS_MAP
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- hw/display/virtio-vga.h     |  32 +++++++++
- hw/display/virtio-gpu-pci.c |  52 +++++++++-----
- hw/display/virtio-vga.c     | 135 ++++++++++++++++++------------------
- MAINTAINERS                 |   2 +-
- 4 files changed, 137 insertions(+), 84 deletions(-)
- create mode 100644 hw/display/virtio-vga.h
+This doesn't seem right.  Why is -cpu host not whatever the host supports?  It
+certainly has been so far.  I really don't see how -cpu max makes any sense for
+kvm.
 
-diff --git a/hw/display/virtio-vga.h b/hw/display/virtio-vga.h
-new file mode 100644
-index 0000000000..f03e1ba619
---- /dev/null
-+++ b/hw/display/virtio-vga.h
-@@ -0,0 +1,32 @@
-+#ifndef VIRTIO_VGA_H_
-+#define VIRTIO_VGA_H_
-+
-+#include "hw/virtio/virtio-pci.h"
-+#include "vga_int.h"
-+
-+/*
-+ * virtio-vga-base: This extends VirtioPCIProxy.
-+ */
-+#define TYPE_VIRTIO_VGA_BASE "virtio-vga-base"
-+#define VIRTIO_VGA_BASE(obj)                                \
-+    OBJECT_CHECK(VirtIOVGABase, (obj), TYPE_VIRTIO_VGA_BASE)
-+#define VIRTIO_VGA_BASE_GET_CLASS(obj)                      \
-+    OBJECT_GET_CLASS(VirtIOVGABaseClass, obj, TYPE_VIRTIO_VGA_BASE)
-+#define VIRTIO_VGA_BASE_CLASS(klass)                        \
-+    OBJECT_CLASS_CHECK(VirtIOVGABaseClass, klass, TYPE_VIRTIO_VGA_BASE)
-+
-+typedef struct VirtIOVGABase {
-+    VirtIOPCIProxy parent_obj;
-+
-+    VirtIOGPUBase *vgpu;
-+    VGACommonState vga;
-+    MemoryRegion vga_mrs[3];
-+} VirtIOVGABase;
-+
-+typedef struct VirtIOVGABaseClass {
-+    VirtioPCIClass parent_class;
-+
-+    DeviceReset parent_reset;
-+} VirtIOVGABaseClass;
-+
-+#endif /* VIRTIO_VGA_H_ */
-diff --git a/hw/display/virtio-gpu-pci.c b/hw/display/virtio-gpu-pci.c
-index 305ea5fff3..3b88bf4d1f 100644
---- a/hw/display/virtio-gpu-pci.c
-+++ b/hw/display/virtio-gpu-pci.c
-@@ -19,30 +19,30 @@
- #include "hw/virtio/virtio-pci.h"
- #include "hw/virtio/virtio-gpu.h"
-=20
--typedef struct VirtIOGPUPCI VirtIOGPUPCI;
-+typedef struct VirtIOGPUPCIBase VirtIOGPUPCIBase;
-=20
- /*
-- * virtio-gpu-pci: This extends VirtioPCIProxy.
-+ * virtio-gpu-pci-base: This extends VirtioPCIProxy.
-  */
--#define TYPE_VIRTIO_GPU_PCI "virtio-gpu-pci"
--#define VIRTIO_GPU_PCI(obj) \
--        OBJECT_CHECK(VirtIOGPUPCI, (obj), TYPE_VIRTIO_GPU_PCI)
-+#define TYPE_VIRTIO_GPU_PCI_BASE "virtio-gpu-pci-base"
-+#define VIRTIO_GPU_PCI_BASE(obj) \
-+        OBJECT_CHECK(VirtIOGPUPCIBase, (obj), TYPE_VIRTIO_GPU_PCI_BASE)
-=20
--struct VirtIOGPUPCI {
-+struct VirtIOGPUPCIBase {
-     VirtIOPCIProxy parent_obj;
--    VirtIOGPU vdev;
-+    VirtIOGPUBase *vgpu;
- };
-=20
--static Property virtio_gpu_pci_properties[] =3D {
-+static Property virtio_gpu_pci_base_properties[] =3D {
-     DEFINE_VIRTIO_GPU_PCI_PROPERTIES(VirtIOPCIProxy),
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
--static void virtio_gpu_pci_realize(VirtIOPCIProxy *vpci_dev, Error **err=
-p)
-+static void virtio_gpu_pci_base_realize(VirtIOPCIProxy *vpci_dev, Error =
-**errp)
- {
--    VirtIOGPUPCI *vgpu =3D VIRTIO_GPU_PCI(vpci_dev);
--    VirtIOGPUBase *g =3D VIRTIO_GPU_BASE(&vgpu->vdev);
--    DeviceState *vdev =3D DEVICE(&vgpu->vdev);
-+    VirtIOGPUPCIBase *vgpu =3D VIRTIO_GPU_PCI_BASE(vpci_dev);
-+    VirtIOGPUBase *g =3D vgpu->vgpu;
-+    DeviceState *vdev =3D DEVICE(g);
-     int i;
-     Error *local_error =3D NULL;
-=20
-@@ -62,36 +62,56 @@ static void virtio_gpu_pci_realize(VirtIOPCIProxy *vp=
-ci_dev, Error **errp)
-     }
- }
-=20
--static void virtio_gpu_pci_class_init(ObjectClass *klass, void *data)
-+static void virtio_gpu_pci_base_class_init(ObjectClass *klass, void *dat=
-a)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     VirtioPCIClass *k =3D VIRTIO_PCI_CLASS(klass);
-     PCIDeviceClass *pcidev_k =3D PCI_DEVICE_CLASS(klass);
-=20
-     set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
--    dc->props =3D virtio_gpu_pci_properties;
-+    dc->props =3D virtio_gpu_pci_base_properties;
-     dc->hotpluggable =3D false;
--    k->realize =3D virtio_gpu_pci_realize;
-+    k->realize =3D virtio_gpu_pci_base_realize;
-     pcidev_k->class_id =3D PCI_CLASS_DISPLAY_OTHER;
- }
-=20
-+static const TypeInfo virtio_gpu_pci_base_info =3D {
-+    .name =3D TYPE_VIRTIO_GPU_PCI_BASE,
-+    .parent =3D TYPE_VIRTIO_PCI,
-+    .instance_size =3D sizeof(VirtIOGPUPCIBase),
-+    .class_init =3D virtio_gpu_pci_base_class_init,
-+    .abstract =3D true
-+};
-+
-+#define TYPE_VIRTIO_GPU_PCI "virtio-gpu-pci"
-+#define VIRTIO_GPU_PCI(obj)                                 \
-+    OBJECT_CHECK(VirtIOGPUPCI, (obj), TYPE_VIRTIO_GPU_PCI)
-+
-+typedef struct VirtIOGPUPCI {
-+    VirtIOGPUPCIBase parent_obj;
-+    VirtIOGPU vdev;
-+} VirtIOGPUPCI;
-+
- static void virtio_gpu_initfn(Object *obj)
- {
-     VirtIOGPUPCI *dev =3D VIRTIO_GPU_PCI(obj);
-=20
-     virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-                                 TYPE_VIRTIO_GPU);
-+    VIRTIO_GPU_PCI_BASE(obj)->vgpu =3D VIRTIO_GPU_BASE(&dev->vdev);
- }
-=20
- static const VirtioPCIDeviceTypeInfo virtio_gpu_pci_info =3D {
-     .generic_name =3D TYPE_VIRTIO_GPU_PCI,
-+    .parent =3D TYPE_VIRTIO_GPU_PCI_BASE,
-     .instance_size =3D sizeof(VirtIOGPUPCI),
-     .instance_init =3D virtio_gpu_initfn,
--    .class_init =3D virtio_gpu_pci_class_init,
- };
-=20
- static void virtio_gpu_pci_register_types(void)
- {
-+    type_register_static(&virtio_gpu_pci_base_info);
-     virtio_pci_types_register(&virtio_gpu_pci_info);
- }
-+
- type_init(virtio_gpu_pci_register_types)
-diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
-index 33af54d44f..caa3e138b0 100644
---- a/hw/display/virtio-vga.c
-+++ b/hw/display/virtio-vga.c
-@@ -1,66 +1,42 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
--#include "vga_int.h"
--#include "hw/virtio/virtio-pci.h"
- #include "hw/virtio/virtio-gpu.h"
- #include "qapi/error.h"
-+#include "virtio-vga.h"
-=20
--/*
-- * virtio-vga: This extends VirtioPCIProxy.
-- */
--#define TYPE_VIRTIO_VGA "virtio-vga"
--#define VIRTIO_VGA(obj) \
--        OBJECT_CHECK(VirtIOVGA, (obj), TYPE_VIRTIO_VGA)
--#define VIRTIO_VGA_GET_CLASS(obj) \
--        OBJECT_GET_CLASS(VirtIOVGAClass, obj, TYPE_VIRTIO_VGA)
--#define VIRTIO_VGA_CLASS(klass) \
--        OBJECT_CLASS_CHECK(VirtIOVGAClass, klass, TYPE_VIRTIO_VGA)
--
--typedef struct VirtIOVGA {
--    VirtIOPCIProxy parent_obj;
--    VirtIOGPU      vdev;
--    VGACommonState vga;
--    MemoryRegion   vga_mrs[3];
--} VirtIOVGA;
--
--typedef struct VirtIOVGAClass {
--    VirtioPCIClass parent_class;
--    DeviceReset parent_reset;
--} VirtIOVGAClass;
--
--static void virtio_vga_invalidate_display(void *opaque)
-+static void virtio_vga_base_invalidate_display(void *opaque)
- {
--    VirtIOVGA *vvga =3D opaque;
--    VirtIOGPUBase *g =3D VIRTIO_GPU_BASE(&vvga->vdev);
-+    VirtIOVGABase *vvga =3D opaque;
-+    VirtIOGPUBase *g =3D vvga->vgpu;
-=20
-     if (g->enable) {
--        virtio_gpu_ops.invalidate(&vvga->vdev);
-+        virtio_gpu_ops.invalidate(g);
-     } else {
-         vvga->vga.hw_ops->invalidate(&vvga->vga);
-     }
- }
-=20
--static void virtio_vga_update_display(void *opaque)
-+static void virtio_vga_base_update_display(void *opaque)
- {
--    VirtIOVGA *vvga =3D opaque;
--    VirtIOGPUBase *g =3D VIRTIO_GPU_BASE(&vvga->vdev);
-+    VirtIOVGABase *vvga =3D opaque;
-+    VirtIOGPUBase *g =3D vvga->vgpu;
-=20
-     if (g->enable) {
--        virtio_gpu_ops.gfx_update(&vvga->vdev);
-+        virtio_gpu_ops.gfx_update(g);
-     } else {
-         vvga->vga.hw_ops->gfx_update(&vvga->vga);
-     }
- }
-=20
--static void virtio_vga_text_update(void *opaque, console_ch_t *chardata)
-+static void virtio_vga_base_text_update(void *opaque, console_ch_t *char=
-data)
- {
--    VirtIOVGA *vvga =3D opaque;
--    VirtIOGPUBase *g =3D VIRTIO_GPU_BASE(&vvga->vdev);
-+    VirtIOVGABase *vvga =3D opaque;
-+    VirtIOGPUBase *g =3D vvga->vgpu;
-=20
-     if (g->enable) {
-         if (virtio_gpu_ops.text_update) {
--            virtio_gpu_ops.text_update(&vvga->vdev, chardata);
-+            virtio_gpu_ops.text_update(g, chardata);
-         }
-     } else {
-         if (vvga->vga.hw_ops->text_update) {
-@@ -69,49 +45,52 @@ static void virtio_vga_text_update(void *opaque, cons=
-ole_ch_t *chardata)
-     }
- }
-=20
--static int virtio_vga_ui_info(void *opaque, uint32_t idx, QemuUIInfo *in=
-fo)
-+static int virtio_vga_base_ui_info(void *opaque, uint32_t idx, QemuUIInf=
-o *info)
- {
--    VirtIOVGA *vvga =3D opaque;
-+    VirtIOVGABase *vvga =3D opaque;
-+    VirtIOGPUBase *g =3D vvga->vgpu;
-=20
-     if (virtio_gpu_ops.ui_info) {
--        return virtio_gpu_ops.ui_info(&vvga->vdev, idx, info);
-+        return virtio_gpu_ops.ui_info(g, idx, info);
-     }
-     return -1;
- }
-=20
--static void virtio_vga_gl_block(void *opaque, bool block)
-+static void virtio_vga_base_gl_block(void *opaque, bool block)
- {
--    VirtIOVGA *vvga =3D opaque;
-+    VirtIOVGABase *vvga =3D opaque;
-+    VirtIOGPUBase *g =3D vvga->vgpu;
-=20
-     if (virtio_gpu_ops.gl_block) {
--        virtio_gpu_ops.gl_block(&vvga->vdev, block);
-+        virtio_gpu_ops.gl_block(g, block);
-     }
- }
-=20
--static const GraphicHwOps virtio_vga_ops =3D {
--    .invalidate =3D virtio_vga_invalidate_display,
--    .gfx_update =3D virtio_vga_update_display,
--    .text_update =3D virtio_vga_text_update,
--    .ui_info =3D virtio_vga_ui_info,
--    .gl_block =3D virtio_vga_gl_block,
-+static const GraphicHwOps virtio_vga_base_ops =3D {
-+    .invalidate =3D virtio_vga_base_invalidate_display,
-+    .gfx_update =3D virtio_vga_base_update_display,
-+    .text_update =3D virtio_vga_base_text_update,
-+    .ui_info =3D virtio_vga_base_ui_info,
-+    .gl_block =3D virtio_vga_base_gl_block,
- };
-=20
--static const VMStateDescription vmstate_virtio_vga =3D {
-+static const VMStateDescription vmstate_virtio_vga_base =3D {
-     .name =3D "virtio-vga",
-     .version_id =3D 2,
-     .minimum_version_id =3D 2,
-     .fields =3D (VMStateField[]) {
-         /* no pci stuff here, saving the virtio device will handle that =
-*/
--        VMSTATE_STRUCT(vga, VirtIOVGA, 0, vmstate_vga_common, VGACommonS=
-tate),
-+        VMSTATE_STRUCT(vga, VirtIOVGABase, 0,
-+                       vmstate_vga_common, VGACommonState),
-         VMSTATE_END_OF_LIST()
-     }
- };
-=20
- /* VGA device wrapper around PCI device around virtio GPU */
--static void virtio_vga_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-+static void virtio_vga_base_realize(VirtIOPCIProxy *vpci_dev, Error **er=
-rp)
- {
--    VirtIOVGA *vvga =3D VIRTIO_VGA(vpci_dev);
--    VirtIOGPUBase *g =3D VIRTIO_GPU_BASE(&vvga->vdev);
-+    VirtIOVGABase *vvga =3D VIRTIO_VGA_BASE(vpci_dev);
-+    VirtIOGPUBase *g =3D vvga->vgpu;
-     VGACommonState *vga =3D &vvga->vga;
-     Error *err =3D NULL;
-     uint32_t offset;
-@@ -169,7 +148,7 @@ static void virtio_vga_realize(VirtIOPCIProxy *vpci_d=
-ev, Error **errp)
-                                  vvga->vga_mrs, true, false);
-=20
-     vga->con =3D g->scanout[0].con;
--    graphic_console_set_hwops(vga->con, &virtio_vga_ops, vvga);
-+    graphic_console_set_hwops(vga->con, &virtio_vga_base_ops, vvga);
-=20
-     for (i =3D 0; i < g->conf.max_outputs; i++) {
-         object_property_set_link(OBJECT(g->scanout[i].con),
-@@ -178,10 +157,10 @@ static void virtio_vga_realize(VirtIOPCIProxy *vpci=
-_dev, Error **errp)
-     }
- }
-=20
--static void virtio_vga_reset(DeviceState *dev)
-+static void virtio_vga_base_reset(DeviceState *dev)
- {
--    VirtIOVGAClass *klass =3D VIRTIO_VGA_GET_CLASS(dev);
--    VirtIOVGA *vvga =3D VIRTIO_VGA(dev);
-+    VirtIOVGABaseClass *klass =3D VIRTIO_VGA_BASE_GET_CLASS(dev);
-+    VirtIOVGABase *vvga =3D VIRTIO_VGA_BASE(dev);
-=20
-     /* reset virtio-gpu */
-     klass->parent_reset(dev);
-@@ -191,48 +170,70 @@ static void virtio_vga_reset(DeviceState *dev)
-     vga_dirty_log_start(&vvga->vga);
- }
-=20
--static Property virtio_vga_properties[] =3D {
-+static Property virtio_vga_base_properties[] =3D {
-     DEFINE_VIRTIO_GPU_PCI_PROPERTIES(VirtIOPCIProxy),
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
--static void virtio_vga_class_init(ObjectClass *klass, void *data)
-+static void virtio_vga_base_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     VirtioPCIClass *k =3D VIRTIO_PCI_CLASS(klass);
--    VirtIOVGAClass *v =3D VIRTIO_VGA_CLASS(klass);
-+    VirtIOVGABaseClass *v =3D VIRTIO_VGA_BASE_CLASS(klass);
-     PCIDeviceClass *pcidev_k =3D PCI_DEVICE_CLASS(klass);
-=20
-     set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
--    dc->props =3D virtio_vga_properties;
--    dc->vmsd =3D &vmstate_virtio_vga;
-+    dc->props =3D virtio_vga_base_properties;
-+    dc->vmsd =3D &vmstate_virtio_vga_base;
-     dc->hotpluggable =3D false;
--    device_class_set_parent_reset(dc, virtio_vga_reset,
-+    device_class_set_parent_reset(dc, virtio_vga_base_reset,
-                                   &v->parent_reset);
-=20
--    k->realize =3D virtio_vga_realize;
-+    k->realize =3D virtio_vga_base_realize;
-     pcidev_k->romfile =3D "vgabios-virtio.bin";
-     pcidev_k->class_id =3D PCI_CLASS_DISPLAY_VGA;
- }
-=20
-+static TypeInfo virtio_vga_base_info =3D {
-+    .name          =3D TYPE_VIRTIO_VGA_BASE,
-+    .parent        =3D TYPE_VIRTIO_PCI,
-+    .instance_size =3D sizeof(struct VirtIOVGABase),
-+    .class_size    =3D sizeof(struct VirtIOVGABaseClass),
-+    .class_init    =3D virtio_vga_base_class_init,
-+    .abstract      =3D true,
-+};
-+
-+#define TYPE_VIRTIO_VGA "virtio-vga"
-+
-+#define VIRTIO_VGA(obj)                             \
-+    OBJECT_CHECK(VirtIOVGA, (obj), TYPE_VIRTIO_VGA)
-+
-+typedef struct VirtIOVGA {
-+    VirtIOVGABase parent_obj;
-+
-+    VirtIOGPU     vdev;
-+} VirtIOVGA;
-+
- static void virtio_vga_inst_initfn(Object *obj)
- {
-     VirtIOVGA *dev =3D VIRTIO_VGA(obj);
-=20
-     virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-                                 TYPE_VIRTIO_GPU);
-+    VIRTIO_VGA_BASE(dev)->vgpu =3D VIRTIO_GPU_BASE(&dev->vdev);
- }
-=20
-+
- static VirtioPCIDeviceTypeInfo virtio_vga_info =3D {
-     .generic_name  =3D TYPE_VIRTIO_VGA,
-+    .parent        =3D TYPE_VIRTIO_VGA_BASE,
-     .instance_size =3D sizeof(struct VirtIOVGA),
-     .instance_init =3D virtio_vga_inst_initfn,
--    .class_size    =3D sizeof(struct VirtIOVGAClass),
--    .class_init    =3D virtio_vga_class_init,
- };
-=20
- static void virtio_vga_register_types(void)
- {
-+    type_register_static(&virtio_vga_base_info);
-     virtio_pci_types_register(&virtio_vga_info);
- }
-=20
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a2ea99f4cd..1eee26a951 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1672,7 +1672,7 @@ virtio-gpu
- M: Gerd Hoffmann <kraxel@redhat.com>
- S: Maintained
- F: hw/display/virtio-gpu*
--F: hw/display/virtio-vga.c
-+F: hw/display/virtio-vga.*
- F: include/hw/virtio/virtio-gpu.h
-=20
- vhost-user-gpu
---=20
-2.21.0.777.g83232e3864
 
+> The QMP query returns a list of valid vq lists. For example, if
+> a guest can use vqs 1, 2, 3, and 4, then the following list will
+> be returned
+> 
+>  [ [ 1 ], [ 1, 2 ], [ 1, 2, 3 ], [ 1, 2, 3, 4 ] ]
+> 
+> Another example might be 1, 2, 4, as the architecture states 3
+> is optional. In that case the list would be
+> 
+>  [ [ 1 ], [ 1, 2 ], [ 1, 2, 4 ] ]
+> 
+> This may look redundant, but it's necessary to provide a future-
+> proof query, because while KVM currently requires vector sets to
+> be strict truncations of the full valid vector set, that may change
+> at some point.
+
+How and why would that make sense?
+
+Real hardware is going to support one set of vector lengths.  Whether VQ=3 is
+valid or not is not going to depend on the maximum VQ, surely.
+
+I'll also note that if we want to support the theoretical
+beyond-current-architecture maximum VQ=512, such that migration works
+seemlessly with current hardware, then we're going to have to change the
+migration format.
+
+So far I'm supporting only the current architecture maximum VQ=16.  Which
+seemed plenty, given that the first round of hardware only supports VQ=4.
+
+
+
+r~
 
