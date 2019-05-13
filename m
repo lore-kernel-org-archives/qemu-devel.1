@@ -3,41 +3,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11020C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:16:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D5EEC04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:16:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAB8C2133F
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:16:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAB8C2133F
+	by mail.kernel.org (Postfix) with ESMTPS id 1279F2133F
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:16:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1279F2133F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57206 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57208 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQAoH-0006R3-3J
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 09:16:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50264)
+	id 1hQAoz-0006yY-8Z
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 09:16:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1hQAbh-0003Xj-5O
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:03:10 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1hQAbk-0003kS-M4
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:03:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1hQAM4-00089P-0u
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 08:46:57 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2210 helo=huawei.com)
+	(envelope-from <gengdongjiu@huawei.com>) id 1hQAM2-000875-GY
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 08:46:55 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2211 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
-	id 1hQAM1-00080A-EK; Mon, 13 May 2019 08:46:54 -0400
+	id 1hQAM0-00080K-KA; Mon, 13 May 2019 08:46:52 -0400
 Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
-	by Forcepoint Email with ESMTP id 64B96A929D6EF2512CA3;
+	by Forcepoint Email with ESMTP id 6DCD1895AF6D1E24CF23;
 	Mon, 13 May 2019 20:46:48 +0800 (CST)
 Received: from ros.huawei.com (10.143.28.118) by
 	DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server
-	id 14.3.439.0; Mon, 13 May 2019 20:46:40 +0800
+	id 14.3.439.0; Mon, 13 May 2019 20:46:37 +0800
 From: Dongjiu Geng <gengdongjiu@huawei.com>
 To: <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
 	<shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
@@ -46,8 +46,8 @@ To: <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
 	<rth@twiddle.net>, <ehabkost@redhat.com>, <zhengxiang9@huawei.com>,
 	<jonathan.cameron@huawei.com>, <xuwei5@huawei.com>, <kvm@vger.kernel.org>, 
 	<qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
-Date: Mon, 13 May 2019 05:43:07 -0700
-Message-ID: <1557751388-27063-10-git-send-email-gengdongjiu@huawei.com>
+Date: Mon, 13 May 2019 05:43:04 -0700
+Message-ID: <1557751388-27063-7-git-send-email-gengdongjiu@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1557751388-27063-1-git-send-email-gengdongjiu@huawei.com>
 References: <1557751388-27063-1-git-send-email-gengdongjiu@huawei.com>
@@ -57,8 +57,8 @@ X-Originating-IP: [10.143.28.118]
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 45.249.212.190
-Subject: [Qemu-devel] [PATCH v16 09/10] target-arm: kvm64: inject
- synchronous External Abort
+Subject: [Qemu-devel] [PATCH v16 06/10] docs: APEI GHES generation and CPER
+ record description
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,103 +74,117 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add synchronous external abort injection logic, setup
-exception type and syndrome value. When switch to guest,
-it will jump to the synchronous external abort vector
-table entry.
-
-The ESR_ELx.DFSC is set to synchronous external abort(0x10),
-and ESR_ELx.FnV is set to not valid(0x1), which will tell
-guest that FAR is not valid and hold an UNKNOWN value.
-These value will be set to KVM register structures through
-KVM_SET_ONE_REG IOCTL.
+Add APEI/GHES detailed design document
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 ---
- target/arm/internals.h |  5 +++--
- target/arm/kvm64.c     | 34 ++++++++++++++++++++++++++++++++++
- target/arm/op_helper.c |  2 +-
- 3 files changed, 38 insertions(+), 3 deletions(-)
+ docs/specs/acpi_hest_ghes.txt | 97 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 97 insertions(+)
+ create mode 100644 docs/specs/acpi_hest_ghes.txt
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 587a1dd..4d67a91 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -451,13 +451,14 @@ static inline uint32_t syn_insn_abort(int same_el, int ea, int s1ptw, int fsc)
-         | ARM_EL_IL | (ea << 9) | (s1ptw << 7) | fsc;
- }
- 
--static inline uint32_t syn_data_abort_no_iss(int same_el,
-+static inline uint32_t syn_data_abort_no_iss(int same_el, int fnv,
-                                              int ea, int cm, int s1ptw,
-                                              int wnr, int fsc)
- {
-     return (EC_DATAABORT << ARM_EL_EC_SHIFT) | (same_el << ARM_EL_EC_SHIFT)
-            | ARM_EL_IL
--           | (ea << 9) | (cm << 8) | (s1ptw << 7) | (wnr << 6) | fsc;
-+           | (fnv << 10) | (ea << 9) | (cm << 8) | (s1ptw << 7)
-+           | (wnr << 6) | fsc;
- }
- 
- static inline uint32_t syn_data_abort_with_iss(int same_el,
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index e3ba149..c7bdc6a 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -697,6 +697,40 @@ int kvm_arm_cpreg_level(uint64_t regidx)
-     return KVM_PUT_RUNTIME_STATE;
- }
- 
-+/* Inject synchronous external abort */
-+static void kvm_inject_arm_sea(CPUState *c)
-+{
-+    ARMCPU *cpu = ARM_CPU(c);
-+    CPUARMState *env = &cpu->env;
-+    CPUClass *cc = CPU_GET_CLASS(c);
-+    uint32_t esr;
-+    bool same_el;
+diff --git a/docs/specs/acpi_hest_ghes.txt b/docs/specs/acpi_hest_ghes.txt
+new file mode 100644
+index 0000000..fbfc787
+--- /dev/null
++++ b/docs/specs/acpi_hest_ghes.txt
+@@ -0,0 +1,97 @@
++APEI tables generating and CPER record
++=============================
 +
-+    /**
-+     * set the exception type to synchronous data abort
-+     * and the target exception Level to EL1.
-+     */
-+    c->exception_index = EXCP_DATA_ABORT;
-+    env->exception.target_el = 1;
++Copyright (C) 2017 HuaWei Corporation.
 +
-+    /*
-+     * Set the DFSC to synchronous external abort and set FnV to not valid,
-+     * this will tell guest the FAR_ELx is UNKNOWN for this abort.
-+     */
++Design Details:
++-------------------
 +
-+    /* This exception comes from lower or current exception level. */
-+    same_el = arm_current_el(env) == env->exception.target_el;
-+    esr = syn_data_abort_no_iss(same_el, 1, 0, 0, 0, 0, 0x10);
++       etc/acpi/tables                                 etc/hardware_errors
++    ====================                      ==========================================
+++ +--------------------------+            +-----------------------+
++| | HEST                     |            |    address            |            +--------------+
++| +--------------------------+            |    registers          |            | Error Status |
++| | GHES1                    |            | +---------------------+            | Data Block 1 |
++| +--------------------------+ +--------->| |error_block_address1 |----------->| +------------+
++| | .................        | |          | +---------------------+            | |  CPER      |
++| | error_status_address-----+-+ +------->| |error_block_address2 |--------+   | |  CPER      |
++| | .................        |   |        | +---------------------+        |   | |  ....      |
++| | read_ack_register--------+-+ |        | |    ..............   |        |   | |  CPER      |
++| | read_ack_preserve        | | |        +-----------------------+        |   | +------------+
++| | read_ack_write           | | | +----->| |error_block_addressN |------+ |   | Error Status |
+++ +--------------------------+ | | |      | +---------------------+      | |   | Data Block 2 |
++| | GHES2                    | +-+-+----->| |read_ack_register1   |      | +-->| +------------+
+++ +--------------------------+   | |      | +---------------------+      |     | |  CPER      |
++| | .................        |   | | +--->| |read_ack_register2   |      |     | |  CPER      |
++| | error_status_address-----+---+ | |    | +---------------------+      |     | |  ....      |
++| | .................        |     | |    | |  .............      |      |     | |  CPER      |
++| | read_ack_register--------+-----+-+    | +---------------------+      |     +-+------------+
++| | read_ack_preserve        |     |   +->| |read_ack_registerN   |      |     | |..........  |
++| | read_ack_write           |     |   |  | +---------------------+      |     | +------------+
+++ +--------------------------|     |   |                                 |     | Error Status |
++| | ...............          |     |   |                                 |     | Data Block N |
+++ +--------------------------+     |   |                                 +---->| +------------+
++| | GHESN                    |     |   |                                       | |  CPER      |
+++ +--------------------------+     |   |                                       | |  CPER      |
++| | .................        |     |   |                                       | |  ....      |
++| | error_status_address-----+-----+   |                                       | |  CPER      |
++| | .................        |         |                                       +-+------------+
++| | read_ack_register--------+---------+
++| | read_ack_preserve        |
++| | read_ack_write           |
+++ +--------------------------+
 +
-+    env->exception.syndrome = esr;
++(1) QEMU generates the ACPI HEST table. This table goes in the current
++    "etc/acpi/tables" fw_cfg blob. Each error source has different
++    notification type.
 +
-+    /**
-+     * The vcpu thread already hold BQL, so no need hold again when
-+     * calling do_interrupt
-+     */
-+    cc->do_interrupt(c);
-+}
++(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
++    also need to populate this blob. The "etc/hardwre_errors" fw_cfg blob
++    contains one address registers table and one Error Status Data Block
++    table, all of which are pre-allocated.
 +
- #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
-                  KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
- 
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index 8698b4d..d43134a 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -109,7 +109,7 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
-      * ISV field.
-      */
-     if (!(template_syn & ARM_EL_ISV) || target_el != 2 || s1ptw) {
--        syn = syn_data_abort_no_iss(same_el,
-+        syn = syn_data_abort_no_iss(same_el, 0,
-                                     ea, 0, s1ptw, is_write, fsc);
-     } else {
-         /* Fields: IL, ISV, SAS, SSE, SRT, SF and AR come from the template
++(3) The address registers table contains N Error Block Address entries
++    and N Read Ack Address entries, the size for each entry is 8-byte.
++    The Error Status Data Block table contains N Error Status Data Block
++    entries, the size for each entry is 4096(0x1000) bytes. The total size
++    for "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) bytes.
++
++(4) QEMU generates the ACPI linker/loader script for the firmware
++
++(4a) The HEST table is part of "etc/acpi/tables", the firmware already
++    allocates the memory for it, because QEMU already generates an ALLOCATE
++    linker/loader command for it
++
++(4b) QEMU creates another ALLOCATE command for the "etc/hardware_errors"
++    blob. The firmware allocates memory for this blob and downloads it.
++
++(5) QEMU generates N ADD_POINTER commands, which patch address in the
++    "error_status_address" fields of the HEST table with a pointer to the
++    corresponding "address registers" in the downloaded "etc/hardware_errors"
++    blob.
++
++(6) QEMU generates N ADD_POINTER commands, which patch address in the
++    "read_ack_register" fields of the HEST table with a pointer to the
++    corresponding "address registers" in the downloaded "etc/hardware_errors" blob.
++
++(7) QEMU generates N ADD_POINTER commands for the firmware, which patch
++    address in the " error_block_address" fields with a pointer to the
++    respective "Error Status Data Block" in the downloaded "etc/hardware_errors"
++    blob.
++
++(8) QEMU Defines a third and write-only fw_cfg blob which is called
++    "etc/hardware_errors_addr". Through that blob, the firmware can send back
++    the guest-side allocation addresses to QEMU. The "etc/hardware_errors_addr"
++    blob contains a 8-byte entry. QEMU generates a single WRITE_POINTER commands
++    for the firmware, the firmware will write back the start address of
++    "etc/hardware_errors" blob to fw_cfg file "etc/hardware_errors_addr". Then
++    Qemu will know the Error Status Data Block for every error source. Each of
++    Error Status Data Block has fixed size which is 4096(0x1000).
++
++(9) When QEMU gets SIGBUS from the kernel, QEMU formats the CPER right into
++    guest memory, and then injects whatever interrupt (or assert whatever GPIO line)
++    as a notification which is necessary for notifying the guest.
++
++(10) This notification (in virtual hardware) will be handled by guest kernel,
++    guest APEI driver will read the CPER which is recorded by QEMU and do the
++    recovery.
 -- 
 1.8.3.1
 
