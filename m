@@ -2,78 +2,72 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7066EC04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 16:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39DD6C04AB1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 16:56:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 384AD2086A
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 16:54:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kb6TcA9R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 384AD2086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 005A02086A
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 16:56:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 005A02086A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60482 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60522 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQEDk-0001bW-BL
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 12:54:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39279)
+	id 1hQEFi-0002Kv-Ab
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 12:56:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hQECn-0001Da-Rf
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 12:53:38 -0400
+	(envelope-from <palmer@dabbelt.com>) id 1hQEEv-000211-Cb
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 12:55:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hQECm-0007oC-FG
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 12:53:37 -0400
-Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:32979)
+	(envelope-from <palmer@dabbelt.com>) id 1hQEEt-0000pA-UM
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 12:55:49 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:40378)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hQECm-0007nK-4f
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 12:53:36 -0400
-Received: by mail-ot1-x336.google.com with SMTP id 66so12445605otq.0
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 09:53:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=Pb1B8Av39ZPvBs2RJzpF2tUcLswjPPgnNSykVdts5UI=;
-	b=kb6TcA9R7yAtnFT4DHiUVUsEVZJxi1zZO6w+g+Zs8Bkg1FCNOwznDUb/p2PZN1EvGw
-	Fc6Jk5p6mbke9B1tlpamDVJlDvEc5t7DUrpByyDc1P3o0DNagEebNuU5BMcqU9gbgNEI
-	Bje5SdZuKQwkYc8nq8yAY/UmgX35bCNzFdcnEb1wL9pZW3d1ESsMBQwWtNMb96CQc+ud
-	azLUKKXDOJsFPV93DzIf/5bFN2Ic5f8iQ/eFr4PITMcWGSoaMqw5ru0ZAfQgl1BeL1G5
-	eOfwb+eVXZDPq+2jBWxagulGvh3NDeF06HTy047/i+L3/ASiT9en+q3z8tpxMeavSXk3
-	i03w==
+	(Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hQEEt-0000o2-OJ
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 12:55:47 -0400
+Received: by mail-pf1-f193.google.com with SMTP id u17so7507595pfn.7
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 09:55:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=Pb1B8Av39ZPvBs2RJzpF2tUcLswjPPgnNSykVdts5UI=;
-	b=nYT5N6fGq+g8GltDZEPPROysF5wJzS1HX6lRp6sFgWdoSTLV2t5i9O0zfqiAPLwM8t
-	957CPxW6QMav/c2zT8h62JRGQKPdNMxhiHd72F3pOMLz9WMMC75m+sL6D6IPTsnSA4HO
-	7pnY0Uns5pApmvMLE0WOPWJlmfsS/W8ndOUppeMUhrmpYDPunHnBbyEmaVEXAlGD2yVH
-	vF1yO86n1y6oZ4xET7D+tL1uSrK+T2uydot4xPvI/XvO5fa5y1zTEwpsz500tlrFyoag
-	IczmpoF3GvejMQe9GLSfEiUZcL/YAv/K7K9ejAPIzFcptBZrIc7auBic9FshW6Xw6pYA
-	FdCg==
-X-Gm-Message-State: APjAAAXbwlzPfadLUF26JHgRx4nT8Ksj+3/YJak4XaWNDF8kI0Is93+G
-	blDoUhdUS1Les8r2c19Ts0W007vNUZxYnx07JYR8Sw==
-X-Google-Smtp-Source: APXvYqyxMvFxEGibW2cZgqey9s2dBMJffDIemHLQE5CkxmJkresExMPoWNYf4eExs4oFJs1Ej4JazSHLEhEZT1B3iOI=
-X-Received: by 2002:a9d:2002:: with SMTP id n2mr14169212ota.363.1557766414804; 
-	Mon, 13 May 2019 09:53:34 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190513082940.30295-1-thuth@redhat.com>
-In-Reply-To: <20190513082940.30295-1-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 13 May 2019 17:53:23 +0100
-Message-ID: <CAFEAcA-1xskd=p5kWvW=nvm+8O0H=Y55LtQSynvW-1vXRPjdFg@mail.gmail.com>
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::336
-Subject: Re: [Qemu-devel] [PULL v3 00/29] Kconfig for Arm
+	h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+	:mime-version:content-transfer-encoding;
+	bh=ah6GWwfR1g+tDsx1lcSLI2FHFTAjFKmbKebHaxFmxBQ=;
+	b=gpGAjRxIqhBQVREzvjQk8wRUHLrRgYKpPyDD6Frjn9/7Kq6XQALG8TP1McJJL4H+lv
+	JgkNuWT07nyHo8sON4VmDaMS7rQ4Tum5/g3vaKtKPRgwKsyBtMv6yXTX8UfL0aEmaGaP
+	OllshbZC4bD3ijHKgaDEy46jBEOge0xABjly+ZUt+oyz0Cx7b3sbDkzYZihJE7jDOwyB
+	E7pLxxRjeu6l1cc9SuRwCIE+SPHvkGKGeclrL0tsiOjbIat6hE5HNygV1xHeZ4MYri8P
+	IdHws1TDdD0wOGcAa62iUTkkMu7oQYIenRW7aEHniUW3nxylxmhbeEzRcAl2leTcCiwY
+	wBEg==
+X-Gm-Message-State: APjAAAV7TvVck7wJXIQ+uSEkrPnJVc5SLLofk/e+yvQLMs03m04gbG1I
+	cWtArx3sqqqVQwz5Qa7Eb1tgTqYhtL8=
+X-Google-Smtp-Source: APXvYqwX4Ozs5dF8Ahytdhe1nrcdFy2KBYy8S4FVvfpCTPWBJCD84CoFNgbFz6XQ61sfCtmPOSeejg==
+X-Received: by 2002:a63:c106:: with SMTP id w6mr28863993pgf.422.1557766545380; 
+	Mon, 13 May 2019 09:55:45 -0700 (PDT)
+Received: from localhost ([12.206.222.5]) by smtp.gmail.com with ESMTPSA id
+	q19sm19372104pff.96.2019.05.13.09.55.43
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Mon, 13 May 2019 09:55:44 -0700 (PDT)
+Date: Mon, 13 May 2019 09:55:44 -0700 (PDT)
+X-Google-Original-Date: Mon, 13 May 2019 09:47:44 PDT (-0700)
+In-Reply-To: <20190513081844.26699-5-armbru@redhat.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: armbru@redhat.com
+Message-ID: <mhng-5f5db13d-9ab7-414b-8979-4e119c319f78@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.210.193
+Subject: Re: [Qemu-devel] [PULL 4/9] linux-user/nios2 linux-user/riscv:
+ Clean up header guards
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -85,36 +79,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 13 May 2019 at 09:29, Thomas Huth <thuth@redhat.com> wrote:
+On Mon, 13 May 2019 01:18:39 PDT (-0700), armbru@redhat.com wrote:
+> Reuse of the same guard symbol in multiple headers is okay as long as
+> they cannot be included together.  scripts/clean-header-guards.pl
+> can't tell, so it warns.
 >
->  Hi Peter,
+> Since we can avoid guard symbol reuse easily, do so: use guard symbol
+> ${target^^}_${fname^^} for linux-user/$target/$fname, just like we did
+> in commit a9c94277f0..3500385697.
 >
-> the following changes since commit efb4f3b62c69383a7308d7b739a3193e7c0ccae8:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Message-Id: <20190315145123.28030-4-armbru@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  linux-user/nios2/target_cpu.h     | 4 ++--
+>  linux-user/nios2/target_signal.h  | 6 +++---
+>  linux-user/nios2/target_structs.h | 4 ++--
+>  linux-user/nios2/target_syscall.h | 6 +++---
+>  linux-user/riscv/target_cpu.h     | 4 ++--
+>  linux-user/riscv/target_signal.h  | 6 +++---
+>  linux-user/riscv/target_structs.h | 4 ++--
+>  7 files changed, 17 insertions(+), 17 deletions(-)
 >
->   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-05-10 14:49:36 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/huth/qemu.git tags/pull-request-2019-05-13
->
-> for you to fetch changes up to 704d9892561d3b7ac4728296240a1b3ccfa2045a:
->
->   hw/arm: Remove hard-enablement of the remaining PCI devices (2019-05-13 09:36:32 +0200)
->
-> ----------------------------------------------------------------
-> Kconfig settings for the Arm machines
-> (v3: Added the config-devices.mak.d patch to fix the dependencies)
+> diff --git a/linux-user/nios2/target_cpu.h b/linux-user/nios2/target_cpu.h
+> index 14f63338fa..5596c05c9c 100644
+> --- a/linux-user/nios2/target_cpu.h
+> +++ b/linux-user/nios2/target_cpu.h
+> @@ -17,8 +17,8 @@
+>   * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+>   */
+>  
+> -#ifndef TARGET_CPU_H
+> -#define TARGET_CPU_H
+> +#ifndef NIOS2_TARGET_CPU_H
+> +#define NIOS2_TARGET_CPU_H
+>  
+>  static inline void cpu_clone_regs(CPUNios2State *env, target_ulong newsp)
+>  {
+> diff --git a/linux-user/nios2/target_signal.h b/linux-user/nios2/target_signal.h
+> index 7776bcdbfd..fe48721b3d 100644
+> --- a/linux-user/nios2/target_signal.h
+> +++ b/linux-user/nios2/target_signal.h
+> @@ -1,5 +1,5 @@
+> -#ifndef TARGET_SIGNAL_H
+> -#define TARGET_SIGNAL_H
+> +#ifndef NIOS2_TARGET_SIGNAL_H
+> +#define NIOS2_TARGET_SIGNAL_H
+>  
+>  /* this struct defines a stack used during syscall handling */
+>  
+> @@ -18,4 +18,4 @@ typedef struct target_sigaltstack {
+>  
+>  #include "../generic/signal.h"
+>  
+> -#endif /* TARGET_SIGNAL_H */
+> +#endif /* NIOS2_TARGET_SIGNAL_H */
+> diff --git a/linux-user/nios2/target_structs.h b/linux-user/nios2/target_structs.h
+> index 8713772089..7145251706 100644
+> --- a/linux-user/nios2/target_structs.h
+> +++ b/linux-user/nios2/target_structs.h
+> @@ -16,8 +16,8 @@
+>   * You should have received a copy of the GNU Lesser General Public
+>   * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+>   */
+> -#ifndef TARGET_STRUCTS_H
+> -#define TARGET_STRUCTS_H
+> +#ifndef NIOS2_TARGET_STRUCTS_H
+> +#define NIOS2_TARGET_STRUCTS_H
+>  
+>  struct target_ipc_perm {
+>      abi_int __key;                      /* Key.  */
+> diff --git a/linux-user/nios2/target_syscall.h b/linux-user/nios2/target_syscall.h
+> index ca6b7e69f6..f3b2a500f4 100644
+> --- a/linux-user/nios2/target_syscall.h
+> +++ b/linux-user/nios2/target_syscall.h
+> @@ -1,5 +1,5 @@
+> -#ifndef TARGET_SYSCALL_H
+> -#define TARGET_SYSCALL_H
+> +#ifndef NIOS2_TARGET_SYSCALL_H
+> +#define NIOS2_TARGET_SYSCALL_H
+>  
+>  #define UNAME_MACHINE "nios2"
+>  #define UNAME_MINIMUM_RELEASE "3.19.0"
+> @@ -34,4 +34,4 @@ struct target_pt_regs {
+>  #define TARGET_MLOCKALL_MCL_CURRENT 1
+>  #define TARGET_MLOCKALL_MCL_FUTURE  2
+>  
+> -#endif  /* TARGET_SYSCALL_H */
+> +#endif /* NIOS2_TARGET_SYSCALL_H */
+> diff --git a/linux-user/riscv/target_cpu.h b/linux-user/riscv/target_cpu.h
+> index 7e090f376a..90f9a4171e 100644
+> --- a/linux-user/riscv/target_cpu.h
+> +++ b/linux-user/riscv/target_cpu.h
+> @@ -1,5 +1,5 @@
+> -#ifndef TARGET_CPU_H
+> -#define TARGET_CPU_H
+> +#ifndef RISCV_TARGET_CPU_H
+> +#define RISCV_TARGET_CPU_H
+>  
+>  static inline void cpu_clone_regs(CPURISCVState *env, target_ulong newsp)
+>  {
+> diff --git a/linux-user/riscv/target_signal.h b/linux-user/riscv/target_signal.h
+> index c8b1455800..f113ba9a55 100644
+> --- a/linux-user/riscv/target_signal.h
+> +++ b/linux-user/riscv/target_signal.h
+> @@ -1,5 +1,5 @@
+> -#ifndef TARGET_SIGNAL_H
+> -#define TARGET_SIGNAL_H
+> +#ifndef RISCV_TARGET_SIGNAL_H
+> +#define RISCV_TARGET_SIGNAL_H
+>  
+>  typedef struct target_sigaltstack {
+>      abi_ulong ss_sp;
+> @@ -15,4 +15,4 @@ typedef struct target_sigaltstack {
+>  
+>  #include "../generic/signal.h"
+>  
+> -#endif /* TARGET_SIGNAL_H */
+> +#endif /* RISCV_TARGET_SIGNAL_H */
+> diff --git a/linux-user/riscv/target_structs.h b/linux-user/riscv/target_structs.h
+> index 4f0462c497..ea3e5ed17e 100644
+> --- a/linux-user/riscv/target_structs.h
+> +++ b/linux-user/riscv/target_structs.h
+> @@ -4,8 +4,8 @@
+>   * This is a copy of ../aarch64/target_structs.h atm.
+>   *
+>   */
+> -#ifndef TARGET_STRUCTS_H
+> -#define TARGET_STRUCTS_H
+> +#ifndef RISCV_TARGET_STRUCTS_H
+> +#define RISCV_TARGET_STRUCTS_H
+>  
+>  struct target_ipc_perm {
+>      abi_int __key;                      /* Key.  */
+> -- 
+> 2.17.2
 
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
-
--- PMM
+I'm assuming this is going in through someone else's tree, so I'm not going to
+pick it up into mine.
 
