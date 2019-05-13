@@ -2,65 +2,64 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87335C04AB1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 09:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F066C04AB1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 09:37:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4ED3920989
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 09:36:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4ED3920989
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 506212146F
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 09:37:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 506212146F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54108 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54126 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQ7NL-00033i-Hb
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 05:36:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42142)
+	id 1hQ7OX-0004KJ-K1
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 05:37:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hQ7Lz-0002N5-HX
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 05:34:42 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hQ7NF-0003Ne-WB
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 05:35:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hQ7Ly-0000gV-58
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 05:34:39 -0400
-Received: from 6.mo4.mail-out.ovh.net ([188.165.36.253]:40437)
+	(envelope-from <imammedo@redhat.com>) id 1hQ7NE-0001ws-Sp
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 05:35:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58254)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hQ7Lx-0000fb-V3
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 05:34:38 -0400
-Received: from player157.ha.ovh.net (unknown [10.108.35.185])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 3CBB31ECCC8
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 11:34:35 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
-	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
-	by player157.ha.ovh.net (Postfix) with ESMTPSA id D1EE759E19E8;
-	Mon, 13 May 2019 09:34:31 +0000 (UTC)
-Date: Mon, 13 May 2019 11:34:30 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Thomas Huth <thuth@redhat.com>
-Message-ID: <20190513113430.7474011d@bahia.lan>
-In-Reply-To: <1e89091d-c079-e0b2-54b4-778db04d3e37@redhat.com>
-References: <155721868351.451636.16735088470797960209.stgit@bahia.lan>
-	<155721871721.451636.4261205814714842408.stgit@bahia.lan>
-	<2a5ac8c4-60d3-2246-54ca-678ed7a6f988@redhat.com>
-	<20190509151804.56cd4179@bahia.lan>
-	<1e89091d-c079-e0b2-54b4-778db04d3e37@redhat.com>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hQ7NE-0001vM-Nf
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 05:35:56 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EF2E53082B4D;
+	Mon, 13 May 2019 09:35:55 +0000 (UTC)
+Received: from Igors-MacBook-Pro (unknown [10.40.205.133])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0BEEE60BEC;
+	Mon, 13 May 2019 09:35:45 +0000 (UTC)
+Date: Mon, 13 May 2019 11:35:40 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190513113540.07a450a7@Igors-MacBook-Pro>
+In-Reply-To: <20190513110440.7b03eb0d@Igors-MacBook-Pro>
+References: <1556808723-226478-2-git-send-email-imammedo@redhat.com>
+	<20190512141838-mutt-send-email-mst@kernel.org>
+	<20190513110440.7b03eb0d@Igors-MacBook-Pro>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 4191162406564174130
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrleeggdduiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Mon, 13 May 2019 09:35:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 188.165.36.253
-Subject: Re: [Qemu-devel] [PATCH 6/6] virtfs: Fix documentation of -fsdev
- and -virtfs
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v4 01/15] tests: acpi: rename
+ acpi_parse_rsdp_table() into acpi_fetch_rsdp_table()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,109 +71,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Andrew Jones <drjones@redhat.com>, Ben Warren <ben@skyportsystems.com>,
+	Philippe =?UTF-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	linuxarm@huawei.com,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>,
+	Gonglei <arei.gonglei@huawei.com>,
+	Wei Yang <richardw.yang@linux.intel.com>, xuwei5@huawei.com,
+	xuwei5@hisilicon.com, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 13 May 2019 10:39:17 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+On Mon, 13 May 2019 11:04:40 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-> On 09/05/2019 15.18, Greg Kurz wrote:
-> > On Wed, 8 May 2019 17:54:42 +0200
-> > Thomas Huth <thuth@redhat.com> wrote:
-> >   
-> >> On 07/05/2019 10.45, Greg Kurz wrote:  
-> >>> This fixes several things:
-> >>> - add "id" description to -virtfs documentation
-> >>> - split the description into several lines in both usage and documentation
-> >>>   for accurateness and clarity
-> >>> - add documentation and usage of the synth fsdriver
-> >>> - add "throttling.*" description to -fsdev local
-> >>> - add some missing periods
-> >>>
-> >>> Buglink: https://bugs.launchpad.net/qemu/+bug/1581976
-> >>> Signed-off-by: Greg Kurz <groug@kaod.org>
-> >>> ---
-> >>>  qemu-options.hx |   84 +++++++++++++++++++++++++++++++++++++++----------------
-> >>>  1 file changed, 60 insertions(+), 24 deletions(-)
-> >>>
-> >>> diff --git a/qemu-options.hx b/qemu-options.hx
-> >>> index 9c5cc2e6bf70..975342dfbd66 100644
-> >>> --- a/qemu-options.hx
-> >>> +++ b/qemu-options.hx
-> >>> @@ -1232,26 +1232,35 @@ the write back by pressing @key{C-a s} (@pxref{disk_images}).
-> >>>  ETEXI
-> >>>  
-> >>>  DEF("fsdev", HAS_ARG, QEMU_OPTION_fsdev,
-> >>> -    "-fsdev fsdriver,id=id[,path=path,][security_model={mapped-xattr|mapped-file|passthrough|none}]\n"
-> >>> -    " [,writeout=immediate][,readonly][,socket=socket|sock_fd=sock_fd][,fmode=fmode][,dmode=dmode]\n"
-> >>> +    "-fsdev local,id=id,path=path,security_model=mapped-xattr|mapped-file|passthrough|none\n"
-> >>> +    " [,writeout=immediate][,readonly][,fmode=fmode][,dmode=dmode]\n"
-> >>>      " [[,throttling.bps-total=b]|[[,throttling.bps-read=r][,throttling.bps-write=w]]]\n"
-> >>>      " [[,throttling.iops-total=i]|[[,throttling.iops-read=r][,throttling.iops-write=w]]]\n"
-> >>>      " [[,throttling.bps-total-max=bm]|[[,throttling.bps-read-max=rm][,throttling.bps-write-max=wm]]]\n"
-> >>>      " [[,throttling.iops-total-max=im]|[[,throttling.iops-read-max=irm][,throttling.iops-write-max=iwm]]]\n"
-> >>> -    " [[,throttling.iops-size=is]]\n",
-> >>> +    " [[,throttling.iops-size=is]]\n"
-> >>> +    "-fsdev proxy,id=id,socket=socket[,writeout=immediate][,readonly]\n"
-> >>> +    "-fsdev proxy,id=id,sock_fd=sock_fd[,writeout=immediate][,readonly]\n"
-> >>> +    "-fsdev synth,id=id\n",
-> >>>      QEMU_ARCH_ALL)
-> >>>  
-> >>>  STEXI
-> >>>  
-> >>> -@item -fsdev @var{fsdriver},id=@var{id},path=@var{path},[security_model=@var{security_model}][,writeout=@var{writeout}][,readonly][,socket=@var{socket}|sock_fd=@var{sock_fd}][,fmode=@var{fmode}][,dmode=@var{dmode}]
-> >>> +@item -fsdev local,id=@var{id},path=@var{path},security_model=@var{security_model} [,writeout=@var{writeout}][,readonly][,fmode=@var{fmode}][,dmode=@var{dmode}] [,throttling.@var{option}=@var{value}[,throttling.@var{option}=@var{value}[,...]]]
-> >>> +@itemx -fsdev proxy,id=@var{id},socket=@var{socket}[,writeout=@var{writeout}][,readonly]
-> >>> +@itemx -fsdev proxy,id=@var{id},sock_fd=@var{sock_fd}[,writeout=@var{writeout}][,readonly]
-> >>> +@itemx -fsdev synth,id=@var{id}[,readonly]
-> >>>  @findex -fsdev
-> >>>  Define a new file system device. Valid options are:
-> >>>  @table @option
-> >>> -@item @var{fsdriver}
-> >>> -This option specifies the fs driver backend to use.
-> >>> -Currently "local" and "proxy" file system drivers are supported.
-> >>> +@item local
-> >>> +Accesses to the filesystem are done by QEMU.
-> >>> +@item proxy
-> >>> +Accesses to the filesystem are done by virtfs-proxy-helper(1).
-> >>> +@item synth
-> >>> +Synthetic filesystem, only used by QTests.
-> >>>  @item id=@var{id}
-> >>> -Specifies identifier for this device
-> >>> +Specifies identifier for this device.
-> >>>  @item path=@var{path}
-> >>>  Specifies the export path for the file system device. Files under
-> >>>  this path will be available to the 9p client on the guest.
-> >>> @@ -1279,17 +1288,33 @@ Enables exporting 9p share as a readonly mount for guests. By default
-> >>>  read-write access is given.
-> >>>  @item socket=@var{socket}
-> >>>  Enables proxy filesystem driver to use passed socket file for communicating
-> >>> -with virtfs-proxy-helper
-> >>> +with virtfs-proxy-helper(1).    
-> >>
-> >> Why did you add a "(1)" after each virtfs-proxy-helper?
-> >>  
-> > 
-> > Oops forgot to mention that in the changelog... We have a manual page for the
-> > virtfs-proxy-helper command, and IIUC this is the way for a manual page to
-> > reference another one. Makes sense ?  
-> 
-> Makes sense for the man page ... but it might look a little bit strange
-> in the qemu-doc.html file? I've got no strong opinion, but I think I'd
-> rather not include the "(1)" here.
-> 
+> On Sun, 12 May 2019 14:19:08 -0400
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>=20
+> > On Thu, May 02, 2019 at 04:51:49PM +0200, Igor Mammedov wrote:
+> > > so name would reflect what the function does
+> > >=20
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > > Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
+> > > ---
+> > > v4:
+> > >  * make it as the first patch in series
+> > > ---
+> >=20
+> >=20
+> > FYI this trips up git am.
+> > Don't do two --- please: just one is enough,
+> > second is not needed.
+>=20
+> strange, git am works for me just fine.
+> I've always formated par patch comments this way and I think it's rather
+> common approach on the list.
+>=20
+> What version of git do you use?
+>=20
+[...]
+> (it doesn't apply to master anymore)
+  never mind, it applies just fine (I've missed one patch when applying)
 
-FWIW, we already have some similar references to manual pages:
-
-$ grep '([1-9])' qemu-doc.html
-<p>Note that, by default, GUS shares IRQ(7) with parallel ports and so
-QEMU mmap(2) <samp>mem-path</samp>, and accepts common suffixes, eg
-<dd><p>is a QEMU user creatable object definition. See the <code>qemu(1)</code> manual
-<p>The size syntax is similar to dd(1)&rsquo;s size syntax.
-See the <code>qemu(1)</code> manual page for full details of the properties
-
->  Thomas
+>=20
+> >=20
+> [...]
+>=20
+>=20
 
 
