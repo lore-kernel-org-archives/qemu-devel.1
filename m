@@ -2,93 +2,78 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C258C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 17:20:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE537C04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 17:27:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5733B20873
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 17:20:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FN4oihnz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5733B20873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9055E2084A
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 17:27:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9055E2084A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60735 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60813 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQEcf-00085P-EB
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 13:20:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43153)
+	id 1hQEjf-0001AJ-QZ
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 13:27:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQEbq-0007gb-Sg
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 13:19:31 -0400
+	(envelope-from <philmd@redhat.com>) id 1hQEiq-0000qW-Lm
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 13:26:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQEbp-0005Nj-Uf
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 13:19:30 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:34791)
+	(envelope-from <philmd@redhat.com>) id 1hQEip-0000xW-Au
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 13:26:44 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43161)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hQEbp-0005Mg-Na
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 13:19:29 -0400
-Received: by mail-pf1-x441.google.com with SMTP id n19so7554956pfa.1
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 10:19:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=XxwWa2ijAArGPWsus3mu2myK1b43gnq5vviw5SvdiQ8=;
-	b=FN4oihnzdM8f84+djyrybamm1Ng0iNIvZ6UmimF/pZri7a2KA0y1hLKa0m1BiD8o0F
-	r13ypMxzFXHb0+usZf+uaW0P3yK1S7Yy/+BbDgF7uWsMAgLmO1MFNzJSH68OlFuJ+PBO
-	zkoINE1ExGEFkhUXae6JO717KO7Mv9y4+VJAaOUzL6/SE4SlFGNP/I+uyceYWN5d3Y83
-	HWlm9IX0pb5SjdGu/0PAstcdxu+LgoPIES3hGV76NCH3erWoD6sm/1oumuvqqTLt1eNN
-	xGUFMmELPQHrpjmXMTT6jXFDLxK3QH+7hCCgWesSIgqlApD049unmj6xtcODWeo36aQh
-	7pNg==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hQEip-0000wx-4Z
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 13:26:43 -0400
+Received: by mail-wr1-f65.google.com with SMTP id r4so16188422wro.10
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 10:26:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=XxwWa2ijAArGPWsus3mu2myK1b43gnq5vviw5SvdiQ8=;
-	b=NJKxXGH4JThUp1hC+F5keGua4WPaldGzCw9MC990vhvArPh8kMsT7joekP2C/zxkCF
-	BLctrLZjY3HPGpDcCJiP+zNKKZY3CGr2KKYOaCvNARIPx5nAMCfE0gGr/J8CfW0V3d8B
-	0XgGlD2hPdwClV2fF239om9jdmDNa10l7YNW6zpaPKmJ/Qf+eJpD4pXeugkyptFEWgiQ
-	ncNHXwyfV8JLn9LXIE6aAhhw5Q2GfuovWsijgW7kbvhcitRJlNZIBbI0EzfaUNrzJZxC
-	HMGLVIKRrxxdjfnf2VqzEyK5cOY2WAb4IDmBMGtcTDQ1d1EjFw04e1Mrj1ah5bm1DXCB
-	md4w==
-X-Gm-Message-State: APjAAAWmKHLttCadTW5XURlBXMece6CMgv0sovRZ6Frb5L0b2Uh3NYs9
-	M+CMOYq4jDU8/jobcCjxt6FiiQ==
-X-Google-Smtp-Source: APXvYqzEm+QiUBlc5s2j+lc5i0gf6a65KtN2gNwwMM3HI1Dc+nE2vMoGGKIaLvtsLNXF016hAeeWXA==
-X-Received: by 2002:a63:a08:: with SMTP id 8mr32301138pgk.46.1557767967909;
-	Mon, 13 May 2019 10:19:27 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id
-	a3sm18165859pfn.182.2019.05.13.10.19.26
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 13 May 2019 10:19:27 -0700 (PDT)
-To: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org
-References: <20190512083624.8916-1-drjones@redhat.com>
-	<20190512083624.8916-8-drjones@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <50d07a50-d780-2c73-d9d8-f6eeff6a17c8@linaro.org>
-Date: Mon, 13 May 2019 10:19:25 -0700
+	bh=zxoSeMoBB64F36rtqv5xEafqZO+XPUTtWoPdqTQrbes=;
+	b=HIq2NcJ29SwRgo1Vn3pBBNap900sP1V8j4yCWJblNLbw8hgaMZDVQczus4z8WzE6O7
+	T0QcXiuWIF00QTDo8iyBjv3hpRt5+rk8fG752wePa7eeG1HeaLuFxFvasY6Rw7H9XetE
+	EpInbV9/XM6e7yXyA5VRg1IdA39eki0VW7pz1q+iq1t11XdxLzG+6VqULVyE90LSfmKj
+	da1k996I50vr7C8ORG1XIY9g3lYpKfv4G/aMMYRuvCxPIrA8mnNhLUiMijocgHSQBAc1
+	hQSp+vQhjy+Ij1NA/pgtrPYwDbOTXC4Rcuo8tzbkBVdqFVv/oi8K7YArWTXDrQpW6vHK
+	zxPg==
+X-Gm-Message-State: APjAAAXrc+X4BwD49HpSLh3k9pHCgmnlTva7ji4YE+2Sv2w7Vi6HADdZ
+	xIZn8VB+4pE9IIARdOvq+oBfDJyIZIQ=
+X-Google-Smtp-Source: APXvYqzITeuU/h3tBEuTBDxZxeqU7/yxjqvsdWw8kc8oE2/SgC9UVB4nAyIGwGiYXWcjEtGs308QYg==
+X-Received: by 2002:adf:e691:: with SMTP id r17mr15697646wrm.50.1557768401289; 
+	Mon, 13 May 2019 10:26:41 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193])
+	by smtp.gmail.com with ESMTPSA id j82sm90345wmj.40.2019.05.13.10.26.40
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Mon, 13 May 2019 10:26:40 -0700 (PDT)
+To: Yoshinori Sato <yo-satoh@sios.com>, qemu-devel@nongnu.org
+References: <20190513052518.6274-1-yo-satoh@sios.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <7fcd8994-1549-fb6f-d7c2-5ad4558767c3@redhat.com>
+Date: Mon, 13 May 2019 19:26:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190512083624.8916-8-drjones@redhat.com>
+In-Reply-To: <20190513052518.6274-1-yo-satoh@sios.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH 07/13] target/arm/kvm: max cpu: Allow sve
- max vector length setting
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH v11 00/12] Add RX archtecture support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,42 +85,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, abologna@redhat.com, armbru@redhat.com,
-	alex.bennee@linaro.org, Dave.Martin@arm.com
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/12/19 1:36 AM, Andrew Jones wrote:
-> @@ -292,7 +292,7 @@ static void aarch64_max_initfn(Object *obj)
->  
->      if (kvm_enabled()) {
->          kvm_arm_set_cpu_features_from_host(cpu);
-> -        cpu->sve_max_vq = ARM_MAX_VQ;
-> +        cpu->sve_max_vq = -1; /* set in kvm_arch_init_vcpu() */
+Hi Yoshinori,
 
-Perhaps a better comment is "unspecified, to be finalized in ..."
+On 5/13/19 7:25 AM, Yoshinori Sato wrote:
+> Hello.
+> This patch series is added Renesas RX target emulation.
+> 
+> Fixed build errors and cleaned up the code.
+> 
+> My git repository is bellow.
+> git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git tags/rx-20190513
 
-> +    object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve_vq,
-> +                        cpu_max_set_sve_vq, NULL, NULL, &error_fatal);
+This tag isn't exactly the same as the series you posted, some patches
+are ordered differently, leading to this failure at commit fc564da941a
+(Add rx-softmmu) of your tag:
 
-as one can set it here, via the command-line.
+((fc564da941a...))$ make -C rx-softmmu hw/intc/rx_icu.o
+  CC      hw/intc/rx_icu.o
+hw/intc/rx_icu.c:35:9: error: expected ‘)’ before numeric constant
+ REG8(IR, 0)
+         ^~
+         )
+...
+hw/intc/rx_icu.c: In function ‘icu_read’:
+hw/intc/rx_icu.c:174:18: error: ‘A_FIR’ undeclared (first use in this
+function); did you mean ‘A_FPSW’?
+     if ((addr != A_FIR && size != 1) ||
+                  ^~~~~
+                  A_FPSW
+hw/intc/rx_icu.c:174:18: note: each undeclared identifier is reported
+only once for each function it appears in
+hw/intc/rx_icu.c:181:10: error: ‘A_IR’ undeclared (first use in this
+function); did you mean ‘DIR’?
+     case A_IR ... A_IR + 0xff:
+          ^~~~
+          DIR
+...
+hw/intc/rx_icu.c:199:44: error: ‘R_IRQCR_IRQMD_SHIFT’ undeclared (first
+use in this function); did you mean ‘R_IRQCR_IRQMD_MASK’?
+         return icu->src[64 + reg].sense << R_IRQCR_IRQMD_SHIFT;
+                                            ^~~~~~~~~~~~~~~~~~~
+                                            R_IRQCR_IRQMD_MASK
 
-> @@ -644,6 +702,24 @@ int kvm_arch_init_vcpu(CPUState *cs)
->      }
->  
->      if (cpu->sve_max_vq) {
-> +        uint64_t sve_vls[KVM_ARM64_SVE_VLS_WORDS];
-> +        ret = kvm_arm_get_sve_vls(cs, sve_vls);
-> +        if (ret < 0) {
-> +            return ret;
-> +        }
-> +        if (cpu->sve_max_vq == -1) {
-> +            cpu->sve_max_vq = ret;
+This is because the commit "hw/registerfields.h" is added after.
+I see this series seems ordered correctly, so I'll keep testing.
 
-You still cannot set a value larger than ARM_MAX_VQ, as that is the fixed
-amount of space allocated within the cpu structure.
-
-
-r~
+> 
+> Testing binaries bellow.
+> u-boot
+> Download - https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
+> 
+> starting
+> $ gzip -d u-boot.bin.gz
+> $ qemu-system-rx -bios u-boot.bin
+> 
+> linux and pico-root (only sash)
+> Download - https://osdn.net/users/ysato/pf/qemu/dl/zImage (kernel)
+>            https://osdn.net/users/ysato/pf/qemu/dl/rx-qemu.dtb (DeviceTree)
+> 
+> starting
+> $ qemu-system-rx -kernel zImage -dtb rx-qemu.dtb -append "earlycon"
+> 
+> Changes for v10.
+> - Fix build error for 32bit system.
+> - Use "object_initialize_child" in create device instance.
+> - Remove unused headers.
+> - Avoid some magic number.
+> - Clean up Kconfig symbols.
+> 
+> Yoshinori Sato (12):
+>   target/rx: TCG translation
+>   target/rx: TCG helper
+>   target/rx: CPU definition
+>   target/rx: RX disassembler
+>   hw/intc: RX62N interrupt controller (ICUa)
+>   hw/timer: RX62N internal timer modules
+>   hw/char: RX62N serial communication interface (SCI)
+>   hw/rx: RX Target hardware definition
+>   hw/registerfields.h: Add 8bit and 16bit register macros.
+>   qemu/bitops.h: Add extract8 and extract16
+>   Add rx-softmmu
+>   MAINTAINERS: Add RX
+> 
+>  MAINTAINERS                    |   19 +
+>  arch_init.c                    |    2 +
+>  configure                      |    8 +
+>  default-configs/rx-softmmu.mak |    3 +
+>  hw/Kconfig                     |    1 +
+>  hw/char/Kconfig                |    3 +
+>  hw/char/Makefile.objs          |    1 +
+>  hw/char/renesas_sci.c          |  340 ++++++
+>  hw/intc/Kconfig                |    3 +
+>  hw/intc/Makefile.objs          |    1 +
+>  hw/intc/rx_icu.c               |  376 +++++++
+>  hw/rx/Kconfig                  |   14 +
+>  hw/rx/Makefile.objs            |    2 +
+>  hw/rx/rx-virt.c                |  105 ++
+>  hw/rx/rx62n.c                  |  238 ++++
+>  hw/timer/Kconfig               |    6 +
+>  hw/timer/Makefile.objs         |    3 +
+>  hw/timer/renesas_cmt.c         |  275 +++++
+>  hw/timer/renesas_tmr.c         |  455 ++++++++
+>  include/disas/dis-asm.h        |    5 +
+>  include/hw/char/renesas_sci.h  |   45 +
+>  include/hw/intc/rx_icu.h       |   57 +
+>  include/hw/registerfields.h    |   32 +-
+>  include/hw/rx/rx.h             |    7 +
+>  include/hw/rx/rx62n.h          |   94 ++
+>  include/hw/timer/renesas_cmt.h |   38 +
+>  include/hw/timer/renesas_tmr.h |   50 +
+>  include/qemu/bitops.h          |   38 +
+>  include/sysemu/arch_init.h     |    1 +
+>  target/rx/Makefile.objs        |   12 +
+>  target/rx/cpu.c                |  222 ++++
+>  target/rx/cpu.h                |  227 ++++
+>  target/rx/disas.c              | 1480 ++++++++++++++++++++++++
+>  target/rx/gdbstub.c            |  112 ++
+>  target/rx/helper.c             |  148 +++
+>  target/rx/helper.h             |   31 +
+>  target/rx/insns.decode         |  621 ++++++++++
+>  target/rx/monitor.c            |   38 +
+>  target/rx/op_helper.c          |  481 ++++++++
+>  target/rx/translate.c          | 2432 ++++++++++++++++++++++++++++++++++++++++
+>  40 files changed, 8025 insertions(+), 1 deletion(-)
+>  create mode 100644 default-configs/rx-softmmu.mak
+>  create mode 100644 hw/char/renesas_sci.c
+>  create mode 100644 hw/intc/rx_icu.c
+>  create mode 100644 hw/rx/Kconfig
+>  create mode 100644 hw/rx/Makefile.objs
+>  create mode 100644 hw/rx/rx-virt.c
+>  create mode 100644 hw/rx/rx62n.c
+>  create mode 100644 hw/timer/renesas_cmt.c
+>  create mode 100644 hw/timer/renesas_tmr.c
+>  create mode 100644 include/hw/char/renesas_sci.h
+>  create mode 100644 include/hw/intc/rx_icu.h
+>  create mode 100644 include/hw/rx/rx.h
+>  create mode 100644 include/hw/rx/rx62n.h
+>  create mode 100644 include/hw/timer/renesas_cmt.h
+>  create mode 100644 include/hw/timer/renesas_tmr.h
+>  create mode 100644 target/rx/Makefile.objs
+>  create mode 100644 target/rx/cpu.c
+>  create mode 100644 target/rx/cpu.h
+>  create mode 100644 target/rx/disas.c
+>  create mode 100644 target/rx/gdbstub.c
+>  create mode 100644 target/rx/helper.c
+>  create mode 100644 target/rx/helper.h
+>  create mode 100644 target/rx/insns.decode
+>  create mode 100644 target/rx/monitor.c
+>  create mode 100644 target/rx/op_helper.c
+>  create mode 100644 target/rx/translate.c
+> 
 
