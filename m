@@ -2,73 +2,56 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C8FC04AAA
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 256EFC04AB1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:20:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF3DC2146F
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:20:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF3DC2146F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DF8F42146F
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:20:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF8F42146F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sios.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58095 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58113 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQBo7-0002qU-6o
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 10:19:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36849)
+	id 1hQBoj-0003Ku-31
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 10:20:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hQBlI-0000uu-I3
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 10:17:07 -0400
+	(envelope-from <yo-satoh@sios.com>) id 1hQ3Sw-0000dt-C4
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:25:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hQBfU-0000Eb-IF
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 10:11:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48790)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hQBfU-0000EK-Ar
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 10:11:04 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AEFF5309B14B
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 14:11:03 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
-	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E33A06A497;
-	Mon, 13 May 2019 14:10:59 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 63A6111385E4; Mon, 13 May 2019 16:10:58 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-References: <20190430131919.GN6818@redhat.com> <20190430144546.GA3065@work-vm>
-	<20190430150556.GA2423@redhat.com>
-	<87sgtqejn9.fsf@dusky.pond.sub.org>
-	<20190507093954.GG27205@redhat.com>
-	<875zql3ylk.fsf@dusky.pond.sub.org>
-	<20190513120856.GH15029@redhat.com> <20190513122933.GC2786@work-vm>
-	<20190513123542.GJ15029@redhat.com>
-Date: Mon, 13 May 2019 16:10:58 +0200
-In-Reply-To: <20190513123542.GJ15029@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
-	=?utf-8?Q?rang=C3=A9=22's?=
-	message of "Mon, 13 May 2019 13:35:42 +0100")
-Message-ID: <878sva5tsd.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Mon, 13 May 2019 14:11:03 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] QMP; unsigned 64-bit ints;
- JSON standards compliance
+	(envelope-from <yo-satoh@sios.com>) id 1hQ3St-0006Ko-Hv
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:25:34 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:35623)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <yo-satoh@sios.com>) id 1hQ3St-0006Ii-8T
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:25:31 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.vps.ablenet.jp
+	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+	by mail02.asahi-net.or.jp (Postfix) with ESMTPA id EED5F3DF34;
+	Mon, 13 May 2019 14:25:29 +0900 (JST)
+Received: from ysato.dip.jp (ZM005235.ppp.dion.ne.jp [222.8.5.235])
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id A19D8240085; 
+	Mon, 13 May 2019 14:25:29 +0900 (JST)
+From: Yoshinori Sato <yo-satoh@sios.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 13 May 2019 14:25:13 +0900
+Message-Id: <20190513052518.6274-8-yo-satoh@sios.com>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20190513052518.6274-1-yo-satoh@sios.com>
+References: <20190513052518.6274-1-yo-satoh@sios.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 202.224.55.14
+X-Mailman-Approved-At: Mon, 13 May 2019 10:11:53 -0400
+Subject: [Qemu-devel] [PATCH v11 07/12] hw/char: RX62N serial communication
+ interface (SCI)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,231 +63,451 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, =?utf-8?Q?J=C3=A1n?= Tomko <jtomko@redhat.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+	Yoshinori Sato <yo-satoh@sios.com>,
+	Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
 
-> On Mon, May 13, 2019 at 01:29:34PM +0100, Dr. David Alan Gilbert wrote:
->> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
->> > On Wed, May 08, 2019 at 02:44:07PM +0200, Markus Armbruster wrote:
->> > > Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
->> > >=20
->> > > > On Tue, May 07, 2019 at 10:47:06AM +0200, Markus Armbruster wrote:
->> > > >
->> > > >> >> > I can think of some options:
->> > > >> >> >=20
->> > > >> >> >   1. Encode unsigned 64-bit integers as signed 64-bit intege=
-rs.
->> > > >> >> >=20
->> > > >> >> >      This follows the example that most C libraries map JSON=
- ints
->> > > >> >> >      to 'long long int'. This is still relying on undefined
->> > > >> >> >      behaviour as apps don't need to support > 2^53-1.
->> > > >> >> >=20
->> > > >> >> >      Apps would need to cast back to 'unsigned long long' for
->> > > >> >> >      those QMP fields they know are supposed to be unsigned.
->> > > >>=20
->> > > >> Ugly.  It's also what we did until v2.10, August 2017.  QMP's inp=
-ut
->> > > >> direction still does it, for backward compatibility.
->> > > >>=20
->> > > >> >> >=20
->> > > >> >> >=20
->> > > >> >> >   2. Encode all 64-bit integers as a pair of 32-bit integers.
->> > > >> >> >=20=20=20=20=20
->> > > >> >> >      This is fully compliant with the JSON spec as each half
->> > > >> >> >      is fully within the declared limits. App has to split or
->> > > >> >> >      assemble the 2 pieces from/to a signed/unsigned 64-bit
->> > > >> >> >      int as needed.
->> > > >>=20
->> > > >> Differently ugly.
->> > > >>=20
->> > > >> >> >=20
->> > > >> >> >=20
->> > > >> >> >   3. Encode all 64-bit integers as strings
->> > > >> >> >=20
->> > > >> >> >      The application has todo all parsing/formatting client
->> > > >> >> >      side.
->> > > >>=20
->> > > >> Yet another ugly.
->> > > >>=20
->> > > >> >> >=20
->> > > >> >> >=20
->> > > >> >> > None of these changes are backwards compatible, so I doubt w=
-e could make
->> > > >> >> > the change transparently in QMP.  Instead we would have to h=
-ave a
->> > > >> >> > QMP greeting message capability where the client can request=
- enablement
->> > > >> >> > of the enhanced integer handling.
->> > > >>=20
->> > > >> We might be able to do option 1 without capability negotiation.  =
-v2.10's
->> > > >> change from option 1 to what we have now produced zero complaints.
->> > > >>=20
->> > > >> On the other hand, we made that change for a reason, so we may wa=
-nt a
->> > > >> "send large integers as negative integers" capability regardless.
->> > > >>=20
->> > > >> >> >=20
->> > > >> >> > Any of the three options above would likely work for libvirt=
-, but I
->> > > >> >> > would have a slight preference for either 2 or 3, so that we=
- become
->> > > >> >> > 100% standards compliant.
->> > > >>=20
->> > > >> There's no such thing.  You mean "we maximize interoperability wi=
-th
->> > > >> common implementations of JSON".
->> > > >
->> > > > s/common/any/
->> > >=20
->> > > info: error correction applied, future applications will be silent ;=
--P
->> > >=20
->> > > >> Let's talk implementation for a bit.
->> > > >>=20
->> > > >> Encoding and decoding integers in funny ways should be fairly eas=
-y in
->> > > >> the QObject visitors.  The generated QMP marshallers all use them.
->> > > >> Trouble is a few commands still bypass the generated marshallers,=
- and
->> > > >> mess with the QObject themselves:
->> > > >>=20
->> > > >> * query-qmp-schema: minor hack explained in qmp_query_qmp_schema(=
-)'s
->> > > >>   comment.  Should be harmless.
->> > > >>=20
->> > > >> * netdev_add: not QAPIfied.  Eric's patches to QAPIfy it got stuck
->> > > >>   because they reject some abuses like passing numbers and bools =
-as
->> > > >>   strings.
->> > > >>=20
->> > > >> * device_add: not QAPIfied.  We're not sure QAPIfication is feasi=
-ble.
->> > > >>=20
->> > > >> netdev_add and device_add both use qemu_opts_from_qdict().  Perha=
-ps we
->> > > >> could hack that to mirror what the QObject visitor do.
->> > > >>=20
->> > > >> Else, we might have to do it in the JSON parser.  Should be possi=
-ble,
->> > > >> but I'd rather not.
->> > > >>=20
->> > > >> >> My preference would be 3 with the strings defined as being
->> > > >> >> %x lower case hex formated with a 0x prefix and no longer than=
- 18 characters
->> > > >> >> ("0x" + 16 nybbles). Zero padding allowed but not required.
->> > > >> >> It's readable and unambiguous when dealing with addresses; I d=
-on't want
->> > > >> >> to have to start decoding (2) by hand when debugging.
->> > > >> >
->> > > >> > Yep, that's a good point about readability.
->> > > >>=20
->> > > >> QMP sending all integers in decimal is inconvenient for some valu=
-es,
->> > > >> such as addresses.  QMP sending all (large) integers in hexadecim=
-al
->> > > >> would be inconvenient for other values.
->> > > >>=20
->> > > >> Let's keep it simple & stupid.  If you want sophistication, JSON =
-is the
->> > > >> wrong choice.
->> > > >>=20
->> > > >>=20
->> > > >> Option 1 feels simplest.
->> > > >
->> > > > But will still fail with any JSON impl that uses double precision =
-floating
->> > > > point for integers as it will loose precision.
->> > > >
->> > > >> Option 2 feels ugliest.  Less simple, more interoperable than opt=
-ion 1.
->> > > >
->> > > > If we assume any JSON impl can do 32-bit integers without loss of
->> > > > precision, then I think we can say it is guaranteed portable, but
->> > > > it is certainly horrible / ugly.
->> > > >
->> > > >> Option 3 is like option 2, just not quite as ugly.
->> > > >
->> > > > I think option 3 can be guaranteed to be loss-less with /any/ JSON=
- impl
->> > > > that exists, since you're delegating all string -> int conversion =
-to
->> > > > the application code taking the JSON parser/formatter out of the e=
-quation.
->> > >=20
->> > > Double-checking: do you propose to encode *all* numbers as strings, =
-or
->> > > just certain "problematic" numbers?
->> > >=20
->> > > If the latter, I guess your idea of "problematic" is "not representa=
-ble
->> > > exactly as double precision floating-point".
->> >=20
->> > We have a few options
->> >=20
->> >  1. Use string format for values > 2^53-1, int format below that
->> >  2. Use string format for all fields which are 64-bit ints whether
->> >     signed or unsigned
->> >  3. Use string format for all fields which are integers, even 32-bit
->> >     ones
->> >=20
->> > I would probably suggest option 2. It would make the QEMU impl quite
->> > easy IIUC, we we'd just change the QAPI visitor's impl for the int64
->> > and uint64 fields to use string format (when the right capability is
->> > negotiated by QMP).
->> >=20
->> > I include 3 only for completeness - I don't think there's a hugely
->> > compelling reason to mess with 32-bit ints.
->>=20
->> What about when the size is architecture dependent?
->
-> The QAPI visitor for 'int' uses an 'int64_t' parameters, so I think
-> that will want to be string encoded, as if it was a 64-bit int, even
-> if built on a 32-bit platform.
+This module supported only non FIFO type.
+Hardware manual.
+https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033ej0140_rx62n.pdf
 
-Yes, QAPI type 'int' is int64_t.  All of QAPI's integer types map to
-exact-width C integer types.
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Signed-off-by: Yoshinori Sato <yo-satoh@sios.com>
+---
+ hw/char/Kconfig               |   3 +
+ hw/char/Makefile.objs         |   1 +
+ hw/char/renesas_sci.c         | 340 ++++++++++++++++++++++++++++++++++++++++++
+ include/hw/char/renesas_sci.h |  45 ++++++
+ 4 files changed, 389 insertions(+)
+ create mode 100644 hw/char/renesas_sci.c
+ create mode 100644 include/hw/char/renesas_sci.h
 
->>=20
->> > Option 1 is the bare minimum needed to ensure precision, but to me
->> > it feels a bit dirty to say a given field will have different encoding
->> > depending on the value. If apps need to deal with string encoding, they
->> > might as well just use it for all values in a given field.
->>=20
->> Yeh, 1 is horrid; it's too easy to miss a case which forgot to handle
->>  the 2^53-1 because we hadn't forced a large value down that check.
+diff --git a/hw/char/Kconfig b/hw/char/Kconfig
+index 6360c9fffa..10c24ca87f 100644
+--- a/hw/char/Kconfig
++++ b/hw/char/Kconfig
+@@ -40,3 +40,6 @@ config SCLPCONSOLE
+ 
+ config TERMINAL3270
+     bool
++
++config RENESAS_SCI
++    bool
+diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+index cf086e7114..f1b9bf0ecb 100644
+--- a/hw/char/Makefile.objs
++++ b/hw/char/Makefile.objs
+@@ -20,6 +20,7 @@ obj-$(CONFIG_PSERIES) += spapr_vty.o
+ obj-$(CONFIG_DIGIC) += digic-uart.o
+ obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
+ obj-$(CONFIG_RASPI) += bcm2835_aux.o
++obj-$(CONFIG_RENESAS_SCI) += renesas_sci.o
+ 
+ common-obj-$(CONFIG_CMSDK_APB_UART) += cmsdk-apb-uart.o
+ common-obj-$(CONFIG_ETRAXFS) += etraxfs_ser.o
+diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
+new file mode 100644
+index 0000000000..6298cbf43a
+--- /dev/null
++++ b/hw/char/renesas_sci.c
+@@ -0,0 +1,340 @@
++/*
++ * Renesas Serial Communication Interface
++ *
++ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
++ * (Rev.1.40 R01UH0033EJ0140)
++ *
++ * Copyright (c) 2019 Yoshinori Sato
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "hw/sysbus.h"
++#include "hw/registerfields.h"
++#include "hw/char/renesas_sci.h"
++#include "qemu/error-report.h"
++
++/* SCI register map */
++REG8(SMR, 0)
++  FIELD(SMR, CKS,  0, 2)
++  FIELD(SMR, MP,   2, 1)
++  FIELD(SMR, STOP, 3, 1)
++  FIELD(SMR, PM,   4, 1)
++  FIELD(SMR, PE,   5, 1)
++  FIELD(SMR, CHR,  6, 1)
++  FIELD(SMR, CM,   7, 1)
++REG8(BRR, 1)
++REG8(SCR, 2)
++  FIELD(SCR, CKE, 0, 2)
++  FIELD(SCR, TEIE, 2, 1)
++  FIELD(SCR, MPIE, 3, 1)
++  FIELD(SCR, RE,   4, 1)
++  FIELD(SCR, TE,   5, 1)
++  FIELD(SCR, RIE,  6, 1)
++  FIELD(SCR, TIE,  7, 1)
++REG8(TDR, 3)
++REG8(SSR, 4)
++  FIELD(SSR, MPBT, 0, 1)
++  FIELD(SSR, MPB,  1, 1)
++  FIELD(SSR, TEND, 2, 1)
++  FIELD(SSR, ERR, 3, 3)
++    FIELD(SSR, PER,  3, 1)
++    FIELD(SSR, FER,  4, 1)
++    FIELD(SSR, ORER, 5, 1)
++  FIELD(SSR, RDRF, 6, 1)
++  FIELD(SSR, TDRE, 7, 1)
++REG8(RDR, 5)
++REG8(SCMR, 6)
++  FIELD(SCMR, SMIF, 0, 1)
++  FIELD(SCMR, SINV, 2, 1)
++  FIELD(SCMR, SDIR, 3, 1)
++  FIELD(SCMR, BCP2, 7, 1)
++REG8(SEMR, 7)
++  FIELD(SEMR, ACS0, 0, 1)
++  FIELD(SEMR, ABCS, 4, 1)
++
++static int can_receive(void *opaque)
++{
++    RSCIState *sci = RSCI(opaque);
++    if (sci->rx_next > qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)) {
++        return 0;
++    } else {
++        return FIELD_EX8(sci->scr, SCR, RE);
++    }
++}
++
++static void receive(void *opaque, const uint8_t *buf, int size)
++{
++    RSCIState *sci = RSCI(opaque);
++    sci->rx_next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime;
++    if (FIELD_EX8(sci->ssr, SSR, RDRF) || size > 1) {
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, ORER, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 1);
++        }
++    } else {
++        sci->rdr = buf[0];
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, RDRF, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_irq_pulse(sci->irq[RXI]);
++        }
++    }
++}
++
++static void send_byte(RSCIState *sci)
++{
++    if (qemu_chr_fe_backend_connected(&sci->chr)) {
++        qemu_chr_fe_write_all(&sci->chr, &sci->tdr, 1);
++    }
++    timer_mod(sci->timer,
++              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime);
++    sci->ssr = FIELD_DP8(sci->ssr, SSR, TEND, 0);
++    sci->ssr = FIELD_DP8(sci->ssr, SSR, TDRE, 1);
++    qemu_set_irq(sci->irq[TEI], 0);
++    if (FIELD_EX8(sci->scr, SCR, TIE)) {
++        qemu_irq_pulse(sci->irq[TXI]);
++    }
++}
++
++static void txend(void *opaque)
++{
++    RSCIState *sci = RSCI(opaque);
++    if (!FIELD_EX8(sci->ssr, SSR, TDRE)) {
++        send_byte(sci);
++    } else {
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, TEND, 1);
++        if (FIELD_EX8(sci->scr, SCR, TEIE)) {
++            qemu_set_irq(sci->irq[TEI], 1);
++        }
++    }
++}
++
++static void update_trtime(RSCIState *sci)
++{
++    /* char per bits */
++    sci->trtime = 8 - FIELD_EX8(sci->smr, SMR, CHR);
++    sci->trtime += FIELD_EX8(sci->smr, SMR, PE);
++    sci->trtime += FIELD_EX8(sci->smr, SMR, STOP) + 1;
++    /* x bit transmit time (32 * divrate * brr) / base freq */
++    sci->trtime *= 32 * sci->brr;
++    sci->trtime *= 1 << (2 * FIELD_EX8(sci->smr, SMR, CKS));
++    sci->trtime *= NANOSECONDS_PER_SECOND;
++    sci->trtime /= sci->input_freq;
++}
++
++#define IS_TR_ENABLED(scr) \
++    (FIELD_EX8(scr, SCR, TE) || FIELD_EX8(scr, SCR, RE))
++
++static void sci_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
++{
++    hwaddr offset = addr & 0x07;
++    RSCIState *sci = RSCI(opaque);
++
++    switch (offset) {
++    case A_SMR:
++        if (!IS_TR_ENABLED(sci->scr)) {
++            sci->smr = val;
++            update_trtime(sci);
++        }
++        break;
++    case A_BRR:
++        if (!IS_TR_ENABLED(sci->scr)) {
++            sci->brr = val;
++            update_trtime(sci);
++        }
++        break;
++    case A_SCR:
++        sci->scr = val;
++        if (FIELD_EX8(sci->scr, SCR, TE)) {
++            sci->ssr = FIELD_DP8(sci->ssr, SSR, TDRE, 1);
++            sci->ssr = FIELD_DP8(sci->ssr, SSR, TEND, 1);
++            if (FIELD_EX8(sci->scr, SCR, TIE)) {
++                qemu_irq_pulse(sci->irq[TXI]);
++            }
++        }
++        if (!FIELD_EX8(sci->scr, SCR, TEIE)) {
++            qemu_set_irq(sci->irq[TEI], 0);
++        }
++        if (!FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 0);
++        }
++        break;
++    case A_TDR:
++        sci->tdr = val;
++        if (FIELD_EX8(sci->ssr, SSR, TEND)) {
++            send_byte(sci);
++        } else {
++            sci->ssr = FIELD_DP8(sci->ssr, SSR, TDRE, 0);
++        }
++        break;
++    case A_SSR:
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, MPBT,
++                             FIELD_EX8(val, SSR, MPBT));
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, ERR,
++                             FIELD_EX8(val, SSR, ERR) & 0x07);
++        if (FIELD_EX8(sci->read_ssr, SSR, ERR) &&
++            FIELD_EX8(sci->ssr, SSR, ERR) == 0) {
++            qemu_set_irq(sci->irq[ERI], 0);
++        }
++        break;
++    case A_RDR:
++        qemu_log_mask(LOG_GUEST_ERROR, "reneas_sci: RDR is read only.\n");
++        break;
++    case A_SCMR:
++        sci->scmr = val; break;
++    case A_SEMR: /* SEMR */
++        sci->semr = val; break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
++                      " not implemented\n", offset);
++    }
++}
++
++static uint64_t sci_read(void *opaque, hwaddr addr, unsigned size)
++{
++    hwaddr offset = addr & 0x07;
++    RSCIState *sci = RSCI(opaque);
++
++    switch (offset) {
++    case A_SMR:
++        return sci->smr;
++    case A_BRR:
++        return sci->brr;
++    case A_SCR:
++        return sci->scr;
++    case A_TDR:
++        return sci->tdr;
++    case A_SSR:
++        sci->read_ssr = sci->ssr;
++        return sci->ssr;
++    case A_RDR:
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, RDRF, 0);
++        return sci->rdr;
++    case A_SCMR:
++        return sci->scmr;
++    case A_SEMR:
++        return sci->semr;
++    default:
++        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
++                      " not implemented.\n", offset);
++    }
++    return UINT64_MAX;
++}
++
++static const MemoryRegionOps sci_ops = {
++    .write = sci_write,
++    .read  = sci_read,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {
++        .max_access_size = 1,
++    },
++};
++
++static void rsci_reset(DeviceState *dev)
++{
++    RSCIState *sci = RSCI(dev);
++    sci->smr = sci->scr = 0x00;
++    sci->brr = 0xff;
++    sci->tdr = 0xff;
++    sci->rdr = 0x00;
++    sci->ssr = 0x84;
++    sci->scmr = 0x00;
++    sci->semr = 0x00;
++    sci->rx_next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++}
++
++static void sci_event(void *opaque, int event)
++{
++    RSCIState *sci = RSCI(opaque);
++    if (event == CHR_EVENT_BREAK) {
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, FER, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 1);
++        }
++    }
++}
++
++static void rsci_realize(DeviceState *dev, Error **errp)
++{
++    RSCIState *sci = RSCI(dev);
++
++    if (sci->input_freq == 0) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "renesas_sci: input-freq property must be set.");
++        return;
++    }
++    qemu_chr_fe_set_handlers(&sci->chr, can_receive, receive,
++                             sci_event, NULL, sci, NULL, true);
++}
++
++static void rsci_init(Object *obj)
++{
++    SysBusDevice *d = SYS_BUS_DEVICE(obj);
++    RSCIState *sci = RSCI(obj);
++    int i;
++
++    memory_region_init_io(&sci->memory, OBJECT(sci), &sci_ops,
++                          sci, "renesas-sci", 0x8);
++    sysbus_init_mmio(d, &sci->memory);
++
++    for (i = 0; i < SCI_NR_IRQ; i++) {
++        sysbus_init_irq(d, &sci->irq[i]);
++    }
++    sci->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, txend, sci);
++}
++
++static const VMStateDescription vmstate_rcmt = {
++    .name = "renesas-sci",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static Property rsci_properties[] = {
++    DEFINE_PROP_UINT64("input-freq", RSCIState, input_freq, 0),
++    DEFINE_PROP_CHR("chardev", RSCIState, chr),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void rsci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = rsci_realize;
++    dc->props = rsci_properties;
++    dc->vmsd = &vmstate_rcmt;
++    dc->reset = rsci_reset;
++}
++
++static const TypeInfo rsci_info = {
++    .name       = TYPE_RENESAS_SCI,
++    .parent     = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(RSCIState),
++    .instance_init = rsci_init,
++    .class_init = rsci_class_init,
++};
++
++static void rsci_register_types(void)
++{
++    type_register_static(&rsci_info);
++}
++
++type_init(rsci_register_types)
+diff --git a/include/hw/char/renesas_sci.h b/include/hw/char/renesas_sci.h
+new file mode 100644
+index 0000000000..50d1336944
+--- /dev/null
++++ b/include/hw/char/renesas_sci.h
+@@ -0,0 +1,45 @@
++/*
++ * Renesas Serial Communication Interface
++ *
++ * Copyright (c) 2018 Yoshinori Sato
++ *
++ * This code is licensed under the GPL version 2 or later.
++ *
++ */
++
++#include "chardev/char-fe.h"
++#include "qemu/timer.h"
++#include "hw/sysbus.h"
++
++#define TYPE_RENESAS_SCI "renesas-sci"
++#define RSCI(obj) OBJECT_CHECK(RSCIState, (obj), TYPE_RENESAS_SCI)
++
++enum {
++    ERI = 0,
++    RXI = 1,
++    TXI = 2,
++    TEI = 3,
++    SCI_NR_IRQ = 4,
++};
++
++typedef struct {
++    SysBusDevice parent_obj;
++    MemoryRegion memory;
++
++    uint8_t smr;
++    uint8_t brr;
++    uint8_t scr;
++    uint8_t tdr;
++    uint8_t ssr;
++    uint8_t rdr;
++    uint8_t scmr;
++    uint8_t semr;
++
++    uint8_t read_ssr;
++    int64_t trtime;
++    int64_t rx_next;
++    QEMUTimer *timer;
++    CharBackend chr;
++    uint64_t input_freq;
++    qemu_irq irq[SCI_NR_IRQ];
++} RSCIState;
+-- 
+2.11.0
 
-If we had many places where we could forget to handle the
-interoperability capability, I'd shoot down the idea of having it :)
-
-Fortunately, we don't: the qobject visitors take care of it, and they
-come with unit tests.
-
-I listed the few exceptions above under "Let's talk implementation for a
-bit."
-
-* query-qmp-schema
-
-  No input.
-
-  Output contains no numbers.  Should it acquire numbers, we'll probably
-  want to get rid of the hack, so the output goes through the visitor.
-
-* netdev_add
-
-  Input gets stringified anyway (misfeature).
-
-  No output.
-
-* device_add
-
-  Input gets stringified anyway (misfeature).
-
-  No output.
 
