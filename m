@@ -6,64 +6,137 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 428C3C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 19:34:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA63EC04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 19:58:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 164C020850
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 19:34:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 164C020850
+	by mail.kernel.org (Postfix) with ESMTPS id 82AF9208CA
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 19:58:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82AF9208CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34029 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34274 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQGiG-0007qn-8V
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 15:34:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36993)
+	id 1hQH5t-0004WI-E6
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 15:58:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1hQGgL-0006i4-9s
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 15:32:18 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hQH3r-0002pf-Uh
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 15:56:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1hQGgJ-0002Bu-OM
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 15:32:17 -0400
-Received: from mail-oi1-f172.google.com ([209.85.167.172]:44380)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1hQGgJ-0002Ae-HT
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 15:32:15 -0400
-Received: by mail-oi1-f172.google.com with SMTP id z65so3040520oia.11
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 12:32:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=KVTe2WOIT1HDg/9VNCr0mTjf9oVbirz2WXQ6fQjyQ8Q=;
-	b=PJzoY+0ILqiPYWrM2lpdaYvC2gI04xRVRB/FEvX/B+os9IyUQKH/aB5oVLKv/VKlZd
-	DLm2QAJYaZFxdfzKbaXKzfEky29fz84+ofYrclZLL4zrRExBBBjPC1fUgOn8cgbXzQ93
-	ckqYsRqJPfCkhAiH7G7Xzyxb9Gs5ErVqFw08tn35I48jaz26Y6S8fFU/uK/Rj5xTNciY
-	Un4ICBLt18vTm7zP+W2UOMbOjgp/QQN0vsrVsqJ/KKapU+BvH0wRzIoHfYXBhtb0F503
-	NNdN9ZCksXn0oQnyOBFuthIoxZXqfNUP1RQmkGaiDVx2s0szEEF7bkJh3xmxV40jdGeA
-	noVA==
-X-Gm-Message-State: APjAAAXM4nCTr4DYODfwj6zBGPh9Cs2S9esueSQB+K1LV6DP/oAusgNl
-	N+eFrZ4ymvw5DGZeedN86legq3/RoQVsR6e8mnN6Ug==
-X-Google-Smtp-Source: APXvYqyrBgUEq0bs6m6bbTqF51JcrfgilNX2XYAiAPWqaROzNUesZy6Kr3GvQwGm73ZoJM814P6qCizVm7m7jtazQtE=
-X-Received: by 2002:aca:3d57:: with SMTP id k84mr497640oia.106.1557775932199; 
-	Mon, 13 May 2019 12:32:12 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1hQGv6-00088e-7l
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 15:47:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57086)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
+	id 1hQGv4-00088E-AN; Mon, 13 May 2019 15:47:30 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E8F0C81DFC;
+	Mon, 13 May 2019 19:47:28 +0000 (UTC)
+Received: from [10.18.17.188] (dhcp-17-188.bos.redhat.com [10.18.17.188])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id F0683420D;
+	Mon, 13 May 2019 19:47:27 +0000 (UTC)
+To: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org
+References: <20190326211742.26140-1-danielhb413@gmail.com>
+	<20190326211742.26140-2-danielhb413@gmail.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <996f1818-a255-62e2-1b33-f2ca69cfc6d0@redhat.com>
+Date: Mon, 13 May 2019 15:47:27 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190513155254.27773-1-mreitz@redhat.com>
-In-Reply-To: <20190513155254.27773-1-mreitz@redhat.com>
-From: Nir Soffer <nsoffer@redhat.com>
-Date: Mon, 13 May 2019 22:31:59 +0300
-Message-ID: <CAMRbyytLLb_+D1KEPz2gUmrzu7NBFFM3=ziNvXdOhpy7S-u6OA@mail.gmail.com>
-To: Max Reitz <mreitz@redhat.com>
+In-Reply-To: <20190326211742.26140-2-danielhb413@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.25]);
+	Mon, 13 May 2019 19:47:29 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.167.172
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v2] iotests: Filter 175's allocation
- information
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 1/3] block: introducing
+ 'bdrv_co_delete_file' interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,118 +148,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>
+Cc: kwolf@redhat.com, berrange@redhat.com, qemu-block@nongnu.org,
+	mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 13, 2019, 18:52 Max Reitz <mreitz@redhat.com> wrote:
+It looks like this one has gone un-noticed for a little while.
 
-> It is possible for an empty file to take up blocks on a filesystem.
-> Make iotest 175 take this into account.
->
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On 3/26/19 5:17 PM, Daniel Henrique Barboza wrote:
+> Adding to Block Drivers the capability of being able to clean up
+> its created files can be useful in certain situations. For the
+> LUKS driver, for instance, a failure in one of its authentication
+> steps can leave files in the host that weren't there before.
+>=20
+> This patch adds the 'bdrv_co_delete_file' interface to block
+> drivers and add it to the 'file' driver in file-posix.c. The
+> implementation is given by 'raw_co_delete_file'. The helper
+> 'bdrv_path_is_regular_file' is being used only in raw_co_delete_file
+> at this moment, but it will be used inside LUKS in a later patch.
+> Foreseeing this future use, let's put it in block.c and make it
+> public.
+>=20
+> Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 > ---
-> v2: [Nir]
-> - Use a function for filtering
-> - s/empty_blocks/extra_blocks/
-> ---
->  tests/qemu-iotests/175     | 26 ++++++++++++++++++++++----
->  tests/qemu-iotests/175.out |  8 ++++----
->  2 files changed, 26 insertions(+), 8 deletions(-)
->
-> diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
-> index d0ffc495c2..b5eb0aa856 100755
-> --- a/tests/qemu-iotests/175
-> +++ b/tests/qemu-iotests/175
-> @@ -28,10 +28,25 @@ status=1    # failure is the default!
->
->  _cleanup()
->  {
-> -       _cleanup_test_img
-> +    _cleanup_test_img
-> +    rm -f "$TEST_DIR/empty"
+>  block.c                   | 11 +++++++++++
+>  block/file-posix.c        | 28 ++++++++++++++++++++++++++++
+>  include/block/block.h     |  1 +
+>  include/block/block_int.h |  6 ++++++
+>  4 files changed, 46 insertions(+)
+>=20
+> diff --git a/block.c b/block.c
+> index 0a93ee9ac8..227362b282 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -621,6 +621,17 @@ int get_tmp_filename(char *filename, int size)
+>  #endif
 >  }
->  trap "_cleanup; exit \$status" 0 1 2 3 15
->
-> +# Some file systems sometimes allocate extra blocks independently of
-> +# the file size.  This function hides the resulting difference in the
-> +# stat -c '%b' output.
-> +# Parameter 1: Number of blocks an empty file occupies
-> +# Parameter 2: Image size in bytes
-> +_filter_blocks()
+> =20
+> +/**
+> + * Helper that checks if a given string represents a regular
+> + * local file.
+> + */
+> +bool bdrv_path_is_regular_file(const char *path)
 > +{
-> +    extra_blocks=$1
-> +    img_size=$2
+> +    struct stat st;
 > +
-> +    sed -e "s/blocks=$extra_blocks/nothing allocated/" \
-> +        -e "s/blocks=$((extra_blocks + img_size / 512))/everything
-> allocated/"
+> +    return (stat(path, &st) =3D=3D 0) && S_ISREG(st.st_mode);
 > +}
 > +
->  # get standard environment, filters and checks
->  . ./common.rc
->  . ./common.filter
-> @@ -40,18 +55,21 @@ _supported_fmt raw
->  _supported_proto file
->  _supported_os Linux
->
-> -size=1m
-> +size=$((1 * 1024 * 1024))
+>  /*
+>   * Detect host devices. By convention, /dev/cdrom[N] is always
+>   * recognized as a host CDROM.
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index d102f3b222..09d84bab37 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -2342,6 +2342,33 @@ static int coroutine_fn raw_co_create_opts(const=
+ char *filename, QemuOpts *opts,
+>      return raw_co_create(&options, errp);
+>  }
+> =20
+> +/**
+> + * Co-routine function that erases a regular file.
+> + */
+> +static int coroutine_fn raw_co_delete_file(const char *filename,
+> +                                           Error **errp)
+
+Do we need to mark functions that make no use of coroutines as
+coroutine_fn? I guess this way the interface is *allowed* to be a
+coroutine if other drivers need to make use of that.
+
+> +{
+> +    int ret;
 > +
-> +touch "$TEST_DIR/empty"
-> +extra_blocks=$(stat -c '%b' "$TEST_DIR/empty")
->
->  echo
->  echo "== creating image with default preallocation =="
->  _make_test_img $size | _filter_imgfmt
-> -stat -c "size=%s, blocks=%b" $TEST_IMG
-> +stat -c "size=%s, blocks=%b" $TEST_IMG | _filter_blocks $extra_blocks
-> $size
->
->  for mode in off full falloc; do
->      echo
->      echo "== creating image with preallocation $mode =="
->      IMGOPTS=preallocation=$mode _make_test_img $size | _filter_imgfmt
-> -    stat -c "size=%s, blocks=%b" $TEST_IMG
-> +    stat -c "size=%s, blocks=%b" $TEST_IMG | _filter_blocks $extra_blocks
-> $size
->  done
->
->  # success, all done
-> diff --git a/tests/qemu-iotests/175.out b/tests/qemu-iotests/175.out
-> index 76c02c6a57..6d9a5ed84e 100644
-> --- a/tests/qemu-iotests/175.out
-> +++ b/tests/qemu-iotests/175.out
-> @@ -2,17 +2,17 @@ QA output created by 175
->
->  == creating image with default preallocation ==
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-> -size=1048576, blocks=0
-> +size=1048576, nothing allocated
->
->  == creating image with preallocation off ==
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=off
-> -size=1048576, blocks=0
-> +size=1048576, nothing allocated
->
->  == creating image with preallocation full ==
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=full
-> -size=1048576, blocks=2048
-> +size=1048576, everything allocated
->
->  == creating image with preallocation falloc ==
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-> preallocation=falloc
-> -size=1048576, blocks=2048
-> +size=1048576, everything allocated
->   *** done
-> --
-> 2.21.0
+> +    /* Skip file: protocol prefix */
+> +    strstart(filename, "file:", &filename);
+> +
 
+This sticks out as fragile to me, but I guess that's exactly how create
+works, so... OK.
 
-Reviewed-by: Nir Soffer <nsoffer@redhat.com>
+> +    if (!bdrv_path_is_regular_file(filename)) {
+> +        ret =3D -ENOENT;
+> +        error_setg_errno(errp, -ret, "%s is not a regular file", filen=
+ame);
+> +        goto done;
+> +    }
+> +
+> +    ret =3D unlink(filename);
+> +    if (ret < 0) {
+> +        ret =3D -errno;
+> +        error_setg_errno(errp, -ret, "Error when deleting file %s", fi=
+lename);
+> +    }
+> +
+> +done:
+> +    return ret;
+> +}
+> +
+>  /*
+>   * Find allocation range in @bs around offset @start.
+>   * May change underlying file descriptor's file offset.
+> @@ -2867,6 +2894,7 @@ BlockDriver bdrv_file =3D {
+>      .bdrv_co_block_status =3D raw_co_block_status,
+>      .bdrv_co_invalidate_cache =3D raw_co_invalidate_cache,
+>      .bdrv_co_pwrite_zeroes =3D raw_co_pwrite_zeroes,
+> +    .bdrv_co_delete_file =3D raw_co_delete_file,
+> =20
+>      .bdrv_co_preadv         =3D raw_co_preadv,
+>      .bdrv_co_pwritev        =3D raw_co_pwritev,
+> diff --git a/include/block/block.h b/include/block/block.h
+> index e452988b66..820643f96d 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -363,6 +363,7 @@ int bdrv_freeze_backing_chain(BlockDriverState *bs,=
+ BlockDriverState *base,
+>                                Error **errp);
+>  void bdrv_unfreeze_backing_chain(BlockDriverState *bs, BlockDriverStat=
+e *base);
+> =20
+> +bool bdrv_path_is_regular_file(const char *path);
+> =20
+>  typedef struct BdrvCheckResult {
+>      int corruptions;
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 01e855a066..74abb78ce7 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -309,6 +309,12 @@ struct BlockDriver {
+>       */
+>      int coroutine_fn (*bdrv_co_flush)(BlockDriverState *bs);
+> =20
+> +    /*
+> +     * Delete a local created file.
+> +     */
+> +    int coroutine_fn (*bdrv_co_delete_file)(const char *filename,
+> +                                            Error **errp);
+> +
+>      /*
+>       * Flushes all data that was already written to the OS all the way=
+ down to
+>       * the disk (for example file-posix.c calls fsync()).
+>=20
 
->
+Seems alright at a glance, if we want this interface.
+
+Kevin, do we?
+
+--js
+
