@@ -2,81 +2,72 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6ACBC04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:24:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2870BC04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:29:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61D2E208C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:24:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Iau5J0OB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61D2E208C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E3CEB20862
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:29:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3CEB20862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57383 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57472 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQAwT-0004rU-Gg
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 09:24:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53434)
+	id 1hQB0x-0007QM-1I
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 09:29:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hQAn3-0005f9-L7
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:14:51 -0400
+	(envelope-from <eskultet@redhat.com>) id 1hQB0D-00075d-4v
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:28:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hQAn1-0004sd-9K
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:14:49 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35795)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hQAn0-0004ri-LM
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:14:46 -0400
-Received: by mail-oi1-x243.google.com with SMTP id a132so9272485oib.2
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 06:14:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=cMjzGnLVpq/xIUfb1kG6VVA/5QDnB2YJfyhx77XPFnU=;
-	b=Iau5J0OB1acoqv4NGhWEilNM+KrrBitlOkhwzn4Nwgp+SMCsWrXbl59AdmD6hApedk
-	XbBr1PFtn32j8VZ1CXVpo+rl9hG0qf5wXVjPXASw+b0jfZSy4OrTwgnNNd0c7pCY1EB3
-	RHzmfud2Q1/EYadZ1Yb+QsVaOnlV4Gw5Qts9KujraW7P1y5iC5+M4XWqWBUI3jSI5pca
-	7HoGJ9d4gp+ve6ahH0mSjw+/KHtBPEzDzSKsZfrerEsxB4RSjSKQ9g82FEwsLwZZDMn3
-	pAAFtcaLd/AJgyp7BBsk9OGQcWuql0nlBkvwRW1iYdLCsU4D8ERLqQIuoT2bg/QZOR1E
-	9NfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=cMjzGnLVpq/xIUfb1kG6VVA/5QDnB2YJfyhx77XPFnU=;
-	b=WAuMsiWgxwfD8lYKMkkEF1Rp8gSLoAdqzRgOwfXeBsWajul5X7yLr9ln3oYCifHKCn
-	OLs8g/SgQ5VW8ZdGO3iXYYhsigKrDKRL0CUbdtLKaBbhBGK+T3PLDniwHtGxfo+tUd6X
-	cZVvSQWsNScEy9qaD30Gc3ZnyCdfMVms+AZBBTl2dh/YnIvDhThdN/l3aGfwgM9oGxWR
-	/ZaYYg5KnM7PmhokT6f+4a5AOr/vhTKGZVqCFHWLs0AGNmp/PIZgfQAjJvGrKtFGrP1s
-	VrE9cOADoL373wcrl1GbG5NfTfb9xNOqeojKGRaugkhKKKq4hJ6E2LDQ0XOkItSCZh6v
-	od4w==
-X-Gm-Message-State: APjAAAW8bvYxbL5ouiAYnb5DndL2rGy6EE7i7p1x1a2CvvCCDVH9d0EA
-	5cE3wn/wC1LKmAp+GgxHvulDcTuSQ80gsr6uBk/JIw==
-X-Google-Smtp-Source: APXvYqw46T1KaAmGEyN8Sm1bee2greOSqmZxJRyiK+tiovQDTYbgROmixfaz0sUX461S57H48SrDXB8PhjoozHkcaBs=
-X-Received: by 2002:aca:5785:: with SMTP id l127mr12444924oib.48.1557753285412;
-	Mon, 13 May 2019 06:14:45 -0700 (PDT)
+	(envelope-from <eskultet@redhat.com>) id 1hQB0B-0003c4-ST
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:28:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39910)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eskultet@redhat.com>) id 1hQB0B-0003b9-KQ
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:28:23 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 285468830B;
+	Mon, 13 May 2019 13:28:20 +0000 (UTC)
+Received: from beluga.usersys.redhat.com (unknown [10.43.2.166])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3D1EE10027DA;
+	Mon, 13 May 2019 13:28:07 +0000 (UTC)
+Date: Mon, 13 May 2019 15:28:04 +0200
+From: Erik Skultety <eskultet@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190513132804.GD11139@beluga.usersys.redhat.com>
+References: <20190506014514.3555-1-yan.y.zhao@intel.com>
+	<20190506014904.3621-1-yan.y.zhao@intel.com>
+	<20190507151826.502be009@x1.home>
+	<20190509173839.2b9b2b46.cohuck@redhat.com>
+	<20190509154857.GF2868@work-vm>
+	<20190509175404.512ae7aa.cohuck@redhat.com>
+	<20190509164825.GG2868@work-vm>
+	<20190510110838.2df4c4d0.cohuck@redhat.com>
+	<20190510093608.GD2854@work-vm>
+	<20190510114838.7e16c3d6.cohuck@redhat.com>
 MIME-Version: 1.0
-References: <20190510191051.5973-1-alex.bennee@linaro.org>
-In-Reply-To: <20190510191051.5973-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 13 May 2019 14:14:34 +0100
-Message-ID: <CAFEAcA8iZuU+xw--1WLH0=+TzeXrgGF7-rauKMSK_vqp98x0dQ@mail.gmail.com>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::243
-Subject: Re: [Qemu-devel] [RFC PATCH] target/arm: semihosting docs,
- formatting and return clean-ups
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190510114838.7e16c3d6.cohuck@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.28]);
+	Mon, 13 May 2019 13:28:20 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] vfio/mdev: add version attribute
+ for mdev device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,208 +79,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: cjia@nvidia.com, kvm@vger.kernel.org, aik@ozlabs.ru,
+	Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+	qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com,
+	yi.l.liu@intel.com, ziye.yang@intel.com, mlevitsk@redhat.com,
+	pasic@linux.ibm.com, libvir-list@redhat.com,
+	arei.gonglei@huawei.com, felipe@nutanix.com, Ken.Xue@amd.com,
+	kevin.tian@intel.com, Yan Zhao <yan.y.zhao@intel.com>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	zhenyuw@linux.intel.com, dinechin@redhat.com,
+	Alex Williamson <alex.williamson@redhat.com>,
+	intel-gvt-dev@lists.freedesktop.org, changpeng.liu@intel.com,
+	berrange@redhat.com, linux-kernel@vger.kernel.org,
+	zhi.a.wang@intel.com, jonathan.davies@nutanix.com, shaopeng.he@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 10 May 2019 at 20:10, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
+On Fri, May 10, 2019 at 11:48:38AM +0200, Cornelia Huck wrote:
+> On Fri, 10 May 2019 10:36:09 +0100
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 >
-> This is a clean-up of the semihosting calls after reading ver 2.0 of
-> the specification. There are a number of small fixes that seemed too
-> insignificant to split into smaller patches:
+> > * Cornelia Huck (cohuck@redhat.com) wrote:
+> > > On Thu, 9 May 2019 17:48:26 +0100
+> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > >
+> > > > * Cornelia Huck (cohuck@redhat.com) wrote:
+> > > > > On Thu, 9 May 2019 16:48:57 +0100
+> > > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > > > >
+> > > > > > * Cornelia Huck (cohuck@redhat.com) wrote:
+> > > > > > > On Tue, 7 May 2019 15:18:26 -0600
+> > > > > > > Alex Williamson <alex.williamson@redhat.com> wrote:
+> > > > > > >
+> > > > > > > > On Sun,  5 May 2019 21:49:04 -0400
+> > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > > > >
+> > > > > > > > > +  Errno:
+> > > > > > > > > +  If vendor driver wants to claim a mdev device incompatible to all other mdev
+> > > > > > > > > +  devices, it should not register version attribute for this mdev device. But if
+> > > > > > > > > +  a vendor driver has already registered version attribute and it wants to claim
+> > > > > > > > > +  a mdev device incompatible to all other mdev devices, it needs to return
+> > > > > > > > > +  -ENODEV on access to this mdev device's version attribute.
+> > > > > > > > > +  If a mdev device is only incompatible to certain mdev devices, write of
+> > > > > > > > > +  incompatible mdev devices's version strings to its version attribute should
+> > > > > > > > > +  return -EINVAL;
+> > > > > > > >
+> > > > > > > > I think it's best not to define the specific errno returned for a
+> > > > > > > > specific situation, let the vendor driver decide, userspace simply
+> > > > > > > > needs to know that an errno on read indicates the device does not
+> > > > > > > > support migration version comparison and that an errno on write
+> > > > > > > > indicates the devices are incompatible or the target doesn't support
+> > > > > > > > migration versions.
+> > > > > > >
+> > > > > > > I think I have to disagree here: It's probably valuable to have an
+> > > > > > > agreed error for 'cannot migrate at all' vs 'cannot migrate between
+> > > > > > > those two particular devices'. Userspace might want to do different
+> > > > > > > things (e.g. trying with different device pairs).
+> > > > > >
+> > > > > > Trying to stuff these things down an errno seems a bad idea; we can't
+> > > > > > get much information that way.
+> > > > >
+> > > > > So, what would be a reasonable approach? Userspace should first read
+> > > > > the version attributes on both devices (to find out whether migration
+> > > > > is supported at all), and only then figure out via writing whether they
+> > > > > are compatible?
+> > > > >
+> > > > > (Or just go ahead and try, if it does not care about the reason.)
+> > > >
+> > > > Well, I'm OK with something like writing to test whether it's
+> > > > compatible, it's just we need a better way of saying 'no'.
+> > > > I'm not sure if that involves reading back from somewhere after
+> > > > the write or what.
+> > >
+> > > Hm, so I basically see two ways of doing that:
+> > > - standardize on some error codes... problem: error codes can be hard
+> > >   to fit to reasons
+> > > - make the error available in some attribute that can be read
+> > >
+> > > I'm not sure how we can serialize the readback with the last write,
+> > > though (this looks inherently racy).
+> > >
+> > > How important is detailed error reporting here?
+> >
+> > I think we need something, otherwise we're just going to get vague
+> > user reports of 'but my VM doesn't migrate'; I'd like the error to be
+> > good enough to point most users to something they can understand
+> > (e.g. wrong card family/too old a driver etc).
 >
->   - add reference to the ARM semihosting spec
->   - add some additional commentary on return values
->   - fixup block comments as per standard
->   - audit return values, return 0xdeadbeef for corrupted values
->   - fix up leaks from early returns with lock_user_string
->   - return bytes not written/read instead of -1
->   - add LOG_UNIMP for missing functionality
+> Ok, that sounds like a reasonable point. Not that I have a better idea
+> how to achieve that, though... we could also log a more verbose error
+> message to the kernel log, but that's not necessarily where a user will
+> look first.
+
+In case of libvirt checking the compatibility, it won't matter how good the
+error message in the kernel log is and regardless of how many error states you
+want to handle, libvirt's only limited to errno here, since we're going to do
+plain read/write, so our internal error message returned to the user is only
+going to contain what the errno says - okay, of course we can (and we DO)
+provide libvirt specific string, further specifying the error but like I
+mentioned, depending on how many error cases we want to distinguish this may be
+hard for anyone to figure out solely on the error code, as apps will most
+probably not parse the
+logs.
+
+Regards,
+Erik
 >
-> This is very much a Friday patch. It might be worth splitting up if
-> coming back for a more concerted clean-up series for semihosting as
-> the asynchronous gdb calls probably need more attention.
+> Ideally, we'd want to have the user space program setting up things
+> querying the general compatibility for migration (so that it becomes
+> their problem on how to alert the user to problems :), but I'm not sure
+> how to eliminate the race between asking the vendor driver for
+> compatibility and getting the result of that operation.
 >
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  target/arm/arm-semi.c | 180 +++++++++++++++++++++++++-----------------
->  1 file changed, 109 insertions(+), 71 deletions(-)
->
-> diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-> index 4c326fdc2fb..8deaed2807c 100644
-> --- a/target/arm/arm-semi.c
-> +++ b/target/arm/arm-semi.c
-> @@ -2,6 +2,7 @@
->   *  Arm "Angel" semihosting syscalls
->   *
->   *  Copyright (c) 2005, 2007 CodeSourcery.
-> + *  Copyright (c) 2019 Linaro
->   *  Written by Paul Brook.
->   *
->   *  This program is free software; you can redistribute it and/or modify
-> @@ -15,13 +16,19 @@
->   *  GNU General Public License for more details.
->   *
->   *  You should have received a copy of the GNU General Public License
-> - *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-> + *  along with this program; if not, see
-> + *  <http://www.gnu.org/licenses/>.
-> + *
-> + *  ARM Semihosting is documented in:
-> + *     Semihosting for AArch32 and AArch64 Release 2.0
-> + *     https://static.docs.arm.com/100863/0200/semihosting.pdf
->   */
->
->  #include "qemu/osdep.h"
->
->  #include "cpu.h"
->  #include "exec/semihost.h"
-> +#include "exec/log.h"
->  #ifdef CONFIG_USER_ONLY
->  #include "qemu.h"
->
-> @@ -241,13 +248,18 @@ static target_ulong arm_gdb_syscall(ARMCPU *cpu, gd=
-b_syscall_complete_cb cb,
->       put_user_u64(val, args + (n) * 8) :                \
->       put_user_u32(val, args + (n) * 4))
->
-> +/*
-> + * Do a semihosting call. Returns the "RETURN REGISTER" which is
-> + * documented as corrupted for some calls. In this case we use the
-> + * venerable 0xdeadbeef.
-> + */
-
-I think what you mean here is something like "the specification always
-says that the "return register" either returns a specific value or
-is corrupted, so we don't need to report to our caller whether we
-are returning a value or trying to leave the register unchanged.
-We use 0xdeadbeef as the return value when there isn't a defined
-return value for the call."
-
->  target_ulong do_arm_semihosting(CPUARMState *env)
->  {
->      ARMCPU *cpu =3D arm_env_get_cpu(env);
->      CPUState *cs =3D CPU(cpu);
->      target_ulong args;
->      target_ulong arg0, arg1, arg2, arg3;
-> -    char * s;
-> +    char *s;
->      int nr;
->      uint32_t ret;
->      uint32_t len;
-> @@ -273,9 +285,9 @@ target_ulong do_arm_semihosting(CPUARMState *env)
->          GET_ARG(2);
->          s =3D lock_user_string(arg0);
->          if (!s) {
-> -            /* FIXME - should this error code be -TARGET_EFAULT ? */
-
-We definitely don't want to return -TARGET_EFAULT, but we could
-in theory call set_swi_errno(ts, EFAULT). The spec says that
-it's up to the implementation, effectively, so I think I agree
-we don't need to bother. Any caller which has messed things up
-sufficiently to be passing us bogus memory is unlikely to be
-in a state to successfully call SYS_ERRNO anyway.
-
->              return (uint32_t)-1;
->          }
-> +        /* check for invalid open mode */
->          if (arg1 >=3D 12) {
->              unlock_user(s, arg0, 0);
->              return (uint32_t)-1;
-> @@ -287,7 +299,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
->          }
->          if (use_gdb_syscalls()) {
->              ret =3D arm_gdb_syscall(cpu, arm_semi_cb, "open,%s,%x,1a4", =
-arg0,
-> -                                  (int)arg2+1, gdb_open_modeflags[arg1])=
-;
-> +                                  (int) arg2 + 1, gdb_open_modeflags[arg=
-1]);
-
-The space after the cast looks a bit odd here.
-
->          } else {
->              ret =3D set_swi_errno(ts, open(s, open_modeflags[arg1], 0644=
-));
->          }
-> @@ -301,48 +313,51 @@ target_ulong do_arm_semihosting(CPUARMState *env)
->              return set_swi_errno(ts, close(arg0));
->          }
->      case TARGET_SYS_WRITEC:
-> -        {
-> -          char c;
-> -
-> -          if (get_user_u8(c, args))
-> -              /* FIXME - should this error code be -TARGET_EFAULT ? */
-> -              return (uint32_t)-1;
-> -          /* Write to debug console.  stderr is near enough.  */
-> -          if (use_gdb_syscalls()) {
-> +    {
-> +        char c;
-> +        if (!get_user_u8(c, args)) {
-> +            /* Write to debug console.  stderr is near enough.  */
-> +            if (use_gdb_syscalls()) {
->                  return arm_gdb_syscall(cpu, arm_semi_cb, "write,2,%x,1",=
- args);
-> -          } else {
-> +            } else {
->  #ifdef CONFIG_SOFTMMU
-> -              Chardev *chardev =3D semihosting_get_chardev();
-> -              if (chardev) {
-> -                  return qemu_chr_write_all(chardev, (uint8_t *) &c, 1);
-> -              } else
-> +                Chardev *chardev =3D semihosting_get_chardev();
-> +                if (chardev) {
-> +                    return qemu_chr_write_all(chardev, (uint8_t *) &c, 1=
-);
-> +                }
->  #endif
-
-Looks like this patch is dependent on some other patchset?
+> Unless we introduce an interface that can retrieve _all_ results
+> together with the written value? Or is that not going to be much of a
+> problem in practice?
 
 
-> @@ -447,20 +474,23 @@ target_ulong do_arm_semihosting(CPUARMState *env)
->          GET_ARG(3);
->          if (use_gdb_syscalls()) {
->              return arm_gdb_syscall(cpu, arm_semi_cb, "rename,%s,%s",
-> -                                   arg0, (int)arg1+1, arg2, (int)arg3+1)=
-;
-> +                                   arg0, (int)arg1 + 1, arg2, (int)arg3 =
-+ 1);
->          } else {
->              char *s2;
->              s =3D lock_user_string(arg0);
->              s2 =3D lock_user_string(arg2);
-> -            if (!s || !s2)
-> -                /* FIXME - should this error code be -TARGET_EFAULT ? */
-> -                ret =3D (uint32_t)-1;
-> -            else
-> +            if (s && s2) {
->                  ret =3D set_swi_errno(ts, rename(s, s2));
-> -            if (s2)
-> +            } else {
-> +                ret =3D -EIO;
-
-I would stick with -1 personally. The spec says "host-specific error
-code", but since there's not a lot the guest can do with the result
-anyway we can just use -1 in our implementation. Also, EIO is an
-odd choice for "you passed us non-readable memory", which is more
-usually EFAULT.
-
-More generally, can you keep changes in behaviour in a separate patch
-from code reformatting, please ?
-
-> @@ -472,7 +502,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
->          GET_ARG(1);
->          if (use_gdb_syscalls()) {
->              return arm_gdb_syscall(cpu, arm_semi_cb, "system,%s",
-> -                                   arg0, (int)arg1+1);
-> +                                   arg0, (int)arg1 + 1);
-
-...here you don't have the space after the cast. I prefer this way.
-
-thanks
--- PMM
 
