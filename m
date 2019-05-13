@@ -2,66 +2,59 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60DE9C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 18:43:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D04AC04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 18:46:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22C0E20989
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 18:43:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22C0E20989
+	by mail.kernel.org (Postfix) with ESMTPS id 5253420989
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 18:46:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5253420989
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33481 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33528 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQFvI-0002vk-Fd
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 14:43:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57375)
+	id 1hQFxr-00045o-Hm
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 14:46:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1hQFuV-0002d4-UU
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:42:53 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hQFwJ-0003G4-Pf
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:44:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1hQFuU-0002Kd-3g
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:42:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41934)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hQFwI-0003VQ-DP
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:44:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37336)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1hQFuT-0002K2-Rg
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:42:50 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1hQFwI-0003Up-5I
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:44:42 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BAA9759461;
-	Mon, 13 May 2019 18:42:48 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (ovpn-116-151.ams2.redhat.com
-	[10.36.116.151])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0AA7D104C512;
-	Mon, 13 May 2019 18:42:40 +0000 (UTC)
-Date: Mon, 13 May 2019 20:42:37 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190513184237.i2ha3ixvhjqzkn5q@kamzik.brq.redhat.com>
-References: <20190418092841.fzrcegkbal7dpfcy@kamzik.brq.redhat.com>
-	<20190418112610.GO13773@redhat.com>
-	<877ebrmch2.fsf@dusky.pond.sub.org>
+	by mx1.redhat.com (Postfix) with ESMTPS id 6C94EC0568FE
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 18:44:41 +0000 (UTC)
+Received: from localhost (unknown [10.36.112.10])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9BE545DE01;
+	Mon, 13 May 2019 18:44:34 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 13 May 2019 20:44:25 +0200
+Message-Id: <20190513184433.21038-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <877ebrmch2.fsf@dusky.pond.sub.org>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Mon, 13 May 2019 18:42:48 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.32]);
+	Mon, 13 May 2019 18:44:41 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] How do we do user input bitmap properties?
+Subject: [Qemu-devel] [PATCH v7 0/8] Add vhost-user-gpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,148 +66,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
-	Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-	dgilbert@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com,
-	Dave.Martin@arm.com
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 18, 2019 at 07:48:09PM +0200, Markus Armbruster wrote:
-> Daniel P. Berrang=E9 <berrange@redhat.com> writes:
->=20
-> > On Thu, Apr 18, 2019 at 11:28:41AM +0200, Andrew Jones wrote:
-> >> Hi all,
-> >>=20
-> >> First some background:
-> >>=20
-> >> For the userspace side of AArch64 guest SVE support we need to
-> >> expose KVM's allowed vector lengths bitmap to the user and allow
-> >> the user to choose a subset of that bitmap. Since bitmaps are a
-> >> bit awkward to work with then we'll likely want to expose it as
-> >> an array of vector lengths instead. Also, assuming we want to
-> >> expose the lengths as number-of-quadwords (quadword =3D=3D 128 bits
-> >> for AArch64 and vector lengths must be multiples of quadwords)
-> >> rather than number-of-bits, then an example array (which will
-> >> always be a sequence) might be
-> >>=20
-> >>  [ 8, 16, 32 ]
-> >>=20
-> >> The user may choose a subsequence, but only through truncation,
-> >> i.e. [ 8, 32 ] is not valid, but [ 8, 16 ] is.
-> >>=20
-> >> Furthermore, different hosts may support different sequences
-> >> which have the same maximum. For example, if the above sequence
-> >> is for Host_A, then Host_B could be
-> >>=20
-> >>  [ 8, 16, 24, 32 ]
-> >>=20
-> >> The host must support all lengths in the sequence, which means
-> >> that while Host_A supports 32, since it doesn't support 24 and
-> >> we can only truncate sequences, we must use either [ 8 ] or
-> >> [ 8, 16 ] for a compatible sequence if we intend to migrate
-> >> between the hosts.
-> >>=20
-> >> Now to the $SUBJECT question:
-> >>=20
-> >> My feeling is that we should require the sequence to be
-> >> provided on the command line as a cpu property. Something
-> >> like
-> >>=20
-> >>   -cpu host,sve-vl-list=3D8:16
-> >>=20
-> >> (I chose ':' for the delimiter because ',' can't work, but
-> >> if there's a better choice, then that's fine by me.)
-> >>=20
-> >> Afaict a property list like this will require a new parser,
->=20
-> We had 20+ of those when I last counted.  Among the more annoying
-> reasons CLI QAPIfication is hard[1].
->=20
-> >> which feels a bit funny since it seems we should already
-> >> have support for this type of thing somewhere in QEMU. So,
-> >> the question is: do we? I see we have array properties, but
-> >> I don't believe that works with the command line. Should we
-> >> only use QMP for this? We already want some QMP in order to
-> >> query the supported vector lengths. Maybe we should use QMP
-> >> to set the selection too? But then what about command line
-> >> support for developers? And if the property is on the command
-> >> line then we don't have to add it to the migration stream.
-> >
-> > You should be able to use arrays from the CLI with QemuOpts by repeat=
-ing
-> > the same option name many times, though I can't say it is a very
-> > nice approach if you have many values to list as it gets very repetat=
-ive.
->=20
-> Yes, this is one of the ways the current CLI does lists.  It's also one
-> of the more annoying reasons CLI QAPIfication is hard[2].
->=20
-> QemuOpts let the last param=3Dvalue win the stupidest way that could
-> possibly work (I respect that): add to the front of the list, search it
-> front to back.
->=20
-> Then somebody discovered that if you search the list manually, you can
-> see them all, and abuse that to get a list-valued param.  I'm sure that
-> felt clever at the time.
->=20
-> Another way to do lists the funky list feature of string input and opts
-> visitor.  Yet another annoying reason CLI QAPIfication is hard[3].
->=20
-> We use the opts visitor's list feature for -numa node,cpus=3D...  Hmm,
-> looks like we even combine it with the "multiple param=3Dvalue build up=
- a
-> list" technique: -smp node,cpus=3D0-1,cpus=3D4-5 denotes [0,1,4,5].
->=20
-> > That's the curse of not having a good CLI syntax for non-scalar data =
-in
-> > QemuOpts & why Markus believes we should switch to JSON for the CLI t=
-oo
-> >
-> >      -cpu host,sve-vl=3D8,sve-vl=3D16
->=20
-> We actually have CLI syntax for non-scalar data: dotted keys.  Dotted
-> keys are syntactic sugar for JSON.  It looks friendlier than JSON for
-> simple cases, then gets uglier as things get more complex, and then it
-> falls apart: it can't quite express all of JSON.
->=20
-> Example: sve-vl.0=3D8,sve-vl.1=3D16
->     gets desugared into {"sve": [8, 16]}
->     if the QAPI schema has 'sve': ['int'].
->=20
-> The comment at the beginning of util/keyval.c explains it in more
-> detail.
->=20
-> It powers -blockdev and -display.  Both options accept either JSON or
-> dotted keys.  If the option argument starts with '{', it's JSON.
-> Management applications should stick to JSON.
->=20
->=20
-> [1] Towards a more expressive and introspectable QEMU command line
-> https://www.linux-kvm.org/images/f/f2/Armbru-qapi-cmdline_1.pdf
-> Slide 34 "Backward compatibility" item 1
->=20
-> [2] ibid, item 4
->=20
-> [3] ibid, item 3
->
+Hi,
 
-Sorry I forgot to follow up to this earlier. I looked at the examples
-provided and saw they were all for independent command line options,
-rather than command line options like '-cpu' that then accepts additional
-properties. I couldn't see how I could use ',' to separate array members
-when using properties or to use an array property input on the command
-line. In the end I opted to use a single uint64_t for a bitmap, as 64 is
-big enough for now, and even though passing some hex number on the comman=
-d
-line isn't user friendly at all, it didn't seem like a long list of a
-repeated parameter was that user friendly either. Of course I'm still ope=
-n
-to suggestions to try to find the best balance between user friendliness,
-current QEMU command line parsing support, and just getting a bitmap into
-cpu state one way or another.
+vhost-user allows to drive a virtio device in a seperate
+process. After vhost-user-net, we have seen
+vhost-user-{scsi,blk,crypto,input} added more recently.
 
-Thanks,
-drew
+This series, initially proposed ~3 years ago, time flies
+(https://lists.gnu.org/archive/html/qemu-devel/2016-06/msg01905.html)
+contributes with vhost-user-gpu.
+
+You may start a vhost-user-gpu with virgl rendering in a separate
+process like this:
+
+$ ./vhost-user-gpu --virgl -s vgpu.sock &
+$ qemu...
+  -chardev socket,id=3Dchr,path=3Dvgpu.sock
+  -device vhost-user-vga,chardev=3Dchr
+
+Based-on: <20190513183325.8596-1-marcandre.lureau@redhat.com>
+
+v7:
+ - add "framed" replies to the vhost-user-gpu protocol
+ - use GBM library instead of drm-vendor APIs
+ - added "virtio-gpu: add a pixman helper header"
+
+v6:
+ - do not install vhost-user-input
+ - install vhost-user-gpu and json file following the spec
+ - fix the build when drm-intel-devel missing
+ - rebase (& resend without already applied patches)
+
+v5:
+ - remove user-creatable version of vhost-user-backend
+ - remove optinal management of sub-process in vhost-user-backend
+ - removed daemonize/pid code
+ - drop introduction of new input & gpu messages for PCI config space
+   handling, instead use VHOST_USER_PROTOCOL_F_CONFIG
+ - plain mem & udmabuf fallback for 2d rendering
+ - rebased, kconfig-ify, rst-ify
+
+Marc-Andr=C3=A9 Lureau (8):
+  vhost-user: add vhost_user_gpu_set_socket()
+  virtio-gpu: add bswap helpers header
+  virtio-gpu: add a pixman helper header
+  util: compile drm.o on Linux
+  contrib: add vhost-user-gpu
+  virtio-gpu: split virtio-gpu, introduce virtio-gpu-base
+  virtio-gpu: split virtio-gpu-pci & virtio-vga
+  hw/display: add vhost-user-vga & gpu-pci
+
+ configure                                  |   17 +
+ contrib/libvhost-user/libvhost-user.h      |    1 +
+ contrib/vhost-user-gpu/virgl.h             |   25 +
+ contrib/vhost-user-gpu/vugbm.h             |   67 ++
+ contrib/vhost-user-gpu/vugpu.h             |  177 +++
+ hw/display/virtio-vga.h                    |   32 +
+ include/hw/virtio/vhost-backend.h          |    2 +
+ include/hw/virtio/virtio-gpu-bswap.h       |   61 +
+ include/hw/virtio/virtio-gpu-pci.h         |   40 +
+ include/hw/virtio/virtio-gpu-pixman.h      |   45 +
+ include/hw/virtio/virtio-gpu.h             |   92 +-
+ contrib/libvhost-user/libvhost-user.c      |    1 +
+ contrib/vhost-user-gpu/main.c              | 1185 ++++++++++++++++++++
+ contrib/vhost-user-gpu/virgl.c             |  579 ++++++++++
+ contrib/vhost-user-gpu/vugbm.c             |  331 ++++++
+ hw/display/vhost-user-gpu-pci.c            |   51 +
+ hw/display/vhost-user-gpu.c                |  607 ++++++++++
+ hw/display/vhost-user-vga.c                |   52 +
+ hw/display/virtio-gpu-3d.c                 |   49 +-
+ hw/display/virtio-gpu-base.c               |  268 +++++
+ hw/display/virtio-gpu-pci.c                |   55 +-
+ hw/display/virtio-gpu.c                    |  444 ++------
+ hw/display/virtio-vga.c                    |  138 +--
+ hw/virtio/vhost-user.c                     |   11 +
+ vl.c                                       |    1 +
+ MAINTAINERS                                |   10 +-
+ Makefile                                   |   24 +-
+ Makefile.objs                              |    1 +
+ contrib/vhost-user-gpu/50-qemu-gpu.json.in |    5 +
+ contrib/vhost-user-gpu/Makefile.objs       |   10 +
+ docs/interop/index.rst                     |    2 +-
+ docs/interop/vhost-user-gpu.rst            |  243 ++++
+ docs/interop/vhost-user.txt                |    9 +
+ hw/display/Kconfig                         |   10 +
+ hw/display/Makefile.objs                   |    5 +-
+ rules.mak                                  |    9 +-
+ util/Makefile.objs                         |    2 +-
+ 37 files changed, 4176 insertions(+), 485 deletions(-)
+ create mode 100644 contrib/vhost-user-gpu/virgl.h
+ create mode 100644 contrib/vhost-user-gpu/vugbm.h
+ create mode 100644 contrib/vhost-user-gpu/vugpu.h
+ create mode 100644 hw/display/virtio-vga.h
+ create mode 100644 include/hw/virtio/virtio-gpu-bswap.h
+ create mode 100644 include/hw/virtio/virtio-gpu-pci.h
+ create mode 100644 include/hw/virtio/virtio-gpu-pixman.h
+ create mode 100644 contrib/vhost-user-gpu/main.c
+ create mode 100644 contrib/vhost-user-gpu/virgl.c
+ create mode 100644 contrib/vhost-user-gpu/vugbm.c
+ create mode 100644 hw/display/vhost-user-gpu-pci.c
+ create mode 100644 hw/display/vhost-user-gpu.c
+ create mode 100644 hw/display/vhost-user-vga.c
+ create mode 100644 hw/display/virtio-gpu-base.c
+ create mode 100644 contrib/vhost-user-gpu/50-qemu-gpu.json.in
+ create mode 100644 contrib/vhost-user-gpu/Makefile.objs
+ create mode 100644 docs/interop/vhost-user-gpu.rst
+
+--=20
+2.21.0.777.g83232e3864
+
 
