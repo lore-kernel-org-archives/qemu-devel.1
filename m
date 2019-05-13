@@ -2,70 +2,64 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC2B5C46460
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5CC0C04AA7
 	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:52:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1AF521473
+	by mail.kernel.org (Postfix) with ESMTPS id B0E88208CA
 	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:52:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1AF521473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="f+l+AsnF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0E88208CA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57677 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57679 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQBNy-0004is-SF
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 09:52:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59800)
+	id 1hQBNy-0004jA-V9
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 09:52:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1hQBM2-00039x-IS
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:50:59 -0400
+	(envelope-from <berto@igalia.com>) id 1hQBLu-0002eJ-NN
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:50:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1hQBGa-0004s6-Ec
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:45:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55434)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>)
-	id 1hQBGY-0004lz-Nn; Mon, 13 May 2019 09:45:18 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 008D23091761;
-	Mon, 13 May 2019 13:45:18 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (ovpn-116-151.ams2.redhat.com
-	[10.36.116.151])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6C35E1001943;
-	Mon, 13 May 2019 13:45:15 +0000 (UTC)
-Date: Mon, 13 May 2019 15:45:12 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Dave Martin <Dave.Martin@arm.com>
-Message-ID: <20190513134512.alclwrqnxlyai6uy@kamzik.brq.redhat.com>
-References: <20190512083624.8916-1-drjones@redhat.com>
-	<20190512083624.8916-12-drjones@redhat.com>
-	<20190513112635.GD28398@e103592.cambridge.arm.com>
-	<20190513123023.h4q5sihktqctkgml@kamzik.brq.redhat.com>
-	<20190513124126.GF28398@e103592.cambridge.arm.com>
-	<20190513125740.ukyx4vuili3f5wbe@kamzik.brq.redhat.com>
-	<20190513131248.GI28398@e103592.cambridge.arm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190513131248.GI28398@e103592.cambridge.arm.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Mon, 13 May 2019 13:45:18 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 11/13] target/arm/cpu64: max cpu: Introduce
- sve-vls-map
+	(envelope-from <berto@igalia.com>) id 1hQBHs-0005e2-B5
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:46:41 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:36074)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <berto@igalia.com>)
+	id 1hQBHs-0005cj-1o; Mon, 13 May 2019 09:46:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; 
+	h=References:In-Reply-To:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
+	bh=10jZxo2pQTHlyRjmSoGjzlkHOLb5jm8EaFasG2y36X0=; 
+	b=f+l+AsnFa70e60IZi128u+ezhCl1fLrmvkhoIQf/iWGGVrACCmAlNUfEt3Ii2alEvQ/U+WREaYL1MG9Mhzx7Y3glUyopX1F/bfXy2LKH/ncefYoH+eUh7XPPmD4RY9xJvde3SUeP/ehzH8cABSOUtGPOoKU8WVdtULQwIk7c1D2kO8NE6KnMkzzWw2leIMPSMPMSGa3XpVBEvi8EL4erWJ3IbNb8P6CT9Y8ek6pyDJXTcONl3WAyaDZd2XD/RfuUkRFX6N7NZR+VT8VNtpQRfwweMYjoftYWUH247x7+78kGPTB6exHBUp+oizfcFS6PFOYJqQLA39rxBAf7eONIZA==;
+Received: from mobile-access-bcee32-86.dhcp.inet.fi ([188.238.50.86]
+	helo=perseus.local) by fanzine.igalia.com with esmtpsa 
+	(Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
+	id 1hQBHo-0003gf-ER; Mon, 13 May 2019 15:46:36 +0200
+Received: from berto by perseus.local with local (Exim 4.89)
+	(envelope-from <berto@igalia.com>)
+	id 1hQBHb-0003Bw-8e; Mon, 13 May 2019 16:46:23 +0300
+From: Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 13 May 2019 16:46:17 +0300
+Message-Id: <6d1d5feaa53aa1ab127adb73d605dc4503e3abd5.1557754872.git.berto@igalia.com>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <cover.1557754872.git.berto@igalia.com>
+References: <cover.1557754872.git.berto@igalia.com>
+In-Reply-To: <cover.1557754872.git.berto@igalia.com>
+References: <cover.1557754872.git.berto@igalia.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+	timestamps) [generic] [fuzzy]
+X-Received-From: 91.117.99.155
+Subject: [Qemu-devel] [PATCH v3 1/2] block: Use bdrv_unref_child() for all
+ children in bdrv_close()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,146 +71,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"armbru@redhat.com" <armbru@redhat.com>,
-	"richard.henderson@linaro.org" <richard.henderson@linaro.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"abologna@redhat.com" <abologna@redhat.com>,
-	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-	"alex.bennee@linaro.org" <alex.bennee@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+	qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 13, 2019 at 02:12:48PM +0100, Dave Martin wrote:
-> On Mon, May 13, 2019 at 01:57:40PM +0100, Andrew Jones wrote:
-> > On Mon, May 13, 2019 at 01:41:26PM +0100, Dave Martin wrote:
-> > > On Mon, May 13, 2019 at 01:30:23PM +0100, Andrew Jones wrote:
-> > > > On Mon, May 13, 2019 at 12:26:36PM +0100, Dave Martin wrote:
-> > > > > On Sun, May 12, 2019 at 09:36:22AM +0100, Andrew Jones wrote:
-> > > > > > Introduce another cpu property to control SVE vector lengths,
-> > > > > > sve-vls-map, which allows the user to explicitly select the
-> > > > > > set of vector lengths the guest can use. The map must conform
-> > > > > > to QEMU's limits and architectural constraints, checked when
-> > > > > > the property is set. Inconsistencies with sve-max-vq are also
-> > > > > > checked. The bit number of a set bit in the map represents the
-> > > > > > allowed vector length in number of quadwords.
-> > > > > > 
-> > > > > > Note, as the map is implemented with a single 64-bit word we
-> > > > > > currently only support up to 8192-bit vectors. As QEMU and
-> > > > > > KVM only support up to 2048-bit vectors then this sufficient
-> > > > > > now, and probably for some time. Extending the bitmap beyond
-> > > > > > a single word will likely require changing the property to
-> > > > > > a string and adding yet another parser to QEMU.
-> > > > > > 
-> > > > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > > > > ---
-> > > > > >  target/arm/cpu.c     |  4 +++
-> > > > > >  target/arm/cpu.h     |  3 ++
-> > > > > >  target/arm/cpu64.c   | 70 +++++++++++++++++++++++++++++++++++++++++---
-> > > > > >  target/arm/helper.c  | 10 ++++++-
-> > > > > >  target/arm/monitor.c |  9 ++++--
-> > > > > >  5 files changed, 88 insertions(+), 8 deletions(-)
-> > > > > > 
-> > > > > 
-> > > > > [...]
-> > > > > 
-> > > > > > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> > > > > > index 8292d547e8f9..f0d0ce759ba8 100644
-> > > > > > --- a/target/arm/cpu.h
-> > > > > > +++ b/target/arm/cpu.h
-> > > > > > @@ -920,6 +920,9 @@ struct ARMCPU {
-> > > > > >  
-> > > > > >      /* Used to set the maximum vector length the cpu will support.  */
-> > > > > >      uint32_t sve_max_vq;
-> > > > > > +
-> > > > > > +    /* Each bit represents a supported vector length of (bitnum * 16) bytes */
-> > > > > > +    uint64_t sve_vls_map;
-> > > > > 
-> > > > > Just to be clear, the representation here is different from the
-> > > > > representation in KVM_REG_ARM64_SVE_VLS?
-> > > > > 
-> > > > > In the latter, bit n represents vector length ((n + 1) * 16) bytes.
-> > > > 
-> > > > KVM also uses bitnum * 16. bitnum is the the bit number, not the shift.
-> > > 
-> > > Can you point to the relevant kernel code?  This isn't what I thought I
-> > > wrote...
-> > 
-> > The Documentation/virtual/kvm/api.txt documentation has
-> > 
-> >  > if (vq >= SVE_VQ_MIN && vq <= SVE_VQ_MAX &&
-> >  >    ((vector_lengths[(vq - KVM_ARM64_SVE_VQ_MIN) / 64] >>
-> >  >                ((vq - KVM_ARM64_SVE_VQ_MIN) % 64)) & 1))
-> >  >        /* Vector length vq * 16 bytes supported */
-> >  > else
-> >  >        /* Vector length vq * 16 bytes not supported */
-> > 
-> > Taking vq=1, we check (vector_lengths[0] >> 0) to see if we have the
-> > length (1 * 16) bytes. Since bitnum 1 is (1 << 0) that means the shift
-> > is zero and (bitnum * 16) is the same as (vq * 16). With ((n + 1) * 16),
-> > n would have to be zero, which is not a valid bitnum, but is a valid
-> > bit shift.
-> 
-> OK, so it sounds like the interpretation of the KVM ABI is what I intended.
-> 
-> What is "bitnum" though?  Most of the time, people seem to number bits
-> starting from 0 -- though of course that's just a convention.
+bdrv_unref_child() does the following things:
 
-Eh, I see the problem. I used the word 'number', when I meant 'position'.
-Indeed the bit number of bit position 1 is zero. Sorry about the confusion.
-For v2 I can try to ensure I don't use the wrong terminology.
+  - Updates the child->bs->inherits_from pointer.
+  - Calls bdrv_detach_child() to remove the BdrvChild from bs->children.
+  - Calls bdrv_unref() to unref the child BlockDriverState.
 
-> 
-> > > > So you can't have bitnum=0. 'n' must be a shift, as it would need to
-> > > > allow zero in order to represent KVM_ARM64_SVE_VQ_MIN.
-> 
-> [...]
-> 
-> > > > > > diff --git a/target/arm/helper.c b/target/arm/helper.c
-> > > > > > index 1e6eb0d0f360..bedec1ea0b27 100644
-> > > > > > --- a/target/arm/helper.c
-> > > > > > +++ b/target/arm/helper.c
-> > > > > > @@ -5254,12 +5254,20 @@ uint32_t sve_zcr_len_for_el(CPUARMState *env, int el)
-> > > > > >  static void zcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-> > > > > >                        uint64_t value)
-> > > > > >  {
-> > > > > > +    ARMCPU *cpu = arm_env_get_cpu(env);
-> > > > > >      int cur_el = arm_current_el(env);
-> > > > > >      int old_len = sve_zcr_len_for_el(env, cur_el);
-> > > > > >      int new_len;
-> > > > > >  
-> > > > > >      /* Bits other than [3:0] are RAZ/WI.  */
-> > > > > > -    raw_write(env, ri, value & 0xf);
-> > > > > > +    value &= 0xf;
-> > > > > 
-> > > > > You might want to sanity-check that the max vq you configured for the
-> > > > > vcpu is <= 16 here.
-> > > > 
-> > > > It's already checked by the cpu property set function at input time.
-> > > 
-> > > The check is in one place, but the assumptions based on it are
-> > > potentially all over the place -- it may be tricky to track them
-> > > all down if you ever add support for >8192-bit vectors.
-> > > 
-> > > (Not a big deal from my point of view, but I'd migration to larger
-> > > vectors to be as smooth as reasonably possible if we ever find we have
-> > > to do it.)
-> > >
-> > 
-> > Adding asserts might be a good idea to catch bugs when expanding the
-> > supported vector lengths. I can certainly add one here. Maybe Richard
-> > has some ideas as well for this.
-> 
-> Sure, just wanted to make the point, since this might be an issue in the
-> future.
-> 
-> The compromise in the kernel implementation was similar: in many places
-> the code is agnostic to larger vectors, but in a few (such as the ioctl
-> reg accessors) this seemed too cumbersome to justify for now, so I went
-> with a simpler implementation with some added sanity-checks.
->
+When bdrv_unref_child() was introduced in commit 33a604075c it was not
+used in bdrv_close() because the drivers that had additional children
+(like quorum or blkverify) had already called bdrv_unref() on their
+children during their own close functions.
 
-Thanks,
-drew
+This was changed later (in 0bd6e91a7e for quorum, in 3e586be0b2 for
+blkverify) so there's no reason not to use bdrv_unref_child() in
+bdrv_close() anymore.
+
+After this there's also no need to remove bs->backing and bs->file
+separately from the rest of the children, so bdrv_close() can be
+simplified.
+
+Now bdrv_close() unrefs all children (before this patch it was only
+bs->file and bs->backing). As a result, none of the callers of
+brvd_attach_child() should remove their reference to child_bs (because
+this function effectively steals that reference). This patch updates a
+couple of tests that where doing their own bdrv_unref().
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block.c                     | 16 +++-------------
+ tests/test-bdrv-drain.c     |  6 ------
+ tests/test-bdrv-graph-mod.c |  1 -
+ 3 files changed, 3 insertions(+), 20 deletions(-)
+
+diff --git a/block.c b/block.c
+index 5c2c6aa761..3c3bd0f8d2 100644
+--- a/block.c
++++ b/block.c
+@@ -3842,22 +3842,12 @@ static void bdrv_close(BlockDriverState *bs)
+         bs->drv = NULL;
+     }
+ 
+-    bdrv_set_backing_hd(bs, NULL, &error_abort);
+-
+-    if (bs->file != NULL) {
+-        bdrv_unref_child(bs, bs->file);
+-        bs->file = NULL;
+-    }
+-
+     QLIST_FOREACH_SAFE(child, &bs->children, next, next) {
+-        /* TODO Remove bdrv_unref() from drivers' close function and use
+-         * bdrv_unref_child() here */
+-        if (child->bs->inherits_from == bs) {
+-            child->bs->inherits_from = NULL;
+-        }
+-        bdrv_detach_child(child);
++        bdrv_unref_child(bs, child);
+     }
+ 
++    bs->backing = NULL;
++    bs->file = NULL;
+     g_free(bs->opaque);
+     bs->opaque = NULL;
+     atomic_set(&bs->copy_on_read, 0);
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index eda90750eb..5534c2adf9 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -1436,12 +1436,6 @@ static void test_detach_indirect(bool by_parent_cb)
+     bdrv_unref(parent_b);
+     blk_unref(blk);
+ 
+-    /* XXX Once bdrv_close() unref's children instead of just detaching them,
+-     * this won't be necessary any more. */
+-    bdrv_unref(a);
+-    bdrv_unref(a);
+-    bdrv_unref(c);
+-
+     g_assert_cmpint(a->refcnt, ==, 1);
+     g_assert_cmpint(b->refcnt, ==, 1);
+     g_assert_cmpint(c->refcnt, ==, 1);
+diff --git a/tests/test-bdrv-graph-mod.c b/tests/test-bdrv-graph-mod.c
+index 283dc84869..747c0bf8fc 100644
+--- a/tests/test-bdrv-graph-mod.c
++++ b/tests/test-bdrv-graph-mod.c
+@@ -116,7 +116,6 @@ static void test_update_perm_tree(void)
+     g_assert_nonnull(local_err);
+     error_free(local_err);
+ 
+-    bdrv_unref(bs);
+     blk_unref(root);
+ }
+ 
+-- 
+2.11.0
+
 
