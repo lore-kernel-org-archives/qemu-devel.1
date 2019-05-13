@@ -2,65 +2,72 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA7F7C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 11:56:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C2E2C04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 11:58:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 979FE208CA
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 11:56:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="Lakp+/6l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 979FE208CA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	by mail.kernel.org (Postfix) with ESMTPS id 72001208CA
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 11:58:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72001208CA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55676 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55704 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQ9Yr-0001vl-Uw
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 07:56:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38728)
+	id 1hQ9b3-0003gX-JO
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 07:58:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hQ9XB-0000pR-Fg
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:54:22 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hQ9XD-0000l5-Bi
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:54:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hQ9Rq-0004W8-J9
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:48:52 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:36998)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>)
-	id 1hQ9Ro-0004NL-IP; Mon, 13 May 2019 07:48:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; 
-	h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
-	bh=7hYwN2m6a89sqlEMo1+JeIA5fLxGN2G2ug2Twog+0mo=; 
-	b=Lakp+/6l43G2Rv4u/YGiKaEX28XU0mZTmB7HQTpteU/3vZMJzLTD9VuLuA1Qzb8V14C84h+2alO+iYFG/M7dki6WdT/04qtCux06lwCOWG6CemOmmZAx7uNQ+hPalSDvTQ9+wrJGDhlhAKdVm15gpAn8ElHBx97+/CTShf2SV5angON1Liwtry+jq3+QM4LrfQ74xLNBSAZbeIpEv2SvHZ2rR3efZQCu1/+/GkzbM5q8kO0XUUd2/Uc0qj57eVW5iEpvmMxAjXCjBd7iBDofnd54aF5s4hktsFPtzXwwyR3rHe0y9f8dczJCV9OVJa3zoqhGEZFAEuKVdez+t+nBJA==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
-	by fanzine.igalia.com with esmtps 
-	(Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
-	id 1hQ9RU-0004cm-39; Mon, 13 May 2019 13:48:28 +0200
-Received: from berto by mail.igalia.com with local (Exim)
-	id 1hQ9RU-0000Ck-0h; Mon, 13 May 2019 13:48:28 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-In-Reply-To: <20190513112846.ggnhopjwbopfexum@steredhat>
-References: <20190510162254.8152-1-berto@igalia.com>
-	<20190513112846.ggnhopjwbopfexum@steredhat>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
-	(i586-pc-linux-gnu)
-Date: Mon, 13 May 2019 13:48:27 +0200
-Message-ID: <w51d0km7eyc.fsf@maestria.local.igalia.com>
+	(envelope-from <laurent@vivier.eu>) id 1hQ9Pw-0003gq-8z
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:46:53 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:40253)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hQ9Pv-0003gI-VI
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:46:52 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+	1MPp0l-1h4LIq2Lw3-00Mv6J; Mon, 13 May 2019 13:46:15 +0200
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1556905846-14074-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1556905846-14074-4-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <8acf2e45-f2c4-36aa-7064-d23aa3f1bca2@vivier.eu>
+Date: Mon, 13 May 2019 13:46:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
-	timestamps) [generic] [fuzzy]
-X-Received-From: 91.117.99.155
-Subject: Re: [Qemu-devel] [PATCH] qcow2: Define and use
- QCOW2_COMPRESSED_SECTOR_SIZE
+In-Reply-To: <1556905846-14074-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:R279r3hxeBq9BzeqznatG1S6W1kc2XsOsiWlbNDMakhoU3pUTMS
+	alC1lNgqANNf0uXsQ9TYg0ctWj28uIbNospsiduRPQkOibEqSfO9Zupu1Exa24zAjfmRrlD
+	EMRnIK69JtHZkyxqtyo60hAbGhoauLGrkRNSN6T3CdLVqdJqcq9udWgCgkgFg2t/bLY8dmm
+	5v680ktFwcKWfEAmjnAFQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:SAOMlRHzpTc=:uTkiH4IluFIK3eH1O3H5Tv
+	t2vTYzBh4z7Vihj4oQ4PwqMYJREdvTbbOcyjMv4u6dEda0vL2UHfqUgaXwzjaEU5a9pm3TGpS
+	NJPQCizjZ0YhpneYQKCYecaClYYjRM5zUsI+mLnDds7HET2YLYjDCb/tw9Cm1FG3vUMczuy+P
+	aa71rxohufiV38gqt8BDlCMpvp9FD+rgTMlXUeM2iFxM0Mim8IUfv3q28IaIDWILIze2SeHjR
+	LwDEryFby2C9192buoa0Bp3hbLgxeLIKKxE4CvFr35OifQ6G28seSaz7z5S4TYubpZgXMZXaq
+	5J6cjqe4T3a0yAvZRKetqo22WaNz2vxczDGy408vitYRymFXY9RjtfFmdZ9dWU1NoWqIyUYRL
+	qIFiSJpPPGt4N+GA2HqoT2rhgya44U92mT7+i4OSo2Y6JnoaTJyvUspWKR1T+0Uzo4c2HZwfD
+	youV9324KOdtSjMjddbD6A4YEwAkMh4ujm4Mv2uR6BN7DM5pjrxtFRvspZmcUr+KwWO49Rzzc
+	mU2UCw08QFs0fjHHEEQvCEXdmUurzGXl2h91CfiumAs8Qyqt0IH9Nb5b50xEcKDnJaO2Re3Pg
+	00rWSjLzKeYUlbpV3pYlJJqEOKcuPSRN389YNleSNczM5UgG49x+RXvolY6HhLMMUcC6+C9Bd
+	7MME3GggYJ5/CbrK5GdLgAZM9qP36SqIGe+TF7bDIt85q/RZjdN7+c/Z6yyHZ2Bt3dPaHTUJY
+	7wxrLHeYzN/hWIE7fF+o47x33CJB0PzI79jZPxQXl7PpG07XdJO5+ENCJrc=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.134
+Subject: Re: [Qemu-devel] [PATCH v4 3/5] linux-user: Add support the
+ SIOC<G|S>IFPFLAGS ioctls for all targets
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,28 +79,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
-	Max Reitz <mreitz@redhat.com>
+Cc: lvivier@redhat.com, thuth@redhat.com, daniel.santos@pobox.com,
+	arikalo@wavecomp.com, jcmvbkbc@gmail.com, amarkovic@wavecomp.com,
+	nchen@wavecomp.com, philmd@redhat.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon 13 May 2019 01:28:46 PM CEST, Stefano Garzarella wrote:
->> +            int size = QCOW2_COMPRESSED_SECTOR_SIZE *
->> +                (((l2_entry >> s->csize_shift) & s->csize_mask) + 1);
->
-> What about using int64_t type for the 'size' variable?
-> (because the qcow2_free_clusters() 'size' parameter is int64_t)
+On 03/05/2019 19:50, Aleksandar Markovic wrote:
+> From: Neng Chen <nchen@wavecomp.com>
+> 
+> Add support for getting and setting extended private flags of a
+> network device via SIOCSIFPFLAGS and SIOCGIFPFLAGS ioctls.
+> 
+> The ioctl numeric values are platform-independent and determined by
+> the file include/uapi/linux/sockios.h in Linux kernel source code:
+> 
+>    #define SIOCSIFPFLAGS 0x8934
+>    #define SIOCGIFPFLAGS	0x8935
+> 
+> These ioctls get (or set) the field ifr_flags of type short in the
+> structure ifreq. Such functionality is achieved in QEMU by using
+> MK_STRUCT() and MK_PTR() macros with an appropriate argument, as
+> it was done for existing similar cases.
+> 
+> Signed-off-by: Neng Chen <nchen@wavecomp.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Message-Id: <1554839486-3527-1-git-send-email-aleksandar.markovic@rt-rk.com>
+> ---
+>   linux-user/ioctls.h       | 2 ++
+>   linux-user/syscall_defs.h | 2 ++
+>   2 files changed, 4 insertions(+)
 
-The maximum size that can be read from a compressed cluster descriptor
-using the formula above is twice the cluster size (more information on
-commit abd3622cc03cf41ed542126a540385f30a4c0175 and on the Compressed
-Clusters Descriptor spec in docs/interop/qcow2.txt).
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
-Since the maximum allowed cluster size is 2MB, the value of the 'size'
-variable can never be larger than 4MB, which fits comfortably on a
-32-bit integer. We would need to support 512MB clusters in order to have
-problems with this.
 
-Berto
 
