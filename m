@@ -2,83 +2,80 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D65CC04AB1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 11:59:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 069FFC04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 12:01:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A436208CA
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 11:59:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3C79208CA
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 12:01:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bYUJE4JP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A436208CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ghCHnCEq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3C79208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55708 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55763 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQ9cF-0004hp-8B
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 07:59:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39820)
+	id 1hQ9ds-00064K-1W
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 08:01:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hQ9aO-0003XL-UB
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:57:41 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hQ9XE-0000l5-Fo
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:54:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hQ9aN-0001Ry-T8
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:57:40 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36593)
+	(envelope-from <peter.maydell@linaro.org>) id 1hQ9Pr-0003ej-4l
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:46:49 -0400
+Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:44194)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1hQ9aN-0001RL-Mn
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:57:39 -0400
-Received: by mail-wr1-x444.google.com with SMTP id o4so14949734wra.3
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 04:57:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=Nnd8FYZPm/MLulz3Akv9891/p6EUv5PIMcaH5c6XG9k=;
-	b=bYUJE4JPlOZnPo0KYhnqkF9fn+yBVwhdAcRerhGa9IAAYMEyxgdAq1ZhuPDwxZqyH6
-	f85SHsvGvt+V0zG44R9A1CyrGeS6knlshZr0dl384JgPp3EU8t+V9+ilK/71yyt17ovo
-	1oZo6StGYsSjuLlC3ZzDOtl9ZUkYj662/vYkige9ANiTySc9vclXxbpFRNVlNO6hwf6B
-	ZV7onw8X4b64PkKKL49QZSb4rSGdUwoaUEelkluicFEbUvrHMgJfwnpEP8sB4FGYntf3
-	qwrSEpdrTsWByEsbtpYbsp4rgQRROZsxKNIEntYwkb3Yn4dPJnGClPfj8ygtlo8X93gK
-	xAlw==
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hQ9Pn-0003cO-Jh
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:46:45 -0400
+Received: by mail-oi1-x235.google.com with SMTP id z65so1818260oia.11
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 04:46:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=Q9SOicrrtTczbrcda5tZpSyF/s7AqO5v7E7dfJBVzaA=;
+	b=ghCHnCEqpesKGm+kztjg7F7ZVroDFsMY6MAaMPjMGBl5rJYSqg86Qmlq8GSRKHu/tM
+	ec7JrnHVihlbPRvOpwh5t9/aBseE7eQw4VDUGtPDDdhClKLdgYO5gt2XkVZlx6zm6Klj
+	MDfRZMaf+D00yuTkRDBn7c1VkoJQNgA/brhQ5OZ4U+RsZwHz39GhN+Ebe1vPRVd8TY0o
+	PaGy46uHiuswaSl1V3uCrpxPQYooylp4baDLHrt8uTThK2sm3uOGlQUzoaIKbZILRhpA
+	FIFSbEo5NiJIeNaQDwLH1+ne65LdObSdzquyfbqxQuXwXYrwIw5KLaTM9jbEEoLOc6cc
+	k9xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=Nnd8FYZPm/MLulz3Akv9891/p6EUv5PIMcaH5c6XG9k=;
-	b=dfCHyWZepWbOWVf8Y4xiau5VGbClaySehQjaFoUBbvGpLlc1EUy5vcALPTxFOAMH8E
-	ZQ4axDXNtaUqnLJ9hQ40zla/Inv54pOXcgE8mQJ4Q8VIfbH4jD6LnwnWoZ6ZwHVuledr
-	QEhynbtnAO5evTJdLiIP+Pa62wCTC/cqCRZYTefK5aVRNumHYpnoZWq/OGkX1s/ufHXQ
-	YRHQdVOT8oXMN4tgK1UhBQrE6lpi4U9GANAUoInsvbmuIOqiDoLHtS46RlwYgPY+Yz9X
-	bFZ2b78T5kGbRmS1BewDWVdESsDUoMplXZJL3a6H7AnRDp24DS3k5M3GeZITTNea5kC/
-	xo9g==
-X-Gm-Message-State: APjAAAWlm58GQXgkI932Ol5RCT4IAGItT0QRH8f0s9WoGl6QA3xT7MaX
-	KqzVQcTY4tLu0OhEj0bVNdBvV+Ef
-X-Google-Smtp-Source: APXvYqwZiOmKbkkNsp/7A+fQ/jMH4LL2MS5zEwSCV0rHlGrgvyrTZjQnn4+DqKir17z6lP+a9xhxaQ==
-X-Received: by 2002:a5d:4f88:: with SMTP id d8mr2847906wru.34.1557748658455;
-	Mon, 13 May 2019 04:57:38 -0700 (PDT)
-Received: from localhost.localdomain ([37.142.144.27])
-	by smtp.gmail.com with ESMTPSA id z5sm5238554wmi.34.2019.05.13.04.57.36
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Mon, 13 May 2019 04:57:37 -0700 (PDT)
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 13 May 2019 14:57:30 +0300
-Message-Id: <20190513115731.17588-3-marcel.apfelbaum@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190513115731.17588-1-marcel.apfelbaum@gmail.com>
-References: <20190513115731.17588-1-marcel.apfelbaum@gmail.com>
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=Q9SOicrrtTczbrcda5tZpSyF/s7AqO5v7E7dfJBVzaA=;
+	b=DXcnjK+WdVApu9u2GgpW6i+XEPkBlKKWDytPVy1/qNnawB8xMshQtEbCu4g3SptcTn
+	C9xUn4CNhO+eYZQVL9gmt1sf4iF+B7JNJnb8PUyESC9+MaGBzG1V4EE+1dBKqZgAdvG3
+	/huyZGFz+ZfOCYtptCo+3A4P1ZfswrNVwwXdy2PoP8a7/+Ok9BVbu3SlhH/PW5dK6zqr
+	ffkq7fUghL6+HI3y1x3YH9ZFeuNRdpNyp4bcCJwX118Eowr9mR/vssMRaY0irPrkrnPj
+	j4QtXPhcBfttqgc2tF3iFBZ8258J5dxEvpy6qLo83O9/lu+/vp1/gZikxD4i7s2u/Ugj
+	klbg==
+X-Gm-Message-State: APjAAAVey0WkleW/BB9DQ2Hd6d5VtbMY22nWQbbMbRIVuBViP+X3xo+U
+	dZr+PvceuD02SsH6QyxzH94zLV75foA9wFvTMVBQXA==
+X-Google-Smtp-Source: APXvYqxEG0FbIhRiz1TUHdFCMvqRbVpnhX3xmCFcwS9bXvmW5tXDBgAboehUbG9OqNZmrwFq4R75G9yaFstUZHDqMAQ=
+X-Received: by 2002:aca:5785:: with SMTP id l127mr12235653oib.48.1557748000634;
+	Mon, 13 May 2019 04:46:40 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190510200101.31096-1-alex.bennee@linaro.org>
+In-Reply-To: <20190510200101.31096-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 13 May 2019 12:46:29 +0100
+Message-ID: <CAFEAcA9Mn5pP5XSEjtnmd2N7XqhmQ_7FGHHBPh1B0ciXpifWDA@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH V3 2/3] hw/display/ramfb: lock guest resolution
- after it's set
+X-Received-From: 2607:f8b0:4864:20::235
+Subject: Re: [Qemu-devel] [PULL 0/5] demacro SoftMMU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,94 +87,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.williamson@redhat.com, kraxel@redhat.com, hqm03ster@gmail.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Hou Qiming <hqm03ster@gmail.com>
+On Fri, 10 May 2019 at 21:01, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> The following changes since commit a6ae23831b05a11880b40f7d58e332c45a6b04=
+f7:
+>
+>   Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-re=
+quest' into staging (2019-05-03 15:26:09 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-demacro-softmmu-100519-1
+>
+> for you to fetch changes up to 4601f8d10d7628bcaf2a8179af36e04b42879e91:
+>
+>   cputlb: Do unaligned store recursion to outermost function (2019-05-10 =
+20:23:21 +0100)
+>
+> ----------------------------------------------------------------
+> Demacrofy the SoftMMU
+>
+>   - the demacro itself
+>   - refactor TLB_RECHECK and fix bug
+>   - move unaligned handler out
+>
 
-Only allow one resolution change per guest boot, which prevents a
-crash when the guest writes garbage to the configuration space (e.g.
-when rebooting).
 
-Signed-off-by: HOU Qiming <hqm03ster@gmail.com>
-[fixed malformed patch]
-Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
----
- hw/display/ramfb.c | 26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
+Applied, thanks.
 
-diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
-index 1955b048dd..0fe79aa856 100644
---- a/hw/display/ramfb.c
-+++ b/hw/display/ramfb.c
-@@ -30,6 +30,7 @@ struct RAMFBState {
-     DisplaySurface *ds;
-     uint32_t width, height;
-     struct RAMFBCfg cfg;
-+    bool locked;
- };
- 
- static void ramfb_unmap_display_surface(pixman_image_t *image, void *unused)
-@@ -70,18 +71,25 @@ static DisplaySurface *ramfb_create_display_surface(int width, int height,
- static void ramfb_fw_cfg_write(void *dev, off_t offset, size_t len)
- {
-     RAMFBState *s = dev;
--    uint32_t fourcc, format;
-+    uint32_t fourcc, format, width, height;
-     hwaddr stride, addr;
- 
--    s->width  = be32_to_cpu(s->cfg.width);
--    s->height = be32_to_cpu(s->cfg.height);
-+    width     = be32_to_cpu(s->cfg.width);
-+    height    = be32_to_cpu(s->cfg.height);
-     stride    = be32_to_cpu(s->cfg.stride);
-     fourcc    = be32_to_cpu(s->cfg.fourcc);
-     addr      = be64_to_cpu(s->cfg.addr);
-     format    = qemu_drm_format_to_pixman(fourcc);
- 
-     fprintf(stderr, "%s: %dx%d @ 0x%" PRIx64 "\n", __func__,
--            s->width, s->height, addr);
-+            width, height, addr);
-+    if (s->locked) {
-+        fprintf(stderr, "%s: resolution locked, change rejected\n", __func__);
-+        return;
-+    }
-+    s->locked = true;
-+    s->width = width;
-+    s->height = height;
-     s->ds = ramfb_create_display_surface(s->width, s->height,
-                                          format, stride, addr);
- }
-@@ -101,6 +109,13 @@ void ramfb_display_update(QemuConsole *con, RAMFBState *s)
-     dpy_gfx_update_full(con);
- }
- 
-+static void ramfb_reset(void *opaque)
-+{
-+    RAMFBState *s = (RAMFBState *)opaque;
-+    s->locked = false;
-+    memset(&s->cfg, 0, sizeof(s->cfg));
-+}
-+
- RAMFBState *ramfb_setup(Error **errp)
- {
-     FWCfgState *fw_cfg = fw_cfg_find();
-@@ -113,9 +128,12 @@ RAMFBState *ramfb_setup(Error **errp)
- 
-     s = g_new0(RAMFBState, 1);
- 
-+    s->locked = false;
-+
-     rom_add_vga("vgabios-ramfb.bin");
-     fw_cfg_add_file_callback(fw_cfg, "etc/ramfb",
-                              NULL, ramfb_fw_cfg_write, s,
-                              &s->cfg, sizeof(s->cfg), false);
-+    qemu_register_reset(ramfb_reset, s);
-     return s;
- }
--- 
-2.17.1
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
+-- PMM
 
