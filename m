@@ -2,68 +2,80 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2261C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:04:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A387EC04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:04:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76C79208C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:04:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76C79208C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D89A208C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:04:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HIV6Xgt0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D89A208C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56972 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56974 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQAcy-0004Vh-P6
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 09:04:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49936)
+	id 1hQAdS-0004v8-JS
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 09:04:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1hQAb3-0003Am-K6
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:02:27 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hQAbT-0003DN-RB
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:02:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1hQAWk-0004pE-OH
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 08:58:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55920)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>)
-	id 1hQAWj-0004nz-3K; Mon, 13 May 2019 08:57:57 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 642CF81127;
-	Mon, 13 May 2019 12:57:46 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (ovpn-116-151.ams2.redhat.com
-	[10.36.116.151])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 57710600C8;
-	Mon, 13 May 2019 12:57:43 +0000 (UTC)
-Date: Mon, 13 May 2019 14:57:40 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Dave Martin <Dave.Martin@arm.com>
-Message-ID: <20190513125740.ukyx4vuili3f5wbe@kamzik.brq.redhat.com>
-References: <20190512083624.8916-1-drjones@redhat.com>
-	<20190512083624.8916-12-drjones@redhat.com>
-	<20190513112635.GD28398@e103592.cambridge.arm.com>
-	<20190513123023.h4q5sihktqctkgml@kamzik.brq.redhat.com>
-	<20190513124126.GF28398@e103592.cambridge.arm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hQARI-0002hd-CY
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 08:52:21 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33938)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hQARI-0002gw-2h
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 08:52:20 -0400
+Received: by mail-ot1-x341.google.com with SMTP id l17so11619532otq.1
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 05:52:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=/h7YDU+P6MUHl6sVj0WLp+MoxyBRTBEzmvX8oGYQxPw=;
+	b=HIV6Xgt0hlwXHD88KEhJy0PqeRJraTxBfxR2EpWUqn7bD/MeMl+qPLfovJYIfQlXUH
+	BKJMP7+97uiq3Sr1Jp5kVTSvFBqmtBv8vKN9ijEX0gtHlHTaOPcxijD/NevmbmDRkp54
+	hsj5T93JiqUv5kV0a2dNDqrk7iUOHjoOYjT36htvtDJUwnyrqR2ew0OiHD7YtdZSQ0o/
+	NVC+WITkg5D1YjYGKsfgnWdj9YvqukCY4z4QKhdpKiaLiekXV1oc07yjdUahfPkf2N08
+	Y9ojpNQiS5gvxBxhv+ysFu3dXqPbJddhbNScx/bcQ70HfiU0IfoCQcBhQSb24S4Pg0BH
+	BGyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=/h7YDU+P6MUHl6sVj0WLp+MoxyBRTBEzmvX8oGYQxPw=;
+	b=pQaVWokwwB3cqOnNCWkZZkCRwRdh1FDI7EqUBuuD5lCFiSVquoxMmE+TAF7DG0Futm
+	jr6tyg/hbVT2lvPEnm6afPtqO62jzJj3IPOT7DE++NNEGlVuOwHiFW+3cNhd6uRfdYRI
+	8lhYxiGD5mNmX2qBgvLDD24NBOf9zMgZZ6vkYmeSIU3VJlKIz0Wrkt2mG5J+7qJ2vt4v
+	Eh0dod3Vyc3qS/5jmgQFQjxeuy9FcGg32UeWSptdjaXhSsgKxWdquVMw7hLI3T+DegeK
+	LpGYh2Rb7QH44HRqvKTucD2cWFgI1LEqHUncHSzgbpEm3dgpQNuzcjXlzKCy6IjioO5S
+	qTXg==
+X-Gm-Message-State: APjAAAUn6dJEg2NwyR0K/bN/LjigOBPSEit0rzcsEawjn0wjvqOLpefO
+	VJVg4gYwzMd7ezD8gEH4732wOio5xhzT7vsqmteUBQ==
+X-Google-Smtp-Source: APXvYqzU1KagDuT8cYSQvW6nJUrBFKBgehNsCEbpnaW4NclGbCz1NWGRZC8o9SUsmJnUBwuuLvv5/OMp+Rgu8aGJhEM=
+X-Received: by 2002:a9d:4793:: with SMTP id b19mr12407690otf.238.1557751938700;
+	Mon, 13 May 2019 05:52:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190513124126.GF28398@e103592.cambridge.arm.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Mon, 13 May 2019 12:57:52 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 11/13] target/arm/cpu64: max cpu: Introduce
- sve-vls-map
+References: <1557751388-27063-1-git-send-email-gengdongjiu@huawei.com>
+	<1557751388-27063-11-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <1557751388-27063-11-git-send-email-gengdongjiu@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 13 May 2019 13:52:07 +0100
+Message-ID: <CAFEAcA81nMkHdCvQTcv2ixNB7sg+3Qx+9mpNgF0XLaBPY7-PNQ@mail.gmail.com>
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH v16 10/10] target-arm: kvm64: handle SIGBUS
+ signal from kernel or KVM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,159 +87,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"armbru@redhat.com" <armbru@redhat.com>,
-	"richard.henderson@linaro.org" <richard.henderson@linaro.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"abologna@redhat.com" <abologna@redhat.com>,
-	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-	"alex.bennee@linaro.org" <alex.bennee@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
+	Shannon Zhao <shannon.zhaosl@gmail.com>,
+	Zheng Xiang <zhengxiang9@huawei.com>, qemu-arm <qemu-arm@nongnu.org>,
+	James Morse <james.morse@arm.com>,
+	Jonathan Cameron <jonathan.cameron@huawei.com>,
+	Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	"xuwei \(O\)" <xuwei5@huawei.com>, Laszlo Ersek <lersek@redhat.com>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 13, 2019 at 01:41:26PM +0100, Dave Martin wrote:
-> On Mon, May 13, 2019 at 01:30:23PM +0100, Andrew Jones wrote:
-> > On Mon, May 13, 2019 at 12:26:36PM +0100, Dave Martin wrote:
-> > > On Sun, May 12, 2019 at 09:36:22AM +0100, Andrew Jones wrote:
-> > > > Introduce another cpu property to control SVE vector lengths,
-> > > > sve-vls-map, which allows the user to explicitly select the
-> > > > set of vector lengths the guest can use. The map must conform
-> > > > to QEMU's limits and architectural constraints, checked when
-> > > > the property is set. Inconsistencies with sve-max-vq are also
-> > > > checked. The bit number of a set bit in the map represents the
-> > > > allowed vector length in number of quadwords.
-> > > > 
-> > > > Note, as the map is implemented with a single 64-bit word we
-> > > > currently only support up to 8192-bit vectors. As QEMU and
-> > > > KVM only support up to 2048-bit vectors then this sufficient
-> > > > now, and probably for some time. Extending the bitmap beyond
-> > > > a single word will likely require changing the property to
-> > > > a string and adding yet another parser to QEMU.
-> > > > 
-> > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > > ---
-> > > >  target/arm/cpu.c     |  4 +++
-> > > >  target/arm/cpu.h     |  3 ++
-> > > >  target/arm/cpu64.c   | 70 +++++++++++++++++++++++++++++++++++++++++---
-> > > >  target/arm/helper.c  | 10 ++++++-
-> > > >  target/arm/monitor.c |  9 ++++--
-> > > >  5 files changed, 88 insertions(+), 8 deletions(-)
-> > > > 
-> > > 
-> > > [...]
-> > > 
-> > > > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> > > > index 8292d547e8f9..f0d0ce759ba8 100644
-> > > > --- a/target/arm/cpu.h
-> > > > +++ b/target/arm/cpu.h
-> > > > @@ -920,6 +920,9 @@ struct ARMCPU {
-> > > >  
-> > > >      /* Used to set the maximum vector length the cpu will support.  */
-> > > >      uint32_t sve_max_vq;
-> > > > +
-> > > > +    /* Each bit represents a supported vector length of (bitnum * 16) bytes */
-> > > > +    uint64_t sve_vls_map;
-> > > 
-> > > Just to be clear, the representation here is different from the
-> > > representation in KVM_REG_ARM64_SVE_VLS?
-> > > 
-> > > In the latter, bit n represents vector length ((n + 1) * 16) bytes.
-> > 
-> > KVM also uses bitnum * 16. bitnum is the the bit number, not the shift.
-> 
-> Can you point to the relevant kernel code?  This isn't what I thought I
-> wrote...
-
-The Documentation/virtual/kvm/api.txt documentation has
-
- > if (vq >= SVE_VQ_MIN && vq <= SVE_VQ_MAX &&
- >    ((vector_lengths[(vq - KVM_ARM64_SVE_VQ_MIN) / 64] >>
- >                ((vq - KVM_ARM64_SVE_VQ_MIN) % 64)) & 1))
- >        /* Vector length vq * 16 bytes supported */
- > else
- >        /* Vector length vq * 16 bytes not supported */
-
-Taking vq=1, we check (vector_lengths[0] >> 0) to see if we have the
-length (1 * 16) bytes. Since bitnum 1 is (1 << 0) that means the shift
-is zero and (bitnum * 16) is the same as (vq * 16). With ((n + 1) * 16),
-n would have to be zero, which is not a valid bitnum, but is a valid
-bit shift.
-
-> 
-> > So you can't have bitnum=0. 'n' must be a shift, as it would need to
-> > allow zero in order to represent KVM_ARM64_SVE_VQ_MIN.
-> 
-> [...]
-> 
-> > > > +static void cpu_set_sve_vls_map(Object *obj, Visitor *v, const char *name,
-> > > > +                                void *opaque, Error **errp)
-> > > > +{
-> > > > +    ARMCPU *cpu = ARM_CPU(obj);
-> > > > +    Error *err = NULL;
-> > > > +    uint64_t mask = ~(BIT_MASK(ARM_MAX_VQ - 1) - 1);
-> > > > +    int i;
-> > > > +
-> > > > +    visit_type_uint64(v, name, &cpu->sve_vls_map, errp);
-> > > > +
-> > > > +    if (!err) {
-> > > > +        if (cpu->sve_vls_map == 0) {
-> > > > +            error_setg(&err, "SVE vector length map cannot be zero");
-> > > 
-> > > Maybe say "empty" here, since the map represents a set?
-> > 
-> > Empty does sound better when considering the map represents a set, but
-> > the user will be inputting a number for the map, so zero will be what
-> > they attempted to input.
-> 
-> If the user is inputting the encoded number directly, I guess it makes
-> sense to describe the empty set as "zero".
-> 
-> > > (But it this is just for debug rather than reporting errors to the user,
-> > > it probably doesn't matter much.)
-> > 
-> > I'm also not too worried about which term we use, so I'm happy to change
-> > it if you'd like.
-> 
-> I guess I don't have a strong opinion.
-> 
-> [...]
-> 
-> > > > diff --git a/target/arm/helper.c b/target/arm/helper.c
-> > > > index 1e6eb0d0f360..bedec1ea0b27 100644
-> > > > --- a/target/arm/helper.c
-> > > > +++ b/target/arm/helper.c
-> > > > @@ -5254,12 +5254,20 @@ uint32_t sve_zcr_len_for_el(CPUARMState *env, int el)
-> > > >  static void zcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-> > > >                        uint64_t value)
-> > > >  {
-> > > > +    ARMCPU *cpu = arm_env_get_cpu(env);
-> > > >      int cur_el = arm_current_el(env);
-> > > >      int old_len = sve_zcr_len_for_el(env, cur_el);
-> > > >      int new_len;
-> > > >  
-> > > >      /* Bits other than [3:0] are RAZ/WI.  */
-> > > > -    raw_write(env, ri, value & 0xf);
-> > > > +    value &= 0xf;
-> > > 
-> > > You might want to sanity-check that the max vq you configured for the
-> > > vcpu is <= 16 here.
-> > 
-> > It's already checked by the cpu property set function at input time.
-> 
-> The check is in one place, but the assumptions based on it are
-> potentially all over the place -- it may be tricky to track them
-> all down if you ever add support for >8192-bit vectors.
-> 
-> (Not a big deal from my point of view, but I'd migration to larger
-> vectors to be as smooth as reasonably possible if we ever find we have
-> to do it.)
+On Mon, 13 May 2019 at 13:46, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
 >
+> Add SIGBUS signal handler. In this handler, it checks the SIGBUS type,
+> translates the host VA delivered by host to guest PA, then fill this PA
+> to guest APEI GHES memory, then notify guest according to the SIGBUS type.
+>
+> If guest accesses the poisoned memory, it generates Synchronous External
+> Abort(SEA). Then host kernel gets an APEI notification and call memory_failure()
+> to unmapped the affected page for the guest's stage 2, finally return
+> to guest.
+>
+> Guest continues to access PG_hwpoison page, it will trap to KVM as stage2 fault,
+> then a SIGBUS_MCEERR_AR synchronous signal is delivered to Qemu, Qemu record this
+> error address into guest APEI GHES memory and notify guest using
+> Synchronous-External-Abort(SEA).
+>
+> Suggested-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 
-Adding asserts might be a good idea to catch bugs when expanding the
-supported vector lengths. I can certainly add one here. Maybe Richard
-has some ideas as well for this.
 
-Thanks,
-drew
+> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(c);
+> +    CPUARMState *env = &cpu->env;
+> +    ram_addr_t ram_addr;
+> +    hwaddr paddr;
+> +
+> +    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
+> +
+> +    if (addr) {
+> +        ram_addr = qemu_ram_addr_from_host(addr);
+> +        if (ram_addr != RAM_ADDR_INVALID &&
+> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
+> +            kvm_hwpoison_page_add(ram_addr);
+> +            /* Asynchronous signal will be masked by main thread, so
+> +             * only handle synchronous signal.
+> +             */
+> +            if (code == BUS_MCEERR_AR) {
+> +                kvm_cpu_synchronize_state(c);
+> +                if (GHES_CPER_FAIL != ghes_record_errors(ACPI_HEST_NOTIFY_SEA, paddr)) {
+> +                    kvm_inject_arm_sea(c);
+> +                } else {
+> +                    fprintf(stderr, "failed to record the error\n");
+> +                }
+> +            }
+> +            return;
+> +        }
+> +        fprintf(stderr, "Hardware memory error for memory used by "
+> +                "QEMU itself instead of guest system!\n");
+> +    }
+> +
+> +    if (code == BUS_MCEERR_AR) {
+> +        fprintf(stderr, "Hardware memory error!\n");
+> +        exit(1);
+> +    }
+> +}
+
+This code appears to still be unconditionally trying to
+notify the guest of the error via the ACPI tables without
+checking whether those ACPI tables even exist. I told you
+about this in a previous round of review :-(
+
+thanks
+-- PMM
 
