@@ -5,44 +5,44 @@ X-Spam-Level:
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4845EC04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 18:56:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0059EC04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 18:56:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C8542085A
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 18:56:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C8542085A
+	by mail.kernel.org (Postfix) with ESMTPS id BF4862085A
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 18:56:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF4862085A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33669 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33671 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQG7H-0003sh-6F
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 14:56:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59015)
+	id 1hQG7f-00047w-Vx
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 14:56:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hQG2O-0008G9-9G
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:51:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1hQG2G-00086O-BI
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:50:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hQG2L-0007RB-Ha
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:51:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47422)
+	(envelope-from <bounces@canonical.com>) id 1hQG2E-0007Ln-3i
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:50:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46994)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hQG2K-0007Ok-VW
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:50:57 -0400
+	id 1hQG2C-0007L2-L9
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:50:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hQG2I-0000Ad-IQ
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 18:50:54 +0000
+	id 1hQG2B-0008Rc-58
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 18:50:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7D4902E80D0
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 18:50:54 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 257BF2E80CB
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 18:50:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 May 2019 18:40:13 -0000
+Date: Mon, 13 May 2019 18:37:54 -0000
 From: Corey Bryant <corey.bryant@canonical.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -81,13 +81,13 @@ X-Launchpad-Bug-Commenters: brian-murray corey.bryant ddstreet janitor paelzer
 X-Launchpad-Bug-Reporter: Dan Streetman (ddstreet)
 X-Launchpad-Bug-Modifier: Corey Bryant (corey.bryant)
 References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
-Message-Id: <155777281330.15139.10915349559281446941.malone@wampee.canonical.com>
+Message-Id: <155777267439.26747.11260715964409534522.malone@soybean.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18962";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: b5e758505b71b957971e27b9dc99b2ecc10b67b0
+X-Launchpad-Hash: b6f1e292bd40d3781de7e2d41a96de2935b20c07
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1823458] Re: race condition between
@@ -107,14 +107,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This bug was fixed in the package qemu - 1:2.5+dfsg-5ubuntu10.37~cloud0
+This bug was fixed in the package qemu - 1:2.8+dfsg-3ubuntu2.9~cloud5.1
 ---------------
 
- qemu (1:2.5+dfsg-5ubuntu10.37~cloud0) trusty-mitaka; urgency=3Dmedium
- .
-   * New update for the Ubuntu Cloud Archive.
- .
- qemu (1:2.5+dfsg-5ubuntu10.37) xenial; urgency=3Dmedium
+ qemu (1:2.8+dfsg-3ubuntu2.9~cloud5.1) xenial-ocata; urgency=3Dmedium
  .
    * d/p/lp1823458/add-VirtIONet-vhost_stopped-flag-to-prevent-multiple.pat=
 ch,
@@ -127,7 +123,7 @@ ch:
        (LP: #1823458)
 
 
-** Changed in: cloud-archive/mitaka
+** Changed in: cloud-archive/ocata
        Status: Fix Committed =3D> Fix Released
 
 -- =
