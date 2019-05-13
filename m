@@ -2,69 +2,66 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94D00C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 12:37:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2F05C04AAA
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 12:38:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56E4E2084E
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 12:37:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56E4E2084E
+	by mail.kernel.org (Postfix) with ESMTPS id C6E20206A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 12:38:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6E20206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56602 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56604 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQACV-0002ct-Sl
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 08:37:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46290)
+	id 1hQADQ-0003O1-3M
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 08:38:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hQABP-0001xv-QD
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 08:35:57 -0400
+	(envelope-from <drjones@redhat.com>) id 1hQABu-0002NX-4m
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 08:36:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hQABO-0002vO-6Z
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 08:35:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57236)
+	(envelope-from <drjones@redhat.com>) id 1hQABs-0003a2-UC
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 08:36:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58096)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hQABN-0002qj-6Y
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 08:35:53 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <drjones@redhat.com>)
+	id 1hQA6E-0000Cx-45; Mon, 13 May 2019 08:30:34 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5A6EC307D854
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 12:35:48 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.22.189])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B38AD1001E79;
-	Mon, 13 May 2019 12:35:44 +0000 (UTC)
-Date: Mon, 13 May 2019 13:35:42 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190513123542.GJ15029@redhat.com>
-References: <20190430131919.GN6818@redhat.com> <20190430144546.GA3065@work-vm>
-	<20190430150556.GA2423@redhat.com>
-	<87sgtqejn9.fsf@dusky.pond.sub.org>
-	<20190507093954.GG27205@redhat.com>
-	<875zql3ylk.fsf@dusky.pond.sub.org>
-	<20190513120856.GH15029@redhat.com> <20190513122933.GC2786@work-vm>
+	by mx1.redhat.com (Postfix) with ESMTPS id B7EAE87629;
+	Mon, 13 May 2019 12:30:30 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (ovpn-116-151.ams2.redhat.com
+	[10.36.116.151])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 580F75D72E;
+	Mon, 13 May 2019 12:30:25 +0000 (UTC)
+Date: Mon, 13 May 2019 14:30:23 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Dave Martin <Dave.Martin@arm.com>
+Message-ID: <20190513123023.h4q5sihktqctkgml@kamzik.brq.redhat.com>
+References: <20190512083624.8916-1-drjones@redhat.com>
+	<20190512083624.8916-12-drjones@redhat.com>
+	<20190513112635.GD28398@e103592.cambridge.arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190513122933.GC2786@work-vm>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20190513112635.GD28398@e103592.cambridge.arm.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Mon, 13 May 2019 12:35:48 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.26]);
+	Mon, 13 May 2019 12:30:31 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] QMP; unsigned 64-bit ints;
- JSON standards compliance
+Subject: Re: [Qemu-devel] [PATCH 11/13] target/arm/cpu64: max cpu: Introduce
+ sve-vls-map
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,221 +73,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: libvir-list@redhat.com, =?utf-8?Q?J=C3=A1n?= Tomko <jtomko@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"armbru@redhat.com" <armbru@redhat.com>,
+	"richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"abologna@redhat.com" <abologna@redhat.com>,
+	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+	"alex.bennee@linaro.org" <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 13, 2019 at 01:29:34PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
-> > On Wed, May 08, 2019 at 02:44:07PM +0200, Markus Armbruster wrote:
-> > > Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
-> > >=20
-> > > > On Tue, May 07, 2019 at 10:47:06AM +0200, Markus Armbruster wrote=
-:
-> > > >
-> > > >> >> > I can think of some options:
-> > > >> >> >=20
-> > > >> >> >   1. Encode unsigned 64-bit integers as signed 64-bit integ=
-ers.
-> > > >> >> >=20
-> > > >> >> >      This follows the example that most C libraries map JSO=
-N ints
-> > > >> >> >      to 'long long int'. This is still relying on undefined
-> > > >> >> >      behaviour as apps don't need to support > 2^53-1.
-> > > >> >> >=20
-> > > >> >> >      Apps would need to cast back to 'unsigned long long' f=
-or
-> > > >> >> >      those QMP fields they know are supposed to be unsigned=
-.
-> > > >>=20
-> > > >> Ugly.  It's also what we did until v2.10, August 2017.  QMP's in=
-put
-> > > >> direction still does it, for backward compatibility.
-> > > >>=20
-> > > >> >> >=20
-> > > >> >> >=20
-> > > >> >> >   2. Encode all 64-bit integers as a pair of 32-bit integer=
-s.
-> > > >> >> >    =20
-> > > >> >> >      This is fully compliant with the JSON spec as each hal=
-f
-> > > >> >> >      is fully within the declared limits. App has to split =
-or
-> > > >> >> >      assemble the 2 pieces from/to a signed/unsigned 64-bit
-> > > >> >> >      int as needed.
-> > > >>=20
-> > > >> Differently ugly.
-> > > >>=20
-> > > >> >> >=20
-> > > >> >> >=20
-> > > >> >> >   3. Encode all 64-bit integers as strings
-> > > >> >> >=20
-> > > >> >> >      The application has todo all parsing/formatting client
-> > > >> >> >      side.
-> > > >>=20
-> > > >> Yet another ugly.
-> > > >>=20
-> > > >> >> >=20
-> > > >> >> >=20
-> > > >> >> > None of these changes are backwards compatible, so I doubt =
-we could make
-> > > >> >> > the change transparently in QMP.  Instead we would have to =
-have a
-> > > >> >> > QMP greeting message capability where the client can reques=
-t enablement
-> > > >> >> > of the enhanced integer handling.
-> > > >>=20
-> > > >> We might be able to do option 1 without capability negotiation. =
- v2.10's
-> > > >> change from option 1 to what we have now produced zero complaint=
-s.
-> > > >>=20
-> > > >> On the other hand, we made that change for a reason, so we may w=
-ant a
-> > > >> "send large integers as negative integers" capability regardless=
-.
-> > > >>=20
-> > > >> >> >=20
-> > > >> >> > Any of the three options above would likely work for libvir=
-t, but I
-> > > >> >> > would have a slight preference for either 2 or 3, so that w=
-e become
-> > > >> >> > 100% standards compliant.
-> > > >>=20
-> > > >> There's no such thing.  You mean "we maximize interoperability w=
-ith
-> > > >> common implementations of JSON".
-> > > >
-> > > > s/common/any/
-> > >=20
-> > > info: error correction applied, future applications will be silent =
-;-P
-> > >=20
-> > > >> Let's talk implementation for a bit.
-> > > >>=20
-> > > >> Encoding and decoding integers in funny ways should be fairly ea=
-sy in
-> > > >> the QObject visitors.  The generated QMP marshallers all use the=
-m.
-> > > >> Trouble is a few commands still bypass the generated marshallers=
-, and
-> > > >> mess with the QObject themselves:
-> > > >>=20
-> > > >> * query-qmp-schema: minor hack explained in qmp_query_qmp_schema=
-()'s
-> > > >>   comment.  Should be harmless.
-> > > >>=20
-> > > >> * netdev_add: not QAPIfied.  Eric's patches to QAPIfy it got stu=
-ck
-> > > >>   because they reject some abuses like passing numbers and bools=
- as
-> > > >>   strings.
-> > > >>=20
-> > > >> * device_add: not QAPIfied.  We're not sure QAPIfication is feas=
-ible.
-> > > >>=20
-> > > >> netdev_add and device_add both use qemu_opts_from_qdict().  Perh=
-aps we
-> > > >> could hack that to mirror what the QObject visitor do.
-> > > >>=20
-> > > >> Else, we might have to do it in the JSON parser.  Should be poss=
-ible,
-> > > >> but I'd rather not.
-> > > >>=20
-> > > >> >> My preference would be 3 with the strings defined as being
-> > > >> >> %x lower case hex formated with a 0x prefix and no longer tha=
-n 18 characters
-> > > >> >> ("0x" + 16 nybbles). Zero padding allowed but not required.
-> > > >> >> It's readable and unambiguous when dealing with addresses; I =
-don't want
-> > > >> >> to have to start decoding (2) by hand when debugging.
-> > > >> >
-> > > >> > Yep, that's a good point about readability.
-> > > >>=20
-> > > >> QMP sending all integers in decimal is inconvenient for some val=
-ues,
-> > > >> such as addresses.  QMP sending all (large) integers in hexadeci=
-mal
-> > > >> would be inconvenient for other values.
-> > > >>=20
-> > > >> Let's keep it simple & stupid.  If you want sophistication, JSON=
- is the
-> > > >> wrong choice.
-> > > >>=20
-> > > >>=20
-> > > >> Option 1 feels simplest.
-> > > >
-> > > > But will still fail with any JSON impl that uses double precision=
- floating
-> > > > point for integers as it will loose precision.
-> > > >
-> > > >> Option 2 feels ugliest.  Less simple, more interoperable than op=
-tion 1.
-> > > >
-> > > > If we assume any JSON impl can do 32-bit integers without loss of
-> > > > precision, then I think we can say it is guaranteed portable, but
-> > > > it is certainly horrible / ugly.
-> > > >
-> > > >> Option 3 is like option 2, just not quite as ugly.
-> > > >
-> > > > I think option 3 can be guaranteed to be loss-less with /any/ JSO=
-N impl
-> > > > that exists, since you're delegating all string -> int conversion=
- to
-> > > > the application code taking the JSON parser/formatter out of the =
-equation.
-> > >=20
-> > > Double-checking: do you propose to encode *all* numbers as strings,=
- or
-> > > just certain "problematic" numbers?
-> > >=20
-> > > If the latter, I guess your idea of "problematic" is "not represent=
-able
-> > > exactly as double precision floating-point".
-> >=20
-> > We have a few options
-> >=20
-> >  1. Use string format for values > 2^53-1, int format below that
-> >  2. Use string format for all fields which are 64-bit ints whether
-> >     signed or unsigned
-> >  3. Use string format for all fields which are integers, even 32-bit
-> >     ones
-> >=20
-> > I would probably suggest option 2. It would make the QEMU impl quite
-> > easy IIUC, we we'd just change the QAPI visitor's impl for the int64
-> > and uint64 fields to use string format (when the right capability is
-> > negotiated by QMP).
-> >=20
-> > I include 3 only for completeness - I don't think there's a hugely
-> > compelling reason to mess with 32-bit ints.
->=20
-> What about when the size is architecture dependent?
+On Mon, May 13, 2019 at 12:26:36PM +0100, Dave Martin wrote:
+> On Sun, May 12, 2019 at 09:36:22AM +0100, Andrew Jones wrote:
+> > Introduce another cpu property to control SVE vector lengths,
+> > sve-vls-map, which allows the user to explicitly select the
+> > set of vector lengths the guest can use. The map must conform
+> > to QEMU's limits and architectural constraints, checked when
+> > the property is set. Inconsistencies with sve-max-vq are also
+> > checked. The bit number of a set bit in the map represents the
+> > allowed vector length in number of quadwords.
+> > 
+> > Note, as the map is implemented with a single 64-bit word we
+> > currently only support up to 8192-bit vectors. As QEMU and
+> > KVM only support up to 2048-bit vectors then this sufficient
+> > now, and probably for some time. Extending the bitmap beyond
+> > a single word will likely require changing the property to
+> > a string and adding yet another parser to QEMU.
+> > 
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > ---
+> >  target/arm/cpu.c     |  4 +++
+> >  target/arm/cpu.h     |  3 ++
+> >  target/arm/cpu64.c   | 70 +++++++++++++++++++++++++++++++++++++++++---
+> >  target/arm/helper.c  | 10 ++++++-
+> >  target/arm/monitor.c |  9 ++++--
+> >  5 files changed, 88 insertions(+), 8 deletions(-)
+> > 
+> 
+> [...]
+> 
+> > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> > index 8292d547e8f9..f0d0ce759ba8 100644
+> > --- a/target/arm/cpu.h
+> > +++ b/target/arm/cpu.h
+> > @@ -920,6 +920,9 @@ struct ARMCPU {
+> >  
+> >      /* Used to set the maximum vector length the cpu will support.  */
+> >      uint32_t sve_max_vq;
+> > +
+> > +    /* Each bit represents a supported vector length of (bitnum * 16) bytes */
+> > +    uint64_t sve_vls_map;
+> 
+> Just to be clear, the representation here is different from the
+> representation in KVM_REG_ARM64_SVE_VLS?
+> 
+> In the latter, bit n represents vector length ((n + 1) * 16) bytes.
 
-The QAPI visitor for 'int' uses an 'int64_t' parameters, so I think
-that will want to be string encoded, as if it was a 64-bit int, even
-if built on a 32-bit platform.
+KVM also uses bitnum * 16. bitnum is the the bit number, not the shift.
+So you can't have bitnum=0. 'n' must be a shift, as it would need to
+allow zero in order to represent KVM_ARM64_SVE_VQ_MIN.
 
->=20
-> > Option 1 is the bare minimum needed to ensure precision, but to me
-> > it feels a bit dirty to say a given field will have different encodin=
-g
-> > depending on the value. If apps need to deal with string encoding, th=
-ey
-> > might as well just use it for all values in a given field.
->=20
-> Yeh, 1 is horrid; it's too easy to miss a case which forgot to handle
->  the 2^53-1 because we hadn't forced a large value down that check.
+> 
+> (QEMU is free to choose its own internal representation, naturally.)
+> 
+> [...]
+> 
+> > diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> 
+> [...]
+> 
+> > +static void cpu_set_sve_vls_map(Object *obj, Visitor *v, const char *name,
+> > +                                void *opaque, Error **errp)
+> > +{
+> > +    ARMCPU *cpu = ARM_CPU(obj);
+> > +    Error *err = NULL;
+> > +    uint64_t mask = ~(BIT_MASK(ARM_MAX_VQ - 1) - 1);
+> > +    int i;
+> > +
+> > +    visit_type_uint64(v, name, &cpu->sve_vls_map, errp);
+> > +
+> > +    if (!err) {
+> > +        if (cpu->sve_vls_map == 0) {
+> > +            error_setg(&err, "SVE vector length map cannot be zero");
+> 
+> Maybe say "empty" here, since the map represents a set?
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Empty does sound better when considering the map represents a set, but
+the user will be inputting a number for the map, so zero will be what
+they attempted to input.
+
+> 
+> (But it this is just for debug rather than reporting errors to the user,
+> it probably doesn't matter much.)
+
+I'm also not too worried about which term we use, so I'm happy to change
+it if you'd like.
+
+> 
+> [...]
+> 
+> > diff --git a/target/arm/helper.c b/target/arm/helper.c
+> > index 1e6eb0d0f360..bedec1ea0b27 100644
+> > --- a/target/arm/helper.c
+> > +++ b/target/arm/helper.c
+> > @@ -5254,12 +5254,20 @@ uint32_t sve_zcr_len_for_el(CPUARMState *env, int el)
+> >  static void zcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> >                        uint64_t value)
+> >  {
+> > +    ARMCPU *cpu = arm_env_get_cpu(env);
+> >      int cur_el = arm_current_el(env);
+> >      int old_len = sve_zcr_len_for_el(env, cur_el);
+> >      int new_len;
+> >  
+> >      /* Bits other than [3:0] are RAZ/WI.  */
+> > -    raw_write(env, ri, value & 0xf);
+> > +    value &= 0xf;
+> 
+> You might want to sanity-check that the max vq you configured for the
+> vcpu is <= 16 here.
+
+It's already checked by the cpu property set function at input time.
+
+> 
+> > +
+> > +    if (value && !(BIT_MASK(value) & cpu->sve_vls_map)) {
+> > +        uint64_t map = cpu->sve_vls_map & (BIT_MASK(value) - 1);
+> > +        value = arm_cpu_fls64(map) - 1;
+> > +    }
+> > +
+> > +    raw_write(env, ri, value);
+> 
+> [...]
+> 
+> Cheers
+> ---Dave
+> 
+
+Thanks,
+drew
 
