@@ -2,56 +2,61 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E2BFC04AB1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 06:22:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6487EC04AB1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 06:24:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D66B220B7C
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 06:22:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D66B220B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1666E20989
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 06:24:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="QsEm3xbW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1666E20989
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51756 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51783 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQ4MP-00058n-TY
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 02:22:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35334)
+	id 1hQ4Nw-0006TL-8q
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 02:24:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hQ4Jw-00035H-1O
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 02:20:20 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hQ4JR-0002h3-9u
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 02:19:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hQ4Jv-0004cM-36
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 02:20:20 -0400
-Received: from mga09.intel.com ([134.134.136.24]:51103)
+	(envelope-from <dgibson@ozlabs.org>) id 1hQ4JP-0004LU-RC
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 02:19:49 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:54939 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hQ4Ju-0004YC-QW
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 02:20:19 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-	by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	12 May 2019 23:20:16 -0700
-X-ExtLoop1: 1
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by fmsmga008.fm.intel.com with ESMTP; 12 May 2019 23:20:15 -0700
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 13 May 2019 14:19:04 +0800
-Message-Id: <20190513061913.9284-1-richardw.yang@linux.intel.com>
-X-Mailer: git-send-email 2.19.1
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+	id 1hQ4JO-0004KM-Ng; Mon, 13 May 2019 02:19:47 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 452Vz304S2z9sN6; Mon, 13 May 2019 16:19:42 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1557728383;
+	bh=RKOH6Pg3qJU+4Km9IdQsBWZQJ1p/0qK29BKTd3RTKoE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=QsEm3xbW2UwmfuySN4nW74ZJUEUmZ4+oqyD3L5WECr7dNVYnHsBTn2glNjbjodgzP
+	yvElZEP1FHWiFqps4JdsDWB4JrMIPowF1zAWXZrNgxhdNJk/P3J9bWdPcYnw4b7QCr
+	DFi3erpDKwr6BJXm6vg9Raa+ILiXfKMvtmmYo7rk=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: mst@redhat.com,
+	qemu-devel@nongnu.org
+Date: Mon, 13 May 2019 16:19:38 +1000
+Message-Id: <20190513061939.3464-5-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190513061939.3464-1-david@gibson.dropbear.id.au>
+References: <20190513061939.3464-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 134.134.136.24
-Subject: [Qemu-devel] [RFC PATCH 0/9] hw/acpi: make build_madt arch agnostic
+X-Received-From: 2401:3900:2:1::2
+Subject: [Qemu-devel] [PATCH v4 4/5] pci: Make is_bridge a bool
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -63,48 +68,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, ehabkost@redhat.com, mst@redhat.com,
-	Wei Yang <richardw.yang@linux.intel.com>, pbonzini@redhat.com,
-	imammedo@redhat.com, rth@twiddle.net
+Cc: aik@ozlabs.ru, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	groug@kaod.org, qemu-ppc@nongnu.org,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now MADT is highly depend in architecture and machine type and leaves
-duplicated code in different architecture. The series here tries to generalize
-it.
+The is_bridge field in PCIDevice acts as a bool, but is declared as an in=
+t.
+Declare it as a bool for clarity, and change everything that writes it to
+use true/false instead of 0/1 to match.
 
-MADT contains one main table and several sub tables. These sub tables are
-highly related to architecture. Here we introduce one method to make it
-architecture agnostic.
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+---
+ hw/pci-bridge/dec.c                | 4 ++--
+ hw/pci-bridge/i82801b11.c          | 2 +-
+ hw/pci-bridge/pci_bridge_dev.c     | 2 +-
+ hw/pci-bridge/pcie_pci_bridge.c    | 2 +-
+ hw/pci-bridge/pcie_root_port.c     | 2 +-
+ hw/pci-bridge/simba.c              | 2 +-
+ hw/pci-bridge/xio3130_downstream.c | 2 +-
+ hw/pci-bridge/xio3130_upstream.c   | 2 +-
+ include/hw/pci/pci.h               | 2 +-
+ 9 files changed, 10 insertions(+), 10 deletions(-)
 
-  * each architecture define its sub-table implementation function in madt_sub
-  * introduces struct madt_input to collect sub table information and pass to
-    build_madt
-
-By doing so, each architecture could prepare its own sub-table implementation
-and madt_input. And keep build_madt architecture agnostic.
-
-Wei Yang (9):
-  hw/acpi: expand pc_madt_cpu_entry in place
-  hw/acpi: implement madt_sub[ACPI_APIC_PROCESSOR]
-  hw/acpi: implement madt_sub[ACPI_APIC_LOCAL_X2APIC]
-  hw/acpi: implement madt_sub[ACPI_APIC_IO]
-  hw/acpi: implement madt_sub[ACPI_APIC_XRUPT_OVERRIDE]
-  hw/acpi: implement madt_sub[ACPI_APIC_LOCAL_X2APIC_NMI]
-  hw/acpi: implement madt_sub[ACPI_APIC_LOCAL_NMI]
-  hw/acpi: factor build_madt with madt_input
-  hw/acpi: implement madt_main to manipulate main madt table
-
- hw/acpi/cpu.c                        |  14 +-
- hw/acpi/piix4.c                      |   3 +-
- hw/i386/acpi-build.c                 | 265 +++++++++++++++++----------
- hw/isa/lpc_ich9.c                    |   3 +-
- include/hw/acpi/acpi_dev_interface.h |  12 +-
- include/hw/i386/pc.h                 |   2 +
- 6 files changed, 194 insertions(+), 105 deletions(-)
-
--- 
-2.19.1
+diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
+index 8484bfd434..ca40253730 100644
+--- a/hw/pci-bridge/dec.c
++++ b/hw/pci-bridge/dec.c
+@@ -68,7 +68,7 @@ static void dec_21154_pci_bridge_class_init(ObjectClass=
+ *klass, void *data)
+     k->vendor_id =3D PCI_VENDOR_ID_DEC;
+     k->device_id =3D PCI_DEVICE_ID_DEC_21154;
+     k->config_write =3D pci_bridge_write_config;
+-    k->is_bridge =3D 1;
++    k->is_bridge =3D true;
+     dc->desc =3D "DEC 21154 PCI-PCI bridge";
+     dc->reset =3D pci_bridge_reset;
+     dc->vmsd =3D &vmstate_pci_device;
+@@ -129,7 +129,7 @@ static void dec_21154_pci_host_class_init(ObjectClass=
+ *klass, void *data)
+     k->device_id =3D PCI_DEVICE_ID_DEC_21154;
+     k->revision =3D 0x02;
+     k->class_id =3D PCI_CLASS_BRIDGE_PCI;
+-    k->is_bridge =3D 1;
++    k->is_bridge =3D true;
+     /*
+      * PCI-facing part of the host bridge, not usable without the
+      * host-facing part, which can't be device_add'ed, yet.
+diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
+index 10e590e5c6..6d8b0f54a7 100644
+--- a/hw/pci-bridge/i82801b11.c
++++ b/hw/pci-bridge/i82801b11.c
+@@ -90,7 +90,7 @@ static void i82801b11_bridge_class_init(ObjectClass *kl=
+ass, void *data)
+     PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+=20
+-    k->is_bridge =3D 1;
++    k->is_bridge =3D true;
+     k->vendor_id =3D PCI_VENDOR_ID_INTEL;
+     k->device_id =3D PCI_DEVICE_ID_INTEL_82801BA_11;
+     k->revision =3D ICH9_D2P_A2_REVISION;
+diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_de=
+v.c
+index ff6b8323da..c56ed1f52f 100644
+--- a/hw/pci-bridge/pci_bridge_dev.c
++++ b/hw/pci-bridge/pci_bridge_dev.c
+@@ -253,7 +253,7 @@ static void pci_bridge_dev_class_init(ObjectClass *kl=
+ass, void *data)
+     k->vendor_id =3D PCI_VENDOR_ID_REDHAT;
+     k->device_id =3D PCI_DEVICE_ID_REDHAT_BRIDGE;
+     k->class_id =3D PCI_CLASS_BRIDGE_PCI;
+-    k->is_bridge =3D 1,
++    k->is_bridge =3D true;
+     dc->desc =3D "Standard PCI Bridge";
+     dc->reset =3D qdev_pci_bridge_dev_reset;
+     dc->props =3D pci_bridge_dev_properties;
+diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bri=
+dge.c
+index d491b40d04..9a4fba413a 100644
+--- a/hw/pci-bridge/pcie_pci_bridge.c
++++ b/hw/pci-bridge/pcie_pci_bridge.c
+@@ -143,7 +143,7 @@ static void pcie_pci_bridge_class_init(ObjectClass *k=
+lass, void *data)
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     HotplugHandlerClass *hc =3D HOTPLUG_HANDLER_CLASS(klass);
+=20
+-    k->is_bridge =3D 1;
++    k->is_bridge =3D true;
+     k->vendor_id =3D PCI_VENDOR_ID_REDHAT;
+     k->device_id =3D PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
+     k->realize =3D pcie_pci_bridge_realize;
+diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_por=
+t.c
+index e94d918b6d..be3f4d5e03 100644
+--- a/hw/pci-bridge/pcie_root_port.c
++++ b/hw/pci-bridge/pcie_root_port.c
+@@ -162,7 +162,7 @@ static void rp_class_init(ObjectClass *klass, void *d=
+ata)
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
+=20
+-    k->is_bridge =3D 1;
++    k->is_bridge =3D true;
+     k->config_write =3D rp_write_config;
+     k->realize =3D rp_realize;
+     k->exit =3D rp_exit;
+diff --git a/hw/pci-bridge/simba.c b/hw/pci-bridge/simba.c
+index dea4c8c5e7..7cf0d6e047 100644
+--- a/hw/pci-bridge/simba.c
++++ b/hw/pci-bridge/simba.c
+@@ -76,7 +76,7 @@ static void simba_pci_bridge_class_init(ObjectClass *kl=
+ass, void *data)
+     k->device_id =3D PCI_DEVICE_ID_SUN_SIMBA;
+     k->revision =3D 0x11;
+     k->config_write =3D pci_bridge_write_config;
+-    k->is_bridge =3D 1;
++    k->is_bridge =3D true;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     dc->reset =3D pci_bridge_reset;
+     dc->vmsd =3D &vmstate_pci_device;
+diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_d=
+ownstream.c
+index 467bbabe4c..ab2a51e15d 100644
+--- a/hw/pci-bridge/xio3130_downstream.c
++++ b/hw/pci-bridge/xio3130_downstream.c
+@@ -152,7 +152,7 @@ static void xio3130_downstream_class_init(ObjectClass=
+ *klass, void *data)
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
+=20
+-    k->is_bridge =3D 1;
++    k->is_bridge =3D true;
+     k->config_write =3D xio3130_downstream_write_config;
+     k->realize =3D xio3130_downstream_realize;
+     k->exit =3D xio3130_downstream_exitfn;
+diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_ups=
+tream.c
+index b524908cf1..1d41a49ab0 100644
+--- a/hw/pci-bridge/xio3130_upstream.c
++++ b/hw/pci-bridge/xio3130_upstream.c
+@@ -126,7 +126,7 @@ static void xio3130_upstream_class_init(ObjectClass *=
+klass, void *data)
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
+=20
+-    k->is_bridge =3D 1;
++    k->is_bridge =3D true;
+     k->config_write =3D xio3130_upstream_write_config;
+     k->realize =3D xio3130_upstream_realize;
+     k->exit =3D xio3130_upstream_exitfn;
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index da20c915ef..d082707dfa 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -234,7 +234,7 @@ typedef struct PCIDeviceClass {
+      * This doesn't mean pci host switch.
+      * When card bus bridge is supported, this would be enhanced.
+      */
+-    int is_bridge;
++    bool is_bridge;
+=20
+     /* rom bar */
+     const char *romfile;
+--=20
+2.21.0
 
 
