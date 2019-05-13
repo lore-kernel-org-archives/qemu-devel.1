@@ -3,70 +3,105 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A368C04AB1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 04:58:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76E2AC04AB1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 04:59:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D346420862
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 04:58:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D346420862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 34C5320B7C
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 04:59:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34C5320B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50939 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50949 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQ32r-0003he-4Z
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 00:58:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50991)
+	id 1hQ347-0004Mf-HG
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 00:59:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hQ30k-0002U4-1p
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 00:56:28 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hQ328-0003R3-SW
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 00:57:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hQ2oc-0000AQ-SR
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 00:43:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34072)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hQ2oc-00008P-KI
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 00:43:54 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 480622026B;
-	Mon, 13 May 2019 04:43:50 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
-	(colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id CAE774B6;
-	Mon, 13 May 2019 04:43:49 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com
-	(zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-	by colo-mx.corp.redhat.com (Postfix) with ESMTP id ED18B18089CA;
-	Mon, 13 May 2019 04:43:48 +0000 (UTC)
-Date: Mon, 13 May 2019 00:43:48 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1713362444.28252458.1557722628363.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190512124954-mutt-send-email-mst@kernel.org>
-References: <20190510155202.14737-1-pagupta@redhat.com>
-	<20190510155202.14737-3-pagupta@redhat.com>
-	<20190512124954-mutt-send-email-mst@kernel.org>
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hQ326-00085Y-UC
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 00:57:52 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43610)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+	id 1hQ324-00083Z-VA
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 00:57:50 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4D4vlCV064538
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 00:57:47 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2setc1um4x-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 00:57:47 -0400
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
+	Mon, 13 May 2019 05:57:16 +0100
+Received: from b03cxnp08026.gho.boulder.ibm.com (9.17.130.18)
+	by e36.co.us.ibm.com (192.168.1.136) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Mon, 13 May 2019 05:57:14 +0100
+Received: from b03ledav001.gho.boulder.ibm.com
+	(b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+	by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x4D4vDto000440
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Mon, 13 May 2019 04:57:13 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5CC1F6E053;
+	Mon, 13 May 2019 04:57:13 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6558D6E04C;
+	Mon, 13 May 2019 04:57:11 +0000 (GMT)
+Received: from [9.124.31.31] (unknown [9.124.31.31])
+	by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+	Mon, 13 May 2019 04:57:11 +0000 (GMT)
+To: Greg Kurz <groug@kaod.org>
+References: <155591636364.20338.844048953355207313.stgit@aravinda>
+	<155591657807.20338.12115795588476734752.stgit@aravinda>
+	<20190510110604.67c0d18d@bahia.lan>
+	<20190510163350.58cc85b9@bahia.lab.toulouse-stg.fr.ibm.com>
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Date: Mon, 13 May 2019 10:27:09 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.6.0
 MIME-Version: 1.0
+In-Reply-To: <20190510163350.58cc85b9@bahia.lab.toulouse-stg.fr.ibm.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.65.16.148, 10.4.195.12]
-Thread-Topic: virtio-pmem: Add virtio pmem driver
-Thread-Index: IHi4BX5O2DPB0MTOeSCuwbiKswIAPw==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Mon, 13 May 2019 04:43:51 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v8 2/6] virtio-pmem: Add virtio pmem driver
+X-TM-AS-GCONF: 00
+x-cbid: 19051304-0020-0000-0000-00000EE74712
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011091; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000285; SDB=6.01202559; UDB=6.00631154;
+	IPR=6.00983476; 
+	MB=3.00026861; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-13 04:57:16
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051304-0021-0000-0000-000065CD9F7E
+Message-Id: <0da3ea09-52a0-9b5e-5ee9-5da2f8f72878@linux.vnet.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-05-13_04:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1905130036
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v8 1/6] ppc: spapr: Handle "ibm,
+ nmi-register" and "ibm, nmi-interlock" RTAS calls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,455 +113,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jack@suse.cz, kvm@vger.kernel.org, david@redhat.com, jasowang@redhat.com,
-	david@fromorbit.com, qemu-devel@nongnu.org,
-	virtualization@lists.linux-foundation.org,
-	adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
-	aarcange@redhat.com, dave jiang <dave.jiang@intel.com>,
-	jstaron@google.com, linux-nvdimm@lists.01.org,
-	vishal l verma <vishal.l.verma@intel.com>, willy@infradead.org,
-	hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com,
-	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
-	riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
-	stefanha@redhat.com, imammedo@redhat.com,
-	dan j williams <dan.j.williams@intel.com>,
-	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
-	tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-	cohuck@redhat.com, rjw@rjwysocki.net,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, pbonzini@redhat.com,
-	darrick wong <darrick.wong@oracle.com>
+Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org,
+	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-> > Guest reads the persistent memory range information from
-> > Qemu over VIRTIO and registers it on nvdimm_bus. It also
-> > creates a nd_region object with the persistent memory
-> > range information so that existing 'nvdimm/pmem' driver
-> > can reserve this into system memory map. This way
-> > 'virtio-pmem' driver uses existing functionality of pmem
-> > driver to register persistent memory compatible for DAX
-> > capable filesystems.
-> > 
-> > This also provides function to perform guest flush over
-> > VIRTIO from 'pmem' driver when userspace performs flush
-> > on DAX memory range.
-> > 
-> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
-> 
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Thank you, Michael.
+On Friday 10 May 2019 08:03 PM, Greg Kurz wrote:
+> On Fri, 10 May 2019 11:06:04 +0200
+> Greg Kurz <groug@kaod.org> wrote:
+> 
+>> On Mon, 22 Apr 2019 12:32:58 +0530
+>> Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
+>>
+>>> This patch adds support in QEMU to handle "ibm,nmi-register"
+>>> and "ibm,nmi-interlock" RTAS calls.
+>>>
+>>> The machine check notification address is saved when the
+>>> OS issues "ibm,nmi-register" RTAS call.
+>>>
+>>> This patch also handles the case when multiple processors
+>>> experience machine check at or about the same time by
+>>> handling "ibm,nmi-interlock" call. In such cases, as per
+>>> PAPR, subsequent processors serialize waiting for the first
+>>> processor to issue the "ibm,nmi-interlock" call. The second
+>>> processor that also received a machine check error waits
+>>> till the first processor is done reading the error log.
+>>> The first processor issues "ibm,nmi-interlock" call
+>>> when the error log is consumed. This patch implements the
+>>> releasing part of the error-log while subsequent patch
+>>> (which builds error log) handles the locking part.
+>>>
+>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+>>> ---
+>>>  hw/ppc/spapr.c         |   18 ++++++++++++++
+>>>  hw/ppc/spapr_rtas.c    |   61 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>>  include/hw/ppc/spapr.h |    9 ++++++-
+>>>  3 files changed, 87 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>> index c56939a..6642cb5 100644
+>>> --- a/hw/ppc/spapr.c
+>>> +++ b/hw/ppc/spapr.c
+>>> @@ -1805,6 +1805,11 @@ static void spapr_machine_reset(void)
+>>>      first_ppc_cpu->env.gpr[5] = 0;
+>>>  
+>>>      spapr->cas_reboot = false;
+>>> +
+>>> +    spapr->guest_machine_check_addr = -1;
+>>> +
+>>> +    /* Signal all vCPUs waiting on this condition */
+>>> +    qemu_cond_broadcast(&spapr->mc_delivery_cond);
+>>>  }
+>>>  
+>>>  static void spapr_create_nvram(SpaprMachineState *spapr)
+>>> @@ -2095,6 +2100,16 @@ static const VMStateDescription vmstate_spapr_dtb = {
+>>>      },
+>>>  };
+>>>  
+>>> +static const VMStateDescription vmstate_spapr_machine_check = {
+>>> +    .name = "spapr_machine_check",
+>>> +    .version_id = 1,
+>>> +    .minimum_version_id = 1,
+>>> +    .fields = (VMStateField[]) {
+>>> +        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
+> 
+> Also this should use VMSTATE_UINTTL()
 
-Best regards,
-Pankaj
+sure..
+
+Regards,
+Aravinda
 
 > 
-> > ---
-> >  drivers/nvdimm/Makefile          |   1 +
-> >  drivers/nvdimm/nd_virtio.c       | 129 +++++++++++++++++++++++++++++++
-> >  drivers/nvdimm/virtio_pmem.c     | 117 ++++++++++++++++++++++++++++
-> >  drivers/virtio/Kconfig           |  10 +++
-> >  include/linux/virtio_pmem.h      |  60 ++++++++++++++
-> >  include/uapi/linux/virtio_ids.h  |   1 +
-> >  include/uapi/linux/virtio_pmem.h |  10 +++
-> >  7 files changed, 328 insertions(+)
-> >  create mode 100644 drivers/nvdimm/nd_virtio.c
-> >  create mode 100644 drivers/nvdimm/virtio_pmem.c
-> >  create mode 100644 include/linux/virtio_pmem.h
-> >  create mode 100644 include/uapi/linux/virtio_pmem.h
-> > 
-> > diff --git a/drivers/nvdimm/Makefile b/drivers/nvdimm/Makefile
-> > index 6f2a088afad6..cefe233e0b52 100644
-> > --- a/drivers/nvdimm/Makefile
-> > +++ b/drivers/nvdimm/Makefile
-> > @@ -5,6 +5,7 @@ obj-$(CONFIG_ND_BTT) += nd_btt.o
-> >  obj-$(CONFIG_ND_BLK) += nd_blk.o
-> >  obj-$(CONFIG_X86_PMEM_LEGACY) += nd_e820.o
-> >  obj-$(CONFIG_OF_PMEM) += of_pmem.o
-> > +obj-$(CONFIG_VIRTIO_PMEM) += virtio_pmem.o nd_virtio.o
-> >  
-> >  nd_pmem-y := pmem.o
-> >  
-> > diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
-> > new file mode 100644
-> > index 000000000000..ed7ddcc5a62c
-> > --- /dev/null
-> > +++ b/drivers/nvdimm/nd_virtio.c
-> > @@ -0,0 +1,129 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * virtio_pmem.c: Virtio pmem Driver
-> > + *
-> > + * Discovers persistent memory range information
-> > + * from host and provides a virtio based flushing
-> > + * interface.
-> > + */
-> > +#include <linux/virtio_pmem.h>
-> > +#include "nd.h"
-> > +
-> > + /* The interrupt handler */
-> > +void host_ack(struct virtqueue *vq)
-> > +{
-> > +	unsigned int len;
-> > +	unsigned long flags;
-> > +	struct virtio_pmem_request *req, *req_buf;
-> > +	struct virtio_pmem *vpmem = vq->vdev->priv;
-> > +
-> > +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
-> > +		req->done = true;
-> > +		wake_up(&req->host_acked);
-> > +
-> > +		if (!list_empty(&vpmem->req_list)) {
-> > +			req_buf = list_first_entry(&vpmem->req_list,
-> > +					struct virtio_pmem_request, list);
-> > +			req_buf->wq_buf_avail = true;
-> > +			wake_up(&req_buf->wq_buf);
-> > +			list_del(&req_buf->list);
-> > +		}
-> > +	}
-> > +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +}
-> > +EXPORT_SYMBOL_GPL(host_ack);
-> > +
-> > + /* The request submission function */
-> > +int virtio_pmem_flush(struct nd_region *nd_region)
-> > +{
-> > +	int err, err1;
-> > +	unsigned long flags;
-> > +	struct scatterlist *sgs[2], sg, ret;
-> > +	struct virtio_device *vdev = nd_region->provider_data;
-> > +	struct virtio_pmem *vpmem = vdev->priv;
-> > +	struct virtio_pmem_request *req;
-> > +
-> > +	might_sleep();
-> > +	req = kmalloc(sizeof(*req), GFP_KERNEL);
-> > +	if (!req)
-> > +		return -ENOMEM;
-> > +
-> > +	req->done = false;
-> > +	strcpy(req->name, "FLUSH");
-> > +	init_waitqueue_head(&req->host_acked);
-> > +	init_waitqueue_head(&req->wq_buf);
-> > +	INIT_LIST_HEAD(&req->list);
-> > +	sg_init_one(&sg, req->name, strlen(req->name));
-> > +	sgs[0] = &sg;
-> > +	sg_init_one(&ret, &req->ret, sizeof(req->ret));
-> > +	sgs[1] = &ret;
-> > +
-> > +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	 /*
-> > +	  * If virtqueue_add_sgs returns -ENOSPC then req_vq virtual
-> > +	  * queue does not have free descriptor. We add the request
-> > +	  * to req_list and wait for host_ack to wake us up when free
-> > +	  * slots are available.
-> > +	  */
-> > +	while ((err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req,
-> > +					GFP_ATOMIC)) == -ENOSPC) {
-> > +
-> > +		dev_err(&vdev->dev, "failed to send command to virtio pmem"\
-> > +			"device, no free slots in the virtqueue\n");
-> > +		req->wq_buf_avail = false;
-> > +		list_add_tail(&req->list, &vpmem->req_list);
-> > +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +
-> > +		/* When host has read buffer, this completes via host_ack */
-> > +		wait_event(req->wq_buf, req->wq_buf_avail);
-> > +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	}
-> > +	err1 = virtqueue_kick(vpmem->req_vq);
-> > +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +
-> > +	/*
-> > +	 * virtqueue_add_sgs failed with error different than -ENOSPC, we can't
-> > +	 * do anything about that.
-> > +	 */
-> > +	if (err || !err1) {
-> > +		dev_info(&vdev->dev, "failed to send command to virtio pmem device\n");
-> > +		err = -EIO;
-> > +		goto ret;
-> > +	}
-> > +
-> > +	/* When host has read buffer, this completes via host_ack */
-> > +	wait_event(req->host_acked, req->done);
-> > +	err = req->ret;
-> > +ret:
-> > +	kfree(req);
-> > +	return err;
-> > +};
-> > +
-> > +/* The asynchronous flush callback function */
-> > +int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
-> > +{
-> > +	int rc = 0;
-> > +
-> > +	/* Create child bio for asynchronous flush and chain with
-> > +	 * parent bio. Otherwise directly call nd_region flush.
-> > +	 */
-> > +	if (bio && bio->bi_iter.bi_sector != -1) {
-> > +		struct bio *child = bio_alloc(GFP_ATOMIC, 0);
-> > +
-> > +		if (!child)
-> > +			return -ENOMEM;
-> > +		bio_copy_dev(child, bio);
-> > +		child->bi_opf = REQ_PREFLUSH;
-> > +		child->bi_iter.bi_sector = -1;
-> > +		bio_chain(child, bio);
-> > +		submit_bio(child);
-> > +	} else {
-> > +		if (virtio_pmem_flush(nd_region))
-> > +			rc = -EIO;
-> > +	}
-> > +
-> > +	return rc;
-> > +};
-> > +EXPORT_SYMBOL_GPL(async_pmem_flush);
-> > +MODULE_LICENSE("GPL");
-> > diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
-> > new file mode 100644
-> > index 000000000000..cfc6381c4e5d
-> > --- /dev/null
-> > +++ b/drivers/nvdimm/virtio_pmem.c
-> > @@ -0,0 +1,117 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * virtio_pmem.c: Virtio pmem Driver
-> > + *
-> > + * Discovers persistent memory range information
-> > + * from host and registers the virtual pmem device
-> > + * with libnvdimm core.
-> > + */
-> > +#include <linux/virtio_pmem.h>
-> > +#include "nd.h"
-> > +
-> > +static struct virtio_device_id id_table[] = {
-> > +	{ VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
-> > +	{ 0 },
-> > +};
-> > +
-> > + /* Initialize virt queue */
-> > +static int init_vq(struct virtio_pmem *vpmem)
-> > +{
-> > +	/* single vq */
-> > +	vpmem->req_vq = virtio_find_single_vq(vpmem->vdev,
-> > +				host_ack, "flush_queue");
-> > +	if (IS_ERR(vpmem->req_vq))
-> > +		return PTR_ERR(vpmem->req_vq);
-> > +
-> > +	spin_lock_init(&vpmem->pmem_lock);
-> > +	INIT_LIST_HEAD(&vpmem->req_list);
-> > +
-> > +	return 0;
-> > +};
-> > +
-> > +static int virtio_pmem_probe(struct virtio_device *vdev)
-> > +{
-> > +	int err = 0;
-> > +	struct resource res;
-> > +	struct virtio_pmem *vpmem;
-> > +	struct nd_region_desc ndr_desc = {};
-> > +	int nid = dev_to_node(&vdev->dev);
-> > +	struct nd_region *nd_region;
-> > +
-> > +	if (!vdev->config->get) {
-> > +		dev_err(&vdev->dev, "%s failure: config access disabled\n",
-> > +			__func__);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	vpmem = devm_kzalloc(&vdev->dev, sizeof(*vpmem), GFP_KERNEL);
-> > +	if (!vpmem) {
-> > +		err = -ENOMEM;
-> > +		goto out_err;
-> > +	}
-> > +
-> > +	vpmem->vdev = vdev;
-> > +	vdev->priv = vpmem;
-> > +	err = init_vq(vpmem);
-> > +	if (err)
-> > +		goto out_err;
-> > +
-> > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> > +			start, &vpmem->start);
-> > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> > +			size, &vpmem->size);
-> > +
-> > +	res.start = vpmem->start;
-> > +	res.end   = vpmem->start + vpmem->size-1;
-> > +	vpmem->nd_desc.provider_name = "virtio-pmem";
-> > +	vpmem->nd_desc.module = THIS_MODULE;
-> > +
-> > +	vpmem->nvdimm_bus = nvdimm_bus_register(&vdev->dev,
-> > +						&vpmem->nd_desc);
-> > +	if (!vpmem->nvdimm_bus)
-> > +		goto out_vq;
-> > +
-> > +	dev_set_drvdata(&vdev->dev, vpmem->nvdimm_bus);
-> > +
-> > +	ndr_desc.res = &res;
-> > +	ndr_desc.numa_node = nid;
-> > +	ndr_desc.flush = async_pmem_flush;
-> > +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
-> > +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
-> > +	nd_region = nvdimm_pmem_region_create(vpmem->nvdimm_bus, &ndr_desc);
-> > +
-> > +	if (!nd_region)
-> > +		goto out_nd;
-> > +	nd_region->provider_data = dev_to_virtio(nd_region->dev.parent->parent);
-> > +	return 0;
-> > +out_nd:
-> > +	err = -ENXIO;
-> > +	nvdimm_bus_unregister(vpmem->nvdimm_bus);
-> > +out_vq:
-> > +	vdev->config->del_vqs(vdev);
-> > +out_err:
-> > +	dev_err(&vdev->dev, "failed to register virtio pmem memory\n");
-> > +	return err;
-> > +}
-> > +
-> > +static void virtio_pmem_remove(struct virtio_device *vdev)
-> > +{
-> > +	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
-> > +
-> > +	nvdimm_bus_unregister(nvdimm_bus);
-> > +	vdev->config->del_vqs(vdev);
-> > +	vdev->config->reset(vdev);
-> > +}
-> > +
-> > +static struct virtio_driver virtio_pmem_driver = {
-> > +	.driver.name		= KBUILD_MODNAME,
-> > +	.driver.owner		= THIS_MODULE,
-> > +	.id_table		= id_table,
-> > +	.probe			= virtio_pmem_probe,
-> > +	.remove			= virtio_pmem_remove,
-> > +};
-> > +
-> > +module_virtio_driver(virtio_pmem_driver);
-> > +MODULE_DEVICE_TABLE(virtio, id_table);
-> > +MODULE_DESCRIPTION("Virtio pmem driver");
-> > +MODULE_LICENSE("GPL");
-> > diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-> > index 35897649c24f..9f634a2ed638 100644
-> > --- a/drivers/virtio/Kconfig
-> > +++ b/drivers/virtio/Kconfig
-> > @@ -42,6 +42,16 @@ config VIRTIO_PCI_LEGACY
-> >  
-> >  	  If unsure, say Y.
-> >  
-> > +config VIRTIO_PMEM
-> > +	tristate "Support for virtio pmem driver"
-> > +	depends on VIRTIO
-> > +	depends on LIBNVDIMM
-> > +	help
-> > +	This driver provides support for virtio based flushing interface
-> > +	for persistent memory range.
-> > +
-> > +	If unsure, say M.
-> > +
-> >  config VIRTIO_BALLOON
-> >  	tristate "Virtio balloon driver"
-> >  	depends on VIRTIO
-> > diff --git a/include/linux/virtio_pmem.h b/include/linux/virtio_pmem.h
-> > new file mode 100644
-> > index 000000000000..ab1da877575d
-> > --- /dev/null
-> > +++ b/include/linux/virtio_pmem.h
-> > @@ -0,0 +1,60 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +/*
-> > + * virtio_pmem.h: virtio pmem Driver
-> > + *
-> > + * Discovers persistent memory range information
-> > + * from host and provides a virtio based flushing
-> > + * interface.
-> > + **/
-> > +
-> > +#ifndef _LINUX_VIRTIO_PMEM_H
-> > +#define _LINUX_VIRTIO_PMEM_H
-> > +
-> > +#include <linux/virtio_ids.h>
-> > +#include <linux/module.h>
-> > +#include <linux/virtio_config.h>
-> > +#include <uapi/linux/virtio_pmem.h>
-> > +#include <linux/libnvdimm.h>
-> > +#include <linux/spinlock.h>
-> > +
-> > +struct virtio_pmem_request {
-> > +	/* Host return status corresponding to flush request */
-> > +	int ret;
-> > +
-> > +	/* command name*/
-> > +	char name[16];
-> > +
-> > +	/* Wait queue to process deferred work after ack from host */
-> > +	wait_queue_head_t host_acked;
-> > +	bool done;
-> > +
-> > +	/* Wait queue to process deferred work after virt queue buffer avail */
-> > +	wait_queue_head_t wq_buf;
-> > +	bool wq_buf_avail;
-> > +	struct list_head list;
-> > +};
-> > +
-> > +struct virtio_pmem {
-> > +	struct virtio_device *vdev;
-> > +
-> > +	/* Virtio pmem request queue */
-> > +	struct virtqueue *req_vq;
-> > +
-> > +	/* nvdimm bus registers virtio pmem device */
-> > +	struct nvdimm_bus *nvdimm_bus;
-> > +	struct nvdimm_bus_descriptor nd_desc;
-> > +
-> > +	/* List to store deferred work if virtqueue is full */
-> > +	struct list_head req_list;
-> > +
-> > +	/* Synchronize virtqueue data */
-> > +	spinlock_t pmem_lock;
-> > +
-> > +	/* Memory region information */
-> > +	uint64_t start;
-> > +	uint64_t size;
-> > +};
-> > +
-> > +void host_ack(struct virtqueue *vq);
-> > +int async_pmem_flush(struct nd_region *nd_region, struct bio *bio);
-> > +#endif
-> > diff --git a/include/uapi/linux/virtio_ids.h
-> > b/include/uapi/linux/virtio_ids.h
-> > index 6d5c3b2d4f4d..32b2f94d1f58 100644
-> > --- a/include/uapi/linux/virtio_ids.h
-> > +++ b/include/uapi/linux/virtio_ids.h
-> > @@ -43,5 +43,6 @@
-> >  #define VIRTIO_ID_INPUT        18 /* virtio input */
-> >  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
-> >  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
-> > +#define VIRTIO_ID_PMEM         27 /* virtio pmem */
-> >  
-> >  #endif /* _LINUX_VIRTIO_IDS_H */
-> > diff --git a/include/uapi/linux/virtio_pmem.h
-> > b/include/uapi/linux/virtio_pmem.h
-> > new file mode 100644
-> > index 000000000000..fa3f7d52717a
-> > --- /dev/null
-> > +++ b/include/uapi/linux/virtio_pmem.h
-> > @@ -0,0 +1,10 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +
-> > +#ifndef _UAPI_LINUX_VIRTIO_PMEM_H
-> > +#define _UAPI_LINUX_VIRTIO_PMEM_H
-> > +
-> > +struct virtio_pmem_config {
-> > +	__le64 start;
-> > +	__le64 size;
-> > +};
-> > +#endif
-> > --
-> > 2.20.1
+>>> +        VMSTATE_END_OF_LIST()
+>>> +    },  
+>>
+>> This VMState descriptor is missing a .needed field because we only want
+>> to migrate the subsection if the guest has called NMI register, ie.
+>> spapr->guest_machine_check_addr != (target_ulong) -1.
+>>
+>>> +};
+>>> +
+>>>  static const VMStateDescription vmstate_spapr = {765cf442a8afe8e5c8c6896b5072066df5129077
+>>>      .name = "spapr",
+>>>      .version_id = 3,
+>>> @@ -2127,6 +2142,7 @@ static const VMStateDescription vmstate_spapr = {
+>>>          &vmstate_spapr_dtb,
+>>>          &vmstate_spapr_cap_large_decr,
+>>>          &vmstate_spapr_cap_ccf_assist,
+>>> +        &vmstate_spapr_machine_check,
+>>>          NULL
+>>>      }
+>>>  };
+>>> @@ -3068,6 +3084,8 @@ static void spapr_machine_init(MachineState *machine)
+>>>  
+>>>          kvmppc_spapr_enable_inkernel_multitce();
+>>>      }
+>>> +
+>>> +    qemu_cond_init(&spapr->mc_delivery_cond);
+>>>  }
+>>>  
+>>>  static int spapr_kvm_type(MachineState *machine, const char *vm_type)
+>>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+>>> index ee24212..c2f3991 100644
+>>> --- a/hw/ppc/spapr_rtas.c
+>>> +++ b/hw/ppc/spapr_rtas.c
+>>> @@ -348,6 +348,39 @@ static void rtas_get_power_level(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>>>      rtas_st(rets, 1, 100);
+>>>  }
+>>>  
+>>> +static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
+>>> +                                  SpaprMachineState *spapr,
+>>> +                                  uint32_t token, uint32_t nargs,
+>>> +                                  target_ulong args,
+>>> +                                  uint32_t nret, target_ulong rets)
+>>> +{
+>>> +    uint64_t rtas_addr = spapr_get_rtas_addr();
+>>> +
+>>> +    if (!rtas_addr) {
+>>> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
+>>> +        return;
+>>> +    }
+>>> +
+>>> +    spapr->guest_machine_check_addr = rtas_ld(args, 1);
+>>> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>>> +}
+>>> +
+>>> +static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+>>> +                                   SpaprMachineState *spapr,
+>>> +                                   uint32_t token, uint32_t nargs,
+>>> +                                   target_ulong args,
+>>> +                                   uint32_t nret, target_ulong rets)
+>>> +{
+>>> +    if (!spapr->guest_machine_check_addr) {  
+>>
+>> Hmm... the default value is -1. It looks like the check should rather be:
+>>
+>>     if (spapr->guest_machine_check_addr == (target_ulong) -1) {
+>>
+>>
+>>> +        /* NMI register not called */
+>>> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+>>> +    } else {
+>>> +        qemu_cond_signal(&spapr->mc_delivery_cond);
+>>> +        rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>>> +    }
+>>> +}
+>>> +
+>>> +
+>>>  static struct rtas_call {
+>>>      const char *name;
+>>>      spapr_rtas_fn fn;
+>>> @@ -466,6 +499,30 @@ void spapr_load_rtas(SpaprMachineState *spapr, void *fdt, hwaddr addr)
+>>>      }
+>>>  }
+>>>  
+>>> +uint64_t spapr_get_rtas_addr(void)  
+>>
+>> Shouldn't this be hwaddr instead of uint64_t ?
+>>
+>>> +{
+>>> +    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+>>> +    int rtas_node;
+>>> +    const struct fdt_property *rtas_addr_prop;
+>>> +    void *fdt = spapr->fdt_blob;
+>>> +    uint32_t rtas_addr;
+>>> +
+>>> +    /* fetch rtas addr from fdt */
+>>> +    rtas_node = fdt_path_offset(fdt, "/rtas");
+>>> +    if (rtas_node == 0) {
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    rtas_addr_prop = fdt_get_property(fdt, rtas_node, "linux,rtas-base", NULL);
+>>> +    if (!rtas_addr_prop) {  
+>>
+>> Just for curiosity: this is ok for linux, but what about other OSes (eg. AIX) ?
+>>
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    rtas_addr = fdt32_to_cpu(*(uint32_t *)rtas_addr_prop->data);  
+>>
+>> Also this assumes the OS called RTAS instantiate-rtas, but some other
+>> OS might have called RTAS instantiate-rtas-64 instead. I guess it is
+>> ok for now because SLOF only provides the 32-bit variant, but a
+>> comment would certainly help IMHO.
+>>
+>>> +    return (uint64_t)rtas_addr;
+>>> +}
+>>> +
+>>> +
+>>>  static void core_rtas_register_types(void)
+>>>  {
+>>>      spapr_rtas_register(RTAS_DISPLAY_CHARACTER, "display-character",
+>>> @@ -489,6 +546,10 @@ static void core_rtas_register_types(void)
+>>>                          rtas_set_power_level);
+>>>      spapr_rtas_register(RTAS_GET_POWER_LEVEL, "get-power-level",
+>>>                          rtas_get_power_level);
+>>> +    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
+>>> +                        rtas_ibm_nmi_register);
+>>> +    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
+>>> +                        rtas_ibm_nmi_interlock);
+>>>  }
+>>>  
+>>>  type_init(core_rtas_register_types)
+>>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>>> index 7e32f30..ec6f33e 100644
+>>> --- a/include/hw/ppc/spapr.h
+>>> +++ b/include/hw/ppc/spapr.h
+>>> @@ -187,6 +187,10 @@ struct SpaprMachineState {
+>>>       * occurs during the unplug process. */
+>>>      QTAILQ_HEAD(, SpaprDimmState) pending_dimm_unplugs;
+>>>  
+>>> +    /* State related to "ibm,nmi-register" and "ibm,nmi-interlock" calls */
+>>> +    target_ulong guest_machine_check_addr;
+>>> +    QemuCond mc_delivery_cond;
+>>> +
+>>>      /*< public >*/
+>>>      char *kvm_type;
+>>>      char *host_model;
+>>> @@ -623,8 +627,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
+>>>  #define RTAS_IBM_CREATE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x27)
+>>>  #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
+>>>  #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
+>>> +#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x2A)
+>>> +#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x2B)
+>>>  
+>>> -#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2A)
+>>> +#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2C)
+>>>  
+>>>  /* RTAS ibm,get-system-parameter token values */
+>>>  #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
+>>> @@ -874,4 +880,5 @@ void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
+>>>  #define SPAPR_OV5_XIVE_BOTH     0x80 /* Only to advertise on the platform */
+>>>  
+>>>  void spapr_set_all_lpcrs(target_ulong value, target_ulong mask);
+>>> +uint64_t spapr_get_rtas_addr(void);
+>>>  #endif /* HW_SPAPR_H */
+>>>
+>>>   
+>>
+>>
 > 
-> 
+
+-- 
+Regards,
+Aravinda
+
 
