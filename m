@@ -2,142 +2,64 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B852C46470
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 19:31:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9165CC04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 19:33:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D79B420989
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 19:31:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D79B420989
+	by mail.kernel.org (Postfix) with ESMTPS id 6AF8320850
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 19:33:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AF8320850
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34005 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34025 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQGfO-0005mo-Sr
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 15:31:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36235)
+	id 1hQGhG-0007Ae-KC
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 15:33:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hQGdV-0004Ul-Em
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 15:29:22 -0400
+	(envelope-from <drjones@redhat.com>) id 1hQGeQ-000552-Fj
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 15:30:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hQGWL-0006d3-Cf
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 15:21:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43762)
+	(envelope-from <drjones@redhat.com>) id 1hQGRk-0004Te-Ty
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 15:17:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50984)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
-	id 1hQGWJ-0006cD-1U; Mon, 13 May 2019 15:21:55 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <drjones@redhat.com>)
+	id 1hQGRh-0004Rq-D0; Mon, 13 May 2019 15:17:10 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1F09E81F07;
-	Mon, 13 May 2019 19:21:54 +0000 (UTC)
-Received: from [10.18.17.188] (dhcp-17-188.bos.redhat.com [10.18.17.188])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4AA885C1B4;
-	Mon, 13 May 2019 19:21:53 +0000 (UTC)
-To: Stefan Hajnoczi <stefanha@gmail.com>,
-	Kenneth Heitke <kenneth.heitke@intel.com>
-References: <20190405214117.1850-1-kenneth.heitke@intel.com>
-	<20190409131903.GF16944@stefanha-x1.localdomain>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-Message-ID: <bcc74555-fe96-2859-db50-001a462ce4a7@redhat.com>
-Date: Mon, 13 May 2019 15:21:52 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id A8E0D3082E66;
+	Mon, 13 May 2019 19:17:05 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (ovpn-116-151.ams2.redhat.com
+	[10.36.116.151])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DB3C60856;
+	Mon, 13 May 2019 19:17:02 +0000 (UTC)
+Date: Mon, 13 May 2019 21:16:59 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20190513191659.2vmrw3act5qkudou@kamzik.brq.redhat.com>
+References: <20190512083624.8916-1-drjones@redhat.com>
+	<fa220ee2-b4bc-cdfa-ddde-90206e417cf3@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190409131903.GF16944@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fa220ee2-b4bc-cdfa-ddde-90206e417cf3@linaro.org>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Mon, 13 May 2019 19:21:54 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.46]);
+	Mon, 13 May 2019 19:17:05 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] nvme: add Get/Set Feature
- Timestamp support
+Subject: Re: [Qemu-devel] [PATCH 00/13] target/arm/kvm: enable SVE in guests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -149,27 +71,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, keith.busch@intel.com, qemu-devel@nongnu.org,
-	qemu-block@nongnu.org, mreitz@redhat.com
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, armbru@redhat.com,
+	qemu-arm@nongnu.org, abologna@redhat.com, alex.bennee@linaro.org,
+	Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 4/9/19 9:19 AM, Stefan Hajnoczi wrote:
-> On Fri, Apr 05, 2019 at 03:41:17PM -0600, Kenneth Heitke wrote:
->> Signed-off-by: Kenneth Heitke <kenneth.heitke@intel.com>
->> ---
->>  hw/block/nvme.c       | 120 +++++++++++++++++++++++++++++++++++++++++-
->>  hw/block/nvme.h       |   3 ++
->>  hw/block/trace-events |   2 +
->>  include/block/nvme.h  |   2 +
->>  4 files changed, 125 insertions(+), 2 deletions(-)
+On Mon, May 13, 2019 at 11:46:29AM -0700, Richard Henderson wrote:
+> On 5/12/19 1:36 AM, Andrew Jones wrote:
+> >    CPU type | accel | sve-max-vq | sve-vls-map
+> >    -------------------------------------------
+> >  1)     max | tcg   |  $MAX_VQ   |  $VLS_MAP
+> >  2)     max | kvm   |  $MAX_VQ   |  $VLS_MAP
+> >  3)    host | kvm   |  N/A       |  $VLS_MAP
 > 
-> CCing Maxim Levitsky <mlevitsk@redhat.com>, who is also working on NVMe
-> emulation at the moment.
+> This doesn't seem right.  Why is -cpu host not whatever the host supports?  It
+> certainly has been so far. 
+
+-cpu host can support whatever the host (hardware + KVM ) supports, but if
+a user doesn't want to expose all of it to the guest, then the user doesn't
+have to. For example, the host cpu may have a PMU, but the guest doesn't
+necessarily get one (-cpu host,pmu=off).
+
+> I really don't see how -cpu max makes any sense for
+> kvm.
+>
+
+It's already supported for kvm. This series just extends that support
+to match tcg's sve support. The reason it's supported is that you can
+then use '-cpu max' along with '-machine accel=kvm:tcg' in a command
+line and it'll just work.
+ 
+> 
+> > The QMP query returns a list of valid vq lists. For example, if
+> > a guest can use vqs 1, 2, 3, and 4, then the following list will
+> > be returned
+> > 
+> >  [ [ 1 ], [ 1, 2 ], [ 1, 2, 3 ], [ 1, 2, 3, 4 ] ]
+> > 
+> > Another example might be 1, 2, 4, as the architecture states 3
+> > is optional. In that case the list would be
+> > 
+> >  [ [ 1 ], [ 1, 2 ], [ 1, 2, 4 ] ]
+> > 
+> > This may look redundant, but it's necessary to provide a future-
+> > proof query, because while KVM currently requires vector sets to
+> > be strict truncations of the full valid vector set, that may change
+> > at some point.
+> 
+> How and why would that make sense?
+> 
+> Real hardware is going to support one set of vector lengths.
+
+The guest's view of the hardware will be a single set. That set can be
+different for different guests though, within the constraints of the
+architecture and KVM or TCG implementations.
+
+> Whether VQ=3 is
+> valid or not is not going to depend on the maximum VQ, surely.
+
+Exactly. That's why we need a way to explicitly state what is supported.
+We can't assume anything from the max VQ alone. Additionally, while
+strict truncation is required now for KVM, things may be more flexible
+later. TCG is already more flexible. For TCG, all sets that at least
+include all the power-of-2 lengths up to the maximum VQ are valid, as
+the architecture states. Plus, all the sets that can be derived by adding
+one ore more optional lengths to those sets are also valid. Listing each
+of them allows management software to know what's going to work and what's
+not without having to know all the rules itself.
+
+> 
+> I'll also note that if we want to support the theoretical
+> beyond-current-architecture maximum VQ=512, such that migration works
+> seemlessly with current hardware, then we're going to have to change the
+> migration format.
+> 
+> So far I'm supporting only the current architecture maximum VQ=16.  Which
+> seemed plenty, given that the first round of hardware only supports VQ=4.
 > 
 
-Did this patch stall? Do we still want it? Do we need reviewers?
+I agree. The changes won't be small to QEMU, but hopefully we can design
+a QMP query that won't need to change, saving libvirt some pain.
+
+Thanks,
+drew
 
