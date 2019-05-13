@@ -3,47 +3,46 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E5DC04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 16:29:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16CEAC04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 16:32:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DEF1208CA
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 16:29:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DEF1208CA
+	by mail.kernel.org (Postfix) with ESMTPS id D0894208CA
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 16:32:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0894208CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60188 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60256 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQDpW-0003F7-ES
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 12:29:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34792)
+	id 1hQDsU-0004KC-8f
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 12:32:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hQDoj-0002w8-KP
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 12:28:46 -0400
+	(envelope-from <eblake@redhat.com>) id 1hQDrV-0003v8-Pp
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 12:31:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hQDoi-0006xT-QJ
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 12:28:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34592)
+	(envelope-from <eblake@redhat.com>) id 1hQDrU-00014P-TQ
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 12:31:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46456)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hQDoi-0006wj-HZ; Mon, 13 May 2019 12:28:44 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	id 1hQDrS-000112-IH; Mon, 13 May 2019 12:31:34 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5247F3092667;
-	Mon, 13 May 2019 16:28:43 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 46BD03091753;
+	Mon, 13 May 2019 16:31:32 +0000 (UTC)
 Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E8EE19C67;
-	Mon, 13 May 2019 16:28:42 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
-	Laurent Vivier <lvivier@redhat.com>
-References: <20190513154759.24973-1-thuth@redhat.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9929918507;
+	Mon, 13 May 2019 16:31:29 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20190513155254.27773-1-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,24 +69,24 @@ Autocrypt: addr=eblake@redhat.com; keydata=
 	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
 	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <3a589750-737c-23b4-0334-9eeb03441726@redhat.com>
-Date: Mon, 13 May 2019 11:28:41 -0500
+Message-ID: <e2d36fac-aeeb-2c08-2a8d-b5bfc5ee5a42@redhat.com>
+Date: Mon, 13 May 2019 11:31:28 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190513154759.24973-1-thuth@redhat.com>
+In-Reply-To: <20190513155254.27773-1-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="HjPYksuTRJjVDvUJqFEoKjb1f0MZnpY8g"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+	boundary="EUWUpLCbctd9I1nhaSPiUikplc8QQgWz7"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Mon, 13 May 2019 16:28:43 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Mon, 13 May 2019 16:31:32 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH] tests/libqtest: Fix description of
- qtest_vinitf() and qtest_initf()
+Subject: Re: [Qemu-devel] [PATCH v2] iotests: Filter 175's allocation
+ information
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,35 +98,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HjPYksuTRJjVDvUJqFEoKjb1f0MZnpY8g
+--EUWUpLCbctd9I1nhaSPiUikplc8QQgWz7
 From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3a589750-737c-23b4-0334-9eeb03441726@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tests/libqtest: Fix description of
- qtest_vinitf() and qtest_initf()
-References: <20190513154759.24973-1-thuth@redhat.com>
-In-Reply-To: <20190513154759.24973-1-thuth@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <e2d36fac-aeeb-2c08-2a8d-b5bfc5ee5a42@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] iotests: Filter 175's allocation
+ information
+References: <20190513155254.27773-1-mreitz@redhat.com>
+In-Reply-To: <20190513155254.27773-1-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 5/13/19 10:47 AM, Thomas Huth wrote:
-> These functions are convenience wrappers of qtest_init() and not of
-> qtest_start().
+On 5/13/19 10:52 AM, Max Reitz wrote:
+> It is possible for an empty file to take up blocks on a filesystem.
+> Make iotest 175 take this into account.
 >=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  tests/libqtest.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> v2: [Nir]
+> - Use a function for filtering
+> - s/empty_blocks/extra_blocks/
+> ---
+
+> +# Some file systems sometimes allocate extra blocks independently of
+> +# the file size.  This function hides the resulting difference in the
+> +# stat -c '%b' output.
+> +# Parameter 1: Number of blocks an empty file occupies
+> +# Parameter 2: Image size in bytes
+> +_filter_blocks()
+> +{
+> +    extra_blocks=3D$1
+> +    img_size=3D$2
+> +
+> +    sed -e "s/blocks=3D$extra_blocks/nothing allocated/" \
+> +        -e "s/blocks=3D$((extra_blocks + img_size / 512))/everything a=
+llocated/"
+> +}
+
+That turned out nicely.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
+
+> -size=3D1m
+> +size=3D$((1 * 1024 * 1024))
+
+Had to change since bash doesn't understand '1m' inside $(()).
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -135,22 +160,22 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---HjPYksuTRJjVDvUJqFEoKjb1f0MZnpY8g
+--EUWUpLCbctd9I1nhaSPiUikplc8QQgWz7
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzZmzkACgkQp6FrSiUn
-Q2rRdwf+NBy/+Te1WHMnCtutJHKFF4Jj59Dx9wrYz7mXamHsli0KVniLGktXvehG
-6J8xQHt3nfO0BwLHTStH8667bXjm6fMzdxVExaAw78g+vID0cN05EA5se70ui9QO
-DLi3J8A5FVxqpKuKmdSvESM7xbSTE+hiq/wwYg0feZIxhzHA/NRZ1n5kupiLQP80
-j+9n6bsOxdutEY/CvuRpMp8E2C3q6TFT3VJAr4HiyAOe1YQeqwe5JdTPHhlK569B
-X3+uRiMUn+a50Fk6XLIamaNOx+K521KrSSeGhTD2w8/7ZR2BSYrwwKXsnqYwSzOH
-pMDwFE763S2E1UnubiMBgX0sTU1KCA==
-=nnYF
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzZm+AACgkQp6FrSiUn
+Q2oyvQf/eQDw72bgYcotSXVGV5nU0ye3aXuhdf3T+tfYL9m9RXjcGNdqSOmtsaAt
+ScMJ9+0gTheCatv2hl5hjSyxKRaJ4l1HI5b4fYXX0oszReTTadsSaVuzSnBERplj
+eMGxgFaOci6W7Ko/qqvjMCChpZyVQ+7OPYvFFcBQSkRC3NNEmlABT5JyJnbcX+a1
+FkIi4Fgdt+AgMHcHIoWef6Jhh8CONc33anT/4rtmpFu/3A+jPqtGV293g0bEvPDx
+qzoV7CS2//FyUToN/eAtr9bvIeXguC9yOEF2MFyd+2439V8uvXlvKCnqLln6ecpY
+ysBEtDP98ZdOIoyv2Q+Q/TSlRaYudQ==
+=Ay3J
 -----END PGP SIGNATURE-----
 
---HjPYksuTRJjVDvUJqFEoKjb1f0MZnpY8g--
+--EUWUpLCbctd9I1nhaSPiUikplc8QQgWz7--
 
