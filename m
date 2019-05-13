@@ -6,57 +6,56 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6487EC04AB1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 06:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9864CC04AB3
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 06:24:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1666E20989
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 06:24:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 634DE20989
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 06:24:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="QsEm3xbW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1666E20989
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="mUHZ9VSD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 634DE20989
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51783 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51781 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQ4Nw-0006TL-8q
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 02:24:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35118)
+	id 1hQ4Nx-0006TG-FO
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 02:24:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hQ4JR-0002h3-9u
+	(envelope-from <dgibson@ozlabs.org>) id 1hQ4JR-0002h2-3Y
 	for qemu-devel@nongnu.org; Mon, 13 May 2019 02:19:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hQ4JP-0004LU-RC
+	(envelope-from <dgibson@ozlabs.org>) id 1hQ4JP-0004LK-Qf
 	for qemu-devel@nongnu.org; Mon, 13 May 2019 02:19:49 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:54939 helo=ozlabs.org)
+Received: from ozlabs.org ([203.11.71.1]:45615)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hQ4JO-0004KM-Ng; Mon, 13 May 2019 02:19:47 -0400
+	id 1hQ4JO-0004KB-O9; Mon, 13 May 2019 02:19:47 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 452Vz304S2z9sN6; Mon, 13 May 2019 16:19:42 +1000 (AEST)
+	id 452Vz23RZtz9s4V; Mon, 13 May 2019 16:19:42 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1557728383;
-	bh=RKOH6Pg3qJU+4Km9IdQsBWZQJ1p/0qK29BKTd3RTKoE=;
+	d=gibson.dropbear.id.au; s=201602; t=1557728382;
+	bh=eXt6jbXbDf70/Q2NJBka7jj4BKphfb5wCwAJcdlJZis=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QsEm3xbW2UwmfuySN4nW74ZJUEUmZ4+oqyD3L5WECr7dNVYnHsBTn2glNjbjodgzP
-	yvElZEP1FHWiFqps4JdsDWB4JrMIPowF1zAWXZrNgxhdNJk/P3J9bWdPcYnw4b7QCr
-	DFi3erpDKwr6BJXm6vg9Raa+ILiXfKMvtmmYo7rk=
+	b=mUHZ9VSDjUr4KdNQIuzKi5+CloY82L5r6bTrO5MWo+oqkX7d0j2l7ZWhvmlBbuHfO
+	24nl2O7uq7B2WafSDTxaSQvqBbGwNzfT6f1jg0wNxZq+f4iFcyvQ/9brr+vOoWjfGj
+	4ZdNtkE1Bn3QfkngMvjvKGZInMbl7rLiJNUXkdys=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: mst@redhat.com,
 	qemu-devel@nongnu.org
-Date: Mon, 13 May 2019 16:19:38 +1000
-Message-Id: <20190513061939.3464-5-david@gibson.dropbear.id.au>
+Date: Mon, 13 May 2019 16:19:36 +1000
+Message-Id: <20190513061939.3464-3-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190513061939.3464-1-david@gibson.dropbear.id.au>
 References: <20190513061939.3464-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PATCH v4 4/5] pci: Make is_bridge a bool
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PATCH v4 2/5] pci: Simplify pci_bus_is_root()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,171 +68,174 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: aik@ozlabs.ru, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	groug@kaod.org, qemu-ppc@nongnu.org,
+	groug@kaod.org, Peter Xu <peterx@redhat.com>,
+	qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>,
 	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The is_bridge field in PCIDevice acts as a bool, but is declared as an in=
-t.
-Declare it as a bool for clarity, and change everything that writes it to
-use true/false instead of 0/1 to match.
+pci_bus_is_root() currently relies on a method in the PCIBusClass.
+But it's always known if a PCI bus is a root bus when we create it, so
+using a dynamic method is overkill.
+
+This replaces it with an IS_ROOT bit in a new flags field, which is set o=
+n
+root buses and otherwise clear.  As a bonus this removes the special
+is_root logic from pci_expander_bridge, since it already creates its bus
+as a root bus.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/pci-bridge/dec.c                | 4 ++--
- hw/pci-bridge/i82801b11.c          | 2 +-
- hw/pci-bridge/pci_bridge_dev.c     | 2 +-
- hw/pci-bridge/pcie_pci_bridge.c    | 2 +-
- hw/pci-bridge/pcie_root_port.c     | 2 +-
- hw/pci-bridge/simba.c              | 2 +-
- hw/pci-bridge/xio3130_downstream.c | 2 +-
- hw/pci-bridge/xio3130_upstream.c   | 2 +-
- include/hw/pci/pci.h               | 2 +-
- 9 files changed, 10 insertions(+), 10 deletions(-)
+ hw/pci-bridge/pci_expander_bridge.c |  6 ------
+ hw/pci/pci.c                        | 14 ++------------
+ hw/virtio/virtio-pci.c              |  1 +
+ include/hw/pci/pci.h                |  1 -
+ include/hw/pci/pci_bus.h            | 12 +++++++++++-
+ 5 files changed, 14 insertions(+), 20 deletions(-)
 
-diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
-index 8484bfd434..ca40253730 100644
---- a/hw/pci-bridge/dec.c
-+++ b/hw/pci-bridge/dec.c
-@@ -68,7 +68,7 @@ static void dec_21154_pci_bridge_class_init(ObjectClass=
- *klass, void *data)
-     k->vendor_id =3D PCI_VENDOR_ID_DEC;
-     k->device_id =3D PCI_DEVICE_ID_DEC_21154;
-     k->config_write =3D pci_bridge_write_config;
--    k->is_bridge =3D 1;
-+    k->is_bridge =3D true;
-     dc->desc =3D "DEC 21154 PCI-PCI bridge";
-     dc->reset =3D pci_bridge_reset;
-     dc->vmsd =3D &vmstate_pci_device;
-@@ -129,7 +129,7 @@ static void dec_21154_pci_host_class_init(ObjectClass=
- *klass, void *data)
-     k->device_id =3D PCI_DEVICE_ID_DEC_21154;
-     k->revision =3D 0x02;
-     k->class_id =3D PCI_CLASS_BRIDGE_PCI;
--    k->is_bridge =3D 1;
-+    k->is_bridge =3D true;
-     /*
-      * PCI-facing part of the host bridge, not usable without the
-      * host-facing part, which can't be device_add'ed, yet.
-diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
-index 10e590e5c6..6d8b0f54a7 100644
---- a/hw/pci-bridge/i82801b11.c
-+++ b/hw/pci-bridge/i82801b11.c
-@@ -90,7 +90,7 @@ static void i82801b11_bridge_class_init(ObjectClass *kl=
-ass, void *data)
-     PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
+diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expa=
+nder_bridge.c
+index e62de4218f..ca66bc721a 100644
+--- a/hw/pci-bridge/pci_expander_bridge.c
++++ b/hw/pci-bridge/pci_expander_bridge.c
+@@ -66,11 +66,6 @@ static int pxb_bus_num(PCIBus *bus)
+     return pxb->bus_nr;
+ }
 =20
--    k->is_bridge =3D 1;
-+    k->is_bridge =3D true;
-     k->vendor_id =3D PCI_VENDOR_ID_INTEL;
-     k->device_id =3D PCI_DEVICE_ID_INTEL_82801BA_11;
-     k->revision =3D ICH9_D2P_A2_REVISION;
-diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_de=
-v.c
-index ff6b8323da..c56ed1f52f 100644
---- a/hw/pci-bridge/pci_bridge_dev.c
-+++ b/hw/pci-bridge/pci_bridge_dev.c
-@@ -253,7 +253,7 @@ static void pci_bridge_dev_class_init(ObjectClass *kl=
-ass, void *data)
-     k->vendor_id =3D PCI_VENDOR_ID_REDHAT;
-     k->device_id =3D PCI_DEVICE_ID_REDHAT_BRIDGE;
-     k->class_id =3D PCI_CLASS_BRIDGE_PCI;
--    k->is_bridge =3D 1,
-+    k->is_bridge =3D true;
-     dc->desc =3D "Standard PCI Bridge";
-     dc->reset =3D qdev_pci_bridge_dev_reset;
-     dc->props =3D pci_bridge_dev_properties;
-diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bri=
-dge.c
-index d491b40d04..9a4fba413a 100644
---- a/hw/pci-bridge/pcie_pci_bridge.c
-+++ b/hw/pci-bridge/pcie_pci_bridge.c
-@@ -143,7 +143,7 @@ static void pcie_pci_bridge_class_init(ObjectClass *k=
-lass, void *data)
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     HotplugHandlerClass *hc =3D HOTPLUG_HANDLER_CLASS(klass);
+-static bool pxb_is_root(PCIBus *bus)
+-{
+-    return true; /* by definition */
+-}
+-
+ static uint16_t pxb_bus_numa_node(PCIBus *bus)
+ {
+     PXBDev *pxb =3D convert_to_pxb(bus->parent_dev);
+@@ -83,7 +78,6 @@ static void pxb_bus_class_init(ObjectClass *class, void=
+ *data)
+     PCIBusClass *pbc =3D PCI_BUS_CLASS(class);
 =20
--    k->is_bridge =3D 1;
-+    k->is_bridge =3D true;
-     k->vendor_id =3D PCI_VENDOR_ID_REDHAT;
-     k->device_id =3D PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
-     k->realize =3D pcie_pci_bridge_realize;
-diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_por=
-t.c
-index e94d918b6d..be3f4d5e03 100644
---- a/hw/pci-bridge/pcie_root_port.c
-+++ b/hw/pci-bridge/pcie_root_port.c
-@@ -162,7 +162,7 @@ static void rp_class_init(ObjectClass *klass, void *d=
-ata)
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
+     pbc->bus_num =3D pxb_bus_num;
+-    pbc->is_root =3D pxb_is_root;
+     pbc->numa_node =3D pxb_bus_numa_node;
+ }
 =20
--    k->is_bridge =3D 1;
-+    k->is_bridge =3D true;
-     k->config_write =3D rp_write_config;
-     k->realize =3D rp_realize;
-     k->exit =3D rp_exit;
-diff --git a/hw/pci-bridge/simba.c b/hw/pci-bridge/simba.c
-index dea4c8c5e7..7cf0d6e047 100644
---- a/hw/pci-bridge/simba.c
-+++ b/hw/pci-bridge/simba.c
-@@ -76,7 +76,7 @@ static void simba_pci_bridge_class_init(ObjectClass *kl=
-ass, void *data)
-     k->device_id =3D PCI_DEVICE_ID_SUN_SIMBA;
-     k->revision =3D 0x11;
-     k->config_write =3D pci_bridge_write_config;
--    k->is_bridge =3D 1;
-+    k->is_bridge =3D true;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     dc->reset =3D pci_bridge_reset;
-     dc->vmsd =3D &vmstate_pci_device;
-diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_d=
-ownstream.c
-index 467bbabe4c..ab2a51e15d 100644
---- a/hw/pci-bridge/xio3130_downstream.c
-+++ b/hw/pci-bridge/xio3130_downstream.c
-@@ -152,7 +152,7 @@ static void xio3130_downstream_class_init(ObjectClass=
- *klass, void *data)
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index a78023f669..b386777045 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -129,14 +129,9 @@ static void pci_bus_unrealize(BusState *qbus, Error =
+**errp)
+     vmstate_unregister(NULL, &vmstate_pcibus, bus);
+ }
 =20
--    k->is_bridge =3D 1;
-+    k->is_bridge =3D true;
-     k->config_write =3D xio3130_downstream_write_config;
-     k->realize =3D xio3130_downstream_realize;
-     k->exit =3D xio3130_downstream_exitfn;
-diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_ups=
-tream.c
-index b524908cf1..1d41a49ab0 100644
---- a/hw/pci-bridge/xio3130_upstream.c
-+++ b/hw/pci-bridge/xio3130_upstream.c
-@@ -126,7 +126,7 @@ static void xio3130_upstream_class_init(ObjectClass *=
-klass, void *data)
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
+-static bool pcibus_is_root(PCIBus *bus)
+-{
+-    return !bus->parent_dev;
+-}
+-
+ static int pcibus_num(PCIBus *bus)
+ {
+-    if (pcibus_is_root(bus)) {
++    if (pci_bus_is_root(bus)) {
+         return 0; /* pci host bridge */
+     }
+     return bus->parent_dev->config[PCI_SECONDARY_BUS];
+@@ -164,7 +159,6 @@ static void pci_bus_class_init(ObjectClass *klass, vo=
+id *data)
+     k->unrealize =3D pci_bus_unrealize;
+     k->reset =3D pcibus_reset;
 =20
--    k->is_bridge =3D 1;
-+    k->is_bridge =3D true;
-     k->config_write =3D xio3130_upstream_write_config;
-     k->realize =3D xio3130_upstream_realize;
-     k->exit =3D xio3130_upstream_exitfn;
+-    pbc->is_root =3D pcibus_is_root;
+     pbc->bus_num =3D pcibus_num;
+     pbc->numa_node =3D pcibus_numa_node;
+     pbc->allows_extended_config_space =3D pcibus_allows_extended_config_=
+space;
+@@ -398,6 +392,7 @@ static void pci_root_bus_init(PCIBus *bus, DeviceStat=
+e *parent,
+     bus->slot_reserved_mask =3D 0x0;
+     bus->address_space_mem =3D address_space_mem;
+     bus->address_space_io =3D address_space_io;
++    bus->flags |=3D PCI_BUS_IS_ROOT;
+=20
+     /* host bridge */
+     QLIST_INIT(&bus->child);
+@@ -415,11 +410,6 @@ bool pci_bus_is_express(PCIBus *bus)
+     return object_dynamic_cast(OBJECT(bus), TYPE_PCIE_BUS);
+ }
+=20
+-bool pci_bus_is_root(PCIBus *bus)
+-{
+-    return PCI_BUS_GET_CLASS(bus)->is_root(bus);
+-}
+-
+ bool pci_bus_allows_extended_config_space(PCIBus *bus)
+ {
+     return PCI_BUS_GET_CLASS(bus)->allows_extended_config_space(bus);
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index cb44e19b67..942173d830 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -20,6 +20,7 @@
+ #include "standard-headers/linux/virtio_pci.h"
+ #include "hw/virtio/virtio.h"
+ #include "hw/pci/pci.h"
++#include "hw/pci/pci_bus.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "hw/pci/msi.h"
 diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index da20c915ef..d082707dfa 100644
+index fdd4c43d3a..edf44de21d 100644
 --- a/include/hw/pci/pci.h
 +++ b/include/hw/pci/pci.h
-@@ -234,7 +234,7 @@ typedef struct PCIDeviceClass {
-      * This doesn't mean pci host switch.
-      * When card bus bridge is supported, this would be enhanced.
-      */
--    int is_bridge;
-+    bool is_bridge;
+@@ -395,7 +395,6 @@ typedef PCIINTxRoute (*pci_route_irq_fn)(void *opaque=
+, int pin);
+ #define TYPE_PCIE_BUS "PCIE"
 =20
-     /* rom bar */
-     const char *romfile;
+ bool pci_bus_is_express(PCIBus *bus);
+-bool pci_bus_is_root(PCIBus *bus);
+ bool pci_bus_allows_extended_config_space(PCIBus *bus);
+=20
+ void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState =
+*parent,
+diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
+index f6df834170..aea98d5040 100644
+--- a/include/hw/pci/pci_bus.h
++++ b/include/hw/pci/pci_bus.h
+@@ -15,14 +15,19 @@ typedef struct PCIBusClass {
+     BusClass parent_class;
+     /*< public >*/
+=20
+-    bool (*is_root)(PCIBus *bus);
+     int (*bus_num)(PCIBus *bus);
+     uint16_t (*numa_node)(PCIBus *bus);
+     bool (*allows_extended_config_space)(PCIBus *bus);
+ } PCIBusClass;
+=20
++enum PCIBusFlags {
++    /* This bus is the root of a PCI domain */
++    PCI_BUS_IS_ROOT                                         =3D 0x0001,
++};
++
+ struct PCIBus {
+     BusState qbus;
++    enum PCIBusFlags flags;
+     PCIIOMMUFunc iommu_fn;
+     void *iommu_opaque;
+     uint8_t devfn_min;
+@@ -47,4 +52,9 @@ struct PCIBus {
+     Notifier machine_done;
+ };
+=20
++static inline bool pci_bus_is_root(PCIBus *bus)
++{
++    return !!(bus->flags & PCI_BUS_IS_ROOT);
++}
++
+ #endif /* QEMU_PCI_BUS_H */
 --=20
 2.21.0
 
