@@ -3,54 +3,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5AD0C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DFB4C04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:16:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCAAF2146F
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:16:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCAAF2146F
+	by mail.kernel.org (Postfix) with ESMTPS id 4140D2146F
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:16:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4140D2146F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sios.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58057 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58059 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQBl0-0000Gj-R5
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 10:16:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55965)
+	id 1hQBl9-0000Qs-9V
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 10:16:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yo-satoh@sios.com>) id 1hQ3Sw-0000dv-GL
+	(envelope-from <yo-satoh@sios.com>) id 1hQ3Sw-0000du-DF
 	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:25:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yo-satoh@sios.com>) id 1hQ3Sv-0006PR-54
+	(envelope-from <yo-satoh@sios.com>) id 1hQ3Su-0006Nn-JL
 	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:25:34 -0400
-Received: from mail01.asahi-net.or.jp ([202.224.55.13]:46293)
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:56162)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yo-satoh@sios.com>) id 1hQ3Su-0006KL-KM
+	(envelope-from <yo-satoh@sios.com>) id 1hQ3Su-0006M5-9C
 	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:25:32 -0400
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.vps.ablenet.jp
 	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
-	by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 1CBFC11C34A;
-	Mon, 13 May 2019 14:25:31 +0900 (JST)
+	by mail03.asahi-net.or.jp (Postfix) with ESMTPA id D6EBE4223B;
+	Mon, 13 May 2019 14:25:30 +0900 (JST)
 Received: from ysato.dip.jp (ZM005235.ppp.dion.ne.jp [222.8.5.235])
-	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id CE162240085; 
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 8ACFA240086; 
 	Mon, 13 May 2019 14:25:30 +0900 (JST)
 From: Yoshinori Sato <yo-satoh@sios.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 13 May 2019 14:25:17 +0900
-Message-Id: <20190513052518.6274-12-yo-satoh@sios.com>
+Date: Mon, 13 May 2019 14:25:16 +0900
+Message-Id: <20190513052518.6274-11-yo-satoh@sios.com>
 X-Mailer: git-send-email 2.11.0
 In-Reply-To: <20190513052518.6274-1-yo-satoh@sios.com>
 References: <20190513052518.6274-1-yo-satoh@sios.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 202.224.55.13
+X-Received-From: 202.224.55.15
 X-Mailman-Approved-At: Mon, 13 May 2019 10:11:53 -0400
-Subject: [Qemu-devel] [PATCH v11 11/12] Add rx-softmmu
+Subject: [Qemu-devel] [PATCH v11 10/12] qemu/bitops.h: Add extract8 and
+ extract16
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,86 +75,58 @@ From: Yoshinori Sato <ysato@users.sourceforge.jp>
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 Signed-off-by: Yoshinori Sato <yo-satoh@sios.com>
 ---
- arch_init.c                    | 2 ++
- configure                      | 8 ++++++++
- default-configs/rx-softmmu.mak | 3 +++
- hw/Kconfig                     | 1 +
- include/sysemu/arch_init.h     | 1 +
- 5 files changed, 15 insertions(+)
- create mode 100644 default-configs/rx-softmmu.mak
+ include/qemu/bitops.h | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/arch_init.c b/arch_init.c
-index f4f3f610c8..cc25ddd7ca 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -74,6 +74,8 @@ int graphic_depth = 32;
- #define QEMU_ARCH QEMU_ARCH_PPC
- #elif defined(TARGET_RISCV)
- #define QEMU_ARCH QEMU_ARCH_RISCV
-+#elif defined(TARGET_RX)
-+#define QEMU_ARCH QEMU_ARCH_RX
- #elif defined(TARGET_S390X)
- #define QEMU_ARCH QEMU_ARCH_S390X
- #elif defined(TARGET_SH4)
-diff --git a/configure b/configure
-index 63f312bd1f..142827b743 100755
---- a/configure
-+++ b/configure
-@@ -7547,6 +7547,11 @@ case "$target_name" in
-     gdb_xml_files="riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml"
-     target_compiler=$cross_cc_riscv64
-   ;;
-+  rx)
-+    TARGET_ARCH=rx
-+    bflt="yes"
-+    target_compiler=$cross_cc_rx
-+  ;;
-   sh4|sh4eb)
-     TARGET_ARCH=sh4
-     bflt="yes"
-@@ -7767,6 +7772,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-   riscv*)
-     disas_config "RISCV"
-   ;;
-+  rx)
-+    disas_config "RX"
-+  ;;
-   s390*)
-     disas_config "S390"
-   ;;
-diff --git a/default-configs/rx-softmmu.mak b/default-configs/rx-softmmu.mak
-new file mode 100644
-index 0000000000..a3eecefb11
---- /dev/null
-+++ b/default-configs/rx-softmmu.mak
-@@ -0,0 +1,3 @@
-+# Default configuration for rx-softmmu
-+
-+CONFIG_RX_VIRT=y
-diff --git a/hw/Kconfig b/hw/Kconfig
-index 88b9f15007..63a071092e 100644
---- a/hw/Kconfig
-+++ b/hw/Kconfig
-@@ -53,6 +53,7 @@ source nios2/Kconfig
- source openrisc/Kconfig
- source ppc/Kconfig
- source riscv/Kconfig
-+source rx/Kconfig
- source s390x/Kconfig
- source sh4/Kconfig
- source sparc/Kconfig
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 10cbafe970..3f4f844f7b 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -25,6 +25,7 @@ enum {
-     QEMU_ARCH_NIOS2 = (1 << 17),
-     QEMU_ARCH_HPPA = (1 << 18),
-     QEMU_ARCH_RISCV = (1 << 19),
-+    QEMU_ARCH_RX = (1 << 20),
- };
+diff --git a/include/qemu/bitops.h b/include/qemu/bitops.h
+index 3f0926cf40..764f9d1ea0 100644
+--- a/include/qemu/bitops.h
++++ b/include/qemu/bitops.h
+@@ -301,6 +301,44 @@ static inline uint32_t extract32(uint32_t value, int start, int length)
+ }
  
- extern const uint32_t arch_type;
+ /**
++ * extract8:
++ * @value: the value to extract the bit field from
++ * @start: the lowest bit in the bit field (numbered from 0)
++ * @length: the length of the bit field
++ *
++ * Extract from the 8 bit input @value the bit field specified by the
++ * @start and @length parameters, and return it. The bit field must
++ * lie entirely within the 8 bit word. It is valid to request that
++ * all 8 bits are returned (ie @length 8 and @start 0).
++ *
++ * Returns: the value of the bit field extracted from the input value.
++ */
++static inline uint8_t extract8(uint8_t value, int start, int length)
++{
++    assert(start >= 0 && length > 0 && length <= 8 - start);
++    return extract32(value, start, length);
++}
++
++/**
++ * extract16:
++ * @value: the value to extract the bit field from
++ * @start: the lowest bit in the bit field (numbered from 0)
++ * @length: the length of the bit field
++ *
++ * Extract from the 16 bit input @value the bit field specified by the
++ * @start and @length parameters, and return it. The bit field must
++ * lie entirely within the 16 bit word. It is valid to request that
++ * all 16 bits are returned (ie @length 16 and @start 0).
++ *
++ * Returns: the value of the bit field extracted from the input value.
++ */
++static inline uint16_t extract16(uint16_t value, int start, int length)
++{
++    assert(start >= 0 && length > 0 && length <= 16 - start);
++    return extract32(value, start, length);
++}
++
++/**
+  * extract64:
+  * @value: the value to extract the bit field from
+  * @start: the lowest bit in the bit field (numbered from 0)
 -- 
 2.11.0
 
