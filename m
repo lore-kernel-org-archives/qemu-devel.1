@@ -2,82 +2,68 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6656C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 17:00:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26FB8C04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 17:02:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B118C208CA
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 17:00:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ymdmVnah"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B118C208CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E0B0E20879
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 17:02:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0B0E20879
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60549 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60590 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQEJb-0003dy-Oq
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 13:00:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40176)
+	id 1hQELB-00058t-96
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 13:02:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hQEI8-0002sZ-AI
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 12:59:09 -0400
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hQEJa-00040T-Rm
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 13:00:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hQEI7-0002tM-2J
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 12:59:08 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41697)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hQEI6-0002sq-TV
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 12:59:06 -0400
-Received: by mail-ot1-x343.google.com with SMTP id g8so12430459otl.8
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 09:59:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=tDNwIVxaQwtlasZZGSTnGm1NI68CaR4A7Mugb6KO2ro=;
-	b=ymdmVnahJOlQbquus6pO1gbiuILzyw3i0yC0HkrCPHrM7B/gR9vGUlZ7mWqtnHXqn7
-	dOra8AttVvhQXvzy3DfZozx0ybXsBALvuHWnir3Nii9LchuT2AT3/eYvBqMeJuzGqq33
-	+SYoo+VwVPnnMbHTFJg45sXsAyr3MG3zOG5d1AhUUdrLhtupy3/mpy6deUqRK+Y2Mcik
-	ngMfVurjjNXVtVEK5T4YWwkvV/FUGNM4uDV78mxmhoorovqxmQwV3MeH9a7w2+JXEQ5y
-	Dwf/8Z4VF3KlWkj4Z+oeAxeW/Rni8ZBvqVQqthGKohZole7UwN+vjyrWSyp3YCs8x1Be
-	W6Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=tDNwIVxaQwtlasZZGSTnGm1NI68CaR4A7Mugb6KO2ro=;
-	b=nrDTsV9Rhi/2GvexXa4qpouf+9etGERt1Yw/twDrsSxPX30+ELO4K9vhG4mewKsHAi
-	0CHrJkc/clwrfWs/B9+fEHg6P+qoWM5cOxtCRphEo+UnDZejXb9OWg2jf6NgzEXBA407
-	2RFIdCyfenD7wdbfj7aCbYL3ccabd1Ag8zjWhaORy2nrJZP08H57EgKeLieWvD2CSG4u
-	SJwd9seNfCXE0JHLkpWoQiXSq9JXhdiE+yxtb/t1Hw6fmd+A7SurjHuXcSXL0tmm9l1C
-	9PnWXIbyRHDUdBh8u4CIioCUc3Q7lPiwjoWN4UF/HMpLdbMol0YdC1KfyHDCl5ohF6Kb
-	vF/A==
-X-Gm-Message-State: APjAAAUeT1RS4iufy1cbYbmFTbeqQAIX7NlUbtvluzqs3DXLlSex3ZrJ
-	1Z5b+62luE1QoL1p3eNuGu99cXkgeFaLA6EWza+2mw==
-X-Google-Smtp-Source: APXvYqzD8uHXoQ4IZWfe/JP4m5/8x5VnwHUtY9rrZF26yG2MAeX6jfQJ1UdRxoCoOWty2SyZ300Hx0MPhjFRgvThi+U=
-X-Received: by 2002:a9d:2002:: with SMTP id n2mr14186478ota.363.1557766745995; 
-	Mon, 13 May 2019 09:59:05 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190513081844.26699-5-armbru@redhat.com>
-	<mhng-5f5db13d-9ab7-414b-8979-4e119c319f78@palmer-si-x1e>
-In-Reply-To: <mhng-5f5db13d-9ab7-414b-8979-4e119c319f78@palmer-si-x1e>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 13 May 2019 17:58:55 +0100
-Message-ID: <CAFEAcA-qpxBS0HxD4xoEhGAjVTzHZC9e6TsSyb25C2HY2HseTw@mail.gmail.com>
-To: Palmer Dabbelt <palmer@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hQEJZ-0004CG-8W
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 13:00:38 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:45405 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hQEJL-0003x4-3a; Mon, 13 May 2019 13:00:23 -0400
+Received: from LHREML712-CAH.china.huawei.com (unknown [172.18.7.106])
+	by Forcepoint Email with ESMTP id 280EEB014FD4D9AA97E0;
+	Mon, 13 May 2019 18:00:19 +0100 (IST)
+Received: from LHREML524-MBB.china.huawei.com ([169.254.3.57]) by
+	LHREML712-CAH.china.huawei.com ([10.201.108.35]) with mapi id
+	14.03.0415.000; Mon, 13 May 2019 18:00:13 +0100
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Thread-Topic: [PATCH v4 3/8] hw/acpi: Add ACPI Generic Event Device Support
+Thread-Index: AQHU7r9fDZwDNe9r+EiYOfOuYN+yBqZYFYcAgAFHvsCAD8XcEIAAWT3w
+Date: Mon, 13 May 2019 17:00:13 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA83F1F0EB5@lhreml524-mbb.china.huawei.com>
+References: <20190409102935.28292-1-shameerali.kolothum.thodi@huawei.com>
+	<20190409102935.28292-4-shameerali.kolothum.thodi@huawei.com>
+	<20190502181252.2e3ae0d4@Igors-MacBook-Pro>
+	<5FC3163CFD30C246ABAA99954A238FA83F1EF349@lhreml524-mbb.china.huawei.com>
+In-Reply-To: <5FC3163CFD30C246ABAA99954A238FA83F1EF349@lhreml524-mbb.china.huawei.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.237]
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PULL 4/9] linux-user/nios2 linux-user/riscv:
- Clean up header guards
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 185.176.76.210
+Subject: Re: [Qemu-devel] [PATCH v4 3/8] hw/acpi: Add ACPI Generic Event
+ Device Support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,42 +75,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"sameo@linux.intel.com" <sameo@linux.intel.com>,
+	"ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Linuxarm <linuxarm@huawei.com>,
+	"shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
+	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+	"eric.auger@redhat.com" <eric.auger@redhat.com>, "xuwei
+	\(O\)" <xuwei5@huawei.com>,
+	"sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>,
+	"lersek@redhat.com" <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 13 May 2019 at 17:56, Palmer Dabbelt <palmer@sifive.com> wrote:
->
-> On Mon, 13 May 2019 01:18:39 PDT (-0700), armbru@redhat.com wrote:
-> > Reuse of the same guard symbol in multiple headers is okay as long as
-> > they cannot be included together.  scripts/clean-header-guards.pl
-> > can't tell, so it warns.
+> -----Original Message-----
+> From: Igor Mammedov [mailto:imammedo@redhat.com]
+> Sent: 13 May 2019 17:25
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Subject: Re: [PATCH v4 3/8] hw/acpi: Add ACPI Generic Event Device Suppor=
+t
+>=20
+> On Mon, 13 May 2019 11:53:38 +0000
+> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+>=20
+> > Hi Igor,
 > >
-> > Since we can avoid guard symbol reuse easily, do so: use guard symbol
-> > ${target^^}_${fname^^} for linux-user/$target/$fname, just like we did
-> > in commit a9c94277f0..3500385697.
+> > > -----Original Message-----
+> > > From: Shameerali Kolothum Thodi
+> > > Sent: 03 May 2019 13:46
+> > > To: 'Igor Mammedov' <imammedo@redhat.com>
+> > > Cc: qemu-devel@nongnu.org; qemu-arm@nongnu.org;
+> > > eric.auger@redhat.com; peter.maydell@linaro.org;
+> > > shannon.zhaosl@gmail.com; sameo@linux.intel.com;
+> > > sebastien.boeuf@intel.com; xuwei (O) <xuwei5@huawei.com>;
+> > > lersek@redhat.com; ard.biesheuvel@linaro.org; Linuxarm
+> > > <linuxarm@huawei.com>
+> > > Subject: RE: [PATCH v4 3/8] hw/acpi: Add ACPI Generic Event Device
+> Support
+> > >
+> > > Hi Igor,
+> > >
+> > > > -----Original Message-----
+> > > > From: Igor Mammedov [mailto:imammedo@redhat.com]
+> > > > Sent: 02 May 2019 17:13
+> > > > To: Shameerali Kolothum Thodi
+> <shameerali.kolothum.thodi@huawei.com>
+> > > > Cc: qemu-devel@nongnu.org; qemu-arm@nongnu.org;
+> > > > eric.auger@redhat.com; peter.maydell@linaro.org;
+> > > > shannon.zhaosl@gmail.com; sameo@linux.intel.com;
+> > > > sebastien.boeuf@intel.com; xuwei (O) <xuwei5@huawei.com>;
+> > > > lersek@redhat.com; ard.biesheuvel@linaro.org; Linuxarm
+> > > > <linuxarm@huawei.com>
+> > > > Subject: Re: [PATCH v4 3/8] hw/acpi: Add ACPI Generic Event Device
+> Support
+> > > >
 > >
-> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> > Message-Id: <20190315145123.28030-4-armbru@redhat.com>
-> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > [...]
+> >
+> > > > > +}
+> > > > > +
+> > > > > +static Property acpi_ged_properties[] =3D {
+> > > > > +    /*
+> > > > > +     * Memory hotplug base address is a property of GED here,
+> > > > > +     * because GED handles memory hotplug event and
+> > > > MEMORY_HOTPLUG_DEVICE
+> > > > > +     * gets initialized when GED device is realized.
+> > > > > +     */
+> > > > > +    DEFINE_PROP_UINT64("memhp-base", AcpiGedState,
+> memhp_base,
+> > > > 0),
+> > > > > +    DEFINE_PROP_BOOL("memory-hotplug-support", AcpiGedState,
+> > > > > +                     memhp_state.is_enabled, true),
+> > > > > +    DEFINE_PROP_PTR("gsi", AcpiGedState, gsi),
+> > > >
+> > > > PTR shouldn't be used in new code, look at object_property_add_link=
+() &
+> co
+> > >
+> > > Ok. I will take a look at that.
+> >
+> > I attempted to remove _PROP_PTR for "ged-events" and use _PROP_LINK
+> and
+> > _set_link(),
+> >
+> >
+> > diff --git a/hw/acpi/generic_event_device.c
+> b/hw/acpi/generic_event_device.c
+> > index 856ca04c01..978c8e088e 100644
+> > --- a/hw/acpi/generic_event_device.c
+> > +++ b/hw/acpi/generic_event_device.c
+> > @@ -268,7 +268,8 @@ static Property acpi_ged_properties[] =3D {
+> >      DEFINE_PROP_PTR("gsi", AcpiGedState, gsi),
+> >      DEFINE_PROP_UINT64("ged-base", AcpiGedState, ged_base, 0),
+> >      DEFINE_PROP_UINT32("ged-irq", AcpiGedState, ged_irq, 0),
+> > -    DEFINE_PROP_PTR("ged-events", AcpiGedState, ged_events),
+> > +    DEFINE_PROP_LINK("ged-events", AcpiGedState, ged_events,
+> TYPE_ACPI_GED,
+> > +                     GedEvent *),
+> >      DEFINE_PROP_UINT32("ged-events-size", AcpiGedState,
+> ged_events_size, 0),
+> >      DEFINE_PROP_END_OF_LIST(),
+> >  };
+> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > index 8179b3e511..c89b7b7120 100644
+> > --- a/hw/arm/virt.c
+> > +++ b/hw/arm/virt.c
+> > @@ -537,7 +537,8 @@ static inline DeviceState
+> *create_acpi_ged(VirtMachineState *vms)
+> >      qdev_prop_set_ptr(dev, "gsi", vms->gsi);
+> >      qdev_prop_set_uint64(dev, "ged-base",
+> vms->memmap[VIRT_ACPI_GED].base);
+> >      qdev_prop_set_uint32(dev, "ged-irq", vms->irqmap[VIRT_ACPI_GED]);
+> > -    qdev_prop_set_ptr(dev, "ged-events", ged_events);
+> > +    object_property_set_link(OBJECT(dev), OBJECT(ged_events),
+> "ged-events",
+> > +                             &error_abort);
+> >      qdev_prop_set_uint32(dev, "ged-events-size",
+> ARRAY_SIZE(ged_events));
+> >
+> >      object_property_add_child(qdev_get_machine(), "acpi-ged",
+> > diff --git a/include/hw/acpi/generic_event_device.h
+> b/include/hw/acpi/generic_event_device.h
+> > index 9c840d8064..588f4ecfba 100644
+> > --- a/include/hw/acpi/generic_event_device.h
+> > +++ b/include/hw/acpi/generic_event_device.h
+> > @@ -111,7 +111,7 @@ typedef struct AcpiGedState {
+> >      hwaddr ged_base;
+> >      GEDState ged_state;
+> >      uint32_t ged_irq;
+> > -    void *ged_events;
+> > +    GedEvent *ged_events;
+> >      uint32_t ged_events_size;
+> >  } AcpiGedState;
+> >
+> >
+> > And with this I get,
+> >
+> > Segmentation fault      (core dumped) ./qemu-system-aarch64-ged-v5
+> > -machine virt, -cpu cortex-a57 -machine type=3Dvirt -nographic -smp 1 -=
+m
+> > 4G,maxmem=3D8G,slots=3D10 -drive if=3Dnone,file=3Dubuntu-est-5.0,id=3Df=
+s -device
+> > virtio-blk-device,drive=3Dfs -kernel Image_memhp_remove -bios
+> > QEMU_EFI_Release.fd -object memory-backend-ram,id=3Dmem1,size=3D1G
+> -device
+> > pc-dimm,id=3Ddimm1,memdev=3Dmem1 -numa node,nodeid=3D0 -append
+> > "console=3DttyAMA0 root=3D/dev/vda rw acpi=3Dforce movable_node"
+> >
+> > It looks like struct pointer cannot be used directly and has to make a =
+QOM
+> object
+> > for DEFINE_PROP_LINK use. Not sure there is an easy way for setting ptr
+> property
+> > using link() functions. Please let me know if there any reference
+> implementation I
+> > can take a look.
+>=20
+> Simple 'struct' won't work with link, it has to be QOM object.
+>=20
+> Question is do we still need GedEvent array?
+> We handle only 1 irq and several event types, why not replace GedEvent
+> with with a 32bit bitmap (1 bit per event type) and pass that to
+> ged device from machine as 'int' property?
 
-> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
->
-> I'm assuming this is going in through someone else's tree, so I'm not goi=
-ng to
-> pick it up into mine.
+Right. That might solve the ged_events ptr issue. But we need to set the ir=
+q as
+well for the GED device. Is there a way to set the irq directly for a TYPE_=
+DEVICE
+object?=20
 
-The subject line says "PULL" rather than "PATCH", so it is
-already going into master (indeed I just applied it).
-In general there's not much point in commenting on
-patches in pull requests on the lists except for "this
-has a problem, please don't apply it" feedback. (In that
-case you should reply to the cover letter, because I won't
-necessarily see replies to individual patches in the pull
-before I apply the pull.)
+(I think Eric mentioned a way of setting it directly earlier but that time =
+GED was=20
+a TYPE_SYS_BUS_DEVICE. May be that is a reason to go back to SYS_BUS_DEVICE=
+ )
 
-thanks
--- PMM
+Thanks,
+Shameer
+
+> >
+> > Appreciate your help,
+> >
+> > Thanks,
+> > Shameer
+> >
 
