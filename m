@@ -2,110 +2,117 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6243C04AB1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 09:57:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92843C04AB1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 09:58:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 901BE20989
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 09:57:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="UW3Adevf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 901BE20989
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 563B320989
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 09:58:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 563B320989
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54412 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54420 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQ7i8-0004tE-V2
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 05:57:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47352)
+	id 1hQ7jB-0005e9-NE
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 05:58:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hQ7hN-0004SS-9G
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 05:56:46 -0400
+	(envelope-from <david@redhat.com>) id 1hQ7iO-0005FP-5z
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 05:57:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hQ7hM-0003ar-31
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 05:56:45 -0400
-Received: from mail-eopbgr120132.outbound.protection.outlook.com
-	([40.107.12.132]:7858
-	helo=FRA01-PR2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hQ7hJ-0003Ym-AQ; Mon, 13 May 2019 05:56:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=Tuymg7ki45v/MnTaxJKwe9aVRyur4dKwm7xXy/JxAjg=;
-	b=UW3AdevfwwwNPxijx8Lvw6R0pZvO7Abchxo7qnDK2UPZ+/7/9uWmqSdfGHxlyhXG5VevUKjWfnNllAVyT02pbcMZJws2YT0hg+5rjhkqNQYowTG53MeHh7QvG0lNjbNk+fOEmK3PKZ3bLpV1hyg5kwx2I6n1l5eZtukSGQI6Wb0=
-Received: from PR2PR08MB4684.eurprd08.prod.outlook.com (52.133.109.209) by
-	PR2PR08MB4747.eurprd08.prod.outlook.com (52.133.111.74) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1878.20; Mon, 13 May 2019 09:56:39 +0000
-Received: from PR2PR08MB4684.eurprd08.prod.outlook.com
-	([fe80::9c35:2e89:30c4:5cc4]) by
-	PR2PR08MB4684.eurprd08.prod.outlook.com
-	([fe80::9c35:2e89:30c4:5cc4%3]) with mapi id 15.20.1878.024;
-	Mon, 13 May 2019 09:56:39 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org"
-	<qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Thread-Topic: [PATCH v6 0/8] qcow2: encryption threads
-Thread-Index: AQHVBBfkp37usDxTHk2YnAVe1273lKZi5qgAgAX1dIA=
-Date: Mon, 13 May 2019 09:56:39 +0000
-Message-ID: <bf68e127-b30d-75db-4ecb-8fc354cb25fe@virtuozzo.com>
-References: <20190506142741.41731-1-vsementsov@virtuozzo.com>
-	<5a643d95-3732-e22d-7cc5-122ae5792641@redhat.com>
-In-Reply-To: <5a643d95-3732-e22d-7cc5-122ae5792641@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1P195CA0011.EURP195.PROD.OUTLOOK.COM (2603:10a6:3:fd::21)
-	To PR2PR08MB4684.eurprd08.prod.outlook.com
-	(2603:10a6:101:22::17)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190513125635479
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 6bcf0720-055d-486c-ae62-08d6d7894af9
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
-	SRVR:PR2PR08MB4747; 
-x-ms-traffictypediagnostic: PR2PR08MB4747:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <PR2PR08MB47472ADAD9EF31E42069AF80C10F0@PR2PR08MB4747.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0036736630
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(366004)(39840400004)(376002)(396003)(346002)(136003)(189003)(199004)(99286004)(2616005)(31696002)(53936002)(2906002)(76176011)(52116002)(2201001)(2501003)(476003)(486006)(66066001)(478600001)(305945005)(7736002)(8676002)(81156014)(8936002)(81166006)(6116002)(86362001)(3846002)(5660300002)(966005)(53546011)(386003)(66446008)(4326008)(68736007)(25786009)(446003)(6512007)(102836004)(186003)(71190400001)(26005)(6436002)(6506007)(71200400001)(6486002)(64756008)(66556008)(66476007)(73956011)(66946007)(31686004)(6246003)(229853002)(316002)(107886003)(54906003)(6306002)(36756003)(11346002)(110136005)(256004)(14444005)(14454004);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:PR2PR08MB4747;
-	H:PR2PR08MB4684.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: WWOVBaQHC6kKe36auvNtVySbZyXLevcFC6KA4d1UYKAU0/mu/rThe26toUPzns461Vgx9BTDERIpUxeHUOX/d5eJgJjGIQfg7yS0/+ApxP6FIcLYTaNRQ+JLOQCOR8AIwkXHmSqQzYcjjMVq38L9RpZXNTeCiECPhIePNAszTPnDfwr+loDfaF0nty96YmxoJatouzWtuQi7lZPqvJ9SQpjzdZXvqX3sLbriIQPTVcLdnMDus85m/C+2G0YX4N7QjLwwpmHhSxrlOZlRdo6Z+XUKnXGL9oHSKcgZnokyaWvGuBM8JExMvc27PFSuKXLNOkDzkKbgUdLsk7o6JqrqkUtxerin1+chH946W9fBu8wTY8l6jj8ZSrMup08NtZtkM0HMDjS3yLjDyGM45NNQ9kOP4M/YEkzWsKB7ZIBPIYo=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B0BE810EDACC5341BA5A3251E4F055B4@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <david@redhat.com>) id 1hQ7iL-00043B-9W
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 05:57:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52012)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hQ7iE-0003wp-Hb; Mon, 13 May 2019 05:57:41 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5EF6A59461;
+	Mon, 13 May 2019 09:57:28 +0000 (UTC)
+Received: from [10.36.117.84] (ovpn-117-84.ams2.redhat.com [10.36.117.84])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0446719C6A;
+	Mon, 13 May 2019 09:57:23 +0000 (UTC)
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+	Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org,
+	qemu-s390x@nongnu.org, cohuck@redhat.com, rth@twiddle.net,
+	pasic@linux.ibm.com, mst@redhat.com, pbonzini@redhat.com
+References: <1556749903-19221-1-git-send-email-walling@linux.ibm.com>
+	<a87c71be-5bf8-a115-5843-720c9ad10c7b@redhat.com>
+	<bc2fd9bb-7b94-eac7-590b-f01d2063ef9c@redhat.com>
+	<e948a030-bd30-180e-bbd6-76f4a2390bb9@de.ibm.com>
+	<ea6df6b1-4062-c057-92ea-5be40d778fe9@redhat.com>
+	<09293a1c-d000-83a8-46b8-b97ad4fa9774@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <56e3ace1-6e48-0e20-47d5-b07ac6dfcf31@redhat.com>
+Date: Mon, 13 May 2019 11:57:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6bcf0720-055d-486c-ae62-08d6d7894af9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 May 2019 09:56:39.0354 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR2PR08MB4747
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.12.132
-Subject: Re: [Qemu-devel] [PATCH v6 0/8] qcow2: encryption threads
+In-Reply-To: <09293a1c-d000-83a8-46b8-b97ad4fa9774@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.39]);
+	Mon, 13 May 2019 09:57:28 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v4] s390: diagnose 318 info reset and
+ migration support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -117,44 +124,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"berto@igalia.com" <berto@igalia.com>,
-	"berrange@redhat.com" <berrange@redhat.com>,
-	Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MDkuMDUuMjAxOSAxNzo1NiwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAwNi4wNS4xOSAxNjoyNywg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IHY2Og0KPj4gICAtIFJlYmFz
-ZSBvbiBtYXN0ZXIsIHNvIDAyIGNoYW5nZWQgdG8gcmVmbGVjdCBjaGFuZ2VzIGluDQo+PiAgICAg
-cWNvdzJfY29tcHJlc3MoKSwga2VlcCByLWIuDQo+PiAgIC0gUmV3cml0ZSAwNiB0byBldmVuIHNp
-bXBsZXIgbG9ja2luZyBbTWF4XSwgZHJvcCByLWINCj4+ICAgICBEcm9wIGZvbGxvd2luZw0KPj4g
-ICAgICJxY293MjogcWNvdzJfY29fcHJlYWR2OiBza2lwIHVzaW5nIGhkX3Fpb3Ygd2hlbiBwb3Nz
-aWJsZSIsIEknbGwgZG8NCj4+ICAgICBpdCBpbiBteSBvdGhlciBjb21pbmcgc29vbiBzZXJpZXMs
-IGFuZCBpdCBpcyBhY3R1YWxseSB1bnJlbGF0ZWQgdG8NCj4+ICAgICBjdXJyZW50Lg0KPj4gICAt
-IERyb3AgY29udHJvdmVyc2lhbCBwZXJmIHRlc3QsIGhvcGUgSSdsbCByZXR1cm4gdG8gdGhpcyB0
-b3BpYywgYnV0IG5vdA0KPj4gICAgIGluIGNvbnRleHQgb2YgdGhlc2Ugc2VyaWVzLg0KPj4gICAt
-IEFkZCBNYXgncyByLWIncyB0byBhbGwgaGVyZSwgZXhjZXB0IDA2DQo+Pg0KPj4gVmxhZGltaXIg
-U2VtZW50c292LU9naWV2c2tpeSAoOCk6DQo+PiAgICBxY293Mi5oOiBhZGQgbWlzc2luZyBpbmNs
-dWRlDQo+PiAgICBxY293MjogYWRkIHNlcGFyYXRlIGZpbGUgZm9yIHRocmVhZGVkIGRhdGEgcHJv
-Y2Vzc2luZyBmdW5jdGlvbnMNCj4+ICAgIHFjb3cyLXRocmVhZHM6IHVzZSB0aHJlYWRfcG9vbF9z
-dWJtaXRfY28NCj4+ICAgIHFjb3cyLXRocmVhZHM6IHFjb3cyX2NvX2RvX2NvbXByZXNzOiBwcm90
-ZWN0IHF1ZXVpbmcgYnkgbXV0ZXgNCj4+ICAgIHFjb3cyLXRocmVhZHM6IHNwbGl0IG91dCBnZW5l
-cmljIHBhdGgNCj4+ICAgIHFjb3cyOiBxY293Ml9jb19wcmVhZHY6IGltcHJvdmUgbG9ja2luZw0K
-Pj4gICAgcWNvdzI6IGJkcnZfY29fcHdyaXRldjogbW92ZSBlbmNyeXB0aW9uIGNvZGUgb3V0IG9m
-IHRoZSBsb2NrDQo+PiAgICBxY293MjogZG8gZW5jcnlwdGlvbiBpbiB0aHJlYWRzDQo+Pg0KPj4g
-ICBibG9jay9xY293Mi5oICAgICAgICAgIHwgIDIwICsrLQ0KPj4gICBibG9jay9xY293Mi1iaXRt
-YXAuYyAgIHwgICAxIC0NCj4+ICAgYmxvY2svcWNvdzItY2FjaGUuYyAgICB8ICAgMSAtDQo+PiAg
-IGJsb2NrL3Fjb3cyLWNsdXN0ZXIuYyAgfCAgIDggKy0NCj4+ICAgYmxvY2svcWNvdzItcmVmY291
-bnQuYyB8ICAgMSAtDQo+PiAgIGJsb2NrL3Fjb3cyLXNuYXBzaG90LmMgfCAgIDEgLQ0KPj4gICBi
-bG9jay9xY293Mi10aHJlYWRzLmMgIHwgMjY4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrDQo+PiAgIGJsb2NrL3Fjb3cyLmMgICAgICAgICAgfCAyNDEgKysrKystLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+PiAgIGJsb2NrL01ha2VmaWxlLm9ianMgICAg
-fCAgIDIgKy0NCj4+ICAgOSBmaWxlcyBjaGFuZ2VkLCAzMjEgaW5zZXJ0aW9ucygrKSwgMjIyIGRl
-bGV0aW9ucygtKQ0KPj4gICBjcmVhdGUgbW9kZSAxMDA2NDQgYmxvY2svcWNvdzItdGhyZWFkcy5j
-DQo+IA0KPiBUaGFua3MsIGFwcGxpZWQgdG8gbXkgYmxvY2sgYnJhbmNoOg0KPiANCj4gaHR0cHM6
-Ly9naXQueGFuY2xpYy5tb2UvWGFuQ2xpYy9xZW11L2NvbW1pdHMvYnJhbmNoL2Jsb2NrDQo+IA0K
-DQpUaGFuayB5b3UhIQ0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On 13.05.19 11:51, Christian Borntraeger wrote:
+> 
+> 
+> On 13.05.19 11:40, David Hildenbrand wrote:
+>> On 13.05.19 11:34, Christian Borntraeger wrote:
+>>>
+>>>
+>>> On 13.05.19 10:03, David Hildenbrand wrote:
+>>>>>> +    if ((SCCB_SIZE - sizeof(ReadInfo)) / sizeof(CPUEntry) < S390_MAX_CPUS)
+>>>>>> +        mc->max_cpus = S390_MAX_CPUS - 8;
+>>>>>
+>>>>> This is too complicated, just set it always to 240.
+>>>>>
+>>>>> However, I am still not sure how to best handle this scenario. One
+>>>>> solution is
+>>>>>
+>>>>> 1. Set it statically to 240 for machine > 4.1
+>>>>> 2. Keep the old machines unmodifed
+>>>>> 3. Don't indicate the CPU feature for machines <= 4.0
+>>>>>
+>>>>> #3 is the problematic part, as it mixes host CPU features and machines.
+>>>>> Bad. The host CPU model should always look the same on all machines. I
+>>>>> don't like this.
+>>>>>
+>>>>
+>>>> FWIW, #3 is only an issue when modeling it via the CPU model, like
+>>>> Christian suggested.
+>>>>
+>>>> I suggest the following
+>>>>
+>>>> 1. Set the max #cpus for 4.1 to 240 (already done)
+>>>> 2. Keep it for the other machines unmodified (as suggested by Thomas)
+>>>> 3. Create the layout of the SCCB depending on the machine type (to be done)
+>>>>
+>>>> If we want to model diag318 via a CPU feature (which makes sense for
+>>>> migration):
+>>>>
+>>>> 4. Disable diag318 with a warning if used with a machine < 4.1
+>>>>
+>>>
+>>> I think there is a simpler solution. It is perfectly fine to fail the startup
+>>> if we cannot fulfil the cpu model. So lets just allow 248 and allow this feature 
+>>> also for older machines. And if somebody chooses both at the same time,
+>>> lets fails the startup.
+>>
+>> To which knob do you want to glue the layout of the SCLP response? Like
+>> I described?  Do you mean instead of warning and masking the feature off
+>> as I suggested, simply failing?
+> 
+> The sclp response will depend on the dia318 cpu model flag. If its on, the sclp
+> response will have it, otherwise not.
+> - host-passthrough: not migration safe anyway
+> - host-model: if the target has diag318 good, otherwise we reject migration 
+>>
+>> In that case, -machine ..-4.0 -cpu host will not work on new HW with new
+>> KVM. Just noting.
+> 
+> Only if you have 248 CPUs (which is unlikely). My point was to do that for all
+> machine levels.
+> 
+
+The issue with this approach is that e.g. libvirt is not aware of this
+restriction. It could query "max_cpus" and expand the host-cpu model,
+but starting a guest with > 240 cpus would fail. Maybe this is acceptable.
+
+The approach you describe is actually pretty nice. We would have to
+
+1. Modify SCLP code to change the layout based on the feature availability
+2. Check against the cpus when trying to enable the cpu model.
+
+-- 
+
+Thanks,
+
+David / dhildenb
 
