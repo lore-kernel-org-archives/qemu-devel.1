@@ -2,82 +2,63 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E9F7C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:19:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B909C04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:19:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E3DC2147A
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:19:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E3DC2147A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2BC942147A
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:19:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BC942147A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57247 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57255 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQArC-0000um-JD
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 09:19:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51414)
+	id 1hQArg-0001Gp-CZ
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 09:19:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hQAe2-0005mO-2i
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:05:31 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1hQAbm-0003kQ-Md
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:03:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hQAe1-0008PG-1O
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:05:30 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:36354)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hQAe0-0008LU-Qx
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:05:28 -0400
-Received: by mail-wr1-f65.google.com with SMTP id o4so15209801wra.3
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 06:05:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=6itApyjXnEbSCeJT5c9l/Z/GIJifu4LTHrClxtvqmpg=;
-	b=pG3DbGQFnG7kcdgkaBOD9icSGbVf7cPkYPEzTEzIH/IxuOKskgBwDFpkV1I7qdaS7R
-	vJddj7F4YYSD2rm2i+5NG0UN5ehFQLS6DRhE0HuGMG8isEj2WPNx4c4S8PvLapWm9EfA
-	16VdblZkkFKgkB/hADVywkHVtWNmXyIum6wYZcbDFyKwiztbTYXWGs0++yZOn2Cj0cud
-	EwMdKJaVqPck704sKfv2A5fivuMct6novNb5hEb6qF/j/u/sWPb2spAZS90CMwMVuZJL
-	81fFEWGUrmFzxDQ4BYZUTDa7bqS467yw4ERuFS14TlSfxKGfDMNjdx+FTx83a8MiVaiY
-	Bvkg==
-X-Gm-Message-State: APjAAAUaxIQvGJ+TodNJ/LcXDxEdxO4/w6/nD6oUemkXmxz4fywUhO89
-	ja3J+TWIeKrzKkxMGYjD1OZ44V98edE=
-X-Google-Smtp-Source: APXvYqwByNiCAGzAfrPMzf33PHKf7w2imfCWj35SfH4eij3Z6KNMbGnDDD6pcs/ExZSso8h7pe0E8w==
-X-Received: by 2002:adf:f80f:: with SMTP id s15mr8008680wrp.322.1557752719281; 
-	Mon, 13 May 2019 06:05:19 -0700 (PDT)
-Received: from [10.201.33.53] ([195.166.127.210])
-	by smtp.gmail.com with ESMTPSA id
-	q4sm10246700wrx.25.2019.05.13.06.05.18
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 13 May 2019 06:05:18 -0700 (PDT)
-To: Markus Armbruster <armbru@redhat.com>
-References: <20190418145355.21100-1-armbru@redhat.com>
-	<20190418145355.21100-4-armbru@redhat.com>
-	<78da03ed-2b9f-2357-6f28-44115d8b2955@redhat.com>
-	<87ef527clf.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <cd22d43c-6a97-1fe7-5d61-0b84e5710b4c@redhat.com>
-Date: Mon, 13 May 2019 15:05:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <gengdongjiu@huawei.com>) id 1hQAM0-00084i-L1
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 08:46:53 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:57484 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
+	id 1hQALy-0007xH-Bk; Mon, 13 May 2019 08:46:50 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
+	by Forcepoint Email with ESMTP id 4DC25E7214918BC2A151;
+	Mon, 13 May 2019 20:46:43 +0800 (CST)
+Received: from ros.huawei.com (10.143.28.118) by
+	DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server
+	id 14.3.439.0; Mon, 13 May 2019 20:46:34 +0800
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+To: <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
+	<shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
+	<lersek@redhat.com>, 
+	<james.morse@arm.com>, <gengdongjiu@huawei.com>, <mtosatti@redhat.com>, 
+	<rth@twiddle.net>, <ehabkost@redhat.com>, <zhengxiang9@huawei.com>,
+	<jonathan.cameron@huawei.com>, <xuwei5@huawei.com>, <kvm@vger.kernel.org>, 
+	<qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
+Date: Mon, 13 May 2019 05:43:01 -0700
+Message-ID: <1557751388-27063-4-git-send-email-gengdongjiu@huawei.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1557751388-27063-1-git-send-email-gengdongjiu@huawei.com>
+References: <1557751388-27063-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <87ef527clf.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.143.28.118]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH 3/6] gdbstub: Reject invalid RLE repeat
- counts
+X-Received-From: 45.249.212.32
+Subject: [Qemu-devel] [PATCH v16 03/10] acpi: add build_append_ghes_notify()
+ helper for Hardware Error Notification
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,65 +70,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/13/19 2:39 PM, Markus Armbruster wrote:
-> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
-> 
->> On 4/18/19 4:53 PM, Markus Armbruster wrote:
->>> "Debugging with GDB / Appendix E GDB Remote Serial Protocol /
->>> Overview" specifies "The printable characters '#' and '$' or with a
->>> numeric value greater than 126 must not be used."  gdb_read_byte()
->>> only rejects values < 32.  This is wrong.  Impact depends on the caller:
->>>
->>> * gdb_handlesig() passes a char.  Incorrectly accepts '#', '$' and
->>>   '\127'.
->>>
->>> * gdb_chr_receive() passes an uint8_t.  Additionally accepts
->>>   characters with the most-significant bit set.
->>>
->>> Correct the validity check to match the specification.
->>>
->>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>> ---
->>>  gdbstub.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/gdbstub.c b/gdbstub.c
->>> index d54abd17cc..a6dce1b027 100644
->>> --- a/gdbstub.c
->>> +++ b/gdbstub.c
->>> @@ -2064,7 +2064,7 @@ static void gdb_read_byte(GDBState *s, int ch)
->>>              }
->>>              break;
->>>          case RS_GETLINE_RLE:
->>> -            if (ch < ' ') {
->>
->> Can you add a comment referring to the ""Debugging with GDB / Appendix E
->> GDB Remote Serial Protocol / Overview" here?
-> 
-> Like this?
-> 
->         case RS_GETLINE_RLE:
->             /*
->              * Run-length encoding is explained in "Debugging with GDB /
->              * Appendix E GDB Remote Serial Protocol / Overview".
->              */
->             if (ch < ' ') {
+It will help to add Hardware Error Notification to ACPI tables
+without using packed C structures and avoid endianness
+issues as API doesn't need explicit conversion.
 
-Yes, thanks!
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+---
+ hw/acpi/aml-build.c         | 22 ++++++++++++++++++++++
+ include/hw/acpi/aml-build.h |  8 ++++++++
+ 2 files changed, 30 insertions(+)
 
-> 
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
-> Thanks!
-> 
->>> +            if (ch < ' ' || ch == '#' || ch == '$' || ch > 126) {
->>>                  /* invalid RLE count encoding */
->>>                  trace_gdbstub_err_invalid_repeat((uint8_t)ch);
->>>                  s->state = RS_GETLINE;
->>>
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 555c24f..fb53f21 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -274,6 +274,28 @@ void build_append_gas(GArray *table, AmlAddressSpace as,
+     build_append_int_noprefix(table, address, 8);
+ }
+ 
++/* Hardware Error Notification
++ * ACPI 4.0: 17.3.2.7 Hardware Error Notification
++ */
++void build_append_ghes_notify(GArray *table, const uint8_t type,
++                              uint8_t length, uint16_t config_write_enable,
++                              uint32_t poll_interval, uint32_t vector,
++                              uint32_t polling_threshold_value,
++                              uint32_t polling_threshold_window,
++                              uint32_t error_threshold_value,
++                              uint32_t error_threshold_window)
++{
++        build_append_int_noprefix(table, type, 1); /* type */
++        build_append_int_noprefix(table, length, 1);
++        build_append_int_noprefix(table, config_write_enable, 2);
++        build_append_int_noprefix(table, poll_interval, 4);
++        build_append_int_noprefix(table, vector, 4);
++        build_append_int_noprefix(table, polling_threshold_value, 4);
++        build_append_int_noprefix(table, polling_threshold_window, 4);
++        build_append_int_noprefix(table, error_threshold_value, 4);
++        build_append_int_noprefix(table, error_threshold_window, 4);
++}
++
+ /*
+  * Build NAME(XXXX, 0x00000000) where 0x00000000 is encoded as a dword,
+  * and return the offset to 0x00000000 for runtime patching.
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 1a563ad..90c8ef8 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -411,6 +411,14 @@ build_append_gas_from_struct(GArray *table, const struct AcpiGenericAddress *s)
+                      s->access_width, s->address);
+ }
+ 
++void build_append_ghes_notify(GArray *table, const uint8_t type,
++                              uint8_t length, uint16_t config_write_enable,
++                              uint32_t poll_interval, uint32_t vector,
++                              uint32_t polling_threshold_value,
++                              uint32_t polling_threshold_window,
++                              uint32_t error_threshold_value,
++                              uint32_t error_threshold_window);
++
+ void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
+                        uint64_t len, int node, MemoryAffinityFlags flags);
+ 
+-- 
+1.8.3.1
+
 
