@@ -3,113 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30A2DC04AB1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 05:58:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A81F2C04AB1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 05:59:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E975420879
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 05:58:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E975420879
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1897A20879
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 05:59:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1897A20879
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51513 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51524 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQ3yo-000738-7b
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 01:58:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60011)
+	id 1hQ3zm-0007vT-4B
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 01:59:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hQ3ww-0005v9-D6
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:56:35 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hQ3yR-000726-AB
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:58:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hQ3wu-0002zU-TY
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:56:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49424)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>)
-	id 1hQ3wu-0002yp-L2; Mon, 13 May 2019 01:56:32 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C968E307D91E;
-	Mon, 13 May 2019 05:56:30 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-122.ams2.redhat.com [10.36.116.122])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id F1A735D9CC;
-	Mon, 13 May 2019 05:56:23 +0000 (UTC)
-To: Collin Walling <walling@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, 
-	qemu-s390x@nongnu.org, cohuck@redhat.com, rth@twiddle.net,
-	david@redhat.com, pasic@linux.ibm.com, mst@redhat.com, pbonzini@redhat.com
-References: <1556749903-19221-1-git-send-email-walling@linux.ibm.com>
-	<4f5c8f1a-8898-c5e3-0b96-065a1ac21476@de.ibm.com>
-	<c26d831b-1ef5-ad6d-f0ce-4f3c7c0993c0@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <f997a54e-7865-727d-6d1d-f7a18047024f@redhat.com>
-Date: Mon, 13 May 2019 07:56:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <c26d831b-1ef5-ad6d-f0ce-4f3c7c0993c0@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Mon, 13 May 2019 05:56:30 +0000 (UTC)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hQ3yO-0003fa-TL
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:58:07 -0400
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:60161)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hQ3yO-0003ef-Fn
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:58:04 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.vps.ablenet.jp
+	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+	by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 9702741946;
+	Mon, 13 May 2019 14:58:01 +0900 (JST)
+Received: from yo-satoh-debian.ysato.ml (ZM005235.ppp.dion.ne.jp [222.8.5.235])
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 126A9240085; 
+	Mon, 13 May 2019 14:58:00 +0900 (JST)
+Date: Mon, 13 May 2019 14:57:59 +0900
+Message-ID: <87ef52521k.wl-ysato@users.sourceforge.jp>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+In-Reply-To: <c7990acf-15ec-8d40-4b49-eea4c7e9b52b@redhat.com>
+References: <20190508145611.107133-1-ysato@users.sourceforge.jp>
+	<20190508145611.107133-7-ysato@users.sourceforge.jp>
+	<c7990acf-15ec-8d40-4b49-eea4c7e9b52b@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+	FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/25.1
+	(x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4] s390: diagnose 318 info
- reset and migration support
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 202.224.55.15
+Subject: Re: [Qemu-devel] [PATCH v10 06/13] hw/intc: RX62N interrupt
+ controller (ICUa)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -121,223 +69,585 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/05/2019 22.50, Collin Walling wrote:
-> On 5/9/19 5:58 AM, Christian Borntraeger wrote:
->>
->>
->> On 02.05.19 00:31, Collin Walling wrote:
->>> DIAGNOSE 0x318 (diag318) is a privileged s390x instruction that must
->>> be intercepted by SIE and handled via KVM. Let's introduce some
->>> functions to communicate between QEMU and KVM via ioctls. These
->>> will be used to get/set the diag318 related information (also known
->>> as the "Control Program Code" or "CPC"), as well as check the system
->>> if KVM supports handling this instruction.
->>>
->>> The availability of this instruction is determined by byte 134, bit 0
->>> of the Read Info block. This coincidentally expands into the space us=
-ed
->>> for CPU entries, which means VMs running with the diag318 capability
->>> will have a reduced maximum CPU count. To alleviate this, let's
->>> calculate
->>> the actual max CPU entry space by subtracting the size of Read Info f=
-rom
->>> the SCCB size then dividing that number by the size of a CPU entry. I=
-f
->>> this value is less than the value denoted by S390_MAX_CPUS, then let'=
-s
->>> reduce the max cpus for s390 from 248 to 240 in an effort to anticipa=
-te
->>> this potentially happening again in the future.
->>>
->>> In order to simplify the migration and system reset requirements of
->>> the diag318 data, let's introduce it as a device class and include
->>> a VMStateDescription.
->>>
->>> Diag318 is reset on during modified clear and load normal.
->>>
->>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
->>> ---
->>> =C2=A0 hw/s390x/Makefile.objs=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=
-=A0=C2=A0 1 +
->>> =C2=A0 hw/s390x/diag318.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 | 100
->>> +++++++++++++++++++++++++++++++++++++++++++
->>> =C2=A0 hw/s390x/diag318.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 |=C2=A0 39 +++++++++++++++++
->>> =C2=A0 hw/s390x/s390-virtio-ccw.c=C2=A0=C2=A0 |=C2=A0 23 ++++++++++
->>> =C2=A0 hw/s390x/sclp.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 5 +++
->>> =C2=A0 include/hw/s390x/sclp.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=
-=A0 2 +
->>> =C2=A0 linux-headers/asm-s390/kvm.h |=C2=A0=C2=A0 4 ++
->>> =C2=A0 target/s390x/kvm-stub.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 =
-15 +++++++
->>> =C2=A0 target/s390x/kvm.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 |=C2=A0 32 ++++++++++++++
->>> =C2=A0 target/s390x/kvm_s390x.h=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=
- 3 ++
->>> =C2=A0 10 files changed, 224 insertions(+)
->>> =C2=A0 create mode 100644 hw/s390x/diag318.c
->>> =C2=A0 create mode 100644 hw/s390x/diag318.h
->>>
->>> diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
->>> index e02ed80..93621dc 100644
->>> --- a/hw/s390x/Makefile.objs
->>> +++ b/hw/s390x/Makefile.objs
->>> @@ -34,3 +34,4 @@ obj-$(CONFIG_KVM) +=3D s390-stattrib-kvm.o
->>> =C2=A0 obj-y +=3D s390-ccw.o
->>> =C2=A0 obj-y +=3D ap-device.o
->>> =C2=A0 obj-y +=3D ap-bridge.o
->>> +obj-y +=3D diag318.o
->>> diff --git a/hw/s390x/diag318.c b/hw/s390x/diag318.c
->>> new file mode 100644
->>> index 0000000..94b44da
->>> --- /dev/null
->>> +++ b/hw/s390x/diag318.c
->>> @@ -0,0 +1,100 @@
->>> +/*
->>> + * DIAGNOSE 0x318 functions for reset and migration
->>> + *
->>> + * Copyright IBM, Corp. 2019
->>> + *
->>> + * Authors:
->>> + *=C2=A0 Collin Walling <walling@linux.ibm.com>
->>> + *
->>> + * This work is licensed under the terms of the GNU GPL, version 2
->>> or (at your
->>> + * option) any later version. See the COPYING file in the top-level
->>> directory.
->>> + */
->>> +
->>> +#include "hw/s390x/diag318.h"
->>> +#include "qapi/error.h"
->>> +#include "kvm_s390x.h"
->>> +#include "sysemu/kvm.h"
->>> +
->>> +static int diag318_post_load(void *opaque, int version_id)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 DIAG318State *d =3D opaque;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 kvm_s390_set_cpc(d->cpc);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 /* It is not necessary to retain a copy of the cp=
-c after
->>> migration. */
->>> +=C2=A0=C2=A0=C2=A0 d->cpc =3D 0;
->>
->> But we also do not need to zero it out? Can't you just drop these 2
->> lines?
->>
->>
+On Thu, 09 May 2019 01:27:40 +0900,
+Philippe Mathieu-Daud=E9 wrote:
 >=20
-> Absolutely. I'll drop them.
+> On 5/8/19 4:56 PM, Yoshinori Sato wrote:
+> > This implementation supported only ICUa.
+> > Hardware manual.
+> > https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh00=
+33ej0140_rx62n.pdf
+> >=20
+> > Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> > ---
+> >  include/hw/intc/rx_icu.h |  49 +++++++
+> >  hw/intc/rx_icu.c         | 375 +++++++++++++++++++++++++++++++++++++++=
+++++++++
+> >  hw/intc/Makefile.objs    |   1 +
+> >  3 files changed, 425 insertions(+)
+> >  create mode 100644 include/hw/intc/rx_icu.h
+> >  create mode 100644 hw/intc/rx_icu.c
+> >=20
+> > diff --git a/include/hw/intc/rx_icu.h b/include/hw/intc/rx_icu.h
+> > new file mode 100644
+> > index 0000000000..bc46b3079b
+> > --- /dev/null
+> > +++ b/include/hw/intc/rx_icu.h
+> > @@ -0,0 +1,49 @@
+> > +#ifndef RX_ICU_H
+> > +#define RX_ICU_H
+> > +
+> > +#include "qemu-common.h"
+> > +#include "hw/irq.h"
+> > +
+> > +struct IRQSource {
+> > +    int sense;
 >=20
->>> +
->>> +=C2=A0=C2=A0=C2=A0 return 0;
->>> +}
->>> +
->>> +static int diag318_pre_save(void *opaque)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 DIAG318State *d =3D opaque;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 kvm_s390_get_cpc(&d->cpc);
->>> +=C2=A0=C2=A0=C2=A0 return 0;
->>> +}
->>> +
->>> +static bool diag318_needed(void *opaque)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 DIAG318State *d =3D opaque;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 return d->enabled;
->>> +}
->>
->> I would like to have a cpumodel entry that allows to disable that
->> feature. And we should
->> then check for this.
->>
+> Hmm can you use the enum?
 >=20
-> Noted.
+> > +    int level;
+> > +};
+> > +
+> > +struct RXICUState {
+> > +    SysBusDevice parent_obj;
+> > +
+> > +    MemoryRegion memory;
+> > +    struct IRQSource src[256];
+> > +    char *icutype;
+> > +    uint32_t nr_irqs;
+> > +    uint32_t *map;
+> > +    uint32_t nr_sense;
+> > +    uint32_t *init_sense;
+> > +
+> > +    uint8_t ir[256];
+> > +    uint8_t dtcer[256];
+> > +    uint8_t ier[32];
+> > +    uint8_t ipr[142];
+> > +    uint8_t dmasr[4];
+> > +    uint16_t fir;
+> > +    uint8_t nmisr;
+> > +    uint8_t nmier;
+> > +    uint8_t nmiclr;
+> > +    uint8_t nmicr;
+> > +    int req_irq;
+> > +    qemu_irq _irq;
+> > +    qemu_irq _fir;
+> > +    qemu_irq _swi;
+> > +};
+> > +typedef struct RXICUState RXICUState;
+> > +
+> > +#define TYPE_RXICU "rxicu"
+> > +#define RXICU(obj) OBJECT_CHECK(RXICUState, (obj), TYPE_RXICU)
+> > +
+> > +#define SWI 27
 >=20
->>> +
->>> +const VMStateDescription vmstate_diag318 =3D {
->>> +=C2=A0=C2=A0=C2=A0 .name =3D "vmstate_diag318",
->>> +=C2=A0=C2=A0=C2=A0 .post_load =3D diag318_post_load,
->>> +=C2=A0=C2=A0=C2=A0 .pre_save =3D diag318_pre_save,
->>> +=C2=A0=C2=A0=C2=A0 .version_id =3D 1,
->>> +=C2=A0=C2=A0=C2=A0 .minimum_version_id =3D 1,
->>> +=C2=A0=C2=A0=C2=A0 .needed =3D diag318_needed,
->>> +=C2=A0=C2=A0=C2=A0 .fields =3D (VMStateField[]) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VMSTATE_UINT64(cpc, DIAG3=
-18State),
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VMSTATE_END_OF_LIST()
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +};
->>> +
->>> +static void s390_diag318_realize(DeviceState *dev, Error **errp)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 DIAG318State *d =3D DIAG318(dev);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (kvm_s390_has_diag318()) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 d->enabled =3D true;
->>> +=C2=A0=C2=A0=C2=A0 }
->>
->> same here -> cpumodel
->> Then we can get rid of the enabled bool.
+> enum {
 >=20
-> Noted.
+> > +#define TRG_LEVEL 0
+> > +#define TRG_NEDGE 1
+> > +#define TRG_PEDGE 2
+> > +#define TRG_BEDGE 3
 >=20
-> [...]
->>> =C2=A0 =C2=A0 static void s390_cpu_plug(HotplugHandler *hotplug_dev,
->>> @@ -570,6 +585,7 @@ static void machine_set_loadparm(Object *obj,
->>> const char *val, Error **errp)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ms->loadparm[i=
-] =3D ' '; /* pad right with spaces */
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> =C2=A0 }
->>> +
->>> =C2=A0 static inline void s390_machine_initfn(Object *obj)
->>> =C2=A0 {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_property_add_bool(obj, "aes-key=
--wrap",
->>> @@ -652,6 +668,13 @@ static void
->>> ccw_machine_4_0_instance_options(MachineState *machine)
->>> =C2=A0 =C2=A0 static void ccw_machine_4_0_class_options(MachineClass =
-*mc)
->>> =C2=A0 {
->>> +=C2=A0=C2=A0=C2=A0 /*
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * Read Info might reveal more bytes used to=
- detect facilities,
->>> thus
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * reducing the number of CPU entries. Let's=
- reduce the max CPUs by
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * an arbitrary number in effort to anticipa=
-te future facility
->>> bytes.
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->>> +=C2=A0=C2=A0=C2=A0 if ((SCCB_SIZE - sizeof(ReadInfo)) / sizeof(CPUEn=
-try) <
->>> S390_MAX_CPUS)
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mc->max_cpus =3D S390_MAX=
-_CPUS - 8;
->>
->> Maybe this should depend on the presence of this feature in the cpumod=
-el?
->>
+> };
 >=20
-> That's a good idea. This would allow the user to fine tune their VM to
-> either allow the original max 248 _or_ enable the diag318 instruction.
+> > +
+> > +#endif /* RX_ICU_H */
+> > diff --git a/hw/intc/rx_icu.c b/hw/intc/rx_icu.c
+> > new file mode 100644
+> > index 0000000000..345e047a45
+> > --- /dev/null
+> > +++ b/hw/intc/rx_icu.c
+> > @@ -0,0 +1,375 @@
+> > +/*
+> > + * RX Interrupt control unit
+>=20
+> "Interrupt Control Unit"
+>=20
+> "Warning: Only ICUa is supported."
+>=20
+> > + *
+> > + * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
+> > + * (Rev.1.40 R01UH0033EJ0140)
+> > + *
+> > + * Copyright (c) 2019 Yoshinori Sato
+> > + *
+> > + * This program is free software; you can redistribute it and/or modif=
+y it
+> > + * under the terms and conditions of the GNU General Public License,
+> > + * version 2 or later, as published by the Free Software Foundation.
+> > + *
+> > + * This program is distributed in the hope it will be useful, but WITH=
+OUT
+> > + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY =
+or
+> > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public Licen=
+se for
+> > + * more details.
+> > + *
+> > + * You should have received a copy of the GNU General Public License a=
+long with
+> > + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "qemu-common.h"
+> > +#include "qemu/log.h"
+> > +#include "qapi/error.h"
+> > +#include "cpu.h"
+> > +#include "hw/hw.h"
+> > +#include "hw/sysbus.h"
+> > +#include "hw/registerfields.h"
+> > +#include "hw/intc/rx_icu.h"
+> > +#include "qemu/error-report.h"
+> > +
+> > +REG8(IR, 0)
+> > +  FIELD(IR, IR,  0, 1)
+> > +REG8(DTCER, 0x100)
+> > +  FIELD(DTCER, DTCE,  0, 1)
+> > +REG8(IER, 0x200)
+> > +REG8(SWINTR, 0x2e0)
+> > +  FIELD(SWINTR, SWINT, 0, 1)
+> > +REG16(FIR, 0x2f0)
+> > +  FIELD(FIR, FVCT, 0, 8)
+> > +  FIELD(FIR, FIEN, 15, 1)
+> > +REG8(IPR, 0x300)
+> > +  FIELD(IPR, IPR, 0, 4)
+> > +REG8(DMRSR, 0x400)
+> > +REG8(IRQCR, 0x500)
+> > +  FIELD(IRQCR, IRQMD, 2, 2)
+> > +REG8(NMISR, 0x580)
+> > +  FIELD(NMISR, NMIST, 0, 1)
+> > +  FIELD(NMISR, LVDST, 1, 1)
+> > +  FIELD(NMISR, OSTST, 2, 1)
+> > +REG8(NMIER, 0x581)
+> > +  FIELD(NMIER, NMIEN, 0, 1)
+> > +  FIELD(NMIER, LVDEN, 1, 1)
+> > +  FIELD(NMIER, OSTEN, 2, 1)
+> > +REG8(NMICLR, 0x582)
+> > +  FIELD(NMICLR, NMICLR, 0, 1)
+> > +  FIELD(NMICLR, OSTCLR, 2, 1)
+> > +REG8(NMICR, 0x583)
+> > +  FIELD(NMICR, NMIMD, 3, 1)
+> > +
+> > +#define request(icu, n) (icu->ipr[icu->map[n]] << 8 | n)
+> > +
+> > +static qemu_irq *rxicu_pin(RXICUState *icu, int n_IRQ)
+> > +{
+> > +    if ((icu->fir & R_FIR_FIEN_MASK) &&
+> > +        (icu->fir & R_FIR_FVCT_MASK) =3D=3D n_IRQ) {
+> > +        return &icu->_fir;
+> > +    } else {
+> > +        return &icu->_irq;
+> > +    }
+> > +}
+> > +
+> > +static void rxicu_request(RXICUState *icu, int n_IRQ)
+> > +{
+> > +    int enable;
+> > +
+> > +    enable =3D icu->ier[n_IRQ / 8] & (1 << (n_IRQ & 7));
+> > +    if (n_IRQ > 0 && enable !=3D 0 && atomic_read(&icu->req_irq) < 0) {
+> > +        atomic_set(&icu->req_irq, n_IRQ);
+> > +        qemu_set_irq(*rxicu_pin(icu, n_IRQ), request(icu, n_IRQ));
+> > +    }
+> > +}
+> > +
+> > +static void rxicu_set_irq(void *opaque, int n_IRQ, int level)
+> > +{
+> > +    RXICUState *icu =3D opaque;
+> > +    struct IRQSource *src;
+> > +    int issue;
+> > +
+> > +    if (n_IRQ >=3D 256) {
+>=20
+> OK this should be RX_IRQ_COUNT (noted in later patch).
+>=20
+> > +        error_report("%s: IRQ %d out of range", __func__, n_IRQ);
+> > +        return;
+> > +    }
+> > +
+> > +    src =3D &icu->src[n_IRQ];
+> > +
+> > +    level =3D (level !=3D 0);
+> > +    switch (src->sense) {
+> > +    case TRG_LEVEL:
+> > +        /* level-sensitive irq */
+> > +        issue =3D level;
+> > +        src->level =3D level;
+> > +        break;
+> > +    case TRG_NEDGE:
+> > +        issue =3D (level =3D=3D 0 && src->level =3D=3D 1);
+> > +        src->level =3D level;
+> > +        break;
+> > +    case TRG_PEDGE:
+> > +        issue =3D (level =3D=3D 1 && src->level =3D=3D 0);
+> > +        src->level =3D level;
+> > +        break;
+> > +    case TRG_BEDGE:
+> > +        issue =3D ((level ^ src->level) & 1);
+> > +        src->level =3D level;
+> > +        break;
+> > +    default:
+> > +        g_assert_not_reached();
+> > +    }
+> > +    if (issue =3D=3D 0 && src->sense =3D=3D TRG_LEVEL) {
+> > +        icu->ir[n_IRQ] =3D 0;
+> > +        if (atomic_read(&icu->req_irq) =3D=3D n_IRQ) {
+> > +            /* clear request */
+> > +            qemu_set_irq(*rxicu_pin(icu, n_IRQ), 0);
+> > +            atomic_set(&icu->req_irq, -1);
+> > +        }
+> > +        return;
+> > +    }
+> > +    if (issue) {
+> > +        icu->ir[n_IRQ] =3D 1;
+> > +        rxicu_request(icu, n_IRQ);
+> > +    }
+> > +}
+> > +
+> > +static void rxicu_ack_irq(void *opaque, int no, int level)
+> > +{
+> > +    RXICUState *icu =3D opaque;
+> > +    int i;
+> > +    int n_IRQ;
+> > +    int max_pri;
+> > +
+> > +    n_IRQ =3D atomic_read(&icu->req_irq);
+> > +    if (n_IRQ < 0) {
+> > +        return;
+> > +    }
+> > +    atomic_set(&icu->req_irq, -1);
+> > +    if (icu->src[n_IRQ].sense !=3D TRG_LEVEL) {
+> > +        icu->ir[n_IRQ] =3D 0;
+> > +    }
+> > +
+> > +    max_pri =3D 0;
+> > +    n_IRQ =3D -1;
+> > +    for (i =3D 0; i < 256; i++) {
+> > +        if (icu->ir[i]) {
+> > +            if (max_pri < icu->ipr[icu->map[i]]) {
+> > +                n_IRQ =3D i;
+> > +                max_pri =3D icu->ipr[icu->map[i]];
+> > +            }
+> > +        }
+> > +    }
+> > +
+> > +    if (n_IRQ >=3D 0) {
+> > +        rxicu_request(icu, n_IRQ);
+> > +    }
+> > +}
+> > +
+> > +static uint64_t icu_read(void *opaque, hwaddr addr, unsigned size)
+> > +{
+> > +    hwaddr offset =3D addr & 0xfff;
+>=20
+> The region is 0x600 wide, why AND? (if required that would be & 0x5ff).
+>=20
+> > +    RXICUState *icu =3D opaque;
+> > +    int reg =3D addr & 0xff;
+> > +
+> > +    if ((offset !=3D A_FIR && size !=3D 1) ||
+> > +        (offset =3D=3D A_FIR && size !=3D 2)) {
+> > +        qemu_log_mask(LOG_GUEST_ERROR,
+> > +                      "rx_icu: Invalid read size %08lx.\n", offset);
+> > +        return 0xffffffffffffffffULL;
+>=20
+> UINT64_MAX?
+>=20
+> Here I get on 32bit host:
+>=20
+> In file included from qemu/hw/intc/rx_icu.c:24:0:
+> qemu/hw/intc/rx_icu.c: In function 'icu_read':
+> qemu/hw/intc/rx_icu.c:176:23: error: format '%lx' expects argument of
+> type 'long unsigned int', but argument 2 has type 'hwaddr {aka long long
+> unsigned int}' [-Werror=3Dformat=3D]
+>                        "rx_icu: Invalid read size %08lx.\n", offset);
+>                        ^
+> qemu/include/qemu/log.h:85:22: note: in definition of macro 'qemu_log_mas=
+k'
+>              qemu_log(FMT, ## __VA_ARGS__);              \
+>                       ^
+> qemu/hw/intc/rx_icu.c:208:23: error: format '%lx' expects argument of
+> type 'long unsigned int', but argument 2 has type 'hwaddr {aka long long
+> unsigned int}' [-Werror=3Dformat=3D]
+>                        "rx_icu: Register %08lx not implemented\n", offset=
+);
+>                        ^
+> qemu/include/qemu/log.h:85:22: note: in definition of macro 'qemu_log_mas=
+k'
+>              qemu_log(FMT, ## __VA_ARGS__);              \
+>                       ^
+> qemu/hw/intc/rx_icu.c: In function 'icu_write':
+> qemu/hw/intc/rx_icu.c:223:23: error: format '%lx' expects argument of
+> type 'long unsigned int', but argument 2 has type 'hwaddr {aka long long
+> unsigned int}' [-Werror=3Dformat=3D]
+>                        "rx_icu: Invalid write size at %08lx.\n", offset);
+>                        ^
+> qemu/include/qemu/log.h:85:22: note: in definition of macro 'qemu_log_mas=
+k'
+>              qemu_log(FMT, ## __VA_ARGS__);              \
+>                       ^
+> qemu/hw/intc/rx_icu.c:276:23: error: format '%lx' expects argument of
+> type 'long unsigned int', but argument 2 has type 'hwaddr {aka long long
+> unsigned int}' [-Werror=3Dformat=3D]
+>                        "rx_icu: Register %08lx not implemented\n", offset=
+);
+>                        ^
+> qemu/include/qemu/log.h:85:22: note: in definition of macro 'qemu_log_mas=
+k'
+>              qemu_log(FMT, ## __VA_ARGS__);              \
+>                       ^
+> cc1: all warnings being treated as errors
+>=20
+> Please fix using HWADDR_PRIX.
+>=20
+> > +    }
+> > +    switch (offset) {
+> > +    case A_IR ... A_IR + 0xff:
+> > +        return icu->ir[reg] & R_IR_IR_MASK;
+> > +    case A_DTCER ... A_DTCER + 0xff:
+> > +        return icu->dtcer[reg] & R_DTCER_DTCE_MASK;
+> > +    case A_IER ... A_IER + 0x1f:
+> > +        return icu->ier[reg];
+> > +    case A_SWINTR:
+> > +        return 0;
+> > +    case A_FIR:
+> > +        return icu->fir & (R_FIR_FIEN_MASK | R_FIR_FVCT_MASK);
+> > +    case A_IPR ... A_IPR + 0x8f:
+> > +        return icu->ipr[reg] & R_IPR_IPR_MASK;
+> > +    case A_DMRSR:
+> > +    case A_DMRSR + 4:
+> > +    case A_DMRSR + 8:
+> > +    case A_DMRSR + 12:
+> > +        return icu->dmasr[reg >> 2];
+> > +    case A_IRQCR ... A_IRQCR + 0x1f:
+> > +        return icu->src[64 + reg].sense << R_IRQCR_IRQMD_SHIFT;
+> > +    case A_NMISR:
+> > +    case A_NMICLR:
+> > +        return 0;
+> > +    case A_NMIER:
+> > +        return icu->nmier;
+> > +    case A_NMICR:
+> > +        return icu->nmicr;
+> > +    default:
+> > +        qemu_log_mask(LOG_UNIMP,
+> > +                      "rx_icu: Register %08lx not implemented\n", offs=
+et);
+> > +        break;
+> > +    }
+> > +    return 0xffffffffffffffffULL;
+>=20
+> UINT64_MAX
+>=20
+> > +}
+> > +
+> > +static void icu_write(void *opaque, hwaddr addr, uint64_t val, unsigne=
+d size)
+> > +{
+> > +    hwaddr offset =3D addr & 0xfff;
+>=20
+> AND not needed IMO.
+>=20
+> > +    RXICUState *icu =3D opaque;
+> > +    int reg =3D addr & 0xff;
+> > +
+> > +    if ((offset !=3D A_FIR && size !=3D 1) ||
+> > +        (offset =3D=3D A_FIR && size !=3D 2)) {
+> > +        qemu_log_mask(LOG_GUEST_ERROR,
+> > +                      "rx_icu: Invalid write size at %08lx.\n", offset=
+);
+>=20
+> Oh, I think we don't end logging with trailing dot...
+>=20
+> > +        return;
+> > +    }
+> > +    switch (offset) {
+> > +    case A_IR ... A_IR + 0xff:
+> > +        if (icu->src[reg].sense !=3D TRG_LEVEL && val =3D=3D 0) {
+> > +            icu->ir[reg] =3D 0;
+> > +        }
+> > +        break;
+> > +    case A_DTCER ... A_DTCER + 0xff:
+> > +        icu->dtcer[reg] =3D val & R_DTCER_DTCE_MASK;
+> > +        qemu_log_mask(LOG_UNIMP,
+> > +                      "rx_icu: DTC not implemented\n");
+> > +        break;
+> > +    case A_IER ... A_IER + 0x1f:
+> > +        icu->ier[reg] =3D val;
+> > +        break;
+> > +    case A_SWINTR:
+> > +        if (val & R_SWINTR_SWINT_MASK) {
+> > +            qemu_irq_pulse(icu->_swi);
+> > +        }
+> > +        break;
+> > +    case A_FIR:
+> > +        icu->fir =3D val & (R_FIR_FIEN_MASK | R_FIR_FVCT_MASK);
+> > +        break;
+> > +    case A_IPR ... A_IPR + 0x8f:
+> > +        icu->ipr[reg] =3D val & R_IPR_IPR_MASK;
+> > +        break;
+> > +    case A_DMRSR:
+> > +    case A_DMRSR + 4:
+> > +    case A_DMRSR + 8:
+> > +    case A_DMRSR + 12:
+> > +        icu->dmasr[reg >> 2] =3D val;
+> > +        qemu_log_mask(LOG_UNIMP,
+> > +                      "rx_icu: DMAC not implemented\n");
+> > +        break;
+> > +    case A_IRQCR ... A_IRQCR + 0x1f:
+> > +        icu->src[64 + reg].sense =3D val >> R_IRQCR_IRQMD_SHIFT;
+> > +        break;
+> > +    case A_NMICLR:
+> > +        break;
+> > +    case A_NMIER:
+> > +        icu->nmier |=3D val & (R_NMIER_NMIEN_MASK |
+> > +                             R_NMIER_LVDEN_MASK |
+> > +                             R_NMIER_OSTEN_MASK);
+> > +            break;
+> > +    case A_NMICR:
+> > +        if ((icu->nmier & R_NMIER_NMIEN_MASK) =3D=3D 0) {
+> > +            icu->nmicr =3D val & R_NMICR_NMIMD_MASK;
+> > +        }
+> > +        break;
+> > +    default:
+> > +        qemu_log_mask(LOG_UNIMP,
+> > +                      "rx_icu: Register %08lx not implemented\n", offs=
+et);
+> > +        break;
+> > +    }
+> > +}
+> > +
+> > +static const MemoryRegionOps icu_ops =3D {
+> > +    .write =3D icu_write,
+> > +    .read  =3D icu_read,
+> > +    .endianness =3D DEVICE_LITTLE_ENDIAN,
+> > +    .impl =3D {
+> > +        .max_access_size =3D 2,
+> > +    },
+> > +};
+> > +
+> > +static void rxicu_realize(DeviceState *dev, Error **errp)
+> > +{
+> > +    RXICUState *icu =3D RXICU(dev);
+> > +    int i, j;
+> > +
+> > +    if (icu->init_sense =3D=3D NULL) {
+> > +        qemu_log_mask(LOG_GUEST_ERROR,
+> > +                      "rx_icu: trigger-level property must be set.");
+> > +        return;
+> > +    }
+> > +    for (i =3D j =3D 0; i < 256; i++) {
+>=20
+> RX_IRQ_COUNT
+>=20
+> > +        if (icu->init_sense[j] =3D=3D i) {
+> > +            icu->src[i].sense =3D TRG_LEVEL;
+> > +            if (j < icu->nr_sense) {
+> > +                j++;
+> > +            }
+> > +        } else
+> > +            icu->src[i].sense =3D TRG_PEDGE;
+> > +    }
+> > +    icu->req_irq =3D -1;
+> > +}
+> > +
+> > +static void rxicu_init(Object *obj)
+> > +{
+> > +    SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
+> > +    RXICUState *icu =3D RXICU(obj);
+> > +
+> > +    memory_region_init_io(&icu->memory, OBJECT(icu), &icu_ops,
+> > +                          icu, "rx-icu", 0x600);
+> > +    sysbus_init_mmio(d, &icu->memory);
+> > +
+> > +    qdev_init_gpio_in(DEVICE(d), rxicu_set_irq, 256);
+>=20
+> RX_IRQ_COUNT
+>=20
+> > +    qdev_init_gpio_in_named(DEVICE(d), rxicu_ack_irq, "ack", 1);
+> > +    sysbus_init_irq(d, &icu->_irq);
+> > +    sysbus_init_irq(d, &icu->_fir);
+> > +    sysbus_init_irq(d, &icu->_swi);
+> > +}
+> > +
+> > +static void rxicu_fini(Object *obj)
+> > +{
+> > +    RXICUState *icu =3D RXICU(obj);
+> > +    g_free(icu->map);
+> > +    g_free(icu->init_sense);
+> > +}
+> > +
+> > +static const VMStateDescription vmstate_rxicu =3D {
+> > +    .name =3D "rx-icu",
+> > +    .version_id =3D 1,
+> > +    .minimum_version_id =3D 1,
+> > +    .fields =3D (VMStateField[]) {
+> > +        VMSTATE_END_OF_LIST()
+> > +    }
+> > +};
+> > +
+> > +static Property rxicu_properties[] =3D {
+> > +    DEFINE_PROP_ARRAY("ipr-map", RXICUState, nr_irqs, map,
+> > +                      qdev_prop_uint32, uint32_t),
+> > +    DEFINE_PROP_ARRAY("trigger-level", RXICUState, nr_sense, init_sens=
+e,
+> > +                      qdev_prop_uint32, uint32_t),
+> > +    DEFINE_PROP_END_OF_LIST(),
+> > +};
+> > +
+> > +static void rxicu_class_init(ObjectClass *klass, void *data)
+> > +{
+> > +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> > +
+> > +    dc->realize =3D rxicu_realize;
+> > +    dc->props =3D rxicu_properties;
+> > +    dc->vmsd =3D &vmstate_rxicu;
+> > +}
+> > +
+> > +static const TypeInfo rxicu_info =3D {
+> > +    .name       =3D TYPE_RXICU,
+> > +    .parent     =3D TYPE_SYS_BUS_DEVICE,
+> > +    .instance_size =3D sizeof(RXICUState),
+> > +    .instance_init =3D rxicu_init,
+> > +    .instance_finalize =3D rxicu_fini,
+> > +    .class_init =3D rxicu_class_init,
+> > +};
+> > +
+> > +static void rxicu_register_types(void)
+> > +{
+> > +    type_register_static(&rxicu_info);
+> > +}
+> > +
+> > +type_init(rxicu_register_types)
+> > diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
+> > index df712c3e6c..b54b09b12e 100644
+> > --- a/hw/intc/Makefile.objs
+> > +++ b/hw/intc/Makefile.objs
+> > @@ -48,3 +48,4 @@ obj-$(CONFIG_ARM_GIC) +=3D arm_gicv3_cpuif.o
+> >  obj-$(CONFIG_MIPS_CPS) +=3D mips_gic.o
+> >  obj-$(CONFIG_NIOS2) +=3D nios2_iic.o
+> >  obj-$(CONFIG_OMPIC) +=3D ompic.o
+> > +obj-$(CONFIG_RX) +=3D rx_icu.o
+>=20
+> Why not declare a RENESAS_ICU in Kconfig and use it?
 
-Please also not that ccw_machine_4_0_class_options() is called from
-ccw_machine_3_1_class_options() and thus all older machine class option
-functions - you have to make sure to restore the 248 for them.
+ICU only using RX.
+Timer and SCI using other Renesas MCUs.
+So ICU have RX specific name.
 
-As a test, please check that you can migrate a s390-ccw-virtio-3.1
-machine with 248 CPUs from a qemu without your patch to a QEMU with your
-patch and back.
+> obj-$(CONFIG_RENESAS_ICU) +=3D rx_icu.o
+>=20
+> Good work!
+>=20
+> Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+>=20
 
- Thomas
+--=20
+Yosinori Sato
 
