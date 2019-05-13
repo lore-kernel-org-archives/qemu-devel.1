@@ -2,66 +2,95 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A637BC04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 18:33:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17BF8C04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 18:33:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83EA7208C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 18:33:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83EA7208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DB62E208C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 18:33:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UaDXf4i1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB62E208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33345 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33349 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQFlJ-0006DM-PR
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 14:33:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55299)
+	id 1hQFlk-0006a8-4e
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 14:33:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1hQFjJ-0005Dz-2p
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:31:18 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hQFjY-0005Ky-3i
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:31:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1hQFjH-0001cP-SZ
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:31:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44806)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>)
-	id 1hQFjF-0001ae-Mq; Mon, 13 May 2019 14:31:13 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 04BA23087942;
-	Mon, 13 May 2019 18:31:13 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (ovpn-116-151.ams2.redhat.com
-	[10.36.116.151])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 687405C1B4;
-	Mon, 13 May 2019 18:31:10 +0000 (UTC)
-Date: Mon, 13 May 2019 20:31:07 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190513183107.7lsndkyp2p7yhra5@kamzik.brq.redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hQFjX-0001mW-67
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:31:32 -0400
+Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:46139)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hQFjW-0001ld-SI
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 14:31:31 -0400
+Received: by mail-pf1-x42c.google.com with SMTP id y11so7623448pfm.13
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 11:31:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=xb2WBROopJ6wexUXZZHUN0JJtLxExXrH+yhRAr3GUuY=;
+	b=UaDXf4i1tJOOAPIbuzmFrK3xERze9I6dyyuNScD5+M+7gdvI3/WOIc259lt+4+/8C4
+	vDtA3HHzv+SaFE3qe5JVNiTg3FI6LLNjLHuJxh3GPeLRuZ4AaXxxnAsqbTcgCZHCPNKn
+	/b5NZyp6+0upv9akWf4cRH/kBAW0tSsXwnRIAHadhUVNQmrxORD8j5pQKUJofgMS7yVt
+	OSSANfZm87Crg5Mv6DFcYtfR8rJaGJRLLKW87eV7eScGYGQEVH+JGSTwQkJ8z4mmVgj8
+	JlwFUv+NDIC8nww0paFKkoyqJ+OAuX+YKd4iniY+2y7bYQl0/UAoiY80Z33gMiwtdPS7
+	D5Jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=xb2WBROopJ6wexUXZZHUN0JJtLxExXrH+yhRAr3GUuY=;
+	b=bLDvx6UZgxTAXztGiP2HNQ8viJaVtiI8ayIeuQc4++noE9RuUYFf/TPykSmQsK+AkL
+	b1aGS1n2dbCqnmaQ4eqTlGTrmYc+ax9C2k1P0qUSSNbjMDr+qbH0wHZMjf1uydHDih5u
+	jHWajHiANdBv0AKkI8eQQVTR09Iy8g+zymbjN8XIRmPlFH9rOUtni+RfImbMGgXtyFtD
+	8wxMZrG4Prc7huVBM05ssnJRuoIPr4vTGj1EruxdPJ0My3blf0CqGMJkP0sv9uzT7dhM
+	FSmREUAk4FDcCzHCXIwSyfRRo9bFllM1I8iHoewDfIJWBnkGGBfdZN80+KQAjVpO4ij7
+	uOgA==
+X-Gm-Message-State: APjAAAUoN9OvGDb2lpOuHlzrFJY6Mmxkvl2zTCC+hpzVxA/c08gzWvwC
+	pYvhmXPU7wYq3TRk16DqpT0qgw==
+X-Google-Smtp-Source: APXvYqxwpzIvhEdABMcaogDbt70BjGIJn8JMPJPOxYazEhMtn5w4y7bLMqA9B0aiKBBPUbdw4U7BPA==
+X-Received: by 2002:a62:5ec2:: with SMTP id s185mr36494250pfb.16.1557772289275;
+	Mon, 13 May 2019 11:31:29 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
+	by smtp.gmail.com with ESMTPSA id
+	n27sm24000524pfb.129.2019.05.13.11.31.27
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 13 May 2019 11:31:28 -0700 (PDT)
+To: Andrew Jones <drjones@redhat.com>
 References: <20190512083624.8916-1-drjones@redhat.com>
-	<20190512083624.8916-12-drjones@redhat.com>
-	<875zqefkbg.fsf@dusky.pond.sub.org>
+	<20190512083624.8916-6-drjones@redhat.com>
+	<20190513123110.GE28398@e103592.cambridge.arm.com>
+	<e35ba07e-2844-fe2d-ca4a-0f795a1485b1@linaro.org>
+	<20190513181421.g25e2zqlkks7ntxb@kamzik.brq.redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <9ac95348-54c0-3213-e971-959136241ac7@linaro.org>
+Date: Mon, 13 May 2019 11:31:26 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <875zqefkbg.fsf@dusky.pond.sub.org>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Mon, 13 May 2019 18:31:13 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 11/13] target/arm/cpu64: max cpu: Introduce
- sve-vls-map
+In-Reply-To: <20190513181421.g25e2zqlkks7ntxb@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::42c
+Subject: Re: [Qemu-devel] [PATCH 05/13] target/arm/kvm: Add
+ kvm_arch_get/put_sve
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,39 +102,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
-	qemu-devel@nongnu.org, abologna@redhat.com, qemu-arm@nongnu.org,
-	alex.bennee@linaro.org, Dave.Martin@arm.com
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"armbru@redhat.com" <armbru@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+	"abologna@redhat.com" <abologna@redhat.com>,
+	"alex.bennee@linaro.org" <alex.bennee@linaro.org>,
+	Dave Martin <Dave.Martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 13, 2019 at 05:25:23PM +0200, Markus Armbruster wrote:
-> Andrew Jones <drjones@redhat.com> writes:
+On 5/13/19 11:14 AM, Andrew Jones wrote:
+>> Indeed, to me this seems to be the wrong kind of swabbing here.  Exactly what
+>> format is KVM expecting?  Surely it should be the one used by the unpredicated
+>> LDR/STR instructions.  Anything else would seem to be working against the
+>> architecture.
+>>
+>> If so, the format is, architecturally, a stream of bytes in index order, which
+>> corresponds to a little-endian stream of words.  So the loop I'd expect to see
+>> here is
+>>
+>>     for (i = 0, n = cpu->sve_max_vq; i < n; ++i) {
+>>         d[i] = bswap64(q[i]);
+>>     }
 > 
-> > Introduce another cpu property to control SVE vector lengths,
-> > sve-vls-map, which allows the user to explicitly select the
-> > set of vector lengths the guest can use. The map must conform
-> > to QEMU's limits and architectural constraints, checked when
-> > the property is set. Inconsistencies with sve-max-vq are also
-> > checked. The bit number of a set bit in the map represents the
-> > allowed vector length in number of quadwords.
-> >
-> > Note, as the map is implemented with a single 64-bit word we
-> > currently only support up to 8192-bit vectors. As QEMU and
-> > KVM only support up to 2048-bit vectors then this sufficient
-> > now, and probably for some time. Extending the bitmap beyond
-> > a single word will likely require changing the property to
-> > a string and adding yet another parser to QEMU.
-> >
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> 
-> Please add an example of how the new property should be used on the
-> command line to your commit message.  I'd ask for a documentation update
-> as well if we had any to update.
+> That's the opposite of what we do for fpsimd registers though. I'm
+> fine with doing whatever KVM/TCG needs, but so far I was just following
+> the same pattern we already have.
 
-Will do.
+The behaviour of the hardware is different for LDR of fpsimd registers.
 
-Thanks,
-drew
+FP&SIMD LDR operates on datasize (8, 16, 32, 64, 128 bits).
+SVE LDR always operates on bytes.
+
+
+r~
 
