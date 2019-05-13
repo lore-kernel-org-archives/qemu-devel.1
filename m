@@ -2,64 +2,60 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD70C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:37:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD21C04AB1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:40:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2725F208C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:37:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2725F208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 1231A2084A
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:40:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1231A2084A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58518 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58570 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQC4g-0005ir-B1
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 10:37:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41784)
+	id 1hQC85-0006tR-BJ
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 10:40:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>) id 1hQC3Y-00054o-NT
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 10:35:57 -0400
+	(envelope-from <Dave.Martin@arm.com>) id 1hQC7B-0006Rh-H8
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 10:39:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>) id 1hQC3X-00036v-FP
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 10:35:56 -0400
-Received: from foss.arm.com ([217.140.101.70]:54212)
+	(envelope-from <Dave.Martin@arm.com>) id 1hQC7A-0004OZ-2i
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 10:39:41 -0400
+Received: from foss.arm.com ([217.140.101.70]:54408)
 	by eggs.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <Dave.Martin@arm.com>)
-	id 1hQC3S-00030j-PW; Mon, 13 May 2019 10:35:52 -0400
+	id 1hQC75-0004ML-Pu; Mon, 13 May 2019 10:39:35 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 724BC341;
-	Mon, 13 May 2019 07:35:48 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 06430341;
+	Mon, 13 May 2019 07:39:34 -0700 (PDT)
 Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
 	[10.72.51.249])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EBAD13F71E;
-	Mon, 13 May 2019 07:35:46 -0700 (PDT)
-Date: Mon, 13 May 2019 15:35:44 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7F6073F71E;
+	Mon, 13 May 2019 07:39:32 -0700 (PDT)
+Date: Mon, 13 May 2019 15:39:30 +0100
 From: Dave Martin <Dave.Martin@arm.com>
 To: Andrew Jones <drjones@redhat.com>
-Message-ID: <20190513143544.GJ28398@e103592.cambridge.arm.com>
+Message-ID: <20190513143929.GK28398@e103592.cambridge.arm.com>
 References: <20190512083624.8916-1-drjones@redhat.com>
-	<20190512083624.8916-12-drjones@redhat.com>
-	<20190513112635.GD28398@e103592.cambridge.arm.com>
-	<20190513123023.h4q5sihktqctkgml@kamzik.brq.redhat.com>
-	<20190513124126.GF28398@e103592.cambridge.arm.com>
-	<20190513125740.ukyx4vuili3f5wbe@kamzik.brq.redhat.com>
-	<20190513131248.GI28398@e103592.cambridge.arm.com>
-	<20190513134512.alclwrqnxlyai6uy@kamzik.brq.redhat.com>
+	<20190512083624.8916-6-drjones@redhat.com>
+	<20190513124356.GG28398@e103592.cambridge.arm.com>
+	<20190513140726.vpmenrfw4uocmtnc@kamzik.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190513134512.alclwrqnxlyai6uy@kamzik.brq.redhat.com>
+In-Reply-To: <20190513140726.vpmenrfw4uocmtnc@kamzik.brq.redhat.com>
 User-Agent: Mutt/1.5.23 (2014-03-12)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 217.140.101.70
-Subject: Re: [Qemu-devel] [PATCH 11/13] target/arm/cpu64: max cpu: Introduce
- sve-vls-map
+Subject: Re: [Qemu-devel] [PATCH 05/13] target/arm/kvm: Add
+ kvm_arch_get/put_sve
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,96 +78,60 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 13, 2019 at 02:45:12PM +0100, Andrew Jones wrote:
-> On Mon, May 13, 2019 at 02:12:48PM +0100, Dave Martin wrote:
-> > On Mon, May 13, 2019 at 01:57:40PM +0100, Andrew Jones wrote:
-> > > On Mon, May 13, 2019 at 01:41:26PM +0100, Dave Martin wrote:
-> > > > On Mon, May 13, 2019 at 01:30:23PM +0100, Andrew Jones wrote:
-> > > > > On Mon, May 13, 2019 at 12:26:36PM +0100, Dave Martin wrote:
-> > > > > > On Sun, May 12, 2019 at 09:36:22AM +0100, Andrew Jones wrote:
-> > > > > > > Introduce another cpu property to control SVE vector lengths,
-> > > > > > > sve-vls-map, which allows the user to explicitly select the
-> > > > > > > set of vector lengths the guest can use. The map must conform
-> > > > > > > to QEMU's limits and architectural constraints, checked when
-> > > > > > > the property is set. Inconsistencies with sve-max-vq are also
-> > > > > > > checked. The bit number of a set bit in the map represents the
-> > > > > > > allowed vector length in number of quadwords.
-> > > > > > > 
-> > > > > > > Note, as the map is implemented with a single 64-bit word we
-> > > > > > > currently only support up to 8192-bit vectors. As QEMU and
-> > > > > > > KVM only support up to 2048-bit vectors then this sufficient
-> > > > > > > now, and probably for some time. Extending the bitmap beyond
-> > > > > > > a single word will likely require changing the property to
-> > > > > > > a string and adding yet another parser to QEMU.
-> > > > > > > 
-> > > > > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > > > > > ---
-> > > > > > >  target/arm/cpu.c     |  4 +++
-> > > > > > >  target/arm/cpu.h     |  3 ++
-> > > > > > >  target/arm/cpu64.c   | 70 +++++++++++++++++++++++++++++++++++++++++---
-> > > > > > >  target/arm/helper.c  | 10 ++++++-
-> > > > > > >  target/arm/monitor.c |  9 ++++--
-> > > > > > >  5 files changed, 88 insertions(+), 8 deletions(-)
-> > > > > > > 
-> > > > > > 
-> > > > > > [...]
-> > > > > > 
-> > > > > > > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> > > > > > > index 8292d547e8f9..f0d0ce759ba8 100644
-> > > > > > > --- a/target/arm/cpu.h
-> > > > > > > +++ b/target/arm/cpu.h
-> > > > > > > @@ -920,6 +920,9 @@ struct ARMCPU {
-> > > > > > >  
-> > > > > > >      /* Used to set the maximum vector length the cpu will support.  */
-> > > > > > >      uint32_t sve_max_vq;
-> > > > > > > +
-> > > > > > > +    /* Each bit represents a supported vector length of (bitnum * 16) bytes */
-> > > > > > > +    uint64_t sve_vls_map;
-> > > > > > 
-> > > > > > Just to be clear, the representation here is different from the
-> > > > > > representation in KVM_REG_ARM64_SVE_VLS?
-> > > > > > 
-> > > > > > In the latter, bit n represents vector length ((n + 1) * 16) bytes.
-> > > > > 
-> > > > > KVM also uses bitnum * 16. bitnum is the the bit number, not the shift.
-> > > > 
-> > > > Can you point to the relevant kernel code?  This isn't what I thought I
-> > > > wrote...
+On Mon, May 13, 2019 at 03:07:26PM +0100, Andrew Jones wrote:
+> On Mon, May 13, 2019 at 01:43:56PM +0100, Dave Martin wrote:
+> > On Sun, May 12, 2019 at 09:36:16AM +0100, Andrew Jones wrote:
+> > > These are the SVE equivalents to kvm_arch_get/put_fpsimd.
 > > > 
-> > > The Documentation/virtual/kvm/api.txt documentation has
-> > > 
-> > >  > if (vq >= SVE_VQ_MIN && vq <= SVE_VQ_MAX &&
-> > >  >    ((vector_lengths[(vq - KVM_ARM64_SVE_VQ_MIN) / 64] >>
-> > >  >                ((vq - KVM_ARM64_SVE_VQ_MIN) % 64)) & 1))
-> > >  >        /* Vector length vq * 16 bytes supported */
-> > >  > else
-> > >  >        /* Vector length vq * 16 bytes not supported */
-> > > 
-> > > Taking vq=1, we check (vector_lengths[0] >> 0) to see if we have the
-> > > length (1 * 16) bytes. Since bitnum 1 is (1 << 0) that means the shift
-> > > is zero and (bitnum * 16) is the same as (vq * 16). With ((n + 1) * 16),
-> > > n would have to be zero, which is not a valid bitnum, but is a valid
-> > > bit shift.
+> > > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > > ---
+> > >  target/arm/kvm64.c | 127 +++++++++++++++++++++++++++++++++++++++++++--
+> > >  1 file changed, 123 insertions(+), 4 deletions(-)
 > > 
-> > OK, so it sounds like the interpretation of the KVM ABI is what I intended.
+> > [...]
 > > 
-> > What is "bitnum" though?  Most of the time, people seem to number bits
-> > starting from 0 -- though of course that's just a convention.
+> > > +static int kvm_arch_put_sve(CPUState *cs)
+> > > +{
+> > > +    ARMCPU *cpu = ARM_CPU(cs);
+> > > +    CPUARMState *env = &cpu->env;
+> > > +    struct kvm_one_reg reg;
+> > > +    int n, ret;
+> > > +
+> > > +    for (n = 0; n < KVM_ARM64_SVE_NUM_ZREGS; n++) {
+> > > +        uint64_t *q = aa64_vfp_qreg(env, n);
+> > > +#ifdef HOST_WORDS_BIGENDIAN
+> > > +        uint64_t d[ARM_MAX_VQ * 2];
+> > > +        int i;
+> > > +        for (i = 0; i < cpu->sve_max_vq * 2; i++) {
+> > > +            d[i] = q[cpu->sve_max_vq * 2 - 1 - i];
+> > > +        }
+> > > +        reg.addr = (uintptr_t)d;
+> > > +#else
+> > > +        reg.addr = (uintptr_t)q;
+> > > +#endif
+> > > +        reg.id = KVM_REG_ARM64_SVE_ZREG(n, 0);
+> > 
+> > Will this silently go wrong if more than one slice is required (i.e.,
+> > the register size grows beyond 8192 bits?)
 > 
-> Eh, I see the problem. I used the word 'number', when I meant 'position'.
-> Indeed the bit number of bit position 1 is zero. Sorry about the confusion.
-> For v2 I can try to ensure I don't use the wrong terminology.
+> Yeah, I could probably implement the slice loop now and add a
+> function that returns 1 (for now) like your vcpu_sve_slices()
+> function in KVM. I'll do that for v2.
 
-I'm not sure there's an actual problem here.  I found the terminology
-unfamiliar, that's all.
+Or just add a sanity check that the vector length is <= 2048 bits.
 
-My main concern was that people might be confused about the kernel ABI
-here, but it sounds like your interpretation is as I intended.
+Support for larger vectors is untestable for now, since the kernel
+doesn't support that and would never expose it.
 
-But by all means clarify the comments if you think there's a risk of
-QEMU folks being confused.
 
-[...]
+On that point, could TCG easily be made to expose a larger vector length
+to the kernel?  I'd be interested to see what happened.
+
+The kernel should warn and hide the larger vector lengths from KVM,
+but I've not been able to test that.
+
+It's only worth trying this out if the hacks to QEMU to enable testing
+this were pretty trivial, though.
 
 Cheers
 ---Dave
