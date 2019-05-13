@@ -3,46 +3,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BCB8C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 11:02:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0143DC04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 11:02:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C7E220879
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 11:02:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C7E220879
+	by mail.kernel.org (Postfix) with ESMTPS id BC69721019
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 11:02:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC69721019
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55116 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55118 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQ8jF-00047N-L9
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 07:02:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58213)
+	id 1hQ8jL-0004AZ-Va
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 07:02:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hQ8hm-000376-9N
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:01:15 -0400
+	(envelope-from <bounces@canonical.com>) id 1hQ8hi-00034u-FL
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:01:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hQ8hk-0004Ue-IA
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:01:14 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49820)
+	(envelope-from <bounces@canonical.com>) id 1hQ8hg-0004T7-Lb
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:01:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49642)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hQ8hk-0004UI-Cp
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:01:12 -0400
+	id 1hQ8hg-0004Sj-G4
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 07:01:08 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hQ8hj-0007bl-9a
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 11:01:11 +0000
+	id 1hQ8he-0007Wi-Vd
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 11:01:07 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 430912E8024
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 11:01:11 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id BC1642E80D7
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 11:01:06 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 May 2019 10:54:51 -0000
+Date: Mon, 13 May 2019 10:54:38 -0000
 From: =?utf-8?q?=C5=81ukasz_Zemczak?= <1823458@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -81,16 +82,17 @@ X-Launchpad-Bug-Commenters: brian-murray corey.bryant ddstreet paelzer racb
 X-Launchpad-Bug-Reporter: Dan Streetman (ddstreet)
 X-Launchpad-Bug-Modifier: =?utf-8?q?=C5=81ukasz_Zemczak_=28sil2100=29?=
 References: <155455149397.14414.11595397789908732027.malonedeb@gac.canonical.com>
-Message-Id: <155774489145.21554.2082210266211557370.malone@chaenomeles.canonical.com>
+Message-Id: <155774487824.15002.7678230900575336511.malone@wampee.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18962";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: b0d8e257edf630f83cdd78d6ea376abc7bb77aaa
+X-Launchpad-Hash: 96c6f748a981a1c79ccb271e2d2c4debc497eddf
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1823458] Update Released
+Subject: [Qemu-devel] [Bug 1823458] Re: race condition between
+ vhost_net_stop and CHR_EVENT_CLOSED on shutdown crashes qemu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -106,13 +108,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The verification of the Stable Release Update for qemu has completed
-successfully and the package has now been released to -updates.
-Subsequently, the Ubuntu Stable Release Updates Team is being
-unsubscribed and will not receive messages about this bug report.  In
-the event that you encounter a regression using the package from
--updates please report a new bug using ubuntu-bug and tag the bug report
-regression-update so we can easily find any regressions.
+This is even more than what I wanted, thanks!
 
 -- =
 
