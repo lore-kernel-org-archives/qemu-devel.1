@@ -2,94 +2,62 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41861C04AB1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 05:44:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F292C04AB1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 05:54:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0264520879
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 05:44:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0264520879
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 15ACD20873
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 05:54:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15ACD20873
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51376 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51455 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQ3kt-0002xl-Gd
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 01:44:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57611)
+	id 1hQ3vB-0004hl-7V
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 01:54:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hQ3jv-0002ZG-Ic
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:43:09 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hQ3uL-0004Oi-So
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:53:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hQ3hm-0004mD-5b
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:40:55 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40534)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
-	id 1hQ3hk-0004kk-DF; Mon, 13 May 2019 01:40:52 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4D5cPrq040934; Mon, 13 May 2019 01:40:34 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
-	[169.63.214.131])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2sf2cmghbx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=NOT); Mon, 13 May 2019 01:40:34 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-	by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4CNc5nE009401; Sun, 12 May 2019 23:44:52 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com
-	(b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-	by ppma01dal.us.ibm.com with ESMTP id 2sdp14c06b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=NOT); Sun, 12 May 2019 23:44:52 +0000
-Received: from b03ledav001.gho.boulder.ibm.com
-	(b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-	by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x4D5eWng9961946
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Mon, 13 May 2019 05:40:32 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 047D26E05B;
-	Mon, 13 May 2019 05:40:32 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 15D066E052;
-	Mon, 13 May 2019 05:40:29 +0000 (GMT)
-Received: from [9.124.31.31] (unknown [9.124.31.31])
-	by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
-	Mon, 13 May 2019 05:40:29 +0000 (GMT)
-To: Greg Kurz <groug@kaod.org>
-References: <155591636364.20338.844048953355207313.stgit@aravinda>
-	<155591659639.20338.6078212293519133016.stgit@aravinda>
-	<20190510182541.1c2e81ac@bahia.lab.toulouse-stg.fr.ibm.com>
-From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Message-ID: <2faeefbb-2628-060f-9bd7-996e1f6a1af6@linux.vnet.ibm.com>
-Date: Mon, 13 May 2019 11:10:28 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.6.0
-MIME-Version: 1.0
-In-Reply-To: <20190510182541.1c2e81ac@bahia.lab.toulouse-stg.fr.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-13_04:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1905130041
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v8 3/6] target/ppc: Handle NMI
- guest exit
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hQ3uI-0001pp-GL
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:53:53 -0400
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:50054)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hQ3uI-0001oZ-2v
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:53:50 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.vps.ablenet.jp
+	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+	by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 5BD9211BF7E;
+	Mon, 13 May 2019 14:53:45 +0900 (JST)
+Received: from yo-satoh-debian.ysato.ml (ZM005235.ppp.dion.ne.jp [222.8.5.235])
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id E2C8B240085; 
+	Mon, 13 May 2019 14:53:43 +0900 (JST)
+Date: Mon, 13 May 2019 14:53:38 +0900
+Message-ID: <87ftpi528t.wl-ysato@users.sourceforge.jp>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+In-Reply-To: <bfe7ae4f-cfec-5c66-17e7-1bac7eef4730@redhat.com>
+References: <20190508145611.107133-1-ysato@users.sourceforge.jp>
+	<20190508145611.107133-9-ysato@users.sourceforge.jp>
+	<bfe7ae4f-cfec-5c66-17e7-1bac7eef4730@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+	FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/25.1
+	(x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 202.224.55.13
+Subject: Re: [Qemu-devel] [PATCH v10 08/13] hw/char: RX62N serial
+ communication interface (SCI)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,232 +69,535 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org,
-	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 09 May 2019 01:16:58 +0900,
+Philippe Mathieu-Daud=E9 wrote:
+>=20
+> On 5/8/19 4:56 PM, Yoshinori Sato wrote:
+> > This module supported only non FIFO type.
+> > Hardware manual.
+> > https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh00=
+33ej0140_rx62n.pdf
+> >=20
+> > Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> > ---
+> >  include/hw/char/renesas_sci.h |  45 ++++++
+> >  hw/char/renesas_sci.c         | 340 ++++++++++++++++++++++++++++++++++=
+++++++++
+> >  hw/char/Kconfig               |   3 +
+> >  hw/char/Makefile.objs         |   2 +-
+> >  4 files changed, 389 insertions(+), 1 deletion(-)
+> >  create mode 100644 include/hw/char/renesas_sci.h
+> >  create mode 100644 hw/char/renesas_sci.c
+> >=20
+> > diff --git a/include/hw/char/renesas_sci.h b/include/hw/char/renesas_sc=
+i.h
+> > new file mode 100644
+> > index 0000000000..50d1336944
+> > --- /dev/null
+> > +++ b/include/hw/char/renesas_sci.h
+> > @@ -0,0 +1,45 @@
+> > +/*
+> > + * Renesas Serial Communication Interface
+> > + *
+> > + * Copyright (c) 2018 Yoshinori Sato
+> > + *
+> > + * This code is licensed under the GPL version 2 or later.
+> > + *
+> > + */
+> > +
+> > +#include "chardev/char-fe.h"
+> > +#include "qemu/timer.h"
+> > +#include "hw/sysbus.h"
+> > +
+> > +#define TYPE_RENESAS_SCI "renesas-sci"
+> > +#define RSCI(obj) OBJECT_CHECK(RSCIState, (obj), TYPE_RENESAS_SCI)
+> > +
+> > +enum {
+> > +    ERI =3D 0,
+> > +    RXI =3D 1,
+> > +    TXI =3D 2,
+> > +    TEI =3D 3,
+> > +    SCI_NR_IRQ =3D 4,
+> > +};
+> > +
+> > +typedef struct {
+> > +    SysBusDevice parent_obj;
+> > +    MemoryRegion memory;
+> > +
+> > +    uint8_t smr;
+> > +    uint8_t brr;
+> > +    uint8_t scr;
+> > +    uint8_t tdr;
+> > +    uint8_t ssr;
+> > +    uint8_t rdr;
+> > +    uint8_t scmr;
+> > +    uint8_t semr;
+> > +
+> > +    uint8_t read_ssr;
+> > +    int64_t trtime;
+> > +    int64_t rx_next;
+> > +    QEMUTimer *timer;
+> > +    CharBackend chr;
+> > +    uint64_t input_freq;
+> > +    qemu_irq irq[SCI_NR_IRQ];
+> > +} RSCIState;
+> > diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
+> > new file mode 100644
+> > index 0000000000..2e7c3e460e
+> > --- /dev/null
+> > +++ b/hw/char/renesas_sci.c
+> > @@ -0,0 +1,340 @@
+> > +/*
+> > + * Renesas Serial Communication Interface
+> > + *
+> > + * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
+> > + * (Rev.1.40 R01UH0033EJ0140)
+> > + *
+> > + * Copyright (c) 2019 Yoshinori Sato
+> > + *
+> > + * This program is free software; you can redistribute it and/or modif=
+y it
+> > + * under the terms and conditions of the GNU General Public License,
+> > + * version 2 or later, as published by the Free Software Foundation.
+> > + *
+> > + * This program is distributed in the hope it will be useful, but WITH=
+OUT
+> > + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY =
+or
+> > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public Licen=
+se for
+> > + * more details.
+> > + *
+> > + * You should have received a copy of the GNU General Public License a=
+long with
+> > + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "qemu/log.h"
+> > +#include "qapi/error.h"
+> > +#include "qemu-common.h"
+> > +#include "cpu.h"
+> > +#include "hw/hw.h"
+> > +#include "hw/sysbus.h"
+> > +#include "hw/registerfields.h"
+> > +#include "hw/char/renesas_sci.h"
+> > +#include "qemu/error-report.h"
+> > +
+> > +/* SCI register map */
+> > +REG8(SMR, 0)
+> > +  FIELD(SMR, CKS,  0, 2)
+> > +  FIELD(SMR, MP,   2, 1)
+> > +  FIELD(SMR, STOP, 3, 1)
+> > +  FIELD(SMR, PM,   4, 1)
+> > +  FIELD(SMR, PE,   5, 1)
+> > +  FIELD(SMR, CHR,  6, 1)
+> > +  FIELD(SMR, CM,   7, 1)
+> > +REG8(BRR, 1)
+> > +REG8(SCR, 2)
+> > +  FIELD(SCR, CKE, 0, 2)
+> > +  FIELD(SCR, TEIE, 2, 1)
+> > +  FIELD(SCR, MPIE, 3, 1)
+> > +  FIELD(SCR, RE,   4, 1)
+> > +  FIELD(SCR, TE,   5, 1)
+> > +  FIELD(SCR, RIE,  6, 1)
+> > +  FIELD(SCR, TIE,  7, 1)
+> > +REG8(TDR, 3)
+> > +REG8(SSR, 4)
+> > +  FIELD(SSR, MPBT, 0, 1)
+> > +  FIELD(SSR, MPB,  1, 1)
+> > +  FIELD(SSR, TEND, 2, 1)
+> > +  FIELD(SSR, ERR, 3, 3)
+> > +    FIELD(SSR, PER,  3, 1)
+> > +    FIELD(SSR, FER,  4, 1)
+> > +    FIELD(SSR, ORER, 5, 1)
+> > +  FIELD(SSR, RDRF, 6, 1)
+> > +  FIELD(SSR, TDRE, 7, 1)
+> > +REG8(RDR, 5)
+> > +REG8(SCMR, 6)
+> > +  FIELD(SCMR, SMIF, 0, 1)
+> > +  FIELD(SCMR, SINV, 2, 1)
+> > +  FIELD(SCMR, SDIR, 3, 1)
+> > +  FIELD(SCMR, BCP2, 7, 1)
+> > +REG8(SEMR, 7)
+> > +  FIELD(SEMR, ACS0, 0, 1)
+> > +  FIELD(SEMR, ABCS, 4, 1)
+> > +
+> > +static int can_receive(void *opaque)
+> > +{
+> > +    RSCIState *sci =3D RSCI(opaque);
+> > +    if (sci->rx_next > qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)) {
+> > +        return 0;
+> > +    } else {
+> > +        return FIELD_EX8(sci->scr, SCR, RE);
+> > +    }
+> > +}
+> > +
+> > +static void receive(void *opaque, const uint8_t *buf, int size)
+> > +{
+> > +    RSCIState *sci =3D RSCI(opaque);
+> > +    sci->rx_next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trti=
+me;
+> > +    if (FIELD_EX8(sci->ssr, SSR, RDRF) || size > 1) {
+> > +        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, ORER, 1);
+> > +        if (FIELD_EX8(sci->scr, SCR, RIE)) {
+> > +            qemu_set_irq(sci->irq[ERI], 1);
+> > +        }
+> > +    } else {
+> > +        sci->rdr =3D buf[0];
+> > +        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, RDRF, 1);
+> > +        if (FIELD_EX8(sci->scr, SCR, RIE)) {
+> > +            qemu_irq_pulse(sci->irq[RXI]);
+> > +        }
+> > +    }
+> > +}
+> > +
+> > +static void send_byte(RSCIState *sci)
+> > +{
+> > +    if (qemu_chr_fe_backend_connected(&sci->chr)) {
+> > +        qemu_chr_fe_write_all(&sci->chr, &sci->tdr, 1);
+> > +    }
+> > +    timer_mod(sci->timer,
+> > +              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime);
+> > +    sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 0);
+> > +    sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 1);
+> > +    qemu_set_irq(sci->irq[TEI], 0);
+> > +    if (FIELD_EX8(sci->scr, SCR, TIE)) {
+> > +        qemu_irq_pulse(sci->irq[TXI]);
+> > +    }
+> > +}
+> > +
+> > +static void txend(void *opaque)
+> > +{
+> > +    RSCIState *sci =3D RSCI(opaque);
+> > +    if (!FIELD_EX8(sci->ssr, SSR, TDRE)) {
+> > +        send_byte(sci);
+> > +    } else {
+> > +        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 1);
+> > +        if (FIELD_EX8(sci->scr, SCR, TEIE)) {
+> > +            qemu_set_irq(sci->irq[TEI], 1);
+> > +        }
+> > +    }
+> > +}
+> > +
+> > +static void update_trtime(RSCIState *sci)
+> > +{
+> > +    /* char per bits */
+> > +    sci->trtime =3D 8 - FIELD_EX8(sci->smr, SMR, CHR);
+> > +    sci->trtime +=3D FIELD_EX8(sci->smr, SMR, PE);
+> > +    sci->trtime +=3D FIELD_EX8(sci->smr, SMR, STOP) + 1;
+> > +    /* x bit transmit time (32 * divrate * brr) / base freq */
+> > +    sci->trtime *=3D 32 * sci->brr;
+> > +    sci->trtime *=3D 1 << (2 * FIELD_EX8(sci->smr, SMR, CKS));
+> > +    sci->trtime *=3D NANOSECONDS_PER_SECOND;
+> > +    sci->trtime /=3D sci->input_freq;
+> > +}
+> > +
+> > +#define IS_TR_ENABLED(scr) \
+> > +    (FIELD_EX8(scr, SCR, TE) || FIELD_EX8(scr, SCR, RE))
+> > +
+> > +static void sci_write(void *opaque, hwaddr addr, uint64_t val, unsigne=
+d size)
+> > +{
+> > +    hwaddr offset =3D addr & 0x07;
+> > +    RSCIState *sci =3D RSCI(opaque);
+> > +
+> > +    switch (offset) {
+> > +    case A_SMR:
+> > +        if (!IS_TR_ENABLED(sci->scr)) {
+> > +            sci->smr =3D val;
+> > +            update_trtime(sci);
+> > +        }
+> > +        break;
+> > +    case A_BRR:
+> > +        if (!IS_TR_ENABLED(sci->scr)) {
+> > +            sci->brr =3D val;
+> > +            update_trtime(sci);
+> > +        }
+> > +        break;
+> > +    case A_SCR:
+> > +        sci->scr =3D val;
+> > +        if (FIELD_EX8(sci->scr, SCR, TE)) {
+> > +            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 1);
+> > +            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 1);
+> > +            if (FIELD_EX8(sci->scr, SCR, TIE)) {
+> > +                qemu_irq_pulse(sci->irq[TXI]);
+> > +            }
+> > +        }
+> > +        if (!FIELD_EX8(sci->scr, SCR, TEIE)) {
+> > +            qemu_set_irq(sci->irq[TEI], 0);
+> > +        }
+> > +        if (!FIELD_EX8(sci->scr, SCR, RIE)) {
+> > +            qemu_set_irq(sci->irq[ERI], 0);
+> > +        }
+> > +        break;
+> > +    case A_TDR:
+> > +        sci->tdr =3D val;
+> > +        if (FIELD_EX8(sci->ssr, SSR, TEND)) {
+> > +            send_byte(sci);
+> > +        } else {
+> > +            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 0);
+> > +        }
+> > +        break;
+> > +    case A_SSR:
+> > +        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, MPBT,
+> > +                             FIELD_EX8(val, SSR, MPBT));
+> > +        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, ERR,
+> > +                             FIELD_EX8(val, SSR, ERR) & 0x07);
+> > +        if (FIELD_EX8(sci->read_ssr, SSR, ERR) &&
+> > +            FIELD_EX8(sci->ssr, SSR, ERR) =3D=3D 0) {
+> > +            qemu_set_irq(sci->irq[ERI], 0);
+> > +        }
+> > +        break;
+> > +    case A_RDR:
+> > +        qemu_log_mask(LOG_GUEST_ERROR, "reneas_sci: RDR is read only.\=
+n");
+> > +        break;
+> > +    case A_SCMR:
+> > +        sci->scmr =3D val; break;
+> > +    case A_SEMR: /* SEMR */
+> > +        sci->semr =3D val; break;
+> > +    default:
+> > +        qemu_log_mask(LOG_UNIMP,
+> > +                      "renesas_sci: Register %08lx not implemented\n",=
+ offset);
+>=20
+> On 32bit host I get:
+>=20
+> In file included from qemu/hw/char/renesas_sci.c:23:0:
+> qemu/hw/char/renesas_sci.c: In function 'sci_write':
+> qemu/hw/char/renesas_sci.c:205:23: error: format '%lx' expects argument
+> of type 'long unsigned int', but argument 2 has type 'hwaddr {aka long
+> long unsigned int}' [-Werror=3Dformat=3D]
+>                        "renesas_sci: Register %08lx not implemented\n",
+> offset);
+>                        ^
+> qemu/include/qemu/log.h:85:22: note: in definition of macro 'qemu_log_mas=
+k'
+>              qemu_log(FMT, ## __VA_ARGS__);              \
+>                       ^
+> qemu/hw/char/renesas_sci.c: In function 'sci_read':
+> qemu/hw/char/renesas_sci.c:235:23: error: format '%lx' expects argument
+> of type 'long unsigned int', but argument 2 has type 'hwaddr {aka long
+> long unsigned int}' [-Werror=3Dformat=3D]
+>                        "renesas_sci: Register %08lx not implemented.\n",
+> offset);
+>                        ^
+> qemu/include/qemu/log.h:85:22: note: in definition of macro 'qemu_log_mas=
+k'
+>              qemu_log(FMT, ## __VA_ARGS__);              \
+>                       ^
+> cc1: all warnings being treated as errors
+>=20
+> This snippet fixes the error:
+>=20
+> -- >8 --
+> diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
+> @@ -202,7 +202,8 @@ static void sci_write(void *opaque, hwaddr addr,
+> uint64_t val, unsigned size)
+>          sci->semr =3D val; break;
+>      default:
+>          qemu_log_mask(LOG_UNIMP,
+> -                      "renesas_sci: Register %08lx not implemented\n",
+> offset);
+> +                      "renesas_sci: Register %08" HWADDR_PRIx
+> +                      " not implemented\n", offset);
+>      }
+>  }
+>=20
+> @@ -232,7 +233,8 @@ static uint64_t sci_read(void *opaque, hwaddr addr,
+> unsigned size)
+>          return sci->semr;
+>      default:
+>          qemu_log_mask(LOG_UNIMP,
+> -                      "renesas_sci: Register %08lx not implemented.\n",
+> offset);
+> +                      "renesas_sci: Register %08" HWADDR_PRIx
+> +                      " not implemented\n", offset);
+>      }
+>      return -1;
+>  }
+> ---
+>=20
+> > +    }
+> > +}
+> > +
+> > +static uint64_t sci_read(void *opaque, hwaddr addr, unsigned size)
+> > +{
+> > +    hwaddr offset =3D addr & 0x07;
+> > +    RSCIState *sci =3D RSCI(opaque);
+> > +
+> > +    switch (offset) {
+> > +    case A_SMR:
+> > +        return sci->smr;
+> > +    case A_BRR:
+> > +        return sci->brr;
+> > +    case A_SCR:
+> > +        return sci->scr;
+> > +    case A_TDR:
+> > +        return sci->tdr;
+> > +    case A_SSR:
+> > +        sci->read_ssr =3D sci->ssr;
+> > +        return sci->ssr;
+> > +    case A_RDR:
+> > +        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, RDRF, 0);
+> > +        return sci->rdr;
+> > +    case A_SCMR:
+> > +        return sci->scmr;
+> > +    case A_SEMR:
+> > +        return sci->semr;
+> > +    default:
+> > +        qemu_log_mask(LOG_UNIMP,
+> > +                      "renesas_sci: Register %08lx not implemented.\n"=
+, offset);
+> > +    }
+> > +    return -1;
+> > +}
+> > +
+> > +static const MemoryRegionOps sci_ops =3D {
+> > +    .write =3D sci_write,
+> > +    .read  =3D sci_read,
+> > +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> > +    .impl =3D {
+> > +        .max_access_size =3D 1,
+> > +    },
+> > +};
+> > +
+> > +static void rsci_reset(DeviceState *dev)
+> > +{
+> > +    RSCIState *sci =3D RSCI(dev);
+> > +    sci->smr =3D sci->scr =3D 0x00;
+> > +    sci->brr =3D 0xff;
+> > +    sci->tdr =3D 0xff;
+> > +    sci->rdr =3D 0x00;
+> > +    sci->ssr =3D 0x84;
+> > +    sci->scmr =3D 0x00;
+> > +    sci->semr =3D 0x00;
+> > +    sci->rx_next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> > +}
+> > +
+> > +static void sci_event(void *opaque, int event)
+> > +{
+> > +    RSCIState *sci =3D RSCI(opaque);
+> > +    if (event =3D=3D CHR_EVENT_BREAK) {
+> > +        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, FER, 1);
+> > +        if (FIELD_EX8(sci->scr, SCR, RIE)) {
+> > +            qemu_set_irq(sci->irq[ERI], 1);
+> > +        }
+> > +    }
+> > +}
+> > +
+> > +static void rsci_realize(DeviceState *dev, Error **errp)
+> > +{
+> > +    RSCIState *sci =3D RSCI(dev);
+> > +
+> > +    if (sci->input_freq =3D=3D 0) {
+> > +        qemu_log_mask(LOG_GUEST_ERROR,
+> > +                      "renesas_sci: input-freq property must be set.");
+> > +        return;
+> > +    }
+> > +    qemu_chr_fe_set_handlers(&sci->chr, can_receive, receive,
+> > +                             sci_event, NULL, sci, NULL, true);
+> > +}
+> > +
+> > +static void rsci_init(Object *obj)
+> > +{
+> > +    SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
+> > +    RSCIState *sci =3D RSCI(obj);
+> > +    int i;
+> > +
+> > +    memory_region_init_io(&sci->memory, OBJECT(sci), &sci_ops,
+> > +                          sci, "renesas-sci", 0x8);
+> > +    sysbus_init_mmio(d, &sci->memory);
+> > +
+> > +    for (i =3D 0; i < SCI_NR_IRQ; i++) {
+> > +        sysbus_init_irq(d, &sci->irq[i]);
+> > +    }
+> > +    sci->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, txend, sci);
+> > +}
+> > +
+> > +static const VMStateDescription vmstate_rcmt =3D {
+> > +    .name =3D "renesas-sci",
+> > +    .version_id =3D 1,
+> > +    .minimum_version_id =3D 1,
+> > +    .fields =3D (VMStateField[]) {
+> > +        VMSTATE_END_OF_LIST()
+> > +    }
+> > +};
+> > +
+> > +static Property rsci_properties[] =3D {
+> > +    DEFINE_PROP_UINT64("input-freq", RSCIState, input_freq, 0),
+> > +    DEFINE_PROP_CHR("chardev", RSCIState, chr),
+> > +    DEFINE_PROP_END_OF_LIST(),
+> > +};
+> > +
+> > +static void rsci_class_init(ObjectClass *klass, void *data)
+> > +{
+> > +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> > +
+> > +    dc->realize =3D rsci_realize;
+> > +    dc->props =3D rsci_properties;
+> > +    dc->vmsd =3D &vmstate_rcmt;
+> > +    dc->reset =3D rsci_reset;
+> > +}
+> > +
+> > +static const TypeInfo rsci_info =3D {
+> > +    .name       =3D TYPE_RENESAS_SCI,
+> > +    .parent     =3D TYPE_SYS_BUS_DEVICE,
+> > +    .instance_size =3D sizeof(RSCIState),
+> > +    .instance_init =3D rsci_init,
+> > +    .class_init =3D rsci_class_init,
+> > +};
+> > +
+> > +static void rsci_register_types(void)
+> > +{
+> > +    type_register_static(&rsci_info);
+> > +}
+> > +
+> > +type_init(rsci_register_types)
+> > diff --git a/hw/char/Kconfig b/hw/char/Kconfig
+> > index 6360c9fffa..10c24ca87f 100644
+> > --- a/hw/char/Kconfig
+> > +++ b/hw/char/Kconfig
+> > @@ -40,3 +40,6 @@ config SCLPCONSOLE
+> > =20
+> >  config TERMINAL3270
+> >      bool
+> > +
+> > +config RENESAS_SCI
+> > +    bool
+>=20
+>        select SERIAL
 
+It my mistake.
+RX don't use SERIAL. So this line not needed.
 
-On Friday 10 May 2019 09:55 PM, Greg Kurz wrote:
-> On Mon, 22 Apr 2019 12:33:16 +0530
-> Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
-> 
->> Memory error such as bit flips that cannot be corrected
->> by hardware are passed on to the kernel for handling.
->> If the memory address in error belongs to guest then
->> the guest kernel is responsible for taking suitable action.
->> Patch [1] enhances KVM to exit guest with exit reason
->> set to KVM_EXIT_NMI in such cases. This patch handles
->> KVM_EXIT_NMI exit.
->>
->> [1] https://www.spinics.net/lists/kvm-ppc/msg12637.html
->>     (e20bbd3d and related commits)
->>
->> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
->> ---
->>  hw/ppc/spapr.c          |    3 +++
->>  hw/ppc/spapr_events.c   |   22 ++++++++++++++++++++++
->>  hw/ppc/spapr_rtas.c     |    5 +++++
->>  include/hw/ppc/spapr.h  |    6 ++++++
->>  target/ppc/kvm.c        |   16 ++++++++++++++++
->>  target/ppc/kvm_ppc.h    |    2 ++
->>  target/ppc/trace-events |    2 ++
->>  7 files changed, 56 insertions(+)
->>
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 6642cb5..2779efe 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -1806,6 +1806,7 @@ static void spapr_machine_reset(void)
->>  
->>      spapr->cas_reboot = false;
->>  
->> +    spapr->mc_status = -1;
->>      spapr->guest_machine_check_addr = -1;
->>  
->>      /* Signal all vCPUs waiting on this condition */
->> @@ -2106,6 +2107,7 @@ static const VMStateDescription vmstate_spapr_machine_check = {
->>      .minimum_version_id = 1,
->>      .fields = (VMStateField[]) {
->>          VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
->> +        VMSTATE_INT32(mc_status, SpaprMachineState),
->>          VMSTATE_END_OF_LIST()
->>      },
->>  };
->> @@ -3085,6 +3087,7 @@ static void spapr_machine_init(MachineState *machine)
->>          kvmppc_spapr_enable_inkernel_multitce();
->>      }
->>  
->> +    spapr->mc_status = -1;
-> 
-> Since this is done at reset, do we need it here ?
+> > diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+> > index cf086e7114..7567e89a49 100644
+> > --- a/hw/char/Makefile.objs
+> > +++ b/hw/char/Makefile.objs
+> > @@ -15,7 +15,7 @@ common-obj-$(CONFIG_CADENCE) +=3D cadence_uart.o
+> >  obj-$(CONFIG_EXYNOS4) +=3D exynos4210_uart.o
+> >  obj-$(CONFIG_COLDFIRE) +=3D mcf_uart.o
+> >  obj-$(CONFIG_OMAP) +=3D omap_uart.o
+> > -obj-$(CONFIG_SH4) +=3D sh_serial.o
+> > +obj-$(CONFIG_RENESAS_SCI) +=3D renesas_sci.o
+> >  obj-$(CONFIG_PSERIES) +=3D spapr_vty.o
+> >  obj-$(CONFIG_DIGIC) +=3D digic-uart.o
+> >  obj-$(CONFIG_STM32F2XX_USART) +=3D stm32f2xx_usart.o
+> >=20
+>=20
+> Nice work!
+>=20
+> Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+>=20
 
-Yes, because we need to initialize this on a fresh boot. I need to
-check, but if spapr_machine_reset() is called every time a system boots
-then we don't need qemu_cond_init() here as well.
-
-> 
->>      qemu_cond_init(&spapr->mc_delivery_cond);
->>  }
->>  
->> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
->> index ae0f093..9922a23 100644
->> --- a/hw/ppc/spapr_events.c
->> +++ b/hw/ppc/spapr_events.c
->> @@ -620,6 +620,28 @@ void spapr_hotplug_req_remove_by_count_indexed(SpaprDrcType drc_type,
->>                              RTAS_LOG_V6_HP_ACTION_REMOVE, drc_type, &drc_id);
->>  }
->>  
->> +void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
->> +{
->> +    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
->> +
->> +    while (spapr->mc_status != -1) {
->> +        /*
->> +         * Check whether the same CPU got machine check error
->> +         * while still handling the mc error (i.e., before
->> +         * that CPU called "ibm,nmi-interlock"
-> 
-> Missing )
-
-ok.
-
-> 
->> +         */
->> +        if (spapr->mc_status == cpu->vcpu_id) {
->> +            qemu_system_guest_panicked(NULL);
-> 
-> If we don't also return, is there a chance we end up stuck in
-> qemu_cond_wait_iothread() below ?
-
-I think I need to return here
-
-
-> 
->> +        }
->> +        qemu_cond_wait_iothread(&spapr->mc_delivery_cond);
->> +        /* Meanwhile if the system is reset, then just return */
->> +        if (spapr->guest_machine_check_addr == -1) {
->> +            return;
->> +        }
->> +    }
->> +    spapr->mc_status = cpu->vcpu_id;
->> +}
->> +
->>  static void check_exception(PowerPCCPU *cpu, SpaprMachineState *spapr,
->>                              uint32_t token, uint32_t nargs,
->>                              target_ulong args,
->> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
->> index c2f3991..d3499f9 100644
->> --- a/hw/ppc/spapr_rtas.c
->> +++ b/hw/ppc/spapr_rtas.c
->> @@ -375,6 +375,11 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
->>          /* NMI register not called */
->>          rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
->>      } else {
->> +        /*
->> +         * vCPU issuing "ibm,nmi-interlock" is done with NMI handling,
->> +         * hence unset mc_status.
->> +         */
->> +        spapr->mc_status = -1;
->>          qemu_cond_signal(&spapr->mc_delivery_cond);
->>          rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->>      }
->> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->> index ec6f33e..f7204d0 100644
->> --- a/include/hw/ppc/spapr.h
->> +++ b/include/hw/ppc/spapr.h
->> @@ -189,6 +189,11 @@ struct SpaprMachineState {
->>  
->>      /* State related to "ibm,nmi-register" and "ibm,nmi-interlock" calls */
->>      target_ulong guest_machine_check_addr;
->> +    /*
->> +     * mc_status is set to -1 if mc is not in progress, else is set to the CPU
->> +     * handling the mc.
->> +     */
->> +    int mc_status;
->>      QemuCond mc_delivery_cond;
->>  
->>      /*< public >*/
->> @@ -792,6 +797,7 @@ void spapr_clear_pending_events(SpaprMachineState *spapr);
->>  int spapr_max_server_number(SpaprMachineState *spapr);
->>  void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
->>                        uint64_t pte0, uint64_t pte1);
->> +void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered);
->>  
->>  /* DRC callbacks. */
->>  void spapr_core_release(DeviceState *dev);
->> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
->> index 9e86db0..5eedce8 100644
->> --- a/target/ppc/kvm.c
->> +++ b/target/ppc/kvm.c
->> @@ -1759,6 +1759,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
->>          ret = 0;
->>          break;
->>  
->> +    case KVM_EXIT_NMI:
->> +        trace_kvm_handle_nmi_exception();
->> +        ret = kvm_handle_nmi(cpu, run);
->> +        break;
->> +
->>      default:
->>          fprintf(stderr, "KVM: unknown exit reason %d\n", run->exit_reason);
->>          ret = -1;
->> @@ -2837,6 +2842,17 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
->>      return data & 0xffff;
->>  }
->>  
->> +int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run)
->> +{
->> +    bool recovered = run->flags & KVM_RUN_PPC_NMI_DISP_FULLY_RECOV;
->> +
->> +    cpu_synchronize_state(CPU(cpu));
->> +
->> +    spapr_mce_req_event(cpu, recovered);
->> +
->> +    return 0;
->> +}
->> +
->>  int kvmppc_enable_hwrng(void)
->>  {
->>      if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CAP_PPC_HWRNG)) {
->> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
->> index 2238513..6edc42f 100644
->> --- a/target/ppc/kvm_ppc.h
->> +++ b/target/ppc/kvm_ppc.h
->> @@ -80,6 +80,8 @@ bool kvmppc_hpt_needs_host_contiguous_pages(void);
->>  void kvm_check_mmu(PowerPCCPU *cpu, Error **errp);
->>  void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu, unsigned int online);
->>  
->> +int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run);
->> +
->>  #else
->>  
->>  static inline uint32_t kvmppc_get_tbfreq(void)
->> diff --git a/target/ppc/trace-events b/target/ppc/trace-events
->> index 7b3cfe1..d5691d2 100644
->> --- a/target/ppc/trace-events
->> +++ b/target/ppc/trace-events
->> @@ -28,3 +28,5 @@ kvm_handle_papr_hcall(void) "handle PAPR hypercall"
->>  kvm_handle_epr(void) "handle epr"
->>  kvm_handle_watchdog_expiry(void) "handle watchdog expiry"
->>  kvm_handle_debug_exception(void) "handle debug exception"
->> +kvm_handle_nmi_exception(void) "handle NMI exception"
->> +
-> 
-> new blank line at EOF.
-
-ok
-
-> 
->>
->>
-> 
-> 
-
--- 
-Regards,
-Aravinda
+--=20
+Yosinori Sato
 
