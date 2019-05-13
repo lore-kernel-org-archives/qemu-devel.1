@@ -2,83 +2,93 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A712C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 15:42:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 887D6C04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 15:58:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2341320879
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 15:42:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WB+Nhl7c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2341320879
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5ADB620873
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 15:58:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5ADB620873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59376 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59506 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQD5V-0002cN-FB
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 11:42:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53858)
+	id 1hQDLk-0006LS-DH
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 11:58:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hQD4b-000276-8n
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:41:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hQDJt-00057N-3S
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:56:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hQD4a-0004cH-6V
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:41:05 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41094)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hQD4a-0004bb-0U
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:41:04 -0400
-Received: by mail-ot1-x343.google.com with SMTP id g8so12164505otl.8
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 08:41:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=2WtiAmLbnppF5wdYRwwdYOHNgP4UsBxqvFA32h2u9G8=;
-	b=WB+Nhl7c68MSZAYYp+dtLDMiI3zkm0/8X7dMzFpOJXTpHShrn/G5jDLTTmScVCwkyl
-	Fpp/gs5r4yqPOsT8nT4kaD1kUy3mD/g/TheRs04VzR656nnEFo5o9NowQqJ4/5iqXwBw
-	3fAN2zo685RLbUd6ALXlIYPGlwv1agUqC66gZNcsI+xGksSJMUTjrNf4PhNb1z3vyHVA
-	86ZT6g27aCD1NCEN5PC5nnO2UPmFLJpXeCTDEA1d8+/Yut3C+MBudza6xWy3v6bPtYL0
-	EsY9IynoQUHszdjXy9vy2AZa7n8MGHNU6ACTZ86GzpP2cslSqSHeq+X8sEzmg+acSdTL
-	zgmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=2WtiAmLbnppF5wdYRwwdYOHNgP4UsBxqvFA32h2u9G8=;
-	b=YSG43wQ/AHh0dn5NEj7MwAXKDNQehvq19OgOjK3etma4vuptAgf9X4sXwKOSKCl1ui
-	nzIU5FmTdW/mmR+cRh5elnWjdQPitnyQMolHft1lD5pS/bTI7x3lnfTNHeoCYYSXi7Zi
-	XCTm6Gu3es5pyt0Hecj3+b5ycuLOGjFHLY/ybBUaszG1tvY85KziwYs4DW7uiE5JAUjv
-	IytQ/W3XIA1kRp3sCHnWdRVni/gIzNDgg6o5MJsUD9Zm92Ayts2aPLj21YyIVFeODnDu
-	Q6Ee73rpaB0ZI5IP2bAgmHZCWWPldwp71rPTeVpxNlJWSWOQA4IN0YuoUYJNITLPEtGM
-	cCXQ==
-X-Gm-Message-State: APjAAAV0ov7iAaAsdjmBZWufeHl0G090ODK8rfhmBJLbDVdUPBKoy4qG
-	av8Wlm20Cr+E7KYRRSiTIvw494haybveWAcvUbciJg==
-X-Google-Smtp-Source: APXvYqwH/5qZu17agIjGYc0FSyUggL70xbuawBciikn7GtT3GCIIQJbuX9X6C6rfbeSNldIVuRLpUqf1ioT1A1omw1U=
-X-Received: by 2002:a9d:404:: with SMTP id 4mr7099927otc.352.1557762063062;
-	Mon, 13 May 2019 08:41:03 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1hQDHC-0003Em-5r
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:54:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52478)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hQDHA-0003DU-S9; Mon, 13 May 2019 11:54:05 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 356183087944;
+	Mon, 13 May 2019 15:54:04 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.206.26])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2500E608B9;
+	Mon, 13 May 2019 15:54:02 +0000 (UTC)
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1557754872.git.berto@igalia.com>
+	<20dfb3d9ccec559cdd1a9690146abad5d204a186.1557754872.git.berto@igalia.com>
+	<5783a050-5866-80d5-4699-7ea0bf122398@redhat.com>
+	<w51r292pd0n.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <ca7573fa-774b-89dd-ab7d-849258d51904@redhat.com>
+Date: Mon, 13 May 2019 17:54:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190512083624.8916-1-drjones@redhat.com>
-	<20190512083624.8916-6-drjones@redhat.com>
-	<20190513123110.GE28398@e103592.cambridge.arm.com>
-	<20190513135501.ztggqdac57qbpuft@kamzik.brq.redhat.com>
-	<20190513153116.GL28398@e103592.cambridge.arm.com>
-In-Reply-To: <20190513153116.GL28398@e103592.cambridge.arm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 13 May 2019 16:40:52 +0100
-Message-ID: <CAFEAcA95LbXZOJNUAYuYoVDkM0auj-RGACXPp9Qe9ANp_b3C=w@mail.gmail.com>
-To: Dave Martin <Dave.Martin@arm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH 05/13] target/arm/kvm: Add
- kvm_arch_get/put_sve
+In-Reply-To: <w51r292pd0n.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="l7euaRzGsHEl6QdEtXUikx92nBZM23axJ"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Mon, 13 May 2019 15:54:04 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] block: Make
+ bdrv_root_attach_child() unref child_bs on failure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,39 +100,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jones <drjones@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
-	"richard.henderson@linaro.org" <richard.henderson@linaro.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"abologna@redhat.com" <abologna@redhat.com>,
-	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-	"alex.bennee@linaro.org" <alex.bennee@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 13 May 2019 at 16:31, Dave Martin <Dave.Martin@arm.com> wrote:
->
-> On Mon, May 13, 2019 at 02:55:01PM +0100, Andrew Jones wrote:
-> > QEMU keeps its 128-bit and larger words in the same order (least
-> > significant word first) for both host endian types. We need to
-> > do word swapping every time we set/get them to/from KVM.
->
-> I'm not sure whether this is appropriate here, though it depends on
-> what QEMU does with the data.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--l7euaRzGsHEl6QdEtXUikx92nBZM23axJ
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <ca7573fa-774b-89dd-ab7d-849258d51904@redhat.com>
+Subject: Re: [PATCH v3 2/2] block: Make bdrv_root_attach_child() unref
+ child_bs on failure
+References: <cover.1557754872.git.berto@igalia.com>
+ <20dfb3d9ccec559cdd1a9690146abad5d204a186.1557754872.git.berto@igalia.com>
+ <5783a050-5866-80d5-4699-7ea0bf122398@redhat.com>
+ <w51r292pd0n.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51r292pd0n.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The layout is optimised for TCG emulation to be able
-to work with it, I think (rth would have the definite
-reason, though).
+On 13.05.19 17:52, Alberto Garcia wrote:
+> On Mon 13 May 2019 04:31:16 PM CEST, Max Reitz wrote:
+>>> @@ -2569,10 +2582,6 @@ BdrvChild *bdrv_open_child(const char *filenam=
+e,
+>>>      }
+>>> =20
+>>>      c =3D bdrv_attach_child(parent, bs, bdref_key, child_role, errp)=
+;
+>>> -    if (!c) {
+>>> -        bdrv_unref(bs);
+>>> -        return NULL;
+>>> -    }
+>>> =20
+>>>      return c;
+>>>  }
+>>
+>> (That could have been simplified even further. *shrug*)
+>=20
+> Right, we can remove the 'c' variable altogether. Feel free to edit the=
 
-> Something non-obvious to be aware of:
->
-> As exposed through the signal frame and the KVM ABI, the memory
-> representation of an SVE reg is invariant with respect to the
-> endianness.
+> commit if you want.
 
-Yes; we handle this conversion as we write out the signal frame:
-https://github.com/qemu/qemu/blob/master/linux-user/aarch64/signal.c#L184
+OK, I=E2=80=99ll do that, then.
 
-thanks
--- PMM
+Max
+
+
+--l7euaRzGsHEl6QdEtXUikx92nBZM23axJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzZkxkACgkQ9AfbAGHV
+z0DiNggAmJU5iQUlIxspL6IsSJkuLvhc3bBVkU/w6topAYi9ehGBVFITdnajsGMl
+EItdsYpT87CCSwv/1SoXOOGgCAKTTetsb+l7o6BL+3gk8lrG0rkzY58emmjIZKZ3
+8Njegc0Tj0WBN6O8oC6Y+J0mkSOxgg4hizsgXl/+7uga4IVXdDB3SwVb6dLEstTT
+ywuB62tRZtL8n4K3EhHH6tj5bzgOzuqSfIbV4R+dfnzQHLmK0i6I+W6msbf7jbf7
+IaJFss1Kp0L8tpaJiaVG4BRtfZW8W2efhklo5X2lHqWIoVngeHJ2818VaRofCzwO
+8VM82ifjydwKxJ5wEYr2hCQ5sCZAAw==
+=Nei5
+-----END PGP SIGNATURE-----
+
+--l7euaRzGsHEl6QdEtXUikx92nBZM23axJ--
 
