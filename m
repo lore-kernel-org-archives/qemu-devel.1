@@ -2,93 +2,80 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 019F4C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 21:27:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F5EFC04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 23:19:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A93B120873
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 21:27:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E3793208C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 23:19:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V5O6+P0u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A93B120873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m02C9uQK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3793208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35306 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36238 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQITX-00073t-Ps
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 17:27:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34984)
+	id 1hQKDu-0003U1-QQ
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 19:19:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQIRZ-00041n-CH
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 17:25:17 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hQKCh-0002cX-DH
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 19:18:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQIHL-00015Z-TT
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 17:14:47 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36356)
+	(envelope-from <alistair23@gmail.com>) id 1hQK1t-0001tg-83
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 19:07:23 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:45696)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hQIHL-00012a-Je
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 17:14:35 -0400
-Received: by mail-pg1-x542.google.com with SMTP id a3so7410559pgb.3
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 14:14:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=2yIMAOHgdtQWMc2Sa/XajJ04zkTcJKS7Mtb3fPJ8+bY=;
-	b=V5O6+P0uzhf5RfKWX9eoMW3co9LjTv1CJG/K2Rkjvh7c15IyRx+DLBQFs0yEx/wi7j
-	rSvpYZZ/48jWEPLhhDow9hxxztxz0RmBCqpOlU5jinh8Kw1cHifdB0e8xmRnGj0TtyS/
-	MqxuCmTkroXN5FeQ/DdX+a/+jmlftPmYagMVqbhZywfOTxs1U2lV0jg81BLoXO6hXXZR
-	fBOGyGb0QTIUrL0F3xPArHVLZn98+zsMTxQTFqN+BIf/mN4FiqI5Hlbra4faO4HM1taP
-	BdjahUPDpVrP5gOegmucvTS/457mZBWdm5uYm81zfSpWa7muwAq6Myb5KN0u05ljIPry
-	aDhA==
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1hQK1s-0001o5-QM; Mon, 13 May 2019 19:06:45 -0400
+Received: by mail-lf1-x143.google.com with SMTP id n22so10278305lfe.12;
+	Mon, 13 May 2019 16:06:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=2vHz03zI+JINIBclxZbsNHslHVrte/25NIt2rGtgjnY=;
+	b=m02C9uQKsPUfSqGCArA4wK/5F6UU3CfAIGYxLypeEoOu+3okHBZJ8XtmJL6TPAewhb
+	2K5ifoC/Joq40zaTdtMigjvmExlPrM24WDenpNQA0pOVR2+Q2tqfgEftzywYDtJqx6VX
+	Q/qjjD+zl8MDtTd5zfZOQeYa6pOKe4mT1AkrUkEhzSLCIPE92DONAgdPsJCAF3CZ5uNv
+	McVz1jZ7+rpVE6hw+nv24lBC2Eu77qfaC+P5Z8qrjkFFNbVtK3tnSI3A3ulua4ZPJFpr
+	/HeMMw377ahsGkfxo6UdZK8UYmTQvSsXu3ykoa8qyvjn4KYF4hLCHpXUVVT++TTftrs9
+	aGUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=2yIMAOHgdtQWMc2Sa/XajJ04zkTcJKS7Mtb3fPJ8+bY=;
-	b=KWhqmEufGyPtPlW8qtcqyNrcfg0OvKjqKZFDuNuhmRZNW70mRYffnpUdAM7A54DJqj
-	wQp0CMP/87Mq7KR2suCLoBKipzok8oxqq6rNfXqejNL4cD3d39vT1lboyICNsCae5gqE
-	nO3IDhpzoboMeC7BUsGwiTTf0TRAWTrbW+8Y/sL5/ek/IQMFflJilcdxS7f9Ha6V+3HH
-	X18uNa4OgqkL7jOIKgitgiT8ThRJUpsMQoRNIKFwy/kHR7JIYRcA4a4csS1dINfsl3GX
-	csNkYhasPWKoe6kiKDUW2POAIDHF+MVtGVtg0nRbaSDnBGWKaL8rsDnbOfn3+Vh1jfkb
-	aUrQ==
-X-Gm-Message-State: APjAAAW8Xp8AzXs/DBmKL4C6RYxjCNAD/HsB5a5XscvDltjz+SsdieYL
-	OaoOYpQaD8m+SVgFqw0tsQy/cg==
-X-Google-Smtp-Source: APXvYqzdXeDC6+4iq67zgzSYoZuLZWT2axhnn4a/IZqmDwCgjuI1E9ocNwpYLoHXDicG3HTnjmMpkQ==
-X-Received: by 2002:a62:7a8f:: with SMTP id
-	v137mr36649750pfc.243.1557782073415; 
-	Mon, 13 May 2019 14:14:33 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id
-	c23sm33812640pfp.0.2019.05.13.14.14.31
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 13 May 2019 14:14:32 -0700 (PDT)
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <20190510203452.11870-1-richard.henderson@linaro.org>
-	<CAL1e-=hE4zMwDewsbD6=Kc32Ss9wcB-AyOtY-G=HhDKS9YMOoQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <4a2f1364-b7d2-209e-3d17-ca1eef3b53e3@linaro.org>
-Date: Mon, 13 May 2019 14:14:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=2vHz03zI+JINIBclxZbsNHslHVrte/25NIt2rGtgjnY=;
+	b=EMfkbFrEX2+sG6Vd4HnyOMPDqsQdoGE7DIXPJKtWlLPJlSW+yyUg0bSvr5XF0budk3
+	KxP4a34xCLCL966mra5p8VQ7bBrUqADveiS9mXPRuhazovo2NM0g6qsasI/z1vhC/7g4
+	OJx2dRccrokd1mo2ynrKixdBWRXl9WNKpQu2lCWwF+8xQfp+IA6WTrT06mHcsl5SMDFY
+	iZiEIeNO7ufIYTW/5U+9Mndv1YLvP9KdamhWIrnqadmHKjyrDAdFspMS6wCCL78Cj6hW
+	vOrRctybanysj7JbCZ5inehEjvEcN/S0GwCSOeAwFpaaktFk9UgQvyWQQQIbG8wDObMU
+	WPOQ==
+X-Gm-Message-State: APjAAAUMeiuhTQqgm6Ilj3V7x+931OFdD9ESgAa3nb90fMEZBCosOFIU
+	vyjqbyycx8I7U/tz5HSgKDQHCAlGg3U2kzgzY6A=
+X-Google-Smtp-Source: APXvYqyQCaArhqiuRNRMd0DNX4WEJvaUdMVJ8S/K0zKHOqByX7/LSj7OkAaxCuryXybOQ0GNJtNdw20/EMPNdmShh+0=
+X-Received: by 2002:a05:6512:309:: with SMTP id
+	t9mr14617630lfp.103.1557788799792; 
+	Mon, 13 May 2019 16:06:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=hE4zMwDewsbD6=Kc32Ss9wcB-AyOtY-G=HhDKS9YMOoQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20190513194328.11045-1-jonathan@fintelia.io>
+In-Reply-To: <20190513194328.11045-1-jonathan@fintelia.io>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 13 May 2019 16:04:26 -0700
+Message-ID: <CAKmqyKNGXrvnJSuBN-BqtoyjE6FQ3niNMkWpwv1w2e1GN8ESHg@mail.gmail.com>
+To: Jonathan Behrens <jonathan@fintelia.io>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::542
-Subject: Re: [Qemu-devel] [PATCH] configure: Disable slirp if
- --disable-system
+X-Received-From: 2a00:1450:4864:20::143
+Subject: Re: [Qemu-devel] [PATCH] cadence_gem: Don't define GEM_INT_Q1_MASK
+ twice
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,39 +87,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: samuel.thibault@ens-lyon.org, qemu-devel@nongnu.org,
-	marcandre.lureau@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+	Alistair Francis <alistair@alistair23.me>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+	Jonathan Behrens <fintelia@gmail.com>,
+	"open list:Xilinx Zynq" <qemu-arm@nongnu.org>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/11/19 5:47 AM, Aleksandar Markovic wrote:
-> 
-> On May 10, 2019 10:36 PM, "Richard Henderson" <richard.henderson@linaro.org
-> <mailto:richard.henderson@linaro.org>> wrote:
->>
->> For linux-user, there is no need to add slirp to the set of
->> git modules checked out, nor build it.
->>
->> This also avoids a makefile bug wrt insufficient dependencies
->> on subdir-slirp.  If slirp/ is not initially present, the
->> dependencies that check it out are associated with softmmu,
->> which then generates a build error on slirp/ not present.
->>
-> 
-> Hi,
-> 
-> Does this work if only user mode targets are specified via ˊ--target-listˊ
-> switch?
+On Mon, May 13, 2019 at 12:57 PM Jonathan Behrens <jonathan@fintelia.io> wrote:
+>
+> Signed-off-by: Jonathan Behrens <jonathan@fintelia.io>
 
-Yes.  There is a bit of code that converts such a target list to the same
-result as --disable-system, which is $softmmu = no.
+Good find. Thanks for the patch!
 
-> If no, the patch shoud be amended. If yes, the commit message should be
-> extended.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Like what?  I think it's pretty clear as is.
+Can this go via your tree Jason?
 
+Alistair
 
-r~
+> ---
+>  hw/net/cadence_gem.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+> index 7f63411430..37cb8a4e5c 100644
+> --- a/hw/net/cadence_gem.c
+> +++ b/hw/net/cadence_gem.c
+> @@ -146,7 +146,6 @@
+>  #define GEM_DESCONF7      (0x00000298/4)
+>
+>  #define GEM_INT_Q1_STATUS               (0x00000400 / 4)
+> -#define GEM_INT_Q1_MASK                 (0x00000640 / 4)
+>
+>  #define GEM_TRANSMIT_Q1_PTR             (0x00000440 / 4)
+>  #define GEM_TRANSMIT_Q7_PTR             (GEM_TRANSMIT_Q1_PTR + 6)
+> --
+> 2.20.1
+>
 
