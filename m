@@ -2,52 +2,70 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E57A0C04AB1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 09:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79824C04AB1
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 09:22:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6477620989
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 09:14:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6477620989
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 4E7A921479
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 09:22:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E7A921479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53750 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53883 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQ72O-0008J7-Ex
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 05:14:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35215)
+	id 1hQ79m-0002MR-Va
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 05:22:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <schwab@suse.de>) id 1hQ6rJ-0001Gy-HV
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 05:02:58 -0400
+	(envelope-from <berrange@redhat.com>) id 1hQ78T-0001Ny-0e
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 05:20:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <schwab@suse.de>) id 1hQ6rI-0006ys-Cf
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 05:02:57 -0400
-Received: from mx2.suse.de ([195.135.220.15]:38554 helo=mx1.suse.de)
+	(envelope-from <berrange@redhat.com>) id 1hQ6wn-0002cO-9F
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 05:08:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47676)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <schwab@suse.de>) id 1hQ6rI-0006xU-6q
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 05:02:56 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-	by mx1.suse.de (Postfix) with ESMTP id 5F656AECD;
-	Mon, 13 May 2019 09:02:54 +0000 (UTC)
-From: Andreas Schwab <schwab@suse.de>
-To: qemu-devel@nongnu.org
-X-Yow: HELLO KITTY gang terrorizes town, family STICKERED to death!
-Date: Mon, 13 May 2019 11:02:53 +0200
-Message-ID: <mvmpnomohfm.fsf@suse.de>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hQ6wm-0002aD-MB
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 05:08:36 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AA6FC308792F;
+	Mon, 13 May 2019 09:08:33 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.22.189])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A739960C4D;
+	Mon, 13 May 2019 09:08:32 +0000 (UTC)
+Date: Mon, 13 May 2019 10:08:30 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Message-ID: <20190513090830.GB15029@redhat.com>
+References: <20190418224706.14014-1-programmingkidx@gmail.com>
+	<723372ae-a37a-d7cd-098f-452c7513ce8a@redhat.com>
+	<4B73E5E6-2129-43B8-A35E-0CF7DCAE163B@gmail.com>
+	<1c4c309a-b785-64d2-60ce-4f0501fcc415@redhat.com>
+	<E694EDDC-BFF1-4BE9-BFCC-43B303DE6BF7@gmail.com>
+	<99b26a5a-d756-c1d7-0690-5e419075f5e0@redhat.com>
+	<3D0C069E-C946-47E0-8A1C-EF5B28CFFB09@gmail.com>
+	<2f0545db-a95c-d4ba-cc46-110c3b15e1e8@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
-	timestamps) [generic]
-X-Received-From: 195.135.220.15
-Subject: [Qemu-devel] [PATCH] linux-user: Implement membarrier syscall
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2f0545db-a95c-d4ba-cc46-110c3b15e1e8@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Mon, 13 May 2019 09:08:33 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] configure: Change capstone's default state
+ to disabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -59,47 +77,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Programmingkid <programmingkidx@gmail.com>,
+	Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org,
+	peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Andreas Schwab <schwab@suse.de>
----
- linux-user/syscall.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+On Sun, May 12, 2019 at 03:47:49PM +0200, Thomas Huth wrote:
+> Maybe try to clean the folder first:
+> 
+>  rm -r capstone
+>  mkdir capstone
+>  make git-submodule-update
+> 
+> If that does not help, maybe try a completely fresh git checkout?
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index f5ff6f5dc8..80399f4eb0 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -313,6 +313,9 @@ _syscall3(int, getrandom, void *, buf, size_t, buflen, unsigned int, flags)
- _syscall5(int, kcmp, pid_t, pid1, pid_t, pid2, int, type,
-           unsigned long, idx1, unsigned long, idx2)
- #endif
-+#if defined(TARGET_NR_membarrier) && defined(__NR_membarrier)
-+_syscall2(int, membarrier, int, cmd, int, flags)
-+#endif
- 
- static bitmask_transtbl fcntl_flags_tbl[] = {
-   { TARGET_O_ACCMODE,   TARGET_O_WRONLY,    O_ACCMODE,   O_WRONLY,    },
-@@ -11620,6 +11623,10 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         /* PowerPC specific.  */
-         return do_swapcontext(cpu_env, arg1, arg2, arg3);
- #endif
-+#if defined TARGET_NR_membarrier && defined __NR_membarrier
-+    case TARGET_NR_membarrier:
-+        return get_errno(membarrier(arg1, arg2));
-+#endif
- 
-     default:
-         qemu_log_mask(LOG_UNIMP, "Unsupported syscall: %d\n", num);
+Rather than deleting stuff like that, it is best to use git to put your
+dir back to a clean state.
+
+   git submodule deinit --all --force
+   git clean -f -x -d 
+
+After doing this, then run  'configure' again with normal args and try
+to build.
+
+If it still fails, please provide the /full/ output printed by configure,
+as well as all output from make, and also the contents of the 'config.log'
+file.
+
+Regards,
+Daniel
 -- 
-2.21.0
-
-
--- 
-Andreas Schwab, SUSE Labs, schwab@suse.de
-GPG Key fingerprint = 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D7
-"And now for something completely different."
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
