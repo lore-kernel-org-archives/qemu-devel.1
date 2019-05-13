@@ -2,55 +2,73 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1537C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:19:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C8FC04AAA
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:20:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 921722146F
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:19:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 921722146F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sios.com
+	by mail.kernel.org (Postfix) with ESMTPS id BF3DC2146F
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:20:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF3DC2146F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58097 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58095 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQBo6-0002qX-Ol
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 10:19:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56005)
+	id 1hQBo7-0002qU-6o
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 10:19:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yo-satoh@sios.com>) id 1hQ3Sx-0000eE-MF
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:25:38 -0400
+	(envelope-from <armbru@redhat.com>) id 1hQBlI-0000uu-I3
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 10:17:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yo-satoh@sios.com>) id 1hQ3St-0006Lm-Pt
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:25:35 -0400
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:56144)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yo-satoh@sios.com>) id 1hQ3St-0006I1-8d
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 01:25:31 -0400
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.vps.ablenet.jp
-	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
-	by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 9C6674223D;
-	Mon, 13 May 2019 14:25:28 +0900 (JST)
-Received: from ysato.dip.jp (ZM005235.ppp.dion.ne.jp [222.8.5.235])
-	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id AA30E240088; 
-	Mon, 13 May 2019 14:25:27 +0900 (JST)
-From: Yoshinori Sato <yo-satoh@sios.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 13 May 2019 14:25:09 +0900
-Message-Id: <20190513052518.6274-4-yo-satoh@sios.com>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20190513052518.6274-1-yo-satoh@sios.com>
-References: <20190513052518.6274-1-yo-satoh@sios.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 202.224.55.15
-X-Mailman-Approved-At: Mon, 13 May 2019 10:11:53 -0400
-Subject: [Qemu-devel] [PATCH v11 03/12] target/rx: CPU definition
+	(envelope-from <armbru@redhat.com>) id 1hQBfU-0000Eb-IF
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 10:11:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48790)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hQBfU-0000EK-Ar
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 10:11:04 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AEFF5309B14B
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 14:11:03 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
+	[10.36.116.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E33A06A497;
+	Mon, 13 May 2019 14:10:59 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 63A6111385E4; Mon, 13 May 2019 16:10:58 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+References: <20190430131919.GN6818@redhat.com> <20190430144546.GA3065@work-vm>
+	<20190430150556.GA2423@redhat.com>
+	<87sgtqejn9.fsf@dusky.pond.sub.org>
+	<20190507093954.GG27205@redhat.com>
+	<875zql3ylk.fsf@dusky.pond.sub.org>
+	<20190513120856.GH15029@redhat.com> <20190513122933.GC2786@work-vm>
+	<20190513123542.GJ15029@redhat.com>
+Date: Mon, 13 May 2019 16:10:58 +0200
+In-Reply-To: <20190513123542.GJ15029@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
+	=?utf-8?Q?rang=C3=A9=22's?=
+	message of "Mon, 13 May 2019 13:35:42 +0100")
+Message-ID: <878sva5tsd.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.49]);
+	Mon, 13 May 2019 14:11:03 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] QMP; unsigned 64-bit ints;
+ JSON standards compliance
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -62,652 +80,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
-	Yoshinori Sato <yo-satoh@sios.com>,
-	Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: libvir-list@redhat.com, =?utf-8?Q?J=C3=A1n?= Tomko <jtomko@redhat.com>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Signed-off-by: Yoshinori Sato <yo-satoh@sios.com>
----
- target/rx/cpu.c     | 222 ++++++++++++++++++++++++++++++++++++++++++++++++++
- target/rx/cpu.h     | 227 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- target/rx/gdbstub.c | 112 ++++++++++++++++++++++++++
- target/rx/monitor.c |  38 +++++++++
- 4 files changed, 599 insertions(+)
- create mode 100644 target/rx/cpu.c
- create mode 100644 target/rx/cpu.h
- create mode 100644 target/rx/gdbstub.c
- create mode 100644 target/rx/monitor.c
+> On Mon, May 13, 2019 at 01:29:34PM +0100, Dr. David Alan Gilbert wrote:
+>> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+>> > On Wed, May 08, 2019 at 02:44:07PM +0200, Markus Armbruster wrote:
+>> > > Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+>> > >=20
+>> > > > On Tue, May 07, 2019 at 10:47:06AM +0200, Markus Armbruster wrote:
+>> > > >
+>> > > >> >> > I can think of some options:
+>> > > >> >> >=20
+>> > > >> >> >   1. Encode unsigned 64-bit integers as signed 64-bit intege=
+rs.
+>> > > >> >> >=20
+>> > > >> >> >      This follows the example that most C libraries map JSON=
+ ints
+>> > > >> >> >      to 'long long int'. This is still relying on undefined
+>> > > >> >> >      behaviour as apps don't need to support > 2^53-1.
+>> > > >> >> >=20
+>> > > >> >> >      Apps would need to cast back to 'unsigned long long' for
+>> > > >> >> >      those QMP fields they know are supposed to be unsigned.
+>> > > >>=20
+>> > > >> Ugly.  It's also what we did until v2.10, August 2017.  QMP's inp=
+ut
+>> > > >> direction still does it, for backward compatibility.
+>> > > >>=20
+>> > > >> >> >=20
+>> > > >> >> >=20
+>> > > >> >> >   2. Encode all 64-bit integers as a pair of 32-bit integers.
+>> > > >> >> >=20=20=20=20=20
+>> > > >> >> >      This is fully compliant with the JSON spec as each half
+>> > > >> >> >      is fully within the declared limits. App has to split or
+>> > > >> >> >      assemble the 2 pieces from/to a signed/unsigned 64-bit
+>> > > >> >> >      int as needed.
+>> > > >>=20
+>> > > >> Differently ugly.
+>> > > >>=20
+>> > > >> >> >=20
+>> > > >> >> >=20
+>> > > >> >> >   3. Encode all 64-bit integers as strings
+>> > > >> >> >=20
+>> > > >> >> >      The application has todo all parsing/formatting client
+>> > > >> >> >      side.
+>> > > >>=20
+>> > > >> Yet another ugly.
+>> > > >>=20
+>> > > >> >> >=20
+>> > > >> >> >=20
+>> > > >> >> > None of these changes are backwards compatible, so I doubt w=
+e could make
+>> > > >> >> > the change transparently in QMP.  Instead we would have to h=
+ave a
+>> > > >> >> > QMP greeting message capability where the client can request=
+ enablement
+>> > > >> >> > of the enhanced integer handling.
+>> > > >>=20
+>> > > >> We might be able to do option 1 without capability negotiation.  =
+v2.10's
+>> > > >> change from option 1 to what we have now produced zero complaints.
+>> > > >>=20
+>> > > >> On the other hand, we made that change for a reason, so we may wa=
+nt a
+>> > > >> "send large integers as negative integers" capability regardless.
+>> > > >>=20
+>> > > >> >> >=20
+>> > > >> >> > Any of the three options above would likely work for libvirt=
+, but I
+>> > > >> >> > would have a slight preference for either 2 or 3, so that we=
+ become
+>> > > >> >> > 100% standards compliant.
+>> > > >>=20
+>> > > >> There's no such thing.  You mean "we maximize interoperability wi=
+th
+>> > > >> common implementations of JSON".
+>> > > >
+>> > > > s/common/any/
+>> > >=20
+>> > > info: error correction applied, future applications will be silent ;=
+-P
+>> > >=20
+>> > > >> Let's talk implementation for a bit.
+>> > > >>=20
+>> > > >> Encoding and decoding integers in funny ways should be fairly eas=
+y in
+>> > > >> the QObject visitors.  The generated QMP marshallers all use them.
+>> > > >> Trouble is a few commands still bypass the generated marshallers,=
+ and
+>> > > >> mess with the QObject themselves:
+>> > > >>=20
+>> > > >> * query-qmp-schema: minor hack explained in qmp_query_qmp_schema(=
+)'s
+>> > > >>   comment.  Should be harmless.
+>> > > >>=20
+>> > > >> * netdev_add: not QAPIfied.  Eric's patches to QAPIfy it got stuck
+>> > > >>   because they reject some abuses like passing numbers and bools =
+as
+>> > > >>   strings.
+>> > > >>=20
+>> > > >> * device_add: not QAPIfied.  We're not sure QAPIfication is feasi=
+ble.
+>> > > >>=20
+>> > > >> netdev_add and device_add both use qemu_opts_from_qdict().  Perha=
+ps we
+>> > > >> could hack that to mirror what the QObject visitor do.
+>> > > >>=20
+>> > > >> Else, we might have to do it in the JSON parser.  Should be possi=
+ble,
+>> > > >> but I'd rather not.
+>> > > >>=20
+>> > > >> >> My preference would be 3 with the strings defined as being
+>> > > >> >> %x lower case hex formated with a 0x prefix and no longer than=
+ 18 characters
+>> > > >> >> ("0x" + 16 nybbles). Zero padding allowed but not required.
+>> > > >> >> It's readable and unambiguous when dealing with addresses; I d=
+on't want
+>> > > >> >> to have to start decoding (2) by hand when debugging.
+>> > > >> >
+>> > > >> > Yep, that's a good point about readability.
+>> > > >>=20
+>> > > >> QMP sending all integers in decimal is inconvenient for some valu=
+es,
+>> > > >> such as addresses.  QMP sending all (large) integers in hexadecim=
+al
+>> > > >> would be inconvenient for other values.
+>> > > >>=20
+>> > > >> Let's keep it simple & stupid.  If you want sophistication, JSON =
+is the
+>> > > >> wrong choice.
+>> > > >>=20
+>> > > >>=20
+>> > > >> Option 1 feels simplest.
+>> > > >
+>> > > > But will still fail with any JSON impl that uses double precision =
+floating
+>> > > > point for integers as it will loose precision.
+>> > > >
+>> > > >> Option 2 feels ugliest.  Less simple, more interoperable than opt=
+ion 1.
+>> > > >
+>> > > > If we assume any JSON impl can do 32-bit integers without loss of
+>> > > > precision, then I think we can say it is guaranteed portable, but
+>> > > > it is certainly horrible / ugly.
+>> > > >
+>> > > >> Option 3 is like option 2, just not quite as ugly.
+>> > > >
+>> > > > I think option 3 can be guaranteed to be loss-less with /any/ JSON=
+ impl
+>> > > > that exists, since you're delegating all string -> int conversion =
+to
+>> > > > the application code taking the JSON parser/formatter out of the e=
+quation.
+>> > >=20
+>> > > Double-checking: do you propose to encode *all* numbers as strings, =
+or
+>> > > just certain "problematic" numbers?
+>> > >=20
+>> > > If the latter, I guess your idea of "problematic" is "not representa=
+ble
+>> > > exactly as double precision floating-point".
+>> >=20
+>> > We have a few options
+>> >=20
+>> >  1. Use string format for values > 2^53-1, int format below that
+>> >  2. Use string format for all fields which are 64-bit ints whether
+>> >     signed or unsigned
+>> >  3. Use string format for all fields which are integers, even 32-bit
+>> >     ones
+>> >=20
+>> > I would probably suggest option 2. It would make the QEMU impl quite
+>> > easy IIUC, we we'd just change the QAPI visitor's impl for the int64
+>> > and uint64 fields to use string format (when the right capability is
+>> > negotiated by QMP).
+>> >=20
+>> > I include 3 only for completeness - I don't think there's a hugely
+>> > compelling reason to mess with 32-bit ints.
+>>=20
+>> What about when the size is architecture dependent?
+>
+> The QAPI visitor for 'int' uses an 'int64_t' parameters, so I think
+> that will want to be string encoded, as if it was a 64-bit int, even
+> if built on a 32-bit platform.
 
-diff --git a/target/rx/cpu.c b/target/rx/cpu.c
-new file mode 100644
-index 0000000000..4b96f2e463
---- /dev/null
-+++ b/target/rx/cpu.c
-@@ -0,0 +1,222 @@
-+/*
-+ * QEMU RX CPU
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/qemu-print.h"
-+#include "qapi/error.h"
-+#include "cpu.h"
-+#include "qemu-common.h"
-+#include "migration/vmstate.h"
-+#include "exec/exec-all.h"
-+#include "hw/loader.h"
-+#include "fpu/softfloat.h"
-+
-+static void rx_cpu_set_pc(CPUState *cs, vaddr value)
-+{
-+    RXCPU *cpu = RXCPU(cs);
-+
-+    cpu->env.pc = value;
-+}
-+
-+static void rx_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
-+{
-+    RXCPU *cpu = RXCPU(cs);
-+
-+    cpu->env.pc = tb->pc;
-+}
-+
-+static bool rx_cpu_has_work(CPUState *cs)
-+{
-+    return cs->interrupt_request &
-+        (CPU_INTERRUPT_HARD | CPU_INTERRUPT_FIR);
-+}
-+
-+static void rx_cpu_reset(CPUState *s)
-+{
-+    RXCPU *cpu = RXCPU(s);
-+    RXCPUClass *rcc = RXCPU_GET_CLASS(cpu);
-+    CPURXState *env = &cpu->env;
-+    uint32_t *resetvec;
-+
-+    rcc->parent_reset(s);
-+
-+    memset(env, 0, offsetof(CPURXState, end_reset_fields));
-+
-+    resetvec = rom_ptr(0xfffffffc, 4);
-+    if (resetvec) {
-+        /* In the case of kernel, it is ignored because it is not set. */
-+        env->pc = ldl_p(resetvec);
-+    }
-+    rx_cpu_unpack_psw(env, 0, 1);
-+    env->regs[0] = env->isp = env->usp = 0;
-+    env->fpsw = 0;
-+    set_flush_to_zero(1, &env->fp_status);
-+    set_flush_inputs_to_zero(1, &env->fp_status);
-+}
-+
-+static void rx_cpu_list_entry(gpointer data, gpointer user_data)
-+{
-+    const char *typename = object_class_get_name(OBJECT_CLASS(data));
-+    int len = strlen(typename) - strlen(RX_CPU_TYPE_SUFFIX);
-+
-+    qemu_printf("%.*s\n", len, typename);
-+}
-+
-+void rx_cpu_list(void)
-+{
-+    GSList *list;
-+    list = object_class_get_list_sorted(TYPE_RXCPU, false);
-+    g_slist_foreach(list, rx_cpu_list_entry, NULL);
-+    g_slist_free(list);
-+}
-+
-+static ObjectClass *rx_cpu_class_by_name(const char *cpu_model)
-+{
-+    ObjectClass *oc;
-+    char *typename = NULL;
-+
-+    typename = g_strdup_printf(RX_CPU_TYPE_NAME(""));
-+    oc = object_class_by_name(typename);
-+    if (oc != NULL && object_class_is_abstract(oc)) {
-+        oc = NULL;
-+    }
-+
-+    g_free(typename);
-+    return oc;
-+}
-+
-+static void rx_cpu_realize(DeviceState *dev, Error **errp)
-+{
-+    CPUState *cs = CPU(dev);
-+    RXCPUClass *rcc = RXCPU_GET_CLASS(dev);
-+    Error *local_err = NULL;
-+
-+    cpu_exec_realizefn(cs, &local_err);
-+    if (local_err != NULL) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    cpu_reset(cs);
-+    qemu_init_vcpu(cs);
-+
-+    rcc->parent_realize(dev, errp);
-+}
-+
-+static void rx_cpu_set_irq(void *opaque, int no, int request)
-+{
-+    RXCPU *cpu = opaque;
-+    CPUState *cs = CPU(cpu);
-+    int irq = request & 0xff;
-+
-+    static const int mask[] = {
-+        [RX_CPU_IRQ] = CPU_INTERRUPT_HARD,
-+        [RX_CPU_FIR] = CPU_INTERRUPT_FIR,
-+    };
-+    if (irq) {
-+        cpu->env.req_irq = irq;
-+        cpu->env.req_ipl = (request >> 8) & 0x0f;
-+        cpu_interrupt(cs, mask[no]);
-+    } else {
-+        cpu_reset_interrupt(cs, mask[no]);
-+    }
-+}
-+
-+static void rx_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
-+{
-+    info->mach = bfd_mach_rx;
-+    info->print_insn = print_insn_rx;
-+}
-+
-+static void rx_cpu_init(Object *obj)
-+{
-+    CPUState *cs = CPU(obj);
-+    RXCPU *cpu = RXCPU(obj);
-+    CPURXState *env = &cpu->env;
-+
-+    cs->env_ptr = env;
-+    qdev_init_gpio_in(DEVICE(cpu), rx_cpu_set_irq, 2);
-+}
-+
-+static void rxcpu_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    CPUClass *cc = CPU_CLASS(klass);
-+    RXCPUClass *rcc = RXCPU_CLASS(klass);
-+
-+    device_class_set_parent_realize(dc, rx_cpu_realize,
-+                                    &rcc->parent_realize);
-+
-+    rcc->parent_reset = cc->reset;
-+    cc->reset = rx_cpu_reset;
-+
-+    cc->class_by_name = rx_cpu_class_by_name;
-+    cc->has_work = rx_cpu_has_work;
-+    cc->do_interrupt = rx_cpu_do_interrupt;
-+    cc->cpu_exec_interrupt = rx_cpu_exec_interrupt;
-+    cc->dump_state = rx_cpu_dump_state;
-+    cc->set_pc = rx_cpu_set_pc;
-+    cc->synchronize_from_tb = rx_cpu_synchronize_from_tb;
-+    cc->gdb_read_register = rx_cpu_gdb_read_register;
-+    cc->gdb_write_register = rx_cpu_gdb_write_register;
-+    cc->get_phys_page_debug = rx_cpu_get_phys_page_debug;
-+    cc->disas_set_info = rx_cpu_disas_set_info;
-+    cc->tcg_initialize = rx_translate_init;
-+
-+    cc->gdb_num_core_regs = 26;
-+}
-+
-+static const TypeInfo rxcpu_info = {
-+    .name = TYPE_RXCPU,
-+    .parent = TYPE_CPU,
-+    .instance_size = sizeof(RXCPU),
-+    .instance_init = rx_cpu_init,
-+    .abstract = false,
-+    .class_size = sizeof(RXCPUClass),
-+    .class_init = rxcpu_class_init,
-+};
-+
-+static void rxcpu_register_types(void)
-+{
-+    type_register_static(&rxcpu_info);
-+}
-+
-+type_init(rxcpu_register_types)
-+
-+static uint32_t extable[32];
-+
-+void rx_load_image(RXCPU *cpu, const char *filename,
-+                   uint32_t start, uint32_t size)
-+{
-+    long kernel_size;
-+    int i;
-+
-+    kernel_size = load_image_targphys(filename, start, size);
-+    if (kernel_size < 0) {
-+        fprintf(stderr, "qemu: could not load kernel '%s'\n", filename);
-+        exit(1);
-+    }
-+    cpu->env.pc = start;
-+
-+    /* setup exception trap trampoline */
-+    /* linux kernel only works little-endian mode */
-+    for (i = 0; i < 32; i++) {
-+        extable[i] = cpu_to_le32(0x10 + i * 4);
-+    }
-+    rom_add_blob_fixed("extable", extable, sizeof(extable), 0xffffff80);
-+}
-diff --git a/target/rx/cpu.h b/target/rx/cpu.h
-new file mode 100644
-index 0000000000..fa07c25af4
---- /dev/null
-+++ b/target/rx/cpu.h
-@@ -0,0 +1,227 @@
-+/*
-+ *  RX emulation definition
-+ *
-+ *  Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef RX_CPU_H
-+#define RX_CPU_H
-+
-+#include "qemu/bitops.h"
-+#include "qemu-common.h"
-+#include "hw/registerfields.h"
-+#include "qom/cpu.h"
-+
-+#define TYPE_RXCPU "rxcpu"
-+
-+#define RXCPU_CLASS(klass)                                     \
-+    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RXCPU)
-+#define RXCPU(obj) \
-+    OBJECT_CHECK(RXCPU, (obj), TYPE_RXCPU)
-+#define RXCPU_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RXCPU)
-+
-+/*
-+ * RXCPUClass:
-+ * @parent_realize: The parent class' realize handler.
-+ * @parent_reset: The parent class' reset handler.
-+ *
-+ * A RX CPU model.
-+ */
-+typedef struct RXCPUClass {
-+    /*< private >*/
-+    CPUClass parent_class;
-+    /*< public >*/
-+
-+    DeviceRealize parent_realize;
-+    void (*parent_reset)(CPUState *cpu);
-+
-+} RXCPUClass;
-+
-+#define TARGET_LONG_BITS 32
-+#define TARGET_PAGE_BITS 12
-+
-+#define CPUArchState struct CPURXState
-+
-+#include "exec/cpu-defs.h"
-+
-+#define TARGET_PHYS_ADDR_SPACE_BITS 32
-+#define TARGET_VIRT_ADDR_SPACE_BITS 32
-+
-+/* PSW define */
-+REG32(PSW, 0)
-+FIELD(PSW, C, 0, 1)
-+FIELD(PSW, Z, 1, 1)
-+FIELD(PSW, S, 2, 1)
-+FIELD(PSW, O, 3, 1)
-+FIELD(PSW, I, 16, 1)
-+FIELD(PSW, U, 17, 1)
-+FIELD(PSW, PM, 20, 1)
-+FIELD(PSW, IPL, 24, 4)
-+
-+/* FPSW define */
-+REG32(FPSW, 0)
-+FIELD(FPSW, RM, 0, 2)
-+FIELD(FPSW, CV, 2, 1)
-+FIELD(FPSW, CO, 3, 1)
-+FIELD(FPSW, CZ, 4, 1)
-+FIELD(FPSW, CU, 5, 1)
-+FIELD(FPSW, CX, 6, 1)
-+FIELD(FPSW, CE, 7, 1)
-+FIELD(FPSW, CAUSE, 2, 6)
-+FIELD(FPSW, DN, 8, 1)
-+FIELD(FPSW, EV, 10, 1)
-+FIELD(FPSW, EO, 11, 1)
-+FIELD(FPSW, EZ, 12, 1)
-+FIELD(FPSW, EU, 13, 1)
-+FIELD(FPSW, EX, 14, 1)
-+FIELD(FPSW, ENABLE, 10, 5)
-+FIELD(FPSW, FV, 26, 1)
-+FIELD(FPSW, FO, 27, 1)
-+FIELD(FPSW, FZ, 28, 1)
-+FIELD(FPSW, FU, 29, 1)
-+FIELD(FPSW, FX, 30, 1)
-+FIELD(FPSW, FLAGS, 26, 4)
-+FIELD(FPSW, FS, 31, 1)
-+
-+#define NB_MMU_MODES 1
-+#define MMU_MODE0_SUFFIX _all
-+
-+enum {
-+    NUM_REGS = 16,
-+};
-+
-+typedef struct CPURXState {
-+    /* CPU registers */
-+    uint32_t regs[NUM_REGS];    /* general registers */
-+    uint32_t psw_o;             /* O bit of status register */
-+    uint32_t psw_s;             /* S bit of status register */
-+    uint32_t psw_z;             /* Z bit of status register */
-+    uint32_t psw_c;             /* C bit of status register */
-+    uint32_t psw_u;
-+    uint32_t psw_i;
-+    uint32_t psw_pm;
-+    uint32_t psw_ipl;
-+    uint32_t bpsw;              /* backup status */
-+    uint32_t bpc;               /* backup pc */
-+    uint32_t isp;               /* global base register */
-+    uint32_t usp;               /* vector base register */
-+    uint32_t pc;                /* program counter */
-+    uint32_t intb;              /* interrupt vector */
-+    uint32_t fintv;
-+    uint32_t fpsw;
-+    uint64_t acc;
-+
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
-+
-+    /* Internal use */
-+    uint32_t in_sleep;
-+    uint32_t req_irq;           /* Requested interrupt no (hard) */
-+    uint32_t req_ipl;           /* Requested interrupt level */
-+    uint32_t ack_irq;           /* execute irq */
-+    uint32_t ack_ipl;           /* execute ipl */
-+    float_status fp_status;
-+    qemu_irq ack;		/* Interrupt acknowledge */
-+
-+    CPU_COMMON
-+} CPURXState;
-+
-+/*
-+ * RXCPU:
-+ * @env: #CPURXState
-+ *
-+ * A RX CPU
-+ */
-+struct RXCPU {
-+    /*< private >*/
-+    CPUState parent_obj;
-+    /*< public >*/
-+
-+    CPURXState env;
-+};
-+
-+typedef struct RXCPU RXCPU;
-+
-+static inline RXCPU *rx_env_get_cpu(CPURXState *env)
-+{
-+    return container_of(env, RXCPU, env);
-+}
-+
-+#define ENV_GET_CPU(e) CPU(rx_env_get_cpu(e))
-+
-+#define ENV_OFFSET offsetof(RXCPU, env)
-+
-+#define RX_CPU_TYPE_SUFFIX "-" TYPE_RXCPU
-+#define RX_CPU_TYPE_NAME(model) model RX_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_RXCPU
-+
-+extern const char rx_crname[][6];
-+
-+void rx_cpu_do_interrupt(CPUState *cpu);
-+bool rx_cpu_exec_interrupt(CPUState *cpu, int int_req);
-+void rx_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
-+int rx_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
-+int rx_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
-+hwaddr rx_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
-+
-+void rx_translate_init(void);
-+int cpu_rx_signal_handler(int host_signum, void *pinfo,
-+                           void *puc);
-+
-+void rx_cpu_list(void);
-+void rx_load_image(RXCPU *cpu, const char *filename,
-+                   uint32_t start, uint32_t size);
-+void rx_cpu_unpack_psw(CPURXState *env, uint32_t psw, int rte);
-+
-+#define cpu_signal_handler cpu_rx_signal_handler
-+#define cpu_list rx_cpu_list
-+
-+#include "exec/cpu-all.h"
-+
-+#define CPU_INTERRUPT_SOFT CPU_INTERRUPT_TGT_INT_0
-+#define CPU_INTERRUPT_FIR  CPU_INTERRUPT_TGT_INT_1
-+
-+#define RX_CPU_IRQ 0
-+#define RX_CPU_FIR 1
-+
-+static inline void cpu_get_tb_cpu_state(CPURXState *env, target_ulong *pc,
-+                                        target_ulong *cs_base, uint32_t *flags)
-+{
-+    *pc = env->pc;
-+    *cs_base = 0;
-+    *flags = FIELD_DP32(0, PSW, PM, env->psw_pm);
-+}
-+
-+static inline int cpu_mmu_index(CPURXState *env, bool ifetch)
-+{
-+    return 0;
-+}
-+
-+static inline uint32_t rx_cpu_pack_psw(CPURXState *env)
-+{
-+    uint32_t psw = 0;
-+    psw = FIELD_DP32(psw, PSW, IPL, env->psw_ipl);
-+    psw = FIELD_DP32(psw, PSW, PM,  env->psw_pm);
-+    psw = FIELD_DP32(psw, PSW, U,   env->psw_u);
-+    psw = FIELD_DP32(psw, PSW, I,   env->psw_i);
-+    psw = FIELD_DP32(psw, PSW, O,   env->psw_o >> 31);
-+    psw = FIELD_DP32(psw, PSW, S,   env->psw_s >> 31);
-+    psw = FIELD_DP32(psw, PSW, Z,   env->psw_z == 0);
-+    psw = FIELD_DP32(psw, PSW, C,   env->psw_c);
-+    return psw;
-+}
-+
-+#endif /* RX_CPU_H */
-diff --git a/target/rx/gdbstub.c b/target/rx/gdbstub.c
-new file mode 100644
-index 0000000000..d76ca52e82
---- /dev/null
-+++ b/target/rx/gdbstub.c
-@@ -0,0 +1,112 @@
-+/*
-+ * RX gdb server stub
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+#include "exec/gdbstub.h"
-+
-+int rx_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
-+{
-+    RXCPU *cpu = RXCPU(cs);
-+    CPURXState *env = &cpu->env;
-+
-+    switch (n) {
-+    case 0 ... 15:
-+        return gdb_get_regl(mem_buf, env->regs[n]);
-+    case 16:
-+        return gdb_get_regl(mem_buf, (env->psw_u) ? env->regs[0] : env->usp);
-+    case 17:
-+        return gdb_get_regl(mem_buf, (!env->psw_u) ? env->regs[0] : env->isp);
-+    case 18:
-+        return gdb_get_regl(mem_buf, rx_cpu_pack_psw(env));
-+    case 19:
-+        return gdb_get_regl(mem_buf, env->pc);
-+    case 20:
-+        return gdb_get_regl(mem_buf, env->intb);
-+    case 21:
-+        return gdb_get_regl(mem_buf, env->bpsw);
-+    case 22:
-+        return gdb_get_regl(mem_buf, env->bpc);
-+    case 23:
-+        return gdb_get_regl(mem_buf, env->fintv);
-+    case 24:
-+        return gdb_get_regl(mem_buf, env->fpsw);
-+    case 25:
-+        return 0;
-+    }
-+    return 0;
-+}
-+
-+int rx_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-+{
-+    RXCPU *cpu = RXCPU(cs);
-+    CPURXState *env = &cpu->env;
-+    uint32_t psw;
-+    switch (n) {
-+    case 0 ... 15:
-+        env->regs[n] = ldl_p(mem_buf);
-+        if (n == 0) {
-+            if (env->psw_u) {
-+                env->usp = env->regs[0];
-+            } else {
-+                env->isp = env->regs[0];
-+            }
-+        }
-+        break;
-+    case 16:
-+        env->usp = ldl_p(mem_buf);
-+        if (env->psw_u) {
-+            env->regs[0] = ldl_p(mem_buf);
-+        }
-+        break;
-+    case 17:
-+        env->isp = ldl_p(mem_buf);
-+        if (!env->psw_u) {
-+            env->regs[0] = ldl_p(mem_buf);
-+        }
-+        break;
-+    case 18:
-+        psw = ldl_p(mem_buf);
-+        rx_cpu_unpack_psw(env, psw, 1);
-+        break;
-+    case 19:
-+        env->pc = ldl_p(mem_buf);
-+        break;
-+    case 20:
-+        env->intb = ldl_p(mem_buf);
-+        break;
-+    case 21:
-+        env->bpsw = ldl_p(mem_buf);
-+        break;
-+    case 22:
-+        env->bpc = ldl_p(mem_buf);
-+        break;
-+    case 23:
-+        env->fintv = ldl_p(mem_buf);
-+        break;
-+    case 24:
-+        env->fpsw = ldl_p(mem_buf);
-+        break;
-+    case 25:
-+        return 8;
-+    default:
-+        return 0;
-+    }
-+
-+    return 4;
-+}
-diff --git a/target/rx/monitor.c b/target/rx/monitor.c
-new file mode 100644
-index 0000000000..5d7a1e58b5
---- /dev/null
-+++ b/target/rx/monitor.c
-@@ -0,0 +1,38 @@
-+/*
-+ * QEMU monitor
-+ *
-+ * Copyright (c) 2003-2004 Fabrice Bellard
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "monitor/monitor.h"
-+#include "monitor/hmp-target.h"
-+#include "hmp.h"
-+
-+void hmp_info_tlb(Monitor *mon, const QDict *qdict)
-+{
-+    CPUArchState *env = mon_get_cpu_env();
-+
-+    if (!env) {
-+        monitor_printf(mon, "No CPU available\n");
-+        return;
-+    }
-+}
--- 
-2.11.0
+Yes, QAPI type 'int' is int64_t.  All of QAPI's integer types map to
+exact-width C integer types.
 
+>>=20
+>> > Option 1 is the bare minimum needed to ensure precision, but to me
+>> > it feels a bit dirty to say a given field will have different encoding
+>> > depending on the value. If apps need to deal with string encoding, they
+>> > might as well just use it for all values in a given field.
+>>=20
+>> Yeh, 1 is horrid; it's too easy to miss a case which forgot to handle
+>>  the 2^53-1 because we hadn't forced a large value down that check.
+
+If we had many places where we could forget to handle the
+interoperability capability, I'd shoot down the idea of having it :)
+
+Fortunately, we don't: the qobject visitors take care of it, and they
+come with unit tests.
+
+I listed the few exceptions above under "Let's talk implementation for a
+bit."
+
+* query-qmp-schema
+
+  No input.
+
+  Output contains no numbers.  Should it acquire numbers, we'll probably
+  want to get rid of the hack, so the output goes through the visitor.
+
+* netdev_add
+
+  Input gets stringified anyway (misfeature).
+
+  No output.
+
+* device_add
+
+  Input gets stringified anyway (misfeature).
+
+  No output.
 
