@@ -6,63 +6,103 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60B94C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 10:28:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3307AC04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 10:32:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 313F6208CA
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 10:28:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 313F6208CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EB6F1208CA
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 10:32:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB6F1208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54712 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54771 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQ8C4-0002sO-Ce
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 06:28:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52452)
+	id 1hQ8Fk-000417-8a
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 06:32:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hQ8Af-0002Ew-VU
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 06:27:03 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hQ8Eb-0003Xf-DM
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 06:31:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hQ8Ad-0003dK-Ub
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 06:27:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58608)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hQ8Ab-0003bQ-TQ
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 06:26:58 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4F3F8307D85A;
-	Mon, 13 May 2019 10:26:56 +0000 (UTC)
-Received: from [10.40.204.20] (ovpn-204-20.brq.redhat.com [10.40.204.20])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2630E1719E;
-	Mon, 13 May 2019 10:26:47 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>
-References: <20190510134203.24012-1-lvivier@redhat.com>
-	<20190510134203.24012-4-lvivier@redhat.com>
-	<871s16jmfr.fsf@dusky.pond.sub.org>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <8ddff692-fd71-1902-5a61-d4d6680bed0e@redhat.com>
-Date: Mon, 13 May 2019 12:26:47 +0200
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hQ8EX-0005Ii-4C
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 06:31:05 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49964)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+	id 1hQ8EV-0005Ep-0Y
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 06:31:01 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4DASdcq002245
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 06:30:52 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2sf4y75129-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 06:30:52 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
+	Mon, 13 May 2019 11:30:51 +0100
+Received: from b03cxnp07028.gho.boulder.ibm.com (9.17.130.15)
+	by e34.co.us.ibm.com (192.168.1.134) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Mon, 13 May 2019 11:30:47 +0100
+Received: from b03ledav001.gho.boulder.ibm.com
+	(b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+	by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x4DAUkuu11993450
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Mon, 13 May 2019 10:30:46 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9EFF66E052;
+	Mon, 13 May 2019 10:30:46 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E9C9E6E056;
+	Mon, 13 May 2019 10:30:44 +0000 (GMT)
+Received: from [9.124.31.31] (unknown [9.124.31.31])
+	by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+	Mon, 13 May 2019 10:30:44 +0000 (GMT)
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <155591636364.20338.844048953355207313.stgit@aravinda>
+	<155591661564.20338.10693276428550708820.stgit@aravinda>
+	<20190510064620.GL20559@umbus.fritz.box>
+	<fa3f0f81-17bc-ce71-7fa0-e0bc706b3c17@linux.vnet.ibm.com>
+	<20190510095321.GB5030@umbus.fritz.box>
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Date: Mon, 13 May 2019 16:00:43 +0530
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	Thunderbird/52.6.0
 MIME-Version: 1.0
-In-Reply-To: <871s16jmfr.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190510095321.GB5030@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Mon, 13 May 2019 10:26:56 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] virtio-rng: change default backend
- to rng-builtin
+X-TM-AS-GCONF: 00
+x-cbid: 19051310-0016-0000-0000-000009B1A5AB
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011091; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000285; SDB=6.01202671; UDB=6.00631221;
+	IPR=6.00983587; 
+	MB=3.00026863; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-13 10:30:49
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051310-0017-0000-0000-00004333153E
+Message-Id: <69768ad0-7f08-6233-32df-f6a4a4c25d17@linux.vnet.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-05-13_06:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1905130075
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v8 5/6] ppc: spapr: Enable FWNMI
+ capability
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,50 +114,265 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "=?UTF-8?Q?Daniel_P.Berrang=c3=a9?=" <berrange@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Amit Shah <amit@kernel.org>,
-	Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
-	"Richard W . M . Jones" <rjones@redhat.com>,
-	Kashyap Chamarthy <kchamart@redhat.com>
+Cc: paulus@ozlabs.org, aik@au1.ibm.com, qemu-ppc@nongnu.org,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/05/2019 18:36, Markus Armbruster wrote:
-> Laurent Vivier <lvivier@redhat.com> writes:
+
+
+On Friday 10 May 2019 03:23 PM, David Gibson wrote:
+> On Fri, May 10, 2019 at 12:45:29PM +0530, Aravinda Prasad wrote:
+>>
+>>
+>> On Friday 10 May 2019 12:16 PM, David Gibson wrote:
+>>> On Mon, Apr 22, 2019 at 12:33:35PM +0530, Aravinda Prasad wrote:
+>>>> Enable the KVM capability KVM_CAP_PPC_FWNMI so that
+>>>> the KVM causes guest exit with NMI as exit reason
+>>>> when it encounters a machine check exception on the
+>>>> address belonging to a guest. Without this capability
+>>>> enabled, KVM redirects machine check exceptions to
+>>>> guest's 0x200 vector.
+>>>>
+>>>> This patch also deals with the case when a guest with
+>>>> the KVM_CAP_PPC_FWNMI capability enabled is attempted
+>>>> to migrate to a host that does not support this
+>>>> capability.
+>>>>
+>>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+>>>> ---
+>>>>  hw/ppc/spapr.c         |    1 +
+>>>>  hw/ppc/spapr_caps.c    |   26 ++++++++++++++++++++++++++
+>>>>  hw/ppc/spapr_rtas.c    |   14 ++++++++++++++
+>>>>  include/hw/ppc/spapr.h |    4 +++-
+>>>>  target/ppc/kvm.c       |   14 ++++++++++++++
+>>>>  target/ppc/kvm_ppc.h   |    6 ++++++
+>>>>  6 files changed, 64 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>>> index ffd1715..44e09bb 100644
+>>>> --- a/hw/ppc/spapr.c
+>>>> +++ b/hw/ppc/spapr.c
+>>>> @@ -4372,6 +4372,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>>>>      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
+>>>>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
+>>>>      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_OFF;
+>>>> +    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
+>>>>      spapr_caps_add_properties(smc, &error_abort);
+>>>>      smc->irq = &spapr_irq_xics;
+>>>>      smc->dr_phb_enabled = true;
+>>>> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+>>>> index edc5ed0..5b3af04 100644
+>>>> --- a/hw/ppc/spapr_caps.c
+>>>> +++ b/hw/ppc/spapr_caps.c
+>>>> @@ -473,6 +473,22 @@ static void cap_ccf_assist_apply(SpaprMachineState *spapr, uint8_t val,
+>>>>      }
+>>>>  }
+>>>>  
+>>>> +static void cap_fwnmi_mce_apply(SpaprMachineState *spapr, uint8_t val,
+>>>> +                                Error **errp)
+>>>> +{
+>>>> +    PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
+>>>> +
+>>>> +    if (!val) {
+>>>> +        return; /* Disabled by default */
+>>>> +    }
+>>>> +
+>>>> +    if (kvm_enabled()) {
+>>>> +        if (kvmppc_fwnmi_enable(cpu)) {
+>>>> +            error_setg(errp, "Requested fwnmi capability not support by KVM");
+>>>> +        }
+>>>> +    }
+>>>> +}
+>>>> +
+>>>>  SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+>>>>      [SPAPR_CAP_HTM] = {
+>>>>          .name = "htm",
+>>>> @@ -571,6 +587,15 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+>>>>          .type = "bool",
+>>>>          .apply = cap_ccf_assist_apply,
+>>>>      },
+>>>> +    [SPAPR_CAP_FWNMI_MCE] = {
+>>>> +        .name = "fwnmi-mce",
+>>>> +        .description = "Handle fwnmi machine check exceptions",
+>>>> +        .index = SPAPR_CAP_FWNMI_MCE,
+>>>> +        .get = spapr_cap_get_bool,
+>>>> +        .set = spapr_cap_set_bool,
+>>>> +        .type = "bool",
+>>>> +        .apply = cap_fwnmi_mce_apply,
+>>>> +    },
+>>>>  };
+>>>>  
+>>>>  static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
+>>>> @@ -706,6 +731,7 @@ SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
+>>>>  SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
+>>>>  SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
+>>>>  SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
+>>>> +SPAPR_CAP_MIG_STATE(fwnmi, SPAPR_CAP_FWNMI_MCE);
+>>>>  
+>>>>  void spapr_caps_init(SpaprMachineState *spapr)
+>>>>  {
+>>>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+>>>> index d3499f9..997cf19 100644
+>>>> --- a/hw/ppc/spapr_rtas.c
+>>>> +++ b/hw/ppc/spapr_rtas.c
+>>>> @@ -49,6 +49,7 @@
+>>>>  #include "hw/ppc/fdt.h"
+>>>>  #include "target/ppc/mmu-hash64.h"
+>>>>  #include "target/ppc/mmu-book3s-v3.h"
+>>>> +#include "kvm_ppc.h"
+>>>>  
+>>>>  static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>>>>                                     uint32_t token, uint32_t nargs,
+>>>> @@ -354,6 +355,7 @@ static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
+>>>>                                    target_ulong args,
+>>>>                                    uint32_t nret, target_ulong rets)
+>>>>  {
+>>>> +    int ret;
+>>>>      uint64_t rtas_addr = spapr_get_rtas_addr();
+>>>>  
+>>>>      if (!rtas_addr) {
+>>>> @@ -361,6 +363,18 @@ static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
+>>>>          return;
+>>>>      }
+>>>>  
+>>>> +    ret = kvmppc_fwnmi_enable(cpu);
+>>>
+>>> You shouldn't need this here as well as in cap_fwnmi_mce_apply().
+>>>
+>>> Instead, you should unconditionally fail the nmi-register if the
+>>> capability is not enabled.
+>>
+>> cap_fwnmi is not enabled by default, because if it is enabled by default
+>> them KVM will start routing machine check exceptions via guest exit
+>> instead of routing it to guest's 0x200.
+>>
+>> During early boot since guest has not yet issued nmi-register, KVM is
+>> expected to route exceptions to 0x200. Therefore we enable cap_fwnmi
+>> only when a guest issues nmi-register.
 > 
->> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->> ---
->>   backends/rng-builtin.c         |  8 +++-----
->>   hw/virtio/virtio-rng.c         |  2 +-
->>   include/hw/virtio/virtio-rng.h |  4 ++--
->>   include/sysemu/rng-builtin.h   | 17 +++++++++++++++++
->>   qemu-options.hx                |  5 ++---
->>   5 files changed, 25 insertions(+), 11 deletions(-)
->>   create mode 100644 include/sysemu/rng-builtin.h
-...
->> diff --git a/include/hw/virtio/virtio-rng.h b/include/hw/virtio/virtio-rng.h
->> index 922dce7caccf..f9b6339b19a4 100644
->> --- a/include/hw/virtio/virtio-rng.h
->> +++ b/include/hw/virtio/virtio-rng.h
-...
->>   #define TYPE_VIRTIO_RNG "virtio-rng-device"
->> @@ -26,7 +26,7 @@ struct VirtIORNGConf {
->>       RngBackend *rng;
->>       uint64_t max_bytes;
->>       uint32_t period_ms;
->> -    RngRandom *default_backend;
->> +    RngBuiltin *default_backend;
+> Except that's not true - you enable it in cap_fwnmi_mce_apply() which
+> will be executed whenever the machine capability is enabled.
+
+I enable cap_fwnmi in cap_fwnmi_mce_apply() only when the "val" argument
+(which is the effective cap value) is set. In early boot "val" is not
+set as cap_fwnmi by default is not set, hence cap_fwnmi is not enabled.
+
+My understanding is that, cap_fwnmi_mce_apply() is also called during
+migration on the target machine. If effective cap for cap_fwnmi is
+enabled on source machine than I think "val" will be set when
+cap_fwnmi_mce_apply() is called on target machine. I then call
+kvmppc_fwnmi_enable() to enable cap_fwnmi on target.
+
+Regards,
+Aravinda
+
 > 
-> This member appears to be superfluous.  As far as I can tell, it's only
-> used in the part of virtio-rng.c visible above.  If you replace it by a
-> local variable there (in a separate patch, perhaps), this patch will
-> become simpler.  In particular, you won't need to create rng-builtin.h.
+>> Or we should take the approach of enabling this capability by default
+>> and then from QEMU route the error to 0x200 if guest has not issued
+>> nmi-register.
+>>
+>>>
+>>>> +    if (ret == 1) {
+>>>> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
+>>>> +        return;
+>>>> +    }
+>>>> +
+>>>> +    if (ret < 0) {
+>>>> +        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+>>>> +        return;
+>>>> +    }
+>>>> +
+>>>>      spapr->guest_machine_check_addr = rtas_ld(args, 1);
+>>>>      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>>>>  }
+>>>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>>>> index 03f34bf..9d16ad1 100644
+>>>> --- a/include/hw/ppc/spapr.h
+>>>> +++ b/include/hw/ppc/spapr.h
+>>>> @@ -78,8 +78,10 @@ typedef enum {
+>>>>  #define SPAPR_CAP_LARGE_DECREMENTER     0x08
+>>>>  /* Count Cache Flush Assist HW Instruction */
+>>>>  #define SPAPR_CAP_CCF_ASSIST            0x09
+>>>> +/* FWNMI machine check handling */
+>>>> +#define SPAPR_CAP_FWNMI_MCE             0x0A
+>>>>  /* Num Caps */
+>>>> -#define SPAPR_CAP_NUM                   (SPAPR_CAP_CCF_ASSIST + 1)
+>>>> +#define SPAPR_CAP_NUM                   (SPAPR_CAP_FWNMI_MCE + 1)
+>>>>  
+>>>>  /*
+>>>>   * Capability Values
+>>>> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+>>>> index 5eedce8..9c7b71d 100644
+>>>> --- a/target/ppc/kvm.c
+>>>> +++ b/target/ppc/kvm.c
+>>>> @@ -83,6 +83,7 @@ static int cap_ppc_safe_indirect_branch;
+>>>>  static int cap_ppc_count_cache_flush_assist;
+>>>>  static int cap_ppc_nested_kvm_hv;
+>>>>  static int cap_large_decr;
+>>>> +static int cap_ppc_fwnmi;
+>>>>  
+>>>>  static uint32_t debug_inst_opcode;
+>>>>  
+>>>> @@ -150,6 +151,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>>>>      kvmppc_get_cpu_characteristics(s);
+>>>>      cap_ppc_nested_kvm_hv = kvm_vm_check_extension(s, KVM_CAP_PPC_NESTED_HV);
+>>>>      cap_large_decr = kvmppc_get_dec_bits();
+>>>> +    cap_ppc_fwnmi = kvm_check_extension(s, KVM_CAP_PPC_FWNMI);
+>>>>      /*
+>>>>       * Note: setting it to false because there is not such capability
+>>>>       * in KVM at this moment.
+>>>> @@ -2117,6 +2119,18 @@ void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy)
+>>>>      }
+>>>>  }
+>>>>  
+>>>> +int kvmppc_fwnmi_enable(PowerPCCPU *cpu)
+>>>> +{
+>>>> +    CPUState *cs = CPU(cpu);
+>>>> +
+>>>> +    if (!cap_ppc_fwnmi) {
+>>>> +        return 1;
+>>>> +    }
+>>>> +
+>>>> +    return kvm_vcpu_enable_cap(cs, KVM_CAP_PPC_FWNMI, 0);
+>>>> +}
+>>>> +
+>>>> +
+>>>>  int kvmppc_smt_threads(void)
+>>>>  {
+>>>>      return cap_ppc_smt ? cap_ppc_smt : 1;
+>>>> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+>>>> index 6edc42f..28919d3 100644
+>>>> --- a/target/ppc/kvm_ppc.h
+>>>> +++ b/target/ppc/kvm_ppc.h
+>>>> @@ -27,6 +27,7 @@ void kvmppc_enable_h_page_init(void);
+>>>>  void kvmppc_set_papr(PowerPCCPU *cpu);
+>>>>  int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
+>>>>  void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
+>>>> +int kvmppc_fwnmi_enable(PowerPCCPU *cpu);
+>>>>  int kvmppc_smt_threads(void);
+>>>>  void kvmppc_hint_smt_possible(Error **errp);
+>>>>  int kvmppc_set_smt_threads(int smt);
+>>>> @@ -159,6 +160,11 @@ static inline void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy)
+>>>>  {
+>>>>  }
+>>>>  
+>>>> +static inline int kvmppc_fwnmi_enable(PowerPCCPU *cpu)
+>>>> +{
+>>>> +    return 1;
+>>>> +}
+>>>> +
+>>>>  static inline int kvmppc_smt_threads(void)
+>>>>  {
+>>>>      return 1;
+>>>>
+>>>
+>>
 > 
 
-I don't understand how we can remove the rng-builtin.h as we need its 
-macros for "RNG_BUILTIN(object_new(TYPE_RNG_BUILTIN))". Could you explain?
+-- 
+Regards,
+Aravinda
 
-Thanks,
-Laurent
 
