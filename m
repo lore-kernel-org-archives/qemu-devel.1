@@ -2,62 +2,81 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 470E8C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:24:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6ACBC04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:24:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B976208C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:24:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B976208C2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 61D2E208C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 13:24:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Iau5J0OB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61D2E208C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57381 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57383 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQAwC-0004cK-89
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 09:24:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54081)
+	id 1hQAwT-0004rU-Gg
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 09:24:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>) id 1hQAq9-0000Me-VY
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:18:03 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hQAn3-0005f9-L7
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:14:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>) id 1hQAq8-0006q7-Hg
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:18:01 -0400
-Received: from foss.arm.com ([217.140.101.70]:52142)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>)
-	id 1hQAlB-000479-QI; Mon, 13 May 2019 09:12:54 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7277B80D;
-	Mon, 13 May 2019 06:12:52 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
-	[10.72.51.249])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EC2F33F720;
-	Mon, 13 May 2019 06:12:50 -0700 (PDT)
-Date: Mon, 13 May 2019 14:12:48 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Andrew Jones <drjones@redhat.com>
-Message-ID: <20190513131248.GI28398@e103592.cambridge.arm.com>
-References: <20190512083624.8916-1-drjones@redhat.com>
-	<20190512083624.8916-12-drjones@redhat.com>
-	<20190513112635.GD28398@e103592.cambridge.arm.com>
-	<20190513123023.h4q5sihktqctkgml@kamzik.brq.redhat.com>
-	<20190513124126.GF28398@e103592.cambridge.arm.com>
-	<20190513125740.ukyx4vuili3f5wbe@kamzik.brq.redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hQAn1-0004sd-9K
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:14:49 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35795)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hQAn0-0004ri-LM
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 09:14:46 -0400
+Received: by mail-oi1-x243.google.com with SMTP id a132so9272485oib.2
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 06:14:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=cMjzGnLVpq/xIUfb1kG6VVA/5QDnB2YJfyhx77XPFnU=;
+	b=Iau5J0OB1acoqv4NGhWEilNM+KrrBitlOkhwzn4Nwgp+SMCsWrXbl59AdmD6hApedk
+	XbBr1PFtn32j8VZ1CXVpo+rl9hG0qf5wXVjPXASw+b0jfZSy4OrTwgnNNd0c7pCY1EB3
+	RHzmfud2Q1/EYadZ1Yb+QsVaOnlV4Gw5Qts9KujraW7P1y5iC5+M4XWqWBUI3jSI5pca
+	7HoGJ9d4gp+ve6ahH0mSjw+/KHtBPEzDzSKsZfrerEsxB4RSjSKQ9g82FEwsLwZZDMn3
+	pAAFtcaLd/AJgyp7BBsk9OGQcWuql0nlBkvwRW1iYdLCsU4D8ERLqQIuoT2bg/QZOR1E
+	9NfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=cMjzGnLVpq/xIUfb1kG6VVA/5QDnB2YJfyhx77XPFnU=;
+	b=WAuMsiWgxwfD8lYKMkkEF1Rp8gSLoAdqzRgOwfXeBsWajul5X7yLr9ln3oYCifHKCn
+	OLs8g/SgQ5VW8ZdGO3iXYYhsigKrDKRL0CUbdtLKaBbhBGK+T3PLDniwHtGxfo+tUd6X
+	cZVvSQWsNScEy9qaD30Gc3ZnyCdfMVms+AZBBTl2dh/YnIvDhThdN/l3aGfwgM9oGxWR
+	/ZaYYg5KnM7PmhokT6f+4a5AOr/vhTKGZVqCFHWLs0AGNmp/PIZgfQAjJvGrKtFGrP1s
+	VrE9cOADoL373wcrl1GbG5NfTfb9xNOqeojKGRaugkhKKKq4hJ6E2LDQ0XOkItSCZh6v
+	od4w==
+X-Gm-Message-State: APjAAAW8bvYxbL5ouiAYnb5DndL2rGy6EE7i7p1x1a2CvvCCDVH9d0EA
+	5cE3wn/wC1LKmAp+GgxHvulDcTuSQ80gsr6uBk/JIw==
+X-Google-Smtp-Source: APXvYqw46T1KaAmGEyN8Sm1bee2greOSqmZxJRyiK+tiovQDTYbgROmixfaz0sUX461S57H48SrDXB8PhjoozHkcaBs=
+X-Received: by 2002:aca:5785:: with SMTP id l127mr12444924oib.48.1557753285412;
+	Mon, 13 May 2019 06:14:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190513125740.ukyx4vuili3f5wbe@kamzik.brq.redhat.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.140.101.70
-Subject: Re: [Qemu-devel] [PATCH 11/13] target/arm/cpu64: max cpu: Introduce
- sve-vls-map
+References: <20190510191051.5973-1-alex.bennee@linaro.org>
+In-Reply-To: <20190510191051.5973-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 13 May 2019 14:14:34 +0100
+Message-ID: <CAFEAcA8iZuU+xw--1WLH0=+TzeXrgGF7-rauKMSK_vqp98x0dQ@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::243
+Subject: Re: [Qemu-devel] [RFC PATCH] target/arm: semihosting docs,
+ formatting and return clean-ups
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,139 +88,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"armbru@redhat.com" <armbru@redhat.com>,
-	"richard.henderson@linaro.org" <richard.henderson@linaro.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"abologna@redhat.com" <abologna@redhat.com>,
-	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-	"alex.bennee@linaro.org" <alex.bennee@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 13, 2019 at 01:57:40PM +0100, Andrew Jones wrote:
-> On Mon, May 13, 2019 at 01:41:26PM +0100, Dave Martin wrote:
-> > On Mon, May 13, 2019 at 01:30:23PM +0100, Andrew Jones wrote:
-> > > On Mon, May 13, 2019 at 12:26:36PM +0100, Dave Martin wrote:
-> > > > On Sun, May 12, 2019 at 09:36:22AM +0100, Andrew Jones wrote:
-> > > > > Introduce another cpu property to control SVE vector lengths,
-> > > > > sve-vls-map, which allows the user to explicitly select the
-> > > > > set of vector lengths the guest can use. The map must conform
-> > > > > to QEMU's limits and architectural constraints, checked when
-> > > > > the property is set. Inconsistencies with sve-max-vq are also
-> > > > > checked. The bit number of a set bit in the map represents the
-> > > > > allowed vector length in number of quadwords.
-> > > > > 
-> > > > > Note, as the map is implemented with a single 64-bit word we
-> > > > > currently only support up to 8192-bit vectors. As QEMU and
-> > > > > KVM only support up to 2048-bit vectors then this sufficient
-> > > > > now, and probably for some time. Extending the bitmap beyond
-> > > > > a single word will likely require changing the property to
-> > > > > a string and adding yet another parser to QEMU.
-> > > > > 
-> > > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > > > ---
-> > > > >  target/arm/cpu.c     |  4 +++
-> > > > >  target/arm/cpu.h     |  3 ++
-> > > > >  target/arm/cpu64.c   | 70 +++++++++++++++++++++++++++++++++++++++++---
-> > > > >  target/arm/helper.c  | 10 ++++++-
-> > > > >  target/arm/monitor.c |  9 ++++--
-> > > > >  5 files changed, 88 insertions(+), 8 deletions(-)
-> > > > > 
-> > > > 
-> > > > [...]
-> > > > 
-> > > > > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> > > > > index 8292d547e8f9..f0d0ce759ba8 100644
-> > > > > --- a/target/arm/cpu.h
-> > > > > +++ b/target/arm/cpu.h
-> > > > > @@ -920,6 +920,9 @@ struct ARMCPU {
-> > > > >  
-> > > > >      /* Used to set the maximum vector length the cpu will support.  */
-> > > > >      uint32_t sve_max_vq;
-> > > > > +
-> > > > > +    /* Each bit represents a supported vector length of (bitnum * 16) bytes */
-> > > > > +    uint64_t sve_vls_map;
-> > > > 
-> > > > Just to be clear, the representation here is different from the
-> > > > representation in KVM_REG_ARM64_SVE_VLS?
-> > > > 
-> > > > In the latter, bit n represents vector length ((n + 1) * 16) bytes.
-> > > 
-> > > KVM also uses bitnum * 16. bitnum is the the bit number, not the shift.
-> > 
-> > Can you point to the relevant kernel code?  This isn't what I thought I
-> > wrote...
-> 
-> The Documentation/virtual/kvm/api.txt documentation has
-> 
->  > if (vq >= SVE_VQ_MIN && vq <= SVE_VQ_MAX &&
->  >    ((vector_lengths[(vq - KVM_ARM64_SVE_VQ_MIN) / 64] >>
->  >                ((vq - KVM_ARM64_SVE_VQ_MIN) % 64)) & 1))
->  >        /* Vector length vq * 16 bytes supported */
->  > else
->  >        /* Vector length vq * 16 bytes not supported */
-> 
-> Taking vq=1, we check (vector_lengths[0] >> 0) to see if we have the
-> length (1 * 16) bytes. Since bitnum 1 is (1 << 0) that means the shift
-> is zero and (bitnum * 16) is the same as (vq * 16). With ((n + 1) * 16),
-> n would have to be zero, which is not a valid bitnum, but is a valid
-> bit shift.
+On Fri, 10 May 2019 at 20:10, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> This is a clean-up of the semihosting calls after reading ver 2.0 of
+> the specification. There are a number of small fixes that seemed too
+> insignificant to split into smaller patches:
+>
+>   - add reference to the ARM semihosting spec
+>   - add some additional commentary on return values
+>   - fixup block comments as per standard
+>   - audit return values, return 0xdeadbeef for corrupted values
+>   - fix up leaks from early returns with lock_user_string
+>   - return bytes not written/read instead of -1
+>   - add LOG_UNIMP for missing functionality
+>
+> This is very much a Friday patch. It might be worth splitting up if
+> coming back for a more concerted clean-up series for semihosting as
+> the asynchronous gdb calls probably need more attention.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  target/arm/arm-semi.c | 180 +++++++++++++++++++++++++-----------------
+>  1 file changed, 109 insertions(+), 71 deletions(-)
+>
+> diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+> index 4c326fdc2fb..8deaed2807c 100644
+> --- a/target/arm/arm-semi.c
+> +++ b/target/arm/arm-semi.c
+> @@ -2,6 +2,7 @@
+>   *  Arm "Angel" semihosting syscalls
+>   *
+>   *  Copyright (c) 2005, 2007 CodeSourcery.
+> + *  Copyright (c) 2019 Linaro
+>   *  Written by Paul Brook.
+>   *
+>   *  This program is free software; you can redistribute it and/or modify
+> @@ -15,13 +16,19 @@
+>   *  GNU General Public License for more details.
+>   *
+>   *  You should have received a copy of the GNU General Public License
+> - *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + *  along with this program; if not, see
+> + *  <http://www.gnu.org/licenses/>.
+> + *
+> + *  ARM Semihosting is documented in:
+> + *     Semihosting for AArch32 and AArch64 Release 2.0
+> + *     https://static.docs.arm.com/100863/0200/semihosting.pdf
+>   */
+>
+>  #include "qemu/osdep.h"
+>
+>  #include "cpu.h"
+>  #include "exec/semihost.h"
+> +#include "exec/log.h"
+>  #ifdef CONFIG_USER_ONLY
+>  #include "qemu.h"
+>
+> @@ -241,13 +248,18 @@ static target_ulong arm_gdb_syscall(ARMCPU *cpu, gd=
+b_syscall_complete_cb cb,
+>       put_user_u64(val, args + (n) * 8) :                \
+>       put_user_u32(val, args + (n) * 4))
+>
+> +/*
+> + * Do a semihosting call. Returns the "RETURN REGISTER" which is
+> + * documented as corrupted for some calls. In this case we use the
+> + * venerable 0xdeadbeef.
+> + */
 
-OK, so it sounds like the interpretation of the KVM ABI is what I intended.
+I think what you mean here is something like "the specification always
+says that the "return register" either returns a specific value or
+is corrupted, so we don't need to report to our caller whether we
+are returning a value or trying to leave the register unchanged.
+We use 0xdeadbeef as the return value when there isn't a defined
+return value for the call."
 
-What is "bitnum" though?  Most of the time, people seem to number bits
-starting from 0 -- though of course that's just a convention.
+>  target_ulong do_arm_semihosting(CPUARMState *env)
+>  {
+>      ARMCPU *cpu =3D arm_env_get_cpu(env);
+>      CPUState *cs =3D CPU(cpu);
+>      target_ulong args;
+>      target_ulong arg0, arg1, arg2, arg3;
+> -    char * s;
+> +    char *s;
+>      int nr;
+>      uint32_t ret;
+>      uint32_t len;
+> @@ -273,9 +285,9 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>          GET_ARG(2);
+>          s =3D lock_user_string(arg0);
+>          if (!s) {
+> -            /* FIXME - should this error code be -TARGET_EFAULT ? */
 
-> > > So you can't have bitnum=0. 'n' must be a shift, as it would need to
-> > > allow zero in order to represent KVM_ARM64_SVE_VQ_MIN.
+We definitely don't want to return -TARGET_EFAULT, but we could
+in theory call set_swi_errno(ts, EFAULT). The spec says that
+it's up to the implementation, effectively, so I think I agree
+we don't need to bother. Any caller which has messed things up
+sufficiently to be passing us bogus memory is unlikely to be
+in a state to successfully call SYS_ERRNO anyway.
 
-[...]
+>              return (uint32_t)-1;
+>          }
+> +        /* check for invalid open mode */
+>          if (arg1 >=3D 12) {
+>              unlock_user(s, arg0, 0);
+>              return (uint32_t)-1;
+> @@ -287,7 +299,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>          }
+>          if (use_gdb_syscalls()) {
+>              ret =3D arm_gdb_syscall(cpu, arm_semi_cb, "open,%s,%x,1a4", =
+arg0,
+> -                                  (int)arg2+1, gdb_open_modeflags[arg1])=
+;
+> +                                  (int) arg2 + 1, gdb_open_modeflags[arg=
+1]);
 
-> > > > > diff --git a/target/arm/helper.c b/target/arm/helper.c
-> > > > > index 1e6eb0d0f360..bedec1ea0b27 100644
-> > > > > --- a/target/arm/helper.c
-> > > > > +++ b/target/arm/helper.c
-> > > > > @@ -5254,12 +5254,20 @@ uint32_t sve_zcr_len_for_el(CPUARMState *env, int el)
-> > > > >  static void zcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-> > > > >                        uint64_t value)
-> > > > >  {
-> > > > > +    ARMCPU *cpu = arm_env_get_cpu(env);
-> > > > >      int cur_el = arm_current_el(env);
-> > > > >      int old_len = sve_zcr_len_for_el(env, cur_el);
-> > > > >      int new_len;
-> > > > >  
-> > > > >      /* Bits other than [3:0] are RAZ/WI.  */
-> > > > > -    raw_write(env, ri, value & 0xf);
-> > > > > +    value &= 0xf;
-> > > > 
-> > > > You might want to sanity-check that the max vq you configured for the
-> > > > vcpu is <= 16 here.
-> > > 
-> > > It's already checked by the cpu property set function at input time.
-> > 
-> > The check is in one place, but the assumptions based on it are
-> > potentially all over the place -- it may be tricky to track them
-> > all down if you ever add support for >8192-bit vectors.
-> > 
-> > (Not a big deal from my point of view, but I'd migration to larger
-> > vectors to be as smooth as reasonably possible if we ever find we have
-> > to do it.)
-> >
-> 
-> Adding asserts might be a good idea to catch bugs when expanding the
-> supported vector lengths. I can certainly add one here. Maybe Richard
-> has some ideas as well for this.
+The space after the cast looks a bit odd here.
 
-Sure, just wanted to make the point, since this might be an issue in the
-future.
+>          } else {
+>              ret =3D set_swi_errno(ts, open(s, open_modeflags[arg1], 0644=
+));
+>          }
+> @@ -301,48 +313,51 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>              return set_swi_errno(ts, close(arg0));
+>          }
+>      case TARGET_SYS_WRITEC:
+> -        {
+> -          char c;
+> -
+> -          if (get_user_u8(c, args))
+> -              /* FIXME - should this error code be -TARGET_EFAULT ? */
+> -              return (uint32_t)-1;
+> -          /* Write to debug console.  stderr is near enough.  */
+> -          if (use_gdb_syscalls()) {
+> +    {
+> +        char c;
+> +        if (!get_user_u8(c, args)) {
+> +            /* Write to debug console.  stderr is near enough.  */
+> +            if (use_gdb_syscalls()) {
+>                  return arm_gdb_syscall(cpu, arm_semi_cb, "write,2,%x,1",=
+ args);
+> -          } else {
+> +            } else {
+>  #ifdef CONFIG_SOFTMMU
+> -              Chardev *chardev =3D semihosting_get_chardev();
+> -              if (chardev) {
+> -                  return qemu_chr_write_all(chardev, (uint8_t *) &c, 1);
+> -              } else
+> +                Chardev *chardev =3D semihosting_get_chardev();
+> +                if (chardev) {
+> +                    return qemu_chr_write_all(chardev, (uint8_t *) &c, 1=
+);
+> +                }
+>  #endif
 
-The compromise in the kernel implementation was similar: in many places
-the code is agnostic to larger vectors, but in a few (such as the ioctl
-reg accessors) this seemed too cumbersome to justify for now, so I went
-with a simpler implementation with some added sanity-checks.
+Looks like this patch is dependent on some other patchset?
 
-Cheers
----Dave
+
+> @@ -447,20 +474,23 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>          GET_ARG(3);
+>          if (use_gdb_syscalls()) {
+>              return arm_gdb_syscall(cpu, arm_semi_cb, "rename,%s,%s",
+> -                                   arg0, (int)arg1+1, arg2, (int)arg3+1)=
+;
+> +                                   arg0, (int)arg1 + 1, arg2, (int)arg3 =
++ 1);
+>          } else {
+>              char *s2;
+>              s =3D lock_user_string(arg0);
+>              s2 =3D lock_user_string(arg2);
+> -            if (!s || !s2)
+> -                /* FIXME - should this error code be -TARGET_EFAULT ? */
+> -                ret =3D (uint32_t)-1;
+> -            else
+> +            if (s && s2) {
+>                  ret =3D set_swi_errno(ts, rename(s, s2));
+> -            if (s2)
+> +            } else {
+> +                ret =3D -EIO;
+
+I would stick with -1 personally. The spec says "host-specific error
+code", but since there's not a lot the guest can do with the result
+anyway we can just use -1 in our implementation. Also, EIO is an
+odd choice for "you passed us non-readable memory", which is more
+usually EFAULT.
+
+More generally, can you keep changes in behaviour in a separate patch
+from code reformatting, please ?
+
+> @@ -472,7 +502,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>          GET_ARG(1);
+>          if (use_gdb_syscalls()) {
+>              return arm_gdb_syscall(cpu, arm_semi_cb, "system,%s",
+> -                                   arg0, (int)arg1+1);
+> +                                   arg0, (int)arg1 + 1);
+
+...here you don't have the space after the cast. I prefer this way.
+
+thanks
+-- PMM
 
