@@ -2,90 +2,64 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 958C9C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:34:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD70C04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:37:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A2A0208C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:34:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A2A0208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2725F208C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 14:37:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2725F208C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58430 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58518 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQC1l-0003oq-KT
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 10:34:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40788)
+	id 1hQC4g-0005ir-B1
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 10:37:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hQBzv-0002w8-Rv
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 10:32:14 -0400
+	(envelope-from <Dave.Martin@arm.com>) id 1hQC3Y-00054o-NT
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 10:35:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hQBzu-0001R2-QL
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 10:32:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58760)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hQBzs-0001Pt-5f; Mon, 13 May 2019 10:32:08 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8005F3086216;
-	Mon, 13 May 2019 14:32:07 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.206.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2BEC51001DE1;
-	Mon, 13 May 2019 14:32:05 +0000 (UTC)
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1557754872.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <1fe2bae0-2988-bc50-9827-1f6382223538@redhat.com>
-Date: Mon, 13 May 2019 16:32:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <Dave.Martin@arm.com>) id 1hQC3X-00036v-FP
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 10:35:56 -0400
+Received: from foss.arm.com ([217.140.101.70]:54212)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Dave.Martin@arm.com>)
+	id 1hQC3S-00030j-PW; Mon, 13 May 2019 10:35:52 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 724BC341;
+	Mon, 13 May 2019 07:35:48 -0700 (PDT)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+	[10.72.51.249])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EBAD13F71E;
+	Mon, 13 May 2019 07:35:46 -0700 (PDT)
+Date: Mon, 13 May 2019 15:35:44 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Andrew Jones <drjones@redhat.com>
+Message-ID: <20190513143544.GJ28398@e103592.cambridge.arm.com>
+References: <20190512083624.8916-1-drjones@redhat.com>
+	<20190512083624.8916-12-drjones@redhat.com>
+	<20190513112635.GD28398@e103592.cambridge.arm.com>
+	<20190513123023.h4q5sihktqctkgml@kamzik.brq.redhat.com>
+	<20190513124126.GF28398@e103592.cambridge.arm.com>
+	<20190513125740.ukyx4vuili3f5wbe@kamzik.brq.redhat.com>
+	<20190513131248.GI28398@e103592.cambridge.arm.com>
+	<20190513134512.alclwrqnxlyai6uy@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cover.1557754872.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="85I136OkW4c0GCSmTdFxRb967j6UVVSa0"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Mon, 13 May 2019 14:32:07 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190513134512.alclwrqnxlyai6uy@kamzik.brq.redhat.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] block: Use bdrv_unref_child() for
- all children in bdrv_close()
+X-Received-From: 217.140.101.70
+Subject: Re: [Qemu-devel] [PATCH 11/13] target/arm/cpu64: max cpu: Introduce
+ sve-vls-map
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,76 +71,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"armbru@redhat.com" <armbru@redhat.com>,
+	"richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"abologna@redhat.com" <abologna@redhat.com>,
+	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+	"alex.bennee@linaro.org" <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---85I136OkW4c0GCSmTdFxRb967j6UVVSa0
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <1fe2bae0-2988-bc50-9827-1f6382223538@redhat.com>
-Subject: Re: [PATCH v3 0/2] block: Use bdrv_unref_child() for all children in
- bdrv_close()
-References: <cover.1557754872.git.berto@igalia.com>
-In-Reply-To: <cover.1557754872.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, May 13, 2019 at 02:45:12PM +0100, Andrew Jones wrote:
+> On Mon, May 13, 2019 at 02:12:48PM +0100, Dave Martin wrote:
+> > On Mon, May 13, 2019 at 01:57:40PM +0100, Andrew Jones wrote:
+> > > On Mon, May 13, 2019 at 01:41:26PM +0100, Dave Martin wrote:
+> > > > On Mon, May 13, 2019 at 01:30:23PM +0100, Andrew Jones wrote:
+> > > > > On Mon, May 13, 2019 at 12:26:36PM +0100, Dave Martin wrote:
+> > > > > > On Sun, May 12, 2019 at 09:36:22AM +0100, Andrew Jones wrote:
+> > > > > > > Introduce another cpu property to control SVE vector lengths,
+> > > > > > > sve-vls-map, which allows the user to explicitly select the
+> > > > > > > set of vector lengths the guest can use. The map must conform
+> > > > > > > to QEMU's limits and architectural constraints, checked when
+> > > > > > > the property is set. Inconsistencies with sve-max-vq are also
+> > > > > > > checked. The bit number of a set bit in the map represents the
+> > > > > > > allowed vector length in number of quadwords.
+> > > > > > > 
+> > > > > > > Note, as the map is implemented with a single 64-bit word we
+> > > > > > > currently only support up to 8192-bit vectors. As QEMU and
+> > > > > > > KVM only support up to 2048-bit vectors then this sufficient
+> > > > > > > now, and probably for some time. Extending the bitmap beyond
+> > > > > > > a single word will likely require changing the property to
+> > > > > > > a string and adding yet another parser to QEMU.
+> > > > > > > 
+> > > > > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > > > > > > ---
+> > > > > > >  target/arm/cpu.c     |  4 +++
+> > > > > > >  target/arm/cpu.h     |  3 ++
+> > > > > > >  target/arm/cpu64.c   | 70 +++++++++++++++++++++++++++++++++++++++++---
+> > > > > > >  target/arm/helper.c  | 10 ++++++-
+> > > > > > >  target/arm/monitor.c |  9 ++++--
+> > > > > > >  5 files changed, 88 insertions(+), 8 deletions(-)
+> > > > > > > 
+> > > > > > 
+> > > > > > [...]
+> > > > > > 
+> > > > > > > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> > > > > > > index 8292d547e8f9..f0d0ce759ba8 100644
+> > > > > > > --- a/target/arm/cpu.h
+> > > > > > > +++ b/target/arm/cpu.h
+> > > > > > > @@ -920,6 +920,9 @@ struct ARMCPU {
+> > > > > > >  
+> > > > > > >      /* Used to set the maximum vector length the cpu will support.  */
+> > > > > > >      uint32_t sve_max_vq;
+> > > > > > > +
+> > > > > > > +    /* Each bit represents a supported vector length of (bitnum * 16) bytes */
+> > > > > > > +    uint64_t sve_vls_map;
+> > > > > > 
+> > > > > > Just to be clear, the representation here is different from the
+> > > > > > representation in KVM_REG_ARM64_SVE_VLS?
+> > > > > > 
+> > > > > > In the latter, bit n represents vector length ((n + 1) * 16) bytes.
+> > > > > 
+> > > > > KVM also uses bitnum * 16. bitnum is the the bit number, not the shift.
+> > > > 
+> > > > Can you point to the relevant kernel code?  This isn't what I thought I
+> > > > wrote...
+> > > 
+> > > The Documentation/virtual/kvm/api.txt documentation has
+> > > 
+> > >  > if (vq >= SVE_VQ_MIN && vq <= SVE_VQ_MAX &&
+> > >  >    ((vector_lengths[(vq - KVM_ARM64_SVE_VQ_MIN) / 64] >>
+> > >  >                ((vq - KVM_ARM64_SVE_VQ_MIN) % 64)) & 1))
+> > >  >        /* Vector length vq * 16 bytes supported */
+> > >  > else
+> > >  >        /* Vector length vq * 16 bytes not supported */
+> > > 
+> > > Taking vq=1, we check (vector_lengths[0] >> 0) to see if we have the
+> > > length (1 * 16) bytes. Since bitnum 1 is (1 << 0) that means the shift
+> > > is zero and (bitnum * 16) is the same as (vq * 16). With ((n + 1) * 16),
+> > > n would have to be zero, which is not a valid bitnum, but is a valid
+> > > bit shift.
+> > 
+> > OK, so it sounds like the interpretation of the KVM ABI is what I intended.
+> > 
+> > What is "bitnum" though?  Most of the time, people seem to number bits
+> > starting from 0 -- though of course that's just a convention.
+> 
+> Eh, I see the problem. I used the word 'number', when I meant 'position'.
+> Indeed the bit number of bit position 1 is zero. Sorry about the confusion.
+> For v2 I can try to ensure I don't use the wrong terminology.
 
-On 13.05.19 15:46, Alberto Garcia wrote:
-> Hi,
->=20
-> the first patch is the same as in v2 (with an updated commit
-> message). The second patch is new and makes bdrv_root_attach_child()
-> unref child_bs on failure, as suggested by Max.
->=20
-> Regards,
->=20
-> Berto
->=20
-> v2: https://lists.gnu.org/archive/html/qemu-block/2019-05/msg00325.html=
+I'm not sure there's an actual problem here.  I found the terminology
+unfamiliar, that's all.
 
-> v1: https://lists.gnu.org/archive/html/qemu-block/2019-03/msg01040.html=
+My main concern was that people might be confused about the kernel ABI
+here, but it sounds like your interpretation is as I intended.
 
->=20
-> Alberto Garcia (2):
->   block: Use bdrv_unref_child() for all children in bdrv_close()
->   block: Make bdrv_root_attach_child() unref child_bs on failure
->=20
->  block.c                     | 41 ++++++++++++++++++++-----------------=
-----
->  block/block-backend.c       |  3 +--
->  block/quorum.c              |  1 -
->  blockjob.c                  |  2 +-
->  tests/test-bdrv-drain.c     |  6 ------
->  tests/test-bdrv-graph-mod.c |  1 -
->  6 files changed, 22 insertions(+), 32 deletions(-)
+But by all means clarify the comments if you think there's a risk of
+QEMU folks being confused.
 
-Thanks for bearing with me, applied to my block branch:
+[...]
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-
-Max
-
-
---85I136OkW4c0GCSmTdFxRb967j6UVVSa0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzZf+QACgkQ9AfbAGHV
-z0AHAgf/c2V371sQQrdv7HV5lRmeJhvxqUw3zX+GYLaQ293k3/JK4qC5owUPOnwG
-rIMVm8wx6mYuXJqH1zgG8YSyk6DXOYACUwvXkmfyeE04OnX+APynP2mDCeVqpACX
-hP1PZCUheIdQ+7g2VN74voSL57TMRaVnMRTNj/bAycox7NGnMNahS4wodm/B0JhH
-I06Gf3oSdWVQ37Z69eO7+TplwZiv2aSIzboW5Ri7AN4MEsileuzUH/A9I7IxIFcP
-OO1UUHBgREuoabS6rmXoXo4rwnJd6uSVa/HRonjvS5uDTcrn5GcakUUk2wisXLp5
-sjCMnBZM1jy1Fsdj7rPiLLywoyxbdg==
-=RWIw
------END PGP SIGNATURE-----
-
---85I136OkW4c0GCSmTdFxRb967j6UVVSa0--
+Cheers
+---Dave
 
