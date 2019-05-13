@@ -2,66 +2,95 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22936C04AA7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 15:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F41E2C04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 15:35:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D70EE2084F
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 15:34:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D70EE2084F
+	by mail.kernel.org (Postfix) with ESMTPS id B945A2084F
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 15:35:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B945A2084F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59215 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59228 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQCyU-0006Dy-1u
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 11:34:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51209)
+	id 1hQCz5-0006gV-WB
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 11:35:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hQCuu-0003ux-39
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:31:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1hQCuv-0003oo-Rn
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:31:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hQCgB-0003bR-Lg
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:15:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51274)
+	(envelope-from <eblake@redhat.com>) id 1hQCg4-0003LM-65
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:15:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38430)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hQCgB-0003a3-Dj
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:15:51 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hQCg3-0003IG-SY
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:15:44 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B973C3092669;
-	Mon, 13 May 2019 15:15:50 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
-	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EE7565C225;
-	Mon, 13 May 2019 15:15:44 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 6592C11385E4; Mon, 13 May 2019 17:15:42 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Ernest Esene <eroken1@gmail.com>
-References: <20190510180410.GA10349@erokenlabserver>
-Date: Mon, 13 May 2019 17:15:42 +0200
-In-Reply-To: <20190510180410.GA10349@erokenlabserver> (Ernest Esene's message
-	of "Fri, 10 May 2019 19:04:10 +0100")
-Message-ID: <87d0kmfkrl.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	by mx1.redhat.com (Postfix) with ESMTPS id 67108C057E37
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 15:15:42 +0000 (UTC)
+Received: from [10.3.116.15] (ovpn-116-15.phx2.redhat.com [10.3.116.15])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A1975D720;
+	Mon, 13 May 2019 15:15:38 +0000 (UTC)
+To: Markus Armbruster <armbru@redhat.com>,
+	=?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20190430131919.GN6818@redhat.com> <20190430144546.GA3065@work-vm>
+	<20190430150556.GA2423@redhat.com>
+	<87sgtqejn9.fsf@dusky.pond.sub.org>
+	<20190507093954.GG27205@redhat.com> <875zql3ylk.fsf@dusky.pond.sub.org>
+	<20190513120856.GH15029@redhat.com> <87ef525uls.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <a3378e24-f13f-b51f-7180-8e0bf4661e10@redhat.com>
+Date: Mon, 13 May 2019 10:15:37 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <87ef525uls.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ku0DiIj6AIe5ahLp0cG5PKBOTOjPtHXDS"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Mon, 13 May 2019 15:15:50 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.31]);
+	Mon, 13 May 2019 15:15:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3] chardev/char-i2c: Implement Linux I2C
- character device
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [libvirt]  QMP; unsigned 64-bit ints;
+ JSON standards compliance
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,312 +102,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
-	qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
+Cc: libvir-list@redhat.com, =?UTF-8?Q?J=c3=a1n_Tomko?= <jtomko@redhat.com>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ernest Esene <eroken1@gmail.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ku0DiIj6AIe5ahLp0cG5PKBOTOjPtHXDS
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: libvir-list@redhat.com, =?UTF-8?Q?J=c3=a1n_Tomko?= <jtomko@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <a3378e24-f13f-b51f-7180-8e0bf4661e10@redhat.com>
+Subject: Re: [libvirt] [Qemu-devel] QMP; unsigned 64-bit ints; JSON standards
+ compliance
+References: <20190430131919.GN6818@redhat.com> <20190430144546.GA3065@work-vm>
+ <20190430150556.GA2423@redhat.com> <87sgtqejn9.fsf@dusky.pond.sub.org>
+ <20190507093954.GG27205@redhat.com> <875zql3ylk.fsf@dusky.pond.sub.org>
+ <20190513120856.GH15029@redhat.com> <87ef525uls.fsf@dusky.pond.sub.org>
+In-Reply-To: <87ef525uls.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Add support for Linux I2C character device for I2C device passthrough
-> For example:
-> -chardev i2c,address=0x46,path=/dev/i2c-N,id=i2c-chardev
->
-> QEMU supports emulation of I2C devices in software but currently can't
-> passthrough to real I2C devices. This feature is needed by developers
-> using QEMU for writing and testing software for I2C devices.
->
-> Signed-off-by: Ernest Esene <eroken1@gmail.com>
-> ---
-> v3:
->   * change licence to GPLv2+
->   * use non blocking IO for the chardev
->   * change "address" to QEMU_OPT_NUMBER
->   * update qemu-options.hx
-> ---
-> v2:
->   * Fixed errors
->   * update "MAINTAINERS" file.
-> ---
->  MAINTAINERS              |   5 ++
->  chardev/Makefile.objs    |   1 +
->  chardev/char-linux-i2c.c | 126 +++++++++++++++++++++++++++++++++++++++++++++++
->  chardev/char.c           |   3 ++
->  include/chardev/char.h   |   1 +
->  qapi/char.json           |  17 +++++++
->  qemu-options.hx          |  14 +++++-
->  7 files changed, 166 insertions(+), 1 deletion(-)
->  create mode 100644 chardev/char-linux-i2c.c
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 66ddbda9c9..d834a12241 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1801,6 +1801,11 @@ M: Samuel Thibault <samuel.thibault@ens-lyon.org>
->  S: Maintained
->  F: chardev/baum.c
->  
-> +Character Devices (I2C)
-> +M: Ernest Esene <eroken1@gmail.com>
-> +S: Maintained
-> +F: chardev/char-linux-i2c.c
-> +
->  Command line option argument parsing
->  M: Markus Armbruster <armbru@redhat.com>
->  S: Supported
-> diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
-> index d68e1347f9..7b64009aa6 100644
-> --- a/chardev/Makefile.objs
-> +++ b/chardev/Makefile.objs
-> @@ -16,6 +16,7 @@ chardev-obj-y += char-stdio.o
->  chardev-obj-y += char-udp.o
->  chardev-obj-$(CONFIG_WIN32) += char-win.o
->  chardev-obj-$(CONFIG_WIN32) += char-win-stdio.o
-> +chardev-obj-$(CONFIG_LINUX) +=char-linux-i2c.o
+On 5/13/19 8:53 AM, Markus Armbruster wrote:
 
-Space after +=, please.
+>> We have a few options
+>>
+>>  1. Use string format for values > 2^53-1, int format below that
+>>  2. Use string format for all fields which are 64-bit ints whether
+>>     signed or unsigned
+>>  3. Use string format for all fields which are integers, even 32-bit
+>>     ones
+>>
+>> I would probably suggest option 2. It would make the QEMU impl quite
+>> easy IIUC, we we'd just change the QAPI visitor's impl for the int64
+>> and uint64 fields to use string format (when the right capability is
+>> negotiated by QMP).
+>>
+>> I include 3 only for completeness - I don't think there's a hugely
+>> compelling reason to mess with 32-bit ints.
+>=20
+> Agree.
 
->  
->  common-obj-y += msmouse.o wctablet.o testdev.o
->  common-obj-$(CONFIG_BRLAPI) += baum.o
-> diff --git a/chardev/char-linux-i2c.c b/chardev/char-linux-i2c.c
-> new file mode 100644
-> index 0000000000..847a18f611
-> --- /dev/null
-> +++ b/chardev/char-linux-i2c.c
-> @@ -0,0 +1,126 @@
-> +/*
-> + * QEMU System Emulator
-> + * Linux I2C device support as a character device.
-> + *
-> + * Copyright (c) 2019 Ernest Esene <eroken1@gmail.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or
-> + * later.  See the COPYING file in the top-level directory.
-> + */
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "qemu/option.h"
-> +#include "qemu-common.h"
-> +#include "io/channel-file.h"
-> +#include "qemu/cutils.h"
-> +#include "qemu/sockets.h"
-> +
-> +#include "chardev/char-fd.h"
-> +#include "chardev/char.h"
-> +
-> +#include <sys/ioctl.h>
-> +#include <linux/i2c-dev.h>
-> +#include <linux/i2c.h>
-> +
-> +#define CHR_IOCTL_I2C_SET_ADDR 1
-> +
-> +#define CHR_I2C_ADDR_10BIT_MAX 1023
-> +#define CHR_I2C_ADDR_7BIT_MAX 127
-> +
-> +static int i2c_ioctl(Chardev *chr, int cmd, void *arg)
-> +{
-> +    FDChardev *fd_chr = FD_CHARDEV(chr);
-> +    QIOChannelFile *floc = QIO_CHANNEL_FILE(fd_chr->ioc_in);
-> +    int fd = floc->fd;
-> +    int addr;
-> +    unsigned long funcs;
-> +
-> +    switch (cmd) {
-> +    case CHR_IOCTL_I2C_SET_ADDR:
-> +        addr = (intptr_t)arg;
-> +
-> +        if (addr > CHR_I2C_ADDR_7BIT_MAX) {
-> +            if (ioctl(fd, I2C_FUNCS, &funcs) < 0) {
-> +                goto err;
-> +            }
-> +            if (!(funcs & I2C_FUNC_10BIT_ADDR)) {
-> +                goto err;
-> +            }
-> +            if (ioctl(fd, I2C_TENBIT, addr) < 0) {
-> +                goto err;
-> +            }
-> +        } else {
-> +            if (ioctl(fd, I2C_SLAVE, addr) < 0) {
-> +                goto err;
-> +            }
-> +        }
-> +        break;
-> +
-> +    default:
-> +        return -ENOTSUP;
-> +    }
-> +    return 0;
-> +err:
-> +    return -ENOTSUP;
-> +}
-> +
-> +static void qmp_chardev_open_i2c(Chardev *chr, ChardevBackend *backend,
-> +                                 bool *be_opened, Error **errp)
-> +{
-> +    ChardevI2c *i2c = backend->u.i2c.data;
-> +    void *addr;
-> +    int fd;
-> +
-> +    fd = qmp_chardev_open_file_source(i2c->device, O_RDWR | O_NONBLOCK, errp);
-> +    if (fd < 0) {
-> +        return;
-> +    }
-> +    qemu_set_nonblock(fd);
-> +    qemu_chr_open_fd(chr, fd, fd);
-> +    addr = (void *)(intptr_t)i2c->address;
-> +    i2c_ioctl(chr, CHR_IOCTL_I2C_SET_ADDR, addr);
-> +}
-> +
-> +static void qemu_chr_parse_i2c(QemuOpts *opts, ChardevBackend *backend,
-> +                               Error **errp)
-> +{
-> +    const char *device = qemu_opt_get(opts, "path");
-> +    long address = qemu_opt_get_number(opts, "address", LONG_MAX);
-> +    ChardevI2c *i2c;
-> +
-> +    if (device == NULL) {
-> +        error_setg(errp, "chardev: i2c: no device path given");
-> +        return;
-> +    }
-> +    if (address < 0 || address > CHR_I2C_ADDR_10BIT_MAX) {
-> +        error_setg(errp, "chardev: i2c: device address out of range");
-> +        return;
-> +    }
-> +    backend->type = CHARDEV_BACKEND_KIND_I2C;
-> +    i2c = backend->u.i2c.data = g_new0(ChardevI2c, 1);
-> +    qemu_chr_parse_common(opts, qapi_ChardevI2c_base(i2c));
-> +    i2c->device = g_strdup(device);
-> +    i2c->address = (int16_t)address;
-> +}
-> +
-> +static void char_i2c_class_init(ObjectClass *oc, void *data)
-> +{
-> +    ChardevClass *cc = CHARDEV_CLASS(oc);
-> +
-> +    cc->parse = qemu_chr_parse_i2c;
-> +    cc->open = qmp_chardev_open_i2c;
-> +    cc->chr_ioctl = i2c_ioctl;
-> +}
-> +
-> +static const TypeInfo char_i2c_type_info = {
-> +    .name = TYPE_CHARDEV_I2C,
-> +    .parent = TYPE_CHARDEV_FD,
-> +    .class_init = char_i2c_class_init,
-> +};
-> +
-> +static void register_types(void)
-> +{
-> +    type_register_static(&char_i2c_type_info);
-> +}
-> +
-> +type_init(register_types);
-> diff --git a/chardev/char.c b/chardev/char.c
-> index 54724a56b1..8f5ffe16e6 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -926,6 +926,9 @@ QemuOptsList qemu_chardev_opts = {
->          },{
->              .name = "logappend",
->              .type = QEMU_OPT_BOOL,
-> +        },{
-> +            .name = "address",
-> +            .type = QEMU_OPT_NUMBER,
->          },
->          { /* end of list */ }
->      },
-> diff --git a/include/chardev/char.h b/include/chardev/char.h
-> index c0b57f7685..0e08b70fc9 100644
-> --- a/include/chardev/char.h
-> +++ b/include/chardev/char.h
-> @@ -245,6 +245,7 @@ int qemu_chr_wait_connected(Chardev *chr, Error **errp);
->  #define TYPE_CHARDEV_SERIAL "chardev-serial"
->  #define TYPE_CHARDEV_SOCKET "chardev-socket"
->  #define TYPE_CHARDEV_UDP "chardev-udp"
-> +#define TYPE_CHARDEV_I2C "chardev-i2c"
->  
->  #define CHARDEV_IS_RINGBUF(chr) \
->      object_dynamic_cast(OBJECT(chr), TYPE_CHARDEV_RINGBUF)
-> diff --git a/qapi/char.json b/qapi/char.json
-> index a6e81ac7bc..7168b58cfe 100644
-> --- a/qapi/char.json
-> +++ b/qapi/char.json
-> @@ -240,6 +240,22 @@
->    'data': { 'device': 'str' },
->    'base': 'ChardevCommon' }
->  
-> +##
-> +# @ChardevI2c:
-> +#
-> +# Configuration info for i2c chardev.
-> +#
-> +# @device: The name of the special file for the device,
-> +#          i.e. /dev/i2c-0 on linux
-> +# @address: The address of the i2c device on the host.
-> +#
-> +# Since: 4.1
-> +##
-> +{ 'struct': 'ChardevI2c',
-> +  'data': { 'device': 'str',
-> +            'address': 'int16'},
-> +  'base': 'ChardevCommon' }
-> +
->  ##
->  # @ChardevSocket:
->  #
-> @@ -398,6 +414,7 @@
->    'data': { 'file': 'ChardevFile',
->              'serial': 'ChardevHostdev',
->              'parallel': 'ChardevHostdev',
-> +            'i2c': 'ChardevI2c',
+Other than if we ever change the type of a QMP integer. Right now, if we
+widen from 'int32' to 'int' (aka 'int64'), it is invisible to clients;
+but once we start stringizing 64-bit numbers (at client request) but NOT
+32-bit numbers, then changing a type from 32 to 64 bits (or the
+converse) becomes an API change to clients. Introspection will at least
+let a client know which form to expect, but it does mean we have to be
+more aware of typing issues going forward.
 
-Shouldn't this be 'if': 'defined(CONFIG_LINUX)'?
+>=20
+>> Option 1 is the bare minimum needed to ensure precision, but to me
+>> it feels a bit dirty to say a given field will have different encoding=
 
->              'pipe': 'ChardevHostdev',
->              'socket': 'ChardevSocket',
->              'udp': 'ChardevUdp',
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 51802cbb26..435b6975dd 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -2695,6 +2695,9 @@ DEF("chardev", HAS_ARG, QEMU_OPTION_chardev,
->  #if defined(CONFIG_SPICE)
->      "-chardev spicevmc,id=id,name=name[,debug=debug][,logfile=PATH][,logappend=on|off]\n"
->      "-chardev spiceport,id=id,name=name[,debug=debug][,logfile=PATH][,logappend=on|off]\n"
-> +#endif
-> +#ifdef CONFIG_LINUX
-> +    "-chardev i2c,id=id,address=address[,path=path][,logfile=PATH][,logappend=on|off]\n"
->  #endif
->      , QEMU_ARCH_ALL
->  )
-> @@ -2723,7 +2726,8 @@ Backend is one of:
->  @option{parallel},
->  @option{parport},
->  @option{spicevmc},
-> -@option{spiceport}.
-> +@option{spiceport},
-> +@option{i2c}.
->  The specific backend will determine the applicable options.
->  
->  Use @code{-chardev help} to print all available chardev backend types.
-> @@ -2990,6 +2994,14 @@ Connect to a spice virtual machine channel, such as vdiport.
->  
->  Connect to a spice port, allowing a Spice client to handle the traffic
->  identified by a name (preferably a fqdn).
-> +
-> +@item -chardev i2c,id=@var{id},address=@var{address},path=@var{path}
-> +
-> +@option{path} i2c character device (Eg: /dev/i2c-N on Linux)
-> +
-> +@option{address} address of the slave device.
-> +
-> +I2C device support as a character device.
+>> depending on the value. If apps need to deal with string encoding, the=
+y
+>> might as well just use it for all values in a given field.
+>=20
+> I guess that depends on what this interoperability capability does for
+> QMP *input*.
 
-This sentence no verb :)
+"Be liberal in what you accept, strict in what you produce" - that
+argues we should accept both forms on input (it's easy enough to ALWAYS
+permit a string in place of an integer, and to take an in-range integer
+even when we would in turn output it as a string).
 
->  ETEXI
->  
->  STEXI
+>=20
+> For *output*, QEMU has to encode a number either as JSON number or as
+> JSON string
+
+For output, we should document that whatever capability the client
+passes in at initial connect controls the behavior of all future integer
+outputs (and if no capability is negotiated, we output all integers as
+integers, even if it risks overflowing the client's JSON parser).
+
+>=20
+> For *input*, QEMU could accept either.  Or it could accept only the
+> encoding it produces on output.
+>=20
+> Got a preference?
+>=20
+
+My ramblings above argue to teach the parser to always allow both
+integer and string forms regardless of width, to output 32-bit integers
+as integers, and to output 64-bit integers as string-only (if capability
+is negotiated) or as integer-only (if in back-compat mode).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--ku0DiIj6AIe5ahLp0cG5PKBOTOjPtHXDS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzZihkACgkQp6FrSiUn
+Q2ru4Qf/ZlJzSLs7XDQqiubaWvDAvCXCpXfQt3FRuM/8flj+CvtMHgZgOJ1LndC7
++mCAmV1y9gSdPDFHn2OBSV6XlylZu9QlbHgfh+TXHZnDNmgZRGnyv1m2AqUKDdTN
+2uu10i77gDJHG+GtwH2Wf/WPOu212++DbycyE2iFmeImrzDUWgsp9yj/KNsUS4JE
+RL7E2RGIrX29iSHRUBSpUMjQssM3MQIBvJzK22O/EMD2rD0EIhccIn929gBdat+i
+YjRRU/KTs0iKCGKDG7WEPs8FZotqfzQBRauGEwFsrazlr/7ZFm3H8Kg8GIjaVGnv
+4kOzyHNdkj69cKI4AB3U60zqrCisdQ==
+=F2mw
+-----END PGP SIGNATURE-----
+
+--ku0DiIj6AIe5ahLp0cG5PKBOTOjPtHXDS--
 
