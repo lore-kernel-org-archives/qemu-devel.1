@@ -2,112 +2,141 @@ Return-Path: <SRS0=6NMj=TN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28432C04AAA
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 15:01:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C3DFC04AA7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 15:04:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E68DE20879
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 15:01:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="H+hIyfoe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E68DE20879
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id D77B820879
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 May 2019 15:04:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D77B820879
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58771 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58805 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQCSe-00031D-Tr
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 11:01:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45575)
+	id 1hQCVL-0004Zy-Va
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 11:04:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hQCQS-0001VZ-05
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 10:59:36 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hQCSZ-0003F8-Uu
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:01:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hQCEQ-0000Zh-Fs
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 10:47:11 -0400
-Received: from mail-eopbgr90125.outbound.protection.outlook.com
-	([40.107.9.125]:59024
-	helo=FRA01-MR2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hQCEO-0000YH-T0; Mon, 13 May 2019 10:47:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=1geoMEXB+FkXENxt9gKovVdwC1zS8Gsjf7XWaaRzVVY=;
-	b=H+hIyfoeHrS9wvJOhfURySlzSRIGxf6wtumbanZVTp8BSgrXwZftTuAbFzK3Be9HNCWzoKrFuvWZyX+dRrpcnC+v52tu7mr7rUgZX8Ca9rgCnac831DNXVWQtQl0MgFrEvu7TC82Wubd5jPNtfh5YeqQNgXQqTpFBwSAMkNfpX8=
-Received: from PR2PR08MB4684.eurprd08.prod.outlook.com (52.133.109.209) by
-	PR2PR08MB4810.eurprd08.prod.outlook.com (52.133.107.12) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1878.20; Mon, 13 May 2019 14:47:06 +0000
-Received: from PR2PR08MB4684.eurprd08.prod.outlook.com
-	([fe80::9c35:2e89:30c4:5cc4]) by
-	PR2PR08MB4684.eurprd08.prod.outlook.com
-	([fe80::9c35:2e89:30c4:5cc4%3]) with mapi id 15.20.1878.024;
-	Mon, 13 May 2019 14:47:06 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
-	<qemu-devel@nongnu.org>
-Thread-Topic: [PATCH] nbd/server: Nicer spelling of max BLOCK_STATUS reply
-	length
-Thread-Index: AQHVB0OCRUIno+V6F0mF/Up1/Ona46ZpCfuAgAAYnYCAAARWAA==
-Date: Mon, 13 May 2019 14:47:06 +0000
-Message-ID: <d2af0a95-0a58-34a3-5f89-f72ad6ea7a43@virtuozzo.com>
-References: <20190510151735.29687-1-eblake@redhat.com>
-	<f72c864a-b695-cf35-f183-f1818fc5609a@virtuozzo.com>
-	<3dfc080f-9878-f40f-f8c0-40c134bf99b6@redhat.com>
-In-Reply-To: <3dfc080f-9878-f40f-f8c0-40c134bf99b6@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0267.eurprd05.prod.outlook.com
-	(2603:10a6:3:fc::19) To PR2PR08MB4684.eurprd08.prod.outlook.com
-	(2603:10a6:101:22::17)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190513174704309
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e3c872a3-ce5e-4d3a-c331-08d6d7b1de6f
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
-	SRVR:PR2PR08MB4810; 
-x-ms-traffictypediagnostic: PR2PR08MB4810:
-x-microsoft-antispam-prvs: <PR2PR08MB4810B687E5690B94ABDA7C00C10F0@PR2PR08MB4810.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1775;
-x-forefront-prvs: 0036736630
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(39840400004)(376002)(366004)(396003)(346002)(136003)(199004)(189003)(55674003)(36756003)(52116002)(81166006)(53546011)(6116002)(81156014)(4744005)(8676002)(6512007)(6506007)(386003)(102836004)(3846002)(5660300002)(8936002)(31686004)(99286004)(6486002)(6436002)(71190400001)(478600001)(68736007)(71200400001)(316002)(66066001)(229853002)(14444005)(110136005)(2906002)(14454004)(305945005)(76176011)(7736002)(11346002)(66446008)(2616005)(31696002)(4326008)(186003)(66476007)(64756008)(446003)(66946007)(256004)(73956011)(26005)(6246003)(2501003)(53936002)(86362001)(66556008)(25786009)(486006)(476003);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:PR2PR08MB4810;
-	H:PR2PR08MB4684.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 1fADrj7PUY5ZA7SoRUwZ0pZEWpzy4k9PHZxE4GTMLblqNMepNQMt6ACjOdtsom9marNKkNNjXeCHJbEnTxkUNtRaHhKiRFuyk27GkR95vwgg1Z757lr2m3D1Pj/+Lk4FkE42g6fUrWepy0eoY3LknDmTi+04Eu+kK0gcg9j9y25kLdsx7tzh4NSPDZFxoS/2Z8iz+9XVLtrjaCB8wiRezGlbigakN/7AyXqQ3ZAsufaMN/g7YdAqJM1ow79IseCOMgYyvdtpacfr7NOQTDv6bWYgtZM35xlQI8zPanzV17av1TWzuhidsDOmx23OAeB6/vWT68xyZnH7p1FvrU5yQS7JpYfLx9vlNxPs8AbJHmY66eXyWqd3Up7h0ngxEkrKYb1tYkslJuLBEtQ2TJWe97FdPq4Af5mhzzxIn0D5Kh0=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <1E6327E77EF12044AD7C26A1AE5930D7@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <jsnow@redhat.com>) id 1hQCSW-00078D-Rp
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 11:01:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53388)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
+	id 1hQCST-00072q-7o; Mon, 13 May 2019 11:01:41 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 734133086220;
+	Mon, 13 May 2019 15:01:35 +0000 (UTC)
+Received: from [10.18.17.188] (dhcp-17-188.bos.redhat.com [10.18.17.188])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B12DE10C9E70;
+	Mon, 13 May 2019 15:01:34 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190510215212.8413-1-jsnow@redhat.com>
+	<20190513111321.GB19114@linux.fritz.box>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <1d51d7bb-fb4c-5931-ceb3-ddd908d8596d@redhat.com>
+Date: Mon, 13 May 2019 11:01:34 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e3c872a3-ce5e-4d3a-c331-08d6d7b1de6f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 May 2019 14:47:06.4416 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR2PR08MB4810
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.9.125
-Subject: Re: [Qemu-devel] [PATCH] nbd/server: Nicer spelling of max
- BLOCK_STATUS reply length
+In-Reply-To: <20190513111321.GB19114@linux.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Mon, 13 May 2019 15:01:35 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] blockdev: fix missed target unref for
+ drive-backup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -119,27 +148,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Max Reitz <mreitz@redhat.com>, aihua liang <aliang@redhat.com>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org,
+	Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTMuMDUuMjAxOSAxNzozMSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gNS8xMy8xOSA1OjAzIEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMTAuMDUuMjAxOSAxODox
-NywgRXJpYyBCbGFrZSB3cm90ZToNCj4+PiBDb21taXQgM2QwNjhhZmYgKDMuMCkgaW50cm9kdWNl
-ZCBOQkRfTUFYX0JJVE1BUF9FWFRFTlRTIGFzIGEgbGltaXQgb24NCj4+PiBob3cgbGFyZ2Ugd2Ug
-d291bGQgYWxsb3cgYSByZXBseSB0byBOQkRfQ01EX0JMT0NLX1NUQVRVUyB0byBncm93IHdoZW4N
-Cj4+PiBpdCBpcyB2aXNpdGluZyBhIHFlbXU6ZGlydHktYml0bWFwOiBjb250ZXh0LiAgTGF0ZXIs
-IGNvbW1pdCBmYjdhZmM3OQ0KPj4+ICgzLjEpIHJldXNlZCB0aGUgY29uc3RhbnQgdG8gbGltaXQg
-YmFzZTphbGxvY2F0aW9uIGNvbnRleHQgcmVwbGllcywNCj4+PiBhbHRob3VnaCB0aGUgbmFtZSBp
-cyBub3cgbGVzcyBhcHByb3ByaWF0ZSBpbiB0aGF0IHNpdHVhdGlvbi4NCj4+Pg0KPj4+IFJlbmFt
-ZSB0aGluZ3MsIGFuZCBpbXByb3ZlIHRoZSBtYWNybyB0byB1c2UgdW5pdHMuaCBmb3IgYmV0dGVy
-DQo+Pj4gbGVnaWJpbGl0eS4gVGhlbiByZWZvcm1hdCB0aGUgY29tbWVudCB0byBjb21wbHkgd2l0
-aCBjaGVja3BhdGNoIHJ1bGVzDQo+Pj4gYWRkZWQgaW4gdGhlIG1lYW50aW1lLiBObyBzZW1hbnRp
-YyBjaGFuZ2UuDQo+Pj4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVk
-aGF0LmNvbT4NCj4+DQo+Pg0KPj4gV2l0aCBvciB3aXRob3V0IFN0ZWZhbm8ncyBzdWdnZXN0aW9u
-Og0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZz
-ZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4gDQo+IEknbSBhc3N1bWluZyBSZXZpZXdlZC1ieSBp
-bnN0ZWFkIG9mIFNpZ25lZC1vZmYtYnk/DQo+IA0KDQpBaGEsIG9mIGNvdXJzZS4gQ29weS1wYXN0
-ZWQgYW5kIGZvcmdldCB0byBmaXgoDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+
+
+On 5/13/19 7:13 AM, Kevin Wolf wrote:
+> Am 10.05.2019 um 23:52 hat John Snow geschrieben:
+>> If the bitmap can't be used for whatever reason, we skip putting down
+>> the reference. Fix that.
+>>
+>> In practice, this means that if you attempt to gracefully exit QEMU
+>> after a backup command being rejected, bdrv_close_all will fail and
+>> tell you some unpleasant things via assert().
+>>
+>> Reported-by: aihua liang <aliang@redhat.com>
+>> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1703916
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  blockdev.c | 12 +++++-------
+>>  1 file changed, 5 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/blockdev.c b/blockdev.c
+>> index 79fbac8450..278ecdd122 100644
+>> --- a/blockdev.c
+>> +++ b/blockdev.c
+>> @@ -3525,8 +3525,7 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
+>>      if (set_backing_hd) {
+>>          bdrv_set_backing_hd(target_bs, source, &local_err);
+>>          if (local_err) {
+>> -            bdrv_unref(target_bs);
+>> -            goto out;
+>> +            goto unref;
+>>          }
+>>      }
+>>  
+>> @@ -3534,11 +3533,10 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
+>>          bmap = bdrv_find_dirty_bitmap(bs, backup->bitmap);
+>>          if (!bmap) {
+>>              error_setg(errp, "Bitmap '%s' could not be found", backup->bitmap);
+>> -            bdrv_unref(target_bs);
+>> -            goto out;
+>> +            goto unref;
+>>          }
+>>          if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_DEFAULT, errp)) {
+>> -            goto out;
+>> +            goto unref;
+>>          }
+>>      }
+>>      if (!backup->auto_finalize) {
+>> @@ -3552,12 +3550,12 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
+>>                              backup->sync, bmap, backup->compress,
+>>                              backup->on_source_error, backup->on_target_error,
+>>                              job_flags, NULL, NULL, txn, &local_err);
+>> -    bdrv_unref(target_bs);
+>>      if (local_err != NULL) {
+>>          error_propagate(errp, local_err);
+>> -        goto out;
+> 
+> Please leave a 'goto unref' here so we can later add more code without
+> modifying unrelated error paths (or, more likely, forgetting to modify
+> them).
+> 
+
+Oh, that makes sense.
+
+>>      }
+>>  
+>> +unref:
+>> +    bdrv_unref(target_bs);
+>>  out:
+>>      aio_context_release(aio_context);
+>>      return job;
+> 
+> With this fixed:
+> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+> 
+
+Thanks!
 
