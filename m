@@ -2,71 +2,56 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85011C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 06:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE22DC04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 06:25:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46BEF208C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 06:24:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46BEF208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 72C41208C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 06:25:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72C41208C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40179 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40228 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQQrQ-0002C0-Cn
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 02:24:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53896)
+	id 1hQQsp-0003Ti-Ha
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 02:25:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1hQQld-0006Fx-6e
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:18:26 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hQQij-0003Yf-IL
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:15:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1hQQlb-00036G-Sm
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:18:25 -0400
-Received: from mga04.intel.com ([192.55.52.120]:56310)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
-	id 1hQQlb-00032I-Jc
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:18:23 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-	by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	13 May 2019 23:18:19 -0700
-X-ExtLoop1: 1
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
-	([10.239.13.9])
-	by fmsmga004.fm.intel.com with ESMTP; 13 May 2019 23:18:14 -0700
-Date: Tue, 14 May 2019 02:12:35 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Erik Skultety <eskultet@redhat.com>
-Message-ID: <20190514061235.GC20407@joy-OptiPlex-7040>
-References: <20190506014904.3621-1-yan.y.zhao@intel.com>
-	<20190507151826.502be009@x1.home>
-	<20190509173839.2b9b2b46.cohuck@redhat.com>
-	<20190509154857.GF2868@work-vm>
-	<20190509175404.512ae7aa.cohuck@redhat.com>
-	<20190509164825.GG2868@work-vm>
-	<20190510110838.2df4c4d0.cohuck@redhat.com>
-	<20190510093608.GD2854@work-vm>
-	<20190510114838.7e16c3d6.cohuck@redhat.com>
-	<20190513132804.GD11139@beluga.usersys.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190513132804.GD11139@beluga.usersys.redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hQQif-0007gJ-Dw
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:15:25 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:48923)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hQQif-0007YE-2D
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:15:21 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.vps.ablenet.jp
+	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+	by mail02.asahi-net.or.jp (Postfix) with ESMTPA id D45A43E4AC;
+	Tue, 14 May 2019 15:15:15 +0900 (JST)
+Received: from ysato.dip.jp (ZM005235.ppp.dion.ne.jp [222.8.5.235])
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 880FA240085; 
+	Tue, 14 May 2019 15:15:15 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Date: Tue, 14 May 2019 15:14:53 +0900
+Message-Id: <20190514061458.125225-8-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20190514061458.125225-1-ysato@users.sourceforge.jp>
+References: <20190514061458.125225-1-ysato@users.sourceforge.jp>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 192.55.52.120
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] vfio/mdev: add version attribute
- for mdev device
+X-Received-From: 202.224.55.14
+Subject: [Qemu-devel] [PATCH v12 07/12] hw/char: RX62N serial communication
+ interface (SCI)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,149 +63,447 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"aik@ozlabs.ru" <aik@ozlabs.ru>,
-	"Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-	"shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-	"eauger@redhat.com" <eauger@redhat.com>, "Liu,
-	Yi L" <yi.l.liu@intel.com>, "Yang, Ziye" <ziye.yang@intel.com>,
-	"mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-	"pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-	"libvir-list@redhat.com" <libvir-list@redhat.com>,
-	"arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
-	"felipe@nutanix.com" <felipe@nutanix.com>,
-	"Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	"zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-	"dinechin@redhat.com" <dinechin@redhat.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	"intel-gvt-dev@lists.freedesktop.org"
-	<intel-gvt-dev@lists.freedesktop.org>, "Liu,
-	Changpeng" <changpeng.liu@intel.com>,
-	"berrange@redhat.com" <berrange@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Wang, Zhi A" <zhi.a.wang@intel.com>,
-	"jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "He,
-	Shaopeng" <shaopeng.he@intel.com>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+	Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 13, 2019 at 09:28:04PM +0800, Erik Skultety wrote:
-> On Fri, May 10, 2019 at 11:48:38AM +0200, Cornelia Huck wrote:
-> > On Fri, 10 May 2019 10:36:09 +0100
-> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> >
-> > > * Cornelia Huck (cohuck@redhat.com) wrote:
-> > > > On Thu, 9 May 2019 17:48:26 +0100
-> > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > > >
-> > > > > * Cornelia Huck (cohuck@redhat.com) wrote:
-> > > > > > On Thu, 9 May 2019 16:48:57 +0100
-> > > > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > > > > >
-> > > > > > > * Cornelia Huck (cohuck@redhat.com) wrote:
-> > > > > > > > On Tue, 7 May 2019 15:18:26 -0600
-> > > > > > > > Alex Williamson <alex.williamson@redhat.com> wrote:
-> > > > > > > >
-> > > > > > > > > On Sun,  5 May 2019 21:49:04 -0400
-> > > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > > > > >
-> > > > > > > > > > +  Errno:
-> > > > > > > > > > +  If vendor driver wants to claim a mdev device incompatible to all other mdev
-> > > > > > > > > > +  devices, it should not register version attribute for this mdev device. But if
-> > > > > > > > > > +  a vendor driver has already registered version attribute and it wants to claim
-> > > > > > > > > > +  a mdev device incompatible to all other mdev devices, it needs to return
-> > > > > > > > > > +  -ENODEV on access to this mdev device's version attribute.
-> > > > > > > > > > +  If a mdev device is only incompatible to certain mdev devices, write of
-> > > > > > > > > > +  incompatible mdev devices's version strings to its version attribute should
-> > > > > > > > > > +  return -EINVAL;
-> > > > > > > > >
-> > > > > > > > > I think it's best not to define the specific errno returned for a
-> > > > > > > > > specific situation, let the vendor driver decide, userspace simply
-> > > > > > > > > needs to know that an errno on read indicates the device does not
-> > > > > > > > > support migration version comparison and that an errno on write
-> > > > > > > > > indicates the devices are incompatible or the target doesn't support
-> > > > > > > > > migration versions.
-> > > > > > > >
-> > > > > > > > I think I have to disagree here: It's probably valuable to have an
-> > > > > > > > agreed error for 'cannot migrate at all' vs 'cannot migrate between
-> > > > > > > > those two particular devices'. Userspace might want to do different
-> > > > > > > > things (e.g. trying with different device pairs).
-> > > > > > >
-> > > > > > > Trying to stuff these things down an errno seems a bad idea; we can't
-> > > > > > > get much information that way.
-> > > > > >
-> > > > > > So, what would be a reasonable approach? Userspace should first read
-> > > > > > the version attributes on both devices (to find out whether migration
-> > > > > > is supported at all), and only then figure out via writing whether they
-> > > > > > are compatible?
-> > > > > >
-> > > > > > (Or just go ahead and try, if it does not care about the reason.)
-> > > > >
-> > > > > Well, I'm OK with something like writing to test whether it's
-> > > > > compatible, it's just we need a better way of saying 'no'.
-> > > > > I'm not sure if that involves reading back from somewhere after
-> > > > > the write or what.
-> > > >
-> > > > Hm, so I basically see two ways of doing that:
-> > > > - standardize on some error codes... problem: error codes can be hard
-> > > >   to fit to reasons
-> > > > - make the error available in some attribute that can be read
-> > > >
-> > > > I'm not sure how we can serialize the readback with the last write,
-> > > > though (this looks inherently racy).
-> > > >
-> > > > How important is detailed error reporting here?
-> > >
-> > > I think we need something, otherwise we're just going to get vague
-> > > user reports of 'but my VM doesn't migrate'; I'd like the error to be
-> > > good enough to point most users to something they can understand
-> > > (e.g. wrong card family/too old a driver etc).
-> >
-> > Ok, that sounds like a reasonable point. Not that I have a better idea
-> > how to achieve that, though... we could also log a more verbose error
-> > message to the kernel log, but that's not necessarily where a user will
-> > look first.
-> 
-> In case of libvirt checking the compatibility, it won't matter how good the
-> error message in the kernel log is and regardless of how many error states you
-> want to handle, libvirt's only limited to errno here, since we're going to do
-> plain read/write, so our internal error message returned to the user is only
-> going to contain what the errno says - okay, of course we can (and we DO)
-> provide libvirt specific string, further specifying the error but like I
-> mentioned, depending on how many error cases we want to distinguish this may be
-> hard for anyone to figure out solely on the error code, as apps will most
-> probably not parse the
-> logs.
-> 
-> Regards,
-> Erik
-hi Erik
-do you mean you are agreeing on defining common errors and only returning errno?
+This module supported only non FIFO type.
+Hardware manual.
+https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033ej0140_rx62n.pdf
 
-e.g.
-#define ENOMIGRATION         140  /* device not supporting migration */
-#define EUNATCH              49  /* software version not match */
-#define EHWNM                142  /* hardware not matching*/
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+---
+ include/hw/char/renesas_sci.h |  45 ++++++
+ hw/char/renesas_sci.c         | 340 ++++++++++++++++++++++++++++++++++++++++++
+ hw/char/Kconfig               |   3 +
+ hw/char/Makefile.objs         |   1 +
+ 4 files changed, 389 insertions(+)
+ create mode 100644 include/hw/char/renesas_sci.h
+ create mode 100644 hw/char/renesas_sci.c
 
-Thanks
-Yan
-> >
-> > Ideally, we'd want to have the user space program setting up things
-> > querying the general compatibility for migration (so that it becomes
-> > their problem on how to alert the user to problems :), but I'm not sure
-> > how to eliminate the race between asking the vendor driver for
-> > compatibility and getting the result of that operation.
-> >
-> > Unless we introduce an interface that can retrieve _all_ results
-> > together with the written value? Or is that not going to be much of a
-> > problem in practice?
-> 
-> 
+diff --git a/include/hw/char/renesas_sci.h b/include/hw/char/renesas_sci.h
+new file mode 100644
+index 0000000000..50d1336944
+--- /dev/null
++++ b/include/hw/char/renesas_sci.h
+@@ -0,0 +1,45 @@
++/*
++ * Renesas Serial Communication Interface
++ *
++ * Copyright (c) 2018 Yoshinori Sato
++ *
++ * This code is licensed under the GPL version 2 or later.
++ *
++ */
++
++#include "chardev/char-fe.h"
++#include "qemu/timer.h"
++#include "hw/sysbus.h"
++
++#define TYPE_RENESAS_SCI "renesas-sci"
++#define RSCI(obj) OBJECT_CHECK(RSCIState, (obj), TYPE_RENESAS_SCI)
++
++enum {
++    ERI = 0,
++    RXI = 1,
++    TXI = 2,
++    TEI = 3,
++    SCI_NR_IRQ = 4,
++};
++
++typedef struct {
++    SysBusDevice parent_obj;
++    MemoryRegion memory;
++
++    uint8_t smr;
++    uint8_t brr;
++    uint8_t scr;
++    uint8_t tdr;
++    uint8_t ssr;
++    uint8_t rdr;
++    uint8_t scmr;
++    uint8_t semr;
++
++    uint8_t read_ssr;
++    int64_t trtime;
++    int64_t rx_next;
++    QEMUTimer *timer;
++    CharBackend chr;
++    uint64_t input_freq;
++    qemu_irq irq[SCI_NR_IRQ];
++} RSCIState;
+diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
+new file mode 100644
+index 0000000000..6298cbf43a
+--- /dev/null
++++ b/hw/char/renesas_sci.c
+@@ -0,0 +1,340 @@
++/*
++ * Renesas Serial Communication Interface
++ *
++ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
++ * (Rev.1.40 R01UH0033EJ0140)
++ *
++ * Copyright (c) 2019 Yoshinori Sato
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "hw/sysbus.h"
++#include "hw/registerfields.h"
++#include "hw/char/renesas_sci.h"
++#include "qemu/error-report.h"
++
++/* SCI register map */
++REG8(SMR, 0)
++  FIELD(SMR, CKS,  0, 2)
++  FIELD(SMR, MP,   2, 1)
++  FIELD(SMR, STOP, 3, 1)
++  FIELD(SMR, PM,   4, 1)
++  FIELD(SMR, PE,   5, 1)
++  FIELD(SMR, CHR,  6, 1)
++  FIELD(SMR, CM,   7, 1)
++REG8(BRR, 1)
++REG8(SCR, 2)
++  FIELD(SCR, CKE, 0, 2)
++  FIELD(SCR, TEIE, 2, 1)
++  FIELD(SCR, MPIE, 3, 1)
++  FIELD(SCR, RE,   4, 1)
++  FIELD(SCR, TE,   5, 1)
++  FIELD(SCR, RIE,  6, 1)
++  FIELD(SCR, TIE,  7, 1)
++REG8(TDR, 3)
++REG8(SSR, 4)
++  FIELD(SSR, MPBT, 0, 1)
++  FIELD(SSR, MPB,  1, 1)
++  FIELD(SSR, TEND, 2, 1)
++  FIELD(SSR, ERR, 3, 3)
++    FIELD(SSR, PER,  3, 1)
++    FIELD(SSR, FER,  4, 1)
++    FIELD(SSR, ORER, 5, 1)
++  FIELD(SSR, RDRF, 6, 1)
++  FIELD(SSR, TDRE, 7, 1)
++REG8(RDR, 5)
++REG8(SCMR, 6)
++  FIELD(SCMR, SMIF, 0, 1)
++  FIELD(SCMR, SINV, 2, 1)
++  FIELD(SCMR, SDIR, 3, 1)
++  FIELD(SCMR, BCP2, 7, 1)
++REG8(SEMR, 7)
++  FIELD(SEMR, ACS0, 0, 1)
++  FIELD(SEMR, ABCS, 4, 1)
++
++static int can_receive(void *opaque)
++{
++    RSCIState *sci = RSCI(opaque);
++    if (sci->rx_next > qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)) {
++        return 0;
++    } else {
++        return FIELD_EX8(sci->scr, SCR, RE);
++    }
++}
++
++static void receive(void *opaque, const uint8_t *buf, int size)
++{
++    RSCIState *sci = RSCI(opaque);
++    sci->rx_next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime;
++    if (FIELD_EX8(sci->ssr, SSR, RDRF) || size > 1) {
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, ORER, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 1);
++        }
++    } else {
++        sci->rdr = buf[0];
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, RDRF, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_irq_pulse(sci->irq[RXI]);
++        }
++    }
++}
++
++static void send_byte(RSCIState *sci)
++{
++    if (qemu_chr_fe_backend_connected(&sci->chr)) {
++        qemu_chr_fe_write_all(&sci->chr, &sci->tdr, 1);
++    }
++    timer_mod(sci->timer,
++              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime);
++    sci->ssr = FIELD_DP8(sci->ssr, SSR, TEND, 0);
++    sci->ssr = FIELD_DP8(sci->ssr, SSR, TDRE, 1);
++    qemu_set_irq(sci->irq[TEI], 0);
++    if (FIELD_EX8(sci->scr, SCR, TIE)) {
++        qemu_irq_pulse(sci->irq[TXI]);
++    }
++}
++
++static void txend(void *opaque)
++{
++    RSCIState *sci = RSCI(opaque);
++    if (!FIELD_EX8(sci->ssr, SSR, TDRE)) {
++        send_byte(sci);
++    } else {
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, TEND, 1);
++        if (FIELD_EX8(sci->scr, SCR, TEIE)) {
++            qemu_set_irq(sci->irq[TEI], 1);
++        }
++    }
++}
++
++static void update_trtime(RSCIState *sci)
++{
++    /* char per bits */
++    sci->trtime = 8 - FIELD_EX8(sci->smr, SMR, CHR);
++    sci->trtime += FIELD_EX8(sci->smr, SMR, PE);
++    sci->trtime += FIELD_EX8(sci->smr, SMR, STOP) + 1;
++    /* x bit transmit time (32 * divrate * brr) / base freq */
++    sci->trtime *= 32 * sci->brr;
++    sci->trtime *= 1 << (2 * FIELD_EX8(sci->smr, SMR, CKS));
++    sci->trtime *= NANOSECONDS_PER_SECOND;
++    sci->trtime /= sci->input_freq;
++}
++
++#define IS_TR_ENABLED(scr) \
++    (FIELD_EX8(scr, SCR, TE) || FIELD_EX8(scr, SCR, RE))
++
++static void sci_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
++{
++    hwaddr offset = addr & 0x07;
++    RSCIState *sci = RSCI(opaque);
++
++    switch (offset) {
++    case A_SMR:
++        if (!IS_TR_ENABLED(sci->scr)) {
++            sci->smr = val;
++            update_trtime(sci);
++        }
++        break;
++    case A_BRR:
++        if (!IS_TR_ENABLED(sci->scr)) {
++            sci->brr = val;
++            update_trtime(sci);
++        }
++        break;
++    case A_SCR:
++        sci->scr = val;
++        if (FIELD_EX8(sci->scr, SCR, TE)) {
++            sci->ssr = FIELD_DP8(sci->ssr, SSR, TDRE, 1);
++            sci->ssr = FIELD_DP8(sci->ssr, SSR, TEND, 1);
++            if (FIELD_EX8(sci->scr, SCR, TIE)) {
++                qemu_irq_pulse(sci->irq[TXI]);
++            }
++        }
++        if (!FIELD_EX8(sci->scr, SCR, TEIE)) {
++            qemu_set_irq(sci->irq[TEI], 0);
++        }
++        if (!FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 0);
++        }
++        break;
++    case A_TDR:
++        sci->tdr = val;
++        if (FIELD_EX8(sci->ssr, SSR, TEND)) {
++            send_byte(sci);
++        } else {
++            sci->ssr = FIELD_DP8(sci->ssr, SSR, TDRE, 0);
++        }
++        break;
++    case A_SSR:
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, MPBT,
++                             FIELD_EX8(val, SSR, MPBT));
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, ERR,
++                             FIELD_EX8(val, SSR, ERR) & 0x07);
++        if (FIELD_EX8(sci->read_ssr, SSR, ERR) &&
++            FIELD_EX8(sci->ssr, SSR, ERR) == 0) {
++            qemu_set_irq(sci->irq[ERI], 0);
++        }
++        break;
++    case A_RDR:
++        qemu_log_mask(LOG_GUEST_ERROR, "reneas_sci: RDR is read only.\n");
++        break;
++    case A_SCMR:
++        sci->scmr = val; break;
++    case A_SEMR: /* SEMR */
++        sci->semr = val; break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
++                      " not implemented\n", offset);
++    }
++}
++
++static uint64_t sci_read(void *opaque, hwaddr addr, unsigned size)
++{
++    hwaddr offset = addr & 0x07;
++    RSCIState *sci = RSCI(opaque);
++
++    switch (offset) {
++    case A_SMR:
++        return sci->smr;
++    case A_BRR:
++        return sci->brr;
++    case A_SCR:
++        return sci->scr;
++    case A_TDR:
++        return sci->tdr;
++    case A_SSR:
++        sci->read_ssr = sci->ssr;
++        return sci->ssr;
++    case A_RDR:
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, RDRF, 0);
++        return sci->rdr;
++    case A_SCMR:
++        return sci->scmr;
++    case A_SEMR:
++        return sci->semr;
++    default:
++        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
++                      " not implemented.\n", offset);
++    }
++    return UINT64_MAX;
++}
++
++static const MemoryRegionOps sci_ops = {
++    .write = sci_write,
++    .read  = sci_read,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {
++        .max_access_size = 1,
++    },
++};
++
++static void rsci_reset(DeviceState *dev)
++{
++    RSCIState *sci = RSCI(dev);
++    sci->smr = sci->scr = 0x00;
++    sci->brr = 0xff;
++    sci->tdr = 0xff;
++    sci->rdr = 0x00;
++    sci->ssr = 0x84;
++    sci->scmr = 0x00;
++    sci->semr = 0x00;
++    sci->rx_next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++}
++
++static void sci_event(void *opaque, int event)
++{
++    RSCIState *sci = RSCI(opaque);
++    if (event == CHR_EVENT_BREAK) {
++        sci->ssr = FIELD_DP8(sci->ssr, SSR, FER, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 1);
++        }
++    }
++}
++
++static void rsci_realize(DeviceState *dev, Error **errp)
++{
++    RSCIState *sci = RSCI(dev);
++
++    if (sci->input_freq == 0) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "renesas_sci: input-freq property must be set.");
++        return;
++    }
++    qemu_chr_fe_set_handlers(&sci->chr, can_receive, receive,
++                             sci_event, NULL, sci, NULL, true);
++}
++
++static void rsci_init(Object *obj)
++{
++    SysBusDevice *d = SYS_BUS_DEVICE(obj);
++    RSCIState *sci = RSCI(obj);
++    int i;
++
++    memory_region_init_io(&sci->memory, OBJECT(sci), &sci_ops,
++                          sci, "renesas-sci", 0x8);
++    sysbus_init_mmio(d, &sci->memory);
++
++    for (i = 0; i < SCI_NR_IRQ; i++) {
++        sysbus_init_irq(d, &sci->irq[i]);
++    }
++    sci->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, txend, sci);
++}
++
++static const VMStateDescription vmstate_rcmt = {
++    .name = "renesas-sci",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static Property rsci_properties[] = {
++    DEFINE_PROP_UINT64("input-freq", RSCIState, input_freq, 0),
++    DEFINE_PROP_CHR("chardev", RSCIState, chr),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void rsci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = rsci_realize;
++    dc->props = rsci_properties;
++    dc->vmsd = &vmstate_rcmt;
++    dc->reset = rsci_reset;
++}
++
++static const TypeInfo rsci_info = {
++    .name       = TYPE_RENESAS_SCI,
++    .parent     = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(RSCIState),
++    .instance_init = rsci_init,
++    .class_init = rsci_class_init,
++};
++
++static void rsci_register_types(void)
++{
++    type_register_static(&rsci_info);
++}
++
++type_init(rsci_register_types)
+diff --git a/hw/char/Kconfig b/hw/char/Kconfig
+index 6360c9fffa..10c24ca87f 100644
+--- a/hw/char/Kconfig
++++ b/hw/char/Kconfig
+@@ -40,3 +40,6 @@ config SCLPCONSOLE
+ 
+ config TERMINAL3270
+     bool
++
++config RENESAS_SCI
++    bool
+diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+index cf086e7114..f1b9bf0ecb 100644
+--- a/hw/char/Makefile.objs
++++ b/hw/char/Makefile.objs
+@@ -20,6 +20,7 @@ obj-$(CONFIG_PSERIES) += spapr_vty.o
+ obj-$(CONFIG_DIGIC) += digic-uart.o
+ obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
+ obj-$(CONFIG_RASPI) += bcm2835_aux.o
++obj-$(CONFIG_RENESAS_SCI) += renesas_sci.o
+ 
+ common-obj-$(CONFIG_CMSDK_APB_UART) += cmsdk-apb-uart.o
+ common-obj-$(CONFIG_ETRAXFS) += etraxfs_ser.o
+-- 
+2.11.0
+
 
