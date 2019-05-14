@@ -5,68 +5,67 @@ X-Spam-Level:
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CEF8C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 08:55:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E88BAC04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 08:57:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1EAE20862
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 08:55:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1EAE20862
+	by mail.kernel.org (Postfix) with ESMTPS id A97E320862
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 08:57:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A97E320862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43173 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43345 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQTDC-0005PN-7u
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 04:55:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53668)
+	id 1hQTFs-0006VO-Tm
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 04:57:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hQTC9-0004rO-Ge
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:53:58 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hQTF5-0006Dd-B0
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:57:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hQTC7-0003pH-Jy
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:53:57 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43092
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <borntraeger@de.ibm.com>) id 1hQTF3-0002y1-7w
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:56:58 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43196)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1hQTC7-0003nD-9n
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:53:55 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4E8nlfl137434
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 04:53:53 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2sfqmhq3x1-1
+	id 1hQTF0-0002tm-PW
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:56:55 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4E8mgeq038116
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 04:56:53 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2sfq5p88n7-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 04:53:52 -0400
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 04:56:52 -0400
 Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 14 May 2019 09:53:51 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-	by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+	Tue, 14 May 2019 09:56:50 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+	by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
 	Authorized Use Only! Violators will be prosecuted; 
 	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Tue, 14 May 2019 09:53:47 +0100
+	Tue, 14 May 2019 09:56:45 +0100
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
 	[9.149.105.62])
-	by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x4E8rkx846923800
+	by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x4E8ui1Q49414226
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Tue, 14 May 2019 08:53:46 GMT
+	verify=OK); Tue, 14 May 2019 08:56:44 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 18DFEAE055;
-	Tue, 14 May 2019 08:53:46 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 4B02EAE056;
+	Tue, 14 May 2019 08:56:44 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C311DAE051;
-	Tue, 14 May 2019 08:53:45 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id F33C2AE051;
+	Tue, 14 May 2019 08:56:43 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.133])
 	by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-	Tue, 14 May 2019 08:53:45 +0000 (GMT)
-To: Cornelia Huck <cohuck@redhat.com>
+	Tue, 14 May 2019 08:56:43 +0000 (GMT)
+To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 References: <1556749903-19221-1-git-send-email-walling@linux.ibm.com>
 	<a87c71be-5bf8-a115-5843-720c9ad10c7b@redhat.com>
 	<bc2fd9bb-7b94-eac7-590b-f01d2063ef9c@redhat.com>
@@ -80,7 +79,7 @@ References: <1556749903-19221-1-git-send-email-walling@linux.ibm.com>
 	<898144e3-615e-5074-fb68-bf9995c64609@de.ibm.com>
 	<155d2ca3-6a48-c99a-fe42-dca8e3fd4344@redhat.com>
 	<066c7470-94a3-a922-9a12-1ca42e474c51@de.ibm.com>
-	<20190514104934.6bba9232.cohuck@redhat.com>
+	<1a3dcb16-8c6f-214c-843d-6dca6a24801e@redhat.com>
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
@@ -126,19 +125,19 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
 	RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
 	oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
 	syiRa+UVlsKmx1hsEg==
-Date: Tue, 14 May 2019 10:53:45 +0200
+Date: Tue, 14 May 2019 10:56:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190514104934.6bba9232.cohuck@redhat.com>
+In-Reply-To: <1a3dcb16-8c6f-214c-843d-6dca6a24801e@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19051408-0016-0000-0000-0000027B7AB1
+x-cbid: 19051408-0028-0000-0000-0000036D77E5
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051408-0017-0000-0000-000032D84423
-Message-Id: <e29ca9b0-ba2c-21ed-2556-750b9e0c658b@de.ibm.com>
+x-cbparentid: 19051408-0029-0000-0000-0000242D08CE
+Message-Id: <9a9e9c58-d991-369f-a577-b70581efc75b@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
 	definitions=2019-05-14_05:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
@@ -148,7 +147,7 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
 	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
 	scancount=1 engine=8.0.1-1810050000 definitions=main-1905140065
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 Subject: Re: [Qemu-devel] [PATCH v4] s390: diagnose 318 info reset and
  migration support
 X-BeenThere: qemu-devel@nongnu.org
@@ -162,8 +161,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Collin Walling <walling@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>, mst@redhat.com,
+Cc: Collin Walling <walling@linux.ibm.com>, mst@redhat.com,
 	qemu-devel@nongnu.org, pasic@linux.ibm.com,
 	qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
@@ -172,32 +170,32 @@ Sender: "Qemu-devel"
 
 
 
-On 14.05.19 10:49, Cornelia Huck wrote:
-> On Tue, 14 May 2019 10:37:32 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
+On 14.05.19 10:50, David Hildenbrand wrote:
+> On 14.05.19 10:37, Christian Borntraeger wrote:
+>>
+>>
 >> On 14.05.19 09:28, David Hildenbrand wrote:
->>>>>> But that can be tested using the runability information if I am not wrong.  
+>>>>>> But that can be tested using the runability information if I am not wrong.
 >>>>>
->>>>> You mean the cpu level information, right?  
+>>>>> You mean the cpu level information, right?
 >>>
 >>> Yes, query-cpu-definition includes for each model runability information
 >>> via "unavailable-features" (valid under the started QEMU machine).
->>>   
->>>>>  
->>>>>>  
+>>>
+>>>>>
+>>>>>>
 >>>>>>> and others that we have today.
 >>>>>>>
->>>>>>> So yes, I think this would be acceptable.    
+>>>>>>> So yes, I think this would be acceptable.  
 >>>>>>
 >>>>>> I guess it is acceptable yes. I doubt anybody uses that many CPUs in
->>>>>> production either way. But you never know.  
+>>>>>> production either way. But you never know.
 >>>>>
 >>>>> I think that using that many cpus is a more uncommon setup, but I still
->>>>> think that having to wait for actual failure  
+>>>>> think that having to wait for actual failure
 >>>>
 >>>> That can happen all the time today. You can easily say z14 in the xml when 
->>>> on a zEC12. Only at startup you get the error. The question is really:  
+>>>> on a zEC12. Only at startup you get the error. The question is really:
 >>>
 >>> "-smp 248 -cpu host" will no longer work, while e.g. "-smp 248 -cpu z12"
 >>> will work. Actually, even "-smp 248" will no longer work on affected
@@ -217,23 +215,23 @@ On 14.05.19 10:49, Cornelia Huck wrote:
 >>> Implementing that SCLP thingy will avoid any warnings and any errors. It
 >>> just works from the QEMU perspective.
 >>>
->>> Is implementing this realistic?  
+>>> Is implementing this realistic?
 >>
 >> Yes it is but it will take time. I will try to get this rolling. To make
 >> progress on the diag318 thing, can we error on startup now and simply
 >> remove that check when when have implemented a larger sccb? If we would
 >> now do all kinds of "change the max number games" would be harder to "fix".
 > 
-> So, the idea right now is:
 > 
-> - fail to start if you try to specify a diag318 device and more than
->   240 cpus (do we need a knob to turn off the device?)
+> Another idea for temporary handling: Simply only indicate 240 CPUs to
+> the guest if the response does not fit into a page. Once we have that
+> SCLP thingy, this will be fixed. Guest migration back and forth should
+> work, as the VCPUs are fully functional (and initially always stopped),
+> the guest will simply not be able to detect them via SCLP when booting
+> up, and therefore not use them.
 
-The know will be the cpu-model e.g. -cpu z14,diag318=off or something like that
-> - in the future, support more than one SCLP response page
-> 
-> I'm getting a bit lost in the discussion; but the above sounds
-> reasonable to me.
-> 
+Yes, that looks like a good temporary solution. In fact if the guest relies
+on simply probing it could even make use of the additional CPUs. Its just
+the sclp response that is limited to 240 (or make it 247?)
 
 
