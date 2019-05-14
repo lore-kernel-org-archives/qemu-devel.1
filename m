@@ -2,65 +2,96 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36D34C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 12:54:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF4DDC04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 13:04:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDDAC208CA
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 12:54:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDDAC208CA
+	by mail.kernel.org (Postfix) with ESMTPS id 71CD121473
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 13:04:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71CD121473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47793 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48008 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQWxB-0004OY-8x
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 08:54:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43936)
+	id 1hQX6i-0006y1-9q
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 09:04:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1hQWwD-00042Q-96
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 08:53:46 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hQX5E-0006GE-7E
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 09:03:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1hQWwB-0007js-Tb
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 08:53:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57760)
+	(envelope-from <mreitz@redhat.com>) id 1hQX5A-0001Qj-2W
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 09:03:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38382)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>)
-	id 1hQWw7-0007Yl-DY; Tue, 14 May 2019 08:53:39 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hQX51-0001KI-DI; Tue, 14 May 2019 09:02:51 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8A254308795B;
-	Tue, 14 May 2019 12:53:36 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.205.198])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 449B910027CD;
-	Tue, 14 May 2019 12:53:34 +0000 (UTC)
-Date: Tue, 14 May 2019 14:53:29 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Andrea Bolognani <abologna@redhat.com>
-Message-ID: <20190514125329.mi7ctaoujirwm6gs@kamzik.brq.redhat.com>
-References: <20190512083624.8916-1-drjones@redhat.com>
-	<9f57bfa56715b3128c1823150457ddb866e6054c.camel@redhat.com>
-	<20190513123656.6iu7ebu7zucn5mxt@kamzik.brq.redhat.com>
-	<e38aac8cb33c5782499b4ca0356c43267f05dc5e.camel@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 35C6BC069B2C;
+	Tue, 14 May 2019 13:02:40 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.236])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id CDEB25D6A6;
+	Tue, 14 May 2019 13:02:35 +0000 (UTC)
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1551895813.git.berto@igalia.com>
+	<e25b416f8646a476017f21a8484a05931b0e3f5a.1551895814.git.berto@igalia.com>
+	<1df28c23-7efe-310d-2955-432b9a4bb1ad@redhat.com>
+	<w515zrkveul.fsf@maestria.local.igalia.com>
+	<5f16da0c-d689-b06c-883b-3911a2c9ff9d@redhat.com>
+	<w51k1etqnmk.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <f3214198-33ed-5689-2831-802d26a88d21@redhat.com>
+Date: Tue, 14 May 2019 15:02:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e38aac8cb33c5782499b4ca0356c43267f05dc5e.camel@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <w51k1etqnmk.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="mydn7reGStVa5i7YyTKJoXWMUS1jqDTFM"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Tue, 14 May 2019 12:53:36 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.31]);
+	Tue, 14 May 2019 13:02:50 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 00/13] target/arm/kvm: enable SVE in guests
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2 13/13] qemu-iotests: Test the
+ x-blockdev-reopen QMP command
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,148 +103,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
-	qemu-devel@nongnu.org, armbru@redhat.com, qemu-arm@nongnu.org,
-	alex.bennee@linaro.org, Dave.Martin@arm.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 14, 2019 at 02:29:51PM +0200, Andrea Bolognani wrote:
-> On Mon, 2019-05-13 at 14:36 +0200, Andrew Jones wrote:
-> > On Mon, May 13, 2019 at 11:32:46AM +0200, Andrea Bolognani wrote:
-> > > On Sun, 2019-05-12 at 10:36 +0200, Andrew Jones wrote:
-> > > [...]
-> > > >    CPU type | accel | sve-max-vq | sve-vls-map
-> > > >    -------------------------------------------
-> > > >  1)     max | tcg   |  $MAX_VQ   |  $VLS_MAP
-> > > >  2)     max | kvm   |  $MAX_VQ   |  $VLS_MAP
-> > > >  3)    host | kvm   |  N/A       |  $VLS_MAP
-> > > > 
-> > > > Where for (1) $MAX_VQ sets the maximum vq and smaller vqs are
-> > > > all supported when $VLS_MAP is zero, or when the vqs are selected
-> > > > in $VLS_MAP.
-> > > 
-> > > I'm a bit confused by the nomenclature here. VL clearly stands for
-> > > Vector Length, but what does VQ stand for? You seem to be using the
-> > > two terms pretty much interchangeably throughout the cover letter.
-> > 
-> > As Dave pointed out, they're both lengths, but VQ specifically points
-> > out that the unit is 'Q'uadwords. We could use VQS instead of VLS,
-> > "Vector Lengths" sounds better.
-> 
-> Alright, it makes sense - once you've managed to figure out what
-> exactly a "quadword" is, at least :)
-> 
-> Since we expect management applications to use QMP to discover what
-> vector lengths are supported and then provide an explicit map, I
-> think it's fair to say that the ability to specify a single maximum
-> vector length is going to be exclusively used as a convenience for
-> command line users.
-> 
-> In that light, I think it would be reasonable for the usage to look
-> along the lines of
-> 
->   -cpu host,sve-vl-map=0xd # machine-friendly variant
->   -cpu max,sve-vl-max=512  # user-friendly variant
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mydn7reGStVa5i7YyTKJoXWMUS1jqDTFM
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <f3214198-33ed-5689-2831-802d26a88d21@redhat.com>
+Subject: Re: [PATCH v2 13/13] qemu-iotests: Test the x-blockdev-reopen QMP
+ command
+References: <cover.1551895813.git.berto@igalia.com>
+ <e25b416f8646a476017f21a8484a05931b0e3f5a.1551895814.git.berto@igalia.com>
+ <1df28c23-7efe-310d-2955-432b9a4bb1ad@redhat.com>
+ <w515zrkveul.fsf@maestria.local.igalia.com>
+ <5f16da0c-d689-b06c-883b-3911a2c9ff9d@redhat.com>
+ <w51k1etqnmk.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51k1etqnmk.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-We already have sve-max-vq, so I'm not sure we want to rename it.
+On 14.05.19 13:30, Alberto Garcia wrote:
+> On Sat 13 Apr 2019 02:53:42 AM CEST, Max Reitz wrote:
+>>> Calling x-blockdev-reopen without 'backing' should only fail if
+>>>
+>>>  a) the image has a backing file attached to it.
+>>>     In this case it doesn't: we just detached it in the previous line=
+=2E
+>>>
+>>>  b) there's a default backing file written on the image header.
+>>>     In this case there isn't (hd0 is created without one in setUp()).=
 
-> 
-> with documentation clearly pointing out that the two options expect
-> completely different formats - but that was the case even before,
-> so we would have had to document that anyway.
-> 
-> > > > The QMP query returns a list of valid vq lists. For example, if
-> > > > a guest can use vqs 1, 2, 3, and 4, then the following list will
-> > > > be returned
-> > > > 
-> > > >  [ [ 1 ], [ 1, 2 ], [ 1, 2, 3 ], [ 1, 2, 3, 4 ] ]
-> > > > 
-> > > > Another example might be 1, 2, 4, as the architecture states 3
-> > > > is optional. In that case the list would be
-> > > > 
-> > > >  [ [ 1 ], [ 1, 2 ], [ 1, 2, 4 ] ]
-> > > 
-> > > I think the proposed QMP command is problematic, because it reports
-> > > the valid vector lengths for either KVM or TCG based on which
-> > > accelerator is currently enabled: it should report all information
-> > > at all times instead, similarly to how query-gic-capabilities does
-> > > it.
-> > 
-> > OK, and then with a flag stating which is when then.
-> 
-> Correct.
-> 
-> > Dave points out
-> > we may want to reduce the list to a single set and then add flags
-> > to indicate what can be done with it in order to derive other sets.
-> > What do you think about that?
-> 
-> So right now all that can be done is truncating the list by removing
-> an arbitrary number of elements from the end, right? Eg. if you have
-> [ 1, 2, 4 ] you can use either that or [ 1, 2 ] or [ 1 ]. But in the
-> future you might also be able to mask single elements in the middle
-> of the list, thus enabling things like [ 1, 4 ].
-> 
-> That doesn't sound very complicated to support in libvirt, though I
-> have to say that I'm not a big fan of this proposal because as far as
-> I can see it basically means implementing the very same logic twice,
-> once in QEMU and then once more in libvirt.
+>>
+>> That=E2=80=99s what I thought, too, hence me applying effectively the =
+same
+>> change to the test in v4 of my series as you in your "Fix check for
+>> default backing files" series:
+>>
+>> http://lists.nongnu.org/archive/html/qemu-block/2019-04/msg00308.html
+>>
+>>> So it should not fail. I think the bug is that the test for condition=
 
-So if big tables of bits aren't a problem for QMP queries, then I'll
-just leave the design as it is.
+>>> (b) in bdrv_reopen_prepare() that returns "backing is missing..." is
+>>> using backing_file but it should use (correct me if I'm wrong)
+>>> auto_backing_file.
+>>
+>> Well, I think both should be fine, because...
+>=20
+> Why would both be fine? backing_file refers to the backing file
+> currently attached, and auto_backing_file refers to the one written on
+> the image metadata, or am I wrong?
 
-> 
-> > > [...]
-> > > > And now for what might be a bit more controversial; how we input
-> > > > the valid vector set with sve-vls-map. Well, sve-vls-map is a
-> > > > 64-bit bitmap, which is admittedly not user friendly and also not
-> > > > the same size as KVM's vls bitmap (which is 8 64-bit words). Here's
-> > > > the justification:
-> > > > 
-> > > >  1) We want to use the QEMU command line in order for the information
-> > > >     to be migrated without needing to add more VM state.
-> > > >  2) It's not easy/pretty to input arrays on the QEMU command line.
-> > > >  3) We already need to use the QMP query to get a valid set, which
-> > > >     isn't user friendly either, meaning we're already in libvirt
-> > > >     territory.
-> > > >  4) A 64-bit map (supporting up to 8192-bit vectors) is likely big
-> > > >     enough for quite some time (currently KVM and TCG only support
-> > > >     2048-bit vectors).
-> > > >  5) If user friendliness is needed more than migratability then
-> > > >     the 'max' cpu type can be used with the sve-max-vq property.
-> > > >  6) It's possible to probe the full valid vector set from the
-> > > >     command line by using something like sve-vls-map=0xffff and
-> > > >     then, when it fails, the error message will state the correct
-> > > >     map, e.g. 0xb.
-> > > 
-> > > I don't have a problem with having to use a bitmap internally,
-> > > though libvirt will clearly want to expose a more approachable
-> > > interface to users.
-> > > 
-> > > However, QMP reporting the information in the current format means
-> > > we'd have to build an additional parser on top of the bitmap handling
-> > > and conversion routines we'll clearly need to make this work; plus it
-> > > just feels weird that the information reported by QMP can't be used
-> > > on the command line without going through some tranformation first.
-> > > 
-> > > Wouldn't it make more sense to both accept and report bitmaps?
-> > 
-> > If we eventually need more than one word for the bitmap then it'll
-> > require parsing and bitmap composition code in libvirt anyway. I
-> > was thinking by pointing out each bit separately that we could
-> > boundlessly grow the list without having to change anything in
-> > libvirt later.
-> 
-> If the size of the bitmap on the KVM side is 512 bits, why don't we
-> just make it that size on the QEMU side too from the start?
+After my series, backing_file refers to the image metadata.
 
-I'd still only want to input 64-bits on the command line, otherwise
-we get into inputting arrays, which isn't easy. KVM's interface is
-meant for expansion, but it won't be using most of those bits for
-quite some time either.
+>>> Not directly related to this, but should bdrv_backing_detach() also
+>>> clear backing_file ?
+>>
+>> ...I don=E2=80=99t think it should.  That=E2=80=99s what that my patch=
+ addresses. The
+>> real problem is that bs->backing_file is not a cache for
+>> bs->backing->bs->filename, so it shouldn=E2=80=99t be treated as such.=
 
-Thanks,
-drew
+>=20
+> But what's the point of having backing_file set if no backing file is
+> attached?
+
+What=E2=80=99s the point of having backing_file set to the same value as
+bs->backing->bs->filename?
+
+We need some storage for =E2=80=9CWhat does the image header say=E2=80=9D=
+=2E  Currently,
+that sometimes is BDS.backing_file.  Sometimes it isn=E2=80=99t.  That=E2=
+=80=99s broken.
+ See
+http://lists.nongnu.org/archive/html/qemu-block/2019-04/msg00308.html.
+BDS.auto_backing_file does not refer to the image metadata.  It refers
+to something like bdrv_refresh_filename(bdrv_open(bs->backing_file)).
+We need this just to calculate @backing_overridden in
+bdrv_refresh_filename().
+
+Max
+
+
+--mydn7reGStVa5i7YyTKJoXWMUS1jqDTFM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzavGkACgkQ9AfbAGHV
+z0BCAQgAu/u/zowKujPnqDXrE9HrIFQaJTLijpWf2NFggesE3jp1cMlVR4F1W5eF
+daKmcEO0j+Mxu/SCO5qFsywe7aitc2dt7gPCqIV6Sik2bwTgaeDXaZwyMryqQY1k
+xVi1DxgicfAwhcjoFJkux7Sr9n5Cy4JA01L8grtCldrTxwokZaal6JDSeLcy/Tio
+HQYzj+3aXUlJpJsuP3XNZ3pFZrU/APqfJ627OO1HGPoTu9p2pn6LPNU4u6L4dc4W
+gvDQmGIUYnXqT8BGZBBRAOk4w7VEor5sCFj2jm4NZ5/OO9+cGsE1v4tmomJnXdkO
+0+Set5zjwB5QjIsuoNUShFPbFlJE0w==
+=thCN
+-----END PGP SIGNATURE-----
+
+--mydn7reGStVa5i7YyTKJoXWMUS1jqDTFM--
 
