@@ -2,84 +2,67 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34685C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 17:17:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CA9BC04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 17:26:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00EDD2084A
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 17:16:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="POiQkJF2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00EDD2084A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 63B1C20850
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 17:26:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63B1C20850
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51540 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51645 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQb2x-0000L0-7k
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 13:16:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53054)
+	id 1hQbCT-0002Xc-3Y
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 13:26:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hQb1r-0008Ca-Or
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:15:52 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hQbBf-00025Z-Nn
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:26:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hQb1q-0004w9-OS
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:15:51 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43765)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hQb1q-0004u3-Ff
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:15:50 -0400
-Received: by mail-wr1-x442.google.com with SMTP id r4so20078461wro.10
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 10:15:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=uSQmekUfpD7+rcDFA9B68Vfcr/8kNqcRlQG27Zm4D/s=;
-	b=POiQkJF2vvKklQP3lI9ay8t4RlcqKTcc0Mws3U5Kr/WdnMeS4g4OLxPhlANbDvq/mM
-	P4Il0Mjky/vfxttRzVuSQ2AzywtokuVcFvbl+ySVowsFeDWbAeqLJGf1QnPfvZtgfXmT
-	xIHB6syqH8frslrqs6HlCGvd9jeRT9lY21VzB2nqqWGfROsohc9TZEF2pr5/dbVw4YzA
-	YDVdxy8LFG/SQkTlm4FV0iWPyog0rT3aONamspNb+2A8WmttWI3JzuH4VeAr2arVigu6
-	dZHv/iX74BK/rUwbnCq1GijRkJYUiAml4Dz7TKh89BQnlDtJn6unrLiocF1f+42uf5iA
-	OV/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=uSQmekUfpD7+rcDFA9B68Vfcr/8kNqcRlQG27Zm4D/s=;
-	b=g7U5af7dDysLZoTjseevr5/s4ls26YGmZRp20m6jq8on/4+o+3wbViHntCZLoXuniH
-	SrBIWgtSkhLwW8BfROUt0rD5qMnkh8sxQccGlK/SL+vgrVXnDdxh+2SaqTo5FpJICTrs
-	qE8484ipYIBjOoLH1sxJZGVbismJwXH6AmA439r0X4PCGpo1Dr1lNrhp2EmUv/2QSWyJ
-	VkWNKOsTfk/PdzZakNAu2s3Xz5cVNrUgKhEHZ17awj2syANxAb3/h+68ASNzF7/GSZIp
-	3LzUOPGi4+40EJrw6DunMvE2hZfHvbFhlobRJ4gNqE0K6D2DLb6QvSKB60uOwuqx1XY9
-	4uoQ==
-X-Gm-Message-State: APjAAAXGsw9hcobmRuSqPqi1SnmdWSggIsT82vowreIIdJhuoYT80N3+
-	e0VYB94/89U07LyMdge0q7KHdjZf1y0=
-X-Google-Smtp-Source: APXvYqys0Fd/NBX7H5qGK5EnJS7uZ0oPVEAfkIjv7YXiFIGIEmUJmSJHt/AI6cUtjYh9k3nWvJva0A==
-X-Received: by 2002:adf:c188:: with SMTP id x8mr11860795wre.256.1557854148129; 
-	Tue, 14 May 2019 10:15:48 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id
-	g185sm3280036wmf.30.2019.05.14.10.15.47
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 14 May 2019 10:15:47 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Tue, 14 May 2019 18:15:45 +0100
-Message-Id: <20190514171545.24961-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+	(envelope-from <no-reply@patchew.org>) id 1hQbBd-0004bF-6D
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:25:59 -0400
+Resent-Date: Tue, 14 May 2019 13:25:59 -0400
+Resent-Message-Id: <E1hQbBd-0004bF-6D@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21464)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hQbBc-0004CE-TT
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:25:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1557854720; cv=none; d=zoho.com; s=zohoarc; 
+	b=ZI2QsB1NbCXBBz0uHsr8FTkmBxP1ROGI+xEOEwknn0qSNr6Y0Hi6hNtXZdcRq5me+FjOzoMxF22Kcvj3ISnDAZ0uLK7bbcfKMuEW0yIVlQ7jA8iujgmYcdI3ykENay6mcNVnRLVAgrEY2RwhAWYOQb1Y4O0QkSP2rlDce/Kz9dk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1557854720;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=EalVtdtiaQmIx4l5JM0YcZ83/JwB671hGzt738B5GWA=; 
+	b=jXQEYXr8CqcnqB7x1w/TtvaBo6iEH1H00DudQTiHscsO7RE/0wN2RKNPyQecsVATTxvCfgISdb04kqiUA8XmzZdDVEv3TG795MN4cIxWP4VUFGNlQhOiJ7fvuhRq+bEPDtqUkBkZRKtNjuVNAyzT0gJzxKXSt7K+tgTDTXQ/BuE=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1557854711108371.9567291192452;
+	Tue, 14 May 2019 10:25:11 -0700 (PDT)
+Message-ID: <155785470986.250.14828843969119255459@ae4ddf60de60>
+In-Reply-To: <20190514145346.20758-1-wens@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [RFC] hw/core/bus.c: Only the main system bus can have
- no parent
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: wens@kernel.org
+Date: Tue, 14 May 2019 10:25:11 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Pass through nanosecond
+ timestamp components for stat syscalls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,66 +74,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
-	Markus Armbruster <armbru@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, riku.voipio@iki.fi, qemu-devel@nongnu.org, wens@kernel.org,
+	laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In commit 80376c3fc2c38fdd453 in 2010 we added a workaround for
-some qbus buses not being connected to qdev devices -- if the
-bus has no parent object then we register a reset function which
-resets the bus on system reset.
-
-Nearly a decade later, we have now no buses in the tree which
-are created with non-NULL parents, so we can remove the
-workaround and instead just assert that if the bus has a NULL
-parent then it is the main system bus.
-
-(The absence of other parentless buses was confirmed by
-code inspection of all the callsites of qbus_create() and
-qbus_create_inplace() and cross-checked by 'make check'.)
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-While I was reviewing Damian's reset patchset I noticed this
-code which meant that we theoretically had multiple 'roots' to
-the set of things being reset, so I wondered what was actually
-using it. It turns out nothing was :-)
-
-Commit 80376c3fc2c38fdd453 also added a TODO in vl.c suggesting
-that there is the wrong place to register the reset function
-which effectively resets the whole system starting at the
-root which is the main system bus:
-   qemu_register_reset(qbus_reset_all_fn, sysbus_get_default());
-I don't understand why vl.c is a bad place to put that, and I'd
-rather not move it to qdev.c (where in qdev.c?) because that
-would reshuffle reset ordering which seems liable to cause
-regressions. So maybe we should just delete that TODO comment?
-
----
- hw/core/bus.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
-
-diff --git a/hw/core/bus.c b/hw/core/bus.c
-index e09843f6abe..e50287c2b35 100644
---- a/hw/core/bus.c
-+++ b/hw/core/bus.c
-@@ -96,10 +96,9 @@ static void qbus_realize(BusState *bus, DeviceState *parent, const char *name)
-         bus->parent->num_child_bus++;
-         object_property_add_child(OBJECT(bus->parent), bus->name, OBJECT(bus), NULL);
-         object_unref(OBJECT(bus));
--    } else if (bus != sysbus_get_default()) {
--        /* TODO: once all bus devices are qdevified,
--           only reset handler for main_system_bus should be registered here. */
--        qemu_register_reset(qbus_reset_all_fn, bus);
-+    } else {
-+        /* The only bus without a parent is the main system bus */
-+        assert(bus == sysbus_get_default());
-     }
- }
- 
--- 
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDUxNDE0NTM0Ni4yMDc1
+OC0xLXdlbnNAa2VybmVsLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
+bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
+bWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwNTE0MTQ1MzQ2LjIwNzU4LTEt
+d2Vuc0BrZXJuZWwub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGxpbnV4LXVzZXI6
+IFBhc3MgdGhyb3VnaCBuYW5vc2Vjb25kIHRpbWVzdGFtcCBjb21wb25lbnRzIGZvciBzdGF0IHN5
+c2NhbGxzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
+c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8g
+YSBuZXcgYnJhbmNoICd0ZXN0JwplY2FlN2VlIGxpbnV4LXVzZXI6IFBhc3MgdGhyb3VnaCBuYW5v
+c2Vjb25kIHRpbWVzdGFtcCBjb21wb25lbnRzIGZvciBzdGF0IHN5c2NhbGxzCgo9PT0gT1VUUFVU
+IEJFR0lOID09PQpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM5NDog
+RklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMTk1OgorXklhYmlfdWxvbmcgIHRhcmdl
+dF9zdF9hdGltZV9uc2VjOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
+YnMKIzk3OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjExOTc6CiteSWFiaV91bG9u
+ZyAgdGFyZ2V0X3N0X210aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
+ciB1c2UgdGFicwojMTAwOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjExOTk6Cite
+SWFiaV91bG9uZyAgdGFyZ2V0X3N0X2N0aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNo
+b3VsZCBuZXZlciB1c2UgdGFicwojMTA5OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5o
+OjEyMzE6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X2F0aW1lX25zZWM7JAoKRVJST1I6IGNvZGUg
+aW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTEzOiBGSUxFOiBsaW51eC11c2VyL3N5c2Nh
+bGxfZGVmcy5oOjEyMzQ6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X210aW1lX25zZWM7JAoKRVJS
+T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTE3OiBGSUxFOiBsaW51eC11
+c2VyL3N5c2NhbGxfZGVmcy5oOjEyMzc6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X2N0aW1lX25z
+ZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTI2OiBGSUxF
+OiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzMTY6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0
+X2F0aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
+MTMwOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzMTk6CiteSWFiaV91bG9uZ15J
+dGFyZ2V0X3N0X210aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
+c2UgdGFicwojMTM0OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzMjI6CiteSWFi
+aV91bG9uZ15JdGFyZ2V0X3N0X2N0aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3Vs
+ZCBuZXZlciB1c2UgdGFicwojMTQzOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEz
+Mzk6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X2F0aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5k
+ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTQ2OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxf
+ZGVmcy5oOjEzNDE6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X210aW1lX25zZWM7JAoKRVJST1I6
+IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTQ5OiBGSUxFOiBsaW51eC11c2Vy
+L3N5c2NhbGxfZGVmcy5oOjEzNDM6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X2N0aW1lX25zZWM7
+JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTUzOiBGSUxFOiBs
+aW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzNDY6CiteSWFiaV91bG9uZ15JX191bnVzZWQxWzJd
+OyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE2MjogRklMRTog
+bGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMzc0OgorXkl1bnNpZ25lZCBpbnReSXRhcmdldF9z
+dF9hdGltZV9uc2VjOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
+IzE2NjogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMzc3OgorXkl1bnNpZ25lZCBp
+bnReSXRhcmdldF9zdF9tdGltZV9uc2VjOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2
+ZXIgdXNlIHRhYnMKIzE3MDogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMzgwOgor
+Xkl1bnNpZ25lZCBpbnReSXRhcmdldF9zdF9jdGltZV9uc2VjOyQKCkVSUk9SOiBjb2RlIGluZGVu
+dCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE3NDogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2Rl
+ZnMuaDoxMzgyOgorXkl1bnNpZ25lZCBpbnReSV9fdW51c2VkMTskCgpFUlJPUjogY29kZSBpbmRl
+bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxNzU6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9k
+ZWZzLmg6MTM4MzoKK15JdW5zaWduZWQgaW50XklfX3VudXNlZDI7JAoKdG90YWw6IDE4IGVycm9y
+cywgMCB3YXJuaW5ncywgMTIxIGxpbmVzIGNoZWNrZWQKCkNvbW1pdCBlY2FlN2VlMDBmNTUgKGxp
+bnV4LXVzZXI6IFBhc3MgdGhyb3VnaCBuYW5vc2Vjb25kIHRpbWVzdGFtcCBjb21wb25lbnRzIGZv
+ciBzdGF0IHN5c2NhbGxzKSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVO
+RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlz
+IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDUxNDE0NTM0Ni4yMDc1
+OC0xLXdlbnNAa2VybmVsLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
+CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hl
+dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
+dC5jb20=
 
 
