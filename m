@@ -3,66 +3,90 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CA9BC04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 17:26:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B100C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 17:29:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63B1C20850
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 17:26:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63B1C20850
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 20A0920850
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 17:29:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20A0920850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51645 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51653 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQbCT-0002Xc-3Y
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 13:26:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55114)
+	id 1hQbEt-0003FD-6V
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 13:29:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hQbBf-00025Z-Nn
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:26:00 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hQbE3-0002u9-Cv
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:28:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hQbBd-0004bF-6D
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:25:59 -0400
-Resent-Date: Tue, 14 May 2019 13:25:59 -0400
-Resent-Message-Id: <E1hQbBd-0004bF-6D@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21464)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hQbBc-0004CE-TT
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:25:57 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1557854720; cv=none; d=zoho.com; s=zohoarc; 
-	b=ZI2QsB1NbCXBBz0uHsr8FTkmBxP1ROGI+xEOEwknn0qSNr6Y0Hi6hNtXZdcRq5me+FjOzoMxF22Kcvj3ISnDAZ0uLK7bbcfKMuEW0yIVlQ7jA8iujgmYcdI3ykENay6mcNVnRLVAgrEY2RwhAWYOQb1Y4O0QkSP2rlDce/Kz9dk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1557854720;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=EalVtdtiaQmIx4l5JM0YcZ83/JwB671hGzt738B5GWA=; 
-	b=jXQEYXr8CqcnqB7x1w/TtvaBo6iEH1H00DudQTiHscsO7RE/0wN2RKNPyQecsVATTxvCfgISdb04kqiUA8XmzZdDVEv3TG795MN4cIxWP4VUFGNlQhOiJ7fvuhRq+bEPDtqUkBkZRKtNjuVNAyzT0gJzxKXSt7K+tgTDTXQ/BuE=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1557854711108371.9567291192452;
-	Tue, 14 May 2019 10:25:11 -0700 (PDT)
-Message-ID: <155785470986.250.14828843969119255459@ae4ddf60de60>
-In-Reply-To: <20190514145346.20758-1-wens@kernel.org>
+	(envelope-from <mreitz@redhat.com>) id 1hQbE2-0000mn-2M
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:28:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52268)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hQbDw-0000fO-SG; Tue, 14 May 2019 13:28:21 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3140E81E0D;
+	Tue, 14 May 2019 17:28:20 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.236])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A8E9D601A0;
+	Tue, 14 May 2019 17:28:18 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Qemu-block <qemu-block@nongnu.org>
+References: <c276dc0c-0190-1e83-d491-8157d78ec817@redhat.com>
+	<5e56cded-5097-ce97-6f2b-7afee8e480af@redhat.com>
+	<ce551fef-3987-a5fd-7280-e406226c6a20@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <20a7f01f-894c-e121-afc9-03415f55aa82@redhat.com>
+Date: Tue, 14 May 2019 19:28:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: wens@kernel.org
-Date: Tue, 14 May 2019 10:25:11 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <ce551fef-3987-a5fd-7280-e406226c6a20@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Q8O84HfVXzXGdrP8qtZzvN3D3b9Blqe5H"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.25]);
+	Tue, 14 May 2019 17:28:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Pass through nanosecond
- timestamp components for stat syscalls
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] Unaligned images with O_DIRECT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,75 +98,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, riku.voipio@iki.fi, qemu-devel@nongnu.org, wens@kernel.org,
-	laurent@vivier.eu
+Cc: Kevin Wolf <kwolf@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDUxNDE0NTM0Ni4yMDc1
-OC0xLXdlbnNAa2VybmVsLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwNTE0MTQ1MzQ2LjIwNzU4LTEt
-d2Vuc0BrZXJuZWwub3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGxpbnV4LXVzZXI6
-IFBhc3MgdGhyb3VnaCBuYW5vc2Vjb25kIHRpbWVzdGFtcCBjb21wb25lbnRzIGZvciBzdGF0IHN5
-c2NhbGxzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
-c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8g
-YSBuZXcgYnJhbmNoICd0ZXN0JwplY2FlN2VlIGxpbnV4LXVzZXI6IFBhc3MgdGhyb3VnaCBuYW5v
-c2Vjb25kIHRpbWVzdGFtcCBjb21wb25lbnRzIGZvciBzdGF0IHN5c2NhbGxzCgo9PT0gT1VUUFVU
-IEJFR0lOID09PQpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM5NDog
-RklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMTk1OgorXklhYmlfdWxvbmcgIHRhcmdl
-dF9zdF9hdGltZV9uc2VjOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
-YnMKIzk3OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjExOTc6CiteSWFiaV91bG9u
-ZyAgdGFyZ2V0X3N0X210aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
-ciB1c2UgdGFicwojMTAwOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjExOTk6Cite
-SWFiaV91bG9uZyAgdGFyZ2V0X3N0X2N0aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNo
-b3VsZCBuZXZlciB1c2UgdGFicwojMTA5OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5o
-OjEyMzE6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X2F0aW1lX25zZWM7JAoKRVJST1I6IGNvZGUg
-aW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTEzOiBGSUxFOiBsaW51eC11c2VyL3N5c2Nh
-bGxfZGVmcy5oOjEyMzQ6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X210aW1lX25zZWM7JAoKRVJS
-T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTE3OiBGSUxFOiBsaW51eC11
-c2VyL3N5c2NhbGxfZGVmcy5oOjEyMzc6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X2N0aW1lX25z
-ZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTI2OiBGSUxF
-OiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzMTY6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0
-X2F0aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
-MTMwOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzMTk6CiteSWFiaV91bG9uZ15J
-dGFyZ2V0X3N0X210aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
-c2UgdGFicwojMTM0OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzMjI6CiteSWFi
-aV91bG9uZ15JdGFyZ2V0X3N0X2N0aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3Vs
-ZCBuZXZlciB1c2UgdGFicwojMTQzOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEz
-Mzk6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X2F0aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5k
-ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTQ2OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxf
-ZGVmcy5oOjEzNDE6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X210aW1lX25zZWM7JAoKRVJST1I6
-IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTQ5OiBGSUxFOiBsaW51eC11c2Vy
-L3N5c2NhbGxfZGVmcy5oOjEzNDM6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X2N0aW1lX25zZWM7
-JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTUzOiBGSUxFOiBs
-aW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzNDY6CiteSWFiaV91bG9uZ15JX191bnVzZWQxWzJd
-OyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE2MjogRklMRTog
-bGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMzc0OgorXkl1bnNpZ25lZCBpbnReSXRhcmdldF9z
-dF9hdGltZV9uc2VjOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
-IzE2NjogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMzc3OgorXkl1bnNpZ25lZCBp
-bnReSXRhcmdldF9zdF9tdGltZV9uc2VjOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2
-ZXIgdXNlIHRhYnMKIzE3MDogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMzgwOgor
-Xkl1bnNpZ25lZCBpbnReSXRhcmdldF9zdF9jdGltZV9uc2VjOyQKCkVSUk9SOiBjb2RlIGluZGVu
-dCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE3NDogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2Rl
-ZnMuaDoxMzgyOgorXkl1bnNpZ25lZCBpbnReSV9fdW51c2VkMTskCgpFUlJPUjogY29kZSBpbmRl
-bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxNzU6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9k
-ZWZzLmg6MTM4MzoKK15JdW5zaWduZWQgaW50XklfX3VudXNlZDI7JAoKdG90YWw6IDE4IGVycm9y
-cywgMCB3YXJuaW5ncywgMTIxIGxpbmVzIGNoZWNrZWQKCkNvbW1pdCBlY2FlN2VlMDBmNTUgKGxp
-bnV4LXVzZXI6IFBhc3MgdGhyb3VnaCBuYW5vc2Vjb25kIHRpbWVzdGFtcCBjb21wb25lbnRzIGZv
-ciBzdGF0IHN5c2NhbGxzKSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVO
-RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlz
-IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDUxNDE0NTM0Ni4yMDc1
-OC0xLXdlbnNAa2VybmVsLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
-dC5jb20=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Q8O84HfVXzXGdrP8qtZzvN3D3b9Blqe5H
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Qemu-block <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20a7f01f-894c-e121-afc9-03415f55aa82@redhat.com>
+Subject: Re: Unaligned images with O_DIRECT
+References: <c276dc0c-0190-1e83-d491-8157d78ec817@redhat.com>
+ <5e56cded-5097-ce97-6f2b-7afee8e480af@redhat.com>
+ <ce551fef-3987-a5fd-7280-e406226c6a20@redhat.com>
+In-Reply-To: <ce551fef-3987-a5fd-7280-e406226c6a20@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On 14.05.19 18:15, Max Reitz wrote:
+> On 14.05.19 17:45, Eric Blake wrote:
+>> On 5/14/19 10:06 AM, Max Reitz wrote:
+>>> Hi,
+>>>
+>>> Unaligned images don=E2=80=99t work so well with O_DIRECT:
+>>>
+>>> $ echo > foo
+>>> $ qemu-img map --image-opts driver=3Dfile,filename=3Dfoo,cache.direct=
+=3Don
+>>> Offset          Length          Mapped to       File
+>>> qemu-img: block/io.c:2093: bdrv_co_block_status: Assertion `*pnum &&
+>>> QEMU_IS_ALIGNED(*pnum, align) && align > offset - aligned_offset' fai=
+led.
+>>> [1]    10954 abort (core dumped)  qemu-img map --image-opts
+>>> driver=3Dfile,filename=3Dfoo,cache.direct=3Don
+>>>
+>>> (compare https://bugzilla.redhat.com/show_bug.cgi?id=3D1588356)
+>>>
+>>> This is because the request_alignment is 512 (in my case), but the EO=
+F
+>>> is not aligned accordingly, so raw_co_block_status() returns an align=
+ed
+>>> *pnum.
+>>
+>> Uggh. Yet another reason why I want qemu to support byte-accurate
+>> sizing, instead of rounding up. The rounding keeps raising its head in=
+
+>> more and more places. I have pending patches that are trying to improv=
+e
+>> block status to round driver answers up to match request_alignment (wh=
+en
+>> the protocol layer has finer granularity than the format layer); but
+>> this sounds like it is a bug in the file driver itself for returning a=
+n
+>> answer that is not properly rounded according to its own
+>> request_alignment boundary, and not one where my pending patches would=
+ help.
+>=20
+> Yes, I think so, too.
+>=20
+>>> I suppose having an unaligned tail is not so bad and maybe we can jus=
+t
+>>> adjust the assertion accordingly.  On the other hand, this has been
+>>> broken for a while.  Does it even make sense to use O_DIRECT with
+>>> unaligned images?  Shouldn=E2=80=99t we just reject them outright?
+>>
+>> The tail of an unaligned file is generally inaccessible to O_DIRECT,
+>=20
+> Especially with this.
+>=20
+>> where it is easier to use ftruncate() up to an aligned boundary if you=
+
+>> really must play with that region of the file, and then ftruncate() ba=
+ck
+>> to the intended size after I/O. But that sounds hairy.  We could also
+>> round down and silently ignore the tail of the file, but that is at od=
+ds
+>> with our practice of rounding size up.  So for the short term, I'd be
+>> happy with a patch that just rejects any attempt to use cache.direct=3D=
+on
+>> (O_DIRECT) with a file that is not already a multiple of the alignment=
+
+>> required thereby. (For reference, that's what qemu as NBD client
+>> recently did when talking to a server that advertises a size
+>> inconsistent with forced minimum block access: commit 3add3ab7)
+>=20
+> OK, I=E2=80=99ll send a patch.  Thanks for you explanation!
+Well, or maybe not.
+
+$ ./qemu-img create -f qcow2 foo.qcow2 64M
+$ ./qemu-img map --image-opts \
+    driver=3Dqcow2,file.filename=3Dfoo.qcow2,cache.direct=3Don
+qemu-img: Could not open
+'driver=3Dqcow2,file.filename=3Dfoo.qcow2,cache.direct=3Don': File length=
+
+(196616 bytes) is not a multiple of the O_DIRECT alignment (512 bytes)
+Try cache.direct=3Doff, or increasing the file size to match the alignmen=
+t
+
+That may be considered a bug in qcow2.  Maybe it should always fill all
+clusters.  But even if we did so and fixed it now, we can=E2=80=99t disal=
+low
+qemu from opening such images.
+
+Also, well, the tail is accessible, we just need to access it with the
+proper alignment (and then we get a short read).  This seems to be
+handled just fine.
+
+So I think file-posix should just return a rounded result.  Well, or
+bdrv_co_Block_status() could ignore it for the EOF, because it throws
+away everything past the EOF anyway with:
+
+    if (*pnum > bytes) {
+        *pnum =3D bytes;
+    }
+
+On one hand, I agree that file-posix should return an aligned result.
+On the other, it doesn=E2=80=99t make a difference, so I don=E2=80=99t th=
+ink we need to
+enforce it (at EOF).
+
+Max
+
+
+--Q8O84HfVXzXGdrP8qtZzvN3D3b9Blqe5H
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlza+rAACgkQ9AfbAGHV
+z0DOKgf+L32Ja0ovpfoKxgXsNZ9XJBFXS3kbwcjIuR/wX4RbmRrRk6wQCxLi7Grn
+Ao0SM/h1ZacFHMLz05c+9jcZInGZcp+QH5BARul3wde/mnirhVurDlKvL2T2GCgO
+A5KY9yj8X5bC14rpwNemCzXSr9jT4wPIm6E5Q2u+J/zCKdrdZbyZu2qyhzmTbS23
+f4uPNkQRk+TMXNKQ781e3amjunWJ+u+dK6TAOf8WujEcRSA9IzegdPYJeV0+cFsr
+E2iuE7uKEo6VPRIsaUtgeuEBFy/XVuTUGmAnwu7lQxx6KnVadCIHclHIhHcqI7aA
+t+bv7RIzfuH15wLFRsEezxZDpYq7zQ==
+=MIxM
+-----END PGP SIGNATURE-----
+
+--Q8O84HfVXzXGdrP8qtZzvN3D3b9Blqe5H--
 
