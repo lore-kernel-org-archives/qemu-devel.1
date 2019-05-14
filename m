@@ -2,87 +2,59 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,TVD_SPACE_RATIO,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E7BEC04A6B
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 04:00:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A976BC04A6B
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 04:25:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6478820818
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 04:00:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x5xwk29Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6478820818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7758F20843
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 04:25:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7758F20843
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38630 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38887 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQObh-0002nt-JF
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 00:00:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36751)
+	id 1hQP0Z-0008L5-Ib
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 00:25:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQOar-0002W6-SB
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 23:59:10 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hQOzh-0007to-C6
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 00:24:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQOaq-0003f8-Qu
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 23:59:09 -0400
-Received: from mail-pg1-x52e.google.com ([2607:f8b0:4864:20::52e]:38009)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hQKxg-0003hH-0C
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:06:28 -0400
-Received: by mail-pg1-x52e.google.com with SMTP id j26so7598243pgl.5
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 17:06:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=FH8HIUisgKxx/wO5rpgn7QNUU9WJqnDYvJ4xHC9+spw=;
-	b=x5xwk29ZL+7vqT3GgQxBoj/4VOc1XPju6PBEcsc8Eqv3XDhGGnkhpkgCpvamxTXd1J
-	Cx0rNBEuubgxMAyw6mFd9Q5CJD95kgyzFkw7/HDuqMPPeTskFTCVaAaH+jVtVimjI558
-	hJ2pC9wLje2XitkE3qBtjFIxZ36euZtSP//gFw1Cw00hpKpH64f4X1ElxGhP6RQOKvaV
-	YKeTT6USHEgt/1qSQMXDq6qNqyJtBs878svnZZ8u6xOGO16mXmTI06Y3tJuTptIGNP1z
-	HvyRffbwDirGwcAuIhN47y9MyQ8MUFrEDNMlY6ChPnCz4kx903qM4awoFHFLMPd9H2Ft
-	YpPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=FH8HIUisgKxx/wO5rpgn7QNUU9WJqnDYvJ4xHC9+spw=;
-	b=mlrSxC+D+ZLwhIvATDETUQTLvlh0Tb5DODRPjHhg3J/q0smQDZNcLZh5ET2WWGGrnI
-	kejchTEdXqvYLDhZ1Hfw1elLw2jo8TwZgNGq18PjxdeEQGBtmzE4SF3uJcuR3qsPQxVH
-	o7O7nbF7mosa0shEeYEFDohKOPTJEeP8BYHmvfTofzzEQgMLEYl4nc6euPRUQafLocHy
-	eIVI5QnhhlpccsWFpd5SRvLbbxjQDVM+dfhqd3b8fEfhQPZaM2XJ9soUZOi3k7rKM1oi
-	Sx0P+0CyG9yD3mIQyOpvKjMDRA6YwfZqttKxfER9OeB8MXJFOUnkPyswUVgkkOA6enOO
-	o7SA==
-X-Gm-Message-State: APjAAAWGCl/g8ftQybSP+5y0wbySDh0cZESxrrfsk+Lg7LuAPyghbqHe
-	/xgPns32ACM0WWawsEzFX+bNOprirHk=
-X-Google-Smtp-Source: APXvYqxzQQa36EShhQexzfLJHP9KKtGQi8SQh/c1nMYCo6xtwX3eXxpwUYEE2HHQynEHITQhUu9fhA==
-X-Received: by 2002:a63:5443:: with SMTP id e3mr34425763pgm.265.1557792376633; 
-	Mon, 13 May 2019 17:06:16 -0700 (PDT)
-Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
-	[97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id u3sm238151pfn.29.2019.05.13.17.06.15
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 13 May 2019 17:06:15 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+	(envelope-from <kraxel@redhat.com>) id 1hQOzg-0006eD-Cp
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 00:24:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>)
+	id 1hQOzg-0006dU-7c; Tue, 14 May 2019 00:24:48 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C35E7C057F3C;
+	Tue, 14 May 2019 04:24:46 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
+	[10.36.117.74])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 47BC85D71E;
+	Tue, 14 May 2019 04:24:44 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id 805EF1747D; Tue, 14 May 2019 06:24:43 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 13 May 2019 17:05:35 -0700
-Message-Id: <20190514000540.4313-27-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190514000540.4313-1-richard.henderson@linaro.org>
-References: <20190514000540.4313-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::52e
-Subject: [Qemu-devel] [PULL 26/31] target/ppc: Use tcg_gen_abs_i32
+Date: Tue, 14 May 2019 06:24:43 +0200
+Message-Id: <20190514042443.10735-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.32]);
+	Tue, 14 May 2019 04:24:46 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] kbd-state: fix autorepeat handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,47 +66,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linux.org,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+When allowing multiple down-events in a row (key autorepeat) we can't
+use change_bit() any more to update the state, because autorepeat events
+don't change the key state.  We have to explicitly use set_bit() and
+clear_bit() instead.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20190423102145.14812-2-f4bug@amsat.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-stable@nongnu.org
+Fixes: 35921860156e kbd-state: don't block auto-repeat events
+Buglink: https://bugs.launchpad.net/qemu/+bug/1828272
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- target/ppc/translate/spe-impl.inc.c | 14 +-------------
- 1 file changed, 1 insertion(+), 13 deletions(-)
+ ui/kbd-state.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/target/ppc/translate/spe-impl.inc.c b/target/ppc/translate/spe-impl.inc.c
-index 7ab0a29b5f..36b4d5654d 100644
---- a/target/ppc/translate/spe-impl.inc.c
-+++ b/target/ppc/translate/spe-impl.inc.c
-@@ -126,19 +126,7 @@ static inline void gen_##name(DisasContext *ctx)                              \
-     tcg_temp_free_i32(t0);                                                    \
- }
+diff --git a/ui/kbd-state.c b/ui/kbd-state.c
+index f3ab2d7a665d..1668d17ddabc 100644
+--- a/ui/kbd-state.c
++++ b/ui/kbd-state.c
+@@ -59,7 +59,11 @@ void qkbd_state_key_event(QKbdState *kbd, QKeyCode qcode, bool down)
+     }
  
--static inline void gen_op_evabs(TCGv_i32 ret, TCGv_i32 arg1)
--{
--    TCGLabel *l1 = gen_new_label();
--    TCGLabel *l2 = gen_new_label();
--
--    tcg_gen_brcondi_i32(TCG_COND_GE, arg1, 0, l1);
--    tcg_gen_neg_i32(ret, arg1);
--    tcg_gen_br(l2);
--    gen_set_label(l1);
--    tcg_gen_mov_i32(ret, arg1);
--    gen_set_label(l2);
--}
--GEN_SPEOP_ARITH1(evabs, gen_op_evabs);
-+GEN_SPEOP_ARITH1(evabs, tcg_gen_abs_i32);
- GEN_SPEOP_ARITH1(evneg, tcg_gen_neg_i32);
- GEN_SPEOP_ARITH1(evextsb, tcg_gen_ext8s_i32);
- GEN_SPEOP_ARITH1(evextsh, tcg_gen_ext16s_i32);
+     /* update key and modifier state */
+-    change_bit(qcode, kbd->keys);
++    if (down) {
++        set_bit(qcode, kbd->keys);
++    } else {
++        clear_bit(qcode, kbd->keys);
++    }
+     switch (qcode) {
+     case Q_KEY_CODE_SHIFT:
+     case Q_KEY_CODE_SHIFT_R:
 -- 
-2.17.1
+2.18.1
 
 
