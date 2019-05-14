@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
 	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39EBCC04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 14:36:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92E69C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 14:37:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DF2A2085A
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 14:36:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DF2A2085A
+	by mail.kernel.org (Postfix) with ESMTPS id 6604D2085A
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 14:37:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6604D2085A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49095 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49107 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQYXX-0001Z9-P9
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 10:36:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39737)
+	id 1hQYYr-0002Se-IQ
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 10:37:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hQYWT-00015w-Mj
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:35:18 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hQYXD-0001Z3-Ah
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hQYWP-0005Rc-EC
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:35:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38491)
+	(envelope-from <dgilbert@redhat.com>) id 1hQYX9-0006Yz-Ek
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:36:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34726)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hQYWP-0005QQ-8I
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:35:13 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hQYX7-0006X0-IJ
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:35:57 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DFF852D4B7A;
-	Tue, 14 May 2019 14:35:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5B3E2DD9F4;
+	Tue, 14 May 2019 14:35:49 +0000 (UTC)
 Received: from work-vm (ovpn-117-232.ams2.redhat.com [10.36.117.232])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E3BED5D6A6;
-	Tue, 14 May 2019 14:35:00 +0000 (UTC)
-Date: Tue, 14 May 2019 15:34:58 +0100
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 82C245C553;
+	Tue, 14 May 2019 14:35:48 +0000 (UTC)
+Date: Tue, 14 May 2019 15:35:45 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To: Yi Wang <wang.yi59@zte.com.cn>
-Message-ID: <20190514143457.GI2753@work-vm>
+Message-ID: <20190514143545.GJ2753@work-vm>
 References: <1555311089-18610-1-git-send-email-wang.yi59@zte.com.cn>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1555311089-18610-1-git-send-email-wang.yi59@zte.com.cn>
 User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Tue, 14 May 2019 14:35:02 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.38]);
+	Tue, 14 May 2019 14:35:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH] migration: update comments of migration
@@ -81,7 +81,7 @@ Sender: "Qemu-devel"
 > 
 > Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Queued
 
 > ---
 >  migration/ram.c | 4 +---
