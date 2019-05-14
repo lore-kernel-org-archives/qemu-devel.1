@@ -2,124 +2,67 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1723CC04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:04:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A18C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:04:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9DD420862
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:04:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9DD420862
+	by mail.kernel.org (Postfix) with ESMTPS id 0A3F820862
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:04:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A3F820862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43428 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43442 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQTLu-0001Zk-1R
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 05:04:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56080)
+	id 1hQTMb-00022e-6x
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 05:04:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hQTIT-00084X-ID
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:00:39 -0400
+	(envelope-from <drjones@redhat.com>) id 1hQTKd-00012l-9d
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:02:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hQTIO-0007Vt-HO
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:00:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54642)
+	(envelope-from <drjones@redhat.com>) id 1hQTKX-0001Ka-Oo
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:02:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45732)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hQTIO-0007V8-8I; Tue, 14 May 2019 05:00:24 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1hQTKX-0001Ji-Fc
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:02:37 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4EE273004153;
-	Tue, 14 May 2019 09:00:23 +0000 (UTC)
-Received: from [10.36.117.118] (ovpn-117-118.ams2.redhat.com [10.36.117.118])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 81B4551DF1;
-	Tue, 14 May 2019 09:00:17 +0000 (UTC)
-To: Christian Borntraeger <borntraeger@de.ibm.com>,
-	Cornelia Huck <cohuck@redhat.com>
-References: <1556749903-19221-1-git-send-email-walling@linux.ibm.com>
-	<a87c71be-5bf8-a115-5843-720c9ad10c7b@redhat.com>
-	<bc2fd9bb-7b94-eac7-590b-f01d2063ef9c@redhat.com>
-	<e948a030-bd30-180e-bbd6-76f4a2390bb9@de.ibm.com>
-	<ea6df6b1-4062-c057-92ea-5be40d778fe9@redhat.com>
-	<09293a1c-d000-83a8-46b8-b97ad4fa9774@de.ibm.com>
-	<56e3ace1-6e48-0e20-47d5-b07ac6dfcf31@redhat.com>
-	<e140a076-28a0-0db6-4c59-80e0f2ab44bb@de.ibm.com>
-	<c690c4a8-c277-e3c6-3697-3f0a1924559b@redhat.com>
-	<20190513134637.3d8bb275.cohuck@redhat.com>
-	<898144e3-615e-5074-fb68-bf9995c64609@de.ibm.com>
-	<155d2ca3-6a48-c99a-fe42-dca8e3fd4344@redhat.com>
-	<066c7470-94a3-a922-9a12-1ca42e474c51@de.ibm.com>
-	<1a3dcb16-8c6f-214c-843d-6dca6a24801e@redhat.com>
-	<9a9e9c58-d991-369f-a577-b70581efc75b@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <3cacee74-92f8-c63a-1aa4-7a169714d70c@redhat.com>
-Date: Tue, 14 May 2019 11:00:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id BE78B307EA87;
+	Tue, 14 May 2019 09:02:36 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.205.150])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 79FA6608A6;
+	Tue, 14 May 2019 09:02:29 +0000 (UTC)
+Date: Tue, 14 May 2019 11:02:25 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190514090225.vel4xm4x743o4rge@kamzik.brq.redhat.com>
+References: <20190418092841.fzrcegkbal7dpfcy@kamzik.brq.redhat.com>
+	<20190418112610.GO13773@redhat.com>
+	<877ebrmch2.fsf@dusky.pond.sub.org>
+	<20190513184237.i2ha3ixvhjqzkn5q@kamzik.brq.redhat.com>
+	<87bm05ab6c.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <9a9e9c58-d991-369f-a577-b70581efc75b@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <87bm05ab6c.fsf@dusky.pond.sub.org>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Tue, 14 May 2019 09:00:23 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.44]);
+	Tue, 14 May 2019 09:02:36 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4] s390: diagnose 318 info reset and
- migration support
+Subject: Re: [Qemu-devel] How do we do user input bitmap properties?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -131,86 +74,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Collin Walling <walling@linux.ibm.com>, mst@redhat.com,
-	qemu-devel@nongnu.org, pasic@linux.ibm.com,
-	qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+Cc: peter.maydell@linaro.org,
+	Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+	dgilbert@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com,
+	Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14.05.19 10:56, Christian Borntraeger wrote:
-> 
-> 
-> On 14.05.19 10:50, David Hildenbrand wrote:
->> On 14.05.19 10:37, Christian Borntraeger wrote:
->>>
->>>
->>> On 14.05.19 09:28, David Hildenbrand wrote:
->>>>>>> But that can be tested using the runability information if I am not wrong.
->>>>>>
->>>>>> You mean the cpu level information, right?
->>>>
->>>> Yes, query-cpu-definition includes for each model runability information
->>>> via "unavailable-features" (valid under the started QEMU machine).
->>>>
->>>>>>
->>>>>>>
->>>>>>>> and others that we have today.
->>>>>>>>
->>>>>>>> So yes, I think this would be acceptable.  
->>>>>>>
->>>>>>> I guess it is acceptable yes. I doubt anybody uses that many CPUs in
->>>>>>> production either way. But you never know.
->>>>>>
->>>>>> I think that using that many cpus is a more uncommon setup, but I still
->>>>>> think that having to wait for actual failure
->>>>>
->>>>> That can happen all the time today. You can easily say z14 in the xml when 
->>>>> on a zEC12. Only at startup you get the error. The question is really:
->>>>
->>>> "-smp 248 -cpu host" will no longer work, while e.g. "-smp 248 -cpu z12"
->>>> will work. Actually, even "-smp 248" will no longer work on affected
->>>> machines.
->>>>
->>>> That is why wonder if it is better to disable the feature and print a
->>>> warning. Similar to CMMA, where want want to tolerate when CMMA is not
->>>> possible in the current environment (huge pages).
->>>>
->>>> "Diag318 will not be enabled because it is not compatible with more than
->>>> 240 CPUs".
->>>>
->>>> However, I still think that implementing support for more than one SCLP
->>>> response page is the best solution. Guests will need adaptions for > 240
->>>> CPUs with Diag318, but who cares? Existing setups will continue to work.
->>>>
->>>> Implementing that SCLP thingy will avoid any warnings and any errors. It
->>>> just works from the QEMU perspective.
->>>>
->>>> Is implementing this realistic?
->>>
->>> Yes it is but it will take time. I will try to get this rolling. To make
->>> progress on the diag318 thing, can we error on startup now and simply
->>> remove that check when when have implemented a larger sccb? If we would
->>> now do all kinds of "change the max number games" would be harder to "fix".
->>
->>
->> Another idea for temporary handling: Simply only indicate 240 CPUs to
->> the guest if the response does not fit into a page. Once we have that
->> SCLP thingy, this will be fixed. Guest migration back and forth should
->> work, as the VCPUs are fully functional (and initially always stopped),
->> the guest will simply not be able to detect them via SCLP when booting
->> up, and therefore not use them.
-> 
-> Yes, that looks like a good temporary solution. In fact if the guest relies
-> on simply probing it could even make use of the additional CPUs. Its just
-> the sclp response that is limited to 240 (or make it 247?)
+On Tue, May 14, 2019 at 06:54:03AM +0200, Markus Armbruster wrote:
+> Andrew Jones <drjones@redhat.com> writes:
+>=20
+> > On Thu, Apr 18, 2019 at 07:48:09PM +0200, Markus Armbruster wrote:
+> >> Daniel P. Berrang=E9 <berrange@redhat.com> writes:
+> >>=20
+> >> > On Thu, Apr 18, 2019 at 11:28:41AM +0200, Andrew Jones wrote:
+> >> >> Hi all,
+> >> >>=20
+> >> >> First some background:
+> >> >>=20
+> >> >> For the userspace side of AArch64 guest SVE support we need to
+> >> >> expose KVM's allowed vector lengths bitmap to the user and allow
+> >> >> the user to choose a subset of that bitmap. Since bitmaps are a
+> >> >> bit awkward to work with then we'll likely want to expose it as
+> >> >> an array of vector lengths instead. Also, assuming we want to
+> >> >> expose the lengths as number-of-quadwords (quadword =3D=3D 128 bi=
+ts
+> >> >> for AArch64 and vector lengths must be multiples of quadwords)
+> >> >> rather than number-of-bits, then an example array (which will
+> >> >> always be a sequence) might be
+> >> >>=20
+> >> >>  [ 8, 16, 32 ]
+> >> >>=20
+> >> >> The user may choose a subsequence, but only through truncation,
+> >> >> i.e. [ 8, 32 ] is not valid, but [ 8, 16 ] is.
+> >> >>=20
+> >> >> Furthermore, different hosts may support different sequences
+> >> >> which have the same maximum. For example, if the above sequence
+> >> >> is for Host_A, then Host_B could be
+> >> >>=20
+> >> >>  [ 8, 16, 24, 32 ]
+> >> >>=20
+> >> >> The host must support all lengths in the sequence, which means
+> >> >> that while Host_A supports 32, since it doesn't support 24 and
+> >> >> we can only truncate sequences, we must use either [ 8 ] or
+> >> >> [ 8, 16 ] for a compatible sequence if we intend to migrate
+> >> >> between the hosts.
+> >> >>=20
+> >> >> Now to the $SUBJECT question:
+> >> >>=20
+> >> >> My feeling is that we should require the sequence to be
+> >> >> provided on the command line as a cpu property. Something
+> >> >> like
+> >> >>=20
+> >> >>   -cpu host,sve-vl-list=3D8:16
+> >> >>=20
+> >> >> (I chose ':' for the delimiter because ',' can't work, but
+> >> >> if there's a better choice, then that's fine by me.)
+> >> >>=20
+> >> >> Afaict a property list like this will require a new parser,
+> >>=20
+> >> We had 20+ of those when I last counted.  Among the more annoying
+> >> reasons CLI QAPIfication is hard[1].
+> >>=20
+> >> >> which feels a bit funny since it seems we should already
+> >> >> have support for this type of thing somewhere in QEMU. So,
+> >> >> the question is: do we? I see we have array properties, but
+> >> >> I don't believe that works with the command line. Should we
+> >> >> only use QMP for this? We already want some QMP in order to
+> >> >> query the supported vector lengths. Maybe we should use QMP
+> >> >> to set the selection too? But then what about command line
+> >> >> support for developers? And if the property is on the command
+> >> >> line then we don't have to add it to the migration stream.
+> >> >
+> >> > You should be able to use arrays from the CLI with QemuOpts by rep=
+eating
+> >> > the same option name many times, though I can't say it is a very
+> >> > nice approach if you have many values to list as it gets very repe=
+tative.
+> >>=20
+> >> Yes, this is one of the ways the current CLI does lists.  It's also =
+one
+> >> of the more annoying reasons CLI QAPIfication is hard[2].
+> >>=20
+> >> QemuOpts let the last param=3Dvalue win the stupidest way that could
+> >> possibly work (I respect that): add to the front of the list, search=
+ it
+> >> front to back.
+> >>=20
+> >> Then somebody discovered that if you search the list manually, you c=
+an
+> >> see them all, and abuse that to get a list-valued param.  I'm sure t=
+hat
+> >> felt clever at the time.
+> >>=20
+> >> Another way to do lists the funky list feature of string input and o=
+pts
+> >> visitor.  Yet another annoying reason CLI QAPIfication is hard[3].
+> >>=20
+> >> We use the opts visitor's list feature for -numa node,cpus=3D...  Hm=
+m,
+> >> looks like we even combine it with the "multiple param=3Dvalue build=
+ up a
+> >> list" technique: -smp node,cpus=3D0-1,cpus=3D4-5 denotes [0,1,4,5].
+> >>=20
+> >> > That's the curse of not having a good CLI syntax for non-scalar da=
+ta in
+> >> > QemuOpts & why Markus believes we should switch to JSON for the CL=
+I too
+> >> >
+> >> >      -cpu host,sve-vl=3D8,sve-vl=3D16
+> >>=20
+> >> We actually have CLI syntax for non-scalar data: dotted keys.  Dotte=
+d
+> >> keys are syntactic sugar for JSON.  It looks friendlier than JSON fo=
+r
+> >> simple cases, then gets uglier as things get more complex, and then =
+it
+> >> falls apart: it can't quite express all of JSON.
+> >>=20
+> >> Example: sve-vl.0=3D8,sve-vl.1=3D16
+> >>     gets desugared into {"sve": [8, 16]}
+> >>     if the QAPI schema has 'sve': ['int'].
+> >>=20
+> >> The comment at the beginning of util/keyval.c explains it in more
+> >> detail.
+> >>=20
+> >> It powers -blockdev and -display.  Both options accept either JSON o=
+r
+> >> dotted keys.  If the option argument starts with '{', it's JSON.
+> >> Management applications should stick to JSON.
+> >>=20
+> >>=20
+> >> [1] Towards a more expressive and introspectable QEMU command line
+> >> https://www.linux-kvm.org/images/f/f2/Armbru-qapi-cmdline_1.pdf
+> >> Slide 34 "Backward compatibility" item 1
+> >>=20
+> >> [2] ibid, item 4
+> >>=20
+> >> [3] ibid, item 3
+> >>
+> >
+> > Sorry I forgot to follow up to this earlier. I looked at the examples
+> > provided and saw they were all for independent command line options,
+> > rather than command line options like '-cpu' that then accepts additi=
+onal
+> > properties. I couldn't see how I could use ',' to separate array memb=
+ers
+> > when using properties or to use an array property input on the comman=
+d
+> > line.
+>=20
+> The argument of -cpu is parsed ad hoc.  Unlike QemuOpts and dotted keys=
+,
+> parse_cpu_option() doesn't seem to support escaping ','.  Not that
+> escaping would be a user-friendly solution.
+>=20
+> >       In the end I opted to use a single uint64_t for a bitmap, as 64=
+ is
+> > big enough for now,
+>=20
+> Do you think it'll remain big enough?
 
-I think the limiting factor was more than a single CPU, but I don't
-recall. We can do the math again and come up with the right number.
+Probably not forever, and TBH I can't even give an estimate for how long.
+Based on the current state, I "feel" like it'll be quite some time though=
+.
+I think we can extend this map by adding more ad hoc parsing to -cpu
+later. If we added dotted key support then each array member could be
+another bitmap word, for example.
 
--- 
+>=20
+> >                     and even though passing some hex number on the co=
+mmand
+> > line isn't user friendly at all, it didn't seem like a long list of a
+> > repeated parameter was that user friendly either. Of course I'm still=
+ open
+> > to suggestions to try to find the best balance between user friendlin=
+ess,
+> > current QEMU command line parsing support, and just getting a bitmap =
+into
+> > cpu state one way or another.
+>=20
+> I'd ask for consistency with existing practice no matter how flawed if
+> we had such consistency.
+>=20
+> If I understand your "[PATCH 00/13] target/arm/kvm: enable SVE in
+> guests" correctly, the bitmap form of [1, 2, 4] is
+>=20
+>     -cpu max,sve-vls-map=3D11
+>=20
+> Observe bit#0 means 1; better document that clearly.
+>=20
+> If we used dotted keys to produce an intList, we'd do
+>=20
+>     -cpu max,sve-vls-map.0=3D1,sve-vls-map.1=3D2,sve-vls-map.2=3D4
+>=20
+> If the option argument is QAPIfied, we additionally get
+>=20
+>     -cpu '{"type": "max", "sve-vls-map": [1, 2, 4]}'
+>=20
+> for free.
+>=20
+> If we did it like -numa (please don't), we'd get something like
+>=20
+>     -cpu max,sve-vls-map=3D1-2,sve-vls-map=3D4
+>=20
+> None of the above is exactly a pinnacle of user-friendliness.  JSON is
+> at least ugly in a regular way.  Your bitmap encoded in a number is at
+> least concise.
+>=20
+> If a numerically encoded bitmap is the least bad option here, I wonder
+> why it's not the least bad option for -numa...  Perhaps because there 6=
+4
+> isn't big enough.
+>=20
+> I'm afraid the numerically encoded bitmap will make its way into the
+> QAPI schema sooner or later.  This will create an unfortunate
+> inconsistency with the [int] encoding already there.
+>=20
+> Who's going to use sve-vls-map?  Humans, or pretty much only machines?
+
+My thought is primarily machines. If a human wants to use the command
+line and SVE, then I'm assuming they'll be happy with sve-max-vq or
+figuring out a map they like once and then sticking to it.
 
 Thanks,
-
-David / dhildenb
+drew
 
