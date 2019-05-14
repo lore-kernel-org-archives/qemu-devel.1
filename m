@@ -3,41 +3,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8623DC04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 11:25:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7DA3C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 11:27:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 497E2208CA
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 11:25:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 497E2208CA
+	by mail.kernel.org (Postfix) with ESMTPS id 682AE208CA
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 11:27:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 682AE208CA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45896 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45955 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQVYT-0007zv-Cu
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 07:25:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48426)
+	id 1hQVaN-0001TR-M2
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 07:27:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1hQVVe-000660-23
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:22:16 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1hQVVX-0005zf-Ve
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:22:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1hQVVc-0002Hq-I5
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:22:14 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:34236 helo=huawei.com)
+	(envelope-from <gengdongjiu@huawei.com>) id 1hQVVW-0002C1-NH
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:22:07 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:33848 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
-	id 1hQVVY-0002CL-Cc; Tue, 14 May 2019 07:22:08 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
-	by Forcepoint Email with ESMTP id F3D1959367B837C2F810;
-	Tue, 14 May 2019 19:22:05 +0800 (CST)
+	id 1hQVVT-00024O-CY; Tue, 14 May 2019 07:22:03 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+	by Forcepoint Email with ESMTP id 3F83D18CFD8C6B38241D;
+	Tue, 14 May 2019 19:22:00 +0800 (CST)
 Received: from ros.huawei.com (10.143.28.118) by
 	DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server
-	id 14.3.439.0; Tue, 14 May 2019 19:21:54 +0800
+	id 14.3.439.0; Tue, 14 May 2019 19:21:50 +0800
 From: Dongjiu Geng <gengdongjiu@huawei.com>
 To: <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
 	<shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
@@ -46,8 +46,8 @@ To: <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
 	<rth@twiddle.net>, <ehabkost@redhat.com>, <zhengxiang9@huawei.com>,
 	<jonathan.cameron@huawei.com>, <xuwei5@huawei.com>, <kvm@vger.kernel.org>, 
 	<qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
-Date: Tue, 14 May 2019 04:18:19 -0700
-Message-ID: <1557832703-42620-7-git-send-email-gengdongjiu@huawei.com>
+Date: Tue, 14 May 2019 04:18:15 -0700
+Message-ID: <1557832703-42620-3-git-send-email-gengdongjiu@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
 References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
@@ -57,8 +57,8 @@ X-Originating-IP: [10.143.28.118]
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 45.249.212.32
-Subject: [Qemu-devel] [PATCH v17 06/10] docs: APEI GHES generation and CPER
- record description
+Subject: [Qemu-devel] [PATCH v17 02/10] ACPI: add some GHES structures and
+ macros definition
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,117 +74,85 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add APEI/GHES detailed design document
+Add Generic Error Status Block structures and some macros
+definitions, which is referred to the ACPI 4.0 or ACPI 6.2. The
+HEST table generation and CPER record will use them.
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 ---
- docs/specs/acpi_hest_ghes.txt | 97 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 97 insertions(+)
- create mode 100644 docs/specs/acpi_hest_ghes.txt
+ include/hw/acpi/acpi-defs.h | 52 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
-diff --git a/docs/specs/acpi_hest_ghes.txt b/docs/specs/acpi_hest_ghes.txt
-new file mode 100644
-index 0000000..fbfc787
---- /dev/null
-+++ b/docs/specs/acpi_hest_ghes.txt
-@@ -0,0 +1,97 @@
-+APEI tables generating and CPER record
-+=============================
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index f9aa4bd..d1996fb 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -224,6 +224,25 @@ typedef struct AcpiMultipleApicTable AcpiMultipleApicTable;
+ #define ACPI_APIC_RESERVED              16   /* 16 and greater are reserved */
+ 
+ /*
++ * Values for Hardware Error Notification Type field
++ */
++enum AcpiHestNotifyType {
++    ACPI_HEST_NOTIFY_POLLED = 0,
++    ACPI_HEST_NOTIFY_EXTERNAL = 1,
++    ACPI_HEST_NOTIFY_LOCAL = 2,
++    ACPI_HEST_NOTIFY_SCI = 3,
++    ACPI_HEST_NOTIFY_NMI = 4,
++    ACPI_HEST_NOTIFY_CMCI = 5,  /* ACPI 5.0: 18.3.2.7, Table 18-290 */
++    ACPI_HEST_NOTIFY_MCE = 6,   /* ACPI 5.0: 18.3.2.7, Table 18-290 */
++    ACPI_HEST_NOTIFY_GPIO = 7,  /* ACPI 6.0: 18.3.2.7, Table 18-332 */
++    ACPI_HEST_NOTIFY_SEA = 8,   /* ACPI 6.1: 18.3.2.9, Table 18-345 */
++    ACPI_HEST_NOTIFY_SEI = 9,   /* ACPI 6.1: 18.3.2.9, Table 18-345 */
++    ACPI_HEST_NOTIFY_GSIV = 10, /* ACPI 6.1: 18.3.2.9, Table 18-345 */
++    ACPI_HEST_NOTIFY_SDEI = 11, /* ACPI 6.2: 18.3.2.9, Table 18-383 */
++    ACPI_HEST_NOTIFY_RESERVED = 12 /* 12 and greater are reserved */
++};
 +
-+Copyright (C) 2017 HuaWei Corporation.
++/*
+  * MADT sub-structures (Follow MULTIPLE_APIC_DESCRIPTION_TABLE)
+  */
+ #define ACPI_SUB_HEADER_DEF   /* Common ACPI sub-structure header */\
+@@ -400,6 +419,39 @@ struct AcpiSystemResourceAffinityTable {
+ } QEMU_PACKED;
+ typedef struct AcpiSystemResourceAffinityTable AcpiSystemResourceAffinityTable;
+ 
++/*
++ * Generic Error Status Block
++ */
++struct AcpiGenericErrorStatus {
++    /* It is a bitmask composed of ACPI_GEBS_xxx macros */
++    uint32_t block_status;
++    uint32_t raw_data_offset;
++    uint32_t raw_data_length;
++    uint32_t data_length;
++    uint32_t error_severity;
++} QEMU_PACKED;
++typedef struct AcpiGenericErrorStatus AcpiGenericErrorStatus;
 +
-+Design Details:
-+-------------------
++/*
++ * Masks for block_status flags above
++ */
++#define ACPI_GEBS_UNCORRECTABLE         1
 +
-+       etc/acpi/tables                                 etc/hardware_errors
-+    ====================                      ==========================================
-++ +--------------------------+            +-----------------------+
-+| | HEST                     |            |    address            |            +--------------+
-+| +--------------------------+            |    registers          |            | Error Status |
-+| | GHES1                    |            | +---------------------+            | Data Block 1 |
-+| +--------------------------+ +--------->| |error_block_address1 |----------->| +------------+
-+| | .................        | |          | +---------------------+            | |  CPER      |
-+| | error_status_address-----+-+ +------->| |error_block_address2 |--------+   | |  CPER      |
-+| | .................        |   |        | +---------------------+        |   | |  ....      |
-+| | read_ack_register--------+-+ |        | |    ..............   |        |   | |  CPER      |
-+| | read_ack_preserve        | | |        +-----------------------+        |   | +------------+
-+| | read_ack_write           | | | +----->| |error_block_addressN |------+ |   | Error Status |
-++ +--------------------------+ | | |      | +---------------------+      | |   | Data Block 2 |
-+| | GHES2                    | +-+-+----->| |read_ack_register1   |      | +-->| +------------+
-++ +--------------------------+   | |      | +---------------------+      |     | |  CPER      |
-+| | .................        |   | | +--->| |read_ack_register2   |      |     | |  CPER      |
-+| | error_status_address-----+---+ | |    | +---------------------+      |     | |  ....      |
-+| | .................        |     | |    | |  .............      |      |     | |  CPER      |
-+| | read_ack_register--------+-----+-+    | +---------------------+      |     +-+------------+
-+| | read_ack_preserve        |     |   +->| |read_ack_registerN   |      |     | |..........  |
-+| | read_ack_write           |     |   |  | +---------------------+      |     | +------------+
-++ +--------------------------|     |   |                                 |     | Error Status |
-+| | ...............          |     |   |                                 |     | Data Block N |
-++ +--------------------------+     |   |                                 +---->| +------------+
-+| | GHESN                    |     |   |                                       | |  CPER      |
-++ +--------------------------+     |   |                                       | |  CPER      |
-+| | .................        |     |   |                                       | |  ....      |
-+| | error_status_address-----+-----+   |                                       | |  CPER      |
-+| | .................        |         |                                       +-+------------+
-+| | read_ack_register--------+---------+
-+| | read_ack_preserve        |
-+| | read_ack_write           |
-++ +--------------------------+
++/*
++ * Values for error_severity field above
++ */
++enum AcpiGenericErrorSeverity {
++    ACPI_CPER_SEV_RECOVERABLE,
++    ACPI_CPER_SEV_FATAL,
++    ACPI_CPER_SEV_CORRECTED,
++    ACPI_CPER_SEV_NONE,
++};
 +
-+(1) QEMU generates the ACPI HEST table. This table goes in the current
-+    "etc/acpi/tables" fw_cfg blob. Each error source has different
-+    notification type.
++/*
++ * Generic Hardware Error Source version 2
++ */
++#define ACPI_HEST_SOURCE_GENERIC_ERROR_V2    10
 +
-+(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
-+    also need to populate this blob. The "etc/hardwre_errors" fw_cfg blob
-+    contains one address registers table and one Error Status Data Block
-+    table, all of which are pre-allocated.
-+
-+(3) The address registers table contains N Error Block Address entries
-+    and N Read Ack Address entries, the size for each entry is 8-byte.
-+    The Error Status Data Block table contains N Error Status Data Block
-+    entries, the size for each entry is 4096(0x1000) bytes. The total size
-+    for "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) bytes.
-+
-+(4) QEMU generates the ACPI linker/loader script for the firmware
-+
-+(4a) The HEST table is part of "etc/acpi/tables", the firmware already
-+    allocates the memory for it, because QEMU already generates an ALLOCATE
-+    linker/loader command for it
-+
-+(4b) QEMU creates another ALLOCATE command for the "etc/hardware_errors"
-+    blob. The firmware allocates memory for this blob and downloads it.
-+
-+(5) QEMU generates N ADD_POINTER commands, which patch address in the
-+    "error_status_address" fields of the HEST table with a pointer to the
-+    corresponding "address registers" in the downloaded "etc/hardware_errors"
-+    blob.
-+
-+(6) QEMU generates N ADD_POINTER commands, which patch address in the
-+    "read_ack_register" fields of the HEST table with a pointer to the
-+    corresponding "address registers" in the downloaded "etc/hardware_errors" blob.
-+
-+(7) QEMU generates N ADD_POINTER commands for the firmware, which patch
-+    address in the " error_block_address" fields with a pointer to the
-+    respective "Error Status Data Block" in the downloaded "etc/hardware_errors"
-+    blob.
-+
-+(8) QEMU Defines a third and write-only fw_cfg blob which is called
-+    "etc/hardware_errors_addr". Through that blob, the firmware can send back
-+    the guest-side allocation addresses to QEMU. The "etc/hardware_errors_addr"
-+    blob contains a 8-byte entry. QEMU generates a single WRITE_POINTER commands
-+    for the firmware, the firmware will write back the start address of
-+    "etc/hardware_errors" blob to fw_cfg file "etc/hardware_errors_addr". Then
-+    Qemu will know the Error Status Data Block for every error source. Each of
-+    Error Status Data Block has fixed size which is 4096(0x1000).
-+
-+(9) When QEMU gets SIGBUS from the kernel, QEMU formats the CPER right into
-+    guest memory, and then injects whatever interrupt (or assert whatever GPIO line)
-+    as a notification which is necessary for notifying the guest.
-+
-+(10) This notification (in virtual hardware) will be handled by guest kernel,
-+    guest APEI driver will read the CPER which is recorded by QEMU and do the
-+    recovery.
+ #define ACPI_SRAT_PROCESSOR_APIC     0
+ #define ACPI_SRAT_MEMORY             1
+ #define ACPI_SRAT_PROCESSOR_x2APIC   2
 -- 
 1.8.3.1
 
