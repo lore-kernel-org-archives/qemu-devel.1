@@ -7,78 +7,83 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E83C04AA7
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 00:17:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89378C04AA7
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 00:17:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BD6821473
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 00:17:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4156B21655
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 00:17:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YM3lIN7e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BD6821473
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I+fJ4279"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4156B21655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36735 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36737 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQL8N-0002tr-80
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 20:17:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59366)
+	id 1hQL8a-00031P-A7
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 20:17:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQL3u-0004h8-8j
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:13:23 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hQKyF-0001fL-Kj
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:10:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQKxe-0003qE-25
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:07:31 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:46951)
+	(envelope-from <richard.henderson@linaro.org>) id 1hQKxc-0003nx-B3
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:06:59 -0400
+Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:43862)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hQKxb-0003iS-Ri
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:06:25 -0400
-Received: by mail-pg1-x544.google.com with SMTP id t187so7586535pgb.13
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 17:06:20 -0700 (PDT)
+	id 1hQKxX-0003fj-Tn
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:06:22 -0400
+Received: by mail-pg1-x533.google.com with SMTP id t22so7591511pgi.10
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 17:06:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=ceuwSjt3kxNVh2jVmVheMvD/TRbf+fHQnKrqah+IplI=;
-	b=YM3lIN7ecRVVN96Zqwn3iTt3ZilJW4YCEcNw5L5LEGAKSF5X+pauae51nAl5dcRL8E
-	BjwMplzL5TxfrmjPO5jP15Zx23/Dja9ESWt5syivIbsNp9q6BipXveJAkLNmyWEgpfYZ
-	4+3x9R72QAhSaNZgmUTnofXdkw+YPCnVSQ/tsjWbegNCHWJrgi9BC3TtfYG5DLoXrnjD
-	i8V6HKagriz2SjyW8tx4Wql41bez/4I8hCBKQz/1SX/hvckrK7ffhoZBFbxqg61hRf/Q
-	ehD1ZUQq/YTMgoYCR/00gxPSpFK9pdl7sxdrrXafCJFqJycW3U898CjUxO0mE2XnhBut
-	Sz8Q==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=aOq8R9O0JYe2vR4wE14TCH6+yK72ddx4w9niulf5glk=;
+	b=I+fJ42790lAr0n58eQiZSGrwV1sgcAdugkuWGyVDs0aP69M0OjoAh1k9DfWSf1pHVD
+	AlixIUjm09Vt4hHEA65lwEjn19ElhQhOpJCNuBqjqaTk5v7ca9TIj7qWxC5EE0ErtwL5
+	fAJyikSmlmvlTAyMPk8/Txxa4NNqRoHNeY0KPzyikzZdjx9MeZpEBIuhCBNXca3GZOLv
+	zH6jQFi7aD5lrAfVcfRJEXcuhZGEMR3oQoDMnMaOXOR4oletVoeOqlZBfCl+1IHyDElE
+	t4UDoOJr/EHJTr/ASA/RbJ3sQ8ezRWaNKRvtrVx757vXi457EgzkcV9NVy1DTLz051NO
+	jNyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=ceuwSjt3kxNVh2jVmVheMvD/TRbf+fHQnKrqah+IplI=;
-	b=mk2Nsa2Y91dC21LjLDKL8gMPC6hotPhkI3/wh0SIt+HHReuKYsL4XdquPQjlP/xXtC
-	O/Jgim1Lbu0kEi5AHL+UIRtXhFsghDp7bmYbYQRtTyiIXkKqwpauLglVnM4OEZF7o+qA
-	3VmZK6XoWKIl1bYZezV6VaoJ5HTeFTF+WzzzJVG66RSEHxctZPjgGNcse/tMRrF63IXy
-	g9vMmpiAyEWT9IQyXHxPdoOs0WDiAxIyWPA2fBW+gHtM2quf2zL+umkNDePU9vvAi55o
-	+X/ZnbbjIuYiI+n+lMaQKIHaaMgo/a4RNCEEtLv1QLHAmTtbO5ROf0HrjpJNcyB5oxIH
-	Tehw==
-X-Gm-Message-State: APjAAAWwvSQjP6HcAn6lN/cqfuirDFjrQvuBVU5lAefZrNYHTHQ6wVJS
-	O5bS0XfUWHEtQ5whZEFwkfq9M+hTSkk=
-X-Google-Smtp-Source: APXvYqxwyA2VgIdG3t+IEyO3fyrwwSCFxhpJPX7G73pAcqF216VCMDK0WlYlCtNv9fjCFzdFBhdnFw==
-X-Received: by 2002:a63:7c55:: with SMTP id l21mr10588783pgn.121.1557792378991;
-	Mon, 13 May 2019 17:06:18 -0700 (PDT)
+	:references:mime-version:content-transfer-encoding;
+	bh=aOq8R9O0JYe2vR4wE14TCH6+yK72ddx4w9niulf5glk=;
+	b=JBP6lcfctY8vdv8VIqUZR+vAg71JqWDjzFJ4IXgWKh1D+ejDzw8soSHW7pZWds7kdl
+	KGVvLoklvAJk/RDNh9+19duoKwGJDAxN0cHKBr+i++sLF54+9OMPsM6YAx3oEN4ukmUM
+	+uVuIdWtwJtZG6Ufk9eCaLp1y7tgXJ4TaHFv3IS9yf+KQAZmrgi7qBDJo++i4awH5s8l
+	PsTksSCQZ+yTeJ27tjOHhOsRSp3uLEPmdAikF8t3UZEL8bAToG37czL8sJh4oLikuz0d
+	w0HoxFkBBQ6k9ZIrv+taUN8XVIbcMjJk6jpSrTqsOdj8isOuZRoljEQ2E6NNX6v1RF/c
+	2gtA==
+X-Gm-Message-State: APjAAAVMOwz7KU6nFOnuUtxaF2jnNtEcKPDt+USwVBSGCEkIOCZU/S9u
+	7E6lw0SiF+Hd0P8gA/Zjr+P2h6hGU78=
+X-Google-Smtp-Source: APXvYqz0XCcpbh47IH0dgtZExgDc0rXnM3CCnQ4LVRr5BYfsuliB2s5tXkd/lqw1NLR9z+ANkWIDBQ==
+X-Received: by 2002:a63:a18:: with SMTP id 24mr34122390pgk.332.1557792374254; 
+	Mon, 13 May 2019 17:06:14 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id u3sm238151pfn.29.2019.05.13.17.06.17
+	by smtp.gmail.com with ESMTPSA id u3sm238151pfn.29.2019.05.13.17.06.13
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 13 May 2019 17:06:18 -0700 (PDT)
+	Mon, 13 May 2019 17:06:13 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 13 May 2019 17:05:37 -0700
-Message-Id: <20190514000540.4313-29-richard.henderson@linaro.org>
+Date: Mon, 13 May 2019 17:05:33 -0700
+Message-Id: <20190514000540.4313-25-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190514000540.4313-1-richard.henderson@linaro.org>
 References: <20190514000540.4313-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: [Qemu-devel] [PULL 28/31] target/s390x: Use tcg_gen_abs_i64
+X-Received-From: 2607:f8b0:4864:20::533
+Subject: [Qemu-devel] [PULL 24/31] target/arm: Use tcg_gen_abs_i64 and
+ tcg_gen_gvec_abs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,31 +100,148 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/s390x/translate.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ target/arm/helper.h        |  2 --
+ target/arm/neon_helper.c   |  5 -----
+ target/arm/translate-a64.c | 41 +++++---------------------------------
+ target/arm/translate.c     | 11 +++-------
+ 4 files changed, 8 insertions(+), 51 deletions(-)
 
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index d4951836ad..e8e8a79b7d 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -1407,13 +1407,7 @@ static DisasJumpType help_branch(DisasContext *s, DisasCompare *c,
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 50cb036378..132aa1682e 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -352,8 +352,6 @@ DEF_HELPER_2(neon_ceq_u8, i32, i32, i32)
+ DEF_HELPER_2(neon_ceq_u16, i32, i32, i32)
+ DEF_HELPER_2(neon_ceq_u32, i32, i32, i32)
  
- static DisasJumpType op_abs(DisasContext *s, DisasOps *o)
+-DEF_HELPER_1(neon_abs_s8, i32, i32)
+-DEF_HELPER_1(neon_abs_s16, i32, i32)
+ DEF_HELPER_1(neon_clz_u8, i32, i32)
+ DEF_HELPER_1(neon_clz_u16, i32, i32)
+ DEF_HELPER_1(neon_cls_s8, i32, i32)
+diff --git a/target/arm/neon_helper.c b/target/arm/neon_helper.c
+index ed1c6fc41c..4259056723 100644
+--- a/target/arm/neon_helper.c
++++ b/target/arm/neon_helper.c
+@@ -1228,11 +1228,6 @@ NEON_VOP(ceq_u16, neon_u16, 2)
+ NEON_VOP(ceq_u32, neon_u32, 1)
+ #undef NEON_FN
+ 
+-#define NEON_FN(dest, src, dummy) dest = (src < 0) ? -src : src
+-NEON_VOP1(abs_s8, neon_s8, 4)
+-NEON_VOP1(abs_s16, neon_s16, 2)
+-#undef NEON_FN
+-
+ /* Count Leading Sign/Zero Bits.  */
+ static inline int do_clz8(uint8_t x)
  {
--    TCGv_i64 z, n;
--    z = tcg_const_i64(0);
--    n = tcg_temp_new_i64();
--    tcg_gen_neg_i64(n, o->in2);
--    tcg_gen_movcond_i64(TCG_COND_LT, o->out, o->in2, z, n, o->in2);
--    tcg_temp_free_i64(n);
--    tcg_temp_free_i64(z);
-+    tcg_gen_abs_i64(o->out, o->in2);
-     return DISAS_NEXT;
- }
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 9dcc5ff3a3..b7c5a928b4 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -9468,11 +9468,7 @@ static void handle_2misc_64(DisasContext *s, int opcode, bool u,
+         if (u) {
+             tcg_gen_neg_i64(tcg_rd, tcg_rn);
+         } else {
+-            TCGv_i64 tcg_zero = tcg_const_i64(0);
+-            tcg_gen_neg_i64(tcg_rd, tcg_rn);
+-            tcg_gen_movcond_i64(TCG_COND_GT, tcg_rd, tcg_rn, tcg_zero,
+-                                tcg_rn, tcg_rd);
+-            tcg_temp_free_i64(tcg_zero);
++            tcg_gen_abs_i64(tcg_rd, tcg_rn);
+         }
+         break;
+     case 0x2f: /* FABS */
+@@ -12366,11 +12362,12 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
+         }
+         break;
+     case 0xb:
+-        if (u) { /* NEG */
++        if (u) { /* ABS, NEG */
+             gen_gvec_fn2(s, is_q, rd, rn, tcg_gen_gvec_neg, size);
+-            return;
++        } else {
++            gen_gvec_fn2(s, is_q, rd, rn, tcg_gen_gvec_abs, size);
+         }
+-        break;
++        return;
+     }
  
+     if (size == 3) {
+@@ -12438,17 +12435,6 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
+                         gen_helper_neon_qabs_s32(tcg_res, cpu_env, tcg_op);
+                     }
+                     break;
+-                case 0xb: /* ABS, NEG */
+-                    if (u) {
+-                        tcg_gen_neg_i32(tcg_res, tcg_op);
+-                    } else {
+-                        TCGv_i32 tcg_zero = tcg_const_i32(0);
+-                        tcg_gen_neg_i32(tcg_res, tcg_op);
+-                        tcg_gen_movcond_i32(TCG_COND_GT, tcg_res, tcg_op,
+-                                            tcg_zero, tcg_op, tcg_res);
+-                        tcg_temp_free_i32(tcg_zero);
+-                    }
+-                    break;
+                 case 0x2f: /* FABS */
+                     gen_helper_vfp_abss(tcg_res, tcg_op);
+                     break;
+@@ -12561,23 +12547,6 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
+                     tcg_temp_free_i32(tcg_zero);
+                     break;
+                 }
+-                case 0xb: /* ABS, NEG */
+-                    if (u) {
+-                        TCGv_i32 tcg_zero = tcg_const_i32(0);
+-                        if (size) {
+-                            gen_helper_neon_sub_u16(tcg_res, tcg_zero, tcg_op);
+-                        } else {
+-                            gen_helper_neon_sub_u8(tcg_res, tcg_zero, tcg_op);
+-                        }
+-                        tcg_temp_free_i32(tcg_zero);
+-                    } else {
+-                        if (size) {
+-                            gen_helper_neon_abs_s16(tcg_res, tcg_op);
+-                        } else {
+-                            gen_helper_neon_abs_s8(tcg_res, tcg_op);
+-                        }
+-                    }
+-                    break;
+                 case 0x4: /* CLS, CLZ */
+                     if (u) {
+                         if (size == 0) {
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index b25781554f..dd053c80d6 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -8120,6 +8120,9 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                 case NEON_2RM_VNEG:
+                     tcg_gen_gvec_neg(size, rd_ofs, rm_ofs, vec_size, vec_size);
+                     break;
++                case NEON_2RM_VABS:
++                    tcg_gen_gvec_abs(size, rd_ofs, rm_ofs, vec_size, vec_size);
++                    break;
+ 
+                 default:
+                 elementwise:
+@@ -8225,14 +8228,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                             }
+                             tcg_temp_free_i32(tmp2);
+                             break;
+-                        case NEON_2RM_VABS:
+-                            switch(size) {
+-                            case 0: gen_helper_neon_abs_s8(tmp, tmp); break;
+-                            case 1: gen_helper_neon_abs_s16(tmp, tmp); break;
+-                            case 2: tcg_gen_abs_i32(tmp, tmp); break;
+-                            default: abort();
+-                            }
+-                            break;
+                         case NEON_2RM_VCGT0_F:
+                         {
+                             TCGv_ptr fpstatus = get_fpstatus_ptr(1);
 -- 
 2.17.1
 
