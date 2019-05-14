@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1618CC04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 16:32:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE60EC04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 16:32:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E06652085A
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 16:32:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E06652085A
+	by mail.kernel.org (Postfix) with ESMTPS id BE1102085A
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 16:32:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE1102085A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51027 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51036 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQaLc-000237-ST
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 12:32:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43117)
+	id 1hQaLz-0002KD-30
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 12:32:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hQaHl-0007He-0U
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:28:14 -0400
+	(envelope-from <lvivier@redhat.com>) id 1hQaHg-0007Dd-R7
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:28:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hQaHk-0006rS-1C
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:28:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44798)
+	(envelope-from <lvivier@redhat.com>) id 1hQaHf-0006ko-CK
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:28:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:23808)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hQaHj-0006qS-RX
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:28:11 -0400
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hQaHe-0006hM-PC
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:28:07 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 32905307D8BE;
-	Tue, 14 May 2019 16:28:11 +0000 (UTC)
-Received: from thinkpad.redhat.com (unknown [10.40.205.6])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A704162723;
+	by mx1.redhat.com (Postfix) with ESMTPS id 431D65945C;
 	Tue, 14 May 2019 16:28:04 +0000 (UTC)
+Received: from thinkpad.redhat.com (unknown [10.40.205.6])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D5BC3BA54;
+	Tue, 14 May 2019 16:28:00 +0000 (UTC)
 From: Laurent Vivier <lvivier@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 14 May 2019 18:27:44 +0200
-Message-Id: <20190514162744.30398-5-lvivier@redhat.com>
+Date: Tue, 14 May 2019 18:27:43 +0200
+Message-Id: <20190514162744.30398-4-lvivier@redhat.com>
 In-Reply-To: <20190514162744.30398-1-lvivier@redhat.com>
 References: <20190514162744.30398-1-lvivier@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Tue, 14 May 2019 16:28:11 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Tue, 14 May 2019 16:28:04 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v5 4/4] virtio-rng: change default backend to
- rng-builtin
+Subject: [Qemu-devel] [PATCH v5 3/4] virtio-rng: Keep the default backend
+ out of VirtIORNGConf
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,70 +79,95 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Markus Armbruster <armbru@redhat.com>
+
+The default backend is only used within virtio_rng_device_realize().
+Replace VirtIORNGConf member default_backend by a local variable.
+Adjust its type to reduce conversions.
+
+While there, pass &error_abort instead of NULL when failure would be a
+programming error.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 ---
- backends/rng-builtin.c | 1 -
- hw/virtio/virtio-rng.c | 2 +-
- include/sysemu/rng.h   | 2 ++
- qemu-options.hx        | 2 +-
- 4 files changed, 4 insertions(+), 3 deletions(-)
+ hw/virtio/virtio-rng.c         | 20 +++++++++-----------
+ include/hw/virtio/virtio-rng.h |  2 --
+ 2 files changed, 9 insertions(+), 13 deletions(-)
 
-diff --git a/backends/rng-builtin.c b/backends/rng-builtin.c
-index 6b9543a7de87..868055cbc723 100644
---- a/backends/rng-builtin.c
-+++ b/backends/rng-builtin.c
-@@ -10,7 +10,6 @@
- #include "qemu/main-loop.h"
- #include "qemu/guest-random.h"
-=20
--#define TYPE_RNG_BUILTIN "rng-builtin"
- #define RNG_BUILTIN(obj) OBJECT_CHECK(RngBuiltin, (obj), TYPE_RNG_BUILTI=
-N)
-=20
- typedef struct RngBuiltin {
 diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
-index 73ffb476e030..f3706eaba55f 100644
+index 30493a258622..73ffb476e030 100644
 --- a/hw/virtio/virtio-rng.c
 +++ b/hw/virtio/virtio-rng.c
-@@ -190,7 +190,7 @@ static void virtio_rng_device_realize(DeviceState *de=
-v, Error **errp)
+@@ -16,6 +16,7 @@
+ #include "hw/virtio/virtio.h"
+ #include "hw/virtio/virtio-rng.h"
+ #include "sysemu/rng.h"
++#include "sysemu/rng-random.h"
+ #include "qom/object_interfaces.h"
+ #include "trace.h"
+=20
+@@ -189,27 +190,24 @@ static void virtio_rng_device_realize(DeviceState *=
+dev, Error **errp)
      }
 =20
      if (vrng->conf.rng =3D=3D NULL) {
--        Object *default_backend =3D object_new(TYPE_RNG_RANDOM);
-+        Object *default_backend =3D object_new(TYPE_RNG_BUILTIN);
+-        vrng->conf.default_backend =3D RNG_RANDOM(object_new(TYPE_RNG_RA=
+NDOM));
++        Object *default_backend =3D object_new(TYPE_RNG_RANDOM);
 =20
-         user_creatable_complete(USER_CREATABLE(default_backend),
+-        user_creatable_complete(USER_CREATABLE(vrng->conf.default_backen=
+d),
++        user_creatable_complete(USER_CREATABLE(default_backend),
                                  &local_err);
-diff --git a/include/sysemu/rng.h b/include/sysemu/rng.h
-index 27b37da05d2e..9dc5e0e90100 100644
---- a/include/sysemu/rng.h
-+++ b/include/sysemu/rng.h
-@@ -24,6 +24,8 @@
- #define RNG_BACKEND_CLASS(klass) \
-     OBJECT_CLASS_CHECK(RngBackendClass, (klass), TYPE_RNG_BACKEND)
+         if (local_err) {
+             error_propagate(errp, local_err);
+-            object_unref(OBJECT(vrng->conf.default_backend));
++            object_unref(default_backend);
+             return;
+         }
 =20
-+#define TYPE_RNG_BUILTIN "rng-builtin"
-+
- typedef struct RngRequest RngRequest;
- typedef struct RngBackendClass RngBackendClass;
- typedef struct RngBackend RngBackend;
-diff --git a/qemu-options.hx b/qemu-options.hx
-index dc82a8c7ea14..c9784be83cb5 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4285,7 +4285,7 @@ The @option{share} boolean option is @var{on} by de=
-fault with memfd.
- Creates a random number generator backend which obtains entropy from
- QEMU builtin functions. The @option{id} parameter is a unique ID that
- will be used to reference this entropy backend from the @option{virtio-r=
-ng}
--device.
-+device. By default, the @option{virtio-rng} device uses this RNG backend=
-.
+-        object_property_add_child(OBJECT(dev),
+-                                  "default-backend",
+-                                  OBJECT(vrng->conf.default_backend),
+-                                  NULL);
++        object_property_add_child(OBJECT(dev), "default-backend",
++                                  default_backend, &error_abort);
 =20
- @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/random}
+         /* The child property took a reference, we can safely drop ours =
+now */
+-        object_unref(OBJECT(vrng->conf.default_backend));
++        object_unref(default_backend);
 =20
+-        object_property_set_link(OBJECT(dev),
+-                                 OBJECT(vrng->conf.default_backend),
+-                                 "rng", NULL);
++        object_property_set_link(OBJECT(dev), default_backend,
++                                 "rng", &error_abort);
+     }
+=20
+     vrng->rng =3D vrng->conf.rng;
+diff --git a/include/hw/virtio/virtio-rng.h b/include/hw/virtio/virtio-rn=
+g.h
+index 922dce7caccf..28ff752c4096 100644
+--- a/include/hw/virtio/virtio-rng.h
++++ b/include/hw/virtio/virtio-rng.h
+@@ -13,7 +13,6 @@
+ #define QEMU_VIRTIO_RNG_H
+=20
+ #include "sysemu/rng.h"
+-#include "sysemu/rng-random.h"
+ #include "standard-headers/linux/virtio_rng.h"
+=20
+ #define TYPE_VIRTIO_RNG "virtio-rng-device"
+@@ -26,7 +25,6 @@ struct VirtIORNGConf {
+     RngBackend *rng;
+     uint64_t max_bytes;
+     uint32_t period_ms;
+-    RngRandom *default_backend;
+ };
+=20
+ typedef struct VirtIORNG {
 --=20
 2.20.1
 
