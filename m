@@ -2,62 +2,89 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA68C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 19:28:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5BEFC04AB7
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 19:28:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D96F2166E
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 19:28:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D96F2166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6DD182166E
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 19:28:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lhi3bjFT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DD182166E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53064 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53066 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQd5m-0003JG-Me
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 15:28:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50454)
+	id 1hQd6B-0003g4-Ll
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 15:28:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hQd0j-0007Gh-2T
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 15:22:51 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hQcvG-0002Tw-Ok
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 15:17:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hQd0h-00045x-3f
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 15:22:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51528)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>)
-	id 1hQd0f-0003pP-G6; Tue, 14 May 2019 15:22:45 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4DDC4300502A;
-	Tue, 14 May 2019 19:22:42 +0000 (UTC)
-Received: from redhat.com (ovpn-112-28.ams2.redhat.com [10.36.112.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4B270608AB;
-	Tue, 14 May 2019 19:22:34 +0000 (UTC)
-Date: Tue, 14 May 2019 20:22:32 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190514192232.GB9512@redhat.com>
-References: <155785983236.11040.9618506134214930578.stgit@gimli.home>
+	(envelope-from <richard.henderson@linaro.org>) id 1hQcvF-0006qM-Cs
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 15:17:10 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:42945)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hQcvF-0006po-5i
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 15:17:09 -0400
+Received: by mail-pf1-x444.google.com with SMTP id 13so9631937pfw.9
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 12:17:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=4MrsM8HWkl5HnptGJNmid/oZc3Q7MB8Exr59LxaGIMY=;
+	b=Lhi3bjFT32r1L9f70/VFnAglrOjySbukTfUoGsiyENHbf3yn66vSSH2rV146cwakqO
+	R+XTfSQq8xShD9Qx6uH4BxPxbO+U22srS+UVqKLQF7+rxRCW2rLrUKiFpAUh6/Xd6moe
+	+A/FCgjFR8VhDPdqJvHeerGvArXb3yVbplvbVYJIpvNLL8sVs9Mi63oU9/GVTArSj4d0
+	ITxYfSvrYleB2LdEIiwqEnQ0VnQNLmleQqCNCCSQZPGK0nSH3ZPZyeX++jEveL0Tgqmn
+	N4BWkgokfCeA3gJySg+p9amVjNJQe1At1VpNJXa2jxxRLNAeBN+Vmqnx6y2ZRSDfgDDy
+	q1CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=4MrsM8HWkl5HnptGJNmid/oZc3Q7MB8Exr59LxaGIMY=;
+	b=hKC/+RF8oMBvhaTApUXunEvVc5W24ncYOIRzJwz6qBBCL95xa1A1KpJq83aVRTYRy5
+	hG/EKfIGsyI+AuTswk8sL7AJhhbVZz9oPQ4+sUYAJjaPg5MgXciWkgs23y31EE+jQrXE
+	DfQ2TZ2jitaZ2AdP+1EEaHHXZ4/0Tfz9oPXKX7cLXvF/6U8DxWvisloBQ1X9grKv2AlO
+	1Ewrzq9rtMLM1TFKs0T+ZC6Uz3Q99g6vSDa2AGJOr/1eFxHoYIIpu4HBUfEsrNU41/HP
+	BhIGpzNdv1wG5y4siA30lVb125FIO+t/22sURjJ9t5+zecClGgTdH6pfL9dJGQHjBZtm
+	54Bw==
+X-Gm-Message-State: APjAAAXPu+X+U0lp7sBXI9SzTW/DZwDlYvr00Ka7BEn2VfwwqxPtMAqb
+	XHzZj98Fb3KNyGxSSbpfl+D8Sj94qQ4=
+X-Google-Smtp-Source: APXvYqwm3im4htajCMx66r8XAvjHowzzRlhZ9Wbnp76Gih5okgfyD0H50wjRsOecHSpm3gkqezpUQQ==
+X-Received: by 2002:a62:7a8f:: with SMTP id
+	v137mr42687906pfc.243.1557861427693; 
+	Tue, 14 May 2019 12:17:07 -0700 (PDT)
+Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
+	[97.113.13.231]) by smtp.gmail.com with ESMTPSA id
+	o6sm18682982pfa.88.2019.05.14.12.17.06
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 14 May 2019 12:17:06 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Tue, 14 May 2019 12:16:38 -0700
+Message-Id: <20190514191653.31488-10-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190514191653.31488-1-richard.henderson@linaro.org>
+References: <20190514191653.31488-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <155785983236.11040.9618506134214930578.stgit@gimli.home>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Tue, 14 May 2019 19:22:42 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.0.1] q35: Revert to kernel irqchip
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: [Qemu-devel] [PATCH v7 09/24] util: Add qemu_guest_getrandom and
+ associated routines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,56 +96,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-stable@nongnu.org,
-	peterx@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com,
-	rth@twiddle.net
+Cc: lvivier@redhat.com, berrange@redhat.com, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 14, 2019 at 01:03:31PM -0600, Alex Williamson wrote:
-> Commit b2fc91db8447 ("q35: set split kernel irqchip as default") changed
-> the default for the pc-q35-4.0 machine type to use split irqchip, which
-> turned out to have disasterous effects on vfio-pci INTx support.  KVM
-> resampling irqfds are registered for handling these interrupts, but
-> these are non-functional in split irqchip mode.  We can't simply test
-> for split irqchip in QEMU as userspace handling of this interrupt is a
-> significant performance regression versus KVM handling (GeForce GPUs
-> assigned to Windows VMs are non-functional without forcing MSI mode or
-> re-enabling kernel irqchip).
-> 
-> The resolution is to revert the change in default irqchip mode with a
-> new pc-q35-4.0.1 machine type for qemu-stable while the development
-> branch makes the same change in the pc-q35-4.1 machine type.  The
-> qemu-q35-4.0 machine type should not be used in vfio-pci configurations
-> for devices requiring legacy INTx support without explicitly modifying
-> the VM configuration to use KVM irqchip.  This new 4.0.1 machine type
-> makes this change automatically.
+This routine is intended to produce high-quality random numbers to the
+guest.  Normally, such numbers are crypto quality from the host, but a
+command-line option can force the use of a fully deterministic sequence
+for use while debugging.
 
-If we introduce a pc-q35-4.0.1 machine type in -stable, then VMs
-created in stable won't be migratable to future 4.1 unless we also
-create this same machine type in master.
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ include/qemu/guest-random.h | 68 +++++++++++++++++++++++++++
+ util/guest-random.c         | 93 +++++++++++++++++++++++++++++++++++++
+ util/Makefile.objs          |  1 +
+ 3 files changed, 162 insertions(+)
+ create mode 100644 include/qemu/guest-random.h
+ create mode 100644 util/guest-random.c
 
-If we really want to create a new 4.0.1 machine type, then this
-patch needs to go to git master before stable IMHO to guarantee
-no regression to master.
-
-> Link: https://bugs.launchpad.net/qemu/+bug/1826422
-> Link: https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03305.html
-> Fixes: b2fc91db8447 ("q35: set split kernel irqchip as default")
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
-> 
-> Do we want new stable versions for other archs too or only as needed?
-
-
-
-Regards,
-Daniel
+diff --git a/include/qemu/guest-random.h b/include/qemu/guest-random.h
+new file mode 100644
+index 0000000000..09ff9c2236
+--- /dev/null
++++ b/include/qemu/guest-random.h
+@@ -0,0 +1,68 @@
++/*
++ * QEMU guest-visible random functions
++ *
++ * Copyright 2019 Linaro, Ltd.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ */
++
++#ifndef QEMU_GUEST_RANDOM_H
++#define QEMU_GUEST_RANDOM_H
++
++/**
++ * qemu_guest_random_seed_main(const char *optarg, Error **errp)
++ * @optarg: a non-NULL pointer to a C string
++ * @errp: an error indicator
++ *
++ * The @optarg value is that which accompanies the -seed argument.
++ * This forces qemu_guest_getrandom into deterministic mode.
++ *
++ * Returns 0 on success, < 0 on failure while setting *errp.
++ */
++int qemu_guest_random_seed_main(const char *optarg, Error **errp);
++
++/**
++ * qemu_guest_random_seed_thread_part1(void)
++ *
++ * If qemu_getrandom is in deterministic mode, returns an
++ * independent seed for the new thread.  Otherwise returns 0.
++ */
++uint64_t qemu_guest_random_seed_thread_part1(void);
++
++/**
++ * qemu_guest_random_seed_thread_part2(uint64_t seed)
++ * @seed: a value for the new thread.
++ *
++ * If qemu_guest_getrandom is in deterministic mode, this stores an
++ * independent seed for the new thread.  Otherwise a no-op.
++ */
++void qemu_guest_random_seed_thread_part2(uint64_t seed);
++
++/**
++ * qemu_guest_getrandom(void *buf, size_t len, Error **errp)
++ * @buf: a buffer of bytes to be written
++ * @len: the number of bytes in @buf
++ * @errp: an error indicator
++ *
++ * Fills len bytes in buf with random data.  This should only be used
++ * for data presented to the guest.  Host-side crypto services should
++ * use qcrypto_random_bytes.
++ *
++ * Returns 0 on success, < 0 on failure while setting *errp.
++ */
++int qemu_guest_getrandom(void *buf, size_t len, Error **errp);
++
++/**
++ * qemu_guest_getrandom_nofail(void *buf, size_t len)
++ * @buf: a buffer of bytes to be written
++ * @len: the number of bytes in @buf
++ *
++ * Like qemu_guest_getrandom, but will assert for failure.
++ * Use this when there is no reasonable recovery.
++ */
++void qemu_guest_getrandom_nofail(void *buf, size_t len);
++
++#endif /* QEMU_GUEST_RANDOM_H */
+diff --git a/util/guest-random.c b/util/guest-random.c
+new file mode 100644
+index 0000000000..e8124a3cad
+--- /dev/null
++++ b/util/guest-random.c
+@@ -0,0 +1,93 @@
++/*
++ * QEMU guest-visible random functions
++ *
++ * Copyright 2019 Linaro, Ltd.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qemu/cutils.h"
++#include "qapi/error.h"
++#include "qemu/guest-random.h"
++#include "crypto/random.h"
++
++
++static __thread GRand *thread_rand;
++static bool deterministic;
++
++
++static int glib_random_bytes(void *buf, size_t len)
++{
++    GRand *rand = thread_rand;
++    size_t i;
++    uint32_t x;
++
++    if (unlikely(rand == NULL)) {
++        /* Thread not initialized for a cpu, or main w/o -seed.  */
++        thread_rand = rand = g_rand_new();
++    }
++
++    for (i = 0; i + 4 <= len; i += 4) {
++        x = g_rand_int(rand);
++        __builtin_memcpy(buf + i, &x, 4);
++    }
++    if (i < len) {
++        x = g_rand_int(rand);
++        __builtin_memcpy(buf + i, &x, i - len);
++    }
++    return 0;
++}
++
++int qemu_guest_getrandom(void *buf, size_t len, Error **errp)
++{
++    if (unlikely(deterministic)) {
++        /* Deterministic implementation using Glib's Mersenne Twister.  */
++        return glib_random_bytes(buf, len);
++    } else {
++        /* Non-deterministic implementation using crypto routines.  */
++        return qcrypto_random_bytes(buf, len, errp);
++    }
++}
++
++void qemu_guest_getrandom_nofail(void *buf, size_t len)
++{
++    qemu_guest_getrandom(buf, len, &error_fatal);
++}
++
++uint64_t qemu_guest_random_seed_thread_part1(void)
++{
++    if (deterministic) {
++        uint64_t ret;
++        glib_random_bytes(&ret, sizeof(ret));
++        return ret;
++    }
++    return 0;
++}
++
++void qemu_guest_random_seed_thread_part2(uint64_t seed)
++{
++    g_assert(thread_rand == NULL);
++    if (deterministic) {
++        thread_rand =
++            g_rand_new_with_seed_array((const guint32 *)&seed,
++                                       sizeof(seed) / sizeof(guint32));
++    }
++}
++
++int qemu_guest_random_seed_main(const char *optarg, Error **errp)
++{
++    unsigned long long seed;
++    if (parse_uint_full(optarg, &seed, 0)) {
++        error_setg(errp, "Invalid seed number: %s", optarg);
++        return -1;
++    } else {
++        deterministic = true;
++        qemu_guest_random_seed_thread_part2(seed);
++        return 0;
++    }
++}
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index 9206878dec..c27a923dbe 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -54,5 +54,6 @@ util-obj-y += iova-tree.o
+ util-obj-$(CONFIG_INOTIFY1) += filemonitor-inotify.o
+ util-obj-$(CONFIG_LINUX) += vfio-helpers.o
+ util-obj-$(CONFIG_OPENGL) += drm.o
++util-obj-y += guest-random.o
+ 
+ stub-obj-y += filemonitor-stub.o
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.17.1
+
 
