@@ -3,63 +3,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CAB6C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:39:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67DCEC04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:39:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51BDE20879
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:39:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51BDE20879
+	by mail.kernel.org (Postfix) with ESMTPS id 410CA20879
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:39:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 410CA20879
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52417 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52419 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQcKL-0001Ra-Gr
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 14:39:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39635)
+	id 1hQcL4-00024k-GN
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 14:39:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hQcGX-0006Ra-P2
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:35:06 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hQcGZ-0006TG-DN
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:35:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hQcGW-0000Z9-Sc
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:35:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50354)
+	(envelope-from <dgilbert@redhat.com>) id 1hQcGY-0000ax-Fc
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:35:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hQcGW-0000Xr-Mk
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:35:04 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hQcGY-0000aN-A2
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:35:06 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C58893087BD2;
-	Tue, 14 May 2019 18:35:03 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9A4D7300C22E;
+	Tue, 14 May 2019 18:35:05 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-117-232.ams2.redhat.com
 	[10.36.117.232])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 40BDA608A6;
-	Tue, 14 May 2019 18:35:02 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1AB6B67668;
+	Tue, 14 May 2019 18:35:03 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com,
 	ehabkost@redhat.com, richardw.yang@linux.intel.com,
 	yury-kotov@yandex-team.ru, chen.zhang@intel.com
-Date: Tue, 14 May 2019 19:34:41 +0100
-Message-Id: <20190514183454.12758-4-dgilbert@redhat.com>
+Date: Tue, 14 May 2019 19:34:42 +0100
+Message-Id: <20190514183454.12758-5-dgilbert@redhat.com>
 In-Reply-To: <20190514183454.12758-1-dgilbert@redhat.com>
 References: <20190514183454.12758-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Tue, 14 May 2019 18:35:04 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.47]);
+	Tue, 14 May 2019 18:35:05 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 03/16] migration: remove not used field
- xfer_limit
+Subject: [Qemu-devel] [PULL 04/16] vmstate: check subsection_found is enough
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,43 +76,59 @@ Sender: "Qemu-devel"
 
 From: Wei Yang <richardw.yang@linux.intel.com>
 
-MigrationState->xfer_limit is only set to 0 in migrate_init().
+subsection_found is true implies vmdesc is not NULL.
 
-Remove this unnecessary field.
+This patch remove the additional check on vmdesc and rename
+subsection_found to vmdesc_has_subsections to make it more self-explain.
 
 Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Message-Id: <20190326055726.10539-1-richardw.yang@linux.intel.com>
+
+Message-Id: <20190403011016.12549-1-richardw.yang@linux.intel.com>
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/migration.c | 1 -
- migration/migration.h | 1 -
- 2 files changed, 2 deletions(-)
+ migration/vmstate.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 609e0df5d0..4844ad438b 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1681,7 +1681,6 @@ void migrate_init(MigrationState *s)
-      * locks.
-      */
-     s->bytes_xfer =3D 0;
--    s->xfer_limit =3D 0;
-     s->cleanup_bh =3D 0;
-     s->to_dst_file =3D NULL;
-     s->state =3D MIGRATION_STATUS_NONE;
-diff --git a/migration/migration.h b/migration/migration.h
-index 438f17edad..780a096857 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -117,7 +117,6 @@ struct MigrationState
+diff --git a/migration/vmstate.c b/migration/vmstate.c
+index e2bbb7b5f7..1305d1a528 100644
+--- a/migration/vmstate.c
++++ b/migration/vmstate.c
+@@ -496,7 +496,7 @@ static int vmstate_subsection_save(QEMUFile *f, const=
+ VMStateDescription *vmsd,
+                                    void *opaque, QJSON *vmdesc)
+ {
+     const VMStateDescription **sub =3D vmsd->subsections;
+-    bool subsection_found =3D false;
++    bool vmdesc_has_subsections =3D false;
+     int ret =3D 0;
 =20
-     /*< public >*/
-     size_t bytes_xfer;
--    size_t xfer_limit;
-     QemuThread thread;
-     QEMUBH *cleanup_bh;
-     QEMUFile *to_dst_file;
+     trace_vmstate_subsection_save_top(vmsd->name);
+@@ -508,9 +508,9 @@ static int vmstate_subsection_save(QEMUFile *f, const=
+ VMStateDescription *vmsd,
+             trace_vmstate_subsection_save_loop(vmsd->name, vmsdsub->name=
+);
+             if (vmdesc) {
+                 /* Only create subsection array when we have any */
+-                if (!subsection_found) {
++                if (!vmdesc_has_subsections) {
+                     json_start_array(vmdesc, "subsections");
+-                    subsection_found =3D true;
++                    vmdesc_has_subsections =3D true;
+                 }
+=20
+                 json_start_object(vmdesc, NULL);
+@@ -533,7 +533,7 @@ static int vmstate_subsection_save(QEMUFile *f, const=
+ VMStateDescription *vmsd,
+         sub++;
+     }
+=20
+-    if (vmdesc && subsection_found) {
++    if (vmdesc_has_subsections) {
+         json_end_array(vmdesc);
+     }
+=20
 --=20
 2.21.0
 
