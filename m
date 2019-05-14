@@ -7,79 +7,82 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04ED0C04AA7
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 00:12:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3075CC04AA7
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 00:12:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4F3B2084F
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 00:12:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE1F020675
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 00:12:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lgJgSPI4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4F3B2084F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JteRtTLD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE1F020675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36662 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36664 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQL3H-0005Yf-Qt
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 20:12:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50980)
+	id 1hQL3c-0005qz-5d
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 20:12:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQKy5-0001d3-0u
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:07:38 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hQKzB-00025X-K6
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:08:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQKxS-0003da-11
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:06:49 -0400
-Received: from mail-pg1-x535.google.com ([2607:f8b0:4864:20::535]:39485)
+	(envelope-from <richard.henderson@linaro.org>) id 1hQKxg-0003sY-5l
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:08:01 -0400
+Received: from mail-pf1-x42a.google.com ([2607:f8b0:4864:20::42a]:41105)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hQKxP-0003SI-M7
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:06:11 -0400
-Received: by mail-pg1-x535.google.com with SMTP id w22so7599205pgi.6
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 17:06:10 -0700 (PDT)
+	id 1hQKxd-0003jf-UX
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:06:27 -0400
+Received: by mail-pf1-x42a.google.com with SMTP id l132so8057206pfc.8
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 17:06:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=C9S5vov6bUnXU5tt0bNOV17wX7MiGxVomIsm/epCn2g=;
-	b=lgJgSPI4cj87m514yI+1D1kg5grNK2HEEDQjlCKdQQVIiKdsxTY1g1BzBTVNSVQ2kb
-	3tHEdM67Mjcv8wA6xwQmglVaIXZHrlwUuLDIzx+vc2bufv6zdxQhrP9LVw9IybHlSaxI
-	WWXeo+qRXmXjiPVMzxjNhPPLu2Hc9hxZfGnHBTsd3hzKwiPxpHnVN2eRJ3DHWJhK6sMq
-	V9XzAkUP2miaBegcqHYe/IGSxyta8TqRrRs1eEqN1kyZvOby8SWCajXZku8SezbBI+XC
-	b5iQCZ4j1H1MKx4ywjBr2BU0+H+jzKiJoJ0F/ORinJirBiXoAmSUYNy0wTvAhmao7Xrq
-	ILIg==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=NPRvgVGg8Y/3Ni/kBR6Hw8ovXKBKiDD4+leXLS3F/ik=;
+	b=JteRtTLDNIM8JHMEuRdmyIaBMSBrjp3H1hDPFGeoMKXyzyrYDTdqNt7o9GpCY0Rsz5
+	jC4wgCkZjwyHRInK0fyz5DT+mSwxrVNv+WVWIyHcrzE1iKYImaHEUY4rbV6TIm+LTLyu
+	nFOHwwbEKubcPUkujDc1g0m4ZW6RwlS02TyI2ldPs/SgR5T8O/OLd1Eao6mWGp06cPCH
+	TIq5SkhXfNUNamtaqws8e7DMA+DTBVM1NDupSCWJlw+7/ntdVFuF/VWWiCcGgbVlu+co
+	Ooiswa0KnCNPb2bWOZuuKTzccnw/oEAz1HYc2Y/XY6xvMhy5bZZSnQ2sV2rZJwq6djMi
+	q12w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=C9S5vov6bUnXU5tt0bNOV17wX7MiGxVomIsm/epCn2g=;
-	b=fCCuG2O/whjVxjwC8fqiysOkugyAAeFHPz5yY32HviO/fYzDHjulullJpwQeI5ZLuf
-	1/TP4rOq4TbQ5PaFVPAfmiKlBS+6Xxq0lKwIaU3DtLX934zoW74g1m6BSr489D62m3PY
-	T8yPnqaZSwKpDfZTXoro4L82wWJTKeJSmi2dpb407J116AsalpRx8T1hARYB082C1syw
-	bacaO+6mcXh/+rcJbFXpcfeC/r1/9xShyQUXAA7UUpe87N2IkhGJo2oXknb3DZXMalaF
-	I7r+KC6zP1kvQciFTs9IadUa/KJIPFVjNbE5yvoKvqNNsRpyEyu7rgkMT+i3NTc3pvOD
-	HnaA==
-X-Gm-Message-State: APjAAAVvl3asWUkNRrLyBxVueIYf9fZ2O/3nCW+eTSiu8FRkXxDq8R+v
-	TjptABFhnlvVxBX62MGC90LYg+hrbhQ=
-X-Google-Smtp-Source: APXvYqy1AlZ/x57Heq1sTOXwlaKovLtayzte18upZnQP8NKUsd8UxNxtt+CspJ9BICn8BoCD71gbPw==
-X-Received: by 2002:a62:200f:: with SMTP id g15mr37037659pfg.7.1557792368589; 
-	Mon, 13 May 2019 17:06:08 -0700 (PDT)
+	:references:mime-version:content-transfer-encoding;
+	bh=NPRvgVGg8Y/3Ni/kBR6Hw8ovXKBKiDD4+leXLS3F/ik=;
+	b=latT8BI/vM2ctSUpiyKsHpFVuPzPp5Om+4TBHVtTGhcihprPwF/0Npro4ATwtqZVlE
+	6MnHR936KBsAECD39JNk1IUUXx94hV+SkokFWjcb8Iuot/NpI85WgWsD2l0cl6cYPnk5
+	SGMCp09VjL7hmrGvraEFNTlpXQ45aTy10cVNr2vmRSFMGUkm4+UL5JH/ZVbm8jCg8p5X
+	z/gxyjELlQDMpHeV3fU/QTYsBfmlyxX9+RIJeiBEjywKJUYm3/VOK6zxaw0ZPdxDwY+y
+	ewhkp9CytZk2FMpRjdnmwUXGcF+BFra7xNbSIH7A3cOR8e5ls249Qp2yc27Y5xysWagR
+	m2gw==
+X-Gm-Message-State: APjAAAX6lBhnMYeqKolUu6DT7Y0UedeX+7uF7sumGnTMdtY3+yz8HZS2
+	H8leAUvkxGk+MJhtSCKId1xcr6BUUOo=
+X-Google-Smtp-Source: APXvYqzHv+6a6a8mTJ7a45JMOAU+PT2jrdlIsftYUpt9mh+26H41yeM6kQT3EcvxRdKy7IdmA6rztA==
+X-Received: by 2002:a62:5801:: with SMTP id m1mr495543pfb.32.1557792380158;
+	Mon, 13 May 2019 17:06:20 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id u3sm238151pfn.29.2019.05.13.17.06.07
+	by smtp.gmail.com with ESMTPSA id u3sm238151pfn.29.2019.05.13.17.06.19
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 13 May 2019 17:06:07 -0700 (PDT)
+	Mon, 13 May 2019 17:06:19 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 13 May 2019 17:05:28 -0700
-Message-Id: <20190514000540.4313-20-richard.henderson@linaro.org>
+Date: Mon, 13 May 2019 17:05:38 -0700
+Message-Id: <20190514000540.4313-30-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190514000540.4313-1-richard.henderson@linaro.org>
 References: <20190514000540.4313-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::535
-Subject: [Qemu-devel] [PULL 19/31] tcg/i386: Support vector scalar shift
- opcodes
+X-Received-From: 2607:f8b0:4864:20::42a
+Subject: [Qemu-devel] [PULL 29/31] target/tricore: Use tcg_gen_abs_tl
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,104 +94,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linux.org
+Cc: peter.maydell@linux.org,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20190423102145.14812-3-f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/i386/tcg-target.h     |  2 +-
- tcg/i386/tcg-target.inc.c | 35 +++++++++++++++++++++++++++++++++++
- 2 files changed, 36 insertions(+), 1 deletion(-)
+ target/tricore/translate.c | 27 +++++----------------------
+ 1 file changed, 5 insertions(+), 22 deletions(-)
 
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index b240633455..618aa520d2 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -183,7 +183,7 @@ extern bool have_avx2;
- #define TCG_TARGET_HAS_not_vec          0
- #define TCG_TARGET_HAS_neg_vec          0
- #define TCG_TARGET_HAS_shi_vec          1
--#define TCG_TARGET_HAS_shs_vec          0
-+#define TCG_TARGET_HAS_shs_vec          1
- #define TCG_TARGET_HAS_shv_vec          have_avx2
- #define TCG_TARGET_HAS_cmp_vec          1
- #define TCG_TARGET_HAS_mul_vec          1
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index c9448b6d84..0ba1587da4 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -420,6 +420,14 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define OPC_PSHIFTW_Ib  (0x71 | P_EXT | P_DATA16) /* /2 /6 /4 */
- #define OPC_PSHIFTD_Ib  (0x72 | P_EXT | P_DATA16) /* /2 /6 /4 */
- #define OPC_PSHIFTQ_Ib  (0x73 | P_EXT | P_DATA16) /* /2 /6 /4 */
-+#define OPC_PSLLW       (0xf1 | P_EXT | P_DATA16)
-+#define OPC_PSLLD       (0xf2 | P_EXT | P_DATA16)
-+#define OPC_PSLLQ       (0xf3 | P_EXT | P_DATA16)
-+#define OPC_PSRAW       (0xe1 | P_EXT | P_DATA16)
-+#define OPC_PSRAD       (0xe2 | P_EXT | P_DATA16)
-+#define OPC_PSRLW       (0xd1 | P_EXT | P_DATA16)
-+#define OPC_PSRLD       (0xd2 | P_EXT | P_DATA16)
-+#define OPC_PSRLQ       (0xd3 | P_EXT | P_DATA16)
- #define OPC_PSUBB       (0xf8 | P_EXT | P_DATA16)
- #define OPC_PSUBW       (0xf9 | P_EXT | P_DATA16)
- #define OPC_PSUBD       (0xfa | P_EXT | P_DATA16)
-@@ -2724,6 +2732,15 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-         /* TODO: AVX512 adds support for MO_16, MO_64.  */
-         OPC_UD2, OPC_UD2, OPC_VPSRAVD, OPC_UD2
-     };
-+    static int const shls_insn[4] = {
-+        OPC_UD2, OPC_PSLLW, OPC_PSLLD, OPC_PSLLQ
-+    };
-+    static int const shrs_insn[4] = {
-+        OPC_UD2, OPC_PSRLW, OPC_PSRLD, OPC_PSRLQ
-+    };
-+    static int const sars_insn[4] = {
-+        OPC_UD2, OPC_PSRAW, OPC_PSRAD, OPC_UD2
-+    };
+diff --git a/target/tricore/translate.c b/target/tricore/translate.c
+index 8f6416144e..06c4485e55 100644
+--- a/target/tricore/translate.c
++++ b/target/tricore/translate.c
+@@ -2415,11 +2415,7 @@ gen_msubadr32s_h(TCGv ret, TCGv r1, TCGv r2, TCGv r3, uint32_t n, uint32_t mode)
  
-     TCGType type = vecl + TCG_TYPE_V64;
-     int insn, sub;
-@@ -2785,6 +2802,15 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-     case INDEX_op_sarv_vec:
-         insn = sarv_insn[vece];
-         goto gen_simd;
-+    case INDEX_op_shls_vec:
-+        insn = shls_insn[vece];
-+        goto gen_simd;
-+    case INDEX_op_shrs_vec:
-+        insn = shrs_insn[vece];
-+        goto gen_simd;
-+    case INDEX_op_sars_vec:
-+        insn = sars_insn[vece];
-+        goto gen_simd;
-     case INDEX_op_x86_punpckl_vec:
-         insn = punpckl_insn[vece];
-         goto gen_simd;
-@@ -3165,6 +3191,9 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_shlv_vec:
-     case INDEX_op_shrv_vec:
-     case INDEX_op_sarv_vec:
-+    case INDEX_op_shls_vec:
-+    case INDEX_op_shrs_vec:
-+    case INDEX_op_sars_vec:
-     case INDEX_op_cmp_vec:
-     case INDEX_op_x86_shufps_vec:
-     case INDEX_op_x86_blend_vec:
-@@ -3222,6 +3251,12 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
-         }
-         return 1;
+ static inline void gen_abs(TCGv ret, TCGv r1)
+ {
+-    TCGv temp = tcg_temp_new();
+-    TCGv t0 = tcg_const_i32(0);
+-
+-    tcg_gen_neg_tl(temp, r1);
+-    tcg_gen_movcond_tl(TCG_COND_GE, ret, r1, t0, r1, temp);
++    tcg_gen_abs_tl(ret, r1);
+     /* overflow can only happen, if r1 = 0x80000000 */
+     tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_PSW_V, r1, 0x80000000);
+     tcg_gen_shli_tl(cpu_PSW_V, cpu_PSW_V, 31);
+@@ -2430,9 +2426,6 @@ static inline void gen_abs(TCGv ret, TCGv r1)
+     tcg_gen_xor_tl(cpu_PSW_AV, ret, cpu_PSW_AV);
+     /* calc SAV bit */
+     tcg_gen_or_tl(cpu_PSW_SAV, cpu_PSW_SAV, cpu_PSW_AV);
+-
+-    tcg_temp_free(temp);
+-    tcg_temp_free(t0);
+ }
  
-+    case INDEX_op_shls_vec:
-+    case INDEX_op_shrs_vec:
-+        return vece >= MO_16;
-+    case INDEX_op_sars_vec:
-+        return vece >= MO_16 && vece <= MO_32;
-+
-     case INDEX_op_shlv_vec:
-     case INDEX_op_shrv_vec:
-         return have_avx2 && vece >= MO_32;
+ static inline void gen_absdif(TCGv ret, TCGv r1, TCGv r2)
+@@ -6617,13 +6610,8 @@ static void decode_rr_divide(CPUTriCoreState *env, DisasContext *ctx)
+         tcg_gen_movi_tl(cpu_PSW_AV, 0);
+         if (!tricore_feature(env, TRICORE_FEATURE_131)) {
+             /* overflow = (abs(D[r3+1]) >= abs(D[r2])) */
+-            tcg_gen_neg_tl(temp, temp3);
+-            /* use cpu_PSW_AV to compare against 0 */
+-            tcg_gen_movcond_tl(TCG_COND_LT, temp, temp3, cpu_PSW_AV,
+-                               temp, temp3);
+-            tcg_gen_neg_tl(temp2, cpu_gpr_d[r2]);
+-            tcg_gen_movcond_tl(TCG_COND_LT, temp2, cpu_gpr_d[r2], cpu_PSW_AV,
+-                               temp2, cpu_gpr_d[r2]);
++            tcg_gen_abs_tl(temp, temp3);
++            tcg_gen_abs_tl(temp2, cpu_gpr_d[r2]);
+             tcg_gen_setcond_tl(TCG_COND_GE, cpu_PSW_V, temp, temp2);
+         } else {
+             /* overflow = (D[b] == 0) */
+@@ -6655,13 +6643,8 @@ static void decode_rr_divide(CPUTriCoreState *env, DisasContext *ctx)
+         tcg_gen_movi_tl(cpu_PSW_AV, 0);
+         if (!tricore_feature(env, TRICORE_FEATURE_131)) {
+             /* overflow = (abs(D[r3+1]) >= abs(D[r2])) */
+-            tcg_gen_neg_tl(temp, temp3);
+-            /* use cpu_PSW_AV to compare against 0 */
+-            tcg_gen_movcond_tl(TCG_COND_LT, temp, temp3, cpu_PSW_AV,
+-                               temp, temp3);
+-            tcg_gen_neg_tl(temp2, cpu_gpr_d[r2]);
+-            tcg_gen_movcond_tl(TCG_COND_LT, temp2, cpu_gpr_d[r2], cpu_PSW_AV,
+-                               temp2, cpu_gpr_d[r2]);
++            tcg_gen_abs_tl(temp, temp3);
++            tcg_gen_abs_tl(temp2, cpu_gpr_d[r2]);
+             tcg_gen_setcond_tl(TCG_COND_GE, cpu_PSW_V, temp, temp2);
+         } else {
+             /* overflow = (D[b] == 0) */
 -- 
 2.17.1
 
