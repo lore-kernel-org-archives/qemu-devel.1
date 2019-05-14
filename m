@@ -2,63 +2,84 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91066C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 17:15:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34685C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 17:17:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6799720578
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 17:15:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6799720578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 00EDD2084A
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 17:16:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="POiQkJF2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00EDD2084A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51505 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51540 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQb1a-0007qJ-Lh
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 13:15:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52232)
+	id 1hQb2x-0000L0-7k
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 13:16:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hQazS-0006JZ-BP
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:13:23 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hQb1r-0008Ca-Or
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:15:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hQazR-0002rN-Hb
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:13:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:64963)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hQazR-0002qL-CM
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:13:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0D36D306E171
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 17:13:20 +0000 (UTC)
-Received: from work-vm (ovpn-117-232.ams2.redhat.com [10.36.117.232])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C14E3608B9;
-	Tue, 14 May 2019 17:13:16 +0000 (UTC)
-Date: Tue, 14 May 2019 18:13:14 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190514171313.GR2753@work-vm>
-References: <20190510185620.15757-1-ehabkost@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hQb1q-0004w9-OS
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:15:51 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43765)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hQb1q-0004u3-Ff
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 13:15:50 -0400
+Received: by mail-wr1-x442.google.com with SMTP id r4so20078461wro.10
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 10:15:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=uSQmekUfpD7+rcDFA9B68Vfcr/8kNqcRlQG27Zm4D/s=;
+	b=POiQkJF2vvKklQP3lI9ay8t4RlcqKTcc0Mws3U5Kr/WdnMeS4g4OLxPhlANbDvq/mM
+	P4Il0Mjky/vfxttRzVuSQ2AzywtokuVcFvbl+ySVowsFeDWbAeqLJGf1QnPfvZtgfXmT
+	xIHB6syqH8frslrqs6HlCGvd9jeRT9lY21VzB2nqqWGfROsohc9TZEF2pr5/dbVw4YzA
+	YDVdxy8LFG/SQkTlm4FV0iWPyog0rT3aONamspNb+2A8WmttWI3JzuH4VeAr2arVigu6
+	dZHv/iX74BK/rUwbnCq1GijRkJYUiAml4Dz7TKh89BQnlDtJn6unrLiocF1f+42uf5iA
+	OV/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=uSQmekUfpD7+rcDFA9B68Vfcr/8kNqcRlQG27Zm4D/s=;
+	b=g7U5af7dDysLZoTjseevr5/s4ls26YGmZRp20m6jq8on/4+o+3wbViHntCZLoXuniH
+	SrBIWgtSkhLwW8BfROUt0rD5qMnkh8sxQccGlK/SL+vgrVXnDdxh+2SaqTo5FpJICTrs
+	qE8484ipYIBjOoLH1sxJZGVbismJwXH6AmA439r0X4PCGpo1Dr1lNrhp2EmUv/2QSWyJ
+	VkWNKOsTfk/PdzZakNAu2s3Xz5cVNrUgKhEHZ17awj2syANxAb3/h+68ASNzF7/GSZIp
+	3LzUOPGi4+40EJrw6DunMvE2hZfHvbFhlobRJ4gNqE0K6D2DLb6QvSKB60uOwuqx1XY9
+	4uoQ==
+X-Gm-Message-State: APjAAAXGsw9hcobmRuSqPqi1SnmdWSggIsT82vowreIIdJhuoYT80N3+
+	e0VYB94/89U07LyMdge0q7KHdjZf1y0=
+X-Google-Smtp-Source: APXvYqys0Fd/NBX7H5qGK5EnJS7uZ0oPVEAfkIjv7YXiFIGIEmUJmSJHt/AI6cUtjYh9k3nWvJva0A==
+X-Received: by 2002:adf:c188:: with SMTP id x8mr11860795wre.256.1557854148129; 
+	Tue, 14 May 2019 10:15:48 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+	by smtp.gmail.com with ESMTPSA id
+	g185sm3280036wmf.30.2019.05.14.10.15.47
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 14 May 2019 10:15:47 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Tue, 14 May 2019 18:15:45 +0100
+Message-Id: <20190514171545.24961-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190510185620.15757-1-ehabkost@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Tue, 14 May 2019 17:13:20 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] monitor: Call mon_get_cpu() only once at
- hmp_gva2gpa()
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [RFC] hw/core/bus.c: Only the main system bus can have
+ no parent
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,45 +91,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
 	Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Eduardo Habkost (ehabkost@redhat.com) wrote:
-> hmp_gva2gpa() calls mon_get_cpu() twice, which is unnecessary.
-> Not an actual bug, but this is reported as a defect by Coverity
-> Scan (CID 1401346).
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+In commit 80376c3fc2c38fdd453 in 2010 we added a workaround for
+some qbus buses not being connected to qdev devices -- if the
+bus has no parent object then we register a reset function which
+resets the bus on system reset.
 
-I'm going to sneak this onto the end of a migration pull I'm just
-cooking.
+Nearly a decade later, we have now no buses in the tree which
+are created with non-NULL parents, so we can remove the
+workaround and instead just assert that if the bus has a NULL
+parent then it is the main system bus.
 
-Queued.
+(The absence of other parentless buses was confirmed by
+code inspection of all the callsites of qbus_create() and
+qbus_create_inplace() and cross-checked by 'make check'.)
 
-> ---
->  monitor.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/monitor.c b/monitor.c
-> index bb48997913..6428eb3b7e 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -1685,8 +1685,7 @@ static void hmp_gva2gpa(Monitor *mon, const QDict *qdict)
->          return;
->      }
->  
-> -    gpa  = cpu_get_phys_page_attrs_debug(mon_get_cpu(),
-> -                                         addr & TARGET_PAGE_MASK, &attrs);
-> +    gpa  = cpu_get_phys_page_attrs_debug(cs, addr & TARGET_PAGE_MASK, &attrs);
->      if (gpa == -1) {
->          monitor_printf(mon, "Unmapped\n");
->      } else {
-> -- 
-> 2.18.0.rc1.1.g3f1ff2140
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+While I was reviewing Damian's reset patchset I noticed this
+code which meant that we theoretically had multiple 'roots' to
+the set of things being reset, so I wondered what was actually
+using it. It turns out nothing was :-)
+
+Commit 80376c3fc2c38fdd453 also added a TODO in vl.c suggesting
+that there is the wrong place to register the reset function
+which effectively resets the whole system starting at the
+root which is the main system bus:
+   qemu_register_reset(qbus_reset_all_fn, sysbus_get_default());
+I don't understand why vl.c is a bad place to put that, and I'd
+rather not move it to qdev.c (where in qdev.c?) because that
+would reshuffle reset ordering which seems liable to cause
+regressions. So maybe we should just delete that TODO comment?
+
+---
+ hw/core/bus.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/hw/core/bus.c b/hw/core/bus.c
+index e09843f6abe..e50287c2b35 100644
+--- a/hw/core/bus.c
++++ b/hw/core/bus.c
+@@ -96,10 +96,9 @@ static void qbus_realize(BusState *bus, DeviceState *parent, const char *name)
+         bus->parent->num_child_bus++;
+         object_property_add_child(OBJECT(bus->parent), bus->name, OBJECT(bus), NULL);
+         object_unref(OBJECT(bus));
+-    } else if (bus != sysbus_get_default()) {
+-        /* TODO: once all bus devices are qdevified,
+-           only reset handler for main_system_bus should be registered here. */
+-        qemu_register_reset(qbus_reset_all_fn, bus);
++    } else {
++        /* The only bus without a parent is the main system bus */
++        assert(bus == sysbus_get_default());
+     }
+ }
+ 
+-- 
+2.20.1
+
 
