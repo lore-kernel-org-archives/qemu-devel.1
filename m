@@ -2,51 +2,67 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-2.4 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61751C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 16:44:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4718FC04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 16:51:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11E102084F
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 16:44:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11E102084F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1B7FD20675
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 16:51:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B7FD20675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51139 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51222 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQaX7-00054A-7s
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 12:44:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44920)
+	id 1hQaeP-0006pI-A3
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 12:51:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wens@wens.csie.org>) id 1hQYpr-00034L-JK
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:55:21 -0400
+	(envelope-from <berrange@redhat.com>) id 1hQadY-0006U8-BG
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:50:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wens@wens.csie.org>) id 1hQYpp-0005v2-JN
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:55:19 -0400
-Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:41966
-	helo=wens.csie.org)
+	(envelope-from <berrange@redhat.com>) id 1hQadV-0001Uv-Ec
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:50:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37858)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wens@wens.csie.org>) id 1hQYpo-0005pb-7e
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:55:17 -0400
-Received: by wens.csie.org (Postfix, from userid 1000)
-	id BE4CD5FDB8; Tue, 14 May 2019 22:55:07 +0800 (CST)
-From: Chen-Yu Tsai <wens@kernel.org>
-To: qemu-devel@nongnu.org
-Date: Tue, 14 May 2019 22:53:46 +0800
-Message-Id: <20190514145346.20758-1-wens@kernel.org>
-X-Mailer: git-send-email 2.20.1
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hQadV-0001Sn-7C
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:50:41 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4CCD330089B5;
+	Tue, 14 May 2019 16:50:40 +0000 (UTC)
+Received: from redhat.com (ovpn-112-20.ams2.redhat.com [10.36.112.20])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2106A608A6;
+	Tue, 14 May 2019 16:50:38 +0000 (UTC)
+Date: Tue, 14 May 2019 17:50:36 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20190514165036.GA7680@redhat.com>
+References: <20190510173049.28171-1-richard.henderson@linaro.org>
+	<877eatdq3w.fsf@dusky.pond.sub.org>
+	<20190514152331.GJ25916@redhat.com>
+	<d050fa9d-8e4b-7b87-31e5-05a7fa78feb9@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d050fa9d-8e4b-7b87-31e5-05a7fa78feb9@linaro.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Tue, 14 May 2019 16:50:40 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 140.112.30.76
-X-Mailman-Approved-At: Tue, 14 May 2019 12:42:57 -0400
-Subject: [Qemu-devel] [PATCH] linux-user: Pass through nanosecond timestamp
- components for stat syscalls
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v6 00/25] Add qemu_getrandom and
+ ARMv8.5-RNG etc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -58,218 +74,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
-	Chen-Yu Tsai <wens@kernel.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Chen-Yu Tsai <wens@csie.org>
+On Tue, May 14, 2019 at 09:14:57AM -0700, Richard Henderson wrote:
+> On 5/14/19 8:23 AM, Daniel P. Berrang=C3=A9 wrote:
+> > On Tue, May 14, 2019 at 05:15:31PM +0200, Markus Armbruster wrote:
+> >> "make check-unit" fails for me:
+> >>
+> >>   TEST    check-unit: tests/test-crypto-tlscredsx509
+> >> Unexpected error in object_new_with_propv() at /work/armbru/qemu/qom=
+/object.c:674:
+> >> invalid object type: tls-creds-x509
+> >>
+> >> and
+> >>
+> >>   TEST    check-unit: tests/test-io-channel-tls
+> >> Unexpected error in object_new_with_propv() at /work/armbru/qemu/qom=
+/object.c:674:
+> >> invalid object type: tls-creds-x509
+> >>
+> >> I haven't looked further.
+> >=20
+> > I have a nasty feeling it is caused by
+> >=20
+> >   Subject: [PATCH v6 02/25] crypto: Merge crypto-obj-y into libqemuut=
+il.a
+> >=20
+> > The QOM objects are not directly used by most of the code. We rely on
+> > the constructor registering the QOM object and then we request an
+> > instance of it via the type name. So there's no direct function calls
+> > from any code into the crypto object impls.
+> >=20
+> > When we put the crypto objects into libqemuutil.a the linker is not
+> > intelligent enough to see the constructor and so thinks all these
+> > QOM object impls are unused and discards them when linking the final
+> > binary.
+>=20
+> Yes, that would do it.  We would need something in the test that forces=
+ the
+> objects into the link.  Without having yet looked at the test cases, an=
+y ideas?
 
-Since Linux 2.6 the stat syscalls have mostly supported nanosecond
-components for each of the file-related timestamps.
+I don't think this is only the test suite. I think it will affect all the
+binaries we build
 
-QEMU user mode emulation currently does not pass through the nanosecond
-portion of the timestamp, even when the host system fills in the value.
-This results in a mismatch when run on subsecond resolution filesystems
-such as ext4 or XFS.
+The only way you can force it is to use -Wl,--whole-archive arg to tell l=
+d
+to include everything from libqemuutil.la, but that will break the way
+the stubs work, as we want make of the stubs to be discarded.
 
-An example of this leading to inconsistency is cross-debootstraping a
-full desktop root filesystem of Debian Buster. Recent versions of
-fontconfig store the full timestamp (instead of just the second portion)
-of the directory in its per-directory cache file, and checks this against
-the directory to see if the cache is up-to-date. With QEMU user mode
-emulation, the timestamp stored is incorrect, and upon booting the rootfs
-natively, fontconfig discovers the mismatch, and proceeds to rebuild the
-cache on the comparatively slow machine (low-power ARM vs x86). This
-stalls the first attempt to open whatever application that incorporates
-fontconfig.
+The only other option is to not build $(crypto-obj-y) into libqemuutil.la=
+,
+but list that variable explicitly everywhere that we list libqemuutil.la
 
-This patch renames the "unused" padding trailing each timestamp element
-to its nanosecond counterpart name if such an element exists in the
-kernel sources for the given platform. Not all do. Then have the syscall
-wrapper fill in the nanosecond portion if the host supports it, as
-specified by the _POSIX_C_SOURCE and _XOPEN_SOURCE feature macros.
-
-Recent versions of glibc only use stat64 and newfstatat syscalls on
-32-bit and 64-bit platforms respectively. The changes in this patch
-were tested by directly calling the stat, stat64 and newfstatat syscalls
-directly, in addition to the glibc wrapper, on arm and aarch64 little
-endian targets.
-
-Signed-off-by: Chen-Yu Tsai <wens@csie.org>
-
----
-
-This issue was found while integrating some software that uses newer
-versions of fontconfig into Raspbian images. We found that the first
-launch of said software always stalls with fontconfig regenerating its
-font cache files. Upon closer examination I found the timestamps were
-not matching. The rest is explained above. Currently we're just working
-around the problem by patching the correct timestamps into the cache
-files after the fact.
-
-Please consider this a drive-by scratch-my-own-itch contribution, but I
-will stick around to deal with any comments raised during review. I'm
-not on the mailing lists either, so please keep me in CC.
-
-checkpatch returns "ERROR: code indent should never use tabs" for
-linux-user/syscall_defs.h, however as far as I can tell the whole file
-is indented with tabs. I'm not sure what to make of this.
-
-Finally, I think this could be worth backporting to older versions.
----
- linux-user/syscall.c      | 18 ++++++++++++++++++
- linux-user/syscall_defs.h | 36 ++++++++++++++++++------------------
- 2 files changed, 36 insertions(+), 18 deletions(-)
-
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index f5ff6f5dc8..dcd6f5d806 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -6408,6 +6408,11 @@ static inline abi_long host_to_target_stat64(void =
-*cpu_env,
-         __put_user(host_st->st_atime, &target_st->target_st_atime);
-         __put_user(host_st->st_mtime, &target_st->target_st_mtime);
-         __put_user(host_st->st_ctime, &target_st->target_st_ctime);
-+#if _POSIX_C_SOURCE >=3D 200809L || _XOPEN_SOURCE >=3D 700
-+        __put_user(host_st->st_atim.tv_nsec, &target_st->target_st_atime=
-_nsec);
-+        __put_user(host_st->st_mtim.tv_nsec, &target_st->target_st_mtime=
-_nsec);
-+        __put_user(host_st->st_ctim.tv_nsec, &target_st->target_st_ctime=
-_nsec);
-+#endif
-         unlock_user_struct(target_st, target_addr, 1);
-     } else
- #endif
-@@ -6438,6 +6443,11 @@ static inline abi_long host_to_target_stat64(void =
-*cpu_env,
-         __put_user(host_st->st_atime, &target_st->target_st_atime);
-         __put_user(host_st->st_mtime, &target_st->target_st_mtime);
-         __put_user(host_st->st_ctime, &target_st->target_st_ctime);
-+#if _POSIX_C_SOURCE >=3D 200809L || _XOPEN_SOURCE >=3D 700
-+        __put_user(host_st->st_atim.tv_nsec, &target_st->target_st_atime=
-_nsec);
-+        __put_user(host_st->st_mtim.tv_nsec, &target_st->target_st_mtime=
-_nsec);
-+        __put_user(host_st->st_ctim.tv_nsec, &target_st->target_st_ctime=
-_nsec);
-+#endif
-         unlock_user_struct(target_st, target_addr, 1);
-     }
-=20
-@@ -8866,6 +8876,14 @@ static abi_long do_syscall1(void *cpu_env, int num=
-, abi_long arg1,
-                 __put_user(st.st_atime, &target_st->target_st_atime);
-                 __put_user(st.st_mtime, &target_st->target_st_mtime);
-                 __put_user(st.st_ctime, &target_st->target_st_ctime);
-+#if _POSIX_C_SOURCE >=3D 200809L || _XOPEN_SOURCE >=3D 700
-+                __put_user(st.st_atim.tv_nsec,
-+                           &target_st->target_st_atime_nsec);
-+                __put_user(st.st_mtim.tv_nsec,
-+                           &target_st->target_st_mtime_nsec);
-+                __put_user(st.st_ctim.tv_nsec,
-+                           &target_st->target_st_ctime_nsec);
-+#endif
-                 unlock_user_struct(target_st, arg2, 1);
-             }
-         }
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 12c8407144..252e69b76e 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -1192,11 +1192,11 @@ struct target_stat {
- 	abi_ulong  st_blksize;
- 	abi_ulong  st_blocks;
- 	abi_ulong  target_st_atime;
--	abi_ulong  __unused1;
-+	abi_ulong  target_st_atime_nsec;
- 	abi_ulong  target_st_mtime;
--	abi_ulong  __unused2;
-+	abi_ulong  target_st_mtime_nsec;
- 	abi_ulong  target_st_ctime;
--	abi_ulong  __unused3;
-+	abi_ulong  target_st_ctime_nsec;
- 	abi_ulong  __unused4;
- 	abi_ulong  __unused5;
- };
-@@ -1228,13 +1228,13 @@ struct target_stat64 {
- 	abi_ulong	__pad4;		/* future possible st_blocks high bits */
-=20
- 	abi_ulong	target_st_atime;
--	abi_ulong	__pad5;
-+	abi_ulong	target_st_atime_nsec;
-=20
- 	abi_ulong	target_st_mtime;
--	abi_ulong	__pad6;
-+	abi_ulong	target_st_mtime_nsec;
-=20
- 	abi_ulong	target_st_ctime;
--	abi_ulong	__pad7;		/* will be high 32 bits of ctime someday */
-+	abi_ulong	target_st_ctime_nsec;
-=20
- 	unsigned long long	st_ino;
- } QEMU_PACKED;
-@@ -1313,13 +1313,13 @@ struct target_stat64 {
- 	unsigned int	st_blocks;
-=20
- 	abi_ulong	target_st_atime;
--	abi_ulong	__unused1;
-+	abi_ulong	target_st_atime_nsec;
-=20
- 	abi_ulong	target_st_mtime;
--	abi_ulong	__unused2;
-+	abi_ulong	target_st_mtime_nsec;
-=20
- 	abi_ulong	target_st_ctime;
--	abi_ulong	__unused3;
-+	abi_ulong	target_st_ctime_nsec;
-=20
- 	abi_ulong	__unused4[3];
- };
-@@ -1336,14 +1336,14 @@ struct target_stat {
- 	unsigned short	st_rdev;
- 	abi_long	st_size;
- 	abi_long	target_st_atime;
--	abi_ulong	__unused1;
-+	abi_ulong	target_st_atime_nsec;
- 	abi_long	target_st_mtime;
--	abi_ulong	__unused2;
-+	abi_ulong	target_st_mtime_nsec;
- 	abi_long	target_st_ctime;
--	abi_ulong	__unused3;
-+	abi_ulong	target_st_ctime_nsec;
- 	abi_long	st_blksize;
- 	abi_long	st_blocks;
--	abi_ulong	__unused4[2];
-+	abi_ulong	__unused1[2];
- };
-=20
- #define TARGET_HAS_STRUCT_STAT64
-@@ -1371,16 +1371,16 @@ struct target_stat64 {
- 	unsigned int	st_blocks;
-=20
- 	unsigned int	target_st_atime;
--	unsigned int	__unused1;
-+	unsigned int	target_st_atime_nsec;
-=20
- 	unsigned int	target_st_mtime;
--	unsigned int	__unused2;
-+	unsigned int	target_st_mtime_nsec;
-=20
- 	unsigned int	target_st_ctime;
--	unsigned int	__unused3;
-+	unsigned int	target_st_ctime_nsec;
-=20
--	unsigned int	__unused4;
--	unsigned int	__unused5;
-+	unsigned int	__unused1;
-+	unsigned int	__unused2;
- };
-=20
- #elif defined(TARGET_PPC)
+Regards,
+Daniel
 --=20
-2.20.1
-
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
