@@ -6,60 +6,77 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E24EDC04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 11:50:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E09AEC04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 11:51:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B75A920843
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 11:50:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B75A920843
+	by mail.kernel.org (Postfix) with ESMTPS id B684F20843
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 11:51:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B684F20843
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46266 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46333 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQVwi-0005wo-QT
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 07:50:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55706)
+	id 1hQVy5-0007OV-2L
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 07:51:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hQVvp-0005Z3-VH
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:49:18 -0400
+	(envelope-from <philmd@redhat.com>) id 1hQVwm-00065q-Fy
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:50:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hQVvo-0006pg-UO
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:49:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37646)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
-	id 1hQVvo-0006o9-NC; Tue, 14 May 2019 07:49:16 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4ABAA308A963;
-	Tue, 14 May 2019 11:49:15 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0BE135D724;
-	Tue, 14 May 2019 11:49:06 +0000 (UTC)
-Date: Tue, 14 May 2019 13:49:04 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <20190514134904.67decb8b.cohuck@redhat.com>
-In-Reply-To: <1557499133-24169-4-git-send-email-pmorel@linux.ibm.com>
-References: <1557499133-24169-1-git-send-email-pmorel@linux.ibm.com>
-	<1557499133-24169-4-git-send-email-pmorel@linux.ibm.com>
-Organization: Red Hat GmbH
+	(envelope-from <philmd@redhat.com>) id 1hQVwl-0007ex-I5
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:50:16 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46380)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hQVwl-0007eY-CX
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:50:15 -0400
+Received: by mail-wr1-f67.google.com with SMTP id r7so1028668wrr.13
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 04:50:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=/ygqT7KrCoK9YbHKlqHPpcHm8RguaqiHpt4jM8ES73c=;
+	b=a9VbZfBSWRkWH355bRVMBsLkqbbqbF5Rdm2hTyZ5+smk4nfbUipwOL7x1eRzC8Mfeb
+	FKiXg74yI31PV8OfGFOpLG4k30de4rqFkdP6gU+FEYc2wPgfUqnjhdfgoYzgZiPUfQoQ
+	GLQC/0tsGmKbkF+MTW3/pXEAS54hTRvBvSqE6yDxDgv+yY+zQNNilTh+eAa7/qBHGw+d
+	w5Xn2D+Psx0rKcsZCNquDDXLoBLCiN1lzqHxwMUgjTUQvBQX972+3JB95VSpKk0XzY9X
+	5FtHGsoh1BY9W28sbdQlUYiGeHDL8g0XaXE2gvRXAkdrm64Gt5C0J8k/R43VuA2618pE
+	dm3Q==
+X-Gm-Message-State: APjAAAVFvBSUrhNypqSPnDM9FxZTIOxtaagQGAjlpTKeaQ+NN42f4o0e
+	+PSGyEiefkCUba0b2VXWGAQpjQ==
+X-Google-Smtp-Source: APXvYqyS0Zzm9wOEsEMdnN6PnY9+8ir5islZw+k2isbpkcmzNJNxdfTYPeHmQ0qCAywn1Zf1vDCK3g==
+X-Received: by 2002:adf:f487:: with SMTP id l7mr22103494wro.127.1557834614263; 
+	Tue, 14 May 2019 04:50:14 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193])
+	by smtp.gmail.com with ESMTPSA id z74sm3937572wmc.2.2019.05.14.04.50.13
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Tue, 14 May 2019 04:50:13 -0700 (PDT)
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+	qemu-devel@nongnu.org
+References: <20190514104126.6294-1-marcandre.lureau@redhat.com>
+	<20190514104126.6294-2-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <d495e630-df57-85f6-d38a-5d844af52202@redhat.com>
+Date: Tue, 14 May 2019 13:50:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Tue, 14 May 2019 11:49:15 +0000 (UTC)
+In-Reply-To: <20190514104126.6294-2-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/5] s390: vfio_pci: Use a PCI Group
- structure
+	[fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] libvhost-user: fix cast warnings on
+ 32 bits
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,83 +88,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pasic@linux.vnet.ibm.com, mst@redhat.com, qemu-s390x@nongnu.org,
-	david@redhat.com, walling@linux.ibm.com, qemu-devel@nongnu.org,
-	borntraeger@de.ibm.com, alex.williamson@redhat.com,
-	pbonzini@redhat.com, rth@twiddle.net
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 10 May 2019 16:38:51 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
-
-> We use a S390PCIGroup structure to hold the information
-> related to zPCI Function group.
+On 5/14/19 12:41 PM, Marc-André Lureau wrote:
+> Fixes warnings:
+>  warning: cast to pointer from integer of different size
+>  [-Wint-to-pointer-cast]
 > 
-> This allows us to be ready to support multiple groups and to retrieve
-> the group information from the host.
-
-What if there is no host to retrieve information from?
-
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 > ---
->  hw/s390x/s390-pci-bus.c  | 42 ++++++++++++++++++++++++++++++++++++++++++
->  hw/s390x/s390-pci-bus.h  | 11 ++++++++++-
->  hw/s390x/s390-pci-inst.c | 22 +++++++++++++---------
->  3 files changed, 65 insertions(+), 10 deletions(-)
+>  contrib/libvhost-user/libvhost-user.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+> index 74d42177c5..40443a3daa 100644
+> --- a/contrib/libvhost-user/libvhost-user.c
+> +++ b/contrib/libvhost-user/libvhost-user.c
+> @@ -621,7 +621,7 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
+>           * data that's already arrived in the shared process.
+>           * TODO: How to do hugepage
+>           */
+> -        ret = madvise((void *)dev_region->mmap_addr,
+> +        ret = madvise((void *)(uintptr_t)dev_region->mmap_addr,
+>                        dev_region->size + dev_region->mmap_offset,
+>                        MADV_DONTNEED);
+>          if (ret) {
+> @@ -633,7 +633,7 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
+>           * in neighbouring pages.
+>           * TODO: Turn this backon later.
+>           */
+> -        ret = madvise((void *)dev_region->mmap_addr,
+> +        ret = madvise((void *)(uintptr_t)dev_region->mmap_addr,
+>                        dev_region->size + dev_region->mmap_offset,
+>                        MADV_NOHUGEPAGE);
+>          if (ret) {
+> @@ -666,7 +666,7 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
+>          DPRINT("%s: region %d: Registered userfault for %llx + %llx\n",
+>                  __func__, i, reg_struct.range.start, reg_struct.range.len);
+>          /* Now it's registered we can let the client at it */
+> -        if (mprotect((void *)dev_region->mmap_addr,
+> +        if (mprotect((void *)(uintptr_t)dev_region->mmap_addr,
+>                       dev_region->size + dev_region->mmap_offset,
+>                       PROT_READ | PROT_WRITE)) {
+>              vu_panic(dev, "failed to mprotect region %d for postcopy (%s)",
+> 
 
-> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-> index be28962..8147847 100644
-> --- a/hw/s390x/s390-pci-inst.c
-> +++ b/hw/s390x/s390-pci-inst.c
-> @@ -284,21 +284,25 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uintptr_t ra)
->          stq_p(&resquery->edma, ZPCI_EDMA_ADDR);
->          stl_p(&resquery->fid, pbdev->fid);
->          stw_p(&resquery->pchid, 0);
-> -        stw_p(&resquery->ug, 1);
-> +        stw_p(&resquery->ug, ZPCI_DEFAULT_FN_GRP);
->          stl_p(&resquery->uid, pbdev->uid);
->          stw_p(&resquery->hdr.rsp, CLP_RC_OK);
->          break;
->      }
->      case CLP_QUERY_PCI_FNGRP: {
->          ClpRspQueryPciGrp *resgrp = (ClpRspQueryPciGrp *)resh;
-> -        resgrp->fr = 1;
-> -        stq_p(&resgrp->dasm, 0);
-> -        stq_p(&resgrp->msia, ZPCI_MSI_ADDR);
-> -        stw_p(&resgrp->mui, DEFAULT_MUI);
-> -        stw_p(&resgrp->i, 128);
-> -        stw_p(&resgrp->maxstbl, 128);
-> -        resgrp->version = 0;
->  
-> +        ClpReqQueryPciGrp *reqgrp = (ClpReqQueryPciGrp *)reqh;
-> +        S390PCIGroup *grp;
-> +
-> +        grp = s390_grp_find(reqgrp->g);
-> +        if (!grp) {
-> +            /* We do not allow access to unknown groups */
-> +            /* The group must have been obtained with a vfio device */
-
-What about non-vfio devices? How does this whole feature work for
-emulated devices?
-
-> +            stw_p(&resgrp->hdr.rsp, CLP_RC_QUERYPCIFG_PFGID);
-> +            goto out;
-> +        }
-> +        memcpy(resgrp, &grp->zpci_grp, sizeof(ClpRspQueryPciGrp));
->          stw_p(&resgrp->hdr.rsp, CLP_RC_OK);
->          break;
->      }
-> @@ -752,7 +756,7 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
->      }
->      /* Length must be greater than 8, a multiple of 8 */
->      /* and not greater than maxstbl */
-> -    if ((len <= 8) || (len % 8) || (len > pbdev->maxstbl)) {
-> +    if ((len <= 8) || (len % 8) || (len > pbdev->pci_grp->zpci_grp.maxstbl)) {
->          goto specification_error;
->      }
->      /* Do not cross a 4K-byte boundary */
-
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
