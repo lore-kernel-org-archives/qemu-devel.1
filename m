@@ -2,63 +2,81 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B175C04AA7
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 01:58:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39AE9C04AA7
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 02:18:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D303B208CA
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 01:58:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0DE92085A
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 02:18:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="KTWvR5r1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D303B208CA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sios-com.20150623.gappssmtp.com header.i=@sios-com.20150623.gappssmtp.com header.b="JuarAmIZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0DE92085A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sios.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37654 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37839 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQMiV-0005fw-36
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 21:58:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51270)
+	id 1hQN1a-0002jF-V8
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 22:18:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hQMfX-0003br-LF
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 21:55:53 -0400
+	(envelope-from <yo-satoh@sios.com>) id 1hQN0m-0002QT-Oe
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 22:17:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hQMfS-0000Ay-LC
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 21:55:48 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:57597 helo=ozlabs.org)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hQMfL-0008Jv-0K; Mon, 13 May 2019 21:55:42 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 45313p0HGrz9s9N; Tue, 14 May 2019 11:55:33 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1557798934;
-	bh=uUa2ddWxcAJURlvVJkOFWP291wolpLl5iv2Iz2vx6CU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KTWvR5r1wWX8JB8RgMd7mXXyOkOwQJCJlFHsj74wGNmBYzQKJ04QWF4n5QC01wBj0
-	WK3pQalztdya2sS751tBqO+UcSXIfeEHQULFAMS6h/YgOB/1XtnUFYxmMuX7JHxfco
-	a/R5oha79qlgJ5+HpEvcRNgqIc1webfrcDJjrf+k=
-Date: Tue, 14 May 2019 11:52:47 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Message-ID: <20190514015246.GD6441@umbus.fritz.box>
-References: <20190513084245.25755-1-clg@kaod.org>
-	<20190513084245.25755-13-clg@kaod.org>
+	(envelope-from <yo-satoh@sios.com>) id 1hQN0l-000272-87
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 22:17:48 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:37861)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <yo-satoh@sios.com>) id 1hQN0k-00022o-Ie
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 22:17:47 -0400
+Received: by mail-oi1-x243.google.com with SMTP id f4so3612153oib.4
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 19:17:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=sios-com.20150623.gappssmtp.com; s=20150623;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=kekiuAhKWFpQtfxb+tr0MtLnqMWV8twIvvIEFcs6Lxs=;
+	b=JuarAmIZy0H6tDUvlywrSRv6GVTBooR1qWefIL0DVgzWrEJoZzgB9kAdxl4S4Rfqnm
+	xj7svg1x/iD+4hx7hV9UurYv9Ft21uY6ApY9Qk7i9O5tioTvCa5I6IyjfN+2SgFAsBVT
+	aTxq78JPhYBlOLgj4khakN5n7FO99iVemCc2zMKwBHwfxrmighjYd/dlArhklUcB4DFe
+	N7J/fIZ67MNVcBFshhBC98FmaArBC7f+GCzuXWKCAwIDhtvzHLnVWxySH3l4FCdPX/fM
+	JMnFkTy+tiecOXRCuiFAUSkhh/KsSC2BmKomDBWmhNbX5PaAN74egHQ/upNGDT4Us2Ya
+	dD8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=kekiuAhKWFpQtfxb+tr0MtLnqMWV8twIvvIEFcs6Lxs=;
+	b=AD8M6055Yd2Uz4e3TINrCpaQfNZgUlLavsigwxLfhRa9RjQJ9fjvPNTeqvA4GNVX8k
+	RSoj23TVBSKMvuqnIBRmXms7+dqUZOaUdQoNAhv2IEKj2HfAiBAGEoe+ITCENVxdKPUf
+	3B1jaiS5yirEkf6v9KXsGUqEe28/cXZ85y4t/aXx4WK0okcoPfI5Kb4E8Q73pwUPqlKf
+	blbDaGcwR09C50BBRalaStKE7jjixGbWWs2ogmzj/T121Cl3eLnNpPhgsrBnosh5Fvac
+	R/Zk2ycnq6Ee2zU6++stsptS292J57qAo9ii8khZau1klX0Cs7tHSZtP3/AM4W02zBOX
+	d1fA==
+X-Gm-Message-State: APjAAAVU8aV1WZFZVfFm0BG3mWeL0y2+OCi9blHm2mw39Ppx5qDOV9zV
+	6PFfzP3+yfopkY/8POQ1TrDZciOlqJVfkWtOLPjP/Q==
+X-Google-Smtp-Source: APXvYqwHXHybRow70GAMBUHsOtaVt4213ZqSvisLDxlAxc+3jhGTKKtRjycTtDVdiLFXYuYLoyVXT/upkvByYogRclA=
+X-Received: by 2002:aca:50d3:: with SMTP id e202mr1473801oib.88.1557800264980; 
+	Mon, 13 May 2019 19:17:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="32u276st3Jlj2kUU"
-Content-Disposition: inline
-In-Reply-To: <20190513084245.25755-13-clg@kaod.org>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH v4 12/14] spapr/irq: initialize the IRQ
- device only once
+References: <20190513052518.6274-1-yo-satoh@sios.com>
+	<7fcd8994-1549-fb6f-d7c2-5ad4558767c3@redhat.com>
+In-Reply-To: <7fcd8994-1549-fb6f-d7c2-5ad4558767c3@redhat.com>
+From: Yoshinori Sato <yo-satoh@sios.com>
+Date: Tue, 14 May 2019 11:17:33 +0900
+Message-ID: <CAL_XjKWOimLzHs8JeyEJzEOF-T-poJU5LsYJUQtnSPtiPwh2zg@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::243
+Subject: Re: [Qemu-devel] [PATCH v11 00/12] Add RX archtecture support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,120 +88,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Oh. Sorry.
 
---32u276st3Jlj2kUU
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I fount one other problem.
+I will fix it and re-send later.
 
-On Mon, May 13, 2019 at 10:42:43AM +0200, C=E9dric Le Goater wrote:
-> Add a check to make sure that the routine initializing the emulated
-> IRQ device is called once. We don't have much to test on the XICS
-> side, so we introduce a 'init' boolean under ICSState.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-I'm not entirely sure it's the best way to accomplish what we need,
-but it will do for now.
-
-> ---
->=20
->  Changes since v3:
->=20
->  - introduced a 'init' boolean under ICSState
-> =20
->  include/hw/ppc/xics.h | 1 +
->  hw/intc/spapr_xive.c  | 9 +++++++++
->  hw/intc/xics_spapr.c  | 7 +++++++
->  3 files changed, 17 insertions(+)
->=20
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index eb65ad7e43b7..d6f8e4c4c282 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -119,6 +119,7 @@ struct ICSState {
->      uint32_t offset;
->      ICSIRQState *irqs;
->      XICSFabric *xics;
-> +    bool init; /* sPAPR ICS device initialized */
->  };
-> =20
->  #define ICS_PROP_XICS "xics"
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index 246b21ae7f31..1e649d6cdbe1 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -338,6 +338,15 @@ void spapr_xive_init(SpaprXive *xive, Error **errp)
->      XiveSource *xsrc =3D &xive->source;
->      XiveENDSource *end_xsrc =3D &xive->end_source;
-> =20
-> +    /*
-> +     * The emulated XIVE device can only be initialized once. If the
-> +     * ESB memory region has been already mapped, it means we have been
-> +     * through there.
-> +     */
-> +    if (memory_region_is_mapped(&xsrc->esb_mmio)) {
-> +        return;
-> +    }
-> +
->      /* TIMA initialization */
->      memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops, xi=
-ve,
->                            "xive.tima", 4ull << TM_SHIFT);
-> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> index 9d2b8adef7c5..5a1835e8b1ed 100644
-> --- a/hw/intc/xics_spapr.c
-> +++ b/hw/intc/xics_spapr.c
-> @@ -239,6 +239,13 @@ static void rtas_int_on(PowerPCCPU *cpu, SpaprMachin=
-eState *spapr,
-> =20
->  void xics_spapr_init(SpaprMachineState *spapr)
->  {
-> +    /* Emulated mode can only be initialized once. */
-> +    if (spapr->ics->init) {
-> +        return;
-> +    }
-> +
-> +    spapr->ics->init =3D true;
-> +
->      /* Registration of global state belongs into realize */
->      spapr_rtas_register(RTAS_IBM_SET_XIVE, "ibm,set-xive", rtas_set_xive=
-);
->      spapr_rtas_register(RTAS_IBM_GET_XIVE, "ibm,get-xive", rtas_get_xive=
-);
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---32u276st3Jlj2kUU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzaH24ACgkQbDjKyiDZ
-s5L3SA/+IjWuRO5G9QcTp1bLzDzF5GIdTKr7nfpXvCqjfAi8Z6xFlKPu9oezCA5J
-eVAy077EZUHkiiJxvBqMd8ZC94Uc3QCuYAnX3FZOYQ9E8NwSlNOKCMBAhf2T2Ov/
-Qw2Pg9sy1w3CLSEPrC7iDpWaFjI7MPaHO22P6wR9pIwD5eF1f+xGm7D9eHCU5e1l
-R6YzxWDlhedAIjhsMHX8PhoNTSRrU5iDDZ2mi15Tmlsrsy1TuFYQhxbrPRIISwFg
-GBS0DTrRzjhHUZAws1Efxla2YAsC6d1XbjpCDdszi6TVEt5W1ntl+06pOS5wDg3b
-PbfN5X03hCHuX642lAYLFgBidm2C5ainX4ZF+rWmezGS1yyL38PHhukdLBzoXXtm
-HB7MGG1uscT7He6pNGFvCMeqtX4pDdpnRUhDWopHnPs/Ep79DwlRVLzK0j3vLdCf
-NJOBSIu80U2poxd3NA2beaDp+mcpV58xwe7V0vHVIjd2jcPwXufbZhlpeLA8sUYy
-fY78AlAGDwMH8FlsOTWCRO8eq4U7voa2haanjyZ5OKEFdcgngfNHIhtrCVwq4PCy
-HlGWoVI64WoqlxzORNpwLUAHqqnizUgnzHSATHacs8wEGwcY9KHqHWpGYu+pw9av
-jG5iIvMJzPul8iI396MXxarHvybsiQqCL98HgG5VSExK0VPq2GY=
-=Ern6
------END PGP SIGNATURE-----
-
---32u276st3Jlj2kUU--
+2019=E5=B9=B45=E6=9C=8814=E6=97=A5(=E7=81=AB) 2:26 Philippe Mathieu-Daud=C3=
+=A9 <philmd@redhat.com>:
+>
+> Hi Yoshinori,
+>
+> On 5/13/19 7:25 AM, Yoshinori Sato wrote:
+> > Hello.
+> > This patch series is added Renesas RX target emulation.
+> >
+> > Fixed build errors and cleaned up the code.
+> >
+> > My git repository is bellow.
+> > git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git tags/rx-20190513
+>
+> This tag isn't exactly the same as the series you posted, some patches
+> are ordered differently, leading to this failure at commit fc564da941a
+> (Add rx-softmmu) of your tag:
+>
+> ((fc564da941a...))$ make -C rx-softmmu hw/intc/rx_icu.o
+>   CC      hw/intc/rx_icu.o
+> hw/intc/rx_icu.c:35:9: error: expected =E2=80=98)=E2=80=99 before numeric=
+ constant
+>  REG8(IR, 0)
+>          ^~
+>          )
+> ...
+> hw/intc/rx_icu.c: In function =E2=80=98icu_read=E2=80=99:
+> hw/intc/rx_icu.c:174:18: error: =E2=80=98A_FIR=E2=80=99 undeclared (first=
+ use in this
+> function); did you mean =E2=80=98A_FPSW=E2=80=99?
+>      if ((addr !=3D A_FIR && size !=3D 1) ||
+>                   ^~~~~
+>                   A_FPSW
+> hw/intc/rx_icu.c:174:18: note: each undeclared identifier is reported
+> only once for each function it appears in
+> hw/intc/rx_icu.c:181:10: error: =E2=80=98A_IR=E2=80=99 undeclared (first =
+use in this
+> function); did you mean =E2=80=98DIR=E2=80=99?
+>      case A_IR ... A_IR + 0xff:
+>           ^~~~
+>           DIR
+> ...
+> hw/intc/rx_icu.c:199:44: error: =E2=80=98R_IRQCR_IRQMD_SHIFT=E2=80=99 und=
+eclared (first
+> use in this function); did you mean =E2=80=98R_IRQCR_IRQMD_MASK=E2=80=99?
+>          return icu->src[64 + reg].sense << R_IRQCR_IRQMD_SHIFT;
+>                                             ^~~~~~~~~~~~~~~~~~~
+>                                             R_IRQCR_IRQMD_MASK
+>
+> This is because the commit "hw/registerfields.h" is added after.
+> I see this series seems ordered correctly, so I'll keep testing.
+>
+> >
+> > Testing binaries bellow.
+> > u-boot
+> > Download - https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
+> >
+> > starting
+> > $ gzip -d u-boot.bin.gz
+> > $ qemu-system-rx -bios u-boot.bin
+> >
+> > linux and pico-root (only sash)
+> > Download - https://osdn.net/users/ysato/pf/qemu/dl/zImage (kernel)
+> >            https://osdn.net/users/ysato/pf/qemu/dl/rx-qemu.dtb (DeviceT=
+ree)
+> >
+> > starting
+> > $ qemu-system-rx -kernel zImage -dtb rx-qemu.dtb -append "earlycon"
+> >
+> > Changes for v10.
+> > - Fix build error for 32bit system.
+> > - Use "object_initialize_child" in create device instance.
+> > - Remove unused headers.
+> > - Avoid some magic number.
+> > - Clean up Kconfig symbols.
+> >
+> > Yoshinori Sato (12):
+> >   target/rx: TCG translation
+> >   target/rx: TCG helper
+> >   target/rx: CPU definition
+> >   target/rx: RX disassembler
+> >   hw/intc: RX62N interrupt controller (ICUa)
+> >   hw/timer: RX62N internal timer modules
+> >   hw/char: RX62N serial communication interface (SCI)
+> >   hw/rx: RX Target hardware definition
+> >   hw/registerfields.h: Add 8bit and 16bit register macros.
+> >   qemu/bitops.h: Add extract8 and extract16
+> >   Add rx-softmmu
+> >   MAINTAINERS: Add RX
+> >
+> >  MAINTAINERS                    |   19 +
+> >  arch_init.c                    |    2 +
+> >  configure                      |    8 +
+> >  default-configs/rx-softmmu.mak |    3 +
+> >  hw/Kconfig                     |    1 +
+> >  hw/char/Kconfig                |    3 +
+> >  hw/char/Makefile.objs          |    1 +
+> >  hw/char/renesas_sci.c          |  340 ++++++
+> >  hw/intc/Kconfig                |    3 +
+> >  hw/intc/Makefile.objs          |    1 +
+> >  hw/intc/rx_icu.c               |  376 +++++++
+> >  hw/rx/Kconfig                  |   14 +
+> >  hw/rx/Makefile.objs            |    2 +
+> >  hw/rx/rx-virt.c                |  105 ++
+> >  hw/rx/rx62n.c                  |  238 ++++
+> >  hw/timer/Kconfig               |    6 +
+> >  hw/timer/Makefile.objs         |    3 +
+> >  hw/timer/renesas_cmt.c         |  275 +++++
+> >  hw/timer/renesas_tmr.c         |  455 ++++++++
+> >  include/disas/dis-asm.h        |    5 +
+> >  include/hw/char/renesas_sci.h  |   45 +
+> >  include/hw/intc/rx_icu.h       |   57 +
+> >  include/hw/registerfields.h    |   32 +-
+> >  include/hw/rx/rx.h             |    7 +
+> >  include/hw/rx/rx62n.h          |   94 ++
+> >  include/hw/timer/renesas_cmt.h |   38 +
+> >  include/hw/timer/renesas_tmr.h |   50 +
+> >  include/qemu/bitops.h          |   38 +
+> >  include/sysemu/arch_init.h     |    1 +
+> >  target/rx/Makefile.objs        |   12 +
+> >  target/rx/cpu.c                |  222 ++++
+> >  target/rx/cpu.h                |  227 ++++
+> >  target/rx/disas.c              | 1480 ++++++++++++++++++++++++
+> >  target/rx/gdbstub.c            |  112 ++
+> >  target/rx/helper.c             |  148 +++
+> >  target/rx/helper.h             |   31 +
+> >  target/rx/insns.decode         |  621 ++++++++++
+> >  target/rx/monitor.c            |   38 +
+> >  target/rx/op_helper.c          |  481 ++++++++
+> >  target/rx/translate.c          | 2432 ++++++++++++++++++++++++++++++++=
+++++++++
+> >  40 files changed, 8025 insertions(+), 1 deletion(-)
+> >  create mode 100644 default-configs/rx-softmmu.mak
+> >  create mode 100644 hw/char/renesas_sci.c
+> >  create mode 100644 hw/intc/rx_icu.c
+> >  create mode 100644 hw/rx/Kconfig
+> >  create mode 100644 hw/rx/Makefile.objs
+> >  create mode 100644 hw/rx/rx-virt.c
+> >  create mode 100644 hw/rx/rx62n.c
+> >  create mode 100644 hw/timer/renesas_cmt.c
+> >  create mode 100644 hw/timer/renesas_tmr.c
+> >  create mode 100644 include/hw/char/renesas_sci.h
+> >  create mode 100644 include/hw/intc/rx_icu.h
+> >  create mode 100644 include/hw/rx/rx.h
+> >  create mode 100644 include/hw/rx/rx62n.h
+> >  create mode 100644 include/hw/timer/renesas_cmt.h
+> >  create mode 100644 include/hw/timer/renesas_tmr.h
+> >  create mode 100644 target/rx/Makefile.objs
+> >  create mode 100644 target/rx/cpu.c
+> >  create mode 100644 target/rx/cpu.h
+> >  create mode 100644 target/rx/disas.c
+> >  create mode 100644 target/rx/gdbstub.c
+> >  create mode 100644 target/rx/helper.c
+> >  create mode 100644 target/rx/helper.h
+> >  create mode 100644 target/rx/insns.decode
+> >  create mode 100644 target/rx/monitor.c
+> >  create mode 100644 target/rx/op_helper.c
+> >  create mode 100644 target/rx/translate.c
+> >
 
