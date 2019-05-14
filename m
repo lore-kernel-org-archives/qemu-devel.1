@@ -2,70 +2,100 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10EB7C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 22:06:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E3F5C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 23:23:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA2092166E
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 22:06:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA2092166E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 001C9206A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 23:23:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AhpapGS5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 001C9206A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55636 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56351 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQfYz-0000gY-P9
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 18:06:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54786)
+	id 1hQglO-0003EA-Rg
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 19:23:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hQfYE-000056-IB
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 18:05:35 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hQgkc-0002vX-W8
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 19:22:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hQfYD-0005PZ-Bf
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 18:05:34 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47456)
+	(envelope-from <richard.henderson@linaro.org>) id 1hQgkc-0002tT-2S
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 19:22:26 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:42038)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hQfYD-0005NZ-6W
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 18:05:33 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hQfYC-0001BC-1I
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 22:05:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F2F602E80C7
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 22:05:31 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hQgkb-0002qv-RR
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 19:22:26 -0400
+Received: by mail-pg1-x542.google.com with SMTP id 145so315137pgg.9
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 16:22:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=Bu3Hk4xevcTyi0NBZkMJiqlmmF015Z1J5yZLzY1PakI=;
+	b=AhpapGS5ebI4gUMBBSz2NCS6ap5XmY4MMy+e7ITHHSv5e2FDn08sIpwkV+j/SMprCQ
+	GvEvvimmT3nYO9yPKlfSYit0aPX7FU91u0AfA4dZbc5PE0upwFfA3twYlBPecb5hY+N2
+	ibsRSMCS1V/ndjSUCa5cezvhTbai30oKp0J6UCRA/E5xDOiCxJsHeMnuGLD6ub0MN3gA
+	L6NAWa464ZD6049w6ewlN6TL3GyiuYepvJigb3hYQdxQR3noSs13dZ6iortjrmE1MT4c
+	ZMvuhWd1ZNiSokqKmqKGO8K48h1AO1pBXTpoEkgFK40c7lAyFo9UDJiYkmGJwXXCrjfX
+	8X/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=Bu3Hk4xevcTyi0NBZkMJiqlmmF015Z1J5yZLzY1PakI=;
+	b=QQWysZgVC3/55joGLu0J0fF+PQjIdz/zKwYREF2QulNNJeX3BtlKHwm0HVD4Ky38xY
+	Apvqh+Rc3Ty9UUyGY0CXaq+FV/NP2jSKGlUj01gAqF6VNpD6ldoH40CaY5ybLNpsM2kR
+	0/JHb4phJsh8R+a3sP2Z9EHvafFww4sqN4E0brZwBVGz6uRS849+MW1USvozy4yqOiHk
+	f3CZqd2PYfMPmHZfvE1nKq6INTE4n9IfOiCY6NFxMqviSFPwG7XcGAPRGdtjz5pqpkFa
+	vfLKGOBp4KjU/s0UBb5saoi84ZZ0K3PZe1fzB5DRTUWEQIqmFAlpY3W3de9QP/Hi/eqk
+	S89g==
+X-Gm-Message-State: APjAAAUI4wTxhnHp20EEqsN/mACLke86dH8sAtzNNb0tEuCG113MbPhW
+	z5/Vjd8nLqyL5HyhjQexknzy/1tvmss=
+X-Google-Smtp-Source: APXvYqyNlzXu84UUgpoGbKa5/4yaqthvWw4B1SEKIgnDnsSla3NzAuMg+xrCUs4GTGOURjEoOiivDA==
+X-Received: by 2002:a63:e24c:: with SMTP id y12mr16844784pgj.276.1557876143857;
+	Tue, 14 May 2019 16:22:23 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
+	by smtp.gmail.com with ESMTPSA id
+	w194sm179432pfd.56.2019.05.14.16.22.21
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 14 May 2019 16:22:22 -0700 (PDT)
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
+	<berrange@redhat.com>
+References: <20190510173049.28171-1-richard.henderson@linaro.org>
+	<877eatdq3w.fsf@dusky.pond.sub.org> <20190514152331.GJ25916@redhat.com>
+	<d050fa9d-8e4b-7b87-31e5-05a7fa78feb9@linaro.org>
+	<20190514165036.GA7680@redhat.com>
+	<f0da55b5-e14d-e718-0608-fa37d1cb6c2b@linaro.org>
+	<dfed572d-6104-8ada-3bd8-1231dc6d6392@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <44e28b2a-1a9d-bfc5-9d06-5a7fdc079744@linaro.org>
+Date: Tue, 14 May 2019 16:22:20 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 May 2019 21:59:33 -0000
-From: =?utf-8?q?Dariusz_Zyza=C5=84ski?= <1829079@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: insspir
-X-Launchpad-Bug-Reporter: =?utf-8?q?Dariusz_Zyza=C5=84ski_=28insspir=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Dariusz_Zyza=C5=84ski_=28insspir=29?=
-Message-Id: <155787117310.15024.60120190997628985.malonedeb@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18962";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: e319800e8cdc9fc5559cd7fb2788fc55778684c3
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1829079] [NEW] Can't build static on ARM
- (Raspbian)
+In-Reply-To: <dfed572d-6104-8ada-3bd8-1231dc6d6392@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: Re: [Qemu-devel] [PATCH v6 00/25] Add qemu_getrandom and
+ ARMv8.5-RNG etc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -74,69 +104,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1829079 <1829079@bugs.launchpad.net>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 5/14/19 2:43 PM, Eric Blake wrote:
+>> It didn't occur to me that there was nothing in the object files for the
+>> reference.  I'll have to drop the crypto-obj-y patch and come up with a
+>> different solution.
+> 
+> Isn't there a gcc annotation for marking a simple as mandatorily
+> included during link?
 
-I am trying to build static QEMU on Raspbian, chrooted into using systemd-n=
-spawn with QEMU 4.0.0.
-This is how my compiling looks:
-https://pastebin.com/PYZYeRCN
-Just the problematic part:
-https://pastebin.com/7LxWPMxA
-How I do the compiling:
-https://pastebin.com/pYM17A6R (I plan to share this tutorial when it will w=
-ork)
-It is a coincidence, or the build fails because it cannot find lp11-kit. I =
-did some symlinks:
-ln -s /usr/lib/arm-linux-gnueabihf/libp11-kit.so.0 /usr/lib/libp11-kit.so.0
-ln -s /usr/lib/arm-linux-gnueabihf/libp11-kit.so /usr/lib/libp11-kit.so
-(should I also symlink libp11.so and libp11.so.2? I think I have installed =
-all required p11 packages!
+No.
 
-Git commit hash: git rev-parse HEAD
-e329ad2ab72c43b56df88b34954c2c7d839bb373
+There's stuff you can mark a single function within an object file that you can
+use to avoid the function being elided...
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+> __attribute__((externally_visible)) sounds promising (it nullifies the
+> effects of -fwhole-program, so that a function remains visible even if
+> the linker would have otherwise suppressed it)
+> 
+> __attribute__((used)) also sounds useful (the function must be emitted
+> even if it does not appear to be referenced, which may be enough for the
+> linker to infer that it is used)
 
--- =
+... and you found those.  But those do not affect the linker's behaviour with
+.a files at all.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1829079
+You can force a symbol reference from the ld command-line: -u sym, which can
+cause the .o containing sym to be included from the .a file.  But that doesn't
+work if there's no global symbol in the .o to reference.
 
-Title:
-  Can't build static on ARM (Raspbian)
+You can force all .o from a .a file to be included, with --whole-archive.  That
+is useful when you're using .a files a shorthand for lots and lots of .o files.
+ But in our case that would break the use of stubs.
 
-Status in QEMU:
-  New
+Anyway, see v7 now.
 
-Bug description:
-  I am trying to build static QEMU on Raspbian, chrooted into using systemd=
--nspawn with QEMU 4.0.0.
-  This is how my compiling looks:
-  https://pastebin.com/PYZYeRCN
-  Just the problematic part:
-  https://pastebin.com/7LxWPMxA
-  How I do the compiling:
-  https://pastebin.com/pYM17A6R (I plan to share this tutorial when it will=
- work)
-  It is a coincidence, or the build fails because it cannot find lp11-kit. =
-I did some symlinks:
-  ln -s /usr/lib/arm-linux-gnueabihf/libp11-kit.so.0 /usr/lib/libp11-kit.so=
-.0
-  ln -s /usr/lib/arm-linux-gnueabihf/libp11-kit.so /usr/lib/libp11-kit.so
-  (should I also symlink libp11.so and libp11.so.2? I think I have installe=
-d all required p11 packages!
 
-  Git commit hash: git rev-parse HEAD
-  e329ad2ab72c43b56df88b34954c2c7d839bb373
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1829079/+subscriptions
+r~
 
