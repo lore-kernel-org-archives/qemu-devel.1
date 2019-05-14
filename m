@@ -2,90 +2,62 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,T_HK_NAME_DR autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A400C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:27:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05600C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:36:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB49F21473
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:27:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D0L2TDLV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB49F21473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D33AE20879
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:36:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D33AE20879
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52269 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52391 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQc9S-0004eJ-RX
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 14:27:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37249)
+	id 1hQcIH-0007y1-Po
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 14:36:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hQc7a-00037y-Lm
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:25:51 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hQcGT-0006OQ-08
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:35:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hQc6J-0006LX-IZ
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:24:32 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33817)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hQc6J-0006Jw-B8
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:24:31 -0400
-Received: by mail-wr1-x442.google.com with SMTP id f8so2474823wrt.1
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 11:24:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=RADhbBuE5RfT5cw48fawSD6DvBE0/5p53QDlsTfuiwM=;
-	b=D0L2TDLVE68se+4VXoLRLI1b+MSQOUaqjvkrUjeAJmhMhq3BiwhGiD5qh44w+8BWpo
-	TEQuKqd/865v1NiFGNHnmhtVkc/5o5X07yu2Lzzvxw+3bmtNWcJnGcLmCY3gl3kqibW0
-	4Kv7w+LtTI4lLKlmbSSTd+9adQ5W0gajdvk+cWrPl653Zy9dt5nUh/4VxfThChHZsleY
-	tOSnnpMk5CSsVXLoD55Mv++Kn7mPL3OhHwRFPONeOwLWiSp3m1ZqaRqboHVjtG/raxVf
-	tr1zLQ6INSSCc7ZZX2fKj9fJCPY72TMz07fWU5lTA26MxV1L5menZDXj0aIOYk8AytCN
-	jrPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=RADhbBuE5RfT5cw48fawSD6DvBE0/5p53QDlsTfuiwM=;
-	b=r+3H8R86ZPCEXVQeoTprGni6GPLRJnZUD6nOsIswngQGFxN7d33vhFKL+6PxX/V9bM
-	nshbWRbZbhmNkflm1GB50b2XIpx3MhQv/7X+P74EumwxZpm2KX+xOK+xewkRl8RFobwB
-	5EQPDRqAzAa5stzLu5zWczIXsgTd9idNTRdf+ra4LkA5D5hZbRRll/DcP70oJUI/mHYP
-	L0sKOOcMKseTKtSPdBd7awqKSOTzH+9YdAH1NuFhtV0kEzptmlr1u6UEd030gvaUDDBj
-	H51jaiEccDiK3Vr0b62q5KbWrpDQZaGZyLWqSD1bJ4j544efg6Tt34Bq/C9icYlYfQQj
-	GxNw==
-X-Gm-Message-State: APjAAAXzDy5QeTiP3IntDCSu/QgbebsA3IniSz0+E4Kf2pHuoYuqTcb6
-	xOQ1rP32SCaNpoeLP3bBB0ngJw==
-X-Google-Smtp-Source: APXvYqzxkn3wBxhmJH1TpX94jsy8H0BUczAhr0GTnrcXQSwR4YghtFCSNSEy1N3R55KoPdgpLpvLCg==
-X-Received: by 2002:adf:8184:: with SMTP id 4mr23787063wra.27.1557858269350;
-	Tue, 14 May 2019 11:24:29 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id o81sm6089292wmb.2.2019.05.14.11.24.28
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 14 May 2019 11:24:28 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 121651FF87;
-	Tue, 14 May 2019 19:24:28 +0100 (BST)
-References: <20190502081554.5521-1-arilou@gmail.com>
-	<20190502081554.5521-2-arilou@gmail.com>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Jon Doron <arilou@gmail.com>
-In-reply-to: <20190502081554.5521-2-arilou@gmail.com>
-Date: Tue, 14 May 2019 19:24:28 +0100
-Message-ID: <878sv8opwj.fsf@zen.linaroharston>
+	(envelope-from <dgilbert@redhat.com>) id 1hQcGS-0000Oh-2V
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:35:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47564)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hQcGR-0000NJ-TI
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:35:00 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5B5703082E5A;
+	Tue, 14 May 2019 18:34:58 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-117-232.ams2.redhat.com
+	[10.36.117.232])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A6780608A6;
+	Tue, 14 May 2019 18:34:56 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com,
+	ehabkost@redhat.com, richardw.yang@linux.intel.com,
+	yury-kotov@yandex-team.ru, chen.zhang@intel.com
+Date: Tue, 14 May 2019 19:34:38 +0100
+Message-Id: <20190514183454.12758-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Tue, 14 May 2019 18:34:58 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH v9 01/27] gdbstub: Add infrastructure to
- parse cmd packets
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 00/16] migration queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,59 +69,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Jon Doron <arilou@gmail.com> writes:
+The following changes since commit e329ad2ab72c43b56df88b34954c2c7d839bb3=
+73:
 
-> Signed-off-by: Jon Doron <arilou@gmail.com>
-> ---
-<snip>
-> +
-> +/*
-> + * cmd_startswith -> cmd is compared using startswith
-> + *
-> + *
-> + * schema definitions:
-> + * Each schema parameter entry consists of 2 chars,
-> + * the first char represents the parameter type handling
-> + * the second char represents the delimiter for the next parameter
-> + *
-> + * Currently supported schema types:
-> + * 'l' -> unsigned long (stored in .val_ul)
-> + * 'L' -> unsigned long long (stored in .val_ull)
-> + * 's' -> string (stored in .data)
-> + * 'o' -> single char (stored in .opcode)
-> + * 't' -> thread id (stored in .thread_id)
-> + * '?' -> skip according to delimiter
-> + *
-> + * Currently supported delimiters:
-> + * '?' -> Stop at any delimiter (",;:=3D\0")
-> + * '0' -> Stop at "\0"
-> + * '.' -> Skip 1 char unless reached "\0"
-> + * Any other value is treated as the delimiter value itself
-> + */
-> +typedef struct GdbCmdParseEntry {
-> +    GdbCmdHandler handler;
-> +    const char *cmd;
-> +    union {
-> +        int flags;
-> +        struct {
-> +            int cmd_startswith:1;
-> +        };
-> +    };
+  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190513' into =
+staging (2019-05-14 10:08:47 +0100)
 
-This union seems a little over the top given flags isn't used AFAICT.
-Why not just have a bool cmd_startswith for now? You can always expand
-the structure later if you need to.
+are available in the Git repository at:
 
-Otherwise:
+  git://github.com/dagrh/qemu.git tags/pull-migration-20190514b
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+for you to fetch changes up to 9d3250d5ba8c4c5389530b861686e22e77fddcc7:
 
---
-Alex Benn=C3=A9e
+  monitor: Call mon_get_cpu() only once at hmp_gva2gpa() (2019-05-14 19:0=
+0:04 +0100)
+
+----------------------------------------------------------------
+Migration pull 2019-05-14
+
+Small fixes/cleanups
+One HMP/monitor fix
+
+----------------------------------------------------------------
+Cole Robinson (1):
+      migration: savevm: fix error code with migration blockers
+
+Eduardo Habkost (1):
+      monitor: Call mon_get_cpu() only once at hmp_gva2gpa()
+
+Peter Xu (1):
+      migration: comment VMSTATE_UNUSED*() properly
+
+Wei Yang (8):
+      migration: not necessary to check ops again
+      migration: remove not used field xfer_limit
+      vmstate: check subsection_found is enough
+      migration/ram.c: start of migration_bitmap_sync_range is always 0
+      migration/savevm: remove duplicate check of migration_is_blocked
+      migration/savevm: load_header before load_setup
+      migration/savevm: wrap into qemu_loadvm_state_header()
+      migration/ram.c: fix typos in comments
+
+Yi Wang (1):
+      migration: update comments of migration bitmap
+
+Yury Kotov (1):
+      migration: Fix use-after-free during process exit
+
+Zhang Chen (3):
+      migration/colo.c: Remove redundant input parameter
+      migration/colo.h: Remove obsolete codes
+      qemu-option.hx: Update missed parameter for colo-compare
+
+ include/migration/colo.h    |  4 +-
+ include/migration/vmstate.h | 14 +++++++
+ migration/colo-failover.c   |  2 +-
+ migration/colo.c            |  2 +-
+ migration/migration.c       | 26 ++++++++++---
+ migration/migration.h       |  1 -
+ migration/ram.c             | 22 +++++------
+ migration/savevm.c          | 89 ++++++++++++++++++++++++---------------=
+------
+ migration/vmstate.c         |  8 ++--
+ monitor.c                   |  3 +-
+ qemu-options.hx             |  9 +++--
+ 11 files changed, 105 insertions(+), 75 deletions(-)
 
