@@ -2,80 +2,64 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,T_HK_NAME_DR,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D2DAC04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 16:20:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7AD9C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 16:22:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E562C2085A
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 16:20:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TkzBc7fD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E562C2085A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8DB5D20863
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 16:22:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DB5D20863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50839 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50852 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQaAd-0002Ku-6K
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 12:20:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37446)
+	id 1hQaBx-0003ZF-Nt
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 12:22:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hQa10-0002r6-F6
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:10:55 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hQaAG-0002Kn-MM
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:20:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hQa0z-0000ty-Jm
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:10:54 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:39857)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hQa0y-0000r9-4N; Tue, 14 May 2019 12:10:52 -0400
-Received: by mail-lj1-x242.google.com with SMTP id a10so6880296ljf.6;
-	Tue, 14 May 2019 09:10:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=ZpmdCK+ZGwEPJRy3Nfak62DAqT/DdkPrXc34xgi3TxU=;
-	b=TkzBc7fDo6TZGdbmm5Yqzir6G13RxLdvzfGPBNOoe9WgHrE8JCDX6aHjUaYEVw86X+
-	2c15fiDqHp8uAfU5s0IlfNc0a9cqHrLxgnXEUkoTDHETUjnU2kXQhUHHGz2TR8yKTg37
-	48vWLgHPTqxvfjCXWNdTPPE2oPNWI7rxlvsTWSd+OYFEps7SDTIgsgd9Jir7fSs1jLpV
-	qjOmmp1K0wF1vxMZjXVXjmEagMOuYdy7Ah4e7MHpRtFK2D95+ak9z0B9hLlk4zkbxRrQ
-	c99fZOrShjddDPVXlmkj8KSTmZrlYSUDPttGxvDVZ2xemN9jqPzQ++ZTksejPCM8T1Fa
-	ur3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=ZpmdCK+ZGwEPJRy3Nfak62DAqT/DdkPrXc34xgi3TxU=;
-	b=UEs5qTbtj0Frm1vJJ1h1clRLFTZvhE7AfJIXu4hlXn9uH6roV3dQPZaVlGZDmBAuHa
-	w10E0S0CxLqILXrsZRNjX43kd9zTj0IT465bmmqWbJVv8j6Wa3f5ZfPGv7JQZqBiowuf
-	lpbZ6OKjN1Dxj2FDxQWckZyCDTvX+GphlVlFeDGoZyZGskUNTEr2C9ttF7lclgmy9L0X
-	QAppGA2Q9ozYeAFzi1oDraQHCNgjZVrPy9wJoN1vt4irPPmkcSO4BHV5CNn/Bqrq3wdl
-	bXtJavCl2D8lNm/Yf1FnPAAVOSJOAeC1SnN4rxRUq++dTlF+jgkhPkgvSptxfcQcfUW/
-	NmPg==
-X-Gm-Message-State: APjAAAXtUvjXF8rsSquxgWT7+H4bgkgzx97+o7BkZyQNjP7u+rkviiqR
-	UvO16ihOHNJ76PPf4mOatpDCgxcLRH34wvSKjOw=
-X-Google-Smtp-Source: APXvYqx73SEdAbxr0FGeaobrMexAhaJyFlcN0leHOQ/G3DF0R9JHqk/jGsWp/g4O0ecG7EjNfyaoqd6Z60kjfUj3pqA=
-X-Received: by 2002:a2e:8709:: with SMTP id m9mr17508557lji.140.1557850248896; 
-	Tue, 14 May 2019 09:10:48 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1hQaAF-0004jF-Ga
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:20:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59852)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>)
+	id 1hQaAC-0004d0-Qf; Tue, 14 May 2019 12:20:24 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DDABE300183D;
+	Tue, 14 May 2019 16:20:23 +0000 (UTC)
+Received: from work-vm (ovpn-117-232.ams2.redhat.com [10.36.117.232])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8EFA2608AB;
+	Tue, 14 May 2019 16:20:19 +0000 (UTC)
+Date: Tue, 14 May 2019 17:20:17 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, armbru@redhat.com
+Message-ID: <20190514162016.GQ2753@work-vm>
+References: <20190124122525.145968-1-vsementsov@virtuozzo.com>
+	<f92a06b5-6af6-dfe3-6e78-c4448e6a9cd0@redhat.com>
 MIME-Version: 1.0
-References: <ed7713d9b6c523d1c453ed7ac5de5501ef8cf405.1557792121.git.alistair.francis@wdc.com>
-	<28f47fb8-78e2-942a-a678-0d44553ddc55@linaro.org>
-In-Reply-To: <28f47fb8-78e2-942a-a678-0d44553ddc55@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 14 May 2019 09:08:34 -0700
-Message-ID: <CAKmqyKNkWuuyVUMOyM0zfDsWVTiMotzuoxs8nOYJaqKegPbnFQ@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] target/arm: Fix vector operation
- segfault
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f92a06b5-6af6-dfe3-6e78-c4448e6a9cd0@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Tue, 14 May 2019 16:20:23 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/2] fix qmp-cont vs migration-finish
+ race-crash
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,29 +71,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-	Alistair Francis <Alistair.Francis@wdc.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org,
+	lcapitulino@redhat.com, mreitz@redhat.com,
+	Karen Mezick <kmezick@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 13, 2019 at 5:19 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 5/13/19 5:08 PM, Alistair Francis wrote:
-> > We hit the second switch case as
-> > NEON_3R_VQADD and NEON_3R_VQSUB don't return from the function in the
-> > first switch case.
->
-> That's the bug, not here in this second switch.
+* Thomas Huth (thuth@redhat.com) wrote:
+> On 24/01/2019 13.25, Vladimir Sementsov-Ogievskiy wrote:
+> > Hi.
+> > 
+> > It's a simple fix for problems reported in "Aborts in iotest 169"
+> > by Max:
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg05907.html
+> > 
+> > In thread Kevin described that a problem itself is bigger and needs
+> > more effort:
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg06136.html
+> > 
+> > So, we may continue discussion in "Aborts in iotest 169", and in
+> > parallel apply these patches at least as a temporary fix.
+> > 
+> > The problem of this fix is that we finally have a bit weird interface:
+> > 
+> > User gets event MIGRATION_COMPLETED, and after it he can get error
+> > message "Migration is not finalized yet". 
+> > 
+> > But it is better than crash, anyway.
+> > 
+> > Vladimir Sementsov-Ogievskiy (2):
+> >   qmp: forbid qmp_cont in RUN_STATE_FINISH_MIGRATE
+> >   iotest: fix 169: do not run qmp_cont in RUN_STATE_FINISH_MIGRATE
+> 
+> What happened to these two patches? As far as I can see, they've never
+> got applied? Has another fix for 169 included instead?
 
-Ah ok, I couldn't tell if it was there or not, I'll send a v2.
+Hmm not sure; they've slipped between the maintainers if not.
+1/2 is a qmp.c so while it fixes a migration corner case it's probably
+armbru that should take it.
 
-Alistair
+Dave
 
->
->
-> r~
+>  Thomas
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
