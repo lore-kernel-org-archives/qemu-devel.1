@@ -2,104 +2,93 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E3B5C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 21:24:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 484D5C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 21:37:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30AF320850
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 21:24:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30AF320850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 06F4920879
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 21:37:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06F4920879
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54603 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54928 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQeuh-0003Sc-4U
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 17:24:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44878)
+	id 1hQf7T-0007Dj-UG
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 17:37:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1hQetr-00032f-29
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 17:23:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1hQf6Z-0006tV-4L
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 17:37:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1hQeto-0008Mv-Fk
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 17:23:51 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34282
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farman@linux.ibm.com>)
-	id 1hQeto-0008KA-AT
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 17:23:48 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4ELHTUr106426
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 17:23:45 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2sg28fras3-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 17:23:45 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
-	Tue, 14 May 2019 22:23:44 +0100
-Received: from b01cxnp22034.gho.pok.ibm.com (9.57.198.24)
-	by e17.ny.us.ibm.com (146.89.104.204) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Tue, 14 May 2019 22:23:42 +0100
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
-	[9.57.199.109])
-	by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	x4ELNdEX32440508
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Tue, 14 May 2019 21:23:39 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A445F112063;
-	Tue, 14 May 2019 21:23:39 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 50980112062;
-	Tue, 14 May 2019 21:23:39 +0000 (GMT)
-Received: from [9.85.182.11] (unknown [9.85.182.11])
-	by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-	Tue, 14 May 2019 21:23:39 +0000 (GMT)
-To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>
-References: <20190508091219.13799-1-cohuck@redhat.com>
-From: Eric Farman <farman@linux.ibm.com>
-Date: Tue, 14 May 2019 17:23:39 -0400
+	(envelope-from <eblake@redhat.com>) id 1hQf6X-0002ID-TV
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 17:36:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57134)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hQf6V-0002Eb-2D; Tue, 14 May 2019 17:36:55 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BA6B23082B4F;
+	Tue, 14 May 2019 21:36:53 +0000 (UTC)
+Received: from [10.3.116.43] (ovpn-116-43.phx2.redhat.com [10.3.116.43])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id EE5F960F81;
+	Tue, 14 May 2019 21:36:52 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>
+References: <c276dc0c-0190-1e83-d491-8157d78ec817@redhat.com>
+	<5e56cded-5097-ce97-6f2b-7afee8e480af@redhat.com>
+	<ce551fef-3987-a5fd-7280-e406226c6a20@redhat.com>
+	<20a7f01f-894c-e121-afc9-03415f55aa82@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <f9865b64-0882-6e29-e80a-6cbb5998d181@redhat.com>
+Date: Tue, 14 May 2019 16:36:51 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190508091219.13799-1-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19051421-0040-0000-0000-000004EFA070
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011098; HX=3.00000242; KW=3.00000007;
-	PH=3.00000004; SC=3.00000285; SDB=6.01203362; UDB=6.00631639;
-	IPR=6.00984284; 
-	MB=3.00026891; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-14 21:23:43
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051421-0041-0000-0000-000008FBAEC0
-Message-Id: <e9919f24-a9a0-7978-cf98-6d75b2a8f50a@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-14_12:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1905140140
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [PATCH RFC v3] s390/css: handle CCW_FLAG_SKIP
+In-Reply-To: <20a7f01f-894c-e121-afc9-03415f55aa82@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5qthRLOizTGiBaxJQbeQMm1GWhhPvRVak"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Tue, 14 May 2019 21:36:53 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] Unaligned images with O_DIRECT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -111,100 +100,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
-	Pierre Morel <pmorel@linux.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5qthRLOizTGiBaxJQbeQMm1GWhhPvRVak
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <f9865b64-0882-6e29-e80a-6cbb5998d181@redhat.com>
+Subject: Re: Unaligned images with O_DIRECT
+References: <c276dc0c-0190-1e83-d491-8157d78ec817@redhat.com>
+ <5e56cded-5097-ce97-6f2b-7afee8e480af@redhat.com>
+ <ce551fef-3987-a5fd-7280-e406226c6a20@redhat.com>
+ <20a7f01f-894c-e121-afc9-03415f55aa82@redhat.com>
+In-Reply-To: <20a7f01f-894c-e121-afc9-03415f55aa82@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 5/14/19 12:28 PM, Max Reitz wrote:
+
+>>>
+>>> The tail of an unaligned file is generally inaccessible to O_DIRECT,
+>>
+>> Especially with this.
+>>
+>>> where it is easier to use ftruncate() up to an aligned boundary if yo=
+u
+>>> really must play with that region of the file, and then ftruncate() b=
+ack
+>>> to the intended size after I/O. But that sounds hairy.  We could also=
+
+>>> round down and silently ignore the tail of the file, but that is at o=
+dds
+>>> with our practice of rounding size up.  So for the short term, I'd be=
+
+>>> happy with a patch that just rejects any attempt to use cache.direct=3D=
+on
+>>> (O_DIRECT) with a file that is not already a multiple of the alignmen=
+t
+>>> required thereby. (For reference, that's what qemu as NBD client
+>>> recently did when talking to a server that advertises a size
+>>> inconsistent with forced minimum block access: commit 3add3ab7)
+>>
+>> OK, I=E2=80=99ll send a patch.  Thanks for you explanation!
+> Well, or maybe not.
+>=20
+> $ ./qemu-img create -f qcow2 foo.qcow2 64M
+> $ ./qemu-img map --image-opts \
+>     driver=3Dqcow2,file.filename=3Dfoo.qcow2,cache.direct=3Don
+> qemu-img: Could not open
+> 'driver=3Dqcow2,file.filename=3Dfoo.qcow2,cache.direct=3Don': File leng=
+th
+> (196616 bytes) is not a multiple of the O_DIRECT alignment (512 bytes)
+> Try cache.direct=3Doff, or increasing the file size to match the alignm=
+ent
+>=20
+> That may be considered a bug in qcow2.  Maybe it should always fill all=
+
+> clusters.  But even if we did so and fixed it now, we can=E2=80=99t dis=
+allow
+> qemu from opening such images.
+>=20
+> Also, well, the tail is accessible, we just need to access it with the
+> proper alignment (and then we get a short read).  This seems to be
+> handled just fine.
+
+Oh. Yeah, short reads with O_DIRECT are possible (short writes not so
+much; for those, you have to write a full buffer then ftruncate back
+down). But we DO want to support short reads because of pre-existing
+images, whether or not we also improve qcow2 to always create aligned
+image sizes. The qcow2 spec allows unaligned images, even if we quit
+creating new ones.
+
+>=20
+> So I think file-posix should just return a rounded result.  Well, or
+> bdrv_co_Block_status() could ignore it for the EOF, because it throws
+> away everything past the EOF anyway with:
+>=20
+>     if (*pnum > bytes) {
+>         *pnum =3D bytes;
+>     }
+>=20
+> On one hand, I agree that file-posix should return an aligned result.
+> On the other, it doesn=E2=80=99t make a difference, so I don=E2=80=99t =
+think we need to
+> enforce it (at EOF).
+
+My thoughts:
+
+Right now, only io.c sets (or even reads) BDRV_BLOCK_EOF, and it is
+documented as an internal flag for optimizations.  But it would be very
+easy to amend the contract of driver's .bdrv_co_block_status to state
+that a driver may set BDRV_BLOCK_EOF at the end of a file, and MUST set
+that flag if the end of the file also happens to be unaligned with
+respect to the driver's request_alignment. (Most drivers won't need to
+care, but file-posix.c under O_DIRECT would have to start caring).  Then
+fix io.c to relax the assertion - the result must either be aligned
+(current condition) OR the driver must have reported BDRV_BLOCK_EOF (new
+condition). At that point, the block layer can take care of rounding out
+the block status for the unaligned tail beyond EOF up to the alignment
+boundary (similar to the rounding I have proposed in my other patches).
+If you don't get to that first, then it looks like I'll have to fold
+that in to my v2 patches when I get back to addressing those block
+status alignment problems.
+
+Thanks again for testing, and forcing me to think about the issue.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
-On 5/8/19 5:12 AM, Cornelia Huck wrote:
-> If a ccw has CCW_FLAG_SKIP set, and the command is of type
-> read, read backwards, or sense, no data should be written
-> to the guest for that command.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
-> 
-> v2 -> v3: fixed checks even more [Pierre]
-> v1 -> v2: fixed checks for command type [Eric]
-> 
-> ---
->   hw/s390x/css.c         | 22 ++++++++++++++++++----
->   include/hw/s390x/css.h |  1 +
->   2 files changed, 19 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 8fc9e35ba5d3..0fbaa233ffb5 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -830,8 +830,12 @@ static int ccw_dstream_rw_noflags(CcwDataStream *cds, void *buff, int len,
->       if (op == CDS_OP_A) {
->           goto incr;
->       }
-> -    ret = address_space_rw(&address_space_memory, cds->cda,
-> -                           MEMTXATTRS_UNSPECIFIED, buff, len, op);
-> +    if (!cds->do_skip) {
-> +        ret = address_space_rw(&address_space_memory, cds->cda,
-> +                               MEMTXATTRS_UNSPECIFIED, buff, len, op);
-> +    } else {
-> +        ret = 0;
+--5qthRLOizTGiBaxJQbeQMm1GWhhPvRVak
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Maybe set this to MEMTX_OK (defined as zero), just so it's clear based 
-on the existing check below?
+-----BEGIN PGP SIGNATURE-----
 
-> +    }
->       if (ret != MEMTX_OK) {
->           cds->flags |= CDS_F_STREAM_BROKEN;
->           return -EINVAL;
-> @@ -928,8 +932,13 @@ static int ccw_dstream_rw_ida(CcwDataStream *cds, void *buff, int len,
->       do {
->           iter_len = MIN(len, cont_left);
->           if (op != CDS_OP_A) {
-> -            ret = address_space_rw(&address_space_memory, cds->cda,
-> -                                   MEMTXATTRS_UNSPECIFIED, buff, iter_len, op);
-> +            if (!cds->do_skip) {
-> +                ret = address_space_rw(&address_space_memory, cds->cda,
-> +                                       MEMTXATTRS_UNSPECIFIED, buff, iter_len,
-> +                                       op);
-> +            } else {
-> +                ret = 0;
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzbNPMACgkQp6FrSiUn
+Q2pZJAgAlcXGsB0X4PpXznSS4YtwScRRtxq+0SQ8IXDXvPELjLeNb2jPbepvG99i
+OW8gA+oO/+p9FmmARACh3eFzcK0gMeY/FTYxh9aiqdfCqN35pDjAr3/JIWDECyV6
+SxdMLxyniSF4aKDrvVsS+bhZicB81smP7TvOz7XgX8u8xrJwRsLxLTq4kYl+3wF3
+ji+St2SUlPYSl0xip75+uu/QUm6ZhtHc7fvOshpNwddBjnprEI6cyk34gpDBm2mi
+BOpr+dxgZa0N4iNJ8IW9YWQQjtfUpm/h7GIr8o64HA7cZYYh2KraKESEuEVpcio5
+oR5puG8OixGJQWV/LRoEDaphtwkHYg==
+=HkLV
+-----END PGP SIGNATURE-----
 
-(here too)
-
-Either way, this seems reasonable to me.
-
-Reviewed-by: Eric Farman <farman@linux.ibm.com>
-
-> +            }
->               if (ret != MEMTX_OK) {
->                   /* assume inaccessible address */
->                   ret = -EINVAL; /* channel program check */
-> @@ -968,6 +977,11 @@ void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB const *orb)
->   
->       cds->count = ccw->count;
->       cds->cda_orig = ccw->cda;
-> +    /* skip is only effective for read, read backwards, or sense commands */
-> +    cds->do_skip = (ccw->flags & CCW_FLAG_SKIP) &&
-> +        ((ccw->cmd_code & 0x0f) == CCW_CMD_BASIC_SENSE ||
-> +         (ccw->cmd_code & 0x03) == 0x02 /* read */ ||
-> +         (ccw->cmd_code & 0x0f) == 0x0c /* read backwards */);
->       ccw_dstream_rewind(cds);
->       if (!(cds->flags & CDS_F_IDA)) {
->           cds->op_handler = ccw_dstream_rw_noflags;
-> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-> index aae19c427229..7cc183ef4366 100644
-> --- a/include/hw/s390x/css.h
-> +++ b/include/hw/s390x/css.h
-> @@ -97,6 +97,7 @@ typedef struct CcwDataStream {
->       int (*op_handler)(struct CcwDataStream *cds, void *buff, int len,
->                         CcwDataStreamOp op);
->       hwaddr cda;
-> +    bool do_skip;
->   } CcwDataStream;
->   
->   /*
-> 
-
+--5qthRLOizTGiBaxJQbeQMm1GWhhPvRVak--
 
