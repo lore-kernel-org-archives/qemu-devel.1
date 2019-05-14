@@ -2,80 +2,125 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8447FC04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:21:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FAA1C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:22:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56EB820843
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:21:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56EB820843
+	by mail.kernel.org (Postfix) with ESMTPS id 1FA3E20843
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:22:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FA3E20843
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43917 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43919 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQTct-0004nw-JF
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 05:21:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34748)
+	id 1hQTdQ-0005Ar-3n
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 05:22:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hQTbk-0004IY-JO
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:20:25 -0400
+	(envelope-from <david@redhat.com>) id 1hQTc9-0004W0-Ny
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:20:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hQTbi-0003XE-Lw
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:20:24 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:46572)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hQTbh-0003Sw-TL
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:20:22 -0400
-Received: by mail-wr1-f68.google.com with SMTP id r7so494278wrr.13
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 02:20:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=sAUI9Ml8kSnqYgbTKXOJBPeu6BElRZA0RRRwW7fCELQ=;
-	b=kOwFjcy8dvUj0W20BlMDqW/Kc/Llfx6yeMQO07yg7t7awN6o9FiapW3j/FLWlf1KBz
-	WqNp4QcYxnoduRCIaHAv2Whh+xuU42F6xQmi1yxr73ntfjcEmOBC9a1qBeWswgHfzmxi
-	CavOYCQDT/fk3qZ2k8YBZJyVRp0pPMXnYcqW2CJpwofcJbOgfSiYqpNygorbxJqBlN08
-	76rEN3TT90Ev3iFHmgTqN02ovZ4N5X2DMQ/nyJ7f839GC5XtwAkUQyS4OX/p5+YR60PD
-	m22SyEsxiYORqZJSx0rR6RlZhvVpkVxG6nlY+rNIm+as61CxgWXFGLRVaZgDxsVk+fBg
-	UWDA==
-X-Gm-Message-State: APjAAAVdhYWXdyz6NbpoZMKGKjnhemCdREWJHBzHoWDYNLwVLjjEl2bv
-	1IJTdzlEpTPZ5tFZnBLj7y2Sa3hu7sY=
-X-Google-Smtp-Source: APXvYqwsGnI9mDbdoiGhU5xri20O8MvTImxLKbTUu4oBJ43h9Ko4QfaLTcSX73FQYsGS81Zzd7TtDw==
-X-Received: by 2002:adf:e288:: with SMTP id v8mr15635339wri.7.1557825620296;
-	Tue, 14 May 2019 02:20:20 -0700 (PDT)
-Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193])
-	by smtp.gmail.com with ESMTPSA id n1sm1801146wmc.19.2019.05.14.02.20.19
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 14 May 2019 02:20:19 -0700 (PDT)
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
-	Laurent Vivier <lvivier@redhat.com>
-References: <20190513154759.24973-1-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <12b999e9-8ed6-ca03-47c1-4973955798ea@redhat.com>
-Date: Tue, 14 May 2019 11:20:18 +0200
+	(envelope-from <david@redhat.com>) id 1hQTc8-0004gK-LV
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:20:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53064)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hQTc8-0004fM-Dw; Tue, 14 May 2019 05:20:48 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7591730833C0;
+	Tue, 14 May 2019 09:20:47 +0000 (UTC)
+Received: from [10.36.117.118] (ovpn-117-118.ams2.redhat.com [10.36.117.118])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 74D125D706;
+	Tue, 14 May 2019 09:20:43 +0000 (UTC)
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+	Cornelia Huck <cohuck@redhat.com>
+References: <1556749903-19221-1-git-send-email-walling@linux.ibm.com>
+	<a87c71be-5bf8-a115-5843-720c9ad10c7b@redhat.com>
+	<bc2fd9bb-7b94-eac7-590b-f01d2063ef9c@redhat.com>
+	<e948a030-bd30-180e-bbd6-76f4a2390bb9@de.ibm.com>
+	<ea6df6b1-4062-c057-92ea-5be40d778fe9@redhat.com>
+	<09293a1c-d000-83a8-46b8-b97ad4fa9774@de.ibm.com>
+	<56e3ace1-6e48-0e20-47d5-b07ac6dfcf31@redhat.com>
+	<e140a076-28a0-0db6-4c59-80e0f2ab44bb@de.ibm.com>
+	<c690c4a8-c277-e3c6-3697-3f0a1924559b@redhat.com>
+	<20190513134637.3d8bb275.cohuck@redhat.com>
+	<898144e3-615e-5074-fb68-bf9995c64609@de.ibm.com>
+	<155d2ca3-6a48-c99a-fe42-dca8e3fd4344@redhat.com>
+	<066c7470-94a3-a922-9a12-1ca42e474c51@de.ibm.com>
+	<20190514104934.6bba9232.cohuck@redhat.com>
+	<47f7134b-338f-0207-88ae-4c1969be3786@redhat.com>
+	<13b0f0b2-f7c7-01fb-0e17-92bd47d9c346@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <b280d46f-4a0f-f5dd-c89b-b85210d190ca@redhat.com>
+Date: Tue, 14 May 2019 11:20:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190513154759.24973-1-thuth@redhat.com>
+In-Reply-To: <13b0f0b2-f7c7-01fb-0e17-92bd47d9c346@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.44]);
+	Tue, 14 May 2019 09:20:47 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH] tests/libqtest: Fix description of
- qtest_vinitf() and qtest_initf()
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v4] s390: diagnose 318 info reset and
+ migration support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,49 +132,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Collin Walling <walling@linux.ibm.com>, mst@redhat.com,
+	qemu-devel@nongnu.org, pasic@linux.ibm.com,
+	qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/13/19 5:47 PM, Thomas Huth wrote:
-> These functions are convenience wrappers of qtest_init() and not of
-> qtest_start().
+On 14.05.19 11:10, Christian Borntraeger wrote:
+>=20
+>=20
+> On 14.05.19 10:59, David Hildenbrand wrote:
+>> On 14.05.19 10:49, Cornelia Huck wrote:
+>>> On Tue, 14 May 2019 10:37:32 +0200
+>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>>>
+>>>> On 14.05.19 09:28, David Hildenbrand wrote:
+>>>>>>>> But that can be tested using the runability information if I am =
+not wrong. =20
+>>>>>>>
+>>>>>>> You mean the cpu level information, right? =20
+>>>>>
+>>>>> Yes, query-cpu-definition includes for each model runability inform=
+ation
+>>>>> via "unavailable-features" (valid under the started QEMU machine).
+>>>>>  =20
+>>>>>>> =20
+>>>>>>>> =20
+>>>>>>>>> and others that we have today.
+>>>>>>>>>
+>>>>>>>>> So yes, I think this would be acceptable.   =20
+>>>>>>>>
+>>>>>>>> I guess it is acceptable yes. I doubt anybody uses that many CPU=
+s in
+>>>>>>>> production either way. But you never know. =20
+>>>>>>>
+>>>>>>> I think that using that many cpus is a more uncommon setup, but I=
+ still
+>>>>>>> think that having to wait for actual failure =20
+>>>>>>
+>>>>>> That can happen all the time today. You can easily say z14 in the =
+xml when=20
+>>>>>> on a zEC12. Only at startup you get the error. The question is rea=
+lly: =20
+>>>>>
+>>>>> "-smp 248 -cpu host" will no longer work, while e.g. "-smp 248 -cpu=
+ z12"
+>>>>> will work. Actually, even "-smp 248" will no longer work on affecte=
+d
+>>>>> machines.
+>>>>>
+>>>>> That is why wonder if it is better to disable the feature and print=
+ a
+>>>>> warning. Similar to CMMA, where want want to tolerate when CMMA is =
+not
+>>>>> possible in the current environment (huge pages).
+>>>>>
+>>>>> "Diag318 will not be enabled because it is not compatible with more=
+ than
+>>>>> 240 CPUs".
+>>>>>
+>>>>> However, I still think that implementing support for more than one =
+SCLP
+>>>>> response page is the best solution. Guests will need adaptions for =
+> 240
+>>>>> CPUs with Diag318, but who cares? Existing setups will continue to =
+work.
+>>>>>
+>>>>> Implementing that SCLP thingy will avoid any warnings and any error=
+s. It
+>>>>> just works from the QEMU perspective.
+>>>>>
+>>>>> Is implementing this realistic? =20
+>>>>
+>>>> Yes it is but it will take time. I will try to get this rolling. To =
+make
+>>>> progress on the diag318 thing, can we error on startup now and simpl=
+y
+>>>> remove that check when when have implemented a larger sccb? If we wo=
+uld
+>>>> now do all kinds of "change the max number games" would be harder to=
+ "fix".
+>>>
+>>> So, the idea right now is:
+>>>
+>>> - fail to start if you try to specify a diag318 device and more than
+>>>   240 cpus (do we need a knob to turn off the device?)
+>>> - in the future, support more than one SCLP response page
+>>>
+>>> I'm getting a bit lost in the discussion; but the above sounds
+>>> reasonable to me.
+>>>
+>>
+>> We can
+>>
+>> 1. Fail to start with #cpus > 240 when diag318=3Don
+>> 2. Remove the error once we support more than one SCLP response page
+>>
+>> Or
+>>
+>> 1. Allow to start with #cpus > 240 when diag318=3Don, but indicate onl=
+y
+>>    240 CPUs via SCLP
+>> 2. Print a warning
+>> 3. Remove the restriction and the warning once we support more than on=
+e
+>>    SCLP response page
+>>
+>> While I prefer the second approach (similar to defining zPCI devices
+>> without zpci=3Don), I could also live with the first approach.
+>=20
+> I prefer approach 1.
+>=20
 
-Maybe "The qtest_vinitf() and qtest_initf() functions are convenience
-wrappers of qtest_init() and not of qtest_start()." as it is easier to
-read the commit description in some git review tools (gitk i.e.).
+Isn't approach #2 what we discussed (limiting sclp, but of course to 247
+CPUs), but with an additional warning? I'm confused.
 
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+--=20
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Thanks,
 
-> ---
->  tests/libqtest.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/libqtest.h b/tests/libqtest.h
-> index 3f7675fcf0..a98ea15b7d 100644
-> --- a/tests/libqtest.h
-> +++ b/tests/libqtest.h
-> @@ -29,7 +29,7 @@ extern QTestState *global_qtest;
->   * @fmt...: Format for creating other arguments to pass to QEMU, formatted
->   * like sprintf().
->   *
-> - * Convenience wrapper around qtest_start().
-> + * Convenience wrapper around qtest_init().
->   *
->   * Returns: #QTestState instance.
->   */
-> @@ -41,7 +41,7 @@ QTestState *qtest_initf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
->   * like vsprintf().
->   * @ap: Format arguments.
->   *
-> - * Convenience wrapper around qtest_start().
-> + * Convenience wrapper around qtest_init().
->   *
->   * Returns: #QTestState instance.
->   */
-> 
+David / dhildenb
 
