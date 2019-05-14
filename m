@@ -2,114 +2,87 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06212C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:35:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44DEEC04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:37:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BED9321473
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:35:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BED9321473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E6EA720862
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:37:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="T3ZBg0hF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6EA720862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44165 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44198 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQTqA-0004xp-4D
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 05:35:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40142)
+	id 1hQTs3-00063k-8B
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 05:37:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hQTpJ-0004eM-BV
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:34:26 -0400
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hQTrF-0005jY-M9
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:36:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hQTpH-0007xF-D5
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:34:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38476)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hQTpF-0007nj-G4
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:34:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 41D56C1306E5;
-	Tue, 14 May 2019 09:34:20 +0000 (UTC)
-Received: from [10.36.117.118] (ovpn-117-118.ams2.redhat.com [10.36.117.118])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 132E0608AC;
-	Tue, 14 May 2019 09:34:05 +0000 (UTC)
-To: Pankaj Gupta <pagupta@redhat.com>
-References: <20190510155202.14737-1-pagupta@redhat.com>
-	<20190510155202.14737-3-pagupta@redhat.com>
-	<f2ea35a6-ec98-447c-44fe-0cb3ab309340@redhat.com>
-	<752392764.28554139.1557826022323.JavaMail.zimbra@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <86298c2c-cc7c-5b97-0f11-335d7da8c450@redhat.com>
-Date: Tue, 14 May 2019 11:34:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hQTrC-0007ks-Md
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:36:24 -0400
+Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:58478)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hQTrB-0007cQ-F2
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:36:22 -0400
+Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
+	[IPv6:2a02:6b8:0:1619::162])
+	by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 7FC352E098A;
+	Tue, 14 May 2019 12:36:17 +0300 (MSK)
+Received: from localhost (localhost [::1])
+	by mxbackcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
+	Onb6saaT0K-aHwK2rEX; Tue, 14 May 2019 12:36:17 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+	s=default; 
+	t=1557826577; bh=ZZH4SRw/EV+JprWDSDZrm/jgIVM1shrlLRup46h1iAM=;
+	h=Subject:In-Reply-To:Cc:Date:References:To:From:Message-Id;
+	b=T3ZBg0hF5oD1hu/qnJRzqrpaVR7IbHC8H8WB9VIGE7+HGTTo5gkL56mE2wLsPJ32/
+	h9FtQrbe90FplNb1oozjPIBGFyiI9W+c3v+51qUXOUgVdU9n3Wgzrv2wKpmr18ALV5
+	U5lXdzXItO8ShMI6CcomHk9Ey1ekxd4D5dRkOJ/o=
+Authentication-Results: mxbackcorp1j.mail.yandex.net;
+	dkim=pass header.i=@yandex-team.ru
+X-Yandex-Sender-Uid: 1120000000071945
+X-Yandex-Avir: 1
+Received: from mxbackcorp2j.mail.yandex.net ([::1])
+	by mxbackcorp2j.mail.yandex.net with LMTP id 4TdZJygr
+	for <yury-kotov@yandex-team.ru>; Tue, 14 May 2019 12:36:12 +0300
+Received: by vla1-9d3c37294942.qloud-c.yandex.net with HTTP;
+	Tue, 14 May 2019 12:36:11 +0300
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+To: Dr. David Alan Gilbert <dgilbert@redhat.com>
+In-Reply-To: <164761555609613@myt4-a988562a11ab.qloud-c.yandex.net>
+References: <259551555324396@vla1-1374b6242101.qloud-c.yandex.net>
+	<20190415104725.GI5718@redhat.com> <20190415111511.GG2852@work-vm>
+	<20190415111911.GK5718@redhat.com> <20190415113045.GI2852@work-vm>
+	<612681555412465@iva6-8a76e93b6298.qloud-c.yandex.net>
+	<20190418141956.GF2984@work-vm>
+	<1285061555601789@iva6-8a76e93b6298.qloud-c.yandex.net>
+	<20190418160300.GI2984@work-vm>
+	<1201831555604730@vla1-1374b6242101.qloud-c.yandex.net>
+	<20190418170118.GK2984@work-vm>
+	<164761555609613@myt4-a988562a11ab.qloud-c.yandex.net>
 MIME-Version: 1.0
-In-Reply-To: <752392764.28554139.1557826022323.JavaMail.zimbra@redhat.com>
+X-Mailer: Yamail [ http://yandex.ru ] 5.0
+Date: Tue, 14 May 2019 12:36:16 +0300
+Message-Id: <346471557826571@vla1-9d3c37294942.qloud-c.yandex.net>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Tue, 14 May 2019 09:34:20 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v8 2/6] virtio-pmem: Add virtio pmem driver
+	[fuzzy]
+X-Received-From: 77.88.29.217
+Subject: Re: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -118,179 +91,318 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com,
-	jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
-	virtualization@lists.linux-foundation.org,
-	adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
-	aarcange@redhat.com, dave jiang <dave.jiang@intel.com>,
-	jstaron@google.com, linux-nvdimm@lists.01.org,
-	vishal l verma <vishal.l.verma@intel.com>, willy@infradead.org,
-	hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com,
-	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
-	riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
-	stefanha@redhat.com, pbonzini@redhat.com,
-	dan j williams <dan.j.williams@intel.com>,
-	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
-	tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-	darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, imammedo@redhat.com
+Cc: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
+	Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Ping
+
+18.04.2019, 20:46, "Yury Kotov" <yury-kotov@yandex-team.ru>:
+> 18.04.2019, 20:01, "Dr. David Alan Gilbert" <dgilbert@redhat.com>:
+>> =C2=A0* Yury Kotov (yury-kotov@yandex-team.ru) wrote:
+>>> =C2=A0=C2=A018.04.2019, 19:03, "Dr. David Alan Gilbert" <dgilbert@red=
+hat.com>:
+>>> =C2=A0=C2=A0> * Yury Kotov (yury-kotov@yandex-team.ru) wrote:
+>>> =C2=A0=C2=A0>> =C2=A018.04.2019, 17:20, "Dr. David Alan Gilbert" <dgi=
+lbert@redhat.com>:
+>>> =C2=A0=C2=A0>> =C2=A0> * Yury Kotov (yury-kotov@yandex-team.ru) wrote=
+:
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A015.04.2019, 14:30, "Dr. David Alan Gilb=
+ert" <dgilbert@redhat.com>:
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0> * Daniel P. Berrang=C3=A9 (berrange@r=
+edhat.com) wrote:
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0On Mon, Apr 15, 2019 at 12:15:=
+12PM +0100, Dr. David Alan Gilbert wrote:
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> * Daniel P. Berrang=C3=A9 (b=
+errange@redhat.com) wrote:
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > On Mon, Apr 15, 2019 at 01=
+:33:21PM +0300, Yury Kotov wrote:
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > 15.04.2019, 13:25, "Dani=
+el P. Berrang=C3=A9" <berrange@redhat.com>:
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > > On Mon, Apr 15, 2019 a=
+t 01:17:06PM +0300, Yury Kotov wrote:
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A015.04.2019, 13:=
+11, "Daniel P. Berrang=C3=A9" <berrange@redhat.com>:
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0> On Mon, Apr 1=
+5, 2019 at 12:50:08PM +0300, Yury Kotov wrote:
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0Hi,
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0Just t=
+o clarify. I see two possible solutions:
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A01) Sin=
+ce the migration code doesn't receive fd, it isn't responsible for
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0closin=
+g it. So, it may be better to use migrate_fd_param for both
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0incomi=
+ng/outgoing and add dupping for migrate_fd_param. Thus, clients must
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0close =
+the fd themselves. But existing clients will have a leak.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0> We can't brea=
+k existing clients in this way as they are correctly
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0> using the mon=
+itor with its current semantics.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A02) If =
+we don't duplicate fd, then at least we should remove fd from
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0the co=
+rresponding list. Therefore, the solution is to fix qemu_close to find
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0the li=
+st and remove fd from it. But qemu_close is currently consistent with
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0qemu_o=
+pen (which opens/dups fd), so adding additional logic might not be
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0a very=
+ good idea.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0> qemu_close is=
+ not appropriate place to deal with something speciifc
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0> to the montor=
+.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0I don'=
+t see any other solution, but I might miss something.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0What d=
+o you think?
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0> All callers o=
+f monitor_get_fd() will close() the FD they get back.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0> Thus monitor_=
+get_fd() should remove it from the list when it returns
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0> it, and we sh=
+ould add API docs to monitor_get_fd() to explain this.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0Ok, it sounds r=
+easonable. But monitor_get_fd is only about outgoing migration.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0But what about =
+the incoming migration? It doesn't use monitor_get_fd but just
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0converts input =
+string to int and use it as fd.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > > The incoming migration=
+ expects the FD to be passed into QEMU by the mgmt
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > > app when it is exec'in=
+g the QEMU binary. It doesn't interact with the
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > > monitor at all AFAIR.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > >
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > Oh, sorry. This use case=
+ is not obvious. We used add-fd to pass fd for
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > migrate-incoming and suc=
+h way has described problems.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> >
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > That's a bug in your usage=
+ of QEMU IMHO, as the incoming code is not
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > designed to use add-fd.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> Hmm, that's true - although:
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> a) It's very non-obvious
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> b) Unfortunate, since it wou=
+ld go well with -incoming defer
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0Yeah I think this is a screw u=
+p on QMEU's part when introducing 'defer'.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0We should have mandated use of=
+ 'add-fd' when using 'defer', since FD
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0inheritance-over-execve() shou=
+ld only be used for command line args,
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0not monitor commands.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0Not sure how to best fix this =
+is QEMU though without breaking back
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0compat for apps using 'defer' =
+already.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0> We could add mon-fd: transports that =
+has the same behaviour as now for
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0> outgoing, and for incoming uses the a=
+dd-fd stash.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0>
+>>> =C2=A0=C2=A0>> =C2=A0>>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0Oh, I'm sorry again. I think my suggest=
+ion about monitor_fd_param wasn't
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0relevant to this issue. If migrate-inco=
+ming + "fd:" + add-fd is an invalid use
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0case, should we disallow this?
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0I may add a check to fd_start_incoming_=
+migration if fd is in mon fds list.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0But I'm afraid there are users like me =
+who are already using this wrong use case.
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0Because currently nothing in QEMU's doc=
+s disallow this.
+>>> =C2=A0=C2=A0>> =C2=A0>>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0So which solution is better in your opi=
+nion?
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A01) Disallow fd's from mon fds list in f=
+d_start_incoming_migration
+>>> =C2=A0=C2=A0>> =C2=A0>
+>>> =C2=A0=C2=A0>> =C2=A0> I'm surprised anything could be doing that - h=
+ow would a user know what
+>>> =C2=A0=C2=A0>> =C2=A0> the correct fd index was?
+>>> =C2=A0=C2=A0>> =C2=A0>
+>>> =C2=A0=C2=A0>>
+>>> =C2=A0=C2=A0>> =C2=A0Hmm, add-fd returns correct fd value. Maybe I di=
+n't catch you question...
+>>> =C2=A0=C2=A0>
+>>> =C2=A0=C2=A0> I don't understand, where does it return it?
+>>> =C2=A0=C2=A0>
+>>>
+>>> =C2=A0=C2=A0From misc.json:
+>>> =C2=A0=C2=A0# Example:
+>>> =C2=A0=C2=A0#
+>>> =C2=A0=C2=A0# -> { "execute": "add-fd", "arguments": { "fdset-id": 1 =
+} }
+>>> =C2=A0=C2=A0# <- { "return": { "fdset-id": 1, "fd": 3 } }
+>>> =C2=A0=C2=A0#
+>>>
+>>> =C2=A0=C2=A0"fd": 3 is a valid fd for migrate-incoming(uri =3D "fd:3"=
+)
 >>
->>> +	}
->>> +
->>> +	/* When host has read buffer, this completes via host_ack */
+>> =C2=A0Ah OK.
 >>
->> "A host repsonse results in "host_ack" getting called" ... ?
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A02) Allow these fds, but dup them or clo=
+se them correctly
+>>> =C2=A0=C2=A0>> =C2=A0>
+>>> =C2=A0=C2=A0>> =C2=A0> I think I'd leave the current (confusing) fd: =
+as it is, maybe put a note
+>>> =C2=A0=C2=A0>> =C2=A0> in the manual.
+>>> =C2=A0=C2=A0>> =C2=A0>
+>>> =C2=A0=C2=A0>>
+>>> =C2=A0=C2=A0>> =C2=A0So, using fd from fdset will be an undefined beh=
+avior, right?
+>>> =C2=A0=C2=A0>
+>>> =C2=A0=C2=A0> For incoming, yes.
+>>> =C2=A0=C2=A0>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0And how to migrate-incoming defer throu=
+gh fd correctly?
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A01) Add "mon-fd:" protocol to work with =
+fds passed by "add-fd/remove-fd" commands
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0as suggested by Dave
+>>> =C2=A0=C2=A0>> =C2=A0>
+>>> =C2=A0=C2=A0>> =C2=A0> That's my preference; it's explicitly named an=
+d consistent, and it
+>>> =C2=A0=C2=A0>> =C2=A0> doesn't touch the existing fd code.
+>>> =C2=A0=C2=A0>> =C2=A0>
+>>> =C2=A0=C2=A0>>
+>>> =C2=A0=C2=A0>> =C2=A0Ok, but please tell me what you think of my sugg=
+estion (2) about using fd added
+>>> =C2=A0=C2=A0>> =C2=A0by the "getfd" command for incoming migration. I=
+t doesn't requires introducing
+>>> =C2=A0=C2=A0>> =C2=A0new protocol and will be consistent with outgoin=
+g migration through fd.
+>>> =C2=A0=C2=A0>
+>>> =C2=A0=C2=A0> I worry how qemu knows whether the command means it com=
+es from the getfd
+>>> =C2=A0=C2=A0> command or is actually a normal fd like now?
+>>> =C2=A0=C2=A0> Can you give an example.
+>>> =C2=A0=C2=A0>
+>>>
+>>> =C2=A0=C2=A0getfd manages naming fds list.
+>>> =C2=A0=C2=A0# -> { "execute": "getfd", "arguments": { "fdname": "fd1"=
+ } }
+>>> =C2=A0=C2=A0So, for migrate (not incoming) is now valid migrate(uri=3D=
+"fd:fd1")
+>>>
+>>> =C2=A0=C2=A0I want the same for migrate-incoming. If fdname is parsea=
+ble int, then it is
+>>> =C2=A0=C2=A0an old format. Otherwise - it is a name of fd added by ad=
+dfd.
+>>>
+>>> =C2=A0=C2=A0There is a function "monitor_fd_param" which do exactly w=
+hat I mean:
+>>> =C2=A0=C2=A0int monitor_fd_param(Monitor *mon, const char *fdname, Er=
+ror **errp) {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0... local vars ...
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!qemu_isdigit(fdname[0]) && m=
+on) {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0fd =3D mo=
+nitor_get_fd(mon, fdname, &local_err);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0fd =3D qe=
+mu_parse_fd(fdname);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0... report err to errp ...
+>>> =C2=A0=C2=A0}
 >>
->>> +	wait_event(req->host_acked, req->done);
->>> +	err =3D req->ret;
->>> +ret:
->>> +	kfree(req);
->>> +	return err;
->>> +};
->>> +
->>> +/* The asynchronous flush callback function */
->>> +int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
->>> +{
->>> +	int rc =3D 0;
->>> +
->>> +	/* Create child bio for asynchronous flush and chain with
->>> +	 * parent bio. Otherwise directly call nd_region flush.
->>> +	 */
->>> +	if (bio && bio->bi_iter.bi_sector !=3D -1) {
->>> +		struct bio *child =3D bio_alloc(GFP_ATOMIC, 0);
->>> +
->>> +		if (!child)
->>> +			return -ENOMEM;
->>> +		bio_copy_dev(child, bio);
->>> +		child->bi_opf =3D REQ_PREFLUSH;
->>> +		child->bi_iter.bi_sector =3D -1;
->>> +		bio_chain(child, bio);
->>> +		submit_bio(child);
+>> =C2=A0OK, if we're already using monitor_fd_param everywhere then I th=
+ink
+>> =C2=A0we're already down the rat-hole of guessing whether we're an add=
+-fd or
+>> =C2=A0fd by whether it's an integer, and I agree with you that we shou=
+ld
+>> =C2=A0just fix incoming to use that.
 >>
->> return 0;
+>> =C2=A0Now, that means I guess we need to modify monitor_fd_param to te=
+ll us
+>> =C2=A0which type of fd it got, so we know whether to close it later?
 >>
->> Then, drop the "else" case and "int rc" and do directly
->>
->> if (virtio_pmem_flush(nd_region))
->> 	return -EIO;
->=20
-> and another 'return 0' here :)
->=20
-> I don't like return from multiple places instead I prefer
-> single exit point from function.
+>> =C2=A0Dave
+>> =C2=A0P.S. I'm out from tomorrow for a weekish.
+>
+> I think the right way is to check whether fd is added by add-fd and if =
+so then
+> return error. Because IIUC the only valid usage of add-fd is to use
+> qemu_open("/dev/fdset/<fdset_id>") which finds suitable fd from fdset.
+> Such behavior is incompatible with fd:<fd_num> at all, as such syntax
+> doesn't imply the using of particular fd. But if so, why add-fd returns
+> the value of added fd?..
+>
+> But if I'm right it's enough to:
+> 1) Modify monitor_fd_param to check where fd comes from and disallow us=
+ing
+> =C2=A0=C2=A0=C2=A0fd of "add-fd",
+> 2) As we discussed earlier, modify monitor_get_fd to remove named fd fr=
+om its
+> =C2=A0=C2=A0=C2=A0list before return,
 
-Makes this function more complicated than necessary. I agree when there
-are locks involved.
+Omg, monitor_fd_param is already do so... Sorry, so the problem only in
+incoming case.
 
-> =20
->>
->>> +
->>> +	return 0;
->>> +};
->>> +
->>> +static int virtio_pmem_probe(struct virtio_device *vdev)
->>> +{
->>> +	int err =3D 0;
->>> +	struct resource res;
->>> +	struct virtio_pmem *vpmem;
->>> +	struct nd_region_desc ndr_desc =3D {};
->>> +	int nid =3D dev_to_node(&vdev->dev);
->>> +	struct nd_region *nd_region;
->>
->> Nit: use reverse Christmas tree layout :)
->=20
-> Done.
->=20
->>
->>> +
->>> +	if (!vdev->config->get) {
->>> +		dev_err(&vdev->dev, "%s failure: config access disabled\n",
->>> +			__func__);
->>> +		return -EINVAL;
->>> +	}
->>> +
->>> +	vpmem =3D devm_kzalloc(&vdev->dev, sizeof(*vpmem), GFP_KERNEL);
->>> +	if (!vpmem) {
->>> +		err =3D -ENOMEM;
->>> +		goto out_err;
->>> +	}
->>> +
->>> +	vpmem->vdev =3D vdev;
->>> +	vdev->priv =3D vpmem;
->>> +	err =3D init_vq(vpmem);
->>> +	if (err)
->>> +		goto out_err;
->>> +
->>> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
->>> +			start, &vpmem->start);
->>> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
->>> +			size, &vpmem->size);
->>> +
->>> +	res.start =3D vpmem->start;
->>> +	res.end   =3D vpmem->start + vpmem->size-1;
->>> +	vpmem->nd_desc.provider_name =3D "virtio-pmem";
->>> +	vpmem->nd_desc.module =3D THIS_MODULE;
->>> +
->>> +	vpmem->nvdimm_bus =3D nvdimm_bus_register(&vdev->dev,
->>> +						&vpmem->nd_desc);
->>> +	if (!vpmem->nvdimm_bus)
->>> +		goto out_vq;
->>> +
->>> +	dev_set_drvdata(&vdev->dev, vpmem->nvdimm_bus);
->>> +
->>> +	ndr_desc.res =3D &res;
->>> +	ndr_desc.numa_node =3D nid;
->>> +	ndr_desc.flush =3D async_pmem_flush;
->>> +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
->>> +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
->>> +	nd_region =3D nvdimm_pmem_region_create(vpmem->nvdimm_bus, &ndr_des=
-c);
->>> +
->>
->> I'd drop this empty line.
->=20
-> hmm.
->=20
+> 3) Use monitor_fd_param in migrate_incoming for "fd:" proto.
+>
+> I'm not insist. May be it's ok to use fd from fdset directly and so qem=
+u_close
+> should be modifyed.
+>
+> Just to clarify what I mean:
+> fdset is a struct:
+> struct MonFdset {
+> =C2=A0=C2=A0=C2=A0=C2=A0int64_t id;
+> =C2=A0=C2=A0=C2=A0=C2=A0QLIST_HEAD(, MonFdsetFd) fds;
+> =C2=A0=C2=A0=C2=A0=C2=A0QLIST_HEAD(, MonFdsetFd) dup_fds;
+> =C2=A0=C2=A0=C2=A0=C2=A0QLIST_ENTRY(MonFdset) next;
+> };
+>
+> * add-fd appends new fd to "->fds" list.
+> * qemu_open("/dev/fdset/X", int perms) is looking for suitable (by perm=
+s) fd
+> =C2=A0=C2=A0from fdset with id X, dup it and append "->dup_fds" list.
+> * qemu_close(int fd) tryes to find the fd in all "->dup_fds" lists
+> =C2=A0=C2=A0of all fdsets and remove it. And closes fd anyway.
+>
+> If not to disallow using fds added by add-fd then there are three
+> possible solutions:
+> 1) dup fd in monitor_fd_param it the fd is from some fdset,
+> 2) remove the fd from "->fds" list in qemu_close
+> 3) don't close it in qemu_close, so client is responsible to close it b=
+y
+> =C2=A0=C2=A0=C2=A0remove-fd.
+>
+>>> =C2=A0=C2=A0>> =C2=A0>
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A02) My suggestion about monitor_fd_param=
+ and make "fd:" for
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0migrate/migrate-incoming consistent. So=
+ user will be able to use
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A0getfd + migrate-incoming
+>>> =C2=A0=C2=A0>> =C2=A0>> =C2=A03) Both of them or something else
+>>> =C2=A0=C2=A0>> =C2=A0>>
+>>> =C2=A0=C2=A0>>
 
-The common pattern after allocating something, immediately check for it
-in the next line (like you do throughout this patch ;) )
-
-...
->> You are not freeing "vdev->priv".
->=20
-> vdev->priv is vpmem which is allocated using devm API.
-
-I'm confused. Looking at drivers/virtio/virtio_balloon.c:
-
-static void virtballoon_remove(struct virtio_device *vdev)
-{
-	struct virtio_balloon *vb =3D vdev->priv;
-
-	...
-
-	kfree(vb);
-}
-
-I think you should do the same here, vdev->priv is allocated in
-virtio_pmem_probe.
-
-But maybe I am missing something important here :)
-
->>
->>> +	nvdimm_bus_unregister(nvdimm_bus);
->>> +	vdev->config->del_vqs(vdev);
->>> +	vdev->config->reset(vdev);
->>> +}
->>> +
-
---=20
-
-Thanks,
-
-David / dhildenb
+Regards,
+Yury
 
