@@ -3,70 +3,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26D54C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:30:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D977EC04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:31:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D74742084A
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:30:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D74742084A
+	by mail.kernel.org (Postfix) with ESMTPS id 8C8AE21537
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:31:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C8AE21537
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44096 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44116 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQTlT-000244-4o
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 05:30:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37394)
+	id 1hQTmn-0003IN-TF
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 05:31:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hQTiF-0007MD-DA
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:27:09 -0400
+	(envelope-from <philmd@redhat.com>) id 1hQTiR-0007UP-B5
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:27:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hQTiD-0001EH-AH
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:27:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60194)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hQTiD-0001DP-1C
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:27:05 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E269A87624;
-	Tue, 14 May 2019 09:27:03 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
-	(colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8660360166;
-	Tue, 14 May 2019 09:27:03 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com
-	(zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-	by colo-mx.corp.redhat.com (Postfix) with ESMTP id CEC2D41F3C;
-	Tue, 14 May 2019 09:27:02 +0000 (UTC)
-Date: Tue, 14 May 2019 05:27:02 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Message-ID: <752392764.28554139.1557826022323.JavaMail.zimbra@redhat.com>
-In-Reply-To: <f2ea35a6-ec98-447c-44fe-0cb3ab309340@redhat.com>
-References: <20190510155202.14737-1-pagupta@redhat.com>
-	<20190510155202.14737-3-pagupta@redhat.com>
-	<f2ea35a6-ec98-447c-44fe-0cb3ab309340@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hQTiP-0001ac-Da
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:27:19 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42936)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hQTiP-0001YT-4i
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:27:17 -0400
+Received: by mail-wr1-f65.google.com with SMTP id l2so18333615wrb.9
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 02:27:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=/jGquczaI3r5wCsBpvmEnRbuRBlEbj38AHeOWWFtLB0=;
+	b=r25DwGpnBNlZKX7AUcGU/dVukWIg7hiVCxzySyb86EImkXEwk/l7XT3TFpNadmEeT7
+	bqrBDwMGKU7hk21vnBG/i/7cmOzB/A4s3V+JTBYRLx243PrFV6v1Igc3e7ZsecEoEmoe
+	V1JQPRaQQs1VUiEG80TFMKoO+ZLoti1CEdhohx1fwHchbMiJu5TrgHFW98h+yVRe0T3D
+	faLtp+cnJnkY1G/vRT7wlJZKr5advPG5cCkTt0yGHwixT38GK3b8fjQj4nV7l2h/P1LK
+	rji6wWBefy1vdcDCqQuIWUElTd848VGJ6Agi2peUPgaLlMR5g6uhe2nqsYkrOszly66K
+	Ltgw==
+X-Gm-Message-State: APjAAAXgZzE0h+Z1HRwlWd82D1cxmP9uTG+4Bhbxca7+3jgnI7J2mlxP
+	VhVhFuOay+tkpu6vPUqk/rd03zt2IgY=
+X-Google-Smtp-Source: APXvYqwwqyjrLm2CC8PSih4vYTyI+XES+OGIylU/B4ESerNRKuUIK/oww7Pbna3llW7bRoe1RJVzNg==
+X-Received: by 2002:a05:6000:10c4:: with SMTP id
+	b4mr8216543wrx.145.1557826035656; 
+	Tue, 14 May 2019 02:27:15 -0700 (PDT)
+Received: from [192.168.1.33] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	y6sm26665891wrw.60.2019.05.14.02.27.14
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Tue, 14 May 2019 02:27:15 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-arm@nongnu.org
+References: <20190510191051.5973-1-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <90485cb4-4263-6b6e-2250-7717c064f439@redhat.com>
+Date: Tue, 14 May 2019 11:27:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190510191051.5973-1-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.65.16.148, 10.4.195.18]
-Thread-Topic: virtio-pmem: Add virtio pmem driver
-Thread-Index: xYWChsuo0mqv2Tff4hSAYzNT4Gs45Q==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Tue, 14 May 2019 09:27:04 +0000 (UTC)
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v8 2/6] virtio-pmem: Add virtio pmem driver
+	[fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [RFC PATCH] target/arm: semihosting docs,
+ formatting and return clean-ups
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,469 +87,415 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com,
-	jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
-	virtualization@lists.linux-foundation.org,
-	adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
-	aarcange@redhat.com, dave jiang <dave.jiang@intel.com>,
-	jstaron@google.com, linux-nvdimm@lists.01.org,
-	vishal l verma <vishal.l.verma@intel.com>, willy@infradead.org,
-	hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com,
-	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
-	riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
-	stefanha@redhat.com, pbonzini@redhat.com,
-	dan j williams <dan.j.williams@intel.com>,
-	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
-	tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-	darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, imammedo@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Alex,
 
-Hi David,
-
-Thank you for the review.
-
-> On 10.05.19 17:51, Pankaj Gupta wrote:
-> > This patch adds virtio-pmem driver for KVM guest.
-> > 
-> > Guest reads the persistent memory range information from
-> > Qemu over VIRTIO and registers it on nvdimm_bus. It also
-> > creates a nd_region object with the persistent memory
-> > range information so that existing 'nvdimm/pmem' driver
-> > can reserve this into system memory map. This way
-> > 'virtio-pmem' driver uses existing functionality of pmem
-> > driver to register persistent memory compatible for DAX
-> > capable filesystems.
-> > 
-> > This also provides function to perform guest flush over
-> > VIRTIO from 'pmem' driver when userspace performs flush
-> > on DAX memory range.
-> > 
-> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
-> > ---
-> >  drivers/nvdimm/Makefile          |   1 +
-> >  drivers/nvdimm/nd_virtio.c       | 129 +++++++++++++++++++++++++++++++
-> >  drivers/nvdimm/virtio_pmem.c     | 117 ++++++++++++++++++++++++++++
-> >  drivers/virtio/Kconfig           |  10 +++
-> >  include/linux/virtio_pmem.h      |  60 ++++++++++++++
-> >  include/uapi/linux/virtio_ids.h  |   1 +
-> >  include/uapi/linux/virtio_pmem.h |  10 +++
-> >  7 files changed, 328 insertions(+)
-> >  create mode 100644 drivers/nvdimm/nd_virtio.c
-> >  create mode 100644 drivers/nvdimm/virtio_pmem.c
-> >  create mode 100644 include/linux/virtio_pmem.h
-> >  create mode 100644 include/uapi/linux/virtio_pmem.h
-> > 
-> > diff --git a/drivers/nvdimm/Makefile b/drivers/nvdimm/Makefile
-> > index 6f2a088afad6..cefe233e0b52 100644
-> > --- a/drivers/nvdimm/Makefile
-> > +++ b/drivers/nvdimm/Makefile
-> > @@ -5,6 +5,7 @@ obj-$(CONFIG_ND_BTT) += nd_btt.o
-> >  obj-$(CONFIG_ND_BLK) += nd_blk.o
-> >  obj-$(CONFIG_X86_PMEM_LEGACY) += nd_e820.o
-> >  obj-$(CONFIG_OF_PMEM) += of_pmem.o
-> > +obj-$(CONFIG_VIRTIO_PMEM) += virtio_pmem.o nd_virtio.o
-> >  
-> >  nd_pmem-y := pmem.o
-> >  
-> > diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
-> > new file mode 100644
-> > index 000000000000..ed7ddcc5a62c
-> > --- /dev/null
-> > +++ b/drivers/nvdimm/nd_virtio.c
-> > @@ -0,0 +1,129 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * virtio_pmem.c: Virtio pmem Driver
-> > + *
-> > + * Discovers persistent memory range information
-> > + * from host and provides a virtio based flushing
-> > + * interface.
-> > + */
-> > +#include <linux/virtio_pmem.h>
-> > +#include "nd.h"
-> > +
-> > + /* The interrupt handler */
-> > +void host_ack(struct virtqueue *vq)
-> > +{
-> > +	unsigned int len;
-> > +	unsigned long flags;
-> > +	struct virtio_pmem_request *req, *req_buf;
-> > +	struct virtio_pmem *vpmem = vq->vdev->priv;
+On 5/10/19 9:10 PM, Alex Bennée wrote:
+> This is a clean-up of the semihosting calls after reading ver 2.0 of
+> the specification. There are a number of small fixes that seemed too
+> insignificant to split into smaller patches:
 > 
-> Nit: use reverse Christmas tree layout :)
 
-o.k
+Can you split at least this one of:
+
+>   - fixup block comments as per standard
+
+The rest is probably acceptable as an unique patch:
+
+>   - add reference to the ARM semihosting spec
+>   - add some additional commentary on return values
+>   - audit return values, return 0xdeadbeef for corrupted values
+>   - fix up leaks from early returns with lock_user_string
+>   - return bytes not written/read instead of -1
+>   - add LOG_UNIMP for missing functionality
+
+Thanks!
+
+Phil.
 
 > 
-> > +
-> > +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
-> > +		req->done = true;
-> > +		wake_up(&req->host_acked);
-> > +
-> > +		if (!list_empty(&vpmem->req_list)) {
-> > +			req_buf = list_first_entry(&vpmem->req_list,
-> > +					struct virtio_pmem_request, list);
-> > +			req_buf->wq_buf_avail = true;
-> > +			wake_up(&req_buf->wq_buf);
-> > +			list_del(&req_buf->list);
-> > +		}
-> > +	}
-> > +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +}
-> > +EXPORT_SYMBOL_GPL(host_ack);
-> > +
-> > + /* The request submission function */
-> > +int virtio_pmem_flush(struct nd_region *nd_region)
-> > +{
-> > +	int err, err1;
-> > +	unsigned long flags;
-> > +	struct scatterlist *sgs[2], sg, ret;
-> > +	struct virtio_device *vdev = nd_region->provider_data;
-> > +	struct virtio_pmem *vpmem = vdev->priv;
-> > +	struct virtio_pmem_request *req;
+> This is very much a Friday patch. It might be worth splitting up if
+> coming back for a more concerted clean-up series for semihosting as
+> the asynchronous gdb calls probably need more attention.
 > 
-> Nit: use reverse Christmas tree layout :)
-
-o.k
-
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  target/arm/arm-semi.c | 180 +++++++++++++++++++++++++-----------------
+>  1 file changed, 109 insertions(+), 71 deletions(-)
 > 
-> > +
-> > +	might_sleep();
-> > +	req = kmalloc(sizeof(*req), GFP_KERNEL);
-> > +	if (!req)
-> > +		return -ENOMEM;
-> > +
-> > +	req->done = false;
-> > +	strcpy(req->name, "FLUSH");
-> > +	init_waitqueue_head(&req->host_acked);
-> > +	init_waitqueue_head(&req->wq_buf);
-> > +	INIT_LIST_HEAD(&req->list);
-> > +	sg_init_one(&sg, req->name, strlen(req->name));
-> > +	sgs[0] = &sg;
-> > +	sg_init_one(&ret, &req->ret, sizeof(req->ret));
-> > +	sgs[1] = &ret;
-> > +
-> > +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	 /*
-> > +	  * If virtqueue_add_sgs returns -ENOSPC then req_vq virtual
-> > +	  * queue does not have free descriptor. We add the request
-> > +	  * to req_list and wait for host_ack to wake us up when free
-> > +	  * slots are available.
-> > +	  */
-> > +	while ((err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req,
-> > +					GFP_ATOMIC)) == -ENOSPC) {
-> > +
-> > +		dev_err(&vdev->dev, "failed to send command to virtio pmem"\
-> > +			"device, no free slots in the virtqueue\n");
-> > +		req->wq_buf_avail = false;
-> > +		list_add_tail(&req->list, &vpmem->req_list);
-> > +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +
-> > +		/* When host has read buffer, this completes via host_ack */
-> 
-> "A host repsonse results in "host_ack" getting called" ... ?
-
-o.k
-
-> 
-> > +		wait_event(req->wq_buf, req->wq_buf_avail);
-> > +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	}
-> > +	err1 = virtqueue_kick(vpmem->req_vq);
-> > +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +
-> > +	/*
-> > +	 * virtqueue_add_sgs failed with error different than -ENOSPC, we can't
-> > +	 * do anything about that.
-> > +	 */
-> > +	if (err || !err1) {
-> > +		dev_info(&vdev->dev, "failed to send command to virtio pmem device\n");
-> > +		err = -EIO;
-> > +		goto ret;
-> 
-> Avoid the goto. Just move the following statements into an "else" case.
-
-o.k
-
-> 
-> > +	}
-> > +
-> > +	/* When host has read buffer, this completes via host_ack */
-> 
-> "A host repsonse results in "host_ack" getting called" ... ?
-> 
-> > +	wait_event(req->host_acked, req->done);
-> > +	err = req->ret;
-> > +ret:
-> > +	kfree(req);
-> > +	return err;
-> > +};
-> > +
-> > +/* The asynchronous flush callback function */
-> > +int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
-> > +{
-> > +	int rc = 0;
-> > +
-> > +	/* Create child bio for asynchronous flush and chain with
-> > +	 * parent bio. Otherwise directly call nd_region flush.
-> > +	 */
-> > +	if (bio && bio->bi_iter.bi_sector != -1) {
-> > +		struct bio *child = bio_alloc(GFP_ATOMIC, 0);
-> > +
-> > +		if (!child)
-> > +			return -ENOMEM;
-> > +		bio_copy_dev(child, bio);
-> > +		child->bi_opf = REQ_PREFLUSH;
-> > +		child->bi_iter.bi_sector = -1;
-> > +		bio_chain(child, bio);
-> > +		submit_bio(child);
-> 
-> return 0;
-> 
-> Then, drop the "else" case and "int rc" and do directly
-> 
-> if (virtio_pmem_flush(nd_region))
-> 	return -EIO;
-
-and another 'return 0' here :)
-
-I don't like return from multiple places instead I prefer
-single exit point from function.
-
-> 
-> > +	} else {
-> > +
-> > +			rc = -EIO;
-> > +	}
-> > +
-> > +	return rc;
-> > +};
-> > +EXPORT_SYMBOL_GPL(async_pmem_flush);
-> > +MODULE_LICENSE("GPL");
-> > diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
-> > new file mode 100644
-> > index 000000000000..cfc6381c4e5d
-> > --- /dev/null
-> > +++ b/drivers/nvdimm/virtio_pmem.c
-> > @@ -0,0 +1,117 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * virtio_pmem.c: Virtio pmem Driver
-> > + *
-> > + * Discovers persistent memory range information
-> > + * from host and registers the virtual pmem device
-> > + * with libnvdimm core.
-> > + */
-> > +#include <linux/virtio_pmem.h>
-> > +#include "nd.h"
-> > +
-> > +static struct virtio_device_id id_table[] = {
-> > +	{ VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
-> > +	{ 0 },
-> > +};
-> > +
-> > + /* Initialize virt queue */
-> > +static int init_vq(struct virtio_pmem *vpmem)
-> > +{
-> > +	/* single vq */
-> > +	vpmem->req_vq = virtio_find_single_vq(vpmem->vdev,
-> > +				host_ack, "flush_queue");
-> 
-> Nit: Wrong indentation of parameters.
-
-o.k
-
-> 
-> > +	if (IS_ERR(vpmem->req_vq))
-> > +		return PTR_ERR(vpmem->req_vq);
-> > +
-> > +	spin_lock_init(&vpmem->pmem_lock);
-> > +	INIT_LIST_HEAD(&vpmem->req_list);
-> 
-> I would initialize the locks in the virtio_pmem_probe() directly,
-> earlier (directly after allocating vpmem).
-
-Since the lock is to protect the vq so logically I put it in 'init_vq'
-which is eventually called by probe.
- 
-> 
-> > +
-> > +	return 0;
-> > +};
-> > +
-> > +static int virtio_pmem_probe(struct virtio_device *vdev)
-> > +{
-> > +	int err = 0;
-> > +	struct resource res;
-> > +	struct virtio_pmem *vpmem;
-> > +	struct nd_region_desc ndr_desc = {};
-> > +	int nid = dev_to_node(&vdev->dev);
-> > +	struct nd_region *nd_region;
-> 
-> Nit: use reverse Christmas tree layout :)
-
-Done.
-
-> 
-> > +
-> > +	if (!vdev->config->get) {
-> > +		dev_err(&vdev->dev, "%s failure: config access disabled\n",
-> > +			__func__);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	vpmem = devm_kzalloc(&vdev->dev, sizeof(*vpmem), GFP_KERNEL);
-> > +	if (!vpmem) {
-> > +		err = -ENOMEM;
-> > +		goto out_err;
-> > +	}
-> > +
-> > +	vpmem->vdev = vdev;
-> > +	vdev->priv = vpmem;
-> > +	err = init_vq(vpmem);
-> > +	if (err)
-> > +		goto out_err;
-> > +
-> > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> > +			start, &vpmem->start);
-> > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> > +			size, &vpmem->size);
-> > +
-> > +	res.start = vpmem->start;
-> > +	res.end   = vpmem->start + vpmem->size-1;
-> > +	vpmem->nd_desc.provider_name = "virtio-pmem";
-> > +	vpmem->nd_desc.module = THIS_MODULE;
-> > +
-> > +	vpmem->nvdimm_bus = nvdimm_bus_register(&vdev->dev,
-> > +						&vpmem->nd_desc);
-> > +	if (!vpmem->nvdimm_bus)
-> > +		goto out_vq;
-> > +
-> > +	dev_set_drvdata(&vdev->dev, vpmem->nvdimm_bus);
-> > +
-> > +	ndr_desc.res = &res;
-> > +	ndr_desc.numa_node = nid;
-> > +	ndr_desc.flush = async_pmem_flush;
-> > +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
-> > +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
-> > +	nd_region = nvdimm_pmem_region_create(vpmem->nvdimm_bus, &ndr_desc);
-> > +
-> 
-> I'd drop this empty line.
-
-hmm.
-
-> 
-> > +	if (!nd_region)
-> > +		goto out_nd;
-> > +	nd_region->provider_data = dev_to_virtio(nd_region->dev.parent->parent);
-> 
-> Does it make sense to move some parts into separate functions for
-> readability? E.g., virtio_pmem_init_nvdimm_bus()
-
-I think this function only has initialization and don't have any complex logic.
-
-> 
-> > +	return 0;
-> > +out_nd:
-> > +	err = -ENXIO;
-> 
-> I'd always initialize "err" along with the goto statement for
-> readability, especially because ...
-> 
-> > +	nvdimm_bus_unregister(vpmem->nvdimm_bus);
-> > +out_vq:
-> 
-> ... you don't initialize err in this case. Err is here 0 if I am not wrong.
-
-Right. Changed.
-
-> 
-> > +	vdev->config->del_vqs(vdev);
-> > +out_err:
-> > +	dev_err(&vdev->dev, "failed to register virtio pmem memory\n");
-> 
-> Should we try to give more meaning full messages? I can think of
-> scenarios like "memory region is not properly aligned" or "out of memory".
-
-o.k
-
-> 
-> > +	return err;
-> > +}
-> > +
-> > +static void virtio_pmem_remove(struct virtio_device *vdev)
-> > +{
-> > +	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
-> > +
-> 
-> Is the nd_region implicitly cleaned up?
-
-yes. it will be.
-
-> 
-> You are not freeing "vdev->priv".
-
-vdev->priv is vpmem which is allocated using devm API.
-> 
-> > +	nvdimm_bus_unregister(nvdimm_bus);
-> > +	vdev->config->del_vqs(vdev);
-> > +	vdev->config->reset(vdev);
-> > +}
-> > +
-> > +static struct virtio_driver virtio_pmem_driver = {
-> > +	.driver.name		= KBUILD_MODNAME,
-> > +	.driver.owner		= THIS_MODULE,
-> > +	.id_table		= id_table,
-> > +	.probe			= virtio_pmem_probe,
-> > +	.remove			= virtio_pmem_remove,
-> > +};
-> > +
-> > +module_virtio_driver(virtio_pmem_driver);
-> > +MODULE_DEVICE_TABLE(virtio, id_table);
-> > +MODULE_DESCRIPTION("Virtio pmem driver");
-> > +MODULE_LICENSE("GPL");
-> > diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-> > index 35897649c24f..9f634a2ed638 100644
-> > --- a/drivers/virtio/Kconfig
-> > +++ b/drivers/virtio/Kconfig
-> > @@ -42,6 +42,16 @@ config VIRTIO_PCI_LEGACY
-> >  
-> >  	  If unsure, say Y.
-> >  
-> > +config VIRTIO_PMEM
-> > +	tristate "Support for virtio pmem driver"
-> > +	depends on VIRTIO
-> > +	depends on LIBNVDIMM
-> > +	help
-> > +	This driver provides support for virtio based flushing interface
-> > +	for persistent memory range.
-> 
-> "This driver provides access to virtio-pmem devices, storage devices
-> that are mapped into the physical address space - similar to NVDIMMs -
-> with a virtio-based flushing interface." ... ?
-
-looks better. Incorporated.
-
-Thanks,
-Pankaj
-> 
-> > +
-> > +	If unsure, say M.
-> > +
-> 
-> 
-> --
-> 
-> Thanks,
-> 
-> David / dhildenb
+> diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+> index 4c326fdc2fb..8deaed2807c 100644
+> --- a/target/arm/arm-semi.c
+> +++ b/target/arm/arm-semi.c
+> @@ -2,6 +2,7 @@
+>   *  Arm "Angel" semihosting syscalls
+>   *
+>   *  Copyright (c) 2005, 2007 CodeSourcery.
+> + *  Copyright (c) 2019 Linaro
+>   *  Written by Paul Brook.
+>   *
+>   *  This program is free software; you can redistribute it and/or modify
+> @@ -15,13 +16,19 @@
+>   *  GNU General Public License for more details.
+>   *
+>   *  You should have received a copy of the GNU General Public License
+> - *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + *  along with this program; if not, see
+> + *  <http://www.gnu.org/licenses/>.
+> + *
+> + *  ARM Semihosting is documented in:
+> + *     Semihosting for AArch32 and AArch64 Release 2.0
+> + *     https://static.docs.arm.com/100863/0200/semihosting.pdf
+>   */
+>  
+>  #include "qemu/osdep.h"
+>  
+>  #include "cpu.h"
+>  #include "exec/semihost.h"
+> +#include "exec/log.h"
+>  #ifdef CONFIG_USER_ONLY
+>  #include "qemu.h"
+>  
+> @@ -241,13 +248,18 @@ static target_ulong arm_gdb_syscall(ARMCPU *cpu, gdb_syscall_complete_cb cb,
+>       put_user_u64(val, args + (n) * 8) :                \
+>       put_user_u32(val, args + (n) * 4))
+>  
+> +/*
+> + * Do a semihosting call. Returns the "RETURN REGISTER" which is
+> + * documented as corrupted for some calls. In this case we use the
+> + * venerable 0xdeadbeef.
+> + */
+>  target_ulong do_arm_semihosting(CPUARMState *env)
+>  {
+>      ARMCPU *cpu = arm_env_get_cpu(env);
+>      CPUState *cs = CPU(cpu);
+>      target_ulong args;
+>      target_ulong arg0, arg1, arg2, arg3;
+> -    char * s;
+> +    char *s;
+>      int nr;
+>      uint32_t ret;
+>      uint32_t len;
+> @@ -273,9 +285,9 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>          GET_ARG(2);
+>          s = lock_user_string(arg0);
+>          if (!s) {
+> -            /* FIXME - should this error code be -TARGET_EFAULT ? */
+>              return (uint32_t)-1;
+>          }
+> +        /* check for invalid open mode */
+>          if (arg1 >= 12) {
+>              unlock_user(s, arg0, 0);
+>              return (uint32_t)-1;
+> @@ -287,7 +299,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>          }
+>          if (use_gdb_syscalls()) {
+>              ret = arm_gdb_syscall(cpu, arm_semi_cb, "open,%s,%x,1a4", arg0,
+> -                                  (int)arg2+1, gdb_open_modeflags[arg1]);
+> +                                  (int) arg2 + 1, gdb_open_modeflags[arg1]);
+>          } else {
+>              ret = set_swi_errno(ts, open(s, open_modeflags[arg1], 0644));
+>          }
+> @@ -301,48 +313,51 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>              return set_swi_errno(ts, close(arg0));
+>          }
+>      case TARGET_SYS_WRITEC:
+> -        {
+> -          char c;
+> -
+> -          if (get_user_u8(c, args))
+> -              /* FIXME - should this error code be -TARGET_EFAULT ? */
+> -              return (uint32_t)-1;
+> -          /* Write to debug console.  stderr is near enough.  */
+> -          if (use_gdb_syscalls()) {
+> +    {
+> +        char c;
+> +        if (!get_user_u8(c, args)) {
+> +            /* Write to debug console.  stderr is near enough.  */
+> +            if (use_gdb_syscalls()) {
+>                  return arm_gdb_syscall(cpu, arm_semi_cb, "write,2,%x,1", args);
+> -          } else {
+> +            } else {
+>  #ifdef CONFIG_SOFTMMU
+> -              Chardev *chardev = semihosting_get_chardev();
+> -              if (chardev) {
+> -                  return qemu_chr_write_all(chardev, (uint8_t *) &c, 1);
+> -              } else
+> +                Chardev *chardev = semihosting_get_chardev();
+> +                if (chardev) {
+> +                    return qemu_chr_write_all(chardev, (uint8_t *) &c, 1);
+> +                }
+>  #endif
+> -              {
+> -                  return write(STDERR_FILENO, &c, 1);
+> -              }
+> -          }
+> +                return write(STDERR_FILENO, &c, 1);
+> +            }
+> +        } else {
+> +            /* return register is corrupted */
+> +            return 0xdeadbeef;
+>          }
+> +    }
+>      case TARGET_SYS_WRITE0:
+> -        if (!(s = lock_user_string(args)))
+> -            /* FIXME - should this error code be -TARGET_EFAULT ? */
+> -            return (uint32_t)-1;
+> -        len = strlen(s);
+> -        if (use_gdb_syscalls()) {
+> -            return arm_gdb_syscall(cpu, arm_semi_cb, "write,2,%x,%x",
+> -                                   args, len);
+> -        } else {
+> +    {
+> +        s = lock_user_string(args);
+> +        if (s) {
+> +            len = strlen(s);
+> +            if (use_gdb_syscalls()) {
+> +                arm_gdb_syscall(cpu, arm_semi_cb, "write,2,%x,%x",
+> +                                args, len);
+> +            } else {
+>  #ifdef CONFIG_SOFTMMU
+> -            Chardev *chardev = semihosting_get_chardev();
+> -            if (chardev) {
+> -                ret = qemu_chr_write_all(chardev, (uint8_t *) s, len);
+> -            } else
+> +                Chardev *chardev = semihosting_get_chardev();
+> +                if (chardev) {
+> +                    qemu_chr_write_all(chardev, (uint8_t *) s, len);
+> +                } else
+>  #endif
+> -            {
+> -                ret = write(STDERR_FILENO, s, len);
+> +                {
+> +                    /* result ignored */
+> +                    ret = write(STDERR_FILENO, s, len);
+> +                }
+>              }
+>          }
+>          unlock_user(s, args, 0);
+> -        return ret;
+> +        /* return register is corrupted */
+> +        return 0xdeadbeef;
+> +    }
+>      case TARGET_SYS_WRITE:
+>          GET_ARG(0);
+>          GET_ARG(1);
+> @@ -355,13 +370,15 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>          } else {
+>              s = lock_user(VERIFY_READ, arg1, len, 1);
+>              if (!s) {
+> -                /* FIXME - should this error code be -TARGET_EFAULT ? */
+> -                return (uint32_t)-1;
+> +                /* Return bytes not written on error */
+> +                return len;
+>              }
+>              ret = set_swi_errno(ts, write(arg0, s, len));
+>              unlock_user(s, arg1, 0);
+> -            if (ret == (uint32_t)-1)
+> -                return -1;
+> +            if (ret == (uint32_t)-1) {
+> +                ret = 0;
+> +            }
+> +            /* Return bytes not written */
+>              return len - ret;
+>          }
+>      case TARGET_SYS_READ:
+> @@ -376,26 +393,33 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>          } else {
+>              s = lock_user(VERIFY_WRITE, arg1, len, 0);
+>              if (!s) {
+> -                /* FIXME - should this error code be -TARGET_EFAULT ? */
+> -                return (uint32_t)-1;
+> +                /* return bytes not read */
+> +                return len;
+>              }
+>              do {
+>                  ret = set_swi_errno(ts, read(arg0, s, len));
+>              } while (ret == -1 && errno == EINTR);
+>              unlock_user(s, arg1, len);
+> -            if (ret == (uint32_t)-1)
+> -                return -1;
+> +            if (ret == (uint32_t)-1) {
+> +                ret = 0;
+> +            }
+> +            /* Return bytes not read */
+>              return len - ret;
+>          }
+>      case TARGET_SYS_READC:
+> -       /* XXX: Read from debug console. Not implemented.  */
+> +        qemu_log_mask(LOG_UNIMP, "%s: TARGET_SYS_READC not implemented",
+> +                      __func__);
+>          return 0;
+>      case TARGET_SYS_ISTTY:
+>          GET_ARG(0);
+>          if (use_gdb_syscalls()) {
+>              return arm_gdb_syscall(cpu, arm_semi_cb, "isatty,%x", arg0);
+>          } else {
+> -            return isatty(arg0);
+> +            if (isatty(arg0)) {
+> +                return 1;
+> +            } else {
+> +                return (errno == EBADF ? -1 : 0);
+> +            }
+>          }
+>      case TARGET_SYS_SEEK:
+>          GET_ARG(0);
+> @@ -405,8 +429,9 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>                                     arg0, arg1);
+>          } else {
+>              ret = set_swi_errno(ts, lseek(arg0, arg1, SEEK_SET));
+> -            if (ret == (uint32_t)-1)
+> -              return -1;
+> +            if (ret == (uint32_t)-1) {
+> +                return -1;
+> +            }
+>              return 0;
+>          }
+>      case TARGET_SYS_FLEN:
+> @@ -417,28 +442,30 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>          } else {
+>              struct stat buf;
+>              ret = set_swi_errno(ts, fstat(arg0, &buf));
+> -            if (ret == (uint32_t)-1)
+> +            if (ret == (uint32_t)-1) {
+>                  return -1;
+> +            }
+>              return buf.st_size;
+>          }
+>      case TARGET_SYS_TMPNAM:
+> -        /* XXX: Not implemented.  */
+> +        qemu_log_mask(LOG_UNIMP, "%s: TARGET_SYS_TMPNAM not implemented",
+> +                      __func__);
+>          return -1;
+>      case TARGET_SYS_REMOVE:
+>          GET_ARG(0);
+>          GET_ARG(1);
+>          if (use_gdb_syscalls()) {
+>              ret = arm_gdb_syscall(cpu, arm_semi_cb, "unlink,%s",
+> -                                  arg0, (int)arg1+1);
+> +                                  arg0, (int)arg1 + 1);
+>          } else {
+>              s = lock_user_string(arg0);
+>              if (!s) {
+> -                /* FIXME - should this error code be -TARGET_EFAULT ? */
+> -                return (uint32_t)-1;
+> +                return -EIO;
+>              }
+> -            ret =  set_swi_errno(ts, remove(s));
+> +            ret = set_swi_errno(ts, remove(s));
+>              unlock_user(s, arg0, 0);
+>          }
+> +        /* 0 on success or host-specific error code */
+>          return ret;
+>      case TARGET_SYS_RENAME:
+>          GET_ARG(0);
+> @@ -447,20 +474,23 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>          GET_ARG(3);
+>          if (use_gdb_syscalls()) {
+>              return arm_gdb_syscall(cpu, arm_semi_cb, "rename,%s,%s",
+> -                                   arg0, (int)arg1+1, arg2, (int)arg3+1);
+> +                                   arg0, (int)arg1 + 1, arg2, (int)arg3 + 1);
+>          } else {
+>              char *s2;
+>              s = lock_user_string(arg0);
+>              s2 = lock_user_string(arg2);
+> -            if (!s || !s2)
+> -                /* FIXME - should this error code be -TARGET_EFAULT ? */
+> -                ret = (uint32_t)-1;
+> -            else
+> +            if (s && s2) {
+>                  ret = set_swi_errno(ts, rename(s, s2));
+> -            if (s2)
+> +            } else {
+> +                ret = -EIO;
+> +            }
+> +            if (s2) {
+>                  unlock_user(s2, arg2, 0);
+> -            if (s)
+> +            }
+> +            if (s) {
+>                  unlock_user(s, arg0, 0);
+> +            }
+> +            /* 0 on success or host-specific error code */
+>              return ret;
+>          }
+>      case TARGET_SYS_CLOCK:
+> @@ -472,7 +502,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>          GET_ARG(1);
+>          if (use_gdb_syscalls()) {
+>              return arm_gdb_syscall(cpu, arm_semi_cb, "system,%s",
+> -                                   arg0, (int)arg1+1);
+> +                                   arg0, (int)arg1 + 1);
+>          } else {
+>              s = lock_user_string(arg0);
+>              if (!s) {
+> @@ -527,14 +557,16 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>  
+>              output_size = ts->info->arg_end - ts->info->arg_start;
+>              if (!output_size) {
+> -                /* We special-case the "empty command line" case (argc==0).
+> -                   Just provide the terminating 0. */
+> +                /*
+> +                 * We special-case the "empty command line" case (argc==0).
+> +                 * Just provide the terminating 0.
+> +                 */
+>                  output_size = 1;
+>              }
+>  #endif
+>  
+>              if (output_size > input_size) {
+> -                 /* Not enough space to store command-line arguments.  */
+> +                /* Not enough space to store command-line arguments.  */
+>                  return -1;
+>              }
+>  
+> @@ -588,8 +620,10 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>              GET_ARG(0);
+>  
+>  #ifdef CONFIG_USER_ONLY
+> -            /* Some C libraries assume the heap immediately follows .bss, so
+> -               allocate it using sbrk.  */
+> +            /*
+> +             * Some C libraries assume the heap immediately follows .bss, so
+> +             * allocate it using sbrk.
+> +             */
+>              if (!ts->heap_limit) {
+>                  abi_ulong ret;
+>  
+> @@ -637,7 +671,8 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>          }
+>      case TARGET_SYS_EXIT:
+>          if (is_a64(env)) {
+> -            /* The A64 version of this call takes a parameter block,
+> +            /*
+> +             * The A64 version of this call takes a parameter block,
+>               * so the application-exit type can return a subcode which
+>               * is the exit status code from the application.
+>               */
+> @@ -650,14 +685,17 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>                  ret = 1;
+>              }
+>          } else {
+> -            /* ARM specifies only Stopped_ApplicationExit as normal
+> -             * exit, everything else is considered an error */
+> +            /*
+> +             * ARM specifies only Stopped_ApplicationExit as normal
+> +             * exit, everything else is considered an error
+> +             */
+>              ret = (args == ADP_Stopped_ApplicationExit) ? 0 : 1;
+>          }
+>          gdb_exit(env, ret);
+>          exit(ret);
+>      case TARGET_SYS_SYNCCACHE:
+> -        /* Clean the D-cache and invalidate the I-cache for the specified
+> +        /*
+> +         * Clean the D-cache and invalidate the I-cache for the specified
+>           * virtual address range. This is a nop for us since we don't
+>           * implement caches. This is only present on A64.
+>           */
 > 
 
