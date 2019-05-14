@@ -6,50 +6,55 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3438C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 06:32:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76627C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 06:47:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95C7B208C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 06:32:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95C7B208C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id 34220206A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 06:47:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34220206A3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40316 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40520 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQQzE-00009s-TX
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 02:32:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51995)
+	id 1hQRE9-0003W2-6C
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 02:47:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hQQil-0003b2-T9
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:15:31 -0400
+	(envelope-from <clg@kaod.org>) id 1hQRDB-000398-0y
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:46:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hQQif-0007fw-8u
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:15:27 -0400
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:48905)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hQQid-0007Vs-4t
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:15:21 -0400
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.vps.ablenet.jp
-	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
-	by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 5F0B73E542;
-	Tue, 14 May 2019 15:15:14 +0900 (JST)
-Received: from ysato.dip.jp (ZM005235.ppp.dion.ne.jp [222.8.5.235])
-	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 9DD6C240089; 
-	Tue, 14 May 2019 15:15:13 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-To: qemu-devel@nongnu.org
-Date: Tue, 14 May 2019 15:14:50 +0900
-Message-Id: <20190514061458.125225-5-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20190514061458.125225-1-ysato@users.sourceforge.jp>
-References: <20190514061458.125225-1-ysato@users.sourceforge.jp>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 202.224.55.14
-Subject: [Qemu-devel] [PATCH v12 04/12] target/rx: RX disassembler
+	(envelope-from <clg@kaod.org>) id 1hQRD8-0003O5-HW
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:46:52 -0400
+Received: from 1.mo2.mail-out.ovh.net ([46.105.63.121]:38367)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hQRD7-0003I9-RX
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:46:50 -0400
+Received: from player772.ha.ovh.net (unknown [10.109.159.154])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id E3241199F2E
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 08:46:40 +0200 (CEST)
+Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
+	(Authenticated sender: clg@kaod.org)
+	by player772.ha.ovh.net (Postfix) with ESMTPSA id C7BE65B19163;
+	Tue, 14 May 2019 06:46:32 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Tue, 14 May 2019 08:46:27 +0200
+Message-Id: <20190514064627.3838-1-clg@kaod.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 7228277403731594214
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrleehgdduuddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.63.121
+Subject: [Qemu-devel] [PATCH] docs: provide documentation on the POWER9 XIVE
+ interrupt controller
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -61,1529 +66,443 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
-	Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+	Greg Kurz <groug@kaod.org>,
+	Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
+	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
----
- include/disas/dis-asm.h |    5 +
- target/rx/disas.c       | 1480 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 1485 insertions(+)
- create mode 100644 target/rx/disas.c
+This documents the overall XIVE architecture and gives an overview of
+the QEMU models. It also provides documentation on the 'info pic'
+command.
 
-diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-index 9240ec32c2..de17792e88 100644
---- a/include/disas/dis-asm.h
-+++ b/include/disas/dis-asm.h
-@@ -226,6 +226,10 @@ enum bfd_architecture
- #define bfd_mach_nios2r2        2
-   bfd_arch_lm32,       /* Lattice Mico32 */
- #define bfd_mach_lm32 1
-+  bfd_arch_rx,       /* Renesas RX */
-+#define bfd_mach_rx            0x75
-+#define bfd_mach_rx_v2         0x76
-+#define bfd_mach_rx_v3         0x77
-   bfd_arch_last
-   };
- #define bfd_mach_s390_31 31
-@@ -433,6 +437,7 @@ int print_insn_little_nios2     (bfd_vma, disassemble_info*);
- int print_insn_xtensa           (bfd_vma, disassemble_info*);
- int print_insn_riscv32          (bfd_vma, disassemble_info*);
- int print_insn_riscv64          (bfd_vma, disassemble_info*);
-+int print_insn_rx(bfd_vma, disassemble_info *);
- 
- #if 0
- /* Fetch the disassembler for a given BFD, if that support is available.  */
-diff --git a/target/rx/disas.c b/target/rx/disas.c
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ docs/index.rst     |   1 +
+ docs/ppc/index.rst |  13 ++
+ docs/ppc/xive.rst  | 344 +++++++++++++++++++++++++++++++++++++++++++++
+ MAINTAINERS        |   1 +
+ 4 files changed, 359 insertions(+)
+ create mode 100644 docs/ppc/index.rst
+ create mode 100644 docs/ppc/xive.rst
+
+diff --git a/docs/index.rst b/docs/index.rst
+index 3690955dd1f5..557fe86233e3 100644
+--- a/docs/index.rst
++++ b/docs/index.rst
+@@ -12,4 +12,5 @@ Welcome to QEMU's documentation!
+=20
+    interop/index
+    devel/index
++   ppc/index
+=20
+diff --git a/docs/ppc/index.rst b/docs/ppc/index.rst
 new file mode 100644
-index 0000000000..8cada4825d
+index 000000000000..146f416ea3a0
 --- /dev/null
-+++ b/target/rx/disas.c
-@@ -0,0 +1,1480 @@
-+/*
-+ * Renesas RX Disassembler
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato <ysato@users.sourceforge.jp>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "disas/dis-asm.h"
-+#include "qemu/bitops.h"
-+#include "cpu.h"
-+
-+typedef struct DisasContext {
-+    disassemble_info *dis;
-+    uint32_t addr;
-+    uint32_t pc;
-+} DisasContext;
-+
-+
-+static uint32_t decode_load_bytes(DisasContext *ctx, uint32_t insn,
-+                           int i, int n)
-+{
-+    bfd_byte buf;
-+    while (++i <= n) {
-+        ctx->dis->read_memory_func(ctx->addr++, &buf, 1, ctx->dis);
-+        insn |= buf << (32 - i * 8);
-+    }
-+    return insn;
-+}
-+
-+static int32_t li(DisasContext *ctx, int sz)
-+{
-+    int32_t addr;
-+    bfd_byte buf[4];
-+    addr = ctx->addr;
-+
-+    switch (sz) {
-+    case 1:
-+        ctx->addr += 1;
-+        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
-+        return (int8_t)buf[0];
-+    case 2:
-+        ctx->addr += 2;
-+        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
-+        return ldsw_le_p(buf);
-+    case 3:
-+        ctx->addr += 3;
-+        ctx->dis->read_memory_func(addr, buf, 3, ctx->dis);
-+        return (int8_t)buf[2] << 16 | lduw_le_p(buf);
-+    case 0:
-+        ctx->addr += 4;
-+        ctx->dis->read_memory_func(addr, buf, 4, ctx->dis);
-+        return ldl_le_p(buf);
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
-+static int bdsp_s(DisasContext *ctx, int d)
-+{
-+    /*
-+     * 0 -> 8
-+     * 1 -> 9
-+     * 2 -> 10
-+     * 3 -> 3
-+     * :
-+     * 7 -> 7
-+     */
-+    if (d < 3) {
-+        d += 8;
-+    }
-+    return d;
-+}
-+
-+/* Include the auto-generated decoder.  */
-+#include "decode.inc.c"
-+
-+#define prt(...) (ctx->dis->fprintf_func)((ctx->dis->stream), __VA_ARGS__)
-+
-+#define RX_MEMORY_BYTE 0
-+#define RX_MEMORY_WORD 1
-+#define RX_MEMORY_LONG 2
-+
-+#define RX_IM_BYTE 0
-+#define RX_IM_WORD 1
-+#define RX_IM_LONG 2
-+#define RX_IM_UWORD 3
-+
-+static const char size[] = {'b', 'w', 'l'};
-+static const char cond[][4] = {
-+    "eq", "ne", "c", "nc", "gtu", "leu", "pz", "n",
-+    "ge", "lt", "gt", "le", "o", "no", "ra", "f"
-+};
-+static const char psw[] = {
-+    'c', 'z', 's', 'o', 0, 0, 0, 0,
-+    'i', 'u', 0, 0, 0, 0, 0, 0,
-+};
-+
-+static uint32_t rx_index_addr(int ld, int size, DisasContext *ctx)
-+{
-+    bfd_byte buf[2];
-+    switch (ld) {
-+    case 0:
-+        return 0;
-+    case 1:
-+        ctx->dis->read_memory_func(ctx->addr, buf, 1, ctx->dis);
-+        ctx->addr += 1;
-+        return ((uint8_t)buf[0]) << size;
-+    case 2:
-+        ctx->dis->read_memory_func(ctx->addr, buf, 2, ctx->dis);
-+        ctx->addr += 2;
-+        return lduw_le_p(buf) << size;
-+    }
-+    g_assert_not_reached();
-+}
-+
-+static void operand(DisasContext *ctx, int ld, int mi, int rs, int rd)
-+{
-+    int dsp;
-+    static const char sizes[][4] = {".b", ".w", ".l", ".uw", ".ub"};
-+    if (ld < 3) {
-+        switch (mi) {
-+        case 4:
-+            /* dsp[rs].ub */
-+            dsp = rx_index_addr(ld, RX_MEMORY_BYTE, ctx);
-+            break;
-+        case 3:
-+            /* dsp[rs].uw */
-+            dsp = rx_index_addr(ld, RX_MEMORY_WORD, ctx);
-+            break;
-+        default:
-+            /* dsp[rs].b */
-+            /* dsp[rs].w */
-+            /* dsp[rs].l */
-+            dsp = rx_index_addr(ld, mi, ctx);
-+            break;
-+        }
-+        if (dsp > 0) {
-+            prt("%d", dsp);
-+        }
-+        prt("[r%d]%s", rs, sizes[mi]);
-+    } else {
-+        prt("r%d", rs);
-+    }
-+    prt(", r%d", rd);
-+}
-+
-+static void prt_ir(DisasContext *ctx, const char *insn, int imm, int rd)
-+{
-+    if (imm < 0x100) {
-+        prt("%s\t#%d, r%d", insn, imm, rd);
-+    } else {
-+        prt("%s\t#0x%08x, r%d", insn, imm, rd);
-+    }
-+}
-+
-+/* mov.[bwl] rs,dsp:[rd] */
-+static bool trans_MOV_rm(DisasContext *ctx, arg_MOV_rm *a)
-+{
-+    if (a->dsp > 0) {
-+        prt("mov.%c\tr%d,%d[r%d]",
-+            size[a->sz], a->rs, a->dsp << a->sz, a->rd);
-+    } else {
-+        prt("mov.%c\tr%d,[r%d]",
-+            size[a->sz], a->rs, a->rd);
-+    }
-+    return true;
-+}
-+
-+/* mov.[bwl] dsp:[rs],rd */
-+static bool trans_MOV_mr(DisasContext *ctx, arg_MOV_mr *a)
-+{
-+    if (a->dsp > 0) {
-+        prt("mov.%c\t%d[r%d], r%d",
-+            size[a->sz], a->dsp << a->sz, a->rs, a->rd);
-+    } else {
-+        prt("mov.%c\t[r%d], r%d",
-+            size[a->sz], a->rs, a->rd);
-+    }
-+    return true;
-+}
-+
-+/* mov.l #uimm4,rd */
-+/* mov.l #uimm8,rd */
-+/* mov.l #imm,rd */
-+static bool trans_MOV_ir(DisasContext *ctx, arg_MOV_ir *a)
-+{
-+    prt_ir(ctx, "mov.l", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* mov.[bwl] #uimm8,dsp:[rd] */
-+/* mov #imm, dsp:[rd] */
-+static bool trans_MOV_im(DisasContext *ctx, arg_MOV_im *a)
-+{
-+    if (a->dsp > 0) {
-+        prt("mov.%c\t#%d,%d[r%d]",
-+            size[a->sz], a->imm, a->dsp << a->sz, a->rd);
-+    } else {
-+        prt("mov.%c\t#%d,[r%d]",
-+            size[a->sz], a->imm, a->rd);
-+    }
-+    return true;
-+}
-+
-+/* mov.[bwl] [ri,rb],rd */
-+static bool trans_MOV_ar(DisasContext *ctx, arg_MOV_ar *a)
-+{
-+    prt("mov.%c\t[r%d,r%d], r%d", size[a->sz], a->ri, a->rb, a->rd);
-+    return true;
-+}
-+
-+/* mov.[bwl] rd,[ri,rb] */
-+static bool trans_MOV_ra(DisasContext *ctx, arg_MOV_ra *a)
-+{
-+    prt("mov.%c\tr%d, [r%d, r%d]", size[a->sz], a->rs, a->ri, a->rb);
-+    return true;
-+}
-+
-+
-+/* mov.[bwl] dsp:[rs],dsp:[rd] */
-+/* mov.[bwl] rs,dsp:[rd] */
-+/* mov.[bwl] dsp:[rs],rd */
-+/* mov.[bwl] rs,rd */
-+static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_mm *a)
-+{
-+    int dsp;
-+
-+    prt("mov.%c\t", size[a->sz]);
-+    if (a->lds == 3 && a->ldd == 3) {
-+        /* mov.[bwl] rs,rd */
-+        prt("r%d, r%d", a->rs, a->rd);
-+        return true;
-+    }
-+    if (a->lds == 3) {
-+        prt("r%d, ", a->rd);
-+        dsp = rx_index_addr(a->ldd, a->sz, ctx);
-+        if (dsp > 0) {
-+            prt("%d", dsp);
-+        }
-+        prt("[r%d]", a->rs);
-+    } else if (a->ldd == 3) {
-+        dsp = rx_index_addr(a->lds, a->sz, ctx);
-+        if (dsp > 0) {
-+            prt("%d", dsp);
-+        }
-+        prt("[r%d], r%d", a->rs, a->rd);
-+    } else {
-+        dsp = rx_index_addr(a->lds, a->sz, ctx);
-+        if (dsp > 0) {
-+            prt("%d", dsp);
-+        }
-+        prt("[r%d], ", a->rs);
-+        dsp = rx_index_addr(a->ldd, a->sz, ctx);
-+        if (dsp > 0) {
-+            prt("%d", dsp);
-+        }
-+        prt("[r%d]", a->rd);
-+    }
-+    return true;
-+}
-+
-+/* mov.[bwl] rs,[rd+] */
-+/* mov.[bwl] rs,[-rd] */
-+static bool trans_MOV_rp(DisasContext *ctx, arg_MOV_rp *a)
-+{
-+    prt("mov.%c\tr%d, ", size[a->sz], a->rs);
-+    prt((a->ad == 0) ? "[r%d+]" : "[-r%d]", a->rd);
-+    return true;
-+}
-+
-+/* mov.[bwl] [rd+],rs */
-+/* mov.[bwl] [-rd],rs */
-+static bool trans_MOV_pr(DisasContext *ctx, arg_MOV_pr *a)
-+{
-+    prt("mov.%c\t", size[a->sz]);
-+    prt((a->ad == 0) ? "[r%d+]" : "[-r%d]", a->rd);
-+    prt(", r%d", a->rs);
-+    return true;
-+}
-+
-+/* movu.[bw] dsp5:[rs],rd */
-+static bool trans_MOVU_mr(DisasContext *ctx, arg_MOVU_mr *a)
-+{
-+    if (a->dsp > 0) {
-+        prt("movu.%c\t%d[r%d], r%d", size[a->sz],
-+            a->dsp << a->sz, a->rs, a->rd);
-+    } else {
-+        prt("movu.%c\t[r%d], r%d", size[a->sz], a->rs, a->rd);
-+    }
-+    return true;
-+}
-+
-+/* movu.[bw] rs,rd */
-+static bool trans_MOVU_rr(DisasContext *ctx, arg_MOVU_rr *a)
-+{
-+    prt("movu.%c\tr%d, r%d", size[a->sz], a->rs, a->rd);
-+    return true;
-+}
-+
-+/* movu.[bw] [ri,rb],rd */
-+static bool trans_MOVU_ar(DisasContext *ctx, arg_MOVU_ar *a)
-+{
-+    prt("mov.%c\t[r%d,r%d], r%d", size[a->sz], a->ri, a->rb, a->rd);
-+    return true;
-+}
-+
-+/* movu.[bw] [rs+],rd */
-+/* movu.[bw] [-rs],rd */
-+static bool trans_MOVU_pr(DisasContext *ctx, arg_MOVU_pr *a)
-+{
-+    prt("movu.%c\t", size[a->sz]);
-+    prt((a->ad == 0) ? "[r%d+]" : "[-r%d]", a->rd);
-+    prt(", r%d", a->rs);
-+    return true;
-+}
-+
-+/* pop rd */
-+static bool trans_POP(DisasContext *ctx, arg_POP *a)
-+{
-+    prt("pop\tr%d", a->rd);
-+    return true;
-+}
-+
-+/* popc rx */
-+static bool trans_POPC(DisasContext *ctx, arg_POPC *a)
-+{
-+    prt("pop\tr%s", rx_crname[a->cr]);
-+    return true;
-+}
-+
-+/* popm rd-rd2 */
-+static bool trans_POPM(DisasContext *ctx, arg_POPM *a)
-+{
-+    prt("popm\tr%d-r%d", a->rd, a->rd2);
-+    return true;
-+}
-+
-+/* push rs */
-+static bool trans_PUSH_r(DisasContext *ctx, arg_PUSH_r *a)
-+{
-+    prt("push\tr%d", a->rs);
-+    return true;
-+}
-+
-+/* push dsp[rs] */
-+static bool trans_PUSH_m(DisasContext *ctx, arg_PUSH_m *a)
-+{
-+    prt("push\t");
-+    int dsp = rx_index_addr(a->ld, a->sz, ctx);
-+    if (dsp > 0) {
-+        prt("%d", dsp);
-+    }
-+    prt("[r%d]", a->rs);
-+    return true;
-+}
-+
-+/* pushc rx */
-+static bool trans_PUSHC(DisasContext *ctx, arg_PUSHC *a)
-+{
-+    prt("push\t%s", rx_crname[a->cr]);
-+    return true;
-+}
-+
-+/* pushm rs-rs2*/
-+static bool trans_PUSHM(DisasContext *ctx, arg_PUSHM *a)
-+{
-+    prt("pushm\tr%d-r%d", a->rs, a->rs2);
-+    return true;
-+}
-+
-+/* xchg rs,rd */
-+static bool trans_XCHG_rr(DisasContext *ctx, arg_XCHG_rr *a)
-+{
-+    prt("xchg\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+/* xchg dsp[rs].<mi>,rd */
-+static bool trans_XCHG_mr(DisasContext *ctx, arg_XCHG_mr *a)
-+{
-+    int dsp;
-+    static const char msize[][4] = {
-+        "b", "w", "l", "ub", "uw",
-+    };
-+
-+    prt("xchg\t");
-+    dsp = rx_index_addr(a->ld, a->mi, ctx);
-+    if (dsp > 0) {
-+        prt("%d", dsp);
-+    }
-+    prt("[r%d].%s, r%d", a->rs, msize[a->mi], a->rd);
-+    return true;
-+}
-+
-+/* stz #imm,rd */
-+static bool trans_STZ(DisasContext *ctx, arg_STZ *a)
-+{
-+    prt_ir(ctx, "stz", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* stnz #imm,rd */
-+static bool trans_STNZ(DisasContext *ctx, arg_STNZ *a)
-+{
-+    prt_ir(ctx, "stnz", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* rtsd #imm */
-+static bool trans_RTSD_i(DisasContext *ctx, arg_RTSD_i *a)
-+{
-+    prt("rtsd\t#%d", a->imm << 2);
-+    return true;
-+}
-+
-+/* rtsd #imm, rd-rd2 */
-+static bool trans_RTSD_irr(DisasContext *ctx, arg_RTSD_irr *a)
-+{
-+    prt("rtsd\t#%d, r%d - r%d", a->imm << 2, a->rd, a->rd2);
-+    return true;
-+}
-+
-+/* and #uimm:4, rd */
-+/* and #imm, rd */
-+static bool trans_AND_ir(DisasContext *ctx, arg_AND_ir *a)
-+{
-+    prt_ir(ctx, "and", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* and dsp[rs], rd */
-+/* and rs,rd */
-+static bool trans_AND_mr(DisasContext *ctx, arg_AND_mr *a)
-+{
-+    prt("and\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* and rs,rs2,rd */
-+static bool trans_AND_rrr(DisasContext *ctx, arg_AND_rrr *a)
-+{
-+    prt("and\tr%d,r%d, r%d", a->rs, a->rs2, a->rd);
-+    return true;
-+}
-+
-+/* or #uimm:4, rd */
-+/* or #imm, rd */
-+static bool trans_OR_ir(DisasContext *ctx, arg_OR_ir *a)
-+{
-+    prt_ir(ctx, "or", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* or dsp[rs], rd */
-+/* or rs,rd */
-+static bool trans_OR_mr(DisasContext *ctx, arg_OR_mr *a)
-+{
-+    prt("or\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* or rs,rs2,rd */
-+static bool trans_OR_rrr(DisasContext *ctx, arg_OR_rrr *a)
-+{
-+    prt("or\tr%d, r%d, r%d", a->rs, a->rs2, a->rd);
-+    return true;
-+}
-+
-+/* xor #imm, rd */
-+static bool trans_XOR_ir(DisasContext *ctx, arg_XOR_ir *a)
-+{
-+    prt_ir(ctx, "xor", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* xor dsp[rs], rd */
-+/* xor rs,rd */
-+static bool trans_XOR_mr(DisasContext *ctx, arg_XOR_mr *a)
-+{
-+    prt("xor\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* tst #imm, rd */
-+static bool trans_TST_ir(DisasContext *ctx, arg_TST_ir *a)
-+{
-+    prt_ir(ctx, "tst", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* tst dsp[rs], rd */
-+/* tst rs, rd */
-+static bool trans_TST_mr(DisasContext *ctx, arg_TST_mr *a)
-+{
-+    prt("tst\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* not rd */
-+/* not rs, rd */
-+static bool trans_NOT_rr(DisasContext *ctx, arg_NOT_rr *a)
-+{
-+    prt("not\t");
-+    if (a->rs != a->rd) {
-+        prt("r%d, ", a->rs);
-+    }
-+    prt("r%d", a->rd);
-+    return true;
-+}
-+
-+/* neg rd */
-+/* neg rs, rd */
-+static bool trans_NEG_rr(DisasContext *ctx, arg_NEG_rr *a)
-+{
-+    prt("neg\t");
-+    if (a->rs != a->rd) {
-+        prt("r%d, ", a->rs);
-+    }
-+    prt("r%d", a->rd);
-+    return true;
-+}
-+
-+/* adc #imm, rd */
-+static bool trans_ADC_ir(DisasContext *ctx, arg_ADC_ir *a)
-+{
-+    prt_ir(ctx, "adc", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* adc rs, rd */
-+static bool trans_ADC_rr(DisasContext *ctx, arg_ADC_rr *a)
-+{
-+    prt("adc\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* adc dsp[rs], rd */
-+static bool trans_ADC_mr(DisasContext *ctx, arg_ADC_mr *a)
-+{
-+    int dsp;
-+    prt("adc\t");
-+    dsp = rx_index_addr(a->ld, 2, ctx);
-+    if (dsp > 0) {
-+        prt("%d", dsp);
-+    }
-+    prt("[r%d], r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* add #uimm4, rd */
-+/* add #imm, rs, rd */
-+static bool trans_ADD_irr(DisasContext *ctx, arg_ADD_irr *a)
-+{
-+    if (a->imm < 0x10 && a->rs2 == a->rd) {
-+        prt("add\t#%d, r%d", a->imm, a->rd);
-+    } else {
-+        prt("add\t#0x%08x, r%d, r%d", a->imm, a->rs2, a->rd);
-+    }
-+    return true;
-+}
-+
-+/* add rs, rd */
-+/* add dsp[rs], rd */
-+static bool trans_ADD_mr(DisasContext *ctx, arg_ADD_mr *a)
-+{
-+    prt("add\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* add rs, rs2, rd */
-+static bool trans_ADD_rrr(DisasContext *ctx, arg_ADD_rrr *a)
-+{
-+    prt("add\tr%d, r%d, r%d", a->rs, a->rs2, a->rd);
-+    return true;
-+}
-+
-+/* cmp #imm4, rd */
-+/* cmp #imm8, rd */
-+/* cmp #imm, rs2 */
-+static bool trans_CMP_ir(DisasContext *ctx, arg_CMP_ir *a)
-+{
-+    prt_ir(ctx, "cmp", a->imm, a->rs2);
-+    return true;
-+}
-+
-+/* cmp rs, rs2 */
-+/* cmp dsp[rs], rs2 */
-+static bool trans_CMP_mr(DisasContext *ctx, arg_CMP_mr *a)
-+{
-+    prt("cmp\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* sub #imm4, rd */
-+static bool trans_SUB_ir(DisasContext *ctx, arg_SUB_ir *a)
-+{
-+    prt("sub\t#%d, r%d", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* sub rs, rd */
-+/* sub dsp[rs], rd */
-+static bool trans_SUB_mr(DisasContext *ctx, arg_SUB_mr *a)
-+{
-+    prt("sub\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* sub rs, rs2, rd */
-+static bool trans_SUB_rrr(DisasContext *ctx, arg_SUB_rrr *a)
-+{
-+    prt("sub\tr%d, r%d, r%d", a->rs, a->rs2, a->rd);
-+    return true;
-+}
-+
-+/* sbb rs, rd */
-+static bool trans_SBB_rr(DisasContext *ctx, arg_SBB_rr *a)
-+{
-+    prt("sbb\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* sbb dsp[rs], rd */
-+static bool trans_SBB_mr(DisasContext *ctx, arg_SBB_mr *a)
-+{
-+    prt("sbb\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* abs rd */
-+/* abs rs, rd */
-+static bool trans_ABS_rr(DisasContext *ctx, arg_ABS_rr *a)
-+{
-+    prt("abs\t");
-+    if (a->rs == a->rd) {
-+        prt("r%d", a->rd);
-+    } else {
-+        prt("r%d, r%d", a->rs, a->rd);
-+    }
-+    return true;
-+}
-+
-+/* max #imm, rd */
-+static bool trans_MAX_ir(DisasContext *ctx, arg_MAX_ir *a)
-+{
-+    prt_ir(ctx, "max", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* max rs, rd */
-+/* max dsp[rs], rd */
-+static bool trans_MAX_mr(DisasContext *ctx, arg_MAX_mr *a)
-+{
-+    prt("max\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* min #imm, rd */
-+static bool trans_MIN_ir(DisasContext *ctx, arg_MIN_ir *a)
-+{
-+    prt_ir(ctx, "min", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* min rs, rd */
-+/* min dsp[rs], rd */
-+static bool trans_MIN_mr(DisasContext *ctx, arg_MIN_mr *a)
-+{
-+    prt("max\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* mul #uimm4, rd */
-+/* mul #imm, rd */
-+static bool trans_MUL_ir(DisasContext *ctx, arg_MUL_ir *a)
-+{
-+    prt_ir(ctx, "mul", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* mul rs, rd */
-+/* mul dsp[rs], rd */
-+static bool trans_MUL_mr(DisasContext *ctx, arg_MUL_mr *a)
-+{
-+    prt("mul\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* mul rs, rs2, rd */
-+static bool trans_MUL_rrr(DisasContext *ctx, arg_MUL_rrr *a)
-+{
-+    prt("mul\tr%d,r%d,r%d", a->rs, a->rs2, a->rd);
-+    return true;
-+}
-+
-+/* emul #imm, rd */
-+static bool trans_EMUL_ir(DisasContext *ctx, arg_EMUL_ir *a)
-+{
-+    prt_ir(ctx, "emul", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* emul rs, rd */
-+/* emul dsp[rs], rd */
-+static bool trans_EMUL_mr(DisasContext *ctx, arg_EMUL_mr *a)
-+{
-+    prt("emul\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* emulu #imm, rd */
-+static bool trans_EMULU_ir(DisasContext *ctx, arg_EMULU_ir *a)
-+{
-+    prt_ir(ctx, "emulu", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* emulu rs, rd */
-+/* emulu dsp[rs], rd */
-+static bool trans_EMULU_mr(DisasContext *ctx, arg_EMULU_mr *a)
-+{
-+    prt("emulu\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* div #imm, rd */
-+static bool trans_DIV_ir(DisasContext *ctx, arg_DIV_ir *a)
-+{
-+    prt_ir(ctx, "div", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* div rs, rd */
-+/* div dsp[rs], rd */
-+static bool trans_DIV_mr(DisasContext *ctx, arg_DIV_mr *a)
-+{
-+    prt("div\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* divu #imm, rd */
-+static bool trans_DIVU_ir(DisasContext *ctx, arg_DIVU_ir *a)
-+{
-+    prt_ir(ctx, "divu", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* divu rs, rd */
-+/* divu dsp[rs], rd */
-+static bool trans_DIVU_mr(DisasContext *ctx, arg_DIVU_mr *a)
-+{
-+    prt("divu\t");
-+    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    return true;
-+}
-+
-+
-+/* shll #imm:5, rd */
-+/* shll #imm:5, rs, rd */
-+static bool trans_SHLL_irr(DisasContext *ctx, arg_SHLL_irr *a)
-+{
-+    prt("shll\t#%d, ", a->imm);
-+    if (a->rs2 != a->rd) {
-+        prt("r%d, ", a->rs2);
-+    }
-+    prt("r%d", a->rd);
-+    return true;
-+}
-+
-+/* shll rs, rd */
-+static bool trans_SHLL_rr(DisasContext *ctx, arg_SHLL_rr *a)
-+{
-+    prt("shll\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* shar #imm:5, rd */
-+/* shar #imm:5, rs, rd */
-+static bool trans_SHAR_irr(DisasContext *ctx, arg_SHAR_irr *a)
-+{
-+    prt("shar\t#%d,", a->imm);
-+    if (a->rs2 != a->rd) {
-+        prt("r%d, ", a->rs2);
-+    }
-+    prt("r%d", a->rd);
-+    return true;
-+}
-+
-+/* shar rs, rd */
-+static bool trans_SHAR_rr(DisasContext *ctx, arg_SHAR_rr *a)
-+{
-+    prt("shar\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* shlr #imm:5, rd */
-+/* shlr #imm:5, rs, rd */
-+static bool trans_SHLR_irr(DisasContext *ctx, arg_SHLR_irr *a)
-+{
-+    prt("shlr\t#%d, ", a->imm);
-+    if (a->rs2 != a->rd) {
-+        prt("r%d, ", a->rs2);
-+    }
-+    prt("r%d", a->rd);
-+    return true;
-+}
-+
-+/* shlr rs, rd */
-+static bool trans_SHLR_rr(DisasContext *ctx, arg_SHLR_rr *a)
-+{
-+    prt("shlr\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* rolc rd */
-+static bool trans_ROLC(DisasContext *ctx, arg_ROLC *a)
-+{
-+    prt("rorc\tr%d", a->rd);
-+    return true;
-+}
-+
-+/* rorc rd */
-+static bool trans_RORC(DisasContext *ctx, arg_RORC *a)
-+{
-+    prt("rorc\tr%d", a->rd);
-+    return true;
-+}
-+
-+/* rotl #imm, rd */
-+static bool trans_ROTL_ir(DisasContext *ctx, arg_ROTL_ir *a)
-+{
-+    prt("rotl\t#%d, r%d", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* rotl rs, rd */
-+static bool trans_ROTL_rr(DisasContext *ctx, arg_ROTL_rr *a)
-+{
-+    prt("rotl\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* rotr #imm, rd */
-+static bool trans_ROTR_ir(DisasContext *ctx, arg_ROTR_ir *a)
-+{
-+    prt("rotr\t#%d, r%d", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* rotr rs, rd */
-+static bool trans_ROTR_rr(DisasContext *ctx, arg_ROTR_rr *a)
-+{
-+    prt("rotr\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* revl rs, rd */
-+static bool trans_REVL(DisasContext *ctx, arg_REVL *a)
-+{
-+    prt("revl\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* revw rs, rd */
-+static bool trans_REVW(DisasContext *ctx, arg_REVW *a)
-+{
-+    prt("revw\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* conditional branch helper */
-+static void rx_bcnd_main(DisasContext *ctx, int cd, int len, int dst)
-+{
-+    static const char sz[] = {'s', 'b', 'w', 'a'};
-+    prt("b%s.%c\t%08x", cond[cd], sz[len - 1], ctx->pc + dst);
-+}
-+
-+/* beq dsp:3 / bne dsp:3 */
-+/* beq dsp:8 / bne dsp:8 */
-+/* bc dsp:8 / bnc dsp:8 */
-+/* bgtu dsp:8 / bleu dsp:8 */
-+/* bpz dsp:8 / bn dsp:8 */
-+/* bge dsp:8 / blt dsp:8 */
-+/* bgt dsp:8 / ble dsp:8 */
-+/* bo dsp:8 / bno dsp:8 */
-+/* beq dsp:16 / bne dsp:16 */
-+static bool trans_BCnd(DisasContext *ctx, arg_BCnd *a)
-+{
-+    rx_bcnd_main(ctx, a->cd, a->sz, a->dsp);
-+    return true;
-+}
-+
-+/* bra dsp:3 */
-+/* bra dsp:8 */
-+/* bra dsp:16 */
-+/* bra dsp:24 */
-+static bool trans_BRA(DisasContext *ctx, arg_BRA *a)
-+{
-+    rx_bcnd_main(ctx, 14, a->sz, a->dsp);
-+    return true;
-+}
-+
-+/* bra rs */
-+static bool trans_BRA_l(DisasContext *ctx, arg_BRA_l *a)
-+{
-+    prt("bra.l\tr%d", a->rd);
-+    return true;
-+}
-+
-+/* jmp rs */
-+static bool trans_JMP(DisasContext *ctx, arg_JMP *a)
-+{
-+    prt("jmp\tr%d", a->rs);
-+    return true;
-+}
-+
-+/* jsr rs */
-+static bool trans_JSR(DisasContext *ctx, arg_JSR *a)
-+{
-+    prt("jsr\tr%d", a->rs);
-+    return true;
-+}
-+
-+/* bsr dsp:16 */
-+/* bsr dsp:24 */
-+static bool trans_BSR(DisasContext *ctx, arg_BSR *a)
-+{
-+    static const char sz[] = {'w', 'a'};
-+    prt("bsr.%c\t%08x", sz[a->sz - 3], ctx->pc + a->dsp);
-+    return true;
-+}
-+
-+/* bsr rs */
-+static bool trans_BSR_l(DisasContext *ctx, arg_BSR_l *a)
-+{
-+    prt("bsr.l\tr%d", a->rd);
-+    return true;
-+}
-+
-+/* rts */
-+static bool trans_RTS(DisasContext *ctx, arg_RTS *a)
-+{
-+    prt("rts");
-+    return true;
-+}
-+
-+/* nop */
-+static bool trans_NOP(DisasContext *ctx, arg_NOP *a)
-+{
-+    prt("nop");
-+    return true;
-+}
-+
-+/* scmpu */
-+static bool trans_SCMPU(DisasContext *ctx, arg_SCMPU *a)
-+{
-+    prt("scmpu");
-+    return true;
-+}
-+
-+/* smovu */
-+static bool trans_SMOVU(DisasContext *ctx, arg_SMOVU *a)
-+{
-+    prt("smovu");
-+    return true;
-+}
-+
-+/* smovf */
-+static bool trans_SMOVF(DisasContext *ctx, arg_SMOVF *a)
-+{
-+    prt("smovf");
-+    return true;
-+}
-+
-+/* smovb */
-+static bool trans_SMOVB(DisasContext *ctx, arg_SMOVB *a)
-+{
-+    prt("smovb");
-+    return true;
-+}
-+
-+/* suntile */
-+static bool trans_SUNTIL(DisasContext *ctx, arg_SUNTIL *a)
-+{
-+    prt("suntil.%c", size[a->sz]);
-+    return true;
-+}
-+
-+/* swhile */
-+static bool trans_SWHILE(DisasContext *ctx, arg_SWHILE *a)
-+{
-+    prt("swhile.%c", size[a->sz]);
-+    return true;
-+}
-+/* sstr */
-+static bool trans_SSTR(DisasContext *ctx, arg_SSTR *a)
-+{
-+    prt("sstr.%c", size[a->sz]);
-+    return true;
-+}
-+
-+/* rmpa */
-+static bool trans_RMPA(DisasContext *ctx, arg_RMPA *a)
-+{
-+    prt("rmpa.%c", size[a->sz]);
-+    return true;
-+}
-+
-+/* mulhi rs,rs2 */
-+static bool trans_MULHI(DisasContext *ctx, arg_MULHI *a)
-+{
-+    prt("mulhi\tr%d,r%d", a->rs, a->rs2);
-+    return true;
-+}
-+
-+/* mullo rs,rs2 */
-+static bool trans_MULLO(DisasContext *ctx, arg_MULLO *a)
-+{
-+    prt("mullo\tr%d, r%d", a->rs, a->rs2);
-+    return true;
-+}
-+
-+/* machi rs,rs2 */
-+static bool trans_MACHI(DisasContext *ctx, arg_MACHI *a)
-+{
-+    prt("machi\tr%d, r%d", a->rs, a->rs2);
-+    return true;
-+}
-+
-+/* maclo rs,rs2 */
-+static bool trans_MACLO(DisasContext *ctx, arg_MACLO *a)
-+{
-+    prt("maclo\tr%d, r%d", a->rs, a->rs2);
-+    return true;
-+}
-+
-+/* mvfachi rd */
-+static bool trans_MVFACHI(DisasContext *ctx, arg_MVFACHI *a)
-+{
-+    prt("mvfachi\tr%d", a->rd);
-+    return true;
-+}
-+
-+/* mvfacmi rd */
-+static bool trans_MVFACMI(DisasContext *ctx, arg_MVFACMI *a)
-+{
-+    prt("mvfacmi\tr%d", a->rd);
-+    return true;
-+}
-+
-+/* mvtachi rs */
-+static bool trans_MVTACHI(DisasContext *ctx, arg_MVTACHI *a)
-+{
-+    prt("mvtachi\tr%d", a->rs);
-+    return true;
-+}
-+
-+/* mvtaclo rs */
-+static bool trans_MVTACLO(DisasContext *ctx, arg_MVTACLO *a)
-+{
-+    prt("mvtaclo\tr%d", a->rs);
-+    return true;
-+}
-+
-+/* racw #imm */
-+static bool trans_RACW(DisasContext *ctx, arg_RACW *a)
-+{
-+    prt("racw\t#%d", a->imm + 1);
-+    return true;
-+}
-+
-+/* sat rd */
-+static bool trans_SAT(DisasContext *ctx, arg_SAT *a)
-+{
-+    prt("sat\tr%d", a->rd);
-+    return true;
-+}
-+
-+/* satr */
-+static bool trans_SATR(DisasContext *ctx, arg_SATR *a)
-+{
-+    prt("satr");
-+    return true;
-+}
-+
-+/* fadd #imm, rd */
-+static bool trans_FADD_ir(DisasContext *ctx, arg_FADD_ir *a)
-+{
-+    prt("fadd\t#%d,r%d", li(ctx, 0), a->rd);
-+    return true;
-+}
-+
-+/* fadd dsp[rs], rd */
-+/* fadd rs, rd */
-+static bool trans_FADD_mr(DisasContext *ctx, arg_FADD_mr *a)
-+{
-+    prt("fadd\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* fcmp #imm, rd */
-+static bool trans_FCMP_ir(DisasContext *ctx, arg_FCMP_ir *a)
-+{
-+    prt("fadd\t#%d,r%d", li(ctx, 0), a->rd);
-+    return true;
-+}
-+
-+/* fcmp dsp[rs], rd */
-+/* fcmp rs, rd */
-+static bool trans_FCMP_mr(DisasContext *ctx, arg_FCMP_mr *a)
-+{
-+    prt("fcmp\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* fsub #imm, rd */
-+static bool trans_FSUB_ir(DisasContext *ctx, arg_FSUB_ir *a)
-+{
-+    prt("fsub\t#%d,r%d", li(ctx, 0), a->rd);
-+    return true;
-+}
-+
-+/* fsub dsp[rs], rd */
-+/* fsub rs, rd */
-+static bool trans_FSUB_mr(DisasContext *ctx, arg_FSUB_mr *a)
-+{
-+    prt("fsub\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* ftoi dsp[rs], rd */
-+/* ftoi rs, rd */
-+static bool trans_FTOI(DisasContext *ctx, arg_FTOI *a)
-+{
-+    prt("ftoi\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* fmul #imm, rd */
-+static bool trans_FMUL_ir(DisasContext *ctx, arg_FMUL_ir *a)
-+{
-+    prt("fmul\t#%d,r%d", li(ctx, 0), a->rd);
-+    return true;
-+}
-+
-+/* fmul dsp[rs], rd */
-+/* fmul rs, rd */
-+static bool trans_FMUL_mr(DisasContext *ctx, arg_FMUL_mr *a)
-+{
-+    prt("fmul\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* fdiv #imm, rd */
-+static bool trans_FDIV_ir(DisasContext *ctx, arg_FDIV_ir *a)
-+{
-+    prt("fdiv\t#%d,r%d", li(ctx, 0), a->rd);
-+    return true;
-+}
-+
-+/* fdiv dsp[rs], rd */
-+/* fdiv rs, rd */
-+static bool trans_FDIV_mr(DisasContext *ctx, arg_FDIV_mr *a)
-+{
-+    prt("fdiv\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* round dsp[rs], rd */
-+/* round rs, rd */
-+static bool trans_ROUND(DisasContext *ctx, arg_ROUND *a)
-+{
-+    prt("round\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+/* itof rs, rd */
-+/* itof dsp[rs], rd */
-+static bool trans_ITOF(DisasContext *ctx, arg_ITOF *a)
-+{
-+    prt("itof\t");
-+    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    return true;
-+}
-+
-+#define BOP_IM(name, reg)                                       \
-+    do {                                                        \
-+        int dsp;                                                \
-+        prt("b%s\t#%d, ", #name, a->imm);                       \
-+        dsp = rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);        \
-+        if (dsp > 0) {                                          \
-+            prt("%d", dsp);                                     \
-+        }                                                       \
-+        prt("[r%d]", reg);                                      \
-+        return true;                                            \
-+    } while (0)
-+
-+#define BOP_RM(name)                                            \
-+    do {                                                        \
-+        int dsp;                                                \
-+        prt("b%s\tr%d, ", #name, a->rd);                        \
-+        dsp = rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);        \
-+        if (dsp > 0) {                                          \
-+            prt("%d", dsp);                                     \
-+        }                                                       \
-+        prt("[r%d]", a->rs);                                    \
-+        return true;                                            \
-+    } while (0)
-+
-+/* bset #imm, dsp[rd] */
-+static bool trans_BSET_im(DisasContext *ctx, arg_BSET_im *a)
-+{
-+    BOP_IM(bset, a->rs);
-+}
-+
-+/* bset rs, dsp[rd] */
-+static bool trans_BSET_rm(DisasContext *ctx, arg_BSET_rm *a)
-+{
-+    BOP_RM(set);
-+}
-+
-+/* bset rs, rd */
-+static bool trans_BSET_rr(DisasContext *ctx, arg_BSET_rr *a)
-+{
-+    prt("bset\tr%d,r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* bset #imm, rd */
-+static bool trans_BSET_ir(DisasContext *ctx, arg_BSET_ir *a)
-+{
-+    prt("bset\t#%d, r%d", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* bclr #imm, dsp[rd] */
-+static bool trans_BCLR_im(DisasContext *ctx, arg_BCLR_im *a)
-+{
-+    BOP_IM(clr, a->rs);
-+}
-+
-+/* bclr rs, dsp[rd] */
-+static bool trans_BCLR_rm(DisasContext *ctx, arg_BCLR_rm *a)
-+{
-+    BOP_RM(clr);
-+}
-+
-+/* bclr rs, rd */
-+static bool trans_BCLR_rr(DisasContext *ctx, arg_BCLR_rr *a)
-+{
-+    prt("bclr\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* bclr #imm, rd */
-+static bool trans_BCLR_ir(DisasContext *ctx, arg_BCLR_ir *a)
-+{
-+    prt("bclr\t#%d,r%d", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* btst #imm, dsp[rd] */
-+static bool trans_BTST_im(DisasContext *ctx, arg_BTST_im *a)
-+{
-+    BOP_IM(tst, a->rs);
-+}
-+
-+/* btst rs, dsp[rd] */
-+static bool trans_BTST_rm(DisasContext *ctx, arg_BTST_rm *a)
-+{
-+    BOP_RM(tst);
-+}
-+
-+/* btst rs, rd */
-+static bool trans_BTST_rr(DisasContext *ctx, arg_BTST_rr *a)
-+{
-+    prt("btst\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* btst #imm, rd */
-+static bool trans_BTST_ir(DisasContext *ctx, arg_BTST_ir *a)
-+{
-+    prt("btst\t#%d, r%d", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* bnot rs, dsp[rd] */
-+static bool trans_BNOT_rm(DisasContext *ctx, arg_BNOT_rm *a)
-+{
-+    BOP_RM(not);
-+}
-+
-+/* bnot rs, rd */
-+static bool trans_BNOT_rr(DisasContext *ctx, arg_BNOT_rr *a)
-+{
-+    prt("bnot\tr%d, r%d", a->rs, a->rd);
-+    return true;
-+}
-+
-+/* bnot #imm, dsp[rd] */
-+static bool trans_BNOT_im(DisasContext *ctx, arg_BNOT_im *a)
-+{
-+    BOP_IM(not, a->rs);
-+}
-+
-+/* bnot #imm, rd */
-+static bool trans_BNOT_ir(DisasContext *ctx, arg_BNOT_ir *a)
-+{
-+    prt("bnot\t#%d, r%d", a->imm, a->rd);
-+    return true;
-+}
-+
-+/* bmcond #imm, dsp[rd] */
-+static bool trans_BMCnd_im(DisasContext *ctx, arg_BMCnd_im *a)
-+{
-+    int dsp = rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);
-+    prt("bm%s\t#%d, ", cond[a->cd], a->imm);
-+    if (dsp > 0) {
-+        prt("%d", dsp);
-+    }
-+    prt("[%d]", a->rd);
-+    return true;
-+}
-+
-+/* bmcond #imm, rd */
-+static bool trans_BMCnd_ir(DisasContext *ctx, arg_BMCnd_ir *a)
-+{
-+    prt("bm%s\t#%d, r%d", cond[a->cd], a->imm, a->rd);
-+    return true;
-+}
-+
-+/* clrpsw psw */
-+static bool trans_CLRPSW(DisasContext *ctx, arg_CLRPSW *a)
-+{
-+    prt("clrpsw\t%c", psw[a->cb]);
-+    return true;
-+}
-+
-+/* setpsw psw */
-+static bool trans_SETPSW(DisasContext *ctx, arg_SETPSW *a)
-+{
-+    prt("setpsw\t%c", psw[a->cb]);
-+    return true;
-+}
-+
-+/* mvtipl #imm */
-+static bool trans_MVTIPL(DisasContext *ctx, arg_MVTIPL *a)
-+{
-+    prt("movtipl\t#%d", a->imm);
-+    return true;
-+}
-+
-+/* mvtc #imm, rd */
-+static bool trans_MVTC_i(DisasContext *ctx, arg_MVTC_i *a)
-+{
-+    prt("mvtc\t#0x%08x, %s", a->imm, rx_crname[a->cr]);
-+    return true;
-+}
-+
-+/* mvtc rs, rd */
-+static bool trans_MVTC_r(DisasContext *ctx, arg_MVTC_r *a)
-+{
-+    prt("mvtc\tr%d, %s", a->rs, rx_crname[a->cr]);
-+    return true;
-+}
-+
-+/* mvfc rs, rd */
-+static bool trans_MVFC(DisasContext *ctx, arg_MVFC *a)
-+{
-+    prt("mvfc\t%s, r%d", rx_crname[a->cr], a->rd);
-+    return true;
-+}
-+
-+/* rtfi */
-+static bool trans_RTFI(DisasContext *ctx, arg_RTFI *a)
-+{
-+    prt("rtfi");
-+    return true;
-+}
-+
-+/* rte */
-+static bool trans_RTE(DisasContext *ctx, arg_RTE *a)
-+{
-+    prt("rte");
-+    return true;
-+}
-+
-+/* brk */
-+static bool trans_BRK(DisasContext *ctx, arg_BRK *a)
-+{
-+    prt("brk");
-+    return true;
-+}
-+
-+/* int #imm */
-+static bool trans_INT(DisasContext *ctx, arg_INT *a)
-+{
-+    prt("int\t#%d", a->imm);
-+    return true;
-+}
-+
-+/* wait */
-+static bool trans_WAIT(DisasContext *ctx, arg_WAIT *a)
-+{
-+    prt("wait");
-+    return true;
-+}
-+
-+/* sccnd.[bwl] rd */
-+/* sccnd.[bwl] dsp:[rd] */
-+static bool trans_SCCnd(DisasContext *ctx, arg_SCCnd *a)
-+{
-+    int dsp;
-+    prt("sc%s.%c\t", cond[a->cd], size[a->sz]);
-+    if (a->ld < 3) {
-+        dsp = rx_index_addr(a->sz, a->ld, ctx);
-+        if (dsp > 0) {
-+            prt("%d", dsp);
-+        }
-+        prt("[r%d]", a->rd);
-+    } else {
-+        prt("r%d", a->rd);
-+    }
-+    return true;
-+}
-+
-+int print_insn_rx(bfd_vma addr, disassemble_info *dis)
-+{
-+    DisasContext ctx;
-+    uint32_t insn;
-+    int i;
-+    ctx.dis = dis;
-+    ctx.pc = ctx.addr = addr;
-+
-+    insn = decode_load(&ctx);
-+    if (!decode(&ctx, insn)) {
-+        ctx.dis->fprintf_func(ctx.dis->stream, ".byte\t");
-+        for (i = 0; i < ctx.addr - addr; i++) {
-+            if (i > 0) {
-+                ctx.dis->fprintf_func(ctx.dis->stream, ",");
-+            }
-+            ctx.dis->fprintf_func(ctx.dis->stream, "0x%02x", insn >> 24);
-+            insn <<= 8;
-+        }
-+    }
-+    return ctx.addr - addr;
-+}
--- 
-2.11.0
++++ b/docs/ppc/index.rst
+@@ -0,0 +1,13 @@
++.. This is the top level page for the 'ppc' manual
++
++
++QEMU PowerPC Machine and Controller Guide
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++
++Contents:
++
++.. toctree::
++   :maxdepth: 2
++
++   xive
+diff --git a/docs/ppc/xive.rst b/docs/ppc/xive.rst
+new file mode 100644
+index 000000000000..90ddde6bf39f
+--- /dev/null
++++ b/docs/ppc/xive.rst
+@@ -0,0 +1,344 @@
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
++POWER9 XIVE interrupt controller
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
++
++The POWER9 processor comes with a new interrupt controller
++architecture, called XIVE as "eXternal Interrupt Virtualization
++Engine".
++
++Compared to the previous architecture, the main characteristics of
++XIVE are to support a larger number of interrupt sources and to
++deliver interrupts directly to virtual processors without hypervisor
++assistance. This removes the context switches required for the
++delivery process.
++
++
++Overall architecture
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++The XIVE IC is composed of three sub-engines, each taking care of a
++processing layer of external interrupts:
++
++- Interrupt Virtualization Source Engine (IVSE), or Source Controller
++  (SC). These are found in PCI PHBs, in the PSI host bridge
++  controller, but also inside the main controller for the core IPIs
++  and other sub-chips (NX, CAP, NPU) of the chip/processor. They are
++  configured to feed the IVRE with events.
++- Interrupt Virtualization Routing Engine (IVRE) or Virtualization
++  Controller (VC). It handles event coalescing and perform interrupt
++  routing by matching an event source number with an Event
++  Notification Descriptor (END).
++- Interrupt Virtualization Presentation Engine (IVPE) or Presentation
++  Controller (PC). It maintains the interrupt context state of each
++  thread and handles the delivery of the external interrupt to the
++  thread.
++
++::
++
++                XIVE Interrupt Controller
++                +------------------------------------+      IPIs
++                | +---------+ +---------+ +--------+ |    +-------+
++                | |IVRE     | |Common Q | |IVPE    |----> | CORES |
++                | |     esb | |         | |        |----> |       |
++                | |     eas | |  Bridge | |   tctx |----> |       |
++                | |SC   end | |         | |    nvt | |    |       |
++    +------+    | +---------+ +----+----+ +--------+ |    +-+-+-+-+
++    | RAM  |    +------------------|-----------------+      | | |
++    |      |                       |                        | | |
++    |      |                       |                        | | |
++    |      |  +--------------------v------------------------v-v-v--+    =
+other
++    |      <--+                     Power Bus                      +--> =
+chips
++    |  esb |  +---------+-----------------------+------------------+
++    |  eas |            |                       |
++    |  end |         +--|------+                |
++    |  nvt |       +----+----+ |           +----+----+
++    +------+       |IVSE     | |           |IVSE     |
++                   |         | |           |         |
++                   | PQ-bits | |           | PQ-bits |
++                   | local   |-+           |  in VC  |
++                   +---------+             +---------+
++                      PCIe                 NX,NPU,CAPI
++
++
++    PQ-bits: 2 bits source state machine (P:pending Q:queued)
++    esb: Event State Buffer (Array of PQ bits in an IVSE)
++    eas: Event Assignment Structure
++    end: Event Notification Descriptor
++    nvt: Notification Virtual Target
++    tctx: Thread interrupt Context registers
++
++
++
++XIVE internal tables
++--------------------
++
++Each of the sub-engines uses a set of tables to redirect interrupts
++from event sources to CPU threads.
++
++::
++
++                                            +-------+
++    User or O/S                             |  EQ   |
++        or                          +------>|entries|
++    Hypervisor                      |       |  ..   |
++      Memory                        |       +-------+
++                                    |           ^
++                                    |           |
++               +-------------------------------------------------+
++                                    |           |
++    Hypervisor      +------+    +---+--+    +---+--+   +------+
++      Memory        | ESB  |    | EAT  |    | ENDT |   | NVTT |
++     (skiboot)      +----+-+    +----+-+    +----+-+   +------+
++                      ^  |        ^  |        ^  |       ^
++                      |  |        |  |        |  |       |
++               +-------------------------------------------------+
++                      |  |        |  |        |  |       |
++                      |  |        |  |        |  |       |
++                 +----|--|--------|--|--------|--|-+   +-|-----+    +---=
+---+
++                 |    |  |        |  |        |  | |   | | tctx|    |Thr=
+ead|
++     IPI or   ---+    +  v        +  v        +  v |---| +  .. |----->  =
+   |
++    HW events    |                                 |   |       |    |   =
+   |
++                 |             IVRE                |   | IVPE  |    +---=
+---+
++                 +---------------------------------+   +-------+
++
++
++The IVSE have a 2-bits state machine, P for pending and Q for queued,
++for each source that allows events to be triggered. They are stored in
++an Event State Buffer (ESB) array and can be controlled by MMIOs.
++
++If the event is let through, the IVRE looks up in the Event Assignment
++Structure (EAS) table for an Event Notification Descriptor (END)
++configured for the source. Each Event Notification Descriptor defines
++a notification path to a CPU and an in-memory Event Queue, in which
++will be enqueued an EQ data for the O/S to pull.
++
++The IVPE determines if a Notification Virtual Target (NVT) can handle
++the event by scanning the thread contexts of the VCPUs dispatched on
++the processor HW threads. It maintains the interrupt context state of
++each thread in a NVT table.
++
++XIVE thread interrupt context
++-----------------------------
++
++The XIVE presenter can generate four different exceptions to its
++HW threads:
++
++- hypervisor exception
++- O/S exception
++- Event-Based Branch (user level)
++- msgsnd (doorbell)
++
++Each exception has a state independent from the others called a Thread
++Interrupt Management context. This context is a set of registers which
++lets the thread handle priority management and interrupt
++acknowledgment among other things. The most important ones being :
++
++- Interrupt Priority Register  (PIPR)
++- Interrupt Pending Buffer     (IPB)
++- Current Processor Priority   (CPPR)
++- Notification Source Register (NSR)
++
++TIMA
++~~~~
++
++The Thread Interrupt Management registers are accessible through a
++specific MMIO region, called the Thread Interrupt Management Area
++(TIMA), four aligned pages, each exposing a different view of the
++registers. First page (page address ending in ``0b00``) gives access
++to the entire context and is reserved for the ring 0 view for the
++physical thread context. The second (page address ending in ``0b01``)
++is for the hypervisor, ring 1 view. The third (page address ending in
++``0b10``) is for the operating system, ring 2 view. The fourth (page
++address ending in ``0b11``) is for user level, ring 3 view.
++
++Interrupt flow from an O/S perspective
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++After an event data has been enqueued in the O/S Event Queue, the IVPE
++raises the bit corresponding to the priority of the pending interrupt
++in the register IBP (Interrupt Pending Buffer) to indicate that an
++event is pending in one of the 8 priority queues. The Pending
++Interrupt Priority Register (PIPR) is also updated using the IPB. This
++register represent the priority of the most favored pending
++notification.
++
++The PIPR is then compared to the the Current Processor Priority
++Register (CPPR). If it is more favored (numerically less than), the
++CPU interrupt line is raised and the EO bit of the Notification Source
++Register (NSR) is updated to notify the presence of an exception for
++the O/S. The O/S acknowledges the interrupt with a special load in the
++Thread Interrupt Management Area.
++
++The O/S handles the interrupt and when done, performs an EOI using a
++MMIO operation on the ESB management page of the associate source.
++
++
++Overview of the QEMU models for XIVE
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++The XiveSource models the IVSE in general, internal and external. It
++handles the source ESBs and the MMIO interface to control them.
++
++The XiveNotifier is a small helper interface interconnecting the
++XiveSource to the XiveRouter.
++
++The XiveRouter is an abstract model acting as a combined IVRE and
++IVPE. It routes event notifications using the EAS and END tables to
++the IVPE sub-engine which does a CAM scan to find a CPU to deliver the
++exception. Storage should be provided by the inheriting classes.
++
++XiveEnDSource is a special source object. It exposes the END ESB MMIOs
++of the Event Queues which are used for coalescing event notifications
++and for escalation. Not used on the field, only to sync the EQ cache
++in OPAL.
++
++Finally, the XiveTCTX contains the interrupt state context of a thread,
++four sets of registers, one for each exception that can be delivered
++to a CPU. These contexts are scanned by the IVPE to find a matching VP
++when a notification is triggered. It also models the Thread Interrupt
++Management Area (TIMA), which exposes the thread context registers to
++the CPU for interrupt management.
++
++
++XIVE for sPAPR (pseries machines)
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++SpaprXive models the XIVE interrupt controller of a ``pseries``
++machine. It inherits from the XiveRouter and provisions storage for
++the EAS and END tables. The NVT table does not need a backend in
++sPAPR. It owns a XiveSource object for the IPIs and the virtual device
++interrupts, a memory region for the TIMA and a XiveENDSource object to
++manage the END ESBs (not used by Linux).
++
++These choices were made to have a sPAPR interrupt controller consistent
++with the one found on baremetal and to facilitate KVM support, the
++main difficulty being the host memory regions exposed to the guest.
++
++CAS Negotiation
++---------------
++
++The interrupt mode advertised by the ``pseries`` machine in the CAS
++negotiation process depends on the CPU type (XIVE requires POWER9) but
++also on the machine property ``ic-mode`` which can take the following
++values: ``xics``, ``xive`` and ``dual``. ``xics`` is currently the
++default mode but it should change in the future.
++
++The choosen interrupt mode is activated after a reconfiguration done
++in a machine reset.
++
++KVM support
++-----------
++
++Two host memory regions are exposed to the guest and require special
++attention at initialization :
++
++- ESB MMIOs
++- Thread Interrupt Management Area (TIMA)
++
++When using the KVM device, these are `ram device` memory mappings,
++similarly to VFIO, exposed to the guest and the associated VMAs on the
++host are populated dynamically with the appropriate pages using a
++fault handler.
++
++The models uses KVM accessors to synchronize the QEMU state with KVM :
++
++- the source configuration (EAT)
++- the END configuration (ENDT)
++- the O/S EQ state (toggle bit and index)
++- the thread interrupt context registers.
++
++Hybrid guest using KVM and an emulated irqchip ``kernel_irqchip=3Doff``
++is supported.
++
++Monitoring XIVE
++---------------
++
++The state of the XIVE interrupt controller can be queried through the
++monitor commands ``info pic``. The output comes in two parts.
++
++First, the state of the thread interrupt context registers is dumped
++for each CPU :
++
++::
++
++   (qemu) info pic
++   CPU[0000]:   QW   NSR CPPR IPB LSMFB ACK# INC AGE PIPR  W2
++   CPU[0000]: USER    00   00  00    00   00  00  00   00  00000000
++   CPU[0000]:   OS    00   ff  00    00   ff  00  ff   ff  80000400
++   CPU[0000]: POOL    00   00  00    00   00  00  00   00  00000000
++   CPU[0000]: PHYS    00   00  00    00   00  00  00   ff  00000000
++   ...
++
++In the case of a ``pseries`` machine, QEMU acts as the hypervisor and on=
+ly
++the O/S and USER register rings make sense. ``W2`` contains the vCPU CAM
++line which is set to the VP identifier.
++
++Then comes the routing information which aggregates the EAS and the
++END configuration:
++
++::
++
++   ...
++   LISN         PQ    EISN     CPU/PRIO EQ
++   00000000 MSI --    00000010   0/6    380/16384 @1fe3e0000 ^1 [ 800000=
+10 ... ]
++   00000001 MSI --    00000010   1/6    305/16384 @1fc230000 ^1 [ 800000=
+10 ... ]
++   00000002 MSI --    00000010   2/6    220/16384 @1fc2f0000 ^1 [ 800000=
+10 ... ]
++   00000003 MSI --    00000010   3/6    201/16384 @1fc390000 ^1 [ 800000=
+10 ... ]
++   00000004 MSI -Q  M 00000000
++   00000005 MSI -Q  M 00000000
++   00000006 MSI -Q  M 00000000
++   00000007 MSI -Q  M 00000000
++   00001000 MSI --    00000012   0/6    380/16384 @1fe3e0000 ^1 [ 800000=
+10 ... ]
++   00001001 MSI --    00000013   0/6    380/16384 @1fe3e0000 ^1 [ 800000=
+10 ... ]
++   00001100 MSI --    00000100   1/6    305/16384 @1fc230000 ^1 [ 800000=
+10 ... ]
++   00001101 MSI -Q  M 00000000
++   00001200 LSI -Q  M 00000000
++   00001201 LSI -Q  M 00000000
++   00001202 LSI -Q  M 00000000
++   00001203 LSI -Q  M 00000000
++   00001300 MSI --    00000102   1/6    305/16384 @1fc230000 ^1 [ 800000=
+10 ... ]
++   00001301 MSI --    00000103   2/6    220/16384 @1fc2f0000 ^1 [ 800000=
+10 ... ]
++   00001302 MSI --    00000104   3/6    201/16384 @1fc390000 ^1 [ 800000=
+10 ... ]
++
++The source information and configuration:
++
++- The ``LISN`` column outputs the interrupt number of the source in
++  range ``[ 0x0 ... 0x1FFF ]`` and its type : ``MSI`` or ``LSI``
++- The ``PQ`` column reflects the state of the PQ bits of the source :
++
++  - ``--`` source is ready to take events
++  - ``P-`` an event was sent and an EOI is PENDING
++  - ``PQ`` an event was QUEUED
++  - ``-Q`` source is OFF
++
++  a ``M`` indicates that source is *MASKED* at the EAS level,
++
++The targeting configuration :
++
++- The ``EISN`` column is the event data what will be queued in the event
++  queue of the O/S.
++- The ``CPU/PRIO`` column is the tuple defining the CPU number and
++  priority queue serving the source.
++- The ``EQ`` column outputs :
++
++  - the current index of the event queue/ the max number of entries
++  - the O/S event queue address
++  - the toggle bit
++  - the last entries that were pushed in the event queue.
++
++
++
++XIVE for PowerNV
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++The PnvXIVE model uses the XiveRouter abstract model just like
++sPAPRXive. It provides accessors to the EAS, END and NVT tables which
++are stored in the QEMU PowerNV machine and not in QEMU anymore. It
++owns a set of memory regions for the IC registers, the ESBs, the END
++ESBs, the TIMA, the notification MMIO.
++
++Multichip is supported and the available IVSEs are the internal one
++for the IPIS, the PSI host bridge controller and PHB4.
++
++The next interesting step would be to add escalation events and model
++the VCPU dispatching to support emulated KVM guests.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 66ddbda9c958..a896c7407294 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1697,6 +1697,7 @@ L: qemu-ppc@nongnu.org
+ S: Supported
+ F: hw/*/*xive*
+ F: include/hw/*/*xive*
++F: docs/ppc/xive.rst
+=20
+ Subsystems
+ ----------
+--=20
+2.20.1
 
 
