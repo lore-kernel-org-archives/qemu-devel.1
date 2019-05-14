@@ -2,86 +2,81 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E50C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 16:15:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C7FBC04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 16:15:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22D27205C9
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 16:15:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dD3719aD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22D27205C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 22A6A205C9
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 16:15:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22A6A205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50708 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50745 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQa5O-000682-A7
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 12:15:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35938)
+	id 1hQa5c-0006R9-Cs
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 12:15:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hQZw4-0007QH-Nj
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:05:49 -0400
+	(envelope-from <philmd@redhat.com>) id 1hQa49-0005L6-RL
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:14:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hQZw1-0003ja-AT
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:05:46 -0400
-Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:37449)
+	(envelope-from <philmd@redhat.com>) id 1hQa47-0004bU-Re
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:14:09 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:53981)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1hQZw0-0003dT-VE
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:05:45 -0400
-Received: by mail-ot1-x32c.google.com with SMTP id r10so15004163otd.4
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 09:05:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-	:cc; bh=g815QicO24Zdcg/B1B8l8URqFo+173B68O7KxeY5SW4=;
-	b=dD3719aDWh7FNNOqIhW4HWlXHxtWycjSij9AtHJf5TKFrupjgTfSDs7R+ShE+Rp67Z
-	cYpYmMAnmJWxc6U5MugQT4TAG7yRyugZCdau5U9TSmIQifcQeJ/X8tpol5wJBkpcM7Y0
-	lT1C/mcDP0ejEUX6Pe4MRbqfreqxTQd0LFqut8nTfYZdBfmiVBlV5xBASx+iOfePnVJ1
-	QxRSs0lMFsr2aQPqQzxqLWPYvcZev2swLiEYm+2XDngrLDos+aELeFFIB01RteMJRbCG
-	e44D2cp4WuQsATuuhJ9FWRiwE+mQbQj/HzawEJ0xmilAnS3817YrBI33am0ZrfAijDAU
-	PGrg==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hQa44-0004Li-BP
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 12:14:07 -0400
+Received: by mail-wm1-f67.google.com with SMTP id 198so3497522wme.3
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 09:13:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-	:message-id:subject:to:cc;
-	bh=g815QicO24Zdcg/B1B8l8URqFo+173B68O7KxeY5SW4=;
-	b=Uyob49+MHUgxJNRUUxQjRGpkdaiLVWYfrCHvrWU/vpgTni6EvmvW9WHuu07aLT66Ii
-	ZKBuRh55EEVrSwUaV1TIhKPYawkl4qbg2+EeGJxw2Cs1QqoYFwKM6koj6ecIL6AiCN9K
-	hPMNnzw1cOillN1ULWSzY/3fa0EQggbedKYcyyhmuRxQHRouO3/v4aEIO16V6A+kNVdg
-	rc6VmBqvjZc2/i1+DThMZc4IFKvSLi3jbTLnqfF/7rSl1c/XqccsjADGLDx0lANA4Tmf
-	w8i11GB1+EbbjvXZdvZuHaQk35cxaNZaGuasi82OAMOoorz7cvvcbqysg/fbV2hq8YNp
-	dlAQ==
-X-Gm-Message-State: APjAAAUWt/KZTmbwU+I6ukz6Uc9j6LOwj7F5EqaFiX60CVNN0HVUnL4L
-	jk3biQvOmWkJWG+zLKhXE+ZtWn7ZKuWKZrj1jEw=
-X-Google-Smtp-Source: APXvYqxOWTZn/vWqRTrGzW6g2Cyrh9IHPfoZyqWmRAl48R1GZ15xFilJkNQ+9b1DImRPQRMjXTVnFvz9Xn6IFi0CgGY=
-X-Received: by 2002:a9d:400d:: with SMTP id m13mr1277481ote.100.1557849941335; 
-	Tue, 14 May 2019 09:05:41 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:a9d:3be5:0:0:0:0:0 with HTTP; Tue, 14 May 2019 09:05:40
-	-0700 (PDT)
-Received: by 2002:a9d:3be5:0:0:0:0:0 with HTTP; Tue, 14 May 2019 09:05:40
-	-0700 (PDT)
-In-Reply-To: <CAFEAcA-sN6BzQywHUssQqdaiTdSNNS5thnV1VHbKqB2k8K_7-A@mail.gmail.com>
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=EdoZQthCrUH1rq9oZofl1NSqIzFWV+CPYyxzTmP7mww=;
+	b=q74cAw3BjcBT2WtGXjPcUdPErJ0DXxtNjYoXR+2a56f7yhUzYi18tRxFZCsCQ5B9ja
+	11g6vTzE2sSfX2a4lhOTpqHH2iTTH1T5UdLW9aFoSLMr6PMkyRgPHrPjuJQfaeBwid4h
+	nqx75XaIHcIKCCXRqixjqlHAQHQJVm3NRiNH9MonZTi5zwuvRpVg24E5vnaB2NUDyrpu
+	cIv2dmcJ1L0heI24L6gwsV3zaPNMj/zFbuavzXfVCau3X1CLxDlTFGeunzHw5YEgXdj9
+	FaPxfdNLVm+QxkfpxcDB6EqAZP42gUn9sh14SYqaW6PpaiPA54EKsR8eGg78PCwoKi7z
+	NWZg==
+X-Gm-Message-State: APjAAAUtr+iQ2hrn4/LdOcKuREMRlm3od+u33SaLI/+cqLUXRq2xzp8m
+	ymrnAEZrBxCW/40kJOGoxBmUcg==
+X-Google-Smtp-Source: APXvYqz+g/UJuf2BLMUQBC6CBgui230K25N0+aE5mgfMSAxfUuGLVznkdcbrWXmdjTWONaSaqqfQlA==
+X-Received: by 2002:a7b:c04c:: with SMTP id u12mr18865434wmc.59.1557850434383; 
+	Tue, 14 May 2019 09:13:54 -0700 (PDT)
+Received: from [192.168.1.43] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193])
+	by smtp.gmail.com with ESMTPSA id y1sm3817734wma.14.2019.05.14.09.13.53
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Tue, 14 May 2019 09:13:53 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	qemu-devel@nongnu.org
 References: <20190510185438.29533-1-richard.henderson@linaro.org>
 	<20190510185438.29533-4-richard.henderson@linaro.org>
 	<CAL1e-=hRXg7eykwjDxTDXt33FiFOAkkGQk23mEZRB3ChaZcAQA@mail.gmail.com>
-	<CAFEAcA-sN6BzQywHUssQqdaiTdSNNS5thnV1VHbKqB2k8K_7-A@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 14 May 2019 18:05:40 +0200
-Message-ID: <CAL1e-=j5EB=Y+3Lc=_bxs4+sEOSZ7pEWFpSzdozz87q7DOs8NA@mail.gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::32c
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+	<87bm05nijn.fsf@zen.linaroharston>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <e7cc54ef-c40c-1ea4-792b-b3d44abe7739@redhat.com>
+Date: Tue, 14 May 2019 18:13:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <87bm05nijn.fsf@zen.linaroharston>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.128.67
 Subject: Re: [Qemu-devel] [PULL v2 12/27] target/mips: Convert to
  CPUClass::tlb_fill
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,50 +90,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, peter.maydell@linaro.org,
 	Richard Henderson <richard.henderson@linaro.org>,
-	QEMU Developers <qemu-devel@nongnu.org>,
 	Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On May 14, 2019 5:26 PM, "Peter Maydell" <peter.maydell@linaro.org> wrote:
->
-> On Sat, 11 May 2019 at 14:43, Aleksandar Markovic
-> <aleksandar.m.mail@gmail.com> wrote:
-> > This commit message is generally poor, as it explains relatively
-unimportant logging issue, while not explaining the core of the change.
->
-> I think the assumption with this sort of "refactor to change
-> all instances of an API" change is that you will go and
-> look at the commit message (or cover letter for the patch
-> series) that introduces the new API; there's no great need
-> to repeat the same justification for every commit that
-> applies the refactoring to each of our dozen or more
-> guest front-ends.
->
-> I'm not sure that wordsmithing a commit message really
-> justifies rerolling this pull request at this point.
->
-> thanks
-> -- PMM
+On 5/14/19 5:48 PM, Alex Bennée wrote:
+> 
+> Aleksandar Markovic <aleksandar.m.mail@gmail.com> writes:
+> 
+>> On May 10, 2019 8:57 PM, "Richard Henderson" <richard.henderson@linaro.org>
+>> wrote:
+>>>
+>>
+>> Please change the title to 'target/mips: Switch to using
+>> mips_cpu_tlb_fill()', or something along that line.
+> 
+> It does seem a little redundant as "target/mips:" already marks it as a
+> mips specific change and viewing the log you can see a series of
+> architectures being converted to a new API.
+> 
+>> Also, the reason for changing the field access_type to mips_access type
+>> should be explained in the commit message.
+> 
+> ok
+> 
+>> This commit message is generally poor, as it explains relatively
+>> unimportant logging issue, while not explaining the core of the
+>> change.
+> 
+> Surely the core of the change is explained in the main patches that
+> introduce the new API? I think it would be redundant to repeat that for
+> every individual architecture touched. It's a shame it's hard to
+> explicitly reference a patch in the same series as the commit hashes are
+> not yet permanent. At least when we fix things referring to the short
+> hash of the original commit is fairly easy.
 
-Peter, hi.
+Except in the case the maintainer is sending a pull request (like here)
+where he can manually fix the commits. Still this is a PITA...
 
-Thanks for your engaging in the discussion!
+> 
+> Generally for an architecture conversion I want to know what might be
+> different from other architectures converted. If it is a broadly
+> mechanical change it doesn't need to be too detailed.
 
-I am not complaining about myself looking at another commit message, but
-have future maintainers and future developers in mind. Their effort needed
-for deciphering commit messages like this one is multiple times larger than
-putting together a clear, full, and right-on-the-money message by the
-submitter. The commit messages should be made convenient for their readers,
-not writters, shouldn't they?
-
-That being said, I tend to accept your judgement, and I withdraw any
-request for changing elements of this pull request. Please go ahead with
-integrating it, and thanks again for involving in this issue, and sorry for
-taking your time.
-
-Sincerely,
-Aleksandar
