@@ -2,114 +2,152 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAACFC04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 08:21:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D230C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 08:38:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2552F2084E
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 08:21:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2552F2084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4183220645
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 08:38:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4183220645
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42208 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42414 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQSga-00048C-59
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 04:21:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35810)
+	id 1hQSxX-0007dj-1e
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 04:38:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hQSfZ-0003gL-AO
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:20:19 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1hQSwX-0007HW-3Z
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:37:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hQSfX-0007l0-Jo
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:20:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54566)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hQSfX-0007jk-BZ
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:20:15 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 03F6285363;
-	Tue, 14 May 2019 08:20:12 +0000 (UTC)
-Received: from [10.36.117.118] (ovpn-117-118.ams2.redhat.com [10.36.117.118])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5C4A05D720;
-	Tue, 14 May 2019 08:19:53 +0000 (UTC)
-To: Pankaj Gupta <pagupta@redhat.com>, linux-nvdimm@lists.01.org,
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-acpi@vger.kernel.org, qemu-devel@nongnu.org,
-	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
-References: <20190510155202.14737-1-pagupta@redhat.com>
-	<20190510155202.14737-3-pagupta@redhat.com>
-From: David Hildenbrand <david@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1hQSwV-0006Qd-6I
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:37:49 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38286)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1hQSwT-0006Gn-8f
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:37:46 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4E8aR3u059367
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 04:37:42 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2sftab828s-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 04:37:41 -0400
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 14 May 2019 09:37:38 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+	by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Tue, 14 May 2019 09:37:34 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+	[9.149.105.59])
+	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x4E8bX7960817454
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Tue, 14 May 2019 08:37:33 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 385A7A4059;
+	Tue, 14 May 2019 08:37:33 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D5C7AA4040;
+	Tue, 14 May 2019 08:37:32 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.133])
+	by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+	Tue, 14 May 2019 08:37:32 +0000 (GMT)
+To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+References: <1556749903-19221-1-git-send-email-walling@linux.ibm.com>
+	<a87c71be-5bf8-a115-5843-720c9ad10c7b@redhat.com>
+	<bc2fd9bb-7b94-eac7-590b-f01d2063ef9c@redhat.com>
+	<e948a030-bd30-180e-bbd6-76f4a2390bb9@de.ibm.com>
+	<ea6df6b1-4062-c057-92ea-5be40d778fe9@redhat.com>
+	<09293a1c-d000-83a8-46b8-b97ad4fa9774@de.ibm.com>
+	<56e3ace1-6e48-0e20-47d5-b07ac6dfcf31@redhat.com>
+	<e140a076-28a0-0db6-4c59-80e0f2ab44bb@de.ibm.com>
+	<c690c4a8-c277-e3c6-3697-3f0a1924559b@redhat.com>
+	<20190513134637.3d8bb275.cohuck@redhat.com>
+	<898144e3-615e-5074-fb68-bf9995c64609@de.ibm.com>
+	<155d2ca3-6a48-c99a-fe42-dca8e3fd4344@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <f2ea35a6-ec98-447c-44fe-0cb3ab309340@redhat.com>
-Date: Tue, 14 May 2019 10:19:52 +0200
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+	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
+	syiRa+UVlsKmx1hsEg==
+Date: Tue, 14 May 2019 10:37:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190510155202.14737-3-pagupta@redhat.com>
+In-Reply-To: <155d2ca3-6a48-c99a-fe42-dca8e3fd4344@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Tue, 14 May 2019 08:20:13 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v8 2/6] virtio-pmem: Add virtio pmem driver
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19051408-0028-0000-0000-0000036D765B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051408-0029-0000-0000-0000242D0722
+Message-Id: <066c7470-94a3-a922-9a12-1ca42e474c51@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-05-14_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1905140063
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [PATCH v4] s390: diagnose 318 info reset and
+ migration support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -121,414 +159,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jack@suse.cz, mst@redhat.com, jasowang@redhat.com, david@fromorbit.com,
-	lcapitulino@redhat.com, adilger.kernel@dilger.ca,
-	zwisler@kernel.org, aarcange@redhat.com, dave.jiang@intel.com,
-	jstaron@google.com, darrick.wong@oracle.com,
-	vishal.l.verma@intel.com, willy@infradead.org, hch@infradead.org,
-	jmoyer@redhat.com, nilal@redhat.com, lenb@kernel.org,
-	kilobyte@angband.pl, riel@surriel.com, yuval.shaia@oracle.com,
-	stefanha@redhat.com, pbonzini@redhat.com,
-	dan.j.williams@intel.com, kwolf@redhat.com, tytso@mit.edu,
-	xiaoguangrong.eric@gmail.com, cohuck@redhat.com,
-	rjw@rjwysocki.net, imammedo@redhat.com
+Cc: Collin Walling <walling@linux.ibm.com>, mst@redhat.com,
+	qemu-devel@nongnu.org, pasic@linux.ibm.com,
+	qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10.05.19 17:51, Pankaj Gupta wrote:
-> This patch adds virtio-pmem driver for KVM guest.
->=20
-> Guest reads the persistent memory range information from
-> Qemu over VIRTIO and registers it on nvdimm_bus. It also
-> creates a nd_region object with the persistent memory
-> range information so that existing 'nvdimm/pmem' driver
-> can reserve this into system memory map. This way
-> 'virtio-pmem' driver uses existing functionality of pmem
-> driver to register persistent memory compatible for DAX
-> capable filesystems.
->=20
-> This also provides function to perform guest flush over
-> VIRTIO from 'pmem' driver when userspace performs flush
-> on DAX memory range.
->=20
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
-> ---
->  drivers/nvdimm/Makefile          |   1 +
->  drivers/nvdimm/nd_virtio.c       | 129 +++++++++++++++++++++++++++++++
->  drivers/nvdimm/virtio_pmem.c     | 117 ++++++++++++++++++++++++++++
->  drivers/virtio/Kconfig           |  10 +++
->  include/linux/virtio_pmem.h      |  60 ++++++++++++++
->  include/uapi/linux/virtio_ids.h  |   1 +
->  include/uapi/linux/virtio_pmem.h |  10 +++
->  7 files changed, 328 insertions(+)
->  create mode 100644 drivers/nvdimm/nd_virtio.c
->  create mode 100644 drivers/nvdimm/virtio_pmem.c
->  create mode 100644 include/linux/virtio_pmem.h
->  create mode 100644 include/uapi/linux/virtio_pmem.h
->=20
-> diff --git a/drivers/nvdimm/Makefile b/drivers/nvdimm/Makefile
-> index 6f2a088afad6..cefe233e0b52 100644
-> --- a/drivers/nvdimm/Makefile
-> +++ b/drivers/nvdimm/Makefile
-> @@ -5,6 +5,7 @@ obj-$(CONFIG_ND_BTT) +=3D nd_btt.o
->  obj-$(CONFIG_ND_BLK) +=3D nd_blk.o
->  obj-$(CONFIG_X86_PMEM_LEGACY) +=3D nd_e820.o
->  obj-$(CONFIG_OF_PMEM) +=3D of_pmem.o
-> +obj-$(CONFIG_VIRTIO_PMEM) +=3D virtio_pmem.o nd_virtio.o
-> =20
->  nd_pmem-y :=3D pmem.o
-> =20
-> diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
-> new file mode 100644
-> index 000000000000..ed7ddcc5a62c
-> --- /dev/null
-> +++ b/drivers/nvdimm/nd_virtio.c
-> @@ -0,0 +1,129 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * virtio_pmem.c: Virtio pmem Driver
-> + *
-> + * Discovers persistent memory range information
-> + * from host and provides a virtio based flushing
-> + * interface.
-> + */
-> +#include <linux/virtio_pmem.h>
-> +#include "nd.h"
-> +
-> + /* The interrupt handler */
-> +void host_ack(struct virtqueue *vq)
-> +{
-> +	unsigned int len;
-> +	unsigned long flags;
-> +	struct virtio_pmem_request *req, *req_buf;
-> +	struct virtio_pmem *vpmem =3D vq->vdev->priv;
-
-Nit: use reverse Christmas tree layout :)
-
-> +
-> +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +	while ((req =3D virtqueue_get_buf(vq, &len)) !=3D NULL) {
-> +		req->done =3D true;
-> +		wake_up(&req->host_acked);
-> +
-> +		if (!list_empty(&vpmem->req_list)) {
-> +			req_buf =3D list_first_entry(&vpmem->req_list,
-> +					struct virtio_pmem_request, list);
-> +			req_buf->wq_buf_avail =3D true;
-> +			wake_up(&req_buf->wq_buf);
-> +			list_del(&req_buf->list);
-> +		}
-> +	}
-> +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +}
-> +EXPORT_SYMBOL_GPL(host_ack);
-> +
-> + /* The request submission function */
-> +int virtio_pmem_flush(struct nd_region *nd_region)
-> +{
-> +	int err, err1;
-> +	unsigned long flags;
-> +	struct scatterlist *sgs[2], sg, ret;
-> +	struct virtio_device *vdev =3D nd_region->provider_data;
-> +	struct virtio_pmem *vpmem =3D vdev->priv;
-> +	struct virtio_pmem_request *req;
-
-Nit: use reverse Christmas tree layout :)
-
-> +
-> +	might_sleep();
-> +	req =3D kmalloc(sizeof(*req), GFP_KERNEL);
-> +	if (!req)
-> +		return -ENOMEM;
-> +
-> +	req->done =3D false;
-> +	strcpy(req->name, "FLUSH");
-> +	init_waitqueue_head(&req->host_acked);
-> +	init_waitqueue_head(&req->wq_buf);
-> +	INIT_LIST_HEAD(&req->list);
-> +	sg_init_one(&sg, req->name, strlen(req->name));
-> +	sgs[0] =3D &sg;
-> +	sg_init_one(&ret, &req->ret, sizeof(req->ret));
-> +	sgs[1] =3D &ret;
-> +
-> +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +	 /*
-> +	  * If virtqueue_add_sgs returns -ENOSPC then req_vq virtual
-> +	  * queue does not have free descriptor. We add the request
-> +	  * to req_list and wait for host_ack to wake us up when free
-> +	  * slots are available.
-> +	  */
-> +	while ((err =3D virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req,
-> +					GFP_ATOMIC)) =3D=3D -ENOSPC) {
-> +
-> +		dev_err(&vdev->dev, "failed to send command to virtio pmem"\
-> +			"device, no free slots in the virtqueue\n");
-> +		req->wq_buf_avail =3D false;
-> +		list_add_tail(&req->list, &vpmem->req_list);
-> +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +
-> +		/* When host has read buffer, this completes via host_ack */
-
-"A host repsonse results in "host_ack" getting called" ... ?
-
-> +		wait_event(req->wq_buf, req->wq_buf_avail);
-> +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +	}
-> +	err1 =3D virtqueue_kick(vpmem->req_vq);
-> +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +
-> +	/*
-> +	 * virtqueue_add_sgs failed with error different than -ENOSPC, we can=
-'t
-> +	 * do anything about that.
-> +	 */
-> +	if (err || !err1) {
-> +		dev_info(&vdev->dev, "failed to send command to virtio pmem device\n=
-");
-> +		err =3D -EIO;
-> +		goto ret;
-
-Avoid the goto. Just move the following statements into an "else" case.
-
-> +	}
-> +
-> +	/* When host has read buffer, this completes via host_ack */
-
-"A host repsonse results in "host_ack" getting called" ... ?
-
-> +	wait_event(req->host_acked, req->done);
-> +	err =3D req->ret;
-> +ret:
-> +	kfree(req);
-> +	return err;
-> +};
-> +
-> +/* The asynchronous flush callback function */
-> +int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
-> +{
-> +	int rc =3D 0;
-> +
-> +	/* Create child bio for asynchronous flush and chain with
-> +	 * parent bio. Otherwise directly call nd_region flush.
-> +	 */
-> +	if (bio && bio->bi_iter.bi_sector !=3D -1) {
-> +		struct bio *child =3D bio_alloc(GFP_ATOMIC, 0);
-> +
-> +		if (!child)
-> +			return -ENOMEM;
-> +		bio_copy_dev(child, bio);
-> +		child->bi_opf =3D REQ_PREFLUSH;
-> +		child->bi_iter.bi_sector =3D -1;
-> +		bio_chain(child, bio);
-> +		submit_bio(child);
-
-return 0;
-
-Then, drop the "else" case and "int rc" and do directly
-
-if (virtio_pmem_flush(nd_region))
-	return -EIO;
-
-> +	} else {
-> +	=09
-> +			rc =3D -EIO;
-> +	}
-> +
-> +	return rc;
-> +};
-> +EXPORT_SYMBOL_GPL(async_pmem_flush);
-> +MODULE_LICENSE("GPL");
-> diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.=
-c
-> new file mode 100644
-> index 000000000000..cfc6381c4e5d
-> --- /dev/null
-> +++ b/drivers/nvdimm/virtio_pmem.c
-> @@ -0,0 +1,117 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * virtio_pmem.c: Virtio pmem Driver
-> + *
-> + * Discovers persistent memory range information
-> + * from host and registers the virtual pmem device
-> + * with libnvdimm core.
-> + */
-> +#include <linux/virtio_pmem.h>
-> +#include "nd.h"
-> +
-> +static struct virtio_device_id id_table[] =3D {
-> +	{ VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
-> +	{ 0 },
-> +};
-> +
-> + /* Initialize virt queue */
-> +static int init_vq(struct virtio_pmem *vpmem)
-> +{
-> +	/* single vq */
-> +	vpmem->req_vq =3D virtio_find_single_vq(vpmem->vdev,
-> +				host_ack, "flush_queue");
-
-Nit: Wrong indentation of parameters.
-
-> +	if (IS_ERR(vpmem->req_vq))
-> +		return PTR_ERR(vpmem->req_vq);
-> +
-> +	spin_lock_init(&vpmem->pmem_lock);
-> +	INIT_LIST_HEAD(&vpmem->req_list);
-
-I would initialize the locks in the virtio_pmem_probe() directly,
-earlier (directly after allocating vpmem).
-
-> +
-> +	return 0;
-> +};
-> +
-> +static int virtio_pmem_probe(struct virtio_device *vdev)
-> +{
-> +	int err =3D 0;
-> +	struct resource res;
-> +	struct virtio_pmem *vpmem;
-> +	struct nd_region_desc ndr_desc =3D {};
-> +	int nid =3D dev_to_node(&vdev->dev);
-> +	struct nd_region *nd_region;
-
-Nit: use reverse Christmas tree layout :)
-
-> +
-> +	if (!vdev->config->get) {
-> +		dev_err(&vdev->dev, "%s failure: config access disabled\n",
-> +			__func__);
-> +		return -EINVAL;
-> +	}
-> +
-> +	vpmem =3D devm_kzalloc(&vdev->dev, sizeof(*vpmem), GFP_KERNEL);
-> +	if (!vpmem) {
-> +		err =3D -ENOMEM;
-> +		goto out_err;
-> +	}
-> +
-> +	vpmem->vdev =3D vdev;
-> +	vdev->priv =3D vpmem;
-> +	err =3D init_vq(vpmem);
-> +	if (err)
-> +		goto out_err;
-> +
-> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> +			start, &vpmem->start);
-> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> +			size, &vpmem->size);
-> +
-> +	res.start =3D vpmem->start;
-> +	res.end   =3D vpmem->start + vpmem->size-1;
-> +	vpmem->nd_desc.provider_name =3D "virtio-pmem";
-> +	vpmem->nd_desc.module =3D THIS_MODULE;
-> +
-> +	vpmem->nvdimm_bus =3D nvdimm_bus_register(&vdev->dev,
-> +						&vpmem->nd_desc);
-> +	if (!vpmem->nvdimm_bus)
-> +		goto out_vq;
-> +
-> +	dev_set_drvdata(&vdev->dev, vpmem->nvdimm_bus);
-> +
-> +	ndr_desc.res =3D &res;
-> +	ndr_desc.numa_node =3D nid;
-> +	ndr_desc.flush =3D async_pmem_flush;
-> +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
-> +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
-> +	nd_region =3D nvdimm_pmem_region_create(vpmem->nvdimm_bus, &ndr_desc)=
-;
-> +
-
-I'd drop this empty line.
-
-> +	if (!nd_region)
-> +		goto out_nd;
-> +	nd_region->provider_data =3D dev_to_virtio(nd_region->dev.parent->par=
-ent);
-
-Does it make sense to move some parts into separate functions for
-readability? E.g., virtio_pmem_init_nvdimm_bus()
-
-> +	return 0;
-> +out_nd:
-> +	err =3D -ENXIO;
-
-I'd always initialize "err" along with the goto statement for
-readability, especially because ...
-
-> +	nvdimm_bus_unregister(vpmem->nvdimm_bus);
-> +out_vq:
-
-... you don't initialize err in this case. Err is here 0 if I am not wron=
-g.
-
-> +	vdev->config->del_vqs(vdev);
-> +out_err:
-> +	dev_err(&vdev->dev, "failed to register virtio pmem memory\n");
-
-Should we try to give more meaning full messages? I can think of
-scenarios like "memory region is not properly aligned" or "out of memory"=
-.
-
-> +	return err;
-> +}
-> +
-> +static void virtio_pmem_remove(struct virtio_device *vdev)
-> +{
-> +	struct nvdimm_bus *nvdimm_bus =3D dev_get_drvdata(&vdev->dev);
-> +
-
-Is the nd_region implicitly cleaned up?
-
-You are not freeing "vdev->priv".
-
-> +	nvdimm_bus_unregister(nvdimm_bus);
-> +	vdev->config->del_vqs(vdev);
-> +	vdev->config->reset(vdev);
-> +}
-> +
-> +static struct virtio_driver virtio_pmem_driver =3D {
-> +	.driver.name		=3D KBUILD_MODNAME,
-> +	.driver.owner		=3D THIS_MODULE,
-> +	.id_table		=3D id_table,
-> +	.probe			=3D virtio_pmem_probe,
-> +	.remove			=3D virtio_pmem_remove,
-> +};
-> +
-> +module_virtio_driver(virtio_pmem_driver);
-> +MODULE_DEVICE_TABLE(virtio, id_table);
-> +MODULE_DESCRIPTION("Virtio pmem driver");
-> +MODULE_LICENSE("GPL");
-> diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-> index 35897649c24f..9f634a2ed638 100644
-> --- a/drivers/virtio/Kconfig
-> +++ b/drivers/virtio/Kconfig
-> @@ -42,6 +42,16 @@ config VIRTIO_PCI_LEGACY
-> =20
->  	  If unsure, say Y.
-> =20
-> +config VIRTIO_PMEM
-> +	tristate "Support for virtio pmem driver"
-> +	depends on VIRTIO
-> +	depends on LIBNVDIMM
-> +	help
-> +	This driver provides support for virtio based flushing interface
-> +	for persistent memory range.
-
-"This driver provides access to virtio-pmem devices, storage devices
-that are mapped into the physical address space - similar to NVDIMMs -
-with a virtio-based flushing interface." ... ?
-
-> +
-> +	If unsure, say M.
-> +
 
 
---=20
+On 14.05.19 09:28, David Hildenbrand wrote:
+>>>> But that can be tested using the runability information if I am not wrong.
+>>>
+>>> You mean the cpu level information, right?
+> 
+> Yes, query-cpu-definition includes for each model runability information
+> via "unavailable-features" (valid under the started QEMU machine).
+> 
+>>>
+>>>>
+>>>>> and others that we have today.
+>>>>>
+>>>>> So yes, I think this would be acceptable.  
+>>>>
+>>>> I guess it is acceptable yes. I doubt anybody uses that many CPUs in
+>>>> production either way. But you never know.
+>>>
+>>> I think that using that many cpus is a more uncommon setup, but I still
+>>> think that having to wait for actual failure
+>>
+>> That can happen all the time today. You can easily say z14 in the xml when 
+>> on a zEC12. Only at startup you get the error. The question is really:
+> 
+> "-smp 248 -cpu host" will no longer work, while e.g. "-smp 248 -cpu z12"
+> will work. Actually, even "-smp 248" will no longer work on affected
+> machines.
+> 
+> That is why wonder if it is better to disable the feature and print a
+> warning. Similar to CMMA, where want want to tolerate when CMMA is not
+> possible in the current environment (huge pages).
+> 
+> "Diag318 will not be enabled because it is not compatible with more than
+> 240 CPUs".
+> 
+> However, I still think that implementing support for more than one SCLP
+> response page is the best solution. Guests will need adaptions for > 240
+> CPUs with Diag318, but who cares? Existing setups will continue to work.
+> 
+> Implementing that SCLP thingy will avoid any warnings and any errors. It
+> just works from the QEMU perspective.
+> 
+> Is implementing this realistic?
 
-Thanks,
+Yes it is but it will take time. I will try to get this rolling. To make
+progress on the diag318 thing, can we error on startup now and simply
+remove that check when when have implemented a larger sccb? If we would
+now do all kinds of "change the max number games" would be harder to "fix".
 
-David / dhildenb
+
+
+> 
+>> do you want to error on definition of the xml or on startup.
+> 
+> I actually have no idea what the best practice on the libvirt side is.
+> There seems to be a user for max-cpus and unavailable-features in QEMU.
+> 
+> And I think
+>> startup is the better place here. This allows to create definitions that will
+>> be useful in the future (pre-planning), e.g. if you know that you will update
+>> your machine or the code soon.
+> 
+> 
+> 
+
 
