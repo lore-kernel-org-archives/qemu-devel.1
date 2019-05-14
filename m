@@ -2,66 +2,84 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D704BC04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 11:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF5A5C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 11:21:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 973D321473
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 11:14:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 973D321473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B952921473
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 11:21:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KHKcbk/h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B952921473
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45710 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45836 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQVOF-0003Tg-Un
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 07:14:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45166)
+	id 1hQVV3-0005dt-Mf
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 07:21:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hQVNO-00036N-C2
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:13:43 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hQVUE-00054l-5N
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:20:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hQVNL-0002Yn-JO
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:13:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44060)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>)
-	id 1hQVNG-0002T8-59; Tue, 14 May 2019 07:13:35 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4995589C33;
-	Tue, 14 May 2019 11:13:33 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.17.248])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 30319608A6;
-	Tue, 14 May 2019 11:13:32 +0000 (UTC)
-Date: Tue, 14 May 2019 12:13:30 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190514111330.GA8548@redhat.com>
-References: <20180312150218.1314-1-kwolf@redhat.com>
-	<20180312150218.1314-3-kwolf@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hQVUD-0001Aq-8b
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:20:46 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44098)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hQVUC-00019i-WA
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:20:45 -0400
+Received: by mail-wr1-x443.google.com with SMTP id c5so18721005wrs.11
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 04:20:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=bgBMpTCMNLCK26Kqndnd3AJ1Ok3A71IDOIWMZ79Wr14=;
+	b=KHKcbk/huhRfzzGi6p1A5LfQ6wLBy9GL68iflwe2M4qMXw+m2lHYqrK8bECI+G36dG
+	A/OJYYjHlDLzwvKK55aZDJ079bM+nEXz7ryAEE1h+j22NKIGM8kG4mTApB+2C3zu33Jg
+	Wb2Z+bDTmRr9boC0+ZAxdgtXQ5QXF2Wqh5S6L69Cxjsy/4e3iCIeCujKFlHZXX7zlcsv
+	hf39M/PAKDku0skl4WssWF8H+sQmcNWMW8lw6W48QJcso1nafQ6pbUIa/rs2ZBiNj6f9
+	DDLJLZHQnmUORE0Gl4oEr6gDhpzhqVDld/EArA+TsjlwYcZaNdCuOCdbXRi6mDxR2ypt
+	gyQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=bgBMpTCMNLCK26Kqndnd3AJ1Ok3A71IDOIWMZ79Wr14=;
+	b=U3PK6cat0fOJHux5fsERPKvrsUkgGa/QZiRb035sWHKGySUOpL/beB5Dnw57as7z1b
+	qcOmyhy12kRhF9X7aIKlL0lJ9TLB1OIDLvK35TQkJYr9lHGp8PywEk/dFV2dwTguimiD
+	yxTjvxCmWHuUtEbBuvbz8qyFW94TvX3opqF4OcOs5gaiTmq8OJpHqLfpqacaT2Uu/rZE
+	NmbMAYQkA+fgtCMXfy6B526Ec42is6pj+NNS8lA69zLF3FiRaKCnWyqnQfxk1XcW3GXB
+	g5uDuZLS81wCumfZk/oyDgn/b8qvbzG5FQcwoejICFx9PcVuIH6FgBE4xZCIMEmEI0xb
+	W+dw==
+X-Gm-Message-State: APjAAAU+dAOOrsM2c5LDt6PCjBeG8BLjaMG7IwGyVi6xyOYT/jlIQ36v
+	Qq81ImbxgyDhJ1bqqrgXRsRxubT+6rkt82GrZ8w=
+X-Google-Smtp-Source: APXvYqyObUjl1R6Ji/528axfrk0oBmDFh5CiaaWg0GCIypON9omBr5jyqwuTKrLzB7N/lcmfP4D0bkZxJpD/7AaFPTk=
+X-Received: by 2002:adf:b641:: with SMTP id i1mr21149350wre.288.1557832843514; 
+	Tue, 14 May 2019 04:20:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180312150218.1314-3-kwolf@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Tue, 14 May 2019 11:13:33 +0000 (UTC)
+References: <20190513184433.21038-1-marcandre.lureau@redhat.com>
+	<20190513184433.21038-2-marcandre.lureau@redhat.com>
+	<20190514053747.os6lwvzwhe2ojsuu@sirius.home.kraxel.org>
+In-Reply-To: <20190514053747.os6lwvzwhe2ojsuu@sirius.home.kraxel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 14 May 2019 13:20:31 +0200
+Message-ID: <CAJ+F1CLO2Wn1kJYrR5DYcyOXnM1e0JToZ7CJruhWbYEbWbeRHg@mail.gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] luks: Create
- block_crypto_co_create_generic()
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH v7 1/8] vhost-user: add
+ vhost_user_gpu_set_socket()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,204 +91,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Mar 12, 2018 at 04:02:14PM +0100, Kevin Wolf wrote:
-> Everything that refers to the protocol layer or QemuOpts is moved out o=
-f
-> block_crypto_create_generic(), so that the remaining function is
-> suitable to be called by a .bdrv_co_create implementation.
->=20
-> LUKS is the only driver that actually implements the old interface, and
-> we don't intend to use it in any new drivers, so put the moved out code
-> directly into a LUKS function rather than creating a generic
-> intermediate one.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/crypto.c | 95 +++++++++++++++++++++++++++++++++++++-------------=
---------
->  1 file changed, 61 insertions(+), 34 deletions(-)
+Hi
+
+On Tue, May 14, 2019 at 7:38 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+>   Hi,
+>
+> > +VhostUserGpuCursorUpdate
+> > +^^^^^^^^^^^^^^^^^^^^^^^^
+> > +
+> > ++-----+-------+-------+--------+
+> > +| pos | hot_x | hot_y | cursor |
+> > ++-----+-------+-------+--------+
+> > +
+> > +:pos: a ``VhostUserGpuCursorPos``, the cursor location
+> > +
+> > +:hot_x/hot_y: ``u32``, the cursor hot location
+> > +
+> > +:cursor: ``[u32; 64 * 64]``, 64x64 RGBA cursor data
+>
+> Should clarify here what exactly RGBA is. (PIXMAN_a8r8g8b8 I guess).
+
+ok
+
+>
+> > +VhostUserGpuUpdate
+> > +^^^^^^^^^^^^^^^^^^
+> > +
+> > ++------------+---+---+---+---+------+
+> > +| scanout-id | x | y | w | h | data |
+> > ++------------+---+---+---+---+------+
+> > +
+> > +:scanout-id: ``u32``, the scanout content to update
+> > +
+> > +:x/y/w/h: ``u32``, region of the update
+> > +
+> > +:data: RGBA data (the size is computed based on the region size, and
+> > +       the request type)
+>
+> Likewise.  Also: alpha channel for the framebuffer?
+
+It is actually PIXMAN_x8r8g8b8, fixed
+
+>
+> > +C structure
+> > +-----------
+> > +
+> > +In QEMU the vhost-user-gpu message is implemented with the following s=
+truct:
+> > +
+> > +.. code:: c
+> > +
+> > +  typedef struct VhostUserGpuMsg {
+> > +      uint32_t request; /* VhostUserGpuRequest */
+> > +      uint32_t flags;
+> > +      uint32_t size; /* the following payload size */
+>
+> uint32_t padding;
+>
+> > +      union {
+> > +          VhostUserGpuCursorPos cursor_pos;
+> > +          VhostUserGpuCursorUpdate cursor_update;
+> > +          VhostUserGpuScanout scanout;
+> > +          VhostUserGpuUpdate update;
+> > +          VhostUserGpuDMABUFScanout dmabuf_scanout;
+> > +          struct virtio_gpu_resp_display_info display_info;
+> > +          uint64_t u64;
+>
+> ... so this 64bit value will be aligned.
+
+vhost-user didn't bother. Should we?
 
 
-Reviving a year old commit...
-
-The LUKS driver doesn't implement preallocation during create.
-
-Before this commit this would be reported
-
- $ qemu-img create -f luks --object secret,id=3Dsec0,data=3Dbase -o key-s=
-ecret=3Dsec0 base.luks 1G -o preallocation=3Dfull
- Formatting 'base.luks', fmt=3Dluks size=3D1073741824 key-secret=3Dsec0 p=
-reallocation=3Dfull
- qemu-img: base.luks: Parameter 'preallocation' is unexpected
-
-
-After this commit, there is no error reported - it just silently
-ignores the preallocation=3Dfull option.
-
-I'm a bit lost in block layer understanding where is the right
-place to fix the error reporting in this case.
-
->=20
-> diff --git a/block/crypto.c b/block/crypto.c
-> index 77871640cc..b0a4cb3388 100644
-> --- a/block/crypto.c
-> +++ b/block/crypto.c
-> @@ -306,43 +306,29 @@ static int block_crypto_open_generic(QCryptoBlock=
-Format format,
->  }
-> =20
-> =20
-> -static int block_crypto_create_generic(QCryptoBlockFormat format,
-> -                                       const char *filename,
-> -                                       QemuOpts *opts,
-> -                                       Error **errp)
-> +static int block_crypto_co_create_generic(BlockDriverState *bs,
-> +                                          int64_t size,
-> +                                          QCryptoBlockCreateOptions *o=
-pts,
-> +                                          Error **errp)
->  {
-> -    int ret =3D -EINVAL;
-> -    QCryptoBlockCreateOptions *create_opts =3D NULL;
-> +    int ret;
-> +    BlockBackend *blk;
->      QCryptoBlock *crypto =3D NULL;
-> -    struct BlockCryptoCreateData data =3D {
-> -        .size =3D ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE,=
- 0),
-> -                         BDRV_SECTOR_SIZE),
-> -    };
-> -    QDict *cryptoopts;
-> -
-> -    /* Parse options */
-> -    cryptoopts =3D qemu_opts_to_qdict(opts, NULL);
-> +    struct BlockCryptoCreateData data;
-> =20
-> -    create_opts =3D block_crypto_create_opts_init(format, cryptoopts, =
-errp);
-> -    if (!create_opts) {
-> -        return -1;
-> -    }
-> +    blk =3D blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
-> =20
-> -    /* Create protocol layer */
-> -    ret =3D bdrv_create_file(filename, opts, errp);
-> +    ret =3D blk_insert_bs(blk, bs, errp);
->      if (ret < 0) {
-> -        return ret;
-> +        goto cleanup;
->      }
-> =20
-> -    data.blk =3D blk_new_open(filename, NULL, NULL,
-> -                            BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTO=
-COL,
-> -                            errp);
-> -    if (!data.blk) {
-> -        return -EINVAL;
-> -    }
-> +    data =3D (struct BlockCryptoCreateData) {
-> +        .blk =3D blk,
-> +        .size =3D size,
-> +    };
-> =20
-> -    /* Create format layer */
-> -    crypto =3D qcrypto_block_create(create_opts, NULL,
-> +    crypto =3D qcrypto_block_create(opts, NULL,
->                                    block_crypto_init_func,
->                                    block_crypto_write_func,
->                                    &data,
-> @@ -355,10 +341,8 @@ static int block_crypto_create_generic(QCryptoBloc=
-kFormat format,
-> =20
->      ret =3D 0;
->   cleanup:
-> -    QDECREF(cryptoopts);
->      qcrypto_block_free(crypto);
-> -    blk_unref(data.blk);
-> -    qapi_free_QCryptoBlockCreateOptions(create_opts);
-> +    blk_unref(blk);
->      return ret;
->  }
-> =20
-> @@ -563,8 +547,51 @@ static int coroutine_fn block_crypto_co_create_opt=
-s_luks(const char *filename,
->                                                           QemuOpts *opt=
-s,
->                                                           Error **errp)
->  {
-> -    return block_crypto_create_generic(Q_CRYPTO_BLOCK_FORMAT_LUKS,
-> -                                       filename, opts, errp);
-> +    QCryptoBlockCreateOptions *create_opts =3D NULL;
-> +    BlockDriverState *bs =3D NULL;
-> +    QDict *cryptoopts;
-> +    int64_t size;
-> +    int ret;
-> +
-> +    /* Parse options */
-> +    size =3D qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
-> +
-> +    cryptoopts =3D qemu_opts_to_qdict_filtered(opts, NULL,
-> +                                             &block_crypto_create_opts=
-_luks,
-> +                                             true);
-> +
-> +    create_opts =3D block_crypto_create_opts_init(Q_CRYPTO_BLOCK_FORMA=
-T_LUKS,
-> +                                                cryptoopts, errp);
-> +    if (!create_opts) {
-> +        ret =3D -EINVAL;
-> +        goto fail;
-> +    }
-> +
-> +    /* Create protocol layer */
-> +    ret =3D bdrv_create_file(filename, opts, errp);
-> +    if (ret < 0) {
-> +        return ret;
-> +    }
-> +
-> +    bs =3D bdrv_open(filename, NULL, NULL,
-> +                   BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp=
-);
-> +    if (!bs) {
-> +        ret =3D -EINVAL;
-> +        goto fail;
-> +    }
-> +
-> +    /* Create format layer */
-> +    ret =3D block_crypto_co_create_generic(bs, size, create_opts, errp=
-);
-> +    if (ret < 0) {
-> +        goto fail;
-> +    }
-> +
-> +    ret =3D 0;
-> +fail:
-> +    bdrv_unref(bs);
-> +    qapi_free_QCryptoBlockCreateOptions(create_opts);
-> +    QDECREF(cryptoopts);
-> +    return ret;
->  }
-> =20
->  static int block_crypto_get_info_luks(BlockDriverState *bs,
-> --=20
-> 2.13.6
->=20
-
-Regards,
-Daniel
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Marc-Andr=C3=A9 Lureau
 
