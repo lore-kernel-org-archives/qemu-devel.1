@@ -2,62 +2,77 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A01ACC04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:13:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C32AC04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:14:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CDAF20675
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:13:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CDAF20675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id D4EE820675
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:14:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4EE820675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43747 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43777 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQTUq-0001YU-K9
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 05:13:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59646)
+	id 1hQTW6-0002Aq-49
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 05:14:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>) id 1hQTS9-0007X7-6l
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:10:30 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hQTTv-00014A-7M
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:12:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>) id 1hQTS6-0004hO-Kb
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:10:28 -0400
-Received: from foss.arm.com ([217.140.101.70]:48970)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>)
-	id 1hQTRv-0004Ns-RV; Tue, 14 May 2019 05:10:16 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1B911374;
-	Tue, 14 May 2019 02:10:12 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
-	[10.72.51.249])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 94ED23F71E;
-	Tue, 14 May 2019 02:10:10 -0700 (PDT)
-Date: Tue, 14 May 2019 10:10:08 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <20190514091005.GN28398@e103592.cambridge.arm.com>
-References: <20190512083624.8916-1-drjones@redhat.com>
-	<20190512083624.8916-6-drjones@redhat.com>
-	<20190513124356.GG28398@e103592.cambridge.arm.com>
-	<20190513140726.vpmenrfw4uocmtnc@kamzik.brq.redhat.com>
-	<20190513143929.GK28398@e103592.cambridge.arm.com>
-	<956f9bc9-1024-b02a-e792-98b01d016ef4@linaro.org>
+	(envelope-from <cohuck@redhat.com>) id 1hQTTu-0008Ja-7e
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:12:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58588)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
+	id 1hQTTu-0008Hr-1z; Tue, 14 May 2019 05:12:18 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 16AC0C00296E;
+	Tue, 14 May 2019 09:12:17 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B3F741001943;
+	Tue, 14 May 2019 09:12:10 +0000 (UTC)
+Date: Tue, 14 May 2019 11:12:08 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <20190514111208.781e6358.cohuck@redhat.com>
+In-Reply-To: <4ebcad9e-ce3c-bd86-3c96-e2909d360813@de.ibm.com>
+References: <1556749903-19221-1-git-send-email-walling@linux.ibm.com>
+	<a87c71be-5bf8-a115-5843-720c9ad10c7b@redhat.com>
+	<bc2fd9bb-7b94-eac7-590b-f01d2063ef9c@redhat.com>
+	<e948a030-bd30-180e-bbd6-76f4a2390bb9@de.ibm.com>
+	<ea6df6b1-4062-c057-92ea-5be40d778fe9@redhat.com>
+	<09293a1c-d000-83a8-46b8-b97ad4fa9774@de.ibm.com>
+	<56e3ace1-6e48-0e20-47d5-b07ac6dfcf31@redhat.com>
+	<e140a076-28a0-0db6-4c59-80e0f2ab44bb@de.ibm.com>
+	<c690c4a8-c277-e3c6-3697-3f0a1924559b@redhat.com>
+	<20190513134637.3d8bb275.cohuck@redhat.com>
+	<898144e3-615e-5074-fb68-bf9995c64609@de.ibm.com>
+	<155d2ca3-6a48-c99a-fe42-dca8e3fd4344@redhat.com>
+	<066c7470-94a3-a922-9a12-1ca42e474c51@de.ibm.com>
+	<20190514104934.6bba9232.cohuck@redhat.com>
+	<47f7134b-338f-0207-88ae-4c1969be3786@redhat.com>
+	<4ebcad9e-ce3c-bd86-3c96-e2909d360813@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <956f9bc9-1024-b02a-e792-98b01d016ef4@linaro.org>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.31]);
+	Tue, 14 May 2019 09:12:17 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.140.101.70
-Subject: Re: [Qemu-devel] [PATCH 05/13] target/arm/kvm: Add
- kvm_arch_get/put_sve
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v4] s390: diagnose 318 info reset and
+ migration support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,39 +84,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	Andrew Jones <drjones@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"abologna@redhat.com" <abologna@redhat.com>,
-	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-	"alex.bennee@linaro.org" <alex.bennee@linaro.org>
+Cc: Collin Walling <walling@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>, mst@redhat.com,
+	qemu-devel@nongnu.org, pasic@linux.ibm.com,
+	qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 13, 2019 at 05:58:59PM +0100, Richard Henderson wrote:
-> On 5/13/19 7:39 AM, Dave Martin wrote:
-> > On that point, could TCG easily be made to expose a larger vector length
-> > to the kernel?  I'd be interested to see what happened.
+On Tue, 14 May 2019 11:07:41 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
+> On 14.05.19 10:59, David Hildenbrand wrote:
+
+> > We can
+> > 
+> > 1. Fail to start with #cpus > 240 when diag318=on
+> > 2. Remove the error once we support more than one SCLP response page
+> > 
+> > Or
+> > 
+> > 1. Allow to start with #cpus > 240 when diag318=on, but indicate only
+> >    240 CPUs via SCLP
+> > 2. Print a warning
+> > 3. Remove the restriction and the warning once we support more than one
+> >    SCLP response page
+
+We'd need compat handling for step 3., then?
+
+> > 
+> > While I prefer the second approach (similar to defining zPCI devices
+> > without zpci=on), I could also live with the first approach.  
 > 
-> It would be easy enough to extend the maximum vector length within TCG.
-> 
-> Increase ARM_MAX_VQ.  Alter the couple of places where we manipulate ZCR.LEN to
-> extend the current 4-bit mask.
-> 
-> How large do you need the max to be, for testing?
+> Lets just continue with your other suggestion to simply limit the sclp 
+> response and do not do any failure or machine change. That  seems like
+> the easiest solution.
 
-Anything upwards of 256 bytes is interesting.
-
-The architecture reserves space for it to grow up to 9 bits, though it's
-unlikely it would ever get that large in reality.
-
-So if you wanted to go crazy, you might be able to go up to 8192 bytes.
-
-This is just for fun, since it goes outside the architecture and Linux
-officially doesn't support it today in any case.  So definitely not a
-priority!
-
-Cheers
----Dave
+That's the second option, right? Should be reasonable.
 
