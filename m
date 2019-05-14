@@ -6,60 +6,60 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C465C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:41:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31D8BC04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:42:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 502FD20879
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:41:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 502FD20879
+	by mail.kernel.org (Postfix) with ESMTPS id 0934D20879
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:42:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0934D20879
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52473 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52475 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQcN1-0003vH-JI
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 14:41:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39930)
+	id 1hQcNh-0004Yz-7U
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 14:42:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hQcHQ-0007H9-3Z
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:36:00 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hQcH0-0006t9-Uq
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:35:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hQcHP-0001mq-6Z
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:36:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52502)
+	(envelope-from <dgilbert@redhat.com>) id 1hQcH0-0001IR-3T
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:35:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49850)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hQcHP-0001lq-0v
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:35:59 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hQcGz-0001Hf-Ub
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:35:34 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4BCCF33026D;
-	Tue, 14 May 2019 18:35:58 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3BCCE309B15D;
+	Tue, 14 May 2019 18:35:33 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-117-232.ams2.redhat.com
 	[10.36.117.232])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C6FC1608A6;
-	Tue, 14 May 2019 18:35:56 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E6CDB608BA;
+	Tue, 14 May 2019 18:35:05 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com,
 	ehabkost@redhat.com, richardw.yang@linux.intel.com,
 	yury-kotov@yandex-team.ru, chen.zhang@intel.com
-Date: Tue, 14 May 2019 19:34:50 +0100
-Message-Id: <20190514183454.12758-13-dgilbert@redhat.com>
+Date: Tue, 14 May 2019 19:34:43 +0100
+Message-Id: <20190514183454.12758-6-dgilbert@redhat.com>
 In-Reply-To: <20190514183454.12758-1-dgilbert@redhat.com>
 References: <20190514183454.12758-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Tue, 14 May 2019 18:35:58 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.49]);
+	Tue, 14 May 2019 18:35:33 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 12/16] migration/savevm: load_header before
- load_setup
+Subject: [Qemu-devel] [PULL 05/16] migration: savevm: fix error code with
+ migration blockers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,50 +75,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Wei Yang <richardw.yang@linux.intel.com>
+From: Cole Robinson <crobinso@redhat.com>
 
-In migration_thread() and qemu_savevm_state(), we savevm_state in
-following sequence:
+The only caller that checks the error code is looking for !=3D 0,
+so returning false is incorrect.
 
-    qemu_savevm_state_header(f);
-    qemu_savevm_state_setup(f);
+Fixes: 5aaac467938 "migration: savevm: consult migration blockers"
 
-Then it would be more proper to loadvm_state in the save sequence.
-
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Message-Id: <20190424004700.12766-4-richardw.yang@linux.intel.com>
+Signed-off-by: Cole Robinson <crobinso@redhat.com>
+Message-Id: <b991a4d0e6c4253bc08b2794c6084be55fc72e1d.1554851834.git.crob=
+inso@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/savevm.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ migration/savevm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/migration/savevm.c b/migration/savevm.c
-index 6e8912af49..4c7b8379e8 100644
+index 587fec8ce2..81a9a2ef30 100644
 --- a/migration/savevm.c
 +++ b/migration/savevm.c
-@@ -2434,10 +2434,6 @@ int qemu_loadvm_state(QEMUFile *f)
-         return -ENOTSUP;
+@@ -2542,7 +2542,7 @@ int save_snapshot(const char *name, Error **errp)
+     AioContext *aio_context;
+=20
+     if (migration_is_blocked(errp)) {
+-        return false;
++        return ret;
      }
 =20
--    if (qemu_loadvm_state_setup(f) !=3D 0) {
--        return -EINVAL;
--    }
--
-     if (migrate_get_current()->send_configuration) {
-         if (qemu_get_byte(f) !=3D QEMU_VM_CONFIGURATION) {
-             error_report("Configuration section missing");
-@@ -2452,6 +2448,10 @@ int qemu_loadvm_state(QEMUFile *f)
-         }
-     }
-=20
-+    if (qemu_loadvm_state_setup(f) !=3D 0) {
-+        return -EINVAL;
-+    }
-+
-     cpu_synchronize_all_pre_loadvm();
-=20
-     ret =3D qemu_loadvm_state_main(f, mis);
+     if (!replay_can_snapshot()) {
 --=20
 2.21.0
 
