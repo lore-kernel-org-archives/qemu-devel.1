@@ -2,88 +2,88 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C5A1C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 06:07:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85C40C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 06:09:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8FAA2086A
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 06:07:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4EAFE2086A
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 06:09:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cQxM4/0c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8FAA2086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LcN1CWte"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EAFE2086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39955 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39967 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQQbP-0000xt-Vy
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 02:07:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46442)
+	id 1hQQcj-0001Zw-Ki
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 02:09:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1hQQaX-0000eY-UR
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:06:58 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hQQbt-0001IT-QY
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:08:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kernellwp@gmail.com>) id 1hQQaU-0004mb-2w
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:06:55 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45015)
+	(envelope-from <richard.henderson@linaro.org>) id 1hQQbs-00061F-OA
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:08:21 -0400
+Received: from mail-pl1-x633.google.com ([2607:f8b0:4864:20::633]:44557)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1hQQaS-0004fk-0a
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 02:06:52 -0400
-Received: by mail-pf1-x443.google.com with SMTP id g9so8505231pfo.11
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 23:06:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=UrRUImMU/16S9UAMUsLS/q7MrwOXI/8T+fLWmLkbtpk=;
-	b=cQxM4/0chR+C985qN3q14TJSSikOLPQqUpuR37SNGjCMNW7I4SwIC9ugrS2PjIeKDA
-	xu9VgedpqyFLsmmcPlCX/9Gyd/lHPncrrOg6xsNJoDMBE9nnc1RXzmCRAHDE8djyCkMm
-	NG/pKYbP6SF8aOqUOOAA7BiSOeUqvFWTbZaN6apKw83TBsBnh1CuTYePPJd4o1fSLC8o
-	SIvs0WAoRjQBC/sKwi8PFTBoNOMZLAMCyP1v/UDu6kcFeeC1bQPWtrfH2XxGEsq7fWD0
-	eMiBYqosKLCuuKCPJPxFWnQIPUcHxLEHRgG4li3+8AcHJXkJwD+x0fX3XzNGMAKHzXd5
-	fsEg==
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hQKx6-0002xw-RC
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:05:54 -0400
+Received: by mail-pl1-x633.google.com with SMTP id d3so7261676plj.11
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 17:05:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=JF2bKE9XmhoHbt9KR1NJ6aVBR5o9hUq7Nq5BVGZIG24=;
+	b=LcN1CWtejXlR4vPyIVND7D+/ad9xERF+38DPtvt1fWZ9u+6yhisaiq+OT9dfkUb7d0
+	P+5v23BgYWG1N57AWYPOr/A6yQxvFMQY9tVirHSHBPZe02nyAkyHamb0UUlHL7xZrHOo
+	q9WWif05Q6upWGi84sAHzMkMeXkcEpJbAPhkaX08wMP+zey+f0nnHqPpDdKMJHg26Ua7
+	6VIa1ins50U4KpmUuoEYGhWpIZMERoxp8okUO3RkKgTtUdY+CuulqfOmdg6EVngKP3Gi
+	38/Pv+B3ntzaw/d8ZS5+XQklQGe/G7tnBIXOIc/D9qR7dyVzZumRA6hy0vbCODHMHMRk
+	lkzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=UrRUImMU/16S9UAMUsLS/q7MrwOXI/8T+fLWmLkbtpk=;
-	b=fFPTiSqe0q1efMIFDJVI3NxajFweWGhJpWbgQnNRoE/P42v8CujmEHMMwRt6Uh3IfM
-	tr9ouP/igXOjqBZE1YjsPO64uNJ0AIXVnHBCKX9N8IJnY/Y3KcwH1IQt8MSfT9+ogykV
-	hK4v82dlcIJBMNOED5ZXXve94d0A44i7cJEwTtCs8uviHRY9EM7894umoBnXcavnVYnD
-	k2dXPrIETWsZ+Th3wyL4kOWZnf1C8KfeyMKBr2RjV5/gZEhLx70zRvze79NSc+idSsC0
-	OLI3WuHrkX10FEL+ivtowB2GAk/N+3ct3JK2BN/MpcUmqdcHqnEfxt+8oglS6jMl0bXK
-	JPfQ==
-X-Gm-Message-State: APjAAAV3ejFa/Y9Vpbb7t8A68r67BPyUQtowIaxLSGvLzrAQXqUWFwDx
-	HfblJEnbDWQAzLIJZMJutW7mfauv
-X-Google-Smtp-Source: APXvYqyln5zEc+3GWTHA6GymIAAfFqv+OL+uw6EJvSUs0EIPQ0z+P7AJ7eAmy0a5hXlJz0zthX18Sg==
-X-Received: by 2002:a62:d044:: with SMTP id p65mr19008527pfg.37.1557814003379; 
-	Mon, 13 May 2019 23:06:43 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-	by smtp.googlemail.com with ESMTPSA id
-	a80sm41480296pfj.105.2019.05.13.23.06.41
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-	Mon, 13 May 2019 23:06:42 -0700 (PDT)
-From: Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To: qemu-devel@nongnu.org,
-	kvm@vger.kernel.org
-Date: Tue, 14 May 2019 14:06:39 +0800
-Message-Id: <1557813999-9175-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=JF2bKE9XmhoHbt9KR1NJ6aVBR5o9hUq7Nq5BVGZIG24=;
+	b=X6KNZnAQHducFE2RXsMFOhu6OvX0b5OafnUwx2PI/p85lbzl0d0fJEw12MZNyStf7f
+	hI38hPN2gO99islSiyknYZeydNyFB1uBoJYdiO5YU64cA6HaAG9kAYX1P/Aie5G47AaI
+	0hING2fFupm+yJWn9rbsghFFYVELgRNncfIJt+CcRD+UvQ4uGOD/CA7RtzgvSVI6nVKu
+	a0ENql1+ou3eel0X/JkKGpMydzP3Kr1XJ1Kn/abC8LqDNlKn7J31sX+bxO3AQ+cc51kY
+	lWB31VL2UXMDIjX9FaS4BIVWA6zyNxTzo80uIMXuFQq/YtN48FHKdinoTMbou7MI4iYy
+	UiHw==
+X-Gm-Message-State: APjAAAUlF1Kxh4NSFfF8VZoXb+1GCTSbc6wcp8TWg+cey7kzvOEpwFXJ
+	PZZ9a7iWTTTtI4ADf1/HyIH/NE4f5Dg=
+X-Google-Smtp-Source: APXvYqw2rnB7qwBXw/6aYDbeeZtK5VszDP+Ks0t68+Dbpl6bp/PhADdzXOzn3OtQ51H3HunckOnjdA==
+X-Received: by 2002:a17:902:2f:: with SMTP id
+	44mr34503984pla.137.1557792346948; 
+	Mon, 13 May 2019 17:05:46 -0700 (PDT)
+Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
+	[97.113.13.231])
+	by smtp.gmail.com with ESMTPSA id u3sm238151pfn.29.2019.05.13.17.05.45
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 13 May 2019 17:05:46 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Mon, 13 May 2019 17:05:12 -0700
+Message-Id: <20190514000540.4313-4-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190514000540.4313-1-richard.henderson@linaro.org>
+References: <20190514000540.4313-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::443
-Subject: [Qemu-devel] [PATCH] i386: Enable IA32_MISC_ENABLE MWAIT bit when
- exposing mwait/monitor
+X-Received-From: 2607:f8b0:4864:20::633
+Subject: [Qemu-devel] [PULL 03/31] tcg: Allow add_vec, sub_vec, neg_vec,
+ not_vec to be expanded
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,55 +95,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
-	=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: peter.maydell@linux.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Wanpeng Li <wanpengli@tencent.com>
+PowerPC Altivec does not support add and subtract of 64-bit elements.
+Prepare for that configuration by not assuming the operation is
+universally supported.
 
-The CPUID.01H:ECX[bit 3] ought to mirror the value of the MSR 
-IA32_MISC_ENABLE MWAIT bit and as userspace has control of them 
-both, it is userspace's job to configure both bits to match on 
-the initial setup.
-
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/i386/cpu.c | 3 +++
- target/i386/cpu.h | 1 +
- 2 files changed, 4 insertions(+)
+ tcg/tcg-op-vec.c | 49 ++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 33 insertions(+), 16 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 722c551..40b6108 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4729,6 +4729,9 @@ static void x86_cpu_reset(CPUState *s)
+diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
+index 27f65600c3..cfb18682b1 100644
+--- a/tcg/tcg-op-vec.c
++++ b/tcg/tcg-op-vec.c
+@@ -226,16 +226,6 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr b, TCGArg o, TCGType low_type)
+     vec_gen_3(INDEX_op_st_vec, low_type, 0, ri, bi, o);
+ }
  
-     env->pat = 0x0007040600070406ULL;
-     env->msr_ia32_misc_enable = MSR_IA32_MISC_ENABLE_DEFAULT;
-+    if (enable_cpu_pm) {
-+        env->msr_ia32_misc_enable |= MSR_IA32_MISC_ENABLE_MWAIT;
+-void tcg_gen_add_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+-{
+-    vec_gen_op3(INDEX_op_add_vec, vece, r, a, b);
+-}
+-
+-void tcg_gen_sub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+-{
+-    vec_gen_op3(INDEX_op_sub_vec, vece, r, a, b);
+-}
+-
+ void tcg_gen_and_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
+     vec_gen_op3(INDEX_op_and_vec, 0, r, a, b);
+@@ -296,11 +286,30 @@ void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+     tcg_gen_not_vec(0, r, r);
+ }
+ 
++static bool do_op2(unsigned vece, TCGv_vec r, TCGv_vec a, TCGOpcode opc)
++{
++    TCGTemp *rt = tcgv_vec_temp(r);
++    TCGTemp *at = tcgv_vec_temp(a);
++    TCGArg ri = temp_arg(rt);
++    TCGArg ai = temp_arg(at);
++    TCGType type = rt->base_type;
++    int can;
++
++    tcg_debug_assert(at->base_type >= type);
++    can = tcg_can_emit_vec_op(opc, type, vece);
++    if (can > 0) {
++        vec_gen_2(opc, type, vece, ri, ai);
++    } else if (can < 0) {
++        tcg_expand_vec_op(opc, type, vece, ri, ai);
++    } else {
++        return false;
 +    }
++    return true;
++}
++
+ void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a)
+ {
+-    if (TCG_TARGET_HAS_not_vec) {
+-        vec_gen_op2(INDEX_op_not_vec, 0, r, a);
+-    } else {
++    if (!TCG_TARGET_HAS_not_vec || !do_op2(vece, r, a, INDEX_op_not_vec)) {
+         TCGv_vec t = tcg_const_ones_vec_matching(r);
+         tcg_gen_xor_vec(0, r, a, t);
+         tcg_temp_free_vec(t);
+@@ -309,9 +318,7 @@ void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a)
  
-     memset(env->dr, 0, sizeof(env->dr));
-     env->dr[6] = DR6_FIXED_1;
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 0128910..b94c329 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -387,6 +387,7 @@ typedef enum X86Seg {
- #define MSR_IA32_MISC_ENABLE            0x1a0
- /* Indicates good rep/movs microcode on some processors: */
- #define MSR_IA32_MISC_ENABLE_DEFAULT    1
-+#define MSR_IA32_MISC_ENABLE_MWAIT      (1ULL << 18)
+ void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a)
+ {
+-    if (TCG_TARGET_HAS_neg_vec) {
+-        vec_gen_op2(INDEX_op_neg_vec, vece, r, a);
+-    } else {
++    if (!TCG_TARGET_HAS_neg_vec || !do_op2(vece, r, a, INDEX_op_neg_vec)) {
+         TCGv_vec t = tcg_const_zeros_vec_matching(r);
+         tcg_gen_sub_vec(vece, r, t, a);
+         tcg_temp_free_vec(t);
+@@ -409,6 +416,16 @@ static void do_op3(unsigned vece, TCGv_vec r, TCGv_vec a,
+     }
+ }
  
- #define MSR_MTRRphysBase(reg)           (0x200 + 2 * (reg))
- #define MSR_MTRRphysMask(reg)           (0x200 + 2 * (reg) + 1)
++void tcg_gen_add_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
++{
++    do_op3(vece, r, a, b, INDEX_op_add_vec);
++}
++
++void tcg_gen_sub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
++{
++    do_op3(vece, r, a, b, INDEX_op_sub_vec);
++}
++
+ void tcg_gen_mul_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ {
+     do_op3(vece, r, a, b, INDEX_op_mul_vec);
 -- 
-2.7.4
+2.17.1
 
 
