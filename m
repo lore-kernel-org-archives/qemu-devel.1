@@ -5,67 +5,46 @@ X-Spam-Level:
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D230C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 08:38:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58ED4C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 08:50:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4183220645
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 08:38:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4183220645
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2CC162085A
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 08:50:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CC162085A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42414 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42990 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQSxX-0007dj-1e
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 04:38:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42001)
+	id 1hQT8x-0003NO-7B
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 04:50:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hQSwX-0007HW-3Z
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:37:50 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hQT89-0002xi-5k
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:49:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hQSwV-0006Qd-6I
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:37:49 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38286)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1hQSwT-0006Gn-8f
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:37:46 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4E8aR3u059367
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 04:37:42 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2sftab828s-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 04:37:41 -0400
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 14 May 2019 09:37:38 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-	by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Tue, 14 May 2019 09:37:34 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
-	[9.149.105.59])
-	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x4E8bX7960817454
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Tue, 14 May 2019 08:37:33 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 385A7A4059;
-	Tue, 14 May 2019 08:37:33 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D5C7AA4040;
-	Tue, 14 May 2019 08:37:32 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.133])
-	by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-	Tue, 14 May 2019 08:37:32 +0000 (GMT)
-To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1hQT87-0005Ep-9M
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 04:49:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52416)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
+	id 1hQT86-00053h-Uz; Tue, 14 May 2019 04:49:47 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 557ECA96EA;
+	Tue, 14 May 2019 08:49:43 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 063325D720;
+	Tue, 14 May 2019 08:49:36 +0000 (UTC)
+Date: Tue, 14 May 2019 10:49:34 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <20190514104934.6bba9232.cohuck@redhat.com>
+In-Reply-To: <066c7470-94a3-a922-9a12-1ca42e474c51@de.ibm.com>
 References: <1556749903-19221-1-git-send-email-walling@linux.ibm.com>
 	<a87c71be-5bf8-a115-5843-720c9ad10c7b@redhat.com>
 	<bc2fd9bb-7b94-eac7-590b-f01d2063ef9c@redhat.com>
@@ -78,74 +57,17 @@ References: <1556749903-19221-1-git-send-email-walling@linux.ibm.com>
 	<20190513134637.3d8bb275.cohuck@redhat.com>
 	<898144e3-615e-5074-fb68-bf9995c64609@de.ibm.com>
 	<155d2ca3-6a48-c99a-fe42-dca8e3fd4344@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
-	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
-	syiRa+UVlsKmx1hsEg==
-Date: Tue, 14 May 2019 10:37:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	<066c7470-94a3-a922-9a12-1ca42e474c51@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <155d2ca3-6a48-c99a-fe42-dca8e3fd4344@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19051408-0028-0000-0000-0000036D765B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051408-0029-0000-0000-0000242D0722
-Message-Id: <066c7470-94a3-a922-9a12-1ca42e474c51@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-14_05:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1905140063
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.38]);
+	Tue, 14 May 2019 08:49:43 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH v4] s390: diagnose 318 info reset and
  migration support
 X-BeenThere: qemu-devel@nongnu.org
@@ -159,77 +81,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Collin Walling <walling@linux.ibm.com>, mst@redhat.com,
+Cc: Collin Walling <walling@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>, mst@redhat.com,
 	qemu-devel@nongnu.org, pasic@linux.ibm.com,
 	qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, 14 May 2019 10:37:32 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
+> On 14.05.19 09:28, David Hildenbrand wrote:
+> >>>> But that can be tested using the runability information if I am not wrong.  
+> >>>
+> >>> You mean the cpu level information, right?  
+> > 
+> > Yes, query-cpu-definition includes for each model runability information
+> > via "unavailable-features" (valid under the started QEMU machine).
+> >   
+> >>>  
+> >>>>  
+> >>>>> and others that we have today.
+> >>>>>
+> >>>>> So yes, I think this would be acceptable.    
+> >>>>
+> >>>> I guess it is acceptable yes. I doubt anybody uses that many CPUs in
+> >>>> production either way. But you never know.  
+> >>>
+> >>> I think that using that many cpus is a more uncommon setup, but I still
+> >>> think that having to wait for actual failure  
+> >>
+> >> That can happen all the time today. You can easily say z14 in the xml when 
+> >> on a zEC12. Only at startup you get the error. The question is really:  
+> > 
+> > "-smp 248 -cpu host" will no longer work, while e.g. "-smp 248 -cpu z12"
+> > will work. Actually, even "-smp 248" will no longer work on affected
+> > machines.
+> > 
+> > That is why wonder if it is better to disable the feature and print a
+> > warning. Similar to CMMA, where want want to tolerate when CMMA is not
+> > possible in the current environment (huge pages).
+> > 
+> > "Diag318 will not be enabled because it is not compatible with more than
+> > 240 CPUs".
+> > 
+> > However, I still think that implementing support for more than one SCLP
+> > response page is the best solution. Guests will need adaptions for > 240
+> > CPUs with Diag318, but who cares? Existing setups will continue to work.
+> > 
+> > Implementing that SCLP thingy will avoid any warnings and any errors. It
+> > just works from the QEMU perspective.
+> > 
+> > Is implementing this realistic?  
+> 
+> Yes it is but it will take time. I will try to get this rolling. To make
+> progress on the diag318 thing, can we error on startup now and simply
+> remove that check when when have implemented a larger sccb? If we would
+> now do all kinds of "change the max number games" would be harder to "fix".
 
-On 14.05.19 09:28, David Hildenbrand wrote:
->>>> But that can be tested using the runability information if I am not wrong.
->>>
->>> You mean the cpu level information, right?
-> 
-> Yes, query-cpu-definition includes for each model runability information
-> via "unavailable-features" (valid under the started QEMU machine).
-> 
->>>
->>>>
->>>>> and others that we have today.
->>>>>
->>>>> So yes, I think this would be acceptable.  
->>>>
->>>> I guess it is acceptable yes. I doubt anybody uses that many CPUs in
->>>> production either way. But you never know.
->>>
->>> I think that using that many cpus is a more uncommon setup, but I still
->>> think that having to wait for actual failure
->>
->> That can happen all the time today. You can easily say z14 in the xml when 
->> on a zEC12. Only at startup you get the error. The question is really:
-> 
-> "-smp 248 -cpu host" will no longer work, while e.g. "-smp 248 -cpu z12"
-> will work. Actually, even "-smp 248" will no longer work on affected
-> machines.
-> 
-> That is why wonder if it is better to disable the feature and print a
-> warning. Similar to CMMA, where want want to tolerate when CMMA is not
-> possible in the current environment (huge pages).
-> 
-> "Diag318 will not be enabled because it is not compatible with more than
-> 240 CPUs".
-> 
-> However, I still think that implementing support for more than one SCLP
-> response page is the best solution. Guests will need adaptions for > 240
-> CPUs with Diag318, but who cares? Existing setups will continue to work.
-> 
-> Implementing that SCLP thingy will avoid any warnings and any errors. It
-> just works from the QEMU perspective.
-> 
-> Is implementing this realistic?
+So, the idea right now is:
 
-Yes it is but it will take time. I will try to get this rolling. To make
-progress on the diag318 thing, can we error on startup now and simply
-remove that check when when have implemented a larger sccb? If we would
-now do all kinds of "change the max number games" would be harder to "fix".
+- fail to start if you try to specify a diag318 device and more than
+  240 cpus (do we need a knob to turn off the device?)
+- in the future, support more than one SCLP response page
 
-
-
-> 
->> do you want to error on definition of the xml or on startup.
-> 
-> I actually have no idea what the best practice on the libvirt side is.
-> There seems to be a user for max-cpus and unavailable-features in QEMU.
-> 
-> And I think
->> startup is the better place here. This allows to create definitions that will
->> be useful in the future (pre-planning), e.g. if you know that you will update
->> your machine or the code soon.
-> 
-> 
-> 
-
+I'm getting a bit lost in the discussion; but the above sounds
+reasonable to me.
 
