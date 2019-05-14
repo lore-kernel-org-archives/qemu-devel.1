@@ -2,85 +2,67 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0E82C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 05:36:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4865DC04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 05:38:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72DA1208CA
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 05:36:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mH26fGaG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72DA1208CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id CAA1F208C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 05:38:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAA1F208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39605 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39611 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQQ6e-00012A-SF
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 01:36:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45535)
+	id 1hQQ9J-0001z0-UP
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 01:38:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQQ5d-0000UG-N5
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 01:35:02 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hQQ8R-0001gK-7B
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 01:37:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQQ5b-0003XQ-LA
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 01:35:01 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:43229)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hQKxA-000329-T2
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:05:58 -0400
-Received: by mail-pl1-x643.google.com with SMTP id n8so7266493plp.10
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 17:05:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=eQYUrWBgaVSTGc+XM8Y45frZ2xC0wqtFT2VlLB2AH5Q=;
-	b=mH26fGaGPiHha/BXvai1qtLdlWeL8KkKkQdpv7U64LKNa6LMcKQiOw6k+yv3LN2fF/
-	RiL0JuwuO7O6yySkmSmLYKFm6zZf8Rt2tCIpj1vm8OTa4aoSKuOlQeoTcWlkz/2wwOAL
-	1PWNa3XPElL7RzVDbawZHNWe3QMTmd+Cs/jU3CgLdFWYfl/41AtqGMQ8ZEoQdsenC/kB
-	sXspskInX1amn66CX5UEgLXtflYDMCQVasLuzxe0uPKFfCGNcuJXbJON8wvXEX0yU5jc
-	fU4hRgS+XzzhIYDYyNTHJfHf3HfG4gNFHHxygmpVdn0GS0KAcGVoYzIa7FrIaGLURQ8f
-	oFIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=eQYUrWBgaVSTGc+XM8Y45frZ2xC0wqtFT2VlLB2AH5Q=;
-	b=ApoegiCRnHFeib0yVS5+7At7QHBt+Lt86bCwhLo46PzCMY3MJQKLwnWaQ36D7KrAH9
-	EoVia/+giL5jppQ9QnBEyXSagLL3fdwlP9sx/KwO1MewVBuq1AB71Acke2Q0z6dJpEd0
-	H9itaMDI0MQRvcsZVZaC7TLBT88yNFlCYh4DI+6UXOeZT+S++AAgMiSJ7L+a3K48Szc7
-	N8OcZhMzu3msu8+rWVk+0ufQaTlHCGipNIzcaNRJB2wNbxU6JYaB6mi4fVPdQjSNpgQU
-	Dn2xrxi4+3GhApri3VOQ/TRL8E1nyeSDtXknDqARTNmGQhoRsjnYBFyQrZ0HJ91rUvtY
-	4Vxw==
-X-Gm-Message-State: APjAAAUMp/lihf4XQGLJG5vmbnIeraMcazjxwzqqS3R/zj0qGeQXzPdd
-	3JJ9VEcomjytq+Fy0TmLmFBLq6fnr6g=
-X-Google-Smtp-Source: APXvYqwvEqC/fd3E1DMYVPCpU7jwfjjvtBLjK/Y6ui7gWFhu8YZmuerFMIS64F6bWW5YkVvBugzh0g==
-X-Received: by 2002:a17:902:e104:: with SMTP id
-	cc4mr33070434plb.254.1557792351612; 
-	Mon, 13 May 2019 17:05:51 -0700 (PDT)
-Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
-	[97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id u3sm238151pfn.29.2019.05.13.17.05.50
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 13 May 2019 17:05:50 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Mon, 13 May 2019 17:05:15 -0700
-Message-Id: <20190514000540.4313-7-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190514000540.4313-1-richard.henderson@linaro.org>
-References: <20190514000540.4313-1-richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::643
-Subject: [Qemu-devel] [PULL 06/31] tcg/arm: Use tcg_out_mov_reg in
- tcg_out_mov
+	(envelope-from <kraxel@redhat.com>) id 1hQQ8Q-0005xd-AI
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 01:37:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43472)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hQQ8Q-0005x6-4g
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 01:37:54 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5E41430675B0
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 05:37:53 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
+	[10.36.117.74])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C646A608AB;
+	Tue, 14 May 2019 05:37:48 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id DBCD41747D; Tue, 14 May 2019 07:37:47 +0200 (CEST)
+Date: Tue, 14 May 2019 07:37:47 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <20190514053747.os6lwvzwhe2ojsuu@sirius.home.kraxel.org>
+References: <20190513184433.21038-1-marcandre.lureau@redhat.com>
+	<20190513184433.21038-2-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190513184433.21038-2-marcandre.lureau@redhat.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.49]);
+	Tue, 14 May 2019 05:37:53 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v7 1/8] vhost-user: add
+ vhost_user_gpu_set_socket()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,34 +74,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linux.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+	"Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We have a function that takes an additional condition parameter
-over the standard backend interface.  It already takes care of
-eliding no-op moves.
+  Hi,
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/arm/tcg-target.inc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> +VhostUserGpuCursorUpdate
+> +^^^^^^^^^^^^^^^^^^^^^^^^
+> +
+> ++-----+-------+-------+--------+
+> +| pos | hot_x | hot_y | cursor |
+> ++-----+-------+-------+--------+
+> +
+> +:pos: a ``VhostUserGpuCursorPos``, the cursor location
+> +
+> +:hot_x/hot_y: ``u32``, the cursor hot location
+> +
+> +:cursor: ``[u32; 64 * 64]``, 64x64 RGBA cursor data
 
-diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-index abf0c444b4..130b6bef1e 100644
---- a/tcg/arm/tcg-target.inc.c
-+++ b/tcg/arm/tcg-target.inc.c
-@@ -2267,7 +2267,7 @@ static inline bool tcg_out_sti(TCGContext *s, TCGType type, TCGArg val,
- static inline void tcg_out_mov(TCGContext *s, TCGType type,
-                                TCGReg ret, TCGReg arg)
- {
--    tcg_out_dat_reg(s, COND_AL, ARITH_MOV, ret, 0, arg, SHIFT_IMM_LSL(0));
-+    tcg_out_mov_reg(s, COND_AL, ret, arg);
- }
- 
- static inline void tcg_out_movi(TCGContext *s, TCGType type,
--- 
-2.17.1
+Should clarify here what exactly RGBA is. (PIXMAN_a8r8g8b8 I guess).
+
+> +VhostUserGpuUpdate
+> +^^^^^^^^^^^^^^^^^^
+> +
+> ++------------+---+---+---+---+------+
+> +| scanout-id | x | y | w | h | data |
+> ++------------+---+---+---+---+------+
+> +
+> +:scanout-id: ``u32``, the scanout content to update
+> +
+> +:x/y/w/h: ``u32``, region of the update
+> +
+> +:data: RGBA data (the size is computed based on the region size, and
+> +       the request type)
+
+Likewise.  Also: alpha channel for the framebuffer?
+
+> +C structure
+> +-----------
+> +
+> +In QEMU the vhost-user-gpu message is implemented with the following struct:
+> +
+> +.. code:: c
+> +
+> +  typedef struct VhostUserGpuMsg {
+> +      uint32_t request; /* VhostUserGpuRequest */
+> +      uint32_t flags;
+> +      uint32_t size; /* the following payload size */
+
+uint32_t padding;
+
+> +      union {
+> +          VhostUserGpuCursorPos cursor_pos;
+> +          VhostUserGpuCursorUpdate cursor_update;
+> +          VhostUserGpuScanout scanout;
+> +          VhostUserGpuUpdate update;
+> +          VhostUserGpuDMABUFScanout dmabuf_scanout;
+> +          struct virtio_gpu_resp_display_info display_info;
+> +          uint64_t u64;
+
+... so this 64bit value will be aligned.
+
+cheers,
+  Gerd
 
 
