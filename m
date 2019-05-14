@@ -3,62 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E06FCC04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 14:59:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E47DFC04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 15:00:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7A6E208CA
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 14:59:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7A6E208CA
+	by mail.kernel.org (Postfix) with ESMTPS id AB072208CA
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 15:00:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB072208CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49469 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49499 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQYuC-0005ql-Tx
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 10:59:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46264)
+	id 1hQYuo-0006Sk-WF
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 11:00:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hQYsn-0004yH-EA
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:58:22 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hQYrt-0004Oh-R4
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:57:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hQYsl-0000Cu-F8
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:58:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55248)
+	(envelope-from <pagupta@redhat.com>) id 1hQYrs-0007gT-FR
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:57:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59380)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hQYsj-0008Vo-FL
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:58:18 -0400
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hQYrs-0007fY-7V
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:57:24 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 97F23300487E;
-	Tue, 14 May 2019 14:58:12 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 240BE81E07;
+	Tue, 14 May 2019 14:57:23 +0000 (UTC)
 Received: from dhcp201-121.englab.pnq.redhat.com (unknown [10.65.16.148])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A57145D6A6;
-	Tue, 14 May 2019 14:57:46 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 891195D6A6;
+	Tue, 14 May 2019 14:57:00 +0000 (UTC)
 From: Pankaj Gupta <pagupta@redhat.com>
 To: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
 	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
 	qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
 	linux-xfs@vger.kernel.org
-Date: Tue, 14 May 2019 20:24:20 +0530
-Message-Id: <20190514145422.16923-6-pagupta@redhat.com>
+Date: Tue, 14 May 2019 20:24:18 +0530
+Message-Id: <20190514145422.16923-4-pagupta@redhat.com>
 In-Reply-To: <20190514145422.16923-1-pagupta@redhat.com>
 References: <20190514145422.16923-1-pagupta@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Tue, 14 May 2019 14:58:12 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.25]);
+	Tue, 14 May 2019 14:57:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v9 5/7] dax: check synchronous mapping is
- supported
+Subject: [Qemu-devel] [PATCH v9 3/7] libnvdimm: add dax_dev sync flag
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,54 +85,191 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch introduces 'daxdev_mapping_supported' helper
-which checks if 'MAP_SYNC' is supported with filesystem
-mapping. It also checks if corresponding dax_device is
-synchronous. Virtio pmem device is asynchronous and
-does not not support VM_SYNC.
+This patch adds 'DAXDEV_SYNC' flag which is set
+for nd_region doing synchronous flush. This later
+is used to disable MAP_SYNC functionality for
+ext4 & xfs filesystem for devices don't support
+synchronous flush.
 
-Suggested-by: Jan Kara <jack@suse.cz>
 Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- include/linux/dax.h | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ drivers/dax/bus.c            |  2 +-
+ drivers/dax/super.c          | 19 ++++++++++++++++++-
+ drivers/md/dm.c              |  3 ++-
+ drivers/nvdimm/pmem.c        |  5 ++++-
+ drivers/nvdimm/region_devs.c |  7 +++++++
+ include/linux/dax.h          |  9 +++++++--
+ include/linux/libnvdimm.h    |  1 +
+ 7 files changed, 40 insertions(+), 6 deletions(-)
 
+diff --git a/drivers/dax/bus.c b/drivers/dax/bus.c
+index 2109cfe80219..5f184e751c82 100644
+--- a/drivers/dax/bus.c
++++ b/drivers/dax/bus.c
+@@ -388,7 +388,7 @@ struct dev_dax *__devm_create_dev_dax(struct dax_region *dax_region, int id,
+ 	 * No 'host' or dax_operations since there is no access to this
+ 	 * device outside of mmap of the resulting character device.
+ 	 */
+-	dax_dev = alloc_dax(dev_dax, NULL, NULL);
++	dax_dev = alloc_dax(dev_dax, NULL, NULL, DAXDEV_F_SYNC);
+ 	if (!dax_dev)
+ 		goto err;
+ 
+diff --git a/drivers/dax/super.c b/drivers/dax/super.c
+index bbd57ca0634a..93b3718b5cfa 100644
+--- a/drivers/dax/super.c
++++ b/drivers/dax/super.c
+@@ -186,6 +186,8 @@ enum dax_device_flags {
+ 	DAXDEV_ALIVE,
+ 	/* gate whether dax_flush() calls the low level flush routine */
+ 	DAXDEV_WRITE_CACHE,
++	/* flag to check if device supports synchronous flush */
++	DAXDEV_SYNC,
+ };
+ 
+ /**
+@@ -354,6 +356,18 @@ bool dax_write_cache_enabled(struct dax_device *dax_dev)
+ }
+ EXPORT_SYMBOL_GPL(dax_write_cache_enabled);
+ 
++bool dax_synchronous(struct dax_device *dax_dev)
++{
++	return test_bit(DAXDEV_SYNC, &dax_dev->flags);
++}
++EXPORT_SYMBOL_GPL(dax_synchronous);
++
++void set_dax_synchronous(struct dax_device *dax_dev)
++{
++	set_bit(DAXDEV_SYNC, &dax_dev->flags);
++}
++EXPORT_SYMBOL_GPL(set_dax_synchronous);
++
+ bool dax_alive(struct dax_device *dax_dev)
+ {
+ 	lockdep_assert_held(&dax_srcu);
+@@ -508,7 +522,7 @@ static void dax_add_host(struct dax_device *dax_dev, const char *host)
+ }
+ 
+ struct dax_device *alloc_dax(void *private, const char *__host,
+-		const struct dax_operations *ops)
++		const struct dax_operations *ops, unsigned long flags)
+ {
+ 	struct dax_device *dax_dev;
+ 	const char *host;
+@@ -531,6 +545,9 @@ struct dax_device *alloc_dax(void *private, const char *__host,
+ 	dax_add_host(dax_dev, host);
+ 	dax_dev->ops = ops;
+ 	dax_dev->private = private;
++	if (flags & DAXDEV_F_SYNC)
++		set_dax_synchronous(dax_dev);
++
+ 	return dax_dev;
+ 
+  err_dev:
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 043f0761e4a0..ee007b75d9fd 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1969,7 +1969,8 @@ static struct mapped_device *alloc_dev(int minor)
+ 	sprintf(md->disk->disk_name, "dm-%d", minor);
+ 
+ 	if (IS_ENABLED(CONFIG_DAX_DRIVER)) {
+-		dax_dev = alloc_dax(md, md->disk->disk_name, &dm_dax_ops);
++		dax_dev = alloc_dax(md, md->disk->disk_name, &dm_dax_ops,
++							 DAXDEV_F_SYNC);
+ 		if (!dax_dev)
+ 			goto bad;
+ 	}
+diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+index 0279eb1da3ef..bdbd2b414d3d 100644
+--- a/drivers/nvdimm/pmem.c
++++ b/drivers/nvdimm/pmem.c
+@@ -365,6 +365,7 @@ static int pmem_attach_disk(struct device *dev,
+ 	struct gendisk *disk;
+ 	void *addr;
+ 	int rc;
++	unsigned long flags = 0UL;
+ 
+ 	pmem = devm_kzalloc(dev, sizeof(*pmem), GFP_KERNEL);
+ 	if (!pmem)
+@@ -462,7 +463,9 @@ static int pmem_attach_disk(struct device *dev,
+ 	nvdimm_badblocks_populate(nd_region, &pmem->bb, &bb_res);
+ 	disk->bb = &pmem->bb;
+ 
+-	dax_dev = alloc_dax(pmem, disk->disk_name, &pmem_dax_ops);
++	if (is_nvdimm_sync(nd_region))
++		flags = DAXDEV_F_SYNC;
++	dax_dev = alloc_dax(pmem, disk->disk_name, &pmem_dax_ops, flags);
+ 	if (!dax_dev) {
+ 		put_disk(disk);
+ 		return -ENOMEM;
+diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
+index b4ef7d9ff22e..f3ea5369d20a 100644
+--- a/drivers/nvdimm/region_devs.c
++++ b/drivers/nvdimm/region_devs.c
+@@ -1197,6 +1197,13 @@ int nvdimm_has_cache(struct nd_region *nd_region)
+ }
+ EXPORT_SYMBOL_GPL(nvdimm_has_cache);
+ 
++bool is_nvdimm_sync(struct nd_region *nd_region)
++{
++	return is_nd_pmem(&nd_region->dev) &&
++		!test_bit(ND_REGION_ASYNC, &nd_region->flags);
++}
++EXPORT_SYMBOL_GPL(is_nvdimm_sync);
++
+ struct conflict_context {
+ 	struct nd_region *nd_region;
+ 	resource_size_t start, size;
 diff --git a/include/linux/dax.h b/include/linux/dax.h
-index 2b106752b1b8..267251a394fa 100644
+index 0dd316a74a29..2b106752b1b8 100644
 --- a/include/linux/dax.h
 +++ b/include/linux/dax.h
-@@ -42,6 +42,18 @@ void dax_write_cache(struct dax_device *dax_dev, bool wc);
+@@ -7,6 +7,9 @@
+ #include <linux/radix-tree.h>
+ #include <asm/pgtable.h>
+ 
++/* Flag for synchronous flush */
++#define DAXDEV_F_SYNC (1UL << 0)
++
+ typedef unsigned long dax_entry_t;
+ 
+ struct iomap_ops;
+@@ -32,18 +35,20 @@ extern struct attribute_group dax_attribute_group;
+ #if IS_ENABLED(CONFIG_DAX)
+ struct dax_device *dax_get_by_host(const char *host);
+ struct dax_device *alloc_dax(void *private, const char *host,
+-		const struct dax_operations *ops);
++		const struct dax_operations *ops, unsigned long flags);
+ void put_dax(struct dax_device *dax_dev);
+ void kill_dax(struct dax_device *dax_dev);
+ void dax_write_cache(struct dax_device *dax_dev, bool wc);
  bool dax_write_cache_enabled(struct dax_device *dax_dev);
- bool dax_synchronous(struct dax_device *dax_dev);
- void set_dax_synchronous(struct dax_device *dax_dev);
-+/*
-+ * Check if given mapping is supported by the file / underlying device.
-+ */
-+static inline bool daxdev_mapping_supported(struct vm_area_struct *vma,
-+					    struct dax_device *dax_dev)
-+{
-+	if (!(vma->vm_flags & VM_SYNC))
-+		return true;
-+	if (!IS_DAX(file_inode(vma->vm_file)))
-+		return false;
-+	return dax_synchronous(dax_dev);
-+}
++bool dax_synchronous(struct dax_device *dax_dev);
++void set_dax_synchronous(struct dax_device *dax_dev);
  #else
  static inline struct dax_device *dax_get_by_host(const char *host)
  {
-@@ -69,6 +81,11 @@ static inline bool dax_write_cache_enabled(struct dax_device *dax_dev)
- {
- 	return false;
+ 	return NULL;
  }
-+static inline bool daxdev_mapping_supported(struct vm_area_struct *vma,
-+				struct dax_device *dax_dev)
-+{
-+	return !(vma->vm_flags & VM_SYNC);
-+}
- #endif
+ static inline struct dax_device *alloc_dax(void *private, const char *host,
+-		const struct dax_operations *ops)
++		const struct dax_operations *ops, unsigned long flags)
+ {
+ 	/*
+ 	 * Callers should check IS_ENABLED(CONFIG_DAX) to know if this
+diff --git a/include/linux/libnvdimm.h b/include/linux/libnvdimm.h
+index feb342d026f2..3238a206e563 100644
+--- a/include/linux/libnvdimm.h
++++ b/include/linux/libnvdimm.h
+@@ -264,6 +264,7 @@ void nvdimm_flush(struct nd_region *nd_region);
+ int nvdimm_has_flush(struct nd_region *nd_region);
+ int nvdimm_has_cache(struct nd_region *nd_region);
+ int nvdimm_in_overwrite(struct nvdimm *nvdimm);
++bool is_nvdimm_sync(struct nd_region *nd_region);
  
- struct writeback_control;
+ static inline int nvdimm_ctl(struct nvdimm *nvdimm, unsigned int cmd, void *buf,
+ 		unsigned int buf_len, int *cmd_rc)
 -- 
 2.20.1
 
