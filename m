@@ -2,63 +2,73 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D2B8C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 11:32:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A0C0C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 11:32:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE6A7208CA
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 11:32:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE6A7208CA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 12927208CA
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 11:32:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12927208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46032 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46036 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQVf9-0005fH-6H
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 07:32:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48399)
+	id 1hQVfI-0005qk-7q
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 07:32:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1hQVVc-00065W-Mp
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:22:17 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hQVdb-0004c6-Ar
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:30:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1hQVVb-0002Gu-Gz
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:22:12 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:34228 helo=huawei.com)
+	(envelope-from <cohuck@redhat.com>) id 1hQVdZ-0000Gb-Th
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:30:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51136)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
-	id 1hQVVY-0002C7-7N; Tue, 14 May 2019 07:22:08 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
-	by Forcepoint Email with ESMTP id C7B803012A4F42748010;
-	Tue, 14 May 2019 19:22:05 +0800 (CST)
-Received: from ros.huawei.com (10.143.28.118) by
-	DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server
-	id 14.3.439.0; Tue, 14 May 2019 19:21:57 +0800
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-To: <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
-	<shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
-	<lersek@redhat.com>, 
-	<james.morse@arm.com>, <gengdongjiu@huawei.com>, <mtosatti@redhat.com>, 
-	<rth@twiddle.net>, <ehabkost@redhat.com>, <zhengxiang9@huawei.com>,
-	<jonathan.cameron@huawei.com>, <xuwei5@huawei.com>, <kvm@vger.kernel.org>, 
-	<qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
-Date: Tue, 14 May 2019 04:18:22 -0700
-Message-ID: <1557832703-42620-10-git-send-email-gengdongjiu@huawei.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
-References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hQVdZ-0000Ew-Ly
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 07:30:25 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C265A3082E5A;
+	Tue, 14 May 2019 11:30:22 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 04D9760BCF;
+	Tue, 14 May 2019 11:30:09 +0000 (UTC)
+Date: Tue, 14 May 2019 13:30:07 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190514133007.5e1c6c2e.cohuck@redhat.com>
+In-Reply-To: <20190514110143.GD2753@work-vm>
+References: <20190510110838.2df4c4d0.cohuck@redhat.com>
+	<20190510093608.GD2854@work-vm>
+	<20190510114838.7e16c3d6.cohuck@redhat.com>
+	<20190513132804.GD11139@beluga.usersys.redhat.com>
+	<20190514061235.GC20407@joy-OptiPlex-7040>
+	<20190514072039.GA2089@beluga.usersys.redhat.com>
+	<20190514073219.GD20407@joy-OptiPlex-7040>
+	<20190514074344.GB2089@beluga.usersys.redhat.com>
+	<20190514074736.GE20407@joy-OptiPlex-7040>
+	<20190514115135.078bbaf7.cohuck@redhat.com>
+	<20190514110143.GD2753@work-vm>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.143.28.118]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Tue, 14 May 2019 11:30:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.32
-Subject: [Qemu-devel] [PATCH v17 09/10] target-arm: kvm64: inject
- synchronous External Abort
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] vfio/mdev: add version attribute
+ for mdev device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,108 +80,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"aik@ozlabs.ru" <aik@ozlabs.ru>,
+	"Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+	"shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+	"eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi
+	L" <yi.l.liu@intel.com>, Erik Skultety <eskultet@redhat.com>, "Yang,
+	Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+	"pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+	"libvir-list@redhat.com" <libvir-list@redhat.com>,
+	"arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
+	"felipe@nutanix.com" <felipe@nutanix.com>,
+	"Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian,
+	Kevin" <kevin.tian@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
+	"zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+	"jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	"intel-gvt-dev@lists.freedesktop.org"
+	<intel-gvt-dev@lists.freedesktop.org>, "Liu,
+	Changpeng" <changpeng.liu@intel.com>,
+	"berrange@redhat.com" <berrange@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang, Zhi
+	A" <zhi.a.wang@intel.com>, "dinechin@redhat.com" <dinechin@redhat.com>,
+	"He, Shaopeng" <shaopeng.he@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add synchronous external abort injection logic, setup
-exception type and syndrome value. When switch to guest,
-it will jump to the synchronous external abort vector
-table entry.
+On Tue, 14 May 2019 12:01:45 +0100
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-The ESR_ELx.DFSC is set to synchronous external abort(0x10),
-and ESR_ELx.FnV is set to not valid(0x1), which will tell
-guest that FAR is not valid and hold an UNKNOWN value.
-These value will be set to KVM register structures through
-KVM_SET_ONE_REG IOCTL.
+> * Cornelia Huck (cohuck@redhat.com) wrote:
+> > On Tue, 14 May 2019 03:47:36 -0400
+> > Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
----
- target/arm/internals.h |  5 +++--
- target/arm/kvm64.c     | 34 ++++++++++++++++++++++++++++++++++
- target/arm/op_helper.c |  2 +-
- 3 files changed, 38 insertions(+), 3 deletions(-)
+> > > hi Cornelia and Dave,
+> > > do you also agree on:
+> > > 1. "not to define the specific errno returned for a specific situation,
+> > > let the vendor driver decide, userspace simply needs to know that an errno on
+> > > read indicates the device does not support migration version comparison and
+> > > that an errno on write indicates the devices are incompatible or the target
+> > > doesn't support migration versions. "
+> > > 2. vendor driver should log detailed error reasons in kernel log.  
+> > 
+> > Two questions:
+> > - How reasonable is it to refer to the system log in order to find out
+> >   what exactly went wrong?
+> > - If detailed error reporting is basically done to the syslog, do
+> >   different error codes still provide useful information? Or should the
+> >   vendor driver decide what it wants to do?  
+> 
+> I don't see error codes as being that helpful; if we can't actually get
+> an error message back up the stack (which was my preference), then I guess
+> syslog is as good as it will get.
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 587a1dd..4d67a91 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -451,13 +451,14 @@ static inline uint32_t syn_insn_abort(int same_el, int ea, int s1ptw, int fsc)
-         | ARM_EL_IL | (ea << 9) | (s1ptw << 7) | fsc;
- }
- 
--static inline uint32_t syn_data_abort_no_iss(int same_el,
-+static inline uint32_t syn_data_abort_no_iss(int same_el, int fnv,
-                                              int ea, int cm, int s1ptw,
-                                              int wnr, int fsc)
- {
-     return (EC_DATAABORT << ARM_EL_EC_SHIFT) | (same_el << ARM_EL_EC_SHIFT)
-            | ARM_EL_IL
--           | (ea << 9) | (cm << 8) | (s1ptw << 7) | (wnr << 6) | fsc;
-+           | (fnv << 10) | (ea << 9) | (cm << 8) | (s1ptw << 7)
-+           | (wnr << 6) | fsc;
- }
- 
- static inline uint32_t syn_data_abort_with_iss(int same_el,
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index e3ba149..c7bdc6a 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -697,6 +697,40 @@ int kvm_arm_cpreg_level(uint64_t regidx)
-     return KVM_PUT_RUNTIME_STATE;
- }
- 
-+/* Inject synchronous external abort */
-+static void kvm_inject_arm_sea(CPUState *c)
-+{
-+    ARMCPU *cpu = ARM_CPU(c);
-+    CPUARMState *env = &cpu->env;
-+    CPUClass *cc = CPU_GET_CLASS(c);
-+    uint32_t esr;
-+    bool same_el;
-+
-+    /**
-+     * set the exception type to synchronous data abort
-+     * and the target exception Level to EL1.
-+     */
-+    c->exception_index = EXCP_DATA_ABORT;
-+    env->exception.target_el = 1;
-+
-+    /*
-+     * Set the DFSC to synchronous external abort and set FnV to not valid,
-+     * this will tell guest the FAR_ELx is UNKNOWN for this abort.
-+     */
-+
-+    /* This exception comes from lower or current exception level. */
-+    same_el = arm_current_el(env) == env->exception.target_el;
-+    esr = syn_data_abort_no_iss(same_el, 1, 0, 0, 0, 0, 0x10);
-+
-+    env->exception.syndrome = esr;
-+
-+    /**
-+     * The vcpu thread already hold BQL, so no need hold again when
-+     * calling do_interrupt
-+     */
-+    cc->do_interrupt(c);
-+}
-+
- #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
-                  KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
- 
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index 8698b4d..d43134a 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -109,7 +109,7 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
-      * ISV field.
-      */
-     if (!(template_syn & ARM_EL_ISV) || target_el != 2 || s1ptw) {
--        syn = syn_data_abort_no_iss(same_el,
-+        syn = syn_data_abort_no_iss(same_el, 0,
-                                     ea, 0, s1ptw, is_write, fsc);
-     } else {
-         /* Fields: IL, ISV, SAS, SSE, SRT, SF and AR come from the template
--- 
-1.8.3.1
-
+Ok, so letting the vendor driver simply return an(y) error and possibly
+dumping an error message into the syslog seems to be the most
+reasonable approach.
 
