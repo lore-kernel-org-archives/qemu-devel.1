@@ -6,69 +6,69 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFA64C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:55:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1C3EC04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:55:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90B4C20879
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:55:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90B4C20879
+	by mail.kernel.org (Postfix) with ESMTPS id B765620879
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 09:55:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B765620879
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44381 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44383 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQU9r-00023h-3v
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 05:55:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46136)
+	id 1hQU9u-00026l-W7
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 05:55:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hQU7z-0000mF-0S
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:53:44 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hQU8A-0000qT-DM
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:53:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hQU6O-0007zO-DE
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:52:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60816)
+	(envelope-from <pagupta@redhat.com>) id 1hQU1s-0001tU-DB
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:47:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56904)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hQU6O-0007ww-5f
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:52:04 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hQU1s-0001s1-4y
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 05:47:24 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 94115308620F;
-	Tue, 14 May 2019 09:52:02 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 042155C207;
-	Tue, 14 May 2019 09:51:37 +0000 (UTC)
-Date: Tue, 14 May 2019 11:51:35 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Message-ID: <20190514115135.078bbaf7.cohuck@redhat.com>
-In-Reply-To: <20190514074736.GE20407@joy-OptiPlex-7040>
-References: <20190509175404.512ae7aa.cohuck@redhat.com>
-	<20190509164825.GG2868@work-vm>
-	<20190510110838.2df4c4d0.cohuck@redhat.com>
-	<20190510093608.GD2854@work-vm>
-	<20190510114838.7e16c3d6.cohuck@redhat.com>
-	<20190513132804.GD11139@beluga.usersys.redhat.com>
-	<20190514061235.GC20407@joy-OptiPlex-7040>
-	<20190514072039.GA2089@beluga.usersys.redhat.com>
-	<20190514073219.GD20407@joy-OptiPlex-7040>
-	<20190514074344.GB2089@beluga.usersys.redhat.com>
-	<20190514074736.GE20407@joy-OptiPlex-7040>
-Organization: Red Hat GmbH
+	by mx1.redhat.com (Postfix) with ESMTPS id 2D76F308427C;
+	Tue, 14 May 2019 09:47:23 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+	(colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0CA275D6A6;
+	Tue, 14 May 2019 09:47:23 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com
+	(zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+	by colo-mx.corp.redhat.com (Postfix) with ESMTP id BDAEA18089CC;
+	Tue, 14 May 2019 09:47:22 +0000 (UTC)
+Date: Tue, 14 May 2019 05:47:22 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Message-ID: <712871093.28555872.1557827242385.JavaMail.zimbra@redhat.com>
+In-Reply-To: <86298c2c-cc7c-5b97-0f11-335d7da8c450@redhat.com>
+References: <20190510155202.14737-1-pagupta@redhat.com>
+	<20190510155202.14737-3-pagupta@redhat.com>
+	<f2ea35a6-ec98-447c-44fe-0cb3ab309340@redhat.com>
+	<752392764.28554139.1557826022323.JavaMail.zimbra@redhat.com>
+	<86298c2c-cc7c-5b97-0f11-335d7da8c450@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Originating-IP: [10.65.16.148, 10.4.195.13]
+Thread-Topic: virtio-pmem: Add virtio pmem driver
+Thread-Index: 8wNBImudyN2CQ1nMcWyCrDq+wnVDqg==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Tue, 14 May 2019 09:52:03 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Tue, 14 May 2019 09:47:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] vfio/mdev: add version attribute
- for mdev device
+Subject: Re: [Qemu-devel] [PATCH v8 2/6] virtio-pmem: Add virtio pmem driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,94 +80,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"aik@ozlabs.ru" <aik@ozlabs.ru>,
-	"Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-	"shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-	"eauger@redhat.com" <eauger@redhat.com>, "Liu,
-	Yi L" <yi.l.liu@intel.com>, Erik Skultety <eskultet@redhat.com>,
-	"Yang, Ziye" <ziye.yang@intel.com>,
-	"mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-	"pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-	"libvir-list@redhat.com" <libvir-list@redhat.com>,
-	"arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
-	"felipe@nutanix.com" <felipe@nutanix.com>,
-	"Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	"zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-	"jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	"intel-gvt-dev@lists.freedesktop.org"
-	<intel-gvt-dev@lists.freedesktop.org>, "Liu,
-	Changpeng" <changpeng.liu@intel.com>,
-	"berrange@redhat.com" <berrange@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang, Zhi
-	A" <zhi.a.wang@intel.com>, "dinechin@redhat.com" <dinechin@redhat.com>,
-	"He, Shaopeng" <shaopeng.he@intel.com>
+Cc: cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com,
+	jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
+	virtualization@lists.linux-foundation.org,
+	adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
+	aarcange@redhat.com, dave jiang <dave.jiang@intel.com>,
+	jstaron@google.com, linux-nvdimm@lists.01.org,
+	vishal l verma <vishal.l.verma@intel.com>, willy@infradead.org,
+	hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com,
+	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
+	riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
+	stefanha@redhat.com, pbonzini@redhat.com,
+	dan j williams <dan.j.williams@intel.com>,
+	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
+	tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
+	darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 14 May 2019 03:47:36 -0400
-Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-> On Tue, May 14, 2019 at 03:43:44PM +0800, Erik Skultety wrote:
-> > On Tue, May 14, 2019 at 03:32:19AM -0400, Yan Zhao wrote:  
-> > > On Tue, May 14, 2019 at 03:20:40PM +0800, Erik Skultety wrote:  
-
-> > > > That said, from libvirt POV as a consumer, I'd expect there to be truly only 2
-> > > > errors (I believe Alex has mentioned something similar in one of his responses
-> > > > in one of the threads):
-> > > >     a) read error indicating that an mdev type doesn't support migration
-> > > >         - I assume if one type doesn't support migration, none of the other
-> > > >           types exposed on the parent device do, is that a fair assumption?
-
-Probably; but there might be cases where the migratability depends not
-on the device type, but how the partitioning has been done... or is
-that too contrived?
-
-> > > >     b) write error indicating that the mdev types are incompatible for
-> > > >     migration
-> > > >
-> > > > Regards,
-> > > > Erik  
-> > > Thanks for this explanation.
-> > > so, can we arrive at below agreements?
-> > >
-> > > 1. "not to define the specific errno returned for a specific situation,
-> > > let the vendor driver decide, userspace simply needs to know that an errno on
-> > > read indicates the device does not support migration version comparison and
-> > > that an errno on write indicates the devices are incompatible or the target
-> > > doesn't support migration versions. "
-> > > 2. vendor driver should log detailed error reasons in kernel log.  
-> > 
-> > That would be my take on this, yes, but I open to hear any other suggestions and
-> > ideas I couldn't think of as well.
-
-So, read to find out whether migration is supported at all, write to
-find out whether it is supported for that concrete pairing is
-reasonable for libvirt?
-
-> > 
-> > Erik  
-> got it. thanks a lot!
 > 
-> hi Cornelia and Dave,
-> do you also agree on:
-> 1. "not to define the specific errno returned for a specific situation,
-> let the vendor driver decide, userspace simply needs to know that an errno on
-> read indicates the device does not support migration version comparison and
-> that an errno on write indicates the devices are incompatible or the target
-> doesn't support migration versions. "
-> 2. vendor driver should log detailed error reasons in kernel log.
+> >>
+> >>> +	}
+> >>> +
+> >>> +	/* When host has read buffer, this completes via host_ack */
+> >>
+> >> "A host repsonse results in "host_ack" getting called" ... ?
+> >>
+> >>> +	wait_event(req->host_acked, req->done);
+> >>> +	err = req->ret;
+> >>> +ret:
+> >>> +	kfree(req);
+> >>> +	return err;
+> >>> +};
+> >>> +
+> >>> +/* The asynchronous flush callback function */
+> >>> +int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
+> >>> +{
+> >>> +	int rc = 0;
+> >>> +
+> >>> +	/* Create child bio for asynchronous flush and chain with
+> >>> +	 * parent bio. Otherwise directly call nd_region flush.
+> >>> +	 */
+> >>> +	if (bio && bio->bi_iter.bi_sector != -1) {
+> >>> +		struct bio *child = bio_alloc(GFP_ATOMIC, 0);
+> >>> +
+> >>> +		if (!child)
+> >>> +			return -ENOMEM;
+> >>> +		bio_copy_dev(child, bio);
+> >>> +		child->bi_opf = REQ_PREFLUSH;
+> >>> +		child->bi_iter.bi_sector = -1;
+> >>> +		bio_chain(child, bio);
+> >>> +		submit_bio(child);
+> >>
+> >> return 0;
+> >>
+> >> Then, drop the "else" case and "int rc" and do directly
+> >>
+> >> if (virtio_pmem_flush(nd_region))
+> >> 	return -EIO;
+> > 
+> > and another 'return 0' here :)
+> > 
+> > I don't like return from multiple places instead I prefer
+> > single exit point from function.
+> 
+> Makes this function more complicated than necessary. I agree when there
+> are locks involved.
 
-Two questions:
-- How reasonable is it to refer to the system log in order to find out
-  what exactly went wrong?
-- If detailed error reporting is basically done to the syslog, do
-  different error codes still provide useful information? Or should the
-  vendor driver decide what it wants to do?
+o.k. I will change as you suggest :)
+
+> 
+> >  
+> >>
+> >>> +
+> >>> +	return 0;
+> >>> +};
+> >>> +
+> >>> +static int virtio_pmem_probe(struct virtio_device *vdev)
+> >>> +{
+> >>> +	int err = 0;
+> >>> +	struct resource res;
+> >>> +	struct virtio_pmem *vpmem;
+> >>> +	struct nd_region_desc ndr_desc = {};
+> >>> +	int nid = dev_to_node(&vdev->dev);
+> >>> +	struct nd_region *nd_region;
+> >>
+> >> Nit: use reverse Christmas tree layout :)
+> > 
+> > Done.
+> > 
+> >>
+> >>> +
+> >>> +	if (!vdev->config->get) {
+> >>> +		dev_err(&vdev->dev, "%s failure: config access disabled\n",
+> >>> +			__func__);
+> >>> +		return -EINVAL;
+> >>> +	}
+> >>> +
+> >>> +	vpmem = devm_kzalloc(&vdev->dev, sizeof(*vpmem), GFP_KERNEL);
+> >>> +	if (!vpmem) {
+> >>> +		err = -ENOMEM;
+> >>> +		goto out_err;
+> >>> +	}
+> >>> +
+> >>> +	vpmem->vdev = vdev;
+> >>> +	vdev->priv = vpmem;
+> >>> +	err = init_vq(vpmem);
+> >>> +	if (err)
+> >>> +		goto out_err;
+> >>> +
+> >>> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> >>> +			start, &vpmem->start);
+> >>> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> >>> +			size, &vpmem->size);
+> >>> +
+> >>> +	res.start = vpmem->start;
+> >>> +	res.end   = vpmem->start + vpmem->size-1;
+> >>> +	vpmem->nd_desc.provider_name = "virtio-pmem";
+> >>> +	vpmem->nd_desc.module = THIS_MODULE;
+> >>> +
+> >>> +	vpmem->nvdimm_bus = nvdimm_bus_register(&vdev->dev,
+> >>> +						&vpmem->nd_desc);
+> >>> +	if (!vpmem->nvdimm_bus)
+> >>> +		goto out_vq;
+> >>> +
+> >>> +	dev_set_drvdata(&vdev->dev, vpmem->nvdimm_bus);
+> >>> +
+> >>> +	ndr_desc.res = &res;
+> >>> +	ndr_desc.numa_node = nid;
+> >>> +	ndr_desc.flush = async_pmem_flush;
+> >>> +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
+> >>> +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
+> >>> +	nd_region = nvdimm_pmem_region_create(vpmem->nvdimm_bus, &ndr_desc);
+> >>> +
+> >>
+> >> I'd drop this empty line.
+> > 
+> > hmm.
+> > 
+> 
+> The common pattern after allocating something, immediately check for it
+> in the next line (like you do throughout this patch ;) )
+
+Right. But rare times when I see space will beauty the code I tend to
+add it. Maybe I should not :)
+
+> 
+> ...
+> >> You are not freeing "vdev->priv".
+> > 
+> > vdev->priv is vpmem which is allocated using devm API.
+> 
+> I'm confused. Looking at drivers/virtio/virtio_balloon.c:
+> 
+> static void virtballoon_remove(struct virtio_device *vdev)
+> {
+> 	struct virtio_balloon *vb = vdev->priv;
+> 
+> 	...
+> 
+> 	kfree(vb);
+> }
+> 
+> I think you should do the same here, vdev->priv is allocated in
+> virtio_pmem_probe.
+> 
+> But maybe I am missing something important here :)
+
+Because virtio_balloon use "kzalloc" for allocation and needs to be freed. 
+But virtio pmem uses "devm_kzalloc" which takes care of automatically deleting 
+the device memory when associated device is detached.
+
+Thanks,
+Pankaj
+> 
+> >>
+> >>> +	nvdimm_bus_unregister(nvdimm_bus);
+> >>> +	vdev->config->del_vqs(vdev);
+> >>> +	vdev->config->reset(vdev);
+> >>> +}
+> >>> +
+> 
+> --
+> 
+> Thanks,
+> 
+> David / dhildenb
+> 
 
