@@ -2,64 +2,111 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAA33C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:45:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AC93C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:45:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9114220879
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:45:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9114220879
+	by mail.kernel.org (Postfix) with ESMTPS id 42A6D20879
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:45:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42A6D20879
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52506 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52508 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQcQG-0006sW-QN
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 14:45:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39946)
+	id 1hQcQM-0006xH-Gu
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 14:45:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hQcHU-0007Os-Hx
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:36:05 -0400
+	(envelope-from <thuth@redhat.com>) id 1hQcJg-0001GO-Gc
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:38:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hQcHT-0001rS-Gh
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:36:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49410)
+	(envelope-from <thuth@redhat.com>) id 1hQcJf-0004a8-IG
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:38:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57174)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hQcHT-0001pz-9B
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:36:03 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>)
+	id 1hQcJf-0004Y3-8O; Tue, 14 May 2019 14:38:19 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 82CBD3079B6B;
-	Tue, 14 May 2019 18:36:02 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-117-232.ams2.redhat.com
-	[10.36.117.232])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 94661608B9;
-	Tue, 14 May 2019 18:35:58 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com,
-	ehabkost@redhat.com, richardw.yang@linux.intel.com,
-	yury-kotov@yandex-team.ru, chen.zhang@intel.com
-Date: Tue, 14 May 2019 19:34:51 +0100
-Message-Id: <20190514183454.12758-14-dgilbert@redhat.com>
-In-Reply-To: <20190514183454.12758-1-dgilbert@redhat.com>
-References: <20190514183454.12758-1-dgilbert@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 6839681113;
+	Tue, 14 May 2019 18:38:18 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-85.ams2.redhat.com [10.36.116.85])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3455A19C7C;
+	Tue, 14 May 2019 18:38:11 +0000 (UTC)
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+	Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190514180311.16028-1-armbru@redhat.com>
+	<20190514180311.16028-6-armbru@redhat.com>
+	<8572c3ca-bd62-9ae5-d574-fdcb0609af4a@de.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <80141524-6a65-33ad-8144-c3941e3b9616@redhat.com>
+Date: Tue, 14 May 2019 20:38:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <8572c3ca-bd62-9ae5-d574-fdcb0609af4a@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Tue, 14 May 2019 18:36:02 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.28]);
+	Tue, 14 May 2019 18:38:18 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 13/16] migration/savevm: wrap into
- qemu_loadvm_state_header()
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] pc-bios/s390-ccw: Clean up harmless
+ misuse of isdigit()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,127 +118,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Wei Yang <richardw.yang@linux.intel.com>
+On 14/05/2019 20.04, Christian Borntraeger wrote:
+> 
+> 
+> On 14.05.19 20:03, Markus Armbruster wrote:
+>> atoui() and get_index() pass char values to isdigit().  With a
+>> standard isdigit(), we'd get undefined behavior when the value is
+>> negative.  Can't happen as char is unsigned on s390x.  Even if it
+>> could, we're actually using isdigit() from pc-bios/s390-ccw/libc.h
+>> here, which works fine for negative values.  Clean up anyway, just
+>> to avoid setting a bad example.
+>>
+>> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-On source side, we have qemu_savevm_state_header() to send related data,
-while on the receiving side those steps are scattered in
-qemu_loadvm_state().
+FYI, this patch is already queued in Cornelia's s390-next tree (and it
+should also go via her tree, since you need to rebuild the bios binary
+afterwards).
 
-This patch wrap those related steps into qemu_loadvm_state_header() to
-make it friendly to read.
-
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Message-Id: <20190424004700.12766-5-richardw.yang@linux.intel.com>
-Reviewed-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/savevm.c | 69 +++++++++++++++++++++++++++-------------------
- 1 file changed, 40 insertions(+), 29 deletions(-)
-
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 4c7b8379e8..c0e557b4c2 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2262,6 +2262,43 @@ qemu_loadvm_section_part_end(QEMUFile *f, Migratio=
-nIncomingState *mis)
-     return 0;
- }
-=20
-+static int qemu_loadvm_state_header(QEMUFile *f)
-+{
-+    unsigned int v;
-+    int ret;
-+
-+    v =3D qemu_get_be32(f);
-+    if (v !=3D QEMU_VM_FILE_MAGIC) {
-+        error_report("Not a migration stream");
-+        return -EINVAL;
-+    }
-+
-+    v =3D qemu_get_be32(f);
-+    if (v =3D=3D QEMU_VM_FILE_VERSION_COMPAT) {
-+        error_report("SaveVM v2 format is obsolete and don't work anymor=
-e");
-+        return -ENOTSUP;
-+    }
-+    if (v !=3D QEMU_VM_FILE_VERSION) {
-+        error_report("Unsupported migration stream version");
-+        return -ENOTSUP;
-+    }
-+
-+    if (migrate_get_current()->send_configuration) {
-+        if (qemu_get_byte(f) !=3D QEMU_VM_CONFIGURATION) {
-+            error_report("Configuration section missing");
-+            qemu_loadvm_state_cleanup();
-+            return -EINVAL;
-+        }
-+        ret =3D vmstate_load_state(f, &vmstate_configuration, &savevm_st=
-ate, 0);
-+
-+        if (ret) {
-+            qemu_loadvm_state_cleanup();
-+            return ret;
-+        }
-+    }
-+    return 0;
-+}
-+
- static int qemu_loadvm_state_setup(QEMUFile *f)
- {
-     SaveStateEntry *se;
-@@ -2410,7 +2447,6 @@ int qemu_loadvm_state(QEMUFile *f)
- {
-     MigrationIncomingState *mis =3D migration_incoming_get_current();
-     Error *local_err =3D NULL;
--    unsigned int v;
-     int ret;
-=20
-     if (qemu_savevm_state_blocked(&local_err)) {
-@@ -2418,34 +2454,9 @@ int qemu_loadvm_state(QEMUFile *f)
-         return -EINVAL;
-     }
-=20
--    v =3D qemu_get_be32(f);
--    if (v !=3D QEMU_VM_FILE_MAGIC) {
--        error_report("Not a migration stream");
--        return -EINVAL;
--    }
--
--    v =3D qemu_get_be32(f);
--    if (v =3D=3D QEMU_VM_FILE_VERSION_COMPAT) {
--        error_report("SaveVM v2 format is obsolete and don't work anymor=
-e");
--        return -ENOTSUP;
--    }
--    if (v !=3D QEMU_VM_FILE_VERSION) {
--        error_report("Unsupported migration stream version");
--        return -ENOTSUP;
--    }
--
--    if (migrate_get_current()->send_configuration) {
--        if (qemu_get_byte(f) !=3D QEMU_VM_CONFIGURATION) {
--            error_report("Configuration section missing");
--            qemu_loadvm_state_cleanup();
--            return -EINVAL;
--        }
--        ret =3D vmstate_load_state(f, &vmstate_configuration, &savevm_st=
-ate, 0);
--
--        if (ret) {
--            qemu_loadvm_state_cleanup();
--            return ret;
--        }
-+    ret =3D qemu_loadvm_state_header(f);
-+    if (ret) {
-+        return ret;
-     }
-=20
-     if (qemu_loadvm_state_setup(f) !=3D 0) {
---=20
-2.21.0
-
+ Thomas
 
