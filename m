@@ -7,83 +7,79 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89378C04AA7
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 00:17:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80269C04AA7
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 00:18:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4156B21655
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 00:17:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B64A2147A
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 00:18:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I+fJ4279"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4156B21655
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TDUQcnIH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B64A2147A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36737 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36739 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQL8a-00031P-A7
-	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 20:17:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51319)
+	id 1hQL8t-0003Jy-HW
+	for qemu-devel@archiver.kernel.org; Mon, 13 May 2019 20:18:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQKyF-0001fL-Kj
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:10:27 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hQL0C-0002ws-KY
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:09:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQKxc-0003nx-B3
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:06:59 -0400
-Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:43862)
+	(envelope-from <richard.henderson@linaro.org>) id 1hQKxX-0003j0-VJ
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:08:58 -0400
+Received: from mail-pl1-x62b.google.com ([2607:f8b0:4864:20::62b]:42240)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hQKxX-0003fj-Tn
-	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:06:22 -0400
-Received: by mail-pg1-x533.google.com with SMTP id t22so7591511pgi.10
-	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 17:06:15 -0700 (PDT)
+	id 1hQKxS-0003cm-1u
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:06:15 -0400
+Received: by mail-pl1-x62b.google.com with SMTP id x15so7260079pln.9
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 17:06:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=aOq8R9O0JYe2vR4wE14TCH6+yK72ddx4w9niulf5glk=;
-	b=I+fJ42790lAr0n58eQiZSGrwV1sgcAdugkuWGyVDs0aP69M0OjoAh1k9DfWSf1pHVD
-	AlixIUjm09Vt4hHEA65lwEjn19ElhQhOpJCNuBqjqaTk5v7ca9TIj7qWxC5EE0ErtwL5
-	fAJyikSmlmvlTAyMPk8/Txxa4NNqRoHNeY0KPzyikzZdjx9MeZpEBIuhCBNXca3GZOLv
-	zH6jQFi7aD5lrAfVcfRJEXcuhZGEMR3oQoDMnMaOXOR4oletVoeOqlZBfCl+1IHyDElE
-	t4UDoOJr/EHJTr/ASA/RbJ3sQ8ezRWaNKRvtrVx757vXi457EgzkcV9NVy1DTLz051NO
-	jNyg==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=4RamRVLS6CpSQqwq41FPx2oK0CgrkzF+uLuaNa5g2S4=;
+	b=TDUQcnIHIKt/l4ogEWDL9VlpRVwdtYntQdRFLqK3oOIjLFAUhn9KDZFpERGBuqwqk3
+	FczEeVPem/MXsuwJ17mDJdM4askz29AVZ4ogQ+xH9hXpLU4GI4o3s6BYI4P5sxJm7xlK
+	9ITXot/+j27JOFLVtUS+spjbFxzTmGL43wKt727Jw/gRReMssYXp3UUuvN5LZfHHULCl
+	I8fLUyo5Nw7kzjxxo9EQ5uIma9jmNsVAlDufVazkgBWLIi3exPBC7pISz6U0LtZg0926
+	sicHq3muxOCsJctHi6v2u0hAXiuDZOcECpgcOO5l7qF15O0HMIGgxVs1LtpMYTasqQU1
+	LNbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=aOq8R9O0JYe2vR4wE14TCH6+yK72ddx4w9niulf5glk=;
-	b=JBP6lcfctY8vdv8VIqUZR+vAg71JqWDjzFJ4IXgWKh1D+ejDzw8soSHW7pZWds7kdl
-	KGVvLoklvAJk/RDNh9+19duoKwGJDAxN0cHKBr+i++sLF54+9OMPsM6YAx3oEN4ukmUM
-	+uVuIdWtwJtZG6Ufk9eCaLp1y7tgXJ4TaHFv3IS9yf+KQAZmrgi7qBDJo++i4awH5s8l
-	PsTksSCQZ+yTeJ27tjOHhOsRSp3uLEPmdAikF8t3UZEL8bAToG37czL8sJh4oLikuz0d
-	w0HoxFkBBQ6k9ZIrv+taUN8XVIbcMjJk6jpSrTqsOdj8isOuZRoljEQ2E6NNX6v1RF/c
-	2gtA==
-X-Gm-Message-State: APjAAAVMOwz7KU6nFOnuUtxaF2jnNtEcKPDt+USwVBSGCEkIOCZU/S9u
-	7E6lw0SiF+Hd0P8gA/Zjr+P2h6hGU78=
-X-Google-Smtp-Source: APXvYqz0XCcpbh47IH0dgtZExgDc0rXnM3CCnQ4LVRr5BYfsuliB2s5tXkd/lqw1NLR9z+ANkWIDBQ==
-X-Received: by 2002:a63:a18:: with SMTP id 24mr34122390pgk.332.1557792374254; 
-	Mon, 13 May 2019 17:06:14 -0700 (PDT)
+	:references;
+	bh=4RamRVLS6CpSQqwq41FPx2oK0CgrkzF+uLuaNa5g2S4=;
+	b=bzJqDeqecpKFeJCko5licSrWipd0WNQzMd59+qu7ttUmwLrhkqIkXP6ajClwwqF97e
+	3zGKxlHSd1e0CeSSW5FyPWR/+xMuBTa+T9JyKptFOIlAc2YBoEQe6dOPjRUc/TocTIV5
+	ZpPDir9gzSjqVc6ECpsZjGLFfMpMVa346NpexHEmmXFXpJFzD1jm3Z0/0O6Lp4/n6Ihd
+	DgUekv7UF/Z+1oPSaW3vd5hJQ5ZbiKmaWeiEQ56Lc6eUwy80V0ECPTajUY0YoRedSDhI
+	LxiD/FSLlpcYLXOsKqDxY9ierGMAf+5CkX3o1QhFJcrawvoHyFUP4xo+YOncXXdP0/Uk
+	2glQ==
+X-Gm-Message-State: APjAAAVU3BXUGeakKU5TqTuvAglvP5HBq+jCLZ9kO1xNV8IiFzSzJ4nm
+	k7LtFLP0+hZdMClwajh5Ep698HjFwqQ=
+X-Google-Smtp-Source: APXvYqz1BF6JUm7IMUNMOANAArgKbwJ2ERpGE3aRn0yuPq8+ahLMNyaGir/yu3hPxhIu6AE+JRuUqg==
+X-Received: by 2002:a17:902:5ac8:: with SMTP id
+	g8mr5804622plm.154.1557792371878; 
+	Mon, 13 May 2019 17:06:11 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id u3sm238151pfn.29.2019.05.13.17.06.13
+	by smtp.gmail.com with ESMTPSA id u3sm238151pfn.29.2019.05.13.17.06.10
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 13 May 2019 17:06:13 -0700 (PDT)
+	Mon, 13 May 2019 17:06:11 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 13 May 2019 17:05:33 -0700
-Message-Id: <20190514000540.4313-25-richard.henderson@linaro.org>
+Date: Mon, 13 May 2019 17:05:31 -0700
+Message-Id: <20190514000540.4313-23-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190514000540.4313-1-richard.henderson@linaro.org>
 References: <20190514000540.4313-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::533
-Subject: [Qemu-devel] [PULL 24/31] target/arm: Use tcg_gen_abs_i64 and
- tcg_gen_gvec_abs
+X-Received-From: 2607:f8b0:4864:20::62b
+Subject: [Qemu-devel] [PULL 22/31] tcg/i386: Support vector absolute value
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,148 +96,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.h        |  2 --
- target/arm/neon_helper.c   |  5 -----
- target/arm/translate-a64.c | 41 +++++---------------------------------
- target/arm/translate.c     | 11 +++-------
- 4 files changed, 8 insertions(+), 51 deletions(-)
+ tcg/i386/tcg-target.h     |  2 +-
+ tcg/i386/tcg-target.inc.c | 15 +++++++++++++++
+ 2 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 50cb036378..132aa1682e 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -352,8 +352,6 @@ DEF_HELPER_2(neon_ceq_u8, i32, i32, i32)
- DEF_HELPER_2(neon_ceq_u16, i32, i32, i32)
- DEF_HELPER_2(neon_ceq_u32, i32, i32, i32)
+diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+index 7445f05885..66f16fbe3c 100644
+--- a/tcg/i386/tcg-target.h
++++ b/tcg/i386/tcg-target.h
+@@ -182,7 +182,7 @@ extern bool have_avx2;
+ #define TCG_TARGET_HAS_orc_vec          0
+ #define TCG_TARGET_HAS_not_vec          0
+ #define TCG_TARGET_HAS_neg_vec          0
+-#define TCG_TARGET_HAS_abs_vec          0
++#define TCG_TARGET_HAS_abs_vec          1
+ #define TCG_TARGET_HAS_shi_vec          1
+ #define TCG_TARGET_HAS_shs_vec          1
+ #define TCG_TARGET_HAS_shv_vec          have_avx2
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 0ba1587da4..aafd01cb49 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -369,6 +369,9 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define OPC_MOVSLQ	(0x63 | P_REXW)
+ #define OPC_MOVZBL	(0xb6 | P_EXT)
+ #define OPC_MOVZWL	(0xb7 | P_EXT)
++#define OPC_PABSB       (0x1c | P_EXT38 | P_DATA16)
++#define OPC_PABSW       (0x1d | P_EXT38 | P_DATA16)
++#define OPC_PABSD       (0x1e | P_EXT38 | P_DATA16)
+ #define OPC_PACKSSDW    (0x6b | P_EXT | P_DATA16)
+ #define OPC_PACKSSWB    (0x63 | P_EXT | P_DATA16)
+ #define OPC_PACKUSDW    (0x2b | P_EXT38 | P_DATA16)
+@@ -2741,6 +2744,10 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+     static int const sars_insn[4] = {
+         OPC_UD2, OPC_PSRAW, OPC_PSRAD, OPC_UD2
+     };
++    static int const abs_insn[4] = {
++        /* TODO: AVX512 adds support for MO_64.  */
++        OPC_PABSB, OPC_PABSW, OPC_PABSD, OPC_UD2
++    };
  
--DEF_HELPER_1(neon_abs_s8, i32, i32)
--DEF_HELPER_1(neon_abs_s16, i32, i32)
- DEF_HELPER_1(neon_clz_u8, i32, i32)
- DEF_HELPER_1(neon_clz_u16, i32, i32)
- DEF_HELPER_1(neon_cls_s8, i32, i32)
-diff --git a/target/arm/neon_helper.c b/target/arm/neon_helper.c
-index ed1c6fc41c..4259056723 100644
---- a/target/arm/neon_helper.c
-+++ b/target/arm/neon_helper.c
-@@ -1228,11 +1228,6 @@ NEON_VOP(ceq_u16, neon_u16, 2)
- NEON_VOP(ceq_u32, neon_u32, 1)
- #undef NEON_FN
+     TCGType type = vecl + TCG_TYPE_V64;
+     int insn, sub;
+@@ -2829,6 +2836,11 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+         insn = OPC_PUNPCKLDQ;
+         goto gen_simd;
+ #endif
++    case INDEX_op_abs_vec:
++        insn = abs_insn[vece];
++        a2 = a1;
++        a1 = 0;
++        goto gen_simd;
+     gen_simd:
+         tcg_debug_assert(insn != OPC_UD2);
+         if (type == TCG_TYPE_V256) {
+@@ -3206,6 +3218,7 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     case INDEX_op_dup2_vec:
+ #endif
+         return &x_x_x;
++    case INDEX_op_abs_vec:
+     case INDEX_op_dup_vec:
+     case INDEX_op_shli_vec:
+     case INDEX_op_shri_vec:
+@@ -3283,6 +3296,8 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
+     case INDEX_op_umin_vec:
+     case INDEX_op_umax_vec:
+         return vece <= MO_32 ? 1 : -1;
++    case INDEX_op_abs_vec:
++        return vece <= MO_32;
  
--#define NEON_FN(dest, src, dummy) dest = (src < 0) ? -src : src
--NEON_VOP1(abs_s8, neon_s8, 4)
--NEON_VOP1(abs_s16, neon_s16, 2)
--#undef NEON_FN
--
- /* Count Leading Sign/Zero Bits.  */
- static inline int do_clz8(uint8_t x)
- {
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 9dcc5ff3a3..b7c5a928b4 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -9468,11 +9468,7 @@ static void handle_2misc_64(DisasContext *s, int opcode, bool u,
-         if (u) {
-             tcg_gen_neg_i64(tcg_rd, tcg_rn);
-         } else {
--            TCGv_i64 tcg_zero = tcg_const_i64(0);
--            tcg_gen_neg_i64(tcg_rd, tcg_rn);
--            tcg_gen_movcond_i64(TCG_COND_GT, tcg_rd, tcg_rn, tcg_zero,
--                                tcg_rn, tcg_rd);
--            tcg_temp_free_i64(tcg_zero);
-+            tcg_gen_abs_i64(tcg_rd, tcg_rn);
-         }
-         break;
-     case 0x2f: /* FABS */
-@@ -12366,11 +12362,12 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
-         }
-         break;
-     case 0xb:
--        if (u) { /* NEG */
-+        if (u) { /* ABS, NEG */
-             gen_gvec_fn2(s, is_q, rd, rn, tcg_gen_gvec_neg, size);
--            return;
-+        } else {
-+            gen_gvec_fn2(s, is_q, rd, rn, tcg_gen_gvec_abs, size);
-         }
--        break;
-+        return;
-     }
- 
-     if (size == 3) {
-@@ -12438,17 +12435,6 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
-                         gen_helper_neon_qabs_s32(tcg_res, cpu_env, tcg_op);
-                     }
-                     break;
--                case 0xb: /* ABS, NEG */
--                    if (u) {
--                        tcg_gen_neg_i32(tcg_res, tcg_op);
--                    } else {
--                        TCGv_i32 tcg_zero = tcg_const_i32(0);
--                        tcg_gen_neg_i32(tcg_res, tcg_op);
--                        tcg_gen_movcond_i32(TCG_COND_GT, tcg_res, tcg_op,
--                                            tcg_zero, tcg_op, tcg_res);
--                        tcg_temp_free_i32(tcg_zero);
--                    }
--                    break;
-                 case 0x2f: /* FABS */
-                     gen_helper_vfp_abss(tcg_res, tcg_op);
-                     break;
-@@ -12561,23 +12547,6 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
-                     tcg_temp_free_i32(tcg_zero);
-                     break;
-                 }
--                case 0xb: /* ABS, NEG */
--                    if (u) {
--                        TCGv_i32 tcg_zero = tcg_const_i32(0);
--                        if (size) {
--                            gen_helper_neon_sub_u16(tcg_res, tcg_zero, tcg_op);
--                        } else {
--                            gen_helper_neon_sub_u8(tcg_res, tcg_zero, tcg_op);
--                        }
--                        tcg_temp_free_i32(tcg_zero);
--                    } else {
--                        if (size) {
--                            gen_helper_neon_abs_s16(tcg_res, tcg_op);
--                        } else {
--                            gen_helper_neon_abs_s8(tcg_res, tcg_op);
--                        }
--                    }
--                    break;
-                 case 0x4: /* CLS, CLZ */
-                     if (u) {
-                         if (size == 0) {
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index b25781554f..dd053c80d6 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -8120,6 +8120,9 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                 case NEON_2RM_VNEG:
-                     tcg_gen_gvec_neg(size, rd_ofs, rm_ofs, vec_size, vec_size);
-                     break;
-+                case NEON_2RM_VABS:
-+                    tcg_gen_gvec_abs(size, rd_ofs, rm_ofs, vec_size, vec_size);
-+                    break;
- 
-                 default:
-                 elementwise:
-@@ -8225,14 +8228,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                             }
-                             tcg_temp_free_i32(tmp2);
-                             break;
--                        case NEON_2RM_VABS:
--                            switch(size) {
--                            case 0: gen_helper_neon_abs_s8(tmp, tmp); break;
--                            case 1: gen_helper_neon_abs_s16(tmp, tmp); break;
--                            case 2: tcg_gen_abs_i32(tmp, tmp); break;
--                            default: abort();
--                            }
--                            break;
-                         case NEON_2RM_VCGT0_F:
-                         {
-                             TCGv_ptr fpstatus = get_fpstatus_ptr(1);
+     default:
+         return 0;
 -- 
 2.17.1
 
