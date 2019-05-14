@@ -2,61 +2,96 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B327C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 21:45:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBA3EC04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 21:47:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A257F20879
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 21:45:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A257F20879
+	by mail.kernel.org (Postfix) with ESMTPS id AC39C20879
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 21:47:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC39C20879
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55116 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55159 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQfEw-0001pa-Vf
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 17:45:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49356)
+	id 1hQfGm-0002ty-VD
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 17:47:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hQfCC-0008NC-0x
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 17:42:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1hQfD1-0000c5-DO
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 17:43:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hQfC9-00075S-Sr
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 17:42:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46254)
+	(envelope-from <eblake@redhat.com>) id 1hQfD0-0007ur-0E
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 17:43:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49162)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hQfC3-0006kg-8R; Tue, 14 May 2019 17:42:39 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hQfCy-0007qe-Sm
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 17:43:37 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5BDE43082129;
-	Tue, 14 May 2019 21:42:38 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.236])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E3CF05D6A6;
-	Tue, 14 May 2019 21:42:37 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Tue, 14 May 2019 23:42:30 +0200
-Message-Id: <20190514214230.22601-3-mreitz@redhat.com>
-In-Reply-To: <20190514214230.22601-1-mreitz@redhat.com>
-References: <20190514214230.22601-1-mreitz@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 5D691307D910;
+	Tue, 14 May 2019 21:43:35 +0000 (UTC)
+Received: from [10.3.116.43] (ovpn-116-43.phx2.redhat.com [10.3.116.43])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id AA0B65D6A6;
+	Tue, 14 May 2019 21:43:34 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>,
+	=?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20190510173049.28171-1-richard.henderson@linaro.org>
+	<877eatdq3w.fsf@dusky.pond.sub.org> <20190514152331.GJ25916@redhat.com>
+	<d050fa9d-8e4b-7b87-31e5-05a7fa78feb9@linaro.org>
+	<20190514165036.GA7680@redhat.com>
+	<f0da55b5-e14d-e718-0608-fa37d1cb6c2b@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <dfed572d-6104-8ada-3bd8-1231dc6d6392@redhat.com>
+Date: Tue, 14 May 2019 16:43:33 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <f0da55b5-e14d-e718-0608-fa37d1cb6c2b@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="YfrUyl5bOcMKTyAn9h7EDSbuyEqdNFc74"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Tue, 14 May 2019 21:42:38 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.48]);
+	Tue, 14 May 2019 21:43:35 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 2/2] iotests: Test unaligned raw images with
- O_DIRECT
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v6 00/25] Add qemu_getrandom and
+ ARMv8.5-RNG etc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,183 +103,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org,
-	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We already have 221 for accesses through the page cache, but it is
-better to create a new file for O_DIRECT instead of integrating those
-test cases into 221.  This way, we can make use of
-_supported_cache_modes (and _default_cache_mode) so the test is
-automatically skipped on filesystems that do not support O_DIRECT.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--YfrUyl5bOcMKTyAn9h7EDSbuyEqdNFc74
+From: Eric Blake <eblake@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <dfed572d-6104-8ada-3bd8-1231dc6d6392@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 00/25] Add qemu_getrandom and ARMv8.5-RNG
+ etc
+References: <20190510173049.28171-1-richard.henderson@linaro.org>
+ <877eatdq3w.fsf@dusky.pond.sub.org> <20190514152331.GJ25916@redhat.com>
+ <d050fa9d-8e4b-7b87-31e5-05a7fa78feb9@linaro.org>
+ <20190514165036.GA7680@redhat.com>
+ <f0da55b5-e14d-e718-0608-fa37d1cb6c2b@linaro.org>
+In-Reply-To: <f0da55b5-e14d-e718-0608-fa37d1cb6c2b@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-As part of the split, add _supported_cache_modes to 221.  With that, it
-no longer fails when run with -c none or -c directsync.
+On 5/14/19 12:46 PM, Richard Henderson wrote:
+> On 5/14/19 9:50 AM, Daniel P. Berrang=C3=A9 wrote:
+>> On Tue, May 14, 2019 at 09:14:57AM -0700, Richard Henderson wrote:
+>>> Yes, that would do it.  We would need something in the test that forc=
+es the
+>>> objects into the link.  Without having yet looked at the test cases, =
+any ideas?
+>>
+>> I don't think this is only the test suite. I think it will affect all =
+the
+>> binaries we build
+>=20
+> You're right, it does.
+>=20
+> $ nm aarch64-softmmu/qemu-system-aarch64  \
+>   | grep qcrypto_tls_creds_x509_register_types
+>=20
+> comes up empty.
+>=20
+> It didn't occur to me that there was nothing in the object files for th=
+e
+> reference.  I'll have to drop the crypto-obj-y patch and come up with a=
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/221     |  4 ++
- tests/qemu-iotests/253     | 84 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/253.out | 14 +++++++
- tests/qemu-iotests/group   |  1 +
- 4 files changed, 103 insertions(+)
- create mode 100755 tests/qemu-iotests/253
- create mode 100644 tests/qemu-iotests/253.out
+> different solution.
 
-diff --git a/tests/qemu-iotests/221 b/tests/qemu-iotests/221
-index 25dd47bcfe..0e9096fec7 100755
---- a/tests/qemu-iotests/221
-+++ b/tests/qemu-iotests/221
-@@ -1,6 +1,7 @@
- #!/usr/bin/env bash
- #
- # Test qemu-img vs. unaligned images
-+# (See also 253, which is the O_DIRECT version)
- #
- # Copyright (C) 2018-2019 Red Hat, Inc.
- #
-@@ -37,6 +38,9 @@ _supported_fmt raw
- _supported_proto file
- _supported_os Linux
-=20
-+_default_cache_mode writeback
-+_supported_cache_modes writeback writethrough unsafe
-+
- echo
- echo "=3D=3D=3D Check mapping of unaligned raw image =3D=3D=3D"
- echo
-diff --git a/tests/qemu-iotests/253 b/tests/qemu-iotests/253
-new file mode 100755
-index 0000000000..d88d5afa45
---- /dev/null
-+++ b/tests/qemu-iotests/253
-@@ -0,0 +1,84 @@
-+#!/usr/bin/env bash
-+#
-+# Test qemu-img vs. unaligned images; O_DIRECT version
-+# (Originates from 221)
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+seq=3D"$(basename $0)"
-+echo "QA output created by $seq"
-+
-+status=3D1 # failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt raw
-+_supported_proto file
-+_supported_os Linux
-+
-+_default_cache_mode none
-+_supported_cache_modes none directsync
-+
-+echo
-+echo "=3D=3D=3D Check mapping of unaligned raw image =3D=3D=3D"
-+echo
-+
-+# We do not know how large a physical sector is, but it is certainly
-+# going to be a factor of 1 MB
-+size=3D$((1 * 1024 * 1024 - 1))
-+
-+# qemu-img create rounds size up to BDRV_SECTOR_SIZE
-+_make_test_img $size
-+$QEMU_IMG map --output=3Djson --image-opts \
-+    "driver=3D$IMGFMT,file.driver=3Dfile,file.filename=3D$TEST_IMG,cache=
-.direct=3Don" \
-+    | _filter_qemu_img_map
-+
-+# so we resize it and check again
-+truncate --size=3D$size "$TEST_IMG"
-+$QEMU_IMG map --output=3Djson --image-opts \
-+    "driver=3D$IMGFMT,file.driver=3Dfile,file.filename=3D$TEST_IMG,cache=
-.direct=3Don" \
-+    | _filter_qemu_img_map
-+
-+# qemu-io with O_DIRECT always writes whole physical sectors.  Again,
-+# we do not know how large a physical sector is, so we just start
-+# writing from a 64 kB boundary, which should always be aligned.
-+offset=3D$((1 * 1024 * 1024 - 64 * 1024))
-+$QEMU_IO -c "w $offset $((size - offset))" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=3Djson --image-opts \
-+    "driver=3D$IMGFMT,file.driver=3Dfile,file.filename=3D$TEST_IMG,cache=
-.direct=3Don" \
-+    | _filter_qemu_img_map
-+
-+# Resize it and check again -- contrary to 221, we may not get partial
-+# sectors here, so there should be only two areas (one zero, one
-+# data).
-+truncate --size=3D$size "$TEST_IMG"
-+$QEMU_IMG map --output=3Djson --image-opts \
-+    "driver=3D$IMGFMT,file.driver=3Dfile,file.filename=3D$TEST_IMG,cache=
-.direct=3Don" \
-+    | _filter_qemu_img_map
-+
-+# success, all done
-+echo '*** done'
-+rm -f $seq.full
-+status=3D0
-diff --git a/tests/qemu-iotests/253.out b/tests/qemu-iotests/253.out
-new file mode 100644
-index 0000000000..607c0baa0b
---- /dev/null
-+++ b/tests/qemu-iotests/253.out
-@@ -0,0 +1,14 @@
-+QA output created by 253
-+
-+=3D=3D=3D Check mapping of unaligned raw image =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048575
-+[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": fals=
-e, "offset": OFFSET}]
-+[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": fals=
-e, "offset": OFFSET}]
-+wrote 65535/65535 bytes at offset 983040
-+63.999 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 983040, "depth": 0, "zero": true, "data": false=
-, "offset": OFFSET},
-+{ "start": 983040, "length": 65536, "depth": 0, "zero": false, "data": t=
-rue, "offset": OFFSET}]
-+[{ "start": 0, "length": 983040, "depth": 0, "zero": true, "data": false=
-, "offset": OFFSET},
-+{ "start": 983040, "length": 65536, "depth": 0, "zero": false, "data": t=
-rue, "offset": OFFSET}]
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 00e474ab0a..52b7c16e15 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -250,3 +250,4 @@
- 248 rw auto quick
- 249 rw auto quick
- 252 rw auto backing quick
-+253 rw auto quick
+Isn't there a gcc annotation for marking a simple as mandatorily
+included during link?
+
+/me goes looking...
+
+__attribute__((externally_visible)) sounds promising (it nullifies the
+effects of -fwhole-program, so that a function remains visible even if
+the linker would have otherwise suppressed it)
+
+__attribute__((used)) also sounds useful (the function must be emitted
+even if it does not appear to be referenced, which may be enough for the
+linker to infer that it is used)
+
+There may be other tricks, although I didn't go searching very hard.
+
 --=20
-2.21.0
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
+
+--YfrUyl5bOcMKTyAn9h7EDSbuyEqdNFc74
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzbNoUACgkQp6FrSiUn
+Q2r4/wgAjaSc1QCHYQvuMoAL6zHXl+Vbacs0JZnYTvvY+Kf3ttJ1TX9qdGRr8jCi
+h7gSEZCSweA+D28jduW/wVg581yK6OJkXmT5x9iEv25e99MZSwBwiyhm/l8sFfP7
+BeWkuJUErg6qVd02F9ro6H8vCGwCdZfIeQCY6NHCnm+Kbjo7VaHOc0Ha30+TK0Vf
+2g6Kzurmg9B7SAkXwGmv0TmBTxk1nZr/gPEuPkDFexof+lfM5VpmT+Zx+SKrQLZp
+2mnAU/vDTysqxTIgGVuQ9Z++C5PQ0WpaGEBd95BGCtmQxMeFH6ZqNdwf36sCj7Mg
+/IRpJ8RUeC+bCkWuj4dhSB4Q/1T3Eg==
+=SmN1
+-----END PGP SIGNATURE-----
+
+--YfrUyl5bOcMKTyAn9h7EDSbuyEqdNFc74--
 
