@@ -6,73 +6,72 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CCE4C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 19:22:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66948C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 19:22:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED6F720873
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 19:22:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3106D20873
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 19:22:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="llixhV8s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED6F720873
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PJcfjnh6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3106D20873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52979 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52981 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQd0R-0006f9-4E
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 15:22:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48849)
+	id 1hQd0U-0006iI-Be
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 15:22:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQcvI-0002W8-TC
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 15:17:13 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hQcvC-0002Tm-CA
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 15:17:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQcvH-0006sg-Pm
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 15:17:12 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:38184)
+	(envelope-from <richard.henderson@linaro.org>) id 1hQcvB-0006lP-Bo
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 15:17:06 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:46900)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hQcvH-0006rT-JI
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 15:17:11 -0400
-Received: by mail-pf1-x442.google.com with SMTP id b76so5329pfb.5
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 12:17:11 -0700 (PDT)
+	id 1hQcvB-0006jd-5Z
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 15:17:05 -0400
+Received: by mail-pg1-x543.google.com with SMTP id t187so29177pgb.13
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 12:17:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=xy1OktLeK7/mJWPw/JMSGUFtW6+kUG05ru+wLl6Tmjo=;
-	b=llixhV8s2IXNRYJyRFtKp14FjEtBz7C44GLPCmGS70qLY5BIDc0Pgwhek+5l0GJD2b
-	GZD4F76T6qPe3RKOFELuf5+aWqIaZzgfke9bXCHJxNcr8bmZu2FqzSg6h2es1eDtBGxz
-	PNV0JNX+o8nhp7y5y3vPiglzXelbBQSxJCY9847n2iykzuD8RK/LRDjvZ2P57wU7wzrV
-	xQ/A4lvbGszCGWwMi8kganW0l0VDm7ARww5rr9l4quubcar4IsF35ZpEHk16zKOCjOFw
-	MUPuKxZy5HsbMSVgaAtQBvoWDAjH8jKH5BPswX4Ge6d1r2wOnrT+OuIrA4pmNE2PCeD8
-	EsNQ==
+	bh=z+TkCJ+Ncy1KMgA4q+7eFD+GiqzlCrNmhclplUZOTOM=;
+	b=PJcfjnh6iCpJv/K+c7imTedknfYbTfCH5zIPH+iNkMN/dant7wWVqX4OTZctBOiRcY
+	6s/unk+w2w4glf6iFG5e2j0S/laU6TYrr0w/tEmsVWS3XOk3O93Cj48FtxG3nLRWUzcI
+	9ScnAn1HfhnoXEl/B12uF5OORCDbgG7Z9uJP6E0ordK4k5UlubGl9lOlauQHJif4k0I6
+	FnnaS0WY+4eN8QEtYcPixOcHEcE7kyCWS04QuV9KLv2D9t++MuDsx+o1VWSRLAEnzsHo
+	4t6/sfBMfjpXkawBZSNvJuGZyEYR/Icw457AL63JJrxYm3XmYHLDenWVYsc9OFCBZAfR
+	HDGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=xy1OktLeK7/mJWPw/JMSGUFtW6+kUG05ru+wLl6Tmjo=;
-	b=mkyRK7kb3nCBUf/IyAFI4LasQWR7FME23wcsoywcq7qG/puMtOLjwnCdwUMtD/dUaD
-	O4j7tUoW22nVXTwBBmodaAO8wocVO9EgCpJkQiIjljk2Hb0Lo/CwpuLux8iDfwuRZKTi
-	RmajtfBpArnG8H3J7t4JhbF3IGgUEYsvWBJlzysbnPxkYfIyvoLgTWeedTa9FQqlVIn9
-	3IJrTaRzgiSCKuC3RBugovVWNYUj2v5tnIvb7PKqCUfQJCx6yebfiEi5IkjO6PLPY6xo
-	gjmNc2zBSeMQ1CA1cDKpwzrV4YJ4AuY/UsjoaWnauPHMCTEyuJjfqe/I5FUwiWFsnzb7
-	e6Tg==
-X-Gm-Message-State: APjAAAV6tiaRzbiY9ug3ser9GgYZs+EYdH7WVnEZuqhYgDd2m6K/CZ7X
-	85kPi82QkibohI85P5UIVuyJb5qvTrc=
-X-Google-Smtp-Source: APXvYqyMIVejzT99QMaP8Q3TIHEsbmTk2As5aX4etKVj03AkFzT/B4ckMGGki7YjTZigBB66OpdgVw==
-X-Received: by 2002:a62:1b85:: with SMTP id
-	b127mr14346929pfb.165.1557861430208; 
-	Tue, 14 May 2019 12:17:10 -0700 (PDT)
+	bh=z+TkCJ+Ncy1KMgA4q+7eFD+GiqzlCrNmhclplUZOTOM=;
+	b=F9Dp7A89LpFMsh2nvlKvOLjmrVweBG/esjpyGiAqPvTV1aI0DlHCfgo9PwIrMhhOnC
+	wZ+jTM4S5T16Hl6gUs7BwnF9nuARVs/OfAPzRoh3MV25ddc4r6PEnoJEmrgH4Dk8SulR
+	7AQ0OjLfcp29DsRwHC7wHG63SP5J3odmovCFbyc1NKgKxObP7hHfIYzNDbS6bZKU1RLM
+	UqzHBVhKYTAdrepdkpKIc1DutR16TZmGXaSJgSATYrC6svIbbwiDAUGhoCB0MoBdxjDA
+	yRR8d07q9wndclDIL9RfXy5XA1PoCRYrqFaYodlG0dVtlBsTeWLmiMlA5U/ezLkgCedD
+	HSpw==
+X-Gm-Message-State: APjAAAVOTC/RDDE0PceztROgF6tklR4Z1ZE6wtxErxpPcXRO3zvpC+RO
+	bKl3OZL4r4XJRm3VeA4xDvOq2zU7nlA=
+X-Google-Smtp-Source: APXvYqzcsASC1zE64noQinsr0C/Jyl4EuQYBUA9Tmcmg87ZWFi89r3TD9b0I4eGPikdZg4ULk+dkNQ==
+X-Received: by 2002:a62:570a:: with SMTP id l10mr42189212pfb.151.1557861423815;
+	Tue, 14 May 2019 12:17:03 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231]) by smtp.gmail.com with ESMTPSA id
-	o6sm18682982pfa.88.2019.05.14.12.17.09
+	o6sm18682982pfa.88.2019.05.14.12.17.02
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 14 May 2019 12:17:09 -0700 (PDT)
+	Tue, 14 May 2019 12:17:03 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue, 14 May 2019 12:16:40 -0700
-Message-Id: <20190514191653.31488-12-richard.henderson@linaro.org>
+Date: Tue, 14 May 2019 12:16:35 -0700
+Message-Id: <20190514191653.31488-7-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190514191653.31488-1-richard.henderson@linaro.org>
 References: <20190514191653.31488-1-richard.henderson@linaro.org>
@@ -81,9 +80,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: [Qemu-devel] [PATCH v7 11/24] linux-user: Initialize pseudo-random
- seeds for all guest cpus
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: [Qemu-devel] [PATCH v7 06/24] crypto: Change the
+ qcrypto_random_bytes buffer type to void*
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,117 +99,74 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When the -seed option is given, call qemu_guest_random_seed_main,
-putting the subsystem into deterministic mode.  Pass derived seeds
-to each cpu created during clone; which is a no-op unless the
-subsystem is in deterministic mode.
+Using uint8_t* merely requires useless casts for use with
+other types to be filled with randomness.
 
 Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/main.c    | 30 +++++++++++++++++++-----------
- linux-user/syscall.c |  3 +++
- 2 files changed, 22 insertions(+), 11 deletions(-)
+ include/crypto/random.h  | 2 +-
+ crypto/random-gcrypt.c   | 2 +-
+ crypto/random-gnutls.c   | 2 +-
+ crypto/random-platform.c | 4 ++--
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 3d2230320b..7e704845c0 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -34,6 +34,7 @@
- #include "tcg.h"
- #include "qemu/timer.h"
- #include "qemu/envlist.h"
-+#include "qemu/guest-random.h"
- #include "elf.h"
- #include "trace/control.h"
- #include "target_elf.h"
-@@ -48,6 +49,7 @@ static int gdbstub_port;
- static envlist_t *envlist;
- static const char *cpu_model;
- static const char *cpu_type;
-+static const char *seed_optarg;
- unsigned long mmap_min_addr;
- unsigned long guest_base;
- int have_guest_base;
-@@ -290,15 +292,9 @@ static void handle_arg_pagesize(const char *arg)
-     }
- }
+diff --git a/include/crypto/random.h b/include/crypto/random.h
+index 8764ca0562..fde592904e 100644
+--- a/include/crypto/random.h
++++ b/include/crypto/random.h
+@@ -34,7 +34,7 @@
+  *
+  * Returns 0 on success, -1 on error
+  */
+-int qcrypto_random_bytes(uint8_t *buf,
++int qcrypto_random_bytes(void *buf,
+                          size_t buflen,
+                          Error **errp);
  
--static void handle_arg_randseed(const char *arg)
-+static void handle_arg_seed(const char *arg)
+diff --git a/crypto/random-gcrypt.c b/crypto/random-gcrypt.c
+index 9f1c9ee60e..7aea4ac81f 100644
+--- a/crypto/random-gcrypt.c
++++ b/crypto/random-gcrypt.c
+@@ -24,7 +24,7 @@
+ 
+ #include <gcrypt.h>
+ 
+-int qcrypto_random_bytes(uint8_t *buf,
++int qcrypto_random_bytes(void *buf,
+                          size_t buflen,
+                          Error **errp G_GNUC_UNUSED)
  {
--    unsigned long long seed;
--
--    if (parse_uint_full(arg, &seed, 0) != 0 || seed > UINT_MAX) {
--        fprintf(stderr, "Invalid seed number: %s\n", arg);
--        exit(EXIT_FAILURE);
--    }
--    srand(seed);
-+    seed_optarg = arg;
+diff --git a/crypto/random-gnutls.c b/crypto/random-gnutls.c
+index 445fd6a30b..ed6c9ca12f 100644
+--- a/crypto/random-gnutls.c
++++ b/crypto/random-gnutls.c
+@@ -26,7 +26,7 @@
+ #include <gnutls/gnutls.h>
+ #include <gnutls/crypto.h>
+ 
+-int qcrypto_random_bytes(uint8_t *buf,
++int qcrypto_random_bytes(void *buf,
+                          size_t buflen,
+                          Error **errp)
+ {
+diff --git a/crypto/random-platform.c b/crypto/random-platform.c
+index cb3ca1bc09..66624106fe 100644
+--- a/crypto/random-platform.c
++++ b/crypto/random-platform.c
+@@ -64,8 +64,8 @@ int qcrypto_random_init(Error **errp)
+     return 0;
  }
  
- static void handle_arg_gdb(const char *arg)
-@@ -433,7 +429,7 @@ static const struct qemu_argument arg_table[] = {
-      "",           "run in singlestep mode"},
-     {"strace",     "QEMU_STRACE",      false, handle_arg_strace,
-      "",           "log system calls"},
--    {"seed",       "QEMU_RAND_SEED",   true,  handle_arg_randseed,
-+    {"seed",       "QEMU_RAND_SEED",   true,  handle_arg_seed,
-      "",           "Seed for pseudo-random number generator"},
-     {"trace",      "QEMU_TRACE",       true,  handle_arg_trace,
-      "",           "[[enable=]<pattern>][,events=<file>][,file=<file>]"},
-@@ -689,8 +685,20 @@ int main(int argc, char **argv, char **envp)
-         do_strace = 1;
-     }
- 
--    if (getenv("QEMU_RAND_SEED")) {
--        handle_arg_randseed(getenv("QEMU_RAND_SEED"));
-+    if (seed_optarg == NULL) {
-+        seed_optarg = getenv("QEMU_RAND_SEED");
-+    }
-+    if (seed_optarg != NULL) {
-+        unsigned long long seed;
-+
-+        /* This will go away with the last user of rand(). */
-+        if (parse_uint_full(seed_optarg, &seed, 0) != 0) {
-+            fprintf(stderr, "Invalid seed number: %s\n", seed_optarg);
-+            exit(EXIT_FAILURE);
-+        }
-+        srand(seed);
-+
-+        qemu_guest_random_seed_main(seed_optarg, &error_fatal);
-     }
- 
-     target_environ = envlist_to_environ(envlist, NULL);
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index f5ff6f5dc8..96f20886ce 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -107,6 +107,7 @@
- #include "uname.h"
- 
- #include "qemu.h"
-+#include "qemu/guest-random.h"
- #include "fd-trans.h"
- 
- #ifndef CLONE_IO
-@@ -5482,6 +5483,7 @@ static void *clone_func(void *arg)
-         put_user_u32(info->tid, info->child_tidptr);
-     if (info->parent_tidptr)
-         put_user_u32(info->tid, info->parent_tidptr);
-+    qemu_guest_random_seed_thread_part2(cpu->random_seed);
-     /* Enable signals.  */
-     sigprocmask(SIG_SETMASK, &info->sigmask, NULL);
-     /* Signal to the parent that we're ready.  */
-@@ -5568,6 +5570,7 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
-            initializing, so temporarily block all signals.  */
-         sigfillset(&sigmask);
-         sigprocmask(SIG_BLOCK, &sigmask, &info.sigmask);
-+        cpu->random_seed = qemu_guest_random_seed_thread_part1();
- 
-         /* If this is our first additional thread, we need to ensure we
-          * generate code for parallel execution and flush old translations.
+-int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
+-                         size_t buflen G_GNUC_UNUSED,
++int qcrypto_random_bytes(void *buf,
++                         size_t buflen,
+                          Error **errp)
+ {
+ #ifdef _WIN32
 -- 
 2.17.1
 
