@@ -3,63 +3,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,T_HK_NAME_DR,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D78C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:45:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAA33C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:45:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEB0820879
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:45:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEB0820879
+	by mail.kernel.org (Postfix) with ESMTPS id 9114220879
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 18:45:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9114220879
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52504 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52506 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQcQC-0006qU-T2
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 14:45:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39833)
+	id 1hQcQG-0006sW-QN
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 14:45:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hQcHF-00073Z-9s
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:35:50 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hQcHU-0007Os-Hx
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hQcHE-0001YK-BI
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:35:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57186)
+	(envelope-from <dgilbert@redhat.com>) id 1hQcHT-0001rS-Gh
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:36:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49410)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hQcHE-0001Xa-6c
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:35:48 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hQcHT-0001pz-9B
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 14:36:03 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7E9FE3019880;
-	Tue, 14 May 2019 18:35:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 82CBD3079B6B;
+	Tue, 14 May 2019 18:36:02 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-117-232.ams2.redhat.com
 	[10.36.117.232])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 85A2A608A6;
-	Tue, 14 May 2019 18:35:33 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 94661608B9;
+	Tue, 14 May 2019 18:35:58 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com,
 	ehabkost@redhat.com, richardw.yang@linux.intel.com,
 	yury-kotov@yandex-team.ru, chen.zhang@intel.com
-Date: Tue, 14 May 2019 19:34:44 +0100
-Message-Id: <20190514183454.12758-7-dgilbert@redhat.com>
+Date: Tue, 14 May 2019 19:34:51 +0100
+Message-Id: <20190514183454.12758-14-dgilbert@redhat.com>
 In-Reply-To: <20190514183454.12758-1-dgilbert@redhat.com>
 References: <20190514183454.12758-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Tue, 14 May 2019 18:35:47 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Tue, 14 May 2019 18:36:02 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 06/16] migration/colo.c: Remove redundant input
- parameter
+Subject: [Qemu-devel] [PULL 13/16] migration/savevm: wrap into
+ qemu_loadvm_state_header()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,59 +75,122 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Zhang Chen <chen.zhang@intel.com>
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-The colo_do_failover no need the input parameter.
+On source side, we have qemu_savevm_state_header() to send related data,
+while on the receiving side those steps are scattered in
+qemu_loadvm_state().
 
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-Message-Id: <20190426090730.2691-2-chen.zhang@intel.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+This patch wrap those related steps into qemu_loadvm_state_header() to
+make it friendly to read.
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Message-Id: <20190424004700.12766-5-richardw.yang@linux.intel.com>
+Reviewed-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/migration/colo.h  | 2 +-
- migration/colo-failover.c | 2 +-
- migration/colo.c          | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ migration/savevm.c | 69 +++++++++++++++++++++++++++-------------------
+ 1 file changed, 40 insertions(+), 29 deletions(-)
 
-diff --git a/include/migration/colo.h b/include/migration/colo.h
-index 99ce17aca7..ddebe0ad27 100644
---- a/include/migration/colo.h
-+++ b/include/migration/colo.h
-@@ -37,7 +37,7 @@ bool migration_incoming_in_colo_state(void);
- COLOMode get_colo_mode(void);
-=20
- /* failover */
--void colo_do_failover(MigrationState *s);
-+void colo_do_failover(void);
-=20
- void colo_checkpoint_notify(void *opaque);
- #endif
-diff --git a/migration/colo-failover.c b/migration/colo-failover.c
-index 4854a96c92..e9ca0b4774 100644
---- a/migration/colo-failover.c
-+++ b/migration/colo-failover.c
-@@ -39,7 +39,7 @@ static void colo_failover_bh(void *opaque)
-         return;
-     }
-=20
--    colo_do_failover(NULL);
-+    colo_do_failover();
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 4c7b8379e8..c0e557b4c2 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2262,6 +2262,43 @@ qemu_loadvm_section_part_end(QEMUFile *f, Migratio=
+nIncomingState *mis)
+     return 0;
  }
 =20
- void failover_request_active(Error **errp)
-diff --git a/migration/colo.c b/migration/colo.c
-index 238a6d62c7..8c1644091f 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -193,7 +193,7 @@ COLOMode get_colo_mode(void)
-     }
- }
-=20
--void colo_do_failover(MigrationState *s)
-+void colo_do_failover(void)
++static int qemu_loadvm_state_header(QEMUFile *f)
++{
++    unsigned int v;
++    int ret;
++
++    v =3D qemu_get_be32(f);
++    if (v !=3D QEMU_VM_FILE_MAGIC) {
++        error_report("Not a migration stream");
++        return -EINVAL;
++    }
++
++    v =3D qemu_get_be32(f);
++    if (v =3D=3D QEMU_VM_FILE_VERSION_COMPAT) {
++        error_report("SaveVM v2 format is obsolete and don't work anymor=
+e");
++        return -ENOTSUP;
++    }
++    if (v !=3D QEMU_VM_FILE_VERSION) {
++        error_report("Unsupported migration stream version");
++        return -ENOTSUP;
++    }
++
++    if (migrate_get_current()->send_configuration) {
++        if (qemu_get_byte(f) !=3D QEMU_VM_CONFIGURATION) {
++            error_report("Configuration section missing");
++            qemu_loadvm_state_cleanup();
++            return -EINVAL;
++        }
++        ret =3D vmstate_load_state(f, &vmstate_configuration, &savevm_st=
+ate, 0);
++
++        if (ret) {
++            qemu_loadvm_state_cleanup();
++            return ret;
++        }
++    }
++    return 0;
++}
++
+ static int qemu_loadvm_state_setup(QEMUFile *f)
  {
-     /* Make sure VM stopped while failover happened. */
-     if (!colo_runstate_is_stopped()) {
+     SaveStateEntry *se;
+@@ -2410,7 +2447,6 @@ int qemu_loadvm_state(QEMUFile *f)
+ {
+     MigrationIncomingState *mis =3D migration_incoming_get_current();
+     Error *local_err =3D NULL;
+-    unsigned int v;
+     int ret;
+=20
+     if (qemu_savevm_state_blocked(&local_err)) {
+@@ -2418,34 +2454,9 @@ int qemu_loadvm_state(QEMUFile *f)
+         return -EINVAL;
+     }
+=20
+-    v =3D qemu_get_be32(f);
+-    if (v !=3D QEMU_VM_FILE_MAGIC) {
+-        error_report("Not a migration stream");
+-        return -EINVAL;
+-    }
+-
+-    v =3D qemu_get_be32(f);
+-    if (v =3D=3D QEMU_VM_FILE_VERSION_COMPAT) {
+-        error_report("SaveVM v2 format is obsolete and don't work anymor=
+e");
+-        return -ENOTSUP;
+-    }
+-    if (v !=3D QEMU_VM_FILE_VERSION) {
+-        error_report("Unsupported migration stream version");
+-        return -ENOTSUP;
+-    }
+-
+-    if (migrate_get_current()->send_configuration) {
+-        if (qemu_get_byte(f) !=3D QEMU_VM_CONFIGURATION) {
+-            error_report("Configuration section missing");
+-            qemu_loadvm_state_cleanup();
+-            return -EINVAL;
+-        }
+-        ret =3D vmstate_load_state(f, &vmstate_configuration, &savevm_st=
+ate, 0);
+-
+-        if (ret) {
+-            qemu_loadvm_state_cleanup();
+-            return ret;
+-        }
++    ret =3D qemu_loadvm_state_header(f);
++    if (ret) {
++        return ret;
+     }
+=20
+     if (qemu_loadvm_state_setup(f) !=3D 0) {
 --=20
 2.21.0
 
