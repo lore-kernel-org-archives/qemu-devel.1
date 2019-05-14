@@ -2,63 +2,63 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5645C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 14:56:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB416C04AB7
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 14:56:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A4CA2084E
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 14:56:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A4CA2084E
+	by mail.kernel.org (Postfix) with ESMTPS id B20C72084E
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 14:56:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B20C72084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49425 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49429 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQYqh-0003S8-TP
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 10:56:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44902)
+	id 1hQYrS-0003yK-Si
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 10:56:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hQYpo-00033l-2S
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:55:17 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hQYqH-0003MH-UJ
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:55:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hQYpm-0005sG-7f
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:55:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48324)
+	(envelope-from <pagupta@redhat.com>) id 1hQYqG-0006HN-Cu
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:55:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29525)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hQYpl-0005rT-Vr
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:55:14 -0400
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hQYqG-0006H4-5Q
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 10:55:44 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DB40B2D7EA;
-	Tue, 14 May 2019 14:55:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 099EC307EA8D;
+	Tue, 14 May 2019 14:55:43 +0000 (UTC)
 Received: from dhcp201-121.englab.pnq.redhat.com (unknown [10.65.16.148])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1F6AC5D6A6;
-	Tue, 14 May 2019 14:54:30 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5BD1F5EDE0;
+	Tue, 14 May 2019 14:55:01 +0000 (UTC)
 From: Pankaj Gupta <pagupta@redhat.com>
 To: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
 	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
 	qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
 	linux-xfs@vger.kernel.org
-Date: Tue, 14 May 2019 20:24:15 +0530
-Message-Id: <20190514145422.16923-1-pagupta@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Date: Tue, 14 May 2019 20:24:16 +0530
+Message-Id: <20190514145422.16923-2-pagupta@redhat.com>
+In-Reply-To: <20190514145422.16923-1-pagupta@redhat.com>
+References: <20190514145422.16923-1-pagupta@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Tue, 14 May 2019 14:55:10 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.44]);
+	Tue, 14 May 2019 14:55:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v9 0/7] virtio pmem driver
+Subject: [Qemu-devel] [PATCH v9 1/7] libnvdimm: nd_region flush callback
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,219 +86,242 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
- Hi Dan,
+This patch adds functionality to perform flush from guest
+to host over VIRTIO. We are registering a callback based
+on 'nd_region' type. virtio_pmem driver requires this special
+flush function. For rest of the region types we are registering
+existing flush function. Report error returned by host fsync
+failure to userspace.
 
- Proposing the patch series to be merged via nvdimm tree
- as kindly agreed by you. We have ack/review on XFS, EXT4 &
- VIRTIO patches.=20
+Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+---
+ drivers/acpi/nfit/core.c     |  4 ++--
+ drivers/nvdimm/claim.c       |  6 ++++--
+ drivers/nvdimm/nd.h          |  1 +
+ drivers/nvdimm/pmem.c        | 13 ++++++++-----
+ drivers/nvdimm/region_devs.c | 26 ++++++++++++++++++++++++--
+ include/linux/libnvdimm.h    |  8 +++++++-
+ 6 files changed, 46 insertions(+), 12 deletions(-)
 
- Incorporated all the changes suggested in v8. This version
- added a new patch 4 for dax for device mapper change and some
- minor style changes in patch 2. Kept all the reviews. Request
- to please merge the series.
+diff --git a/drivers/acpi/nfit/core.c b/drivers/acpi/nfit/core.c
+index 5a389a4f4f65..08dde76cf459 100644
+--- a/drivers/acpi/nfit/core.c
++++ b/drivers/acpi/nfit/core.c
+@@ -2434,7 +2434,7 @@ static void write_blk_ctl(struct nfit_blk *nfit_blk, unsigned int bw,
+ 		offset = to_interleave_offset(offset, mmio);
+ 
+ 	writeq(cmd, mmio->addr.base + offset);
+-	nvdimm_flush(nfit_blk->nd_region);
++	nvdimm_flush(nfit_blk->nd_region, NULL);
+ 
+ 	if (nfit_blk->dimm_flags & NFIT_BLK_DCR_LATCH)
+ 		readq(mmio->addr.base + offset);
+@@ -2483,7 +2483,7 @@ static int acpi_nfit_blk_single_io(struct nfit_blk *nfit_blk,
+ 	}
+ 
+ 	if (rw)
+-		nvdimm_flush(nfit_blk->nd_region);
++		nvdimm_flush(nfit_blk->nd_region, NULL);
+ 
+ 	rc = read_blk_stat(nfit_blk, lane) ? -EIO : 0;
+ 	return rc;
+diff --git a/drivers/nvdimm/claim.c b/drivers/nvdimm/claim.c
+index fb667bf469c7..13510bae1e6f 100644
+--- a/drivers/nvdimm/claim.c
++++ b/drivers/nvdimm/claim.c
+@@ -263,7 +263,7 @@ static int nsio_rw_bytes(struct nd_namespace_common *ndns,
+ 	struct nd_namespace_io *nsio = to_nd_namespace_io(&ndns->dev);
+ 	unsigned int sz_align = ALIGN(size + (offset & (512 - 1)), 512);
+ 	sector_t sector = offset >> 9;
+-	int rc = 0;
++	int rc = 0, ret = 0;
+ 
+ 	if (unlikely(!size))
+ 		return 0;
+@@ -301,7 +301,9 @@ static int nsio_rw_bytes(struct nd_namespace_common *ndns,
+ 	}
+ 
+ 	memcpy_flushcache(nsio->addr + offset, buf, size);
+-	nvdimm_flush(to_nd_region(ndns->dev.parent));
++	ret = nvdimm_flush(to_nd_region(ndns->dev.parent), NULL);
++	if (ret)
++		rc = ret;
+ 
+ 	return rc;
+ }
+diff --git a/drivers/nvdimm/nd.h b/drivers/nvdimm/nd.h
+index a5ac3b240293..0c74d2428bd7 100644
+--- a/drivers/nvdimm/nd.h
++++ b/drivers/nvdimm/nd.h
+@@ -159,6 +159,7 @@ struct nd_region {
+ 	struct badblocks bb;
+ 	struct nd_interleave_set *nd_set;
+ 	struct nd_percpu_lane __percpu *lane;
++	int (*flush)(struct nd_region *nd_region, struct bio *bio);
+ 	struct nd_mapping mapping[0];
+ };
+ 
+diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+index bc2f700feef8..f719245da170 100644
+--- a/drivers/nvdimm/pmem.c
++++ b/drivers/nvdimm/pmem.c
+@@ -192,6 +192,7 @@ static blk_status_t pmem_do_bvec(struct pmem_device *pmem, struct page *page,
+ 
+ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
+ {
++	int ret = 0;
+ 	blk_status_t rc = 0;
+ 	bool do_acct;
+ 	unsigned long start;
+@@ -201,7 +202,7 @@ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
+ 	struct nd_region *nd_region = to_region(pmem);
+ 
+ 	if (bio->bi_opf & REQ_PREFLUSH)
+-		nvdimm_flush(nd_region);
++		ret = nvdimm_flush(nd_region, bio);
+ 
+ 	do_acct = nd_iostat_start(bio, &start);
+ 	bio_for_each_segment(bvec, bio, iter) {
+@@ -216,7 +217,10 @@ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
+ 		nd_iostat_end(bio, start);
+ 
+ 	if (bio->bi_opf & REQ_FUA)
+-		nvdimm_flush(nd_region);
++		ret = nvdimm_flush(nd_region, bio);
++
++	if (ret)
++		bio->bi_status = errno_to_blk_status(ret);
+ 
+ 	bio_endio(bio);
+ 	return BLK_QC_T_NONE;
+@@ -469,7 +473,6 @@ static int pmem_attach_disk(struct device *dev,
+ 	}
+ 	dax_write_cache(dax_dev, nvdimm_has_cache(nd_region));
+ 	pmem->dax_dev = dax_dev;
+-
+ 	gendev = disk_to_dev(disk);
+ 	gendev->groups = pmem_attribute_groups;
+ 
+@@ -527,14 +530,14 @@ static int nd_pmem_remove(struct device *dev)
+ 		sysfs_put(pmem->bb_state);
+ 		pmem->bb_state = NULL;
+ 	}
+-	nvdimm_flush(to_nd_region(dev->parent));
++	nvdimm_flush(to_nd_region(dev->parent), NULL);
+ 
+ 	return 0;
+ }
+ 
+ static void nd_pmem_shutdown(struct device *dev)
+ {
+-	nvdimm_flush(to_nd_region(dev->parent));
++	nvdimm_flush(to_nd_region(dev->parent), NULL);
+ }
+ 
+ static void nd_pmem_notify(struct device *dev, enum nvdimm_event event)
+diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
+index b4ef7d9ff22e..e5b59708865e 100644
+--- a/drivers/nvdimm/region_devs.c
++++ b/drivers/nvdimm/region_devs.c
+@@ -295,7 +295,9 @@ static ssize_t deep_flush_store(struct device *dev, struct device_attribute *att
+ 		return rc;
+ 	if (!flush)
+ 		return -EINVAL;
+-	nvdimm_flush(nd_region);
++	rc = nvdimm_flush(nd_region, NULL);
++	if (rc)
++		return rc;
+ 
+ 	return len;
+ }
+@@ -1085,6 +1087,11 @@ static struct nd_region *nd_region_create(struct nvdimm_bus *nvdimm_bus,
+ 	dev->of_node = ndr_desc->of_node;
+ 	nd_region->ndr_size = resource_size(ndr_desc->res);
+ 	nd_region->ndr_start = ndr_desc->res->start;
++	if (ndr_desc->flush)
++		nd_region->flush = ndr_desc->flush;
++	else
++		nd_region->flush = NULL;
++
+ 	nd_device_register(dev);
+ 
+ 	return nd_region;
+@@ -1125,11 +1132,24 @@ struct nd_region *nvdimm_volatile_region_create(struct nvdimm_bus *nvdimm_bus,
+ }
+ EXPORT_SYMBOL_GPL(nvdimm_volatile_region_create);
+ 
++int nvdimm_flush(struct nd_region *nd_region, struct bio *bio)
++{
++	int rc = 0;
++
++	if (!nd_region->flush)
++		rc = generic_nvdimm_flush(nd_region);
++	else {
++		if (nd_region->flush(nd_region, bio))
++			rc = -EIO;
++	}
++
++	return rc;
++}
+ /**
+  * nvdimm_flush - flush any posted write queues between the cpu and pmem media
+  * @nd_region: blk or interleaved pmem region
+  */
+-void nvdimm_flush(struct nd_region *nd_region)
++int generic_nvdimm_flush(struct nd_region *nd_region)
+ {
+ 	struct nd_region_data *ndrd = dev_get_drvdata(&nd_region->dev);
+ 	int i, idx;
+@@ -1153,6 +1173,8 @@ void nvdimm_flush(struct nd_region *nd_region)
+ 		if (ndrd_get_flush_wpq(ndrd, i, 0))
+ 			writeq(1, ndrd_get_flush_wpq(ndrd, i, idx));
+ 	wmb();
++
++	return 0;
+ }
+ EXPORT_SYMBOL_GPL(nvdimm_flush);
+ 
+diff --git a/include/linux/libnvdimm.h b/include/linux/libnvdimm.h
+index feb342d026f2..a5f369ec3726 100644
+--- a/include/linux/libnvdimm.h
++++ b/include/linux/libnvdimm.h
+@@ -65,6 +65,9 @@ enum {
+ 	 */
+ 	ND_REGION_PERSIST_MEMCTRL = 2,
+ 
++	/* Platform provides asynchronous flush mechanism */
++	ND_REGION_ASYNC = 3,
++
+ 	/* mark newly adjusted resources as requiring a label update */
+ 	DPA_RESOURCE_ADJUSTED = 1 << 0,
+ };
+@@ -121,6 +124,7 @@ struct nd_mapping_desc {
+ 	int position;
+ };
+ 
++struct nd_region;
+ struct nd_region_desc {
+ 	struct resource *res;
+ 	struct nd_mapping_desc *mapping;
+@@ -133,6 +137,7 @@ struct nd_region_desc {
+ 	int target_node;
+ 	unsigned long flags;
+ 	struct device_node *of_node;
++	int (*flush)(struct nd_region *nd_region, struct bio *bio);
+ };
+ 
+ struct device;
+@@ -260,7 +265,8 @@ unsigned long nd_blk_memremap_flags(struct nd_blk_region *ndbr);
+ unsigned int nd_region_acquire_lane(struct nd_region *nd_region);
+ void nd_region_release_lane(struct nd_region *nd_region, unsigned int lane);
+ u64 nd_fletcher64(void *addr, size_t len, bool le);
+-void nvdimm_flush(struct nd_region *nd_region);
++int nvdimm_flush(struct nd_region *nd_region, struct bio *bio);
++int generic_nvdimm_flush(struct nd_region *nd_region);
+ int nvdimm_has_flush(struct nd_region *nd_region);
+ int nvdimm_has_cache(struct nd_region *nd_region);
+ int nvdimm_in_overwrite(struct nvdimm *nvdimm);
+-- 
+2.20.1
 
- ---
-
- This patch series has implementation for "virtio pmem".=20
- "virtio pmem" is fake persistent memory(nvdimm) in guest=20
- which allows to bypass the guest page cache. This also
- implements a VIRTIO based asynchronous flush mechanism. =20
-=20
- Sharing guest kernel driver in this patchset with the=20
- changes suggested in v4. Tested with Qemu side device=20
- emulation [6] for virtio-pmem. Documented the impact of
- possible page cache side channel attacks with suggested
- countermeasures.
-
- Details of project idea for 'virtio pmem' flushing interface=20
- is shared [3] & [4].
-
- Implementation is divided into two parts:
- New virtio pmem guest driver and qemu code changes for new=20
- virtio pmem paravirtualized device.
-
-1. Guest virtio-pmem kernel driver
----------------------------------
-   - Reads persistent memory range from paravirt device and=20
-     registers with 'nvdimm_bus'. =20
-   - 'nvdimm/pmem' driver uses this information to allocate=20
-     persistent memory region and setup filesystem operations=20
-     to the allocated memory.=20
-   - virtio pmem driver implements asynchronous flushing=20
-     interface to flush from guest to host.
-
-2. Qemu virtio-pmem device
----------------------------------
-   - Creates virtio pmem device and exposes a memory range to=20
-     KVM guest.=20
-   - At host side this is file backed memory which acts as=20
-     persistent memory.=20
-   - Qemu side flush uses aio thread pool API's and virtio=20
-     for asynchronous guest multi request handling.=20
-
-   David Hildenbrand CCed also posted a modified version[7] of=20
-   qemu virtio-pmem code based on updated Qemu memory device API.=20
-
- Virtio-pmem security implications and countermeasures:
- -----------------------------------------------------
-
- In previous posting of kernel driver, there was discussion [9]
- on possible implications of page cache side channel attacks with=20
- virtio pmem. After thorough analysis of details of known side=20
- channel attacks, below are the suggestions:
-
- - Depends entirely on how host backing image file is mapped=20
-   into guest address space.=20
-
- - virtio-pmem device emulation, by default shared mapping is used
-   to map host backing file. It is recommended to use separate
-   backing file at host side for every guest. This will prevent
-   any possibility of executing common code from multiple guests
-   and any chance of inferring guest local data based based on=20
-   execution time.
-
- - If backing file is required to be shared among multiple guests=20
-   it is recommended to don't support host page cache eviction=20
-   commands from the guest driver. This will avoid any possibility
-   of inferring guest local data or host data from another guest.=20
-
- - Proposed device specification [8] for virtio-pmem device with=20
-   details of possible security implications and suggested=20
-   countermeasures for device emulation.
-
- Virtio-pmem errors handling:
- ----------------------------------------
-  Checked behaviour of virtio-pmem for below types of errors
-  Need suggestions on expected behaviour for handling these errors?
-
-  - Hardware Errors: Uncorrectable recoverable Errors:=20
-  a] virtio-pmem:=20
-    - As per current logic if error page belongs to Qemu process,=20
-      host MCE handler isolates(hwpoison) that page and send SIGBUS.=20
-      Qemu SIGBUS handler injects exception to KVM guest.=20
-    - KVM guest then isolates the page and send SIGBUS to guest=20
-      userspace process which has mapped the page.=20
- =20
-  b] Existing implementation for ACPI pmem driver:=20
-    - Handles such errors with MCE notifier and creates a list=20
-      of bad blocks. Read/direct access DAX operation return EIO=20
-      if accessed memory page fall in bad block list.
-    - It also starts backgound scrubbing. =20
-    - Similar functionality can be reused in virtio-pmem with MCE=20
-      notifier but without scrubbing(no ACPI/ARS)? Need inputs to=20
-      confirm if this behaviour is ok or needs any change?
-
-Changes from PATCH v8: [1]=20
- - Set device mapper synchronous if all target devices support - Dan
- - Move virtio_pmem.h to nvdimm directory  - Dan
- - Style, indentation & better error messages in patch 2 - DavidH
- - Added MST's ack in patch 2.
-
-Changes from PATCH v7: [2]
- - Corrected pending request queue logic (patch 2) - Jakub Staro=C5=84
- - Used unsigned long flags for passing DAXDEV_F_SYNC (patch 3) - Dan
- - Fixed typo =3D>  vma 'flag' to 'vm_flag' (patch 4)
- - Added rob in patch 6 & patch 2
-
-Changes from PATCH v6:=20
- - Corrected comment format in patch 5 & patch 6. [Dave]
- - Changed variable declaration indentation in patch 6 [Darrick]
- - Add Reviewed-by tag by 'Jan Kara' in patch 4 & patch 5
-
-Changes from PATCH v5:=20
-  Changes suggested in by - [Cornelia, Yuval]
-- Remove assignment chaining in virtio driver
-- Better error message and remove not required free
-- Check nd_region before use
-
-  Changes suggested by - [Jan Kara]
-- dax_synchronous() for !CONFIG_DAX
-- Correct 'daxdev_mapping_supported' comment and non-dax implementation
-
-  Changes suggested by - [Dan Williams]
-- Pass meaningful flag 'DAXDEV_F_SYNC' to alloc_dax
-- Gate nvdimm_flush instead of additional async parameter
-- Move block chaining logic to flush callback than common nvdimm_flush
-- Use NULL flush callback for generic flush for better readability [Dan, =
-Jan]
-
-- Use virtio device id 27 from 25(already used) - [MST]
-
-Changes from PATCH v4:
-- Factor out MAP_SYNC supported functionality to a common helper
-				[Dave, Darrick, Jan]
-- Comment, indentation and virtqueue_kick failure handle - Yuval Shaia
-
-Changes from PATCH v3:=20
-- Use generic dax_synchronous() helper to check for DAXDEV_SYNC=20
-  flag - [Dan, Darrick, Jan]
-- Add 'is_nvdimm_async' function
-- Document page cache side channel attacks implications &=20
-  countermeasures - [Dave Chinner, Michael]
-
-Changes from PATCH v2:=20
-- Disable MAP_SYNC for ext4 & XFS filesystems - [Dan]=20
-- Use name 'virtio pmem' in place of 'fake dax'=20
-
-Changes from PATCH v1:=20
-- 0-day build test for build dependency on libnvdimm=20
-
- Changes suggested by - [Dan Williams]
-- Split the driver into two parts virtio & pmem =20
-- Move queuing of async block request to block layer
-- Add "sync" parameter in nvdimm_flush function
-- Use indirect call for nvdimm_flush
-- Don=E2=80=99t move declarations to common global header e.g nd.h
-- nvdimm_flush() return 0 or -EIO if it fails
-- Teach nsio_rw_bytes() that the flush can fail
-- Rename nvdimm_flush() to generic_nvdimm_flush()
-- Use 'nd_region->provider_data' for long dereferencing
-- Remove virtio_pmem_freeze/restore functions
-- Remove BSD license text with SPDX license text
-
-- Add might_sleep() in virtio_pmem_flush - [Luiz]
-- Make spin_lock_irqsave() narrow
-
-Pankaj Gupta (7):
-   libnvdimm: nd_region flush callback support
-   virtio-pmem: Add virtio-pmem guest driver
-   libnvdimm: add nd_region buffered dax_dev flag
-   dax: check synchronous mapping is supported
-   dm: dm: Enable synchronous dax
-   ext4: disable map_sync for virtio pmem
-   xfs: disable map_sync for virtio pmem
-
-[1] https://lkml.org/lkml/2019/5/10/447
-[2] https://lkml.org/lkml/2019/4/26/36
-[3] https://www.spinics.net/lists/kvm/msg149761.html
-[4] https://www.spinics.net/lists/kvm/msg153095.html =20
-[5] https://lkml.org/lkml/2018/8/31/413
-[6] https://marc.info/?l=3Dlinux-kernel&m=3D153572228719237&w=3D2=20
-[7] https://marc.info/?l=3Dqemu-devel&m=3D153555721901824&w=3D2
-[8] https://lists.oasis-open.org/archives/virtio-dev/201903/msg00083.html
-[9] https://lkml.org/lkml/2019/1/9/1191
-
- drivers/acpi/nfit/core.c         |    4 -
- drivers/dax/bus.c                |    2=20
- drivers/dax/super.c              |   19 +++++
- drivers/md/dm-table.c            |   14 ++++
- drivers/md/dm.c                  |    3=20
- drivers/nvdimm/Makefile          |    1=20
- drivers/nvdimm/claim.c           |    6 +
- drivers/nvdimm/nd.h              |    1=20
- drivers/nvdimm/nd_virtio.c       |  126 ++++++++++++++++++++++++++++++++=
-+++++++
- drivers/nvdimm/pmem.c            |   18 +++--
- drivers/nvdimm/region_devs.c     |   33 +++++++++-
- drivers/nvdimm/virtio_pmem.c     |  122 ++++++++++++++++++++++++++++++++=
-+++++
- drivers/nvdimm/virtio_pmem.h     |   60 ++++++++++++++++++
- drivers/virtio/Kconfig           |   11 +++
- fs/ext4/file.c                   |   10 +--
- fs/xfs/xfs_file.c                |    9 +-
- include/linux/dax.h              |   26 +++++++-
- include/linux/libnvdimm.h        |    9 ++
- include/uapi/linux/virtio_ids.h  |    1=20
- include/uapi/linux/virtio_pmem.h |   10 +++
- 20 files changed, 460 insertions(+), 25 deletions(-)
 
