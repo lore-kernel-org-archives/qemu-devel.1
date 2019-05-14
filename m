@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DEB3C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 21:52:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81622C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 21:53:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B43520879
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 21:52:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B43520879
+	by mail.kernel.org (Postfix) with ESMTPS id 41B9720873
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 21:53:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41B9720873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55302 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55334 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQfL5-0005Cu-D5
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 17:51:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51591)
+	id 1hQfMT-0005yk-J3
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 17:53:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hQfK7-0004lL-Fp
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 17:51:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1hQfLY-0005Xe-9I
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 17:52:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hQfK6-0005Lb-8B
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 17:50:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56096)
+	(envelope-from <eblake@redhat.com>) id 1hQfLW-0006QU-Jg
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 17:52:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:3859)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hQfJz-0005Fy-LZ; Tue, 14 May 2019 17:50:53 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	id 1hQfLT-0006Ij-71; Tue, 14 May 2019 17:52:23 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B8653308FED4;
-	Tue, 14 May 2019 21:50:49 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 74F86301899D;
+	Tue, 14 May 2019 21:52:22 +0000 (UTC)
 Received: from [10.3.116.43] (ovpn-116-43.phx2.redhat.com [10.3.116.43])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C2501001E67;
-	Tue, 14 May 2019 21:50:40 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C515719C7E;
+	Tue, 14 May 2019 21:52:21 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20190514214230.22601-1-mreitz@redhat.com>
-	<20190514214230.22601-2-mreitz@redhat.com>
+	<20190514214230.22601-3-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,24 +70,24 @@ Autocrypt: addr=eblake@redhat.com; keydata=
 	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
 	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <88ab9614-e1ec-650f-8834-4a906768aedb@redhat.com>
-Date: Tue, 14 May 2019 16:50:39 -0500
+Message-ID: <37e9abea-d7f8-9ea8-d584-4de345257376@redhat.com>
+Date: Tue, 14 May 2019 16:52:20 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190514214230.22601-2-mreitz@redhat.com>
+In-Reply-To: <20190514214230.22601-3-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="wvHelhw4PiKCjPM2sbVXIUGhjhEl9fFaY"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+	boundary="elFsbVhpz9Qy1oaTYRHORu5V3KjJUPZkC"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Tue, 14 May 2019 21:50:49 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.47]);
+	Tue, 14 May 2019 21:52:22 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 1/2] block/file-posix: Unaligned O_DIRECT
- block-status
+Subject: Re: [Qemu-devel] [PATCH 2/2] iotests: Test unaligned raw images
+ with O_DIRECT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -106,131 +106,201 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wvHelhw4PiKCjPM2sbVXIUGhjhEl9fFaY
+--elFsbVhpz9Qy1oaTYRHORu5V3KjJUPZkC
 From: Eric Blake <eblake@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
  qemu-stable@nongnu.org
-Message-ID: <88ab9614-e1ec-650f-8834-4a906768aedb@redhat.com>
-Subject: Re: [PATCH 1/2] block/file-posix: Unaligned O_DIRECT block-status
+Message-ID: <37e9abea-d7f8-9ea8-d584-4de345257376@redhat.com>
+Subject: Re: [PATCH 2/2] iotests: Test unaligned raw images with O_DIRECT
 References: <20190514214230.22601-1-mreitz@redhat.com>
- <20190514214230.22601-2-mreitz@redhat.com>
-In-Reply-To: <20190514214230.22601-2-mreitz@redhat.com>
+ <20190514214230.22601-3-mreitz@redhat.com>
+In-Reply-To: <20190514214230.22601-3-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 5/14/19 4:42 PM, Max Reitz wrote:
-> Currently, qemu crashes whenever someone queries the block status of an=
-
-> unaligned image tail of an O_DIRECT image:
-> $ echo > foo
-> $ qemu-img map --image-opts driver=3Dfile,filename=3Dfoo,cache.direct=3D=
-on
-> Offset          Length          Mapped to       File
-> qemu-img: block/io.c:2093: bdrv_co_block_status: Assertion `*pnum &&
-> QEMU_IS_ALIGNED(*pnum, align) && align > offset - aligned_offset'
-> failed.
+> We already have 221 for accesses through the page cache, but it is
+> better to create a new file for O_DIRECT instead of integrating those
+> test cases into 221.  This way, we can make use of
+> _supported_cache_modes (and _default_cache_mode) so the test is
+> automatically skipped on filesystems that do not support O_DIRECT.
 >=20
-> This is because bdrv_co_block_status() checks that the result returned
-> by the driver's implementation is aligned to the request_alignment, but=
+> As part of the split, add _supported_cache_modes to 221.  With that, it=
 
-> file-posix can fail to do so, which is actually mentioned in a comment
-> there: "[...] possibly including a partial sector at EOF".
+> no longer fails when run with -c none or -c directsync.
 >=20
-> Fix this by rounding up those partial sectors.
->=20
-> There are two possible alternative fixes:
-> (1) We could refuse to open unaligned image files with O_DIRECT
->     altogether.  That sounds reasonable until you realize that qcow2
->     does necessarily not fill up its metadata clusters, and that nobody=
-
->     runs qemu-img create with O_DIRECT.  Therefore, unpreallocated qcow=
-2
->     files usually have an unaligned image tail.
-
-Yep, non-starter.
-
->=20
-> (2) bdrv_co_block_status() could ignore unaligned tails.  It actually
->     throws away everything past the EOF already, so that sounds
->     reasonable.
->     Unfortunately, the block layer knows file lengths only with a
->     granularity of BDRV_SECTOR_SIZE, so bdrv_co_block_status() usually
->     would have to guess whether its file length information is inexact
->     or whether the driver is broken.
-
-Well, if I ever get around to my thread of making the block layer honor
-byte-accurate sizes, instead of rounding up, then there is no longer
-than inexactness. I think our mails crossed, and you missed another idea
-of mine of having block drivers (probably only file-posix, per your
-audit) set BDRV_BLOCK_EOF when returning an unaligned answer due to EOF,
-as the key for letting the block layer know whether the unaligned answer
-was due to size rounding.
-
->=20
-> Fixing what raw_co_block_status() returns is the safest thing to do.
-
-Agree.
-
->=20
-> There seems to be no other block driver that sets request_alignment and=
-
-> does not make sure that it always returns aligned values.
-
-Thanks for auditing.
-
->=20
-> Cc: qemu-stable@nongnu.org
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  block/file-posix.c | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
->=20
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index e09e15bbf8..f489a5420c 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -2488,6 +2488,9 @@ static int coroutine_fn raw_co_block_status(Block=
-DriverState *bs,
->      off_t data =3D 0, hole =3D 0;
->      int ret;
-> =20
-> +    assert(QEMU_IS_ALIGNED(offset, bs->bl.request_alignment) &&
-> +           QEMU_IS_ALIGNED(bytes, bs->bl.request_alignment));
-> +
+>  tests/qemu-iotests/221     |  4 ++
+>  tests/qemu-iotests/253     | 84 ++++++++++++++++++++++++++++++++++++++=
 
-Can write in one line as:
-
-assert(QEMU_IS_ALIGNED(offset | bytes, bs->bl.request_alignment));
-
->      ret =3D fd_open(bs);
->      if (ret < 0) {
->          return ret;
-> @@ -2513,6 +2516,20 @@ static int coroutine_fn raw_co_block_status(Bloc=
-kDriverState *bs,
->          /* On a data extent, compute bytes to the end of the extent,
->           * possibly including a partial sector at EOF. */
->          *pnum =3D MIN(bytes, hole - offset);
-> +
-> +        /*
-> +         * We are not allowed to return partial sectors, though, so
-> +         * round up if necessary.
-> +         */
-> +        if (!QEMU_IS_ALIGNED(*pnum, bs->bl.request_alignment)) {
-> +            int64_t file_length =3D raw_getlength(bs);
-> +            if (file_length > 0) {
-> +                /* Ignore errors, this is just a safeguard */
-> +                assert(hole =3D=3D file_length);
-> +            }
-> +            *pnum =3D ROUND_UP(*pnum, bs->bl.request_alignment);
-> +        }
+>  tests/qemu-iotests/253.out | 14 +++++++
+>  tests/qemu-iotests/group   |  1 +
+>  4 files changed, 103 insertions(+)
+>  create mode 100755 tests/qemu-iotests/253
+>  create mode 100644 tests/qemu-iotests/253.out
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
-bl.request_alignment is normally 1 (making this a no-op), but is
-definitely larger for O_DIRECT images (where rounding up and treating
-the post-EOF hole the same as the rest of the sector is the same thing
-that NBD chose to do).
+>=20
+> diff --git a/tests/qemu-iotests/221 b/tests/qemu-iotests/221
+> index 25dd47bcfe..0e9096fec7 100755
+> --- a/tests/qemu-iotests/221
+> +++ b/tests/qemu-iotests/221
+> @@ -1,6 +1,7 @@
+>  #!/usr/bin/env bash
+>  #
+>  # Test qemu-img vs. unaligned images
+> +# (See also 253, which is the O_DIRECT version)
+>  #
+>  # Copyright (C) 2018-2019 Red Hat, Inc.
+>  #
+> @@ -37,6 +38,9 @@ _supported_fmt raw
+>  _supported_proto file
+>  _supported_os Linux
+> =20
+> +_default_cache_mode writeback
+> +_supported_cache_modes writeback writethrough unsafe
+> +
+>  echo
+>  echo "=3D=3D=3D Check mapping of unaligned raw image =3D=3D=3D"
+>  echo
+> diff --git a/tests/qemu-iotests/253 b/tests/qemu-iotests/253
+> new file mode 100755
+> index 0000000000..d88d5afa45
+> --- /dev/null
+> +++ b/tests/qemu-iotests/253
+> @@ -0,0 +1,84 @@
+> +#!/usr/bin/env bash
+> +#
+> +# Test qemu-img vs. unaligned images; O_DIRECT version
+> +# (Originates from 221)
+> +#
+> +# Copyright (C) 2019 Red Hat, Inc.
+> +#
+> +# This program is free software; you can redistribute it and/or modify=
+
+> +# it under the terms of the GNU General Public License as published by=
+
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>=
+=2E
+> +#
+> +
+> +seq=3D"$(basename $0)"
+> +echo "QA output created by $seq"
+> +
+> +status=3D1 # failure is the default!
+> +
+> +_cleanup()
+> +{
+> +    _cleanup_test_img
+> +}
+> +trap "_cleanup; exit \$status" 0 1 2 3 15
+> +
+> +# get standard environment, filters and checks
+> +. ./common.rc
+> +. ./common.filter
+> +
+> +_supported_fmt raw
+> +_supported_proto file
+> +_supported_os Linux
+> +
+> +_default_cache_mode none
+> +_supported_cache_modes none directsync
+> +
+> +echo
+> +echo "=3D=3D=3D Check mapping of unaligned raw image =3D=3D=3D"
+> +echo
+> +
+> +# We do not know how large a physical sector is, but it is certainly
+> +# going to be a factor of 1 MB
+> +size=3D$((1 * 1024 * 1024 - 1))
+> +
+> +# qemu-img create rounds size up to BDRV_SECTOR_SIZE
+> +_make_test_img $size
+> +$QEMU_IMG map --output=3Djson --image-opts \
+> +    "driver=3D$IMGFMT,file.driver=3Dfile,file.filename=3D$TEST_IMG,cac=
+he.direct=3Don" \
+> +    | _filter_qemu_img_map
+> +
+> +# so we resize it and check again
+> +truncate --size=3D$size "$TEST_IMG"
+> +$QEMU_IMG map --output=3Djson --image-opts \
+> +    "driver=3D$IMGFMT,file.driver=3Dfile,file.filename=3D$TEST_IMG,cac=
+he.direct=3Don" \
+> +    | _filter_qemu_img_map
+> +
+> +# qemu-io with O_DIRECT always writes whole physical sectors.  Again,
+> +# we do not know how large a physical sector is, so we just start
+> +# writing from a 64 kB boundary, which should always be aligned.
+> +offset=3D$((1 * 1024 * 1024 - 64 * 1024))
+> +$QEMU_IO -c "w $offset $((size - offset))" "$TEST_IMG" | _filter_qemu_=
+io
+> +$QEMU_IMG map --output=3Djson --image-opts \
+> +    "driver=3D$IMGFMT,file.driver=3Dfile,file.filename=3D$TEST_IMG,cac=
+he.direct=3Don" \
+> +    | _filter_qemu_img_map
+> +
+> +# Resize it and check again -- contrary to 221, we may not get partial=
+
+> +# sectors here, so there should be only two areas (one zero, one
+> +# data).
+> +truncate --size=3D$size "$TEST_IMG"
+> +$QEMU_IMG map --output=3Djson --image-opts \
+> +    "driver=3D$IMGFMT,file.driver=3Dfile,file.filename=3D$TEST_IMG,cac=
+he.direct=3Don" \
+> +    | _filter_qemu_img_map
+> +
+> +# success, all done
+> +echo '*** done'
+> +rm -f $seq.full
+> +status=3D0
+> diff --git a/tests/qemu-iotests/253.out b/tests/qemu-iotests/253.out
+> new file mode 100644
+> index 0000000000..607c0baa0b
+> --- /dev/null
+> +++ b/tests/qemu-iotests/253.out
+> @@ -0,0 +1,14 @@
+> +QA output created by 253
+> +
+> +=3D=3D=3D Check mapping of unaligned raw image =3D=3D=3D
+> +
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048575
+> +[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": fa=
+lse, "offset": OFFSET}]
+> +[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": fa=
+lse, "offset": OFFSET}]
+> +wrote 65535/65535 bytes at offset 983040
+> +63.999 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +[{ "start": 0, "length": 983040, "depth": 0, "zero": true, "data": fal=
+se, "offset": OFFSET},
+> +{ "start": 983040, "length": 65536, "depth": 0, "zero": false, "data":=
+ true, "offset": OFFSET}]
+> +[{ "start": 0, "length": 983040, "depth": 0, "zero": true, "data": fal=
+se, "offset": OFFSET},
+> +{ "start": 983040, "length": 65536, "depth": 0, "zero": false, "data":=
+ true, "offset": OFFSET}]
+> +*** done
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index 00e474ab0a..52b7c16e15 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -250,3 +250,4 @@
+>  248 rw auto quick
+>  249 rw auto quick
+>  252 rw auto backing quick
+> +253 rw auto quick
+>=20
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -238,22 +308,22 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---wvHelhw4PiKCjPM2sbVXIUGhjhEl9fFaY
+--elFsbVhpz9Qy1oaTYRHORu5V3KjJUPZkC
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzbOC8ACgkQp6FrSiUn
-Q2oOJQf6A6mIaz+Ca8ufpHWA+l4HsmYAqtvbsngFOD825+SvYRb7I+OdDuEt01H1
-4M9OA7bGN86MHal3GiVipa3fZwqrcVacvlhuK8XItHsO1qMbw/agOHmjFJeYxQMr
-V6WkUYBMdMRcrVvb+4kTRaPhgDsNqHfefYG1wuNqYQwBH6VcUPcpXkiCBRaBCpg0
-Ymse4Bybse6T24udPpcb77cSxe4hmKVLi3nqFIDLNt5rDVdcefMXYZeHeF1lQCrY
-baVbUwYVVJESf8k2uFEaSFIedzBGvyuyl/d2K2tCifKBoRQjOhC7X2ve+KGyB7G3
-AQeeVyuPN32zTBvdaSgFy/FVA5ndfg==
-=Gtms
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzbOJUACgkQp6FrSiUn
+Q2q6EwgAp9NpVbs53RO50nEA6HnMoBbn7s/2m9q+QnxBwRNXm3Td5gbsbUqgVp6q
+1PikFShMKoN5CsLofCABFb/sNBVB9+mnwMiN6d0NgSntpFSBxWthqmuGZLzOGj+y
+R2gdzmq2S+ZlKYj6c8FRIcnCHsLzzg+rsv4TQW2LUAZ4/QygIOq42wn2v21CklaN
+PYd6dfIEXpo/PtPpabfdar5cUwaTbGC5+RvSFKcSHK3SnlCqaY4c8Q2wb+Jbfk1a
+V2odFL3AFm7MaueVtnrvBcC2ku2zsVQo2uTwFnz7zF37aEyJ4xB55JRhw4q8ESAH
+yG95EOFUgAHWJdw79wctnf2MGigwCw==
+=KBrz
 -----END PGP SIGNATURE-----
 
---wvHelhw4PiKCjPM2sbVXIUGhjhEl9fFaY--
+--elFsbVhpz9Qy1oaTYRHORu5V3KjJUPZkC--
 
