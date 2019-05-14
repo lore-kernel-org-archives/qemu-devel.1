@@ -2,108 +2,88 @@ Return-Path: <SRS0=VR7F=TO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49860C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 05:07:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC964C04AB4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 05:23:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DAC020843
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 05:07:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DAC020843
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5E93F2086A
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 May 2019 05:23:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="leTqu8/D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E93F2086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39296 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39452 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQPfF-0002cl-5e
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 01:07:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52574)
+	id 1hQPup-00059Z-IS
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 01:23:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hQPeK-0002GC-DS
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 01:06:49 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hQPty-0004qr-Gc
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 01:22:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hQPeG-0005rF-MN
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 01:06:46 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49838)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
-	id 1hQPeB-0005Hw-QL
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 01:06:44 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4E53KBw045137
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 01:06:26 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2sfjwjg9cx-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 01:06:26 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
-	Tue, 14 May 2019 06:06:24 +0100
-Received: from b01cxnp22034.gho.pok.ibm.com (9.57.198.24)
-	by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Tue, 14 May 2019 06:06:21 +0100
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
-	[9.57.199.110])
-	by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	x4E56K8v29098010
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Tue, 14 May 2019 05:06:20 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C63D1AE068;
-	Tue, 14 May 2019 05:06:20 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BD698AE062;
-	Tue, 14 May 2019 05:06:18 +0000 (GMT)
-Received: from [9.199.60.51] (unknown [9.199.60.51])
-	by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-	Tue, 14 May 2019 05:06:18 +0000 (GMT)
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <155591636364.20338.844048953355207313.stgit@aravinda>
-	<155591660602.20338.9804738040071843715.stgit@aravinda>
-	<20190513133053.4d900d4a@bahia.lan>
-	<20190514000819.GA6441@umbus.fritz.box>
-	<9eb7a5a6-a018-d08a-4556-26da0b6cc3ca@linux.vnet.ibm.com>
-	<20190514044005.GH6441@umbus.fritz.box>
-From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Date: Tue, 14 May 2019 10:36:17 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.6.0
+	(envelope-from <richard.henderson@linaro.org>) id 1hQPtx-0004gS-CO
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 01:22:58 -0400
+Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:45078)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hQKxP-0003Sy-Pj
+	for qemu-devel@nongnu.org; Mon, 13 May 2019 20:06:11 -0400
+Received: by mail-pl1-x62a.google.com with SMTP id a5so7254651pls.12
+	for <qemu-devel@nongnu.org>; Mon, 13 May 2019 17:06:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=oB7VP5ATUZChOLMjOlpdWPN1IctJhwYBQQIlaCDVjkw=;
+	b=leTqu8/DI8MzpUWoAYnCi1Qr4rR0BtDqbXChthla/WcLLjap3YjbdF7QbYqfwoH8mf
+	OCpU21DvuZ4xwPpdaQ/828EJApuw5wCc24hYWqBVyGt7CzTIs1j+aexFQw1mi7zSzrrJ
+	WrkBSpMNrEtXHbKRVwZvxHJ/QpvKSJazzGrMd9yTHNUQMaA6e+5oc1/3C63NaGY99z6s
+	Gy1zHDznTt+2ZUwE6s047lMidadP5Ub1DEMwK/hFLfzmXIk14YEYhRlXTtHXqVsh6lML
+	gBKZjeEIfbL4tc3yiwk6WiSJtcqkJShKrdLrwa2giPTtetY6W8S4DAfowveoF3cjXMZV
+	U+nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=oB7VP5ATUZChOLMjOlpdWPN1IctJhwYBQQIlaCDVjkw=;
+	b=LmNfyC63gaR117mb/xxd1goLICmA92PJE/zLK+/Oo9hqir8nRjq3oL9gp4XFeQl0u/
+	GGm/jAwIcRPIu5eB4wfdmEhwnTZ9C6gXlIkHiJEuerdLMWsBxxYCrS5+HX8vwbJ89t55
+	5/2uGYLEvew2Ly+itK+KO7y9fZB76zrmk7BSptfRorMQyyEiIcbLrxmSrw6WDOl6w/Lj
+	iCn/F8mUw4TpYLGK2uElCHZSDPEh/T4vHQ83vuYb3SQNORiZH7ua9lgbXa4/gpRxxyXF
+	8+9TxLnOQ4tNRa5kWD0PnfhaJPKYLHDDwmagKjhddJH4D49OP+cqjQmxrl9xPw2S5o6Y
+	4vgg==
+X-Gm-Message-State: APjAAAUPxFz/G+80Q8T4uZwu1IpzSe4+RI7bOhe57a+6ProCuA6gkRWb
+	ZLdwBk1orz1wFPRdju1dU3pmip0iqak=
+X-Google-Smtp-Source: APXvYqwDQhebWUDaVLM/bY2S9m8bNX2yc9Lj/TMZ5v9ekYGQuugEPq6EKvE9zy/bYNE0MEfenAzV7w==
+X-Received: by 2002:a17:902:e785:: with SMTP id
+	cp5mr15743115plb.167.1557792369502; 
+	Mon, 13 May 2019 17:06:09 -0700 (PDT)
+Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
+	[97.113.13.231])
+	by smtp.gmail.com with ESMTPSA id u3sm238151pfn.29.2019.05.13.17.06.08
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 13 May 2019 17:06:08 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Mon, 13 May 2019 17:05:29 -0700
+Message-Id: <20190514000540.4313-21-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190514000540.4313-1-richard.henderson@linaro.org>
+References: <20190514000540.4313-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190514044005.GH6441@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19051405-0052-0000-0000-000003BEED9A
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011095; HX=3.00000242; KW=3.00000007;
-	PH=3.00000004; SC=3.00000285; SDB=6.01203036; UDB=6.00631444;
-	IPR=6.00983959; 
-	MB=3.00026878; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-14 05:06:23
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051405-0053-0000-0000-000060E37FD2
-Message-Id: <2cc48944-4ad7-6fd6-7d59-f041339fc6ec@linux.vnet.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-14_02:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1905140035
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v8 4/6] target/ppc: Build rtas
- error log upon an MCE
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::62a
+Subject: [Qemu-devel] [PULL 20/31] tcg: Add support for integer absolute
+ value
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -115,92 +95,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@au1.ibm.com, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
-	paulus@ozlabs.org, qemu-ppc@nongnu.org
+Cc: peter.maydell@linux.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Remove a function of the same name from target/arm/.
+Use a branchless implementation of abs gleaned from gcc.
 
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tcg/tcg-op.h           |  5 +++++
+ target/arm/translate.c | 10 ----------
+ tcg/tcg-op.c           | 20 ++++++++++++++++++++
+ 3 files changed, 25 insertions(+), 10 deletions(-)
 
-On Tuesday 14 May 2019 10:10 AM, David Gibson wrote:
-> On Tue, May 14, 2019 at 09:56:41AM +0530, Aravinda Prasad wrote:
->>
->>
->> On Tuesday 14 May 2019 05:38 AM, David Gibson wrote:
->>> On Mon, May 13, 2019 at 01:30:53PM +0200, Greg Kurz wrote:
->>>> On Mon, 22 Apr 2019 12:33:26 +0530
->>>> Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
->>>>
->>>>> Upon a machine check exception (MCE) in a guest address space,
->>>>> KVM causes a guest exit to enable QEMU to build and pass the
->>>>> error to the guest in the PAPR defined rtas error log format.
->>>>>
->>>>> This patch builds the rtas error log, copies it to the rtas_addr
->>>>> and then invokes the guest registered machine check handler. The
->>>>> handler in the guest takes suitable action(s) depending on the type
->>>>> and criticality of the error. For example, if an error is
->>>>> unrecoverable memory corruption in an application inside the
->>>>> guest, then the guest kernel sends a SIGBUS to the application.
->>>>> For recoverable errors, the guest performs recovery actions and
->>>>> logs the error.
->>>>>
->>>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
->>>>> ---
->>>>>  hw/ppc/spapr.c         |    4 +
->>>>>  hw/ppc/spapr_events.c  |  245 ++++++++++++++++++++++++++++++++++++++++++++++++
->>>>>  include/hw/ppc/spapr.h |    4 +
->>>>>  3 files changed, 253 insertions(+)
->>>>>
->>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->>>>> index 2779efe..ffd1715 100644
->>>>> --- a/hw/ppc/spapr.c
->>>>> +++ b/hw/ppc/spapr.c
->>>>> @@ -2918,6 +2918,10 @@ static void spapr_machine_init(MachineState *machine)
->>>>>          error_report("Could not get size of LPAR rtas '%s'", filename);
->>>>>          exit(1);
->>>>>      }
->>>>> +
->>>>> +    /* Resize blob to accommodate error log. */
->>>>> +    spapr->rtas_size = spapr_get_rtas_size(spapr->rtas_size);
->>>>> +
->>>>
->>>> This is the only user for spapr_get_rtas_size(), which is trivial.
->>>> I suggest you simply open-code it here.
->>>
->>> I agree.
->>
->> Sure.
->>
->>>
->>>> But also, spapr->rtas_size is a guest visible thing, "rtas-size" prop in the
->>>> DT. Since existing machine types don't do that, I guess we should only use
->>>> the new size if cap-fwnmi-mce=on for the sake of compatibility.
->>>
->>> Yes, that's a good idea.  Changing this is very unlikely to break a
->>> guest, but it's easy to be safe here so let's do it.
->>
->> I did it like that because the rtas_blob is allocated based on rtas_size
->> in spapr_machine_init(). During spapr_machine_init() it is not know if
->> the guest calls "ibm, nmi-register". So if we want to use the new size
->> only when cap_fwnmi=on, then we have to realloc the blob in "ibm,
->> nmi-register".
-> 
-> What?  Just always allocate the necessary space in
-> spapr_machine_init() if cap_fwnmi=on, it'll be wasted if
-> ibm,nmi-register is never called, but it's not that much space so we
-> don't really care.
-
-Yes, not that much space, and ibm,nmi-register is called when the Linux
-kernel boots. I guess, even though other OSes might not call
-ibm,nmi-register, they do not constitute significant QEMU on Power users.
-
-So I think, I will keep the code as is.
-
-> 
-
+diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+index 472b73cb38..660fe205d0 100644
+--- a/tcg/tcg-op.h
++++ b/tcg/tcg-op.h
+@@ -335,6 +335,7 @@ void tcg_gen_smin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
+ void tcg_gen_smax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
+ void tcg_gen_umin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
+ void tcg_gen_umax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
++void tcg_gen_abs_i32(TCGv_i32, TCGv_i32);
+ 
+ static inline void tcg_gen_discard_i32(TCGv_i32 arg)
+ {
+@@ -534,6 +535,7 @@ void tcg_gen_smin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
+ void tcg_gen_smax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
+ void tcg_gen_umin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
+ void tcg_gen_umax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
++void tcg_gen_abs_i64(TCGv_i64, TCGv_i64);
+ 
+ #if TCG_TARGET_REG_BITS == 64
+ static inline void tcg_gen_discard_i64(TCGv_i64 arg)
+@@ -973,6 +975,7 @@ void tcg_gen_nor_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+ void tcg_gen_eqv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+ void tcg_gen_not_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
+ void tcg_gen_neg_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
++void tcg_gen_abs_vec(unsigned vece, TCGv_vec r, TCGv_vec a);
+ void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+ void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+ void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
+@@ -1019,6 +1022,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
+ #define tcg_gen_addi_tl tcg_gen_addi_i64
+ #define tcg_gen_sub_tl tcg_gen_sub_i64
+ #define tcg_gen_neg_tl tcg_gen_neg_i64
++#define tcg_gen_abs_tl tcg_gen_abs_i64
+ #define tcg_gen_subfi_tl tcg_gen_subfi_i64
+ #define tcg_gen_subi_tl tcg_gen_subi_i64
+ #define tcg_gen_and_tl tcg_gen_and_i64
+@@ -1131,6 +1135,7 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
+ #define tcg_gen_addi_tl tcg_gen_addi_i32
+ #define tcg_gen_sub_tl tcg_gen_sub_i32
+ #define tcg_gen_neg_tl tcg_gen_neg_i32
++#define tcg_gen_abs_tl tcg_gen_abs_i32
+ #define tcg_gen_subfi_tl tcg_gen_subfi_i32
+ #define tcg_gen_subi_tl tcg_gen_subi_i32
+ #define tcg_gen_and_tl tcg_gen_and_i32
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 35bd426a3d..b25781554f 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -604,16 +604,6 @@ static void gen_sar(TCGv_i32 dest, TCGv_i32 t0, TCGv_i32 t1)
+     tcg_temp_free_i32(tmp1);
+ }
+ 
+-static void tcg_gen_abs_i32(TCGv_i32 dest, TCGv_i32 src)
+-{
+-    TCGv_i32 c0 = tcg_const_i32(0);
+-    TCGv_i32 tmp = tcg_temp_new_i32();
+-    tcg_gen_neg_i32(tmp, src);
+-    tcg_gen_movcond_i32(TCG_COND_GT, dest, src, c0, src, tmp);
+-    tcg_temp_free_i32(c0);
+-    tcg_temp_free_i32(tmp);
+-}
+-
+ static void shifter_out_im(TCGv_i32 var, int shift)
+ {
+     if (shift == 0) {
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index a00d1df37e..0ac291f1c4 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -1091,6 +1091,16 @@ void tcg_gen_umax_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
+     tcg_gen_movcond_i32(TCG_COND_LTU, ret, a, b, b, a);
+ }
+ 
++void tcg_gen_abs_i32(TCGv_i32 ret, TCGv_i32 a)
++{
++    TCGv_i32 t = tcg_temp_new_i32();
++
++    tcg_gen_sari_i32(t, a, 31);
++    tcg_gen_xor_i32(ret, a, t);
++    tcg_gen_sub_i32(ret, ret, t);
++    tcg_temp_free_i32(t);
++}
++
+ /* 64-bit ops */
+ 
+ #if TCG_TARGET_REG_BITS == 32
+@@ -2548,6 +2558,16 @@ void tcg_gen_umax_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
+     tcg_gen_movcond_i64(TCG_COND_LTU, ret, a, b, b, a);
+ }
+ 
++void tcg_gen_abs_i64(TCGv_i64 ret, TCGv_i64 a)
++{
++    TCGv_i64 t = tcg_temp_new_i64();
++
++    tcg_gen_sari_i64(t, a, 63);
++    tcg_gen_xor_i64(ret, a, t);
++    tcg_gen_sub_i64(ret, ret, t);
++    tcg_temp_free_i64(t);
++}
++
+ /* Size changing operations.  */
+ 
+ void tcg_gen_extrl_i64_i32(TCGv_i32 ret, TCGv_i64 arg)
 -- 
-Regards,
-Aravinda
+2.17.1
 
 
