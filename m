@@ -6,57 +6,64 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C05A6C04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 12:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB0FFC04E87
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 12:29:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F1F520578
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 12:24:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F1F520578
+	by mail.kernel.org (Postfix) with ESMTPS id 8FCEB2084E
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 12:29:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FCEB2084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36437 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36489 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQsxM-0006PS-Sn
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 08:24:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57978)
+	id 1hQt2L-00082h-Nv
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 08:29:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1hQsq7-0000eG-R6
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:16:56 -0400
+	(envelope-from <armbru@redhat.com>) id 1hQt11-0007N0-Gt
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:28:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1hQsq6-0002xE-N4
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:16:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37340)
+	(envelope-from <armbru@redhat.com>) id 1hQt10-0006Fv-99
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:28:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48418)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hQsq6-0002w5-Fo
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:16:54 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hQt10-0006Aq-0e
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:28:10 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D653BC057EC4
-	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 12:16:53 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-37.ams2.redhat.com
-	[10.36.116.37])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id BCA705C1A3;
-	Wed, 15 May 2019 12:16:49 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 15 May 2019 14:15:44 +0200
-Message-Id: <20190515121544.4597-9-quintela@redhat.com>
-In-Reply-To: <20190515121544.4597-1-quintela@redhat.com>
-References: <20190515121544.4597-1-quintela@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 49E0B37F46
+	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 12:28:08 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
+	[10.36.116.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 16CFE5C236;
+	Wed, 15 May 2019 12:28:07 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 8CB5911385E4; Wed, 15 May 2019 14:28:05 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+References: <20190403114958.3705-1-quintela@redhat.com>
+	<20190403114958.3705-7-quintela@redhat.com>
+	<87tvf8svr3.fsf@dusky.pond.sub.org> <87d0kkj8mx.fsf@trasno.org>
+Date: Wed, 15 May 2019 14:28:05 +0200
+In-Reply-To: <87d0kkj8mx.fsf@trasno.org> (Juan Quintela's message of "Wed, 15
+	May 2019 12:48:38 +0200")
+Message-ID: <87a7fn7vhm.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
+Content-Type: text/plain
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Wed, 15 May 2019 12:16:53 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.29]);
+	Wed, 15 May 2019 12:28:08 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 8/8] multifd: rest of zlib compression
+Subject: Re: [Qemu-devel] [PATCH v2 6/8] migration: Add multifd-compress
+ parameter
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,158 +75,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Juan Quintela <quintela@redhat.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is still a work in progress, but get everything sent as expected
-and it is faster than the code that is already there.
+Juan Quintela <quintela@redhat.com> writes:
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- migration/ram.c | 106 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 104 insertions(+), 2 deletions(-)
+> Markus Armbruster <armbru@redhat.com> wrote:
+>> Juan Quintela <quintela@redhat.com> writes:
+>>
+>>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>>>
+>>> ---
+>>> Rename it to NONE
+>
+>>> @@ -1822,6 +1826,19 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+>>>          p->has_multifd_channels = true;
+>>>          visit_type_int(v, param, &p->multifd_channels, &err);
+>>>          break;
+>>> +    case MIGRATION_PARAMETER_MULTIFD_COMPRESS:
+>>> +        p->has_multifd_compress = true;
+>>> +        visit_type_enum(v, param, &compress_type,
+>>> +                        &MultifdCompress_lookup, &err);
+>>
+>> visit_type_MultifdCompress(), please.
+>
+> done.
+>
+> Interesting that I can
+>
+> #include "qapi/qapi-visit-common.h"
+>
+> but not what I would expect/want:
+>
+> #include "qapi/qapi-visit.h"
 
-diff --git a/migration/ram.c b/migration/ram.c
-index fdb5bf07a5..efbb253c1a 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -747,6 +747,100 @@ MultifdMethods multifd_none_ops =3D {
-     .recv_pages =3D none_recv_pages
- };
-=20
-+/* Multifd zlib compression */
-+
-+static int zlib_send_prepare(MultiFDSendParams *p, uint32_t used)
-+{
-+    struct iovec *iov =3D p->pages->iov;
-+    z_stream *zs =3D &p->zs;
-+    uint32_t out_size =3D 0;
-+    int ret;
-+    int i;
-+
-+    for (i =3D 0; i < used; i++) {
-+        uint32_t available =3D p->zbuff_len - out_size;
-+        int flush =3D Z_NO_FLUSH;
-+
-+        if (i =3D=3D used  - 1) {
-+            flush =3D Z_SYNC_FLUSH;
-+        }
-+
-+        zs->avail_in =3D iov[i].iov_len;
-+        zs->next_in =3D iov[i].iov_base;
-+
-+        zs->avail_out =3D available;
-+        zs->next_out =3D p->zbuff + out_size;
-+
-+        ret =3D deflate(zs, flush);
-+        if (ret !=3D Z_OK) {
-+            printf("problem with deflate? %d\n", ret);
-+            qemu_mutex_unlock(&p->mutex);
-+            return -1;
-+        }
-+        out_size +=3D available - zs->avail_out;
-+    }
-+    p->next_packet_size =3D out_size;
-+
-+    return 0;
-+}
-+
-+static int zlib_send_write(MultiFDSendParams *p, uint32_t used, Error **=
-perr)
-+{
-+    return qio_channel_write_all(p->c, (void *)p->zbuff, p->next_packet_=
-size,
-+                                 perr);
-+}
-+
-+static int zlib_recv_pages(MultiFDRecvParams *p, uint32_t used, Error **=
-perr)
-+{
-+    uint32_t in_size =3D p->next_packet_size;
-+    uint32_t out_size =3D 0;
-+    uint32_t expected_size =3D used * qemu_target_page_size();
-+    z_stream *zs =3D &p->zs;
-+    int ret;
-+    int i;
-+
-+    ret =3D qio_channel_read_all(p->c, (void *)p->zbuff, in_size, perr);
-+
-+    if (ret !=3D 0) {
-+        return ret;
-+    }
-+
-+    zs->avail_in =3D in_size;
-+    zs->next_in =3D p->zbuff;
-+
-+    for (i =3D 0; i < used; i++) {
-+        struct iovec *iov =3D &p->pages->iov[i];
-+        int flush =3D Z_NO_FLUSH;
-+
-+        if (i =3D=3D used  - 1) {
-+            flush =3D Z_SYNC_FLUSH;
-+        }
-+
-+        zs->avail_out =3D iov->iov_len;
-+        zs->next_out =3D iov->iov_base;
-+
-+        ret =3D inflate(zs, flush);
-+        if (ret !=3D Z_OK) {
-+            printf("%d: problem with inflate? %d\n", p->id, ret);
-+            qemu_mutex_unlock(&p->mutex);
-+            return ret;
-+        }
-+        out_size +=3D iov->iov_len;
-+    }
-+    if (out_size !=3D expected_size) {
-+        printf("out size %d expected size %d\n",
-+               out_size, expected_size);
-+        return -1;
-+    }
-+    return 0;
-+}
-+
-+MultifdMethods multifd_zlib_ops =3D {
-+    .send_prepare =3D zlib_send_prepare,
-+    .send_write =3D zlib_send_write,
-+    .recv_pages =3D zlib_recv_pages
-+};
-+
- static int multifd_send_initial_packet(MultiFDSendParams *p, Error **err=
-p)
- {
-     MultiFDInit_t msg;
-@@ -1145,7 +1239,11 @@ static void *multifd_send_thread(void *opaque)
-     /* initial packet */
-     p->num_packets =3D 1;
-=20
--    multifd_send_state->ops =3D &multifd_none_ops;
-+    if (migrate_use_multifd_zlib()) {
-+        multifd_send_state->ops =3D &multifd_zlib_ops;
-+    } else {
-+        multifd_send_state->ops =3D &multifd_none_ops;
-+    }
-=20
-     while (true) {
-         qemu_sem_wait(&p->sem);
-@@ -1399,7 +1497,11 @@ static void *multifd_recv_thread(void *opaque)
-     trace_multifd_recv_thread_start(p->id);
-     rcu_register_thread();
-=20
--    multifd_recv_state->ops =3D &multifd_none_ops;
-+    if (migrate_use_multifd_zlib()) {
-+        multifd_recv_state->ops =3D &multifd_zlib_ops;
-+    } else {
-+        multifd_recv_state->ops =3D &multifd_none_ops;
-+    }
-     while (true) {
-         uint32_t used;
-         uint32_t flags;
---=20
-2.21.0
+I guess you tried to include it into target-independent code, which
+doesn't work since we added target conditionals like
 
+    { 'command': 'rtc-reset-reinjection',
+      'if': 'defined(TARGET_I386)' }
+
+Adding these (merge commit a0430dd8abb) was only possible because the
+code generated from the QAPI schema mirrors the QAPI schema's modular
+structure: just like qapi-schema.json includes its sub-modules such as
+common.json, the generated qapi-visit.h includes the headers generated
+for its sub-modules such as qapi-visit-common.h.  See commit 252dc3105f
+"qapi: Generate separate .h, .c for each module".
+
+The original motivation for this modularization was actually compile
+time.  Before modularization, touching the QAPI schema typically
+recompiled everything using QAPI, which nowadays means pretty much
+everything.  Modularization let me replace "include all generated QAPI
+stuff" by "include just the generated QAPI stuff I actually need", for
+*massive* compile time improvements.
+
+Back to target conditionals.  Right now, we confine them to sub-module
+target.json.  This means the headers generated for this sub-module, such
+as qapi-visit-target.h, can only be included into target-dependent code.
+Since qapi-visit.h includes all sub-modules, it can also only be
+included there.
+
+> Perhaps we should remove
+>
+> #include "qapi-visit-target.h"
+>
+> from there?
+
+No for two reasons:
+
+1. The code generating qapi-visit.h has no idea which sub-modules are
+target-specific.
+
+2. You shouldn't include qapi-visit.h anyway, it's bad for compile time.
+
+> Anyways, independent of this patch.
+
+Yes.
+
+>>> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+>>> index 5da1439a8b..7c8e71532f 100644
+>>> --- a/hw/core/qdev-properties.c
+>>> +++ b/hw/core/qdev-properties.c
+>>> @@ -645,6 +645,17 @@ const PropertyInfo qdev_prop_fdc_drive_type = {
+>>>      .set_default_value = set_default_value_enum,
+>>>  };
+>>>  
+>>> +/* --- MultifdCompress --- */
+>>> +
+>>> +const PropertyInfo qdev_prop_multifd_compress = {
+>>> +    .name = "MultifdCompress",
+>>> +    .description = "multifd_compress values",
+>>
+>> Similar property declarations list the valid values in .description.
+>
+> Fixed, thanks.
+>
+>>>  
+>>> +#define DEFINE_PROP_MULTIFD_COMPRESS(_n, _s, _f, _d) \
+>>> +    DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_multifd_compress, MultifdCompress)
+>>> +
+>>
+>> As long as qdev_prop_multifd_compress is exposed in qdev-properties.h,
+>> hiding the macro using it doesn't make sense to me.
+>
+> Where do you want it to be?  This should only be used here, but if you
+> want it anywhere else, told me where.
+
+Put the declaration of qdev_prop_multifd_compress and the macro in the
+same source file.  Simplest: qdev-properties.h.
+
+>>> +##
+>>> +# @MultifdCompress:
+>>> +#
+>>> +# An enumeration of multifd compression.
+>>> +#
+>>> +# @none: no compression.
+>>> +#
+>>> +# Since: 4.1
+>>> +#
+>>> +##
+>>> +{ 'enum': 'MultifdCompress',
+>>> +  'data': [ 'none' ] }
+>>
+>> Any particular reason for putting this in common.json?  As is, it looks
+>> rather migration-specific to me...
+>
+> Not sure if with new "qapi" compiler it works, it used to be that it
+> failed if you declared an enum anywhere else.  See how I have to put
+> property info into qdev-properties.c instead of any migration file.
+
+You can certainly declare enums anywhere, you just have to make sure to
+include the right headers in the right places, just like for manually
+written enums in C headers.
+
+Rules for modular QAPI schema:
+
+1. If module A uses an entity defined in module B, A must include B
+
+   Example: since migration.json uses MultifdCompress defined in
+   common.json, migration.json must include common.json (it does).
+
+2. No circular includes, ever.
+
+3. Try to avoid cross-module dependencies
+
+   Example: migration.json uses MultifdCompress defined in common.json.
+   This is a cross-module dependency.  Can we avoid it by moving
+   MultifdCompress into migration.json?
+
+   The QAPI schema would be just fine with such a move, but C code using
+   the generated headers might be unhappy, because it now has to include
+   qapi-types-migration.h instead of just qapi-types-common.h.
+
+   My question was: is C code really unhappy?  Please find out and tell
+   me.
 
