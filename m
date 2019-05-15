@@ -2,87 +2,90 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FFCFC04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:24:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAC23C04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:27:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C9F62084F
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:24:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A3C722084F
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:27:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wvp/V7SA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C9F62084F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wih/5+yv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3C722084F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34724 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34781 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQr5c-0003DQ-KF
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 06:24:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37678)
+	id 1hQr88-0004ZT-Ns
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 06:27:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hQr4R-0002cj-Gq
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:23:36 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hQr71-00045A-Nd
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:26:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hQr4Q-0003oJ-GP
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:23:35 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40774)
+	(envelope-from <alex.bennee@linaro.org>) id 1hQr6z-0006U0-Pc
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:26:15 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38920)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hQr4Q-0003mO-9P
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:23:34 -0400
-Received: by mail-wm1-x343.google.com with SMTP id h11so1895789wmb.5
-	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 03:23:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=date:from:to:cc:subject:message-id:references:mime-version
-	:content-disposition:in-reply-to:user-agent;
-	bh=ORlIJW1ZD0nZ9aWk/z/m+9BDPE634oBXKYOP+njEA2M=;
-	b=Wvp/V7SAK+XaS0KEUQqN0tHtfQg4GhZbrkbU30oH9D3yBuiItxmALROpr6BUdv3cFc
-	fJw4qOPw+UtZ0NOEfNQOcrv/6AMwk7eGmNDnXrNVAjMWm/4jJteTE12bnOikWMM/4tyL
-	uOd9MRbzoCzx8kdeL6JgUeM8li7oF+jsN5QVlmaByinCqh3PJDrx/hCvAsJni+77OeiB
-	yRLhSqQccobGnd4VlU5wGHlSrGwGyUqXiqlx50qkPDA02HzRFAvV3LLp3JRzChMPiqRY
-	ELgALLqJMgGfpeGFbyiGRMO3BA68YBxwmHu3a4n6KiQ+Qo0nzxRD13K2cFra/uc1j+r9
-	hGLg==
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hQr6x-0006IO-QS
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:26:13 -0400
+Received: by mail-wr1-x443.google.com with SMTP id w8so2045018wrl.6
+	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 03:26:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=8COhqbaNSo/kEE51ptGZPKJUZy90z07rOi6/SaibSog=;
+	b=wih/5+yv9U5gVGv/UcoGCErjAUxGp7G/IaB4N4petS7t3wusQzAOOcCXXdeCz3fVoN
+	SpG8ZQohBQA7ohNRH0V22uE0C/ciDxHTFtAeVPfnLbWCmG5XUflkzyPHk1ZaH5uq22Sp
+	/f2NrOW759JxxuLc4ge317BA0pjlviEvO4JaJ0qT2ZLf4qUi9/3MCpcTgFTdAKRHsTAz
+	XTPqpQ9rI0BWdTZQDfsw69heubwZ235Z4L0jErwLyk7QtB1sGC5aEenISpPvg+OrbFa5
+	Tb2fg+p2I6IcMgULP9vwGSFaaLRlBQzdnnVaq99Y3SGTT0TLHgd/+j0BQ/+mL4OHqr2K
+	cOxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=ORlIJW1ZD0nZ9aWk/z/m+9BDPE634oBXKYOP+njEA2M=;
-	b=R71Ig8Wee//82NB+jdxfyQrL06yaFbxsNi+wzl9e4KTef65dhnXTF5XRKaQKhvOWZn
-	ehtsnes17oF1DNZ/k9i3bS10K07aCGj9ca0jiYZ0vvyvvWJztpU2X8D7OyI1bEsPZ9ii
-	ZVZAR6p7KzhjI4yKiTZdvvis1kp/ROZmp8ir4GXXao8FAkczV9fF2jdPjG7ISf5vs8L/
-	HTqG5yy9u2fNSvJF0rWi/sk8g+cpwJD9sp6Z4FGN3kRJWC6pI9XsZl7aFnUNGnsdJF/H
-	DEdPusT/xNgkBJyjFTFFghj17hJvt2+2XY1umEOPGBl/t9DBRAYTfQLadiodtzMW/7lh
-	/MFw==
-X-Gm-Message-State: APjAAAX7+3qUtAH+18f8wI/SlPb3a2Sat5O7yPsR9BrDZDjC2Wnkz9rz
-	AwmO4zrvnB+V9SSziklYe/4=
-X-Google-Smtp-Source: APXvYqyC9U/9S2NYRWTUdb/W11hIob9GALohAvHXn+Ut7PiEXLaUCkSPdjMQ3KjvN4x8WP7buaD5ow==
-X-Received: by 2002:a1c:5fc2:: with SMTP id t185mr23189006wmb.95.1557915813322;
-	Wed, 15 May 2019 03:23:33 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
-	by smtp.gmail.com with ESMTPSA id 88sm3612384wrc.33.2019.05.15.03.23.32
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=8COhqbaNSo/kEE51ptGZPKJUZy90z07rOi6/SaibSog=;
+	b=fB5NnIgm68nDlfgpFh3uoak0AIMJI15Nvtg9YQQA6vYjdphK4L3llnjoTlRUdOV4EO
+	bxeTzyLvNDeHEPeChyFFcchfguPnhe3Wo4KIL+74dvbvgcHztDh7VcOoQfjRff0hfGRk
+	noFeUW7hBvB4oTybBLaJK+H3fH0K+eosi8WM2SHCQRKUhOyflLVksmwrrXcUcyrPztxU
+	IKwmuD9iWEGpfb8JZY4sN43UoTCE+buYK1Ke9FHgvXU/3UZmmJ9IwoMwvpRrv1YNsoG+
+	MvZ8rMEqAlAVllyGwKuhYa/rxB/Npl6kdBCL3AZIVPtf5+FjI7O+N0h7+vmUcPFjjYzh
+	D/Jw==
+X-Gm-Message-State: APjAAAXTAz9U0k3GVtAMTE3RSuBq3U/mjkcK3NW4GgGvROaS0106+J+z
+	buwwNinCJqyU6jdv8PTA2AD2BA==
+X-Google-Smtp-Source: APXvYqyRE2bpVqMmX/cKqXcmv/lprUEAdCt+Z9ua+hZMTm/6b/J/+mMD1HGCuOuV3BfoeeL+dq9X6A==
+X-Received: by 2002:adf:f487:: with SMTP id l7mr26184554wro.127.1557915964268; 
+	Wed, 15 May 2019 03:26:04 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id a8sm1797533wmf.33.2019.05.15.03.26.03
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 15 May 2019 03:23:32 -0700 (PDT)
-Date: Wed, 15 May 2019 11:23:31 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Bug 1828508 <1828508@bugs.launchpad.net>
-Message-ID: <20190515102331.GC29507@stefanha-x1.localdomain>
-References: <155746839267.15002.8138674450166661929.malonedeb@wampee.canonical.com>
+	Wed, 15 May 2019 03:26:03 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id EDF611FF87;
+	Wed, 15 May 2019 11:26:02 +0100 (BST)
+References: <20190502081554.5521-1-arilou@gmail.com>
+	<20190502081554.5521-8-arilou@gmail.com>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Jon Doron <arilou@gmail.com>
+In-reply-to: <20190502081554.5521-8-arilou@gmail.com>
+Date: Wed, 15 May 2019 11:26:02 +0100
+Message-ID: <87y338m2th.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="i7F3eY7HS/tUJxUd"
-Content-Disposition: inline
-In-Reply-To: <155746839267.15002.8138674450166661929.malonedeb@wampee.canonical.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: Re: [Qemu-devel] [Bug 1828508] [NEW] qemu-img created VMDK files
- lead to "Unsupported or invalid disk type 7"
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH v9 07/27] gdbstub: Implement insert
+ breakpoint (Z pkt) with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,78 +97,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---i7F3eY7HS/tUJxUd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Jon Doron <arilou@gmail.com> writes:
 
-On Fri, May 10, 2019 at 06:06:32AM -0000, Jake Mikelson wrote:
-> Public bug reported:
->=20
-> Using qemu-img version 3.1.50 (v3.1.0-13607-geb2db0f7ba-dirty) on a
-> Windows 10 machine.
->=20
-> Converting a VHD to VMDK.
-> qemu-img.exe convert "c:\test\AppD-VM01.vhd" -O vmdk -o adapter_type=3Dbu=
-slogic -p "c:\test\AppD-VM01.vmdk"
->=20
-> I have also tried:
-> qemu-img.exe convert "c:\test\AppD-VM01.vhd" -O vmdk -o adapter_type=3Dbu=
-slogic,hwversion=3D6 -p "c:\test\AppD-VM01.vmdk"
->=20
-> Attaching the VMDK to a VM in VMware produces the following error when
-> powering on.
->=20
-> Power On virtual machine:Failed to open disk scsi0:1: Unsupported or inva=
-lid disk type 7. Ensure that the disk has been imported.
-> Target: MyVM1
-> vCenter Server: VCENTER
-> Error Stack
-> An error was received from the ESX host while powering on VM MyVM1.
-> Failed to start the virtual machine.
-> Module DevicePowerOn power on failed.=20
-> Unable to create virtual SCSI device for scsi0:1, '/vmfs/volumes/5cca0155=
--bdddf31d-2714-00215acbeb1e/AppD-VM01/AppDdisk1-VM01.vmdk'=20
-> Failed to open disk scsi0:1: Unsupported or invalid disk type 7. Ensure t=
-hat the disk has been imported.
->=20
->=20
-> If I do not specify the adapter type, it creates an IDE VMDK which works =
-perfectly.
->=20
-> ** Affects: qemu
->      Importance: Undecided
->          Status: New
->=20
-> --=20
-> You received this bug notification because you are a member of qemu-
-> devel-ml, which is subscribed to QEMU.
-> https://bugs.launchpad.net/bugs/1828508
+> Signed-off-by: Jon Doron <arilou@gmail.com>
+> ---
+>  gdbstub.c | 33 +++++++++++++++++++++++++++++++++
+>  1 file changed, 33 insertions(+)
+>
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 21cdaf4678..36c7353a22 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -1588,6 +1588,29 @@ static void handle_set_thread(GdbCmdContext *gdb_c=
+tx, void *user_ctx)
+>      }
+>  }
+>
+> +static void handle_insert_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
+> +{
+> +    int res;
+> +
+> +    if (gdb_ctx->num_params < 3) {
 
-Which version of VMware are you running?
+!=3D 3?
 
-Stefan
+> +        put_packet(gdb_ctx->s, "E22");
+> +        return;
+> +    }
+> +
+> +    res =3D gdb_breakpoint_insert(gdb_ctx->params[1].val_ull,
+> +                                gdb_ctx->params[2].val_ull,
+> +                                gdb_ctx->params[0].val_ul);
 
---i7F3eY7HS/tUJxUd
-Content-Type: application/pgp-signature; name="signature.asc"
+I would be tempted to fix the prototype of gdb_breakpoint_insert to
+match the order of the packet parameters for cleanliness.
 
------BEGIN PGP SIGNATURE-----
+> +    if (res >=3D 0) {
+> +        put_packet(gdb_ctx->s, "OK");
+> +        return;
+> +    } else if (res =3D=3D -ENOSYS) {
+> +        put_packet(gdb_ctx->s, "");
+> +        return;
+> +    }
+> +
+> +    put_packet(gdb_ctx->s, "E22");
+> +}
+> +
+>  static int gdb_handle_packet(GDBState *s, const char *line_buf)
+>  {
+>      CPUState *cpu;
+> @@ -1843,6 +1866,16 @@ static int gdb_handle_packet(GDBState *s, const ch=
+ar *line_buf)
+>          put_packet(s, "OK");
+>          break;
+>      case 'Z':
+> +        {
+> +            static const GdbCmdParseEntry insert_bp_cmd_desc =3D {
+> +                .handler =3D handle_insert_bp,
+> +                .cmd =3D "Z",
+> +                .cmd_startswith =3D 1,
+> +                .schema =3D "l?L?L0"
+> +            };
+> +            cmd_parser =3D &insert_bp_cmd_desc;
+> +        }
+> +        break;
+>      case 'z':
+>          type =3D strtoul(p, (char **)&p, 16);
+>          if (*p =3D=3D ',')
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzb6KMACgkQnKSrs4Gr
-c8hOswf+Nk4HcBAZ5RxLNDt+NlDABcpwPfVb5sVEAkj8LC5oLLjeXZFkph6DrYnX
-y5b+X8YXpygOv8274ExDiQgb+3jtGLX5stTCNYBAkPW3BYMf8cBgSvCXaTG69yPn
-rPIZi0Uw026adxGYupo0kk2I1URLomMaOjAWqhuj9q6/knmT297FqXAdaeahbyqy
-IEPb/j9uGNDkpMGlM8YyLAGRhS41a9u4LzUeaighLbM3bFK4H9xrTc7iM9yTdALQ
-xFCjDdJNCQqhumbm3JcynRxGqJuu9hQpdv9fzzejOi205rVCZK5Kgfq+EL1iaUJl
-HAayyxK5Cc0ZJKU1sIGUV2nW3czHTw==
-=bK94
------END PGP SIGNATURE-----
+You should also delete the:
 
---i7F3eY7HS/tUJxUd--
+        if (ch =3D=3D 'Z')
+            res =3D gdb_breakpoint_insert(addr, len, type);
+case.
+
+In fact I think there is probably a good case just to merge with the
+next patch as the two functions are very much related.
+
+--
+Alex Benn=C3=A9e
 
