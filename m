@@ -2,80 +2,62 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C2F0C04AA7
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 05:45:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3701C04AA7
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 06:18:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFA1A20862
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 05:45:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFA1A20862
+	by mail.kernel.org (Postfix) with ESMTPS id B8E1720862
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 06:18:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8E1720862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59980 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60241 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQmjA-0007OY-W3
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 01:45:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43272)
+	id 1hQnF4-0005VD-B8
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 02:18:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hQmiP-0006u3-6k
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 01:44:34 -0400
+	(envelope-from <peterx@redhat.com>) id 1hQnDt-0004qu-0W
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 02:17:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hQmiN-0005S8-6M
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 01:44:33 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:40276)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hQmiM-0005Mf-VR
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 01:44:31 -0400
-Received: by mail-wm1-f68.google.com with SMTP id h11so1104506wmb.5
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 22:44:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=ufWX82v8bZFc3Q9l5cvg7f2gG6sa/mwWv/p2Vf2bwU0=;
-	b=AmpIUvVbWsTZdOq2TADtSrCZJKnPzb5nOpcu6v+/Qvuz+fST1PNNMKTmQlQchiNn3W
-	JgXXMJioXb6mvOlR6pmb7VAJ9M1GvjXSumSP0KoUk2ZytF+RJrJGzSDY7SwFYQfvihYh
-	tmcfESghrC0Ej3lhFqeYYWanp3PthyguqMehXYxONqPTSnOzJQN5l26od9Iqi9SEHGoC
-	Hf++PfJwXY7zP0NvVepu3TORDniCsVmReWMlN78tG0glUOLSnlvkMNgjwql1eQZ8di8v
-	4gtglwPsCmKmfQd66yNkGAmC8g3b6L3mgIUQa2IAnTxtl9eFlGhP3qo/e7VPyMPDrOq6
-	x2bg==
-X-Gm-Message-State: APjAAAUPvd4qk7HSvMS77YO+GGnUGKe5DbLZFHxWZ3HOvcCjvUv4mPR6
-	anZFqIxsV4t0jmp8j7ppAxDHzw==
-X-Google-Smtp-Source: APXvYqxfEhQWO8CUNGYTY8q9X4GXbpsd9nC9GYVWSe9AO3YAjiqCbWqv2ZTMp/IW2Rs+Qex01+WtDw==
-X-Received: by 2002:a1c:4909:: with SMTP id w9mr22600268wma.17.1557899068985; 
-	Tue, 14 May 2019 22:44:28 -0700 (PDT)
-Received: from [192.168.1.43] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193])
-	by smtp.gmail.com with ESMTPSA id e8sm2322191wrc.34.2019.05.14.22.44.28
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 14 May 2019 22:44:28 -0700 (PDT)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190510032710.23910-1-richard.henderson@linaro.org>
-	<20190510032710.23910-4-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <492ec7a8-b5bf-b873-8ed2-2a1faf0968b4@redhat.com>
-Date: Wed, 15 May 2019 07:44:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <peterx@redhat.com>) id 1hQnCB-000756-5P
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 02:15:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41346)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hQnCA-0006xv-Vo
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 02:15:19 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8D737300183D;
+	Wed, 15 May 2019 06:15:15 +0000 (UTC)
+Received: from xz-x1 (dhcp-15-205.nay.redhat.com [10.66.15.205])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6128C19723;
+	Wed, 15 May 2019 06:15:05 +0000 (UTC)
+Date: Wed, 15 May 2019 14:15:03 +0800
+From: Peter Xu <peterx@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20190515061503.GF16681@xz-x1>
+References: <155786484688.13873.6037015630912983760.stgit@gimli.home>
 MIME-Version: 1.0
-In-Reply-To: <20190510032710.23910-4-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <155786484688.13873.6037015630912983760.stgit@gimli.home>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Wed, 15 May 2019 06:15:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] target/sparc: Define an enumeration
- for accessing env->regwptr
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.1 v2] q35: Revert to kernel irqchip
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,65 +69,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent@vivier.eu
+Cc: berrange@redhat.com, ehabkost@redhat.com, mst@redhat.com,
+	Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+	pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Richard,
-
-On 5/10/19 5:27 AM, Richard Henderson wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/sparc/cpu.h | 33 +++++++++++++++++++++++++++++++++
->  1 file changed, 33 insertions(+)
+On Tue, May 14, 2019 at 02:14:41PM -0600, Alex Williamson wrote:
+> Commit b2fc91db8447 ("q35: set split kernel irqchip as default") changed
+> the default for the pc-q35-4.0 machine type to use split irqchip, which
+> turned out to have disasterous effects on vfio-pci INTx support.  KVM
+> resampling irqfds are registered for handling these interrupts, but
+> these are non-functional in split irqchip mode.  We can't simply test
+> for split irqchip in QEMU as userspace handling of this interrupt is a
+> significant performance regression versus KVM handling (GeForce GPUs
+> assigned to Windows VMs are non-functional without forcing MSI mode or
+> re-enabling kernel irqchip).
 > 
-> diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-> index 85b9665ccc..08f7d1a3c6 100644
-> --- a/target/sparc/cpu.h
-> +++ b/target/sparc/cpu.h
-> @@ -31,6 +31,39 @@
->  
->  /*#define EXCP_INTERRUPT 0x100*/
->  
-> +/* Windowed register indexes.  */
-> +enum {
-> +    WREG_O0,
-> +    WREG_O1,
-> +    WREG_O2,
-> +    WREG_O3,
-> +    WREG_O4,
-> +    WREG_O5,
-> +    WREG_O6,
-> +    WREG_O7,
-> +
-> +    WREG_L0,
-> +    WREG_L1,
-> +    WREG_L2,
-> +    WREG_L3,
-> +    WREG_L4,
-> +    WREG_L5,
-> +    WREG_L6,
-> +    WREG_L7,
-> +
-> +    WREG_I0,
-> +    WREG_I1,
-> +    WREG_I2,
-> +    WREG_I3,
-> +    WREG_I4,
-> +    WREG_I5,
-> +    WREG_I6,
-> +    WREG_I7,
-
-I'd feel safer if you initialize those enums (better safe than sorry!).
-
-> +
-> +    WREG_SP = WREG_O6,
-> +    WREG_FP = WREG_I6,
-> +};
-> +
->  /* trap definitions */
->  #ifndef TARGET_SPARC64
->  #define TT_TFAULT   0x01
+> The resolution is to revert the change in default irqchip mode in the
+> pc-q35-4.1 machine and create a pc-q35-4.0.1 machine for the 4.0-stable
+> branch.  The qemu-q35-4.0 machine type should not be used in vfio-pci
+> configurations for devices requiring legacy INTx support without
+> explicitly modifying the VM configuration to use kernel irqchip.
 > 
+> Link: https://bugs.launchpad.net/qemu/+bug/1826422
+> Fixes: b2fc91db8447 ("q35: set split kernel irqchip as default")
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+
+Hi, Alex,
+
+I have two (probably naive) questions about the patch, possibly due to
+lack of context of previous discussions so please let me know if
+there's any upstream discussion that I can read.
+
+Firstly, could I ask why we need this 4.0.1 machine type specific for
+fixing this problem?  Asked because this seems to be the first time
+QEMU introduces the X.Y.Z machine type in master.  Could it be somehow
+delayed to the release of QEMU 4.1?  From the planning page I see that
+it's releasing on Aug 06th/13th, a bit far away but not really that
+much imho.  I'm perfectly fine with this, but I just want to make sure
+I have the correct understanding of the motivations.
+
+The second question is about our previous decision to introduce QEMU
+4.1 machine type before it's released (which is not related to the
+patch at all).  Is it really correct to do so before releasing of 4.1?
+So now even with a development QEMU 4.0 branch the user will be able
+to create 4.1 machines using "-M pc-q35-4.1", then what if the user
+migrated a real 4.1 machine (with the to-be-released QEMU 4.1 binary)
+to some 4.1 machine that was run with such an old 4.0 QEMU binary?
+The problem is we can add more compatible properties into
+pc_q35_4_1_machine_options and future pc_compat_4_1 array before QEMU
+4.1 is finally released and then "-M pc-q35-4.1" will actually have
+different combination of properties IMHO, which seems to break
+compatibility.  Am I wrong somewhere?
+
+Thanks,
+
+-- 
+Peter Xu
 
