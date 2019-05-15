@@ -2,89 +2,64 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05182C04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 13:20:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1CB4C04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 13:24:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C60AB20843
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 13:20:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Icsq+wPg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C60AB20843
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A594D20843
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 13:24:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A594D20843
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37142 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37173 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQtpe-0002LK-00
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 09:20:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47018)
+	id 1hQttH-0003VE-Mg
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 09:24:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hQtoZ-0001qf-Rv
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 09:19:24 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1hQtsS-0003CZ-K9
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 09:23:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hQtoY-0000MJ-Lj
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 09:19:23 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34810)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hQtoY-0000Kx-F8
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 09:19:22 -0400
-Received: by mail-wr1-x443.google.com with SMTP id f8so2682801wrt.1
-	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 06:19:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=lGeg13vIu9QamGoiU3kRLkgpMfysxq9BkUT6xkAnII8=;
-	b=Icsq+wPgmODDNVArE9pPlttWupRUQoW53eZuOuqhMwSnZdGbWluOEHeUwDlwlL7RwS
-	ZRdPMsv4dkdyR+AibT5PYkCrQwEPVnYKaKljbqmWUvVv7BffHXNImE2dY2yHpWhBn1a0
-	Ay52p/uYzcaFYI7y4KgIPdv0ms66GfkC5n6qpLY1+h6foOu0c4IIcZca3z14NCVr+lGL
-	vFQMDzH40E8/qkQjecg4vxCYPqdDoyfV4NTS1LU3Zay/+9xg4n507aDJUMGyh8kd85Kw
-	W8aSMwSp8lgFAX86clUnUPH4CSOFkBZxN7HcGLx9clqwtBCwtNX+whCRhI6oLjqHQ86s
-	ETQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=lGeg13vIu9QamGoiU3kRLkgpMfysxq9BkUT6xkAnII8=;
-	b=o52zQSZSTyz86yP8dWY4dRx3jnL5Y/lVNx5M5IaPyxDXjJYESfvIKbz3skd/5DjKGV
-	oaRgCu6astcgQn1MwBx2BZAanNjYVP1ytnoHUYaJD2ln0El70/IWePrRCPlWmtXd6fMM
-	0m27Yqb+zpC62nhjGCiEewnt/6BO1NrXxT/1BpAjiHIQQk7TDZMJAZOO8dT8zjTvo5oQ
-	8a/vhixZ/7Dfa203njHbCbG6nWalMipWGrqq5R07MFvgj9SW6Qw4mx1LHaleTBgBJMSi
-	6Mx54nIqyFinUyXLkb5h6igBrRwhD7KV/kcTeq0yzalytCftFhYkd9zxVml/9iWN+xFK
-	6wRA==
-X-Gm-Message-State: APjAAAVVqt0980+Avf7bGoceUFsaMnVVlJmbfGdfT3VAIyry9+lUOAlf
-	JIHrQmAIaiJg1NJ5ILuQBf2w1A==
-X-Google-Smtp-Source: APXvYqzMUw4VG+RdKgLXkEsOfouzqAEvhgxf2ulyC/oGfSHjw5avz3Q8XOFlNZ1vC4ULZsdleJQQBw==
-X-Received: by 2002:adf:b641:: with SMTP id i1mr25793751wre.288.1557926360997; 
-	Wed, 15 May 2019 06:19:20 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id b8sm1775157wrr.64.2019.05.15.06.19.20
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 15 May 2019 06:19:20 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id DE4681FF87;
-	Wed, 15 May 2019 14:19:19 +0100 (BST)
-References: <20190502081554.5521-1-arilou@gmail.com>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Jon Doron <arilou@gmail.com>
-In-reply-to: <20190502081554.5521-1-arilou@gmail.com>
-Date: Wed, 15 May 2019 14:19:19 +0100
-Message-ID: <87sgtfn9d4.fsf@zen.linaroharston>
+	(envelope-from <alex.williamson@redhat.com>) id 1hQtsR-0004fD-40
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 09:23:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53784)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1hQtsQ-0004dS-SK
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 09:23:23 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6BC293003715;
+	Wed, 15 May 2019 13:23:21 +0000 (UTC)
+Received: from x1.home (ovpn-117-92.phx2.redhat.com [10.3.117.92])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CCFFA5D71F;
+	Wed, 15 May 2019 13:23:14 +0000 (UTC)
+Date: Wed, 15 May 2019 07:23:13 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Message-ID: <20190515072313.1a5af022@x1.home>
+In-Reply-To: <20190515061503.GF16681@xz-x1>
+References: <155786484688.13873.6037015630912983760.stgit@gimli.home>
+	<20190515061503.GF16681@xz-x1>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH v9 00/27] gdbstub: Refactor command packets
- handler
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Wed, 15 May 2019 13:23:21 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.1 v2] q35: Revert to kernel irqchipQEM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,30 +71,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, ehabkost@redhat.com, mst@redhat.com,
+	Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+	pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 15 May 2019 14:15:03 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
-Jon Doron <arilou@gmail.com> writes:
+> On Tue, May 14, 2019 at 02:14:41PM -0600, Alex Williamson wrote:
+> > Commit b2fc91db8447 ("q35: set split kernel irqchip as default") changed
+> > the default for the pc-q35-4.0 machine type to use split irqchip, which
+> > turned out to have disasterous effects on vfio-pci INTx support.  KVM
+> > resampling irqfds are registered for handling these interrupts, but
+> > these are non-functional in split irqchip mode.  We can't simply test
+> > for split irqchip in QEMU as userspace handling of this interrupt is a
+> > significant performance regression versus KVM handling (GeForce GPUs
+> > assigned to Windows VMs are non-functional without forcing MSI mode or
+> > re-enabling kernel irqchip).
+> > 
+> > The resolution is to revert the change in default irqchip mode in the
+> > pc-q35-4.1 machine and create a pc-q35-4.0.1 machine for the 4.0-stable
+> > branch.  The qemu-q35-4.0 machine type should not be used in vfio-pci
+> > configurations for devices requiring legacy INTx support without
+> > explicitly modifying the VM configuration to use kernel irqchip.
+> > 
+> > Link: https://bugs.launchpad.net/qemu/+bug/1826422
+> > Fixes: b2fc91db8447 ("q35: set split kernel irqchip as default")
+> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>  
+> 
+> Hi, Alex,
+> 
+> I have two (probably naive) questions about the patch, possibly due to
+> lack of context of previous discussions so please let me know if
+> there's any upstream discussion that I can read.
+> 
+> Firstly, could I ask why we need this 4.0.1 machine type specific for
+> fixing this problem?  Asked because this seems to be the first time
+> QEMU introduces the X.Y.Z machine type in master.  Could it be somehow
+> delayed to the release of QEMU 4.1?  From the planning page I see that
+> it's releasing on Aug 06th/13th, a bit far away but not really that
+> much imho.  I'm perfectly fine with this, but I just want to make sure
+> I have the correct understanding of the motivations.
 
-> This patch series refactors the old gdbstub command packets handler
-> with a new infrastructure which should ease extending and adding new
-> and missing gdb command packets.
+As I see it, this is a regression from previous releases, therefore it
+should be fixed in 4.0-stable.  Users are encountering this issue and
+leaning on support groups like reddit.com/r/VFIO to find workarounds.
+It would be a disservice to our user base and downstream consumers to
+simply ignore this regression until the 4.1 release.  If this is the
+first z-stream release of upstream QEMU with a new machine type, we've
+been lucky, but previous discussions indicate that we cannot currently
+change the irqchip mode without rev'ing the machine type for migration
+compatibility.
+ 
+> The second question is about our previous decision to introduce QEMU
+> 4.1 machine type before it's released (which is not related to the
+> patch at all).  Is it really correct to do so before releasing of 4.1?
+> So now even with a development QEMU 4.0 branch the user will be able
+> to create 4.1 machines using "-M pc-q35-4.1", then what if the user
+> migrated a real 4.1 machine (with the to-be-released QEMU 4.1 binary)
+> to some 4.1 machine that was run with such an old 4.0 QEMU binary?
+> The problem is we can add more compatible properties into
+> pc_q35_4_1_machine_options and future pc_compat_4_1 array before QEMU
+> 4.1 is finally released and then "-M pc-q35-4.1" will actually have
+> different combination of properties IMHO, which seems to break
+> compatibility.  Am I wrong somewhere?
 
-There seems to be some compiler errors and variants that this breaks the
-CI on:
+Users who expect migration stability from VMs based on unreleased
+development code are in for a world of hurt.  I assume that the 4.1
+machine types are entirely unstable until 4.1 is released.  We
+introduce them early in the development cycle because we've been burned
+in the past introducing them late and inconsistently.  Ideally this
+change would trigger a migration regression test to generate a warning
+for the in-development machine type changing in an incompatible way,
+we'd acknowledge that, perhaps log it to a changelog, and move on, but
+I suspect we don't have such automated testing in place.  Thanks,
 
-  https://travis-ci.org/stsquad/qemu/builds/532410263
-  https://app.shippable.com/github/stsquad/qemu/runs/822/summary/console
-  https://gitlab.com/stsquad/qemu/pipelines/61291132
-
-You might want to consider setting up CI checks on your system and
-running your next series through them before posting:
-
-  https://wiki.qemu.org/Testing/CI
-
---
-Alex Benn=C3=A9e
+Alex
 
