@@ -2,68 +2,92 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8558C04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 15:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44D4BC04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 15:24:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65E352084E
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 15:06:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65E352084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0CF5620862
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 15:24:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IYa0pMy4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CF5620862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38400 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38617 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQvUY-0007ee-W9
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 11:06:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38209)
+	id 1hQvlt-00034K-KS
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 11:24:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hQvM9-0002A5-UC
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 10:58:11 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hQvkS-0002GW-UY
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 11:23:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hQvM8-0003HE-O0
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 10:58:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55668)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>)
-	id 1hQvL2-0001yF-F6; Wed, 15 May 2019 10:57:03 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0B14289C36;
-	Wed, 15 May 2019 14:56:32 +0000 (UTC)
-Received: from localhost (ovpn-117-238.ams2.redhat.com [10.36.117.238])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8AD7A60BE5;
-	Wed, 15 May 2019 14:56:31 +0000 (UTC)
-Date: Wed, 15 May 2019 15:56:30 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Message-ID: <20190515145630.GH29507@stefanha-x1.localdomain>
-References: <68cc5bbc-ed6f-e001-e376-ccd986683b88@redhat.com>
-	<f1dfe2c3-2d61-e477-ac3d-37ad26d9236d@redhat.com>
-	<61685a48-b84e-c379-7193-f456e82635ba@redhat.com>
-	<67a38513-89af-7f54-2fc8-05b5777983ca@redhat.com>
-	<22933e94-18da-257c-7931-da511bc5a602@redhat.com>
-	<20f1aecc-02b4-781c-9ada-7ac6c73892a3@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1hQvjV-0005Kf-A5
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 11:22:20 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38606)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hQvjT-0005GF-46
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 11:22:15 -0400
+Received: by mail-wm1-x343.google.com with SMTP id f2so441729wmj.3
+	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 08:22:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=zn08J2ZicgXsvPPHPeb0hDqpQW2rlLQB6utuXdutmLQ=;
+	b=IYa0pMy4rwBfgradf+GCVFy0l5OAIu141Y8QQYdGJarY86bhcmxGzWvFkC0XWEr/wx
+	A5asZQgW5BUhP9jLIYO897LfQC3uMsy0jrci7DE2hoPsHvz/71QhDYtCgIYHVggRvr/+
+	1lEdyk5cACG2QOw3tIBY37DzEQ3YwY7b1JK8H50GSQWuHii2S/SfaVkELNLWREID+VJX
+	pX7zEdW1CR2nyhfp8uBU4qYuJ6XfH3wyHlAcx4ggVec3EByujd0il/tmAk3ZKlVvNRrm
+	8qsZE1NllZobKqfTo02yU/mrXF4SNd+qrVY3and1+dBzDrK7jU0RyZ03EEb/aSZvxVtx
+	WBBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=zn08J2ZicgXsvPPHPeb0hDqpQW2rlLQB6utuXdutmLQ=;
+	b=JLt8uKiJURdhScxAML6wZIqlMF4VJw82tf26jkZwjU9w2QeKxBwp604U3mEvRly2Yy
+	PIGRfO+3siUUUPoVkf5LCQWN8fCKurR8oU0Ekk8nL5OPeptR15eoR62dDpcZ4dhfLtgB
+	pJWqIjDmeYu6g9SsFUDil/NcEUBCQw9136+0EKUC1t8DoTfapqymqa0/ZhFf/Ybgmw1Z
+	XhGLuBgpLXYsZEfoV1LswbNvowLGaHQUq7dX8L12E8hnOf5KmTUz0HKSkWqe+boCky0w
+	Lifu6D8B3JplgGHMDijbttBUeS//azrYZT19JKaHQAUUw8/taLuzxTsV6gOT4A72Q51D
+	JpDg==
+X-Gm-Message-State: APjAAAVEXenAqGFsGH6UmJdAYQCAlOu7/O5VofM5sDaw3l9WfrUHIc3N
+	N2iazh919mG2OlKVX5bHxBJ9pQ==
+X-Google-Smtp-Source: APXvYqx4476j8F6b8Xoe5dMJJyNDov9kn9pNUcbcUIQkJa9iDsmierQbrvg4MlTP9RGabOhAOs/c+A==
+X-Received: by 2002:a1c:a684:: with SMTP id
+	p126mr18880343wme.101.1557933732149; 
+	Wed, 15 May 2019 08:22:12 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	l18sm2432952wrv.38.2019.05.15.08.22.10
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Wed, 15 May 2019 08:22:10 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 928F71FF87;
+	Wed, 15 May 2019 16:22:10 +0100 (BST)
+References: <20190502081554.5521-1-arilou@gmail.com>
+	<20190502081554.5521-12-arilou@gmail.com>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Jon Doron <arilou@gmail.com>
+In-reply-to: <20190502081554.5521-12-arilou@gmail.com>
+Date: Wed, 15 May 2019 16:22:10 +0100
+Message-ID: <87pnojn3od.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="2oox5VnwalALFvA7"
-Content-Disposition: inline
-In-Reply-To: <20f1aecc-02b4-781c-9ada-7ac6c73892a3@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Wed, 15 May 2019 14:56:32 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Failing QEMU iotest 175
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH v9 11/27] gdbstub: Implement write memory
+ (M pkt) with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,154 +99,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Qemu-block <qemu-block@nongnu.org>, Nir Soffer <nirsof@gmail.com>,
-	QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---2oox5VnwalALFvA7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Jon Doron <arilou@gmail.com> writes:
 
-On Mon, May 06, 2019 at 12:44:56PM -0500, Eric Blake wrote:
-> On 5/4/19 1:51 AM, Thomas Huth wrote:
->=20
-> >> Hmm, it's passing for me on ext4, but that probably means we have
-> >> different configuration parameters. I'm not sure how to easily show wh=
-at
-> >> parameters a particular ext4 partition uses to compare the differences
-> >> between your setup and mine (mine is tuned to whatever defaults Fedora=
-'s
-> >> installer chose on my behalf), so maybe someone else can chime in.
-> >=20
-> > $ sudo tune2fs -l /dev/mapper/Home
-> > tune2fs 1.42.9 (28-Dec-2013)
-> > Filesystem volume name:   <none>
-> > Last mounted on:          /home
-> > Filesystem magic number:  0xEF53
-> > Filesystem revision #:    1 (dynamic)
-> > Filesystem features:      has_journal ext_attr dir_index filetype
-> > needs_recovery meta_bg extent 64bit flex_bg sparse_super large_file
-> > huge_file uninit_bg dir_nlink extra_isize
-> > Filesystem flags:         signed_directory_hash
-> > Default mount options:    user_xattr acl
-> > Filesystem state:         clean
-> > Errors behavior:          Continue
-> > Filesystem OS type:       Linux
-> > Inode count:              36700160
-> > Block count:              146800640
-> > Reserved block count:     5873663
-> > Free blocks:              56266267
-> > Free inodes:              35403275
-> > First block:              1
-> > Block size:               1024
-> > Fragment size:            1024
-> > Group descriptor size:    64
-> > Blocks per group:         8192
-> > Fragments per group:      8192
-> > Inodes per group:         2048
-> > Inode blocks per group:   256
-> > First meta block group:   258
-> > Flex block group size:    16
-> > Filesystem created:       Thu Apr 19 18:34:33 2018
-> > Last mount time:          Sat May  4 08:20:36 2019
-> > Last write time:          Sat May  4 08:20:36 2019
-> > Mount count:              224
-> > Maximum mount count:      -1
-> > Last checked:             Thu Apr 19 18:34:33 2018
-> > Check interval:           0 (<none>)
-> > Lifetime writes:          1826 GB
-> > Reserved blocks uid:      0 (user root)
-> > Reserved blocks gid:      0 (group root)
-> > First inode:              11
-> > Inode size:	          128
-> > Journal inode:            8
-> > First orphan inode:       11076944
-> > Default directory hash:   half_md4
-> > Directory Hash Seed:      08e1be04-c3a3-4c37-a059-cf54af5c4bc0
-> > Journal backup:           inode blocks
-> >=20
->=20
-> # tune2fs -l /dev/mapper/fedora-home
-> tune2fs 1.44.6 (5-Mar-2019)
-> Filesystem volume name:   home
-> Last mounted on:          /home
-> Filesystem UUID:          3ef45c0b-b2a0-43da-a1d3-c4f726097eda
-> Filesystem magic number:  0xEF53
-> Filesystem revision #:    1 (dynamic)
-> Filesystem features:      has_journal ext_attr resize_inode dir_index
-> filetype needs_recovery extent 64bit flex_bg sparse_super large_file
-> huge_file dir_nlink extra_isize metadata_csum
-> Filesystem flags:         signed_directory_hash
-> Default mount options:    user_xattr acl
-> Filesystem state:         clean
-> Errors behavior:          Continue
-> Filesystem OS type:       Linux
-> Inode count:              13107200
-> Block count:              52428800
-> Reserved block count:     2621440
-> Free blocks:              27184765
-> Free inodes:              12049129
-> First block:              0
-> Block size:               4096
-> Fragment size:            4096
-> Group descriptor size:    64
-> Reserved GDT blocks:      1024
-> Blocks per group:         32768
-> Fragments per group:      32768
-> Inodes per group:         8192
-> Inode blocks per group:   512
-> Flex block group size:    16
-> Filesystem created:       Thu Dec  6 16:17:23 2018
-> Last mount time:          Wed Apr  3 10:19:05 2019
-> Last write time:          Wed Apr  3 10:19:05 2019
-> Mount count:              12
-> Maximum mount count:      -1
-> Last checked:             Thu Dec  6 16:17:23 2018
-> Check interval:           0 (<none>)
-> Lifetime writes:          1962 GB
-> Reserved blocks uid:      0 (user root)
-> Reserved blocks gid:      0 (group root)
-> First inode:              11
-> Inode size:	          256
-> Required extra isize:     32
-> Desired extra isize:      32
-> Journal inode:            8
-> First orphan inode:       5248434
-> Default directory hash:   half_md4
-> Directory Hash Seed:      d1bbea0e-dd2e-4df7-b7f0-f7300c524cc9
-> Journal backup:           inode blocks
-> Checksum type:            crc32c
-> Checksum:                 0x3a8a8676
->=20
-> I'm definitely seeing some differences in the two configs (such as your
-> block size of 1k vs. mine at 4k), but not sure which are the most
-> important, nor how to easily recreate a setup that matches yours.
+> Signed-off-by: Jon Doron <arilou@gmail.com>
 
-Yes, previously when we had similar issues it was the block size that
-caused the difference.  It's worth trying it out with a test file system
-on a loop device.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Stefan
+> ---
+>  gdbstub.c | 51 +++++++++++++++++++++++++++++++++------------------
+>  1 file changed, 33 insertions(+), 18 deletions(-)
+>
+> diff --git a/gdbstub.c b/gdbstub.c
+> index e9a3d0c2bc..8dc2e1d507 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -1685,6 +1685,31 @@ static void handle_get_reg(GdbCmdContext *gdb_ctx,=
+ void *user_ctx)
+>      put_packet(gdb_ctx->s, gdb_ctx->str_buf);
+>  }
+>
+> +static void handle_write_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
+> +{
+> +    if (gdb_ctx->num_params < 3) {
+> +        put_packet(gdb_ctx->s, "E22");
+> +        return;
+> +    }
+> +
+> +    /* hextomem() reads 2*len bytes */
+> +    if (gdb_ctx->params[1].val_ull > strlen(gdb_ctx->params[2].data) / 2=
+) {
+> +        put_packet(gdb_ctx->s, "E22");
+> +        return;
+> +    }
+> +
+> +    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[2].data,
+> +             gdb_ctx->params[1].val_ull);
+> +    if (target_memory_rw_debug(gdb_ctx->s->g_cpu, gdb_ctx->params[0].val=
+_ull,
+> +                               gdb_ctx->mem_buf,
+> +                               gdb_ctx->params[1].val_ull, true)) {
+> +        put_packet(gdb_ctx->s, "E14");
+> +        return;
+> +    }
+> +
+> +    put_packet(gdb_ctx->s, "OK");
+> +}
+> +
+>  static int gdb_handle_packet(GDBState *s, const char *line_buf)
+>  {
+>      CPUState *cpu;
+> @@ -1893,24 +1918,14 @@ static int gdb_handle_packet(GDBState *s, const c=
+har *line_buf)
+>          }
+>          break;
+>      case 'M':
+> -        addr =3D strtoull(p, (char **)&p, 16);
+> -        if (*p =3D=3D ',')
+> -            p++;
+> -        len =3D strtoull(p, (char **)&p, 16);
+> -        if (*p =3D=3D ':')
+> -            p++;
+> -
+> -        /* hextomem() reads 2*len bytes */
+> -        if (len > strlen(p) / 2) {
+> -            put_packet (s, "E22");
+> -            break;
+> -        }
+> -        hextomem(mem_buf, p, len);
+> -        if (target_memory_rw_debug(s->g_cpu, addr, mem_buf, len,
+> -                                   true) !=3D 0) {
+> -            put_packet(s, "E14");
+> -        } else {
+> -            put_packet(s, "OK");
+> +        {
+> +            static const GdbCmdParseEntry write_mem_cmd_desc =3D {
+> +                .handler =3D handle_write_mem,
+> +                .cmd =3D "M",
+> +                .cmd_startswith =3D 1,
+> +                .schema =3D "L,L:s0"
+> +            };
+> +            cmd_parser =3D &write_mem_cmd_desc;
+>          }
+>          break;
+>      case 'p':
 
---2oox5VnwalALFvA7
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzcKJ4ACgkQnKSrs4Gr
-c8jrPgf7B7lu3T8LfS6j/jA7v2GQvriP3wIvYBjRYl8whQSwWxVNQCQAvb8aVLW3
-PD9RjHoDDlInROaURUVsk3qgEN34CgH0VKJQ2nDfb/WWN6KNOwDUEVBA1Qwnr/x2
-4cZ4D2SRvUFmcBZgw9w4CqfRlvk6CNoMihGksweLaXWGGt682GOE8tVw+RgTdbDc
-vlcE1rcIDrWamvXOrlnC8Wv0Dwx76f28LfuJYF+XspkcAKf2dh+FC1tkclXD9iTm
-aTQT3cmYXNS9LuYrPEZKAdauPo848BEhVVj20hqtSQhhB7jdKTRhyNmjmW/chklx
-+9oEbHpbnlfamLQlW8lBITwPvBByiQ==
-=uccx
------END PGP SIGNATURE-----
-
---2oox5VnwalALFvA7--
+--
+Alex Benn=C3=A9e
 
