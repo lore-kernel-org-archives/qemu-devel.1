@@ -2,68 +2,105 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB0FFC04E87
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 12:29:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A69C04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 12:29:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FCEB2084E
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 12:29:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FCEB2084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2C7512084E
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 12:29:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="bnfZhXMi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C7512084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36489 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36491 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQt2L-00082h-Nv
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 08:29:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60047)
+	id 1hQt2h-0008IB-D4
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 08:29:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hQt11-0007N0-Gt
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:28:12 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hQt1A-0007Qu-UZ
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:28:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hQt10-0006Fv-99
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:28:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48418)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hQt10-0006Aq-0e
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:28:10 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 49E0B37F46
-	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 12:28:08 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
-	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 16CFE5C236;
-	Wed, 15 May 2019 12:28:07 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 8CB5911385E4; Wed, 15 May 2019 14:28:05 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-References: <20190403114958.3705-1-quintela@redhat.com>
-	<20190403114958.3705-7-quintela@redhat.com>
-	<87tvf8svr3.fsf@dusky.pond.sub.org> <87d0kkj8mx.fsf@trasno.org>
-Date: Wed, 15 May 2019 14:28:05 +0200
-In-Reply-To: <87d0kkj8mx.fsf@trasno.org> (Juan Quintela's message of "Wed, 15
-	May 2019 12:48:38 +0200")
-Message-ID: <87a7fn7vhm.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hQt19-0006d8-8L
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:28:20 -0400
+Received: from mail-eopbgr10102.outbound.protection.outlook.com
+	([40.107.1.102]:26134
+	helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hQt18-0006Sf-Fi
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:28:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+	s=selector1;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=jAB+jdQqSxqzZRNVmYSCrruxnjw2dqcImIBu4EcrZqI=;
+	b=bnfZhXMi9zshtbOwVtL/FWZv8IucWrBHYgIjPGDptksU4tm5TCQlDWsm/7NlWdPqfRXVEYZoBjjU5gVno3ajLGC0UUXi/UeJxoSn/Ap2R5o/0sfXf7+qtnBj6JnxtHuHEFiDCexK4fIPrJXSUhT3boaHHWi2ijtgQ1Xy7f3+/1Y=
+Received: from AM6PR08MB4675.eurprd08.prod.outlook.com (10.255.96.78) by
+	AM6PR08MB4967.eurprd08.prod.outlook.com (10.255.120.80) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1878.24; Wed, 15 May 2019 12:28:15 +0000
+Received: from AM6PR08MB4675.eurprd08.prod.outlook.com
+	([fe80::9051:3c85:28c6:a0c1]) by
+	AM6PR08MB4675.eurprd08.prod.outlook.com
+	([fe80::9051:3c85:28c6:a0c1%6]) with mapi id 15.20.1878.024;
+	Wed, 15 May 2019 12:28:15 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel <qemu-devel@nongnu.org>, "kraxel@redhat.com" <kraxel@redhat.com>
+Thread-Topic: qemu vga crash
+Thread-Index: AQHVCxmrHO5nMga4yUWaJUGzY6aKBg==
+Date: Wed, 15 May 2019 12:28:15 +0000
+Message-ID: <c2a0ab8b-8229-29be-3658-1a2c52df65ad@virtuozzo.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0193.eurprd05.prod.outlook.com
+	(2603:10a6:3:f9::17) To AM6PR08MB4675.eurprd08.prod.outlook.com
+	(2603:10a6:20b:c2::14)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ae9a02c5-e2aa-4834-b1d6-08d6d930cd70
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
+	SRVR:AM6PR08MB4967; 
+x-ms-traffictypediagnostic: AM6PR08MB4967:
+x-microsoft-antispam-prvs: <AM6PR08MB49679FFF788BE08EEB53BD7CC1090@AM6PR08MB4967.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1013;
+x-forefront-prvs: 0038DE95A2
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(39850400004)(346002)(376002)(136003)(366004)(396003)(189003)(199004)(316002)(486006)(71200400001)(71190400001)(2501003)(7116003)(26005)(54906003)(5660300002)(186003)(73956011)(66476007)(64756008)(66556008)(66946007)(66446008)(110136005)(6512007)(478600001)(386003)(2906002)(36756003)(14454004)(3480700005)(8936002)(4326008)(25786009)(107886003)(256004)(68736007)(81166006)(14444005)(8676002)(53936002)(81156014)(6436002)(6486002)(52116002)(86362001)(66066001)(476003)(305945005)(31686004)(2616005)(99286004)(7736002)(31696002)(3846002)(6116002)(102836004)(6506007);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4967;
+	H:AM6PR08MB4675.eurprd08.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: KrCFU48ykRuLhGO5hMaecx7F92m350Los3POasjdZSpKMxFLLLwfXzOwV0kvglN0lC7qEQstvWcUqdEjJls9F/9sx7Xy4U5NpTRdwVdKkUptb8uXSZpRoN1M31LzS1PA6AT0lEtfbYcUxF/KWWmd68/Ht5Xig2MDcVg3ogTdLLWWCp2sh/pcU+pOnWdaaa2EjJrz0tEio+LnKPnR/CnmeuYjR7/xr4Kz4BiQ3wJASAKLXClGegpG1Q+4VIbZ1iTQHw7JGWf1hrTK1bVq7JZ4cetUxF8h3+lGbgn2WA3moX0l6tf8xjf9L//guoZB2ZtJNK1Mbj5la5Ot5Vt4bSGi79ZvQQsOZFWD2k3QXYh/g+JnrgQ69fqpirlH4EyePU1bo8uMb0P9UmVO4/dA0IFcmS5wXgB787EU/iY5/A1/iDk=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <64FF9E0A80865747BCF6256AAC807ACB@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Wed, 15 May 2019 12:28:08 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 6/8] migration: Add multifd-compress
- parameter
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ae9a02c5-e2aa-4834-b1d6-08d6d930cd70
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 May 2019 12:28:15.0514 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4967
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.1.102
+Subject: [Qemu-devel] qemu vga crash
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,162 +112,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "ross.lagerwall@citrix.com" <ross.lagerwall@citrix.com>,
+	"pjp@fedoraproject.org" <pjp@fedoraproject.org>,
+	Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Juan Quintela <quintela@redhat.com> writes:
-
-> Markus Armbruster <armbru@redhat.com> wrote:
->> Juan Quintela <quintela@redhat.com> writes:
->>
->>> Signed-off-by: Juan Quintela <quintela@redhat.com>
->>>
->>> ---
->>> Rename it to NONE
->
->>> @@ -1822,6 +1826,19 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->>>          p->has_multifd_channels = true;
->>>          visit_type_int(v, param, &p->multifd_channels, &err);
->>>          break;
->>> +    case MIGRATION_PARAMETER_MULTIFD_COMPRESS:
->>> +        p->has_multifd_compress = true;
->>> +        visit_type_enum(v, param, &compress_type,
->>> +                        &MultifdCompress_lookup, &err);
->>
->> visit_type_MultifdCompress(), please.
->
-> done.
->
-> Interesting that I can
->
-> #include "qapi/qapi-visit-common.h"
->
-> but not what I would expect/want:
->
-> #include "qapi/qapi-visit.h"
-
-I guess you tried to include it into target-independent code, which
-doesn't work since we added target conditionals like
-
-    { 'command': 'rtc-reset-reinjection',
-      'if': 'defined(TARGET_I386)' }
-
-Adding these (merge commit a0430dd8abb) was only possible because the
-code generated from the QAPI schema mirrors the QAPI schema's modular
-structure: just like qapi-schema.json includes its sub-modules such as
-common.json, the generated qapi-visit.h includes the headers generated
-for its sub-modules such as qapi-visit-common.h.  See commit 252dc3105f
-"qapi: Generate separate .h, .c for each module".
-
-The original motivation for this modularization was actually compile
-time.  Before modularization, touching the QAPI schema typically
-recompiled everything using QAPI, which nowadays means pretty much
-everything.  Modularization let me replace "include all generated QAPI
-stuff" by "include just the generated QAPI stuff I actually need", for
-*massive* compile time improvements.
-
-Back to target conditionals.  Right now, we confine them to sub-module
-target.json.  This means the headers generated for this sub-module, such
-as qapi-visit-target.h, can only be included into target-dependent code.
-Since qapi-visit.h includes all sub-modules, it can also only be
-included there.
-
-> Perhaps we should remove
->
-> #include "qapi-visit-target.h"
->
-> from there?
-
-No for two reasons:
-
-1. The code generating qapi-visit.h has no idea which sub-modules are
-target-specific.
-
-2. You shouldn't include qapi-visit.h anyway, it's bad for compile time.
-
-> Anyways, independent of this patch.
-
-Yes.
-
->>> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
->>> index 5da1439a8b..7c8e71532f 100644
->>> --- a/hw/core/qdev-properties.c
->>> +++ b/hw/core/qdev-properties.c
->>> @@ -645,6 +645,17 @@ const PropertyInfo qdev_prop_fdc_drive_type = {
->>>      .set_default_value = set_default_value_enum,
->>>  };
->>>  
->>> +/* --- MultifdCompress --- */
->>> +
->>> +const PropertyInfo qdev_prop_multifd_compress = {
->>> +    .name = "MultifdCompress",
->>> +    .description = "multifd_compress values",
->>
->> Similar property declarations list the valid values in .description.
->
-> Fixed, thanks.
->
->>>  
->>> +#define DEFINE_PROP_MULTIFD_COMPRESS(_n, _s, _f, _d) \
->>> +    DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_multifd_compress, MultifdCompress)
->>> +
->>
->> As long as qdev_prop_multifd_compress is exposed in qdev-properties.h,
->> hiding the macro using it doesn't make sense to me.
->
-> Where do you want it to be?  This should only be used here, but if you
-> want it anywhere else, told me where.
-
-Put the declaration of qdev_prop_multifd_compress and the macro in the
-same source file.  Simplest: qdev-properties.h.
-
->>> +##
->>> +# @MultifdCompress:
->>> +#
->>> +# An enumeration of multifd compression.
->>> +#
->>> +# @none: no compression.
->>> +#
->>> +# Since: 4.1
->>> +#
->>> +##
->>> +{ 'enum': 'MultifdCompress',
->>> +  'data': [ 'none' ] }
->>
->> Any particular reason for putting this in common.json?  As is, it looks
->> rather migration-specific to me...
->
-> Not sure if with new "qapi" compiler it works, it used to be that it
-> failed if you declared an enum anywhere else.  See how I have to put
-> property info into qdev-properties.c instead of any migration file.
-
-You can certainly declare enums anywhere, you just have to make sure to
-include the right headers in the right places, just like for manually
-written enums in C headers.
-
-Rules for modular QAPI schema:
-
-1. If module A uses an entity defined in module B, A must include B
-
-   Example: since migration.json uses MultifdCompress defined in
-   common.json, migration.json must include common.json (it does).
-
-2. No circular includes, ever.
-
-3. Try to avoid cross-module dependencies
-
-   Example: migration.json uses MultifdCompress defined in common.json.
-   This is a cross-module dependency.  Can we avoid it by moving
-   MultifdCompress into migration.json?
-
-   The QAPI schema would be just fine with such a move, but C code using
-   the generated headers might be unhappy, because it now has to include
-   qapi-types-migration.h instead of just qapi-types-common.h.
-
-   My question was: is C code really unhappy?  Please find out and tell
-   me.
+SGkgR2VyZCENCg0KV3JpdGluZyB0byB5b3UsIGFzIHlvdSB3ZXJlIHRoZSBsYXN0IG9uZSB3aG8g
+Y29tbWl0dGVkIHRvIHZnYV9kcmF3X2dyYXBoaWMsIGhvcGUgeW91IGNhbiBoZWxwLg0KDQpXZSBm
+YWNlZCB0aGUgZm9sbG93aW5nIGNyYXNoIGluIDIuMTItYmFzZWQgUWVtdSwgYnV0IGNvZGUgc2Vl
+bXMgbm90IHJlYWxseSBjaGFuZ2VkOg0KDQojMCAgX19HSV9yYWlzZSAoc2lnPXNpZ0BlbnRyeT02
+KSBhdCAuLi9ucHRsL3N5c2RlcHMvdW5peC9zeXN2L2xpbnV4L3JhaXNlLmM6NTYNCiMxICBfX0dJ
+X2Fib3J0ICgpIGF0IGFib3J0LmM6OTANCiMyICBfX2Fzc2VydF9mYWlsX2Jhc2UgKA0KICAgICBm
+bXQ9MHg3ZjAxMTI2Yjk1MjAgIiVzJXMlczoldTogJXMlc0Fzc2VydGlvbiBgJXMnIGZhaWxlZC5c
+biVuIiwNCiAgICAgYXNzZXJ0aW9uPWFzc2VydGlvbkBlbnRyeT0weDU2MTJmOTk1ZmZmNiAic3Rh
+cnQgKyBsZW5ndGggPD0gc25hcC0+ZW5kIiwNCiAgICAgZmlsZT1maWxlQGVudHJ5PTB4NTYxMmY5
+OTYwMWQwICIvYnVpbGRkaXIvYnVpbGQvQlVJTEQvcWVtdS0yLjEwLjAvZXhlYy5jIiwgbGluZT1s
+aW5lQGVudHJ5PTExOTgsDQogICAgIGZ1bmN0aW9uPWZ1bmN0aW9uQGVudHJ5PTB4NTYxMmY5OTYw
+YjYwIDxfX1BSRVRUWV9GVU5DVElPTl9fLjMzNjU5PiAiY3B1X3BoeXNpY2FsX21lbW9yeV9zbmFw
+c2hvdF9nZXRfZGlydHkiKSBhdCBhc3NlcnQuYzo5Mg0KIzMgIF9fR0lfX19hc3NlcnRfZmFpbCAo
+DQogICAgIGFzc2VydGlvbj1hc3NlcnRpb25AZW50cnk9MHg1NjEyZjk5NWZmZjYgInN0YXJ0ICsg
+bGVuZ3RoIDw9IHNuYXAtPmVuZCIsDQogICAgIGZpbGU9ZmlsZUBlbnRyeT0weDU2MTJmOTk2MDFk
+MCAiL2J1aWxkZGlyL2J1aWxkL0JVSUxEL3FlbXUtMi4xMC4wL2V4ZWMuYyIsIGxpbmU9bGluZUBl
+bnRyeT0xMTk4LA0KICAgICBmdW5jdGlvbj1mdW5jdGlvbkBlbnRyeT0weDU2MTJmOTk2MGI2MCA8
+X19QUkVUVFlfRlVOQ1RJT05fXy4zMzY1OT4gImNwdV9waHlzaWNhbF9tZW1vcnlfc25hcHNob3Rf
+Z2V0X2RpcnR5IikgYXQgYXNzZXJ0LmM6MTAxDQojNCAgY3B1X3BoeXNpY2FsX21lbW9yeV9zbmFw
+c2hvdF9nZXRfZGlydHkgKHNuYXA9c25hcEBlbnRyeT0weDU2MTMwODdiZGNiMCwNCiAgICAgc3Rh
+cnQ9PG9wdGltaXplZCBvdXQ+LCBsZW5ndGg9PG9wdGltaXplZCBvdXQ+KSBhdCAvdXNyL3NyYy9k
+ZWJ1Zy9xZW11LTIuMTAuMC9leGVjLmM6MTE5OA0KIzUgIG1lbW9yeV9yZWdpb25fc25hcHNob3Rf
+Z2V0X2RpcnR5IChtcj1tckBlbnRyeT0weDU2MTMwOTJlMDhmMCwNCiAgICAgc25hcD1zbmFwQGVu
+dHJ5PTB4NTYxMzA4N2JkY2IwLCBhZGRyPTxvcHRpbWl6ZWQgb3V0Piwgc2l6ZT08b3B0aW1pemVk
+IG91dD4pDQogICAgIGF0IC91c3Ivc3JjL2RlYnVnL3FlbXUtMi4xMC4wL21lbW9yeS5jOjE5NDkN
+CiM2ICB2Z2FfZHJhd19ncmFwaGljIChmdWxsX3VwZGF0ZT0wLCBzPTB4NTYxMzA5MmUwOGUwKQ0K
+ICAgICBhdCAvdXNyL3NyYy9kZWJ1Zy9xZW11LTIuMTAuMC9ody9kaXNwbGF5L3ZnYS5jOjE2NzgN
+CiM3ICB2Z2FfdXBkYXRlX2Rpc3BsYXkgKG9wYXF1ZT0weDU2MTMwOTJlMDhlMCkgYXQgL3Vzci9z
+cmMvZGVidWcvcWVtdS0yLjEwLjAvaHcvZGlzcGxheS92Z2EuYzoxNzc0DQojOCAgdm5jX3JlZnJl
+c2ggKGRjbD0weDU2MTMwOTExNjA2MCkgYXQgdWkvdm5jLmM6MzAxMw0KIzkgIGRweV9yZWZyZXNo
+IChzPTB4NTYxMzA4OGY4ZTEwKSBhdCB1aS9jb25zb2xlLmM6MTYxMw0KIzEwIGd1aV91cGRhdGUg
+KG9wYXF1ZT0weDU2MTMwODhmOGUxMCkgYXQgdWkvY29uc29sZS5jOjIwMQ0KIzExIHRpbWVybGlz
+dF9ydW5fdGltZXJzICh0aW1lcl9saXN0PTB4NTYxMmZiYTA1MzQwKSBhdCB1dGlsL3FlbXUtdGlt
+ZXIuYzo1MzYNCiMxMiBxZW11X2Nsb2NrX3J1bl90aW1lcnMgKHR5cGU9PG9wdGltaXplZCBvdXQ+
+KSBhdCB1dGlsL3FlbXUtdGltZXIuYzo1NDcNCiMxMyBxZW11X2Nsb2NrX3J1bl9hbGxfdGltZXJz
+ICgpIGF0IHV0aWwvcWVtdS10aW1lci5jOjY2Mg0KIzE0IG1haW5fbG9vcF93YWl0IChub25ibG9j
+a2luZz1ub25ibG9ja2luZ0BlbnRyeT0wKSBhdCB1dGlsL21haW4tbG9vcC5jOjUyMQ0KIzE1IG1h
+aW5fbG9vcCAoKSBhdCB2bC5jOjE5MzcNCiMxNiBtYWluIChhcmdjPTxvcHRpbWl6ZWQgb3V0Piwg
+YXJndj08b3B0aW1pemVkIG91dD4sIGVudnA9PG9wdGltaXplZCBvdXQ+KSBhdCB2bC5jOjQ4MjkN
+Cg0KDQpJdCdzIGFuIGFzc2VydGlvbiAiYXNzZXJ0KHN0YXJ0ICsgbGVuZ3RoIDw9IHNuYXAtPmVu
+ZCk7IiBpbiBjcHVfcGh5c2ljYWxfbWVtb3J5X3NuYXBzaG90X2dldF9kaXJ0eSwNCmFuZCBzZWVt
+cyB0aGF0IHN0YXJ0ID0gc25hcC0+ZW5kLCB3aGVuIGxlbmd0aCBpcyA1MTEuDQoNCkRpZ2dpbmcg
+aW4sIEkgZm91bmQsIHRoYXQgaW4gdmdhX2RyYXdfZ3JhcGhpYyB3ZSBtb3N0IHByb2JhYmx5IGhh
+dmUgcy0+Z2V0X2JwcCgpIHJldHVybmluZyB6ZXJvLCB3aGljaCBsZWFkcw0KdG8gcmVnaW9uX2Vu
+ZCA9IHJlZ2lvbl9zdGFydCwgaS5lLiByZWdpb24gb2YgemVybyBsZW5ndGgsIHdoaWNoIHRoZW4g
+bGVhZHMgdG8gc25hcC0+ZW5kID09IHNuYXAtPnN0YXJ0ID09IHMtPnZyYW0ucmFtX2Jsb2NrLT5v
+ZmZzZXQuDQoNCk9uIHRoZSBvdGhlciBoYW5kDQoNCnBhZ2UwID0gYWRkciAmIHMtPnZiZV9zaXpl
+X21hc2sgPSAwDQpwYWdlMSA9IChhZGRyICsgYndpZHRoIC0gMSkgJiBzLT52YmVfc2l6ZV9tYXNr
+ID0gNTExDQoNCndoaWNoIGZpbmFsbHkgbGVhZHMgdG8gYXNzZXJ0IGZhaWwgaW4gY3B1X3BoeXNp
+Y2FsX21lbW9yeV9zbmFwc2hvdF9nZXRfZGlydHkoKQ0KDQooYWRkciBpcyAwLCBid2lkdGggaXMg
+NTEyLCB3aWR0aCBpcyAxMDI0IGFuZCBoZWlnaHQgaXMgNzY4KS4uDQoNCg0KSSBkb24ndCB1bmRl
+cnN0YW5kLCB3aGF0IGdldF9icHAgPSAwIG1lYW5zPyBGb3IgbWUgaXQgbG9va3Mgc3RyYW5nZSAo
+aXQgaXMgYml0cyBwZXIgcGl4ZWwsIGlzbid0IGl0PykuLg0KSG9wZSB5b3UgY2FuIHNoZWQgc29t
+ZSBsaWdodCBvbiB0aGlzLg0KDQoNCj09PT09PT09PT09PT09PSBzb21lIGFkZGl0aW9uYWwgZGVi
+dWdnaW5nIGluZm9ybWF0aW9uIGlmIGl0IGhlbHBzID09PT09PT09DQoNCihnZGIpIGZyIDQNCiM0
+ICAweDAwMDA1NjEyZjk1ZDdhMTEgaW4gY3B1X3BoeXNpY2FsX21lbW9yeV9zbmFwc2hvdF9nZXRf
+ZGlydHkgKHNuYXA9c25hcEBlbnRyeT0weDU2MTMwODdiZGNiMCwNCiAgICAgc3RhcnQ9PG9wdGlt
+aXplZCBvdXQ+LCBsZW5ndGg9PG9wdGltaXplZCBvdXQ+KSBhdCAvdXNyL3NyYy9kZWJ1Zy9xZW11
+LTIuMTAuMC9leGVjLmM6MTE5OA0KMTE5OCAgICAgICAgYXNzZXJ0KHN0YXJ0ICsgbGVuZ3RoIDw9
+IHNuYXAtPmVuZCk7DQooZ2RiKSBsaXN0DQoxMTkzICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgcmFtX2FkZHJfdCBsZW5ndGgpDQoxMTk0ICAgIHsNCjExOTUg
+ICAgICAgIHVuc2lnbmVkIGxvbmcgcGFnZSwgZW5kOw0KMTE5Ng0KMTE5NyAgICAgICAgYXNzZXJ0
+KHN0YXJ0ID49IHNuYXAtPnN0YXJ0KTsNCjExOTggICAgICAgIGFzc2VydChzdGFydCArIGxlbmd0
+aCA8PSBzbmFwLT5lbmQpOw0KMTE5OQ0KMTIwMCAgICAgICAgZW5kID0gVEFSR0VUX1BBR0VfQUxJ
+R04oc3RhcnQgKyBsZW5ndGggLSBzbmFwLT5zdGFydCkgPj4gVEFSR0VUX1BBR0VfQklUUzsNCjEy
+MDEgICAgICAgIHBhZ2UgPSAoc3RhcnQgLSBzbmFwLT5zdGFydCkgPj4gVEFSR0VUX1BBR0VfQklU
+UzsNCjEyMDINCihnZGIpIGluZm8gbG9jYWxzDQpwYWdlID0gPG9wdGltaXplZCBvdXQ+DQplbmQg
+PSA8b3B0aW1pemVkIG91dD4NCl9fUFJFVFRZX0ZVTkNUSU9OX18gPSAiY3B1X3BoeXNpY2FsX21l
+bW9yeV9zbmFwc2hvdF9nZXRfZGlydHkiDQooZ2RiKSBwIHNuYXANCiQ2MSA9IChEaXJ0eUJpdG1h
+cFNuYXBzaG90ICopIDB4NTYxMzA4N2JkY2IwDQooZ2RiKSBwICpzbmFwDQokNjIgPSB7c3RhcnQg
+PSA3NzMxMDQ1OTkwNCwgZW5kID0gNzczMTA0NTk5MDQsIGRpcnR5ID0gMHg1NjEzMDg3YmRjYzB9
+DQoNCg0KKGdkYikgZnIgNQ0KIzUgIDB4MDAwMDU2MTJmOTYyMWQyZSBpbiBtZW1vcnlfcmVnaW9u
+X3NuYXBzaG90X2dldF9kaXJ0eSAobXI9bXJAZW50cnk9MHg1NjEzMDkyZTA4ZjAsDQogICAgIHNu
+YXA9c25hcEBlbnRyeT0weDU2MTMwODdiZGNiMCwgYWRkcj08b3B0aW1pemVkIG91dD4sIHNpemU9
+PG9wdGltaXplZCBvdXQ+KQ0KICAgICBhdCAvdXNyL3NyYy9kZWJ1Zy9xZW11LTIuMTAuMC9tZW1v
+cnkuYzoxOTQ5DQoxOTQ5ICAgICAgICByZXR1cm4gY3B1X3BoeXNpY2FsX21lbW9yeV9zbmFwc2hv
+dF9nZXRfZGlydHkoc25hcCwNCihnZGIpIGxpc3QNCjE5NDQNCjE5NDUgICAgYm9vbCBtZW1vcnlf
+cmVnaW9uX3NuYXBzaG90X2dldF9kaXJ0eShNZW1vcnlSZWdpb24gKm1yLCBEaXJ0eUJpdG1hcFNu
+YXBzaG90ICpzbmFwLA0KMTk0NiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIGh3YWRkciBhZGRyLCBod2FkZHIgc2l6ZSkNCjE5NDcgICAgew0KMTk0OCAgICAgICAgYXNz
+ZXJ0KG1yLT5yYW1fYmxvY2spOw0KMTk0OSAgICAgICAgcmV0dXJuIGNwdV9waHlzaWNhbF9tZW1v
+cnlfc25hcHNob3RfZ2V0X2RpcnR5KHNuYXAsDQoxOTUwICAgICAgICAgICAgICAgICAgICBtZW1v
+cnlfcmVnaW9uX2dldF9yYW1fYWRkcihtcikgKyBhZGRyLCBzaXplKTsNCjE5NTEgICAgfQ0KMTk1
+Mg0KMTk1MyAgICB2b2lkIG1lbW9yeV9yZWdpb25fc3luY19kaXJ0eV9iaXRtYXAoTWVtb3J5UmVn
+aW9uICptcikNCihnZGIpIGluZm8gbG9jYWxzDQpfX1BSRVRUWV9GVU5DVElPTl9fID0gIm1lbW9y
+eV9yZWdpb25fc25hcHNob3RfZ2V0X2RpcnR5Ig0KKGdkYikgcCAqbXItPnJhbV9ibG9jaw0KJDYz
+ID0ge3JjdSA9IHtuZXh0ID0gMHgwLCBmdW5jID0gMHgwfSwgbXIgPSAweDU2MTMwOTJlMDhmMCwN
+CiAgIGhvc3QgPSAweDdlZWVmOTAwMDAwMCA8QWRkcmVzcyAweDdlZWVmOTAwMDAwMCBvdXQgb2Yg
+Ym91bmRzPiwgb2Zmc2V0ID0gNzczMTA0NTk5MDQsDQogICB1c2VkX2xlbmd0aCA9IDMzNTU0NDMy
+LCBtYXhfbGVuZ3RoID0gMzM1NTQ0MzIsIHJlc2l6ZWQgPSAweDAsIGZsYWdzID0gMCwNCiAgIGlk
+c3RyID0gInZnYS52cmFtIiwgJ1wwMDAnIDxyZXBlYXRzIDI0NyB0aW1lcz4sIG5leHQgPSB7bGVf
+bmV4dCA9IDB4NTYxMzA3NWZjYTgwLA0KICAgICBsZV9wcmV2ID0gMHg1NjEyZmJhMmM3NDh9LCBy
+YW1ibG9ja19ub3RpZmllcnMgPSB7bGhfZmlyc3QgPSAweDB9LCBmZCA9IC0xLCBwYWdlX3NpemUg
+PSA0MDk2LA0KICAgYm1hcCA9IDB4MCwgdW5zZW50bWFwID0gMHgwfQ0KDQoNCihnZGIpIGZyIDYN
+CiM2ICAweDAwMDA1NjEyZjk2NDRhZjUgaW4gdmdhX2RyYXdfZ3JhcGhpYyAoZnVsbF91cGRhdGU9
+MCwgcz0weDU2MTMwOTJlMDhlMCkNCiAgICAgYXQgL3Vzci9zcmMvZGVidWcvcWVtdS0yLjEwLjAv
+aHcvZGlzcGxheS92Z2EuYzoxNjc4DQoxNjc4ICAgICAgICAgICAgICAgIHVwZGF0ZSA9IG1lbW9y
+eV9yZWdpb25fc25hcHNob3RfZ2V0X2RpcnR5KCZzLT52cmFtLCBzbmFwLA0KKGdkYikgbGlzdA0K
+MTY3MyAgICAgICAgICAgICAgICB1cGRhdGUgPSBtZW1vcnlfcmVnaW9uX3NuYXBzaG90X2dldF9k
+aXJ0eSgmcy0+dnJhbSwgc25hcCwNCjE2NzQgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgcGFnZTAsIDApOw0KMTY3NSAgICAgICAgICAgICAg
+ICB1cGRhdGUgfD0gbWVtb3J5X3JlZ2lvbl9zbmFwc2hvdF9nZXRfZGlydHkoJnMtPnZyYW0sIHNu
+YXAsDQoxNjc2ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBwYWdlMSwgMCk7DQoxNjc3ICAgICAgICAgICAgfSBlbHNlIHsNCjE2NzggICAg
+ICAgICAgICAgICAgdXBkYXRlID0gbWVtb3J5X3JlZ2lvbl9zbmFwc2hvdF9nZXRfZGlydHkoJnMt
+PnZyYW0sIHNuYXAsDQoxNjc5ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIHBhZ2UwLCBwYWdlMSAtIHBhZ2UwKTsNCjE2ODAgICAgICAgICAg
+ICB9DQoxNjgxICAgICAgICAgICAgLyogZXhwbGljaXQgaW52YWxpZGF0aW9uIGZvciB0aGUgaGFy
+ZHdhcmUgY3Vyc29yIChjaXJydXMgb25seSkgKi8NCjE2ODIgICAgICAgICAgICB1cGRhdGUgfD0g
+dmdhX3NjYW5saW5lX2ludmFsaWRhdGVkKHMsIHkpOw0KKGdkYikgaW5mbyBsb2NhbHMNCmRvdWJs
+ZV9zY2FuID0gPG9wdGltaXplZCBvdXQ+DQp3aWR0aCA9IDEwMjQNCm11bHRpX3NjYW4gPSAwDQp5
+ID0gMA0KYml0cyA9IDxvcHRpbWl6ZWQgb3V0Pg0Kc25hcCA9IDB4NTYxMzA4N2JkY2IwDQpieXRl
+c3dhcCA9IDxvcHRpbWl6ZWQgb3V0Pg0KcmVnaW9uX2VuZCA9IDxvcHRpbWl6ZWQgb3V0Pg0KYWRk
+cjEgPSAwDQphZGRyID0gMA0Kc2hhcmVfc3VyZmFjZSA9IDxvcHRpbWl6ZWQgb3V0Pg0KZm9ybWF0
+ID0gPG9wdGltaXplZCBvdXQ+DQp5MSA9IDANCnlfc3RhcnQgPSAtMQ0KbXVsdGlfcnVuID0gMA0K
+c3VyZmFjZSA9IDB4NTYxMzA4YWM1YzgwDQp1cGRhdGUgPSAwDQpkZXB0aCA9IDxvcHRpbWl6ZWQg
+b3V0Pg0KaGVpZ2h0ID0gNzY4DQpid2lkdGggPSA1MTINCnJlZ2lvbl9zdGFydCA9IDxvcHRpbWl6
+ZWQgb3V0Pg0KdmdhX2RyYXdfbGluZSA9IDB4NTYxMmY5NjQxOGQwIDx2Z2FfZHJhd19saW5lOGQy
+Pg0KbWFzayA9IDxvcHRpbWl6ZWQgb3V0Pg0KcGFnZTAgPSA8b3B0aW1pemVkIG91dD4NCmQgPSAw
+eDU2MTMwYTY4YzAwMCAiIg0KdiA9IDxvcHRpbWl6ZWQgb3V0Pg0KZm9yY2Vfc2hhZG93ID0gZmFs
+c2UNCnNoaWZ0X2NvbnRyb2wgPSA8b3B0aW1pemVkIG91dD4NCnBhZ2UxID0gPG9wdGltaXplZCBv
+dXQ+DQpkaXNwX3dpZHRoID0gMTAyNA0KDQooZ2RiKSBwIGZ1bGxfdXBkYXRlDQokNjQgPSAwDQoo
+Z2RiKSBwIHMtPmxpbmVfb2Zmc2V0DQokNjUgPSAwDQooZ2RiKSBwIHMtPmdldF9icHANCiQ2NiA9
+IChpbnQgKCopKHN0cnVjdCBWR0FDb21tb25TdGF0ZSAqKSkgMHg1NjEyZjk2NDFmNjAgPHZnYV9n
+ZXRfYnBwPg0KKGdkYikgcCBzLT52YmVfcmVncw0KJDY3ID0gezQ1MjQ4LCAxMDI0LCA3NjgsIDMy
+LCAwLCAwLCAxMDI0LCA4MTkyLCAwLCAwfSAgLy8gd2hpY2ggbWVhbnMgdGhhdCB2YmVfZW5hYmxl
+ZCBzaG91bGQgcmV0dXJuIDAgYW5kIHRoZW4gdmdhX2dldF9icHAgc2hvdWxkIHJldHVybiAwDQoo
+Z2RiKSBwIChzLT5ncls1XSA+PiA1KSAmIDMNCiQ2OCA9IDIgICAgICAgICAgICAgIC8vIGl0IHNo
+b3VsZCBiZSBzaGlmdF9jb250cm9sDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
 
