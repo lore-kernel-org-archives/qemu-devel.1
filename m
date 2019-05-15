@@ -2,65 +2,59 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14070C04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 07:17:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31A53C04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 07:17:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D74102084A
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 07:17:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D74102084A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 068572084A
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 07:17:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 068572084A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60826 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60832 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQoAD-0002AI-Sf
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 03:17:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54521)
+	id 1hQoAm-0002Z8-6o
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 03:17:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hQo8m-00010d-3F
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 03:15:53 -0400
+	(envelope-from <philmd@redhat.com>) id 1hQo9I-0001SA-PQ
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 03:16:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hQnxa-0005n7-P8
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 03:04:20 -0400
-Received: from mga04.intel.com ([192.55.52.120]:23934)
+	(envelope-from <philmd@redhat.com>) id 1hQnxP-0005J5-6L
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 03:04:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43052)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hQnxZ-0005f3-A3
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 03:04:17 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-	by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	15 May 2019 00:04:14 -0700
-X-ExtLoop1: 1
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by orsmga005.jf.intel.com with ESMTP; 15 May 2019 00:04:13 -0700
-Date: Wed, 15 May 2019 15:03:41 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190515070341.GA24741@richard>
-References: <20190424004700.12766-1-richardw.yang@linux.intel.com>
-	<20190424004700.12766-3-richardw.yang@linux.intel.com>
-	<0eb5e5a5-593e-f4a2-7e2d-a9fed481ab6c@gmail.com>
-	<20190426005133.GB25513@richard> <20190514151813.GL2753@work-vm>
-	<20190515063827.GB11845@richard>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>)
+	id 1hQnxP-0005G5-0s; Wed, 15 May 2019 03:04:07 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 02D913001C3D;
+	Wed, 15 May 2019 07:04:06 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-225.brq.redhat.com [10.40.204.225])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E45C60BE5;
+	Wed, 15 May 2019 07:04:00 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 15 May 2019 09:03:57 +0200
+Message-Id: <20190515070357.882-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190515063827.GB11845@richard>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 192.55.52.120
-Subject: Re: [Qemu-devel] [PATCH 2/4] migration/savevm: use
- migration_is_blocked to validate
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Wed, 15 May 2019 07:04:06 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] docs/devel/build-system: Update an example
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,48 +66,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: quintela@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Huth <thuth@redhat.com>,
+	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, May 15, 2019 at 02:38:27PM +0800, Wei Yang wrote:
->On Tue, May 14, 2019 at 04:18:14PM +0100, Dr. David Alan Gilbert wrote:
->>* Wei Yang (richardw.yang@linux.intel.com) wrote:
->>> 
->>> Well, when you look into the source side of migration:
->>> 
->>> qmp_migrate
->>>   migrate_prepare
->>>     migration_is_blocked
->>> 
->>> This means if migration_is_blocked fails, the source will not start migration.
->>> And it is the same as save_snapshot.
->>> 
->>> From my understanding, when we load a vm, it should check the same
->>> requirement.
->>
->>I've been thinking about this, and I think I agree with Daniel on this.
->>The 'migration_blockers' list tells you that something about the
->>*current* state of a device means that it can't be migrated - e.g.
->>a 9pfs with a mounted filesystem can't be migrated.
->>
->>If we're about to reload the state from a snapshot, then the saved
->>snapshot's state must have been migratable, so that's OK.
->>
->
->The situation is on a vm with 'migration_blockers' still could reload from a
->snapshot.
->
->This sounds reasonable. Thanks :-)
->
+The default-configs/ example added in 717171bd2025 is no
+more accurate since fa212a2b8b60 (and various further other
+commits).
 
-Well, this is still a little strange. The means source vm and destination vm
-could have different configuration. Is this common?
+The Kconfig build system is now in place.
+Use the aarch64-softmmu config as example.
 
--- 
-Wei Yang
-Help you, Help me
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ docs/devel/build-system.txt | 15 +++++----------
+ 1 file changed, 5 insertions(+), 10 deletions(-)
+
+diff --git a/docs/devel/build-system.txt b/docs/devel/build-system.txt
+index addd274eebd..79a85bfba06 100644
+--- a/docs/devel/build-system.txt
++++ b/docs/devel/build-system.txt
+@@ -415,16 +415,11 @@ context.
+ The files under default-configs/ control what emulated hardware is built
+ into each QEMU system and userspace emulator targets. They merely
+ contain a long list of config variable definitions. For example,
+-default-configs/x86_64-softmmu.mak has:
+-
+-  include sound.mak
+-  include usb.mak
+-  CONFIG_QXL=3D$(CONFIG_SPICE)
+-  CONFIG_VGA_ISA=3Dy
+-  CONFIG_VGA_CIRRUS=3Dy
+-  CONFIG_VMWARE_VGA=3Dy
+-  CONFIG_VIRTIO_VGA=3Dy
+-  ...snip...
++default-configs/aarch64-softmmu.mak has:
++
++  include arm-softmmu.mak
++  CONFIG_XLNX_ZYNQMP_ARM=3Dy
++  CONFIG_XLNX_VERSAL=3Dy
+=20
+ These files rarely need changing unless new devices / hardware need to
+ be enabled for a particular system/userspace emulation target
+--=20
+2.20.1
+
 
