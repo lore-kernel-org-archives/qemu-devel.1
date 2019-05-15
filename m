@@ -4,89 +4,89 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6836BC04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 16:05:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5346CC04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 16:11:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3389B20873
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 16:05:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CFE420862
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 16:11:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AZaiqSe0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3389B20873
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xKDLnvhF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CFE420862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39301 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39363 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQwPP-0008R7-8V
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 12:05:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53233)
+	id 1hQwVa-0001dR-5c
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 12:11:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hQwLb-0006WF-2S
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:01:40 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hQwUk-0001MN-Ox
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hQwLV-0007DA-O9
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:01:39 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42353)
+	(envelope-from <alex.bennee@linaro.org>) id 1hQwUi-00041U-2b
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:11:05 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54827)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hQwLV-00071L-Cf
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:01:33 -0400
-Received: by mail-wr1-x442.google.com with SMTP id l2so79189wrb.9
-	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 09:01:29 -0700 (PDT)
+	id 1hQwUf-0003r2-JL
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:11:02 -0400
+Received: by mail-wm1-x342.google.com with SMTP id i3so611336wml.4
+	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 09:10:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=references:user-agent:from:to:cc:subject:in-reply-to:date
 	:message-id:mime-version:content-transfer-encoding;
-	bh=F4X7OUYgrPIAx7m8tiEPn2A0jIWPS2IieBRBcThWfI4=;
-	b=AZaiqSe0+QizmshUDYDV/vPOkEt/KfxQowr69qxLkBEvbstpqJZr4dUp2IKgFJYW2j
-	S0BePZMNymU7S7KHK29TXSGm0nxo8IXfPILFtAM95ACombGmEsHm11Z+cypeWd3NyX8+
-	FCZft/yOG59W1YAtE7xADINbBICJtBazsl6y9UHio1zCAeMZ5fa7Mkt3ItMKzVvMze/K
-	5LRlCPqns/8513b/q7pP6nkwzc2NM26Px8u3YuCAFW9+6GAwJU2TNzwem6kFtMfCP4Lt
-	uc/iHwUjWnoDZ6dwhfS5gxItTjZshauoAvFahuCoXyaP4dgDi+HMe/XatKs/ofiNOxd1
-	P6aA==
+	bh=5UZ0MlRKqle2hmtTs6beMk0fpe+fn2n5zvXxyj+X1hg=;
+	b=xKDLnvhFg+00UP6KsDB0kiH6IkCq8szeZZeuAHvwzR1thOKk4mgdyTSKS1M7tm0Tqp
+	dvFsUGzra+6InhxhYsY9BHQSnaq4YE3s86UP/BRJPA6I3m4q3MqhSTqr/TFGtOEV0h15
+	iEt7L6p4NolE0y6vAIM1KjTrFlio+VkbvOH59sFidu7t+gomEB2wQe83Je/OQ9mAAM9Y
+	ZaIMLfsZJ9kfwJEb1BlB8qR0HboBNIYKWjB6gktI1qb5ACfrjmiYSDrdR2POyvm3NGCs
+	LNhdhcvzbl+nlnM1DgiwH9Y/QVjn6Qo/OMszg0F6ebGsqlMdFEvRXyqWagX54j9YGqFh
+	hszg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:references:user-agent:from:to:cc:subject
 	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=F4X7OUYgrPIAx7m8tiEPn2A0jIWPS2IieBRBcThWfI4=;
-	b=XB0OuA8Gl4uduJT9v5UiLEkjszJGSPxXy45vhOF7EtyGGoe2xVgYBq1es+qAn988ed
-	qOjoIID8rtmIp8jNnVRHv32yEyFoZANbhQOYOpuM06mPgr6vOgAMW/dWm5CZB4rAg6d/
-	4XbOLvMc/FUKr5nHJGklJ2+VWnhDELQgRPTd3+0xwURVOL1eU0JbV0UdApMOsMVeMZQO
-	CS+kvpXrmWoO4IKjX1j5WAjnidwmfwnnI7fCDvvx8GqYsjprxm89SjSwCtQJu0Q9g64L
-	DwPtQqPAmO5ahH7YanCwRaak8kgRISHR8IsG5Qtr8zXXGAzVRmgO1Y9K+msresNa2X6k
-	i/XA==
-X-Gm-Message-State: APjAAAUDfb3AjRpaEcOiBwkoE5pDpV5KJLYaa+YBpvdGWBneeQUigjCr
-	c53zBVDk/dCqxmrHOmruMKV57w==
-X-Google-Smtp-Source: APXvYqyhWcV616I2XdEVlitITXlBhKZU5LJFuWBT6ZUm+69sdwpHLVgKS61it80DDfvgYz2vkHLBDg==
-X-Received: by 2002:adf:f208:: with SMTP id p8mr7405288wro.160.1557936088394; 
-	Wed, 15 May 2019 09:01:28 -0700 (PDT)
+	bh=5UZ0MlRKqle2hmtTs6beMk0fpe+fn2n5zvXxyj+X1hg=;
+	b=pleF25HyoIzk5dxMGyDHQzJlLqWK7x9Hzvkbljg9AFTLN6w41cROcHP4cJV99Y6xDN
+	/nIczY4jO7Ez9rTmIXhHAq6O6TRNjHVWK11xFNyC+iVl012sKpP4cbyW/r7+9d/oUqlR
+	P6ddIA1W/VOUEUEaHfvymvX9eCPplBI2Qgd9yYng1wXarEewb9gQuMXViUgWWyEdYb+P
+	zbWfPuvpFpiD3AHFPG629MaTWL9WKOCMTG3gjQbH32ZxPW5yAdfYdhCnXkXs3rWlHYPa
+	vm3JZYiVGiaom3sb2HFDHzUOxmhXwy8G5DRtZxjTlIflAlQHhhfyBTM5yKALlwe44mdR
+	BT8Q==
+X-Gm-Message-State: APjAAAVoX+9fL6UQl3whXuRQR9bDg5w/Woo9nJdIYKT2Bi/P7IsQ7NlD
+	Vn83477Q+XVrZNQqC6XD1QklWQ==
+X-Google-Smtp-Source: APXvYqzfx0xK6aLfpPE8gvEo2CLcRBh3aU701RdClHalcwVkbviqTEpP2DvMugYOkGayPD++JmFolw==
+X-Received: by 2002:a1c:486:: with SMTP id 128mr22547020wme.83.1557936655310; 
+	Wed, 15 May 2019 09:10:55 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
 	by smtp.gmail.com with ESMTPSA id
-	a11sm2728326wrx.31.2019.05.15.09.01.27
+	y184sm2989770wmg.7.2019.05.15.09.10.54
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 15 May 2019 09:01:27 -0700 (PDT)
+	Wed, 15 May 2019 09:10:54 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 515CD1FF87;
-	Wed, 15 May 2019 17:01:27 +0100 (BST)
+	by zen.linaroharston (Postfix) with ESMTP id 260791FF87;
+	Wed, 15 May 2019 17:10:54 +0100 (BST)
 References: <20190502081554.5521-1-arilou@gmail.com>
-	<20190502081554.5521-14-arilou@gmail.com>
+	<20190502081554.5521-15-arilou@gmail.com>
 User-agent: mu4e 1.3.1; emacs 26.1
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Jon Doron <arilou@gmail.com>
-In-reply-to: <20190502081554.5521-14-arilou@gmail.com>
-Date: Wed, 15 May 2019 17:01:27 +0100
-Message-ID: <87mujnn1uw.fsf@zen.linaroharston>
+In-reply-to: <20190502081554.5521-15-arilou@gmail.com>
+Date: Wed, 15 May 2019 17:10:54 +0100
+Message-ID: <87lfz7n1f5.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH v9 13/27] gdbstub: Implement write all
- registers (G pkt) with new infra
+X-Received-From: 2a00:1450:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v9 14/27] gdbstub: Implement read all
+ registers (g pkt) with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -108,96 +108,79 @@ Jon Doron <arilou@gmail.com> writes:
 
 > Signed-off-by: Jon Doron <arilou@gmail.com>
 > ---
->  gdbstub.c | 41 +++++++++++++++++++++++++++++++----------
->  1 file changed, 31 insertions(+), 10 deletions(-)
+>  gdbstub.c | 31 +++++++++++++++++++++++--------
+>  1 file changed, 23 insertions(+), 8 deletions(-)
 >
 > diff --git a/gdbstub.c b/gdbstub.c
-> index daa602edc3..adfe39b3a3 100644
+> index adfe39b3a3..3478ac778d 100644
 > --- a/gdbstub.c
 > +++ b/gdbstub.c
-> @@ -1734,6 +1734,29 @@ static void handle_read_mem(GdbCmdContext *gdb_ctx=
-, void *user_ctx)
->      put_packet(gdb_ctx->s, gdb_ctx->str_buf);
+> @@ -1757,6 +1757,21 @@ static void handle_write_all_regs(GdbCmdContext *g=
+db_ctx, void *user_ctx)
+>      put_packet(gdb_ctx->s, "OK");
 >  }
 >
-> +static void handle_write_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
+> +static void handle_read_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
 > +{
 > +    target_ulong addr, len;
-> +    uint8_t *registers;
-> +    int reg_size;
-> +
-> +    if (!gdb_ctx->num_params) {
-> +        return;
-> +    }
 > +
 > +    cpu_synchronize_state(gdb_ctx->s->g_cpu);
-> +    registers =3D gdb_ctx->mem_buf;
-> +    len =3D strlen(gdb_ctx->params[0].data) / 2;
-> +    hextomem(registers, gdb_ctx->params[0].data, len);
+> +    len =3D 0;
+> +    for (addr =3D 0; addr < gdb_ctx->s->g_cpu->gdb_num_g_regs; addr++) {
+> +        len +=3D gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf +=
+ len,
+> +                                 addr);
+> +    }
 
-Admittedly the legacy code didn't check either but we are assuming that
-registers (i.e. gdb_ctx->mem_buf) won't overflow. It's probably still
-safe as the incoming packets are limited in size. I was trying to find
-where MAX_PACKET_LENGTH came from and AFAICT it's an arbitrary number we
-made up.
+Again no bounds checking - we get away with it because for hppa:
 
-I wonder if it would make sense in another series to convert the various
-buffers to GString and GBytes so we can dynamically handle longer
-packets without all this inconsistent application of bounds checking.
+  (* 8 128 2) =3D 2048
 
 Anyway:
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-
-> +    for (addr =3D 0; addr < gdb_ctx->s->g_cpu->gdb_num_g_regs && len > 0;
-> +         addr++) {
-> +        reg_size =3D gdb_write_register(gdb_ctx->s->g_cpu, registers, ad=
-dr);
-> +        len -=3D reg_size;
-> +        registers +=3D reg_size;
-> +    }
-> +    put_packet(gdb_ctx->s, "OK");
+> +
+> +    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, len);
+> +    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
 > +}
 > +
 >  static int gdb_handle_packet(GDBState *s, const char *line_buf)
 >  {
 >      CPUState *cpu;
-> @@ -1745,7 +1768,6 @@ static int gdb_handle_packet(GDBState *s, const cha=
+> @@ -1764,7 +1779,7 @@ static int gdb_handle_packet(GDBState *s, const cha=
 r *line_buf)
+>      CPUClass *cc;
+>      const char *p;
+>      uint32_t pid, tid;
+> -    int ch, reg_size, type, res;
+> +    int ch, type, res;
 >      uint8_t mem_buf[MAX_PACKET_LENGTH];
 >      char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
 >      char thread_id[16];
-> -    uint8_t *registers;
->      target_ulong addr, len;
->      const GdbCmdParseEntry *cmd_parser =3D NULL;
->
-> @@ -1911,16 +1933,15 @@ static int gdb_handle_packet(GDBState *s, const c=
+> @@ -1923,14 +1938,14 @@ static int gdb_handle_packet(GDBState *s, const c=
 har *line_buf)
->          put_packet(s, buf);
+>          }
+>          break;
+>      case 'g':
+> -        cpu_synchronize_state(s->g_cpu);
+> -        len =3D 0;
+> -        for (addr =3D 0; addr < s->g_cpu->gdb_num_g_regs; addr++) {
+> -            reg_size =3D gdb_read_register(s->g_cpu, mem_buf + len, addr=
+);
+> -            len +=3D reg_size;
+> +        {
+> +            static const GdbCmdParseEntry read_all_regs_cmd_desc =3D {
+> +                .handler =3D handle_read_all_regs,
+> +                .cmd =3D "g",
+> +                .cmd_startswith =3D 1
+> +            };
+> +            cmd_parser =3D &read_all_regs_cmd_desc;
+>          }
+> -        memtohex(buf, mem_buf, len);
+> -        put_packet(s, buf);
 >          break;
 >      case 'G':
-> -        cpu_synchronize_state(s->g_cpu);
-> -        registers =3D mem_buf;
-> -        len =3D strlen(p) / 2;
-> -        hextomem((uint8_t *)registers, p, len);
-> -        for (addr =3D 0; addr < s->g_cpu->gdb_num_g_regs && len > 0; add=
-r++) {
-> -            reg_size =3D gdb_write_register(s->g_cpu, registers, addr);
-> -            len -=3D reg_size;
-> -            registers +=3D reg_size;
-> +        {
-> +            static const GdbCmdParseEntry write_all_regs_cmd_desc =3D {
-> +                .handler =3D handle_write_all_regs,
-> +                .cmd =3D "G",
-> +                .cmd_startswith =3D 1,
-> +                .schema =3D "s0"
-> +            };
-> +            cmd_parser =3D &write_all_regs_cmd_desc;
->          }
-> -        put_packet(s, "OK");
->          break;
->      case 'm':
 >          {
 
 
