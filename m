@@ -6,58 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9937C04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 12:23:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C05A6C04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 12:24:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D04A20578
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 12:23:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D04A20578
+	by mail.kernel.org (Postfix) with ESMTPS id 8F1F520578
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 12:24:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F1F520578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36421 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36437 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQsw4-0005Vd-Q3
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 08:23:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57955)
+	id 1hQsxM-0006PS-Sn
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 08:24:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1hQsq1-0000NM-5v
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:16:50 -0400
+	(envelope-from <quintela@redhat.com>) id 1hQsq7-0000eG-R6
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:16:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1hQsq0-0002ny-2c
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:16:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34376)
+	(envelope-from <quintela@redhat.com>) id 1hQsq6-0002xE-N4
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:16:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37340)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hQspz-0002n0-R4
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:16:48 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hQsq6-0002w5-Fo
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:16:54 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2CC92300414C
-	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 12:16:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D653BC057EC4
+	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 12:16:53 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-116-37.ams2.redhat.com
 	[10.36.116.37])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 42A105C236;
-	Wed, 15 May 2019 12:16:45 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BCA705C1A3;
+	Wed, 15 May 2019 12:16:49 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 15 May 2019 14:15:42 +0200
-Message-Id: <20190515121544.4597-7-quintela@redhat.com>
+Date: Wed, 15 May 2019 14:15:44 +0200
+Message-Id: <20190515121544.4597-9-quintela@redhat.com>
 In-Reply-To: <20190515121544.4597-1-quintela@redhat.com>
 References: <20190515121544.4597-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Wed, 15 May 2019 12:16:47 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.32]);
+	Wed, 15 May 2019 12:16:53 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 6/8] migration: Make none operations into
- its own structure
+Subject: [Qemu-devel] [PATCH v3 8/8] multifd: rest of zlib compression
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,134 +76,149 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It will be used later.
+This is still a work in progress, but get everything sent as expected
+and it is faster than the code that is already there.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c | 54 ++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 49 insertions(+), 5 deletions(-)
+ migration/ram.c | 106 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 104 insertions(+), 2 deletions(-)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index 1ca9ba77b6..6679e4f213 100644
+index fdb5bf07a5..efbb253c1a 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -700,6 +700,40 @@ typedef struct {
-     QemuSemaphore sem_sync;
- } MultiFDRecvParams;
+@@ -747,6 +747,100 @@ MultifdMethods multifd_none_ops =3D {
+     .recv_pages =3D none_recv_pages
+ };
 =20
-+typedef struct {
-+    /* Prepare the send packet */
-+    int (*send_prepare)(MultiFDSendParams *p, uint32_t used);
-+    /* Write the send packet */
-+    int (*send_write)(MultiFDSendParams *p, uint32_t used, Error **perr)=
-;
-+    /* Read all pages */
-+    int (*recv_pages)(MultiFDRecvParams *p, uint32_t used, Error **perr)=
-;
-+} MultifdMethods;
++/* Multifd zlib compression */
 +
-+/* Multifd without compression */
-+
-+static int none_send_prepare(MultiFDSendParams *p, uint32_t used)
++static int zlib_send_prepare(MultiFDSendParams *p, uint32_t used)
 +{
-+    p->next_packet_size =3D used * qemu_target_page_size();
++    struct iovec *iov =3D p->pages->iov;
++    z_stream *zs =3D &p->zs;
++    uint32_t out_size =3D 0;
++    int ret;
++    int i;
++
++    for (i =3D 0; i < used; i++) {
++        uint32_t available =3D p->zbuff_len - out_size;
++        int flush =3D Z_NO_FLUSH;
++
++        if (i =3D=3D used  - 1) {
++            flush =3D Z_SYNC_FLUSH;
++        }
++
++        zs->avail_in =3D iov[i].iov_len;
++        zs->next_in =3D iov[i].iov_base;
++
++        zs->avail_out =3D available;
++        zs->next_out =3D p->zbuff + out_size;
++
++        ret =3D deflate(zs, flush);
++        if (ret !=3D Z_OK) {
++            printf("problem with deflate? %d\n", ret);
++            qemu_mutex_unlock(&p->mutex);
++            return -1;
++        }
++        out_size +=3D available - zs->avail_out;
++    }
++    p->next_packet_size =3D out_size;
++
 +    return 0;
 +}
 +
-+static int none_send_write(MultiFDSendParams *p, uint32_t used, Error **=
++static int zlib_send_write(MultiFDSendParams *p, uint32_t used, Error **=
 perr)
 +{
-+    return qio_channel_writev_all(p->c, p->pages->iov, used, perr);
++    return qio_channel_write_all(p->c, (void *)p->zbuff, p->next_packet_=
+size,
++                                 perr);
 +}
 +
-+static int none_recv_pages(MultiFDRecvParams *p, uint32_t used, Error **=
++static int zlib_recv_pages(MultiFDRecvParams *p, uint32_t used, Error **=
 perr)
 +{
-+    return qio_channel_readv_all(p->c, p->pages->iov, used, perr);
++    uint32_t in_size =3D p->next_packet_size;
++    uint32_t out_size =3D 0;
++    uint32_t expected_size =3D used * qemu_target_page_size();
++    z_stream *zs =3D &p->zs;
++    int ret;
++    int i;
 +
++    ret =3D qio_channel_read_all(p->c, (void *)p->zbuff, in_size, perr);
++
++    if (ret !=3D 0) {
++        return ret;
++    }
++
++    zs->avail_in =3D in_size;
++    zs->next_in =3D p->zbuff;
++
++    for (i =3D 0; i < used; i++) {
++        struct iovec *iov =3D &p->pages->iov[i];
++        int flush =3D Z_NO_FLUSH;
++
++        if (i =3D=3D used  - 1) {
++            flush =3D Z_SYNC_FLUSH;
++        }
++
++        zs->avail_out =3D iov->iov_len;
++        zs->next_out =3D iov->iov_base;
++
++        ret =3D inflate(zs, flush);
++        if (ret !=3D Z_OK) {
++            printf("%d: problem with inflate? %d\n", p->id, ret);
++            qemu_mutex_unlock(&p->mutex);
++            return ret;
++        }
++        out_size +=3D iov->iov_len;
++    }
++    if (out_size !=3D expected_size) {
++        printf("out size %d expected size %d\n",
++               out_size, expected_size);
++        return -1;
++    }
++    return 0;
 +}
 +
-+MultifdMethods multifd_none_ops =3D {
-+    .send_prepare =3D none_send_prepare,
-+    .send_write =3D none_send_write,
-+    .recv_pages =3D none_recv_pages
++MultifdMethods multifd_zlib_ops =3D {
++    .send_prepare =3D zlib_send_prepare,
++    .send_write =3D zlib_send_write,
++    .recv_pages =3D zlib_recv_pages
 +};
 +
  static int multifd_send_initial_packet(MultiFDSendParams *p, Error **err=
 p)
  {
      MultiFDInit_t msg;
-@@ -904,6 +938,8 @@ struct {
-     uint64_t packet_num;
-     /* send channels ready */
-     QemuSemaphore channels_ready;
-+    /* multifd ops */
-+    MultifdMethods *ops;
- } *multifd_send_state;
-=20
- /*
-@@ -1093,6 +1129,8 @@ static void *multifd_send_thread(void *opaque)
+@@ -1145,7 +1239,11 @@ static void *multifd_send_thread(void *opaque)
      /* initial packet */
      p->num_packets =3D 1;
 =20
-+    multifd_send_state->ops =3D &multifd_none_ops;
-+
+-    multifd_send_state->ops =3D &multifd_none_ops;
++    if (migrate_use_multifd_zlib()) {
++        multifd_send_state->ops =3D &multifd_zlib_ops;
++    } else {
++        multifd_send_state->ops =3D &multifd_none_ops;
++    }
+=20
      while (true) {
          qemu_sem_wait(&p->sem);
-         qemu_mutex_lock(&p->mutex);
-@@ -1102,7 +1140,12 @@ static void *multifd_send_thread(void *opaque)
-             uint64_t packet_num =3D p->packet_num;
-             uint32_t flags =3D p->flags;
-=20
--            p->next_packet_size =3D used * qemu_target_page_size();
-+            if (used) {
-+                ret =3D multifd_send_state->ops->send_prepare(p, used);
-+                if (ret !=3D 0) {
-+                    break;
-+                }
-+            }
-             multifd_send_fill_packet(p);
-             p->flags =3D 0;
-             p->num_packets++;
-@@ -1120,8 +1163,7 @@ static void *multifd_send_thread(void *opaque)
-             }
-=20
-             if (used) {
--                ret =3D qio_channel_writev_all(p->c, p->pages->iov,
--                                             used, &local_err);
-+                ret =3D multifd_send_state->ops->send_write(p, used, &lo=
-cal_err);
-                 if (ret !=3D 0) {
-                     break;
-                 }
-@@ -1223,6 +1265,8 @@ struct {
-     QemuSemaphore sem_sync;
-     /* global number of generated multifd packets */
-     uint64_t packet_num;
-+    /* multifd ops */
-+    MultifdMethods *ops;
- } *multifd_recv_state;
-=20
- static void multifd_recv_terminate_threads(Error *err)
-@@ -1324,6 +1368,7 @@ static void *multifd_recv_thread(void *opaque)
+@@ -1399,7 +1497,11 @@ static void *multifd_recv_thread(void *opaque)
      trace_multifd_recv_thread_start(p->id);
      rcu_register_thread();
 =20
-+    multifd_recv_state->ops =3D &multifd_none_ops;
+-    multifd_recv_state->ops =3D &multifd_none_ops;
++    if (migrate_use_multifd_zlib()) {
++        multifd_recv_state->ops =3D &multifd_zlib_ops;
++    } else {
++        multifd_recv_state->ops =3D &multifd_none_ops;
++    }
      while (true) {
          uint32_t used;
          uint32_t flags;
-@@ -1353,8 +1398,7 @@ static void *multifd_recv_thread(void *opaque)
-         qemu_mutex_unlock(&p->mutex);
-=20
-         if (used) {
--            ret =3D qio_channel_readv_all(p->c, p->pages->iov,
--                                        used, &local_err);
-+            ret =3D multifd_recv_state->ops->recv_pages(p, used, &local_=
-err);
-             if (ret !=3D 0) {
-                 break;
-             }
 --=20
 2.21.0
 
