@@ -2,92 +2,62 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50FEAC04E84
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 12:29:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3788C04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 12:33:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B5D82084E
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 12:29:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YcWHLkTc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B5D82084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 381C120843
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 12:33:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 381C120843
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36493 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36545 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQt2i-0008Iy-D1
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 08:29:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60104)
+	id 1hQt6U-0002W4-Tt
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 08:33:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hQt1E-0007Se-6O
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:28:29 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1hQt4Z-00018T-IC
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:31:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hQt1D-0006zX-4Q
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:28:24 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:41116)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
-	id 1hQt1C-0006fi-N3
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:28:23 -0400
-Received: by mail-ed1-x541.google.com with SMTP id m4so3830194edd.8
-	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 05:28:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
-	:content-disposition:in-reply-to:user-agent;
-	bh=cbaLoTFydWQo72ytbfEQ1owVAhADDT3+OqWdRDyyzto=;
-	b=YcWHLkTcgLPIdP+Cdv8qQu+VlQWfReXEgR9FgWSUp1TH1w06dx9ifp4azRv6kYSldW
-	J5kpQNKzZmMWEHjaKjniZ3XHu30jtkJLHUEQOg1VFVwPwl+wsknX7SWTpu+M3h9BU57O
-	82lwmGonehuRcIDILqjmIJT+9fwcOC9MNUXlQAwJJH/QlkSxuTRGDySysd6ZnuPhh0C5
-	65PJoLedEr0lKRckEb5oA1WPDmsusrVONSir2QbhUi/mSu5u14Fyc/3WMSqX4hFBRkRo
-	MiB9e3GLn1HAoZsCZPYXZbpJeN0KOgZCf35MkC0nIi1bIUj69lmLlyb/5ldVuFdCS9Za
-	gkBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
-	:references:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=cbaLoTFydWQo72ytbfEQ1owVAhADDT3+OqWdRDyyzto=;
-	b=nxdRoRGhcfiveodLskj2UtQfa1KI1joEGwDZLvm1nnc2Zb7Io/JuMNUGaoAwgfxnQc
-	G21OApJq7OlHRYJFU+c0volILOHU303T53Kwc1ZLKFL7q5TYPReMHuc0f6Sp0Cew/AuD
-	ZB925m+PzfU3Bp6Wxzg95TkU+DBZTShMEm8NvQnz2nRWwVZo4JyRkjwvthfjEF5ZIWQC
-	Dc8rCow7t98QRmt4gBtn5qKIh1yR1k2Pq2F/z2+Y0qmuLibxQUd5abEMm0pqR2Yp1Efn
-	mnTx62gFuEAOwfOGt+egEFrdwn4SLZROaUUB3fs+5ATecjoJt84y7yX63M0B/zKuSCIK
-	JlPw==
-X-Gm-Message-State: APjAAAWcgR6syGSdBF2E+CKMgDn4UVRl0zKXzsf5yPV/s7RoMG7MgqNk
-	bWQzmER6bRUYq75EaHyLWXE=
-X-Google-Smtp-Source: APXvYqz35Spzmnks6NyxjaV0PFvJRZwRZ7MMfZoteUQPZ/nvDpOnTUkE0nnz7/+95HIfpcdKiS2oRg==
-X-Received: by 2002:a50:8903:: with SMTP id e3mr40298055ede.11.1557923299241; 
-	Wed, 15 May 2019 05:28:19 -0700 (PDT)
-Received: from localhost ([185.92.221.13])
-	by smtp.gmail.com with ESMTPSA id w14sm441426ejv.58.2019.05.15.05.28.17
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 15 May 2019 05:28:17 -0700 (PDT)
-Date: Wed, 15 May 2019 12:28:17 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190515122817.of52yngzguy6xfwn@master>
-References: <20190424004700.12766-1-richardw.yang@linux.intel.com>
-	<20190424004700.12766-3-richardw.yang@linux.intel.com>
-	<0eb5e5a5-593e-f4a2-7e2d-a9fed481ab6c@gmail.com>
-	<20190426005133.GB25513@richard> <20190514151813.GL2753@work-vm>
-	<20190515063827.GB11845@richard> <20190515070341.GA24741@richard>
-	<20190515093837.GD2668@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190515093837.GD2668@work-vm>
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::541
-Subject: Re: [Qemu-devel] [PATCH 2/4] migration/savevm: use
- migration_is_blocked to validate
+	(envelope-from <frederic.konrad@adacore.com>) id 1hQt4Y-0006E5-AX
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:31:51 -0400
+Received: from mel.act-europe.fr ([194.98.77.210]:39575
+	helo=smtp.eu.adacore.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1hQt4Y-0006C2-4m
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 08:31:50 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by filtered-smtp.eu.adacore.com (Postfix) with ESMTP id 5A41881397;
+	Wed, 15 May 2019 14:31:48 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at eu.adacore.com
+Received: from smtp.eu.adacore.com ([127.0.0.1])
+	by localhost (smtp.eu.adacore.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id VkEEhX5bDde9; Wed, 15 May 2019 14:31:48 +0200 (CEST)
+Received: from wifi-guest-96.act-europe.fr (wifi-guest-96.act-europe.fr
+	[10.10.126.96])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.eu.adacore.com (Postfix) with ESMTPSA id 4211181391;
+	Wed, 15 May 2019 14:31:48 +0200 (CEST)
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 15 May 2019 14:31:27 +0200
+Message-Id: <1557923493-4836-2-git-send-email-frederic.konrad@adacore.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1557923493-4836-1-git-send-email-frederic.konrad@adacore.com>
+References: <1557923493-4836-1-git-send-email-frederic.konrad@adacore.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 194.98.77.210
+Subject: [Qemu-devel] [PATCH v3 1/7] leon3: fix the error message when no
+ bios are provided
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,81 +69,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-Cc: quintela@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>,
-	Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, mark.cave-ayland@ilande.co.uk,
+	chouteau@adacore.com, frederic.konrad@adacore.com,
+	philmd@redhat.com, atar4qemu@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, May 15, 2019 at 10:38:37AM +0100, Dr. David Alan Gilbert wrote:
->* Wei Yang (richardw.yang@linux.intel.com) wrote:
->> On Wed, May 15, 2019 at 02:38:27PM +0800, Wei Yang wrote:
->> >On Tue, May 14, 2019 at 04:18:14PM +0100, Dr. David Alan Gilbert wrote:
->> >>* Wei Yang (richardw.yang@linux.intel.com) wrote:
->> >>> 
->> >>> Well, when you look into the source side of migration:
->> >>> 
->> >>> qmp_migrate
->> >>>   migrate_prepare
->> >>>     migration_is_blocked
->> >>> 
->> >>> This means if migration_is_blocked fails, the source will not start migration.
->> >>> And it is the same as save_snapshot.
->> >>> 
->> >>> From my understanding, when we load a vm, it should check the same
->> >>> requirement.
->> >>
->> >>I've been thinking about this, and I think I agree with Daniel on this.
->> >>The 'migration_blockers' list tells you that something about the
->> >>*current* state of a device means that it can't be migrated - e.g.
->> >>a 9pfs with a mounted filesystem can't be migrated.
->> >>
->> >>If we're about to reload the state from a snapshot, then the saved
->> >>snapshot's state must have been migratable, so that's OK.
->> >>
->> >
->> >The situation is on a vm with 'migration_blockers' still could reload from a
->> >snapshot.
->> >
->> >This sounds reasonable. Thanks :-)
->> >
->> 
->> Well, this is still a little strange. The means source vm and destination vm
->> could have different configuration. Is this common?
->
->It's not different configuration that I'm worried about here; but it's different runtime state.
->Items can get added/removed from migration_blockers dynamically
->depending on the behaviour of the guest; e.g. a device might only
->migratable in certain states.
->
+The leon3 board is looking for u-boot.bin by default (LEON3_PROM_FILENAME)..
+But in the case this file is not found and no other file are given on the
+command line we get the following error:
 
-I am not familiar with the usage of migration_blockers, just found one case
-when we add a reason to it. -- vhost_dev_init().
+  $ ./qemu-system-sparc -M leon3_generic
+  qemu-system-sparc: Can't read bios image (null)
 
-Per my understanding, this is a device. We specify it in command line or use
-hot-plug to add it. To me, guest may not alter the add/remove? Looks even we
-have one such device, we still could load vm. This looks not bad, but we have
-the different devices from source. 
+So use LEON3_PROM_FILENAME instead of filename in case it is NULL to get a
+less cryptic message:
 
-BTW, migration works if source and destination have different devices?
+  $ ./qemu-system-sparc -M leon3_generic
+  qemu-system-sparc: Can't read bios image 'u-boot.bin'
 
-As you mentioned, these is some case where guest could add/remove a reason to
-migration_blockers.  This is what you concerned right?
+Suggested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+---
+ hw/sparc/leon3.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Do we need to limit the usage of migration_blockers? Just use this in the case
-you concerned?
-
->Dave
->
->
->> -- 
->> Wei Yang
->> Help you, Help me
->--
->Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index 0383b17..f438718 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -1,7 +1,7 @@
+ /*
+  * QEMU Leon3 System Emulator
+  *
+- * Copyright (c) 2010-2011 AdaCore
++ * Copyright (c) 2010-2019 AdaCore
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a copy
+  * of this software and associated documentation files (the "Software"), to deal
+@@ -43,7 +43,7 @@
+ /* Default system clock.  */
+ #define CPU_CLK (40 * 1000 * 1000)
+ 
+-#define PROM_FILENAME        "u-boot.bin"
++#define LEON3_PROM_FILENAME "u-boot.bin"
+ 
+ #define MAX_PILS 16
+ 
+@@ -158,7 +158,7 @@ static void leon3_generic_hw_init(MachineState *machine)
+ 
+     /* Load boot prom */
+     if (bios_name == NULL) {
+-        bios_name = PROM_FILENAME;
++        bios_name = LEON3_PROM_FILENAME;
+     }
+     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+ 
+@@ -180,7 +180,9 @@ static void leon3_generic_hw_init(MachineState *machine)
+             exit(1);
+         }
+     } else if (kernel_filename == NULL && !qtest_enabled()) {
+-        error_report("Can't read bios image %s", filename);
++        error_report("Can't read bios image '%s'", filename
++                                                   ? filename
++                                                   : LEON3_PROM_FILENAME);
+         exit(1);
+     }
+     g_free(filename);
 -- 
-Wei Yang
-Help you, Help me
+1.8.3.1
+
 
