@@ -2,90 +2,93 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3180C04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 16:49:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51F47C04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 16:52:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DD6620881
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 16:49:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 156F520862
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 16:52:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sHd6/etN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DD6620881
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gTPRvU5G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 156F520862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39783 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39835 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQx5u-00042E-Uj
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 12:49:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34826)
+	id 1hQx9E-00058h-Cx
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 12:52:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQx52-0003fX-2N
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:48:37 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hQx8O-0004qm-AX
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:52:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQx50-0004j3-V0
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:48:36 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:46543)
+	(envelope-from <richard.henderson@linaro.org>) id 1hQx8M-0007JB-Fo
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:52:04 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:34906)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hQx50-0004hp-Nv
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:48:34 -0400
-Received: by mail-pf1-x444.google.com with SMTP id y11so242228pfm.13
-	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 09:48:34 -0700 (PDT)
+	id 1hQx8K-0007IX-Pz
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:52:01 -0400
+Received: by mail-pf1-x444.google.com with SMTP id t87so275061pfa.2
+	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 09:52:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
 	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=RMGkwM3XSApYIV+P3GR3GIgyJDcH5SsU5AbBli8SMdU=;
-	b=sHd6/etNw3t5lCoLgXlvlNUvlrN+4F2wIB9Iz6DrS2kpftsD50vyMD5GsaLNXHArqR
-	3Km2OXvx16LkJsE6OYEIUtxgu1C5VKs9TRSHhBa/jGOxbsqn0S7BSlEo7c29ONHb+KBC
-	8jyI0vad6PsKf7NlNwQh3+qGq5eIuSGP3WlG5kOzrMkyPZv7/4ZkC68GSScoF+v6waxt
-	YhRd4UQdZW2CfM7oYziq+3vA3AxQzmXpG+5pFdaYrzvgu5N5S01sLvfwmcZT1xao6SxG
-	+LRTB9BXzHZ+tbLsFV3gXB2v+8xlOquQf2X62OLDYQld05h/suOZRJJQHpUgY+f394kV
-	3c4A==
+	bh=ecCwGEZWl/0ixL9wiJsXL54bOGoCvgaxqkKrtPY06u0=;
+	b=gTPRvU5G+2tNU93ZZ56qSdzdTmK/bAj6wjhI+5/TsAT9L4TvpYC33+qx3DWTNU8rFd
+	J94yGCQFwwH9EoI6oy0A8SacWAsApszpKruuINb4+WcaX46iULmcA6eEMhcoQuinCv3f
+	mDXSCfD42IRWjJnkFKVgqSrKjXi9ixcmGZY7qD9mr1tkQcIhq76jmv127ySVFbnazWwg
+	79MGY2M42ztFVNEBP+zO7M2iH6cBx2FuAJzjkJlIg+vWb5kQF1tyqqjJqWY9CX9mjnyY
+	7Sn9kYEoqJvthIIsQdX4rohPR3OkJv25z3cDufe23qMeEYTqpDQgu5+vc9JS/CMr9Djr
+	evyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=RMGkwM3XSApYIV+P3GR3GIgyJDcH5SsU5AbBli8SMdU=;
-	b=YWLbS1O4HbWtET7+PE9Ui59BAikDqdl/B9yhyCmQJ6ZVlYL07l+6/OPUBctkLyQynl
-	c1STDGFgy8nAdnwPxzH0hpRqnxW5zYkMPWrkEkqXTK7fpvClboXcJDHsZMGDEQ3luEZo
-	/NtcUeiYdam18b7tLXhVFdmkkFPuv78x80F7jqbk6wpBhS+1YNJu6Bx5jqOPu/pGdZBl
-	BEDjXr6C4y0D9qDCprJ1RtLdVKhSHN/YDf55fVuQ5G19+sRXRzPhY0yGMRpYUtzsfrpp
-	HWPJ2zYcsvtxAP96yiZ4eeWE+TvSPbJa28toZjmbIHuKJnHAeQ5agfeao++KnLLjMEy3
-	2s4g==
-X-Gm-Message-State: APjAAAXpfLBosOS8umi0UQKy59taFkSQU6GV7h0JqpOtm3HF1iKejHjZ
-	P4/EPlWA7YzqW4KKqjhp4UlVzw==
-X-Google-Smtp-Source: APXvYqyeVj2GPe29m6QwpFOkMBWthQRk2HkwmwUgK5umkMLyaKB80/ZGBhJy0zUZhX6PKu6fExNu8w==
-X-Received: by 2002:a62:414a:: with SMTP id o71mr49130448pfa.240.1557938912932;
-	Wed, 15 May 2019 09:48:32 -0700 (PDT)
+	bh=ecCwGEZWl/0ixL9wiJsXL54bOGoCvgaxqkKrtPY06u0=;
+	b=glg80CHYocBFn+D59A6W6Kl6B3b9IILxUFJ62XzUaGiApIBf4ArAUAoDGzl5kxVzq1
+	lDWOhtpf0eX0C+tbZzyCHQ3FGwz8Uan/iZoqdUBayvWbdgNyFOjzYg8svsk5PyAQhpuQ
+	5totN2IxZzqaKYragwW7qe2seXEMq4k5z+1/6ODKytHFKR3MQwyPKUL+pPdgMtQZgw/d
+	GZGNyuV9oCeoWLqBFeUUHoQKSLm97W/8brk46SEaae0Sfb9/UIZNWNTIeGo9e8JjrKlR
+	t/zkCBdeHRAFeNhBjE1vD5PGHpIKPTEcMXCzshJN5h6ESszMfrJzh+re8GRuru3zabyh
+	fgYQ==
+X-Gm-Message-State: APjAAAVQORNDdtfnXXrllDibXvWnBRp3DyFQTXzVgdviL7XewvzxSabI
+	QbUhVwDURHCFynoIgNSgWvF5Bg==
+X-Google-Smtp-Source: APXvYqzgfdWjYL5Xkai5s3YGXM1YQfd4DPPJejnuI8wiRKBV0l3gupEcfok6XIa5C3CcRi9KaksgkA==
+X-Received: by 2002:a63:234c:: with SMTP id u12mr46649237pgm.264.1557939119575;
+	Wed, 15 May 2019 09:51:59 -0700 (PDT)
 Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
 	by smtp.gmail.com with ESMTPSA id
-	c15sm3601899pfi.172.2019.05.15.09.48.31
+	f28sm6264864pfk.104.2019.05.15.09.51.58
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 15 May 2019 09:48:31 -0700 (PDT)
-To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
-References: <20190514061458.125225-1-ysato@users.sourceforge.jp>
+	Wed, 15 May 2019 09:51:58 -0700 (PDT)
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+References: <20190514191653.31488-1-richard.henderson@linaro.org>
+	<20190514191653.31488-2-richard.henderson@linaro.org>
+	<0574ecaa-ed9a-40d5-5e09-050266455c90@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <ffcd9051-9c72-30ed-f53e-8d0351a76250@linaro.org>
-Date: Wed, 15 May 2019 09:48:29 -0700
+Message-ID: <b35d9332-95b3-3d70-bcbf-9c4ae13d18ac@linaro.org>
+Date: Wed, 15 May 2019 09:51:55 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190514061458.125225-1-ysato@users.sourceforge.jp>
+In-Reply-To: <0574ecaa-ed9a-40d5-5e09-050266455c90@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2607:f8b0:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH v12 00/12] Add RX archtecture support
+Subject: Re: [Qemu-devel] [PATCH v7 01/24] build: Link user-only with
+ crypto-rng-obj-y
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,76 +100,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, philmd@redhat.com
+Cc: berrange@redhat.com, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/13/19 11:14 PM, Yoshinori Sato wrote:
-> This patch series is added Renesas RX target emulation.
+On 5/15/19 9:42 AM, Laurent Vivier wrote:
+> On 14/05/2019 21:16, Richard Henderson wrote:
+>> For user-only, we require only the random number bits of the
+>> crypto subsystem.
+>>
+>> We need to preserve --static linking, which for many recent Linux
+>> distributions precludes using GnuTLS or GCrypt.  Instead, use our
+>> random-platform module unconditionally.
+>>
 > 
-> I fixed the ROM address because v11 was incorrect.
+> Perhaps we can rename "crypto-aes-obj" to "crypto-user-obj" and put
+> aes.o and random-platform.o into?
 > 
-> My git repository is bellow.
-> git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git tags/rx-20190514
-> 
-> Testing binaries bellow.
-> u-boot
-> Download - https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
-> 
-> starting
-> $ gzip -d u-boot.bin.gz
-> $ qemu-system-rx -bios u-boot.bin
-> 
-> linux and pico-root (only sash)
-> Download - https://osdn.net/users/ysato/pf/qemu/dl/zImage (kernel)
->            https://osdn.net/users/ysato/pf/qemu/dl/rx-qemu.dtb (DeviceTree)
-> 
-> starting
-> $ qemu-system-rx -kernel zImage -dtb rx-qemu.dtb -append "earlycon"
-> 
-> Changes for v11.
-> - Fix ROM address.
+> The only aim of crypto-aes-obj was to link aes.o with linux-user binaries.
 
-I think this is ready to be committed, but it is difficult to tell because you
-have not retained the Reviewed-by: tags that have been given to previous versions.
-
-Looking at
-
-https://patchwork.ozlabs.org/project/qemu-devel/list/?series=&submitter=7114&state=&q=&archive=&delegate=
-
-	Review	Tested
-
->From v10:
-13/13	-	-
-12/13	1	-
-11/13	-	-
-10/13	2	1
-09/13	1	1
-08/13	-	1
-07/13	-	-
-06/13	-	1
-05/13	1	-
-04/13	1	1
-03/13	1	-
-02/13	1	-
-01/13	1	1
-
->From v8:
-08/12	1	-
-07/12	1	-
-06/12	1	-
-
-In summary, only the last patch is unreviewed, and it appears that you've fixed
-the issue I pointed out in v11.  I have now sent reviews for those.
-
-In future, please retain the tags as you go through the development process.
-
-Rather than having you send out a v13 with only changes to the tags, I will
-apply them myself while preparing an initial pull request for this.
-
-Thanks for your patience.
+That does seem better.  I'll make the change.
 
 
 r~
+
+> 
+> Anyway, it's only cosmetic, so you can add:
+> 
+> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> 
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  Makefile             | 6 ++++--
+>>  Makefile.objs        | 1 +
+>>  Makefile.target      | 3 ++-
+>>  crypto/Makefile.objs | 1 +
+>>  4 files changed, 8 insertions(+), 3 deletions(-)
+
 
