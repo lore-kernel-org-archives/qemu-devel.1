@@ -2,72 +2,94 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46117C04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:28:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C07C04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:29:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C27492084F
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:28:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C27492084F
+	by mail.kernel.org (Postfix) with ESMTPS id F3E432084F
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:29:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vRoMBjo9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3E432084F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34813 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34817 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQr9a-0005kD-Ry
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 06:28:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38607)
+	id 1hQrAM-0006GJ-AL
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 06:29:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hQr8G-0004u5-72
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:27:33 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hQr7q-0004be-RA
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:27:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hQr8E-0007H5-W7
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:27:32 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49242)
+	(envelope-from <alex.bennee@linaro.org>) id 1hQr7p-0006wB-Hq
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:27:06 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44796)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hQr8E-0007Ge-QH
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:27:30 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hQr8C-0001yG-Q6
-	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 10:27:28 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6BD072E80CB
-	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 10:27:28 +0000 (UTC)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hQr7p-0006vX-9Q
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:27:05 -0400
+Received: by mail-wr1-x444.google.com with SMTP id c5so2013754wrs.11
+	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 03:27:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=nek2yc66oPkliVoy0vVqW3tLUdTEffY5mOcU44NEznI=;
+	b=vRoMBjo9mnRwGzxJCSPPR3ZOdZUEYhiuWDs8ZBYU5GQ+ndkOMsFlBqVFGSIZi3B6Sg
+	48yKI+0nMxfeo8WmfdcSD/9D4fOHo3uBshSLkfrYwB7ajPmvPSJc/6McSit5TYDziYeI
+	Bp75oDn4JCfCdfw5tGZDplkbTi5JgBRAMAt2xjfHp/wiezLIFMZHxDX6juL++yPjk0X7
+	dAY+djcRcMCdS8egekkaY+5HxDHtC/rD0UAgtgYA78e3Io77VlFlvJ2YnQpwNZdL6H+A
+	XRMG6ONzYfJbFQQdl79Fl6rIJa9AGXxRaOWrkveAxRs7mAZyIY1e012JbHPkFZbXd8Cl
+	EWTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=nek2yc66oPkliVoy0vVqW3tLUdTEffY5mOcU44NEznI=;
+	b=D22JwRVbKeMfMmwR2HLFAlTU63FbZNuyD4DHR6hZxQ9jV2LDApvSR6/n3JAxueJQfu
+	aElgkhkhC6F+IgGFXNAR8O5toHKcXtVKjoTEjMo4MZ00Ya1uK8WzT5o9zeUhwtTEKm2d
+	GNtocYfUDp8TM5NhWTpTzuVsT+E/zNE06tfyqPCqYDFHPstabHxt7/Ce6RF0OIZeY550
+	IkFW2mPXVXflnKLv3tvAGjN8EOujM8JyDjdP9IOABkeGL8ioGzJLtm54waVROZrsECP9
+	NRQabSxTKIAuBsWOzRSe8wAsWcXq73P8fI034AZaESp2/FkG/ppWx4rtVkh5omyLWFw6
+	xGVw==
+X-Gm-Message-State: APjAAAWX8CxA1YXLyWDx29UtQ0U+F6wrY3tNsd6K9wutxrwXGs5WrGXj
+	gFcaMcO0xnfiPIdXrdErDzKncg==
+X-Google-Smtp-Source: APXvYqw86w9qxUzQ0fQgL66/ce62XeuDe6IqJgsQkyExx73QaprRDMouPNtmavQv29upuTQC7NJ22Q==
+X-Received: by 2002:adf:b243:: with SMTP id y3mr24423438wra.21.1557916024236; 
+	Wed, 15 May 2019 03:27:04 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	b194sm794876wmb.23.2019.05.15.03.27.03
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Wed, 15 May 2019 03:27:03 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 4B63A1FF87;
+	Wed, 15 May 2019 11:27:03 +0100 (BST)
+References: <20190502081554.5521-1-arilou@gmail.com>
+	<20190502081554.5521-9-arilou@gmail.com>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Jon Doron <arilou@gmail.com>
+In-reply-to: <20190502081554.5521-9-arilou@gmail.com>
+Date: Wed, 15 May 2019 11:27:03 +0100
+Message-ID: <87woism2rs.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 May 2019 10:11:30 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: insspir philmd pmaydell th-huth
-X-Launchpad-Bug-Reporter: =?utf-8?q?Dariusz_Zyza=C5=84ski_=28insspir=29?=
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <155787117310.15024.60120190997628985.malonedeb@gac.canonical.com>
-Message-Id: <155791509010.15725.18273977661483049091.malone@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18962";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: c6f2fd78b10eaa47f07e9e6fca9fa521c7018e2e
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1829079] Re: Can't build static on ARM (Raspbian)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH v9 08/27] gdbstub: Implement remove
+ breakpoint (z pkt) with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,48 +98,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1829079 <1829079@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-You might find that adding --disable-tools to your configure line also
-helps in not trying to statically link random binaries you don't really
-want.
 
--- =
+Jon Doron <arilou@gmail.com> writes:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1829079
+> Signed-off-by: Jon Doron <arilou@gmail.com>
 
-Title:
-  Can't build static on ARM (Raspbian)
+Merge with previous patch as per comments there.
 
-Status in QEMU:
-  Invalid
+> ---
+>  gdbstub.c | 49 ++++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 32 insertions(+), 17 deletions(-)
+>
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 36c7353a22..b42425b24c 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -1611,6 +1611,29 @@ static void handle_insert_bp(GdbCmdContext *gdb_ct=
+x, void *user_ctx)
+>      put_packet(gdb_ctx->s, "E22");
+>  }
+>
+> +static void handle_remove_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
+> +{
+> +    int res;
+> +
+> +    if (gdb_ctx->num_params < 3) {
+> +        put_packet(gdb_ctx->s, "E22");
+> +        return;
+> +    }
+> +
+> +    res =3D gdb_breakpoint_remove(gdb_ctx->params[1].val_ull,
+> +                                gdb_ctx->params[2].val_ull,
+> +                                gdb_ctx->params[0].val_ul);
+> +    if (res >=3D 0) {
+> +        put_packet(gdb_ctx->s, "OK");
+> +        return;
+> +    } else if (res =3D=3D -ENOSYS) {
+> +        put_packet(gdb_ctx->s, "");
+> +        return;
+> +    }
+> +
+> +    put_packet(gdb_ctx->s, "E22");
+> +}
+> +
+>  static int gdb_handle_packet(GDBState *s, const char *line_buf)
+>  {
+>      CPUState *cpu;
+> @@ -1877,23 +1900,15 @@ static int gdb_handle_packet(GDBState *s, const c=
+har *line_buf)
+>          }
+>          break;
+>      case 'z':
+> -        type =3D strtoul(p, (char **)&p, 16);
+> -        if (*p =3D=3D ',')
+> -            p++;
+> -        addr =3D strtoull(p, (char **)&p, 16);
+> -        if (*p =3D=3D ',')
+> -            p++;
+> -        len =3D strtoull(p, (char **)&p, 16);
+> -        if (ch =3D=3D 'Z')
+> -            res =3D gdb_breakpoint_insert(addr, len, type);
+> -        else
+> -            res =3D gdb_breakpoint_remove(addr, len, type);
+> -        if (res >=3D 0)
+> -             put_packet(s, "OK");
+> -        else if (res =3D=3D -ENOSYS)
+> -            put_packet(s, "");
+> -        else
+> -            put_packet(s, "E22");
+> +        {
+> +            static const GdbCmdParseEntry remove_bp_cmd_desc =3D {
+> +                .handler =3D handle_remove_bp,
+> +                .cmd =3D "z",
+> +                .cmd_startswith =3D 1,
+> +                .schema =3D "l?L?L0"
+> +            };
+> +            cmd_parser =3D &remove_bp_cmd_desc;
+> +        }
+>          break;
+>      case 'H':
+>          {
 
-Bug description:
-  I am trying to build static QEMU on Raspbian, chrooted into using systemd=
--nspawn with QEMU 4.0.0.
-  This is how my compiling looks:
-  https://pastebin.com/PYZYeRCN
-  Just the problematic part:
-  https://pastebin.com/7LxWPMxA
-  How I do the compiling:
-  https://pastebin.com/pYM17A6R (I plan to share this tutorial when it will=
- work)
-  It is a coincidence, or the build fails because it cannot find lp11-kit. =
-I did some symlinks:
-  ln -s /usr/lib/arm-linux-gnueabihf/libp11-kit.so.0 /usr/lib/libp11-kit.so=
-.0
-  ln -s /usr/lib/arm-linux-gnueabihf/libp11-kit.so /usr/lib/libp11-kit.so
-  (should I also symlink libp11.so and libp11.so.2? I think I have installe=
-d all required p11 packages!
 
-  Git commit hash: git rev-parse HEAD
-  e329ad2ab72c43b56df88b34954c2c7d839bb373
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1829079/+subscriptions
+--
+Alex Benn=C3=A9e
 
