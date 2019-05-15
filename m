@@ -6,88 +6,87 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44D4BC04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 15:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA0DC04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 15:26:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CF5620862
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 15:24:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EAB3020862
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 15:26:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IYa0pMy4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CF5620862
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wO9uBX+5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAB3020862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38617 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38666 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQvlt-00034K-KS
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 11:24:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44056)
+	id 1hQvnD-0003zX-4a
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 11:26:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hQvkS-0002GW-UY
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 11:23:17 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hQvkp-0002Gm-0B
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 11:23:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hQvjV-0005Kf-A5
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 11:22:20 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38606)
+	(envelope-from <alex.bennee@linaro.org>) id 1hQvac-0001mx-C2
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 11:13:07 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37276)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hQvjT-0005GF-46
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 11:22:15 -0400
-Received: by mail-wm1-x343.google.com with SMTP id f2so441729wmj.3
-	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 08:22:13 -0700 (PDT)
+	id 1hQvac-0001hi-4Z
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 11:13:06 -0400
+Received: by mail-wr1-x443.google.com with SMTP id e15so3119266wrs.4
+	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 08:13:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=references:user-agent:from:to:cc:subject:in-reply-to:date
 	:message-id:mime-version:content-transfer-encoding;
-	bh=zn08J2ZicgXsvPPHPeb0hDqpQW2rlLQB6utuXdutmLQ=;
-	b=IYa0pMy4rwBfgradf+GCVFy0l5OAIu141Y8QQYdGJarY86bhcmxGzWvFkC0XWEr/wx
-	A5asZQgW5BUhP9jLIYO897LfQC3uMsy0jrci7DE2hoPsHvz/71QhDYtCgIYHVggRvr/+
-	1lEdyk5cACG2QOw3tIBY37DzEQ3YwY7b1JK8H50GSQWuHii2S/SfaVkELNLWREID+VJX
-	pX7zEdW1CR2nyhfp8uBU4qYuJ6XfH3wyHlAcx4ggVec3EByujd0il/tmAk3ZKlVvNRrm
-	8qsZE1NllZobKqfTo02yU/mrXF4SNd+qrVY3and1+dBzDrK7jU0RyZ03EEb/aSZvxVtx
-	WBBQ==
+	bh=ig9fMrZaBNK6PguGD1OfQ26inyYK2n0Bdj94H1/THFs=;
+	b=wO9uBX+5oLBA0qfVT2IiE+g7o4YtID04CY1XKo1sXje9JeUXca3YA4IoJsJq6bTaT+
+	LW6Gjd2XzoKAdBADf6YcPJn6pEKt1I9DsZGHU8wLFACDBXy0whuOr+wx5Fx8FpoFDXXM
+	6biRvCuG1LGoUexigcF0Ao2BLPANgQSznasKU77Pvc6ps916+NGDUImjHxD4I+/Y1coE
+	Ap1rCleNh+Xq36KlXCx4n4FYghyvPTu/MKgiKd6BIYff3bfhlov0BVO2PEUDVFzcixFw
+	9DFhroobY0njIkxEvSuaB+swWnbCKzmTQGH3kP616+zcJunETkrhwEmJxrBDWctioRPN
+	W/Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:references:user-agent:from:to:cc:subject
 	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=zn08J2ZicgXsvPPHPeb0hDqpQW2rlLQB6utuXdutmLQ=;
-	b=JLt8uKiJURdhScxAML6wZIqlMF4VJw82tf26jkZwjU9w2QeKxBwp604U3mEvRly2Yy
-	PIGRfO+3siUUUPoVkf5LCQWN8fCKurR8oU0Ekk8nL5OPeptR15eoR62dDpcZ4dhfLtgB
-	pJWqIjDmeYu6g9SsFUDil/NcEUBCQw9136+0EKUC1t8DoTfapqymqa0/ZhFf/Ybgmw1Z
-	XhGLuBgpLXYsZEfoV1LswbNvowLGaHQUq7dX8L12E8hnOf5KmTUz0HKSkWqe+boCky0w
-	Lifu6D8B3JplgGHMDijbttBUeS//azrYZT19JKaHQAUUw8/taLuzxTsV6gOT4A72Q51D
-	JpDg==
-X-Gm-Message-State: APjAAAVEXenAqGFsGH6UmJdAYQCAlOu7/O5VofM5sDaw3l9WfrUHIc3N
-	N2iazh919mG2OlKVX5bHxBJ9pQ==
-X-Google-Smtp-Source: APXvYqx4476j8F6b8Xoe5dMJJyNDov9kn9pNUcbcUIQkJa9iDsmierQbrvg4MlTP9RGabOhAOs/c+A==
-X-Received: by 2002:a1c:a684:: with SMTP id
-	p126mr18880343wme.101.1557933732149; 
-	Wed, 15 May 2019 08:22:12 -0700 (PDT)
+	bh=ig9fMrZaBNK6PguGD1OfQ26inyYK2n0Bdj94H1/THFs=;
+	b=W6A99/dHso8B7WZ6sACKSpvRsd5TXuGT4KLoDdr4XJlprSKF9uEcUTjmT9/hlFUFey
+	M1FYKJ/bLtnDkwJUsryvATUkDQHgxVrvXv7/1ywnFWuHr8dUlnvnXt/wfNGwCkIXkz3e
+	+kLtj6bBKn8JA8jXb3q3GiET1B7lec8yRiV7GJO+/Cyr0EHKpbtS+aH0wTI/IN+dknyI
+	hwTS+n26n/vhUBvCmvHB8dJoxaNAYtLTjEGu+9Zv6YA5Ez5a4OhcrvuH09J4XsSha3ev
+	HABtZkLkB/QdkOEAwqNWdzGAoWThN3Jf5loFOr5S94d6EoSlQqARDM1ZmdPsbH5n2med
+	iWIw==
+X-Gm-Message-State: APjAAAWNvOjAxLbLM4UEF4EPSV8mRMydR51jvvJetv7Rml0yAfhbAi0J
+	R5UPsfAz6RQN6eIVawe2ZjNCWA==
+X-Google-Smtp-Source: APXvYqxhIq0YU/F9UDQaGyiqlK0qNz1clT5R8LFVAtPlHvioHfXGT6vNS4WdYh2fSYtS66vtcqqoXA==
+X-Received: by 2002:adf:e288:: with SMTP id v8mr20942088wri.7.1557933184544;
+	Wed, 15 May 2019 08:13:04 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
 	by smtp.gmail.com with ESMTPSA id
-	l18sm2432952wrv.38.2019.05.15.08.22.10
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Wed, 15 May 2019 08:22:10 -0700 (PDT)
+	a10sm3282483wrm.94.2019.05.15.08.13.03
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 15 May 2019 08:13:03 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 928F71FF87;
-	Wed, 15 May 2019 16:22:10 +0100 (BST)
+	by zen.linaroharston (Postfix) with ESMTP id 694261FF87;
+	Wed, 15 May 2019 16:13:03 +0100 (BST)
 References: <20190502081554.5521-1-arilou@gmail.com>
-	<20190502081554.5521-12-arilou@gmail.com>
+	<20190502081554.5521-24-arilou@gmail.com>
 User-agent: mu4e 1.3.1; emacs 26.1
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Jon Doron <arilou@gmail.com>
-In-reply-to: <20190502081554.5521-12-arilou@gmail.com>
-Date: Wed, 15 May 2019 16:22:10 +0100
-Message-ID: <87pnojn3od.fsf@zen.linaroharston>
+In-reply-to: <20190502081554.5521-24-arilou@gmail.com>
+Date: Wed, 15 May 2019 16:13:03 +0100
+Message-ID: <87r28zn43k.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH v9 11/27] gdbstub: Implement write memory
- (M pkt) with new infra
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH v9 23/27] gdbstub: Implement qemu physical
+ memory mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -107,87 +106,127 @@ Sender: "Qemu-devel"
 
 Jon Doron <arilou@gmail.com> writes:
 
+> Add a new query/set which changes the memory GDB sees to physical memory
+> only.
+>
+> gdb> maint packet qqemu.PhyMemMode
+> will reply the current phy_mem_mode state (1 for enabled, 0 for disabled)
+> gdb> maint packet Qqemu.PhyMemMode:1
+> Will make GDB read/write only to physical memory, set to 0 to disable
+>
 > Signed-off-by: Jon Doron <arilou@gmail.com>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
 > ---
->  gdbstub.c | 51 +++++++++++++++++++++++++++++++++------------------
->  1 file changed, 33 insertions(+), 18 deletions(-)
+>  gdbstub.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 55 insertions(+), 3 deletions(-)
 >
 > diff --git a/gdbstub.c b/gdbstub.c
-> index e9a3d0c2bc..8dc2e1d507 100644
+> index 00c07d6ec0..88ff6224e6 100644
 > --- a/gdbstub.c
 > +++ b/gdbstub.c
-> @@ -1685,6 +1685,31 @@ static void handle_get_reg(GdbCmdContext *gdb_ctx,=
- void *user_ctx)
->      put_packet(gdb_ctx->s, gdb_ctx->str_buf);
->  }
+> @@ -46,11 +46,23 @@
+>  #define GDB_ATTACHED "1"
+>  #endif
 >
-> +static void handle_write_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
-> +{
-> +    if (gdb_ctx->num_params < 3) {
-> +        put_packet(gdb_ctx->s, "E22");
-> +        return;
+> +static int phy_memory_mode;
+> +
+>  static inline int target_memory_rw_debug(CPUState *cpu, target_ulong add=
+r,
+>                                           uint8_t *buf, int len, bool is_=
+write)
+>  {
+> -    CPUClass *cc =3D CPU_GET_CLASS(cpu);
+> +    CPUClass *cc;
+>
+> +    if (phy_memory_mode) {
+> +        if (is_write) {
+> +            cpu_physical_memory_write(addr, buf, len);
+> +        } else {
+> +            cpu_physical_memory_read(addr, buf, len);
+> +        }
+> +        return 0;
 > +    }
 > +
-> +    /* hextomem() reads 2*len bytes */
-> +    if (gdb_ctx->params[1].val_ull > strlen(gdb_ctx->params[2].data) / 2=
-) {
-> +        put_packet(gdb_ctx->s, "E22");
-> +        return;
-> +    }
-> +
-> +    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[2].data,
-> +             gdb_ctx->params[1].val_ull);
-> +    if (target_memory_rw_debug(gdb_ctx->s->g_cpu, gdb_ctx->params[0].val=
-_ull,
-> +                               gdb_ctx->mem_buf,
-> +                               gdb_ctx->params[1].val_ull, true)) {
-> +        put_packet(gdb_ctx->s, "E14");
-> +        return;
-> +    }
-> +
-> +    put_packet(gdb_ctx->s, "OK");
+
+I think this is the commit that breaks the build. As the gdbstub can run
+for both system and linux-user emulation modes you need to take care to
+disable the bits that don't make sense for linux-user emulation. You'll
+see other places in the code doing that with #if[n]def CONFIG_USER_ONLY.
+
+
+> +    cc =3D CPU_GET_CLASS(cpu);
+>      if (cc->memory_rw_debug) {
+>          return cc->memory_rw_debug(cpu, addr, buf, len, is_write);
+>      }
+> @@ -2129,7 +2141,29 @@ static void handle_query_attached(GdbCmdContext *g=
+db_ctx, void *user_ctx)
+>
+>  static void handle_query_qemu_supported(GdbCmdContext *gdb_ctx, void *us=
+er_ctx)
+>  {
+> -    put_packet(gdb_ctx->s, "sstepbits;sstep");
+> +    put_packet(gdb_ctx->s, "sstepbits;sstep;PhyMemMode");
 > +}
 > +
->  static int gdb_handle_packet(GDBState *s, const char *line_buf)
->  {
->      CPUState *cpu;
-> @@ -1893,24 +1918,14 @@ static int gdb_handle_packet(GDBState *s, const c=
-har *line_buf)
->          }
->          break;
->      case 'M':
-> -        addr =3D strtoull(p, (char **)&p, 16);
-> -        if (*p =3D=3D ',')
-> -            p++;
-> -        len =3D strtoull(p, (char **)&p, 16);
-> -        if (*p =3D=3D ':')
-> -            p++;
-> -
-> -        /* hextomem() reads 2*len bytes */
-> -        if (len > strlen(p) / 2) {
-> -            put_packet (s, "E22");
-> -            break;
-> -        }
-> -        hextomem(mem_buf, p, len);
-> -        if (target_memory_rw_debug(s->g_cpu, addr, mem_buf, len,
-> -                                   true) !=3D 0) {
-> -            put_packet(s, "E14");
-> -        } else {
-> -            put_packet(s, "OK");
-> +        {
-> +            static const GdbCmdParseEntry write_mem_cmd_desc =3D {
-> +                .handler =3D handle_write_mem,
-> +                .cmd =3D "M",
-> +                .cmd_startswith =3D 1,
-> +                .schema =3D "L,L:s0"
-> +            };
-> +            cmd_parser =3D &write_mem_cmd_desc;
->          }
->          break;
->      case 'p':
+> +static void handle_query_qemu_phy_mem_mode(GdbCmdContext *gdb_ctx,
+> +                                           void *user_ctx)
+> +{
+> +    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "%d", phy_memor=
+y_mode);
+> +    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
+> +}
+> +
+> +static void handle_set_qemu_phy_mem_mode(GdbCmdContext *gdb_ctx, void *u=
+ser_ctx)
+> +{
+> +    if (!gdb_ctx->num_params) {
+> +        put_packet(gdb_ctx->s, "E22");
+> +        return;
+> +    }
+> +
+> +    if (!gdb_ctx->params[0].val_ul) {
+> +        phy_memory_mode =3D 0;
+> +    } else {
+> +        phy_memory_mode =3D 1;
+> +    }
+> +    put_packet(gdb_ctx->s, "OK");
+>  }
+>
+>  static GdbCmdParseEntry gdb_gen_query_set_common_table[] =3D {
+> @@ -2212,6 +2246,20 @@ static GdbCmdParseEntry gdb_gen_query_table[] =3D {
+>          .handler =3D handle_query_qemu_supported,
+>          .cmd =3D "qemu.Supported",
+>      },
+> +    {
+> +        .handler =3D handle_query_qemu_phy_mem_mode,
+> +        .cmd =3D "qemu.PhyMemMode",
+> +    },
+> +};
+> +
+> +static GdbCmdParseEntry gdb_gen_set_table[] =3D {
+> +    /* Order is important if has same prefix */
+> +    {
+> +        .handler =3D handle_set_qemu_phy_mem_mode,
+> +        .cmd =3D "qemu.PhyMemMode:",
+> +        .cmd_startswith =3D 1,
+> +        .schema =3D "l0"
+> +    },
+>  };
+>
+>  static void handle_gen_query(GdbCmdContext *gdb_ctx, void *user_ctx)
+> @@ -2245,7 +2293,11 @@ static void handle_gen_set(GdbCmdContext *gdb_ctx,=
+ void *user_ctx)
+>          return;
+>      }
+>
+> -    put_packet(gdb_ctx->s, "");
+> +    if (process_string_cmd(gdb_ctx->s, NULL, gdb_ctx->params[0].data,
+> +                           gdb_gen_set_table,
+> +                           ARRAY_SIZE(gdb_gen_set_table))) {
+> +        put_packet(gdb_ctx->s, "");
+> +    }
+>  }
+>
+>  static void handle_target_halt(GdbCmdContext *gdb_ctx, void *user_ctx)
 
 
 --
