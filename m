@@ -2,77 +2,90 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88B2BC04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:03:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F92AC04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:07:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 507A62084A
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:03:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B81012070D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:07:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uW/2I2ro"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 507A62084A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UkspcLQS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B81012070D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34501 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34539 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQqkp-0004rU-RF
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 06:03:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33529)
+	id 1hQqp2-0006BU-B8
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 06:07:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hQqjp-0004Wh-5J
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:02:22 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hQqoC-0005ka-4W
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:06:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hQqjj-0001tK-Ha
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:02:17 -0400
-Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:39291)
+	(envelope-from <alex.bennee@linaro.org>) id 1hQqoB-0005fW-5g
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:06:48 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44650)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hQqjh-0001k0-Tm
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:02:10 -0400
-Received: by mail-oi1-x232.google.com with SMTP id v2so1373999oie.6
-	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 03:01:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:from:date:message-id:subject:to;
-	bh=003KoGbnzQZEoTCv6ZTSkFQVXeDrX0qzhdyLi+73oTc=;
-	b=uW/2I2ro3If7juwCOfBUih5gueMzfGBtR7T0p9ScSRJJNQi4tXmAyUj2SmvxyWGXnS
-	l1NUNCXY5Qwd6z0TLeaG6301SmW9P/3BXh33bxcvAQscSyP1i/gnyQQs8y6D8x8VMBh1
-	DN09AljSQ7rDvc0qJlOXhBaoTpKPjbzPIAzl8Aij82POWJ+OOtljM1dqjKGzHEFK/B+e
-	9/fSdgeBwoSdgIAmgm2bBb7K6NzSoZ5wqFhxxPfc5GPvhoJ/n/keqVmLtp3XxwVUK9rA
-	0rsqf3D4h6zuonbGy3unBp9P3STjnbgHRj3jSl25etRVB14AeqLX6b8+IU7VcqABNQpy
-	6L1Q==
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hQqoA-0005eZ-UY
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:06:47 -0400
+Received: by mail-wr1-x444.google.com with SMTP id c5so1941939wrs.11
+	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 03:06:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=tar7J8umpdxL+8RfreXMe7ooxeh0RMCxv9r5wwamxsU=;
+	b=UkspcLQSx0AaNomXNnJvHPh+am/MylHaixhvXkpSbmAVRwizyOxyhYW/LHs4DdqAwL
+	qB2jOswAeaR0aXUHCALE+Lyy2I+D/1acYpQGeuYwFpJZ04KNLOi54yL7ci9n+BsdTEBR
+	myzTksJnxxfmpymBA0tWn855zXKiEvZscTe7Ri1m/eVVV0XmFQxk2pE+R2z9epz1h1yN
+	4x0Ms/SBEHVlcB/i0gYic/gyGWuWeQtDW9Ffb97dmVwhAN3WDAPKXTF45YbAoI3NTtee
+	5URwdjFmJq/HtfoMWJ4ZSENpADexmdNtJfSgItygzG7vV9AiNo02lXyGWobHWjfYN3TU
+	y5fQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-	bh=003KoGbnzQZEoTCv6ZTSkFQVXeDrX0qzhdyLi+73oTc=;
-	b=HAqh73Edn8W9t17xEr7H4vCoDWiNTtRsX2M3Qa1DtJDxQNLZ/CvY5dyO5tL709xakI
-	EBONueVP0/Xu1mk990fkq/0xbvw93WYXppA57r0Y7Tl3x3/EbgbOkWk6w/RLw7yzTQw5
-	ZkXx1lRLBiRCc+yGADhQnRMNSuIviAzzngCUl+ciZO8gs0rUK2YqxBzGTB+A+cQnX2Jb
-	tGKdF8T3itYx1NT8MGUT74qSFWdV4reV3FSQyDFZqJR5aP+Ij+SUz2UG/08X8ztab2U8
-	LVVCdCw/WNlzuou65CXy2kdVyTixwb5r/gqZ4/mlebjO65hQoVY+wD1afIiDVpXPqp99
-	gyjw==
-X-Gm-Message-State: APjAAAW6IZUogvFHByk5yAoRNy9DWn+lDbLZ8lFMffZLAINKJFxzDrJ1
-	PPBz9tfmfrainX7D5Kt59KRs9+Wh9D6dEidQsuE=
-X-Google-Smtp-Source: APXvYqxN2KwNfyVJ/8DwYFH5HlluEuAN+2jXKtiC6NKNfqW5oboCbz4a2Oe60OsUqj52ZfWlIbCs/V7JaVX3ErbiipY=
-X-Received: by 2002:aca:61d7:: with SMTP id v206mr6451249oib.97.1557914517989; 
-	Wed, 15 May 2019 03:01:57 -0700 (PDT)
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=tar7J8umpdxL+8RfreXMe7ooxeh0RMCxv9r5wwamxsU=;
+	b=oW2mnk22uNN8e36BWVDIzPef648HOHFt34h2IAuGS8W5L9fNVu8xZPh6x2w9cf4Oqc
+	3xOaNReBpYJ7MjGvRZ23rEq5Smn8tVaps7UA/AFpOnJs6LRMJbCPL1dCUmGSYzM2WE0P
+	9KDFuV3cZ+WGtpKB0g+jAIMAmTZBFBiNEJ+LFQSc2vSiwgM/xbDXdeXGjH2qvndJQiB7
+	5bNJPvWYZ5UgkQuma5ZA8MRy2VvrkniDlYeBLyYJQS7SwMbxUElz/rARp3IZri4g2CNA
+	142e2ot7Co5W330CA1uOMQJusqadK1U2hMFfpGU5sLweoKamYDDoGzMAwMzjGfe0w1ZR
+	iCvg==
+X-Gm-Message-State: APjAAAX2BcJFZqc3snT75fzW+ijyB/125M7URSvQWnD9xNdZG4V/TWle
+	X5nfAJyBe53XaiNJa37eQGlNUg==
+X-Google-Smtp-Source: APXvYqz4I4Q2pMam6gIPWF0y+WC3pQs+QP3P9mzbRRdDUjoABuQaMPTP68aUX2Hb7EQgcyuZVw6PBw==
+X-Received: by 2002:a5d:4b81:: with SMTP id b1mr1310368wrt.217.1557914805413; 
+	Wed, 15 May 2019 03:06:45 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id f2sm1889738wme.12.2019.05.15.03.06.44
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 15 May 2019 03:06:44 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 755921FF87;
+	Wed, 15 May 2019 11:06:44 +0100 (BST)
+References: <20190502081554.5521-1-arilou@gmail.com>
+	<20190502081554.5521-7-arilou@gmail.com>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Jon Doron <arilou@gmail.com>
+In-reply-to: <20190502081554.5521-7-arilou@gmail.com>
+Date: Wed, 15 May 2019 11:06:44 +0100
+Message-ID: <87zhnom3pn.fsf@zen.linaroharston>
 MIME-Version: 1.0
-From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 15 May 2019 18:01:22 +0800
-Message-ID: <CAKXe6SKBgMcq+p7EB1kRWLSbg9NvZg1Mr24UrX8S+kpzq-GR4Q@mail.gmail.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, alex.williamson@redhat.com, 
-	Qemu Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::232
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: [Qemu-devel] Question about the vfio device interrupt
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH v9 06/27] gdbstub: Implement set_thread (H
+ pkt) with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -84,44 +97,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello Paolo, Alex and all,
 
-In vfio_intx_enable_kvm(qemu) I see we associate a resamplefd with the
-umask function(vfio_pci_intx_unmask_handler in linux).
+Jon Doron <arilou@gmail.com> writes:
 
-    irq_set = g_malloc0(argsz);
-    irq_set->argsz = argsz;
-    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_UNMASK;
-    irq_set->index = VFIO_PCI_INTX_IRQ_INDEX;
-    irq_set->start = 0;
-    irq_set->count = 1;
-    pfd = (int32_t *)&irq_set->data;
+> Signed-off-by: Jon Doron <arilou@gmail.com>
+> ---
+>  gdbstub.c | 79 ++++++++++++++++++++++++++++++++++---------------------
+>  1 file changed, 49 insertions(+), 30 deletions(-)
+>
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 469aaeb875..21cdaf4678 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -1547,6 +1547,47 @@ static void handle_cont_with_sig(GdbCmdContext *gd=
+b_ctx, void *user_ctx)
+>      gdb_continue(gdb_ctx->s);
+>  }
+>
+> +static void handle_set_thread(GdbCmdContext *gdb_ctx, void *user_ctx)
+> +{
+> +    CPUState *cpu;
+> +
+> +    if (gdb_ctx->num_params < 2) {
 
-    *pfd = irqfd.resamplefd;
+Given we should have a fixed number of parameters !=3D 2 perhaps?
 
-    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
+> +        put_packet(gdb_ctx->s, "E22");
+> +        return;
+> +    }
+> +
+> +    if (gdb_ctx->params[1].thread_id.kind =3D=3D GDB_READ_THREAD_ERR) {
+> +        put_packet(gdb_ctx->s, "E22");
+> +        return;
+> +    }
+> +
+> +    if (gdb_ctx->params[1].thread_id.kind !=3D GDB_ONE_THREAD) {
+> +        put_packet(gdb_ctx->s, "OK");
+> +        return;
+> +    }
+> +
+> +    cpu =3D gdb_get_cpu(gdb_ctx->s, gdb_ctx->params[1].thread_id.pid,
+> +                      gdb_ctx->params[1].thread_id.tid);
+> +    if (!cpu) {
+> +        put_packet(gdb_ctx->s, "E22");
+> +        return;
+> +    }
+> +
+> +    switch (gdb_ctx->params[0].opcode) {
 
-I know this resamplefd is triggered when the interrupt controller receives
-an EOI and
-then we unmask and re-enabled the VFIO devices' interrupt.
 
-So I think there  there must be a mask process(so we unmask it later), I
-mean there must a
-call of function vfio_pci_set_intx_mask(in linux).
+Perhaps a comment here to say this is a legacy command and modern gdb's
+should be using vCont?
 
-What I can't understand is when this process(mask VFIO devices' interrupt)
-occurs?
-I only find a place(vfio_basic_config_write) calls vfio_pci_intx_mask.
-I think when the guest process the interrupt it may mask this
-interrupt(finally call vfio_pci_set_intx_mask), but I can't find the code
-path related with vfio_basic_config_write.
+> +    case 'c':
+> +        gdb_ctx->s->c_cpu =3D cpu;
+> +        put_packet(gdb_ctx->s, "OK");
+> +        break;
+> +    case 'g':
+> +        gdb_ctx->s->g_cpu =3D cpu;
+> +        put_packet(gdb_ctx->s, "OK");
+> +        break;
+> +    default:
+> +        put_packet(gdb_ctx->s, "E22");
+> +        break;
+> +    }
+> +}
+<snip>
 
+Otherwise:
 
-Any hints?
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Thanks,
-Li Qiang
+--
+Alex Benn=C3=A9e
+
