@@ -2,63 +2,78 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9E68C04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 21:13:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E3FC04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 21:15:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6375020815
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 21:13:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6375020815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5706420815
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 21:15:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KdM0oOyl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5706420815
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42669 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42728 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hR1DO-0007dR-GL
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 17:13:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53618)
+	id 1hR1FQ-0000kD-A0
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 17:15:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hR0sB-0006cE-1A
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 16:51:36 -0400
+	(envelope-from <adam.loyd.parker@gmail.com>) id 1hR0y7-0003vF-Gx
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 16:57:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hR0s4-0001h1-R9
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 16:51:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55076)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hR0s4-0001dC-EL
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 16:51:28 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A8B15A971A
-	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 20:51:22 +0000 (UTC)
-Received: from 640k.localdomain.com (ovpn-112-17.ams2.redhat.com
-	[10.36.112.17])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 283821820E;
-	Wed, 15 May 2019 20:51:16 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 15 May 2019 22:50:33 +0200
-Message-Id: <1557953433-19663-22-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1557953433-19663-1-git-send-email-pbonzini@redhat.com>
-References: <1557953433-19663-1-git-send-email-pbonzini@redhat.com>
+	(envelope-from <adam.loyd.parker@gmail.com>) id 1hR0y6-000773-CC
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 16:57:43 -0400
+Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:32857)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <adam.loyd.parker@gmail.com>)
+	id 1hR0y6-0006zQ-7S
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 16:57:42 -0400
+Received: by mail-oi1-x230.google.com with SMTP id m204so902900oib.0
+	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 13:57:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:from:date:message-id:subject:to;
+	bh=r2NOzl046FyRmC+loWdRS7ygF5z5SrZUgNHOTdM5jhE=;
+	b=KdM0oOylETCXG2f9TvKAGGmlJsgY7Drx9Tg2d2Nn9T/Om5ceQVAR14ohgBfR+dsiJr
+	PYqtvgKiLgWEC9dWth62eDoiKHavCk8noyTQfisrS8/pBRdFDL4fShz4bxXaAqu0eiUU
+	26vnfoLKWHvI3bPmCtOJO1F2qstXybJNqdAGPvjuu+y0Jm2XY1NY1UY5ySTa7OfcbNoZ
+	jo3HtEEVcgILACQ5ZrTeQu2LUcuzyelPoeGhJ/MmbQCu9h690dq4MM2kb4+I+a5Mrvd5
+	26nyjh/VL0yYb7rCBLiGYAaCxeSTTqw/MBHo4mTaZTGKdV/YzRbj2hCv3nwuxRZzShAA
+	ZnrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+	bh=r2NOzl046FyRmC+loWdRS7ygF5z5SrZUgNHOTdM5jhE=;
+	b=iz54ey10cI6mygNiIXuNXsq4zgc5z3WHVcttABII08zJo7vpunJIkFz5o+JphZUIUU
+	dBkkXoRUbDNrVFL9WYF/vK1UKqHWUVHQ+D9nGDfhGJUAJAx3hphLgVGrXFZQaEXioq2s
+	0B96nnyQDUoa3DuKzlGU47QlMpcRvUGQlOQd6zxhSP5BE6b//PIG+B0hi9FTWkSaKOs4
+	T1nRbwzcen7Q3boeskVEqYWwF3nBx+Khcdro+a4FVGe/pkWwnM+1NTYkeY4YCPCYORIT
+	G6/Mi3cCyDIpuc1BZIEJ6WNmGiRxN0MlYs56EpM39oZog/RsRBsE7z34lus2pzKaAjVo
+	K9og==
+X-Gm-Message-State: APjAAAVulQ6SyqCERNLlwNXrj4/lRgN8Lvn0Y2BMO3JwAAYm6qIimDrb
+	4VhwSQRIKLNXN3TrYtk/58nWt+Z98xQmhM9dJ013rC1R
+X-Google-Smtp-Source: APXvYqzvSxK8eyUeUoF7L1mZHzpJRV3JlXALWKgn3oDimaDWbSXlak72eSf3C6A078g1Shm06aN1zOLsdYvH3AOuSdg=
+X-Received: by 2002:aca:54cc:: with SMTP id i195mr1432402oib.37.1557953860139; 
+	Wed, 15 May 2019 13:57:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Wed, 15 May 2019 20:51:22 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 21/21] hw/net/ne2000: Extract the PCI device
- from the chipset common code
+From: Adam Parker <adam.loyd.parker@gmail.com>
+Date: Wed, 15 May 2019 15:57:29 -0500
+Message-ID: <CAP80XEGcxWai-8BF1GyfPo1+FrUxB3Qa=aGieYshu371mt+jFA@mail.gmail.com>
+To: qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::230
+X-Mailman-Approved-At: Wed, 15 May 2019 17:13:10 -0400
+Subject: [Qemu-devel] Unhandled Fault when trying to access PCIE
+ [AARCH64/VIRT]
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,366 +85,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Hello all,
 
-The ne2000.c file contains functions common the the ISA and PCI
-devices. To allow to build with one or another, extract the PCI
-specific part into a new file.
+I am attempting to write PCIe drivers for my OP-TEE project against
+the Cortex-A57 using the virt machine.  I am using the default
+packaged qemu, 3.0.93v3.1.0-rc3-dirty and v4.0.0-rc4.  I have added
+the PCIE device to the page table of the OS and when I try to write to
+PIO (0xCF8) I get an unhandled fault.  Tracing this down I found the
+memory access was falling into unassigned_mem_write.  Unfortunately I
+don't have an example of PCIe working so I don't know what this is
+supposed to look like.  Is this normal behavior and the issue lies
+elsewhere?  Or is unassigned_mem_write always a problem?  The debug
+text for the unassigned_mem_write does say the correct physical
+address and value for the operation.
 
-This fix an issue where the NE2000_ISA Kconfig had to pull the
-full PCI core objects.
+>E/TC:0 0
+>E/TC:0 0 Core data-abort at address 0x107f0cf8
+>E/TC:0 0 esr 0x96000050 ttbr0 0x0e29f000 ttbr1 0x00000000 cidr 0x0
+>E/TC:0 0 cpu #0 cpsr 0x600003c4
+>E/TC:0 0 x0 00000000107f0cf8 x1 00000000107f0000
+>E/TC:0 0 x2 00000000117fffff x3 000000000e14a6a0
+>E/TC:0 0 x4 0000000001200000 x5 000000000000000d
+>E/TC:0 0 x6 000000003eff0000 x7 0000000000000020
+>E/TC:0 0 x8 000000000e127c48 x9 000000000e146d24
+>E/TC:0 0 x10 000000000e142f20 x11 00000000f1906769
+>E/TC:0 0 x12 00000000113044e7 x13 000000000e2a693c
+>E/TC:0 0 x14 0000000011800000 x15 0000000000000000
+>E/TC:0 0 x16 0000000000000000 x17 0000000000000000
+>E/TC:0 0 x18 0000000000000000 x19 0000000080000000
+>E/TC:0 0 x20 0000000000000000 x21 000000000e1480b4
+>E/TC:0 0 x22 000000000e1480a2 x23 0000000000000001
+>E/TC:0 0 x24 0000000000000002 x25 000000000000000a
+>E/TC:0 0 x26 0000000000000000 x27 0000000000000000
+>E/TC:0 0 x28 0000000000000000 x29 000000000e2a6990
+>E/TC:0 0 x30 000000000e125af4 elr 000000000e125af4
+>E/TC:0 0 sp_el0 000000000e2a6990
+>D/TC:0 0 get_fault_type:602 [abort] Unhandled fault!
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190504123538.14952-1-philmd@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/net/Kconfig       |   7 ++-
- hw/net/Makefile.objs |   3 +-
- hw/net/ne2000-pci.c  | 132 +++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- hw/net/ne2000.c      | 105 ----------------------------------------
- 4 files changed, 139 insertions(+), 108 deletions(-)
- create mode 100644 hw/net/ne2000-pci.c
-
-diff --git a/hw/net/Kconfig b/hw/net/Kconfig
-index 7d7bbc5..4ef86dc 100644
---- a/hw/net/Kconfig
-+++ b/hw/net/Kconfig
-@@ -1,10 +1,14 @@
- config DP8393X
-     bool
-=20
-+config NE2000_COMMON
-+    bool
-+
- config NE2000_PCI
-     bool
-     default y if PCI_DEVICES
-     depends on PCI
-+    select NE2000_COMMON
-=20
- config EEPRO100_PCI
-     bool
-@@ -51,8 +55,7 @@ config NE2000_ISA
-     bool
-     default y
-     depends on ISA_BUS
--    depends on PCI # for NE2000State
--    select NE2000_PCI
-+    select NE2000_COMMON
-=20
- config OPENCORES_ETH
-     bool
-diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
-index ea63715..9904273 100644
---- a/hw/net/Makefile.objs
-+++ b/hw/net/Makefile.objs
-@@ -1,8 +1,9 @@
- common-obj-$(CONFIG_DP8393X) +=3D dp8393x.o
- common-obj-$(CONFIG_XEN) +=3D xen_nic.o
-+common-obj-$(CONFIG_NE2000_COMMON) +=3D ne2000.o
-=20
- # PCI network cards
--common-obj-$(CONFIG_NE2000_PCI) +=3D ne2000.o
-+common-obj-$(CONFIG_NE2000_PCI) +=3D ne2000-pci.o
- common-obj-$(CONFIG_EEPRO100_PCI) +=3D eepro100.o
- common-obj-$(CONFIG_PCNET_PCI) +=3D pcnet-pci.o
- common-obj-$(CONFIG_PCNET_COMMON) +=3D pcnet.o
-diff --git a/hw/net/ne2000-pci.c b/hw/net/ne2000-pci.c
-new file mode 100644
-index 0000000..cb05744
---- /dev/null
-+++ b/hw/net/ne2000-pci.c
-@@ -0,0 +1,132 @@
-+/*
-+ * QEMU NE2000 emulation (PCI bus)
-+ *
-+ * Copyright (c) 2003-2004 Fabrice Bellard
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-+ * of this software and associated documentation files (the "Software"),=
- to deal
-+ * in the Software without restriction, including without limitation the=
- rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be includ=
-ed in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-+ * THE SOFTWARE.
-+ */
-+#include "qemu/osdep.h"
-+#include "hw/pci/pci.h"
-+#include "ne2000.h"
-+#include "sysemu/sysemu.h"
-+
-+typedef struct PCINE2000State {
-+    PCIDevice dev;
-+    NE2000State ne2000;
-+} PCINE2000State;
-+
-+static const VMStateDescription vmstate_pci_ne2000 =3D {
-+    .name =3D "ne2000",
-+    .version_id =3D 3,
-+    .minimum_version_id =3D 3,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_PCI_DEVICE(dev, PCINE2000State),
-+        VMSTATE_STRUCT(ne2000, PCINE2000State, 0, vmstate_ne2000, NE2000=
-State),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static NetClientInfo net_ne2000_info =3D {
-+    .type =3D NET_CLIENT_DRIVER_NIC,
-+    .size =3D sizeof(NICState),
-+    .receive =3D ne2000_receive,
-+};
-+
-+static void pci_ne2000_realize(PCIDevice *pci_dev, Error **errp)
-+{
-+    PCINE2000State *d =3D DO_UPCAST(PCINE2000State, dev, pci_dev);
-+    NE2000State *s;
-+    uint8_t *pci_conf;
-+
-+    pci_conf =3D d->dev.config;
-+    pci_conf[PCI_INTERRUPT_PIN] =3D 1; /* interrupt pin A */
-+
-+    s =3D &d->ne2000;
-+    ne2000_setup_io(s, DEVICE(pci_dev), 0x100);
-+    pci_register_bar(&d->dev, 0, PCI_BASE_ADDRESS_SPACE_IO, &s->io);
-+    s->irq =3D pci_allocate_irq(&d->dev);
-+
-+    qemu_macaddr_default_if_unset(&s->c.macaddr);
-+    ne2000_reset(s);
-+
-+    s->nic =3D qemu_new_nic(&net_ne2000_info, &s->c,
-+                          object_get_typename(OBJECT(pci_dev)),
-+                          pci_dev->qdev.id, s);
-+    qemu_format_nic_info_str(qemu_get_queue(s->nic), s->c.macaddr.a);
-+}
-+
-+static void pci_ne2000_exit(PCIDevice *pci_dev)
-+{
-+    PCINE2000State *d =3D DO_UPCAST(PCINE2000State, dev, pci_dev);
-+    NE2000State *s =3D &d->ne2000;
-+
-+    qemu_del_nic(s->nic);
-+    qemu_free_irq(s->irq);
-+}
-+
-+static void ne2000_instance_init(Object *obj)
-+{
-+    PCIDevice *pci_dev =3D PCI_DEVICE(obj);
-+    PCINE2000State *d =3D DO_UPCAST(PCINE2000State, dev, pci_dev);
-+    NE2000State *s =3D &d->ne2000;
-+
-+    device_add_bootindex_property(obj, &s->c.bootindex,
-+                                  "bootindex", "/ethernet-phy@0",
-+                                  &pci_dev->qdev, NULL);
-+}
-+
-+static Property ne2000_properties[] =3D {
-+    DEFINE_NIC_PROPERTIES(PCINE2000State, ne2000.c),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void ne2000_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
-+
-+    k->realize =3D pci_ne2000_realize;
-+    k->exit =3D pci_ne2000_exit;
-+    k->romfile =3D "efi-ne2k_pci.rom",
-+    k->vendor_id =3D PCI_VENDOR_ID_REALTEK;
-+    k->device_id =3D PCI_DEVICE_ID_REALTEK_8029;
-+    k->class_id =3D PCI_CLASS_NETWORK_ETHERNET;
-+    dc->vmsd =3D &vmstate_pci_ne2000;
-+    dc->props =3D ne2000_properties;
-+    set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
-+}
-+
-+static const TypeInfo ne2000_info =3D {
-+    .name          =3D "ne2k_pci",
-+    .parent        =3D TYPE_PCI_DEVICE,
-+    .instance_size =3D sizeof(PCINE2000State),
-+    .class_init    =3D ne2000_class_init,
-+    .instance_init =3D ne2000_instance_init,
-+    .interfaces =3D (InterfaceInfo[]) {
-+        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-+        { },
-+    },
-+};
-+
-+static void ne2000_register_types(void)
-+{
-+    type_register_static(&ne2000_info);
-+}
-+
-+type_init(ne2000_register_types)
-diff --git a/hw/net/ne2000.c b/hw/net/ne2000.c
-index 037afc8..ca792d9 100644
---- a/hw/net/ne2000.c
-+++ b/hw/net/ne2000.c
-@@ -22,7 +22,6 @@
-  * THE SOFTWARE.
-  */
- #include "qemu/osdep.h"
--#include "hw/pci/pci.h"
- #include "net/eth.h"
- #include "ne2000.h"
- #include "sysemu/sysemu.h"
-@@ -118,11 +117,6 @@
- #define ENTSR_CDH 0x40	/* The collision detect "heartbeat" signal was lo=
-st. */
- #define ENTSR_OWC 0x80  /* There was an out-of-window collision. */
-=20
--typedef struct PCINE2000State {
--    PCIDevice dev;
--    NE2000State ne2000;
--} PCINE2000State;
--
- void ne2000_reset(NE2000State *s)
- {
-     int i;
-@@ -644,17 +638,6 @@ const VMStateDescription vmstate_ne2000 =3D {
-     }
- };
-=20
--static const VMStateDescription vmstate_pci_ne2000 =3D {
--    .name =3D "ne2000",
--    .version_id =3D 3,
--    .minimum_version_id =3D 3,
--    .fields =3D (VMStateField[]) {
--        VMSTATE_PCI_DEVICE(dev, PCINE2000State),
--        VMSTATE_STRUCT(ne2000, PCINE2000State, 0, vmstate_ne2000, NE2000=
-State),
--        VMSTATE_END_OF_LIST()
--    }
--};
--
- static uint64_t ne2000_read(void *opaque, hwaddr addr,
-                             unsigned size)
- {
-@@ -711,91 +694,3 @@ void ne2000_setup_io(NE2000State *s, DeviceState *de=
-v, unsigned size)
- {
-     memory_region_init_io(&s->io, OBJECT(dev), &ne2000_ops, s, "ne2000",=
- size);
- }
--
--static NetClientInfo net_ne2000_info =3D {
--    .type =3D NET_CLIENT_DRIVER_NIC,
--    .size =3D sizeof(NICState),
--    .receive =3D ne2000_receive,
--};
--
--static void pci_ne2000_realize(PCIDevice *pci_dev, Error **errp)
--{
--    PCINE2000State *d =3D DO_UPCAST(PCINE2000State, dev, pci_dev);
--    NE2000State *s;
--    uint8_t *pci_conf;
--
--    pci_conf =3D d->dev.config;
--    pci_conf[PCI_INTERRUPT_PIN] =3D 1; /* interrupt pin A */
--
--    s =3D &d->ne2000;
--    ne2000_setup_io(s, DEVICE(pci_dev), 0x100);
--    pci_register_bar(&d->dev, 0, PCI_BASE_ADDRESS_SPACE_IO, &s->io);
--    s->irq =3D pci_allocate_irq(&d->dev);
--
--    qemu_macaddr_default_if_unset(&s->c.macaddr);
--    ne2000_reset(s);
--
--    s->nic =3D qemu_new_nic(&net_ne2000_info, &s->c,
--                          object_get_typename(OBJECT(pci_dev)), pci_dev-=
->qdev.id, s);
--    qemu_format_nic_info_str(qemu_get_queue(s->nic), s->c.macaddr.a);
--}
--
--static void pci_ne2000_exit(PCIDevice *pci_dev)
--{
--    PCINE2000State *d =3D DO_UPCAST(PCINE2000State, dev, pci_dev);
--    NE2000State *s =3D &d->ne2000;
--
--    qemu_del_nic(s->nic);
--    qemu_free_irq(s->irq);
--}
--
--static void ne2000_instance_init(Object *obj)
--{
--    PCIDevice *pci_dev =3D PCI_DEVICE(obj);
--    PCINE2000State *d =3D DO_UPCAST(PCINE2000State, dev, pci_dev);
--    NE2000State *s =3D &d->ne2000;
--
--    device_add_bootindex_property(obj, &s->c.bootindex,
--                                  "bootindex", "/ethernet-phy@0",
--                                  &pci_dev->qdev, NULL);
--}
--
--static Property ne2000_properties[] =3D {
--    DEFINE_NIC_PROPERTIES(PCINE2000State, ne2000.c),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void ne2000_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc =3D DEVICE_CLASS(klass);
--    PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
--
--    k->realize =3D pci_ne2000_realize;
--    k->exit =3D pci_ne2000_exit;
--    k->romfile =3D "efi-ne2k_pci.rom",
--    k->vendor_id =3D PCI_VENDOR_ID_REALTEK;
--    k->device_id =3D PCI_DEVICE_ID_REALTEK_8029;
--    k->class_id =3D PCI_CLASS_NETWORK_ETHERNET;
--    dc->vmsd =3D &vmstate_pci_ne2000;
--    dc->props =3D ne2000_properties;
--    set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
--}
--
--static const TypeInfo ne2000_info =3D {
--    .name          =3D "ne2k_pci",
--    .parent        =3D TYPE_PCI_DEVICE,
--    .instance_size =3D sizeof(PCINE2000State),
--    .class_init    =3D ne2000_class_init,
--    .instance_init =3D ne2000_instance_init,
--    .interfaces =3D (InterfaceInfo[]) {
--        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
--        { },
--    },
--};
--
--static void ne2000_register_types(void)
--{
--    type_register_static(&ne2000_info);
--}
--
--type_init(ne2000_register_types)
---=20
-1.8.3.1
-
+Thanks,
+Adam Parker
 
