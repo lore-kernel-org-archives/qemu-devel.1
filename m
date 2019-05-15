@@ -3,60 +3,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F485C04AA7
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 04:20:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA83C04AA7
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 05:30:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1283720862
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 04:20:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1283720862
+	by mail.kernel.org (Postfix) with ESMTPS id 1F2C02084A
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 05:30:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F2C02084A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59144 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59823 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQlOZ-0001U5-9d
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 00:19:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56178)
+	id 1hQmUY-0004Tc-5r
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 01:30:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hQlKb-0007C4-UI
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 00:15:55 -0400
+	(envelope-from <philmd@redhat.com>) id 1hQmTh-00046r-RA
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 01:29:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hQlKa-0004sE-G9
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 00:15:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55888)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hQlKX-0004hk-7W; Wed, 15 May 2019 00:15:49 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 837093082A8D;
-	Wed, 15 May 2019 04:15:48 +0000 (UTC)
-Received: from localhost (ovpn-204-29.brq.redhat.com [10.40.204.29])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1AE6F60BE5;
-	Wed, 15 May 2019 04:15:47 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Wed, 15 May 2019 06:15:41 +0200
-Message-Id: <20190515041541.12367-3-mreitz@redhat.com>
-In-Reply-To: <20190515041541.12367-1-mreitz@redhat.com>
-References: <20190515041541.12367-1-mreitz@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hQmTg-00051V-MJ
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 01:29:21 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:33679)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hQmTg-0004xP-GK
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 01:29:20 -0400
+Received: by mail-wm1-f65.google.com with SMTP id c66so3796700wme.0
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 22:29:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=/jTHOxsJ7PAM6xGoNz59r8y5PNeCVWuZw86J1Q4W5dg=;
+	b=FFkSHT9oKE4aCMxZ1u9/kOHYu6nhjcWOZLPKhYKAm3woBXLwrxB71kNAettiRRrrfR
+	UjrEc/q+8/aaRAxRf1uR1PYwlXT6Lvesfxfec7RGkI5BueFWJnuuN2z1O++wxKzQQdgu
+	QSNxMbLi3bh591UwJk84aF8PeQnSzjPGEwWnausY6ceAK63n1qIwaJKh4RESgv5kC8Ml
+	Gsl6CllggY72yMSeSAJAIOAuBpkfkb3nLZgqkVlH/QroCxfgyPLKP85E2WJseDLmaF8K
+	L0CBrhWjBMeHD0aSLcjEEWRWgmV693mDVhaU8guaJv0yITYq1VqMZAZt9jtNrRjc24s6
+	ruYQ==
+X-Gm-Message-State: APjAAAXKkMjAbpkrCLpj5MZEA//3OT/vo/PsvXLQiHckibrDjQamlQZz
+	+lVVAhr8ty/So1RPjrifnFRL5Q==
+X-Google-Smtp-Source: APXvYqzd3Nm3gCZpABYFGjPClMiXtv9Gt+iawLJ+UnJR/uFRRDoVLuqLdBl8MFox9J604i10Lg7iGA==
+X-Received: by 2002:a1c:9c8c:: with SMTP id f134mr7659684wme.95.1557898158852; 
+	Tue, 14 May 2019 22:29:18 -0700 (PDT)
+Received: from [192.168.1.43] (193.red-88-21-103.staticip.rima-tde.net.
+	[88.21.103.193])
+	by smtp.gmail.com with ESMTPSA id s10sm808099wrt.66.2019.05.14.22.29.17
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Tue, 14 May 2019 22:29:17 -0700 (PDT)
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+	Wei Yang <richardw.yang@linux.intel.com>
+References: <20190419003053.8260-1-richardw.yang@linux.intel.com>
+	<20190419003053.8260-7-richardw.yang@linux.intel.com>
+	<20190514211015-mutt-send-email-mst@kernel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <d9d265e1-1052-9d8d-c749-5d1e5901f567@redhat.com>
+Date: Wed, 15 May 2019 07:29:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Wed, 15 May 2019 04:15:48 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190514211015-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 2/2] iotests: Test unaligned raw images with
- O_DIRECT
+	[fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH v4 6/6] acpi: pci: use build_append_foo()
+ API to construct MCFG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,184 +89,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org,
-	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, qemu-devel@nongnu.org,
+	shannon.zhaosl@gmail.com, qemu-arm@nongnu.org, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We already have 221 for accesses through the page cache, but it is
-better to create a new file for O_DIRECT instead of integrating those
-test cases into 221.  This way, we can make use of
-_supported_cache_modes (and _default_cache_mode) so the test is
-automatically skipped on filesystems that do not support O_DIRECT.
+On 5/15/19 3:10 AM, Michael S. Tsirkin wrote:
+> On Fri, Apr 19, 2019 at 08:30:53AM +0800, Wei Yang wrote:
+>> build_append_foo() API doesn't need explicit endianness conversions
+>> which eliminates a source of errors and it makes build_mcfg() look like
+>> declarative definition of MCFG table in ACPI spec, which makes it easy
+>> to review.
+>>
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> 
+> Causes a regression with an invalid MCFG produced.
+> Dropped.
+> 
+>> ---
+>>  hw/acpi/pci.c               | 33 +++++++++++++++++++++------------
+>>  include/hw/acpi/acpi-defs.h | 18 ------------------
+>>  2 files changed, 21 insertions(+), 30 deletions(-)
+>>
+>> diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
+>> index fa0fa30bb9..341805e786 100644
+>> --- a/hw/acpi/pci.c
+>> +++ b/hw/acpi/pci.c
+>> @@ -30,17 +30,26 @@
+>>  
+>>  void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+>>  {
+>> -    AcpiTableMcfg *mcfg;
+>> -    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
+>> -
+>> -    mcfg = acpi_data_push(table_data, len);
+>> -    mcfg->allocation[0].address = cpu_to_le64(info->base);
+>> -
+>> -    /* Only a single allocation so no need to play with segments */
+>> -    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+>> -    mcfg->allocation[0].start_bus_number = 0;
+>> -    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
+>> -
+>> -    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
+>> +    int mcfg_start = table_data->len;
+>> +
+>> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
 
-As part of the split, add _supported_cache_modes to 221.  With that, it
-no longer fails when run with -c none or -c directsync.
+Ah, it seems we missed AcpiTableMcfg.reserved[8]...:
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- tests/qemu-iotests/221     |  4 ++
- tests/qemu-iotests/253     | 84 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/253.out | 14 +++++++
- tests/qemu-iotests/group   |  1 +
- 4 files changed, 103 insertions(+)
- create mode 100755 tests/qemu-iotests/253
- create mode 100644 tests/qemu-iotests/253.out
+        build_append_int_noprefix(table_data, 0, 8);
 
-diff --git a/tests/qemu-iotests/221 b/tests/qemu-iotests/221
-index 25dd47bcfe..0e9096fec7 100755
---- a/tests/qemu-iotests/221
-+++ b/tests/qemu-iotests/221
-@@ -1,6 +1,7 @@
- #!/usr/bin/env bash
- #
- # Test qemu-img vs. unaligned images
-+# (See also 253, which is the O_DIRECT version)
- #
- # Copyright (C) 2018-2019 Red Hat, Inc.
- #
-@@ -37,6 +38,9 @@ _supported_fmt raw
- _supported_proto file
- _supported_os Linux
-=20
-+_default_cache_mode writeback
-+_supported_cache_modes writeback writethrough unsafe
-+
- echo
- echo "=3D=3D=3D Check mapping of unaligned raw image =3D=3D=3D"
- echo
-diff --git a/tests/qemu-iotests/253 b/tests/qemu-iotests/253
-new file mode 100755
-index 0000000000..d88d5afa45
---- /dev/null
-+++ b/tests/qemu-iotests/253
-@@ -0,0 +1,84 @@
-+#!/usr/bin/env bash
-+#
-+# Test qemu-img vs. unaligned images; O_DIRECT version
-+# (Originates from 221)
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+seq=3D"$(basename $0)"
-+echo "QA output created by $seq"
-+
-+status=3D1 # failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt raw
-+_supported_proto file
-+_supported_os Linux
-+
-+_default_cache_mode none
-+_supported_cache_modes none directsync
-+
-+echo
-+echo "=3D=3D=3D Check mapping of unaligned raw image =3D=3D=3D"
-+echo
-+
-+# We do not know how large a physical sector is, but it is certainly
-+# going to be a factor of 1 MB
-+size=3D$((1 * 1024 * 1024 - 1))
-+
-+# qemu-img create rounds size up to BDRV_SECTOR_SIZE
-+_make_test_img $size
-+$QEMU_IMG map --output=3Djson --image-opts \
-+    "driver=3D$IMGFMT,file.driver=3Dfile,file.filename=3D$TEST_IMG,cache=
-.direct=3Don" \
-+    | _filter_qemu_img_map
-+
-+# so we resize it and check again
-+truncate --size=3D$size "$TEST_IMG"
-+$QEMU_IMG map --output=3Djson --image-opts \
-+    "driver=3D$IMGFMT,file.driver=3Dfile,file.filename=3D$TEST_IMG,cache=
-.direct=3Don" \
-+    | _filter_qemu_img_map
-+
-+# qemu-io with O_DIRECT always writes whole physical sectors.  Again,
-+# we do not know how large a physical sector is, so we just start
-+# writing from a 64 kB boundary, which should always be aligned.
-+offset=3D$((1 * 1024 * 1024 - 64 * 1024))
-+$QEMU_IO -c "w $offset $((size - offset))" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG map --output=3Djson --image-opts \
-+    "driver=3D$IMGFMT,file.driver=3Dfile,file.filename=3D$TEST_IMG,cache=
-.direct=3Don" \
-+    | _filter_qemu_img_map
-+
-+# Resize it and check again -- contrary to 221, we may not get partial
-+# sectors here, so there should be only two areas (one zero, one
-+# data).
-+truncate --size=3D$size "$TEST_IMG"
-+$QEMU_IMG map --output=3Djson --image-opts \
-+    "driver=3D$IMGFMT,file.driver=3Dfile,file.filename=3D$TEST_IMG,cache=
-.direct=3Don" \
-+    | _filter_qemu_img_map
-+
-+# success, all done
-+echo '*** done'
-+rm -f $seq.full
-+status=3D0
-diff --git a/tests/qemu-iotests/253.out b/tests/qemu-iotests/253.out
-new file mode 100644
-index 0000000000..607c0baa0b
---- /dev/null
-+++ b/tests/qemu-iotests/253.out
-@@ -0,0 +1,14 @@
-+QA output created by 253
-+
-+=3D=3D=3D Check mapping of unaligned raw image =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048575
-+[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": fals=
-e, "offset": OFFSET}]
-+[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": fals=
-e, "offset": OFFSET}]
-+wrote 65535/65535 bytes at offset 983040
-+63.999 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 983040, "depth": 0, "zero": true, "data": false=
-, "offset": OFFSET},
-+{ "start": 983040, "length": 65536, "depth": 0, "zero": false, "data": t=
-rue, "offset": OFFSET}]
-+[{ "start": 0, "length": 983040, "depth": 0, "zero": true, "data": false=
-, "offset": OFFSET},
-+{ "start": 983040, "length": 65536, "depth": 0, "zero": false, "data": t=
-rue, "offset": OFFSET}]
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 00e474ab0a..52b7c16e15 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -250,3 +250,4 @@
- 248 rw auto quick
- 249 rw auto quick
- 252 rw auto backing quick
-+253 rw auto quick
---=20
-2.21.0
+>> +
+>> +    /*
+>> +     * PCI Firmware Specification, Revision 3.0
+>> +     * 4.1.2 MCFG Table Description.
+>> +     */
+>> +    /* Base address, processor-relative */
+>> +    build_append_int_noprefix(table_data, info->base, 8);
+>> +    /* PCI segment group number */
+>> +    build_append_int_noprefix(table_data, 0, 2);
+>> +    /* Starting PCI Bus number */
+>> +    build_append_int_noprefix(table_data, 0, 1);
+>> +    /* Final PCI Bus number */
+>> +    build_append_int_noprefix(table_data, PCIE_MMCFG_BUS(info->size - 1), 1);
+>> +    /* Reserved */
+>> +    build_append_int_noprefix(table_data, 0, 4);
+>> +
+>> +    build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
+>> +                 "MCFG", table_data->len - mcfg_start, 1, NULL, NULL);
+>>  }
+>>  
+>> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+>> index f9aa4bd398..57a3f58b0c 100644
+>> --- a/include/hw/acpi/acpi-defs.h
+>> +++ b/include/hw/acpi/acpi-defs.h
+>> @@ -449,24 +449,6 @@ struct AcpiSratProcessorGiccAffinity {
+>>  
+>>  typedef struct AcpiSratProcessorGiccAffinity AcpiSratProcessorGiccAffinity;
+>>  
+>> -/* PCI fw r3.0 MCFG table. */
+>> -/* Subtable */
+>> -struct AcpiMcfgAllocation {
+>> -    uint64_t address;                /* Base address, processor-relative */
+>> -    uint16_t pci_segment;            /* PCI segment group number */
+>> -    uint8_t start_bus_number;       /* Starting PCI Bus number */
+>> -    uint8_t end_bus_number;         /* Final PCI Bus number */
+>> -    uint32_t reserved;
+>> -} QEMU_PACKED;
+>> -typedef struct AcpiMcfgAllocation AcpiMcfgAllocation;
+>> -
+>> -struct AcpiTableMcfg {
+>> -    ACPI_TABLE_HEADER_DEF;
+>> -    uint8_t reserved[8];
 
+           --------^
+
+Thanks Michael for testing...
+
+Wei, can you add a MCFG test in tests/bios-tables-test.c?
+
+Regards,
+
+Phil.
+
+>> -    AcpiMcfgAllocation allocation[0];
+>> -} QEMU_PACKED;
+>> -typedef struct AcpiTableMcfg AcpiTableMcfg;
+>> -
+>>  /*
+>>   * TCPA Description Table
+>>   *
+>> -- 
+>> 2.19.1
 
