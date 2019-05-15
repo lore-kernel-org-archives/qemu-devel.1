@@ -2,93 +2,75 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9B61C04AB7
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 00:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60FC9C04AB4
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 01:11:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 758F420862
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 00:32:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gukC8KrU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 758F420862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3126D20862
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 01:11:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3126D20862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56919 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57279 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQhq5-00066U-LE
-	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 20:32:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48974)
+	id 1hQiSJ-0003oe-39
+	for qemu-devel@archiver.kernel.org; Tue, 14 May 2019 21:11:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQhpA-0005p3-CV
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 20:31:13 -0400
+	(envelope-from <mst@redhat.com>) id 1hQiRP-0003Rh-UY
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 21:10:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hQhp9-0004lH-HN
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 20:31:12 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:39604)
+	(envelope-from <mst@redhat.com>) id 1hQiRO-0006lc-Gl
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 21:10:43 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:34218)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hQhp9-0004ku-B3
-	for qemu-devel@nongnu.org; Tue, 14 May 2019 20:31:11 -0400
-Received: by mail-pl1-x642.google.com with SMTP id g9so409071plm.6
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 17:31:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:from:to:cc:references:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=ay36xswJnI9uCkH/zcYhwSWZ6KaPY3ZfMAXmPgj9ujY=;
-	b=gukC8KrUtWsAn+eR3g7mI8xVm/ru6N+XvB1BT02cOQHoxzr+7rhzHkLJcJPhItyp7V
-	Q0tAxxSmMo2lcCDGIEDNdMFL4nBm/blB4mZNOpJDFWhSCcAUA3DSgJc5WQ0XU66TVZK3
-	VGKLZg1O0469iSMWMhM1Nntoob+MxbKBHddjonpFJ8gso+ksI7l/n46z/vCaeaugTw2u
-	isUzWc+8rNgT+ajN72EZ5Wi1acB6GuZZP7CLi28wMad1QDWF6d/4W+n2PKN6YtoKF61Q
-	rSQdI6/kH9SrHylweSrazamtDsOOtis04GYU3ANRMr7Be0qtF9yhKhNewcH+XeV4tXYN
-	7+yQ==
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hQiRO-0006is-Aj
+	for qemu-devel@nongnu.org; Tue, 14 May 2019 21:10:42 -0400
+Received: by mail-qt1-f196.google.com with SMTP id h1so1445265qtp.1
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 18:10:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=ay36xswJnI9uCkH/zcYhwSWZ6KaPY3ZfMAXmPgj9ujY=;
-	b=DLe5kP9jiaVCv8+RzfMWhnyflH/TeN60M9mdk+fGbiFrDkKZOeQ3vbYwfEyXBrZxEe
-	ZwTXlDC9/RnxBT+GLg0bb3lgR6IzSANDm0g8pyIZAdK3vIyt+HQAIA5k2E9ThxSHhtbR
-	hjsSXNo3W4toUCbOJx7QjkdVfpwsnk+0k9cYFKv9oN2P+H2u6Ayq1IRlAw3yo9+9/PLe
-	3w/gDqxYPzOUeGK3+v6Au2UI7eqE5J5JLGRCoyPPWU/pDGNVtjk+bXb0WNvb38XaQwgt
-	UNPQcddeGeuD/EwFka6scnCssRkfd2kU7UvGH6d84VhTvjd5AQMNNy86KUcEagopyN/D
-	qmLw==
-X-Gm-Message-State: APjAAAVIwg+c9kU3y5RCbBnwLl1J+lveceZzbPDik1lXNaFJftKJeKQf
-	VCm3rYQH6zDmWwHZ+DCw1thaKLDNhzU=
-X-Google-Smtp-Source: APXvYqwXwqRHnv4M4e0nqCKzeFWx+C+nuPSrtY3tCVruCPpemOwY/qF9lQci97dUvokvmfc9aVZuMw==
-X-Received: by 2002:a17:902:4624:: with SMTP id
-	o33mr22845023pld.268.1557880269166; 
-	Tue, 14 May 2019 17:31:09 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id
-	r64sm390826pfa.25.2019.05.14.17.31.07
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 14 May 2019 17:31:07 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-References: <20190510032710.23910-1-richard.henderson@linaro.org>
-	<20190510032710.23910-2-richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <360bb191-e9cb-51ef-1527-0e0767a9146b@linaro.org>
-Date: Tue, 14 May 2019 17:31:05 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:content-transfer-encoding
+	:in-reply-to;
+	bh=PU0ahnnz2Yw+Drru1xrR3apQ5vSXutrP8LiQj6IFiPg=;
+	b=M4gkw0f0n97g7AKGM5SZvIhSdC1d1WtlZXYRneRULYCgw+hDsvX+aZ+r+av8P9/KoZ
+	W17khXnSPeBpZaETFzLEmCU5YywXiEKCGlIciS+jHiljTBjQUiElS7IW8yKAj7OnZwk3
+	mzN4uMp7t3T+U7JJOtVMlF7xfgxx/0HiX6J4n3hWFv8WO1HNpC7lgJCe5mIbS5PLP19h
+	+OvzORLg2nB3iDfYjCnlog0CcmBdWLpofByUMyiMr130G5m6Y40aHsnUuuZdf+WcBhtU
+	j+PYK9ZqfDRYtUcGF7yQZpOTaJ/mtGXW3/aIhpavGz5qx57XpM3JR0uDIUPmBcW7aHBO
+	1fCA==
+X-Gm-Message-State: APjAAAUSWYap9o15f/7p4R1r5xv3oGaS7hsJs+tw+hS+G17uv/SsRAD0
+	N5QGJrP2BDPFvfkeaaZl8wpcyA==
+X-Google-Smtp-Source: APXvYqwDiqC3RAYXzyOYtCw+lXE0OsL/UKLB7wFIgNaD7m6JeyTXTxlhiqFu4RxjNrM7gxxfRLDm2A==
+X-Received: by 2002:ac8:2af4:: with SMTP id c49mr14230189qta.83.1557882640602; 
+	Tue, 14 May 2019 18:10:40 -0700 (PDT)
+Received: from redhat.com ([185.54.206.10])
+	by smtp.gmail.com with ESMTPSA id v22sm551377qtj.29.2019.05.14.18.10.37
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Tue, 14 May 2019 18:10:39 -0700 (PDT)
+Date: Tue, 14 May 2019 21:10:34 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190514211015-mutt-send-email-mst@kernel.org>
+References: <20190419003053.8260-1-richardw.yang@linux.intel.com>
+	<20190419003053.8260-7-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20190510032710.23910-2-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::642
-Subject: Re: [Qemu-devel] [PATCH v2 1/8] linux-user: Disallow setting newsp
- for fork
+In-Reply-To: <20190419003053.8260-7-richardw.yang@linux.intel.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.160.196
+Subject: Re: [Qemu-devel] [PATCH v4 6/6] acpi: pci: use build_append_foo()
+ API to construct MCFG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,45 +82,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent@vivier.eu
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, qemu-devel@nongnu.org,
+	shannon.zhaosl@gmail.com, qemu-arm@nongnu.org,
+	imammedo@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/9/19 8:27 PM, Richard Henderson wrote:
-> Or really, just clone devolving into fork.  This should not ever happen
-> in practice.  We do want to reserve calling cpu_clone_regs for the case
-> in which we are actually performing a clone.
+On Fri, Apr 19, 2019 at 08:30:53AM +0800, Wei Yang wrote:
+> build_append_foo() API doesn't need explicit endianness conversions
+> which eliminates a source of errors and it makes build_mcfg() look like
+> declarative definition of MCFG table in ACPI spec, which makes it easy
+> to review.
 > 
-> Reviewed-by: Alex BennÃ©e <alex.bennee@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+Causes a regression with an invalid MCFG produced.
+Dropped.
+
 > ---
->  linux-user/syscall.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+>  hw/acpi/pci.c               | 33 +++++++++++++++++++++------------
+>  include/hw/acpi/acpi-defs.h | 18 ------------------
+>  2 files changed, 21 insertions(+), 30 deletions(-)
 > 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 96cd4bf86d..f7d0754c8d 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -5553,10 +5553,14 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
->          pthread_mutex_destroy(&info.mutex);
->          pthread_mutex_unlock(&clone_lock);
->      } else {
-> -        /* if no CLONE_VM, we consider it is a fork */
-> +        /* If no CLONE_VM, we consider it is a fork.  */
->          if (flags & CLONE_INVALID_FORK_FLAGS) {
->              return -TARGET_EINVAL;
->          }
-> +        /* As a fork, setting a new sp does not make sense.  */
-> +        if (newsp) {
-> +            return -TARGET_EINVAL;
-> +        }
-
-This causes failures for aarch64 and riscv.
-
-We have to allow no-op setting of sp as well.
-Other targets set newsp to 0 for in vfork.S in glibc.
-
-
-r~
+> diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
+> index fa0fa30bb9..341805e786 100644
+> --- a/hw/acpi/pci.c
+> +++ b/hw/acpi/pci.c
+> @@ -30,17 +30,26 @@
+>  
+>  void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+>  {
+> -    AcpiTableMcfg *mcfg;
+> -    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
+> -
+> -    mcfg = acpi_data_push(table_data, len);
+> -    mcfg->allocation[0].address = cpu_to_le64(info->base);
+> -
+> -    /* Only a single allocation so no need to play with segments */
+> -    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+> -    mcfg->allocation[0].start_bus_number = 0;
+> -    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
+> -
+> -    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
+> +    int mcfg_start = table_data->len;
+> +
+> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
+> +
+> +    /*
+> +     * PCI Firmware Specification, Revision 3.0
+> +     * 4.1.2 MCFG Table Description.
+> +     */
+> +    /* Base address, processor-relative */
+> +    build_append_int_noprefix(table_data, info->base, 8);
+> +    /* PCI segment group number */
+> +    build_append_int_noprefix(table_data, 0, 2);
+> +    /* Starting PCI Bus number */
+> +    build_append_int_noprefix(table_data, 0, 1);
+> +    /* Final PCI Bus number */
+> +    build_append_int_noprefix(table_data, PCIE_MMCFG_BUS(info->size - 1), 1);
+> +    /* Reserved */
+> +    build_append_int_noprefix(table_data, 0, 4);
+> +
+> +    build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
+> +                 "MCFG", table_data->len - mcfg_start, 1, NULL, NULL);
+>  }
+>  
+> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> index f9aa4bd398..57a3f58b0c 100644
+> --- a/include/hw/acpi/acpi-defs.h
+> +++ b/include/hw/acpi/acpi-defs.h
+> @@ -449,24 +449,6 @@ struct AcpiSratProcessorGiccAffinity {
+>  
+>  typedef struct AcpiSratProcessorGiccAffinity AcpiSratProcessorGiccAffinity;
+>  
+> -/* PCI fw r3.0 MCFG table. */
+> -/* Subtable */
+> -struct AcpiMcfgAllocation {
+> -    uint64_t address;                /* Base address, processor-relative */
+> -    uint16_t pci_segment;            /* PCI segment group number */
+> -    uint8_t start_bus_number;       /* Starting PCI Bus number */
+> -    uint8_t end_bus_number;         /* Final PCI Bus number */
+> -    uint32_t reserved;
+> -} QEMU_PACKED;
+> -typedef struct AcpiMcfgAllocation AcpiMcfgAllocation;
+> -
+> -struct AcpiTableMcfg {
+> -    ACPI_TABLE_HEADER_DEF;
+> -    uint8_t reserved[8];
+> -    AcpiMcfgAllocation allocation[0];
+> -} QEMU_PACKED;
+> -typedef struct AcpiTableMcfg AcpiTableMcfg;
+> -
+>  /*
+>   * TCPA Description Table
+>   *
+> -- 
+> 2.19.1
 
