@@ -2,82 +2,92 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20577C04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 16:18:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00725C04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 16:24:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E197B20862
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 16:18:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E197B20862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B90A320818
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 16:24:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gRXFpDOj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B90A320818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39434 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39508 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQwc3-0003vo-W7
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 12:18:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56327)
+	id 1hQwhX-0006gF-JA
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 12:24:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hQwat-0003T2-1G
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:17:27 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hQwg8-0005sY-VH
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:22:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hQwas-0001yI-2y
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:17:27 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:38700)
+	(envelope-from <richard.henderson@linaro.org>) id 1hQwg7-0006d3-St
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:22:52 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:38123)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hQwar-0001v8-SO
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:17:26 -0400
-Received: by mail-wr1-f65.google.com with SMTP id d18so168191wrs.5
-	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 09:17:25 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hQwg5-0006ZV-VS
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:22:51 -0400
+Received: by mail-pf1-x443.google.com with SMTP id b76so229930pfb.5
+	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 09:22:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=C1oyxAzsQeeNCGbw5lRtk/JX1xi9l8PA9oCk2tyAWgs=;
+	b=gRXFpDOju7t8cUfjSKzNsR4/s1o3UbLKG9KZYBdt94GEnvuOw3KJ+0Fi8LL7VJxC/n
+	YQB+7Wv8yySHuqXnB4TdaHDRBQzy2qFok6MnLwRPvAyOfBBbIKtmQl65tmT2/929kQ0j
+	MZkjXw6e5zhGvTNvHr774R4bIiCr2dkPsnvjI7tUdxIQbD3etcixLA/GxalOW7HRjFYe
+	mHKN/hLEhdMPTzqNJdLxtdEKALVKtmrOopt0LgQlD8wa1iILQU+jQhGJSFGKWPW3p908
+	75m65J5D/bA/DFxl3XRgw+5UB1oBPj3eQ6DaUWxgXSj8ddoM0G7xJkSC/0nQ5BFOpvW/
+	Ejzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=aeg8SVa8lIu3q85B2yqngTt8oZntQqVn91puRt3wQOI=;
-	b=nk6CFPbsBRTdBtFoIZLXVkyAiURJgweASgbUG+xI5sjyfVg6Vn/tIPU59DehmuHnYw
-	2DxPqES+3/hvH9+YZHJ5Gq8cjnA0c6pPUak3OD6MHykMU9o4ZmfcQl8eo1fBoTeNeZti
-	YU438RxbMBz4Cl2x1RkKQK1DyEQVXaFqWMgbxeQWSDh9sAEoxKkvAmK2oKTGtMbUUJLX
-	hbXieiZfgfZmGp5GsRkC97SR6QbcwZ8c1R2Z+mVdnUPPP5uXPu3dHVWktx3O9cXnsg8I
-	XtnR/oTyqqTPs0RsFM6uj8bGWYQO8Sap0zRB92YFRUwNN9Cu6FbMKxYCZZN197GiNMV3
-	KOAQ==
-X-Gm-Message-State: APjAAAUZj3B0Q0skUjZwdtmD1TtFfZS3Yc0l1KDziPMfca6L3/SBdrPt
-	DAfgy0Ejy1hb+oUCvQOIBC2xMQ==
-X-Google-Smtp-Source: APXvYqxgptbLBnmKKZCvLjjrb9uxi4Z0N/z5YGqvmi9ZgS32pydqygzXXVM8wp9zsDf1bxgZIVTa1w==
-X-Received: by 2002:adf:f743:: with SMTP id z3mr11911141wrp.129.1557937044045; 
-	Wed, 15 May 2019 09:17:24 -0700 (PDT)
-Received: from [192.168.1.43] (228.red-83-52-173.dynamicip.rima-tde.net.
-	[83.52.173.228])
-	by smtp.gmail.com with ESMTPSA id 88sm4911031wrc.33.2019.05.15.09.17.23
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Wed, 15 May 2019 09:17:23 -0700 (PDT)
-To: Stefano Garzarella <sgarzare@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>
-References: <20190515090805.44785-1-sgarzare@redhat.com>
-	<875zqb7v9c.fsf@dusky.pond.sub.org>
-	<20190515130100.rth7dnluusk75v23@steredhat>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <611f79b2-a01a-c17e-08ed-5a5bdd17b5d6@redhat.com>
-Date: Wed, 15 May 2019 18:17:22 +0200
+	bh=C1oyxAzsQeeNCGbw5lRtk/JX1xi9l8PA9oCk2tyAWgs=;
+	b=WWJb+ttUxMyiF76VUl/gnmNgwHcdQsMfJ0VQsjF4ZEsIFnccaeQ1AyxWQ8P4QWZQSQ
+	fPmA92ud+FNrLu8G6LkGq31hM9jLLNE+qLTgiY9W978lGc1ckER0kTUwB2be/84/QmxI
+	4Ib/9TRxmoU048r3Riu71qHqVcyzgBjbT62eO0mLmJWIf4O8rYKTZV1JxcZ3ykUhZrth
+	Ms2+8GormkVrmPXRp+YbskV6cH5AWDnxYR1luFALxWRxzpdkOVMnMdHT8kU4jf6Tg3aI
+	k/qNq1ZxL9j4KWFpHYLG6RmyDTQTTl/1ZRKuTyyCsDEUbhIrdYHd9qLXSlDhfH235z8V
+	YgYw==
+X-Gm-Message-State: APjAAAXmoPC35Zrbeeu46syQ/5nwPI2sXYa35UuglfMtr7u7TkwMWhXP
+	+IdH4PQZuKScpr8AVlORwX5xEA==
+X-Google-Smtp-Source: APXvYqw0OPypD02DkghfO9OWuckb5abnN+NLiEK/PTogyG03yr720Q2/nt80wW79fIzejQV85lqxvQ==
+X-Received: by 2002:a62:1a0f:: with SMTP id a15mr26955486pfa.111.1557937366487;
+	Wed, 15 May 2019 09:22:46 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
+	by smtp.gmail.com with ESMTPSA id
+	t5sm2795592pgn.80.2019.05.15.09.22.45
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 15 May 2019 09:22:45 -0700 (PDT)
+To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
+References: <20190514061458.125225-1-ysato@users.sourceforge.jp>
+	<20190514061458.125225-12-ysato@users.sourceforge.jp>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <d7a58033-efe2-d911-f5fc-fe1f066d69ae@linaro.org>
+Date: Wed, 15 May 2019 09:22:42 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190515130100.rth7dnluusk75v23@steredhat>
+In-Reply-To: <20190514061458.125225-12-ysato@users.sourceforge.jp>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH v2] net/slirp: fix the IPv6 prefix length
- error message
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH v12 11/12] qemu/bitops.h: Add extract8 and
+ extract16
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,57 +99,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Jan Kiszka <jan.kiszka@siemens.com>,
-	Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
-	Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	=?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: peter.maydell@linaro.org, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/15/19 3:01 PM, Stefano Garzarella wrote:
-> On Wed, May 15, 2019 at 02:33:03PM +0200, Markus Armbruster wrote:
->> Stefano Garzarella <sgarzare@redhat.com> writes:
->>
->>> Reword and add a missing parentheses at the end of the
->>> error message.
->>>
->>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->>> Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
->>> ---
->>> v2:
->>>   - Reworded the error message (Markus)
->>>   - Added Marc-André's R-b
->>>     I made a little change to the error message, let me now
->>>     if I should remove yuor R-b.
->>> ---
->>>  net/slirp.c | 3 ++-
->>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/net/slirp.c b/net/slirp.c
->>> index 95934fb36d..b34cb29276 100644
->>> --- a/net/slirp.c
->>> +++ b/net/slirp.c
->>> @@ -498,7 +498,8 @@ static int net_slirp_init(NetClientState *peer, const char *model,
->>>      }
->>>      if (vprefix6_len < 0 || vprefix6_len > 126) {
->>>          error_setg(errp,
->>> -                   "Invalid prefix provided (prefix len must be in range 0-126");
->>> +                   "Invalid IPv6 prefix provided "
->>> +                   "(IPv6 prefix length must be between 0 and 126)");
->>>          return -1;
->>>      }
->>
->> "Parameter 'ipv6-prefixlen' expects a value between 0 and 126" would be
->> closer to how we report similar errors elsewhere.
-> 
-> This error is shown when 'ipv6-net' or 'ipv6-prefixlen' parameters are
-> used, so I preferred to leave a more generic error to fit both cases.
-> 
->>
->> Regardless:
->> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+On 5/13/19 11:14 PM, Yoshinori Sato wrote:
+> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> ---
+>  include/qemu/bitops.h | 38 ++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 38 insertions(+)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
+
+r~
 
