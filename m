@@ -2,61 +2,114 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 175DCC04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 20:37:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C28EC04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 20:47:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87D162070D
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 20:36:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87D162070D
+	by mail.kernel.org (Postfix) with ESMTPS id 5C1FA20843
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 20:47:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C1FA20843
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42170 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42269 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hR0e2-0001Bw-HT
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 16:36:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48046)
+	id 1hR0oU-00042F-B5
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 16:47:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hR0Yo-0005ty-H6
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 16:31:35 -0400
+	(envelope-from <david@redhat.com>) id 1hR0nD-0003SW-K3
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 16:46:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hR0Ym-0002Hg-Vu
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 16:31:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46470)
+	(envelope-from <david@redhat.com>) id 1hR0nC-00063O-DO
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 16:46:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:26538)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hR0Ym-0002Gi-Md; Wed, 15 May 2019 16:31:32 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hR0nA-00060f-39
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 16:46:25 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0168F3001A77;
-	Wed, 15 May 2019 20:31:32 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-116-133.ams2.redhat.com [10.36.116.133])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 983BF62926;
-	Wed, 15 May 2019 20:31:28 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 42E323082B46;
+	Wed, 15 May 2019 20:46:17 +0000 (UTC)
+Received: from [10.36.116.133] (ovpn-116-133.ams2.redhat.com [10.36.116.133])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4C6766266C;
+	Wed, 15 May 2019 20:46:01 +0000 (UTC)
+To: Pankaj Gupta <pagupta@redhat.com>, linux-nvdimm@lists.01.org,
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-acpi@vger.kernel.org, qemu-devel@nongnu.org,
+	linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, mst@redhat.com
+References: <20190514145422.16923-1-pagupta@redhat.com>
+	<20190514145422.16923-3-pagupta@redhat.com>
 From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 15 May 2019 22:31:12 +0200
-Message-Id: <20190515203112.506-6-david@redhat.com>
-In-Reply-To: <20190515203112.506-1-david@redhat.com>
-References: <20190515203112.506-1-david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <9f6b1d8e-ef90-7d8b-56da-61a426953ba3@redhat.com>
+Date: Wed, 15 May 2019 22:46:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190514145422.16923-3-pagupta@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
 	(mx1.redhat.com [10.5.110.45]);
-	Wed, 15 May 2019 20:31:32 +0000 (UTC)
+	Wed, 15 May 2019 20:46:17 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v1 5/5] s390x/tcg: Implement VECTOR STRING
- RANGE COMPARE
+Subject: Re: [Qemu-devel] [PATCH v9 2/7] virtio-pmem: Add virtio pmem driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,328 +121,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-	David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+Cc: jack@suse.cz, jasowang@redhat.com, david@fromorbit.com,
+	lcapitulino@redhat.com, adilger.kernel@dilger.ca,
+	zwisler@kernel.org, aarcange@redhat.com, dave.jiang@intel.com,
+	jstaron@google.com, darrick.wong@oracle.com,
+	vishal.l.verma@intel.com, willy@infradead.org, hch@infradead.org,
+	jmoyer@redhat.com, nilal@redhat.com, lenb@kernel.org,
+	kilobyte@angband.pl, riel@surriel.com, yuval.shaia@oracle.com,
+	stefanha@redhat.com, pbonzini@redhat.com,
+	dan.j.williams@intel.com, kwolf@redhat.com, tytso@mit.edu,
+	xiaoguangrong.eric@gmail.com, cohuck@redhat.com,
+	rjw@rjwysocki.net, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Crazy stuff. Implement it similar to VECTOR FIND ANY ELEMENT
-EQUAL.
+> +	vpmem->vdev =3D vdev;
+> +	vdev->priv =3D vpmem;
+> +	err =3D init_vq(vpmem);
+> +	if (err) {
+> +		dev_err(&vdev->dev, "failed to initialize virtio pmem vq's\n");
+> +		goto out_err;
+> +	}
+> +
+> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> +			start, &vpmem->start);
+> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> +			size, &vpmem->size);
+> +
+> +	res.start =3D vpmem->start;
+> +	res.end   =3D vpmem->start + vpmem->size-1;
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/helper.h            |   6 ++
- target/s390x/insn-data.def       |   2 +
- target/s390x/translate_vx.inc.c  |  37 +++++++++++
- target/s390x/vec_string_helper.c | 108 +++++++++++++++++++++++++++++++
- 4 files changed, 153 insertions(+)
+nit: " - 1;"
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 1f9f0b463b..f2743ccd97 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -236,6 +236,12 @@ DEF_HELPER_FLAGS_3(gvec_vistr32, TCG_CALL_NO_RWG, vo=
-id, ptr, cptr, i32)
- DEF_HELPER_4(gvec_vistr_cc8, void, ptr, cptr, env, i32)
- DEF_HELPER_4(gvec_vistr_cc16, void, ptr, cptr, env, i32)
- DEF_HELPER_4(gvec_vistr_cc32, void, ptr, cptr, env, i32)
-+DEF_HELPER_FLAGS_5(gvec_vstrc8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vstrc16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
- cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vstrc32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
- cptr, i32)
-+DEF_HELPER_6(gvec_vstrc_cc8, void, ptr, cptr, cptr, cptr, env, i32)
-+DEF_HELPER_6(gvec_vstrc_cc16, void, ptr, cptr, cptr, cptr, env, i32)
-+DEF_HELPER_6(gvec_vstrc_cc32, void, ptr, cptr, cptr, cptr, env, i32)
-=20
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index b4a6b59608..a2969fab58 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1201,6 +1201,8 @@
-     F(0xe781, VFENE,   VRR_b, V,   0, 0, 0, 0, vfene, 0, IF_VEC)
- /* VECTOR ISOLATE STRING */
-     F(0xe75c, VISTR,   VRR_a, V,   0, 0, 0, 0, vistr, 0, IF_VEC)
-+/* VECTOR STRING RANGE COMPARE */
-+    F(0xe78a, VSTRC,   VRR_d, V,   0, 0, 0, 0, vstrc, 0, IF_VEC)
-=20
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
-inc.c
-index 437b416b4a..62a8d4d738 100644
---- a/target/s390x/translate_vx.inc.c
-+++ b/target/s390x/translate_vx.inc.c
-@@ -217,6 +217,10 @@ static void get_vec_element_ptr_i64(TCGv_ptr ptr, ui=
-nt8_t reg, TCGv_i64 enr,
-     tcg_gen_gvec_4_ool(vec_full_reg_offset(v1), vec_full_reg_offset(v2),=
- \
-                        vec_full_reg_offset(v3), vec_full_reg_offset(v4),=
- \
-                        16, 16, data, fn)
-+#define gen_gvec_4_ptr(v1, v2, v3, v4, ptr, data, fn) \
-+    tcg_gen_gvec_4_ptr(vec_full_reg_offset(v1), vec_full_reg_offset(v2),=
- \
-+                       vec_full_reg_offset(v3), vec_full_reg_offset(v4),=
- \
-+                       ptr, 16, 16, data, fn)
- #define gen_gvec_dup_i64(es, v1, c) \
-     tcg_gen_gvec_dup_i64(es, vec_full_reg_offset(v1), 16, 16, c)
- #define gen_gvec_mov(v1, v2) \
-@@ -2480,3 +2484,36 @@ static DisasJumpType op_vistr(DisasContext *s, Dis=
-asOps *o)
-     }
-     return DISAS_NEXT;
- }
-+
-+static DisasJumpType op_vstrc(DisasContext *s, DisasOps *o)
-+{
-+    const uint8_t es =3D get_field(s->fields, m5);
-+    const uint8_t m6 =3D get_field(s->fields, m6);
-+    static gen_helper_gvec_4_ptr * const cc[3] =3D {
-+        gen_helper_gvec_vstrc_cc8,
-+        gen_helper_gvec_vstrc_cc16,
-+        gen_helper_gvec_vstrc_cc32,
-+    };
-+    static gen_helper_gvec_4 * const nocc[3] =3D {
-+        gen_helper_gvec_vstrc8,
-+        gen_helper_gvec_vstrc16,
-+        gen_helper_gvec_vstrc32,
-+    };
-+
-+    if (es > ES_32) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    if (m6 & 1) {
-+        gen_gvec_4_ptr(get_field(s->fields, v1), get_field(s->fields, v2=
-),
-+                       get_field(s->fields, v3), get_field(s->fields, v4=
-),
-+                       cpu_env, m6, cc[es]);
-+        set_cc_static(s);
-+    } else {
-+        gen_gvec_4_ool(get_field(s->fields, v1), get_field(s->fields, v2=
-),
-+                       get_field(s->fields, v3), get_field(s->fields, v4=
-), m6,
-+                       nocc[es]);
-+    }
-+    return DISAS_NEXT;
-+}
-diff --git a/target/s390x/vec_string_helper.c b/target/s390x/vec_string_h=
-elper.c
-index 2e998c21a2..6d6dbfa061 100644
---- a/target/s390x/vec_string_helper.c
-+++ b/target/s390x/vec_string_helper.c
-@@ -248,3 +248,111 @@ void HELPER(gvec_vistr_cc##BITS)(void *v1, const vo=
-id *v2,                     \
- DEF_VISTR_CC_HELPER(8)
- DEF_VISTR_CC_HELPER(16)
- DEF_VISTR_CC_HELPER(32)
-+
-+#define DEF_ELEMENT_COMPARE(BITS)                                       =
-       \
-+static bool element_compare##BITS(uint##BITS##_t data, uint##BITS##_t l,=
-       \
-+                                  uint##BITS##_t c)                     =
-       \
-+{                                                                       =
-       \
-+    const bool equal =3D extract32(c, BITS - 1, 1);                     =
-         \
-+    const bool lower =3D extract32(c, BITS - 2, 1);                     =
-         \
-+    const bool higher =3D extract32(c, BITS - 3, 1);                    =
-         \
-+                                                                        =
-       \
-+    if (equal && data =3D=3D l) {                                       =
-           \
-+        return true;                                                    =
-       \
-+    } else if (lower && data < l) {                                     =
-       \
-+        return true;                                                    =
-       \
-+    } else if (higher && data > l) {                                    =
-       \
-+        return true;                                                    =
-       \
-+    }                                                                   =
-       \
-+    return false;                                                       =
-       \
-+}
-+DEF_ELEMENT_COMPARE(8)
-+DEF_ELEMENT_COMPARE(16)
-+DEF_ELEMENT_COMPARE(32)
-+
-+#define DEF_VSTRC(BITS)                                                 =
-       \
-+static int vstrc##BITS(void *v1, const void *v2, const void *v3,        =
-       \
-+                       const void *v4, uint8_t m6)                      =
-       \
-+{                                                                       =
-       \
-+    const bool in =3D extract32(m6, 3, 1);                              =
-         \
-+    const bool rt =3D extract32(m6, 2, 1);                              =
-         \
-+    const bool zs =3D extract32(m6, 1, 1);                              =
-         \
-+    S390Vector tmp =3D {};                                              =
-         \
-+    int first_byte =3D 16;                                              =
-         \
-+    int cc =3D 3; /* no match */                                        =
-         \
-+    int i, j;                                                           =
-       \
-+                                                                        =
-       \
-+    for (i =3D 0; i < (128 / BITS); i++) {                              =
-         \
-+        const uint##BITS##_t data =3D s390_vec_read_element##BITS(v2, i)=
-;        \
-+        bool any_comp =3D false;                                        =
-         \
-+                                                                        =
-       \
-+        if (zs && !data) {                                              =
-       \
-+            if (cc =3D=3D 3) {                                          =
-           \
-+                first_byte =3D i * (BITS / 8);                          =
-         \
-+                cc =3D 0; /* match for zero */                          =
-         \
-+            } else if (cc !=3D 0) {                                     =
-         \
-+                cc =3D 2; /* matching elements before match for zero */ =
-         \
-+            }                                                           =
-       \
-+            if (!rt) {                                                  =
-       \
-+                break;                                                  =
-       \
-+            }                                                           =
-       \
-+        }                                                               =
-       \
-+                                                                        =
-       \
-+        /* compare against every even-odd range pair */                 =
-       \
-+        for (j =3D 0; j < (128 / BITS); j +=3D 2) {                     =
-           \
-+            const uint##BITS##_t l1 =3D s390_vec_read_element##BITS(v3, =
-j);      \
-+            const uint##BITS##_t c1 =3D s390_vec_read_element##BITS(v4, =
-j);      \
-+            const uint##BITS##_t l2 =3D s390_vec_read_element##BITS(v3, =
-j + 1);  \
-+            const uint##BITS##_t c2 =3D s390_vec_read_element##BITS(v4, =
-j + 1);  \
-+                                                                        =
-       \
-+            if (element_compare##BITS(data, l1, c1) &&                  =
-       \
-+                element_compare##BITS(data, l2, c2)) {                  =
-       \
-+                any_comp =3D true;                                      =
-         \
-+                break;                                                  =
-       \
-+            }                                                           =
-       \
-+        }                                                               =
-       \
-+                                                                        =
-       \
-+        /* invert the result if requested */                            =
-       \
-+        any_comp =3D in ^ any_comp;                                     =
-         \
-+        if (cc =3D=3D 3 && any_comp) {                                  =
-           \
-+            first_byte =3D i * (BITS / 8);                              =
-         \
-+            cc =3D 1; /* matching elements, no match for zero */        =
-         \
-+            if (!zs && !rt) {                                           =
-       \
-+                break;                                                  =
-       \
-+            }                                                           =
-       \
-+        }                                                               =
-       \
-+        /* indicate bit vector if requested */                          =
-       \
-+        if (rt && any_comp) {                                           =
-       \
-+            s390_vec_write_element##BITS(&tmp, i, (uint##BITS##_t)-1ull)=
-;      \
-+        }                                                               =
-       \
-+    }                                                                   =
-       \
-+    if (!rt) {                                                          =
-       \
-+        s390_vec_write_element8(&tmp, 7, first_byte);                   =
-       \
-+    }                                                                   =
-       \
-+    *(S390Vector *)v1 =3D tmp;                                          =
-         \
-+    return cc;                                                          =
-       \
-+}
-+DEF_VSTRC(8)
-+DEF_VSTRC(16)
-+DEF_VSTRC(32)
-+
-+#define DEF_VSTRC_HELPER(BITS)                                          =
-       \
-+void HELPER(gvec_vstrc##BITS)(void *v1, const void *v2, const void *v3, =
-       \
-+                               const void *v4, uint32_t desc)           =
-       \
-+{                                                                       =
-       \
-+    vstrc##BITS(v1, v2, v3, v4, simd_data(desc));                       =
-       \
-+}
-+DEF_VSTRC_HELPER(8)
-+DEF_VSTRC_HELPER(16)
-+DEF_VSTRC_HELPER(32)
-+
-+#define DEF_VSTRC_CC_HELPER(BITS)                                       =
-       \
-+void HELPER(gvec_vstrc_cc##BITS)(void *v1, const void *v2, const void *v=
-3,     \
-+                                 const void *v4, CPUS390XState *env,    =
-       \
-+                                 uint32_t desc)                         =
-       \
-+{                                                                       =
-       \
-+    env->cc_op =3D vstrc##BITS(v1, v2, v3, v4, simd_data(desc));        =
-         \
-+}
-+DEF_VSTRC_CC_HELPER(8)
-+DEF_VSTRC_CC_HELPER(16)
-+DEF_VSTRC_CC_HELPER(32)
+> +	vpmem->nd_desc.provider_name =3D "virtio-pmem";
+> +	vpmem->nd_desc.module =3D THIS_MODULE;
+> +
+> +	vpmem->nvdimm_bus =3D nvdimm_bus_register(&vdev->dev,
+> +						&vpmem->nd_desc);
+> +	if (!vpmem->nvdimm_bus) {
+> +		dev_err(&vdev->dev, "failed to register device with nvdimm_bus\n");
+> +		err =3D -ENXIO;
+> +		goto out_vq;
+> +	}
+> +
+> +	dev_set_drvdata(&vdev->dev, vpmem->nvdimm_bus);
+> +
+> +	ndr_desc.res =3D &res;
+> +	ndr_desc.numa_node =3D nid;
+> +	ndr_desc.flush =3D async_pmem_flush;
+> +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
+> +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
+> +	nd_region =3D nvdimm_pmem_region_create(vpmem->nvdimm_bus, &ndr_desc)=
+;
+> +	if (!nd_region) {
+> +		dev_err(&vdev->dev, "failed to create nvdimm region\n");
+> +		err =3D -ENXIO;
+> +		goto out_nd;
+> +	}
+> +	nd_region->provider_data =3D dev_to_virtio(nd_region->dev.parent->par=
+ent);
+> +	return 0;
+> +out_nd:
+> +	nvdimm_bus_unregister(vpmem->nvdimm_bus);
+> +out_vq:
+> +	vdev->config->del_vqs(vdev);
+> +out_err:
+> +	return err;
+> +}
+> +
+> +static void virtio_pmem_remove(struct virtio_device *vdev)
+> +{
+> +	struct nvdimm_bus *nvdimm_bus =3D dev_get_drvdata(&vdev->dev);
+> +
+> +	nvdimm_bus_unregister(nvdimm_bus);
+> +	vdev->config->del_vqs(vdev);
+> +	vdev->config->reset(vdev);
+> +}
+> +
+> +static struct virtio_driver virtio_pmem_driver =3D {
+> +	.driver.name		=3D KBUILD_MODNAME,
+> +	.driver.owner		=3D THIS_MODULE,
+> +	.id_table		=3D id_table,
+> +	.probe			=3D virtio_pmem_probe,
+> +	.remove			=3D virtio_pmem_remove,
+> +};
+> +
+> +module_virtio_driver(virtio_pmem_driver);
+> +MODULE_DEVICE_TABLE(virtio, id_table);
+> +MODULE_DESCRIPTION("Virtio pmem driver");
+> +MODULE_LICENSE("GPL");
+> diff --git a/drivers/nvdimm/virtio_pmem.h b/drivers/nvdimm/virtio_pmem.=
+h
+> new file mode 100644
+> index 000000000000..ab1da877575d
+> --- /dev/null
+> +++ b/drivers/nvdimm/virtio_pmem.h
+> @@ -0,0 +1,60 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * virtio_pmem.h: virtio pmem Driver
+> + *
+> + * Discovers persistent memory range information
+> + * from host and provides a virtio based flushing
+> + * interface.
+> + **/
+> +
+> +#ifndef _LINUX_VIRTIO_PMEM_H
+> +#define _LINUX_VIRTIO_PMEM_H
+> +
+> +#include <linux/virtio_ids.h>
+> +#include <linux/module.h>
+> +#include <linux/virtio_config.h>
+> +#include <uapi/linux/virtio_pmem.h>
+> +#include <linux/libnvdimm.h>
+> +#include <linux/spinlock.h>
+> +
+> +struct virtio_pmem_request {
+> +	/* Host return status corresponding to flush request */
+> +	int ret;
+> +
+> +	/* command name*/
+> +	char name[16];
+
+So ... why are we sending string commands and expect native-endianess
+integers and don't define a proper request/response structure + request
+types in include/uapi/linux/virtio_pmem.h like
+
+struct virtio_pmem_resp {
+	__virtio32 ret;
+}
+
+#define VIRTIO_PMEM_REQ_TYPE_FLUSH	1
+struct virtio_pmem_req {
+	__virtio16 type;
+}
+
+... and this way we also define a proper endianess format for exchange
+and keep it extensible
+
+@MST, what's your take on this?
+
+
 --=20
-2.20.1
 
+Thanks,
+
+David / dhildenb
 
