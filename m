@@ -2,86 +2,63 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25C33C04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:39:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88B4BC04E87
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 11:00:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E361120881
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:39:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EvZUowFz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E361120881
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 59D062189F
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 11:00:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59D062189F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34930 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35102 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQrJz-0001Lw-8a
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 06:39:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40379)
+	id 1hQrdr-0005Gq-C0
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 07:00:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hQrIr-0000lS-Ck
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:38:30 -0400
+	(envelope-from <Dave.Martin@arm.com>) id 1hQrc5-00048b-9z
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:58:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hQrIq-00071g-Ih
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:38:29 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39022)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hQrIq-000719-9f
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:38:28 -0400
-Received: by mail-wr1-x444.google.com with SMTP id w8so2087403wrl.6
-	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 03:38:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=date:from:to:cc:subject:message-id:references:mime-version
-	:content-disposition:in-reply-to:user-agent;
-	bh=fGQomAmfYsv3QFUEiAS69lY4nkrxcZdpENt6ktQXgJg=;
-	b=EvZUowFzLmzLaPiFsb7SzRRTDd+ytbML8Bwz3fajKFp6WS5+iVh2GPngPEwvp5WBe0
-	WZFmdp8prTUjVjI9uy7ybG4/fZkS0QUAtzlT9IX1NF+U5DS+3AN5wqlQYMCe0hvf4UP8
-	5kRKO6SMqaHaXj7lMt2wigM37KZ0xqyiT0k9398R+bfKXMzV+NmUIGgjDCy3R59TXaz+
-	i+s4uZRUvhm4hqVqJ/9TGA1wGjHZ2s2ORq7dMeuOWz/loqEwfLVf/peUyfOr0/DNI3pQ
-	Xx6rXUA4AJ3m1BniG9VV2X4KmOGVXF4VCIgeNgJtw0n34LZAmADq6/nZ6Ci0La6wkWbl
-	CBZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=fGQomAmfYsv3QFUEiAS69lY4nkrxcZdpENt6ktQXgJg=;
-	b=saoMmxh2clxZq87rc1sR5tozlrXuPTjNmDti+cyFHz7eQqXPz3cG2p8d9jROUEZUrd
-	iyZqAi5pxTXNI9WiJkFqVtylqqnsiCTc5V/DYU8njEkinPiSJC8QmL4oL0rYPo4t3vgL
-	7weJEJm+gZTHbIh7LPOWqkiyhA33hk1CgDcjLMcIaMQb0W03JKa/0IAdVmXqybnjATrr
-	6akwhZMLva+lieqhwTxld+plUFXbcNVDWHYja784ZBgNUKIIj82yvrizKe/6c8Ubq4gz
-	PiSd9E61NfXnMKhqIqOAE0juw6zDMT/vBX9BkM1NGrvZ2lScZeyxeVLKgGq+9JaK2/x1
-	Z6NA==
-X-Gm-Message-State: APjAAAXtTcl1Oufsd6eRpdr3FZuGPC7ywJwy+CKy+33nFLv+G2Pe3fP1
-	ATzfEFHNmzumluEbeilEkxg=
-X-Google-Smtp-Source: APXvYqzziJVp5kAUOFWZexfdl26AUlqeX6Q5E3Thd4PVBUC2SBjd9D/w/vp3BxnDarxN1xFxuOzwYA==
-X-Received: by 2002:adf:e691:: with SMTP id r17mr6338422wrm.50.1557916707090; 
-	Wed, 15 May 2019 03:38:27 -0700 (PDT)
-Received: from localhost ([51.15.41.238]) by smtp.gmail.com with ESMTPSA id
-	u125sm3125319wme.15.2019.05.15.03.38.25
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 15 May 2019 03:38:25 -0700 (PDT)
-Date: Wed, 15 May 2019 11:38:25 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Message-ID: <20190515103825.GE29507@stefanha-x1.localdomain>
-References: <20190510190140.17589-1-dgilbert@redhat.com>
+	(envelope-from <Dave.Martin@arm.com>) id 1hQrXt-00085a-7D
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:54:02 -0400
+Received: from foss.arm.com ([217.140.101.70]:37182)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Dave.Martin@arm.com>) id 1hQrXt-00084F-09
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:54:01 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 05FAD80D;
+	Wed, 15 May 2019 03:53:59 -0700 (PDT)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+	[10.72.51.249])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A13893F703;
+	Wed, 15 May 2019 03:53:57 -0700 (PDT)
+Date: Wed, 15 May 2019 11:53:55 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Andrew Jones <drjones@redhat.com>
+Message-ID: <20190515105352.GP28398@e103592.cambridge.arm.com>
+References: <20190418092841.fzrcegkbal7dpfcy@kamzik.brq.redhat.com>
+	<20190418112610.GO13773@redhat.com>
+	<877ebrmch2.fsf@dusky.pond.sub.org>
+	<20190513184237.i2ha3ixvhjqzkn5q@kamzik.brq.redhat.com>
+	<87bm05ab6c.fsf@dusky.pond.sub.org>
+	<20190514090225.vel4xm4x743o4rge@kamzik.brq.redhat.com>
+	<87woit40wy.fsf@dusky.pond.sub.org>
+	<20190515081520.nazchdnludojzfqe@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="xJK8B5Wah2CMJs8h"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190510190140.17589-1-dgilbert@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH] monitor: Fix gva2gpa coverityism
+In-Reply-To: <20190515081520.nazchdnludojzfqe@kamzik.brq.redhat.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 217.140.101.70
+Subject: Re: [Qemu-devel] How do we do user input bitmap properties?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,51 +70,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Markus Armbruster <armbru@redhat.com>,
+	"imammedo@redhat.com" <imammedo@redhat.com>,
+	"dgilbert@redhat.com" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, May 15, 2019 at 09:15:20AM +0100, Andrew Jones wrote:
+> On Tue, May 14, 2019 at 03:32:13PM +0200, Markus Armbruster wrote:
+> > Syntax that can support such growth would be nice.
+> > 
+> > To grow a single unsigned number, we can make it wider (but we don't
+> > have infrastructure for numbers wider than 64 bits), or we can add more
+> > numbers (but under what name?).
+> > 
+> > Dotted keys syntax could grow more easily, but it's rather awkward.
+> > 
+> > Looking more closely at your "[PATCH 11/13] target/arm/cpu64: max cpu:
+> > Introduce sve-vls-map"... your syntax reflects your data structure:
+> > property "sve-vls-map" is of type uint64_t, and interpreted as bit set.
+> > This data type would have to grow, too.
+> > 
+> > We could make widen the integer property (but we don't have
+> > infrastructure for integer properties wider than 64 bits), or we can
+> > turn it into an array of integers (compatibility?), or we can add more
+> > properties to hold the additional integers (yet another silly way to
+> > represent a list/array of integers).
+> > 
+> > I'm not asking you to complicate things just to future-proof this.  Just
+> > pause and think whether you can pick a data type that's similarly
+> > convenient now, and easier to grow.
+> > 
+> > Then pick an external syntax for this data type.  You may have to pick a
+> > reasonable compromise between ease of implementation and ease of use.
+> 
+> Widening the integer property sounds good to me. I just hadn't thought of
+> it (implementation tunnel vision affecting my user interface design).
+> Andrea also mentioned that as a possibility in a reply to the series. I
+> think we can leave the property as a uint64_t right now and then, when/if
+> it needs to expand past 64 bits we can change the property to a string
+> and start parsing arbitrarily large integers from it. The internal state,
+> 'uint64_t sve_vls_map' can easily be changed to a 'uint64_t sve_vls_map[]'
+> at that point too. How's that sound?
 
---xJK8B5Wah2CMJs8h
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Having an arbitrary-width integer should work.
 
-On Fri, May 10, 2019 at 08:01:40PM +0100, Dr. David Alan Gilbert (git) wrot=
-e:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> Coverity is complaining that while I'm checking the return
-> value of mon_get_cpu(), I'm not actually using the checked value,
-> I'm calling it again and thus it's worried I might get null;
-> I don't think that's actually possible since i'm under
-> lock anyway.
-> However, it's a sensible cleanup.
->=20
-> CID: 1401346
->=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  monitor.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+It will suck a bit for the common case of sparse vector length support
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+	0x8000000000000000800000008000808b
 
---xJK8B5Wah2CMJs8h
-Content-Type: application/pgp-signature; name="signature.asc"
+(= [ 1, 2, 4, 8, 16, 32, 64, 128 ] quadwords)
 
------BEGIN PGP SIGNATURE-----
+Since lengths above 16 quadwords remain theoretical for now though it's
+probably OK as a compromise, though.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzb7CAACgkQnKSrs4Gr
-c8iNCQf/T3fCkKhEZQr1u1P0gMG9OOdX90X7+ZzRlXbdf7nKl1XT7i2azL69TJXr
-YT4DWoktpbrCdEppVRKCCi/mqOQRENpjjvOif93hJFuaVuLDKVJFz0PB7Vv/h3Vc
-Zoifrasjz1jiKCYyIjs8u1B/wZr97nuJadPURK/0K5YHOScFDFPHA/2aTksnc7Z6
-uNGtkakR3S9l35bEXjkPQqmPX+BuCVEJ29eM4oLxdR+OqbSHEJ3iIrOcxRGDbOTM
-hLFJyayvt8niPyJ5FHY09Gvu9Ps0+KOKU/YY2EMiT8oMlcl83l3NM7SZ/tYTL59W
-x0NocyGVqjU06/z6oNNIxB7J05tjuQ==
-=0ABn
------END PGP SIGNATURE-----
+The most human-compatible approach would be some kind of list
+comprehension syntax, but it's hard to justify that adding a whole new
+syntax is justified at this point.
 
---xJK8B5Wah2CMJs8h--
+[...]
+
+Cheers
+---Dave
 
