@@ -2,87 +2,65 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED06C04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:30:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08732C04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:31:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AE722084F
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:30:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GreAe/mP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AE722084F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id CF15D2084F
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 10:31:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF15D2084F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34861 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34865 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQrBK-0006zZ-Ha
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 06:30:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38698)
+	id 1hQrCI-0007WR-1x
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 06:31:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hQr8U-00055h-Ab
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:27:47 -0400
+	(envelope-from <quintela@redhat.com>) id 1hQr8i-0005IC-Iq
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:28:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hQr8T-0007Wo-GW
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:27:46 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:51069)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>)
-	id 1hQr8T-0007WA-9g; Wed, 15 May 2019 06:27:45 -0400
-Received: by mail-wm1-x334.google.com with SMTP id f204so2092444wme.0;
-	Wed, 15 May 2019 03:27:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=date:from:to:cc:subject:message-id:references:mime-version
-	:content-disposition:in-reply-to:user-agent;
-	bh=hIrqSTt1Hx+dJyTXINmE+v6ezJPmaJkLgI8CJvvMU0U=;
-	b=GreAe/mPvFmJaTGrMB0MERX3GAsaZt+b3BxAnoLA+7el1gKvns3ioLTB1PFYcc+ZeE
-	7gEb6y095ifgmv/THg5kG0R5afG0kZjU66kfKgmDngO/I5/B726ofaEQUQPhw1jkwxgU
-	nmRqIWOrrj1RAg31jJYcLNJcb+xJyKCEUnAuAIBGPIFp3qld05025GjxGx9Ix5XFZHBO
-	mRzwxnrzgYo/Sjmb1kgvKXh/fgOPfpxqNE3ZGlaiZJtIkTfe6MV6HgNtUSo0z28V1/vo
-	rHHjhb32j78dlNj5BuKl8Ej0x44D9HQNPQueeQ/L4sWkphtwzERYktb4q15EoJI03yF/
-	nOsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=hIrqSTt1Hx+dJyTXINmE+v6ezJPmaJkLgI8CJvvMU0U=;
-	b=OqaBBV1GdeECDs1BcjGs3PP840R55cRy0yBiQbL3hxKzYskV/qEo57d7xkWc3MZXyf
-	P9CZdwbd2N2KGK4B7F310qRgirEjASadbdRdP0eED5rfNL6bwnlIzd2j5A04ihYw1oRe
-	+nvKylnQ3VAv4dzjdpvQKagaoMrMizjYbWg5vRF/l1DfG+Fs1HEdpgkpGuQgkBjwlcfq
-	uFfECW5vXAokwk0JK3AEh83/bZ4uFUOx/ZRHweZvo6W6eoUbT/35KCwOEvACLD90b5xa
-	8bhimOyFv+Xji5nn/o5KP+J8UPHJbstGDiA1NqlbtLG30MfLWNrDB7GkTBizvWlaGz2Z
-	2NXg==
-X-Gm-Message-State: APjAAAX1+wQ3oRSBuEBYWI3K3BU0ihso31LN6npck45rP7Hk0G0UwKAD
-	hzjp53aUNd4Ytituy5YJ5YueGobcLtw=
-X-Google-Smtp-Source: APXvYqyy3XUa3tWEaluUoT7tESU878RKV3eU0OU8Gloqzo9L63CZi5/FuqJdHO1MRfqpcmp2gmwYuw==
-X-Received: by 2002:a1c:1b49:: with SMTP id b70mr13959180wmb.50.1557916064127; 
-	Wed, 15 May 2019 03:27:44 -0700 (PDT)
-Received: from localhost ([51.15.41.238]) by smtp.gmail.com with ESMTPSA id
-	i17sm1890268wrr.46.2019.05.15.03.27.43
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 15 May 2019 03:27:43 -0700 (PDT)
-Date: Wed, 15 May 2019 11:27:42 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Thomas Huth <thuth@redhat.com>
-Message-ID: <20190515102742.GD29507@stefanha-x1.localdomain>
-References: <20190510052239.21947-1-thuth@redhat.com>
+	(envelope-from <quintela@redhat.com>) id 1hQr8h-0007jK-Js
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:28:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34564)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hQr8f-0007ei-Vm
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 06:27:59 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4404D81F0F
+	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 10:27:55 +0000 (UTC)
+Received: from redhat.com (ovpn-116-74.ams2.redhat.com [10.36.116.74])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C9CB01001F58;
+	Wed, 15 May 2019 10:27:54 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+In-Reply-To: <20190226114852.GE2721@work-vm> (David Alan Gilbert's message of
+	"Tue, 26 Feb 2019 11:48:52 +0000")
+References: <20190220125755.3906-1-quintela@redhat.com>
+	<20190220125755.3906-2-quintela@redhat.com>
+	<20190226114852.GE2721@work-vm>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+Date: Wed, 15 May 2019 12:27:52 +0200
+Message-ID: <87k1esj9lj.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="C+ts3FVlLX8+P6JN"
-Content-Disposition: inline
-In-Reply-To: <20190510052239.21947-1-thuth@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::334
-Subject: Re: [Qemu-devel] [PATCH] tests/libqtest: Remove unused
- global_qtest-related wrapper functions
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.27]);
+	Wed, 15 May 2019 10:27:55 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/3] migration: Add multifd-compress
+ parameter
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,44 +72,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-trivial@nongnu.org,
-	qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: quintela@redhat.com
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
---C+ts3FVlLX8+P6JN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>> +    case MIGRATION_PARAMETER_MULTIFD_COMPRESS:
+>> +        p->has_multifd_compress = true;
+>> +        visit_type_enum(v, param, &compress_type,
+>> +                        &MultifdCompress_lookup, &err);
+>> +        if (err) {
+>> +            break;
+>> +        }
+>> +        if (compress_type < 0 || compress_type > MULTIFD_COMPRESS__MAX) {
+>
+> I think that needs to be >= rather than >
+> (Actually it surprises me visit_type_enum doesn't turn those cases into
+> errors)
 
-On Fri, May 10, 2019 at 07:22:39AM +0200, Thomas Huth wrote:
-> A bunch of the wrapper functions that use global_qtest are not used
-> anymore. Remove them to avoid that they are used in new code again.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/libqtest.c |  11 +----
->  tests/libqtest.h | 108 -----------------------------------------------
->  2 files changed, 1 insertion(+), 118 deletions(-)
+You are right.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> @@ -81,6 +81,7 @@
+>>  /* The delay time (in ms) between two COLO checkpoints */
+>>  #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
+>>  #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
+>> +#define DEFAULT_MIGRATE_MULTIFD_COMPRESS false
+>
+> Shouldn't that be an enum value?
 
---C+ts3FVlLX8+P6JN
-Content-Type: application/pgp-signature; name="signature.asc"
+Fixed
 
------BEGIN PGP SIGNATURE-----
+>> +
+>> +##
+>> +# @MultifdCompress:
+>> +#
+>> +# An enumeration of multifd compression.
+>> +#
+>> +# @none: no compression.
+>> +#
+>> +# @zlib: Compress using zlib.
+>> +#
+>> +# Since: 3.1
+>
+> 4.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzb6Z4ACgkQnKSrs4Gr
-c8iVvwf/VqAjYooJcBvZm/qNr3h5JUlKiyE5pGfaUSs36sRfM9CykM44zk6f3K+z
-TWoNIQqfTegYRPxP/gJFHFXefy+o+zSsrZsM3nPmKd3sq9N6dbAD5D9VHexzCo5A
-i48FpROu+vT50zxer5V5ifydmiF8ztsy3QhxvKoyVeCrenEQJePYOuNLJ2hklMkn
-HDISQ5Z14UdZF3DVIny3ou6R+eIHX7RbUz3ObzHsm+FoHSvNdchSNjjaCEsxWLo2
-v6sCqBmo68u0/8ntfDcNfBdLxBwS1C+IE4Xn1dMXxMQMWv90Y6aQwq3Nz0N2Hylg
-Wi9RZufGI9pYLmhBt2DJXtBf/VYcFA==
-=NqMN
------END PGP SIGNATURE-----
+fixed.
 
---C+ts3FVlLX8+P6JN--
+>>  # @max-cpu-throttle: maximum cpu throttle percentage.
+>>  #                    Defaults to 99. (Since 3.1)
+>> +#
+>> +# @multifd-compress: What compression method to use.
+>> +#                    Defaults to none. (Since 4.0)
+>> +#
+>
+> I think that should be 'Which' rather than 'What'.
+
+You are the native speaker.
+
+>>  # Since: 2.4
+>>  ##
+>>  { 'enum': 'MigrationParameter',
+>> @@ -568,7 +572,7 @@
+>>             'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+>>             'multifd-channels',
+>>             'xbzrle-cache-size', 'max-postcopy-bandwidth',
+>> -           'max-cpu-throttle' ] }
+>> +           'max-cpu-throttle', 'multifd-compress' ] }
+>>  
+>>  ##
+>>  # @MigrateSetParameters:
+>> @@ -644,7 +648,10 @@
+>>  #                     (Since 3.0)
+>>  #
+>>  # @max-cpu-throttle: maximum cpu throttle percentage.
+>> -#                    The default value is 99. (Since 3.1)
+>> +#                    The default value is 99. (Since 4.0)
+>
+> That change is wrong?
+
+Fixed.
+
+Thanks, Juan.
 
