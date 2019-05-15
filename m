@@ -2,85 +2,68 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C67F7C04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 15:04:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8558C04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 15:06:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9017520818
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 15:04:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vy3BcbLd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9017520818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 65E352084E
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 15:06:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65E352084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38324 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38400 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQvRu-0005oX-MX
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 11:04:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39335)
+	id 1hQvUY-0007ee-W9
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 11:06:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hQvQ5-0004vd-AW
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 11:02:14 -0400
+	(envelope-from <stefanha@redhat.com>) id 1hQvM9-0002A5-UC
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 10:58:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hQvPz-00072E-Lj
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 11:02:13 -0400
-Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:34660)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hQvPz-00070n-8q
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 11:02:07 -0400
-Received: by mail-ot1-x330.google.com with SMTP id l17so325090otq.1
-	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 08:02:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=D3+PsrFIkM91AP5VuhcwBaagk2YeyL/RyrrR+O/CEyo=;
-	b=Vy3BcbLdUH7v1p8H8E56jBzZVZPusosFmmZdKZSu7h65prhvEiX7AOc9CRs2B5iiGc
-	Vp0hPNXD3DyVu+o4Uhivs4tkx+XF/JWpsuVOk4ol29DXz2Y3XKaBWY4cuAGsEn09XMat
-	+gIQ/tUuDleqxAgOzJLjeu+2k7ikxUFA+m7K1/DTmgrVR/1NuErvzI/VQvuSl3Pb/vkt
-	22hAembzma2p7hydPGj9x5Dfx2nniXf7R0LCfHZakCFKHOBEmKgLzeSTFD5iN+qYAMob
-	cpb6oZhqQ/X0r25/lodsBFBAPpKtzgFo4o+QYIWUXaOLKSPnwlr7pp7j49V+JRucsv6E
-	ot0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=D3+PsrFIkM91AP5VuhcwBaagk2YeyL/RyrrR+O/CEyo=;
-	b=eckFZb+4JThVQ83mu8lPEyyzEQ/qvPTUke5QILiYQ+j+2VNZjlmi5n4ZJzLFDzmw5+
-	wjJsKzsm/9Z3ozkJRQW0qSa4GqbH1g109cducjeN24UZb8/98Y5Kp+fhSvu7oaOqGf6C
-	AJvIVBowmN0y+wIuxYQpp8S9IJg870JNUQR0An1JqjycDF147LdornjcnFovlH9ZprFL
-	2Su/DOnrXiOv45VuoJvKpBNvZDRcNwZHepvwE1oYSQRf3JVgSJRYn0zqZFIyYuYfjyty
-	CY0EBtpePJWWSh3U8PuO6Zvtid2ZaDYdrswF+yj8cTeEuIWIvzfdbPSnvTRO8QxeV7Rr
-	cY/Q==
-X-Gm-Message-State: APjAAAWTbJYZjgUsMq9lYf6dhcEZPbidce2b6bx19P43ebPbKCMNIGCJ
-	crd6WizicKBXf4VPZ+WVHahLABAUQa59y/m+XsM=
-X-Google-Smtp-Source: APXvYqwi//h5edo4jdKjfodY9Cb7gcc3m3PD8yVi9mjD6TRkrBemCaVCaQdys70KPDwWoit3+LFtqB3mucxNH/WhXQA=
-X-Received: by 2002:a9d:2c2a:: with SMTP id f39mr24050037otb.67.1557932526139; 
-	Wed, 15 May 2019 08:02:06 -0700 (PDT)
+	(envelope-from <stefanha@redhat.com>) id 1hQvM8-0003HE-O0
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 10:58:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55668)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>)
+	id 1hQvL2-0001yF-F6; Wed, 15 May 2019 10:57:03 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0B14289C36;
+	Wed, 15 May 2019 14:56:32 +0000 (UTC)
+Received: from localhost (ovpn-117-238.ams2.redhat.com [10.36.117.238])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8AD7A60BE5;
+	Wed, 15 May 2019 14:56:31 +0000 (UTC)
+Date: Wed, 15 May 2019 15:56:30 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Message-ID: <20190515145630.GH29507@stefanha-x1.localdomain>
+References: <68cc5bbc-ed6f-e001-e376-ccd986683b88@redhat.com>
+	<f1dfe2c3-2d61-e477-ac3d-37ad26d9236d@redhat.com>
+	<61685a48-b84e-c379-7193-f456e82635ba@redhat.com>
+	<67a38513-89af-7f54-2fc8-05b5777983ca@redhat.com>
+	<22933e94-18da-257c-7931-da511bc5a602@redhat.com>
+	<20f1aecc-02b4-781c-9ada-7ac6c73892a3@redhat.com>
 MIME-Version: 1.0
-References: <CAKXe6SKBgMcq+p7EB1kRWLSbg9NvZg1Mr24UrX8S+kpzq-GR4Q@mail.gmail.com>
-	<c707e882-e194-355a-d96c-bfb00a8db247@redhat.com>
-	<CAKXe6SKetRL1uEww7wZeOCU5d8t+qrDDjzk3uBsQuhiQzt5S6w@mail.gmail.com>
-	<20190515074616.3d6e6b32@x1.home>
-	<9e0c77b53b1507e4a2aab2f6296cc7c716864ad3.camel@redhat.com>
-	<20190515085359.1f94c81f@x1.home>
-In-Reply-To: <20190515085359.1f94c81f@x1.home>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 15 May 2019 23:01:29 +0800
-Message-ID: <CAKXe6SKybTqSf1J9WD+QfNLHzG+xvRcC5tEsAcdhU3pxn=_vrw@mail.gmail.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::330
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] Question about the vfio device interrupt
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="2oox5VnwalALFvA7"
+Content-Disposition: inline
+In-Reply-To: <20f1aecc-02b4-781c-9ada-7ac6c73892a3@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.27]);
+	Wed, 15 May 2019 14:56:32 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Failing QEMU iotest 175
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,88 +75,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Auger Eric <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Qemu Developers <qemu-devel@nongnu.org>,
-	Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Qemu-block <qemu-block@nongnu.org>, Nir Soffer <nirsof@gmail.com>,
+	QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Alex Williamson <alex.williamson@redhat.com> =E4=BA=8E2019=E5=B9=B45=E6=9C=
-=8815=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8810:54=E5=86=99=E9=81=93=
-=EF=BC=9A
 
-> On Wed, 15 May 2019 17:27:52 +0300
-> Maxim Levitsky <mlevitsk@redhat.com> wrote:
->
-> > Hi!
-> >
-> > Let me add my 0.2 cents to this discussion by sharing my summary of INT=
-x
-> emulation in VFIO:
-> >
-> > COMMON:
-> > * real interrupt is signaled in the kernel
-> > * vfio-pci kernel interrupt hanlder (vfio_intx_handler), masks the INTx
-> flag
-> > * vfio-pci kernel interrupt handler triggers an eventfd, if the
-> interrupt is not virtually intx masked
-> >   (an eventfd which was registred for VFIO_IRQ_SET_DATA_EVENTFD |
-> VFIO_IRQ_SET_ACTION_TRIGGER)
-> >
-> >
-> > KERNEL INTERRUPT CONTROLLER CASE:
-> >
-> > * the vfio-pci eventfd is listened by the kvm (set by KVM_IRQFD ioctl),
-> and delivered to guest ioapic
-> >   (the setup is done by qemu in vfio_intx_enable_kvm, the same eventfd
-> is given to vfio-pci and to kvm)
-> > * when guest writes eoi, an 'resamplefd' is (which is registered by
-> vfio_intx_enable_kvm too)
-> >   is triggered.
-> >   the vfio_intx_enable_kvm tells the vfio pci module
-> (VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_UNMASK)
-> >   to listen to that 'resamplefd' and unmask the interrupt
-> >   (here too, a same eventfd is given to kvm and to vfio-pci, but here
-> the kvm signals it, and vfio-pci listens to it).
-> >
-> >
-> > USERSPACE QEMU CASE:
-> >
-> >   (only happens in short period while vfio_intx_enable is running and
-> before it calles the vfio_intx_enable_kvm)
-> >   (or when vfio_intx_enable_kvm fails)
-> >
-> > * the vfio-pci eventfd is listened by the qemu (vfio_intx_interrupt)
-> > * the vfio_intx_interrupt (in qemu)
-> >       * masks the interrupt using kernel vfio interface
-> >       * unmaps all the device bars and sets a timer to map them again
-> >       * sends the interrupt down the qemu stack till it is reinjected t=
-o
-> the guest
-> > * any bar access now goes to qemu via EPT fault
-> (vfio_region_read/vfio_region_write)
-> > * the bar access
-> >       * triggers (vfio_eoi->vfio_intx_eoi) which unmasks (using
-> vfio-pci) the interrupt
-> >         the idea is that first few bar accesses should ack the interrup=
-t
-> and thus avoid flood
-> >         but some interrupts could still happen (one per bar access)
->
-> Full points :)  Thanks,
->
+--2oox5VnwalALFvA7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, May 06, 2019 at 12:44:56PM -0500, Eric Blake wrote:
+> On 5/4/19 1:51 AM, Thomas Huth wrote:
+>=20
+> >> Hmm, it's passing for me on ext4, but that probably means we have
+> >> different configuration parameters. I'm not sure how to easily show wh=
+at
+> >> parameters a particular ext4 partition uses to compare the differences
+> >> between your setup and mine (mine is tuned to whatever defaults Fedora=
+'s
+> >> installer chose on my behalf), so maybe someone else can chime in.
+> >=20
+> > $ sudo tune2fs -l /dev/mapper/Home
+> > tune2fs 1.42.9 (28-Dec-2013)
+> > Filesystem volume name:   <none>
+> > Last mounted on:          /home
+> > Filesystem magic number:  0xEF53
+> > Filesystem revision #:    1 (dynamic)
+> > Filesystem features:      has_journal ext_attr dir_index filetype
+> > needs_recovery meta_bg extent 64bit flex_bg sparse_super large_file
+> > huge_file uninit_bg dir_nlink extra_isize
+> > Filesystem flags:         signed_directory_hash
+> > Default mount options:    user_xattr acl
+> > Filesystem state:         clean
+> > Errors behavior:          Continue
+> > Filesystem OS type:       Linux
+> > Inode count:              36700160
+> > Block count:              146800640
+> > Reserved block count:     5873663
+> > Free blocks:              56266267
+> > Free inodes:              35403275
+> > First block:              1
+> > Block size:               1024
+> > Fragment size:            1024
+> > Group descriptor size:    64
+> > Blocks per group:         8192
+> > Fragments per group:      8192
+> > Inodes per group:         2048
+> > Inode blocks per group:   256
+> > First meta block group:   258
+> > Flex block group size:    16
+> > Filesystem created:       Thu Apr 19 18:34:33 2018
+> > Last mount time:          Sat May  4 08:20:36 2019
+> > Last write time:          Sat May  4 08:20:36 2019
+> > Mount count:              224
+> > Maximum mount count:      -1
+> > Last checked:             Thu Apr 19 18:34:33 2018
+> > Check interval:           0 (<none>)
+> > Lifetime writes:          1826 GB
+> > Reserved blocks uid:      0 (user root)
+> > Reserved blocks gid:      0 (group root)
+> > First inode:              11
+> > Inode size:	          128
+> > Journal inode:            8
+> > First orphan inode:       11076944
+> > Default directory hash:   half_md4
+> > Directory Hash Seed:      08e1be04-c3a3-4c37-a059-cf54af5c4bc0
+> > Journal backup:           inode blocks
+> >=20
+>=20
+> # tune2fs -l /dev/mapper/fedora-home
+> tune2fs 1.44.6 (5-Mar-2019)
+> Filesystem volume name:   home
+> Last mounted on:          /home
+> Filesystem UUID:          3ef45c0b-b2a0-43da-a1d3-c4f726097eda
+> Filesystem magic number:  0xEF53
+> Filesystem revision #:    1 (dynamic)
+> Filesystem features:      has_journal ext_attr resize_inode dir_index
+> filetype needs_recovery extent 64bit flex_bg sparse_super large_file
+> huge_file dir_nlink extra_isize metadata_csum
+> Filesystem flags:         signed_directory_hash
+> Default mount options:    user_xattr acl
+> Filesystem state:         clean
+> Errors behavior:          Continue
+> Filesystem OS type:       Linux
+> Inode count:              13107200
+> Block count:              52428800
+> Reserved block count:     2621440
+> Free blocks:              27184765
+> Free inodes:              12049129
+> First block:              0
+> Block size:               4096
+> Fragment size:            4096
+> Group descriptor size:    64
+> Reserved GDT blocks:      1024
+> Blocks per group:         32768
+> Fragments per group:      32768
+> Inodes per group:         8192
+> Inode blocks per group:   512
+> Flex block group size:    16
+> Filesystem created:       Thu Dec  6 16:17:23 2018
+> Last mount time:          Wed Apr  3 10:19:05 2019
+> Last write time:          Wed Apr  3 10:19:05 2019
+> Mount count:              12
+> Maximum mount count:      -1
+> Last checked:             Thu Dec  6 16:17:23 2018
+> Check interval:           0 (<none>)
+> Lifetime writes:          1962 GB
+> Reserved blocks uid:      0 (user root)
+> Reserved blocks gid:      0 (group root)
+> First inode:              11
+> Inode size:	          256
+> Required extra isize:     32
+> Desired extra isize:      32
+> Journal inode:            8
+> First orphan inode:       5248434
+> Default directory hash:   half_md4
+> Directory Hash Seed:      d1bbea0e-dd2e-4df7-b7f0-f7300c524cc9
+> Journal backup:           inode blocks
+> Checksum type:            crc32c
+> Checksum:                 0x3a8a8676
+>=20
+> I'm definitely seeing some differences in the two configs (such as your
+> block size of 1k vs. mine at 4k), but not sure which are the most
+> important, nor how to easily recreate a setup that matches yours.
 
-Thanks very much Alex and Maxim!
-I appreciate it.
+Yes, previously when we had similar issues it was the block size that
+caused the difference.  It's worth trying it out with a test file system
+on a loop device.
 
-Thanks,
-Li Qiang
+Stefan
 
+--2oox5VnwalALFvA7
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzcKJ4ACgkQnKSrs4Gr
+c8jrPgf7B7lu3T8LfS6j/jA7v2GQvriP3wIvYBjRYl8whQSwWxVNQCQAvb8aVLW3
+PD9RjHoDDlInROaURUVsk3qgEN34CgH0VKJQ2nDfb/WWN6KNOwDUEVBA1Qwnr/x2
+4cZ4D2SRvUFmcBZgw9w4CqfRlvk6CNoMihGksweLaXWGGt682GOE8tVw+RgTdbDc
+vlcE1rcIDrWamvXOrlnC8Wv0Dwx76f28LfuJYF+XspkcAKf2dh+FC1tkclXD9iTm
+aTQT3cmYXNS9LuYrPEZKAdauPo848BEhVVj20hqtSQhhB7jdKTRhyNmjmW/chklx
++9oEbHpbnlfamLQlW8lBITwPvBByiQ==
+=uccx
+-----END PGP SIGNATURE-----
 
->
-> Alex
->
+--2oox5VnwalALFvA7--
+
