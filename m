@@ -2,80 +2,62 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0091BC04AA7
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 06:50:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B50FBC04AA7
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 06:50:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBA6D2084E
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 06:50:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBA6D2084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8B8062084E
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 06:50:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B8062084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60522 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60530 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQnkH-0002on-3H
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 02:50:33 -0400
+	id 1hQnkK-0002sX-Ot
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 02:50:36 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:50628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hQniI-0001Dk-Ob
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 02:48:31 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hQniY-0001Dk-B1
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 02:48:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hQng1-0002lM-NZ
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 02:46:10 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:54423)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hQng1-0002j7-Hf
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 02:46:09 -0400
-Received: by mail-wm1-f65.google.com with SMTP id i3so1341894wml.4
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 23:46:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=hO9hy0hk2KtmErCifJJO9cqw0c8hz6D7TCf4zsvJgdI=;
-	b=X7xsa76cs9tTq7A2lfuyi/NwXMpoVItsGb//mPSYX0H4W6onHUe+VVIOzr8IN+5wsG
-	zuo4PDn5oV/tT1a6tzQaqZ5mKq2qQwMuUdNnXphCQAVcxELd/Jv7goeXS76SkSPtpzS3
-	3hWRxVgGbtLPkXBBM1Najqs5U/202f62+vFPnZ5Do48vC/nu+ppPzw11PPNVByWxW/KW
-	fEp6qULOp81vDkgeZktH8O6iKVFaScnycWH/ClEHhuxCpjesmS0zyJBELDUxbLzzcWVD
-	6v/C4jhZRsL2h+3zq2ygFqy541BrB3Ask2nZmXIdibiiY1YpPhA6vmPO1gGJ/YiJxh2M
-	RnIQ==
-X-Gm-Message-State: APjAAAWcUKCL1be/uL1wLOrx44j9Iz2aUuQnhx3GaqAWq/sX4E9cuyv1
-	Fs6jQrLjlli0UdyuILhXlMEjDBS0jag=
-X-Google-Smtp-Source: APXvYqwiGevrr3Ja2yuLnY9t7vMsKpWSDwLETuGwU+cE6yInFouy4yudB2ZaMUQAy+aNIvaO2xMpRw==
-X-Received: by 2002:a1c:ed12:: with SMTP id l18mr23390382wmh.13.1557902768347; 
-	Tue, 14 May 2019 23:46:08 -0700 (PDT)
-Received: from [192.168.1.43] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
-	u125sm2198739wme.15.2019.05.14.23.46.07
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 14 May 2019 23:46:07 -0700 (PDT)
-To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
-References: <20190514204447.17486-1-jcmvbkbc@gmail.com>
-	<20190514204447.17486-8-jcmvbkbc@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <8293f332-446d-1ff7-7c69-8043568e96de@redhat.com>
-Date: Wed, 15 May 2019 08:46:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hQncQ-0001Co-6x
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 02:42:27 -0400
+Received: from mga03.intel.com ([134.134.136.65]:50541)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1hQncP-00016R-Ul
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 02:42:26 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+	by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	14 May 2019 23:42:24 -0700
+X-ExtLoop1: 1
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+	by orsmga007.jf.intel.com with ESMTP; 14 May 2019 23:42:23 -0700
+Date: Wed, 15 May 2019 14:41:51 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190515064151.GC11845@richard>
+References: <20190430034412.12935-1-richardw.yang@linux.intel.com>
+	<20190430034412.12935-2-richardw.yang@linux.intel.com>
+	<20190514142702.GH2753@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20190514204447.17486-8-jcmvbkbc@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH 7/9] target/xtensa: implement block
- prefetch option opcodes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190514142702.GH2753@work-vm>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 134.134.136.65
+Subject: Re: [Qemu-devel] [PATCH 1/3] migration/ram.c: start of
+ migration_bitmap_sync_range is always 0
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,106 +69,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: pbonzini@redhat.com, quintela@redhat.com,
+	Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/14/19 10:44 PM, Max Filippov wrote:
-> Block prefetch option adds a bunch of non-privileged opcodes that may be
-> implemented as nops since QEMU doesn't model caches.
-> 
-> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
-> ---
->  target/xtensa/translate.c | 42 ++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 42 insertions(+)
-> 
-> diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-> index 24eb70d619d5..356eb9948701 100644
-> --- a/target/xtensa/translate.c
-> +++ b/target/xtensa/translate.c
-> @@ -3078,6 +3078,9 @@ static const XtensaOpcodeOps core_ops[] = {
->          .translate = translate_dcache,
->          .op_flags = XTENSA_OP_PRIVILEGED,
->      }, {
-> +        .name = "dhi.b",
-> +        .translate = translate_nop,
-> +    }, {
->          .name = "dhu",
->          .translate = translate_dcache,
->          .op_flags = XTENSA_OP_PRIVILEGED,
-> @@ -3085,9 +3088,15 @@ static const XtensaOpcodeOps core_ops[] = {
->          .name = "dhwb",
->          .translate = translate_dcache,
->      }, {
-> +        .name = "dhwb.b",
-> +        .translate = translate_nop,
-> +    }, {
->          .name = "dhwbi",
->          .translate = translate_dcache,
->      }, {
-> +        .name = "dhwbi.b",
-> +        .translate = translate_nop,
-> +    }, {
->          .name = "dii",
->          .translate = translate_nop,
->          .op_flags = XTENSA_OP_PRIVILEGED,
-> @@ -3112,15 +3121,33 @@ static const XtensaOpcodeOps core_ops[] = {
->          .translate = translate_dcache,
->          .op_flags = XTENSA_OP_PRIVILEGED,
->      }, {
-> +        .name = "dpfm.b",
-> +        .translate = translate_nop,
-> +    }, {
-> +        .name = "dpfm.bf",
-> +        .translate = translate_nop,
-> +    }, {
->          .name = "dpfr",
->          .translate = translate_nop,
->      }, {
-> +        .name = "dpfr.b",
-> +        .translate = translate_nop,
-> +    }, {
-> +        .name = "dpfr.bf",
-> +        .translate = translate_nop,
-> +    }, {
->          .name = "dpfro",
->          .translate = translate_nop,
->      }, {
->          .name = "dpfw",
->          .translate = translate_nop,
->      }, {
-> +        .name = "dpfw.b",
-> +        .translate = translate_nop,
-> +    }, {
-> +        .name = "dpfw.bf",
-> +        .translate = translate_nop,
-> +    }, {
->          .name = "dpfwo",
->          .translate = translate_nop,
->      }, {
-> @@ -3628,6 +3655,21 @@ static const XtensaOpcodeOps core_ops[] = {
->          .par = (const uint32_t[]){true},
->          .op_flags = XTENSA_OP_PRIVILEGED,
->      }, {
-> +        .name = "pfend.a",
-> +        .translate = translate_nop,
-> +    }, {
-> +        .name = "pfend.o",
-> +        .translate = translate_nop,
-> +    }, {
-> +        .name = "pfnxt.f",
-> +        .translate = translate_nop,
-> +    }, {
-> +        .name = "pfwait.a",
-> +        .translate = translate_nop,
-> +    }, {
-> +        .name = "pfwait.o",
-> +        .translate = translate_nop,
-> +    }, {
->          .name = "pitlb",
->          .translate = translate_ptlb,
->          .par = (const uint32_t[]){false},
-> 
+On Tue, May 14, 2019 at 03:27:02PM +0100, Dr. David Alan Gilbert wrote:
+>* Wei Yang (richardw.yang@linux.intel.com) wrote:
+>> We can eliminate to pass 0.
+>> 
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>
+>I'm going to queue just 1/3for the current pull.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+In the pull request, I didn't see Patch[3]. Do I misunderstand this?
+
+>
+>Dave
+>
+
+-- 
+Wei Yang
+Help you, Help me
 
