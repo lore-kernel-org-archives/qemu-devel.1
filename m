@@ -3,80 +3,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7079DC04AA7
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 06:50:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0091BC04AA7
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 06:50:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 416F22084E
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 06:50:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 416F22084E
+	by mail.kernel.org (Postfix) with ESMTPS id CBA6D2084E
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 06:50:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBA6D2084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60516 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60522 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQnk8-0002fx-68
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 02:50:24 -0400
+	id 1hQnkH-0002on-3H
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 02:50:33 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:50628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hQniP-0001Dk-D2
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 02:48:38 -0400
+	(envelope-from <philmd@redhat.com>) id 1hQniI-0001Dk-Ob
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 02:48:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hQnds-0005RW-K5
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 02:43:57 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:36552)
+	(envelope-from <philmd@redhat.com>) id 1hQng1-0002lM-NZ
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 02:46:10 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:54423)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hQndr-0005Lx-SP
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 02:43:56 -0400
-Received: by mail-wr1-f67.google.com with SMTP id s17so1281095wru.3
-	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 23:43:55 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hQng1-0002j7-Hf
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 02:46:09 -0400
+Received: by mail-wm1-f65.google.com with SMTP id i3so1341894wml.4
+	for <qemu-devel@nongnu.org>; Tue, 14 May 2019 23:46:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=U6hSEAt7kVlfX2ACvICmMavT/g6i3LH1gfXC2Uu3Pcg=;
-	b=oFiCTvabyZaVBWNKOY2/hjWvW/ZOYcvd2YMlskQuAwYkq85K5X8BGbGkR5ezI66cyI
-	VMWvrrsxwKmqaELEkXLyIs4zoRpbUgNqAryFzGbVPtnbRHTpclZvQQjFPLP5L5xX1XA5
-	ufktjDigw/GeDyrCy8EKVYj39mfuYun6fqkcwFDMkFk0uUZCHcIlO+P/5OIET6kxdnEq
-	9CmtHK+euQKDNLQfZoVyVHbqYLdY6FS/Vfi0YVERB1YGquCzebcV0Rn7XD+LPi6D58LT
-	VpBGtIC9CmiWeYQLKZvNSz+C4AYwr6NZE/8B68dELWpLTDAwKVsEJx3h4vQdL5K/YWn/
-	iy2w==
-X-Gm-Message-State: APjAAAVhD3LvEzGKUmWjl51/9pT1Uo82kDYYXZnh2QdFAps2HXnZWtW6
-	f1M2nf6iTAx/MSuuNkJM298WGw==
-X-Google-Smtp-Source: APXvYqxYUkgY5fym8n9ZUAVFwCuIo0dUzda/RGpQDLmvKYbi6+zRiCqQqzR30jhihZEm/abhmtQreQ==
-X-Received: by 2002:adf:dbcc:: with SMTP id e12mr220759wrj.134.1557902634382; 
-	Tue, 14 May 2019 23:43:54 -0700 (PDT)
+	bh=hO9hy0hk2KtmErCifJJO9cqw0c8hz6D7TCf4zsvJgdI=;
+	b=X7xsa76cs9tTq7A2lfuyi/NwXMpoVItsGb//mPSYX0H4W6onHUe+VVIOzr8IN+5wsG
+	zuo4PDn5oV/tT1a6tzQaqZ5mKq2qQwMuUdNnXphCQAVcxELd/Jv7goeXS76SkSPtpzS3
+	3hWRxVgGbtLPkXBBM1Najqs5U/202f62+vFPnZ5Do48vC/nu+ppPzw11PPNVByWxW/KW
+	fEp6qULOp81vDkgeZktH8O6iKVFaScnycWH/ClEHhuxCpjesmS0zyJBELDUxbLzzcWVD
+	6v/C4jhZRsL2h+3zq2ygFqy541BrB3Ask2nZmXIdibiiY1YpPhA6vmPO1gGJ/YiJxh2M
+	RnIQ==
+X-Gm-Message-State: APjAAAWcUKCL1be/uL1wLOrx44j9Iz2aUuQnhx3GaqAWq/sX4E9cuyv1
+	Fs6jQrLjlli0UdyuILhXlMEjDBS0jag=
+X-Google-Smtp-Source: APXvYqwiGevrr3Ja2yuLnY9t7vMsKpWSDwLETuGwU+cE6yInFouy4yudB2ZaMUQAy+aNIvaO2xMpRw==
+X-Received: by 2002:a1c:ed12:: with SMTP id l18mr23390382wmh.13.1557902768347; 
+	Tue, 14 May 2019 23:46:08 -0700 (PDT)
 Received: from [192.168.1.43] (193.red-88-21-103.staticip.rima-tde.net.
-	[88.21.103.193])
-	by smtp.gmail.com with ESMTPSA id o8sm947625wrx.50.2019.05.14.23.43.53
+	[88.21.103.193]) by smtp.gmail.com with ESMTPSA id
+	u125sm2198739wme.15.2019.05.14.23.46.07
 	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 14 May 2019 23:43:53 -0700 (PDT)
-To: Alistair Francis <Alistair.Francis@wdc.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
-References: <78cf484c4d991e899d0065b2dab3a2e204ce8723.1557879499.git.alistair.francis@wdc.com>
+	Tue, 14 May 2019 23:46:07 -0700 (PDT)
+To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
+References: <20190514204447.17486-1-jcmvbkbc@gmail.com>
+	<20190514204447.17486-8-jcmvbkbc@gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
 	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <f3b0b9a8-2e25-6054-8893-377c30a83579@redhat.com>
-Date: Wed, 15 May 2019 08:43:52 +0200
+Message-ID: <8293f332-446d-1ff7-7c69-8043568e96de@redhat.com>
+Date: Wed, 15 May 2019 08:46:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <78cf484c4d991e899d0065b2dab3a2e204ce8723.1557879499.git.alistair.francis@wdc.com>
+In-Reply-To: <20190514204447.17486-8-jcmvbkbc@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] target/arm: Fix vector operation
- segfault
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH 7/9] target/xtensa: implement block
+ prefetch option opcodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,62 +87,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"richard.henderson@linaro.org" <richard.henderson@linaro.org>,
-	"alistair23@gmail.com" <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/15/19 2:21 AM, Alistair Francis wrote:
-> Commit 89e68b575 "target/arm: Use vector operations for saturation"
-> causes this abort() when booting QEMU ARM with a Cortex-A15:
+On 5/14/19 10:44 PM, Max Filippov wrote:
+> Block prefetch option adds a bunch of non-privileged opcodes that may be
+> implemented as nops since QEMU doesn't model caches.
 > 
-> 0  0x00007ffff4c2382f in raise () at /usr/lib/libc.so.6
-> 1  0x00007ffff4c0e672 in abort () at /usr/lib/libc.so.6
-> 2  0x00005555559c1839 in disas_neon_data_insn (insn=<optimized out>, s=<optimized out>) at ./target/arm/translate.c:6673
-> 3  0x00005555559c1839 in disas_neon_data_insn (s=<optimized out>, insn=<optimized out>) at ./target/arm/translate.c:6386
-> 4  0x00005555559cd8a4 in disas_arm_insn (insn=4081107068, s=0x7fffe59a9510) at ./target/arm/translate.c:9289
-> 5  0x00005555559cd8a4 in arm_tr_translate_insn (dcbase=0x7fffe59a9510, cpu=<optimized out>) at ./target/arm/translate.c:13612
-> 6  0x00005555558d1d39 in translator_loop (ops=0x5555561cc580 <arm_translator_ops>, db=0x7fffe59a9510, cpu=0x55555686a2f0, tb=<optimized out>, max_insns=<optimized out>) at ./accel/tcg/translator.c:96
-> 7  0x00005555559d10d4 in gen_intermediate_code (cpu=cpu@entry=0x55555686a2f0, tb=tb@entry=0x7fffd7840080 <code_gen_buffer+126091347>, max_insns=max_insns@entry=512) at ./target/arm/translate.c:13901
-> 8  0x00005555558d06b9 in tb_gen_code (cpu=cpu@entry=0x55555686a2f0, pc=3067096216, cs_base=0, flags=192, cflags=-16252928, cflags@entry=524288) at ./accel/tcg/translate-all.c:1736
-> 9  0x00005555558ce467 in tb_find (cf_mask=524288, tb_exit=1, last_tb=0x7fffd783e640 <code_gen_buffer+126084627>, cpu=0x1) at ./accel/tcg/cpu-exec.c:407
-> 10 0x00005555558ce467 in cpu_exec (cpu=cpu@entry=0x55555686a2f0) at ./accel/tcg/cpu-exec.c:728
-> 11 0x000055555588b0cf in tcg_cpu_exec (cpu=0x55555686a2f0) at ./cpus.c:1431
-> 12 0x000055555588d223 in qemu_tcg_cpu_thread_fn (arg=0x55555686a2f0) at ./cpus.c:1735
-> 13 0x000055555588d223 in qemu_tcg_cpu_thread_fn (arg=arg@entry=0x55555686a2f0) at ./cpus.c:1709
-> 14 0x0000555555d2629a in qemu_thread_start (args=<optimized out>) at ./util/qemu-thread-posix.c:502
-> 15 0x00007ffff4db8a92 in start_thread () at /usr/lib/libpthread.
-> 
-> This patch ensures that we don't hit the abort() in the second switch
-> case in disas_neon_data_insn() as we will return from the first case.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 > ---
->  target/arm/translate.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  target/xtensa/translate.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 42 insertions(+)
 > 
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index dd053c80d6..298c262825 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -6598,13 +6598,13 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
->              tcg_gen_gvec_4(rd_ofs, offsetof(CPUARMState, vfp.qc),
->                             rn_ofs, rm_ofs, vec_size, vec_size,
->                             (u ? uqadd_op : sqadd_op) + size);
-> -            break;
-> +            return 0;
->  
->          case NEON_3R_VQSUB:
->              tcg_gen_gvec_4(rd_ofs, offsetof(CPUARMState, vfp.qc),
->                             rn_ofs, rm_ofs, vec_size, vec_size,
->                             (u ? uqsub_op : sqsub_op) + size);
-> -            break;
-> +            return 0;
->  
->          case NEON_3R_VMUL: /* VMUL */
->              if (u) {
+> diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
+> index 24eb70d619d5..356eb9948701 100644
+> --- a/target/xtensa/translate.c
+> +++ b/target/xtensa/translate.c
+> @@ -3078,6 +3078,9 @@ static const XtensaOpcodeOps core_ops[] = {
+>          .translate = translate_dcache,
+>          .op_flags = XTENSA_OP_PRIVILEGED,
+>      }, {
+> +        .name = "dhi.b",
+> +        .translate = translate_nop,
+> +    }, {
+>          .name = "dhu",
+>          .translate = translate_dcache,
+>          .op_flags = XTENSA_OP_PRIVILEGED,
+> @@ -3085,9 +3088,15 @@ static const XtensaOpcodeOps core_ops[] = {
+>          .name = "dhwb",
+>          .translate = translate_dcache,
+>      }, {
+> +        .name = "dhwb.b",
+> +        .translate = translate_nop,
+> +    }, {
+>          .name = "dhwbi",
+>          .translate = translate_dcache,
+>      }, {
+> +        .name = "dhwbi.b",
+> +        .translate = translate_nop,
+> +    }, {
+>          .name = "dii",
+>          .translate = translate_nop,
+>          .op_flags = XTENSA_OP_PRIVILEGED,
+> @@ -3112,15 +3121,33 @@ static const XtensaOpcodeOps core_ops[] = {
+>          .translate = translate_dcache,
+>          .op_flags = XTENSA_OP_PRIVILEGED,
+>      }, {
+> +        .name = "dpfm.b",
+> +        .translate = translate_nop,
+> +    }, {
+> +        .name = "dpfm.bf",
+> +        .translate = translate_nop,
+> +    }, {
+>          .name = "dpfr",
+>          .translate = translate_nop,
+>      }, {
+> +        .name = "dpfr.b",
+> +        .translate = translate_nop,
+> +    }, {
+> +        .name = "dpfr.bf",
+> +        .translate = translate_nop,
+> +    }, {
+>          .name = "dpfro",
+>          .translate = translate_nop,
+>      }, {
+>          .name = "dpfw",
+>          .translate = translate_nop,
+>      }, {
+> +        .name = "dpfw.b",
+> +        .translate = translate_nop,
+> +    }, {
+> +        .name = "dpfw.bf",
+> +        .translate = translate_nop,
+> +    }, {
+>          .name = "dpfwo",
+>          .translate = translate_nop,
+>      }, {
+> @@ -3628,6 +3655,21 @@ static const XtensaOpcodeOps core_ops[] = {
+>          .par = (const uint32_t[]){true},
+>          .op_flags = XTENSA_OP_PRIVILEGED,
+>      }, {
+> +        .name = "pfend.a",
+> +        .translate = translate_nop,
+> +    }, {
+> +        .name = "pfend.o",
+> +        .translate = translate_nop,
+> +    }, {
+> +        .name = "pfnxt.f",
+> +        .translate = translate_nop,
+> +    }, {
+> +        .name = "pfwait.a",
+> +        .translate = translate_nop,
+> +    }, {
+> +        .name = "pfwait.o",
+> +        .translate = translate_nop,
+> +    }, {
+>          .name = "pitlb",
+>          .translate = translate_ptlb,
+>          .par = (const uint32_t[]){false},
 > 
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
