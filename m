@@ -2,75 +2,95 @@ Return-Path: <SRS0=zTTU=TP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EEDEC04E53
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 16:57:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32743C04E53
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 17:05:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3464420862
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 16:57:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3464420862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E96B220862
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 May 2019 17:05:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E96B220862
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39913 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40016 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hQxDz-0008Hp-If
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 12:57:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36651)
+	id 1hQxLl-0001gw-2B
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 13:05:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hQxCE-0006we-6P
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:56:03 -0400
+	(envelope-from <groug@kaod.org>) id 1hQxKl-0001Fi-AN
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 13:04:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hQxCC-0001om-OS
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:56:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59990)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hQxCC-0001oQ-Gu
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 12:56:00 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C5AD6C057F47;
-	Wed, 15 May 2019 16:55:59 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
-	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 89FD15D70A;
-	Wed, 15 May 2019 16:55:56 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 0F10311385E4; Wed, 15 May 2019 18:55:55 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-References: <20190418145355.21100-1-armbru@redhat.com>
-	<20190418145355.21100-2-armbru@redhat.com>
-	<2679829b-cc1d-83ce-9949-2b80d970ddec@redhat.com>
-	<875zqe7b10.fsf@dusky.pond.sub.org>
-	<CAFEAcA-vqnucYKuV3QKf4wBsfuXMZiC1kqrnaVcA+BEaud__Bw@mail.gmail.com>
-	<877eat6xgm.fsf@dusky.pond.sub.org>
-	<e562c5f5-9d01-59b0-5a4c-d040fa8b8962@redhat.com>
-	<87lfz88bva.fsf@dusky.pond.sub.org> <20190515102615.GB4751@redhat.com>
-	<87a7fn6a5v.fsf@dusky.pond.sub.org>
-Date: Wed, 15 May 2019 18:55:55 +0200
-In-Reply-To: <87a7fn6a5v.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Wed, 15 May 2019 16:54:04 +0200")
-Message-ID: <87zhnn1wtg.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(envelope-from <groug@kaod.org>) id 1hQxKk-0000tE-0Q
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 13:04:51 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35636
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hQxKj-0000mA-Qn
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 13:04:49 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4FH3gU0036235
+	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 13:04:40 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2sgmm7qn0q-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 15 May 2019 13:04:35 -0400
+Received: from localhost
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Wed, 15 May 2019 18:04:28 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+	by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Wed, 15 May 2019 18:04:26 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+	(b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+	by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x4FH4P7k59703326
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Wed, 15 May 2019 17:04:25 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1E35EA4054;
+	Wed, 15 May 2019 17:04:25 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D5929A405C;
+	Wed, 15 May 2019 17:04:24 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.156.103])
+	by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+	Wed, 15 May 2019 17:04:24 +0000 (GMT)
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>,
+	=?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+	Greg Kurz <groug@kaod.org>
+Date: Wed, 15 May 2019 19:04:24 +0200
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Wed, 15 May 2019 16:55:59 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/6] qemu-bridge-helper: Fix misuse of
- isspace()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19051517-4275-0000-0000-00000335241A
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051517-4276-0000-0000-00003844A90D
+Message-Id: <155793986451.464434.12887933000007255549.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-05-15_11:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1905150103
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH] spapr/xive: Sanity checks of OV5 during CAS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,199 +102,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	"Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>, qemu-ppc@nongnu.org,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> writes:
+If a machine is started with ic-mode=xive but the guest only knows
+about XICS, eg. an RHEL 7.6 guest, the kernel panics. This is
+expected but a bit unfortunate since the crash doesn't provide
+much information for the end user to guess what's happening.
 
-> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
->
->> On Wed, May 15, 2019 at 08:34:17AM +0200, Markus Armbruster wrote:
->>> Jason Wang <jasowang@redhat.com> writes:
->>>=20
->>> > On 2019/5/14 =E4=B8=8B=E5=8D=888:18, Markus Armbruster wrote:
->>> >> Peter Maydell <peter.maydell@linaro.org> writes:
->>> >>
->>> >>> On Mon, 13 May 2019 at 14:21, Markus Armbruster <armbru@redhat.com>=
- wrote:
->>> >>>> Perhaps I should do it just for this file while I touch it anyway.=
-  The
->>> >>>> question to ask: should parse_acl_file() obey the locale for white=
-space
->>> >>>> recognition?
->>> >>> I vote for "no".
->>> >>>
->>> >>> Q: do we document the format of the ACL file anywhere ?
->>> >> Support for it was added in commit bdef79a2994, v1.1.  Just code, no
->>> >> documentation.
->>> >>
->>> >> Grepping for qemu-bridge-helper finds just qemu-options.hx.  Contains
->>> >> -help output and some .texi that goes into qemu-doc and the manual p=
-age.
->>> >> None of it mentions how qemu-bridge-helper is run, or the ACL file
->>> >> feature, let alone what its format might be.
->>> >>
->>> >> I'm afraid all we have is the commit message.  Which doesn't really
->>> >> define the file format, it merely gives a bunch of examples.
->>> >>
->>> >> As far as I can tell, qemu-bridge-helper is for use with -netdev tap=
- and
->>> >> -netdev bridge.
->>> >>
->>> >> Both variations of -netdev call net_bridge_run_helper() to run the
->>> >> helper.  First argument is -netdev parameter "helper", default usual=
-ly
->>> >> "$prefix/libexec/qemu-bridge-helper".  Second argument is parameter
->>> >> "br", default "br0".
->>> >>
->>> >> If @helper contains space or tab, net_bridge_run_helper() guesses it=
-s a
->>> >> full command, else it guesses its the name of the executable.  Bad
->>> >> magic.
->>> >>
->>> >> If it guesses name of executable, it execv()s this executable with
->>> >> arguments "--use-vnet", "--fd=3DFD", "--br=3D@bridge".
->>> >>
->>> >> If it guesses full command, it appends "--use-vnet --fd=3DFD", where=
- FD is
->>> >> the helper's half of the socketpair used to connect QEMU and the hel=
-per.
->>> >> It further appends "--br=3D@bridge", unless @helper contains "--br=
-=3D".
->>> >> More bad magic.
->>> >>
->>> >> It executes the resulting string with sh -c.  Magic cherry on top.
->>> >>
->>> >> When the helper fails, netdev creation fails.
->>> >>
->>> >> The helper we ship with QEMU unconditionally tries to read
->>> >> "$prefix/etc/bridge.conf".  Fatal error if this file doesn't exist.
+Detect that during CAS and exit QEMU with a proper error message
+instead, like it is already done for the MMU.
 
-Correction: $prefix/etc/qemu/bridge.conf
+Even if this is less likely to happen, the opposite case of a guest
+that only knows about XIVE would certainly fail all the same if the
+machine is started with ic-mode=xics.
 
->>> >> Errors in this file are fatal.  Errors in files it includes are not
->>> >> fatal; instead, the remainder of the erroneous file is ignored.
->>> >> *Boggle*
->>> >>
->>> >> As far as I can tell, libvirt runs qemu-bridge-helper itself (Paolo's
->>> >> commit 2d80fbb14df).  Makes sense, because running QEMU with the
->>> >> necessary privileges would be unwise, and so would be letting it exe=
-cute
->>> >> setuid helpers.  Also bypasses the bad magic in QEMU's
->>> >> net_bridge_run_helper().
->>> >
->>> >
->>> > I don't notice this before. Is this only for the convenience of
->>> > development? I guess libvirt should have native support like adding
->>> > port to bridge/OVS without the help any external command or script.
->>>=20
->>> Commit 2d80fbb14df hints at the reason:
->>>=20
->>>     <source type=3D'bridge'> uses a helper application to do the necess=
-ary
->>>     TUN/TAP setup to use an existing network bridge, thus letting
->>>     unprivileged users use TUN/TAP interfaces.
->>>     ~~~~~~~~~~~~~~~~~~
->>>=20
->>> The code confirms:
->>>=20
->>>     /* qemuInterfaceBridgeConnect:
->>>      * @def: the definition of the VM
->>>      * @driver: qemu driver data
->>>      * @net: pointer to the VM's interface description
->>>      * @tapfd: array of file descriptor return value for the new device
->>>      * @tapfdsize: number of file descriptors in @tapfd
->>>      *
->>> ---> * Called *only* called if actualType is VIR_DOMAIN_NET_TYPE_NETWOR=
-K or
->>> ---> * VIR_DOMAIN_NET_TYPE_BRIDGE (i.e. if the connection is made with =
-a tap
->>>      * device connecting to a bridge device)
->>>      */
->>>     int
->>>     qemuInterfaceBridgeConnect(virDomainDefPtr def,
->>>                                virQEMUDriverPtr driver,
->>>                                virDomainNetDefPtr net,
->>>                                int *tapfd,
->>>                                size_t *tapfdSize)
->>>     {
->>>         [...]
->>> --->    if (virQEMUDriverIsPrivileged(driver)) {
->>>             [...]
->>>         } else {
->>>             if (qemuCreateInBridgePortWithHelper(cfg, brname,
->>>                                                  &net->ifname,
->>>                                                  tapfd, tap_create_flag=
-s) < 0) {
->>>                 virDomainAuditNetDevice(def, net, tunpath, false);
->>>                 goto cleanup;
->>>             }
->>>             [...]
->>>         }
->>>         [...]
->>>     }
->>>=20
->>> >> qemu-bridge-helper should have a manual page, and its handling of er=
-rors
->>> >> in ACL include files needs work.  There's probably more; I just glan=
-ced
->>> >> at it.  I'm not volunteering, though.  It lacks a maintainer.  Shoul=
-d we
->>> >> add it to Jason's "Network device backends"?
->>> >
->>> >
->>> > Yes.
->>> >
->>> >> -netdev's helper parameter is seriously underdocumented.  Document or
->>> >> deprecate?
->>> >
->>> >
->>> > I believe management should only use fd parameter of TAP. If we have
->>> > other, it should be a duplication. So I suggest to deprecate the
->>> > bridge helper and -netdev bridge.
->>>=20
->>> Objections, anyone?
->>
->> Libvirt runs the qemu bridge helper command directly, and we have
->> applications using this functionality.
->
-> Specifically, when libvirt lacks the privileges to set up a TAP fd, it
-> farms out the job to setuid qemu-bridge-helper.  Correct?
->
->> I'd like libvirt to be able to avoid use of the QEMU bridge helper and
->> instead have unprivileged libvirt talk to privileged libvirtd to open a
->> TAP fd on its behalf. If we ever get that done, then libvirt would not
->> need the qemu bridge helper command anymore.
->
-> We don't want to deprecate qemu-bridge-helper while libvirt has a
-> sensible use for it.
->
-> We can still deprecate -netdev tap parameter "helper" and -netdev bridge
-> entirely.
+Also, the only valid values a guest can pass in byte 23 of OV5 during
+CAS are 0b00 (XIVE legacy mode) and 0b01 (XIVE exploitation mode). Any
+other value is a bug, at least with the current spec. Again, it does
+not seem right to let the guest go on without a precise idea of the
+interrupt mode it asked for.
 
-Paolo and Richard objected to deprecating -netdev bridge, so that's out,
-too.
+Handle these cases as well.
 
-Proposal:
+Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/spapr_hcall.c |   24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-1. Add qemu-bridge-helper.c to Jason's "Network device backends"
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 6c16d2b12040..63a55614b83d 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1513,6 +1513,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+     bool guest_radix;
+     Error *local_err = NULL;
+     bool raw_mode_supported = false;
++    bool guest_xive;
+ 
+     cas_pvr = cas_check_pvr(spapr, cpu, &addr, &raw_mode_supported, &local_err);
+     if (local_err) {
+@@ -1545,10 +1546,17 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+         error_report("guest requested hash and radix MMU, which is invalid.");
+         exit(EXIT_FAILURE);
+     }
++    if (spapr_ovec_test(ov5_guest, OV5_XIVE_BOTH)) {
++        error_report("guest requested an invalid interrupt mode");
++        exit(EXIT_FAILURE);
++    }
++
+     /* The radix/hash bit in byte 24 requires special handling: */
+     guest_radix = spapr_ovec_test(ov5_guest, OV5_MMU_RADIX_300);
+     spapr_ovec_clear(ov5_guest, OV5_MMU_RADIX_300);
+ 
++    guest_xive = spapr_ovec_test(ov5_guest, OV5_XIVE_EXPLOIT);
++
+     /*
+      * HPT resizing is a bit of a special case, because when enabled
+      * we assume an HPT guest will support it until it says it
+@@ -1632,6 +1640,22 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+                                           ov5_updates) != 0);
+     }
+ 
++    /*
++     * Ensure the guest asks for an interrupt mode we support; otherwise
++     * terminate the boot.
++     */
++    if (guest_xive) {
++        if (spapr->irq->ov5 == SPAPR_OV5_XIVE_LEGACY) {
++            error_report("Guest requested unavailable interrupt mode (XIVE)");
++            exit(EXIT_FAILURE);
++        }
++    } else {
++        if (spapr->irq->ov5 == SPAPR_OV5_XIVE_EXPLOIT) {
++            error_report("Guest requested unavailable interrupt mode (XICS)");
++            exit(EXIT_FAILURE);
++        }
++    }
++
+     /*
+      * Generate a machine reset when we have an update of the
+      * interrupt mode. Only required when the machine supports both
 
-2. Deprecate -netdev tap parameter "helper"
-
-3. Improve documentation of -netdev bridge
-
-4. Create a manual page for qemu-bridge-helper that also covers
-   /etc/qemu/bridge.conf.
-
-5. Fix the nutty error handling in parse_acl_file()
-
-Objections?
-
-[...]
 
