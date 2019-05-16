@@ -6,69 +6,58 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 826D1C04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 13:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67D20C04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 13:43:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 591C020833
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 13:38:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 591C020833
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 3605E20833
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 13:43:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3605E20833
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58016 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58227 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRGaz-0000wz-J2
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 09:38:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44286)
+	id 1hRGfu-0003G4-9h
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 09:43:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hRGZD-0008Gh-0X
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 09:37:06 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hRGf7-0002ye-MP
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 09:43:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hRGZ9-0004EC-VV
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 09:37:02 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:59013)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hRGZ9-00049Q-Na
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 09:36:59 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1N17cq-1ghez41H6w-012W0x; Thu, 16 May 2019 15:36:56 +0200
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20181210165636.28366-1-peter.maydell@linaro.org>
-	<98f62d5c-0c2a-9651-0dd6-961a243c4519@vivier.eu>
-	<CAFEAcA_AqVBcjSsJkkruO-rGnvJSiOq9w2RW7VXVCXJu5kXW=A@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <2e054351-8210-4a43-dcb9-066a743631d9@vivier.eu>
-Date: Thu, 16 May 2019 15:36:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_AqVBcjSsJkkruO-rGnvJSiOq9w2RW7VXVCXJu5kXW=A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:yrJ41vfu+IW3yAarRd2BCvirsDAiFcARhC2erGCyYk+Xi69bRvu
-	XBk6TRz2KCgNdmib2+Lcsj/8FzDAdQf2qFNpzWo4LdwGvDl8gs6kraI6mnC3jC/XQBtZFNn
-	+7Gqc4eThIO9H/W0oQI7D83BRSCRR3i1BAcLNBC+fgTCfawlw5Z3dznNVqNEkQIN0wYOmHt
-	90Flv5tx9lStmx2TCR6tg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ODJ5316Tk9k=:dOjVGqt1VIA71ggbuHr0Vn
-	kABkTI13qmp6OyKrDf8AJ19+w1U+BwR4/BeyTzaHZnelpl+2FKphGfkv4FGqcMWK8oKKRaYiN
-	nw6Mt/tyUEKWyIukWGrnyP4emnVKjTmoLt4Ht+wvMO2RTlYWqvl8MPYnbqtH/AxgVCAFhLwNu
-	ka+vyacSXcj2ZqEAUzA3My9pSrrZ2MyWngX1CZH0yETNa1Werzg8WNu2DEHocGM+adgWNE1RX
-	M7e8qmAHkmYJtCHuFmThVOoZyQHKWt9glZI79ZUc/RmaLDn1N8bM1yzk40Ga9TXxkHszgPC9b
-	rABpHoFHXjzdnp91TIPe6Mjq2qthXMFoNyXZE+GKCMM4QzfubVru8YN7nBcHs0Iretqoi+eml
-	Y+TmAqPlmu8eyFB+5h/orakr4ToWCPZ6UmVshKVNFk0Nh7ztmSrd2BKduV8/R9hkdfJ6VfIyF
-	+qMleATk524TxiF3LHVooO3S5Mi7FTY7rSiVN54Jo1N/NimwcFuOhIZF430AEZbwXZ1yoeS/v
-	qNdL4T7k1FVez8qh7HE62DIZUno5V2wbGgJIpMmEnshdWZhQJdbbz7EgGcZOo0QuCD/IqjaA7
-	wVh1T2w9QRHHUg8U7oAPhVCDrOJ80aQGJv/9FVYV4U9Al7YJvRX8Th4qor3aMmhL9fe8fr7bE
-	msAJ1XvmtHdOH/kxxOVaHqdPInYGiR+q5OLpw0zAy6BHiK3WBJ/EyKkwYhco3bzuNNi3796nm
-	uS48C0PoKbPuaRlEyq/AWQOIVLB49R1FKR5cc7f84lotbnNCJmLNeo+G/d0=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.10
-Subject: Re: [Qemu-devel] [RFC 0/3] target/m68k: convert to
- transaction_failed hook
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hRGf4-0002p8-8s
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 09:43:09 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:53940)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hRGf4-0002jo-1j
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 09:43:06 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+	by mail02.asahi-net.or.jp (Postfix) with ESMTPA id DA5F83F1AC;
+	Thu, 16 May 2019 22:42:58 +0900 (JST)
+Received: from yo-satoh-debian.ysato.ml (ZM005235.ppp.dion.ne.jp [222.8.5.235])
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id B11AE240085; 
+	Thu, 16 May 2019 22:42:57 +0900 (JST)
+Date: Thu, 16 May 2019 22:42:56 +0900
+Message-ID: <87lfz6ikgv.wl-ysato@users.sourceforge.jp>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+In-Reply-To: <73abcaad-1672-c670-2957-4b6d1bf3ec16@redhat.com>
+References: <20190514061458.125225-1-ysato@users.sourceforge.jp>
+	<ffcd9051-9c72-30ed-f53e-8d0351a76250@linaro.org>
+	<87mujnhwa5.wl-ysato@users.sourceforge.jp>
+	<73abcaad-1672-c670-2957-4b6d1bf3ec16@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+	FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/25.1
+	(x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 202.224.55.14
+Subject: Re: [Qemu-devel] [PATCH v12 00/12] Add RX archtecture support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,38 +69,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	"patches@linaro.org" <patches@linaro.org>
+Cc: peter.maydell@linaro.org, Richard Henderson <richard.henderson@linaro.org>,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16/05/2019 15:26, Peter Maydell wrote:
-> On Fri, 3 May 2019 at 18:12, Laurent Vivier <laurent@vivier.eu> wrote:
->>
->> On 10/12/2018 17:56, Peter Maydell wrote:
->>> This patchset converts the m68k target from the deprecated
->>> unassigned_access hook to the new transaction_failed hook.
->>> It's RFC for a couple of reasons:
->>>    * it's untested, since I don't have an m68k test image
->>>    * the second patch just makes "bus error while trying to
->>>      read page tables" be treated as a page fault, when it
->>>      should probably cause a fault reporting it as a bus error
->>>      of some kind
->>>    * I don't understand why the old unassigned_access hook
->>>      set the ATC bit in the MMU SSW, since the docs I have say
->>>      this should be set if the fault happened during a table
->>>      search, but cleared if it's just an ordinary bus-errored
->>>      data or insn access. Probably this is a pre-existing bug?
->>
->> I think you're right. It must be cleared on bus error.
-> 
-> Thanks for the review of this patchset. Is there anything
-> you want me to do for a v2, or is it ready to be applied ?
+On Thu, 16 May 2019 19:44:52 +0900,
+Philippe Mathieu-Daud=E9 wrote:
+>=20
+> Hi Yoshinori,
+>=20
+> On 5/16/19 6:13 AM, Yoshinori Sato wrote:
+> > On Thu, 16 May 2019 01:48:29 +0900,
+> > Richard Henderson wrote:
+> [...]>> Rather than having you send out a v13 with only changes to the
+> tags, I will
+> >> apply them myself while preparing an initial pull request for this.
+> >>
+> >> Thanks for your patience.
+> >>
+> >=20
+> > OK.
+> > I prepare v13 which added Reviewed-by.
+>=20
+> No need for a v13! Richard already did the work for you :)
 
-It looks good to me. I'm going to add it to my m68k branch and send a PR.
+Oh. Sorry.
+I misunderstood it.
 
-Thanks,
-Laurent
+--=20
+Yosinori Sato
 
