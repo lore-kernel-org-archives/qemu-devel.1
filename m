@@ -2,111 +2,74 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86EEBC04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35371C04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:52:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5859020815
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:51:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5859020815
+	by mail.kernel.org (Postfix) with ESMTPS id EE24920833
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:52:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE24920833
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54602 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54615 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRFrR-0002Or-Gv
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:51:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53671)
+	id 1hRFsB-0003CP-7k
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:52:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hRFgX-00025I-69
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:40:36 -0400
+	(envelope-from <mst@redhat.com>) id 1hRFN8-0001SM-Gv
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:20:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hRFgU-0000U7-3r
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:40:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51478)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hRFgT-0000T7-Tc
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:40:30 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C88543082E58;
-	Thu, 16 May 2019 12:40:28 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-68.ams2.redhat.com [10.36.116.68])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id BFD7D60F81;
-	Thu, 16 May 2019 12:40:27 +0000 (UTC)
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
-	Igor Mammedov <imammedo@redhat.com>
-References: <1557953433-19663-1-git-send-email-pbonzini@redhat.com>
-	<1557953433-19663-3-git-send-email-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <9b182cdb-132c-c19c-55c0-2ce38373b71a@redhat.com>
-Date: Thu, 16 May 2019 14:40:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <mst@redhat.com>) id 1hRFN4-0002d8-M5
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:20:30 -0400
+Received: from mail-qt1-f182.google.com ([209.85.160.182]:33122)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hRFN4-0002c4-IV
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:20:26 -0400
+Received: by mail-qt1-f182.google.com with SMTP id m32so3617464qtf.0
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 05:20:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to;
+	bh=iPvvkfZxQATlPIEpp1afMv/TD5HHoCU3dbBXU5r4pdU=;
+	b=dfXo/oxj2CjM5OLTLv42ux8YXcCycSbPkWUobD7vxdwSLkr2Cj6OoGXP4GU1shKkSy
+	cd0YFL82glHZYXMebeJT06Y4HGY27FCHRK8Sfh9wIEY6g62XNXu/uKT/jYSboHl4bRVa
+	R2Pa3KDXdpigMnp2wwt9zY1bE5U0TxKxUncy3JDActWMA/85SfH0FUjaUuuoeCNwOeWv
+	W0uuHqq9Y1J+h0fRpBUipbwKEYj/xyA3FdA9CFKqjmfwqo4MVtBNB8NQM6aqLEp2yjfj
+	cIc58bEo2+YHxo+Z+cdyleymb19RKTis5+XN7g5n7UWXY66vWLvUHWCHbfjA2HHJWUHO
+	P5yQ==
+X-Gm-Message-State: APjAAAUSF4QLVFHHooNrCbBK/BGzdlutoI3RdLttujpW3+363TdQPhYA
+	SqIcOwYq+dQxFW18Rbg2zbcla5zdRTw=
+X-Google-Smtp-Source: APXvYqxWdE6hXZhIx3SJI13b7HZJ8WUtrytJQ+gInVMlF59PKeVqyDa+CaS1aMAmFD980hIbS5yCYQ==
+X-Received: by 2002:a0c:bf08:: with SMTP id m8mr40098245qvi.214.1558009224603; 
+	Thu, 16 May 2019 05:20:24 -0700 (PDT)
+Received: from redhat.com ([185.54.206.10]) by smtp.gmail.com with ESMTPSA id
+	196sm2331001qkh.94.2019.05.16.05.20.21
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Thu, 16 May 2019 05:20:23 -0700 (PDT)
+Date: Thu, 16 May 2019 08:20:20 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Message-ID: <1556808723-226478-3-git-send-email-imammedo@redhat.com>
+References: <20190515121146.7248-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1557953433-19663-3-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Thu, 16 May 2019 12:40:28 +0000 (UTC)
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+In-Reply-To: <20190515121146.7248-1-mst@redhat.com>
+X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
+X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 02/21] roms: assert if max rom size is less
- than the used size
+	[fuzzy]
+X-Received-From: 209.85.160.182
+Subject: [Qemu-devel] [PULL 24/37] tests: acpi: make acpi_fetch_table() take
+ size of fetched table pointer
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -118,28 +81,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+	Ben Warren <ben@skyportsystems.com>,
+	Wei Yang <richardw.yang@linux.intel.com>,
+	Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20190516122020.A6HMax-oxQi0820DSeLxIOCwTPRuqnXzfDEh750D9w4@z>
 
-On 15/05/2019 22.50, Paolo Bonzini wrote:
-> From: Igor Mammedov <imammedo@redhat.com>
-> 
-> It would ensure that we would notice attempt to write beyond
-> the allocated buffer. In case of MemoryRegion backed ROM it's
-> the host buffer and the guest RAM otherwise.
-> 
-> assert can be triggered with:
->   dd if=/dev/zero of=/tmp/blob bs=63k count=1
->   qemu-system-x86_64 `for  i in {1..33}; do echo -n " -acpitable /tmp/blob"; done`
+From: Igor Mammedov <imammedo@redhat.com>
 
-Sorry, but a user should normally never be able to trigger an assert,
-even if passing lots of garbage to qemu via the command line. asserts
-are for guarding against programming errors.
+Currently acpi_fetch_table() assumes 32 bit size of table pointer
+in ACPI tables. However X_foo variants are 64 bit, prepare
+acpi_fetch_table() to handle both by adding an argument
+for addr_ptr pointed entry size. Follow up commits will use that
+to read XSDT and X_foo entries in ACPI tables.
 
-Could you please change this into a proper error message instead?
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <1556808723-226478-3-git-send-email-imammedo@redhat.com>
+Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ tests/acpi-utils.h       |  2 +-
+ tests/acpi-utils.c       | 10 ++++++----
+ tests/bios-tables-test.c |  8 ++++----
+ tests/vmgenid-test.c     |  4 ++--
+ 4 files changed, 13 insertions(+), 11 deletions(-)
 
- Thanks,
-  Thomas
+diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+index 4cd5553586..92285b75b3 100644
+--- a/tests/acpi-utils.h
++++ b/tests/acpi-utils.h
+@@ -49,7 +49,7 @@ uint32_t acpi_find_rsdp_address(QTestState *qts);
+ uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
+ void acpi_fetch_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table);
+ void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
+-                      const uint8_t *addr_ptr, const char *sig,
++                      const uint8_t *addr_ptr, int addr_size, const char *sig,
+                       bool verify_checksum);
+ 
+ #endif  /* TEST_ACPI_UTILS_H */
+diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
+index 633d8f513d..644c87b5f9 100644
+--- a/tests/acpi-utils.c
++++ b/tests/acpi-utils.c
+@@ -91,13 +91,15 @@ void acpi_fetch_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table)
+  *  actual one.
+  */
+ void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
+-                      const uint8_t *addr_ptr, const char *sig,
++                      const uint8_t *addr_ptr, int addr_size, const char *sig,
+                       bool verify_checksum)
+ {
+-    uint32_t addr, len;
++    uint32_t len;
++    uint64_t addr = 0;
+ 
+-    memcpy(&addr, addr_ptr , sizeof(addr));
+-    addr = le32_to_cpu(addr);
++    g_assert(addr_size == 4 || addr_size == 8);
++    memcpy(&addr, addr_ptr , addr_size);
++    addr = le64_to_cpu(addr);
+     qtest_memread(qts, addr + 4, &len, 4); /* Length of ACPI table */
+     *aml_len = le32_to_cpu(len);
+     *aml = g_malloc0(*aml_len);
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 6a678bf761..86b592c67f 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -114,14 +114,14 @@ static void test_acpi_rsdt_table(test_data *data)
+ 
+     /* read RSDT table */
+     acpi_fetch_table(data->qts, &rsdt.aml, &rsdt.aml_len,
+-                     &data->rsdp_table[16 /* RsdtAddress */], "RSDT", true);
++                     &data->rsdp_table[16 /* RsdtAddress */], 4, "RSDT", true);
+ 
+     /* Load all tables and add to test list directly RSDT referenced tables */
+     ACPI_FOREACH_RSDT_ENTRY(rsdt.aml, rsdt.aml_len, ent, 4 /* Entry size */) {
+         AcpiSdtTable ssdt_table = {};
+ 
+         acpi_fetch_table(data->qts, &ssdt_table.aml, &ssdt_table.aml_len, ent,
+-                         NULL, true);
++                         4, NULL, true);
+         /* Add table to ASL test tables list */
+         g_array_append_val(data->tables, ssdt_table);
+     }
+@@ -139,11 +139,11 @@ static void test_acpi_fadt_table(test_data *data)
+ 
+     /* Since DSDT/FACS isn't in RSDT, add them to ASL test list manually */
+     acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
+-                     fadt_aml + 36 /* FIRMWARE_CTRL */, "FACS", false);
++                     fadt_aml + 36 /* FIRMWARE_CTRL */, 4, "FACS", false);
+     g_array_append_val(data->tables, table);
+ 
+     acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
+-                     fadt_aml + 40 /* DSDT */, "DSDT", true);
++                     fadt_aml + 40 /* DSDT */, 4, "DSDT", true);
+     g_array_append_val(data->tables, table);
+ 
+     memset(fadt_aml + 36, 0, 4); /* sanitize FIRMWARE_CTRL ptr */
+diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+index f400184268..85d8e6463e 100644
+--- a/tests/vmgenid-test.c
++++ b/tests/vmgenid-test.c
+@@ -42,12 +42,12 @@ static uint32_t acpi_find_vgia(QTestState *qts)
+ 
+     acpi_fetch_rsdp_table(qts, rsdp_offset, rsdp_table);
+     acpi_fetch_table(qts, &rsdt, &rsdt_len, &rsdp_table[16 /* RsdtAddress */],
+-                     "RSDT", true);
++                     4, "RSDT", true);
+ 
+     ACPI_FOREACH_RSDT_ENTRY(rsdt, rsdt_len, ent, 4 /* Entry size */) {
+         uint8_t *table_aml;
+ 
+-        acpi_fetch_table(qts, &table_aml, &table_length, ent, NULL, true);
++        acpi_fetch_table(qts, &table_aml, &table_length, ent, 4, NULL, true);
+         if (!memcmp(table_aml + 16 /* OEM Table ID */, "VMGENID", 7)) {
+             uint32_t vgia_val;
+             uint8_t *aml = &table_aml[36 /* AML byte-code start */];
+-- 
+MST
+
 
