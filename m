@@ -2,81 +2,94 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 164D9C04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 10:53:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B51FC04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 10:56:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFE852070D
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 10:53:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFE852070D
+	by mail.kernel.org (Postfix) with ESMTPS id 244C32070D
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 10:56:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 244C32070D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51939 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51989 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRE1K-0006wD-6O
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 06:53:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54920)
+	id 1hRE3P-0008W3-DC
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 06:56:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hRDzx-0005uZ-Jm
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 06:52:30 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hRDzz-0005uW-3K
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 06:52:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hRDsd-0000Z2-Va
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 06:44:56 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:36840)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hRDsd-0000Xl-PA
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 06:44:55 -0400
-Received: by mail-wm1-f66.google.com with SMTP id j187so2964902wmj.1
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 03:44:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=yAuuq8KF9V9p/k7mioodrg95s1p9HsstM58L3ODAYaM=;
-	b=Jwk/vG7SbFNT8VqbqH1evlsSnysN5J4sj2RuYiu+WgTpOgdp0JnyfY2U6DriBWY2+O
-	4fKCky2C3hfB1/MOfPHy+6NoAWRTIRBdtQzMus2xNxx0BSk+dZjZlHZW7Bhk+ogwPAow
-	6JQUFszxTrvDIVteFbCYdwTzD52Y1oQN1kv8HZL84NJ2ypriZZMpGbyJdWNapmyR0Ak6
-	ysjq6KHrdUJ5lUMzyI3pt0c1cRabhQobarM1VkSwTR6B51UWMc6MRdcNqNENUPvGsXdd
-	6LuygJtkN5HZgzNZJVo65xBvqntuu2H5hBsrtcHOT2nyf5jCbhujLCLxrROHZy/OlZZX
-	QV8Q==
-X-Gm-Message-State: APjAAAUQTtTwd+D21jAYSLUiYolCcCvYfo+a7Cfpmvp79yqKPHbTviFe
-	t5Ub2zq/Fye/6Ny5wl/PcyGihw==
-X-Google-Smtp-Source: APXvYqy76b+eAslpqy2MR9l+H7VlZG6kFCR5T09JjBQOPNHD09eIKUeGt3wBgEJYPOA9B0g4KgWkaw==
-X-Received: by 2002:a7b:c40e:: with SMTP id k14mr3131970wmi.114.1558003494628; 
-	Thu, 16 May 2019 03:44:54 -0700 (PDT)
-Received: from [192.168.1.43] (228.red-83-52-173.dynamicip.rima-tde.net.
-	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
-	h14sm5679748wrt.11.2019.05.16.03.44.53
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 16 May 2019 03:44:53 -0700 (PDT)
-To: Yoshinori Sato <ysato@users.sourceforge.jp>,
-	Richard Henderson <richard.henderson@linaro.org>
-References: <20190514061458.125225-1-ysato@users.sourceforge.jp>
-	<ffcd9051-9c72-30ed-f53e-8d0351a76250@linaro.org>
-	<87mujnhwa5.wl-ysato@users.sourceforge.jp>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <73abcaad-1672-c670-2957-4b6d1bf3ec16@redhat.com>
-Date: Thu, 16 May 2019 12:44:52 +0200
+	(envelope-from <mreitz@redhat.com>) id 1hRDoj-00056l-LA
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 06:40:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:62631)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hRDoi-00054J-64; Thu, 16 May 2019 06:40:52 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 183CE308623C;
+	Thu, 16 May 2019 10:40:51 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-34.brq.redhat.com
+	[10.40.204.34])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 642EE608AB;
+	Thu, 16 May 2019 10:40:49 +0000 (UTC)
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>,
+	"kwolf@redhat.com" <kwolf@redhat.com>
+References: <20190205090825.14059-1-dplotnikov@virtuozzo.com>
+	<cd22d738-d09c-4e2f-5ec6-8d3d34e2b341@redhat.com>
+	<f441d52b-4124-7951-c715-a35127ca3a54@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <be26ed1d-ced3-4a26-24f5-ef26278d72a5@redhat.com>
+Date: Thu, 16 May 2019 12:40:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <87mujnhwa5.wl-ysato@users.sourceforge.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <f441d52b-4124-7951-c715-a35127ca3a54@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="FcTq6f65IjcONIBxzej2ah2AhxPBz7MKf"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Thu, 16 May 2019 10:40:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH v12 00/12] Add RX archtecture support
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH] [RFC] qcow2: add compression type feature
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,25 +101,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+	Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Yoshinori,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FcTq6f65IjcONIBxzej2ah2AhxPBz7MKf
+From: Max Reitz <mreitz@redhat.com>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ "kwolf@redhat.com" <kwolf@redhat.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Denis Lunev <den@virtuozzo.com>, "eblake@redhat.com" <eblake@redhat.com>
+Message-ID: <be26ed1d-ced3-4a26-24f5-ef26278d72a5@redhat.com>
+Subject: Re: [PATCH] [RFC] qcow2: add compression type feature
+References: <20190205090825.14059-1-dplotnikov@virtuozzo.com>
+ <cd22d738-d09c-4e2f-5ec6-8d3d34e2b341@redhat.com>
+ <f441d52b-4124-7951-c715-a35127ca3a54@virtuozzo.com>
+In-Reply-To: <f441d52b-4124-7951-c715-a35127ca3a54@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 5/16/19 6:13 AM, Yoshinori Sato wrote:
-> On Thu, 16 May 2019 01:48:29 +0900,
-> Richard Henderson wrote:
-[...]>> Rather than having you send out a v13 with only changes to the
-tags, I will
->> apply them myself while preparing an initial pull request for this.
->>
->> Thanks for your patience.
->>
-> 
-> OK.
-> I prepare v13 which added Reviewed-by.
+On 16.05.19 09:50, Denis Plotnikov wrote:
+>=20
+>=20
+> On 29.04.2019 1:32, Max Reitz wrote:
+>> On 05.02.19 10:08, Denis Plotnikov wrote:
+>>> The patch adds some preparation parts for incompatible compression ty=
+pe
+>>> feature into QCOW2 header that indicates that *all* compressed cluste=
+rs
+>>> must be (de)compressed using a certain compression type.
+>>>
+>>> It is implied that the compression type is set on the image creation =
+and
+>>> can be changed only later by image convertion, thus the only compress=
+ion
+>>> algorithm is used for the image.
+>>>
+>>> The plan is to add support for ZSTD and then may be something more ef=
+fective
+>>> in the future.
+>>>
+>>> ZSDT compression algorithm consumes 3-5 times less CPU power with a
+>>> comparable comression ratio with zlib. It would be wise to use it for=
 
-No need for a v13! Richard already did the work for you :)
+>>> data compression f.e. for backups.
+>>>
+>>> The default compression is ZLIB.
+>>>
+>>> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+>>> ---
+>>>   block/qcow2.c | 25 +++++++++++++++++++++++++
+>>>   block/qcow2.h | 26 ++++++++++++++++++++++----
+>>>   2 files changed, 47 insertions(+), 4 deletions(-)
+>>
+>> Are there plans to pursue this further?
+> Yes, I'm going to come up with the first version in a few weeks
+
+OK.
+
+>> [...]
+>>
+>>> diff --git a/block/qcow2.h b/block/qcow2.h
+>>> index 32cce9eee2..fdde5bbefd 100644
+>>> --- a/block/qcow2.h
+>>> +++ b/block/qcow2.h
+>>> @@ -112,6 +112,10 @@
+>>>   #define QCOW2_OPT_REFCOUNT_CACHE_SIZE "refcount-cache-size"
+>>>   #define QCOW2_OPT_CACHE_CLEAN_INTERVAL "cache-clean-interval"
+>>>  =20
+>>> +/* Compression types */
+>>> +#define QCOW2_COMPRESSION_TYPE_ZLIB    0
+>>> +#define QCOW2_COMPRESSION_TYPE_ZSTD    1
+>>
+>> We probably want QAPI types anyway (qemu-img info should report the
+>> compression type), so I think we could use them instead.
+> I'm not sure that I understood the idea. Could you please explain what =
+
+> is meant here? We don't need those constants and should use the=20
+> constants defined somewhere else (where)?
+
+qemu-img info can report format-specific information.  I think the
+compression type should be listed there as well, once there is more than
+one.
+
+Format-specific information is a QAPI type, namely
+ImageInfoSpecificQCow2.  Therefore, everything it contains needs to be a
+QAPI object, and this includes potential compression information.  We
+thus need a QAPI enum like Qcow2CompressionType, and that would
+automatically give us these values.
+
+Max
+
+
+--FcTq6f65IjcONIBxzej2ah2AhxPBz7MKf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzdPi8ACgkQ9AfbAGHV
+z0A2JAf/XvWpYzRao+e7i590Gh+yd4wobif+QnnKyxGvLZHkqIRIeKbLaGaGyoT4
+nuKrSUkXZlCLY72Vicd4QNGsz0VnjmvFaZrHdUhft7PDhIhvU5l8gag5KAp3big9
+j0ujvq8oO2j2UtSiL3SFkahqj1apLFoHtMvDM1dIsgWZjTAyWEd9fkvRRJdSlkbD
+QmHUq364I/8CRfvMaGA+gyeb0y1P2OhnQXkCB+9LNQk9lUaphfIlGZuYU4ySOxe0
+AydTPGrCcUafwX1oXZP1tTTAH4LMLwnfoZs0EWkhtWkvzw2i7emnPZ4LoZMpwBYN
+mLkA6ZinjJZvs+QM3YD3Wtu1S8liCQ==
+=vEJ2
+-----END PGP SIGNATURE-----
+
+--FcTq6f65IjcONIBxzej2ah2AhxPBz7MKf--
 
