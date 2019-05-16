@@ -2,67 +2,100 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9A24C04AB4
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 08:50:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C5A2C04AB4
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 08:52:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3801205C9
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 08:50:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3801205C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F2D77204EC
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 08:52:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2D77204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50822 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50833 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRC67-0001FD-2o
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 04:50:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35216)
+	id 1hRC7h-0002AX-Ap
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 04:52:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hRC2f-0007Oq-Sj
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 04:47:10 -0400
+	(envelope-from <pmorel@linux.ibm.com>) id 1hRC6u-0001qI-Vq
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 04:51:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hRC2e-0005Ug-WE
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 04:47:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59902)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hRC2e-0005Tb-Qt
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 04:47:08 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 26A493001822
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 08:47:08 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
-	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E9BFD60605;
-	Thu, 16 May 2019 08:47:07 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id B094311385E4; Thu, 16 May 2019 10:47:06 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-References: <20190509130345.227526-1-sgarzare@redhat.com>
-	<20190509130345.227526-5-sgarzare@redhat.com>
-Date: Thu, 16 May 2019 10:47:06 +0200
-In-Reply-To: <20190509130345.227526-5-sgarzare@redhat.com> (Stefano
-	Garzarella's message of "Thu, 9 May 2019 15:03:45 +0200")
-Message-ID: <87y336u6ph.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(envelope-from <pmorel@linux.ibm.com>) id 1hRC6t-000308-SQ
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 04:51:32 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53778
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1hRC6t-0002qH-M4
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 04:51:31 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4G8hDAb143416
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 04:51:22 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2sh42r1pfs-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 04:51:22 -0400
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Thu, 16 May 2019 09:51:21 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+	by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Thu, 16 May 2019 09:51:17 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+	[9.149.105.232])
+	by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x4G8pFND46268534
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Thu, 16 May 2019 08:51:15 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A9B0F5204E;
+	Thu, 16 May 2019 08:51:15 +0000 (GMT)
+Received: from [9.152.222.58] (unknown [9.152.222.58])
+	by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id E6A455204F;
+	Thu, 16 May 2019 08:51:14 +0000 (GMT)
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <1557499133-24169-1-git-send-email-pmorel@linux.ibm.com>
+	<1557499133-24169-2-git-send-email-pmorel@linux.ibm.com>
+	<20190512142218-mutt-send-email-mst@kernel.org>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Thu, 16 May 2019 10:51:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Thu, 16 May 2019 08:47:08 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] net: remove unused get_str_sep()
- function
+In-Reply-To: <20190512142218-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19051608-0008-0000-0000-000002E73E28
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051608-0009-0000-0000-00002253E230
+Message-Id: <7a1f78b7-fad9-2fc7-2015-186c6bdc9de8@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-05-16_07:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1905160060
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+	mx0a-001b2d01.pphosted.com id x4G8hDAb143416
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: Re: [Qemu-devel] [PATCH 1/5] vfio: vfio_iommu_type1: linux header
+ place holder
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,17 +107,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+Reply-To: pmorel@linux.ibm.com
+Cc: pasic@linux.vnet.ibm.com, david@redhat.com, qemu-s390x@nongnu.org,
+	cohuck@redhat.com, walling@linux.ibm.com, qemu-devel@nongnu.org,
+	borntraeger@de.ibm.com, alex.williamson@redhat.com,
+	pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Stefano Garzarella <sgarzare@redhat.com> writes:
+On 12/05/2019 20:22, Michael S. Tsirkin wrote:
+> On Fri, May 10, 2019 at 04:38:49PM +0200, Pierre Morel wrote:
+>> This should be copied from Linux kernel UAPI includes.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>=20
+> pls add a note which linux version did you sync with.
 
-> Since the get_str_sep() function is no longer used in
-> net/net.c, we can remove it.
->
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+I will, thanks.
+Pierre
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>=20
+>> ---
+>>   linux-headers/linux/vfio.h | 16 +++++++++++++---
+>>   1 file changed, 13 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+>> index 12a7b1d..eaecaef 100644
+>> --- a/linux-headers/linux/vfio.h
+>> +++ b/linux-headers/linux/vfio.h
+>> @@ -9,8 +9,8 @@
+>>    * it under the terms of the GNU General Public License version 2 as
+>>    * published by the Free Software Foundation.
+>>    */
+>> -#ifndef VFIO_H
+>> -#define VFIO_H
+>> +#ifndef _UAPIVFIO_H
+>> +#define _UAPIVFIO_H
+>>  =20
+>>   #include <linux/types.h>
+>>   #include <linux/ioctl.h>
+>> @@ -711,6 +711,16 @@ struct vfio_iommu_type1_info {
+>>   	__u32	flags;
+>>   #define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes inf=
+o */
+>>   	__u64	iova_pgsizes;		/* Bitmap of supported page sizes */
+>> +#define VFIO_IOMMU_INFO_CAPABILITIES (1 << 1)  /* support capabilitie=
+s info */
+>> +	__u64   cap_offset;     /* Offset within info struct of first cap */
+>> +};
+>> +
+>> +#define VFIO_IOMMU_INFO_CAP_QFN		1
+>> +#define VFIO_IOMMU_INFO_CAP_QGRP	2
+>> +
+>> +struct vfio_iommu_type1_info_block {
+>> +	struct vfio_info_cap_header header;
+>> +	__u32 data[];
+>>   };
+>>  =20
+>>   #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+>> @@ -910,4 +920,4 @@ struct vfio_iommu_spapr_tce_remove {
+>>  =20
+>>   /* *****************************************************************=
+ */
+>>  =20
+>> -#endif /* VFIO_H */
+>> +#endif /* _UAPIVFIO_H */
+>> --=20
+>> 2.7.4
+>=20
+
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
+
 
