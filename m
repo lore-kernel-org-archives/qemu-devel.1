@@ -6,102 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 869DAC04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 11:05:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 839F6C04E84
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 11:40:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 479392070D
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 11:05:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 479392070D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5A64121473
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 11:40:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A64121473
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52164 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52581 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRECY-0005Wa-Kk
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 07:05:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58046)
+	id 1hREkC-0005KF-AX
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 07:40:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hREBK-0004pn-Fw
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 07:04:15 -0400
+	(envelope-from <berrange@redhat.com>) id 1hREjS-00051A-2P
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 07:39:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hREBJ-000809-9E
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 07:04:14 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38032
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
-	id 1hREBJ-0007z3-4d
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 07:04:13 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4GAvsis133814
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 07:04:12 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2sh6carwhh-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 07:04:11 -0400
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
-	Thu, 16 May 2019 11:59:11 +0100
-Received: from b03cxnp07028.gho.boulder.ibm.com (9.17.130.15)
-	by e33.co.us.ibm.com (192.168.1.133) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Thu, 16 May 2019 11:59:08 +0100
-Received: from b03ledav004.gho.boulder.ibm.com
-	(b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-	by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x4GAx7Os32374926
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Thu, 16 May 2019 10:59:07 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E5D137805C;
-	Thu, 16 May 2019 10:59:06 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4E7947805F;
-	Thu, 16 May 2019 10:59:04 +0000 (GMT)
-Received: from [9.102.2.175] (unknown [9.102.2.175])
-	by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-	Thu, 16 May 2019 10:59:03 +0000 (GMT)
-To: Greg Kurz <groug@kaod.org>
-References: <155591636364.20338.844048953355207313.stgit@aravinda>
-	<155591662496.20338.3862565585716109724.stgit@aravinda>
-	<20190516125445.79d0ba34@bahia.lan>
-From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Date: Thu, 16 May 2019 16:29:02 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.6.0
+	(envelope-from <berrange@redhat.com>) id 1hREjQ-0005AN-47
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 07:39:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:14903)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hREjP-000590-UP
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 07:39:28 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DDDBD30917F1;
+	Thu, 16 May 2019 11:39:25 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-112-59.ams2.redhat.com
+	[10.36.112.59])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 504BE60DC8;
+	Thu, 16 May 2019 11:39:23 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 16 May 2019 12:39:22 +0100
+Message-Id: <20190516113922.8383-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190516125445.79d0ba34@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19051610-0036-0000-0000-00000ABC48B6
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011104; HX=3.00000242; KW=3.00000007;
-	PH=3.00000004; SC=3.00000285; SDB=6.01204103; UDB=6.00632087;
-	IPR=6.00985034; 
-	MB=3.00026916; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-16 10:59:10
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051610-0037-0000-0000-00004BD0F9CB
-Message-Id: <d087094a-6459-0eda-0fee-935cd3b5bdbc@linux.vnet.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-16_09:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1905160074
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v8 6/6] migration: Block
- migration while handling machine check
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.41]);
+	Thu, 16 May 2019 11:39:25 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] configure: only link capstone to emulation
+ targets
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -113,134 +68,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org,
-	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Only the emulators link to code that uses capstone, so adding it to the
+global LIBs places undesirable dependancies on other binaries, in
+particular the tools.
 
+There is no variable that covers both user emulation and machine
+emulation, so add a new "$libs_cpu" for this purpose.
 
-On Thursday 16 May 2019 04:24 PM, Greg Kurz wrote:
-> On Mon, 22 Apr 2019 12:33:45 +0530
-> Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
-> 
->> Block VM migration requests until the machine check
->> error handling is complete as (i) these errors are
->> specific to the source hardware and is irrelevant on
->> the target hardware, (ii) these errors cause data
->> corruption and should be handled before migration.
->>
->> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
->> ---
->>  hw/ppc/spapr_events.c  |   17 +++++++++++++++++
->>  hw/ppc/spapr_rtas.c    |    4 ++++
->>  include/hw/ppc/spapr.h |    3 +++
->>  3 files changed, 24 insertions(+)
->>
->> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
->> index 4032db0..45b990c 100644
->> --- a/hw/ppc/spapr_events.c
->> +++ b/hw/ppc/spapr_events.c
->> @@ -41,6 +41,7 @@
->>  #include "qemu/bcd.h"
->>  #include "hw/ppc/spapr_ovec.h"
->>  #include <libfdt.h>
->> +#include "migration/blocker.h"
->>  
->>  #define RTAS_LOG_VERSION_MASK                   0xff000000
->>  #define   RTAS_LOG_VERSION_6                    0x06000000
->> @@ -864,6 +865,22 @@ static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
->>  void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
->>  {
->>      SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
->> +    int ret;
->> +    Error *local_err = NULL;
->> +
->> +    error_setg(&spapr->migration_blocker,
->> +            "Live migration not supported during machine check handling");
->> +    ret = migrate_add_blocker(spapr->migration_blocker, &local_err);
-> 
-> migrate_add_blocker() propagates the reason of the failure in local_err,
-> ie. because a migration is already in progress or --only-migratable was
-> passed on the QEMU command line, along with the error message passed in
-> the first argument. This means that...
-> 
->> +    if (ret < 0) {
->> +        /*
->> +         * We don't want to abort and let the migration to continue. In a
->> +         * rare case, the machine check handler will run on the target
->> +         * hardware. Though this is not preferable, it is better than aborting
->> +         * the migration or killing the VM.
->> +         */
->> +        error_free(spapr->migration_blocker);
->> +        fprintf(stderr, "Warning: Machine check during VM migration\n");
-> 
-> ... you should just do:
-> 
->         error_report_err(local_err);
-> 
-> This also takes care of freeing local_err which would be leaked otherwise.
+In particular this removes the 8 MB capstone dep from the things
+qemu-img links against, allowing for a more minimal installation
+in scenarios that don't want system emulators installed.
 
-Sure. I am planning to use warn_report_err() as I don't want to abort.
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ Makefile.target | 1 +
+ configure       | 6 ++++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-Regards,
-Aravinda
-
-> 
->> +    }
->>  
->>      while (spapr->mc_status != -1) {
->>          /*
->> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
->> index 997cf19..1229a0e 100644
->> --- a/hw/ppc/spapr_rtas.c
->> +++ b/hw/ppc/spapr_rtas.c
->> @@ -50,6 +50,7 @@
->>  #include "target/ppc/mmu-hash64.h"
->>  #include "target/ppc/mmu-book3s-v3.h"
->>  #include "kvm_ppc.h"
->> +#include "migration/blocker.h"
->>  
->>  static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
->>                                     uint32_t token, uint32_t nargs,
->> @@ -396,6 +397,9 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
->>          spapr->mc_status = -1;
->>          qemu_cond_signal(&spapr->mc_delivery_cond);
->>          rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->> +        migrate_del_blocker(spapr->migration_blocker);
->> +        error_free(spapr->migration_blocker);
->> +        spapr->migration_blocker = NULL;
->>      }
->>  }
->>  
->> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->> index 9d16ad1..dda5fd2 100644
->> --- a/include/hw/ppc/spapr.h
->> +++ b/include/hw/ppc/spapr.h
->> @@ -10,6 +10,7 @@
->>  #include "hw/ppc/spapr_irq.h"
->>  #include "hw/ppc/spapr_xive.h"  /* For SpaprXive */
->>  #include "hw/ppc/xics.h"        /* For ICSState */
->> +#include "qapi/error.h"
->>  
->>  struct SpaprVioBus;
->>  struct SpaprPhbState;
->> @@ -213,6 +214,8 @@ struct SpaprMachineState {
->>      SpaprCapabilities def, eff, mig;
->>  
->>      unsigned gpu_numa_id;
->> +
->> +    Error *migration_blocker;
->>  };
->>  
->>  #define H_SUCCESS         0
->>
->>
-> 
-
--- 
-Regards,
-Aravinda
+diff --git a/Makefile.target b/Makefile.target
+index ae02495951..15e5191f36 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -117,6 +117,7 @@ obj-$(CONFIG_TCG) +=3D fpu/softfloat.o
+ obj-y +=3D target/$(TARGET_BASE_ARCH)/
+ obj-y +=3D disas.o
+ obj-$(call notempty,$(TARGET_XML_FILES)) +=3D gdbstub-xml.o
++LIBS :=3D $(libs_cpu) $(LIBS)
+=20
+ #########################################################
+ # Linux user emulator target
+diff --git a/configure b/configure
+index 8999698bc2..64f09c5905 100755
+--- a/configure
++++ b/configure
+@@ -289,6 +289,7 @@ audio_drv_list=3D""
+ block_drv_rw_whitelist=3D""
+ block_drv_ro_whitelist=3D""
+ host_cc=3D"cc"
++libs_cpu=3D""
+ libs_softmmu=3D""
+ libs_tools=3D""
+ audio_pt_int=3D""
+@@ -5015,12 +5016,12 @@ case "$capstone" in
+     else
+       LIBCAPSTONE=3Dlibcapstone.a
+     fi
+-    LIBS=3D"-L\$(BUILD_DIR)/capstone -lcapstone $LIBS"
++    libs_cpu=3D"-L\$(BUILD_DIR)/capstone -lcapstone $libs_cpu"
+     ;;
+=20
+   system)
+     QEMU_CFLAGS=3D"$QEMU_CFLAGS $($pkg_config --cflags capstone)"
+-    LIBS=3D"$($pkg_config --libs capstone) $LIBS"
++    libs_cpu=3D"$($pkg_config --libs capstone) $libs_cpu"
+     ;;
+=20
+   no)
+@@ -6488,6 +6489,7 @@ echo "qemu_helperdir=3D$libexecdir" >> $config_host=
+_mak
+ echo "qemu_localedir=3D$qemu_localedir" >> $config_host_mak
+ echo "qemu_icondir=3D$qemu_icondir" >> $config_host_mak
+ echo "qemu_desktopdir=3D$qemu_desktopdir" >> $config_host_mak
++echo "libs_cpu=3D$libs_cpu" >> $config_host_mak
+ echo "libs_softmmu=3D$libs_softmmu" >> $config_host_mak
+ echo "GIT=3D$git" >> $config_host_mak
+ echo "GIT_SUBMODULES=3D$git_submodules" >> $config_host_mak
+--=20
+2.21.0
 
 
