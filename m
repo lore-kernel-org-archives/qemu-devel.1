@@ -2,66 +2,58 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 345FEC04AB4
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 05:49:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16F96C04AB4
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 05:54:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0A3D20848
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 05:49:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0A3D20848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DD6FE20818
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 05:54:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD6FE20818
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49005 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49081 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hR9GR-00022g-VG
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 01:49:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36956)
+	id 1hR9Ln-0003ty-0t
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 01:54:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hR9Fh-0001Up-CI
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 01:48:26 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hR9K9-0002pL-EC
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 01:53:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hR95D-00051P-Le
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 01:37:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53292)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hR95D-00050X-E9
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 01:37:35 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 861E630001EB;
-	Thu, 16 May 2019 05:37:33 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
-	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 031C660FAF;
-	Thu, 16 May 2019 05:37:32 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 53B7011385E4; Thu, 16 May 2019 07:37:30 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190514171545.24961-1-peter.maydell@linaro.org>
-Date: Thu, 16 May 2019 07:37:30 +0200
-In-Reply-To: <20190514171545.24961-1-peter.maydell@linaro.org> (Peter
-	Maydell's message of "Tue, 14 May 2019 18:15:45 +0100")
-Message-ID: <878sv7yn6t.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hR9K7-0003eI-Te
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 01:53:01 -0400
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:46171)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hR9K6-0003WQ-0u
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 01:52:58 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+	by mail01.asahi-net.or.jp (Postfix) with ESMTPA id F214411C749;
+	Thu, 16 May 2019 14:52:55 +0900 (JST)
+Received: from ysato.dip.jp (v045049.dynamic.ppp.asahi-net.or.jp
+	[124.155.45.49])
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id BC0C7240085; 
+	Thu, 16 May 2019 14:52:55 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Date: Thu, 16 May 2019 14:52:41 +0900
+Message-Id: <20190516055244.95559-10-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20190516055244.95559-1-ysato@users.sourceforge.jp>
+References: <20190516055244.95559-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Thu, 16 May 2019 05:37:33 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC] hw/core/bus.c: Only the main system bus can
- have no parent
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 202.224.55.13
+Subject: [Qemu-devel] [PATCH v13 09/12] Add rx-softmmu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,103 +65,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+	Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-> In commit 80376c3fc2c38fdd453 in 2010 we added a workaround for
-> some qbus buses not being connected to qdev devices -- if the
-> bus has no parent object then we register a reset function which
-> resets the bus on system reset.
->
-> Nearly a decade later, we have now no buses in the tree which
-> are created with non-NULL parents, so we can remove the
-> workaround and instead just assert that if the bus has a NULL
-> parent then it is the main system bus.
->
-> (The absence of other parentless buses was confirmed by
-> code inspection of all the callsites of qbus_create() and
-> qbus_create_inplace() and cross-checked by 'make check'.)
+Using only CONFIG_RX=3Dy:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Could we assert(parent || bus == main_system_bus) in qbus_realize()?
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+---
+ configure                      | 8 ++++++++
+ default-configs/rx-softmmu.mak | 3 +++
+ include/sysemu/arch_init.h     | 1 +
+ arch_init.c                    | 2 ++
+ hw/Kconfig                     | 1 +
+ 5 files changed, 15 insertions(+)
+ create mode 100644 default-configs/rx-softmmu.mak
 
-Aside: I hate sysbus_get_default().  It creates main_system_bus on first
-call, wherever that call may be hiding.  I feel we should create it
-explicitly.  I'd then make main_system_bus public, and delete
-sysbus_get_default().
+diff --git a/configure b/configure
+index 8999698bc2..28782762dd 100755
+--- a/configure
++++ b/configure
+@@ -7547,6 +7547,11 @@ case "$target_name" in
+     gdb_xml_files=3D"riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit=
+-csr.xml"
+     target_compiler=3D$cross_cc_riscv64
+   ;;
++  rx)
++    TARGET_ARCH=3Drx
++    bflt=3D"yes"
++    target_compiler=3D$cross_cc_rx
++  ;;
+   sh4|sh4eb)
+     TARGET_ARCH=3Dsh4
+     bflt=3D"yes"
+@@ -7767,6 +7772,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+   riscv*)
+     disas_config "RISCV"
+   ;;
++  rx)
++    disas_config "RX"
++  ;;
+   s390*)
+     disas_config "S390"
+   ;;
+diff --git a/default-configs/rx-softmmu.mak b/default-configs/rx-softmmu.=
+mak
+new file mode 100644
+index 0000000000..a3eecefb11
+--- /dev/null
++++ b/default-configs/rx-softmmu.mak
+@@ -0,0 +1,3 @@
++# Default configuration for rx-softmmu
++
++CONFIG_RX_VIRT=3Dy
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+index 10cbafe970..3f4f844f7b 100644
+--- a/include/sysemu/arch_init.h
++++ b/include/sysemu/arch_init.h
+@@ -25,6 +25,7 @@ enum {
+     QEMU_ARCH_NIOS2 =3D (1 << 17),
+     QEMU_ARCH_HPPA =3D (1 << 18),
+     QEMU_ARCH_RISCV =3D (1 << 19),
++    QEMU_ARCH_RX =3D (1 << 20),
+ };
+=20
+ extern const uint32_t arch_type;
+diff --git a/arch_init.c b/arch_init.c
+index f4f3f610c8..cc25ddd7ca 100644
+--- a/arch_init.c
++++ b/arch_init.c
+@@ -74,6 +74,8 @@ int graphic_depth =3D 32;
+ #define QEMU_ARCH QEMU_ARCH_PPC
+ #elif defined(TARGET_RISCV)
+ #define QEMU_ARCH QEMU_ARCH_RISCV
++#elif defined(TARGET_RX)
++#define QEMU_ARCH QEMU_ARCH_RX
+ #elif defined(TARGET_S390X)
+ #define QEMU_ARCH QEMU_ARCH_S390X
+ #elif defined(TARGET_SH4)
+diff --git a/hw/Kconfig b/hw/Kconfig
+index 88b9f15007..63a071092e 100644
+--- a/hw/Kconfig
++++ b/hw/Kconfig
+@@ -53,6 +53,7 @@ source nios2/Kconfig
+ source openrisc/Kconfig
+ source ppc/Kconfig
+ source riscv/Kconfig
++source rx/Kconfig
+ source s390x/Kconfig
+ source sh4/Kconfig
+ source sparc/Kconfig
+--=20
+2.11.0
 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> While I was reviewing Damian's reset patchset I noticed this
-> code which meant that we theoretically had multiple 'roots' to
-> the set of things being reset, so I wondered what was actually
-> using it. It turns out nothing was :-)
->
-> Commit 80376c3fc2c38fdd453 also added a TODO in vl.c suggesting
-> that there is the wrong place to register the reset function
-> which effectively resets the whole system starting at the
-> root which is the main system bus:
->    qemu_register_reset(qbus_reset_all_fn, sysbus_get_default());
-> I don't understand why vl.c is a bad place to put that, and I'd
-> rather not move it to qdev.c (where in qdev.c?) because that
-> would reshuffle reset ordering which seems liable to cause
-> regressions. So maybe we should just delete that TODO comment?
-
-Hmm.
-
-The one in vl.c arranges to run qbus_reset_all(main_system_bus), which
-walks the tree rooted at main_system_bus, resetting its buses and
-devices in post-order.
-
-A registry of callbacks to run on certain events is a fine technique.
-Relying on registration order, however, is in bad taste.  We should
-model dependencies between reset functions explicitly.
-
-That said, we can't ignore dependencies just because we've coded them
-badly.
-
-I count more than 100 qemu_register_reset(), and most of them look like
-they reset hardware.  Why do devices use qemu_register_reset() instead
-of DeviceClass method reset?
-
-Registered handlers run in (implicitly defined) registration order,
-reset methods in (explicit) qdev tree post order.  Much better as long
-as that's the order we want.
-
-Say we managed to clean up this mess somehow, so reset handler
-registration order doesn't matter anymore.  Then moving the
-qemu_register_reset() for main_system_bus from main() to wherever we
-create main_system_bus would make sense, wouldn't it?
-
-If it does make sense, we should keep the TODO in main(), because it
-asks for exactly that.  Perhaps delete "by qdev.c".
-
-> ---
->  hw/core/bus.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
->
-> diff --git a/hw/core/bus.c b/hw/core/bus.c
-> index e09843f6abe..e50287c2b35 100644
-> --- a/hw/core/bus.c
-> +++ b/hw/core/bus.c
-> @@ -96,10 +96,9 @@ static void qbus_realize(BusState *bus, DeviceState *parent, const char *name)
->          bus->parent->num_child_bus++;
->          object_property_add_child(OBJECT(bus->parent), bus->name, OBJECT(bus), NULL);
->          object_unref(OBJECT(bus));
-> -    } else if (bus != sysbus_get_default()) {
-> -        /* TODO: once all bus devices are qdevified,
-> -           only reset handler for main_system_bus should be registered here. */
-> -        qemu_register_reset(qbus_reset_all_fn, bus);
-> +    } else {
-> +        /* The only bus without a parent is the main system bus */
-> +        assert(bus == sysbus_get_default());
->      }
->  }
-
-You delete a qemu_register_reset() because it's unreachable.  The commit
-that added it also added a qemu_unregister_reset().  It's now in
-bus_unparent().  Why is it still needed?
 
