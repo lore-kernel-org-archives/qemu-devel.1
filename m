@@ -2,72 +2,92 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F316C04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 11:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A142C04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 11:04:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D174A2070D
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 11:02:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D174A2070D
+	by mail.kernel.org (Postfix) with ESMTPS id 4F3D72082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 11:04:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F3D72082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52114 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52138 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRE9s-0003os-1O
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 07:02:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57481)
+	id 1hREBY-0004nS-Ea
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 07:04:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmathieu@redhat.com>) id 1hRE8z-0003VC-5I
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 07:01:50 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hREAI-0004CV-CR
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 07:03:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmathieu@redhat.com>) id 1hRE8y-0002uL-37
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 07:01:49 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:38517)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1hRE8x-0002qU-S6
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 07:01:48 -0400
-Received: by mail-wm1-f67.google.com with SMTP id t5so1651443wmh.3
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 04:01:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=TsY7QTJOtCc+BxBvNXl4oredYNBn+PUw5zscj0+qkeg=;
-	b=HWPVMzOxzNei59RJRDPe9o8xBsmTM34DMsxHn0k6728OGueL8MRgczLKGnXzQIwvZK
-	mZp11d9iTulWeknMjrrvw7HBikyKSEAz4Nb/8l3kSLtGtB61EpOKKt/L75s1l1dXfo+w
-	sVYux+/Yzv4ncWve8R62yfla4CCbVeRr/4YHXCeo8wBJAXNa6Wa0cOto4VlE4IYz0Qcd
-	U182rgKNnu7ue0dp63UCrsmQbwJSsVBUU3xTTIx7muW6OIgxZHxeyj1ea7bOM+Dz2eow
-	6ALehSjjIDbHd+ayEJ8wmIyJbF3q5VsgTTQH5pwr5rxIuTF9v5tzFYRJ8sVGLyWZsZsI
-	/KWg==
-X-Gm-Message-State: APjAAAXuoqFaYH4oLiyiV+dUxKpzmafXHawFtLh6rb2l80vcXow8hybC
-	JhduFPcVDp77NxoT5sHUiss9z/eX2UAw1Vc4yHpz1A==
-X-Google-Smtp-Source: APXvYqwKxL04NZKOeQ68lWbQw1fDOkfJ+z17k0iLftcFKekM3GpXz+5iFbgfnGIO8iOkWBMfkPGWfsx/8L9FNBeq6oQ=
-X-Received: by 2002:a7b:c7d5:: with SMTP id z21mr20936116wmk.56.1558004502491; 
-	Thu, 16 May 2019 04:01:42 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1hREAH-0005sD-Ar
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 07:03:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34212)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hREAE-0005lq-Pf; Thu, 16 May 2019 07:03:07 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EE88C3082A9A;
+	Thu, 16 May 2019 11:03:05 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-34.brq.redhat.com
+	[10.40.204.34])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D3016A24B;
+	Thu, 16 May 2019 11:03:04 +0000 (UTC)
+To: qemu-block@nongnu.org
+References: <20190513155254.27773-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <7886115c-a73e-607d-6487-5cf68a3da756@redhat.com>
+Date: Thu, 16 May 2019 13:03:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190419003053.8260-1-richardw.yang@linux.intel.com>
-	<20190419003053.8260-7-richardw.yang@linux.intel.com>
-	<20190514211015-mutt-send-email-mst@kernel.org>
-	<d9d265e1-1052-9d8d-c749-5d1e5901f567@redhat.com>
-	<20190516074110.GA11938@richard>
-In-Reply-To: <20190516074110.GA11938@richard>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Thu, 16 May 2019 13:01:31 +0200
-Message-ID: <CAP+75-XHpLkekrmSxK8FFGkpPJQH=V0+2d6RonQTyJNcSHGaEg@mail.gmail.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190513155254.27773-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="jUu44DSJO1pRd9A8aiVGoGfilCMQA0LhQ"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Thu, 16 May 2019 11:03:06 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH v4 6/6] acpi: pci: use build_append_foo()
- API to construct MCFG
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2] iotests: Filter 175's allocation
+ information
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,51 +99,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
-	Igor Mammedov <imammedo@redhat.com>
+Cc: Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 16, 2019 at 9:41 AM Wei Yang <richardw.yang@linux.intel.com> wr=
-ote:
->
-> On Wed, May 15, 2019 at 07:29:17AM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> >
-> >Thanks Michael for testing...
-> >
-> >Wei, can you add a MCFG test in tests/bios-tables-test.c?
-> >
->
-> I took a look into the test, current q35 has already has a reference MCFG=
- in
-> tests/data/acpi/q35/MCFG.
->
-> And there would be a warning message when reserved[8] is missed.
->
->     /x86_64/acpi/q35/bridge: acpi-test: Warning! MCFG mismatch.
->
-> Is this enough? Or what more information prefer to add?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jUu44DSJO1pRd9A8aiVGoGfilCMQA0LhQ
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>,
+ Nir Soffer <nsoffer@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <7886115c-a73e-607d-6487-5cf68a3da756@redhat.com>
+Subject: Re: [PATCH v2] iotests: Filter 175's allocation information
+References: <20190513155254.27773-1-mreitz@redhat.com>
+In-Reply-To: <20190513155254.27773-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Well, the test has to fail for any mismatch (not a simple warning).
+On 13.05.19 17:52, Max Reitz wrote:
+> It is possible for an empty file to take up blocks on a filesystem.
+> Make iotest 175 take this into account.
+>=20
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+> v2: [Nir]
+> - Use a function for filtering
+> - s/empty_blocks/extra_blocks/
+> ---
+>  tests/qemu-iotests/175     | 26 ++++++++++++++++++++++----
+>  tests/qemu-iotests/175.out |  8 ++++----
+>  2 files changed, 26 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
+> index d0ffc495c2..b5eb0aa856 100755
+> --- a/tests/qemu-iotests/175
+> +++ b/tests/qemu-iotests/175
+> @@ -28,10 +28,25 @@ status=3D1	# failure is the default!
+> =20
+>  _cleanup()
+>  {
+> -	_cleanup_test_img
+> +    _cleanup_test_img
+> +    rm -f "$TEST_DIR/empty"
+>  }
+>  trap "_cleanup; exit \$status" 0 1 2 3 15
+> =20
+> +# Some file systems sometimes allocate extra blocks independently of
+> +# the file size.  This function hides the resulting difference in the
+> +# stat -c '%b' output.
+> +# Parameter 1: Number of blocks an empty file occupies
+> +# Parameter 2: Image size in bytes
+> +_filter_blocks()
+> +{
+> +    extra_blocks=3D$1
+> +    img_size=3D$2
+> +
+> +    sed -e "s/blocks=3D$extra_blocks/nothing allocated/" \
+> +        -e "s/blocks=3D$((extra_blocks + img_size / 512))/everything a=
+llocated/"
 
-A mismatch failure seems to be enough IMHO.
+Only now got around to creating an FS with similar characteristics to
+Thomas=E2=80=99s.  Turns out this test still fails there because it print=
+s
+=E2=80=9Cblocks=3Dnothing allocated050=E2=80=9D...
 
-> >>> -    AcpiMcfgAllocation allocation[0];
-> >>> -} QEMU_PACKED;
-> >>> -typedef struct AcpiTableMcfg AcpiTableMcfg;
-> >>> -
-> >>>  /*
-> >>>   * TCPA Description Table
-> >>>   *
-> >>> --
-> >>> 2.19.1
->
-> --
-> Wei Yang
-> Help you, Help me
+Unless objections arise, I=E2=80=99ll just add a \$ to each pattern to fi=
+x that.
+ (I could also just swap the lines, but that isn=E2=80=99t really right.)=
+
+
+Max
+
+
+--jUu44DSJO1pRd9A8aiVGoGfilCMQA0LhQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzdQ2YACgkQ9AfbAGHV
+z0BzqAgAwYK056qY9M21foi1JFxjsQtaMVjZjfxxzQbjFaDAc3PvpcYbsPvMH2y1
+0AKxCWDyJBxSNpBEgNJvv/6IbvkXfbpLrfNMdvO3eCoFKetYRcWhnM5D48v1d7bq
+jfal8qf6qss3nnKzLdbVVuf8BC4wRJAHp/oU+1klE46yR166CU7GR4lEUCRS2Iwb
+uTsITb1riqjy+GGVCjqDKg2qb0/RaPXyLZDe1lZIhhA2awv6UObiW2JEDU7KwWJv
+Yc+t79FrHQ6o01MfDj8QwTf8vVJdQ+aX1nALjuypN2/4EZ+HULbMCBArc8/hK2rD
++1twkYBLJAaABbjyVYoT68G/InqtjA==
+=NziM
+-----END PGP SIGNATURE-----
+
+--jUu44DSJO1pRd9A8aiVGoGfilCMQA0LhQ--
 
