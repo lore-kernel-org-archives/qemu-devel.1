@@ -4,72 +4,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 164A1C04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:20:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C50A9C04AB4
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:21:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F64A20833
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:20:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F64A20833
+	by mail.kernel.org (Postfix) with ESMTPS id 9923D20833
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:21:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9923D20833
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53713 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53753 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRFMw-0000mc-Fg
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:20:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48575)
+	id 1hRFO2-0001qn-Pe
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:21:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hRFL6-00086r-PM
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:18:27 -0400
+	(envelope-from <mst@redhat.com>) id 1hRFM5-0000Vo-Bn
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:19:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hRFL3-0001Gb-Oj
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:18:24 -0400
-Received: from mail-qt1-f182.google.com ([209.85.160.182]:43272)
+	(envelope-from <mst@redhat.com>) id 1hRFM2-0001uR-5P
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:19:25 -0400
+Received: from mail-qt1-f172.google.com ([209.85.160.172]:44409)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hRFL3-0001GC-M7
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:18:21 -0400
-Received: by mail-qt1-f182.google.com with SMTP id i26so3508605qtr.10
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 05:18:21 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hRFM2-0001uI-2j
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:19:22 -0400
+Received: by mail-qt1-f172.google.com with SMTP id f24so3512626qtk.11
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 05:19:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
 	:mime-version:content-disposition:in-reply-to;
-	bh=BdQmdQ0lBDJ6Q7Q+g+I1UB4uSsg7bUq8SfpRaDBHlX4=;
-	b=NWr4DSvYvCvhmhKT4tRxDhDF/wTjYrH6FOGfLoWHUrE/IZoHjUG3U++buwvSqBiclu
-	/Tbi4bWrg7a7oEaTtedv1qsTDAyrmTEFy5h9GFSmUJbsHTk63tFSCRz2BopDqdzUP/oo
-	evE0rU0ytS4kAzzALbB3g2Is5t7vWS69hR/ONQSu+1MitIna4k/skNmI7aqWoROby73P
-	ANjr3n7/9Jzb5oVNaxZPgt/+w76Z9Th+pgF88gaNV98HAn1UIN6Q+jOSuTop7BQnlLFs
-	P0C3Nzurj/RO0D3h1WO7Yag3Pm76tMVxQEZAb+nsu7syObDe7IpEJiI7RYnCOJgDvsDV
-	/o1A==
-X-Gm-Message-State: APjAAAXpat+apg9/dftIvcnNuKLouQsTQc8y7Wv0uRsLilR7XCrAaXud
-	aFWHqVdElPrfm/1HaMDAPif6N0OFXhM=
-X-Google-Smtp-Source: APXvYqxou0TZddpmUVDHRZRFJ3io/v294/jv4jvLW7knu1raXC5Q9tJwa63p3+cnxCdMqNlIisvsrw==
-X-Received: by 2002:ac8:1985:: with SMTP id u5mr39409311qtj.389.1558009100866; 
-	Thu, 16 May 2019 05:18:20 -0700 (PDT)
+	bh=GEBbw5yBYMAQw8+9J5YyvTBzIi99r+JtCnmq4U1dRRs=;
+	b=h+YxrALXwnCc5cVC8ePo4UwK0dDRWuNJ15JyZQRVsneHN8Bu+Jg8lXHNZ/5dDuUS48
+	eVCtB4mHqfsINvQ5eMwOsawJvBJlyJAulXaT51MQhRftMWGZRFN/5CREPONv+PWrlGEE
+	4PN4OUH2AezxZvDqPMc04EJVbKh1bStyPxVDP9Ll202nRBb6F6W9TsrdJrxHzB/UJl6C
+	+u8pjkDBbtVrPfmukPfZCvM6XpGN9hQxmfcjD2UA4hAPahJfHRnmBT0OUkvkxc3cCGlR
+	3ZDeqP+0IJI1CM+open22K/NVxCS9H/b1o8BvSisnUvZEKNYxcdYnlAty8hLhT/n38uZ
+	UcQA==
+X-Gm-Message-State: APjAAAUFwv9d+Js25SFc9iGoqr4HbxANNLrKpVYEHFfX6jKuzoZimaTl
+	iVJfRBtFCg1UBgPw4a6UAYN9ZpBJuDs=
+X-Google-Smtp-Source: APXvYqwztD8Dle4kuh7AEP2hkVfoMq4sByoI6Qj+z6cey3NzTRtv6IL05JiKdQNnjoOcqBxN/NPrkg==
+X-Received: by 2002:a0c:9542:: with SMTP id m2mr23480022qvm.108.1558009161411; 
+	Thu, 16 May 2019 05:19:21 -0700 (PDT)
 Received: from redhat.com ([185.54.206.10]) by smtp.gmail.com with ESMTPSA id
-	q66sm2569078qke.66.2019.05.16.05.18.19
+	124sm2348926qkj.59.2019.05.16.05.19.19
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Thu, 16 May 2019 05:18:20 -0700 (PDT)
-Date: Thu, 16 May 2019 08:18:17 -0400
+	Thu, 16 May 2019 05:19:20 -0700 (PDT)
+Date: Thu, 16 May 2019 08:19:18 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <20190320112646.3712-4-xieyongji@baidu.com>
+Message-ID: <20190416184624.15397-3-dan.streetman@canonical.com>
 References: <20190515121146.7248-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
 In-Reply-To: <20190515121146.7248-1-mst@redhat.com>
 X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
 X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.160.182
-Subject: [Qemu-devel] [PULL 06/37] vhost-user-blk: Use started flag in
- vhost_user_blk_set_status()
+X-Received-From: 209.85.160.172
+Subject: [Qemu-devel] [PULL 15/37] do not call vhost_net_cleanup() on
+ running net from char user event
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -81,49 +81,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
-	Zhang Yu <zhangyu31@baidu.com>, qemu-block@nongnu.org,
-	Max Reitz <mreitz@redhat.com>, Xie Yongji <xieyongji@baidu.com>
+Cc: Dan Streetman <ddstreet@canonical.com>,
+	Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20190516121918.kr-TVtgGC6vbxKi9ppkMZK3oRTlibhSYI-ZDHe2Js70@z>
 
-From: Xie Yongji <xieyongji@baidu.com>
+From: Dan Streetman <ddstreet@canonical.com>
 
-Use started flag in vhost_user_blk_set_status() to decide if
-starting vhost-user backend or not.
+Buglink: https://launchpad.net/bugs/1823458
 
-Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
-Message-Id: <20190320112646.3712-4-xieyongji@baidu.com>
+Currently, a user CHR_EVENT_CLOSED event will cause net_vhost_user_event()
+to call vhost_user_cleanup(), which calls vhost_net_cleanup() for all
+its queues.  However, vhost_net_cleanup() must never be called like
+this for fully-initialized nets; when other code later calls
+vhost_net_stop() - such as from virtio_net_vhost_status() - it will try
+to access the already-cleaned-up fields and fail with assertion errors
+or segfaults.
+
+The vhost_net_cleanup() will eventually be called from
+qemu_cleanup_net_client().
+
+Signed-off-by: Dan Streetman <ddstreet@canonical.com>
+Message-Id: <20190416184624.15397-3-dan.streetman@canonical.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/block/vhost-user-blk.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/vhost-user.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index 28b81368f7..700c1dd111 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -190,7 +190,7 @@ static void vhost_user_blk_stop(VirtIODevice *vdev)
- static void vhost_user_blk_set_status(VirtIODevice *vdev, uint8_t status)
- {
-     VHostUserBlk *s = VHOST_USER_BLK(vdev);
--    bool should_start = status & VIRTIO_CONFIG_S_DRIVER_OK;
-+    bool should_start = vdev->started;
+diff --git a/net/vhost-user.c b/net/vhost-user.c
+index 5a26a24708..51921de443 100644
+--- a/net/vhost-user.c
++++ b/net/vhost-user.c
+@@ -236,7 +236,6 @@ static void chr_closed_bh(void *opaque)
+     s = DO_UPCAST(NetVhostUserState, nc, ncs[0]);
  
-     if (!vdev->vm_running) {
-         should_start = false;
-@@ -350,7 +350,7 @@ static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **errp)
-     VHostUserBlk *s = VHOST_USER_BLK(dev);
-     struct vhost_virtqueue *vqs = s->dev.vqs;
+     qmp_set_link(name, false, &err);
+-    vhost_user_stop(queues, ncs);
  
--    vhost_user_blk_set_status(vdev, 0);
-+    virtio_set_status(vdev, 0);
-     vhost_dev_cleanup(&s->dev);
-     vhost_dev_free_inflight(s->inflight);
-     g_free(vqs);
+     qemu_chr_fe_set_handlers(&s->chr, NULL, NULL, net_vhost_user_event,
+                              NULL, opaque, NULL, true);
 -- 
 MST
 
