@@ -6,58 +6,59 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8061C04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:29:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E5A6C04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:29:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EE6920848
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:29:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EE6920848
+	by mail.kernel.org (Postfix) with ESMTPS id F3C8A20848
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:29:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3C8A20848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53882 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53884 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRFVL-0000Vx-Kw
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:28:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48854)
+	id 1hRFVt-00010t-51
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:29:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hRFM2-0000Sk-6C
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:19:25 -0400
+	(envelope-from <mst@redhat.com>) id 1hRFNX-0001p7-Nr
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:20:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hRFLz-0001sd-5b
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:19:22 -0400
-Received: from mail-qk1-f179.google.com ([209.85.222.179]:35357)
+	(envelope-from <mst@redhat.com>) id 1hRFNU-0002w5-NG
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:20:55 -0400
+Received: from mail-qk1-f177.google.com ([209.85.222.177]:46996)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hRFLz-0001sM-2s
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:19:19 -0400
-Received: by mail-qk1-f179.google.com with SMTP id c15so2093513qkl.2
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 05:19:19 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hRFNU-0002ve-KW
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:20:52 -0400
+Received: by mail-qk1-f177.google.com with SMTP id a132so2023828qkb.13
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 05:20:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
 	:mime-version:content-disposition:in-reply-to;
-	bh=DIeBZtrDSH+jJ+9/dLwDKk3EUBZlccVUquSpchsWfTY=;
-	b=uJSvplBJW1XdayPwqpmnEniljFsrbSnOKvlt9g8u0sfyfnbQVrpBdh/zqZRHDy4Vh7
-	Lc6cEHJDc4wcW98zYml21uIJF8Qc5mOOeIH88CqosdWpPiS7yyLuiS2PGLl6rF6DQJsY
-	4WB0gTcWfPb/uN4zCJ9zHobOqHvI5OvXzBREIPoBfUoLcFCb/3Mpy1/s2NpTjY1Oc2li
-	0y9jl/sdzlZzgaSH9wC7Fe7jINsTvIRZXiRdHYn1DtqqrSqeYZwii4Xe3oRojAVTRRYp
-	DYt7WIJmNNuJdA8es50IvHihg8L7ggrQ5S6eA2OYS+pVMZwGgviEjVoCJ9E/PfilC853
-	ND5Q==
-X-Gm-Message-State: APjAAAXYKYQhNHZCfzc7ipQ27qjXU2Z5yJ3QcOGcC5k3kQt4l4ZpA3id
-	3yM8HenKNLIz/q7EG5VPpKhuIj1DyJE=
-X-Google-Smtp-Source: APXvYqykb8t9W5KKsSSKAVG5yakEDUIM1vW0Co0IbGSElp8cCrx0j9J/F1qNzRy50DDz9ZE69MtX4Q==
-X-Received: by 2002:ae9:f503:: with SMTP id o3mr10955220qkg.345.1558009158238; 
-	Thu, 16 May 2019 05:19:18 -0700 (PDT)
-Received: from redhat.com ([185.54.206.10])
-	by smtp.gmail.com with ESMTPSA id a5sm2310836qtj.58.2019.05.16.05.19.16
+	bh=im+qbcew1Qe+0x5KgoK3OVmxTwCql9ERQ/Z1WYRFGjA=;
+	b=KTTpP5Py3OB6db5bWOG6Pe/JFjSKZkp9qK9fHGX5oEjnBVtILiFoKYqrA0Kwf84TiN
+	p1UwHAfROuz5y/LYBO7yPe5tFSLTllZcstWRcUdQ8+LmXtg0xeyjpImfSxTHLHt+vtTU
+	V+BZ3LB24sfoDjqDOCgEDWoiun3LZQI6OBrToHNGeJ7xEch+zAMj8xCDh/Ondm+J7dcE
+	LF1k26xnmfm8TuLfG5s4RVEo2nAfUtDlAuCZ4Qkp4p/mt4Q7MwaFzSPhNxX+UXeaxIwN
+	YXdoEG0uNq4+/nkB8qi5auZI7vrZFcApP93JjRUtxTP8zawXqugd06B41Aj1xPBgJQlB
+	C4qA==
+X-Gm-Message-State: APjAAAWced/1TC43R/clazxE1yeJ329lJqCr1dBZO+KjsaS9hmPf9L86
+	l6sS/liEvspev2xwMCN53a48B2GV+uI=
+X-Google-Smtp-Source: APXvYqzjGo9wq+Re2v+JKm0JeZ9jzOLSfjDPdR3VfthW2h/69+HH9bFPDs7vrwlYrmdP3/nHuliqGw==
+X-Received: by 2002:a05:620a:1012:: with SMTP id
+	z18mr38072891qkj.205.1558009251771; 
+	Thu, 16 May 2019 05:20:51 -0700 (PDT)
+Received: from redhat.com ([185.54.206.10]) by smtp.gmail.com with ESMTPSA id
+	t17sm3555117qte.66.2019.05.16.05.20.49
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Thu, 16 May 2019 05:19:17 -0700 (PDT)
-Date: Thu, 16 May 2019 08:19:14 -0400
+	Thu, 16 May 2019 05:20:51 -0700 (PDT)
+Date: Thu, 16 May 2019 08:20:48 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <1554822037-329838-1-git-send-email-imammedo@redhat.com>
+Message-ID: <1556808723-226478-10-git-send-email-imammedo@redhat.com>
 References: <20190515121146.7248-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -67,8 +68,9 @@ X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
 X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.222.179
-Subject: [Qemu-devel] [PULL 14/37] q35: acpi: do not create dummy MCFG table
+X-Received-From: 209.85.222.177
+Subject: [Qemu-devel] [PULL 31/37] tests: acpi: add a way to start tests
+ with UEFI firmware
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,83 +82,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Wei Yang <richardw.yang@linux.intel.com>,
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
 	Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+	Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190516121914.xPV05bl_tx_RSMjKe_YhZfNlgGyCOAs_lpvvBvdYTlE@z>
+Message-ID: <20190516122048.4_EMfQpueWVwZtrsxYOdU1lFdocwhTyLvfL1Af-gEBY@z>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-Dummy table (with signature "QEMU") creation came from original SeaBIOS
-codebase. And QEMU would have to keep it around if there were Q35 machine
-that depended on keeping ACPI tables blob constant size. Luckily there
-were no versioned Q35 machine types before commit:
-  (since 2.3) a1666142db acpi-build: make ROMs RAM blocks resizeable
-which obsoleted need to keep ACPI tables blob the same size on source/destination.
-
-Considering the 1st versioned machine is pc-q35-2.4, the dummy table
-is not really necessary and it's safe to drop it without breaking
-cross version migration in both directions unconditionally.
+For testcase to use UEFI firmware, one needs to provide and specify
+firmware and varstore blob names in test_data { uefi_fl1, uefi_fl2 }
+fields respectively and RAM start address plus size where to look for
+test structure signature. Additionally testcase should specify
+bootable cdrom image from uefi-boot-images with EFI test utility.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1554822037-329838-1-git-send-email-imammedo@redhat.com>
-Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Message-Id: <1556808723-226478-10-git-send-email-imammedo@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/acpi-build.c | 18 ++++--------------
- 1 file changed, 4 insertions(+), 14 deletions(-)
+ tests/bios-tables-test.c | 50 +++++++++++++++++++++++++++-------------
+ 1 file changed, 34 insertions(+), 16 deletions(-)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 416da318ae..8671e25af4 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2401,7 +2401,6 @@ static void
- build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
- {
-     AcpiTableMcfg *mcfg;
--    const char *sig;
-     int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
- 
-     mcfg = acpi_data_push(table_data, len);
-@@ -2411,19 +2410,7 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-     mcfg->allocation[0].start_bus_number = 0;
-     mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->mcfg_size - 1);
- 
--    /* MCFG is used for ECAM which can be enabled or disabled by guest.
--     * To avoid table size changes (which create migration issues),
--     * always create the table even if there are no allocations,
--     * but set the signature to a reserved value in this case.
--     * ACPI spec requires OSPMs to ignore such tables.
--     */
--    if (info->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
--        /* Reserved signature: ignored by OSPM */
--        sig = "QEMU";
--    } else {
--        sig = "MCFG";
--    }
--    build_header(linker, table_data, (void *)mcfg, sig, len, 1, NULL, NULL);
-+    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 4d13a3cce6..84e1ce2972 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -26,6 +26,11 @@
+ typedef struct {
+     const char *machine;
+     const char *variant;
++    const char *uefi_fl1;
++    const char *uefi_fl2;
++    const char *cd;
++    const uint64_t ram_start;
++    const uint64_t scan_len;
+     uint64_t rsdp_addr;
+     uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
+     GArray *tables;
+@@ -77,13 +82,6 @@ static void free_test_data(test_data *data)
+     g_array_free(data->tables, true);
  }
  
- /*
-@@ -2592,6 +2579,9 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
-     }
-     mcfg->mcfg_base = qnum_get_uint(qobject_to(QNum, o));
-     qobject_unref(o);
-+    if (mcfg->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
-+        return false;
+-static void test_acpi_rsdp_address(test_data *data)
+-{
+-    uint32_t off = acpi_find_rsdp_address(data->qts);
+-    g_assert_cmphex(off, <, 0x100000);
+-    data->rsdp_addr = off;
+-}
+-
+ static void test_acpi_rsdp_table(test_data *data)
+ {
+     uint8_t *rsdp_table = data->rsdp_table;
+@@ -524,21 +522,41 @@ static void test_smbios_structs(test_data *data)
+ static void test_acpi_one(const char *params, test_data *data)
+ {
+     char *args;
++    bool use_uefi = data->uefi_fl1 && data->uefi_fl2;
+ 
+-    /* Disable kernel irqchip to be able to override apic irq0. */
+-    args = g_strdup_printf("-machine %s,accel=%s,kernel-irqchip=off "
+-                           "-net none -display none %s "
+-                           "-drive id=hd0,if=none,file=%s,format=raw "
+-                           "-device ide-hd,drive=hd0 ",
+-                           data->machine, "kvm:tcg",
+-                           params ? params : "", disk);
++    if (use_uefi) {
++        /*
++         * TODO: convert '-drive if=pflash' to new syntax (see e33763be7cd3)
++         * when arm/virt boad starts to support it.
++         */
++        args = g_strdup_printf("-machine %s,accel=%s -nodefaults -nographic "
++            "-drive if=pflash,format=raw,file=%s,readonly "
++            "-drive if=pflash,format=raw,file=%s,snapshot=on -cdrom %s %s",
++            data->machine, "kvm:tcg", data->uefi_fl1, data->uefi_fl2,
++            data->cd, params ? params : "");
++
++    } else {
++        /* Disable kernel irqchip to be able to override apic irq0. */
++        args = g_strdup_printf("-machine %s,accel=%s,kernel-irqchip=off "
++            "-net none -display none %s "
++            "-drive id=hd0,if=none,file=%s,format=raw "
++            "-device ide-hd,drive=hd0 ",
++             data->machine, "kvm:tcg", params ? params : "", disk);
 +    }
  
-     o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NULL);
-     assert(o);
+     data->qts = qtest_init(args);
+ 
+-    boot_sector_test(data->qts);
++    if (use_uefi) {
++        g_assert(data->scan_len);
++        data->rsdp_addr = acpi_find_rsdp_address_uefi(data->qts,
++            data->ram_start, data->scan_len);
++    } else {
++        boot_sector_test(data->qts);
++        data->rsdp_addr = acpi_find_rsdp_address(data->qts);
++        g_assert_cmphex(data->rsdp_addr, <, 0x100000);
++    }
+ 
+     data->tables = g_array_new(false, true, sizeof(AcpiSdtTable));
+-    test_acpi_rsdp_address(data);
+     test_acpi_rsdp_table(data);
+     test_acpi_rxsdt_table(data);
+     test_acpi_fadt_table(data);
 -- 
 MST
 
