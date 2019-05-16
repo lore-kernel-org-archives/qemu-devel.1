@@ -2,63 +2,60 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B161EC04E84
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 02:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEFFDC04AB4
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 04:14:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71DF820862
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 02:06:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71DF820862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7D85F20862
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 04:14:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D85F20862
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47045 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48177 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hR5me-0005ry-HV
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 22:06:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33039)
+	id 1hR7mV-0004c0-8L
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 00:14:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hR5lk-0005N2-KN
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 22:05:17 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hR7lf-0004Ki-JK
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 00:13:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hR5lg-0001Ox-Dj
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 22:05:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42335)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>)
-	id 1hR5lg-0001Ok-7d; Wed, 15 May 2019 22:05:12 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 69EC3307D913;
-	Thu, 16 May 2019 02:05:11 +0000 (UTC)
-Received: from xz-x1 (dhcp-15-205.nay.redhat.com [10.66.15.205])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 416F126552;
-	Thu, 16 May 2019 02:05:03 +0000 (UTC)
-Date: Thu, 16 May 2019 10:05:01 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190516020501.GJ16681@xz-x1>
-References: <155785983236.11040.9618506134214930578.stgit@gimli.home>
-	<20190514142203.430c106e@x1.home>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190514142203.430c106e@x1.home>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Thu, 16 May 2019 02:05:11 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.0.1] q35: Revert to kernel irqchip
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hR7le-0005Ms-GJ
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 00:13:19 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:43080)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hR7le-0005JC-8O
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 00:13:18 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+	by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 75BE93F1BE;
+	Thu, 16 May 2019 13:13:10 +0900 (JST)
+Received: from yo-satoh-debian.ysato.ml (v045049.dynamic.ppp.asahi-net.or.jp
+	[124.155.45.49])
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 3B100240085; 
+	Thu, 16 May 2019 13:13:09 +0900 (JST)
+Date: Thu, 16 May 2019 13:13:06 +0900
+Message-ID: <87mujnhwa5.wl-ysato@users.sourceforge.jp>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <ffcd9051-9c72-30ed-f53e-8d0351a76250@linaro.org>
+References: <20190514061458.125225-1-ysato@users.sourceforge.jp>
+	<ffcd9051-9c72-30ed-f53e-8d0351a76250@linaro.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+	FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/25.1
+	(x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 202.224.55.14
+Subject: Re: [Qemu-devel] [PATCH v12 00/12] Add RX archtecture support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,54 +67,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-	ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
-	qemu-stable@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+Cc: peter.maydell@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 14, 2019 at 02:22:03PM -0600, Alex Williamson wrote:
-> On Tue, 14 May 2019 13:03:31 -0600
-> Alex Williamson <alex.williamson@redhat.com> wrote:
+On Thu, 16 May 2019 01:48:29 +0900,
+Richard Henderson wrote:
 > 
-> > Commit b2fc91db8447 ("q35: set split kernel irqchip as default") changed
-> > the default for the pc-q35-4.0 machine type to use split irqchip, which
-> > turned out to have disasterous effects on vfio-pci INTx support.  KVM
-> > resampling irqfds are registered for handling these interrupts, but
-> > these are non-functional in split irqchip mode.  We can't simply test
-> > for split irqchip in QEMU as userspace handling of this interrupt is a
-> > significant performance regression versus KVM handling (GeForce GPUs
-> > assigned to Windows VMs are non-functional without forcing MSI mode or
-> > re-enabling kernel irqchip).
+> On 5/13/19 11:14 PM, Yoshinori Sato wrote:
+> > This patch series is added Renesas RX target emulation.
 > > 
-> > The resolution is to revert the change in default irqchip mode with a
-> > new pc-q35-4.0.1 machine type for qemu-stable while the development
-> > branch makes the same change in the pc-q35-4.1 machine type.  The
-> > qemu-q35-4.0 machine type should not be used in vfio-pci configurations
-> > for devices requiring legacy INTx support without explicitly modifying
-> > the VM configuration to use KVM irqchip.  This new 4.0.1 machine type
-> > makes this change automatically.
+> > I fixed the ROM address because v11 was incorrect.
 > > 
-> > Link: https://bugs.launchpad.net/qemu/+bug/1826422
-> > Link: https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03305.html
+> > My git repository is bellow.
+> > git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git tags/rx-20190514
+> > 
+> > Testing binaries bellow.
+> > u-boot
+> > Download - https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
+> > 
+> > starting
+> > $ gzip -d u-boot.bin.gz
+> > $ qemu-system-rx -bios u-boot.bin
+> > 
+> > linux and pico-root (only sash)
+> > Download - https://osdn.net/users/ysato/pf/qemu/dl/zImage (kernel)
+> >            https://osdn.net/users/ysato/pf/qemu/dl/rx-qemu.dtb (DeviceTree)
+> > 
+> > starting
+> > $ qemu-system-rx -kernel zImage -dtb rx-qemu.dtb -append "earlycon"
+> > 
+> > Changes for v11.
+> > - Fix ROM address.
 > 
-> This link is superseded by a v2 of the mainline patch:
+> I think this is ready to be committed, but it is difficult to tell because you
+> have not retained the Reviewed-by: tags that have been given to previous versions.
 > 
-> Link: https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03338.html
+> Looking at
 > 
-> I believe this patch is still the proper stable backport though.  Also
-> to clarify, this patch should be gated on mainline acceptance of the
-> link above, but clearly there's no clean cherry-pick between mainline
-> and stable for this, so I'm proposing them in parallel.  Thanks,
+> https://patchwork.ozlabs.org/project/qemu-devel/list/?series=&submitter=7114&state=&q=&archive=&delegate=
+> 
+> 	Review	Tested
+> 
+> >From v10:
+> 13/13	-	-
+> 12/13	1	-
+> 11/13	-	-
+> 10/13	2	1
+> 09/13	1	1
+> 08/13	-	1
+> 07/13	-	-
+> 06/13	-	1
+> 05/13	1	-
+> 04/13	1	1
+> 03/13	1	-
+> 02/13	1	-
+> 01/13	1	1
+> 
+> >From v8:
+> 08/12	1	-
+> 07/12	1	-
+> 06/12	1	-
+> 
+> In summary, only the last patch is unreviewed, and it appears that you've fixed
+> the issue I pointed out in v11.  I have now sent reviews for those.
+> 
+> In future, please retain the tags as you go through the development process.
+> 
+> Rather than having you send out a v13 with only changes to the tags, I will
+> apply them myself while preparing an initial pull request for this.
+> 
+> Thanks for your patience.
+>
 
-Agreed.  As long as the 4.1 patch can be accepted, this should be the
-correct patch for 4.0-stable AFAICT:
+OK.
+I prepare v13 which added Reviewed-by.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Thanks.
 
-Thanks,
+> 
+> r~
+> 
 
 -- 
-Peter Xu
+Yosinori Sato
 
