@@ -2,68 +2,77 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D0BAC04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:58:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8F9CC04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 13:00:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13CA320833
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:58:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13CA320833
+	by mail.kernel.org (Postfix) with ESMTPS id 9D43A20833
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 13:00:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D43A20833
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54890 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54927 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRFy8-0000Mg-C2
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:58:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54834)
+	id 1hRFzb-0001WT-TQ
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 09:00:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1hRFkm-0005Zs-KV
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:44:59 -0400
+	(envelope-from <mst@redhat.com>) id 1hRFNw-0002AN-Ez
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:21:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1hRFki-0004Ab-Ow
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:44:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56896)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1hRFkg-00045X-Pj
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:44:52 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 92513308623C
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 12:44:48 +0000 (UTC)
-Received: from [10.43.2.30] (unknown [10.43.2.30])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 14B6410027BB;
-	Thu, 16 May 2019 12:44:47 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>
-References: <20190311220843.4026-1-armbru@redhat.com>
-	<20190311220843.4026-23-armbru@redhat.com>
-	<76d4a7b2-3c13-beea-2dc0-4fda7025030b@redhat.com>
-	<878sv6tyjy.fsf@dusky.pond.sub.org>
-From: Michal Privoznik <mprivozn@redhat.com>
-Message-ID: <ea01ee11-8888-444d-1f51-387dc73464f5@redhat.com>
-Date: Thu, 16 May 2019 14:44:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <mst@redhat.com>) id 1hRFNs-0003BJ-JN
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:21:20 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:44188)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hRFNs-0003AZ-Ex
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:21:16 -0400
+Received: by mail-qk1-f196.google.com with SMTP id w25so2040989qkj.11
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 05:21:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:content-transfer-encoding
+	:in-reply-to;
+	bh=Z/IfauSZcYb/NvfmZ0aQ9zbqfx97hf0Wl+ffe4WB7Ls=;
+	b=b2CZP7r6Prg3KbMAaro9ehzFbMK6qWOdUKgNmBeo/0JCBmBAGFWhrFdHpU0nwEc1Cv
+	OcXV7sj0Qm5jzjqQs9q+lE4+QpzytXFIBF+p1jaddrsyfF9Jh3NIyYcYVn36RforboEQ
+	spX1AlhkzUoMOu6pc7wklmvcO6x5/sVT/o9idFLFqHySKS2jvOSEcfcMmHXTY1GRdjX0
+	pylcFk4lrOQF3w5DeXOzsV5YtlA/AmIRbU/6Htbgby8fa8vXwkiTICyTCezQbEYaeFgl
+	aUkUzm/+0KD6XgdcLnJFjj5Sd/lERkzrU3mLaNwvWpqiHi7WEvQuFNODG09caErKOi0P
+	+I3A==
+X-Gm-Message-State: APjAAAW92jVijQJvboXZrzgfJe0MY5AjrK5aim4aVSawAo/6aqC5rz7F
+	gSpBLTLBA2AoWXtpejvHANg8bM5jVm8=
+X-Google-Smtp-Source: APXvYqwkQOsSmaUu7jktJ4nMofNoLx+2NPtU7kagcmpdFcLtX/ARwRKDIMtVR7ppVvNABUtSliqK4A==
+X-Received: by 2002:a05:620a:124f:: with SMTP id
+	a15mr30908645qkl.210.1558009274533; 
+	Thu, 16 May 2019 05:21:14 -0700 (PDT)
+Received: from redhat.com ([185.54.206.10])
+	by smtp.gmail.com with ESMTPSA id 17sm2233532qkg.30.2019.05.16.05.21.12
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Thu, 16 May 2019 05:21:13 -0700 (PDT)
+Date: Thu, 16 May 2019 08:21:11 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Message-ID: <1556808723-226478-15-git-send-email-imammedo@redhat.com>
+References: <20190515121146.7248-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <878sv6tyjy.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Thu, 16 May 2019 12:44:48 +0000 (UTC)
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190515121146.7248-1-mst@redhat.com>
+X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
+X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 22/27] vl: Create block backends before
- setting machine properties
+	[fuzzy]
+X-Received-From: 209.85.222.196
+Subject: [Qemu-devel] [PULL 36/37] tests: acpi: refactor
+ rebuild-expected-aml.sh to dump ACPI tables for a specified list of targets
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,52 +84,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Wei Yang <richardw.yang@linux.intel.com>,
+	Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20190516122111.gdpRjseNfOlsGec-g9Ym2gpmqtvE6-ldJlVvWpPGZt8@z>
 
-On 5/16/19 1:43 PM, Markus Armbruster wrote:
-<snip/>
+From: Igor Mammedov <imammedo@redhat.com>
 
->> Actually, there is more problems with this. Trying to run a guest with
->> persistent reservations fails after this patch is applied (git bisect
->> points me to this commit). My command line is:
->>
->> qemu.git $ ./x86_64-softmmu/qemu-system-x86_64 \
->> -monitor stdio \
->> -object pr-manager-helper,id=pr-helper0,path=/tmp/pr-helper0.sock
->> -drive
->> file=/dev/mapper/crypt,file.pr-manager=pr-helper0,format=raw,if=none,id=drive-scsi0-0-0-2
->> \
->> -device
->> scsi-block,bus=scsi0.0,channel=0,scsi-id=0,lun=2,drive=drive-scsi0-0-0-2,id=scsi0-0-0-2
->>
->> Honestly, I have no idea how to fix it, so I'm just raising this issue
->> here. Do you want me to open a bug or something?
-> 
-> Let's skip the bug filing bureaucracy and go straight to debugging.
+Make initial list contain aarch64 and x86_64 targets.
 
-Agreed.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <1556808723-226478-15-git-send-email-imammedo@redhat.com>
+Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ tests/data/acpi/rebuild-expected-aml.sh | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
 
-> 
-> Actual and expected behavior of your reproducer, please :)
-> 
+diff --git a/tests/data/acpi/rebuild-expected-aml.sh b/tests/data/acpi/rebuild-expected-aml.sh
+index abdff70a0d..07f7e3f501 100755
+--- a/tests/data/acpi/rebuild-expected-aml.sh
++++ b/tests/data/acpi/rebuild-expected-aml.sh
+@@ -7,21 +7,12 @@
+ #
+ # Authors:
+ #  Marcel Apfelbaum <marcel.a@redhat.com>
++#  Igor Mammedov <imammedo@redhat.com>
+ #
+ # This work is licensed under the terms of the GNU GPLv2.
+ # See the COPYING.LIB file in the top-level directory.
+ 
+-qemu=
+-
+-if [ -e x86_64-softmmu/qemu-system-x86_64 ]; then
+-    qemu="x86_64-softmmu/qemu-system-x86_64"
+-elif [ -e i386-softmmu/qemu-system-i386 ]; then
+-    qemu="i386-softmmu/qemu-system-i386"
+-else
+-    echo "Run 'make' to build the qemu exectutable!"
+-    echo "Run this script from the build directory."
+-    exit 1;
+-fi
++qemu_bins="aarch64-softmmu/qemu-system-aarch64 x86_64-softmmu/qemu-system-x86_64"
+ 
+ if [ ! -e "tests/bios-tables-test" ]; then
+     echo "Test: bios-tables-test is required! Run make check before this script."
+@@ -29,6 +20,14 @@ if [ ! -e "tests/bios-tables-test" ]; then
+     exit 1;
+ fi
+ 
+-TEST_ACPI_REBUILD_AML=y QTEST_QEMU_BINARY=$qemu tests/bios-tables-test
++for qemu in $qemu_bins; do
++    if [ ! -e $qemu ]; then
++        echo "Run 'make' to build the following QEMU executables: $qemu_bins"
++        echo "Also, run this script from the build directory."
++        exit 1;
++    fi
++    TEST_ACPI_REBUILD_AML=y QTEST_QEMU_BINARY=$qemu tests/bios-tables-test
++done
++
+ 
+ echo "The files were rebuilt and can be added to git."
+-- 
+MST
 
-Actual is that qemu fails to parse cmd line:
-
-
-qemu-system-x86_64: -drive 
-file=/dev/mapper/crypt,file.pr-manager=pr-helper0,format=raw,if=none,id=drive-scsi0-0-0-2: 
-No persistent reservation manager with id 'pr-helper0'
-
-
-Which obviously is not correct, because pr-helper0 is specified.
-Expected result is that qemu suceeds in parsing the cmd line and starts 
-the guest. To test it you don't need /dev/mapper/* really, I mean, if 
-qemu fails with a different error message (e.g. it can't open the disk 
-or EPERM or whatever), it's a sign it got past the cmd line parsing 
-successfuly.
-
-Michal
 
