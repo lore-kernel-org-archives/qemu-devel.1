@@ -2,87 +2,81 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D77FC04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 16:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02870C04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 16:44:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19DDF20645
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 16:41:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B919C205ED
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 16:44:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HUZwvoSX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19DDF20645
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dvYgO0L9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B919C205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60931 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60964 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRJRj-0005vk-5G
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 12:41:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51843)
+	id 1hRJUz-0008Pe-1j
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 12:44:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hRJPT-0004QW-FE
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:39:13 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hRJTq-0007qH-Ft
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:43:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hRJPQ-0002mo-Iu
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:39:11 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35478)
+	(envelope-from <peter.maydell@linaro.org>) id 1hRJTp-00088i-FJ
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:43:42 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:37951)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hRJPP-0002m6-9J
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:39:08 -0400
-Received: by mail-wm1-x344.google.com with SMTP id q15so4165937wmj.0
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 09:39:07 -0700 (PDT)
+	id 1hRJTp-00087O-AE
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:43:41 -0400
+Received: by mail-ot1-x342.google.com with SMTP id s19so4055703otq.5
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 09:43:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-	:content-transfer-encoding;
-	bh=mLV1dnTBqVx2J+FptWGhA6OCL7EQMuxWiS/uXJcC1QQ=;
-	b=HUZwvoSXmRz8+EhCZWtzRZr8jnaVbX25b31kRe6YS6ResF2vvGhnWM1DEdE9gvdW+V
-	WeHREDuGC/3YLQw/rtZOZvdG48/Nbr3t3nWLFPppypH77kuIl0SNQkf1GsDOM3iNtIBQ
-	mVqx/rMOAH88gEn6oNN8BfB0tOQ04tnmIfVBsMAKZ8Nu5otHM4uIFqqzcqG2cdMbUEeK
-	mU3wZfdmZoHEclXWDyLZnd/fYR4/msdOqPMYI8dVq31eonGihTEIAnFSv9AlmT9FKTBq
-	G8F7uT3g8NkZh6yFMi9A6iVEdpwsWBV5787clz7EzpFxBkXfJlXHC08JtGBE/cT16leq
-	cdmw==
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=7+za8/mffhd/+flkPPB9/EXj+dL01I/fv/Vq9n9G+4A=;
+	b=dvYgO0L9sd/CbCApiufLqliLyg1PBnS8hlJ/xecY4FNUZvATBGqhpPINlETT6E7v0s
+	fhB6NkeqBLhX02aO+Ai9qO3xWmAgPg2VDNH4Z0ke9U3N1puuu3DIQPOZ2fMEdepY+Piv
+	3J/UjFxH9Py3Y3FWNUMESh4rKVOAToRjGmQM6iVaXGKW7US92hnUQkH013Ze02u+TUvj
+	vh0tuXnrI/qIfyJa7ebqYJ66UBO/fTi7WO35FbjmlQSJm8YZ50CSvzGQ9CULn9GB2iwJ
+	fSxtl9eQJTpgt5r+THcvUIDXKCaEfgWTULTRfy4j6y1socwZZnuLANN/K/wdhNqfD+EM
+	m8eA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=mLV1dnTBqVx2J+FptWGhA6OCL7EQMuxWiS/uXJcC1QQ=;
-	b=nIjFAQyxW4PU8Rj9TG1MNYG1dSUIrID4fsBG4mOPYRMfXm3UVPGlTVw8F6/L6iSkID
-	7MApfQcTHwiY4u9mSEeSwEQxjpU6pMusD9xGbLVGzBLr6fPTrgMY8WtA6w8bnO8QeX+6
-	orInCGShdMWXTwKFNE9Nmtu0+C/L4sMrBFKNJ3lAbAuTAVZNVE8dOZyfhq5uoDljGLTa
-	BEZ4oHlCunfzY0RgxdmRBM3nra+EBd+gyM8vH9O9rkYe/PAAx1h9UkP00ryZq/WGWnuG
-	S50SlC4G7Kv34UJ+vlJoo82GQD7RdlG6/whWPtb2ldiCDHfxPGmHvVCFKRRCcSgRxYT0
-	E/6w==
-X-Gm-Message-State: APjAAAWRvWBnNAbRWN6PBxC2Idpqw0r/ZDGSDpaQEu585LdapbaLVcol
-	oTDDQI/LdBbgUXxaQih0/P+KdMxLzs0=
-X-Google-Smtp-Source: APXvYqxKHgKy6KKUijSch8zj1WtIPKufesWg94U7srRiL6BZquORb7JqEQMPhczFAgKnTMtDoUUOsQ==
-X-Received: by 2002:a1c:7312:: with SMTP id d18mr28329169wmb.147.1558024745991;
-	Thu, 16 May 2019 09:39:05 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id
-	y130sm6702844wmc.44.2019.05.16.09.39.03
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 16 May 2019 09:39:04 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Thu, 16 May 2019 17:38:57 +0100
-Message-Id: <20190516163857.6430-4-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190516163857.6430-1-peter.maydell@linaro.org>
-References: <20190516163857.6430-1-peter.maydell@linaro.org>
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=7+za8/mffhd/+flkPPB9/EXj+dL01I/fv/Vq9n9G+4A=;
+	b=fNyzfplkUym6EbVQEvvoqpoJNfLSwPcRadKhGY05c8UaM27WPsHjgx7HL6+N/ZAQAe
+	nVLbkwYTYdbzcdBK2YHrh4WXYFvurVj6jqdBkNanoXd0pVWiYJY6z8SjOlTHsClGLvAR
+	FRx1bB1JaA3QOBjvrO1FE+ai7tJnK/WkH0gi9BLgcXq4KOewNkUDEo+Oucc3eGh5EwWc
+	UdG3fBo6FPT5yrRkHjwGnCrDU7SrQG46YLUKTnraNe9R+iQk/4uH5eDiNt+E8AzggRI5
+	SghO80mSGq29/PfeEodFBVphSDs8fKIShL94bGewhZjNa3kKmTXeD4sTD4ScKnli/OBj
+	GT9g==
+X-Gm-Message-State: APjAAAWr1rdYTqqYkjGiaOGNzrk42oGrBQLkyGAnRpNQA8CdOSeDRooO
+	+OZaMAoRHxizLhqxNHrgC0YLpqbisD0m8CDUEttYGg==
+X-Google-Smtp-Source: APXvYqwLu8cONCw0CKhczX+QZb/Nrhaj9bm4pNmUkcAbABtmCEhkfvL2NarjGsXr46Oewmvj9FM/yKkotWyrFxDqgcI=
+X-Received: by 2002:a9d:760b:: with SMTP id k11mr29107479otl.135.1558025019335;
+	Thu, 16 May 2019 09:43:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <ad91b397f360b2fc7f4087e476f7df5b04d42ddb.1558021877.git.alistair.francis@wdc.com>
+In-Reply-To: <ad91b397f360b2fc7f4087e476f7df5b04d42ddb.1558021877.git.alistair.francis@wdc.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 May 2019 17:43:28 +0100
+Message-ID: <CAFEAcA85+TK5LbsJRa8r1G4--J10AAceWS_o4-SmnoOp5VACFA@mail.gmail.com>
+To: Alistair Francis <alistair.francis@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: [Qemu-devel] [PATCH 3/3] arm: Rename hw/arm/arm.h to hw/arm/boot.h
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v3 1/1] target/arm: Fix vector operation
+ segfault
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,727 +88,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+	Alistair Francis <alistair23@gmail.com>,
+	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The header file hw/arm/arm.h now includes only declarations
-relating to hw/arm/boot.c functionality. Rename it accordingly,
-and adjust its header comment.
+On Thu, 16 May 2019 at 16:56, Alistair Francis <alistair.francis@wdc.com> w=
+rote:
+>
+> Commit 89e68b575 "target/arm: Use vector operations for saturation"
+> causes this abort() when booting QEMU ARM with a Cortex-A15:
+>
+> 0  0x00007ffff4c2382f in raise () at /usr/lib/libc.so.6
+> 1  0x00007ffff4c0e672 in abort () at /usr/lib/libc.so.6
+> 2  0x00005555559c1839 in disas_neon_data_insn (insn=3D<optimized out>, s=
+=3D<optimized out>) at ./target/arm/translate.c:6673
+> 3  0x00005555559c1839 in disas_neon_data_insn (s=3D<optimized out>, insn=
+=3D<optimized out>) at ./target/arm/translate.c:6386
+> 4  0x00005555559cd8a4 in disas_arm_insn (insn=3D4081107068, s=3D0x7fffe59=
+a9510) at ./target/arm/translate.c:9289
+> 5  0x00005555559cd8a4 in arm_tr_translate_insn (dcbase=3D0x7fffe59a9510, =
+cpu=3D<optimized out>) at ./target/arm/translate.c:13612
+> 6  0x00005555558d1d39 in translator_loop (ops=3D0x5555561cc580 <arm_trans=
+lator_ops>, db=3D0x7fffe59a9510, cpu=3D0x55555686a2f0, tb=3D<optimized out>=
+, max_insns=3D<optimized out>) at ./accel/tcg/translator.c:96
+> 7  0x00005555559d10d4 in gen_intermediate_code (cpu=3Dcpu@entry=3D0x55555=
+686a2f0, tb=3Dtb@entry=3D0x7fffd7840080 <code_gen_buffer+126091347>, max_in=
+sns=3Dmax_insns@entry=3D512) at ./target/arm/translate.c:13901
+> 8  0x00005555558d06b9 in tb_gen_code (cpu=3Dcpu@entry=3D0x55555686a2f0, p=
+c=3D3067096216, cs_base=3D0, flags=3D192, cflags=3D-16252928, cflags@entry=
+=3D524288) at ./accel/tcg/translate-all.c:1736
+> 9  0x00005555558ce467 in tb_find (cf_mask=3D524288, tb_exit=3D1, last_tb=
+=3D0x7fffd783e640 <code_gen_buffer+126084627>, cpu=3D0x1) at ./accel/tcg/cp=
+u-exec.c:407
+> 10 0x00005555558ce467 in cpu_exec (cpu=3Dcpu@entry=3D0x55555686a2f0) at .=
+/accel/tcg/cpu-exec.c:728
+> 11 0x000055555588b0cf in tcg_cpu_exec (cpu=3D0x55555686a2f0) at ./cpus.c:=
+1431
+> 12 0x000055555588d223 in qemu_tcg_cpu_thread_fn (arg=3D0x55555686a2f0) at=
+ ./cpus.c:1735
+> 13 0x000055555588d223 in qemu_tcg_cpu_thread_fn (arg=3Darg@entry=3D0x5555=
+5686a2f0) at ./cpus.c:1709
+> 14 0x0000555555d2629a in qemu_thread_start (args=3D<optimized out>) at ./=
+util/qemu-thread-posix.c:502
+> 15 0x00007ffff4db8a92 in start_thread () at /usr/lib/libpthread.
+>
+> This patch ensures that we don't hit the abort() in the second switch
+> case in disas_neon_data_insn() as we will return from the first case.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-The bulk of this commit was created via
- perl -pi -e 's|hw/arm/arm.h|hw/arm/boot.h|' hw/arm/*.c include/hw/arm/*.h
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/hw/arm/allwinner-a10.h   | 2 +-
- include/hw/arm/aspeed_soc.h      | 2 +-
- include/hw/arm/bcm2836.h         | 2 +-
- include/hw/arm/{arm.h => boot.h} | 8 ++++----
- include/hw/arm/fsl-imx25.h       | 2 +-
- include/hw/arm/fsl-imx31.h       | 2 +-
- include/hw/arm/fsl-imx6.h        | 2 +-
- include/hw/arm/fsl-imx6ul.h      | 2 +-
- include/hw/arm/fsl-imx7.h        | 2 +-
- include/hw/arm/virt.h            | 2 +-
- include/hw/arm/xlnx-versal.h     | 2 +-
- include/hw/arm/xlnx-zynqmp.h     | 2 +-
- hw/arm/armsse.c                  | 2 +-
- hw/arm/armv7m.c                  | 2 +-
- hw/arm/aspeed.c                  | 2 +-
- hw/arm/boot.c                    | 2 +-
- hw/arm/collie.c                  | 2 +-
- hw/arm/exynos4210.c              | 2 +-
- hw/arm/exynos4_boards.c          | 2 +-
- hw/arm/highbank.c                | 2 +-
- hw/arm/integratorcp.c            | 2 +-
- hw/arm/mainstone.c               | 2 +-
- hw/arm/microbit.c                | 2 +-
- hw/arm/mps2-tz.c                 | 2 +-
- hw/arm/mps2.c                    | 2 +-
- hw/arm/msf2-soc.c                | 2 +-
- hw/arm/msf2-som.c                | 2 +-
- hw/arm/musca.c                   | 2 +-
- hw/arm/musicpal.c                | 2 +-
- hw/arm/netduino2.c               | 2 +-
- hw/arm/nrf51_soc.c               | 2 +-
- hw/arm/nseries.c                 | 2 +-
- hw/arm/omap1.c                   | 2 +-
- hw/arm/omap2.c                   | 2 +-
- hw/arm/omap_sx1.c                | 2 +-
- hw/arm/palm.c                    | 2 +-
- hw/arm/raspi.c                   | 2 +-
- hw/arm/realview.c                | 2 +-
- hw/arm/spitz.c                   | 2 +-
- hw/arm/stellaris.c               | 2 +-
- hw/arm/stm32f205_soc.c           | 2 +-
- hw/arm/strongarm.c               | 2 +-
- hw/arm/tosa.c                    | 2 +-
- hw/arm/versatilepb.c             | 2 +-
- hw/arm/vexpress.c                | 2 +-
- hw/arm/virt.c                    | 2 +-
- hw/arm/xilinx_zynq.c             | 2 +-
- hw/arm/xlnx-versal.c             | 2 +-
- hw/arm/z2.c                      | 2 +-
- 49 files changed, 52 insertions(+), 52 deletions(-)
- rename include/hw/arm/{arm.h => boot.h} (98%)
 
-diff --git a/include/hw/arm/allwinner-a10.h b/include/hw/arm/allwinner-a10.h
-index 389e128d0fc..6305b9c586f 100644
---- a/include/hw/arm/allwinner-a10.h
-+++ b/include/hw/arm/allwinner-a10.h
-@@ -3,7 +3,7 @@
- #include "qemu-common.h"
- #include "qemu/error-report.h"
- #include "hw/char/serial.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/timer/allwinner-a10-pit.h"
- #include "hw/intc/allwinner-a10-pic.h"
- #include "hw/net/allwinner_emac.h"
-diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-index 11ec0179db5..24078fd1895 100644
---- a/include/hw/arm/aspeed_soc.h
-+++ b/include/hw/arm/aspeed_soc.h
-@@ -12,7 +12,7 @@
- #ifndef ASPEED_SOC_H
- #define ASPEED_SOC_H
- 
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/intc/aspeed_vic.h"
- #include "hw/misc/aspeed_scu.h"
- #include "hw/misc/aspeed_sdmc.h"
-diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
-index 93248399ba0..1b04a0e7fe8 100644
---- a/include/hw/arm/bcm2836.h
-+++ b/include/hw/arm/bcm2836.h
-@@ -11,7 +11,7 @@
- #ifndef BCM2836_H
- #define BCM2836_H
- 
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/arm/bcm2835_peripherals.h"
- #include "hw/intc/bcm2836_control.h"
- 
-diff --git a/include/hw/arm/arm.h b/include/hw/arm/boot.h
-similarity index 98%
-rename from include/hw/arm/arm.h
-rename to include/hw/arm/boot.h
-index ba3a9b41422..c48cc4c2bca 100644
---- a/include/hw/arm/arm.h
-+++ b/include/hw/arm/boot.h
-@@ -1,5 +1,5 @@
- /*
-- * Misc ARM declarations
-+ * ARM kernel loader.
-  *
-  * Copyright (c) 2006 CodeSourcery.
-  * Written by Paul Brook
-@@ -8,8 +8,8 @@
-  *
-  */
- 
--#ifndef HW_ARM_H
--#define HW_ARM_H
-+#ifndef HW_ARM_BOOT_H
-+#define HW_ARM_BOOT_H
- 
- #include "exec/memory.h"
- #include "target/arm/cpu-qom.h"
-@@ -167,4 +167,4 @@ void arm_write_secure_board_setup_dummy_smc(ARMCPU *cpu,
-                                             const struct arm_boot_info *info,
-                                             hwaddr mvbar_addr);
- 
--#endif /* HW_ARM_H */
-+#endif /* HW_ARM_BOOT_H */
-diff --git a/include/hw/arm/fsl-imx25.h b/include/hw/arm/fsl-imx25.h
-index 65a73714efe..3280ab1fb05 100644
---- a/include/hw/arm/fsl-imx25.h
-+++ b/include/hw/arm/fsl-imx25.h
-@@ -17,7 +17,7 @@
- #ifndef FSL_IMX25_H
- #define FSL_IMX25_H
- 
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/intc/imx_avic.h"
- #include "hw/misc/imx25_ccm.h"
- #include "hw/char/imx_serial.h"
-diff --git a/include/hw/arm/fsl-imx31.h b/include/hw/arm/fsl-imx31.h
-index d408abbba0d..e68a81efd75 100644
---- a/include/hw/arm/fsl-imx31.h
-+++ b/include/hw/arm/fsl-imx31.h
-@@ -17,7 +17,7 @@
- #ifndef FSL_IMX31_H
- #define FSL_IMX31_H
- 
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/intc/imx_avic.h"
- #include "hw/misc/imx31_ccm.h"
- #include "hw/char/imx_serial.h"
-diff --git a/include/hw/arm/fsl-imx6.h b/include/hw/arm/fsl-imx6.h
-index 06f8aaeda42..1265a55c3b0 100644
---- a/include/hw/arm/fsl-imx6.h
-+++ b/include/hw/arm/fsl-imx6.h
-@@ -17,7 +17,7 @@
- #ifndef FSL_IMX6_H
- #define FSL_IMX6_H
- 
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/cpu/a9mpcore.h"
- #include "hw/misc/imx6_ccm.h"
- #include "hw/misc/imx6_src.h"
-diff --git a/include/hw/arm/fsl-imx6ul.h b/include/hw/arm/fsl-imx6ul.h
-index 58972171943..9e94e98f8ee 100644
---- a/include/hw/arm/fsl-imx6ul.h
-+++ b/include/hw/arm/fsl-imx6ul.h
-@@ -17,7 +17,7 @@
- #ifndef FSL_IMX6UL_H
- #define FSL_IMX6UL_H
- 
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/cpu/a15mpcore.h"
- #include "hw/misc/imx6ul_ccm.h"
- #include "hw/misc/imx6_src.h"
-diff --git a/include/hw/arm/fsl-imx7.h b/include/hw/arm/fsl-imx7.h
-index d848262bfdd..4101f80251e 100644
---- a/include/hw/arm/fsl-imx7.h
-+++ b/include/hw/arm/fsl-imx7.h
-@@ -19,7 +19,7 @@
- #ifndef FSL_IMX7_H
- #define FSL_IMX7_H
- 
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/cpu/a15mpcore.h"
- #include "hw/intc/imx_gpcv2.h"
- #include "hw/misc/imx7_ccm.h"
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 424070924ed..73005f05ae8 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -34,7 +34,7 @@
- #include "exec/hwaddr.h"
- #include "qemu/notify.h"
- #include "hw/boards.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/block/flash.h"
- #include "sysemu/kvm.h"
- #include "hw/intc/arm_gicv3_common.h"
-diff --git a/include/hw/arm/xlnx-versal.h b/include/hw/arm/xlnx-versal.h
-index ec7c859d08c..14405c1465d 100644
---- a/include/hw/arm/xlnx-versal.h
-+++ b/include/hw/arm/xlnx-versal.h
-@@ -13,7 +13,7 @@
- #define XLNX_VERSAL_H
- 
- #include "hw/sysbus.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/intc/arm_gicv3.h"
- 
- #define TYPE_XLNX_VERSAL "xlnx-versal"
-diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-index 591515c7600..cd90b04310c 100644
---- a/include/hw/arm/xlnx-zynqmp.h
-+++ b/include/hw/arm/xlnx-zynqmp.h
-@@ -18,7 +18,7 @@
- #ifndef XLNX_ZYNQMP_H
- 
- #include "qemu-common.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/intc/arm_gic.h"
- #include "hw/net/cadence_gem.h"
- #include "hw/char/cadence_uart.h"
-diff --git a/hw/arm/armsse.c b/hw/arm/armsse.c
-index 76cc6905798..83b920334d5 100644
---- a/hw/arm/armsse.c
-+++ b/hw/arm/armsse.c
-@@ -17,7 +17,7 @@
- #include "hw/sysbus.h"
- #include "hw/registerfields.h"
- #include "hw/arm/armsse.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- 
- /* Format of the System Information block SYS_CONFIG register */
- typedef enum SysConfigFormat {
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index c4b2a9a1f5c..029572258f0 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -13,7 +13,7 @@
- #include "qemu-common.h"
- #include "cpu.h"
- #include "hw/sysbus.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/loader.h"
- #include "elf.h"
- #include "sysemu/qtest.h"
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 29d225ed140..415cff7a015 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -14,7 +14,7 @@
- #include "qemu-common.h"
- #include "cpu.h"
- #include "exec/address-spaces.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/arm/aspeed.h"
- #include "hw/arm/aspeed_soc.h"
- #include "hw/boards.h"
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index a830655e1af..7279185bd94 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -12,7 +12,7 @@
- #include "qapi/error.h"
- #include <libfdt.h>
- #include "hw/hw.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/arm/linux-boot-if.h"
- #include "sysemu/kvm.h"
- #include "sysemu/sysemu.h"
-diff --git a/hw/arm/collie.c b/hw/arm/collie.c
-index d12604c5739..3db3c560048 100644
---- a/hw/arm/collie.c
-+++ b/hw/arm/collie.c
-@@ -14,7 +14,7 @@
- #include "hw/sysbus.h"
- #include "hw/boards.h"
- #include "strongarm.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/block/flash.h"
- #include "exec/address-spaces.h"
- #include "cpu.h"
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index af82e955421..0bf61134550 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -30,7 +30,7 @@
- #include "hw/boards.h"
- #include "sysemu/sysemu.h"
- #include "hw/sysbus.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/loader.h"
- #include "hw/arm/exynos4210.h"
- #include "hw/sd/sdhci.h"
-diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
-index ea8100f65a8..71f0af3bdbb 100644
---- a/hw/arm/exynos4_boards.c
-+++ b/hw/arm/exynos4_boards.c
-@@ -29,7 +29,7 @@
- #include "sysemu/sysemu.h"
- #include "hw/sysbus.h"
- #include "net/net.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "exec/address-spaces.h"
- #include "hw/arm/exynos4210.h"
- #include "hw/net/lan9118.h"
-diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
-index 96ccf18d863..a89a1d3a7c1 100644
---- a/hw/arm/highbank.c
-+++ b/hw/arm/highbank.c
-@@ -20,7 +20,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "hw/sysbus.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/loader.h"
- #include "net/net.h"
- #include "sysemu/kvm.h"
-diff --git a/hw/arm/integratorcp.c b/hw/arm/integratorcp.c
-index 0b6f24465e4..d18caab8bdd 100644
---- a/hw/arm/integratorcp.c
-+++ b/hw/arm/integratorcp.c
-@@ -13,7 +13,7 @@
- #include "cpu.h"
- #include "hw/sysbus.h"
- #include "hw/boards.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/misc/arm_integrator_debug.h"
- #include "hw/net/smc91c111.h"
- #include "net/net.h"
-diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
-index c1cec590379..cd1f904c6c9 100644
---- a/hw/arm/mainstone.c
-+++ b/hw/arm/mainstone.c
-@@ -16,7 +16,7 @@
- #include "qapi/error.h"
- #include "hw/hw.h"
- #include "hw/arm/pxa.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "net/net.h"
- #include "hw/net/smc91c111.h"
- #include "hw/boards.h"
-diff --git a/hw/arm/microbit.c b/hw/arm/microbit.c
-index da67bf6d9d1..e9a891f7d37 100644
---- a/hw/arm/microbit.c
-+++ b/hw/arm/microbit.c
-@@ -11,7 +11,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "hw/boards.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "sysemu/sysemu.h"
- #include "exec/address-spaces.h"
- 
-diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-index 7832408bb70..c167a5fa593 100644
---- a/hw/arm/mps2-tz.c
-+++ b/hw/arm/mps2-tz.c
-@@ -40,7 +40,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/arm/armv7m.h"
- #include "hw/or-irq.h"
- #include "hw/boards.h"
-diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-index 54b7395849f..b74f1378c90 100644
---- a/hw/arm/mps2.c
-+++ b/hw/arm/mps2.c
-@@ -25,7 +25,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/arm/armv7m.h"
- #include "hw/or-irq.h"
- #include "hw/boards.h"
-diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
-index 2702e90b453..92e2b418757 100644
---- a/hw/arm/msf2-soc.c
-+++ b/hw/arm/msf2-soc.c
-@@ -26,7 +26,7 @@
- #include "qemu/units.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "exec/address-spaces.h"
- #include "hw/char/serial.h"
- #include "hw/boards.h"
-diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
-index 2432b5e9352..8c550a8bddc 100644
---- a/hw/arm/msf2-som.c
-+++ b/hw/arm/msf2-som.c
-@@ -27,7 +27,7 @@
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "hw/boards.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "exec/address-spaces.h"
- #include "hw/arm/msf2-soc.h"
- #include "cpu.h"
-diff --git a/hw/arm/musca.c b/hw/arm/musca.c
-index 23aff43f4bc..825d80e75a4 100644
---- a/hw/arm/musca.c
-+++ b/hw/arm/musca.c
-@@ -24,7 +24,7 @@
- #include "qapi/error.h"
- #include "exec/address-spaces.h"
- #include "sysemu/sysemu.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/arm/armsse.h"
- #include "hw/boards.h"
- #include "hw/char/pl011.h"
-diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
-index 93ec3c5698f..5645997b56f 100644
---- a/hw/arm/musicpal.c
-+++ b/hw/arm/musicpal.c
-@@ -14,7 +14,7 @@
- #include "qemu-common.h"
- #include "cpu.h"
- #include "hw/sysbus.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "net/net.h"
- #include "sysemu/sysemu.h"
- #include "hw/boards.h"
-diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
-index f936017d4a7..f57fc38f920 100644
---- a/hw/arm/netduino2.c
-+++ b/hw/arm/netduino2.c
-@@ -27,7 +27,7 @@
- #include "hw/boards.h"
- #include "qemu/error-report.h"
- #include "hw/arm/stm32f205_soc.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- 
- static void netduino2_init(MachineState *machine)
- {
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-index 3e633d160ea..ce618edc7b3 100644
---- a/hw/arm/nrf51_soc.c
-+++ b/hw/arm/nrf51_soc.c
-@@ -11,7 +11,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/sysbus.h"
- #include "hw/boards.h"
- #include "hw/misc/unimp.h"
-diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
-index 303f7a31e1c..4a79f5c88b4 100644
---- a/hw/arm/nseries.c
-+++ b/hw/arm/nseries.c
-@@ -25,7 +25,7 @@
- #include "qemu/bswap.h"
- #include "sysemu/sysemu.h"
- #include "hw/arm/omap.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/irq.h"
- #include "ui/console.h"
- #include "hw/boards.h"
-diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
-index 539d29ef9ce..28fbe275a88 100644
---- a/hw/arm/omap1.c
-+++ b/hw/arm/omap1.c
-@@ -24,7 +24,7 @@
- #include "cpu.h"
- #include "hw/boards.h"
- #include "hw/hw.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/arm/omap.h"
- #include "sysemu/sysemu.h"
- #include "hw/arm/soc_dma.h"
-diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
-index 446223906e4..23e72db79ef 100644
---- a/hw/arm/omap2.c
-+++ b/hw/arm/omap2.c
-@@ -26,7 +26,7 @@
- #include "sysemu/qtest.h"
- #include "hw/boards.h"
- #include "hw/hw.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/arm/omap.h"
- #include "sysemu/sysemu.h"
- #include "qemu/timer.h"
-diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
-index 95a4fe7e7f0..cae78d0a368 100644
---- a/hw/arm/omap_sx1.c
-+++ b/hw/arm/omap_sx1.c
-@@ -31,7 +31,7 @@
- #include "ui/console.h"
- #include "hw/arm/omap.h"
- #include "hw/boards.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/block/flash.h"
- #include "sysemu/qtest.h"
- #include "exec/address-spaces.h"
-diff --git a/hw/arm/palm.c b/hw/arm/palm.c
-index 139d27d1cc0..9eb9612bce9 100644
---- a/hw/arm/palm.c
-+++ b/hw/arm/palm.c
-@@ -25,7 +25,7 @@
- #include "ui/console.h"
- #include "hw/arm/omap.h"
- #include "hw/boards.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/input/tsc2xxx.h"
- #include "hw/loader.h"
- #include "exec/address-spaces.h"
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index fe2bb511b98..2b5fe10e2f0 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -20,7 +20,7 @@
- #include "qemu/error-report.h"
- #include "hw/boards.h"
- #include "hw/loader.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "sysemu/sysemu.h"
- 
- #define SMPBOOT_ADDR    0x300 /* this should leave enough space for ATAGS */
-diff --git a/hw/arm/realview.c b/hw/arm/realview.c
-index 05a244df255..d42a76e7a1c 100644
---- a/hw/arm/realview.c
-+++ b/hw/arm/realview.c
-@@ -12,7 +12,7 @@
- #include "qemu-common.h"
- #include "cpu.h"
- #include "hw/sysbus.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/arm/primecell.h"
- #include "hw/net/lan9118.h"
- #include "hw/net/smc91c111.h"
-diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
-index 22f5958b9da..723cf5d5929 100644
---- a/hw/arm/spitz.c
-+++ b/hw/arm/spitz.c
-@@ -14,7 +14,7 @@
- #include "qapi/error.h"
- #include "hw/hw.h"
- #include "hw/arm/pxa.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "sysemu/sysemu.h"
- #include "hw/pcmcia.h"
- #include "hw/i2c/i2c.h"
-diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
-index 5059aedbaa2..499035f5c8f 100644
---- a/hw/arm/stellaris.c
-+++ b/hw/arm/stellaris.c
-@@ -11,7 +11,7 @@
- #include "qapi/error.h"
- #include "hw/sysbus.h"
- #include "hw/ssi/ssi.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "qemu/timer.h"
- #include "hw/i2c/i2c.h"
- #include "net/net.h"
-diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
-index 980e5af13c5..a5b6f7bda2b 100644
---- a/hw/arm/stm32f205_soc.c
-+++ b/hw/arm/stm32f205_soc.c
-@@ -25,7 +25,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "exec/address-spaces.h"
- #include "hw/arm/stm32f205_soc.h"
- 
-diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
-index 644a9c45b4e..a1ecbddaab9 100644
---- a/hw/arm/strongarm.c
-+++ b/hw/arm/strongarm.c
-@@ -33,7 +33,7 @@
- #include "hw/sysbus.h"
- #include "strongarm.h"
- #include "qemu/error-report.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "chardev/char-fe.h"
- #include "chardev/char-serial.h"
- #include "sysemu/sysemu.h"
-diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
-index 9a1247797fe..7843d68d465 100644
---- a/hw/arm/tosa.c
-+++ b/hw/arm/tosa.c
-@@ -15,7 +15,7 @@
- #include "qapi/error.h"
- #include "hw/hw.h"
- #include "hw/arm/pxa.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/arm/sharpsl.h"
- #include "hw/pcmcia.h"
- #include "hw/boards.h"
-diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
-index 25166e15171..f471fb70255 100644
---- a/hw/arm/versatilepb.c
-+++ b/hw/arm/versatilepb.c
-@@ -12,7 +12,7 @@
- #include "qemu-common.h"
- #include "cpu.h"
- #include "hw/sysbus.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/net/smc91c111.h"
- #include "net/net.h"
- #include "sysemu/sysemu.h"
-diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-index d8634f3dd29..2b3b0c2334e 100644
---- a/hw/arm/vexpress.c
-+++ b/hw/arm/vexpress.c
-@@ -26,7 +26,7 @@
- #include "qemu-common.h"
- #include "cpu.h"
- #include "hw/sysbus.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/arm/primecell.h"
- #include "hw/net/lan9118.h"
- #include "hw/i2c/i2c.h"
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 5331ab71e22..bf54f10b515 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -33,7 +33,7 @@
- #include "qemu/option.h"
- #include "qapi/error.h"
- #include "hw/sysbus.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/arm/primecell.h"
- #include "hw/arm/virt.h"
- #include "hw/block/flash.h"
-diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-index b3b82157597..198e3f97634 100644
---- a/hw/arm/xilinx_zynq.c
-+++ b/hw/arm/xilinx_zynq.c
-@@ -20,7 +20,7 @@
- #include "qemu-common.h"
- #include "cpu.h"
- #include "hw/sysbus.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "net/net.h"
- #include "exec/address-spaces.h"
- #include "sysemu/sysemu.h"
-diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
-index 5ee58c09be8..e8e4278eb3b 100644
---- a/hw/arm/xlnx-versal.c
-+++ b/hw/arm/xlnx-versal.c
-@@ -17,7 +17,7 @@
- #include "net/net.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "kvm_arm.h"
- #include "hw/misc/unimp.h"
- #include "hw/intc/arm_gicv3_common.h"
-diff --git a/hw/arm/z2.c b/hw/arm/z2.c
-index 1f906ef20bc..44aa748d39d 100644
---- a/hw/arm/z2.c
-+++ b/hw/arm/z2.c
-@@ -14,7 +14,7 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "hw/arm/pxa.h"
--#include "hw/arm/arm.h"
-+#include "hw/arm/boot.h"
- #include "hw/i2c/i2c.h"
- #include "hw/ssi/ssi.h"
- #include "hw/boards.h"
--- 
-2.20.1
+Applied to target-arm.next, thanks.
 
+-- PMM
 
