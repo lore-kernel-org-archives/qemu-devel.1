@@ -2,63 +2,67 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01734C04AB4
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 08:48:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 171BFC04AB4
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 08:49:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA875205C9
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 08:48:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA875205C9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id DDAE0205C9
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 08:49:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDAE0205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50758 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50786 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRC4B-0008Ga-4a
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 04:48:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34980)
+	id 1hRC50-0000Zj-7T
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 04:49:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hRC2U-00075F-My
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 04:46:59 -0400
+	(envelope-from <armbru@redhat.com>) id 1hRC2S-00079L-M0
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 04:46:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hRBoR-00017f-3a
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 04:32:28 -0400
-Received: from 3.mo178.mail-out.ovh.net ([46.105.44.197]:47298)
+	(envelope-from <armbru@redhat.com>) id 1hRC2P-00059I-Mu
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 04:46:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48270)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hRBoQ-00014P-Sq
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 04:32:27 -0400
-Received: from player772.ha.ovh.net (unknown [10.108.42.83])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 75D2367F1D
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 10:32:23 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
-	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
-	by player772.ha.ovh.net (Postfix) with ESMTPSA id E54C65CBC44F;
-	Thu, 16 May 2019 08:32:16 +0000 (UTC)
-Date: Thu, 16 May 2019 10:32:15 +0200
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Message-ID: <20190516103215.6ba7a70c@bahia.lan>
-In-Reply-To: <3d7a99b9-5f31-e18d-5cd8-a20c4361efc2@kaod.org>
-References: <155799221739.527449.14907564571096243745.stgit@bahia.lan>
-	<20190516074551.GB25414@sathnaga86>
-	<3d7a99b9-5f31-e18d-5cd8-a20c4361efc2@kaod.org>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hRC2P-00055v-HK
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 04:46:53 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1D031308330B
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 08:46:51 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
+	[10.36.116.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id DAB9C60FB3;
+	Thu, 16 May 2019 08:46:50 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 7F81011385E4; Thu, 16 May 2019 10:46:49 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+References: <20190509130345.227526-1-sgarzare@redhat.com>
+	<20190509130345.227526-4-sgarzare@redhat.com>
+Date: Thu, 16 May 2019 10:46:49 +0200
+In-Reply-To: <20190509130345.227526-4-sgarzare@redhat.com> (Stefano
+	Garzarella's message of "Thu, 9 May 2019 15:03:44 +0200")
+Message-ID: <8736levlae.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 2312035460353726859
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddttddgtdegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.44]);
+	Thu, 16 May 2019 08:46:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.44.197
-Subject: Re: [Qemu-devel] [PATCH] spapr: Print out extra hints when CAS
- negotiation of interrupt mode fails
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] net: use g_strsplit() for parsing
+ host address and port
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,73 +74,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
-	qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 16 May 2019 10:22:26 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+Stefano Garzarella <sgarzare@redhat.com> writes:
 
-> On 5/16/19 9:45 AM, Satheesh Rajendran wrote:
-> > On Thu, May 16, 2019 at 09:36:57AM +0200, Greg Kurz wrote: =20
-> >> Let's suggest to the user how the machine should be configured to allow
-> >> the guest to boot successfully.
-> >>
-> >> Suggested-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-> >> Signed-off-by: Greg Kurz <groug@kaod.org>
-> >> ---
-> >>  hw/ppc/spapr_hcall.c |    4 ++--
-> >>  1 file changed, 2 insertions(+), 2 deletions(-) =20
-> >=20
-> > Reviewed-and-Tested-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com=
-> =20
->=20
-> you should use two different tags. I don't think patchwork understand
-> compounds.
->=20
-> C.=20
->=20
+> Use the glib function to split host address and port in
+> the parse_host_port() function.
+>
+> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 
-It doesn't indeed.
-
-$ pwclient view 1100396 | grep Reviewed
-$
-=20
-> > 2019-05-16T07:42:43.018771Z qemu-system-ppc64: Guest requested unavaila=
-ble interrupt mode (XICS), either don't set the ic-mode machine property or=
- try ic-mode=3Dxics or ic-mode=3Ddual
-> > 2019-05-16 07:42:43.394+0000: shutting down, reason=3Dcrashed
-> >  =20
-> >>
-> >> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> >> index 63a55614b83d..aae9fd2b3e6d 100644
-> >> --- a/hw/ppc/spapr_hcall.c
-> >> +++ b/hw/ppc/spapr_hcall.c
-> >> @@ -1646,12 +1646,12 @@ static target_ulong h_client_architecture_supp=
-ort(PowerPCCPU *cpu,
-> >>       */
-> >>      if (guest_xive) {
-> >>          if (spapr->irq->ov5 =3D=3D SPAPR_OV5_XIVE_LEGACY) {
-> >> -            error_report("Guest requested unavailable interrupt mode =
-(XIVE)");
-> >> +            error_report("Guest requested unavailable interrupt mode =
-(XIVE), try the ic-mode=3Dxive or ic-mode=3Ddual machine property");
-> >>              exit(EXIT_FAILURE);
-> >>          }
-> >>      } else {
-> >>          if (spapr->irq->ov5 =3D=3D SPAPR_OV5_XIVE_EXPLOIT) {
-> >> -            error_report("Guest requested unavailable interrupt mode =
-(XICS)");
-> >> +            error_report("Guest requested unavailable interrupt mode =
-(XICS), either don't set the ic-mode machine property or try ic-mode=3Dxics=
- or ic-mode=3Ddual");
-> >>              exit(EXIT_FAILURE);
-> >>          }
-> >>      }
-> >> =20
-> >  =20
->=20
-
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
