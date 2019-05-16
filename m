@@ -2,72 +2,65 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41224C04AB4
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 07:55:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C80BC04AB4
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 08:26:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0665B205ED
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 07:55:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0665B205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 412452082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 08:26:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 412452082E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50275 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50557 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRBEM-000776-B7
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 03:55:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55157)
+	id 1hRBiF-0002ju-D7
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 04:26:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hRBDX-0006q0-Da
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 03:54:20 -0400
+	(envelope-from <clg@kaod.org>) id 1hRBhI-0002G1-4K
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 04:25:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hRBDW-0003T6-4q
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 03:54:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45912)
+	(envelope-from <clg@kaod.org>) id 1hRBeu-0008Uc-9G
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 04:22:37 -0400
+Received: from 7.mo179.mail-out.ovh.net ([46.105.61.94]:38812)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hRBDV-0003Rc-SD
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 03:54:18 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BFF97308FC5F;
-	Thu, 16 May 2019 07:54:16 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
-	(colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 872F45D772;
-	Thu, 16 May 2019 07:54:16 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com
-	(zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-	by colo-mx.corp.redhat.com (Postfix) with ESMTP id 11A561806B11;
-	Thu, 16 May 2019 07:54:16 +0000 (UTC)
-Date: Thu, 16 May 2019 03:54:15 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Message-ID: <1392189898.29183015.1557993255983.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1d6f6964-4653-ebf3-554f-666fda3779f1@redhat.com>
-References: <20190514145422.16923-1-pagupta@redhat.com>
-	<20190514145422.16923-3-pagupta@redhat.com>
-	<9f6b1d8e-ef90-7d8b-56da-61a426953ba3@redhat.com>
-	<1d6f6964-4653-ebf3-554f-666fda3779f1@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hRBeu-0008TS-1q
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 04:22:36 -0400
+Received: from player688.ha.ovh.net (unknown [10.109.143.223])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id C20E512925D
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 10:22:32 +0200 (CEST)
+Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
+	(Authenticated sender: clg@kaod.org)
+	by player688.ha.ovh.net (Postfix) with ESMTPSA id 164545BB8434;
+	Thu, 16 May 2019 08:22:26 +0000 (UTC)
+To: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
+	Greg Kurz <groug@kaod.org>
+References: <155799221739.527449.14907564571096243745.stgit@bahia.lan>
+	<20190516074551.GB25414@sathnaga86>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <3d7a99b9-5f31-e18d-5cd8-a20c4361efc2@kaod.org>
+Date: Thu, 16 May 2019 10:22:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190516074551.GB25414@sathnaga86>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.65.16.97, 10.4.195.28]
-Thread-Topic: virtio-pmem: Add virtio pmem driver
-Thread-Index: QMQNE7pgfu3mBYS2GC/vovrzij4mzg==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Thu, 16 May 2019 07:54:17 +0000 (UTC)
+X-Ovh-Tracer-Id: 2145965224295369555
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddttddgtddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v9 2/7] virtio-pmem: Add virtio pmem driver
+X-Received-From: 46.105.61.94
+Subject: Re: [Qemu-devel] [PATCH] spapr: Print out extra hints when CAS
+ negotiation of interrupt mode fails
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,173 +72,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com,
-	jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
-	virtualization@lists.linux-foundation.org,
-	adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
-	aarcange@redhat.com, dave jiang <dave.jiang@intel.com>,
-	jstaron@google.com, linux-nvdimm@lists.01.org,
-	vishal l verma <vishal.l.verma@intel.com>, willy@infradead.org,
-	hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com,
-	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
-	riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
-	stefanha@redhat.com, pbonzini@redhat.com,
-	dan j williams <dan.j.williams@intel.com>,
-	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
-	tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-	darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, imammedo@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 5/16/19 9:45 AM, Satheesh Rajendran wrote:
+> On Thu, May 16, 2019 at 09:36:57AM +0200, Greg Kurz wrote:
+>> Let's suggest to the user how the machine should be configured to allow
+>> the guest to boot successfully.
+>>
+>> Suggested-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+>> Signed-off-by: Greg Kurz <groug@kaod.org>
+>> ---
+>>  hw/ppc/spapr_hcall.c |    4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> Reviewed-and-Tested-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 
-> >> +	vpmem->vdev = vdev;
-> >> +	vdev->priv = vpmem;
-> >> +	err = init_vq(vpmem);
-> >> +	if (err) {
-> >> +		dev_err(&vdev->dev, "failed to initialize virtio pmem vq's\n");
-> >> +		goto out_err;
-> >> +	}
-> >> +
-> >> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> >> +			start, &vpmem->start);
-> >> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> >> +			size, &vpmem->size);
-> >> +
-> >> +	res.start = vpmem->start;
-> >> +	res.end   = vpmem->start + vpmem->size-1;
-> > 
-> > nit: " - 1;"
-> > 
-> >> +	vpmem->nd_desc.provider_name = "virtio-pmem";
-> >> +	vpmem->nd_desc.module = THIS_MODULE;
-> >> +
-> >> +	vpmem->nvdimm_bus = nvdimm_bus_register(&vdev->dev,
-> >> +						&vpmem->nd_desc);
-> >> +	if (!vpmem->nvdimm_bus) {
-> >> +		dev_err(&vdev->dev, "failed to register device with nvdimm_bus\n");
-> >> +		err = -ENXIO;
-> >> +		goto out_vq;
-> >> +	}
-> >> +
-> >> +	dev_set_drvdata(&vdev->dev, vpmem->nvdimm_bus);
-> >> +
-> >> +	ndr_desc.res = &res;
-> >> +	ndr_desc.numa_node = nid;
-> >> +	ndr_desc.flush = async_pmem_flush;
-> >> +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
-> >> +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
-> >> +	nd_region = nvdimm_pmem_region_create(vpmem->nvdimm_bus, &ndr_desc);
-> >> +	if (!nd_region) {
-> >> +		dev_err(&vdev->dev, "failed to create nvdimm region\n");
-> >> +		err = -ENXIO;
-> >> +		goto out_nd;
-> >> +	}
-> >> +	nd_region->provider_data = dev_to_virtio(nd_region->dev.parent->parent);
-> >> +	return 0;
-> >> +out_nd:
-> >> +	nvdimm_bus_unregister(vpmem->nvdimm_bus);
-> >> +out_vq:
-> >> +	vdev->config->del_vqs(vdev);
-> >> +out_err:
-> >> +	return err;
-> >> +}
-> >> +
-> >> +static void virtio_pmem_remove(struct virtio_device *vdev)
-> >> +{
-> >> +	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
-> >> +
-> >> +	nvdimm_bus_unregister(nvdimm_bus);
-> >> +	vdev->config->del_vqs(vdev);
-> >> +	vdev->config->reset(vdev);
-> >> +}
-> >> +
-> >> +static struct virtio_driver virtio_pmem_driver = {
-> >> +	.driver.name		= KBUILD_MODNAME,
-> >> +	.driver.owner		= THIS_MODULE,
-> >> +	.id_table		= id_table,
-> >> +	.probe			= virtio_pmem_probe,
-> >> +	.remove			= virtio_pmem_remove,
-> >> +};
-> >> +
-> >> +module_virtio_driver(virtio_pmem_driver);
-> >> +MODULE_DEVICE_TABLE(virtio, id_table);
-> >> +MODULE_DESCRIPTION("Virtio pmem driver");
-> >> +MODULE_LICENSE("GPL");
-> >> diff --git a/drivers/nvdimm/virtio_pmem.h b/drivers/nvdimm/virtio_pmem.h
-> >> new file mode 100644
-> >> index 000000000000..ab1da877575d
-> >> --- /dev/null
-> >> +++ b/drivers/nvdimm/virtio_pmem.h
-> >> @@ -0,0 +1,60 @@
-> >> +/* SPDX-License-Identifier: GPL-2.0 */
-> >> +/*
-> >> + * virtio_pmem.h: virtio pmem Driver
-> >> + *
-> >> + * Discovers persistent memory range information
-> >> + * from host and provides a virtio based flushing
-> >> + * interface.
-> >> + **/
-> >> +
-> >> +#ifndef _LINUX_VIRTIO_PMEM_H
-> >> +#define _LINUX_VIRTIO_PMEM_H
-> >> +
-> >> +#include <linux/virtio_ids.h>
-> >> +#include <linux/module.h>
-> >> +#include <linux/virtio_config.h>
-> >> +#include <uapi/linux/virtio_pmem.h>
-> >> +#include <linux/libnvdimm.h>
-> >> +#include <linux/spinlock.h>
-> >> +
-> >> +struct virtio_pmem_request {
-> >> +	/* Host return status corresponding to flush request */
-> >> +	int ret;
-> >> +
-> >> +	/* command name*/
-> >> +	char name[16];
-> > 
-> > So ... why are we sending string commands and expect native-endianess
-> > integers and don't define a proper request/response structure + request
-> > types in include/uapi/linux/virtio_pmem.h like
-> > 
-> > struct virtio_pmem_resp {
-> > 	__virtio32 ret;
-> > }
-> 
-> FWIW, I wonder if we should even properly translate return values and
-> define types like
-> 
-> VIRTIO_PMEM_RESP_TYPE_OK	0
-> VIRTIO_PMEM_RESP_TYPE_EIO	1
+you should use two different tags. I don't think patchwork understand
+compounds.
 
-Don't think these are required as only failure and success
-return types easy to understand.
+C. 
 
-Thanks,
-Pankaj
+> 2019-05-16T07:42:43.018771Z qemu-system-ppc64: Guest requested unavailable interrupt mode (XICS), either don't set the ic-mode machine property or try ic-mode=xics or ic-mode=dual
+> 2019-05-16 07:42:43.394+0000: shutting down, reason=crashed
 > 
-> ..
+>>
+>> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+>> index 63a55614b83d..aae9fd2b3e6d 100644
+>> --- a/hw/ppc/spapr_hcall.c
+>> +++ b/hw/ppc/spapr_hcall.c
+>> @@ -1646,12 +1646,12 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+>>       */
+>>      if (guest_xive) {
+>>          if (spapr->irq->ov5 == SPAPR_OV5_XIVE_LEGACY) {
+>> -            error_report("Guest requested unavailable interrupt mode (XIVE)");
+>> +            error_report("Guest requested unavailable interrupt mode (XIVE), try the ic-mode=xive or ic-mode=dual machine property");
+>>              exit(EXIT_FAILURE);
+>>          }
+>>      } else {
+>>          if (spapr->irq->ov5 == SPAPR_OV5_XIVE_EXPLOIT) {
+>> -            error_report("Guest requested unavailable interrupt mode (XICS)");
+>> +            error_report("Guest requested unavailable interrupt mode (XICS), either don't set the ic-mode machine property or try ic-mode=xics or ic-mode=dual");
+>>              exit(EXIT_FAILURE);
+>>          }
+>>      }
+>>
 > 
-> > 
-> > #define VIRTIO_PMEM_REQ_TYPE_FLUSH	1
-> > struct virtio_pmem_req {
-> > 	__virtio16 type;
-> > }
-> > 
-> > ... and this way we also define a proper endianess format for exchange
-> > and keep it extensible
-> > 
-> > @MST, what's your take on this?
-> > 
-> > 
-> 
-> 
-> --
-> 
-> Thanks,
-> 
-> David / dhildenb
-> 
+
 
