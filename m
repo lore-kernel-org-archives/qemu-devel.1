@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34196C04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 14:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0390AC04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 14:49:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F378920815
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 14:49:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1EEA20848
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 14:49:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dFH3g7ap"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F378920815
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SE+aDuN2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1EEA20848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59417 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59435 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRHhN-0003XY-70
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 10:49:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58851)
+	id 1hRHhg-0003oK-Vh
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 10:49:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hRHfX-0002Za-6W
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 10:47:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hRHfZ-0002au-7a
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 10:47:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hRHfW-0008E8-0G
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 10:47:38 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36333)
+	(envelope-from <peter.maydell@linaro.org>) id 1hRHfY-0008H6-5g
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 10:47:41 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39957)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hRHfV-0008D3-Pm
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 10:47:37 -0400
-Received: by mail-wr1-x444.google.com with SMTP id s17so3759008wru.3
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 07:47:37 -0700 (PDT)
+	id 1hRHfX-0008Eh-86
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 10:47:39 -0400
+Received: by mail-wm1-x343.google.com with SMTP id h11so3752880wmb.5
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 07:47:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=ZzmBM+wcCb9270VyvJ51TIpyGicjAazonG2iWSjoQgc=;
-	b=dFH3g7apCsFiSnQ2IZ2+IxFvBA512Pz9PeYAWM4u3CIt80+JQzjym49JE2DGBwhMtN
-	BoI4Zt7gWyn2jKFh2AapYyYPsqIU+HRUR8PpHaZf+wIwbb357YNddL1MZ3cMTmZDDrsy
-	dgFdwil6BkvO6u/ksdDsqY7A+IN+97kYRrajt88UTMolwNa05NEZiiO1W3+DYp6fxcT6
-	381b7K6K6XIi2g1chgiONKrCU3zzO4Ux47rmSubsnh6JIkC8tQm41idgbTz27KONAq3x
-	zyI/HSzB/oZxWlwq6KKRdNcwCBZbuTBhEAzgDtSFKAGsVZhctaqneKCnnLGya+ojIjgJ
-	kM7A==
+	bh=DgMhkLiABo0DJwU8oJ8YkfjP+Hk6v1roeqysC4eg468=;
+	b=SE+aDuN2LJ0lQpMoo3ZRFMPWP9p0Weq1dhOnfcYXLJ79rrxDtptgaDDry/xFsWUZqh
+	eGBHZgrufeHGBGg8ZUruLfPOXSDTXPrDhA/iVRTm8gxN0vi+xvpPSnGtb+IdR3vvaOrg
+	kxpGfZ3OvKEGOtcR352oxR76OHjU0B7Dpa1G/3CoLDW7Hbt4gxTXQbJfA0hivygq8P8s
+	V0wEpSfveD1o3Z0yFyXJMoN6mK5UMIXdThhvM6YMXaKIJMAwk0uymPQ2KBL/H0kYXwyW
+	+vGrU604TknDsnj9O+9Az3DG7WIxZ2meQfG/feuGmmQdTF+FOr7LSMyDpQm6YQCkRFP+
+	bn9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=ZzmBM+wcCb9270VyvJ51TIpyGicjAazonG2iWSjoQgc=;
-	b=sDa2noDmsRZwHFmIJRd3EF2Q6jsSXU35IUjVMJUX66e8oGnN/7tm55IetVaaDcLyQU
-	3X8MPD5GRXhf0YJBwO45MsVDMPrya+ESfAZLKTywXeIDJ+4WJGLOYFwOv9phKbYc8DUW
-	JUW4ok42jbXzu6qPqTyd/cxCg1SRUBQR5DnBzNYr99wOQCwUcPHSHxJy+qSqqJYoP1MZ
-	C19xqNEhGzXkzBFefOwVfeZcPKjPz7SlLGXMM2fmIKtMsV8lvmgdoSpjZXfzSmGFl3i0
-	PcMTPtyayiF9LOzEh6bGlIhFMPVg4J8njW8+s94Ci3beE132vBr9vTTsBNwQbrN9gXFZ
-	FViw==
-X-Gm-Message-State: APjAAAVqGaZVznndXIlkACuzJMQtIQEaXpv/AvKHddzEbXLcyXVr8rkF
-	nmrr29Z/YDo3RKWI/viZW27AHA==
-X-Google-Smtp-Source: APXvYqyno3abO5WDcjRoEUpjErfabNhvEQ3prajEnTi2vpSofbX3VL+6PmCuiJvISI6uXiX5DPLabA==
-X-Received: by 2002:adf:c188:: with SMTP id x8mr20036758wre.256.1558018056982; 
-	Thu, 16 May 2019 07:47:36 -0700 (PDT)
+	bh=DgMhkLiABo0DJwU8oJ8YkfjP+Hk6v1roeqysC4eg468=;
+	b=Kl6B5BcOlSIcjmipkYClOiAF/Wbl21VOWoJJI8F0nzSdrqMeLIZ9unVA2ZboSqshSb
+	T5XnYv39+xjas5kNxKsvNfFZR5WEwuRhqrkGG504V9BZjKwl+1I6T7C4UXfjlz1ruqwn
+	937soYjLW+qebIw1YgyNXPezwD6I38Z7H42qEBNRAc7qVDd60uZlrICjjHR+1m7qYOrK
+	eMopwC0fg7VkvvdFVGPQOVFxHXNStF25lYvn/cVWjaz3gJonToqjSyI64TzP5tBmMuXZ
+	Oh/yKhLNCj7Mfkt4NxzqF04D2QSg13FYCONufzxKY76QYPfBLgA0L9vGb87NME/D8BzD
+	qoqA==
+X-Gm-Message-State: APjAAAVh3Os9AX6Eype/jXKaT4bEawoHO33p5LZIycnye3OnAS2t/h9z
+	ZTRVBHREFmpgTgYSrN5/ljrDgg==
+X-Google-Smtp-Source: APXvYqwJboeSmaXVCkOQA0uw97JcB1A7k6HHKmAOMOaI4Qh9zlskErpjyUIWYYIVZ9RjZjJjIf3Ogg==
+X-Received: by 2002:a1c:63d5:: with SMTP id x204mr11618190wmb.3.1558018058135; 
+	Thu, 16 May 2019 07:47:38 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id o8sm7629018wra.4.2019.05.16.07.47.35
+	by smtp.gmail.com with ESMTPSA id o8sm7629018wra.4.2019.05.16.07.47.37
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 16 May 2019 07:47:36 -0700 (PDT)
+	Thu, 16 May 2019 07:47:37 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Thu, 16 May 2019 15:47:30 +0100
-Message-Id: <20190516144733.32399-2-peter.maydell@linaro.org>
+Date: Thu, 16 May 2019 15:47:31 +0100
+Message-Id: <20190516144733.32399-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190516144733.32399-1-peter.maydell@linaro.org>
 References: <20190516144733.32399-1-peter.maydell@linaro.org>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH v2 1/4] hw/arm/boot: Don't assume RAM starts at
- address zero
+X-Received-From: 2a00:1450:4864:20::343
+Subject: [Qemu-devel] [PATCH v2 2/4] hw/arm/boot: Diagnose layouts that put
+ initrd or DTB off the end of RAM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,58 +100,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the Arm kernel/initrd loading code, in some places we make the
-incorrect assumption that info->ram_size can be treated as the
-address of the end of RAM, as for instance when we calculate the
-available space for the initrd using "info->ram_size - info->initrd_start".
-This is wrong, because many Arm boards (including "virt") specify
-a non-zero info->loader_start to indicate that their RAM area
-starts at a non-zero physical address.
+We calculate the locations in memory where we want to put the
+initrd and the DTB based on the size of the kernel, since they
+come after it. Add some explicit checks that these aren't off the
+end of RAM entirely.
 
-Correct the places which make this incorrect assumption.
+(At the moment the way we calculate the initrd_start means that
+it can't ever be off the end of RAM, but that will change with
+the next commit.)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/boot.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ hw/arm/boot.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
 diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index a830655e1af..0bb9a7d5b5c 100644
+index 0bb9a7d5b5c..935be3b92a5 100644
 --- a/hw/arm/boot.c
 +++ b/hw/arm/boot.c
-@@ -976,6 +976,7 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
-     int elf_machine;
-     hwaddr entry;
-     static const ARMInsnFixup *primary_loader;
-+    uint64_t ram_end = info->loader_start + info->ram_size;
- 
-     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
-         primary_loader = bootloader_aarch64;
-@@ -1047,8 +1048,7 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
-         /* 32-bit ARM */
-         entry = info->loader_start + KERNEL_LOAD_ADDR;
-         kernel_size = load_image_targphys_as(info->kernel_filename, entry,
--                                             info->ram_size - KERNEL_LOAD_ADDR,
--                                             as);
-+                                             ram_end - KERNEL_LOAD_ADDR, as);
-         is_linux = 1;
+@@ -1055,11 +1055,25 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
+         error_report("could not load kernel '%s'", info->kernel_filename);
+         exit(1);
      }
-     if (kernel_size < 0) {
-@@ -1062,12 +1062,11 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
++
++    if (kernel_size > info->ram_size) {
++        error_report("kernel '%s' is too large to fit in RAM "
++                     "(kernel size %d, RAM size %" PRId64 ")",
++                     info->kernel_filename, kernel_size, info->ram_size);
++        exit(1);
++    }
++
+     info->entry = entry;
+     if (is_linux) {
+         uint32_t fixupcontext[FIXUP_MAX];
+ 
          if (info->initrd_filename) {
++
++            if (info->initrd_start >= ram_end) {
++                error_report("not enough space after kernel to load initrd");
++                exit(1);
++            }
++
              initrd_size = load_ramdisk_as(info->initrd_filename,
                                            info->initrd_start,
--                                          info->ram_size - info->initrd_start,
--                                          as);
-+                                          ram_end - info->initrd_start, as);
-             if (initrd_size < 0) {
-                 initrd_size = load_image_targphys_as(info->initrd_filename,
-                                                      info->initrd_start,
--                                                     info->ram_size -
-+                                                     ram_end -
-                                                      info->initrd_start,
-                                                      as);
+                                           ram_end - info->initrd_start, as);
+@@ -1075,6 +1089,11 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
+                              info->initrd_filename);
+                 exit(1);
              }
++            if (info->initrd_start + initrd_size > info->ram_size) {
++                error_report("could not load initrd '%s': "
++                             "too big to fit into RAM after the kernel",
++                             info->initrd_filename);
++            }
+         } else {
+             initrd_size = 0;
+         }
+@@ -1110,6 +1129,10 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
+             /* Place the DTB after the initrd in memory with alignment. */
+             info->dtb_start = QEMU_ALIGN_UP(info->initrd_start + initrd_size,
+                                            align);
++            if (info->dtb_start >= ram_end) {
++                error_report("Not enough space for DTB after kernel/initrd");
++                exit(1);
++            }
+             fixupcontext[FIXUP_ARGPTR_LO] = info->dtb_start;
+             fixupcontext[FIXUP_ARGPTR_HI] = info->dtb_start >> 32;
+         } else {
 -- 
 2.20.1
 
