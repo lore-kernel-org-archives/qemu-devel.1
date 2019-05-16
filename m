@@ -2,72 +2,72 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 733B1C04E87
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 01:50:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9C59C04E53
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 01:52:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31B8620873
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 01:50:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="QZCkd6nm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31B8620873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id A081B20843
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 01:52:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A081B20843
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46898 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46911 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hR5XV-0001FG-FP
-	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 21:50:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56888)
+	id 1hR5Yy-0002R2-W7
+	for qemu-devel@archiver.kernel.org; Wed, 15 May 2019 21:52:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hR5WE-0000dW-QJ
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 21:49:16 -0400
+	(envelope-from <bounces@canonical.com>) id 1hR5Xh-0001dK-8T
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 21:50:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hR5WC-0007tx-DN
-	for qemu-devel@nongnu.org; Wed, 15 May 2019 21:49:14 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:58627 helo=ozlabs.org)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hR5WB-0007qU-Cd; Wed, 15 May 2019 21:49:12 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 454DqQ5G5dz9sDn; Thu, 16 May 2019 11:49:06 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1557971346;
-	bh=OMnZtmSbza04Rog52QhKBprI3OFUAqDHv/qox3A3TVM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QZCkd6nmNtu0iNVaBmW/OvaTh+y2XzDAz8pHHtH2DGDhWLDWumFOu+qzy9Xu4E6rx
-	8JCOnqTc633uwJObiClXCZyP3b3RdU+77QcEy9ZQnmsRyTiv5rxz5ytfyIIK8fQHg0
-	rZmfj3y3bL0s0MeO8BaAdESqFPG8OcmgvlbIqbO8=
-Date: Thu, 16 May 2019 11:47:33 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Message-ID: <20190516014733.GE3207@umbus.fritz.box>
-References: <155591636364.20338.844048953355207313.stgit@aravinda>
-	<155591660602.20338.9804738040071843715.stgit@aravinda>
-	<20190513133053.4d900d4a@bahia.lan>
-	<20190514000819.GA6441@umbus.fritz.box>
-	<9eb7a5a6-a018-d08a-4556-26da0b6cc3ca@linux.vnet.ibm.com>
-	<20190514044005.GH6441@umbus.fritz.box>
-	<2cc48944-4ad7-6fd6-7d59-f041339fc6ec@linux.vnet.ibm.com>
+	(envelope-from <bounces@canonical.com>) id 1hR5Xg-0000fE-1A
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 21:50:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36284)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hR5Xf-0000dg-Rp
+	for qemu-devel@nongnu.org; Wed, 15 May 2019 21:50:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hR5Xc-00039A-Cz
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 01:50:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 37DFE2E80CB
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 01:50:40 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="phCU5ROyZO6kBE05"
-Content-Disposition: inline
-In-Reply-To: <2cc48944-4ad7-6fd6-7d59-f041339fc6ec@linux.vnet.ibm.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 16 May 2019 01:44:26 -0000
+From: Jake Mikelson <1828508@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: alpha76 stefanha
+X-Launchpad-Bug-Reporter: Jake Mikelson (alpha76)
+X-Launchpad-Bug-Modifier: Jake Mikelson (alpha76)
+References: <155746839267.15002.8138674450166661929.malonedeb@wampee.canonical.com>
+Message-Id: <155797106641.26747.10974187444352362382.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18962";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 7a245ff56aef212362961cfe6fae2b3878fc8263
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v8 4/6] target/ppc: Build rtas
- error log upon an MCE
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1828508] Re: qemu-img created VMDK files lead to
+ "Unsupported or invalid disk type 7"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,131 +76,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@au1.ibm.com, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
-	paulus@ozlabs.org, qemu-ppc@nongnu.org
+Reply-To: Bug 1828508 <1828508@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi, I'm running 5.5.
 
---phCU5ROyZO6kBE05
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I've been playing around with some of the options, and if I run the
+below, I end up with 2 files.
 
-On Tue, May 14, 2019 at 10:36:17AM +0530, Aravinda Prasad wrote:
->=20
->=20
-> On Tuesday 14 May 2019 10:10 AM, David Gibson wrote:
-> > On Tue, May 14, 2019 at 09:56:41AM +0530, Aravinda Prasad wrote:
-> >>
-> >>
-> >> On Tuesday 14 May 2019 05:38 AM, David Gibson wrote:
-> >>> On Mon, May 13, 2019 at 01:30:53PM +0200, Greg Kurz wrote:
-> >>>> On Mon, 22 Apr 2019 12:33:26 +0530
-> >>>> Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
-> >>>>
-> >>>>> Upon a machine check exception (MCE) in a guest address space,
-> >>>>> KVM causes a guest exit to enable QEMU to build and pass the
-> >>>>> error to the guest in the PAPR defined rtas error log format.
-> >>>>>
-> >>>>> This patch builds the rtas error log, copies it to the rtas_addr
-> >>>>> and then invokes the guest registered machine check handler. The
-> >>>>> handler in the guest takes suitable action(s) depending on the type
-> >>>>> and criticality of the error. For example, if an error is
-> >>>>> unrecoverable memory corruption in an application inside the
-> >>>>> guest, then the guest kernel sends a SIGBUS to the application.
-> >>>>> For recoverable errors, the guest performs recovery actions and
-> >>>>> logs the error.
-> >>>>>
-> >>>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-> >>>>> ---
-> >>>>>  hw/ppc/spapr.c         |    4 +
-> >>>>>  hw/ppc/spapr_events.c  |  245 ++++++++++++++++++++++++++++++++++++=
-++++++++++++
-> >>>>>  include/hw/ppc/spapr.h |    4 +
-> >>>>>  3 files changed, 253 insertions(+)
-> >>>>>
-> >>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >>>>> index 2779efe..ffd1715 100644
-> >>>>> --- a/hw/ppc/spapr.c
-> >>>>> +++ b/hw/ppc/spapr.c
-> >>>>> @@ -2918,6 +2918,10 @@ static void spapr_machine_init(MachineState =
-*machine)
-> >>>>>          error_report("Could not get size of LPAR rtas '%s'", filen=
-ame);
-> >>>>>          exit(1);
-> >>>>>      }
-> >>>>> +
-> >>>>> +    /* Resize blob to accommodate error log. */
-> >>>>> +    spapr->rtas_size =3D spapr_get_rtas_size(spapr->rtas_size);
-> >>>>> +
-> >>>>
-> >>>> This is the only user for spapr_get_rtas_size(), which is trivial.
-> >>>> I suggest you simply open-code it here.
-> >>>
-> >>> I agree.
-> >>
-> >> Sure.
-> >>
-> >>>
-> >>>> But also, spapr->rtas_size is a guest visible thing, "rtas-size" pro=
-p in the
-> >>>> DT. Since existing machine types don't do that, I guess we should on=
-ly use
-> >>>> the new size if cap-fwnmi-mce=3Don for the sake of compatibility.
-> >>>
-> >>> Yes, that's a good idea.  Changing this is very unlikely to break a
-> >>> guest, but it's easy to be safe here so let's do it.
-> >>
-> >> I did it like that because the rtas_blob is allocated based on rtas_si=
-ze
-> >> in spapr_machine_init(). During spapr_machine_init() it is not know if
-> >> the guest calls "ibm, nmi-register". So if we want to use the new size
-> >> only when cap_fwnmi=3Don, then we have to realloc the blob in "ibm,
-> >> nmi-register".
-> >=20
-> > What?  Just always allocate the necessary space in
-> > spapr_machine_init() if cap_fwnmi=3Don, it'll be wasted if
-> > ibm,nmi-register is never called, but it's not that much space so we
-> > don't really care.
->=20
-> Yes, not that much space, and ibm,nmi-register is called when the Linux
-> kernel boots. I guess, even though other OSes might not call
-> ibm,nmi-register, they do not constitute significant QEMU on Power users.
->=20
-> So I think, I will keep the code as is.
+qemu-img.exe convert "c:\test\AppD-VM01.vhd" -O vmdk -o
+adapter_type=3Dlsilogic,subformat=3DmonolithicFlat -p "c:\test\AppD-
+VM01.vmdk"
 
-No, that's not right.  It's impractical to change the allocation
-depending on whether fwnmi is currently active.  But you *can* (and
-should) base the allocation on whether fwnmi is *possible* - that is,
-the value of the spapr cap.
+The files I get are:
+AppD-VM01.vmdk (which is always 12kb)
+AppD-VM01-flat.vmdk (which is the full size of the disk, eg 30GB).
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+If I then upload both of these files to the datastore, they somehow
+merge into 1 and I can attach and power on the VM. If you dont upload
+both files into the datastore, VMware does not recognise it.
 
---phCU5ROyZO6kBE05
-Content-Type: application/pgp-signature; name="signature.asc"
+This is the only method that seems to work for me.
 
------BEGIN PGP SIGNATURE-----
+-- =
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzcwTUACgkQbDjKyiDZ
-s5KVcg//RaOsfpN6N+7yYikVoWWCVMTWKrzHgSJdPF8C2YqnwktajGXI6YM7wdAv
-gkTgc3+jryt8BiQsfI+DMaAzF2PhZtrD5kc2csIG6LI5bOXvyHzzVt86QVUZpbHp
-Hj0xSpenbX5vfkpLU7A8U9nJlNbSAKFKIZYEbJU/GoZWbx/hHjJr2tfsjKMWZSLA
-hpyTCgDEZPF2RzLv6+2c7TTBdfESexFmRW6Q8fkXDsgpbjddbXz/Vl12GnWVkFj1
-xozSunV5oT3tnSxaGZrGuYTMiO/aeoChht3rFIj48Ej280QaneVAzXcV4O6Sxeue
-SX/YNA4shLWvq31Tcrj+QVQHez1vRcXgNCX/rubcJ+BJEGBeSROI5quhYD8Y96RF
-FZeHmFAKV4wifbirLjO8/aHXFhxo7DD7s/q7KsAqSq8xDc3tBq3sQY5f7/0OVUiU
-LkyXazFPJ7jwIrdQKN6kHX4iJu4wTi8i3h48BsexxbVd8Y0oNLLyHfNu7UqG0iX5
-AdraB131yrs8/1V9HgoxQeNvBats+oafh58+5IleduCbRY67LOJrnwRuH7HAGkYZ
-AA03mEUDGOFFMLS5u1w+VOWuD7G7nJNymKrL49F2i0jLy9ZUWnw40uwpV0Kn7p/M
-oKFMBM4wS8wdG2/d6zgUjkG9482q+d/SM2fqDWq3lueXIJ6tlf8=
-=uOx5
------END PGP SIGNATURE-----
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1828508
 
---phCU5ROyZO6kBE05--
+Title:
+  qemu-img created VMDK files lead to "Unsupported or invalid disk type
+  7"
+
+Status in QEMU:
+  New
+
+Bug description:
+  Using qemu-img version 3.1.50 (v3.1.0-13607-geb2db0f7ba-dirty) on a
+  Windows 10 machine.
+
+  Converting a VHD to VMDK.
+  qemu-img.exe convert "c:\test\AppD-VM01.vhd" -O vmdk -o adapter_type=3Dbu=
+slogic -p "c:\test\AppD-VM01.vmdk"
+
+  I have also tried:
+  qemu-img.exe convert "c:\test\AppD-VM01.vhd" -O vmdk -o adapter_type=3Dbu=
+slogic,hwversion=3D6 -p "c:\test\AppD-VM01.vmdk"
+
+  Attaching the VMDK to a VM in VMware produces the following error when
+  powering on.
+
+  Power On virtual machine:Failed to open disk scsi0:1: Unsupported or inva=
+lid disk type 7. Ensure that the disk has been imported.
+  Target: MyVM1
+  vCenter Server: VCENTER
+  Error Stack
+  An error was received from the ESX host while powering on VM MyVM1.
+  Failed to start the virtual machine.
+  Module DevicePowerOn power on failed. =
+
+  Unable to create virtual SCSI device for scsi0:1, '/vmfs/volumes/5cca0155=
+-bdddf31d-2714-00215acbeb1e/AppD-VM01/AppDdisk1-VM01.vmdk' =
+
+  Failed to open disk scsi0:1: Unsupported or invalid disk type 7. Ensure t=
+hat the disk has been imported.
+
+  =
+
+  If I do not specify the adapter type, it creates an IDE VMDK which works =
+perfectly.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1828508/+subscriptions
 
