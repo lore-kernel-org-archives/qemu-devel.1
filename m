@@ -2,65 +2,76 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1FECC04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:56:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FF7AC04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:57:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6591A20833
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:56:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="jeVxQvZf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6591A20833
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	by mail.kernel.org (Postfix) with ESMTPS id 121BC20833
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:57:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 121BC20833
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54819 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54878 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRFw2-000736-Ja
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:56:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56603)
+	id 1hRFxL-00087w-An
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:57:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hRFqh-00024w-Dg
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:51:06 -0400
+	(envelope-from <mst@redhat.com>) id 1hRFNQ-0001gq-3g
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:20:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hRFqa-0002JO-Tw
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:51:00 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:53305)
+	(envelope-from <mst@redhat.com>) id 1hRFNN-0002q3-2p
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:20:48 -0400
+Received: from mail-qt1-f179.google.com ([209.85.160.179]:44612)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>)
-	id 1hRFqO-0001xg-Si; Thu, 16 May 2019 08:50:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; 
-	h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
-	bh=NpDjpkIXbpLSRAyK6nU3OS/GTh89ltsPjsD9PfRLpJM=; 
-	b=jeVxQvZfCvCr5Ciu9EubLO+fD8d4pnY3eJrfwraB9YRa0Rm13r0NSvPtkitG13K0ISLwna2dM5n33jcRe4hHNzfQTKIcts6+Q5m4lpEjXZgwv+cQSSoZld+tUtikncHukrJ6ta0ikJLo4iO6MMNuD7Wo8mvklB2VPNcgpdJtq1M/Y33PISYpoDcRoKh1sc6pkahFLMmKFqcEWI0t50Zjoa86XUrG6Y7WN7jM191kjikxtorp3Ch0GtPubj9AkrMP//mLDwzw//PoMGNn7A6LpFYkf9c5/kIl7GnqY6egW553v0AptKVVJQlz+7kAJZ80wzmDtUwK750iRGd4CantJg==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
-	by fanzine.igalia.com with esmtps 
-	(Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
-	id 1hRFqN-00069f-3h; Thu, 16 May 2019 14:50:43 +0200
-Received: from berto by mail.igalia.com with local (Exim)
-	id 1hRFqN-00076A-16; Thu, 16 May 2019 14:50:43 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-In-Reply-To: <20190515201503.19069-3-mreitz@redhat.com>
-References: <20190515201503.19069-1-mreitz@redhat.com>
-	<20190515201503.19069-3-mreitz@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
-	(i586-pc-linux-gnu)
-Date: Thu, 16 May 2019 14:50:43 +0200
-Message-ID: <w51bm02v9zw.fsf@maestria.local.igalia.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hRFNM-0002pm-WD
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:20:45 -0400
+Received: by mail-qt1-f179.google.com with SMTP id f24so3517755qtk.11
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 05:20:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:content-transfer-encoding
+	:in-reply-to;
+	bh=TqEyVktznYJ7P+ZeySCJaFo5Dw05r/YzBTh1BaibXtY=;
+	b=t3PI2xm3bI3E5k20j9383bk42Xar0F6sKtKRlJkr0mePgUfjgUAp+C/9Z/3zhhuskK
+	EXsOZJw4VC/b+LiybQs1XygMjK+YWoszENMelEEWnZ/Ooagkey5VcCaxtsv4GUZsD1Gx
+	joEU2AYsiBEEPFOps58nbej1A5z13wtNI/Q3kDvaLmRW84SMkShH4Iln59ua+66g8oq1
+	oNH7VuqHi8zKctIn0qEe9Yz6NPORjKa6K/pATQ3NFCn8E3P05Qjyqyiqll5JyhtgPwxl
+	cuud1hw+k31T9ix/6Y45pETkg8UTOHFDwUeS9cCy06m2TdS4NqRreAOlp2J/qICMMIf4
+	z+Sw==
+X-Gm-Message-State: APjAAAV7aoeXY2pn5PnFb/InNYKkKxRi+7ZjdXrs3PIMQXiykA8A8TxZ
+	RueeDzrRkpdTjL8If7wW/OCxbOmKB8g=
+X-Google-Smtp-Source: APXvYqyTVxd4OqLh9Wan+eL+6DtftmJGI25sz4K1KhrObE4gS+ZIBgsHDVPBmnaeRVpzWYK2URfmhQ==
+X-Received: by 2002:ac8:38eb:: with SMTP id g40mr42506689qtc.342.1558009244009;
+	Thu, 16 May 2019 05:20:44 -0700 (PDT)
+Received: from redhat.com ([185.54.206.10]) by smtp.gmail.com with ESMTPSA id
+	q27sm3634301qtf.27.2019.05.16.05.20.42
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Thu, 16 May 2019 05:20:43 -0700 (PDT)
+Date: Thu, 16 May 2019 08:20:40 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Message-ID: <1556808723-226478-8-git-send-email-imammedo@redhat.com>
+References: <20190515121146.7248-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
-	timestamps) [generic] [fuzzy]
-X-Received-From: 91.117.99.155
-Subject: Re: [Qemu-devel] [PATCH 2/4] iotests.py: Let assert_qmp() accept an
- array
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190515121146.7248-1-mst@redhat.com>
+X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
+X-Mutt-Fcc: =sent
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.160.179
+Subject: [Qemu-devel] [PULL 29/37] tests: acpi: move boot_sector_init() into
+ x86 tests branch
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,20 +83,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
-	Max Reitz <mreitz@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20190516122040.LfDMSyDU513-YWDzQA8mZ4q4btC-JaBacBK_RWnkNGQ@z>
 
-On Wed 15 May 2019 10:15:01 PM CEST, Max Reitz wrote:
-> Sometimes we cannot tell which error message qemu will emit, and we do
-> not care.  With this change, we can then just pass an array of all
-> possible messages to assert_qmp() and it will choose the right one.
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+boot_sector_init() won't be used by arm/virt board, so move it from
+global scope to x86 branch that uses it.
 
-Berto
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <1556808723-226478-8-git-send-email-imammedo@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ tests/bios-tables-test.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index e2fc34143d..4d13a3cce6 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -788,13 +788,14 @@ int main(int argc, char *argv[])
+     const char *arch = qtest_get_arch();
+     int ret;
+ 
+-    ret = boot_sector_init(disk);
+-    if(ret)
+-        return ret;
+-
+     g_test_init(&argc, &argv, NULL);
+ 
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
++        ret = boot_sector_init(disk);
++        if (ret) {
++            return ret;
++        }
++
+         qtest_add_func("acpi/piix4", test_acpi_piix4_tcg);
+         qtest_add_func("acpi/piix4/bridge", test_acpi_piix4_tcg_bridge);
+         qtest_add_func("acpi/q35", test_acpi_q35_tcg);
+-- 
+MST
+
 
