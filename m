@@ -2,86 +2,81 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5303BC04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 15:57:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0000EC04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 15:58:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDCC220815
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 15:57:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE71220815
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 15:58:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="NmO/Xl8g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDCC220815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o4mAY6MY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE71220815
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60250 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60268 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRIkt-00089v-OH
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 11:57:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43133)
+	id 1hRImD-0000mF-1t
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 11:58:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=032022a23=alistair.francis@wdc.com>)
-	id 1hRIjo-0007ik-MY
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 11:56:09 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hRIkd-0008F8-Am
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 11:57:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=032022a23=alistair.francis@wdc.com>)
-	id 1hRIjn-0000MD-86
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 11:56:08 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:24383)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=032022a23=alistair.francis@wdc.com>)
-	id 1hRIjm-00007P-GY; Thu, 16 May 2019 11:56:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-	d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-	t=1558022167; x=1589558167;
-	h=from:to:cc:subject:date:message-id:mime-version:
-	content-transfer-encoding;
-	bh=pZrU0rLEl7AtHjWF7GI8X1ehkUlz2HyiMO84c3e1OXI=;
-	b=NmO/Xl8gNPRh7s3ILTtpKczp7AEecx7ZpOX3b5t/Ed6xC9mMVMMnxcbz
-	NKIOlV2DdzuQL55XojirWAKX+XD+pWxuRNOlxPhJ5SHpF+G7Zy+PKni77
-	dBT48sjltZmUB6O94e7qjuJRaIaqHelM6KFv0U76/aZ1TpIiwD0CKfvpc
-	nUBELfXn3v/E8BEsIs47W0wJbxiODfYy4jm+Ql3nb9J3dvyaqeWUqOYKc
-	qMVNvxLtGY6cTpWWyl3KuW02i7IlPGGSwwLiymkH6yhy/WL1qjaKE6bsb
-	fSL+/fKexcMcYYoWFLrRIzcYrATGqqH7S7qt53m+WuGWXapeJlcw+e4+b g==;
-X-IronPort-AV: E=Sophos;i="5.60,477,1549900800"; d="scan'208";a="113375280"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
-	([199.255.45.14])
-	by ob1.hgst.iphmx.com with ESMTP; 16 May 2019 23:56:02 +0800
-IronPort-SDR: /mwFINPXrPe2YxMN4MLZB0xhiC8LagBcduJVmGGyIwGH1Ktz/mqxux9ENBYck5OUawYO30Cafy
-	aeXGDN5FSZ+2DK11yUQKzUDNYuKfn1BP9pyKKQpAANZ4F/kvuIpv1LErcyXsa86ei5ScTcGvb5
-	EPbLm32rMcAEAWt/JwfIZaqvIwXmGojaEqGCd978VwGUCkbgBfyX196Mv+SF+r7bkWIPwbwOGh
-	R+yHwZsz5ciOUVe+bcc3afguCJ3A9QDsX8C5SWmSDGh6Up8dA6kdKZ/j3bWDcTgjXKQUPcrqCw
-	W1ihK4RUYgYK11snR8Iq3BN3
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-	by uls-op-cesaep01.wdc.com with ESMTP; 16 May 2019 08:31:37 -0700
-IronPort-SDR: UOieCsjXzhXGKQUiSYIaqfcxYjdEnZab/0yyE/PCdqB7/fXnp9BbOx4fB7dcGnNdjxEkCs73+a
-	/bWzqcYqX6cfZQ5rUyHQujhXRLlqhyx51kQD3MyduZ1hEwXrW0zq9ENXV8eQvHQflmQymYgzdq
-	YMaRLbK3Jcol/je8OQ/vbUZAr4vD+eB0S3DRfeUjtIP775NlMw/xBYJvGZgv7GfSaBycINj2FQ
-	ohhjApOKNT9H46UEvzcr973/G5zz2C9fIevmUA63/VuxG2nlUJhntXj1DZacXtp4vSoHMPNopr
-	Rp4=
-Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
-	risc6-mainframe.int.fusionio.com) ([10.196.157.140])
-	by uls-op-cesaip02.wdc.com with ESMTP; 16 May 2019 08:56:01 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	peter.maydell@linaro.org
-Date: Thu, 16 May 2019 08:54:10 -0700
-Message-Id: <ad91b397f360b2fc7f4087e476f7df5b04d42ddb.1558021877.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.21.0
+	(envelope-from <peter.maydell@linaro.org>) id 1hRIkc-0002p5-13
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 11:56:59 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35238)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hRIkb-0002nV-RA
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 11:56:57 -0400
+Received: by mail-ot1-x341.google.com with SMTP id n14so3932147otk.2
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 08:56:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=wXHASg9Ms1/AhgMkkjvldTEjYbHigQD50JV9vemyh+E=;
+	b=o4mAY6MYLGFWVsFOwUzjTcnJJ4BWk8RhE+af7ShbgnKIJB5vGFta4t9Jw4dfTMP9js
+	DufBp+bybXLyQcW/JC32n3PigS9PSuecEpxZEDhxZomLnV4SDn+FBbpGmpjjiKcd8wpQ
+	YpzAAz+66E15YxURgFA/GU1d7eBDSK02wZvPeD2i5HKdnE1EJA8fCxJrMx8irV6iOB79
+	nD3U2gJJXqYoKxofM3HRJ2dI9vCn7aczwV6M+vwDEjXaSyUGewxERHuOXwn4uLKUG4d7
+	pxsh5VmKzDfz9zC7nMEuqypTtd4fBv9nqlH0DziGISTUzbH3lNzClmG6xJp775kNTPU7
+	prtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=wXHASg9Ms1/AhgMkkjvldTEjYbHigQD50JV9vemyh+E=;
+	b=jv/RjthefKocebgfWRo2ttqdwLjuHRCq+dBLMmBqW7qJ2wxVehzwTNWlHVbkcctaQS
+	iS1IGBPsVCW3St7d0t91AwjhxEvJz9XvYnjNIaGQxZ7djmdCL1fvaxLuleLQmAZvyAac
+	XKyb0vdtVpH4tAntztBISZDJ9YWDbgtyrahZu1N99YoDG9SmqEhmrJKJW6CDXyyJUi2+
+	tBmo02BmFOUyHKgaFxUcsbhCcInzGeI8B9ahN5f9Vt0Ub/Ket36sN1TVaGREXqjOoH9L
+	6nIE9+Ckh11Su44L6veaczQ7zim4dxlBxw14/KexUdhFVLgLgWyZQmX3wgHewxchXU/v
+	bACQ==
+X-Gm-Message-State: APjAAAWQbRf4kUJTbqs1p8gQK55h8DAB+8+4S6RbWE0Nu31mz76M5nrR
+	p5U2CZmiIwbbwM1uvMogxuKPIwenvsiXPfLdG/zAhw==
+X-Google-Smtp-Source: APXvYqw0Dd423ETGA/vKgNdXOWBILRt1N4100RzMdDhHDvFGN+gjrvBSlASLN4VTAXbwKbEumxIADiGgZx7ELBk+70Q=
+X-Received: by 2002:a05:6830:149a:: with SMTP id
+	s26mr1630372otq.221.1558022216817; 
+	Thu, 16 May 2019 08:56:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20190510185438.29533-1-richard.henderson@linaro.org>
+	<CAFEAcA-bGyRDeYNdiAkJfNNqSPkbOpGZCNyY94w3dJftzrYPJA@mail.gmail.com>
+In-Reply-To: <CAFEAcA-bGyRDeYNdiAkJfNNqSPkbOpGZCNyY94w3dJftzrYPJA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 May 2019 16:56:45 +0100
+Message-ID: <CAFEAcA9NzSwXgjevsNUtJqOLXqJPBZPSC-6YQh_QqzXcqVfj-Q@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 216.71.153.141
-Subject: [Qemu-devel] [PATCH v3 1/1] target/arm: Fix vector operation
- segfault
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PULL v2 00/27] tcg: Add CPUClass::tlb_fill
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,68 +88,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, richard.henderson@linaro.org, qemu-arm@nongnu.org,
-	alistair.francis@wdc.com, alistair23@gmail.com, alex.bennee@linaro.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit 89e68b575 "target/arm: Use vector operations for saturation"
-causes this abort() when booting QEMU ARM with a Cortex-A15:
+On Tue, 14 May 2019 at 13:36, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Fri, 10 May 2019 at 19:54, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+> >
+> > Changes in v2:
+> >
+> >   * Fix --disable-tcg compilation for x86 and s390x.
+> >     I adjusted every target/ that used any CONFIG_TCG in cpu.c.
+> >     but then afterward I see that only x86 and s390x have had
+> >     their Makefiles adjusted to make --disable-tcg actually work.
+> >
+> >   * Fix Werror for 64-bit on 32-bit.
+> >
+> > Only re-posting changed patches.
+> >
+> >
+> > r~
+> >
+> >
+> > The following changes since commit efb4f3b62c69383a7308d7b739a3193e7c0ccae8:
+> >
+> >   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-05-10 14:49:36 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/rth7680/qemu.git tags/pull-tcg-20190510
+> >
+> > for you to fetch changes up to 4811e9095c0491bc6f5450e5012c9c4796b9e59d:
+> >
+> >   tcg: Use tlb_fill probe from tlb_vaddr_to_host (2019-05-10 11:12:50 -0700)
+> >
+> > ----------------------------------------------------------------
+> > Add CPUClass::tlb_fill.
+> > Improve tlb_vaddr_to_host for use by ARM SVE no-fault loads.
+> >
+>
+> I did a test merge of this and it passed my build tests; I haven't
+> applied it though pending resolution of Aleksandar's comments.
 
-0  0x00007ffff4c2382f in raise () at /usr/lib/libc.so.6
-1  0x00007ffff4c0e672 in abort () at /usr/lib/libc.so.6
-2  0x00005555559c1839 in disas_neon_data_insn (insn=<optimized out>, s=<optimized out>) at ./target/arm/translate.c:6673
-3  0x00005555559c1839 in disas_neon_data_insn (s=<optimized out>, insn=<optimized out>) at ./target/arm/translate.c:6386
-4  0x00005555559cd8a4 in disas_arm_insn (insn=4081107068, s=0x7fffe59a9510) at ./target/arm/translate.c:9289
-5  0x00005555559cd8a4 in arm_tr_translate_insn (dcbase=0x7fffe59a9510, cpu=<optimized out>) at ./target/arm/translate.c:13612
-6  0x00005555558d1d39 in translator_loop (ops=0x5555561cc580 <arm_translator_ops>, db=0x7fffe59a9510, cpu=0x55555686a2f0, tb=<optimized out>, max_insns=<optimized out>) at ./accel/tcg/translator.c:96
-7  0x00005555559d10d4 in gen_intermediate_code (cpu=cpu@entry=0x55555686a2f0, tb=tb@entry=0x7fffd7840080 <code_gen_buffer+126091347>, max_insns=max_insns@entry=512) at ./target/arm/translate.c:13901
-8  0x00005555558d06b9 in tb_gen_code (cpu=cpu@entry=0x55555686a2f0, pc=3067096216, cs_base=0, flags=192, cflags=-16252928, cflags@entry=524288) at ./accel/tcg/translate-all.c:1736
-9  0x00005555558ce467 in tb_find (cf_mask=524288, tb_exit=1, last_tb=0x7fffd783e640 <code_gen_buffer+126084627>, cpu=0x1) at ./accel/tcg/cpu-exec.c:407
-10 0x00005555558ce467 in cpu_exec (cpu=cpu@entry=0x55555686a2f0) at ./accel/tcg/cpu-exec.c:728
-11 0x000055555588b0cf in tcg_cpu_exec (cpu=0x55555686a2f0) at ./cpus.c:1431
-12 0x000055555588d223 in qemu_tcg_cpu_thread_fn (arg=0x55555686a2f0) at ./cpus.c:1735
-13 0x000055555588d223 in qemu_tcg_cpu_thread_fn (arg=arg@entry=0x55555686a2f0) at ./cpus.c:1709
-14 0x0000555555d2629a in qemu_thread_start (args=<optimized out>) at ./util/qemu-thread-posix.c:502
-15 0x00007ffff4db8a92 in start_thread () at /usr/lib/libpthread.
 
-This patch ensures that we don't hit the abort() in the second switch
-case in disas_neon_data_insn() as we will return from the first case.
+Applied, thanks (conclusion of mailing list discussion was that it
+was ok to apply as-is).
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
----
-v3:
- - Resend with hopefully 8bit encoding instead of base64
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
- target/arm/translate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index dd053c80d6..298c262825 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -6598,13 +6598,13 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-             tcg_gen_gvec_4(rd_ofs, offsetof(CPUARMState, vfp.qc),
-                            rn_ofs, rm_ofs, vec_size, vec_size,
-                            (u ? uqadd_op : sqadd_op) + size);
--            break;
-+            return 0;
- 
-         case NEON_3R_VQSUB:
-             tcg_gen_gvec_4(rd_ofs, offsetof(CPUARMState, vfp.qc),
-                            rn_ofs, rm_ofs, vec_size, vec_size,
-                            (u ? uqsub_op : sqsub_op) + size);
--            break;
-+            return 0;
- 
-         case NEON_3R_VMUL: /* VMUL */
-             if (u) {
--- 
-2.21.0
-
+-- PMM
 
