@@ -2,91 +2,83 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EC7EC04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 16:13:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81522C04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 16:32:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 726FD20815
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 16:13:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 726FD20815
+	by mail.kernel.org (Postfix) with ESMTPS id 42C8F2082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 16:32:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42C8F2082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60662 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60823 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRJ0n-0007JZ-MK
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 12:13:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46846)
+	id 1hRJJB-0002b6-42
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 12:32:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hRIzH-0006fK-Lr
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:12:08 -0400
+	(envelope-from <philmd@redhat.com>) id 1hRJHh-0001k4-F2
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:31:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hRIzG-0004x9-QR
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:12:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44070)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hRIzE-0004tt-6U; Thu, 16 May 2019 12:12:04 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 82D0D3DDBE;
-	Thu, 16 May 2019 16:12:03 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-34.brq.redhat.com
-	[10.40.204.34])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B660560928;
-	Thu, 16 May 2019 16:12:02 +0000 (UTC)
-To: qemu-block@nongnu.org
-References: <20190516161114.27596-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <af7d3620-4cea-c931-c793-359e8272bfc4@redhat.com>
-Date: Thu, 16 May 2019 18:12:01 +0200
+	(envelope-from <philmd@redhat.com>) id 1hRJHf-0002hJ-SC
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:31:09 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:45502)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hRJHf-0002fe-Lk
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:31:07 -0400
+Received: by mail-wr1-f66.google.com with SMTP id b18so4072177wrq.12
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 09:31:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=LIurXMSJmXU6vCy+NHcAmHy2hxO7o3vwPkFQiG77T+k=;
+	b=pBOUWHLkL8MCvpvcBy2iymeNGbeipKIA1GhSY/4Zrb7IiVxpTvjIlEkFPGW4wMtiqF
+	CDhC4HuKIBi/Qj2B/+jhwqTb7HUbebEHnE290s0G6TX5Mnb/ofOeaIXnKpp3ZiMZYBVa
+	R8Nzb9c/cWMDJLsssrhNvaDY9qP+X9+UUKReIFuhi3nnDgiDpKaqWA0qD0mH5gYoe6nT
+	knu3V24fxIUeLQVmkXO0XR8qjtfd6+8GkXJtrcisSgajIbCUBr97ayhdqwQ3k1M5ihAp
+	0fKzX1/t2RlwXL2MNjnXpEEFZsYwcYxx8SC9tictajsOVoanXrf2oMVEAdlpCI9hdyJe
+	Vswg==
+X-Gm-Message-State: APjAAAWceYPdC9+Q/A//XJMZ6u3SreZGGrkpX2qeh2Mr3QLl9TS/a9yF
+	VLSk+Qzji2m8jXJxws60j5PH7A==
+X-Google-Smtp-Source: APXvYqycqsH3dGKkqnoxEj+GPCx8SoG4tSfFcYBe0o4bkbV2OR0Z1TIw12AlwhlqnZJkE6YE6oWl2A==
+X-Received: by 2002:adf:eb02:: with SMTP id s2mr24583449wrn.29.1558024265581; 
+	Thu, 16 May 2019 09:31:05 -0700 (PDT)
+Received: from [192.168.1.43] (228.red-83-52-173.dynamicip.rima-tde.net.
+	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
+	l21sm5160583wmh.35.2019.05.16.09.31.04
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Thu, 16 May 2019 09:31:05 -0700 (PDT)
+To: Jakub Jermar <jakub.jermar@kernkonzept.com>, qemu-devel@nongnu.org
+References: <20190423110034.1260142-1-jakub.jermar@kernkonzept.com>
+	<ab4b6d04-74f9-2f12-829d-9df8c1b1c4ca@redhat.com>
+	<6ae8d347-149d-e7eb-bb02-90aba44c5bbd@kernkonzept.com>
+	<1e9a8595-4653-4900-b747-236f9888b893@kernkonzept.com>
+	<04a4fcca-0db9-46f8-ac41-0d770b0dc5d6@kernkonzept.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <f9f1b930-2381-b343-854f-70e2590c9b73@redhat.com>
+Date: Thu, 16 May 2019 18:31:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190516161114.27596-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wR68KPlItLdAI6ZLaC45g9R0j48hPVpLC"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Thu, 16 May 2019 16:12:03 +0000 (UTC)
+In-Reply-To: <04a4fcca-0db9-46f8-ac41-0d770b0dc5d6@kernkonzept.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH] iotests: Fix intermittent failure in 219
+	[fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH v2] mips: Decide to map PAGE_EXEC in
+ map_address
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,67 +90,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+	Leon Alrae <leon.alrae@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wR68KPlItLdAI6ZLaC45g9R0j48hPVpLC
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <af7d3620-4cea-c931-c793-359e8272bfc4@redhat.com>
-Subject: Re: [PATCH] iotests: Fix intermittent failure in 219
-References: <20190516161114.27596-1-mreitz@redhat.com>
-In-Reply-To: <20190516161114.27596-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Jakub,
 
-On 16.05.19 18:11, Max Reitz wrote:
-> In 219, we wait for the job to make progress before we emit its status.=
+On 5/16/19 3:10 PM, Jakub Jermar wrote:
+> Hi,
+> 
+> On 5/3/19 12:02 PM, Jakub Jermar wrote:
+>> Hi,
+>>
+>> On 4/23/19 4:58 PM, Jakub Jermar wrote:
+>>> Hi Philippe!
+>>>
+>>> On 4/23/19 3:48 PM, Philippe Mathieu-Daudé wrote:
+>>>> Hi Jakub,
+>>>>
+>>>> On 4/23/19 1:00 PM, Jakub Jermář wrote:
+>>>>> This commit addresses QEMU Bug #1825311:
+>>>>>
+>>>>>   mips_cpu_handle_mmu_fault renders all accessed pages executable
+>>>>>
+>>>>> It allows finer-grained control over whether the accessed page should be
+>>>>> executable by moving the decision to the underlying map_address
+>>>>> function, which has more information for this.
+>>>>>
+>>>>> As a result, pages that have the XI bit set in the TLB and are accessed
+>>>>> for read/write, don't suddenly end up being executable.
+>>>>>
+>>>>
+>>>> Fixes: https://bugs.launchpad.net/qemu/+bug/1825311
+>>>>
+>>>>> Signed-off-by: Jakub Jermář <jakub.jermar@kernkonzept.com>
+>>>>> ---
+>>>>>  target/mips/helper.c | 17 ++++++++++-------
+>>>>>  1 file changed, 10 insertions(+), 7 deletions(-)
+>>>>>
+>>>>> diff --git a/target/mips/helper.c b/target/mips/helper.c
+>>>>> index c44cdca3b5..132d073fbe 100644
+>>>>> --- a/target/mips/helper.c
+>>>>> +++ b/target/mips/helper.c
+>>>>> @@ -43,7 +43,7 @@ int no_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+>>>>>                          target_ulong address, int rw, int access_type)
+>>>>>  {
+>>>>>      *physical = address;
+>>>>> -    *prot = PAGE_READ | PAGE_WRITE;
+>>>>> +    *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+>>>>>      return TLBRET_MATCH;
+>>>>>  }
+>>>>>  
+>>>>> @@ -61,7 +61,7 @@ int fixed_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+>>>>>      else
+>>>>>          *physical = address;
+>>>>>  
+>>>>> -    *prot = PAGE_READ | PAGE_WRITE;
+>>>>> +    *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+>>>>>      return TLBRET_MATCH;
+>>>>>  }
+>>>>>  
+>>>>> @@ -101,6 +101,9 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+>>>>>                  *prot = PAGE_READ;
+>>>>>                  if (n ? tlb->D1 : tlb->D0)
+>>>>>                      *prot |= PAGE_WRITE;
+>>>>> +                if (!(n ? tlb->XI1 : tlb->XI0)) {
+>>>>> +                    *prot |= PAGE_EXEC;
+>>>>> +                }
+>>>>
+>>>> This was indeed missed in commit 2fb58b73746e.
 
-> This makes the output reliable.
->=20
-> Unfortunately, there is a bug: We do not wait for any more progress if
-> the job has already reached its total-progress.  Right after the job ha=
-s
-> been started, it is possible that total-progress is still 0, though.  I=
-n
-> that case, we may skip the first progress-making step and keep ending u=
-p
-> 64 kB short.
->=20
-> To fix that bug, we cab simply wait for total-progress to reach 4 MB
+Aleksandar, if this patch is OK with you, can you amend this comment,
+and add the "Fixes:" tag too when applying? Thanks!
 
-s/cab/can/...
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> (the image size) after starting the job.
->=20
-> Reported-by: Karen Mezick <kmezick@redhat.com>
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1686651
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/219 | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
+>>>>
+>>>>>                  return TLBRET_MATCH;
+>>>>>              }
+>>>>>              return TLBRET_DIRTY;
+>>>>> @@ -182,7 +185,7 @@ static int get_seg_physical_address(CPUMIPSState *env, hwaddr *physical,
+>>>>>      } else {
+>>>>>          /* The segment is unmapped */
+>>>>>          *physical = physical_base | (real_address & segmask);
+>>>>> -        *prot = PAGE_READ | PAGE_WRITE;
+>>>>> +        *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+>>>>>          return TLBRET_MATCH;
+>>>>>      }
+>>>>>  }
+>>>>> @@ -913,8 +916,8 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+>>>>>      }
+>>>>>      if (ret == TLBRET_MATCH) {
+>>>>>          tlb_set_page(cs, address & TARGET_PAGE_MASK,
+>>>>> -                     physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
+>>>>> -                     mmu_idx, TARGET_PAGE_SIZE);
+>>>>> +                     physical & TARGET_PAGE_MASK, prot, mmu_idx,
+>>>>> +                     TARGET_PAGE_SIZE);
+>>>>>          ret = 0;
+>>>>>      } else if (ret < 0)
+>>>>>  #endif
+>>>>> @@ -936,8 +939,8 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+>>>>>                                             address, rw, access_type, mmu_idx);
+>>>>>                  if (ret == TLBRET_MATCH) {
+>>>>>                      tlb_set_page(cs, address & TARGET_PAGE_MASK,
+>>>>> -                            physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
+>>>>> -                            mmu_idx, TARGET_PAGE_SIZE);
+>>>>> +                            physical & TARGET_PAGE_MASK, prot, mmu_idx,
+>>>>> +                            TARGET_PAGE_SIZE);
+>>>>>                      ret = 0;
+>>>>>                      return ret;
+>>>>>                  }
+>>>>>
+>>>>
+>>>> Your patch looks correct, but I'd like to test it.
+>>>> Do you have a reproducer?
+>>>> Can you describe the command line you used?
+>>>
+>>> I've just attached a reproducer image and script to the bug. It's a
+>>> 32-bit little-endian test binary running on top of the L4Re microkernel.
 
+I can't get the "TAP" output you described on launchpad.
 
---wR68KPlItLdAI6ZLaC45g9R0j48hPVpLC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>>> Let me know if you also need a 64-bit version.
 
------BEGIN PGP SIGNATURE-----
+64-bit version is welcomed.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzdi9EACgkQ9AfbAGHV
-z0CBsgf/XRXSeLiXa8Xw8tKfdv0xZE1CKAfNtwfDw4qOEyPihW1Tlmwlwb5TBdEH
-KwHNR0Swm8hMr00/4voZ8LaDHFOjvzasrzulDDLVs9H72KnzxNxbmENjGMm3KW18
-7PWmzspgqzO426oDyYxYmR0mnZNqSIXxhME7U6XbSEqRw5dWFGbSdtnA9qII4Ezb
-yXpKnc4mdNIkPHfv1BKeUqMvL+tOLnKtNvd/C7NJHRfrTbBYyS+qk3C7MNCQG3p3
-YMtjZVrXLppX6PnKZnrUWyRWZuhQQ3usRWqGI4sXxltrYJA1hCbqPPs/fNwqL3kn
-cPeh9H3A0VBq/Ns5qEG2sTW9WeUFug==
-=F1s0
------END PGP SIGNATURE-----
+>>> I tested both 32 and 64-bit versions of the reproducer and also checked
+>>> to see that the the other images I have lying around here (Linux 2.6.32
+>>> big endian and HelenOS master little-endian, both 32-bit for 4Kc)
+>>> continue to run without regressions.
 
---wR68KPlItLdAI6ZLaC45g9R0j48hPVpLC--
+Yes, definitively an improvement:
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+Regards,
+
+Phil.
 
