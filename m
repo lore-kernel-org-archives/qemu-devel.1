@@ -2,87 +2,111 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EAA3C04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 14:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40714C04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 14:55:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69BC42082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 14:53:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A5C72082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 14:55:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="siYCmilX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69BC42082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="eeHgEcwO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A5C72082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59500 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59534 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRHkr-0006Sa-JK
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 10:53:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58920)
+	id 1hRHme-0007tD-Cg
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 10:55:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hRHfZ-0002bP-Rp
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 10:47:42 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hRHjN-0005aM-Rs
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 10:51:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hRHfY-0008Hx-KV
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 10:47:41 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45700)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hRHfY-0008G7-D0
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 10:47:40 -0400
-Received: by mail-wr1-x442.google.com with SMTP id b18so3683910wrq.12
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 07:47:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=l9q7KvmjaLy6huMCLkNzLHAGghAhe5aW2pE9iFxRei4=;
-	b=siYCmilXdCQxs0pTnh8rf295KB88n2tg3pdX3QvoPyXQqmhksf1Kxuw127Sy048LOb
-	Pj7IWwFOatj83QodTxOm2oRAE5okdEmtYzdFlB2a0zIowtMOhmgSHlW16JMK/dF6LWN+
-	pezYWy7mS2OLXXYlevM3XFwFZTu9ptLUUkbXzUS8n2NSSdqtHhr0y8G0/OyNnfZLTw99
-	eUuKHFTLxIiTR43JE+LVlWfrkj0Y26zcSWK7FfsUabYMHTeqqWgfrKVrY0dXPXlPP0fI
-	3FvQyMznOc8CM0mZkPfr2H0j8bTzQOlXhjRA9k+R1V2E4PmvbICdROlfbZZzOl5gO+xx
-	fHXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=l9q7KvmjaLy6huMCLkNzLHAGghAhe5aW2pE9iFxRei4=;
-	b=Dp4s3Lup7VKWBuz1s8HDkmRii0+kkbkmzjvTfALJ4Vt/Hp7g3q3mVzsx5ZBVUfrsWQ
-	F8ECbZHCUZIciFMpKr5q4rAIxv5Wc5lASyC1LNc2yok7YQao/jdEpgT2TRhREHjdmBlM
-	BkH02m35XMTdcuhT1TaAf0g6gOxtqgumbC1kLP+zLZW5rodBJliOaWSPROUg0zPi1Amd
-	hYOm31pIy1C7ikDiovru1Ysl1Srw+ihkOUs3Mui3+sWBjVNRFmpOuPruljNQPRHkH5fE
-	7TG+liyl4cxtodIIc0tl05KpkEIOsqofYY7flwazz/ZmYIhqKd91yDox3fP9q/m2VSq3
-	avDg==
-X-Gm-Message-State: APjAAAUcRYx2POBW3R7ZEmKkxw8GuJHxLn0rJ2yBhhj2OTmUniW5ocIX
-	TWkvSVm+5B07cVQBSH1TGYRNdg==
-X-Google-Smtp-Source: APXvYqx0E3d7kqMINU4Wxx4KBJs2TUmPTAyeuT4VhjY/bozFY/2i4qlC23tsg0unTnm19siU1Qspdg==
-X-Received: by 2002:adf:dcc4:: with SMTP id x4mr5709889wrm.107.1558018059213; 
-	Thu, 16 May 2019 07:47:39 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id o8sm7629018wra.4.2019.05.16.07.47.38
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 16 May 2019 07:47:38 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Thu, 16 May 2019 15:47:32 +0100
-Message-Id: <20190516144733.32399-4-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190516144733.32399-1-peter.maydell@linaro.org>
-References: <20190516144733.32399-1-peter.maydell@linaro.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hRHjN-00013f-1o
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 10:51:37 -0400
+Received: from mail-ve1eur01on0716.outbound.protection.outlook.com
+	([2a01:111:f400:fe1f::716]:39488
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hRHjM-0000tM-DT; Thu, 16 May 2019 10:51:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+	s=selector1;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=SCE72iC/B4JsiH8x53oQ2i6fj4bc5WxfZUdRq1COGBg=;
+	b=eeHgEcwOG1FyfFXvzsBu2D2IZJ7sCg4kN8OttLQw9Ae1bG0ekozm9nBGB4k39A5MWiXTSyHD6Up6HpN1sdkfz3yZCilpuQ1ipIzwI4IRTX33gxDzqWYfqvDahbCp2l1RW052aNTtOmxMStAFc9v8vSdNEr5SMmNiUhauwBaOu1o=
+Received: from AM6PR08MB4675.eurprd08.prod.outlook.com (10.255.96.78) by
+	AM6PR08MB4644.eurprd08.prod.outlook.com (10.255.22.83) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1878.25; Thu, 16 May 2019 14:51:31 +0000
+Received: from AM6PR08MB4675.eurprd08.prod.outlook.com
+	([fe80::9051:3c85:28c6:a0c1]) by
+	AM6PR08MB4675.eurprd08.prod.outlook.com
+	([fe80::9051:3c85:28c6:a0c1%6]) with mapi id 15.20.1878.024;
+	Thu, 16 May 2019 14:51:31 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-block@nongnu.org"
+	<qemu-block@nongnu.org>
+Thread-Topic: [PATCH v14 1/1] qcow2: skip writing zero buffers to empty COW
+	areas
+Thread-Index: AQHVC/OS54EXOze61k+cXZVdUWneQqZt1ciA
+Date: Thu, 16 May 2019 14:51:31 +0000
+Message-ID: <ab977ecc-4d49-24f0-8116-873e91ee4dd8@virtuozzo.com>
+References: <20190516142749.81019-1-anton.nefedov@virtuozzo.com>
+	<20190516142749.81019-2-anton.nefedov@virtuozzo.com>
+In-Reply-To: <20190516142749.81019-2-anton.nefedov@virtuozzo.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0328.eurprd05.prod.outlook.com
+	(2603:10a6:7:92::23) To AM6PR08MB4675.eurprd08.prod.outlook.com
+	(2603:10a6:20b:c2::14)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190516175129103
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d1ba02da-d2bf-4c74-75f0-08d6da0dfbc2
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
+	SRVR:AM6PR08MB4644; 
+x-ms-traffictypediagnostic: AM6PR08MB4644:
+x-microsoft-antispam-prvs: <AM6PR08MB46444F9F499C51C5BB147F34C10A0@AM6PR08MB4644.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5797;
+x-forefront-prvs: 0039C6E5C5
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(979002)(396003)(366004)(346002)(376002)(136003)(39850400004)(199004)(189003)(2616005)(11346002)(316002)(3846002)(6116002)(26005)(186003)(446003)(486006)(476003)(5660300002)(66476007)(66946007)(73956011)(64756008)(66556008)(54906003)(66446008)(2906002)(14454004)(4744005)(6246003)(110136005)(99286004)(36756003)(2501003)(71190400001)(71200400001)(6436002)(6512007)(229853002)(6486002)(53936002)(305945005)(7736002)(4326008)(31696002)(86362001)(8676002)(68736007)(25786009)(81156014)(81166006)(52116002)(386003)(6506007)(478600001)(102836004)(256004)(66066001)(76176011)(31686004)(8936002)(969003)(989001)(999001)(1009001)(1019001);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4644;
+	H:AM6PR08MB4675.eurprd08.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: jaeB7p7sNOUUnx/PerI8XSkNO6jtY1rVhIZx8waXVdMHgUpY5ic/inyW35yRQGyyxbpTLovcg5gv/1hEEQ60tk0pizDNA6zXVDVvjaMcPh9459OmYYjshFQd6APcsUrzCShtJuoXBCZk1Rq4BM+NAiWJ+KRToazHAiytSptXmXZhLejIAjJNlxMrajvsE07mH5CPrtWoB8qoP0TAgH1e4b3nLF4h+gcxjOWR+2zK1P/NBHZPMN2/ZikHxTCrcKGGZU1MfskvxkvnxZlroQJEk1ijaSvecN89YEzkRjMyDRdWynyr1+WULHbtHAM+ljHsluXwDk6+gBqzwT+T8BEeKZO1oo738986Dxr/rf02R9XAM+9D9ZPHfAaME4Kb9xpAOgg6gdDHMVAFLcceMAlyo6UpBWbYBtcc0/XxlyE09jo=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <1782D3B5ECD9B347B672F36D6541F9FB@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH v2 3/4] hw/arm/boot: Avoid placing the initrd
- on top of the kernel
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d1ba02da-d2bf-4c74-75f0-08d6da0dfbc2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 May 2019 14:51:31.5247 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4644
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 2a01:111:f400:fe1f::716
+Subject: Re: [Qemu-devel] [PATCH v14 1/1] qcow2: skip writing zero buffers
+ to empty COW areas
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,83 +118,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	Richard Henderson <richard.henderson@linaro.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+	"berto@igalia.com" <berto@igalia.com>, Denis Lunev <den@virtuozzo.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We currently put the initrd at the smaller of:
- * 128MB into RAM
- * halfway into the RAM
-(with the dtb following it).
-
-However for large kernels this might mean that the kernel
-overlaps the initrd. For some kinds of kernel (self-decompressing
-32-bit kernels, and ELF images with a BSS section at the end)
-we don't know the exact size, but even there we have a
-minimum size. Put the initrd at least further into RAM than
-that. For image formats that can give us an exact kernel size, this
-will mean that we definitely avoid overlaying kernel and initrd.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/arm/boot.c | 34 ++++++++++++++++++++--------------
- 1 file changed, 20 insertions(+), 14 deletions(-)
-
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index 935be3b92a5..e441393fdf5 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -999,20 +999,6 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
-     if (info->nb_cpus == 0)
-         info->nb_cpus = 1;
- 
--    /*
--     * We want to put the initrd far enough into RAM that when the
--     * kernel is uncompressed it will not clobber the initrd. However
--     * on boards without much RAM we must ensure that we still leave
--     * enough room for a decent sized initrd, and on boards with large
--     * amounts of RAM we must avoid the initrd being so far up in RAM
--     * that it is outside lowmem and inaccessible to the kernel.
--     * So for boards with less  than 256MB of RAM we put the initrd
--     * halfway into RAM, and for boards with 256MB of RAM or more we put
--     * the initrd at 128MB.
--     */
--    info->initrd_start = info->loader_start +
--        MIN(info->ram_size / 2, 128 * 1024 * 1024);
--
-     /* Assume that raw images are linux kernels, and ELF images are not.  */
-     kernel_size = arm_load_elf(info, &elf_entry, &elf_low_addr,
-                                &elf_high_addr, elf_machine, as);
-@@ -1064,6 +1050,26 @@ static void arm_setup_direct_kernel_boot(ARMCPU *cpu,
-     }
- 
-     info->entry = entry;
-+
-+    /*
-+     * We want to put the initrd far enough into RAM that when the
-+     * kernel is uncompressed it will not clobber the initrd. However
-+     * on boards without much RAM we must ensure that we still leave
-+     * enough room for a decent sized initrd, and on boards with large
-+     * amounts of RAM we must avoid the initrd being so far up in RAM
-+     * that it is outside lowmem and inaccessible to the kernel.
-+     * So for boards with less  than 256MB of RAM we put the initrd
-+     * halfway into RAM, and for boards with 256MB of RAM or more we put
-+     * the initrd at 128MB.
-+     * We also refuse to put the initrd somewhere that will definitely
-+     * overlay the kernel we just loaded, though for kernel formats which
-+     * don't tell us their exact size (eg self-decompressing 32-bit kernels)
-+     * we might still make a bad choice here.
-+     */
-+    info->initrd_start = info->loader_start +
-+        MAX(MIN(info->ram_size / 2, 128 * 1024 * 1024), kernel_size);
-+    info->initrd_start = TARGET_PAGE_ALIGN(info->initrd_start);
-+
-     if (is_linux) {
-         uint32_t fixupcontext[FIXUP_MAX];
- 
--- 
-2.20.1
-
+MTYuMDUuMjAxOSAxNzoyNywgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gSWYgQ09XIGFyZWFzIG9m
+IHRoZSBuZXdseSBhbGxvY2F0ZWQgY2x1c3RlcnMgYXJlIHplcm9lcyBvbiB0aGUgYmFja2luZw0K
+PiBpbWFnZSwgZWZmaWNpZW50IGJkcnZfd3JpdGVfemVyb2VzKGZsYWdzPUJEUlZfUkVRX05PX0ZB
+TExCQUNLKSBjYW4gYmUNCj4gdXNlZCBvbiB0aGUgd2hvbGUgY2x1c3RlciBpbnN0ZWFkIG9mIHdy
+aXRpbmcgZXhwbGljaXQgemVybyBidWZmZXJzIGxhdGVyDQo+IGluIHBlcmZvcm1fY293KCkuDQo+
+IA0KPiBpb3Rlc3QgMDYwOg0KPiB3cml0ZSB0byB0aGUgZGlzY2FyZGVkIGNsdXN0ZXIgZG9lcyBu
+b3QgdHJpZ2dlciBDT1cgYW55bW9yZS4NCj4gVXNlIGEgYmFja2luZyBpbWFnZSBpbnN0ZWFkLg0K
+PiANCj4gU2lnbmVkLW9mZi1ieTogQW50b24gTmVmZWRvdiA8YW50b24ubmVmZWRvdkB2aXJ0dW96
+em8uY29tPg0KDQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNl
+bWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1p
+cg0K
 
