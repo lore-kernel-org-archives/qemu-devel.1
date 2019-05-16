@@ -2,52 +2,80 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83383C04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:48:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42B13C04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:51:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5785020815
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:48:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5785020815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id C980220815
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:50:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C980220815
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54449 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54595 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRFoX-0008D2-GA
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:48:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50557)
+	id 1hRFqc-0001b2-QF
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:50:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hRFTy-0007uY-Ib
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:27:37 -0400
+	(envelope-from <philmd@redhat.com>) id 1hRFol-0000Gl-9k
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:49:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hRFTv-000877-H1
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:27:34 -0400
-Received: from relay.sw.ru ([185.231.240.75]:33896)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hRFTv-00085F-9v; Thu, 16 May 2019 08:27:31 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
-	by relay.sw.ru with esmtp (Exim 4.91)
-	(envelope-from <vsementsov@virtuozzo.com>)
-	id 1hRFTq-0006Eb-1S; Thu, 16 May 2019 15:27:26 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Thu, 16 May 2019 15:27:25 +0300
-Message-Id: <20190516122725.132334-3-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190516122725.132334-1-vsementsov@virtuozzo.com>
-References: <20190516122725.132334-1-vsementsov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH 2/2] iotests: test external snapshot with
- bitmap copying
+	(envelope-from <philmd@redhat.com>) id 1hRFoh-00007i-Tt
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:49:03 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:33601)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hRFoh-00005B-P5
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:48:59 -0400
+Received: by mail-wr1-f66.google.com with SMTP id d9so3309930wrx.0
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 05:48:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=tEE4UjBX4z7ardUlhrXQ1kvjs/LJcBk85s+8v4yEK0I=;
+	b=uL5IbijmPJG3MYGd7yulRkfcy+U5kOHc4K3s8bmFoJa3wgUl76iAKu0oF+2Iv1PQPK
+	iQuqVOWSCt2YMCWE8OTsWwMEiJv8xJUj5OLA3Y23EfJaYTdq+kybe0EmiM61l3+hhXBz
+	M3kVLw1J8iUU4lEUv0dHeIgg+5TJ0tjWwtCZdsmMaFWYj1Sj6jyPEbKcbXCTQhmIZu9K
+	CGNjaBdocmJ7apny0cxwLEh+6Q+vkNoJ6fAYYndXxloZu9bVfGWuUdWmfGgXqkKEzBKL
+	ByDfnPx8MKEfDgGkudBK/SyQgCkvisp0k8fJhAUvUiqA2lzzv1RjDQjC0wjxxfeVoWoO
+	vTog==
+X-Gm-Message-State: APjAAAXW0paLa3FlSXWgLyPZGcJQcpO3jm3GIrV3uqrTOLrBPPWs2RdY
+	IvTasnJkueuvHhiieTYp3x8deA==
+X-Google-Smtp-Source: APXvYqynTtNkE4Kqp02qcay/5t2usuykMCUjsGsSn22eSGpT+ARR+5dsSeLAVx5AOLADM4U1F+cuVA==
+X-Received: by 2002:adf:f487:: with SMTP id l7mr31386506wro.127.1558010935377; 
+	Thu, 16 May 2019 05:48:55 -0700 (PDT)
+Received: from [192.168.1.43] (228.red-83-52-173.dynamicip.rima-tde.net.
+	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
+	q14sm3042969wrw.60.2019.05.16.05.48.54
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Thu, 16 May 2019 05:48:54 -0700 (PDT)
+To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
+References: <20190516055244.95559-1-ysato@users.sourceforge.jp>
+	<20190516055244.95559-12-ysato@users.sourceforge.jp>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <76b23848-b949-8cfb-1e94-5984fa25eda3@redhat.com>
+Date: Thu, 16 May 2019 14:48:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190516055244.95559-12-ysato@users.sourceforge.jp>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH v13 11/12] qemu/bitops.h: Add extract8 and
+ extract16
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -59,151 +87,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
-	den@virtuozzo.com, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test shows that external snapshots and incremental backups are
-friends.
+On 5/16/19 7:52 AM, Yoshinori Sato wrote:
+> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  include/qemu/bitops.h | 38 ++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 38 insertions(+)
+> 
+> diff --git a/include/qemu/bitops.h b/include/qemu/bitops.h
+> index 3f0926cf40..764f9d1ea0 100644
+> --- a/include/qemu/bitops.h
+> +++ b/include/qemu/bitops.h
+> @@ -301,6 +301,44 @@ static inline uint32_t extract32(uint32_t value, int start, int length)
+>  }
+>  
+>  /**
+> + * extract8:
+> + * @value: the value to extract the bit field from
+> + * @start: the lowest bit in the bit field (numbered from 0)
+> + * @length: the length of the bit field
+> + *
+> + * Extract from the 8 bit input @value the bit field specified by the
+> + * @start and @length parameters, and return it. The bit field must
+> + * lie entirely within the 8 bit word. It is valid to request that
+> + * all 8 bits are returned (ie @length 8 and @start 0).
+> + *
+> + * Returns: the value of the bit field extracted from the input value.
+> + */
+> +static inline uint8_t extract8(uint8_t value, int start, int length)
+> +{
+> +    assert(start >= 0 && length > 0 && length <= 8 - start);
+> +    return extract32(value, start, length);
+> +}
+> +
+> +/**
+> + * extract16:
+> + * @value: the value to extract the bit field from
+> + * @start: the lowest bit in the bit field (numbered from 0)
+> + * @length: the length of the bit field
+> + *
+> + * Extract from the 16 bit input @value the bit field specified by the
+> + * @start and @length parameters, and return it. The bit field must
+> + * lie entirely within the 16 bit word. It is valid to request that
+> + * all 16 bits are returned (ie @length 16 and @start 0).
+> + *
+> + * Returns: the value of the bit field extracted from the input value.
+> + */
+> +static inline uint16_t extract16(uint16_t value, int start, int length)
+> +{
+> +    assert(start >= 0 && length > 0 && length <= 16 - start);
+> +    return extract32(value, start, length);
+> +}
+> +
+> +/**
+>   * extract64:
+>   * @value: the value to extract the bit field from
+>   * @start: the lowest bit in the bit field (numbered from 0)
+> 
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- tests/qemu-iotests/254     | 52 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/254.out | 53 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 106 insertions(+)
- create mode 100755 tests/qemu-iotests/254
- create mode 100644 tests/qemu-iotests/254.out
-
-diff --git a/tests/qemu-iotests/254 b/tests/qemu-iotests/254
-new file mode 100755
-index 0000000000..15688f2c29
---- /dev/null
-+++ b/tests/qemu-iotests/254
-@@ -0,0 +1,52 @@
-+#!/usr/bin/env python
-+#
-+# Test external snapshot with bitmap copying.
-+#
-+# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import iotests
-+from iotests import qemu_img_create, file_path, log
-+
-+disk, top = file_path('disk', 'top')
-+size = 1024 * 1024
-+
-+qemu_img_create('-f', iotests.imgfmt, disk, str(size))
-+
-+vm = iotests.VM().add_drive(disk, opts='node-name=base')
-+vm.launch()
-+
-+vm.qmp_log('block-dirty-bitmap-add', node='drive0', name='bitmap0')
-+
-+vm.hmp_qemu_io('drive0', 'write 0 512K')
-+
-+vm.qmp_log('transaction', indent=2, actions=[
-+    {'type': 'blockdev-snapshot-sync',
-+     'data': {'device': 'drive0', 'snapshot-file': top,
-+              'snapshot-node-name': 'snap'}},
-+    {'type': 'block-dirty-bitmap-add',
-+     'data': {'node': 'snap', 'name': 'bitmap0'}},
-+    {'type': 'block-dirty-bitmap-merge',
-+     'data': {'node': 'snap', 'target': 'bitmap0', 'bitmaps': [],
-+              'external-bitmaps': [{'node': 'base', 'name': 'bitmap0'}]}}
-+], filters=[iotests.filter_qmp_testfiles])
-+
-+result = vm.qmp('query-block')['return'][0]
-+log("query-block: device = {}, node-name = {}, dirty-bitmaps:".format(
-+    result['device'], result['inserted']['node-name']))
-+log(result['dirty-bitmaps'], indent=2)
-+
-+vm.shutdown()
-diff --git a/tests/qemu-iotests/254.out b/tests/qemu-iotests/254.out
-new file mode 100644
-index 0000000000..14a9cd3d71
---- /dev/null
-+++ b/tests/qemu-iotests/254.out
-@@ -0,0 +1,53 @@
-+{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "node": "drive0"}}
-+{"return": {}}
-+{
-+  "execute": "transaction",
-+  "arguments": {
-+    "actions": [
-+      {
-+        "data": {
-+          "device": "drive0",
-+          "snapshot-file": "TEST_DIR/PID-top",
-+          "snapshot-node-name": "snap"
-+        },
-+        "type": "blockdev-snapshot-sync"
-+      },
-+      {
-+        "data": {
-+          "name": "bitmap0",
-+          "node": "snap"
-+        },
-+        "type": "block-dirty-bitmap-add"
-+      },
-+      {
-+        "data": {
-+          "bitmaps": [],
-+          "external-bitmaps": [
-+            {
-+              "name": "bitmap0",
-+              "node": "base"
-+            }
-+          ],
-+          "node": "snap",
-+          "target": "bitmap0"
-+        },
-+        "type": "block-dirty-bitmap-merge"
-+      }
-+    ]
-+  }
-+}
-+{
-+  "return": {}
-+}
-+query-block: device = drive0, node-name = snap, dirty-bitmaps:
-+[
-+  {
-+    "busy": false,
-+    "count": 524288,
-+    "granularity": 65536,
-+    "name": "bitmap0",
-+    "persistent": false,
-+    "recording": true,
-+    "status": "active"
-+  }
-+]
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 00e474ab0a..5552d0153c 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -250,3 +250,4 @@
- 248 rw auto quick
- 249 rw auto quick
- 252 rw auto backing quick
-+254 rw auto backing quick
--- 
-2.18.0
-
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
