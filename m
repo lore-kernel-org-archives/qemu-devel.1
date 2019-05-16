@@ -2,79 +2,74 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A245C04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:54:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD5AFC04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:55:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA53F20833
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:54:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l3s57O/a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA53F20833
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id AEC2720833
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:55:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEC2720833
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54692 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54724 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRFtm-0004jQ-1n
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:54:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56852)
+	id 1hRFux-0005nY-S5
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:55:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hRFrH-0002ie-SM
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:51:42 -0400
+	(envelope-from <mst@redhat.com>) id 1hRFNB-0001Va-IF
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:20:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hRFrD-0004Wu-Rq
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:51:39 -0400
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:42772)
+	(envelope-from <mst@redhat.com>) id 1hRFN8-0002fn-HX
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:20:33 -0400
+Received: from mail-qt1-f178.google.com ([209.85.160.178]:41513)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hREyp-0006wy-1p
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 07:55:23 -0400
-Received: by mail-oi1-x22c.google.com with SMTP id w9so459322oic.9
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 04:54:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=CuAMivnfo6K315tiSkMxQUNeBoA572jc3TfjxQot0Lo=;
-	b=l3s57O/akLc3INSz276uaGYZ+reCKs0gBLA5rhsHLHyUFMj3QykL8U39rbpb+kpKcc
-	cg0TR2UaoRU7dZ5lFnJygnFmDcMbLwTo2wXzq3CUbz7bMymd6CwK9nr5YuNQ+/HbDQcW
-	iIT2ACpsLG6gcevr4X329CKBt5j8gxLGzuOvvVOXm24hvae2unCYN0I8a5Z1VFdljrw2
-	jmaeHwXZ/PrJBoxum+w4QVCkafjp0xayoEQ2Hm4kFuNIOyhF3jSQFOc0TfpW0uNj6ZlQ
-	D7yJx2zL5SrJMy+4NiSsWio8xWX3mANn2zFbL+LnyN/t0+CJKHft+M1d8m5ihdS90hn7
-	A3GA==
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hRFN6-0002eN-Pm
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:20:30 -0400
+Received: by mail-qt1-f178.google.com with SMTP id y22so3543412qtn.8
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 05:20:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=CuAMivnfo6K315tiSkMxQUNeBoA572jc3TfjxQot0Lo=;
-	b=NDaj1xudatXIOAR+0WXQ4ia6b5+AQsUDu3MRtReT1JRMt4PHZWoQvWgVl1KBlF6ygW
-	27ew3x6jZSdd67yAJb+hBBHwWdKQ2Erd8dNyEAEbqShaePgAht6Inpooppj7ms5ct9KY
-	INIW8PNJ5cb5sDlmiH98xMIS1CT5kbfJzrFzvqv5IlLSG8ZkoSU+76rSapYrF4ACIChJ
-	G6A8+k3XiTHoIOV3gSxuIEYgo1QDCRt1Ij6LA3QUQMmbMBzqqb2K1xjU/kioNnvnmeSE
-	qqwFeyeL4NU0rjDHxfLB95dNgtlLm9y86sQaLxFGVqgHuRDXlFDrXvBjphm6sU3Z8PI7
-	vh6g==
-X-Gm-Message-State: APjAAAWrgZnsngap+MMfYgmmUOxp4aV84gw+i6ozQL85vlnB5uheaC9l
-	kFmnDR+sMZu5IvOo+98kxHbtyz9lttt/BaVsWivF9w==
-X-Google-Smtp-Source: APXvYqwOBgC+QfG/Wi5AlnM3ilUYpuR9A4J1CtwwamneyO2wPPt1kWwSN5NS/L1BN+Q+V4IOJpT1JlGPSVOIV+eNZ2A=
-X-Received: by 2002:aca:845:: with SMTP id 66mr10220492oii.163.1558007684661; 
-	Thu, 16 May 2019 04:54:44 -0700 (PDT)
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to;
+	bh=uWaDRe7+LF+zrJ+Tf/oQtPH1jlenE8wNIJt9AIDqefY=;
+	b=HdaiTfynb3TYh0fI8fDtSGTFFoZMUTgzRv1ykgc6FcIxycyUB2w8CFaLe1oDcEIb41
+	4j3kmdC8S5UrwmTmdn3MnCT+byAvJUCtM1s7yo05fPhHgFu1JZI6qeprNCM/3hnEPZyD
+	22Gq0zfZgPeI6OMPYFcIOdCkWxA8OhPr7LXlmA9La/xjiOEJ3gs+qI3CzhC2duDKkbFz
+	9/GYXVDInjX4cGRSYFQBiyfis7WeF8KfEX41NL07ICL+1lUEy0XNQzeKav0Irkp7rkml
+	o/rZrRlUZfIzCb/C3mvKGMM24DhdQQTalc4fF5lnb9BuS+j6b6GtAuzrgE9VMoVgijFm
+	fm3A==
+X-Gm-Message-State: APjAAAXaz7tBLzE0eZ7mEVuydx5LaiUMiUch23PNSw1X/PSjLch1HAa8
+	yUOYCdDYrgdhikBxDrEKWrk8yLjp+pg=
+X-Google-Smtp-Source: APXvYqz9TV2609jZpPXpHjoiTDdJhSvz2BMDW+Mgnjc/UCokD755IXObKMhfdlgc9IpgUo6o+ouhzw==
+X-Received: by 2002:ac8:1671:: with SMTP id x46mr18972263qtk.240.1558009227932;
+	Thu, 16 May 2019 05:20:27 -0700 (PDT)
+Received: from redhat.com ([185.54.206.10])
+	by smtp.gmail.com with ESMTPSA id v3sm4229465qtc.97.2019.05.16.05.20.26
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Thu, 16 May 2019 05:20:27 -0700 (PDT)
+Date: Thu, 16 May 2019 08:20:24 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Message-ID: <1556808723-226478-4-git-send-email-imammedo@redhat.com>
+References: <20190515121146.7248-1-mst@redhat.com>
 MIME-Version: 1.0
-References: <20190514183454.12758-1-dgilbert@redhat.com>
-In-Reply-To: <20190514183454.12758-1-dgilbert@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 May 2019 12:54:33 +0100
-Message-ID: <CAFEAcA-Wb7tCVGyJqfVH1WmRHQvGto=Bs_DkeT8StJ7KSi429w@mail.gmail.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::22c
-Subject: Re: [Qemu-devel] [PULL 00/16] migration queue
+Content-Disposition: inline
+In-Reply-To: <20190515121146.7248-1-mst@redhat.com>
+X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
+X-Mutt-Fcc: =sent
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.160.178
+Subject: [Qemu-devel] [PULL 25/37] tests: acpi: make RSDT test routine
+ handle XSDT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,45 +81,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
-	Yury Kotov <yury-kotov@yandex-team.ru>, Zhang Chen <chen.zhang@intel.com>,
-	Wei Yang <richardw.yang@linux.intel.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+	Wei Yang <richardw.yang@linux.intel.com>,
+	Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20190516122024.R_tm97YG_riFG2z5bdPMVHIKjcSjia0-yI-Y-Bu5vMw@z>
 
-On Tue, 14 May 2019 at 19:36, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
->
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> The following changes since commit e329ad2ab72c43b56df88b34954c2c7d839bb373:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190513' into staging (2019-05-14 10:08:47 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/dagrh/qemu.git tags/pull-migration-20190514b
->
-> for you to fetch changes up to 9d3250d5ba8c4c5389530b861686e22e77fddcc7:
->
->   monitor: Call mon_get_cpu() only once at hmp_gva2gpa() (2019-05-14 19:00:04 +0100)
->
-> ----------------------------------------------------------------
-> Migration pull 2019-05-14
->
-> Small fixes/cleanups
-> One HMP/monitor fix
->
-> ----------------------------------------------------------------
+From: Igor Mammedov <imammedo@redhat.com>
 
+If RSDP revision is more than 0 fetch table pointed by XSDT
+and fallback to legacy RSDT table otherwise.
 
+While at it drop unused acpi_get_xsdt_address().
 
-Applied, thanks.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <1556808723-226478-4-git-send-email-imammedo@redhat.com>
+Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ tests/acpi-utils.h       |  1 -
+ tests/acpi-utils.c       | 12 ------------
+ tests/bios-tables-test.c | 20 ++++++++++++++------
+ 3 files changed, 14 insertions(+), 19 deletions(-)
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
+diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+index 92285b75b3..f55ccf9ff7 100644
+--- a/tests/acpi-utils.h
++++ b/tests/acpi-utils.h
+@@ -46,7 +46,6 @@ typedef struct {
+ 
+ uint8_t acpi_calc_checksum(const uint8_t *data, int len);
+ uint32_t acpi_find_rsdp_address(QTestState *qts);
+-uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
+ void acpi_fetch_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table);
+ void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
+                       const uint8_t *addr_ptr, int addr_size, const char *sig,
+diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
+index 644c87b5f9..a0d49c4371 100644
+--- a/tests/acpi-utils.c
++++ b/tests/acpi-utils.c
+@@ -51,18 +51,6 @@ uint32_t acpi_find_rsdp_address(QTestState *qts)
+     return off;
+ }
+ 
+-uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table)
+-{
+-    uint64_t xsdt_physical_address;
+-    uint8_t revision = rsdp_table[15 /* Revision offset */];
+-
+-    /* We must have revision 2 if we're looking for an XSDT pointer */
+-    g_assert(revision == 2);
+-
+-    memcpy(&xsdt_physical_address, &rsdp_table[24 /* XsdtAddress offset */], 8);
+-    return le64_to_cpu(xsdt_physical_address);
+-}
+-
+ void acpi_fetch_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table)
+ {
+     uint8_t revision;
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 86b592c67f..d6ab1218da 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -107,21 +107,29 @@ static void test_acpi_rsdp_table(test_data *data)
+     }
+ }
+ 
+-static void test_acpi_rsdt_table(test_data *data)
++static void test_acpi_rxsdt_table(test_data *data)
+ {
++    const char *sig = "RSDT";
+     AcpiSdtTable rsdt = {};
++    int entry_size = 4;
++    int addr_off = 16 /* RsdtAddress */;
+     uint8_t *ent;
+ 
+-    /* read RSDT table */
++    if (data->rsdp_table[15 /* Revision offset */] != 0) {
++        addr_off = 24 /* XsdtAddress */;
++        entry_size = 8;
++        sig = "XSDT";
++    }
++    /* read [RX]SDT table */
+     acpi_fetch_table(data->qts, &rsdt.aml, &rsdt.aml_len,
+-                     &data->rsdp_table[16 /* RsdtAddress */], 4, "RSDT", true);
++                     &data->rsdp_table[addr_off], entry_size, sig, true);
+ 
+     /* Load all tables and add to test list directly RSDT referenced tables */
+-    ACPI_FOREACH_RSDT_ENTRY(rsdt.aml, rsdt.aml_len, ent, 4 /* Entry size */) {
++    ACPI_FOREACH_RSDT_ENTRY(rsdt.aml, rsdt.aml_len, ent, entry_size) {
+         AcpiSdtTable ssdt_table = {};
+ 
+         acpi_fetch_table(data->qts, &ssdt_table.aml, &ssdt_table.aml_len, ent,
+-                         4, NULL, true);
++                         entry_size, NULL, true);
+         /* Add table to ASL test tables list */
+         g_array_append_val(data->tables, ssdt_table);
+     }
+@@ -521,7 +529,7 @@ static void test_acpi_one(const char *params, test_data *data)
+     data->tables = g_array_new(false, true, sizeof(AcpiSdtTable));
+     test_acpi_rsdp_address(data);
+     test_acpi_rsdp_table(data);
+-    test_acpi_rsdt_table(data);
++    test_acpi_rxsdt_table(data);
+     test_acpi_fadt_table(data);
+ 
+     if (iasl) {
+-- 
+MST
 
--- PMM
 
