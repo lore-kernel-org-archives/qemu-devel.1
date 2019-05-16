@@ -4,67 +4,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17540C04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 22:37:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 938C7C04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 22:37:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE09D2082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 22:37:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE09D2082E
+	by mail.kernel.org (Postfix) with ESMTPS id 618002070D
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 22:37:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 618002070D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37747 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37749 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRP01-0006xQ-59
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 18:37:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35247)
+	id 1hRP09-000724-Jx
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 18:37:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hROyP-0005qY-82
+	(envelope-from <laurent@vivier.eu>) id 1hROyO-0005qV-Tc
 	for qemu-devel@nongnu.org; Thu, 16 May 2019 18:35:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hROyO-00024i-3H
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 18:35:37 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:49137)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hROyN-000207-QL
+	(envelope-from <laurent@vivier.eu>) id 1hROyN-00023U-PL
 	for qemu-devel@nongnu.org; Thu, 16 May 2019 18:35:36 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:60019)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hROyN-0001zi-FQ
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 18:35:35 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA
 	(Nemesis)
-	id 1N6bsG-1gc2OY0DJm-01861d; Fri, 17 May 2019 00:35:32 +0200
+	id 1MBUuP-1hX9C60p1b-00CzGe; Fri, 17 May 2019 00:35:33 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Fri, 17 May 2019 00:35:14 +0200
-Message-Id: <20190516223519.7520-2-laurent@vivier.eu>
+Date: Fri, 17 May 2019 00:35:16 +0200
+Message-Id: <20190516223519.7520-4-laurent@vivier.eu>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190516223519.7520-1-laurent@vivier.eu>
 References: <20190516223519.7520-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:mD9HteA2IFi9s1K5T83VMGrv0hpvBwVXoe9rDB5eXNP/haHwuQt
-	cYN9bBB/2YWBVsEnn8j2y/4o1VsYtmMtYXLm6yh+Dh7Eh3R38wA8pEcClSJHh4W1UCpHrRA
-	/xbxgCS4TZpSUgdVp8YlqdcfJ+wtrcn3X6SoQeCNzZEWgopPJVWjwAubR0bGmo3hfYsdvz2
-	5P1XATwrPFIZ6aQAkA7vw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zwm4bP9DNDE=:L6PDi8m94BmOKcfPkmct3D
-	QtV7DQyhqm8PlzRNYi/Kc12pZ+27Rs9EfqFcprN/UVngIZjOKtUI/GVRDkYNFzuydxpCNytMK
-	p52+/cRqOwm4wCJ981J4k6SOYt3UwWVMAG1C6ngUyNEMOei7SO/vjAA08mnCt5Nu0QdI4drmn
-	fmZGiTGgKrJBwy8bBCpLfivh+FlGuKe9L0ptWjaLTCzssZk+LH8NQ0Zgammw2UcYDJx72xo8S
-	4s5pJvAcoT3YJ3BC38dm0+yiPd5A+Ck/cwv5xRqo1F/bMyAJ9ftYsbG46vwoeAScdcb4tar4P
-	YzQAMCNQcxx9u0K/PFWkqfaN0d/FWIsR7g0qpIWoFn2TRhMh5lfsVFWLD5Zff4atJMGoxSeCu
-	e5SEy60BDNnSk1wHg+wotH7RgJEhpkgyGPub3UQPosbs1HVTL0wFrSEAqIKwNRPBlg7tydb5O
-	ZLMmPp7LCZoTslvl2NYJi5UT+Nc6NqRftZTVybIZ5VhXDVhQ40pi4QegPd4a0syLYeniANy5q
-	pmns3GX9FtTPUn1ifNEO7bft1+QLJoiBYeP2QLPtjpVjzPciycp/ADCJ5LEEYpUoyshG0hioB
-	CxxsU1AbPcQ9zkWF0HpWSxsDi7GIsdb42jOlnEgVb8VqZIM26L+unr3odidd6u+UKx/HDzMfP
-	MO9Ydv2NAXWs5jEmKSI+HD7RZFq2ryNJ8fxwFWoZZbMwa4GCuT2I/l6tglJ6dzMzymFGQ1Dwe
-	P/K+6u9Z+QyuJeTphb2z85LKVTyGSFz65habUg==
+X-Provags-ID: V03:K1:l9C8KLvBW2gomwO+cpQLeYlEVNz3HseGsRFns7bsiU+O6tkAfy5
+	k5eGTtSxtfBicIOjZ+tSGRY40Rpqn1EKPhDfuSQ7WXFCJ9Pl3CZ39a51u1SUn2mpPLvq8/b
+	Kbk7lw1eDPMAcTIg4OFdZHNFK2TaVzRSgGlDK2SVats0o5DZFxTkwmk+H9sSfl9r4UzJHVS
+	f11z2bBpZ+9jaXFZKmXSw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:KuBjqcR/sak=:YFalkuBsw0/Jgukd69HVaS
+	kqKHfK9UpnHcYDiT+wqN5/tBNp1dqCtpPS0tlU1vnJ57a+PKwVBR6Y9ryU2c5Fr9ka7q5MfDt
+	9i3GbWOaUf+FXLKNLjkuEuBbgQyixNm2+FVX0SIX6yllhXqp3xZwKqdZi+gTrYgHGOkfghr+3
+	A4OoErNP48zHBZb2tDGiW1wb/MGZNVW/IfnwCOWvknetxBV37UzC37iKCWrMCPiOvrJM3Ox2l
+	M5zeWCHc6+FxfVjeHlfFPxGgOvCMvshZDDbz9jS4dx8QWJzLvNibK+H69FKIFNvIZkMyqw6Gi
+	T7nkxz9fgGxkITmNx1WrqSW65f2a1UP8K9qcBu93+lPOQ+IlTe2wT9ENNohc0pOv8o8rWVwo0
+	LHZCTOQ6I96EQV9dWnAEaMsRRdTPERNtCmZ6IvlRjCpyueK9Y68WsPFPAs1kY8TZhWunnc+5j
+	aj6bNiUp6mbkhUQ3UCKXErBf1ibyVsg4UMiFHJwe3nlxWHPRYHQrEe9MYgsHWs2UnIp07js0m
+	bv9E1dtWH2zQbRLPO+tORJ1TMcd7+tBfAnkaT8/3GPCm0o2zCjE0TXWvp5YVMSFAXr36E5Xw6
+	yCyVRgkf+dim6prNADyixP8evFFD//4+ig9bplBdcftvavxfrHPUrWfEI+7h6W+JqjNQWyrsq
+	V2CHGw4N+AJtK9kYavf9cY3zR8e4GC19GjPkJoWXoe1SgG3OLmRR7aAeKkkRJS+s4RWqo6Xhl
+	0wdcL/fQtGha/TuiKGJxB6ldOl7qKUauqn5V9A==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.10
-Subject: [Qemu-devel] [PULL 1/6] target/m68k: In dump_address_map() check
- for memory access failures
+X-Received-From: 217.72.192.73
+Subject: [Qemu-devel] [PULL 3/6] target/m68k: Switch to transaction_failed
+ hook
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -85,65 +85,105 @@ Sender: "Qemu-devel"
 
 From: Peter Maydell <peter.maydell@linaro.org>
 
-In dump_address_map(), use address_space_ldl() instead of ldl_phys().
-This allows us to check whether the memory access failed.
+Switch the m68k target from the old unassigned_access hook
+to the transaction_failed hook.
+
+The notable difference is that rather than it being called
+for all physical memory accesses which fail (including
+those made by DMA devices or by the gdbstub), it is only
+called for those made by the CPU via its MMU. (In previous
+commits we put in explicit checks for the direct physical
+loads made by the target/m68k code which will no longer
+be handled by calling the unassigned_access hook.)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20181210165636.28366-2-peter.maydell@linaro.org>
+Message-Id: <20181210165636.28366-4-peter.maydell@linaro.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/m68k/helper.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ target/m68k/cpu.c       |  2 +-
+ target/m68k/cpu.h       |  7 ++++---
+ target/m68k/op_helper.c | 20 ++++++++------------
+ 3 files changed, 13 insertions(+), 16 deletions(-)
 
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index d958a34959..5b81995ee7 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -403,6 +403,7 @@ static void dump_address_map(CPUM68KState *env, uint32_t root_pointer)
-     int last_attr = -1, attr = -1;
-     M68kCPU *cpu = m68k_env_get_cpu(env);
-     CPUState *cs = CPU(cpu);
-+    MemTxResult txres;
+diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+index 582e3a73b3..6d09c630b0 100644
+--- a/target/m68k/cpu.c
++++ b/target/m68k/cpu.c
+@@ -271,7 +271,7 @@ static void m68k_cpu_class_init(ObjectClass *c, void *data)
+     cc->gdb_write_register = m68k_cpu_gdb_write_register;
+     cc->handle_mmu_fault = m68k_cpu_handle_mmu_fault;
+ #if defined(CONFIG_SOFTMMU)
+-    cc->do_unassigned_access = m68k_cpu_unassigned_access;
++    cc->do_transaction_failed = m68k_cpu_transaction_failed;
+     cc->get_phys_page_debug = m68k_cpu_get_phys_page_debug;
+ #endif
+     cc->disas_set_info = m68k_cpu_disas_set_info;
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index ad41608341..6039b47d0c 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -544,9 +544,10 @@ static inline int cpu_mmu_index (CPUM68KState *env, bool ifetch)
  
-     if (env->mmu.tcr & M68K_TCR_PAGE_8K) {
-         /* 8k page */
-@@ -416,22 +417,29 @@ static void dump_address_map(CPUM68KState *env, uint32_t root_pointer)
-         tib_mask = M68K_4K_PAGE_MASK;
-     }
-     for (i = 0; i < M68K_ROOT_POINTER_ENTRIES; i++) {
--        tia = ldl_phys(cs->as, M68K_POINTER_BASE(root_pointer) + i * 4);
--        if (!M68K_UDT_VALID(tia)) {
-+        tia = address_space_ldl(cs->as, M68K_POINTER_BASE(root_pointer) + i * 4,
-+                                MEMTXATTRS_UNSPECIFIED, &txres);
-+        if (txres != MEMTX_OK || !M68K_UDT_VALID(tia)) {
-             continue;
+ int m68k_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size, int rw,
+                               int mmu_idx);
+-void m68k_cpu_unassigned_access(CPUState *cs, hwaddr addr,
+-                                bool is_write, bool is_exec, int is_asi,
+-                                unsigned size);
++void m68k_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
++                                 unsigned size, MMUAccessType access_type,
++                                 int mmu_idx, MemTxAttrs attrs,
++                                 MemTxResult response, uintptr_t retaddr);
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
+index 76f439985a..1c272b4cda 100644
+--- a/target/m68k/op_helper.c
++++ b/target/m68k/op_helper.c
+@@ -454,19 +454,15 @@ static inline void do_interrupt_m68k_hardirq(CPUM68KState *env)
+     do_interrupt_all(env, 1);
+ }
+ 
+-void m68k_cpu_unassigned_access(CPUState *cs, hwaddr addr, bool is_write,
+-                                bool is_exec, int is_asi, unsigned size)
++void m68k_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
++                                 unsigned size, MMUAccessType access_type,
++                                 int mmu_idx, MemTxAttrs attrs,
++                                 MemTxResult response, uintptr_t retaddr)
+ {
+     M68kCPU *cpu = M68K_CPU(cs);
+     CPUM68KState *env = &cpu->env;
+-#ifdef DEBUG_UNASSIGNED
+-    qemu_log_mask(CPU_LOG_INT, "Unassigned " TARGET_FMT_plx " wr=%d exe=%d\n",
+-             addr, is_write, is_exec);
+-#endif
+-    if (env == NULL) {
+-        /* when called from gdb, env is NULL */
+-        return;
+-    }
++
++    cpu_restore_state(cs, retaddr, true);
+ 
+     if (m68k_feature(env, M68K_FEATURE_M68040)) {
+         env->mmu.mmusr = 0;
+@@ -476,7 +472,7 @@ void m68k_cpu_unassigned_access(CPUState *cs, hwaddr addr, bool is_write,
+         if (env->sr & SR_S) { /* SUPERVISOR */
+             env->mmu.ssw |= M68K_TM_040_SUPER;
          }
-         for (j = 0; j < M68K_ROOT_POINTER_ENTRIES; j++) {
--            tib = ldl_phys(cs->as, M68K_POINTER_BASE(tia) + j * 4);
--            if (!M68K_UDT_VALID(tib)) {
-+            tib = address_space_ldl(cs->as, M68K_POINTER_BASE(tia) + j * 4,
-+                                    MEMTXATTRS_UNSPECIFIED, &txres);
-+            if (txres != MEMTX_OK || !M68K_UDT_VALID(tib)) {
-                 continue;
-             }
-             for (k = 0; k < tic_size; k++) {
--                tic = ldl_phys(cs->as, (tib & tib_mask) + k * 4);
--                if (!M68K_PDT_VALID(tic)) {
-+                tic = address_space_ldl(cs->as, (tib & tib_mask) + k * 4,
-+                                        MEMTXATTRS_UNSPECIFIED, &txres);
-+                if (txres != MEMTX_OK || !M68K_PDT_VALID(tic)) {
-                     continue;
-                 }
-                 if (M68K_PDT_INDIRECT(tic)) {
--                    tic = ldl_phys(cs->as, M68K_INDIRECT_POINTER(tic));
-+                    tic = address_space_ldl(cs->as, M68K_INDIRECT_POINTER(tic),
-+                                            MEMTXATTRS_UNSPECIFIED, &txres);
-+                    if (txres != MEMTX_OK) {
-+                        continue;
-+                    }
-                 }
+-        if (is_exec) { /* instruction or data */
++        if (access_type == MMU_INST_FETCH) { /* instruction or data */
+             env->mmu.ssw |= M68K_TM_040_CODE;
+         } else {
+             env->mmu.ssw |= M68K_TM_040_DATA;
+@@ -494,7 +490,7 @@ void m68k_cpu_unassigned_access(CPUState *cs, hwaddr addr, bool is_write,
+             break;
+         }
  
-                 last_logical = logical;
+-        if (!is_write) {
++        if (access_type != MMU_DATA_STORE) {
+             env->mmu.ssw |= M68K_RW_040;
+         }
+ 
 -- 
 2.20.1
 
