@@ -2,77 +2,64 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E21FDC04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2152CC04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:42:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F97A20815
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:42:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F97A20815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EA89F20815
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:42:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA89F20815
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54238 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54240 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRFik-0003mE-Tb
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:42:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48931)
+	id 1hRFip-0003q7-7c
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:42:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hRFMJ-0000fa-PA
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:19:42 -0400
+	(envelope-from <groug@kaod.org>) id 1hRFUV-000056-SE
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:28:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hRFMF-00023S-Vk
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:19:39 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:40308)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hRFME-00022C-Bc
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:19:35 -0400
-Received: by mail-qk1-f193.google.com with SMTP id q197so2074073qke.7
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 05:19:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:content-transfer-encoding
-	:in-reply-to;
-	bh=82yaoR5Qd6z6aUjmHl7ZXeDTv2ZIDxYt8pX/8qpvvOk=;
-	b=fG3SekBm+RwUibe1yM9VjTnOJxmzmruUBe5dEuoGnnYn2LseR3dFbGHV31OzdCiEJp
-	rrCG/apghymlexEkpc2RhwMPVcC/fmbYa0uzzlJxejrB30bFpGSXp6bZMhqamfGP1Z8s
-	dfF5//criOrtrwp2RkxcVVIDCz0cSQ9zORRbdy6cWvXi3gEkfhqTfNpt5M4ZgkvK8dl8
-	/KdzAn20+ee0r3pt15GjNaBupL9fdvySf+eItsTWDktuAmynUXYDAWN19qjETUrMOKCB
-	aJWkl4pLmVS+GM2gRNUAcR4QXna6QgGzIleU4OkHoS6RzTZX37KH+D2vqfWkAlBDjDCx
-	MXmQ==
-X-Gm-Message-State: APjAAAX2/NFq8EMVNdlMixDmzVVcmKzczeU0lOhmBsJUEgupGP6jzGKc
-	Rrsj5FHQAgnzYqriQ5fF5hNZfRQpDso=
-X-Google-Smtp-Source: APXvYqx34zoLCFmLiPl28IIfIqHHtICWH40cz66CJ7bYHhb5RpmZ49g79svpllq+8Ib6nN31w6DGmQ==
-X-Received: by 2002:a05:620a:13c6:: with SMTP id
-	g6mr26179321qkl.153.1558009173486; 
-	Thu, 16 May 2019 05:19:33 -0700 (PDT)
-Received: from redhat.com ([185.54.206.10])
-	by smtp.gmail.com with ESMTPSA id 22sm2546484qkl.4.2019.05.16.05.19.31
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Thu, 16 May 2019 05:19:32 -0700 (PDT)
-Date: Thu, 16 May 2019 08:19:29 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190419003053.8260-5-richardw.yang@linux.intel.com>
-References: <20190515121146.7248-1-mst@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1hRFUS-0008VE-R9
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:28:07 -0400
+Received: from 4.mo179.mail-out.ovh.net ([46.105.36.149]:59154)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hRFUS-0008TS-Lw
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:28:04 -0400
+Received: from player158.ha.ovh.net (unknown [10.109.143.223])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id B1B43126A3A
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 14:28:01 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player158.ha.ovh.net (Postfix) with ESMTPSA id 816F95BA6C5B;
+	Thu, 16 May 2019 12:27:55 +0000 (UTC)
+Date: Thu, 16 May 2019 14:27:54 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190516142754.54e2a656@bahia.lan>
+In-Reply-To: <20190516114601.GG3207@umbus.fritz.box>
+References: <155793986451.464434.12887933000007255549.stgit@bahia.lan>
+	<20190516063957.GA25414@sathnaga86>
+	<20190516085814.022ef4b1@bahia.lan>
+	<20190516114601.GG3207@umbus.fritz.box>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190515121146.7248-1-mst@redhat.com>
-X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
-X-Mutt-Fcc: =sent
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/xKYH_akNmZXic4qrZYfmByy";
+	protocol="application/pgp-signature"
+X-Ovh-Tracer-Id: 6291810158273337830
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddttddgheduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.222.193
-Subject: [Qemu-devel] [PULL 18/37] hw/arm/virt-acpi-build: pass AcpiMcfgInfo
- to build_mcfg()
+X-Received-From: 46.105.36.149
+Subject: Re: [Qemu-devel] [PATCH] spapr/xive: Sanity checks of OV5 during CAS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -84,158 +71,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
-	Wei Yang <richardw.yang@linux.intel.com>,
-	Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+Cc: qemu-ppc@nongnu.org, Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
+	=?UTF-8?B?Q8OpZHJp?= =?UTF-8?B?Yw==?= Le Goater <clg@kaod.org>,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190516121929.FaACVnuNU21q-MoeDQky1B2GOklKb1ntKtlYnvUwB8s@z>
 
-From: Wei Yang <richardw.yang@linux.intel.com>
+--Sig_/xKYH_akNmZXic4qrZYfmByy
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-To build MCFG, two information is necessary:
+On Thu, 16 May 2019 21:46:01 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+[...]
+>=20
+> I won't be sending a pull request for a little while yet, so if you
+> want to send a followup improving the messages I can fold it into the
+> original patch in my tree.
+>=20
 
-    * bus number
-    * base address
+Done.
 
-Abstract these two information to AcpiMcfgInfo so that build_mcfg and
-build_mcfg_q35 will have the same declaration.
+https://patchwork.ozlabs.org/patch/1100396/
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Message-Id: <20190419003053.8260-5-richardw.yang@linux.intel.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- include/hw/acpi/pci.h    | 33 +++++++++++++++++++++++++++++++++
- hw/arm/virt-acpi-build.c | 18 +++++++++++-------
- hw/i386/acpi-build.c     |  6 +-----
- 3 files changed, 45 insertions(+), 12 deletions(-)
- create mode 100644 include/hw/acpi/pci.h
+--Sig_/xKYH_akNmZXic4qrZYfmByy
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-diff --git a/include/hw/acpi/pci.h b/include/hw/acpi/pci.h
-new file mode 100644
-index 0000000000..124af7d32a
---- /dev/null
-+++ b/include/hw/acpi/pci.h
-@@ -0,0 +1,33 @@
-+/*
-+ * Support for generating PCI related ACPI tables and passing them to Guests
-+ *
-+ * Copyright (C) 2006 Fabrice Bellard
-+ * Copyright (C) 2008-2010  Kevin O'Connor <kevin@koconnor.net>
-+ * Copyright (C) 2013-2019 Red Hat Inc
-+ * Copyright (C) 2019 Intel Corporation
-+ *
-+ * Author: Wei Yang <richardw.yang@linux.intel.com>
-+ * Author: Michael S. Tsirkin <mst@redhat.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+#ifndef HW_ACPI_PCI_H
-+#define HW_ACPI_PCI_H
-+
-+typedef struct AcpiMcfgInfo {
-+    uint64_t base;
-+    uint32_t size;
-+} AcpiMcfgInfo;
-+
-+#endif
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 12dbaf3846..e7c96d658e 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -40,6 +40,7 @@
- #include "hw/loader.h"
- #include "hw/hw.h"
- #include "hw/acpi/aml-build.h"
-+#include "hw/acpi/pci.h"
- #include "hw/pci/pcie_host.h"
- #include "hw/pci/pci.h"
- #include "hw/arm/virt.h"
-@@ -546,21 +547,18 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
- }
- 
- static void
--build_mcfg(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-+build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
- {
-     AcpiTableMcfg *mcfg;
--    const MemMapEntry *memmap = vms->memmap;
--    int ecam_id = VIRT_ECAM_ID(vms->highmem_ecam);
-     int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
- 
-     mcfg = acpi_data_push(table_data, len);
--    mcfg->allocation[0].address = cpu_to_le64(memmap[ecam_id].base);
-+    mcfg->allocation[0].address = cpu_to_le64(info->base);
- 
-     /* Only a single allocation so no need to play with segments */
-     mcfg->allocation[0].pci_segment = cpu_to_le16(0);
-     mcfg->allocation[0].start_bus_number = 0;
--    mcfg->allocation[0].end_bus_number =
--        PCIE_MMCFG_BUS(memmap[ecam_id].size - 1);
-+    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
- 
-     build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
- }
-@@ -801,7 +799,13 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-     build_gtdt(tables_blob, tables->linker, vms);
- 
-     acpi_add_table(table_offsets, tables_blob);
--    build_mcfg(tables_blob, tables->linker, vms);
-+    {
-+        AcpiMcfgInfo mcfg = {
-+           .base = vms->memmap[VIRT_ECAM_ID(vms->highmem_ecam)].base,
-+           .size = vms->memmap[VIRT_ECAM_ID(vms->highmem_ecam)].size,
-+        };
-+        build_mcfg(tables_blob, tables->linker, &mcfg);
-+    }
- 
-     acpi_add_table(table_offsets, tables_blob);
-     build_spcr(tables_blob, tables->linker, vms);
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 6df7bb3abc..dbd3a6cac2 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -58,6 +58,7 @@
- #include "hw/i386/x86-iommu.h"
- 
- #include "hw/acpi/aml-build.h"
-+#include "hw/acpi/pci.h"
- 
- #include "qom/qom-qobject.h"
- #include "hw/i386/amd_iommu.h"
-@@ -86,11 +87,6 @@
- /* Default IOAPIC ID */
- #define ACPI_BUILD_IOAPIC_ID 0x0
- 
--typedef struct AcpiMcfgInfo {
--    uint64_t base;
--    uint32_t size;
--} AcpiMcfgInfo;
--
- typedef struct AcpiPmInfo {
-     bool s3_disabled;
-     bool s4_disabled;
--- 
-MST
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlzdV0oACgkQcdTV5YIv
+c9ZW4w//Qq5d5ePp/1GApVl7G3vXuyOROehiQZaBJcNBNkjNbCyoK/J+7cqM+f/X
+jmZLUeqNjKmx+wLgAoeqm5rT4YWN7s5WKCVQxroNZEoeRGCBIhJTP0zmrte/9Fyl
+QlW3RZPzgZQ06+v/06Ieyi5ci8def5tZnc/nTuYS2XmbkFw+0ecWiRp9wkJ05+rf
+O4xQP4oOr5475/48w3WtnXvwdUtLoG3bB2wsWtivfGvCcZhyAQF1q5gV6TJLVlXd
+O1SspML3y1981UynSoRF0uVvbL9rTeXAJZkBMMN89rc/s19/D0BlmROCbd8KPX15
+F0DTrgZw618vlvgpsOU1lamzFyn2ZOhsv4YcE0lqtqrcWC7AAFXvuXIsmRZH6Nhd
+y206h8l1pFfm8pxyoqQZM7N/RNM9/nbj+szT2H0pT5JUwsDEegnF3lecCG/xtUT+
+10OPfWn4gfo3+mHpzC8oiTa6YyHFpf9sQDxHW1u+ZFb9ddTTslauJjdMQaeCAXDH
+xUFd+11cQ64iw6cxfd77bIPJrASvppEWE7XM4yXUPIbvfwiarLWIztL/le3cm/sG
+Z0UVbvtP2odBsmk5nlFHLsCdXFJFFIQkVQt7fKW1izKD3xxUNo6M0PHGptxfU9ak
+yA7mic+zzogOfg3MyCX0sH62XGk3b/GeAa/6/2XJ72poRPN7i4o=
+=fEse
+-----END PGP SIGNATURE-----
+
+--Sig_/xKYH_akNmZXic4qrZYfmByy--
 
