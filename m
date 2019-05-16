@@ -2,83 +2,91 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81522C04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 16:32:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6784FC04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 16:32:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42C8F2082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 16:32:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42C8F2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 331BF2082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 16:32:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rfXrz+F8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 331BF2082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60823 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60825 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRJJB-0002b6-42
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 12:32:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50110)
+	id 1hRJJI-0002iM-Ds
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 12:32:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hRJHh-0001k4-F2
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:31:10 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hRJHm-0001ms-R3
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:31:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hRJHf-0002hJ-SC
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:31:09 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:45502)
+	(envelope-from <alex.bennee@linaro.org>) id 1hRJHl-0002sV-Pg
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:31:14 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39738)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hRJHf-0002fe-Lk
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:31:07 -0400
-Received: by mail-wr1-f66.google.com with SMTP id b18so4072177wrq.12
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 09:31:06 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hRJHl-0002pQ-Hk
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 12:31:13 -0400
+Received: by mail-wm1-x343.google.com with SMTP id n25so3747455wmk.4
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 09:31:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=87l+4sPqAWK7bomSCB5mtlGmIUFpehR+N/kma7vM1vw=;
+	b=rfXrz+F8ssg0HFWD84p2AxhQxL6yKHhx1g3K+/x/qmJKOXkOeCWU4v0UsBqdUy7I0H
+	C4+A6Y/KhQvhjrspZyW7f30psSgTqXkMp/AStKYVlc74sfBrfnhlNdg8mFYj49WRIeRB
+	14J1BZSaCfhLi/1rxzgj3oz3Evsxt8caD/We/YXcXmduxiOWdP3Qh2t3GDzMratx2MWC
+	iCqvAmajIveKC4rjMOkBKPpCmZOjkkSVypJDpa3TaXfrkoPuFATzF5ufk/p2e6mvrWlJ
+	BuUNV4TRHAqEjSfFTIxx958ESlX1jkfa1s6lMHVBbfKV3Goc7i6TWd3qJJ0lHAMe1cW8
+	m0dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=LIurXMSJmXU6vCy+NHcAmHy2hxO7o3vwPkFQiG77T+k=;
-	b=pBOUWHLkL8MCvpvcBy2iymeNGbeipKIA1GhSY/4Zrb7IiVxpTvjIlEkFPGW4wMtiqF
-	CDhC4HuKIBi/Qj2B/+jhwqTb7HUbebEHnE290s0G6TX5Mnb/ofOeaIXnKpp3ZiMZYBVa
-	R8Nzb9c/cWMDJLsssrhNvaDY9qP+X9+UUKReIFuhi3nnDgiDpKaqWA0qD0mH5gYoe6nT
-	knu3V24fxIUeLQVmkXO0XR8qjtfd6+8GkXJtrcisSgajIbCUBr97ayhdqwQ3k1M5ihAp
-	0fKzX1/t2RlwXL2MNjnXpEEFZsYwcYxx8SC9tictajsOVoanXrf2oMVEAdlpCI9hdyJe
-	Vswg==
-X-Gm-Message-State: APjAAAWceYPdC9+Q/A//XJMZ6u3SreZGGrkpX2qeh2Mr3QLl9TS/a9yF
-	VLSk+Qzji2m8jXJxws60j5PH7A==
-X-Google-Smtp-Source: APXvYqycqsH3dGKkqnoxEj+GPCx8SoG4tSfFcYBe0o4bkbV2OR0Z1TIw12AlwhlqnZJkE6YE6oWl2A==
-X-Received: by 2002:adf:eb02:: with SMTP id s2mr24583449wrn.29.1558024265581; 
-	Thu, 16 May 2019 09:31:05 -0700 (PDT)
-Received: from [192.168.1.43] (228.red-83-52-173.dynamicip.rima-tde.net.
-	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
-	l21sm5160583wmh.35.2019.05.16.09.31.04
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 16 May 2019 09:31:05 -0700 (PDT)
-To: Jakub Jermar <jakub.jermar@kernkonzept.com>, qemu-devel@nongnu.org
-References: <20190423110034.1260142-1-jakub.jermar@kernkonzept.com>
-	<ab4b6d04-74f9-2f12-829d-9df8c1b1c4ca@redhat.com>
-	<6ae8d347-149d-e7eb-bb02-90aba44c5bbd@kernkonzept.com>
-	<1e9a8595-4653-4900-b747-236f9888b893@kernkonzept.com>
-	<04a4fcca-0db9-46f8-ac41-0d770b0dc5d6@kernkonzept.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <f9f1b930-2381-b343-854f-70e2590c9b73@redhat.com>
-Date: Thu, 16 May 2019 18:31:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=87l+4sPqAWK7bomSCB5mtlGmIUFpehR+N/kma7vM1vw=;
+	b=RQHzoVltsiAhM4b9JtrTxqvQEQGnZ022/8FVt2B8R/AD+5G434l5nSTXdwTxZypDIl
+	oaw59hXtN2Z2tsjXFp2jdjXCLw6H6Ay1DsnsgWE4SAzeVKuxIA27LLsEWY7hGhOpou38
+	pyyQwWU4sisjVHgx15tgT08KPwrJ3KIBCyD0fcklgMvnWJopAnbJ0DlT6npzv9hU3kcP
+	yVLWy/8+PxpXq/1ZJgC+mR2EYr1Uur+aGjKh4mpk4zB7ynYj0phtHXjTpL3I8Y1htBIX
+	XIts1ztMeja2GpUUGK8lgnUkUSo8d6oU3HL15Xf/LDlWm4EDApUy6KjugXhqPAAAPp/E
+	dhgg==
+X-Gm-Message-State: APjAAAUQ1XtmaP6yr4MPK6BkjTx2oVy5mfLAAe1IWErvEkkhCPL4/7lH
+	riLkqnW0gOM3Ye8NggF3X1+cvA==
+X-Google-Smtp-Source: APXvYqx14zI3TxIkI3Rw4hOJjALoSRLlU7a+NQTrsQbrmUDo8NPW//HqJgc4WsPPJRAGZJui2s7+Dg==
+X-Received: by 2002:a1c:a695:: with SMTP id
+	p143mr28815160wme.128.1558024271654; 
+	Thu, 16 May 2019 09:31:11 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	h11sm7371940wrr.44.2019.05.16.09.31.10
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 16 May 2019 09:31:10 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 7754E1FF87;
+	Thu, 16 May 2019 17:31:10 +0100 (BST)
+References: <ad91b397f360b2fc7f4087e476f7df5b04d42ddb.1558021877.git.alistair.francis@wdc.com>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Alistair Francis <alistair.francis@wdc.com>
+In-reply-to: <ad91b397f360b2fc7f4087e476f7df5b04d42ddb.1558021877.git.alistair.francis@wdc.com>
+Date: Thu, 16 May 2019 17:31:10 +0100
+Message-ID: <87zhnml5td.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <04a4fcca-0db9-46f8-ac41-0d770b0dc5d6@kernkonzept.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH v2] mips: Decide to map PAGE_EXEC in
- map_address
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH v3 1/1] target/arm: Fix vector operation
+ segfault
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,143 +98,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
-	Leon Alrae <leon.alrae@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+	qemu-devel@nongnu.org, qemu-arm@nongnu.org, alistair23@gmail.com,
+	philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Jakub,
 
-On 5/16/19 3:10 PM, Jakub Jermar wrote:
-> Hi,
-> 
-> On 5/3/19 12:02 PM, Jakub Jermar wrote:
->> Hi,
->>
->> On 4/23/19 4:58 PM, Jakub Jermar wrote:
->>> Hi Philippe!
->>>
->>> On 4/23/19 3:48 PM, Philippe Mathieu-Daudé wrote:
->>>> Hi Jakub,
->>>>
->>>> On 4/23/19 1:00 PM, Jakub Jermář wrote:
->>>>> This commit addresses QEMU Bug #1825311:
->>>>>
->>>>>   mips_cpu_handle_mmu_fault renders all accessed pages executable
->>>>>
->>>>> It allows finer-grained control over whether the accessed page should be
->>>>> executable by moving the decision to the underlying map_address
->>>>> function, which has more information for this.
->>>>>
->>>>> As a result, pages that have the XI bit set in the TLB and are accessed
->>>>> for read/write, don't suddenly end up being executable.
->>>>>
->>>>
->>>> Fixes: https://bugs.launchpad.net/qemu/+bug/1825311
->>>>
->>>>> Signed-off-by: Jakub Jermář <jakub.jermar@kernkonzept.com>
->>>>> ---
->>>>>  target/mips/helper.c | 17 ++++++++++-------
->>>>>  1 file changed, 10 insertions(+), 7 deletions(-)
->>>>>
->>>>> diff --git a/target/mips/helper.c b/target/mips/helper.c
->>>>> index c44cdca3b5..132d073fbe 100644
->>>>> --- a/target/mips/helper.c
->>>>> +++ b/target/mips/helper.c
->>>>> @@ -43,7 +43,7 @@ int no_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
->>>>>                          target_ulong address, int rw, int access_type)
->>>>>  {
->>>>>      *physical = address;
->>>>> -    *prot = PAGE_READ | PAGE_WRITE;
->>>>> +    *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
->>>>>      return TLBRET_MATCH;
->>>>>  }
->>>>>  
->>>>> @@ -61,7 +61,7 @@ int fixed_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
->>>>>      else
->>>>>          *physical = address;
->>>>>  
->>>>> -    *prot = PAGE_READ | PAGE_WRITE;
->>>>> +    *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
->>>>>      return TLBRET_MATCH;
->>>>>  }
->>>>>  
->>>>> @@ -101,6 +101,9 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
->>>>>                  *prot = PAGE_READ;
->>>>>                  if (n ? tlb->D1 : tlb->D0)
->>>>>                      *prot |= PAGE_WRITE;
->>>>> +                if (!(n ? tlb->XI1 : tlb->XI0)) {
->>>>> +                    *prot |= PAGE_EXEC;
->>>>> +                }
->>>>
->>>> This was indeed missed in commit 2fb58b73746e.
+Alistair Francis <alistair.francis@wdc.com> writes:
 
-Aleksandar, if this patch is OK with you, can you amend this comment,
-and add the "Fixes:" tag too when applying? Thanks!
+> Commit 89e68b575 "target/arm: Use vector operations for saturation"
+> causes this abort() when booting QEMU ARM with a Cortex-A15:
+>
+> 0  0x00007ffff4c2382f in raise () at /usr/lib/libc.so.6
+> 1  0x00007ffff4c0e672 in abort () at /usr/lib/libc.so.6
+> 2  0x00005555559c1839 in disas_neon_data_insn (insn=3D<optimized out>, s=
+=3D<optimized out>) at ./target/arm/translate.c:6673
+> 3  0x00005555559c1839 in disas_neon_data_insn (s=3D<optimized out>, insn=
+=3D<optimized out>) at ./target/arm/translate.c:6386
+> 4  0x00005555559cd8a4 in disas_arm_insn (insn=3D4081107068, s=3D0x7fffe59=
+a9510) at ./target/arm/translate.c:9289
+> 5  0x00005555559cd8a4 in arm_tr_translate_insn (dcbase=3D0x7fffe59a9510, =
+cpu=3D<optimized out>) at ./target/arm/translate.c:13612
+> 6  0x00005555558d1d39 in translator_loop (ops=3D0x5555561cc580 <arm_trans=
+lator_ops>, db=3D0x7fffe59a9510, cpu=3D0x55555686a2f0, tb=3D<optimized out>=
+, max_insns=3D<optimized out>) at ./accel/tcg/translator.c:96
+> 7  0x00005555559d10d4 in gen_intermediate_code (cpu=3Dcpu@entry=3D0x55555=
+686a2f0, tb=3Dtb@entry=3D0x7fffd7840080 <code_gen_buffer+126091347>, max_in=
+sns=3Dmax_insns@entry=3D512) at ./target/arm/translate.c:13901
+> 8  0x00005555558d06b9 in tb_gen_code (cpu=3Dcpu@entry=3D0x55555686a2f0, p=
+c=3D3067096216, cs_base=3D0, flags=3D192, cflags=3D-16252928, cflags@entry=
+=3D524288) at ./accel/tcg/translate-all.c:1736
+> 9  0x00005555558ce467 in tb_find (cf_mask=3D524288, tb_exit=3D1, last_tb=
+=3D0x7fffd783e640 <code_gen_buffer+126084627>, cpu=3D0x1) at ./accel/tcg/cp=
+u-exec.c:407
+> 10 0x00005555558ce467 in cpu_exec (cpu=3Dcpu@entry=3D0x55555686a2f0) at .=
+/accel/tcg/cpu-exec.c:728
+> 11 0x000055555588b0cf in tcg_cpu_exec (cpu=3D0x55555686a2f0) at ./cpus.c:=
+1431
+> 12 0x000055555588d223 in qemu_tcg_cpu_thread_fn (arg=3D0x55555686a2f0) at=
+ ./cpus.c:1735
+> 13 0x000055555588d223 in qemu_tcg_cpu_thread_fn (arg=3Darg@entry=3D0x5555=
+5686a2f0) at ./cpus.c:1709
+> 14 0x0000555555d2629a in qemu_thread_start (args=3D<optimized out>) at ./=
+util/qemu-thread-posix.c:502
+> 15 0x00007ffff4db8a92 in start_thread () at /usr/lib/libpthread.
+>
+> This patch ensures that we don't hit the abort() in the second switch
+> case in disas_neon_data_insn() as we will return from the first case.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+> v3:
+>  - Resend with hopefully 8bit encoding instead of base64
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Applies nicely thanks ;-)
 
->>>>
->>>>>                  return TLBRET_MATCH;
->>>>>              }
->>>>>              return TLBRET_DIRTY;
->>>>> @@ -182,7 +185,7 @@ static int get_seg_physical_address(CPUMIPSState *env, hwaddr *physical,
->>>>>      } else {
->>>>>          /* The segment is unmapped */
->>>>>          *physical = physical_base | (real_address & segmask);
->>>>> -        *prot = PAGE_READ | PAGE_WRITE;
->>>>> +        *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
->>>>>          return TLBRET_MATCH;
->>>>>      }
->>>>>  }
->>>>> @@ -913,8 +916,8 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
->>>>>      }
->>>>>      if (ret == TLBRET_MATCH) {
->>>>>          tlb_set_page(cs, address & TARGET_PAGE_MASK,
->>>>> -                     physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
->>>>> -                     mmu_idx, TARGET_PAGE_SIZE);
->>>>> +                     physical & TARGET_PAGE_MASK, prot, mmu_idx,
->>>>> +                     TARGET_PAGE_SIZE);
->>>>>          ret = 0;
->>>>>      } else if (ret < 0)
->>>>>  #endif
->>>>> @@ -936,8 +939,8 @@ int mips_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
->>>>>                                             address, rw, access_type, mmu_idx);
->>>>>                  if (ret == TLBRET_MATCH) {
->>>>>                      tlb_set_page(cs, address & TARGET_PAGE_MASK,
->>>>> -                            physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
->>>>> -                            mmu_idx, TARGET_PAGE_SIZE);
->>>>> +                            physical & TARGET_PAGE_MASK, prot, mmu_idx,
->>>>> +                            TARGET_PAGE_SIZE);
->>>>>                      ret = 0;
->>>>>                      return ret;
->>>>>                  }
->>>>>
->>>>
->>>> Your patch looks correct, but I'd like to test it.
->>>> Do you have a reproducer?
->>>> Can you describe the command line you used?
->>>
->>> I've just attached a reproducer image and script to the bug. It's a
->>> 32-bit little-endian test binary running on top of the L4Re microkernel.
-
-I can't get the "TAP" output you described on launchpad.
-
->>> Let me know if you also need a 64-bit version.
-
-64-bit version is welcomed.
-
->>> I tested both 32 and 64-bit versions of the reproducer and also checked
->>> to see that the the other images I have lying around here (Linux 2.6.32
->>> big endian and HelenOS master little-endian, both 32-bit for 4Kc)
->>> continue to run without regressions.
-
-Yes, definitively an improvement:
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-Regards,
-
-Phil.
+--
+Alex Benn=C3=A9e
 
