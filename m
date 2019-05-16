@@ -2,76 +2,121 @@ Return-Path: <SRS0=H6GY=TQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5C3BC04AAF
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:45:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E32D6C04AAF
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:48:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC15C20815
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:45:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC15C20815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A5DB920815
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 May 2019 12:48:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5DB920815
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54313 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54439 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRFli-00063N-Vg
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:45:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49330)
+	id 1hRFnr-0007gH-N6
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 08:48:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hRFO0-0002Eb-Cc
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:21:27 -0400
+	(envelope-from <walling@linux.ibm.com>) id 1hRFlp-0006SD-Lt
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:46:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hRFNw-0003EC-NY
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:21:24 -0400
-Received: from mail-qk1-f171.google.com ([209.85.222.171]:43681)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hRFNw-0003Cz-EE
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:21:20 -0400
-Received: by mail-qk1-f171.google.com with SMTP id z6so2058350qkl.10
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 05:21:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:content-transfer-encoding
-	:in-reply-to;
-	bh=/L0JLOdIaBhKUSCjEGKCuHpfFulwdCMtoNoYZbrd6mk=;
-	b=ZXP+9bYqrcgGjNrkRKGfatK3cJWI93FX2PoKobt11isAZrQqKbJpTIWj5B2mDIJNt/
-	pmv86FyCqBxYr1/NBYp4pPwSouO67U5zmFPOqCXdl4K9mvQNwXwAw3iM4AGw4DkgbPvk
-	JhPlMWRhQQM8hkMxXqSgzbCx1r5Ez8waMHj5tau4/XV42OhBkMhS7ViDobXY3+I0Ouo2
-	W4eOvSG+LSAztgudKwn2Ih1qZUMwjSqmOd6RFmlYsGRj29T9SZfEjhSCWTRuZUGYp5+w
-	PYuRZXNzMYLo1cLakDKc+pfvHkC/5fez+Aj01ETbOin6snBV81/jV//3SXKrdwihBVGT
-	6QtA==
-X-Gm-Message-State: APjAAAWVU5TQnvBefLYbvjrhXEcHCb/0KRZeW38zRwHqGBAKL+kUFjgd
-	Ow6o/+wwETKDlIEa5qRDwy8n3Po2y5g=
-X-Google-Smtp-Source: APXvYqxjpD+Zzsl/o3hQyidOkqDu0wszKEBJd0RDA7TNbrLOofHiWMjYo1hsChhO9jH05FSFNXQ9HQ==
-X-Received: by 2002:a37:8241:: with SMTP id e62mr37211935qkd.355.1558009278475;
-	Thu, 16 May 2019 05:21:18 -0700 (PDT)
-Received: from redhat.com ([185.54.206.10])
-	by smtp.gmail.com with ESMTPSA id e3sm3366811qkn.93.2019.05.16.05.21.16
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Thu, 16 May 2019 05:21:17 -0700 (PDT)
-Date: Thu, 16 May 2019 08:21:15 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <1556808723-226478-16-git-send-email-imammedo@redhat.com>
-References: <20190515121146.7248-1-mst@redhat.com>
+	(envelope-from <walling@linux.ibm.com>) id 1hRFlm-000577-KY
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:46:01 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60412
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1hRFle-0004zE-W3
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 08:45:53 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4GCiO1F044040
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 08:45:43 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2sh6qvc4xt-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 08:44:26 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Thu, 16 May 2019 13:42:12 +0100
+Received: from b01cxnp23033.gho.pok.ibm.com (9.57.198.28)
+	by e17.ny.us.ibm.com (146.89.104.204) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Thu, 16 May 2019 13:42:09 +0100
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
+	[9.57.199.106])
+	by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	x4GCg8ob21889472
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Thu, 16 May 2019 12:42:08 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A126728059;
+	Thu, 16 May 2019 12:42:08 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 91CC528058;
+	Thu, 16 May 2019 12:42:08 +0000 (GMT)
+Received: from [9.56.58.99] (unknown [9.56.58.99])
+	by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+	Thu, 16 May 2019 12:42:08 +0000 (GMT)
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+	David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+References: <1556749903-19221-1-git-send-email-walling@linux.ibm.com>
+	<a87c71be-5bf8-a115-5843-720c9ad10c7b@redhat.com>
+	<bc2fd9bb-7b94-eac7-590b-f01d2063ef9c@redhat.com>
+	<e948a030-bd30-180e-bbd6-76f4a2390bb9@de.ibm.com>
+	<ea6df6b1-4062-c057-92ea-5be40d778fe9@redhat.com>
+	<09293a1c-d000-83a8-46b8-b97ad4fa9774@de.ibm.com>
+	<56e3ace1-6e48-0e20-47d5-b07ac6dfcf31@redhat.com>
+	<e140a076-28a0-0db6-4c59-80e0f2ab44bb@de.ibm.com>
+	<c690c4a8-c277-e3c6-3697-3f0a1924559b@redhat.com>
+	<20190513134637.3d8bb275.cohuck@redhat.com>
+	<898144e3-615e-5074-fb68-bf9995c64609@de.ibm.com>
+	<155d2ca3-6a48-c99a-fe42-dca8e3fd4344@redhat.com>
+	<066c7470-94a3-a922-9a12-1ca42e474c51@de.ibm.com>
+	<1a3dcb16-8c6f-214c-843d-6dca6a24801e@redhat.com>
+	<9a9e9c58-d991-369f-a577-b70581efc75b@de.ibm.com>
+	<3cacee74-92f8-c63a-1aa4-7a169714d70c@redhat.com>
+	<92561a80-6ae7-8d18-4448-01b9418053a6@de.ibm.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Thu, 16 May 2019 08:42:08 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190515121146.7248-1-mst@redhat.com>
-X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
-X-Mutt-Fcc: =sent
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.222.171
-Subject: [Qemu-devel] [PULL 37/37] tests: acpi: print error unable to dump
- ACPI table during rebuild
+In-Reply-To: <92561a80-6ae7-8d18-4448-01b9418053a6@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19051612-0040-0000-0000-000004F080E1
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011105; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000285; SDB=6.01204138; UDB=6.00632107;
+	IPR=6.00985068; 
+	MB=3.00026918; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-16 12:42:11
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051612-0041-0000-0000-000008FC9086
+Message-Id: <5b984668-9f48-3762-3c64-0668fb3ecf90@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-05-16_10:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1905160085
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: Re: [Qemu-devel] [PATCH v4] s390: diagnose 318 info reset and
+ migration support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -83,54 +128,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
-	Wei Yang <richardw.yang@linux.intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: mst@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com,
+	qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190516122115.f-oTBwJ1NBvWTFZVaDteTEK_Y6CTEXDAoQw6HLnngAc@z>
 
-From: Igor Mammedov <imammedo@redhat.com>
+On 5/14/19 5:04 AM, Christian Borntraeger wrote:
+> 
+> 
+> On 14.05.19 11:00, David Hildenbrand wrote:
+>> On 14.05.19 10:56, Christian Borntraeger wrote:
+>>>
+>>>
+>>> On 14.05.19 10:50, David Hildenbrand wrote:
+>>>> On 14.05.19 10:37, Christian Borntraeger wrote:
+>>>>>
+>>>>>
+>>>>> On 14.05.19 09:28, David Hildenbrand wrote:
+>>>>>>>>> But that can be tested using the runability information if I am not wrong.
+>>>>>>>>
+>>>>>>>> You mean the cpu level information, right?
+>>>>>>
+>>>>>> Yes, query-cpu-definition includes for each model runability information
+>>>>>> via "unavailable-features" (valid under the started QEMU machine).
+>>>>>>
+>>>>>>>>
+>>>>>>>>>
+>>>>>>>>>> and others that we have today.
+>>>>>>>>>>
+>>>>>>>>>> So yes, I think this would be acceptable.
+>>>>>>>>>
+>>>>>>>>> I guess it is acceptable yes. I doubt anybody uses that many CPUs in
+>>>>>>>>> production either way. But you never know.
+>>>>>>>>
+>>>>>>>> I think that using that many cpus is a more uncommon setup, but I still
+>>>>>>>> think that having to wait for actual failure
+>>>>>>>
+>>>>>>> That can happen all the time today. You can easily say z14 in the xml when
+>>>>>>> on a zEC12. Only at startup you get the error. The question is really:
+>>>>>>
+>>>>>> "-smp 248 -cpu host" will no longer work, while e.g. "-smp 248 -cpu z12"
+>>>>>> will work. Actually, even "-smp 248" will no longer work on affected
+>>>>>> machines.
+>>>>>>
+>>>>>> That is why wonder if it is better to disable the feature and print a
+>>>>>> warning. Similar to CMMA, where want want to tolerate when CMMA is not
+>>>>>> possible in the current environment (huge pages).
+>>>>>>
+>>>>>> "Diag318 will not be enabled because it is not compatible with more than
+>>>>>> 240 CPUs".
+>>>>>>
+>>>>>> However, I still think that implementing support for more than one SCLP
+>>>>>> response page is the best solution. Guests will need adaptions for > 240
+>>>>>> CPUs with Diag318, but who cares? Existing setups will continue to work.
+>>>>>>
+>>>>>> Implementing that SCLP thingy will avoid any warnings and any errors. It
+>>>>>> just works from the QEMU perspective.
+>>>>>>
+>>>>>> Is implementing this realistic?
+>>>>>
+>>>>> Yes it is but it will take time. I will try to get this rolling. To make
+>>>>> progress on the diag318 thing, can we error on startup now and simply
+>>>>> remove that check when when have implemented a larger sccb? If we would
+>>>>> now do all kinds of "change the max number games" would be harder to "fix".
+>>>>
+>>>>
+>>>> Another idea for temporary handling: Simply only indicate 240 CPUs to
+>>>> the guest if the response does not fit into a page. Once we have that
+>>>> SCLP thingy, this will be fixed. Guest migration back and forth should
+>>>> work, as the VCPUs are fully functional (and initially always stopped),
+>>>> the guest will simply not be able to detect them via SCLP when booting
+>>>> up, and therefore not use them.
+>>>
+>>> Yes, that looks like a good temporary solution. In fact if the guest relies
+>>> on simply probing it could even make use of the additional CPUs. Its just
+>>> the sclp response that is limited to 240 (or make it 247?)
+>>
+>> I think the limiting factor was more than a single CPU, but I don't
+>> recall. We can do the math again and come up with the right number.
+> 
+> I think We need 8 byte per CPU. With byte 134 we should still be ok with
+> 247. Collin can do the math in the patch description.
+> 
+> 
 
-Instead of just asserting print the error that lead to assert first.
-While at it move assert into rebuild branch, which removes redundant
-check done in case of !rebuild branch is taken (the later is taken
-care of by g_assert_no_error).
+Yes 247 fits just fine. The 240 came up as extra space in case we expand
+the rscpi even more in the future.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <1556808723-226478-16-git-send-email-imammedo@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- tests/bios-tables-test.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+I used the
 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index eaa1b0cf62..6cb8b16488 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -195,11 +195,14 @@ static void dump_aml_files(test_data *data, bool rebuild)
-                                        sdt->aml, ext);
-             fd = g_open(aml_file, O_WRONLY|O_TRUNC|O_CREAT,
-                         S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-+            if (fd < 0) {
-+                perror(aml_file);
-+            }
-+            g_assert(fd >= 0);
-         } else {
-             fd = g_file_open_tmp("aml-XXXXXX", &sdt->aml_file, &error);
-             g_assert_no_error(error);
-         }
--        g_assert(fd >= 0);
- 
-         ret = qemu_write_full(fd, sdt->aml, sdt->aml_len);
-         g_assert(ret == sdt->aml_len);
--- 
-MST
+The SCCB_SIZE - sizeof(ReadInfo)) / sizeof(CPUEntry) < S390_MAX_CPUS
+
+calculation as an example of what we could do if the SCCB_SIZE ever
+increases (it would allow older machines to retroactively allow diag318
+if they can also support a larger SCCB... but thinking out loud, there
+might be many more moving parts that would make this preemptive approach
+too tricky to implement today).
 
 
