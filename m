@@ -3,60 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18092C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:56:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 885BFC04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:58:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD92C20848
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:56:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD92C20848
+	by mail.kernel.org (Postfix) with ESMTPS id 5BF9E20656
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:58:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BF9E20656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46339 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46358 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRaXg-0005Z6-4R
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 06:56:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49435)
+	id 1hRaZF-0006qj-JQ
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 06:58:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hRa6b-0006W1-Ew
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:28:50 -0400
+	(envelope-from <david@redhat.com>) id 1hRa6q-0006cz-V6
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:29:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hRa1L-0004u5-Oz
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:23:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40566)
+	(envelope-from <david@redhat.com>) id 1hRa0Z-0004Ll-W2
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:22:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38931)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hRa1L-0004ts-HZ; Fri, 17 May 2019 06:23:23 -0400
+	id 1hRa0Z-0004LJ-O2; Fri, 17 May 2019 06:22:35 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2F7029F759;
-	Fri, 17 May 2019 10:23:21 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 112413082137;
+	Fri, 17 May 2019 10:22:35 +0000 (UTC)
 Received: from t460s.redhat.com (unknown [10.36.118.100])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 78C3538E0E;
-	Fri, 17 May 2019 10:23:16 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E2D8A38E09;
+	Fri, 17 May 2019 10:22:10 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 17 May 2019 12:21:17 +0200
-Message-Id: <20190517102145.21812-13-david@redhat.com>
+Date: Fri, 17 May 2019 12:21:07 +0200
+Message-Id: <20190517102145.21812-3-david@redhat.com>
 In-Reply-To: <20190517102145.21812-1-david@redhat.com>
 References: <20190517102145.21812-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Fri, 17 May 2019 10:23:22 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.42]);
+	Fri, 17 May 2019 10:22:35 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 12/40] s390x/tcg: Implement
- VECTOR COUNT TRAILING ZEROS
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 02/40] s390x/tcg: Implement
+ VECTOR ADD COMPUTE CARRY
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,120 +76,147 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement it similar to VECTOR COUNT LEADING ZEROS.
+128-bit handling courtesy of Richard H.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/helper.h           |  2 ++
- target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c | 28 ++++++++++++++++++++++++++++
- target/s390x/vec_int_helper.c   | 14 ++++++++++++++
- 4 files changed, 46 insertions(+)
+ target/s390x/insn-data.def      |  2 +
+ target/s390x/translate_vx.inc.c | 98 +++++++++++++++++++++++++++++++++
+ 2 files changed, 100 insertions(+)
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 670677427c..60b8bd3c43 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -152,6 +152,8 @@ DEF_HELPER_FLAGS_4(gvec_vavgl8, TCG_CALL_NO_RWG, void=
-, ptr, cptr, cptr, i32)
- DEF_HELPER_FLAGS_4(gvec_vavgl16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
- i32)
- DEF_HELPER_FLAGS_3(gvec_vclz8, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
- DEF_HELPER_FLAGS_3(gvec_vclz16, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
-+DEF_HELPER_FLAGS_3(gvec_vctz8, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
-+DEF_HELPER_FLAGS_3(gvec_vctz16, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
-=20
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index be3c07aafb..a355b7f62f 100644
+index 74a0ccc770..f0e62b9aa8 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1086,6 +1086,8 @@
-     E(0xe7f9, VCHL,    VRR_b, V,   0, 0, 0, 0, vc, 0, TCG_COND_GTU, IF_V=
-EC)
- /* VECTOR COUNT LEADING ZEROS */
-     F(0xe753, VCLZ,    VRR_a, V,   0, 0, 0, 0, vclz, 0, IF_VEC)
-+/* VECTOR COUNT TRAILING ZEROS */
-+    F(0xe752, VCTZ,    VRR_a, V,   0, 0, 0, 0, vctz, 0, IF_VEC)
+@@ -1058,6 +1058,8 @@
+=20
+ /* VECTOR ADD */
+     F(0xe7f3, VA,      VRR_c, V,   0, 0, 0, 0, va, 0, IF_VEC)
++/* VECTOR ADD COMPUTE CARRY */
++    F(0xe7f1, VACC,    VRR_c, V,   0, 0, 0, 0, vacc, 0, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index 948c9fbbb1..2f13d6fa9f 100644
+index 2f84ea0511..a97fce5b65 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -1448,3 +1448,31 @@ static DisasJumpType op_vclz(DisasContext *s, Disa=
-sOps *o)
-     gen_gvec_2(get_field(s->fields, v1), get_field(s->fields, v2), &g[es=
-]);
+@@ -136,6 +136,9 @@ static void get_vec_element_ptr_i64(TCGv_ptr ptr, uin=
+t8_t reg, TCGv_i64 enr,
+     tcg_temp_free_i64(tmp);
+ }
+=20
++#define gen_gvec_3(v1, v2, v3, gen) \
++    tcg_gen_gvec_3(vec_full_reg_offset(v1), vec_full_reg_offset(v2), \
++                   vec_full_reg_offset(v3), 16, 16, gen)
+ #define gen_gvec_3_ool(v1, v2, v3, data, fn) \
+     tcg_gen_gvec_3_ool(vec_full_reg_offset(v1), vec_full_reg_offset(v2),=
+ \
+                        vec_full_reg_offset(v3), 16, 16, data, fn)
+@@ -985,3 +988,98 @@ static DisasJumpType op_va(DisasContext *s, DisasOps=
+ *o)
+                   get_field(s->fields, v3));
      return DISAS_NEXT;
  }
 +
-+static void gen_ctz_i32(TCGv_i32 d, TCGv_i32 a)
++static void gen_acc(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b, uint8_t es)
 +{
-+    tcg_gen_ctzi_i32(d, a, 32);
++    const uint8_t msb_bit_nr =3D NUM_VEC_ELEMENT_BITS(es) - 1;
++    TCGv_i64 msb_mask =3D tcg_const_i64(dup_const(es, 1ull << msb_bit_nr=
+));
++    TCGv_i64 t1 =3D tcg_temp_new_i64();
++    TCGv_i64 t2 =3D tcg_temp_new_i64();
++    TCGv_i64 t3 =3D tcg_temp_new_i64();
++
++    /* Calculate the carry into the MSB, ignoring the old MSBs */
++    tcg_gen_andc_i64(t1, a, msb_mask);
++    tcg_gen_andc_i64(t2, b, msb_mask);
++    tcg_gen_add_i64(t1, t1, t2);
++    /* Calculate the MSB without any carry into it */
++    tcg_gen_xor_i64(t3, a, b);
++    /* Calculate the carry out of the MSB in the MSB bit position */
++    tcg_gen_and_i64(d, a, b);
++    tcg_gen_and_i64(t1, t1, t3);
++    tcg_gen_or_i64(d, d, t1);
++    /* Isolate and shift the carry into position */
++    tcg_gen_and_i64(d, d, msb_mask);
++    tcg_gen_shri_i64(d, d, msb_bit_nr);
++
++    tcg_temp_free_i64(t1);
++    tcg_temp_free_i64(t2);
++    tcg_temp_free_i64(t3);
 +}
 +
-+static void gen_ctz_i64(TCGv_i64 d, TCGv_i64 a)
++static void gen_acc8_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
 +{
-+    tcg_gen_ctzi_i64(d, a, 64);
++    gen_acc(d, a, b, ES_8);
 +}
 +
-+static DisasJumpType op_vctz(DisasContext *s, DisasOps *o)
++static void gen_acc16_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
 +{
-+    const uint8_t es =3D get_field(s->fields, m3);
-+    static const GVecGen2 g[4] =3D {
-+        { .fno =3D gen_helper_gvec_vctz8, },
-+        { .fno =3D gen_helper_gvec_vctz16, },
-+        { .fni4 =3D gen_ctz_i32, },
-+        { .fni8 =3D gen_ctz_i64, },
++    gen_acc(d, a, b, ES_16);
++}
++
++static void gen_acc_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++{
++    TCGv_i32 t =3D tcg_temp_new_i32();
++
++    tcg_gen_add_i32(t, a, b);
++    tcg_gen_setcond_i32(TCG_COND_LTU, d, t, b);
++    tcg_temp_free_i32(t);
++}
++
++static void gen_acc_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
++{
++    TCGv_i64 t =3D tcg_temp_new_i64();
++
++    tcg_gen_add_i64(t, a, b);
++    tcg_gen_setcond_i64(TCG_COND_LTU, d, t, b);
++    tcg_temp_free_i64(t);
++}
++
++static void gen_acc2_i64(TCGv_i64 dl, TCGv_i64 dh, TCGv_i64 al,
++                         TCGv_i64 ah, TCGv_i64 bl, TCGv_i64 bh)
++{
++    TCGv_i64 th =3D tcg_temp_new_i64();
++    TCGv_i64 tl =3D tcg_temp_new_i64();
++    TCGv_i64 zero =3D tcg_const_i64(0);
++
++    tcg_gen_add2_i64(tl, th, al, zero, bl, zero);
++    tcg_gen_add2_i64(tl, th, th, zero, ah, zero);
++    tcg_gen_add2_i64(tl, dl, tl, th, bh, zero);
++    tcg_gen_mov_i64(dh, zero);
++
++    tcg_temp_free_i64(th);
++    tcg_temp_free_i64(tl);
++    tcg_temp_free_i64(zero);
++}
++
++static DisasJumpType op_vacc(DisasContext *s, DisasOps *o)
++{
++    const uint8_t es =3D get_field(s->fields, m4);
++    static const GVecGen3 g[4] =3D {
++        { .fni8 =3D gen_acc8_i64, },
++        { .fni8 =3D gen_acc16_i64, },
++        { .fni4 =3D gen_acc_i32, },
++        { .fni8 =3D gen_acc_i64, },
 +    };
 +
-+    if (es > ES_64) {
++    if (es > ES_128) {
 +        gen_program_exception(s, PGM_SPECIFICATION);
 +        return DISAS_NORETURN;
++    } else if (es =3D=3D ES_128) {
++        gen_gvec128_3_i64(gen_acc2_i64, get_field(s->fields, v1),
++                          get_field(s->fields, v2), get_field(s->fields,=
+ v3));
++        return DISAS_NEXT;
 +    }
-+    gen_gvec_2(get_field(s->fields, v1), get_field(s->fields, v2), &g[es=
-]);
++    gen_gvec_3(get_field(s->fields, v1), get_field(s->fields, v2),
++               get_field(s->fields, v3), &g[es]);
 +    return DISAS_NEXT;
 +}
-diff --git a/target/s390x/vec_int_helper.c b/target/s390x/vec_int_helper.=
-c
-index 016512547c..d1b1f28509 100644
---- a/target/s390x/vec_int_helper.c
-+++ b/target/s390x/vec_int_helper.c
-@@ -60,3 +60,17 @@ void HELPER(gvec_vclz##BITS)(void *v1, const void *v2,=
- uint32_t desc)          \
- }
- DEF_VCLZ(8)
- DEF_VCLZ(16)
-+
-+#define DEF_VCTZ(BITS)                                                  =
-       \
-+void HELPER(gvec_vctz##BITS)(void *v1, const void *v2, uint32_t desc)   =
-       \
-+{                                                                       =
-       \
-+    int i;                                                              =
-       \
-+                                                                        =
-       \
-+    for (i =3D 0; i < (128 / BITS); i++) {                              =
-         \
-+        const uint##BITS##_t a =3D s390_vec_read_element##BITS(v2, i);  =
-         \
-+                                                                        =
-       \
-+        s390_vec_write_element##BITS(v1, i, a ? ctz32(a) : BITS);       =
-       \
-+    }                                                                   =
-       \
-+}
-+DEF_VCTZ(8)
-+DEF_VCTZ(16)
 --=20
 2.20.1
 
