@@ -2,66 +2,80 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BAE5C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 159C7C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:29:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F383D204EC
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:16:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F383D204EC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id D37A120881
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:29:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wjj8fIyd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D37A120881
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45761 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45868 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRZuu-0004Rl-93
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 06:16:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45938)
+	id 1hRa7Y-0007Yx-Rg
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 06:29:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hRZqY-0001H9-EU
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:12:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hRa5i-0006HC-D4
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:27:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hRZqU-0005eD-Rz
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:12:13 -0400
-Received: from 3.mo179.mail-out.ovh.net ([178.33.251.175]:33693)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hRZqT-0005Yy-DY
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:12:09 -0400
-Received: from player735.ha.ovh.net (unknown [10.108.35.103])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id B69D4131B35
-	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 12:12:00 +0200 (CEST)
-Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
-	(Authenticated sender: clg@kaod.org)
-	by player735.ha.ovh.net (Postfix) with ESMTPSA id C24D55E2D28E;
-	Fri, 17 May 2019 10:11:54 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>
-References: <20190506142042.28096-1-clg@kaod.org>
-	<20190506142042.28096-4-clg@kaod.org>
-	<4f7131a7-9099-f506-035f-abc584bf56b0@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <1f038e7c-8980-006c-fffe-c5204052e03c@kaod.org>
-Date: Fri, 17 May 2019 12:11:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <peter.maydell@linaro.org>) id 1hRa2E-0005Yf-8s
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:24:19 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42597)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hRa2E-0005YC-2c
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:24:18 -0400
+Received: by mail-ot1-x342.google.com with SMTP id i2so892926otr.9
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 03:24:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=zq+M/vj/EtUDR8Mf56FK00//ETR1jcsL25mj8EgpdQk=;
+	b=wjj8fIydwOiAP427QUwm1z2EXlTf+YJWeoHFv49ARkcA9E1ytEg3ktjWzgs0rJv5f0
+	qH2KmCRzQQMuP5jJ3S+AZNw51V6VzhyjrevGjYw6Bo/0wudHU/+nremeL74efo4xr91g
+	cwqvHItANhAYE7OAWiUNuQYUvy+HEWmgGuskTupVkDkJ6Et7sw4VWBrDljoBdcZswGzw
+	h8M9e7DY2g1FqbFlDMaSR1emlT9dg01p5fcsD6JfRy5q4l/FF5T2uoZXpNYgAkZOU7ke
+	GTd5vp8w81GnMoVNVjT0+YSvVDY9endiXQxYLMsQOytkY5KNoUtsWythzk36um3c51g0
+	k2kQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=zq+M/vj/EtUDR8Mf56FK00//ETR1jcsL25mj8EgpdQk=;
+	b=CzUnDgyFvOkM4FRTdz3EHxhvgW2zGWU37P13RUwKWDhy0JstMGcoEZDaswDa5UZvoY
+	ZXDE/kBMyvitJir+2vGXRmLTkusxwVTH6eEHbwx/i+NibWZiUpnxvfa+cB6XZw0A0Mtq
+	/P6gjHs6Ivv6CDMYLJaioaRKRlTRf0yzCiXTTaZ+32IaahkX0//PD3jzddGkVA62k7J9
+	KRb+QsWHIeKMUk/PBm5bMe5/q4X99L7b/3q0ulqyiYvTNPmRXXDqWmYaH+r20pgD8x1o
+	ChXtOBVypU2m06jwOKqEtAgBJJcqGv8CX5CK3A5jnMHuYDqcrs4/b9hsUzRBrHq1BOGU
+	zdXQ==
+X-Gm-Message-State: APjAAAXb5ABAGwKjGfMg7mF5nP6ooV4Fpf0KJMoHJrShbptZQFfm8iZI
+	8Ou9HO5Qbh0NTGn/HlJT5DrYm9f/6OXICU7lTFybGg==
+X-Google-Smtp-Source: APXvYqxYYFR7oIomrbPkMfN1IKoIBvjPD4bmAl9eunz6x+f1uVg7R50V7uuE6BMU1hdVlMev3a9yhGhdD8q5CNykZpA=
+X-Received: by 2002:a05:6830:149a:: with SMTP id
+	s26mr4642933otq.221.1558088657287; 
+	Fri, 17 May 2019 03:24:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <4f7131a7-9099-f506-035f-abc584bf56b0@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 9867386783842929619
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddtvddgvdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.251.175
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] aspeed: use sysbus_init_child_obj()
- to initialize children
+References: <20190516223519.7520-1-laurent@vivier.eu>
+In-Reply-To: <20190516223519.7520-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 May 2019 11:24:06 +0100
+Message-ID: <CAFEAcA9Jj6BtS_18K0QPS0FGpqrAJbm9L094BVCfBD08w5w23g@mail.gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PULL 0/6] M68k staging patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,29 +87,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
+Cc: Thomas Huth <huth@tuxfamily.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello Philippe, 
+On Thu, 16 May 2019 at 23:37, Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> The following changes since commit c1497fba36465d0259d4d04f2bf09ea59ed42680:
+>
+>   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20190514b' into staging (2019-05-16 10:24:08 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu-m68k.git tags/m68k-staging-pull-request
+>
+> for you to fetch changes up to 60d3d0cfeb1658d2827d6a4f0df27252bb36baba:
+>
+>   target/m68k: Optimize rotate_x() using extract_i32() (2019-05-17 00:30:47 +0200)
+>
+> ----------------------------------------------------------------
+> code cleanup, switch to transaction_failed hook
+>
+> ----------------------------------------------------------------
+>
 
-[ ... ] 
 
-> A similar patch (although better described IMO) was posted here:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg05931.html
-> 
-> However you improved it by using sysbus_init_child_obj(). If you don't
-> mind I'll respin addressing Markus comment and using your improvement.
+Applied, thanks.
 
-Sure, np. 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
-When is this patchset expected to be merged ? AFAICT, It's blocking 
-this current patchset, which is blocking Joel's RTC one and others 
-are on the way.
-
-Thanks,
-
-C. 
+-- PMM
 
