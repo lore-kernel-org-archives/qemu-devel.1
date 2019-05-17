@@ -4,86 +4,83 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B6BFC04AAF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 02:42:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C155C04AAF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 02:44:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D76B620815
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 02:42:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA6DC20848
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 02:44:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LNPYJC1W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D76B620815
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GVRE1jVM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA6DC20848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40128 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40147 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRSpa-00084O-6O
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 22:42:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39032)
+	id 1hRSr9-0000tn-Vo
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 22:44:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hRSmZ-0005St-QZ
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:39:40 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hRSmS-0005Mp-Tj
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:39:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hRSmY-00025N-CW
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:39:39 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46384)
+	(envelope-from <richard.henderson@linaro.org>) id 1hRSmR-0001zE-Mh
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:39:32 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:44260)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hRSmX-00024V-Ud
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:39:38 -0400
-Received: by mail-pf1-x442.google.com with SMTP id y11so2853220pfm.13
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 19:39:37 -0700 (PDT)
+	id 1hRSmR-0001y1-5Y
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:39:31 -0400
+Received: by mail-pf1-x443.google.com with SMTP id g9so2857480pfo.11
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 19:39:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=zQEKMjfpCTDyJlIECnLYp610ugeuDB8/XWCLVFEbpkI=;
-	b=LNPYJC1WFR6MQja4ezKyO4owmXx5YniGlxytJ//9rjheof42E2cpxfWTIESjIU3eJS
-	GaSPBNYpduTenfusO+TS2lBPEogA+CQPKBhivr7e1MDWYpto7CvGQZGK2dy9mhuQPhCa
-	eH42l0++hbocTw3sJ0HrAx4KVDpZyYE742mThefm0QJ88nxq1kUXnBYDmTxFgDT5At79
-	FSCklWeEvnFHRPV7LwZ6z2sR0R9+cG5KpS2pWueaqhQUGzOHXzQP7Bq0XTK9/GCuzecG
-	4RvJMcjrjU8dsBpFwaigX/V8vXokcH0SotoUNVlq4Lad6zCsyy8EFXV/AsPqFj1S5CzE
-	+IPA==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=w67dNgvn9kqojlns7NF9r0Y8A8UDA9sA3tpOmEXRHUw=;
+	b=GVRE1jVMxZUSaTuKh16/e8qpCCMaq9j5IU+rFXulHjV9VorD4/My5JGV01E/ujhxMm
+	pY4QH3/fG3U1rx96zpxjUx2c6UwK9rxppAvrrZPbWJVJctReaLtCjSvOLgOWAhORlhPY
+	QnYaTd8gDiEFKHEj5tQVOI63HNZtqArRWUPwW4EkULld5MS/ynR2RQAv1f19GbEqAcZS
+	gP4NL7sLk/UFsgMZwopUvVJmtAnSXTrQ6lkUaioETHptpFuMry4gTzOnn/tS0vTfnGK6
+	WdCeCnSYfJyFnzELzXhCRalX2D+WmLk4+BpMHfRqYgSBFcNbWGNlIBTpKaNUedUXahFi
+	apyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=zQEKMjfpCTDyJlIECnLYp610ugeuDB8/XWCLVFEbpkI=;
-	b=BVnqaHc1E3WsRK5875AwUd7BTFx6+zU1PneAKPjIYkMNSYM7zaIf/l3QWk9haEriTG
-	5050WPqYAQT/oE3bRCIbg0xjSMWA3T7vHNBZecZmYY8pv/6QiiiFFiOiBIzZ3YvjfulJ
-	vaCm7hErizP+gNfZrFrZxktpofsvaXr4n4MILT+sbc/dX04d6suPdAdtQ2cTypZ0Pd0j
-	p0LalFY3jQDYnO88avoMexSEGEmYSfBgABFuwj+85iOCQweq1bJIuXczp5abOdDh2KL/
-	Z9kZsLsYvgPNNXFDMN1O79F8lOGAV6yTtvzt0QNA+LBMsT2B5yocl2Cp40ehDtU042V7
-	y3MA==
-X-Gm-Message-State: APjAAAVRXRENFByvOi0qG/jZR62Vx4Ne8Q5K20Byfl0F2EADZVaeAD27
-	tLaGvKsf7zRu/NZfr54mlQIPLqjJJl4=
-X-Google-Smtp-Source: APXvYqyjjuVaOo6NqePRLBKKtkI32w9ApBjAFCSVUQozyuvts4nksFq7lU+4OteAq5HX65HZI86tAg==
-X-Received: by 2002:a63:7d18:: with SMTP id y24mr39575186pgc.101.1558060776811;
-	Thu, 16 May 2019 19:39:36 -0700 (PDT)
+	:references;
+	bh=w67dNgvn9kqojlns7NF9r0Y8A8UDA9sA3tpOmEXRHUw=;
+	b=fuNBESvfd7bPPHBhW6babcGbajIKtQleMJ/VvCssCRbH3f8WHDP1+Mt9JvgxauBCBJ
+	ON4Tu5uOyXZ05ExJtYFBiF+64hR98bM6FKSc/56Q81HGzRsvSbeR8/SyJyuM5NtfZeer
+	o+HC6nJWh/OJqo9Ufx0dF4K3t233uO+B1z/n4P8zX8napL9ZSQDTtS8vQisu4evUkav1
+	e8P0/gUtxiXMNabmE/f3VAf3f602E3k/LaxDzQN16tIIqnDQFe/bKxAGxnpMnT+qqFbP
+	BKtWB6XyER1APaxqtMMo5NxOnNDYo00pQG55FAfX/f2wO4iOpt3bmQoj0QS0sZt0rav/
+	Thpg==
+X-Gm-Message-State: APjAAAWtFRCKKy+6DeEvQuhmCUzPVeLRsop8Qy3Tw8UE6IMIt4wxmkPM
+	QdPlgMu8QZiKQO/Vh72ksRiDwmhEoe4=
+X-Google-Smtp-Source: APXvYqya0lLKUCznzQaPwsEhw9RZWDQowJFU/1jmONtmTm+wDkDPwJXe4HNHhKWdfFRvsrD3jlRIHw==
+X-Received: by 2002:a63:2d87:: with SMTP id
+	t129mr54072650pgt.451.1558060769734; 
+	Thu, 16 May 2019 19:39:29 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id w6sm6984152pge.30.2019.05.16.19.39.35
+	by smtp.gmail.com with ESMTPSA id w6sm6984152pge.30.2019.05.16.19.39.28
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 16 May 2019 19:39:36 -0700 (PDT)
+	Thu, 16 May 2019 19:39:29 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 16 May 2019 19:39:07 -0700
-Message-Id: <20190517023924.1686-9-richard.henderson@linaro.org>
+Date: Thu, 16 May 2019 19:39:01 -0700
+Message-Id: <20190517023924.1686-3-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190517023924.1686-1-richard.henderson@linaro.org>
 References: <20190517023924.1686-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: [Qemu-devel] [PATCH v8 08/25] ui/vnc: Split out
- authentication_failed
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: [Qemu-devel] [PATCH v8 02/25] build: Link user-only with crypto
+ random number objects
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,87 +97,142 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There were 3 copies of this code, one of which used the wrong
-data size for the failure indicator.
+For user-only, we require only the random number bits of the
+crypto subsystem.  Rename crypto-aes-obj-y to crypto-user-obj-y,
+and add the random number objects, plus init.o to handle any
+extra stuff the crypto library requires.
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Move the crypto libraries from libs_softmmu and libs_tools to
+LIBS, so that they are universally used.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- ui/vnc.c | 37 +++++++++++++++----------------------
- 1 file changed, 15 insertions(+), 22 deletions(-)
+ Makefile             |  4 ++--
+ Makefile.objs        |  2 +-
+ Makefile.target      |  4 ++--
+ configure            |  9 +++------
+ crypto/Makefile.objs | 11 ++++++-----
+ 5 files changed, 14 insertions(+), 16 deletions(-)
 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 1871422e1d..785edf3af1 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -2535,6 +2535,18 @@ void start_client_init(VncState *vs)
-     vnc_read_when(vs, protocol_client_init, 1);
- }
+diff --git a/Makefile b/Makefile
+index 66d5c65156..8419d759e0 100644
+--- a/Makefile
++++ b/Makefile
+@@ -410,7 +410,7 @@ dummy := $(call unnest-vars,, \
+                 block-obj-y \
+                 block-obj-m \
+                 crypto-obj-y \
+-                crypto-aes-obj-y \
++                crypto-user-obj-y \
+                 qom-obj-y \
+                 io-obj-y \
+                 common-obj-y \
+@@ -483,7 +483,7 @@ subdir-slirp: .git-submodule-status
+ 	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/slirp BUILD_DIR="$(BUILD_DIR)/slirp" CC="$(CC)" AR="$(AR)" LD="$(LD)" RANLIB="$(RANLIB)" CFLAGS="$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)")
  
-+static void authentication_failed(VncState *vs)
-+{
-+    vnc_write_u32(vs, 1); /* Reject auth */
-+    if (vs->minor >= 8) {
-+        static const char err[] = "Authentication failed";
-+        vnc_write_u32(vs, sizeof(err));
-+        vnc_write(vs, err, sizeof(err));
-+    }
-+    vnc_flush(vs);
-+    vnc_client_error(vs);
-+}
-+
- static void make_challenge(VncState *vs)
- {
-     int i;
-@@ -2609,14 +2621,7 @@ static int protocol_client_auth_vnc(VncState *vs, uint8_t *data, size_t len)
-     return 0;
+ $(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) \
+-	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
++	$(qom-obj-y) $(crypto-user-obj-$(CONFIG_USER_ONLY))
  
- reject:
--    vnc_write_u32(vs, 1); /* Reject auth */
--    if (vs->minor >= 8) {
--        static const char err[] = "Authentication failed";
--        vnc_write_u32(vs, sizeof(err));
--        vnc_write(vs, err, sizeof(err));
--    }
--    vnc_flush(vs);
--    vnc_client_error(vs);
-+    authentication_failed(vs);
-     qcrypto_cipher_free(cipher);
-     return 0;
- }
-@@ -2638,13 +2643,7 @@ static int protocol_client_auth(VncState *vs, uint8_t *data, size_t len)
-      * must pick the one we sent. Verify this */
-     if (data[0] != vs->auth) { /* Reject auth */
-        trace_vnc_auth_reject(vs, vs->auth, (int)data[0]);
--       vnc_write_u32(vs, 1);
--       if (vs->minor >= 8) {
--           static const char err[] = "Authentication failed";
--           vnc_write_u32(vs, sizeof(err));
--           vnc_write(vs, err, sizeof(err));
--       }
--       vnc_client_error(vs);
-+       authentication_failed(vs);
-     } else { /* Accept requested auth */
-        trace_vnc_auth_start(vs, vs->auth);
-        switch (vs->auth) {
-@@ -2673,13 +2672,7 @@ static int protocol_client_auth(VncState *vs, uint8_t *data, size_t len)
+ ROMSUBDIR_RULES=$(patsubst %,romsubdir-%, $(ROMS))
+ # Only keep -O and -g cflags
+diff --git a/Makefile.objs b/Makefile.objs
+index cf065de5ed..84fa83ba21 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -25,7 +25,7 @@ block-obj-m = block/
+ # crypto-obj-y is code used by both qemu system emulation and qemu-img
  
-        default: /* Should not be possible, but just in case */
-            trace_vnc_auth_fail(vs, vs->auth, "Unhandled auth method", "");
--           vnc_write_u8(vs, 1);
--           if (vs->minor >= 8) {
--               static const char err[] = "Authentication failed";
--               vnc_write_u32(vs, sizeof(err));
--               vnc_write(vs, err, sizeof(err));
--           }
--           vnc_client_error(vs);
-+           authentication_failed(vs);
-        }
-     }
-     return 0;
+ crypto-obj-y = crypto/
+-crypto-aes-obj-y = crypto/
++crypto-user-obj-y = crypto/
+ 
+ #######################################################################
+ # qom-obj-y is code used by both qemu system emulation and qemu-img
+diff --git a/Makefile.target b/Makefile.target
+index ae02495951..bde256436b 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -180,7 +180,7 @@ dummy := $(call unnest-vars,.., \
+                block-obj-m \
+                chardev-obj-y \
+                crypto-obj-y \
+-               crypto-aes-obj-y \
++               crypto-user-obj-y \
+                qom-obj-y \
+                io-obj-y \
+                common-obj-y \
+@@ -189,7 +189,7 @@ all-obj-y += $(common-obj-y)
+ all-obj-y += $(qom-obj-y)
+ all-obj-$(CONFIG_SOFTMMU) += $(authz-obj-y)
+ all-obj-$(CONFIG_SOFTMMU) += $(block-obj-y) $(chardev-obj-y)
+-all-obj-$(CONFIG_USER_ONLY) += $(crypto-aes-obj-y)
++all-obj-$(CONFIG_USER_ONLY) += $(crypto-user-obj-y)
+ all-obj-$(CONFIG_SOFTMMU) += $(crypto-obj-y)
+ all-obj-$(CONFIG_SOFTMMU) += $(io-obj-y)
+ 
+diff --git a/configure b/configure
+index f8345368bf..03e71ef7b6 100755
+--- a/configure
++++ b/configure
+@@ -2792,8 +2792,7 @@ if test "$gnutls" != "no"; then
+         # At least ubuntu 18.04 ships only shared libraries.
+         write_c_skeleton
+         if compile_prog "" "$gnutls_libs" ; then
+-            libs_softmmu="$gnutls_libs $libs_softmmu"
+-            libs_tools="$gnutls_libs $libs_tools"
++            LIBS="$gnutls_libs $LIBS"
+             QEMU_CFLAGS="$QEMU_CFLAGS $gnutls_cflags"
+             pass="yes"
+         fi
+@@ -2864,8 +2863,7 @@ if test "$nettle" != "no"; then
+         # Link test to make sure the given libraries work (e.g for static).
+         write_c_skeleton
+         if compile_prog "" "$nettle_libs" ; then
+-            libs_softmmu="$nettle_libs $libs_softmmu"
+-            libs_tools="$nettle_libs $libs_tools"
++            LIBS="$nettle_libs $LIBS"
+             QEMU_CFLAGS="$QEMU_CFLAGS $nettle_cflags"
+             if test -z "$gcrypt"; then
+                gcrypt="no"
+@@ -2896,8 +2894,7 @@ if test "$gcrypt" != "no"; then
+         # Link test to make sure the given libraries work (e.g for static).
+         write_c_skeleton
+         if compile_prog "" "$gcrypt_libs" ; then
+-            libs_softmmu="$gcrypt_libs $libs_softmmu"
+-            libs_tools="$gcrypt_libs $libs_tools"
++            LIBS="$gcrypt_libs $LIBS"
+             QEMU_CFLAGS="$QEMU_CFLAGS $gcrypt_cflags"
+             pass="yes"
+         fi
+diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
+index 256c9aca1f..7fe2fa9da2 100644
+--- a/crypto/Makefile.objs
++++ b/crypto/Makefile.objs
+@@ -19,9 +19,10 @@ crypto-obj-y += tlscredspsk.o
+ crypto-obj-y += tlscredsx509.o
+ crypto-obj-y += tlssession.o
+ crypto-obj-y += secret.o
+-crypto-obj-$(CONFIG_GCRYPT) += random-gcrypt.o
+-crypto-obj-$(if $(CONFIG_GCRYPT),n,$(CONFIG_GNUTLS)) += random-gnutls.o
+-crypto-obj-$(if $(CONFIG_GCRYPT),n,$(if $(CONFIG_GNUTLS),n,y)) += random-platform.o
++crypto-rng-obj-$(CONFIG_GCRYPT) += random-gcrypt.o
++crypto-rng-obj-$(if $(CONFIG_GCRYPT),n,$(CONFIG_GNUTLS)) += random-gnutls.o
++crypto-rng-obj-$(if $(CONFIG_GCRYPT),n,$(if $(CONFIG_GNUTLS),n,y)) += random-platform.o
++crypto-obj-y += $(crypto-rng-obj-y)
+ crypto-obj-y += pbkdf.o
+ crypto-obj-$(CONFIG_NETTLE) += pbkdf-nettle.o
+ crypto-obj-$(if $(CONFIG_NETTLE),n,$(CONFIG_GCRYPT)) += pbkdf-gcrypt.o
+@@ -35,7 +36,7 @@ crypto-obj-y += block.o
+ crypto-obj-y += block-qcow.o
+ crypto-obj-y += block-luks.o
+ 
+-# Let the userspace emulators avoid linking gnutls/etc
+-crypto-aes-obj-y = aes.o
++# Let the userspace emulators avoid linking stuff they won't use.
++crypto-user-obj-y = aes.o $(crypto-rng-obj-y) init.o
+ 
+ stub-obj-y += pbkdf-stub.o
 -- 
 2.17.1
 
