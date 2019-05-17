@@ -2,65 +2,92 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E120C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 18:28:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA0E1C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 18:30:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0999420815
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 18:28:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0999420815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7E7AE20815
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 18:30:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eJfpbGcZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E7AE20815
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52194 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52246 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRhao-0000x4-4a
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 14:28:30 -0400
+	id 1hRhd4-0002go-RO
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 14:30:50 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:54537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hRhYH-0006d9-Ni
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 14:25:54 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hRhYA-0006d9-86
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 14:25:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hRhOK-00082o-N7
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 14:15:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53626)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hRhOK-000823-Ho
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 14:15:36 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1DF6330C0DCD;
-	Fri, 17 May 2019 18:15:29 +0000 (UTC)
-Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 41B7260BE0;
-	Fri, 17 May 2019 18:15:25 +0000 (UTC)
-Date: Fri, 17 May 2019 15:15:23 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: whiteheadm@acm.org
-Message-ID: <20190517181523.GL4189@habkost.net>
-References: <CAP8WD_bf=0=tyCumcNpVLtneio+vbd4JuFMmtWqSwXWFC-7PMg@mail.gmail.com>
-	<6da0c28c-ef4f-8199-1cee-bf1f08387ff1@redhat.com>
-	<ea9cf5ec-f259-9a23-eae1-1b2250c367b0@redhat.com>
-	<CAP8WD_ZUVZJKk-tEfG8+yd6t_U9+A3a4s5_ohjU5KLP0tY5YwQ@mail.gmail.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hRhSg-0003D5-K3
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 14:20:07 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:44205)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hRhSg-0003Ae-CA
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 14:20:06 -0400
+Received: by mail-pg1-x544.google.com with SMTP id z16so3650942pgv.11
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 11:20:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=qNnmv261yOj3OhLx4yhO/zlMgNmWD/pODlnvKhjfp7A=;
+	b=eJfpbGcZSqw+xHFGBkpsU7HTAet5xnsr9ztpqrAj6cq+NFtGOvsDgxcmFw3dKQseiK
+	QRgbpz2M7ykHCpga4/AypJA+ZlUTd/HoSbmsE2ze3FiDZW+4VGgY2TUBuYNej+2ciiym
+	YbqjTn4arzWQSBArjoLZ7pnTGjKk0GHnslHK+UXjgeDiQWN2jDDKhVc7Rzdq2QjtYxw3
+	EncOWkIm+kMMmLp1C8SEKwm+cBv9ZhIEMn0GLi8QUZaLP44g+JDTTBIUG9A4vZmszTIC
+	dDWJ8ZbeVYiV3sdpeX6R7aPhEH5v39U2sVjNlbOTwAgGyNQPFvth9rlx2nuZH5bgl0hu
+	9+Fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=qNnmv261yOj3OhLx4yhO/zlMgNmWD/pODlnvKhjfp7A=;
+	b=dFSc/1tVt47JcHUjwhUZxw0K5mn+kaGW/wT4suHJAYrt+3/8e20EDgfS4xRVxYd73A
+	CBE/Yh/t1QxD3A6LayWowdITYSfskLOWDHwUYbxSAp0WCsCTSoui7AJG3gZyL3Bgzy5K
+	wE+Pbe3I8A4GxBydDp1S+Xmn+KmukaF+pzbNdTHdzY0434A/DSrmnvTFJHBhfgMvKZ7E
+	qV6bFMly1b4mX7IyYyFVLvQ8wmmLFA+wbqr1AGLSlzh99S2RypwDR+75b2dSoAIr03U5
+	yCPVebaAWb391FqQGTOkH6p+eGLo5vcSOSausX4Q2zvoYCtqqHmlIe5bvB4MlLFAaL7+
+	vNSw==
+X-Gm-Message-State: APjAAAV/jVbpRDWuzEr3JnXX10U5aWOUwPR27CbqfwGfOIpu9ZW432zL
+	SemzJfkvHeJmb9GoErwDgOy/HA==
+X-Google-Smtp-Source: APXvYqz5TmXpGBqPSMviILY9MC7D5TV/LR2/EH4Z3RpLjT607a1PosKBJnVhw7hkUsgG/VAb+SNRLg==
+X-Received: by 2002:a62:e117:: with SMTP id q23mr62687857pfh.60.1558117204886; 
+	Fri, 17 May 2019 11:20:04 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
+	by smtp.gmail.com with ESMTPSA id
+	h11sm10788508pfn.170.2019.05.17.11.20.03
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 17 May 2019 11:20:04 -0700 (PDT)
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190515203112.506-1-david@redhat.com>
+	<20190515203112.506-5-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <f2659286-a445-cfcb-56d6-3afa61757773@linaro.org>
+Date: Fri, 17 May 2019 11:20:01 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAP8WD_ZUVZJKk-tEfG8+yd6t_U9+A3a4s5_ohjU5KLP0tY5YwQ@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Fri, 17 May 2019 18:15:34 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Pentium Pro Feature Bugs
+In-Reply-To: <20190515203112.506-5-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::544
+Subject: Re: [Qemu-devel] [PATCH v1 4/5] s390x/tcg: Implement VECTOR ISOLATE
+ STRING
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,29 +99,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 16, 2019 at 08:30:27PM -0400, tedheadster wrote:
-> Paolo,
->   I am running the kvm32 machine and I see a problem. Here is the
-> output of /proc/cpuinfo :
-> 
-> flags           : fpu vme de pse tsc msr pae mce cx8 apic mtrr pge mca
-> cmov constant_tsc
-> 
-> I see something rather important missing: cpuid.
-> 
-> A lot of stuff breaks without cpuid, and I am fairly sure that qemu is
-> supposed to 'hard code' in support for it. It is present with both my
-> i486 and i586 virtual machines.
+On 5/15/19 1:31 PM, David Hildenbrand wrote:
+> +#define DEF_VISTR(BITS)                                                        \
+> +static int vistr##BITS(void *v1, const void *v2)
+> +{
+> +    S390Vector tmp = {};
+> +    int i, cc = 3;
+> +
+> +    for (i = 0; i < (128 / BITS); i++) {
+> +        const uint##BITS##_t data = s390_vec_read_element##BITS(v2, i);
+> +
+> +        if (!data) {
+> +            cc = 0;
+> +            break;
+> +        }
+> +        s390_vec_write_element##BITS(&tmp, i, data);
+> +    }
+> +    *(S390Vector *)v1 = tmp;
+> +    return cc;
+> +}
+> +DEF_VISTR(8)
+> +DEF_VISTR(16)
+> +DEF_VISTR(32)
 
-Are you running the same kernel version on all VMs?
-X86_FEATURE_CPUID was added in Linux v4.11.
+Based on previous, this becomes
 
--- 
-Eduardo
+    cc = 3;
+    a0 = s390_vec_read_element64(v2, 0);
+    a1 = s390_vec_read_element64(v2, 1);
+
+    z0 = zero_search(a0, m);
+    if (z0) {
+        i = clz64(z0);
+        a0 &= ~(UINT64_MAX >> i);
+        a1 = 0;
+        cc = 0;
+    } else {
+        z1 = zero_search(a1, m);
+        if (z1) {
+            i = clz64(z1);
+            a1 &= ~(UINT64_MAX >> i);
+            cc = 0;
+        }
+    }
+
+    s390_vec_write_element64(v1, 0, a0);
+    s390_vec_write_element64(v1, 1, a1);
+    return cc;
+
+
+r~
 
