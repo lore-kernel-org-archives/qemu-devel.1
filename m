@@ -2,66 +2,53 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72046C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 08:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04359C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 08:46:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3585B206A3
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 08:42:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3585B206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CEAA1206A3
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 08:46:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEAA1206A3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=birkelund.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44519 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44590 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRYS2-0006uI-HQ
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 04:42:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58859)
+	id 1hRYVO-0000Mq-3m
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 04:46:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hRYQj-0006Dd-M0
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:41:31 -0400
+	(envelope-from <klaus@birkelund.eu>) id 1hRYTD-0007PG-Q8
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:44:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hRYQi-0001x3-4n
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:41:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55104)
+	(envelope-from <klaus@birkelund.eu>) id 1hRYTC-000610-6L
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:44:03 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:40196)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>)
-	id 1hRYQe-0001qM-Of; Fri, 17 May 2019 04:41:24 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9BE9A81129;
-	Fri, 17 May 2019 08:41:22 +0000 (UTC)
-Received: from Igors-MacBook-Pro (unknown [10.40.205.69])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D838D60BE0;
-	Fri, 17 May 2019 08:41:15 +0000 (UTC)
-Date: Fri, 17 May 2019 10:41:09 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Message-ID: <20190517104109.70883a12@Igors-MacBook-Pro>
-In-Reply-To: <5FC3163CFD30C246ABAA99954A238FA83F1F0EB5@lhreml524-mbb.china.huawei.com>
-References: <20190409102935.28292-1-shameerali.kolothum.thodi@huawei.com>
-	<20190409102935.28292-4-shameerali.kolothum.thodi@huawei.com>
-	<20190502181252.2e3ae0d4@Igors-MacBook-Pro>
-	<5FC3163CFD30C246ABAA99954A238FA83F1EF349@lhreml524-mbb.china.huawei.com>
-	<5FC3163CFD30C246ABAA99954A238FA83F1F0EB5@lhreml524-mbb.china.huawei.com>
+	(Exim 4.71) (envelope-from <klaus@birkelund.eu>)
+	id 1hRYT9-0005yG-ON; Fri, 17 May 2019 04:43:59 -0400
+Received: from apples.localdomain (ip-5-186-120-196.cgn.fibianet.dk
+	[5.186.120.196])
+	by charlie.dont.surf (Postfix) with ESMTPSA id 0BA5CC06EB;
+	Fri, 17 May 2019 08:43:56 +0000 (UTC)
+From: Klaus Birkelund Jensen <klaus@birkelund.eu>
+To: qemu-block@nongnu.org
+Date: Fri, 17 May 2019 10:42:33 +0200
+Message-Id: <20190517084234.26923-8-klaus@birkelund.eu>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190517084234.26923-1-klaus@birkelund.eu>
+References: <20190517084234.26923-1-klaus@birkelund.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Fri, 17 May 2019 08:41:22 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 3/8] hw/acpi: Add ACPI Generic Event
- Device Support
+X-Received-From: 128.199.63.193
+Subject: [Qemu-devel] [PATCH 7/8] nvme: keep a copy of the NVMe command in
+ request
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,192 +60,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"sameo@linux.intel.com" <sameo@linux.intel.com>,
-	"ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	Linuxarm <linuxarm@huawei.com>,
-	"shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
-	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>,
-	"xuwei \(O\)" <xuwei5@huawei.com>,
-	"sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>,
-	"lersek@redhat.com" <lersek@redhat.com>
+Cc: Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>,
+	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 13 May 2019 17:00:13 +0000
-Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+Signed-off-by: Klaus Birkelund Jensen <klaus.jensen@cnexlabs.com>
+---
+ hw/block/nvme.c | 4 ++--
+ hw/block/nvme.h | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-> > -----Original Message-----
-> > From: Igor Mammedov [mailto:imammedo@redhat.com]
-> > Sent: 13 May 2019 17:25
-> > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> > Subject: Re: [PATCH v4 3/8] hw/acpi: Add ACPI Generic Event Device Support
-> > 
-> > On Mon, 13 May 2019 11:53:38 +0000
-> > Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
-> > 
-> > > Hi Igor,
-> > >
-> > > > -----Original Message-----
-> > > > From: Shameerali Kolothum Thodi
-> > > > Sent: 03 May 2019 13:46
-> > > > To: 'Igor Mammedov' <imammedo@redhat.com>
-> > > > Cc: qemu-devel@nongnu.org; qemu-arm@nongnu.org;
-> > > > eric.auger@redhat.com; peter.maydell@linaro.org;
-> > > > shannon.zhaosl@gmail.com; sameo@linux.intel.com;
-> > > > sebastien.boeuf@intel.com; xuwei (O) <xuwei5@huawei.com>;
-> > > > lersek@redhat.com; ard.biesheuvel@linaro.org; Linuxarm
-> > > > <linuxarm@huawei.com>
-> > > > Subject: RE: [PATCH v4 3/8] hw/acpi: Add ACPI Generic Event Device
-> > Support
-> > > >
-> > > > Hi Igor,
-> > > >
-> > > > > -----Original Message-----
-> > > > > From: Igor Mammedov [mailto:imammedo@redhat.com]
-> > > > > Sent: 02 May 2019 17:13
-> > > > > To: Shameerali Kolothum Thodi
-> > <shameerali.kolothum.thodi@huawei.com>
-> > > > > Cc: qemu-devel@nongnu.org; qemu-arm@nongnu.org;
-> > > > > eric.auger@redhat.com; peter.maydell@linaro.org;
-> > > > > shannon.zhaosl@gmail.com; sameo@linux.intel.com;
-> > > > > sebastien.boeuf@intel.com; xuwei (O) <xuwei5@huawei.com>;
-> > > > > lersek@redhat.com; ard.biesheuvel@linaro.org; Linuxarm
-> > > > > <linuxarm@huawei.com>
-> > > > > Subject: Re: [PATCH v4 3/8] hw/acpi: Add ACPI Generic Event Device
-> > Support
-> > > > >
-> > >
-> > > [...]
-> > >
-> > > > > > +}
-> > > > > > +
-> > > > > > +static Property acpi_ged_properties[] = {
-> > > > > > +    /*
-> > > > > > +     * Memory hotplug base address is a property of GED here,
-> > > > > > +     * because GED handles memory hotplug event and
-> > > > > MEMORY_HOTPLUG_DEVICE
-> > > > > > +     * gets initialized when GED device is realized.
-> > > > > > +     */
-> > > > > > +    DEFINE_PROP_UINT64("memhp-base", AcpiGedState,
-> > memhp_base,
-> > > > > 0),
-> > > > > > +    DEFINE_PROP_BOOL("memory-hotplug-support", AcpiGedState,
-> > > > > > +                     memhp_state.is_enabled, true),
-> > > > > > +    DEFINE_PROP_PTR("gsi", AcpiGedState, gsi),
-> > > > >
-> > > > > PTR shouldn't be used in new code, look at object_property_add_link() &
-> > co
-> > > >
-> > > > Ok. I will take a look at that.
-> > >
-> > > I attempted to remove _PROP_PTR for "ged-events" and use _PROP_LINK
-> > and
-> > > _set_link(),
-> > >
-> > >
-> > > diff --git a/hw/acpi/generic_event_device.c
-> > b/hw/acpi/generic_event_device.c
-> > > index 856ca04c01..978c8e088e 100644
-> > > --- a/hw/acpi/generic_event_device.c
-> > > +++ b/hw/acpi/generic_event_device.c
-> > > @@ -268,7 +268,8 @@ static Property acpi_ged_properties[] = {
-> > >      DEFINE_PROP_PTR("gsi", AcpiGedState, gsi),
-> > >      DEFINE_PROP_UINT64("ged-base", AcpiGedState, ged_base, 0),
-> > >      DEFINE_PROP_UINT32("ged-irq", AcpiGedState, ged_irq, 0),
-> > > -    DEFINE_PROP_PTR("ged-events", AcpiGedState, ged_events),
-> > > +    DEFINE_PROP_LINK("ged-events", AcpiGedState, ged_events,
-> > TYPE_ACPI_GED,
-> > > +                     GedEvent *),
-> > >      DEFINE_PROP_UINT32("ged-events-size", AcpiGedState,
-> > ged_events_size, 0),
-> > >      DEFINE_PROP_END_OF_LIST(),
-> > >  };
-> > > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > > index 8179b3e511..c89b7b7120 100644
-> > > --- a/hw/arm/virt.c
-> > > +++ b/hw/arm/virt.c
-> > > @@ -537,7 +537,8 @@ static inline DeviceState
-> > *create_acpi_ged(VirtMachineState *vms)
-> > >      qdev_prop_set_ptr(dev, "gsi", vms->gsi);
-> > >      qdev_prop_set_uint64(dev, "ged-base",
-> > vms->memmap[VIRT_ACPI_GED].base);
-> > >      qdev_prop_set_uint32(dev, "ged-irq", vms->irqmap[VIRT_ACPI_GED]);
-> > > -    qdev_prop_set_ptr(dev, "ged-events", ged_events);
-> > > +    object_property_set_link(OBJECT(dev), OBJECT(ged_events),
-> > "ged-events",
-> > > +                             &error_abort);
-> > >      qdev_prop_set_uint32(dev, "ged-events-size",
-> > ARRAY_SIZE(ged_events));
-> > >
-> > >      object_property_add_child(qdev_get_machine(), "acpi-ged",
-> > > diff --git a/include/hw/acpi/generic_event_device.h
-> > b/include/hw/acpi/generic_event_device.h
-> > > index 9c840d8064..588f4ecfba 100644
-> > > --- a/include/hw/acpi/generic_event_device.h
-> > > +++ b/include/hw/acpi/generic_event_device.h
-> > > @@ -111,7 +111,7 @@ typedef struct AcpiGedState {
-> > >      hwaddr ged_base;
-> > >      GEDState ged_state;
-> > >      uint32_t ged_irq;
-> > > -    void *ged_events;
-> > > +    GedEvent *ged_events;
-> > >      uint32_t ged_events_size;
-> > >  } AcpiGedState;
-> > >
-> > >
-> > > And with this I get,
-> > >
-> > > Segmentation fault      (core dumped) ./qemu-system-aarch64-ged-v5
-> > > -machine virt, -cpu cortex-a57 -machine type=virt -nographic -smp 1 -m
-> > > 4G,maxmem=8G,slots=10 -drive if=none,file=ubuntu-est-5.0,id=fs -device
-> > > virtio-blk-device,drive=fs -kernel Image_memhp_remove -bios
-> > > QEMU_EFI_Release.fd -object memory-backend-ram,id=mem1,size=1G
-> > -device
-> > > pc-dimm,id=dimm1,memdev=mem1 -numa node,nodeid=0 -append
-> > > "console=ttyAMA0 root=/dev/vda rw acpi=force movable_node"
-> > >
-> > > It looks like struct pointer cannot be used directly and has to make a QOM
-> > object
-> > > for DEFINE_PROP_LINK use. Not sure there is an easy way for setting ptr
-> > property
-> > > using link() functions. Please let me know if there any reference
-> > implementation I
-> > > can take a look.
-> > 
-> > Simple 'struct' won't work with link, it has to be QOM object.
-> > 
-> > Question is do we still need GedEvent array?
-> > We handle only 1 irq and several event types, why not replace GedEvent
-> > with with a 32bit bitmap (1 bit per event type) and pass that to
-> > ged device from machine as 'int' property?
-> 
-> Right. That might solve the ged_events ptr issue. But we need to set the irq as
-> well for the GED device. Is there a way to set the irq directly for a TYPE_DEVICE
-> object? 
-> 
-> (I think Eric mentioned a way of setting it directly earlier but that time GED was 
-> a TYPE_SYS_BUS_DEVICE. May be that is a reason to go back to SYS_BUS_DEVICE )
-It's probably not necessary, I think I've found what you are looking for. Pls, take a loot at
-
-hw/i386/pc_q35.c:
-    for (i = 0; i < GSI_NUM_PINS; i++) {                                         
-        qdev_connect_gpio_out_named(lpc_dev, ICH9_GPIO_GSI, i, pcms->gsi[i]);    
-    } 
-
-
-> 
-> Thanks,
-> Shameer
-> 
-> > >
-> > > Appreciate your help,
-> > >
-> > > Thanks,
-> > > Shameer
-> > >
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 81201a8b4834..5cd593806701 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -184,7 +184,7 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList =
+*qsg, uint64_t prp1,
+     int num_prps =3D (len >> n->page_bits) + 1;
+     uint16_t status =3D NVME_SUCCESS;
+=20
+-    trace_nvme_map_prp(req->cmd_opcode, trans_len, len, prp1, prp2, num_=
+prps);
++    trace_nvme_map_prp(req->cmd.opcode, trans_len, len, prp1, prp2, num_=
+prps);
+=20
+     if (unlikely(!prp1)) {
+         trace_nvme_err_invalid_prp();
+@@ -1559,7 +1559,7 @@ static void nvme_init_req(NvmeCtrl *n, NvmeCmd *cmd=
+, NvmeRequest *req)
+     memset(&req->cqe, 0, sizeof(req->cqe));
+     req->cqe.cid =3D le16_to_cpu(cmd->cid);
+=20
+-    req->cmd_opcode =3D cmd->opcode;
++    memcpy(&req->cmd, cmd, sizeof(NvmeCmd));
+     req->is_cmb =3D false;
+=20
+     req->status =3D NVME_SUCCESS;
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index 70f4781a1b61..7e1e026d90e6 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -52,7 +52,7 @@ typedef struct NvmeRequest {
+     uint16_t status;
+     bool     is_cmb;
+     bool     is_write;
+-    uint8_t  cmd_opcode;
++    NvmeCmd  cmd;
+=20
+     QTAILQ_HEAD(, NvmeBlockBackendRequest) blk_req_tailq;
+     QTAILQ_ENTRY(NvmeRequest)entry;
+@@ -143,7 +143,7 @@ typedef struct NvmeCtrl {
+=20
+ static inline bool nvme_rw_is_write(NvmeRequest *req)
+ {
+-    return req->cmd_opcode =3D=3D NVME_CMD_WRITE;
++    return req->cmd.opcode =3D=3D NVME_CMD_WRITE;
+ }
+=20
+ static inline bool nvme_is_error(uint16_t status, uint16_t err)
+--=20
+2.21.0
 
 
