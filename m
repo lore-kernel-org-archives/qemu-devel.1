@@ -2,60 +2,73 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85628C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 04:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45E7DC04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 04:36:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5004B20833
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 04:20:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ZjuI6jBu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5004B20833
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 1C3712083E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 04:36:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C3712083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41960 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42121 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRUMN-0007pQ-2c
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 00:20:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55873)
+	id 1hRUbV-0004Gx-1W
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 00:36:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hRUKa-0006us-9G
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 00:18:55 -0400
+	(envelope-from <jasowang@redhat.com>) id 1hRUaW-0003sS-Lx
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 00:35:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hRUKZ-0002dv-8a
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 00:18:52 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:45147 helo=ozlabs.org)
+	(envelope-from <jasowang@redhat.com>) id 1hRUaT-0001jC-3d
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 00:35:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41672)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hRUKY-0002Oi-0C; Fri, 17 May 2019 00:18:51 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 454w5Q3pYzz9sBK; Fri, 17 May 2019 14:18:34 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1558066714;
-	bh=ktLXqkDC94VTlhMfK/zG3coYvIcnf6/lScKx9mdLL8o=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ZjuI6jBu3PUwpisaD1gKpL0oNnLQqxN57c0MzN4CqNmwmZhz+rw3DKaJmLcGFtLyg
-	5SN6Eid/3K7n/gWCb9r2wrtp3xW26P+GmgavooOJEE0xDRZ2kgEAsG9UROKvz4gxhp
-	K7firL+LloujeWgNBCOW/nwDIzb4Ze3ZQidnLw/g=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: qemu-ppc@nongnu.org
-Date: Fri, 17 May 2019 14:18:23 +1000
-Message-Id: <20190517041823.23871-1-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1hRUaS-0001gc-UO
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 00:35:17 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2EFCB3082163;
+	Fri, 17 May 2019 04:35:13 +0000 (UTC)
+Received: from [10.72.12.67] (ovpn-12-67.pek2.redhat.com [10.72.12.67])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1F7075D6A9;
+	Fri, 17 May 2019 04:35:08 +0000 (UTC)
+To: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+References: <20190418145355.21100-1-armbru@redhat.com>
+	<20190418145355.21100-2-armbru@redhat.com>
+	<2679829b-cc1d-83ce-9949-2b80d970ddec@redhat.com>
+	<875zqe7b10.fsf@dusky.pond.sub.org>
+	<CAFEAcA-vqnucYKuV3QKf4wBsfuXMZiC1kqrnaVcA+BEaud__Bw@mail.gmail.com>
+	<877eat6xgm.fsf@dusky.pond.sub.org>
+	<e562c5f5-9d01-59b0-5a4c-d040fa8b8962@redhat.com>
+	<87lfz88bva.fsf@dusky.pond.sub.org>
+	<1089f272-838f-e3e0-3b50-5a33cce95030@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <a44c8068-406e-be4d-0e72-5cfe15ba22b3@redhat.com>
+Date: Fri, 17 May 2019 12:35:08 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <1089f272-838f-e3e0-3b50-5a33cce95030@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Fri, 17 May 2019 04:35:13 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PATCH] spapr: Add forgotten capability to migration
- stream
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/6] qemu-bridge-helper: Fix misuse of
+ isspace()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,69 +80,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>,
-	qemu-devel@nongnu.org, groug@kaod.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-spapr machine capabilities are supposed to be sent in the migration strea=
-m
-so that we can sanity check the source and destination have compatible
-configuration.  Unfortunately, when we added the hpt-max-page-size
-capability, we forgot to add it to the migration state.  This means that =
-we
-can generate spurious warnings when both ends are configured for large
-pages, or potentially fail to warn if the source is configured for huge
-pages, but the destination is not.
 
-Fixes: 2309832afda "spapr: Maximum (HPT) pagesize property"
+On 2019/5/15 =E4=B8=8B=E5=8D=889:35, Paolo Bonzini wrote:
+> On 15/05/19 08:34, Markus Armbruster wrote:
+>>>> qemu-bridge-helper should have a manual page, and its handling of er=
+rors
+>>>> in ACL include files needs work.  There's probably more; I just glan=
+ced
+>>>> at it.  I'm not volunteering, though.  It lacks a maintainer.  Shoul=
+d we
+>>>> add it to Jason's "Network device backends"?
+>>>
+>>> Yes.
+>>>
+>>>> -netdev's helper parameter is seriously underdocumented.  Document o=
+r
+>>>> deprecate?
+>>>
+>>> I believe management should only use fd parameter of TAP. If we have
+>>> other, it should be a duplication. So I suggest to deprecate the
+>>> bridge helper and -netdev bridge.
+>> Objections, anyone?
+> Yes, your honor. :)  The helper is the only way for unprivileged users
+> to set up TAP networking, which is basically the only really way to hav=
+e
+> *working* network.  It's widely used in the wild, it's self-contained
+> and the only alternative for users is the S-word (hint, it's five
+> letters long and ends with LIRP).
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr.c         | 1 +
- hw/ppc/spapr_caps.c    | 1 +
- include/hw/ppc/spapr.h | 1 +
- 3 files changed, 3 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 8580a8dc67..bcae30ad26 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2125,6 +2125,7 @@ static const VMStateDescription vmstate_spapr =3D {
-         &vmstate_spapr_cap_cfpc,
-         &vmstate_spapr_cap_sbbc,
-         &vmstate_spapr_cap_ibs,
-+        &vmstate_spapr_cap_hpt_maxpagesize,
-         &vmstate_spapr_irq_map,
-         &vmstate_spapr_cap_nested_kvm_hv,
-         &vmstate_spapr_dtb,
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 9b1c10baa6..658eb15a14 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -703,6 +703,7 @@ SPAPR_CAP_MIG_STATE(dfp, SPAPR_CAP_DFP);
- SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
- SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
- SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
-+SPAPR_CAP_MIG_STATE(hpt_maxpagesize, SPAPR_CAP_HPT_MAXPAGESIZE);
- SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
- SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
- SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 7e32f309c2..9fc91c8f5e 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -849,6 +849,7 @@ extern const VMStateDescription vmstate_spapr_cap_dfp=
-;
- extern const VMStateDescription vmstate_spapr_cap_cfpc;
- extern const VMStateDescription vmstate_spapr_cap_sbbc;
- extern const VMStateDescription vmstate_spapr_cap_ibs;
-+extern const VMStateDescription vmstate_spapr_cap_hpt_maxpagesize;
- extern const VMStateDescription vmstate_spapr_cap_nested_kvm_hv;
- extern const VMStateDescription vmstate_spapr_cap_large_decr;
- extern const VMStateDescription vmstate_spapr_cap_ccf_assist;
---=20
-2.21.0
+The issue is it can't deal with e.g vhost-net and multiqueue. We can=20
+have a simple privileged launcher to do network configuration and pass=20
+the fds to unprivileged qemu.
 
+Thanks
+
+
+>
+> However, I have no problem with deprecating the helper argument of
+> "-netdev tap", which is a useless duplication with "-netdev bridge".
+>
+> Paolo
+>
 
