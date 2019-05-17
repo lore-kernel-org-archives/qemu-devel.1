@@ -2,72 +2,59 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EDAFC04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 05:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56ABDC04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 05:36:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22982206A3
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 05:32:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22982206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2B94820848
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 05:36:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B94820848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=birkelund.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42623 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42670 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRVU6-0003g0-U8
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 01:32:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35936)
+	id 1hRVXX-0004xT-9G
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 01:36:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hRVTE-0003Fv-W2
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 01:31:54 -0400
+	(envelope-from <klaus@birkelund.eu>) id 1hRVWe-0004Py-Mi
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 01:35:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hRVTD-0001cM-Az
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 01:31:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50300)
+	(envelope-from <klaus@birkelund.eu>) id 1hRVWd-00041F-MC
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 01:35:24 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:39762)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hRVTA-0001Xt-Tw
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 01:31:51 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C7FAE811DC;
-	Fri, 17 May 2019 05:31:43 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
-	(colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7FC4660BE5;
-	Fri, 17 May 2019 05:31:43 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com
-	(zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-	by colo-mx.corp.redhat.com (Postfix) with ESMTP id 7045B1806B10;
-	Fri, 17 May 2019 05:31:41 +0000 (UTC)
-Date: Fri, 17 May 2019 01:31:40 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>
-Message-ID: <1808083054.29407926.1558071100913.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190516095618-mutt-send-email-mst@kernel.org>
-References: <20190514145422.16923-1-pagupta@redhat.com>
-	<20190514145422.16923-3-pagupta@redhat.com>
-	<9f6b1d8e-ef90-7d8b-56da-61a426953ba3@redhat.com>
-	<20190516095618-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <klaus@birkelund.eu>)
+	id 1hRVWV-0003tA-T5; Fri, 17 May 2019 01:35:17 -0400
+Received: from apples.localdomain (ip-5-186-120-196.cgn.fibianet.dk
+	[5.186.120.196])
+	by charlie.dont.surf (Postfix) with ESMTPSA id 8CB4CBF488;
+	Fri, 17 May 2019 05:35:08 +0000 (UTC)
+Date: Fri, 17 May 2019 07:35:04 +0200
+From: Klaus Birkelund <klaus@birkelund.eu>
+To: "Heitke, Kenneth" <kenneth.heitke@intel.com>
+Message-ID: <20190517053504.GA17341@apples.localdomain>
+Mail-Followup-To: "Heitke, Kenneth" <kenneth.heitke@intel.com>,
+	qemu-block@nongnu.org, keith.busch@intel.com, kwolf@redhat.com,
+	qemu-devel@nongnu.org, mreitz@redhat.com
+References: <20190405214117.1850-1-kenneth.heitke@intel.com>
+	<20190514060225.GA1350@apples.localdomain>
+	<1f607df5-b523-e517-c439-392725fd441b@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.116.188, 10.4.195.6]
-Thread-Topic: virtio-pmem: Add virtio pmem driver
-Thread-Index: FMi3zX+ydzvNE+LRIfWGkFwCXnTU+g==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Fri, 17 May 2019 05:31:44 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1f607df5-b523-e517-c439-392725fd441b@intel.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v9 2/7] virtio-pmem: Add virtio pmem driver
+X-Received-From: 128.199.63.193
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] nvme: add Get/Set Feature
+ Timestamp support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,180 +66,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jack@suse.cz, kvm@vger.kernel.org, jasowang@redhat.com, david@fromorbit.com,
-	qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
-	adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
-	aarcange@redhat.com, dave jiang <dave.jiang@intel.com>,
-	jstaron@google.com, linux-nvdimm@lists.01.org,
-	vishal l verma <vishal.l.verma@intel.com>, willy@infradead.org,
-	hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com,
-	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
-	riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
-	stefanha@redhat.com, imammedo@redhat.com,
-	dan j williams <dan.j.williams@intel.com>,
-	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
-	tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-	cohuck@redhat.com, rjw@rjwysocki.net,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, pbonzini@redhat.com,
-	darrick wong <darrick.wong@oracle.com>
+Cc: keith.busch@intel.com, kwolf@redhat.com, qemu-devel@nongnu.org,
+	qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Kenneth,
 
+On Thu, May 16, 2019 at 05:24:47PM -0600, Heitke, Kenneth wrote:
+> Hi Klaus, thank you for you review. I have one comment inline
 > 
-> On Wed, May 15, 2019 at 10:46:00PM +0200, David Hildenbrand wrote:
-> > > +	vpmem->vdev = vdev;
-> > > +	vdev->priv = vpmem;
-> > > +	err = init_vq(vpmem);
-> > > +	if (err) {
-> > > +		dev_err(&vdev->dev, "failed to initialize virtio pmem vq's\n");
-> > > +		goto out_err;
-> > > +	}
-> > > +
-> > > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> > > +			start, &vpmem->start);
-> > > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> > > +			size, &vpmem->size);
-> > > +
-> > > +	res.start = vpmem->start;
-> > > +	res.end   = vpmem->start + vpmem->size-1;
-> > 
-> > nit: " - 1;"
-> > 
-> > > +	vpmem->nd_desc.provider_name = "virtio-pmem";
-> > > +	vpmem->nd_desc.module = THIS_MODULE;
-> > > +
-> > > +	vpmem->nvdimm_bus = nvdimm_bus_register(&vdev->dev,
-> > > +						&vpmem->nd_desc);
-> > > +	if (!vpmem->nvdimm_bus) {
-> > > +		dev_err(&vdev->dev, "failed to register device with nvdimm_bus\n");
-> > > +		err = -ENXIO;
-> > > +		goto out_vq;
-> > > +	}
-> > > +
-> > > +	dev_set_drvdata(&vdev->dev, vpmem->nvdimm_bus);
-> > > +
-> > > +	ndr_desc.res = &res;
-> > > +	ndr_desc.numa_node = nid;
-> > > +	ndr_desc.flush = async_pmem_flush;
-> > > +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
-> > > +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
-> > > +	nd_region = nvdimm_pmem_region_create(vpmem->nvdimm_bus, &ndr_desc);
-> > > +	if (!nd_region) {
-> > > +		dev_err(&vdev->dev, "failed to create nvdimm region\n");
-> > > +		err = -ENXIO;
-> > > +		goto out_nd;
-> > > +	}
-> > > +	nd_region->provider_data =
-> > > dev_to_virtio(nd_region->dev.parent->parent);
-> > > +	return 0;
-> > > +out_nd:
-> > > +	nvdimm_bus_unregister(vpmem->nvdimm_bus);
-> > > +out_vq:
-> > > +	vdev->config->del_vqs(vdev);
-> > > +out_err:
-> > > +	return err;
-> > > +}
-> > > +
-> > > +static void virtio_pmem_remove(struct virtio_device *vdev)
+> On 5/14/2019 12:02 AM, Klaus Birkelund wrote:
+> > On Fri, Apr 05, 2019 at 03:41:17PM -0600, Kenneth Heitke wrote:
+> > > Signed-off-by: Kenneth Heitke <kenneth.heitke@intel.com>
+> > > ---
+> > >   hw/block/nvme.c       | 120 +++++++++++++++++++++++++++++++++++++++++-
+> > >   hw/block/nvme.h       |   3 ++
+> > >   hw/block/trace-events |   2 +
+> > >   include/block/nvme.h  |   2 +
+> > >   4 files changed, 125 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> > > index 7caf92532a..e775e89299 100644
+> > > --- a/hw/block/nvme.c
+> > > +++ b/hw/block/nvme.c
+> > > @@ -219,6 +219,30 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
+> > >       return NVME_INVALID_FIELD | NVME_DNR;
+> > >   }
+> > > +static uint16_t nvme_dma_write_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
+> > > +                                   uint64_t prp1, uint64_t prp2)
 > > > +{
-> > > +	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
+> > > +    QEMUSGList qsg;
+> > > +    QEMUIOVector iov;
+> > > +    uint16_t status = NVME_SUCCESS;
 > > > +
-> > > +	nvdimm_bus_unregister(nvdimm_bus);
-> > > +	vdev->config->del_vqs(vdev);
-> > > +	vdev->config->reset(vdev);
-> > > +}
-> > > +
-> > > +static struct virtio_driver virtio_pmem_driver = {
-> > > +	.driver.name		= KBUILD_MODNAME,
-> > > +	.driver.owner		= THIS_MODULE,
-> > > +	.id_table		= id_table,
-> > > +	.probe			= virtio_pmem_probe,
-> > > +	.remove			= virtio_pmem_remove,
-> > > +};
-> > > +
-> > > +module_virtio_driver(virtio_pmem_driver);
-> > > +MODULE_DEVICE_TABLE(virtio, id_table);
-> > > +MODULE_DESCRIPTION("Virtio pmem driver");
-> > > +MODULE_LICENSE("GPL");
-> > > diff --git a/drivers/nvdimm/virtio_pmem.h b/drivers/nvdimm/virtio_pmem.h
-> > > new file mode 100644
-> > > index 000000000000..ab1da877575d
-> > > --- /dev/null
-> > > +++ b/drivers/nvdimm/virtio_pmem.h
-> > > @@ -0,0 +1,60 @@
-> > > +/* SPDX-License-Identifier: GPL-2.0 */
-> > > +/*
-> > > + * virtio_pmem.h: virtio pmem Driver
-> > > + *
-> > > + * Discovers persistent memory range information
-> > > + * from host and provides a virtio based flushing
-> > > + * interface.
-> > > + **/
-> > > +
-> > > +#ifndef _LINUX_VIRTIO_PMEM_H
-> > > +#define _LINUX_VIRTIO_PMEM_H
-> > > +
-> > > +#include <linux/virtio_ids.h>
-> > > +#include <linux/module.h>
-> > > +#include <linux/virtio_config.h>
-> > > +#include <uapi/linux/virtio_pmem.h>
-> > > +#include <linux/libnvdimm.h>
-> > > +#include <linux/spinlock.h>
-> > > +
-> > > +struct virtio_pmem_request {
-> > > +	/* Host return status corresponding to flush request */
-> > > +	int ret;
-> > > +
-> > > +	/* command name*/
-> > > +	char name[16];
+> > > +    if (nvme_map_prp(&qsg, &iov, prp1, prp2, len, n)) {
+> > > +        return NVME_INVALID_FIELD | NVME_DNR;
+> > > +    }
+> > > +    if (qsg.nsg > 0) {
+> > > +        if (dma_buf_write(ptr, len, &qsg)) {
+> > > +            status = NVME_INVALID_FIELD | NVME_DNR;
+> > > +        }
+> > > +        qemu_sglist_destroy(&qsg);
+> > > +    } else {
+> > > +        if (qemu_iovec_from_buf(&iov, 0, ptr, len) != len) {
 > > 
-> > So ... why are we sending string commands and expect native-endianess
-> > integers and don't define a proper request/response structure + request
-> > types in include/uapi/linux/virtio_pmem.h like
+> > This should be `qemu_iovec_to_buf`.
+> > 
 > 
-> passing names could be ok.
-> I missed the fact we return a native endian int.
-> Pls fix that.
+> This function is transferring data from the "host" to the device so I
+> believe I am using the correct function.
+> 
 
-Sure. will fix this.
-
-> 
-> 
-> > 
-> > struct virtio_pmem_resp {
-> > 	__virtio32 ret;
-> > }
-> > 
-> > #define VIRTIO_PMEM_REQ_TYPE_FLUSH	1
-> > struct virtio_pmem_req {
-> > 	__virtio16 type;
-> > }
-> > 
-> > ... and this way we also define a proper endianess format for exchange
-> > and keep it extensible
-> > 
-> > @MST, what's your take on this?
-> 
-> Extensions can always use feature bits so I don't think
-> it's a problem.
-
-That was exactly my thought when I implemented this. Though I am
-fine with separate structures for request/response and I made the
-change. 
-
-Thank you for all the comments.
-
-Best regards,
-Pankaj 
-> > 
-> > --
-> > 
-> > Thanks,
-> > 
-> > David / dhildenb
-> 
-> 
+Exactly, but this means that you need to populate `ptr` with data
+described by the prps, hence dma_buf_*write* and qemu_iovec_*to*_buf. In
+this case `ptr` is set to the address of the uint64_t timestamp, and
+that is what we need to write to.
 
