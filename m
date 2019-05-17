@@ -2,63 +2,56 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3CA4C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 12:35:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D42CC04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 12:56:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2C1B205ED
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 12:35:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2C1B205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id E073020881
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 12:56:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E073020881
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernkonzept.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47953 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48224 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRc4x-0008MZ-Mt
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 08:35:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47351)
+	id 1hRcPm-0008FK-Sc
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 08:56:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hRc3L-0007Uf-Ne
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 08:33:37 -0400
+	(envelope-from <jermar@gorgo>) id 1hRcP2-0007hG-DJ
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 08:56:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hRc0c-0003lr-7H
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 08:30:47 -0400
-Received: from 5.mo178.mail-out.ovh.net ([46.105.51.53]:51497)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hRc0c-0003a5-0v
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 08:30:46 -0400
-Received: from player759.ha.ovh.net (unknown [10.108.42.88])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id D9829669AA
-	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 14:30:34 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
-	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
-	by player759.ha.ovh.net (Postfix) with ESMTPSA id 006FD5E88C17;
-	Fri, 17 May 2019 12:30:30 +0000 (UTC)
-Date: Fri, 17 May 2019 14:30:29 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Message-ID: <20190517143029.25454663@bahia.lan>
-In-Reply-To: <8706106.MIJVTSuNya@silver>
-References: <590216e2666653bac21d950aaba98f87d0a53324.1557093245.git.qemu_oss@crudebyte.com>
-	<20190507174239.59ad26d1@bahia.lan> <1714809.tFt2Qa06yj@silver>
-	<8706106.MIJVTSuNya@silver>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	(envelope-from <jermar@gorgo>) id 1hRcP0-00081v-GY
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 08:55:59 -0400
+Received: from 89-24-57-155.nat.epc.tmcz.cz ([89.24.57.155]:28926 helo=gorgo)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jermar@gorgo>) id 1hRcOy-0007h8-GZ
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 08:55:57 -0400
+Received: from gorgo (localhost.localdomain [127.0.0.1])
+	by gorgo (8.15.2/8.15.2) with ESMTPS id x4HCarGY868599
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 17 May 2019 14:36:53 +0200
+Received: (from jermar@localhost)
+	by gorgo (8.15.2/8.15.2/Submit) id x4HCapHV868540;
+	Fri, 17 May 2019 14:36:51 +0200
+From: =?UTF-8?q?Jakub=20Jerm=C3=A1=C5=99?= <jakub.jermar@kernkonzept.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 17 May 2019 14:35:33 +0200
+Message-Id: <20190517123533.868479-1-jakub.jermar@kernkonzept.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 12207569740520462656
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddtvddgheegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by gorgo id x4HCarGY868599
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.51.53
-Subject: Re: [Qemu-devel] [libvirt patch] qemu: adds support for virtfs 9p
- argument 'vii'
+	[fuzzy]
+X-Received-From: 89.24.57.155
+Subject: [Qemu-devel] [PATCH v3] mips: Decide to map PAGE_EXEC in map_address
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,112 +63,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
-	qemu-devel@nongnu.org, Antonios Motakis <antonios.motakis@huawei.com>
+Cc: =?UTF-8?q?Jakub=20Jerm=C3=A1=C5=99?= <jakub.jermar@kernkonzept.com>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 17 May 2019 10:40:48 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+This commit addresses QEMU Bug #1825311:
 
-> On Dienstag, 7. Mai 2019 18:16:08 CEST Christian Schoenebeck wrote:
-> > Here are the archive links for latest v3 patch set [5(+1) patches total]:
-> > 
-> > [PATCH v3 0/5] 9p: Fix file ID collisions:
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01143.html
-> > 
-> > [PATCH v3 1/5] 9p: mitigates most QID path collisions:
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01142.html
-> > 
-> > [PATCH v3 2/5] 9P: trivial cleanup of QID path collision mitigation:
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01140.html
-> > 
-> > [PATCH v3 3/5] 9p: persistency of QID path beyond reboots / suspensions:
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01144.html
-> > 
-> > [PATCH v3 4/5] 9p: use variable length suffixes for inode mapping:
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01141.html
-> > 
-> > [PATCH v3 5/5] 9p: adds virtfs 'vii' device parameter
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01138.html
-> > 
-> > And the optional libvirt patch:
-> > 
-> > [libvirt patch] qemu: adds support for virtfs 9p argument 'vii':
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01223.html
-> >   
-> > > > Please just have a glimpse on that v3 thread, and before I address the
-> > > > details that you requested (I have reviewed them all already and will
-> > > > address them), I would like you to ask you for a coarse feedback on
-> > > > design/features first.  
-> > >   
-> > > > Because there are some things where I am unresolved on design level yet:  
-> > > 
-> > > I'll try but probably not before next week.  
-> 
-> Hi Greg, you have not forgotten about me, did you? ;-)
-> 
+  mips_cpu_handle_mmu_fault renders all accessed pages executable
 
-Hi Christian,
+It allows finer-grained control over whether the accessed page should be
+executable by moving the decision to the underlying map_address
+function, which has more information for this.
 
-I have certainly not forgotten but I had (and still have) some more urgent
-work to do and I couldn't find time for this... Sorry :)
+As a result, pages that have the XI bit set in the TLB and are accessed
+for read/write, don't suddenly end up being executable.
 
-> Or should I go ahead and provide a v4 next week addressing the issues 
-> discussed so far?
-> 
+Signed-off-by: Jakub Jerm=C3=A1=C5=99 <jakub.jermar@kernkonzept.com>
+---
 
-Thinking again about the initial issue raised by Antonios, I agree we
-should at least detect collisions in the existing 9pfs code and
-emit an error rather than silently returning duplicate QIDs to the
-client. This would be patch 2 from Antonios's series: only allow
-a single host device for a given fs device.
+ Changes since v2:
+=20
+ This is the same patch as v2, but rebased to current master.
 
-Then, we come to the bulk problem: how to handle the case where we
-have multiple devices involved in a directory we want to share ?
-Antonios's proposal is a clever way to address the collisions, but
-your work proves it isn't enough... Before going forward, I'd like
-to consider another approach.
+ target/mips/helper.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-What about:
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index 9799f2ede1..68e44df4da 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -43,7 +43,7 @@ int no_mmu_map_address (CPUMIPSState *env, hwaddr *phys=
+ical, int *prot,
+                         target_ulong address, int rw, int access_type)
+ {
+     *physical =3D address;
+-    *prot =3D PAGE_READ | PAGE_WRITE;
++    *prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+     return TLBRET_MATCH;
+ }
+=20
+@@ -61,7 +61,7 @@ int fixed_mmu_map_address (CPUMIPSState *env, hwaddr *p=
+hysical, int *prot,
+     else
+         *physical =3D address;
+=20
+-    *prot =3D PAGE_READ | PAGE_WRITE;
++    *prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+     return TLBRET_MATCH;
+ }
+=20
+@@ -101,6 +101,9 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physi=
+cal, int *prot,
+                 *prot =3D PAGE_READ;
+                 if (n ? tlb->D1 : tlb->D0)
+                     *prot |=3D PAGE_WRITE;
++                if (!(n ? tlb->XI1 : tlb->XI0)) {
++                    *prot |=3D PAGE_EXEC;
++                }
+                 return TLBRET_MATCH;
+             }
+             return TLBRET_DIRTY;
+@@ -182,7 +185,7 @@ static int get_seg_physical_address(CPUMIPSState *env=
+, hwaddr *physical,
+     } else {
+         /* The segment is unmapped */
+         *physical =3D physical_base | (real_address & segmask);
+-        *prot =3D PAGE_READ | PAGE_WRITE;
++        *prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+         return TLBRET_MATCH;
+     }
+ }
+@@ -907,7 +910,7 @@ bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, i=
+nt size,
+     }
+     if (ret =3D=3D TLBRET_MATCH) {
+         tlb_set_page(cs, address & TARGET_PAGE_MASK,
+-                     physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
++                     physical & TARGET_PAGE_MASK, prot,
+                      mmu_idx, TARGET_PAGE_SIZE);
+         return true;
+     }
+@@ -927,7 +930,7 @@ bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, i=
+nt size,
+                                        access_type, mips_access_type, mm=
+u_idx);
+             if (ret =3D=3D TLBRET_MATCH) {
+                 tlb_set_page(cs, address & TARGET_PAGE_MASK,
+-                             physical & TARGET_PAGE_MASK, prot | PAGE_EX=
+EC,
++                             physical & TARGET_PAGE_MASK, prot,
+                              mmu_idx, TARGET_PAGE_SIZE);
+                 return true;
+             }
+--=20
+2.20.1
 
-1) de-compose the shared directory on a per-device basis,
-   ie. identify all mount points under the shared directory
-
-2) expose found mount points separately, each with its onw 9p device
-
-3) re-compose the directory tree within the guest using the same topology
-   as the host
-
-ie. if you want to share /vm/fs and
-
-/vm/fs on device A
-/vm/fs/shares on device B
-/vm/fs/tmp on device C
-
-you would start QEMU with
-
--fsdev local,path=/vm/fs,id=fsdev0... \
--device virtio-9p,fsdev=fsdev0,mount_tag=tag0 \
--fsdev local,path=/vm/fs,id=fsdev1... \
--device virtio-9p,fsdev=fsdev1,mount_tag=tag1 \
--fsdev local,path=/vm/fs,id=fsdev2... \
--device virtio-9p,fsdev=fsdev2,mount_tag=tag2
-
-and /etc/fstab in the guest:
-
-tag0    /       9p      nofail,trans=virtio,version=9p2000.L   0 0
-tag1    /shares 9p      nofail,trans=virtio,version=9p2000.L   0 0
-tag2    /tmp    9p      nofail,trans=virtio,version=9p2000.L   0 0
-
-This involves some more work for the user but it doesn't require
-any changes in QEMU.
-
-Would this approach solve the issues you've been hitting with Samba ?
-
-Cheers,
-
---
-Greg
 
