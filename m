@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CC75C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 13:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F46FC04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 13:53:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D519420873
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 13:52:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D519420873
+	by mail.kernel.org (Postfix) with ESMTPS id 1328420873
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 13:53:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1328420873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49000 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49002 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRdHn-0003Kl-3r
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 09:52:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35667)
+	id 1hRdIP-0003j6-6G
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 09:53:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hRdDU-0008St-8F
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:48:09 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hRdDa-00006l-1o
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:48:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hRdDS-0003Xo-AH
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:48:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43022)
+	(envelope-from <sgarzare@redhat.com>) id 1hRdDW-0003bT-98
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:48:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53198)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hRdDQ-0003Vv-Im
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:48:06 -0400
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hRdDW-0003ZH-3b
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:48:10 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CDC4DC0A4F49
-	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 13:47:58 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D500A75724
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 13:48:07 +0000 (UTC)
 Received: from steredhat.redhat.com (ovpn-116-83.ams2.redhat.com
 	[10.36.116.83])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 91CB37A463;
-	Fri, 17 May 2019 13:47:57 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 953B35DA64;
+	Fri, 17 May 2019 13:48:06 +0000 (UTC)
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 17 May 2019 15:47:45 +0200
-Message-Id: <20190517134748.340381-2-sgarzare@redhat.com>
+Date: Fri, 17 May 2019 15:47:48 +0200
+Message-Id: <20190517134748.340381-5-sgarzare@redhat.com>
 In-Reply-To: <20190517134748.340381-1-sgarzare@redhat.com>
 References: <20190517134748.340381-1-sgarzare@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Fri, 17 May 2019 13:47:58 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.25]);
+	Fri, 17 May 2019 13:48:07 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 1/4] net: fix assertion failure when
- ipv6-prefixlen is not a number
+Subject: [Qemu-devel] [PATCH v3 4/4] net: remove unused get_str_sep()
+ function
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,56 +74,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If 'ipv6-prefixlen' is not a number, the current behaviour
-produces an assertion failure:
-    $ qemu-system-x86_64 -net user,ipv6-net=3Dfeca::0/a
-    qemu-system-x86_64: qemu/util/qemu-option.c:1175: qemu_opts_foreach:
-    Assertion `!errp || !*errp' failed.
-    Aborted (core dumped)
-
-This patch fixes it, jumping to the end of the function when
-'ipv6-prefixlen' is not a number, and printing the more friendly
-message:
-    $ qemu-system-x86_64 -net user,ipv6-net=3Dfeca::0/a
-    qemu-system-x86_64: Parameter 'ipv6-prefixlen' expects a number
+Since the get_str_sep() function is no longer used in
+net/net.c, we can remove it.
 
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- net/net.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ net/net.c | 20 --------------------
+ 1 file changed, 20 deletions(-)
 
 diff --git a/net/net.c b/net/net.c
-index 2cf5e76469..555504a404 100644
+index 23f29ef1d2..4e1b25ba91 100644
 --- a/net/net.c
 +++ b/net/net.c
-@@ -1135,11 +1135,11 @@ static int net_client_init(QemuOpts *opts, bool i=
-s_netdev, Error **errp)
+@@ -63,26 +63,6 @@ static QTAILQ_HEAD(, NetClientState) net_clients;
+ /***********************************************************/
+ /* network device redirectors */
 =20
-                 if (err) {
-                     error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
--                              "ipv6-prefix", "a number");
--                } else {
--                    qemu_opt_set_number(opts, "ipv6-prefixlen", len,
--                                        &error_abort);
-+                               "ipv6-prefixlen", "a number");
-+                    goto out;
-                 }
-+
-+                qemu_opt_set_number(opts, "ipv6-prefixlen", len, &error_=
-abort);
-             }
-             qemu_opt_unset(opts, "ipv6-net");
-         }
-@@ -1161,6 +1161,7 @@ static int net_client_init(QemuOpts *opts, bool is_=
-netdev, Error **errp)
-         qapi_free_NetLegacy(object);
-     }
-=20
-+out:
-     error_propagate(errp, err);
-     visit_free(v);
-     return ret;
+-static int get_str_sep(char *buf, int buf_size, const char **pp, int sep=
+)
+-{
+-    const char *p, *p1;
+-    int len;
+-    p =3D *pp;
+-    p1 =3D strchr(p, sep);
+-    if (!p1)
+-        return -1;
+-    len =3D p1 - p;
+-    p1++;
+-    if (buf_size > 0) {
+-        if (len > buf_size - 1)
+-            len =3D buf_size - 1;
+-        memcpy(buf, p, len);
+-        buf[len] =3D '\0';
+-    }
+-    *pp =3D p1;
+-    return 0;
+-}
+-
+ int parse_host_port(struct sockaddr_in *saddr, const char *str,
+                     Error **errp)
+ {
 --=20
 2.20.1
 
