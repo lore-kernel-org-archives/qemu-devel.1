@@ -2,63 +2,62 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6783C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:49:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92EC0C04E87
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:52:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98EB52166E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:49:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98EB52166E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5A32020578
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:52:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A32020578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49719 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49771 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hReB8-0006tu-Sf
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 10:49:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46871)
+	id 1hReDg-0000Wo-KR
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 10:52:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hRe9N-0005xm-SQ
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:47:58 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hRe4m-0001u6-Kx
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:43:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hRe9M-0004cc-K7
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:47:57 -0400
-Received: from 18.mo4.mail-out.ovh.net ([188.165.54.143]:38278)
+	(envelope-from <kwolf@redhat.com>) id 1hRe4g-00045Q-Kq
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:43:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45382)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hRe9L-0004Vy-6w
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:47:56 -0400
-Received: from player786.ha.ovh.net (unknown [10.108.57.72])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 0429E1E7CB9
-	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 16:47:51 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
-	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
-	by player786.ha.ovh.net (Postfix) with ESMTPSA id ECBA05FCC24A;
-	Fri, 17 May 2019 14:47:47 +0000 (UTC)
-Date: Fri, 17 May 2019 16:47:46 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Message-ID: <20190517164746.5c653a0e@bahia.lan>
-In-Reply-To: <1723391.cvQaRflHa6@silver>
-References: <590216e2666653bac21d950aaba98f87d0a53324.1557093245.git.qemu_oss@crudebyte.com>
-	<8706106.MIJVTSuNya@silver> <20190517143029.25454663@bahia.lan>
-	<1723391.cvQaRflHa6@silver>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hRe4c-00042N-PH; Fri, 17 May 2019 10:43:02 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F12178F914;
+	Fri, 17 May 2019 14:42:51 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-116-213.ams2.redhat.com
+	[10.36.116.213])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 67AAB5D772;
+	Fri, 17 May 2019 14:42:49 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Date: Fri, 17 May 2019 16:42:29 +0200
+Message-Id: <20190517144232.18965-4-kwolf@redhat.com>
+In-Reply-To: <20190517144232.18965-1-kwolf@redhat.com>
+References: <20190517144232.18965-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 14526079126470826304
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddtvddgkedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.26]);
+	Fri, 17 May 2019 14:42:52 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 188.165.54.143
-Subject: Re: [Qemu-devel] [libvirt patch] qemu: adds support for virtfs 9p
- argument 'vii'
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 3/6] tests/qapi-schema: Error case tests for
+ features in structs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,112 +69,270 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
-	qemu-devel@nongnu.org, Antonios Motakis <antonios.motakis@huawei.com>
+Cc: kwolf@redhat.com, pkrempa@redhat.com, armbru@redhat.com,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 17 May 2019 15:23:01 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ tests/qapi-schema/features-bad-type.json       | 3 +++
+ tests/qapi-schema/features-duplicate-name.json | 3 +++
+ tests/qapi-schema/features-missing-name.json   | 3 +++
+ tests/qapi-schema/features-name-bad-type.json  | 3 +++
+ tests/qapi-schema/features-no-list.json        | 3 +++
+ tests/qapi-schema/features-unknown-key.json    | 3 +++
+ tests/Makefile.include                         | 6 ++++++
+ tests/qapi-schema/features-bad-type.err        | 1 +
+ tests/qapi-schema/features-bad-type.exit       | 1 +
+ tests/qapi-schema/features-bad-type.out        | 0
+ tests/qapi-schema/features-duplicate-name.err  | 1 +
+ tests/qapi-schema/features-duplicate-name.exit | 1 +
+ tests/qapi-schema/features-duplicate-name.out  | 0
+ tests/qapi-schema/features-missing-name.err    | 1 +
+ tests/qapi-schema/features-missing-name.exit   | 1 +
+ tests/qapi-schema/features-missing-name.out    | 0
+ tests/qapi-schema/features-name-bad-type.err   | 1 +
+ tests/qapi-schema/features-name-bad-type.exit  | 1 +
+ tests/qapi-schema/features-name-bad-type.out   | 0
+ tests/qapi-schema/features-no-list.err         | 1 +
+ tests/qapi-schema/features-no-list.exit        | 1 +
+ tests/qapi-schema/features-no-list.out         | 0
+ tests/qapi-schema/features-unknown-key.err     | 2 ++
+ tests/qapi-schema/features-unknown-key.exit    | 1 +
+ tests/qapi-schema/features-unknown-key.out     | 0
+ 25 files changed, 37 insertions(+)
+ create mode 100644 tests/qapi-schema/features-bad-type.json
+ create mode 100644 tests/qapi-schema/features-duplicate-name.json
+ create mode 100644 tests/qapi-schema/features-missing-name.json
+ create mode 100644 tests/qapi-schema/features-name-bad-type.json
+ create mode 100644 tests/qapi-schema/features-no-list.json
+ create mode 100644 tests/qapi-schema/features-unknown-key.json
+ create mode 100644 tests/qapi-schema/features-bad-type.err
+ create mode 100644 tests/qapi-schema/features-bad-type.exit
+ create mode 100644 tests/qapi-schema/features-bad-type.out
+ create mode 100644 tests/qapi-schema/features-duplicate-name.err
+ create mode 100644 tests/qapi-schema/features-duplicate-name.exit
+ create mode 100644 tests/qapi-schema/features-duplicate-name.out
+ create mode 100644 tests/qapi-schema/features-missing-name.err
+ create mode 100644 tests/qapi-schema/features-missing-name.exit
+ create mode 100644 tests/qapi-schema/features-missing-name.out
+ create mode 100644 tests/qapi-schema/features-name-bad-type.err
+ create mode 100644 tests/qapi-schema/features-name-bad-type.exit
+ create mode 100644 tests/qapi-schema/features-name-bad-type.out
+ create mode 100644 tests/qapi-schema/features-no-list.err
+ create mode 100644 tests/qapi-schema/features-no-list.exit
+ create mode 100644 tests/qapi-schema/features-no-list.out
+ create mode 100644 tests/qapi-schema/features-unknown-key.err
+ create mode 100644 tests/qapi-schema/features-unknown-key.exit
+ create mode 100644 tests/qapi-schema/features-unknown-key.out
 
-> On Freitag, 17. Mai 2019 14:30:29 CEST Greg Kurz wrote:
-> > Then, we come to the bulk problem: how to handle the case where we
-> > have multiple devices involved in a directory we want to share ?
-> > Antonios's proposal is a clever way to address the collisions, but
-> > your work proves it isn't enough...  
-> 
-> With the patch set I have right now, things finally bahave smooth.
-> 
-> > Before going forward, I'd like
-> > to consider another approach.
-> > 
-> > What about:
-> > 
-> > 1) de-compose the shared directory on a per-device basis,
-> >    ie. identify all mount points under the shared directory
-> > 
-> > 2) expose found mount points separately, each with its onw 9p device
-> > 
-> > 3) re-compose the directory tree within the guest using the same topology
-> >    as the host
-> > 
-> > ie. if you want to share /vm/fs and
-> > 
-> > /vm/fs on device A
-> > /vm/fs/shares on device B
-> > /vm/fs/tmp on device C
-> > 
-> > you would start QEMU with
-> > 
-> > -fsdev local,path=/vm/fs,id=fsdev0... \
-> > -device virtio-9p,fsdev=fsdev0,mount_tag=tag0 \
-> > -fsdev local,path=/vm/fs,id=fsdev1... \
-> > -device virtio-9p,fsdev=fsdev1,mount_tag=tag1 \
-> > -fsdev local,path=/vm/fs,id=fsdev2... \
-> > -device virtio-9p,fsdev=fsdev2,mount_tag=tag2
-> > 
-> > and /etc/fstab in the guest:
-> > 
-> > tag0    /       9p      nofail,trans=virtio,version=9p2000.L   0 0
-> > tag1    /shares 9p      nofail,trans=virtio,version=9p2000.L   0 0
-> > tag2    /tmp    9p      nofail,trans=virtio,version=9p2000.L   0 0
-> > 
-> > This involves some more work for the user but it doesn't require
-> > any changes in QEMU.  
-> 
-> So your suggestion is actually: don't fix it.
-> 
+diff --git a/tests/qapi-schema/features-bad-type.json b/tests/qapi-schema=
+/features-bad-type.json
+new file mode 100644
+index 0000000000..57db5540e7
+--- /dev/null
++++ b/tests/qapi-schema/features-bad-type.json
+@@ -0,0 +1,3 @@
++{ 'struct': 'FeatureStruct0',
++  'data': { 'foo': 'int' },
++  'features': [ [ 'a feature cannot be an array' ] ] }
+diff --git a/tests/qapi-schema/features-duplicate-name.json b/tests/qapi-=
+schema/features-duplicate-name.json
+new file mode 100644
+index 0000000000..29358e6220
+--- /dev/null
++++ b/tests/qapi-schema/features-duplicate-name.json
+@@ -0,0 +1,3 @@
++{ 'struct': 'FeatureStruct0',
++  'data': { 'foo': 'int' },
++  'features': [ 'foo', 'bar', 'foo' ] }
+diff --git a/tests/qapi-schema/features-missing-name.json b/tests/qapi-sc=
+hema/features-missing-name.json
+new file mode 100644
+index 0000000000..2314f97c00
+--- /dev/null
++++ b/tests/qapi-schema/features-missing-name.json
+@@ -0,0 +1,3 @@
++{ 'struct': 'FeatureStruct0',
++  'data': { 'foo': 'int' },
++  'features': [ { 'if': 'defined(NAMELESS_FEATURES)' } ] }
+diff --git a/tests/qapi-schema/features-name-bad-type.json b/tests/qapi-s=
+chema/features-name-bad-type.json
+new file mode 100644
+index 0000000000..b07139978a
+--- /dev/null
++++ b/tests/qapi-schema/features-name-bad-type.json
+@@ -0,0 +1,3 @@
++{ 'struct': 'FeatureStruct0',
++  'data': { 'foo': 'int' },
++  'features': [ { 'name': { 'feature-type': 'object' } } ] }
+diff --git a/tests/qapi-schema/features-no-list.json b/tests/qapi-schema/=
+features-no-list.json
+new file mode 100644
+index 0000000000..9484fd94fc
+--- /dev/null
++++ b/tests/qapi-schema/features-no-list.json
+@@ -0,0 +1,3 @@
++{ 'struct': 'FeatureStruct0',
++  'data': { 'foo': 'int' },
++  'features': 'bar' }
+diff --git a/tests/qapi-schema/features-unknown-key.json b/tests/qapi-sch=
+ema/features-unknown-key.json
+new file mode 100644
+index 0000000000..134df3b503
+--- /dev/null
++++ b/tests/qapi-schema/features-unknown-key.json
+@@ -0,0 +1,3 @@
++{ 'struct': 'FeatureStruct0',
++  'data': { 'foo': 'int' },
++  'features': [ { 'name': 'bar', 'colour': 'red' } ] }
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 60de085ee1..9284f82ec8 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -377,6 +377,12 @@ qapi-schema +=3D event-boxed-empty.json
+ qapi-schema +=3D event-case.json
+ qapi-schema +=3D event-member-invalid-dict.json
+ qapi-schema +=3D event-nest-struct.json
++qapi-schema +=3D features-bad-type.json
++qapi-schema +=3D features-duplicate-name.json
++qapi-schema +=3D features-missing-name.json
++qapi-schema +=3D features-name-bad-type.json
++qapi-schema +=3D features-no-list.json
++qapi-schema +=3D features-unknown-key.json
+ qapi-schema +=3D flat-union-array-branch.json
+ qapi-schema +=3D flat-union-bad-base.json
+ qapi-schema +=3D flat-union-bad-discriminator.json
+diff --git a/tests/qapi-schema/features-bad-type.err b/tests/qapi-schema/=
+features-bad-type.err
+new file mode 100644
+index 0000000000..5fb95c2f90
+--- /dev/null
++++ b/tests/qapi-schema/features-bad-type.err
+@@ -0,0 +1 @@
++tests/qapi-schema/features-bad-type.json:1: Feature of struct FeatureStr=
+uct0 requires a string name
+diff --git a/tests/qapi-schema/features-bad-type.exit b/tests/qapi-schema=
+/features-bad-type.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/features-bad-type.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/features-bad-type.out b/tests/qapi-schema/=
+features-bad-type.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/features-duplicate-name.err b/tests/qapi-s=
+chema/features-duplicate-name.err
+new file mode 100644
+index 0000000000..c0a4cccae6
+--- /dev/null
++++ b/tests/qapi-schema/features-duplicate-name.err
+@@ -0,0 +1 @@
++tests/qapi-schema/features-duplicate-name.json:1: 'foo' (feature of Feat=
+ureStruct0) collides with 'foo' (feature of FeatureStruct0)
+diff --git a/tests/qapi-schema/features-duplicate-name.exit b/tests/qapi-=
+schema/features-duplicate-name.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/features-duplicate-name.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/features-duplicate-name.out b/tests/qapi-s=
+chema/features-duplicate-name.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/features-missing-name.err b/tests/qapi-sch=
+ema/features-missing-name.err
+new file mode 100644
+index 0000000000..4f1d2715aa
+--- /dev/null
++++ b/tests/qapi-schema/features-missing-name.err
+@@ -0,0 +1 @@
++tests/qapi-schema/features-missing-name.json:1: Key 'name' is missing fr=
+om feature of struct FeatureStruct0
+diff --git a/tests/qapi-schema/features-missing-name.exit b/tests/qapi-sc=
+hema/features-missing-name.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/features-missing-name.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/features-missing-name.out b/tests/qapi-sch=
+ema/features-missing-name.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/features-name-bad-type.err b/tests/qapi-sc=
+hema/features-name-bad-type.err
+new file mode 100644
+index 0000000000..8a3eecb972
+--- /dev/null
++++ b/tests/qapi-schema/features-name-bad-type.err
+@@ -0,0 +1 @@
++tests/qapi-schema/features-name-bad-type.json:1: Feature of struct Featu=
+reStruct0 requires a string name
+diff --git a/tests/qapi-schema/features-name-bad-type.exit b/tests/qapi-s=
+chema/features-name-bad-type.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/features-name-bad-type.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/features-name-bad-type.out b/tests/qapi-sc=
+hema/features-name-bad-type.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/features-no-list.err b/tests/qapi-schema/f=
+eatures-no-list.err
+new file mode 100644
+index 0000000000..61ed68612b
+--- /dev/null
++++ b/tests/qapi-schema/features-no-list.err
+@@ -0,0 +1 @@
++tests/qapi-schema/features-no-list.json:1: Struct 'FeatureStruct0' requi=
+res an array for 'features'
+diff --git a/tests/qapi-schema/features-no-list.exit b/tests/qapi-schema/=
+features-no-list.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/features-no-list.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/features-no-list.out b/tests/qapi-schema/f=
+eatures-no-list.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/features-unknown-key.err b/tests/qapi-sche=
+ma/features-unknown-key.err
+new file mode 100644
+index 0000000000..a1d693030d
+--- /dev/null
++++ b/tests/qapi-schema/features-unknown-key.err
+@@ -0,0 +1,2 @@
++tests/qapi-schema/features-unknown-key.json:1: Unknown key 'colour' in f=
+eature of struct FeatureStruct0
++Valid keys are 'if', 'name'.
+diff --git a/tests/qapi-schema/features-unknown-key.exit b/tests/qapi-sch=
+ema/features-unknown-key.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/features-unknown-key.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/features-unknown-key.out b/tests/qapi-sche=
+ma/features-unknown-key.out
+new file mode 100644
+index 0000000000..e69de29bb2
+--=20
+2.20.1
 
-Potentially yes if another approach is satisfying enough, as I wouldn't
-want to over-engineer too much around this 9p imposed limitation. The
-right thing to do would be to come up with a new version of the protocol
-with variable sized QIDs and call it a day.
-
-> "Some" more work for the user is a quantity of how many guests you are 
-> running, multiplied by the nested virtualization levels you might have = 
-> potentially a lot of work for admins.
-> 
-
-Maybe, I don't have enough feedback on 9p use cases to have a clear
-picture...
-
-> > Would this approach solve the issues you've been hitting with Samba ?  
-> 
-> No, because that completely neglects runtime changes on a higher level (host), 
-
-Unless I'm missing something, runtime changes would be neglected as well
-with the "vii" property since it is static for the device lifetime.
-
-> plus it completely destroys the fundamental idea about 9p, which is about 
-> transparency of the higher level(s).
-> 
-
-That's a point indeed, even if again I'm not sure if this is a frequent
-case to share a directory tree spanning over multiple devices.
-
-> May I ask, do you have concrete reasons why you want to abondon the entire 
-> patch set? Because that's what it sounds to me.
-> 
-
-I don't have that much time to spend on 9p maintainership, for both
-reviewing and fixing bugs (CVEs most of the time). So, yes it may
-sound like I want to drop the patchset, but it's just I need to be
-convinced I won't regret having merged a huge change like this...
-when I'll have to support it alone later ;-)
-
-For the moment, I'm not convinced by the "vii" solution. It even
-motivated my suggestion of having several devices actually, since
-the paths you would put in there are known before starting QEMU.
-
-It might take me some more rounds of discussion to decide. I understand
-it is frustrating but bear with me :)
-
-> Best regards,
-> Christian Schoenebeck
-
-Cheers,
-
---
-Greg
 
