@@ -4,75 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05EE3C04E84
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 02:50:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB239C04AAF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 02:50:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C415420848
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 02:50:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9047420815
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 02:50:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zsG5MhDP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C415420848
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P7uCeBfW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9047420815
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40265 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40258 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRSxT-0005zL-3c
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 22:50:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39045)
+	id 1hRSxR-0005w2-MV
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 22:50:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hRSma-0005Tv-Pb
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:39:41 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hRSmj-0005ah-J3
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:39:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hRSmZ-00026L-R5
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:39:40 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:35419)
+	(envelope-from <richard.henderson@linaro.org>) id 1hRSmh-00029l-JX
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:39:49 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33168)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hRSmZ-00025p-Ao
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:39:39 -0400
-Received: by mail-pg1-x544.google.com with SMTP id t1so1101179pgc.2
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 19:39:39 -0700 (PDT)
+	id 1hRSmh-000298-DL
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:39:47 -0400
+Received: by mail-pg1-x542.google.com with SMTP id h17so2535328pgv.0
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 19:39:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=DHS+azgDjOz9872pwx2wjM+spw3T8bEncaHuHvbQJSc=;
-	b=zsG5MhDPy3Peh4KyxlyG0aJPng5JxmauuCZUD4qfQDNewiIZ/j1Xga6OU/4DcKkXi6
-	Lxi4V3EeO/vTN5p8uJlgm3giu2QEIR+mUGqiqU4qk4Vx32pUMhi6XtkTB4gSlS0tyZkI
-	kTK0cIoohtsV85a0DUh1WwKM7V6kj00Sdzl4Xripy/yTO+EzZtPbAgv1ArMImd0F/lr5
-	kE+FDgHKJMLzxrizQ2E4+7E11WfgBqty5uz0TsmsX8fcU37+2byouRWksabOAtFMxixt
-	gSvVrUibeEyn/32tuC2j+3Iym4/2U40CT65H5PvCcHrfUaq8m+RadHbsTcKM+aEVhS/Y
-	Bt8A==
+	bh=yE70JIuqrA6MJdI0/JWiVeD/16stq6LybzVtzKfjj1Q=;
+	b=P7uCeBfW4JYTuGB0oJwFoFu31evMKAOTe6sILXvBjGVc+6cSpc+qFcn8rnBrZoPJ6l
+	mD+VK+hYqFHuinL++2OnmPmfXWGMcnO8U2i6jnGDl4Kb6Lo+4KktlrDuVMfLi903+apd
+	3CpoCqeeXZ/lWgxCvqEAa52HTamETTEGdUQqmFuSIFBnfcYKkAixfcma2+ST85IfAE6w
+	+QCMPa47LImR4iahgMnk6urrQBSMUyv1SDHYDUlxHytfxE5CqB3UMX4ij+PBmQsQC+Mq
+	I6RIRggnQAxaw3avp6Y9WPxFMqAShKO7qpyw9GHoKCac+aWOSxJF/8G90u0blWWp+je/
+	/8Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=DHS+azgDjOz9872pwx2wjM+spw3T8bEncaHuHvbQJSc=;
-	b=pAK/7nFvdzeTPSqAMPVfiBBp9kf+B+HErBu+5vVDUT1K9+iK2oGE6xxcrTNNQf3tXo
-	wc/qTgSmTqtk3J7gUI+yMCJOX+pAcWQnPFRj+iJ2werYfiRTuWvVUOKntVCtucaehmgf
-	XVmVx344zj1l0I1CJRV4+F9Stm3sHUNS+GKhPf5IGNE6fWF25Pj6qfdoU25+8QPqJIdB
-	/jBPyYXnY8P685Tk3+GSJ/k4MMC8+/Bq6FoZhJKT5oX/5aUtGa6M61qqnwX+7RGs14h0
-	xLdLg9MB6dvn3afYF+KohAzytquB3/KGC6hNUEB6Vfpko9Pv6GsmGPEttt4Cr2u0ilsu
-	Z9xg==
-X-Gm-Message-State: APjAAAU1p4PlZZJzUfWdFHGHnaxc+y7UxLZZPOwvC5WXp7lSfw6u/Iyn
-	1Oo/l2+JdpWhgYPJrKlJhcNc6148uSs=
-X-Google-Smtp-Source: APXvYqyxMOp9taj7eZxTTFO5x5r7UevnXPJf+KUTYFE1TCAjx1PzQItXKw3NpZNP4Mh2D0fUJokVbg==
-X-Received: by 2002:aa7:808d:: with SMTP id v13mr26719080pff.198.1558060778076;
-	Thu, 16 May 2019 19:39:38 -0700 (PDT)
+	bh=yE70JIuqrA6MJdI0/JWiVeD/16stq6LybzVtzKfjj1Q=;
+	b=FOdtucYt3NJ+4amANZUHQA881EyBKH+mC9OZ0odqNl9WlH7ml8kkGpboKMmACLqB2E
+	69xdEBkhBVmm+cOpDa/0EJ9C6BWAtfSuIpmZoNioQRbJ1EKSWthEIlkKZp5K3J3TPnP5
+	eQxZ9f1PHLi43UY6w9gQDv+baOBFuQJ3liCBfksIa4eqxio+wm0BO5H2c2ihIH4Kj2cb
+	x7hkl4jTp5AW38qV5Q94AG6Y2hi9eUJ5AYphrWKeGwiPzwrPgRJzZMLkWhFtS0f0jsBu
+	mByBtaaRDZkZaZV1RvLOMmq9joGtPbkMgyqcSv1JzCG6Nfn5ZaH2JDYjEQrVnA7FuqFu
+	cVaQ==
+X-Gm-Message-State: APjAAAVdjm72tmT42vjXxYa8kJuicFuAAM9/bEg/tqCM007QmrLO/g+x
+	Db9KIOGTXJ7ac0yyrPnL0qROSUbqdXU=
+X-Google-Smtp-Source: APXvYqzNe0slqK3gw0CBOZpVfA/NQCoWIJLam6er3rY9Wd97QAgOT/9MvcTF84ce4CCHy5jl6p9B9A==
+X-Received: by 2002:a63:2d87:: with SMTP id
+	t129mr54073702pgt.451.1558060785557; 
+	Thu, 16 May 2019 19:39:45 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id w6sm6984152pge.30.2019.05.16.19.39.37
+	by smtp.gmail.com with ESMTPSA id w6sm6984152pge.30.2019.05.16.19.39.44
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 16 May 2019 19:39:37 -0700 (PDT)
+	Thu, 16 May 2019 19:39:44 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 16 May 2019 19:39:08 -0700
-Message-Id: <20190517023924.1686-10-richard.henderson@linaro.org>
+Date: Thu, 16 May 2019 19:39:14 -0700
+Message-Id: <20190517023924.1686-16-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190517023924.1686-1-richard.henderson@linaro.org>
 References: <20190517023924.1686-1-richard.henderson@linaro.org>
@@ -81,9 +82,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: [Qemu-devel] [PATCH v8 09/25] ui/vnc: Use gcrypto_random_bytes for
- start_auth_vnc
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: [Qemu-devel] [PATCH v8 15/25] linux-user/aarch64: Use
+ qemu_guest_getrandom for PAUTH keys
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,64 +101,145 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use a better interface for random numbers than rand().
-Fail gracefully if for some reason we cannot use the crypto system.
+Use a better interface for random numbers than rand() * 3.
 
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- ui/vnc.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ linux-user/aarch64/target_syscall.h |  2 --
+ linux-user/aarch64/cpu_loop.c       | 29 ++++++---------------------
+ linux-user/syscall.c                | 31 ++++++++++++++++++++++++-----
+ 3 files changed, 32 insertions(+), 30 deletions(-)
 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 785edf3af1..d83f4a6ff9 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -43,6 +43,7 @@
- #include "crypto/hash.h"
- #include "crypto/tlscredsanon.h"
- #include "crypto/tlscredsx509.h"
-+#include "crypto/random.h"
- #include "qom/object_interfaces.h"
- #include "qemu/cutils.h"
- #include "io/dns-resolver.h"
-@@ -2547,16 +2548,6 @@ static void authentication_failed(VncState *vs)
-     vnc_client_error(vs);
+diff --git a/linux-user/aarch64/target_syscall.h b/linux-user/aarch64/target_syscall.h
+index b595e5da82..995e475c73 100644
+--- a/linux-user/aarch64/target_syscall.h
++++ b/linux-user/aarch64/target_syscall.h
+@@ -29,6 +29,4 @@ struct target_pt_regs {
+ # define TARGET_PR_PAC_APDBKEY   (1 << 3)
+ # define TARGET_PR_PAC_APGAKEY   (1 << 4)
+ 
+-void arm_init_pauth_key(ARMPACKey *key);
+-
+ #endif /* AARCH64_TARGET_SYSCALL_H */
+diff --git a/linux-user/aarch64/cpu_loop.c b/linux-user/aarch64/cpu_loop.c
+index d75fd9d3e2..cedad39ca0 100644
+--- a/linux-user/aarch64/cpu_loop.c
++++ b/linux-user/aarch64/cpu_loop.c
+@@ -20,6 +20,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+ #include "cpu_loop-common.h"
++#include "qemu/guest-random.h"
+ 
+ #define get_user_code_u32(x, gaddr, env)                \
+     ({ abi_long __r = get_user_u32((x), (gaddr));       \
+@@ -147,24 +148,6 @@ void cpu_loop(CPUARMState *env)
+     }
  }
  
--static void make_challenge(VncState *vs)
+-static uint64_t arm_rand64(void)
 -{
--    int i;
+-    int shift = 64 - clz64(RAND_MAX);
+-    int i, n = 64 / shift + (64 % shift != 0);
+-    uint64_t ret = 0;
 -
--    srand(time(NULL)+getpid()+getpid()*987654+rand());
--
--    for (i = 0 ; i < sizeof(vs->challenge) ; i++)
--        vs->challenge[i] = (int) (256.0*rand()/(RAND_MAX+1.0));
+-    for (i = 0; i < n; i++) {
+-        ret = (ret << shift) | rand();
+-    }
+-    return ret;
 -}
 -
- static int protocol_client_auth_vnc(VncState *vs, uint8_t *data, size_t len)
+-void arm_init_pauth_key(ARMPACKey *key)
+-{
+-    key->lo = arm_rand64();
+-    key->hi = arm_rand64();
+-}
+-
+ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
  {
-     unsigned char response[VNC_AUTH_CHALLENGE_SIZE];
-@@ -2628,7 +2619,16 @@ reject:
+     ARMCPU *cpu = arm_env_get_cpu(env);
+@@ -192,11 +175,11 @@ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
+ #endif
  
- void start_auth_vnc(VncState *vs)
- {
--    make_challenge(vs);
-+    Error *err = NULL;
+     if (cpu_isar_feature(aa64_pauth, cpu)) {
+-        arm_init_pauth_key(&env->apia_key);
+-        arm_init_pauth_key(&env->apib_key);
+-        arm_init_pauth_key(&env->apda_key);
+-        arm_init_pauth_key(&env->apdb_key);
+-        arm_init_pauth_key(&env->apga_key);
++        qemu_guest_getrandom_nofail(&env->apia_key, sizeof(ARMPACKey));
++        qemu_guest_getrandom_nofail(&env->apib_key, sizeof(ARMPACKey));
++        qemu_guest_getrandom_nofail(&env->apda_key, sizeof(ARMPACKey));
++        qemu_guest_getrandom_nofail(&env->apdb_key, sizeof(ARMPACKey));
++        qemu_guest_getrandom_nofail(&env->apga_key, sizeof(ARMPACKey));
+     }
+ 
+     ts->stack_base = info->start_stack;
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 96f20886ce..8c17b14d51 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -108,6 +108,7 @@
+ 
+ #include "qemu.h"
+ #include "qemu/guest-random.h"
++#include "qapi/error.h"
+ #include "fd-trans.h"
+ 
+ #ifndef CLONE_IO
+@@ -9765,25 +9766,45 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+                     int all = (TARGET_PR_PAC_APIAKEY | TARGET_PR_PAC_APIBKEY |
+                                TARGET_PR_PAC_APDAKEY | TARGET_PR_PAC_APDBKEY |
+                                TARGET_PR_PAC_APGAKEY);
++                    int ret = 0;
++                    Error *err = NULL;
 +
-+    if (qcrypto_random_bytes(vs->challenge, sizeof(vs->challenge), &err)) {
-+        trace_vnc_auth_fail(vs, vs->auth, "cannot get random bytes",
-+                            error_get_pretty(err));
-+        error_free(err);
-+        authentication_failed(vs);
-+        return;
-+    }
-+
-     /* Send client a 'random' challenge */
-     vnc_write(vs, vs->challenge, sizeof(vs->challenge));
-     vnc_flush(vs);
+                     if (arg2 == 0) {
+                         arg2 = all;
+                     } else if (arg2 & ~all) {
+                         return -TARGET_EINVAL;
+                     }
+                     if (arg2 & TARGET_PR_PAC_APIAKEY) {
+-                        arm_init_pauth_key(&env->apia_key);
++                        ret |= qemu_guest_getrandom(&env->apia_key,
++                                                    sizeof(ARMPACKey), &err);
+                     }
+                     if (arg2 & TARGET_PR_PAC_APIBKEY) {
+-                        arm_init_pauth_key(&env->apib_key);
++                        ret |= qemu_guest_getrandom(&env->apib_key,
++                                                    sizeof(ARMPACKey), &err);
+                     }
+                     if (arg2 & TARGET_PR_PAC_APDAKEY) {
+-                        arm_init_pauth_key(&env->apda_key);
++                        ret |= qemu_guest_getrandom(&env->apda_key,
++                                                    sizeof(ARMPACKey), &err);
+                     }
+                     if (arg2 & TARGET_PR_PAC_APDBKEY) {
+-                        arm_init_pauth_key(&env->apdb_key);
++                        ret |= qemu_guest_getrandom(&env->apdb_key,
++                                                    sizeof(ARMPACKey), &err);
+                     }
+                     if (arg2 & TARGET_PR_PAC_APGAKEY) {
+-                        arm_init_pauth_key(&env->apga_key);
++                        ret |= qemu_guest_getrandom(&env->apga_key,
++                                                    sizeof(ARMPACKey), &err);
++                    }
++                    if (ret != 0) {
++                        /*
++                         * Some unknown failure in the crypto.  The best
++                         * we can do is log it and fail the syscall.
++                         * The real syscall cannot fail this way.
++                         */
++                        qemu_log_mask(LOG_UNIMP,
++                                      "PR_PAC_RESET_KEYS: Crypto failure: %s",
++                                      error_get_pretty(err));
++                        error_free(err);
++                        return -TARGET_EIO;
+                     }
+                     return 0;
+                 }
 -- 
 2.17.1
 
