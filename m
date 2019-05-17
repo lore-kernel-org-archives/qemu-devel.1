@@ -3,60 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C26D3C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0931C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:51:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97F122087E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:49:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97F122087E
+	by mail.kernel.org (Postfix) with ESMTPS id C642C2087E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:51:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C642C2087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46206 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46242 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRaR1-0007Od-Np
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 06:49:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49609)
+	id 1hRaSD-0008PU-0V
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 06:51:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hRa6U-0006cz-Ki
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:28:45 -0400
+	(envelope-from <david@redhat.com>) id 1hRa6Z-0006HC-Je
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:28:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hRa1Z-00051i-8z
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:23:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:61152)
+	(envelope-from <david@redhat.com>) id 1hRa1Q-0004wJ-4L
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:23:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54052)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hRa1Z-00050Q-3h; Fri, 17 May 2019 06:23:37 -0400
+	id 1hRa1P-0004vl-VM; Fri, 17 May 2019 06:23:28 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6CFB243A93;
-	Fri, 17 May 2019 10:23:36 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 37FBA3179165;
+	Fri, 17 May 2019 10:23:27 +0000 (UTC)
 Received: from t460s.redhat.com (unknown [10.36.118.100])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E88D619732;
-	Fri, 17 May 2019 10:23:34 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id AC0D659473;
+	Fri, 17 May 2019 10:23:25 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 17 May 2019 12:21:25 +0200
-Message-Id: <20190517102145.21812-21-david@redhat.com>
+Date: Fri, 17 May 2019 12:21:20 +0200
+Message-Id: <20190517102145.21812-16-david@redhat.com>
 In-Reply-To: <20190517102145.21812-1-david@redhat.com>
 References: <20190517102145.21812-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Fri, 17 May 2019 10:23:36 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Fri, 17 May 2019 10:23:27 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 20/40] s390x/tcg: Implement
- VECTOR NAND
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 15/40] s390x/tcg: Implement
+ VECTOR LOAD COMPLEMENT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,57 +76,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Part of vector enhancements facility 1, but easy to implement.
+We can reuse an existing gvec helper for negating the values.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/insn-data.def      | 2 ++
- target/s390x/translate.c        | 1 +
- target/s390x/translate_vx.inc.c | 7 +++++++
- 3 files changed, 10 insertions(+)
+ target/s390x/insn-data.def      |  2 ++
+ target/s390x/translate_vx.inc.c | 16 ++++++++++++++++
+ 2 files changed, 18 insertions(+)
 
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 2c794a2744..bc8b84e1c2 100644
+index add174b793..07868ff082 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1134,6 +1134,8 @@
-     F(0xe7a7, VMO,     VRR_c, V,   0, 0, 0, 0, vm, 0, IF_VEC)
- /* VECTOR MULTIPLY LOGICAL ODD */
-     F(0xe7a5, VMLO,    VRR_c, V,   0, 0, 0, 0, vm, 0, IF_VEC)
-+/* VECTOR NAND */
-+    F(0xe76e, VNN,     VRR_c, VE,  0, 0, 0, 0, vnn, 0, IF_VEC)
+@@ -1094,6 +1094,8 @@
+     F(0xe7b4, VGFM,    VRR_c, V,   0, 0, 0, 0, vgfm, 0, IF_VEC)
+ /* VECTOR GALOIS FIELD MULTIPLY SUM AND ACCUMULATE */
+     F(0xe7bc, VGFMA,   VRR_d, V,   0, 0, 0, 0, vgfma, 0, IF_VEC)
++/* VECTOR LOAD COMPLEMENT */
++    F(0xe7de, VLC,     VRR_a, V,   0, 0, 0, 0, vlc, 0, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index da8f5b469d..fa57b7550e 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -6093,6 +6093,7 @@ enum DisasInsnEnum {
- #define FAC_PCI         S390_FEAT_ZPCI /* z/PCI facility */
- #define FAC_AIS         S390_FEAT_ADAPTER_INT_SUPPRESSION
- #define FAC_V           S390_FEAT_VECTOR /* vector facility */
-+#define FAC_VE          S390_FEAT_VECTOR_ENH /* vector enhancements faci=
-lity 1 */
-=20
- static const DisasInsn insn_info[] =3D {
- #include "insn-data.def"
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index bf212b77bb..7fcb7085e5 100644
+index 1db5d6d152..2fc06c7cf3 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -1791,3 +1791,10 @@ static DisasJumpType op_vm(DisasContext *s, DisasO=
-ps *o)
-                get_field(s->fields, v3), fn);
+@@ -209,6 +209,9 @@ static void get_vec_element_ptr_i64(TCGv_ptr ptr, uin=
+t8_t reg, TCGv_i64 enr,
+                      16)
+ #define gen_gvec_dup64i(v1, c) \
+     tcg_gen_gvec_dup64i(vec_full_reg_offset(v1), 16, 16, c)
++#define gen_gvec_fn_2(fn, es, v1, v2) \
++    tcg_gen_gvec_##fn(es, vec_full_reg_offset(v1), vec_full_reg_offset(v=
+2), \
++                      16, 16)
+ #define gen_gvec_fn_3(fn, es, v1, v2, v3) \
+     tcg_gen_gvec_##fn(es, vec_full_reg_offset(v1), vec_full_reg_offset(v=
+2), \
+                       vec_full_reg_offset(v3), 16, 16)
+@@ -1521,3 +1524,16 @@ static DisasJumpType op_vgfma(DisasContext *s, Dis=
+asOps *o)
+                get_field(s->fields, v3), get_field(s->fields, v4), &g[es=
+]);
      return DISAS_NEXT;
  }
 +
-+static DisasJumpType op_vnn(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vlc(DisasContext *s, DisasOps *o)
 +{
-+    gen_gvec_fn_3(nand, ES_8, get_field(s->fields, v1),
-+                  get_field(s->fields, v2), get_field(s->fields, v3));
++    const uint8_t es =3D get_field(s->fields, m3);
++
++    if (es > ES_64) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++
++    gen_gvec_fn_2(neg, es, get_field(s->fields, v1), get_field(s->fields=
+, v2));
 +    return DISAS_NEXT;
 +}
 --=20
