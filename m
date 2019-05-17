@@ -2,79 +2,63 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 666F2C04E87
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:49:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6783C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:49:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CA362173C
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:49:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l8CnzkuX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CA362173C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 98EB52166E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:49:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98EB52166E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49717 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49719 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hReB3-0006pN-FH
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 10:49:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46548)
+	id 1hReB8-0006tu-Sf
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 10:49:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hRe81-0004px-8b
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:46:34 -0400
+	(envelope-from <groug@kaod.org>) id 1hRe9N-0005xm-SQ
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:47:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hRe80-0002yD-3J
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:46:33 -0400
-Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:45191)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hRe7z-0002x4-RT
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:46:32 -0400
-Received: by mail-oi1-x229.google.com with SMTP id w144so5301178oie.12
-	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 07:46:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=XzzDWYDFaGbP/OBD76c2PpVm4hLOFCcvU4BRCXdFaGo=;
-	b=l8CnzkuXdOv6hafvX5PbqJW/UgbgdE4HEyLycU/I1FJxtf4iSn5/AEQvelET3lCBu7
-	qhMZEuiTDKsh3Hghr7/ieUe02HtyM+fsWDPypK7/765K7bO1AUXVVXmJcU+9Mhi2vOqk
-	G0g4BflMD5jI5hij5vUt05kMya+2h6oMKtRtxK2eWjXbniibaq0JC2LC5fH8G/jcOISu
-	qOdMfCXMh8MN3iNJ/sZwQHkAkGNpymtdJzloi57zVlN0A7TFF+9iP3iy0TmSBWhkTso9
-	mRXUEeyWv66A9zG3P5BG2/meQpNWX6/z1RSlFQdxXEAc1V21hTw/3l2g/WlTA2VkCaNX
-	wcdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=XzzDWYDFaGbP/OBD76c2PpVm4hLOFCcvU4BRCXdFaGo=;
-	b=NVpf+61B7H0wwcpLabEIHaD1nZrLlTGWpIisnLIen1LGX10wlbJYJCjcT1ORXK9K5T
-	+UTXkgZS1T7jnryPO7/tBO/cBS3E9YiflHYzbXnHDVF6eUQQpcQI7BhprOjfgFqr/Fz6
-	89dNCxHULH89tpDw56LxozXs9PmGDJKJpK1P+/6DKfFqq0ryYTxKLRy1x8MoQLG3B5BA
-	GZugXe5LJcS6KMqxjnBZqtKBfjSj75Yoemw3r0G9naxLoU8Fq2uCzErjOJYzU5w3cddz
-	QzISDq22aUbBvgr7pGYhvatgxafz1H9c4Z0s457qCZUKpH6Ily6x4OOQ28RbDLnDbefV
-	ki6g==
-X-Gm-Message-State: APjAAAUmkSp6vR0T3fuTUnjerCWTsifcsQBvEnVjzdHUcVyvmDCBJvOZ
-	TO6/t7vIqhpNiADrExqJaX5arUo1EDM+vXKU0RkGCQ==
-X-Google-Smtp-Source: APXvYqwMMl8HOC8TdD8lIIDH8bObcqV6KlwzFl6fmUddHOoj3FwOJ6uGUfeaVDBzBNfdnM45WsDk0NHNZp3FIEBOLBk=
-X-Received: by 2002:aca:845:: with SMTP id 66mr14583777oii.163.1558104389705; 
-	Fri, 17 May 2019 07:46:29 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1hRe9M-0004cc-K7
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:47:57 -0400
+Received: from 18.mo4.mail-out.ovh.net ([188.165.54.143]:38278)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hRe9L-0004Vy-6w
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:47:56 -0400
+Received: from player786.ha.ovh.net (unknown [10.108.57.72])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 0429E1E7CB9
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 16:47:51 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player786.ha.ovh.net (Postfix) with ESMTPSA id ECBA05FCC24A;
+	Fri, 17 May 2019 14:47:47 +0000 (UTC)
+Date: Fri, 17 May 2019 16:47:46 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Message-ID: <20190517164746.5c653a0e@bahia.lan>
+In-Reply-To: <1723391.cvQaRflHa6@silver>
+References: <590216e2666653bac21d950aaba98f87d0a53324.1557093245.git.qemu_oss@crudebyte.com>
+	<8706106.MIJVTSuNya@silver> <20190517143029.25454663@bahia.lan>
+	<1723391.cvQaRflHa6@silver>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <1558084017-15947-1-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1558084017-15947-1-git-send-email-jasowang@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 May 2019 15:46:18 +0100
-Message-ID: <CAFEAcA-v8QL29VYjxupx1ms2Wz7dGNSyXFeBKWHrgRa3jgDW2Q@mail.gmail.com>
-To: Jason Wang <jasowang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::229
-Subject: Re: [Qemu-devel] [PULL 0/4] Net patches
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 14526079126470826304
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddtvddgkedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 188.165.54.143
+Subject: Re: [Qemu-devel] [libvirt patch] qemu: adds support for virtfs 9p
+ argument 'vii'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,34 +70,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+	qemu-devel@nongnu.org, Antonios Motakis <antonios.motakis@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 17 May 2019 at 10:07, Jason Wang <jasowang@redhat.com> wrote:
->
-> The following changes since commit d8276573da58e8ce78dab8c46dd660efd664bcb7:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190510' into staging (2019-05-16 13:15:08 +0100)
->
-> are available in the git repository at:
->
->   https://github.com/jasowang/qemu.git tags/net-pull-request
->
-> for you to fetch changes up to 78e4f446d2569210a8558946b2321f9ff2ef47f6:
->
->   net/colo-compare.c: Fix a crash in COLO Primary. (2019-05-17 17:00:12 +0800)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
+On Fri, 17 May 2019 15:23:01 +0200
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
+> On Freitag, 17. Mai 2019 14:30:29 CEST Greg Kurz wrote:
+> > Then, we come to the bulk problem: how to handle the case where we
+> > have multiple devices involved in a directory we want to share ?
+> > Antonios's proposal is a clever way to address the collisions, but
+> > your work proves it isn't enough...  
+> 
+> With the patch set I have right now, things finally bahave smooth.
+> 
+> > Before going forward, I'd like
+> > to consider another approach.
+> > 
+> > What about:
+> > 
+> > 1) de-compose the shared directory on a per-device basis,
+> >    ie. identify all mount points under the shared directory
+> > 
+> > 2) expose found mount points separately, each with its onw 9p device
+> > 
+> > 3) re-compose the directory tree within the guest using the same topology
+> >    as the host
+> > 
+> > ie. if you want to share /vm/fs and
+> > 
+> > /vm/fs on device A
+> > /vm/fs/shares on device B
+> > /vm/fs/tmp on device C
+> > 
+> > you would start QEMU with
+> > 
+> > -fsdev local,path=/vm/fs,id=fsdev0... \
+> > -device virtio-9p,fsdev=fsdev0,mount_tag=tag0 \
+> > -fsdev local,path=/vm/fs,id=fsdev1... \
+> > -device virtio-9p,fsdev=fsdev1,mount_tag=tag1 \
+> > -fsdev local,path=/vm/fs,id=fsdev2... \
+> > -device virtio-9p,fsdev=fsdev2,mount_tag=tag2
+> > 
+> > and /etc/fstab in the guest:
+> > 
+> > tag0    /       9p      nofail,trans=virtio,version=9p2000.L   0 0
+> > tag1    /shares 9p      nofail,trans=virtio,version=9p2000.L   0 0
+> > tag2    /tmp    9p      nofail,trans=virtio,version=9p2000.L   0 0
+> > 
+> > This involves some more work for the user but it doesn't require
+> > any changes in QEMU.  
+> 
+> So your suggestion is actually: don't fix it.
+> 
 
-Applied, thanks.
+Potentially yes if another approach is satisfying enough, as I wouldn't
+want to over-engineer too much around this 9p imposed limitation. The
+right thing to do would be to come up with a new version of the protocol
+with variable sized QIDs and call it a day.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
+> "Some" more work for the user is a quantity of how many guests you are 
+> running, multiplied by the nested virtualization levels you might have = 
+> potentially a lot of work for admins.
+> 
 
--- PMM
+Maybe, I don't have enough feedback on 9p use cases to have a clear
+picture...
+
+> > Would this approach solve the issues you've been hitting with Samba ?  
+> 
+> No, because that completely neglects runtime changes on a higher level (host), 
+
+Unless I'm missing something, runtime changes would be neglected as well
+with the "vii" property since it is static for the device lifetime.
+
+> plus it completely destroys the fundamental idea about 9p, which is about 
+> transparency of the higher level(s).
+> 
+
+That's a point indeed, even if again I'm not sure if this is a frequent
+case to share a directory tree spanning over multiple devices.
+
+> May I ask, do you have concrete reasons why you want to abondon the entire 
+> patch set? Because that's what it sounds to me.
+> 
+
+I don't have that much time to spend on 9p maintainership, for both
+reviewing and fixing bugs (CVEs most of the time). So, yes it may
+sound like I want to drop the patchset, but it's just I need to be
+convinced I won't regret having merged a huge change like this...
+when I'll have to support it alone later ;-)
+
+For the moment, I'm not convinced by the "vii" solution. It even
+motivated my suggestion of having several devices actually, since
+the paths you would put in there are known before starting QEMU.
+
+It might take me some more rounds of discussion to decide. I understand
+it is frustrating but bear with me :)
+
+> Best regards,
+> Christian Schoenebeck
+
+Cheers,
+
+--
+Greg
 
