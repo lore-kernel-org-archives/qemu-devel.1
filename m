@@ -2,67 +2,60 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0A99C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:32:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 632CEC04E84
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:42:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B26C02082E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:32:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B26C02082E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernkonzept.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3657A20879
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:42:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3657A20879
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45189 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45300 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRZDy-00022U-Fz
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 05:32:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38423)
+	id 1hRZNt-0005S9-4B
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 05:42:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jakub.jermar@kernkonzept.com>) id 1hRZCS-0001QY-Ku
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:30:50 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hRZM0-0004IN-DY
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:40:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jakub.jermar@kernkonzept.com>) id 1hRZCQ-0007Kh-OZ
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:30:48 -0400
-Received: from serv1.kernkonzept.com ([2a01:4f8:1c1c:b490::2]:51365
-	helo=mx.kernkonzept.com)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hRZLz-00020Q-7W
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:40:40 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:55340
+	helo=mail.default.ilande.uk0.bigv.io)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jakub.jermar@kernkonzept.com>)
-	id 1hRZCQ-0007JI-9M
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:30:46 -0400
-Received: from 93-153-64-87.customers.tmcz.cz ([93.153.64.87]
-	helo=[192.168.0.108]) by mx.kernkonzept.com with esmtpsa
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hRZLz-0001vP-0i
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:40:39 -0400
+Received: from host109-146-247-8.range109-146.btcentralplus.com
+	([109.146.247.8] helo=kentang.home)
+	by mail.default.ilande.uk0.bigv.io with esmtpsa
 	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
-	id 1hRZCJ-0006gQ-3z; Fri, 17 May 2019 11:30:39 +0200
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20190423110034.1260142-1-jakub.jermar@kernkonzept.com>
-	<ab4b6d04-74f9-2f12-829d-9df8c1b1c4ca@redhat.com>
-	<6ae8d347-149d-e7eb-bb02-90aba44c5bbd@kernkonzept.com>
-	<1e9a8595-4653-4900-b747-236f9888b893@kernkonzept.com>
-	<04a4fcca-0db9-46f8-ac41-0d770b0dc5d6@kernkonzept.com>
-	<f9f1b930-2381-b343-854f-70e2590c9b73@redhat.com>
-	<CAL1e-=jFH7+cHGUJsmUKpEAkwohagfM5WVb4-rGSozsEkzFrTA@mail.gmail.com>
-From: Jakub Jermar <jakub.jermar@kernkonzept.com>
-Organization: Kernkonzept
-Message-ID: <35442861-78a7-a60b-8cb4-913a7a299a26@kernkonzept.com>
-Date: Fri, 17 May 2019 11:30:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <CAL1e-=jFH7+cHGUJsmUKpEAkwohagfM5WVb4-rGSozsEkzFrTA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a01:4f8:1c1c:b490::2
-Subject: Re: [Qemu-devel] [PATCH v2] mips: Decide to map PAGE_EXEC in
- map_address
+	(envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hRZLE-00018L-LU; Fri, 17 May 2019 10:39:53 +0100
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: qemu-devel@nongnu.org,
+	peter.maydell@linaro.org
+Date: Fri, 17 May 2019 10:40:25 +0100
+Message-Id: <20190517094029.7667-5-mark.cave-ayland@ilande.co.uk>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20190517094029.7667-1-mark.cave-ayland@ilande.co.uk>
+References: <20190517094029.7667-1-mark.cave-ayland@ilande.co.uk>
+X-SA-Exim-Connect-IP: 109.146.247.8
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.43.2.167
+Subject: [Qemu-devel] [PULL 4/8] grlib,
+ gptimer: get rid of the old-style create function
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,209 +67,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	Leon Alrae <leon.alrae@imgtec.com>, qemu-devel@nongnu.org,
-	Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Aleksandar and Philippe,
+From: KONRAD Frederic <frederic.konrad@adacore.com>
 
-On 5/16/19 8:04 PM, Aleksandar Markovic wrote:
-> 
-> On May 16, 2019 6:31 PM, "Philippe Mathieu-Daudé" <philmd@redhat.com
-> <mailto:philmd@redhat.com>> wrote:
->>
->> Hi Jakub,
->>
->> On 5/16/19 3:10 PM, Jakub Jermar wrote:
->> > Hi,
->> >
->> > On 5/3/19 12:02 PM, Jakub Jermar wrote:
->> >> Hi,
->> >>
->> >> On 4/23/19 4:58 PM, Jakub Jermar wrote:
->> >>> Hi Philippe!
->> >>>
->> >>> On 4/23/19 3:48 PM, Philippe Mathieu-Daudé wrote:
->> >>>> Hi Jakub,
->> >>>>
->> >>>> On 4/23/19 1:00 PM, Jakub Jermář wrote:
->> >>>>> This commit addresses QEMU Bug #1825311:
->> >>>>>
->> >>>>>   mips_cpu_handle_mmu_fault renders all accessed pages executable
->> >>>>>
->> >>>>> It allows finer-grained control over whether the accessed page
-> should be
->> >>>>> executable by moving the decision to the underlying map_address
->> >>>>> function, which has more information for this.
->> >>>>>
->> >>>>> As a result, pages that have the XI bit set in the TLB and are
-> accessed
->> >>>>> for read/write, don't suddenly end up being executable.
->> >>>>>
->> >>>>
->> >>>> Fixes: https://bugs.launchpad.net/qemu/+bug/1825311
->> >>>>
->> >>>>> Signed-off-by: Jakub Jermář <jakub.jermar@kernkonzept.com
-> <mailto:jakub.jermar@kernkonzept.com>>
->> >>>>> ---
->> >>>>>  target/mips/helper.c | 17 ++++++++++-------
->> >>>>>  1 file changed, 10 insertions(+), 7 deletions(-)
->> >>>>>
->> >>>>> diff --git a/target/mips/helper.c b/target/mips/helper.c
->> >>>>> index c44cdca3b5..132d073fbe 100644
->> >>>>> --- a/target/mips/helper.c
->> >>>>> +++ b/target/mips/helper.c
->> >>>>> @@ -43,7 +43,7 @@ int no_mmu_map_address (CPUMIPSState *env,
-> hwaddr *physical, int *prot,
->> >>>>>                          target_ulong address, int rw, int
-> access_type)
->> >>>>>  {
->> >>>>>      *physical = address;
->> >>>>> -    *prot = PAGE_READ | PAGE_WRITE;
->> >>>>> +    *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
->> >>>>>      return TLBRET_MATCH;
->> >>>>>  }
->> >>>>> 
->> >>>>> @@ -61,7 +61,7 @@ int fixed_mmu_map_address (CPUMIPSState *env,
-> hwaddr *physical, int *prot,
->> >>>>>      else
->> >>>>>          *physical = address;
->> >>>>> 
->> >>>>> -    *prot = PAGE_READ | PAGE_WRITE;
->> >>>>> +    *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
->> >>>>>      return TLBRET_MATCH;
->> >>>>>  }
->> >>>>> 
->> >>>>> @@ -101,6 +101,9 @@ int r4k_map_address (CPUMIPSState *env,
-> hwaddr *physical, int *prot,
->> >>>>>                  *prot = PAGE_READ;
->> >>>>>                  if (n ? tlb->D1 : tlb->D0)
->> >>>>>                      *prot |= PAGE_WRITE;
->> >>>>> +                if (!(n ? tlb->XI1 : tlb->XI0)) {
->> >>>>> +                    *prot |= PAGE_EXEC;
->> >>>>> +                }
->> >>>>
->> >>>> This was indeed missed in commit 2fb58b73746e.
->>
->> Aleksandar, if this patch is OK with you, can you amend this comment,
->> and add the "Fixes:" tag too when applying? Thanks!
-> 
-> Yes, definitely, Philippe, that is not a problem.
-> 
-> Thanks for helping out!
-> 
-> I tested Jakub's scenario too, it works as expected, but I am not
-> concerned about it as much as about regression tests. Knowing that you
-> have many MIPS test kernels and images, may I ask you to test some of
-> them WITH Jakub's fix (so indepenently of myself anf Jakub), just to
-> confirm that there are no regressions?
+Suggested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/sparc/leon3.c         | 17 ++++++++++++++++-
+ hw/timer/grlib_gptimer.c |  4 ++--
+ include/hw/sparc/grlib.h | 27 +--------------------------
+ 3 files changed, 19 insertions(+), 29 deletions(-)
 
-May I suggest to include also the following mips32r2 HelenOS images with
-the following command lines to the set of test kernels used for
-verifying new versions of QEMU? I always test HelenOS master on malta
-when there is a new version of QEMU, but it might be better to spot
-prospective issues earlier for both projects:
-
-http://www.helenos.org/releases/HelenOS-0.9.1-mips32-malta-be.boot
-
-qemu-system-mips -cpu 4Kc -kernel HelenOS-0.9.1-mips32-malta-be.boot
--nographic
-
-http://www.helenos.org/releases/HelenOS-0.9.1-mips32-malta-le.boot
-
-qemu-system-mipsel -cpu 4Kc -kernel HelenOS-0.9.1-mips32-malta-le.boot
--nographic
-
-Cheers,
-Jakub
-
-> 
-> C’est vraiment gentil de votre part.
-> 
-> Aleksandar
-> 
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com
-> <mailto:philmd@redhat.com>>
->>
->> >>>>
->> >>>>>                  return TLBRET_MATCH;
->> >>>>>              }
->> >>>>>              return TLBRET_DIRTY;
->> >>>>> @@ -182,7 +185,7 @@ static int
-> get_seg_physical_address(CPUMIPSState *env, hwaddr *physical,
->> >>>>>      } else {
->> >>>>>          /* The segment is unmapped */
->> >>>>>          *physical = physical_base | (real_address & segmask);
->> >>>>> -        *prot = PAGE_READ | PAGE_WRITE;
->> >>>>> +        *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
->> >>>>>          return TLBRET_MATCH;
->> >>>>>      }
->> >>>>>  }
->> >>>>> @@ -913,8 +916,8 @@ int mips_cpu_handle_mmu_fault(CPUState *cs,
-> vaddr address, int size, int rw,
->> >>>>>      }
->> >>>>>      if (ret == TLBRET_MATCH) {
->> >>>>>          tlb_set_page(cs, address & TARGET_PAGE_MASK,
->> >>>>> -                     physical & TARGET_PAGE_MASK, prot | PAGE_EXEC,
->> >>>>> -                     mmu_idx, TARGET_PAGE_SIZE);
->> >>>>> +                     physical & TARGET_PAGE_MASK, prot, mmu_idx,
->> >>>>> +                     TARGET_PAGE_SIZE);
->> >>>>>          ret = 0;
->> >>>>>      } else if (ret < 0)
->> >>>>>  #endif
->> >>>>> @@ -936,8 +939,8 @@ int mips_cpu_handle_mmu_fault(CPUState *cs,
-> vaddr address, int size, int rw,
->> >>>>>                                             address, rw,
-> access_type, mmu_idx);
->> >>>>>                  if (ret == TLBRET_MATCH) {
->> >>>>>                      tlb_set_page(cs, address & TARGET_PAGE_MASK,
->> >>>>> -                            physical & TARGET_PAGE_MASK, prot |
-> PAGE_EXEC,
->> >>>>> -                            mmu_idx, TARGET_PAGE_SIZE);
->> >>>>> +                            physical & TARGET_PAGE_MASK, prot,
-> mmu_idx,
->> >>>>> +                            TARGET_PAGE_SIZE);
->> >>>>>                      ret = 0;
->> >>>>>                      return ret;
->> >>>>>                  }
->> >>>>>
->> >>>>
->> >>>> Your patch looks correct, but I'd like to test it.
->> >>>> Do you have a reproducer?
->> >>>> Can you describe the command line you used?
->> >>>
->> >>> I've just attached a reproducer image and script to the bug. It's a
->> >>> 32-bit little-endian test binary running on top of the L4Re
-> microkernel.
->>
->> I can't get the "TAP" output you described on launchpad.
->>
->> >>> Let me know if you also need a 64-bit version.
->>
->> 64-bit version is welcomed.
->>
->> >>> I tested both 32 and 64-bit versions of the reproducer and also
-> checked
->> >>> to see that the the other images I have lying around here (Linux
-> 2.6.32
->> >>> big endian and HelenOS master little-endian, both 32-bit for 4Kc)
->> >>> continue to run without regressions.
->>
->> Yes, definitively an improvement:
->> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com
-> <mailto:philmd@redhat.com>>
->>
->> Regards,
->>
->> Phil.
->>
-> 
-
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index 34306937bc..fb52527add 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -49,6 +49,10 @@
+ 
+ #define LEON3_IRQMP_OFFSET (0x80000200)
+ 
++#define LEON3_TIMER_OFFSET (0x80000300)
++#define LEON3_TIMER_IRQ    (6)
++#define LEON3_TIMER_COUNT  (2)
++
+ typedef struct ResetData {
+     SPARCCPU *cpu;
+     uint32_t  entry;            /* save kernel entry in case of reset */
+@@ -124,6 +128,7 @@ static void leon3_generic_hw_init(MachineState *machine)
+     int         prom_size;
+     ResetData  *reset_info;
+     DeviceState *dev;
++    int i;
+ 
+     /* Init CPU */
+     cpu = SPARC_CPU(cpu_create(machine->cpu_type));
+@@ -220,7 +225,17 @@ static void leon3_generic_hw_init(MachineState *machine)
+     }
+ 
+     /* Allocate timers */
+-    grlib_gptimer_create(0x80000300, 2, CPU_CLK, cpu_irqs, 6);
++    dev = qdev_create(NULL, TYPE_GRLIB_GPTIMER);
++    qdev_prop_set_uint32(dev, "nr-timers", LEON3_TIMER_COUNT);
++    qdev_prop_set_uint32(dev, "frequency", CPU_CLK);
++    qdev_prop_set_uint32(dev, "irq-line", LEON3_TIMER_IRQ);
++    qdev_init_nofail(dev);
++
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, LEON3_TIMER_OFFSET);
++    for (i = 0; i < LEON3_TIMER_COUNT; i++) {
++        sysbus_connect_irq(SYS_BUS_DEVICE(dev), i,
++                           cpu_irqs[LEON3_TIMER_IRQ + i]);
++    }
+ 
+     /* Allocate uart */
+     if (serial_hd(0)) {
+diff --git a/hw/timer/grlib_gptimer.c b/hw/timer/grlib_gptimer.c
+index 183eddc073..4b7088fc84 100644
+--- a/hw/timer/grlib_gptimer.c
++++ b/hw/timer/grlib_gptimer.c
+@@ -1,7 +1,7 @@
+ /*
+  * QEMU GRLIB GPTimer Emulator
+  *
+- * Copyright (c) 2010-2011 AdaCore
++ * Copyright (c) 2010-2019 AdaCore
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a copy
+  * of this software and associated documentation files (the "Software"), to deal
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "hw/sparc/grlib.h"
+ #include "hw/sysbus.h"
+ #include "qemu/timer.h"
+ #include "hw/ptimer.h"
+@@ -52,7 +53,6 @@
+ #define COUNTER_RELOAD_OFFSET 0x04
+ #define TIMER_BASE            0x10
+ 
+-#define TYPE_GRLIB_GPTIMER "grlib,gptimer"
+ #define GRLIB_GPTIMER(obj) \
+     OBJECT_CHECK(GPTimerUnit, (obj), TYPE_GRLIB_GPTIMER)
+ 
+diff --git a/include/hw/sparc/grlib.h b/include/hw/sparc/grlib.h
+index bef371a06f..fe553e93b8 100644
+--- a/include/hw/sparc/grlib.h
++++ b/include/hw/sparc/grlib.h
+@@ -42,32 +42,7 @@ void grlib_irqmp_set_irq(void *opaque, int irq, int level);
+ void grlib_irqmp_ack(DeviceState *dev, int intno);
+ 
+ /* GPTimer */
+-
+-static inline
+-DeviceState *grlib_gptimer_create(hwaddr  base,
+-                                  uint32_t            nr_timers,
+-                                  uint32_t            freq,
+-                                  qemu_irq           *cpu_irqs,
+-                                  int                 base_irq)
+-{
+-    DeviceState *dev;
+-    int i;
+-
+-    dev = qdev_create(NULL, "grlib,gptimer");
+-    qdev_prop_set_uint32(dev, "nr-timers", nr_timers);
+-    qdev_prop_set_uint32(dev, "frequency", freq);
+-    qdev_prop_set_uint32(dev, "irq-line", base_irq);
+-
+-    qdev_init_nofail(dev);
+-
+-    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
+-
+-    for (i = 0; i < nr_timers; i++) {
+-        sysbus_connect_irq(SYS_BUS_DEVICE(dev), i, cpu_irqs[base_irq + i]);
+-    }
+-
+-    return dev;
+-}
++#define TYPE_GRLIB_GPTIMER "grlib,gptimer"
+ 
+ /* APB UART */
+ 
 -- 
-Kernkonzept GmbH at Dresden, Germany, HRB 31129, CEO Dr.-Ing. Michael
-Hohmuth
+2.11.0
+
 
