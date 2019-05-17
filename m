@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F46FC04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 13:53:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B62C7C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 13:53:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1328420873
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 13:53:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1328420873
+	by mail.kernel.org (Postfix) with ESMTPS id 8D15F20873
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 13:53:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D15F20873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49002 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49004 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRdIP-0003j6-6G
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 09:53:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35698)
+	id 1hRdIT-0003ob-Py
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 09:53:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hRdDa-00006l-1o
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:48:14 -0400
+	(envelope-from <sgarzare@redhat.com>) id 1hRdDa-00006k-1U
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:48:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hRdDW-0003bT-98
+	(envelope-from <sgarzare@redhat.com>) id 1hRdDW-0003bq-Ao
 	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:48:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53198)
+Received: from mx1.redhat.com ([209.132.183.28]:50824)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hRdDW-0003ZH-3b
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hRdDW-0003Uo-2Q
 	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:48:10 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D500A75724
-	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 13:48:07 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5403A2EED1A
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 13:48:02 +0000 (UTC)
 Received: from steredhat.redhat.com (ovpn-116-83.ams2.redhat.com
 	[10.36.116.83])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 953B35DA64;
-	Fri, 17 May 2019 13:48:06 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 22E8C5D9DC;
+	Fri, 17 May 2019 13:47:58 +0000 (UTC)
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 17 May 2019 15:47:48 +0200
-Message-Id: <20190517134748.340381-5-sgarzare@redhat.com>
+Date: Fri, 17 May 2019 15:47:46 +0200
+Message-Id: <20190517134748.340381-3-sgarzare@redhat.com>
 In-Reply-To: <20190517134748.340381-1-sgarzare@redhat.com>
 References: <20190517134748.340381-1-sgarzare@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Fri, 17 May 2019 13:48:07 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.29]);
+	Fri, 17 May 2019 13:48:02 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 4/4] net: remove unused get_str_sep()
- function
+Subject: [Qemu-devel] [PATCH v3 2/4] net: avoid using variable length array
+ in net_client_init()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,47 +74,100 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since the get_str_sep() function is no longer used in
-net/net.c, we can remove it.
+net_client_init() uses a variable length array to store the prefix
+of 'ipv6-net' parameter (e.g. if ipv6-net=3Dfec0::0/64, the prefix
+is 'fec0::0').
+This patch introduces g_strsplit() to split the 'ipv6-net' parameter,
+so we can remove the variable length array.
 
+Suggested-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- net/net.c | 20 --------------------
- 1 file changed, 20 deletions(-)
+v3:
+  - fix indentation [Markus]
+  - move substrings at the function level, and call g_strfreev(substrings=
+)
+    at the end of the function [Markus]
+---
+ net/net.c | 31 +++++++++++++++++++------------
+ 1 file changed, 19 insertions(+), 12 deletions(-)
 
 diff --git a/net/net.c b/net/net.c
-index 23f29ef1d2..4e1b25ba91 100644
+index 555504a404..47c03e5843 100644
 --- a/net/net.c
 +++ b/net/net.c
-@@ -63,26 +63,6 @@ static QTAILQ_HEAD(, NetClientState) net_clients;
- /***********************************************************/
- /* network device redirectors */
+@@ -1104,6 +1104,7 @@ static void show_netdevs(void)
 =20
--static int get_str_sep(char *buf, int buf_size, const char **pp, int sep=
-)
--{
--    const char *p, *p1;
--    int len;
--    p =3D *pp;
--    p1 =3D strchr(p, sep);
--    if (!p1)
--        return -1;
--    len =3D p1 - p;
--    p1++;
--    if (buf_size > 0) {
--        if (len > buf_size - 1)
--            len =3D buf_size - 1;
--        memcpy(buf, p, len);
--        buf[len] =3D '\0';
--    }
--    *pp =3D p1;
--    return 0;
--}
--
- int parse_host_port(struct sockaddr_in *saddr, const char *str,
-                     Error **errp)
+ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
  {
++    gchar **substrings =3D NULL;
+     void *object =3D NULL;
+     Error *err =3D NULL;
+     int ret =3D -1;
+@@ -1119,28 +1120,33 @@ static int net_client_init(QemuOpts *opts, bool i=
+s_netdev, Error **errp)
+         const char *ip6_net =3D qemu_opt_get(opts, "ipv6-net");
+=20
+         if (ip6_net) {
+-            char buf[strlen(ip6_net) + 1];
++            char *prefix_addr;
++            unsigned long prefix_len =3D 64; /* Default 64bit prefix len=
+gth. */
++
++            substrings =3D g_strsplit(ip6_net, "/", 2);
++            if (!substrings || !substrings[0]) {
++                error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "ipv6-net=
+",
++                           "a valid IPv6 prefix");
++                goto out;
++            }
+=20
+-            if (get_str_sep(buf, sizeof(buf), &ip6_net, '/') < 0) {
+-                /* Default 64bit prefix length.  */
+-                qemu_opt_set(opts, "ipv6-prefix", ip6_net, &error_abort)=
+;
+-                qemu_opt_set_number(opts, "ipv6-prefixlen", 64, &error_a=
+bort);
+-            } else {
++            prefix_addr =3D substrings[0];
++
++            if (substrings[1]) {
+                 /* User-specified prefix length.  */
+-                unsigned long len;
+                 int err;
+=20
+-                qemu_opt_set(opts, "ipv6-prefix", buf, &error_abort);
+-                err =3D qemu_strtoul(ip6_net, NULL, 10, &len);
+-
++                err =3D qemu_strtoul(substrings[1], NULL, 10, &prefix_le=
+n);
+                 if (err) {
+                     error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                                "ipv6-prefixlen", "a number");
+                     goto out;
+                 }
+-
+-                qemu_opt_set_number(opts, "ipv6-prefixlen", len, &error_=
+abort);
+             }
++
++            qemu_opt_set(opts, "ipv6-prefix", prefix_addr, &error_abort)=
+;
++            qemu_opt_set_number(opts, "ipv6-prefixlen", prefix_len,
++                                &error_abort);
+             qemu_opt_unset(opts, "ipv6-net");
+         }
+     }
+@@ -1163,6 +1169,7 @@ static int net_client_init(QemuOpts *opts, bool is_=
+netdev, Error **errp)
+=20
+ out:
+     error_propagate(errp, err);
++    g_strfreev(substrings);
+     visit_free(v);
+     return ret;
+ }
 --=20
 2.20.1
 
