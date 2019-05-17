@@ -2,67 +2,74 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9929C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:11:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4DDDC04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:11:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EF3220848
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:11:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EF3220848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B837B20818
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:11:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B837B20818
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44968 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44975 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRYtL-0008AF-QS
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 05:11:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34781)
+	id 1hRYuE-0000bX-W5
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 05:11:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1hRYpb-0004WZ-RB
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:07:12 -0400
+	(envelope-from <bounces@canonical.com>) id 1hRYt4-00088e-71
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:10:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1hRYpa-0003mq-Mb
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:07:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58714)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1hRYpZ-0003kn-Vl
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:07:10 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D1BDA3DE04;
-	Fri, 17 May 2019 09:07:08 +0000 (UTC)
-Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-157.pek2.redhat.com
-	[10.72.12.157])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3CB7E60BE0;
-	Fri, 17 May 2019 09:07:06 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: qemu-devel@nongnu.org,
-	peter.maydell@linaro.org
-Date: Fri, 17 May 2019 17:06:56 +0800
-Message-Id: <1558084017-15947-4-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1558084017-15947-1-git-send-email-jasowang@redhat.com>
-References: <1558084017-15947-1-git-send-email-jasowang@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1hRYt3-0005vJ-7y
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:10:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43790)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hRYt3-0005ug-2Q
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:10:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hRYt0-000213-Nl
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 09:10:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AA7EB2E806D
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 09:10:42 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Fri, 17 May 2019 09:07:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 May 2019 09:00:37 -0000
+From: Jakub Jermar <1825311@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug-Tags: mips
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jakub philmd
+X-Launchpad-Bug-Reporter: Jakub Jermar (jakub)
+X-Launchpad-Bug-Modifier: Jakub Jermar (jakub)
+References: <155557460746.17507.17649109204793492383.malonedeb@soybean.canonical.com>
+Message-Id: <155808363776.26203.151057070751763125.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18962";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 995f708793e3456b513854911479a7cd1d762359
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 3/4] net/slirp: fix the IPv6 prefix length error
- message
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1825311] Re: mips_cpu_handle_mmu_fault renders
+ all accessed pages executable
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -71,42 +78,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+Reply-To: Bug 1825311 <1825311@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+Also attaching the 64-bit version of the reproducer.
 
-Reword and add a missing parentheses at the end of the
-error message.
+** Attachment added: "64-bit version of the reproducer"
+   https://bugs.launchpad.net/qemu/+bug/1825311/+attachment/5264428/+files/=
+reproducer64.tar.xz
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- net/slirp.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+-- =
 
-diff --git a/net/slirp.c b/net/slirp.c
-index 95934fb..b34cb29 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -498,7 +498,8 @@ static int net_slirp_init(NetClientState *peer, const=
- char *model,
-     }
-     if (vprefix6_len < 0 || vprefix6_len > 126) {
-         error_setg(errp,
--                   "Invalid prefix provided (prefix len must be in range=
- 0-126");
-+                   "Invalid IPv6 prefix provided "
-+                   "(IPv6 prefix length must be between 0 and 126)");
-         return -1;
-     }
-=20
---=20
-2.5.0
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1825311
 
+Title:
+  mips_cpu_handle_mmu_fault renders all accessed pages executable
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  On MIPS, data accesses to pages mapped in the TLB result in
+  mips_cpu_handle_mmu_fault() marking the page unconditionally
+  executable, even if the TLB entry has the XI bit set. Later on, when
+  there is an attempt to execute this page, no exception is generated,
+  even though TLBXI is expected.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1825311/+subscriptions
 
