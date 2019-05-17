@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 885BFC04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:58:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4607C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:58:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BF9E20656
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:58:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BF9E20656
+	by mail.kernel.org (Postfix) with ESMTPS id 992DD20656
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:58:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 992DD20656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46358 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46360 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRaZF-0006qj-JQ
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 06:58:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49609)
+	id 1hRaZY-000793-RW
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 06:58:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hRa6q-0006cz-V6
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:29:06 -0400
+	(envelope-from <david@redhat.com>) id 1hRa6Z-0006uC-9n
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:28:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hRa0Z-0004Ll-W2
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:22:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38931)
+	(envelope-from <david@redhat.com>) id 1hRa1R-0004x4-Qf
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:23:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37562)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hRa0Z-0004LJ-O2; Fri, 17 May 2019 06:22:35 -0400
+	id 1hRa1R-0004wq-Ll; Fri, 17 May 2019 06:23:29 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 112413082137;
-	Fri, 17 May 2019 10:22:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 045E7104C1;
+	Fri, 17 May 2019 10:23:29 +0000 (UTC)
 Received: from t460s.redhat.com (unknown [10.36.118.100])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E2D8A38E09;
-	Fri, 17 May 2019 10:22:10 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7D5C734914;
+	Fri, 17 May 2019 10:23:27 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 17 May 2019 12:21:07 +0200
-Message-Id: <20190517102145.21812-3-david@redhat.com>
+Date: Fri, 17 May 2019 12:21:21 +0200
+Message-Id: <20190517102145.21812-17-david@redhat.com>
 In-Reply-To: <20190517102145.21812-1-david@redhat.com>
 References: <20190517102145.21812-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Fri, 17 May 2019 10:22:35 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.38]);
+	Fri, 17 May 2019 10:23:29 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 02/40] s390x/tcg: Implement
- VECTOR ADD COMPUTE CARRY
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 16/40] s390x/tcg: Implement
+ VECTOR LOAD POSITIVE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,145 +76,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-128-bit handling courtesy of Richard H.
+Similar to VECTOR LOAD COMPLEMENT.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/insn-data.def      |  2 +
- target/s390x/translate_vx.inc.c | 98 +++++++++++++++++++++++++++++++++
- 2 files changed, 100 insertions(+)
+ target/s390x/insn-data.def      |  2 ++
+ target/s390x/translate_vx.inc.c | 13 +++++++++++++
+ 2 files changed, 15 insertions(+)
 
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 74a0ccc770..f0e62b9aa8 100644
+index 07868ff082..fc8886ff42 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1058,6 +1058,8 @@
-=20
- /* VECTOR ADD */
-     F(0xe7f3, VA,      VRR_c, V,   0, 0, 0, 0, va, 0, IF_VEC)
-+/* VECTOR ADD COMPUTE CARRY */
-+    F(0xe7f1, VACC,    VRR_c, V,   0, 0, 0, 0, vacc, 0, IF_VEC)
+@@ -1096,6 +1096,8 @@
+     F(0xe7bc, VGFMA,   VRR_d, V,   0, 0, 0, 0, vgfma, 0, IF_VEC)
+ /* VECTOR LOAD COMPLEMENT */
+     F(0xe7de, VLC,     VRR_a, V,   0, 0, 0, 0, vlc, 0, IF_VEC)
++/* VECTOR LOAD POSITIVE */
++    F(0xe7df, VLP,     VRR_a, V,   0, 0, 0, 0, vlp, 0, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index 2f84ea0511..a97fce5b65 100644
+index 2fc06c7cf3..566a7df6df 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -136,6 +136,9 @@ static void get_vec_element_ptr_i64(TCGv_ptr ptr, uin=
-t8_t reg, TCGv_i64 enr,
-     tcg_temp_free_i64(tmp);
- }
-=20
-+#define gen_gvec_3(v1, v2, v3, gen) \
-+    tcg_gen_gvec_3(vec_full_reg_offset(v1), vec_full_reg_offset(v2), \
-+                   vec_full_reg_offset(v3), 16, 16, gen)
- #define gen_gvec_3_ool(v1, v2, v3, data, fn) \
-     tcg_gen_gvec_3_ool(vec_full_reg_offset(v1), vec_full_reg_offset(v2),=
- \
-                        vec_full_reg_offset(v3), 16, 16, data, fn)
-@@ -985,3 +988,98 @@ static DisasJumpType op_va(DisasContext *s, DisasOps=
- *o)
-                   get_field(s->fields, v3));
+@@ -1537,3 +1537,16 @@ static DisasJumpType op_vlc(DisasContext *s, Disas=
+Ops *o)
+     gen_gvec_fn_2(neg, es, get_field(s->fields, v1), get_field(s->fields=
+, v2));
      return DISAS_NEXT;
  }
 +
-+static void gen_acc(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b, uint8_t es)
++static DisasJumpType op_vlp(DisasContext *s, DisasOps *o)
 +{
-+    const uint8_t msb_bit_nr =3D NUM_VEC_ELEMENT_BITS(es) - 1;
-+    TCGv_i64 msb_mask =3D tcg_const_i64(dup_const(es, 1ull << msb_bit_nr=
-));
-+    TCGv_i64 t1 =3D tcg_temp_new_i64();
-+    TCGv_i64 t2 =3D tcg_temp_new_i64();
-+    TCGv_i64 t3 =3D tcg_temp_new_i64();
++    const uint8_t es =3D get_field(s->fields, m3);
 +
-+    /* Calculate the carry into the MSB, ignoring the old MSBs */
-+    tcg_gen_andc_i64(t1, a, msb_mask);
-+    tcg_gen_andc_i64(t2, b, msb_mask);
-+    tcg_gen_add_i64(t1, t1, t2);
-+    /* Calculate the MSB without any carry into it */
-+    tcg_gen_xor_i64(t3, a, b);
-+    /* Calculate the carry out of the MSB in the MSB bit position */
-+    tcg_gen_and_i64(d, a, b);
-+    tcg_gen_and_i64(t1, t1, t3);
-+    tcg_gen_or_i64(d, d, t1);
-+    /* Isolate and shift the carry into position */
-+    tcg_gen_and_i64(d, d, msb_mask);
-+    tcg_gen_shri_i64(d, d, msb_bit_nr);
-+
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(t2);
-+    tcg_temp_free_i64(t3);
-+}
-+
-+static void gen_acc8_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
-+{
-+    gen_acc(d, a, b, ES_8);
-+}
-+
-+static void gen_acc16_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
-+{
-+    gen_acc(d, a, b, ES_16);
-+}
-+
-+static void gen_acc_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
-+{
-+    TCGv_i32 t =3D tcg_temp_new_i32();
-+
-+    tcg_gen_add_i32(t, a, b);
-+    tcg_gen_setcond_i32(TCG_COND_LTU, d, t, b);
-+    tcg_temp_free_i32(t);
-+}
-+
-+static void gen_acc_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
-+{
-+    TCGv_i64 t =3D tcg_temp_new_i64();
-+
-+    tcg_gen_add_i64(t, a, b);
-+    tcg_gen_setcond_i64(TCG_COND_LTU, d, t, b);
-+    tcg_temp_free_i64(t);
-+}
-+
-+static void gen_acc2_i64(TCGv_i64 dl, TCGv_i64 dh, TCGv_i64 al,
-+                         TCGv_i64 ah, TCGv_i64 bl, TCGv_i64 bh)
-+{
-+    TCGv_i64 th =3D tcg_temp_new_i64();
-+    TCGv_i64 tl =3D tcg_temp_new_i64();
-+    TCGv_i64 zero =3D tcg_const_i64(0);
-+
-+    tcg_gen_add2_i64(tl, th, al, zero, bl, zero);
-+    tcg_gen_add2_i64(tl, th, th, zero, ah, zero);
-+    tcg_gen_add2_i64(tl, dl, tl, th, bh, zero);
-+    tcg_gen_mov_i64(dh, zero);
-+
-+    tcg_temp_free_i64(th);
-+    tcg_temp_free_i64(tl);
-+    tcg_temp_free_i64(zero);
-+}
-+
-+static DisasJumpType op_vacc(DisasContext *s, DisasOps *o)
-+{
-+    const uint8_t es =3D get_field(s->fields, m4);
-+    static const GVecGen3 g[4] =3D {
-+        { .fni8 =3D gen_acc8_i64, },
-+        { .fni8 =3D gen_acc16_i64, },
-+        { .fni4 =3D gen_acc_i32, },
-+        { .fni8 =3D gen_acc_i64, },
-+    };
-+
-+    if (es > ES_128) {
++    if (es > ES_64) {
 +        gen_program_exception(s, PGM_SPECIFICATION);
 +        return DISAS_NORETURN;
-+    } else if (es =3D=3D ES_128) {
-+        gen_gvec128_3_i64(gen_acc2_i64, get_field(s->fields, v1),
-+                          get_field(s->fields, v2), get_field(s->fields,=
- v3));
-+        return DISAS_NEXT;
 +    }
-+    gen_gvec_3(get_field(s->fields, v1), get_field(s->fields, v2),
-+               get_field(s->fields, v3), &g[es]);
++
++    gen_gvec_fn_2(abs, es, get_field(s->fields, v1), get_field(s->fields=
+, v2));
 +    return DISAS_NEXT;
 +}
 --=20
