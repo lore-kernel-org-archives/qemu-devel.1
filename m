@@ -2,47 +2,47 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E8B3C04AAF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 00:14:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C694FC04AAF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 00:17:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DC2720848
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 00:14:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DC2720848
+	by mail.kernel.org (Postfix) with ESMTPS id 8A4F020848
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 00:17:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A4F020848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38731 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38773 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRQWY-00053a-G2
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 20:14:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49178)
+	id 1hRQYm-0006DX-SM
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 20:17:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hRQUr-0004EF-BZ
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 20:13:14 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hRQXc-0005ak-1i
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 20:16:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hRQUq-0005iK-4g
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 20:13:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58988)
+	(envelope-from <jsnow@redhat.com>) id 1hRQXb-0000Lh-5z
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 20:16:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49056)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
-	id 1hRQUn-0005ar-DN; Thu, 16 May 2019 20:13:09 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	id 1hRQXZ-0000JL-1u; Thu, 16 May 2019 20:16:01 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6DD3F3082A8F;
-	Fri, 17 May 2019 00:13:08 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 49CFD30BB37A;
+	Fri, 17 May 2019 00:16:00 +0000 (UTC)
 Received: from [10.18.17.215] (dhcp-17-215.bos.redhat.com [10.18.17.215])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C933027071;
-	Fri, 17 May 2019 00:13:07 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190516161114.27596-1-mreitz@redhat.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 96BFB60A9A;
+	Fri, 17 May 2019 00:15:59 +0000 (UTC)
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190510190307.17647-1-jsnow@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -119,23 +119,23 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
 	i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
 	RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
 	glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <021f5c74-b170-f263-b9c2-55213b2d35a8@redhat.com>
-Date: Thu, 16 May 2019 20:13:07 -0400
+Message-ID: <1ed5b4ce-bdee-d653-eaac-00bcbd897ee3@redhat.com>
+Date: Thu, 16 May 2019 20:15:59 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190516161114.27596-1-mreitz@redhat.com>
+In-Reply-To: <20190510190307.17647-1-jsnow@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Fri, 17 May 2019 00:13:08 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.49]);
+	Fri, 17 May 2019 00:16:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] iotests: Fix intermittent
- failure in 219
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] blockdev-backup: don't check
+ aio_context too early
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -147,116 +147,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Happy Friday: ping!
 
+Max: this series corrects some things that were causing some of the
+pitfalls that made me nervous about the context I wrote about in 219.
 
-On 5/16/19 12:11 PM, Max Reitz wrote:
-> In 219, we wait for the job to make progress before we emit its status.
-> This makes the output reliable.
+On 5/10/19 3:03 PM, John Snow wrote:
+> See patch one's commit message for justification.
 > 
-> Unfortunately, there is a bug: We do not wait for any more progress if
-> the job has already reached its total-progress.  Right after the job has
-> been started, it is possible that total-progress is still 0, though.  In
-> that case, we may skip the first progress-making step and keep ending up
-> 64 kB short.
+> v2: added patch 4, with iotest framework adjustments in patches 2/3.
 > 
-
-Oh, this took a while to understand.
-
-The bug is that when the job has started, its current progress is the
-same as its total progress, 0, which we might confuse as as being
-sufficiently done.
-
-You avoid this by forcing the job to update its total progress at least
-once before proceeding.
-
-We do this checking pre-patch in test_pause_resume, not excerpted below
-in the diffstat.
-
-I might recommend:
-
-"In 219, we wait for the job to make progress before we emit its status.
-This makes the output reliable. We do not wait for any more progress if
-the job's current-progress already matches its total-progress.
-
-Unfortunately, there is a bug: Right after the job has been started,
-it's possible that total-progress is still 0."
-
-But, well, that's just like, my opinion, man.
-
-> To fix that bug, we cab simply wait for total-progress to reach 4 MB
-> (the image size) after starting the job.
+> John Snow (4):
+>   blockdev-backup: don't check aio_context too early
+>   iotests.py: do not use infinite waits
+>   iotests.py: rewrite run_job to be pickier
+>   iotests: add iotest 250 for testing blockdev-backup across iothread
+>     contexts
 > 
-> Reported-by: Karen Mezick <kmezick@redhat.com>
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1686651
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/219 | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/219 b/tests/qemu-iotests/219
-> index c03bbdb294..e0c51662c0 100755
-> --- a/tests/qemu-iotests/219
-> +++ b/tests/qemu-iotests/219
-> @@ -23,6 +23,8 @@ import iotests
->  
->  iotests.verify_image_format(supported_fmts=['qcow2'])
->  
-> +img_size = 4 * 1024 * 1024
-> +
->  def pause_wait(vm, job_id):
->      with iotests.Timeout(3, "Timeout waiting for job to pause"):
->          while True:
-> @@ -62,6 +64,8 @@ def test_pause_resume(vm):
->                  iotests.log(vm.qmp('query-jobs'))
->  
->  def test_job_lifecycle(vm, job, job_args, has_ready=False):
-> +    global img_size
-> +
-
-You hate to see it happen, folks
-
->      iotests.log('')
->      iotests.log('')
->      iotests.log('Starting block job: %s (auto-finalize: %s; auto-dismiss: %s)' %
-> @@ -84,6 +88,10 @@ def test_job_lifecycle(vm, job, job_args, has_ready=False):
->      iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHANGE')))
->      iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHANGE')))
->  
-
-In my recent writing of tests, I have come to be quite afraid of naked
-waits on JOB_STATUS_CHANGE without actually waiting on a specific one. I
-suppose it's fine because we log it, so we will eventually see what went
-wrong, but ...
-
-Ehm, just a style thing. Not related to this patch.
-
-> +    # Wait for total-progress to stabilize
-> +    while vm.qmp('query-jobs')['return'][0]['total-progress'] < img_size:
-> +        pass
-> +
->      # RUNNING state:
->      # pause/resume should work, complete/finalize/dismiss should error out
->      iotests.log('')
-> @@ -173,9 +181,8 @@ with iotests.FilePath('disk.img') as disk_path, \
->       iotests.FilePath('copy.img') as copy_path, \
->       iotests.VM() as vm:
->  
-> -    img_size = '4M'
-> -    iotests.qemu_img_create('-f', iotests.imgfmt, disk_path, img_size)
-> -    iotests.qemu_io('-c', 'write 0 %s' % (img_size),
-> +    iotests.qemu_img_create('-f', iotests.imgfmt, disk_path, str(img_size))
-> +    iotests.qemu_io('-c', 'write 0 %i' % (img_size),
->                      '-f', iotests.imgfmt, disk_path)
->  
->      iotests.log('Launching VM...')
+>  blockdev.c                    |   4 --
+>  tests/qemu-iotests/250        | 129 ++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/250.out    | 119 +++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/group      |   1 +
+>  tests/qemu-iotests/iotests.py |  44 ++++++------
+>  5 files changed, 270 insertions(+), 27 deletions(-)
+>  create mode 100755 tests/qemu-iotests/250
+>  create mode 100644 tests/qemu-iotests/250.out
 > 
 
-Regardless of my spurious noisemaking:
-
-Reviewed-by: John Snow <jsnow@redhat.com>
 
