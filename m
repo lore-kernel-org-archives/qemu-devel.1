@@ -2,74 +2,64 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 001DEC04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 11:06:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74F12C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 11:07:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C047820656
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 11:06:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C047820656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4BFBD20656
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 11:07:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BFBD20656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46554 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46564 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRahI-0006FJ-SL
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 07:06:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52910)
+	id 1hRahf-0006na-G3
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 07:07:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hRaIL-0000LP-Gq
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:40:58 -0400
+	(envelope-from <david@redhat.com>) id 1hRa6p-0006QX-VF
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:29:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hRaIK-00034j-3S
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:40:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45286)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hRaIJ-00033o-Td
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:40:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hRaIH-0001Su-O1
-	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 10:40:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B4C332E80C7
-	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 10:40:53 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 May 2019 10:33:53 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+	(envelope-from <david@redhat.com>) id 1hRa0b-0004Me-ST
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:22:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38478)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hRa0b-0004M9-L3; Fri, 17 May 2019 06:22:37 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E4F4E9FDCB;
+	Fri, 17 May 2019 10:22:36 +0000 (UTC)
+Received: from t460s.redhat.com (unknown [10.36.118.100])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 59A5338E09;
+	Fri, 17 May 2019 10:22:35 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Tags: mips testcase
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jakub philmd
-X-Launchpad-Bug-Reporter: Jakub Jermar (jakub)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <155557460746.17507.17649109204793492383.malonedeb@soybean.canonical.com>
-Message-Id: <155808923403.14518.16360837123007279773.launchpad@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18962";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 7c76ef2aeaac275a85dc89ba18506f6a2ffdeda7
+Date: Fri, 17 May 2019 12:21:08 +0200
+Message-Id: <20190517102145.21812-4-david@redhat.com>
+In-Reply-To: <20190517102145.21812-1-david@redhat.com>
+References: <20190517102145.21812-1-david@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.39]);
+	Fri, 17 May 2019 10:22:36 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1825311] Re: mips_cpu_handle_mmu_fault renders
- all accessed pages executable
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 03/40] s390x/tcg: Implement
+ VECTOR ADD WITH CARRY
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,32 +68,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1825311 <1825311@bugs.launchpad.net>
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags added: testcase
+Only slightly ugly, perform two additions. At least it is only supported
+for 128 bit elements.
 
--- =
+Introduce gen_gvec128_4_i64() similar to gen_gvec128_3_i64().
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1825311
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/insn-data.def      |  2 ++
+ target/s390x/translate_vx.inc.c | 63 +++++++++++++++++++++++++++++++++
+ 2 files changed, 65 insertions(+)
 
-Title:
-  mips_cpu_handle_mmu_fault renders all accessed pages executable
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index f0e62b9aa8..38d1e22a6d 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1060,6 +1060,8 @@
+     F(0xe7f3, VA,      VRR_c, V,   0, 0, 0, 0, va, 0, IF_VEC)
+ /* VECTOR ADD COMPUTE CARRY */
+     F(0xe7f1, VACC,    VRR_c, V,   0, 0, 0, 0, vacc, 0, IF_VEC)
++/* VECTOR ADD WITH CARRY */
++    F(0xe7bb, VAC,     VRR_d, V,   0, 0, 0, 0, vac, 0, IF_VEC)
+=20
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
+diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
+inc.c
+index a97fce5b65..d3d3442c0d 100644
+--- a/target/s390x/translate_vx.inc.c
++++ b/target/s390x/translate_vx.inc.c
+@@ -196,6 +196,41 @@ static void gen_gvec128_3_i64(gen_gvec128_3_i64_fn f=
+n, uint8_t d, uint8_t a,
+         tcg_temp_free_i64(bl);
+ }
+=20
++typedef void (*gen_gvec128_4_i64_fn)(TCGv_i64 dl, TCGv_i64 dh, TCGv_i64 =
+al,
++                                     TCGv_i64 ah, TCGv_i64 bl, TCGv_i64 =
+bh,
++                                     TCGv_i64 cl, TCGv_i64 ch);
++static void gen_gvec128_4_i64(gen_gvec128_4_i64_fn fn, uint8_t d, uint8_=
+t a,
++                              uint8_t b, uint8_t c)
++{
++        TCGv_i64 dh =3D tcg_temp_new_i64();
++        TCGv_i64 dl =3D tcg_temp_new_i64();
++        TCGv_i64 ah =3D tcg_temp_new_i64();
++        TCGv_i64 al =3D tcg_temp_new_i64();
++        TCGv_i64 bh =3D tcg_temp_new_i64();
++        TCGv_i64 bl =3D tcg_temp_new_i64();
++        TCGv_i64 ch =3D tcg_temp_new_i64();
++        TCGv_i64 cl =3D tcg_temp_new_i64();
++
++        read_vec_element_i64(ah, a, 0, ES_64);
++        read_vec_element_i64(al, a, 1, ES_64);
++        read_vec_element_i64(bh, b, 0, ES_64);
++        read_vec_element_i64(bl, b, 1, ES_64);
++        read_vec_element_i64(ch, c, 0, ES_64);
++        read_vec_element_i64(cl, c, 1, ES_64);
++        fn(dl, dh, al, ah, bl, bh, cl, ch);
++        write_vec_element_i64(dh, d, 0, ES_64);
++        write_vec_element_i64(dl, d, 1, ES_64);
++
++        tcg_temp_free_i64(dh);
++        tcg_temp_free_i64(dl);
++        tcg_temp_free_i64(ah);
++        tcg_temp_free_i64(al);
++        tcg_temp_free_i64(bh);
++        tcg_temp_free_i64(bl);
++        tcg_temp_free_i64(ch);
++        tcg_temp_free_i64(cl);
++}
++
+ static void gen_gvec_dupi(uint8_t es, uint8_t reg, uint64_t c)
+ {
+     switch (es) {
+@@ -1083,3 +1118,31 @@ static DisasJumpType op_vacc(DisasContext *s, Disa=
+sOps *o)
+                get_field(s->fields, v3), &g[es]);
+     return DISAS_NEXT;
+ }
++
++static void gen_ac2_i64(TCGv_i64 dl, TCGv_i64 dh, TCGv_i64 al, TCGv_i64 =
+ah,
++                        TCGv_i64 bl, TCGv_i64 bh, TCGv_i64 cl, TCGv_i64 =
+ch)
++{
++    TCGv_i64 tl =3D tcg_temp_new_i64();
++    TCGv_i64 th =3D tcg_const_i64(0);
++
++    /* extract the carry only */
++    tcg_gen_extract_i64(tl, cl, 0, 1);
++    tcg_gen_add2_i64(dl, dh, al, ah, bl, bh);
++    tcg_gen_add2_i64(dl, dh, dl, dh, tl, th);
++
++    tcg_temp_free_i64(tl);
++    tcg_temp_free_i64(th);
++}
++
++static DisasJumpType op_vac(DisasContext *s, DisasOps *o)
++{
++    if (get_field(s->fields, m5) !=3D ES_128) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++
++    gen_gvec128_4_i64(gen_ac2_i64, get_field(s->fields, v1),
++                      get_field(s->fields, v2), get_field(s->fields, v3)=
+,
++                      get_field(s->fields, v4));
++    return DISAS_NEXT;
++}
+--=20
+2.20.1
 
-Status in QEMU:
-  In Progress
-
-Bug description:
-  On MIPS, data accesses to pages mapped in the TLB result in
-  mips_cpu_handle_mmu_fault() marking the page unconditionally
-  executable, even if the TLB entry has the XI bit set. Later on, when
-  there is an attempt to execute this page, no exception is generated,
-  even though TLBXI is expected.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1825311/+subscriptions
 
