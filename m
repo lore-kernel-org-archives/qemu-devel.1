@@ -2,66 +2,65 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45ABAC04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 08:21:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 634A9C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 08:30:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B25020848
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 08:21:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B25020848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3688E20818
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 08:30:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3688E20818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44307 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44387 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRY7O-0008FI-4U
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 04:21:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56099)
+	id 1hRYFp-0001X2-ES
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 04:30:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hRY6Y-0007sP-US
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:20:40 -0400
+	(envelope-from <jasowang@redhat.com>) id 1hRYEx-0001Bo-AL
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:29:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hRY6X-0004Nl-HR
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:20:38 -0400
-Received: from mga09.intel.com ([134.134.136.24]:36433)
+	(envelope-from <jasowang@redhat.com>) id 1hRYEw-0006m4-E8
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:29:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42270)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hRY6X-00045w-7U
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:20:37 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-	by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	17 May 2019 01:20:27 -0700
-X-ExtLoop1: 1
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by fmsmga006.fm.intel.com with ESMTP; 17 May 2019 01:20:27 -0700
-Date: Fri, 17 May 2019 16:19:56 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190517081956.GA3998@richard>
-References: <20190515121146.7248-1-mst@redhat.com>
-	<CAFEAcA95Uh=j+vGCT08+ztAc5Yk8RWGzApDZrrt5DS7XudGQhQ@mail.gmail.com>
-	<6d652ee6-ffee-6316-88f4-ba9f2a237817@redhat.com>
-	<CAP+75-XuuUamjbouNYRJzm2Qwtorwhbe+QX8BHBK_WaUc8F+7A@mail.gmail.com>
-	<20190517025903.GA17182@richard> <20190517031203.GA17339@richard>
-	<bea6f63b-a877-54f8-728e-4f1f2d2b0081@redhat.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>)
+	id 1hRYEw-0006hi-7x; Fri, 17 May 2019 04:29:18 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1BE7785546;
+	Fri, 17 May 2019 08:29:10 +0000 (UTC)
+Received: from [10.72.12.168] (ovpn-12-168.pek2.redhat.com [10.72.12.168])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5A74E5D9DC;
+	Fri, 17 May 2019 08:28:59 +0000 (UTC)
+To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org
+References: <20190515090805.44785-1-sgarzare@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <8ff8f283-fa8f-acc1-9f31-414339a54d4d@redhat.com>
+Date: Fri, 17 May 2019 16:28:59 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <bea6f63b-a877-54f8-728e-4f1f2d2b0081@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 134.134.136.24
-Subject: Re: [Qemu-devel] [PULL 00/37] pci, pc, virtio: features, fixes
+In-Reply-To: <20190515090805.44785-1-sgarzare@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.28]);
+	Fri, 17 May 2019 08:29:16 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2] net/slirp: fix the IPv6 prefix length
+ error message
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,130 +72,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
-	Peter Maydell <peter.maydell@linaro.org>, imammedo@redhat.com,
-	Wei Yang <richardw.yang@linux.intel.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-trivial@nongnu.org, Jan Kiszka <jan.kiszka@siemens.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	=?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+	Samuel Thibault <samuel.thibault@ens-lyon.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 17, 2019 at 10:14:11AM +0200, Philippe Mathieu-Daudé wrote:
->On 5/17/19 5:12 AM, Wei Yang wrote:
->> On Fri, May 17, 2019 at 10:59:03AM +0800, Wei Yang wrote:
->>> On Thu, May 16, 2019 at 08:53:04PM +0200, Philippe Mathieu-Daudé wrote:
->>>> On Thu, May 16, 2019 at 8:33 PM Philippe Mathieu-Daudé
->>>> <philmd@redhat.com> wrote:
->>>>> On 5/16/19 6:04 PM, Peter Maydell wrote:
->>>>>> On Thu, 16 May 2019 at 13:17, Michael S. Tsirkin <mst@redhat.com> wrote:
->>>>>>>
->>>>>>> The following changes since commit efb4f3b62c69383a7308d7b739a3193e7c0ccae8:
->>>>>>>
->>>>>>>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-05-10 14:49:36 +0100)
->>>>>>>
->>>>>>> are available in the Git repository at:
->>>>>>>
->>>>>>>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->>>>>>>
->>>>>>> for you to fetch changes up to 0534d255dae78450d90d59db0f3a9a46b32ebd73:
->>>>>>>
->>>>>>>   tests: acpi: print error unable to dump ACPI table during rebuild (2019-05-14 21:19:14 -0400)
->>>>>>>
->>>>>>> ----------------------------------------------------------------
->>>>>>> pci, pc, virtio: features, fixes
->>>>>>>
->>>>>>> reconnect for vhost blk
->>>>>>> tests for UEFI
->>>>>>> misc other stuff
->>>>>>>
->>>>>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>>>>>>
->>>>>>> ----------------------------------------------------------------
->>>>>>
->>>>>> Hi -- this pullreq has a conflict in default-configs/arm-softmmu.mak
->>>>>> because the conversion of arm to Kconfig has landed in master.
->>>>>> Could you rebase and fix up to use whatever the Kconfig
->>>>>> equivalent of these changes is, please?
->>>>>
->>>>> Culprit is "hw/acpi: Consolidate build_mcfg to pci.c"
->>>>>
->>>>> The conflict doesn't look trivial to resolve (to me) so I'd rather see
->>>>> it reviewed (by Thomas). I suggest to drop the patch(es) from your PR :(
->>>>
->>>> Thomas, FYI I did this to resolve the conflict:
->>>>
->>>> - keep default-configs/arm-softmmu.mak from master:
->>>>
->>>>  git checkout origin/master default-configs/arm-softmmu.mak
->>>>
->>>> - applied the following !fixup snippet:
->>>>
->>>> -- >8 --
->>>> --- a/hw/acpi/Kconfig
->>>> +++ b/hw/acpi/Kconfig
->>>> @@ -25,7 +25,7 @@ config ACPI_NVDIMM
->>>>
->>>> config ACPI_PCI
->>>>     bool
->>>> -    depends on ACPI
->>>> +    depends on ACPI && PCI
->>>>
->>>> ---
->>>>
->>>> I felt it easier to review on top of "hw/acpi: Improve build modularity"
->>>> https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg04718.html
->>>>
->>>
->>> Well, I hope this will not block the merge.
->>>
->>> I took a look in the change of default-configs/arm-softmmu.mak. The general
->>> idea from Thomas is put those hard-coded config to Kconfig.
->>>
->>> This is fine and what I need to change in my patch is to select ACPI_PCI in
->>> the proper place, if my understanding is correct.
->>>
->>> Two things I need to fix:
->>>
->>>  * add select ACPI_PCI in proper place of hw/arm/Kconfig
->>>  * add a dummy build_mcfg() for link when ACPI_PCI is not configured.
->>>
->>> Then I have two questions:
->>>
->>>  * In hw/arm/Kconfig, I don't see one option contains both PCI and ACPI. I am
->>>    confused where to put the select.
->>>  * put dummy build_mcfg() in aml-build.c works. Igor, do you like this? Or
->>>    you haver other preference?
->> 
->> Hmm... put build_mcfg() in aml-build.c seems not work when we config both x86
->> and arm. e.g. --target-list=x86_64-softmmu,arm-softmmu. Because we only have
->> one aml-build.o object file.
+
+On 2019/5/15 =E4=B8=8B=E5=8D=885:08, Stefano Garzarella wrote:
+> Reword and add a missing parentheses at the end of the
+> error message.
 >
->I think this is what I tried to fix in "hw/acpi: Improve build modularity"
->https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg04718.html
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+> v2:
+>    - Reworded the error message (Markus)
+>    - Added Marc-Andr=C3=A9's R-b
+>      I made a little change to the error message, let me now
+>      if I should remove yuor R-b.
+> ---
+>   net/slirp.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
 >
+> diff --git a/net/slirp.c b/net/slirp.c
+> index 95934fb36d..b34cb29276 100644
+> --- a/net/slirp.c
+> +++ b/net/slirp.c
+> @@ -498,7 +498,8 @@ static int net_slirp_init(NetClientState *peer, con=
+st char *model,
+>       }
+>       if (vprefix6_len < 0 || vprefix6_len > 126) {
+>           error_setg(errp,
+> -                   "Invalid prefix provided (prefix len must be in ran=
+ge 0-126");
+> +                   "Invalid IPv6 prefix provided "
+> +                   "(IPv6 prefix length must be between 0 and 126)");
+>           return -1;
+>       }
+>  =20
 
-If I am correct, you are trying to add something in stub to fix the "undefined
-reference" right?
 
->> 
->> What comes into my mind is wrap build_mcfg() with #ifdef CONFIG_ACPI_PCI.
->> 
->> Any better idea?
->> 
->>>
->>>> Sadly both series clash :(
->>>>
->>>> Regards,
->>>>
->>>> Phil.
->>>
->>> -- 
->>> Wei Yang
->>> Help you, Help me
->> 
+Applied.
 
--- 
-Wei Yang
-Help you, Help me
+Thanks
+
+
 
