@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F735C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 22:14:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6D5C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 22:14:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 377872133D
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 22:14:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 748772087E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 22:14:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="L0Ge630C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 377872133D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="YJK1BXPm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 748772087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54325 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54327 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRl7w-0000fF-7h
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 18:14:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37103)
+	id 1hRl7y-0000hA-Gv
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 18:14:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37087)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=033a92d29=alistair.francis@wdc.com>)
-	id 1hRl62-0007uo-9o
+	id 1hRl61-0007tu-G0
 	for qemu-devel@nongnu.org; Fri, 17 May 2019 18:13:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=033a92d29=alistair.francis@wdc.com>)
-	id 1hRl60-0007LI-Hs
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 18:12:58 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:41017)
+	id 1hRl5z-0007KV-Nc
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 18:12:57 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:41014)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=033a92d29=alistair.francis@wdc.com>)
-	id 1hRl5z-0007HB-QD; Fri, 17 May 2019 18:12:56 -0400
+	id 1hRl5y-0007GL-25; Fri, 17 May 2019 18:12:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
 	d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-	t=1558131176; x=1589667176;
+	t=1558131175; x=1589667175;
 	h=from:to:cc:subject:date:message-id:in-reply-to:
 	references:mime-version:content-transfer-encoding;
-	bh=UraNYZa/rGlNA4WNmmKuAimGi9hHpUL2xBtVQ8qUMgY=;
-	b=L0Ge630CQW22PLtD6YTpYzbW3bLaDahpxkEQ2Art+3CLjptvl8HW9xzz
-	PpiJVRKr91bHjLUBcHx6f+AO3mMZB6ZHZNw42yf2+YoJovpziqiFqkvVC
-	8ghdwvRhfTrq/2GFqq/+tpyrncMb0FoHdUGEwWUZENWpAe3AcswKIdXfv
-	YdVfQPoSUyY9NWLWG7qjj2qp4MgFTVR5AE1VzG4KdV5EHMZjHKV8vME94
-	HK4JaG7fF52tNzyTAIjqEz6MeYIkGQH6mZBmVQ1kvFnO8bPiMR8LavhHO
-	/c3l02tqV6JIe4OdsFeJUhJLqzdZLSG4ioWcovSCY0l1yfJ2lgPaBUwAQ w==;
-X-IronPort-AV: E=Sophos;i="5.60,481,1549900800"; d="scan'208";a="110242478"
+	bh=RskmDp4j3KgbBIS2jyvrO4SZ54oGm0BoWelhuc13RH0=;
+	b=YJK1BXPmIKdlutRMUUjD8WCcMn0mW34O8H+erFZ+HD15dDdGdYHuCrk1
+	FSPa5mvUQloL8Abz+yI83o8D3RjZ0FQ3vu/jl2Ibw1XWaT6cwQLagNdbb
+	VUJBS8q5qXrTC8A2vZA4qzS24oB22NYV5oANcxCSnpcAZZa4Q/IC1wxem
+	/avQ/H9xVBKGSmYiVRizqcH9yhbEv6xgdm6m215E8tTWC++ZgJoNvydSR
+	msoSr83txTrLfs0QVgLtkoKLfH2X7rt2nS9s0kkuoIxbyUc5YSaFR6Ibc
+	pdtSsYc3l+LA15R9azbsSb0NR2jsUmQJXY1sSGf1l2TvxNDGxdaRtOvJG Q==;
+X-IronPort-AV: E=Sophos;i="5.60,481,1549900800"; d="scan'208";a="110242476"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
 	([199.255.45.14])
-	by ob1.hgst.iphmx.com with ESMTP; 18 May 2019 06:12:51 +0800
-IronPort-SDR: JW4A5iRfgafFbu+nAOoRyFuHUlCPXociE9hZsveRIHUsC+SPYezvk0K04MwRI6V9JJXCKlIwIM
-	OubU5KKpZQHd2rJyEybxxceCo24Es/ZSE4UX80it9qF39IyWN0LRVGa9BEXh0MTKCdIqj2fp/1
-	Qr6PM7HpwidAfzUaFulIgrEfgIrNAK8e0NNYvPUj6KDOSFSJpYlVAcwKr8Mu075BhF96Ia7dio
-	jQ4rFouSu0Z5qA5LbnM2iMBwDz7kEMo54dOcGsaznP17sfogAKIkLChnDN1047KFpytjAcRvkf
-	Xl1MaizZUX5DJzZ0aGflHn2P
+	by ob1.hgst.iphmx.com with ESMTP; 18 May 2019 06:12:48 +0800
+IronPort-SDR: /bXG8hyLW+RrqeAataDe9A3bsxqsHkCaqR7AwUKObSk8LheqP0oWwzxZR7Zu+bVUoK4yNdumrK
+	gmRWlCpyorVXiDJlRzGrX25LVVbm6tGAudr+IHVPAPYTSqZrBp/aY5JV6GQLlaKBeH4LwdRJsP
+	HeUpZFFCWjwEeZcf5GFKUKdQdIHpVbu5bNqs0ASL0kblWFtnJKadRIzneyE2lgRLF2A4NLLjzs
+	WbQgnStYJzNPfE0GxSNg93zOEbVQ5pFdBoMgKFfWUmYR/2J5nwNJ5ZlcTYXnUx4OyHtTEm6FOq
+	4WHwJaZFeMeIF/wwav3kxaIv
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-	by uls-op-cesaep01.wdc.com with ESMTP; 17 May 2019 14:48:20 -0700
-IronPort-SDR: /V5Cj3wc7Oi2NbQNGTtqzdEot64q+ffX4//OW12VKXv0U6bGDgZefsMqn/KQztlFOGuwHQC8CS
-	+4dEaaeof/TidoRtFSmLmfFta5rHQWZDfiKxbl+8teNxfEPTec+s4LxYNS2Ngs2965Zp4rh71C
-	YtgQKJE27zKgUBcaZTtfF6yapeQB4L19NIGqEsnE1TO9TeOEwWj5WvcqgPXpFNWYPBGpPYdwIF
-	EReYfgp0gxq14V1HVG8NBEyC5dpQqv5fIao6S/u0z3UB/gE/Y69jytBUtLyD4fj3IMEZy07sXy
-	iEM=
+	by uls-op-cesaep01.wdc.com with ESMTP; 17 May 2019 14:48:17 -0700
+IronPort-SDR: BR8YwXfSNi2NetMtB9HNZmssyDn1SwZoUxyOfj7JmEAyIWXhOizCVGzbsuakeOYNh3Ni/E8x3E
+	mbN8bR1HYs2KzVAEP8kqy9dYKBPDlOnr4sBqOiyzR2pNRer2GUkPC0if4QoO5RZcefKwX7O+fq
+	hCCPjde8C+OBgHcTgcpWc0imbxsi7X09aXeXWbY8MuMaKUF9+XO9hxCbV1P6KY8dg6/9OrJKn8
+	dEcSH5KM10RizvLvfEBC0WNNeaxkCzzqu5s2qaMi1OhYaRUzB8fw0QXCIvDoa5nLyhfxZDQeoP
+	+wA=
 Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
 	risc6-mainframe.int.fusionio.com) ([10.196.157.140])
-	by uls-op-cesaip01.wdc.com with ESMTP; 17 May 2019 15:12:50 -0700
+	by uls-op-cesaip01.wdc.com with ESMTP; 17 May 2019 15:12:47 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Date: Fri, 17 May 2019 15:11:04 -0700
-Message-Id: <d4664adffe008df43f2a0760dd4e2b9cb834b652.1558131003.git.alistair.francis@wdc.com>
+Date: Fri, 17 May 2019 15:11:01 -0700
+Message-Id: <4e552352bb35b1f4b086e260be369464df7c490e.1558131003.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <cover.1558131003.git.alistair.francis@wdc.com>
 References: <cover.1558131003.git.alistair.francis@wdc.com>
@@ -81,7 +81,8 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 216.71.154.45
-Subject: [Qemu-devel] [PATCH v1 3/4] disas/riscv: Fix `rdinstreth` constraint
+Subject: [Qemu-devel] [PATCH v1 2/4] disas/riscv: Disassemble reserved
+ compressed encodings as illegal
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,29 +101,134 @@ Sender: "Qemu-devel"
 
 From: Michael Clark <mjc@sifive.com>
 
-The constraint for `rdinstreth` was comparing the csr number to 0xc80,
-which is `cycleh` instead. Fix this.
+Due to the design of the disassembler, the immediate is not
+known during decoding of the opcode; so to handle compressed
+encodings with reserved immediate values (non-zero), we need
+to add an additional check during decompression to match
+reserved encodings with zero immediates and translate them
+into the illegal instruction.
 
-Author: Wladimir J. van der Laan <laanwj@gmail.com>
+The following compressed opcodes have reserved encodings with
+zero immediates: c.addi4spn, c.addi, c.lui, c.addi16sp, c.srli,
+c.srai, c.andi and c.slli
+
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- disas/riscv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ disas/riscv.c | 51 ++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 34 insertions(+), 17 deletions(-)
 
 diff --git a/disas/riscv.c b/disas/riscv.c
-index 3ab4586f0a..c2578a3c4b 100644
+index 59a9b0437a..3ab4586f0a 100644
 --- a/disas/riscv.c
 +++ b/disas/riscv.c
-@@ -614,7 +614,7 @@ static const rvc_constraint rvcc_rdtime[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc01, r
- static const rvc_constraint rvcc_rdinstret[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc02, rvc_end };
- static const rvc_constraint rvcc_rdcycleh[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc80, rvc_end };
- static const rvc_constraint rvcc_rdtimeh[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc81, rvc_end };
--static const rvc_constraint rvcc_rdinstreth[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc80, rvc_end };
-+static const rvc_constraint rvcc_rdinstreth[] = { rvc_rs1_eq_x0, rvc_csr_eq_0xc82, rvc_end };
- static const rvc_constraint rvcc_frcsr[] = { rvc_rs1_eq_x0, rvc_csr_eq_0x003, rvc_end };
- static const rvc_constraint rvcc_frrm[] = { rvc_rs1_eq_x0, rvc_csr_eq_0x002, rvc_end };
- static const rvc_constraint rvcc_frflags[] = { rvc_rs1_eq_x0, rvc_csr_eq_0x001, rvc_end };
+@@ -504,14 +504,19 @@ typedef struct {
+     const rvc_constraint *constraints;
+ } rv_comp_data;
+ 
++enum {
++    rvcd_imm_nz = 0x1
++};
++
+ typedef struct {
+     const char * const name;
+     const rv_codec codec;
+     const char * const format;
+     const rv_comp_data *pseudo;
+-    const int decomp_rv32;
+-    const int decomp_rv64;
+-    const int decomp_rv128;
++    const short decomp_rv32;
++    const short decomp_rv64;
++    const short decomp_rv128;
++    const short decomp_data;
+ } rv_opcode_data;
+ 
+ /* register names */
+@@ -1011,7 +1016,7 @@ const rv_opcode_data opcode_data[] = {
+     { "fcvt.q.lu", rv_codec_r_m, rv_fmt_rm_frd_rs1, NULL, 0, 0, 0 },
+     { "fmv.x.q", rv_codec_r, rv_fmt_rd_frs1, NULL, 0, 0, 0 },
+     { "fmv.q.x", rv_codec_r, rv_fmt_frd_rs1, NULL, 0, 0, 0 },
+-    { "c.addi4spn", rv_codec_ciw_4spn, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi },
++    { "c.addi4spn", rv_codec_ciw_4spn, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi, rvcd_imm_nz },
+     { "c.fld", rv_codec_cl_ld, rv_fmt_frd_offset_rs1, NULL, rv_op_fld, rv_op_fld, 0 },
+     { "c.lw", rv_codec_cl_lw, rv_fmt_rd_offset_rs1, NULL, rv_op_lw, rv_op_lw, rv_op_lw },
+     { "c.flw", rv_codec_cl_lw, rv_fmt_frd_offset_rs1, NULL, rv_op_flw, 0, 0 },
+@@ -1019,14 +1024,14 @@ const rv_opcode_data opcode_data[] = {
+     { "c.sw", rv_codec_cs_sw, rv_fmt_rs2_offset_rs1, NULL, rv_op_sw, rv_op_sw, rv_op_sw },
+     { "c.fsw", rv_codec_cs_sw, rv_fmt_frs2_offset_rs1, NULL, rv_op_fsw, 0, 0 },
+     { "c.nop", rv_codec_ci_none, rv_fmt_none, NULL, rv_op_addi, rv_op_addi, rv_op_addi },
+-    { "c.addi", rv_codec_ci, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi },
++    { "c.addi", rv_codec_ci, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi, rvcd_imm_nz },
+     { "c.jal", rv_codec_cj_jal, rv_fmt_rd_offset, NULL, rv_op_jal, 0, 0 },
+     { "c.li", rv_codec_ci_li, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi },
+-    { "c.addi16sp", rv_codec_ci_16sp, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi },
+-    { "c.lui", rv_codec_ci_lui, rv_fmt_rd_imm, NULL, rv_op_lui, rv_op_lui, rv_op_lui },
+-    { "c.srli", rv_codec_cb_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_srli, rv_op_srli, rv_op_srli },
+-    { "c.srai", rv_codec_cb_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_srai, rv_op_srai, rv_op_srai },
+-    { "c.andi", rv_codec_cb_imm, rv_fmt_rd_rs1_imm, NULL, rv_op_andi, rv_op_andi, rv_op_andi },
++    { "c.addi16sp", rv_codec_ci_16sp, rv_fmt_rd_rs1_imm, NULL, rv_op_addi, rv_op_addi, rv_op_addi, rvcd_imm_nz },
++    { "c.lui", rv_codec_ci_lui, rv_fmt_rd_imm, NULL, rv_op_lui, rv_op_lui, rv_op_lui, rvcd_imm_nz },
++    { "c.srli", rv_codec_cb_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_srli, rv_op_srli, rv_op_srli, rvcd_imm_nz },
++    { "c.srai", rv_codec_cb_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_srai, rv_op_srai, rv_op_srai, rvcd_imm_nz },
++    { "c.andi", rv_codec_cb_imm, rv_fmt_rd_rs1_imm, NULL, rv_op_andi, rv_op_andi, rv_op_andi, rvcd_imm_nz },
+     { "c.sub", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_sub, rv_op_sub, rv_op_sub },
+     { "c.xor", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_xor, rv_op_xor, rv_op_xor },
+     { "c.or", rv_codec_cs, rv_fmt_rd_rs1_rs2, NULL, rv_op_or, rv_op_or, rv_op_or },
+@@ -1036,7 +1041,7 @@ const rv_opcode_data opcode_data[] = {
+     { "c.j", rv_codec_cj, rv_fmt_rd_offset, NULL, rv_op_jal, rv_op_jal, rv_op_jal },
+     { "c.beqz", rv_codec_cb, rv_fmt_rs1_rs2_offset, NULL, rv_op_beq, rv_op_beq, rv_op_beq },
+     { "c.bnez", rv_codec_cb, rv_fmt_rs1_rs2_offset, NULL, rv_op_bne, rv_op_bne, rv_op_bne },
+-    { "c.slli", rv_codec_ci_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_slli, rv_op_slli, rv_op_slli },
++    { "c.slli", rv_codec_ci_sh6, rv_fmt_rd_rs1_imm, NULL, rv_op_slli, rv_op_slli, rv_op_slli, rvcd_imm_nz },
+     { "c.fldsp", rv_codec_ci_ldsp, rv_fmt_frd_offset_rs1, NULL, rv_op_fld, rv_op_fld, rv_op_fld },
+     { "c.lwsp", rv_codec_ci_lwsp, rv_fmt_rd_offset_rs1, NULL, rv_op_lw, rv_op_lw, rv_op_lw },
+     { "c.flwsp", rv_codec_ci_lwsp, rv_fmt_frd_offset_rs1, NULL, rv_op_flw, 0, 0 },
+@@ -2795,8 +2800,12 @@ static void decode_inst_decompress_rv32(rv_decode *dec)
+ {
+     int decomp_op = opcode_data[dec->op].decomp_rv32;
+     if (decomp_op != rv_op_illegal) {
+-        dec->op = decomp_op;
+-        dec->codec = opcode_data[decomp_op].codec;
++        if ((opcode_data[dec->op].decomp_data & rvcd_imm_nz) && dec->imm == 0) {
++            dec->op = rv_op_illegal;
++        } else {
++            dec->op = decomp_op;
++            dec->codec = opcode_data[decomp_op].codec;
++        }
+     }
+ }
+ 
+@@ -2804,8 +2813,12 @@ static void decode_inst_decompress_rv64(rv_decode *dec)
+ {
+     int decomp_op = opcode_data[dec->op].decomp_rv64;
+     if (decomp_op != rv_op_illegal) {
+-        dec->op = decomp_op;
+-        dec->codec = opcode_data[decomp_op].codec;
++        if ((opcode_data[dec->op].decomp_data & rvcd_imm_nz) && dec->imm == 0) {
++            dec->op = rv_op_illegal;
++        } else {
++            dec->op = decomp_op;
++            dec->codec = opcode_data[decomp_op].codec;
++        }
+     }
+ }
+ 
+@@ -2813,8 +2826,12 @@ static void decode_inst_decompress_rv128(rv_decode *dec)
+ {
+     int decomp_op = opcode_data[dec->op].decomp_rv128;
+     if (decomp_op != rv_op_illegal) {
+-        dec->op = decomp_op;
+-        dec->codec = opcode_data[decomp_op].codec;
++        if ((opcode_data[dec->op].decomp_data & rvcd_imm_nz) && dec->imm == 0) {
++            dec->op = rv_op_illegal;
++        } else {
++            dec->op = decomp_op;
++            dec->codec = opcode_data[decomp_op].codec;
++        }
+     }
+ }
+ 
 -- 
 2.21.0
 
