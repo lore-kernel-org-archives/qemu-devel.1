@@ -2,88 +2,65 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA55BC04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 03:00:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 229CAC04AAF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 03:01:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9510A205C9
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 03:00:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Eiu4BoC3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9510A205C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E8BD2205C9
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 03:01:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8BD2205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40390 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40442 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRT6e-0005Jk-SA
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 23:00:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39226)
+	id 1hRT83-0006cx-7f
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 23:01:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hRSnB-00061w-Dh
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:40:18 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hRT5y-00053Y-BF
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:59:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hRSn6-0002Mn-AL
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:40:14 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:39981)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hRSn0-0002Cs-9J
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:40:08 -0400
-Received: by mail-pg1-x544.google.com with SMTP id d30so2516081pgm.7
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 19:39:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=O5zIN7a5YhWG7ErE5cL09/UzOmkeLwtbGoogr/y9loY=;
-	b=Eiu4BoC3W1cnCvLVenxrX4Qm4uNV0Fhy1kVhTKBQFAAZGHqwn9wQz5AKs9KvAtVpjV
-	p+dJevuzgxIKVZsjFQPTCIIjWdlnD+nA8p3Xm6pAg8RLCxz3valHdPekLJT+CjCVfrPa
-	j/JyTq/vod5qanBYoSPy7jJ9OE8YwnqynL+S0Qj60whGUyJReZugbtpbWcrmdnCFfjPI
-	oUE6b98n2fAvfqz3GCvxDmxRnbRYVhuRFIbpvgLWkNt+Av3J9P8LwgQkIB2Ka4+uw+QV
-	svrIgCtg3vK6Qyfd8U12Xm7lHOMDmy2fSPWkjKSYzovzDF96melJm2dbFba0bHzOPtjJ
-	Rb5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=O5zIN7a5YhWG7ErE5cL09/UzOmkeLwtbGoogr/y9loY=;
-	b=a7gcQTOtkFKpv9HHouqj/LIw/mrb8YXku1DlAr9xQZGb9peSA39A3KKLbu2N5rJUKY
-	Y0kVzIRpwaGQtXVajFRgrO+64U5VtstbHtJuVPsQsYRkzvVYKl/WhvbmzYwCK47H9m1w
-	RHxtv+Wqjb9P/G4L+ojRgl0j+xuyuod2/L6amSZt6LbWBLro4SWch2ZB36vgJCxOcnyW
-	N3dpoli71zE0uycnso9CmaVG0nXcjPfJyD8+fGNrrMkbLgZeOiWgbdyilILrBHT+u3Qc
-	vX3aEMD/Kg3dKZJg9MFiPU54K022syCFY5GQmCnj0FhNEjoFsYvCGorZ1qyBazJVLfqU
-	ZtXg==
-X-Gm-Message-State: APjAAAVZyZkpDhEhd6dvIsfCTJmHicA9/YKT6T70mYCc7nIPIDWn0TRA
-	1D/D0f129BZ1w8RqBhHTql2qf24loQQ=
-X-Google-Smtp-Source: APXvYqzhQB+LbnBrHx4wuk7A1fmXUlsmgybjJRiZZuTnIyP2tg6TVxNdxy5rr4Qwfe7m1qOXx09wPA==
-X-Received: by 2002:a65:640b:: with SMTP id a11mr38690836pgv.219.1558060792216;
-	Thu, 16 May 2019 19:39:52 -0700 (PDT)
-Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
-	[97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id w6sm6984152pge.30.2019.05.16.19.39.51
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 16 May 2019 19:39:51 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Thu, 16 May 2019 19:39:20 -0700
-Message-Id: <20190517023924.1686-22-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190517023924.1686-1-richard.henderson@linaro.org>
-References: <20190517023924.1686-1-richard.henderson@linaro.org>
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hRT5w-00045Y-Ch
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:59:42 -0400
+Received: from mga04.intel.com ([192.55.52.120]:41190)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1hRT5u-00043I-PP
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:59:39 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+	by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	16 May 2019 19:59:35 -0700
+X-ExtLoop1: 1
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+	by FMSMGA003.fm.intel.com with ESMTP; 16 May 2019 19:59:34 -0700
+Date: Fri, 17 May 2019 10:59:03 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Message-ID: <20190517025903.GA17182@richard>
+References: <20190515121146.7248-1-mst@redhat.com>
+	<CAFEAcA95Uh=j+vGCT08+ztAc5Yk8RWGzApDZrrt5DS7XudGQhQ@mail.gmail.com>
+	<6d652ee6-ffee-6316-88f4-ba9f2a237817@redhat.com>
+	<CAP+75-XuuUamjbouNYRJzm2Qwtorwhbe+QX8BHBK_WaUc8F+7A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAP+75-XuuUamjbouNYRJzm2Qwtorwhbe+QX8BHBK_WaUc8F+7A@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: [Qemu-devel] [PATCH v8 21/25] target/arm: Put all PAC keys into a
- structure
+X-Received-From: 192.55.52.120
+Subject: Re: [Qemu-devel] [PULL 00/37] pci, pc, virtio: features, fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,241 +72,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, berrange@redhat.com, armbru@redhat.com
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, imammedo@redhat.com,
+	Wei Yang <richardw.yang@linux.intel.com>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This allows us to use a single syscall to initialize them all.
+On Thu, May 16, 2019 at 08:53:04PM +0200, Philippe Mathieu-DaudÈ wrote:
+>On Thu, May 16, 2019 at 8:33 PM Philippe Mathieu-DaudÈ
+><philmd@redhat.com> wrote:
+>> On 5/16/19 6:04 PM, Peter Maydell wrote:
+>> > On Thu, 16 May 2019 at 13:17, Michael S. Tsirkin <mst@redhat.com> wrote:
+>> >>
+>> >> The following changes since commit efb4f3b62c69383a7308d7b739a3193e7c0ccae8:
+>> >>
+>> >>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-05-10 14:49:36 +0100)
+>> >>
+>> >> are available in the Git repository at:
+>> >>
+>> >>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>> >>
+>> >> for you to fetch changes up to 0534d255dae78450d90d59db0f3a9a46b32ebd73:
+>> >>
+>> >>   tests: acpi: print error unable to dump ACPI table during rebuild (2019-05-14 21:19:14 -0400)
+>> >>
+>> >> ----------------------------------------------------------------
+>> >> pci, pc, virtio: features, fixes
+>> >>
+>> >> reconnect for vhost blk
+>> >> tests for UEFI
+>> >> misc other stuff
+>> >>
+>> >> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>> >>
+>> >> ----------------------------------------------------------------
+>> >
+>> > Hi -- this pullreq has a conflict in default-configs/arm-softmmu.mak
+>> > because the conversion of arm to Kconfig has landed in master.
+>> > Could you rebase and fix up to use whatever the Kconfig
+>> > equivalent of these changes is, please?
+>>
+>> Culprit is "hw/acpi: Consolidate build_mcfg to pci.c"
+>>
+>> The conflict doesn't look trivial to resolve (to me) so I'd rather see
+>> it reviewed (by Thomas). I suggest to drop the patch(es) from your PR :(
+>
+>Thomas, FYI I did this to resolve the conflict:
+>
+>- keep default-configs/arm-softmmu.mak from master:
+>
+>  git checkout origin/master default-configs/arm-softmmu.mak
+>
+>- applied the following !fixup snippet:
+>
+>-- >8 --
+>--- a/hw/acpi/Kconfig
+>+++ b/hw/acpi/Kconfig
+>@@ -25,7 +25,7 @@ config ACPI_NVDIMM
+>
+> config ACPI_PCI
+>     bool
+>-    depends on ACPI
+>+    depends on ACPI && PCI
+>
+>---
+>
+>I felt it easier to review on top of "hw/acpi: Improve build modularity"
+>https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg04718.html
+>
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud√© <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/cpu.h              | 12 +++++++-----
- linux-user/aarch64/cpu_loop.c |  6 +-----
- linux-user/syscall.c          | 10 +++++-----
- target/arm/helper.c           | 20 ++++++++++----------
- target/arm/pauth_helper.c     | 18 +++++++++---------
- 5 files changed, 32 insertions(+), 34 deletions(-)
+Well, I hope this will not block the merge.
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 733b840a71..892f9a4ad2 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -636,11 +636,13 @@ typedef struct CPUARMState {
-     } iwmmxt;
- 
- #ifdef TARGET_AARCH64
--    ARMPACKey apia_key;
--    ARMPACKey apib_key;
--    ARMPACKey apda_key;
--    ARMPACKey apdb_key;
--    ARMPACKey apga_key;
-+    struct {
-+        ARMPACKey apia;
-+        ARMPACKey apib;
-+        ARMPACKey apda;
-+        ARMPACKey apdb;
-+        ARMPACKey apga;
-+    } keys;
- #endif
- 
- #if defined(CONFIG_USER_ONLY)
-diff --git a/linux-user/aarch64/cpu_loop.c b/linux-user/aarch64/cpu_loop.c
-index cedad39ca0..2f2f63e3e8 100644
---- a/linux-user/aarch64/cpu_loop.c
-+++ b/linux-user/aarch64/cpu_loop.c
-@@ -175,11 +175,7 @@ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
- #endif
- 
-     if (cpu_isar_feature(aa64_pauth, cpu)) {
--        qemu_guest_getrandom_nofail(&env->apia_key, sizeof(ARMPACKey));
--        qemu_guest_getrandom_nofail(&env->apib_key, sizeof(ARMPACKey));
--        qemu_guest_getrandom_nofail(&env->apda_key, sizeof(ARMPACKey));
--        qemu_guest_getrandom_nofail(&env->apdb_key, sizeof(ARMPACKey));
--        qemu_guest_getrandom_nofail(&env->apga_key, sizeof(ARMPACKey));
-+        qemu_guest_getrandom_nofail(&env->keys, sizeof(env->keys));
-     }
- 
-     ts->stack_base = info->start_stack;
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 8c17b14d51..394b956b4a 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -9775,23 +9775,23 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                         return -TARGET_EINVAL;
-                     }
-                     if (arg2 & TARGET_PR_PAC_APIAKEY) {
--                        ret |= qemu_guest_getrandom(&env->apia_key,
-+                        ret |= qemu_guest_getrandom(&env->keys.apia,
-                                                     sizeof(ARMPACKey), &err);
-                     }
-                     if (arg2 & TARGET_PR_PAC_APIBKEY) {
--                        ret |= qemu_guest_getrandom(&env->apib_key,
-+                        ret |= qemu_guest_getrandom(&env->keys.apib,
-                                                     sizeof(ARMPACKey), &err);
-                     }
-                     if (arg2 & TARGET_PR_PAC_APDAKEY) {
--                        ret |= qemu_guest_getrandom(&env->apda_key,
-+                        ret |= qemu_guest_getrandom(&env->keys.apda,
-                                                     sizeof(ARMPACKey), &err);
-                     }
-                     if (arg2 & TARGET_PR_PAC_APDBKEY) {
--                        ret |= qemu_guest_getrandom(&env->apdb_key,
-+                        ret |= qemu_guest_getrandom(&env->keys.apdb,
-                                                     sizeof(ARMPACKey), &err);
-                     }
-                     if (arg2 & TARGET_PR_PAC_APGAKEY) {
--                        ret |= qemu_guest_getrandom(&env->apga_key,
-+                        ret |= qemu_guest_getrandom(&env->keys.apga,
-                                                     sizeof(ARMPACKey), &err);
-                     }
-                     if (ret != 0) {
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 1e6eb0d0f3..7e88b2cadd 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -5707,43 +5707,43 @@ static const ARMCPRegInfo pauth_reginfo[] = {
-     { .name = "APDAKEYLO_EL1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 0, .crn = 2, .crm = 2, .opc2 = 0,
-       .access = PL1_RW, .accessfn = access_pauth,
--      .fieldoffset = offsetof(CPUARMState, apda_key.lo) },
-+      .fieldoffset = offsetof(CPUARMState, keys.apda.lo) },
-     { .name = "APDAKEYHI_EL1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 0, .crn = 2, .crm = 2, .opc2 = 1,
-       .access = PL1_RW, .accessfn = access_pauth,
--      .fieldoffset = offsetof(CPUARMState, apda_key.hi) },
-+      .fieldoffset = offsetof(CPUARMState, keys.apda.hi) },
-     { .name = "APDBKEYLO_EL1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 0, .crn = 2, .crm = 2, .opc2 = 2,
-       .access = PL1_RW, .accessfn = access_pauth,
--      .fieldoffset = offsetof(CPUARMState, apdb_key.lo) },
-+      .fieldoffset = offsetof(CPUARMState, keys.apdb.lo) },
-     { .name = "APDBKEYHI_EL1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 0, .crn = 2, .crm = 2, .opc2 = 3,
-       .access = PL1_RW, .accessfn = access_pauth,
--      .fieldoffset = offsetof(CPUARMState, apdb_key.hi) },
-+      .fieldoffset = offsetof(CPUARMState, keys.apdb.hi) },
-     { .name = "APGAKEYLO_EL1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 0, .crn = 2, .crm = 3, .opc2 = 0,
-       .access = PL1_RW, .accessfn = access_pauth,
--      .fieldoffset = offsetof(CPUARMState, apga_key.lo) },
-+      .fieldoffset = offsetof(CPUARMState, keys.apga.lo) },
-     { .name = "APGAKEYHI_EL1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 0, .crn = 2, .crm = 3, .opc2 = 1,
-       .access = PL1_RW, .accessfn = access_pauth,
--      .fieldoffset = offsetof(CPUARMState, apga_key.hi) },
-+      .fieldoffset = offsetof(CPUARMState, keys.apga.hi) },
-     { .name = "APIAKEYLO_EL1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 0, .crn = 2, .crm = 1, .opc2 = 0,
-       .access = PL1_RW, .accessfn = access_pauth,
--      .fieldoffset = offsetof(CPUARMState, apia_key.lo) },
-+      .fieldoffset = offsetof(CPUARMState, keys.apia.lo) },
-     { .name = "APIAKEYHI_EL1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 0, .crn = 2, .crm = 1, .opc2 = 1,
-       .access = PL1_RW, .accessfn = access_pauth,
--      .fieldoffset = offsetof(CPUARMState, apia_key.hi) },
-+      .fieldoffset = offsetof(CPUARMState, keys.apia.hi) },
-     { .name = "APIBKEYLO_EL1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 0, .crn = 2, .crm = 1, .opc2 = 2,
-       .access = PL1_RW, .accessfn = access_pauth,
--      .fieldoffset = offsetof(CPUARMState, apib_key.lo) },
-+      .fieldoffset = offsetof(CPUARMState, keys.apib.lo) },
-     { .name = "APIBKEYHI_EL1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 0, .crn = 2, .crm = 1, .opc2 = 3,
-       .access = PL1_RW, .accessfn = access_pauth,
--      .fieldoffset = offsetof(CPUARMState, apib_key.hi) },
-+      .fieldoffset = offsetof(CPUARMState, keys.apib.hi) },
-     REGINFO_SENTINEL
- };
- #endif
-diff --git a/target/arm/pauth_helper.c b/target/arm/pauth_helper.c
-index d750f96edf..7f30ae7395 100644
---- a/target/arm/pauth_helper.c
-+++ b/target/arm/pauth_helper.c
-@@ -403,7 +403,7 @@ uint64_t HELPER(pacia)(CPUARMState *env, uint64_t x, uint64_t y)
-         return x;
-     }
-     pauth_check_trap(env, el, GETPC());
--    return pauth_addpac(env, x, y, &env->apia_key, false);
-+    return pauth_addpac(env, x, y, &env->keys.apia, false);
- }
- 
- uint64_t HELPER(pacib)(CPUARMState *env, uint64_t x, uint64_t y)
-@@ -413,7 +413,7 @@ uint64_t HELPER(pacib)(CPUARMState *env, uint64_t x, uint64_t y)
-         return x;
-     }
-     pauth_check_trap(env, el, GETPC());
--    return pauth_addpac(env, x, y, &env->apib_key, false);
-+    return pauth_addpac(env, x, y, &env->keys.apib, false);
- }
- 
- uint64_t HELPER(pacda)(CPUARMState *env, uint64_t x, uint64_t y)
-@@ -423,7 +423,7 @@ uint64_t HELPER(pacda)(CPUARMState *env, uint64_t x, uint64_t y)
-         return x;
-     }
-     pauth_check_trap(env, el, GETPC());
--    return pauth_addpac(env, x, y, &env->apda_key, true);
-+    return pauth_addpac(env, x, y, &env->keys.apda, true);
- }
- 
- uint64_t HELPER(pacdb)(CPUARMState *env, uint64_t x, uint64_t y)
-@@ -433,7 +433,7 @@ uint64_t HELPER(pacdb)(CPUARMState *env, uint64_t x, uint64_t y)
-         return x;
-     }
-     pauth_check_trap(env, el, GETPC());
--    return pauth_addpac(env, x, y, &env->apdb_key, true);
-+    return pauth_addpac(env, x, y, &env->keys.apdb, true);
- }
- 
- uint64_t HELPER(pacga)(CPUARMState *env, uint64_t x, uint64_t y)
-@@ -441,7 +441,7 @@ uint64_t HELPER(pacga)(CPUARMState *env, uint64_t x, uint64_t y)
-     uint64_t pac;
- 
-     pauth_check_trap(env, arm_current_el(env), GETPC());
--    pac = pauth_computepac(x, y, env->apga_key);
-+    pac = pauth_computepac(x, y, env->keys.apga);
- 
-     return pac & 0xffffffff00000000ull;
- }
-@@ -453,7 +453,7 @@ uint64_t HELPER(autia)(CPUARMState *env, uint64_t x, uint64_t y)
-         return x;
-     }
-     pauth_check_trap(env, el, GETPC());
--    return pauth_auth(env, x, y, &env->apia_key, false, 0);
-+    return pauth_auth(env, x, y, &env->keys.apia, false, 0);
- }
- 
- uint64_t HELPER(autib)(CPUARMState *env, uint64_t x, uint64_t y)
-@@ -463,7 +463,7 @@ uint64_t HELPER(autib)(CPUARMState *env, uint64_t x, uint64_t y)
-         return x;
-     }
-     pauth_check_trap(env, el, GETPC());
--    return pauth_auth(env, x, y, &env->apib_key, false, 1);
-+    return pauth_auth(env, x, y, &env->keys.apib, false, 1);
- }
- 
- uint64_t HELPER(autda)(CPUARMState *env, uint64_t x, uint64_t y)
-@@ -473,7 +473,7 @@ uint64_t HELPER(autda)(CPUARMState *env, uint64_t x, uint64_t y)
-         return x;
-     }
-     pauth_check_trap(env, el, GETPC());
--    return pauth_auth(env, x, y, &env->apda_key, true, 0);
-+    return pauth_auth(env, x, y, &env->keys.apda, true, 0);
- }
- 
- uint64_t HELPER(autdb)(CPUARMState *env, uint64_t x, uint64_t y)
-@@ -483,7 +483,7 @@ uint64_t HELPER(autdb)(CPUARMState *env, uint64_t x, uint64_t y)
-         return x;
-     }
-     pauth_check_trap(env, el, GETPC());
--    return pauth_auth(env, x, y, &env->apdb_key, true, 1);
-+    return pauth_auth(env, x, y, &env->keys.apdb, true, 1);
- }
- 
- uint64_t HELPER(xpaci)(CPUARMState *env, uint64_t a)
+I took a look in the change of default-configs/arm-softmmu.mak. The general
+idea from Thomas is put those hard-coded config to Kconfig.
+
+This is fine and what I need to change in my patch is to select ACPI_PCI in
+the proper place, if my understanding is correct.
+
+Two things I need to fix:
+
+  * add select ACPI_PCI in proper place of hw/arm/Kconfig
+  * add a dummy build_mcfg() for link when ACPI_PCI is not configured.
+
+Then I have two questions:
+
+  * In hw/arm/Kconfig, I don't see one option contains both PCI and ACPI. I am
+    confused where to put the select.
+  * put dummy build_mcfg() in aml-build.c works. Igor, do you like this? Or
+    you haver other preference?
+
+>Sadly both series clash :(
+>
+>Regards,
+>
+>Phil.
+
 -- 
-2.17.1
-
+Wei Yang
+Help you, Help me
 
