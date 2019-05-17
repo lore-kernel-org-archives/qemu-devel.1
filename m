@@ -2,72 +2,70 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C2ADC04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 21:07:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B5EC04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 21:11:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F0DA2087B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 21:07:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="aBMJuc25"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F0DA2087B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id B47E92087B
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 21:11:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B47E92087B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53706 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53766 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRk4f-0001MC-EJ
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 17:07:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54645)
+	id 1hRk8i-0003zY-Ig
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 17:11:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <qemu_oss@crudebyte.com>) id 1hRk3D-0000Ry-Hr
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 17:06:02 -0400
+	(envelope-from <bounces@canonical.com>) id 1hRk7r-0003Ns-Av
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 17:10:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <qemu_oss@crudebyte.com>) id 1hRjrR-0005CQ-DK
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 16:53:50 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:39575)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
-	id 1hRjrQ-00055i-Tj
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 16:53:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=DmtBDD0M0Dh3SW8ggr0kK747mii3ZwKo4rcBwehnXNY=;
-	b=aBMJuc25BDUKWpCVWUm1bRKRRx
-	e9gucssOqIfZk1NyVKfgeP87VWkE9qndwbMmRFqyF3g5WSCfc6JtKUERe9399kiVK8HOPSWR0Vptm
-	NNMVnwideockpsUcj5rEcCyegybGPS8M+UgZ8GvgD1ff+h447CbrLu9v7JZDjD/tDjRUYOkIm7fFB
-	tkMijRqMN589C3XdYMACtB6nJowAIvawcZtTmhEJ1mwWR2Xa8Hui0W6gKOKj1r6EC0fw55h7QbCsP
-	3UkIYpnyllQOyAetQDmVbB3lWrH2nP38TuyatrDZIV84H8W4lHSuh3oPygTlTLUW6WEQinoDheU4p
-	LOditd6oWmw5FgFxmgI2pw/Qo4bmi1DxPmuwjQC2gszUAEi0QdMpv+qzrsGzDOA//2e2kBT23EqDo
-	Vb6gTPuCUkwgcZQF51rA3zOePuS4yeBhsg0fEIOnbPiLWLuCqU7vNCIyWa0URMUvnYhcW0isBA6uu
-	IdXnOb+vlhmVW7bT+7o0xHiiMmgs+MBxKdXmMJfWlG09nQ7HTPXAL6rDm0ivYV7tSr3bes0tJgnVr
-	W1Rm79YB2AN3UnM5LfDBA+cTd5jrtY0a/8shHGOlb8KDtDRwOABKqSiohArQvW+Txda5CX93Y25jB
-	nJlZGR9tMAsB4/g7GLDMX2TJBoMgm8dNhEuwV9YlQ=;
-To: qemu-devel@nongnu.org
-Date: Fri, 17 May 2019 22:53:41 +0200
-Message-ID: <4886143.bCxdSxxvz5@silver>
-In-Reply-To: <20190517164746.5c653a0e@bahia.lan>
-References: <590216e2666653bac21d950aaba98f87d0a53324.1557093245.git.qemu_oss@crudebyte.com>
-	<1723391.cvQaRflHa6@silver> <20190517164746.5c653a0e@bahia.lan>
+	(envelope-from <bounces@canonical.com>) id 1hRk7p-0008MT-U4
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 17:10:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41270)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hRk7p-0008M1-Oe
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 17:10:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hRk7o-0000R9-3N
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 21:10:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 15FCB2E800F
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 21:10:44 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 May 2019 21:01:11 -0000
+From: Jose Santiago <1829576@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jlsantiago0
+X-Launchpad-Bug-Reporter: Jose Santiago (jlsantiago0)
+X-Launchpad-Bug-Modifier: Jose Santiago (jlsantiago0)
+Message-Id: <155812687142.26079.4364411221525864419.malonedeb@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18962";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 1b90be116718006f6e7295b982c7dffbd4f61154
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.189.157.229
-Subject: Re: [Qemu-devel] [libvirt patch] qemu: adds support for virtfs 9p
- argument 'vii'
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1829576] [NEW] PPC64 Regression QEMU-4.0.0
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,120 +74,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Cc: Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-	Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
-	Antonios Motakis <antonios.motakis@huawei.com>
+Reply-To: Bug 1829576 <1829576@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Freitag, 17. Mai 2019 16:47:46 CEST Greg Kurz wrote:
-> Potentially yes if another approach is satisfying enough, as I wouldn't
-> want to over-engineer too much around this 9p imposed limitation. The
-> right thing to do would be to come up with a new version of the protocol
-> with variable sized QIDs and call it a day.
+Public bug reported:
 
-Yes, but that's the long-term solution which will still take a very long 
-while. This patch set is already a functional solution until that happens, and 
-this 9p issue is IMO quite severe (as minor as data corruption, data loss and 
-exists for several years already).
+I have been using QEMU-SYSTEM-PPC64 v3.1.0 to run CentOS7 PPC emulated
+system. It stopped working when I upgraded to QEMU-4.0.0 . I downgraded
+back to QEMU-3.1.0 and it started working again. The problem is that my
+CentOS7 image will not boot up udner QEMU-4.0.0, but works fine under
+QEMU-3.1.0.
 
-> > plus it completely destroys the fundamental idea about 9p, which is about
-> > transparency of the higher level(s).
-> 
-> That's a point indeed, even if again I'm not sure if this is a frequent
-> case to share a directory tree spanning over multiple devices.
+I have an QCOW2 image available at
+https://www.mediafire.com/file/d8dda05ro85whn1/linux-
+centos7-ppc64.qcow2/file . NOTE: It is 15GB. Kind of large.
 
-When the use case is mass storage then it is very likely that you will have 
-several devices. Times have changed. With modern file systems like ZFS it is 
-very common to create a large amount of "data sets" for all kinds of 
-individual purposes and mount points which is cheap to get. Each fs data set 
-is a separate "device" from OS (i.e. Linux) point of view, even if all those 
-FS data sets are in the same FS pool and even on the same physical IO device.
+I run it as follows:
 
-Background: The concept of FS "data sets" combines the benefits of classical  
-partitions (e.g. logical file space separation, independent fs configurations 
-like compression on/off/algorithm, data deduplication on/off, snapshot 
-isolation, snapshots on/off) without the disadvantages of classical real 
-partitions (physical space is dynamically shared, no space wasted on fixed 
-boundaries; physical device pool management is transparent for all data sets, 
-configuration options can be inherited from parent data sets).
+   qemu-system-ppc64 \
+      -name "CENTOS7-PPC64" \
+      -cpu POWER7 -machine pseries \
+      -m 4096 \
+      -netdev bridge,id=3Dnetbr0,br=3Dbr0 \
+      -device e1000,netdev=3Dnetbr0,mac=3D52:54:3c:13:21:33 \
+      -hda "./linux-centos7-ppc64.qcow2" \
+      -monitor stdio
 
-> I don't have that much time to spend on 9p maintainership, for both
-> reviewing and fixing bugs (CVEs most of the time). So, yes it may
-> sound like I want to drop the patchset, but it's just I need to be
-> convinced I won't regret having merged a huge change like this...
-> when I'll have to support it alone later ;-)
+HOST: I am using Manjaro Linux on an Intel i7 machine with the QEMU
+packages installed via the package manager of the distribution.
 
-Actually I already assumed this to be the actual root cause.
+[jsantiago@jlsws0 ~]$ uname -a
+Linux jlsws0.haivision.com 4.19.42-1-MANJARO #1 SMP PREEMPT Fri May 10 20:5=
+2:43 UTC 2019 x86_64 GNU/Linux
 
-I see that you are currently the only maintainer, and my plan was not to just 
-provide a one time shot but eventually hang along helping with maintaining it 
-due my use of 9p and its huge potential I see (as universal and efficient root 
-file system for all guests, not just for exotically sharing a small tree 
-portion between guests). I also have plans for supporting native file forks 
-BTW. But if you are seriously suggesting to simply omit a fundamental issue in 
-9p, then my plans would obviously no longer make sense. :)
+jsantiago@jlsws0 ~]$ cpuinfo =
 
-I mean I am completely tolerant to all kinds of religious views on bit level, 
-languages, code style, libs, precise implementation details, parameters, 
-source structure, etc.; but saying to simply leave a fundamental bug open for 
-years to come, that's where I have to drop out.
+Intel(R) processor family information utility, Version 2019 Update 3 Build =
+20190214 (id: b645a4a54)
+Copyright (C) 2005-2019 Intel Corporation.  All rights reserved.
 
-> For the moment, I'm not convinced by the "vii" solution. It even
-> motivated my suggestion of having several devices actually, since
-> the paths you would put in there are known before starting QEMU.
+=3D=3D=3D=3D=3D  Processor composition  =3D=3D=3D=3D=3D
+Processor name    : Intel(R) Core(TM) i7-6700K  =
 
-Well, that "vii" configuration and the QID persistency are 2 optional patches 
-on top of the core fixes. It is a huge difference to suggest dropping these 2 
-patches than saying to completely drop the entire patch set and to leave this 
-bug open.
+Packages(sockets) : 1
+Cores             : 4
+Processors(CPUs)  : 8
+Cores per package : 4
+Threads per core  : 2
 
-The mandatory core fixes that I see (for the short/mid term) are at least 
-Antonios' patches plus my variable length prefix patch, the latter significantly 
-reduces the inode numbers on guest and significantly increases the inode name 
-space, and hence also significanlty reduces the propability that 9p might ever 
-need to kick in with any kind of expensive remapping actions (or even 
-something worse like stat fatally returning -ENFILE to the user).
+=3D=3D=3D=3D=3D  Processor identification  =3D=3D=3D=3D=3D
+Processor	Thread Id.	Core Id.	Package Id.
+0       	0   		0   		0   =
 
-About the "vii" configuration, even though you don't like the idea: there is 
-also a big difference giving the user the _optional_ possibility to define e.g. 
-one path (not device) on guest said to be sensitive regarding high inode 
-numbers on guest; and something completely different telling the user that he 
-_must_ configure every single device from host that is ever supposed to pop up 
-with 9p on guest and forcing the user to update that configuration whenever a 
-new device is added or removed on host. The "vii" configuration feature does 
-not require any knowledge of how many and which kinds of devices are actually 
-ever used on host (nor on any higher level host in case of nested 
-virtualization), nor does that "vii" config require any changes ever when host 
-device setup changes. So 9p's core transparency feature would not be touched 
-at all.
+1       	0   		1   		0   =
 
-> It might take me some more rounds of discussion to decide. I understand
-> it is frustrating but bear with me :)
+2       	0   		2   		0   =
 
-Let me make a different suggestion: how about putting these fixes into a 
-separate C unit for now and making the default behaviour (if you really want) 
-to not use any of that code by default at all. So the user would just get an 
-error message in the qemu log files by default if he tries to export several 
-devices with one 9p device, suggesting him either to map them as separate 9p 
-devices (like you suggested) and informing the user about the alternative of 
-enabling support for the automatic inode remapping code (from that separate C 
-unit) instead by adding one convenient config option if he/she really wants.
+3       	0   		3   		0   =
 
-That way we would have a fix now, not in years, people can decide to use the 
-automatic and hardware transparent solution, instead of being forced to write 
-dozens of config lines for each single guest, or they might decide to stick 
-with your "solution" ;-).
+4       	1   		0   		0   =
 
-And once the long term solution for this issue with variable length QIDs is in 
-place, the inode remapping code can very simply be dropped from the code base 
-completley by just deleting the C unit and about a hand full of lines in 9p.c 
-or so, and hence this fix would not bloat the existing 9p units nor cause 
-maintenance nightmares of any kind.
+5       	1   		1   		0   =
 
-Best regards,
-Christian Schoenebeck
+6       	1   		2   		0   =
+
+7       	1   		3   		0   =
+
+=3D=3D=3D=3D=3D  Placement on packages  =3D=3D=3D=3D=3D
+Package Id.	Core Id.	Processors
+0   		0,1,2,3		(0,4)(1,5)(2,6)(3,7)
+
+=3D=3D=3D=3D=3D  Cache sharing  =3D=3D=3D=3D=3D
+Cache	Size		Processors
+L1	32  KB		(0,4)(1,5)(2,6)(3,7)
+L2	256 KB		(0,4)(1,5)(2,6)(3,7)
+L3	8   MB		(0,1,2,3,4,5,6,7)
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1829576
+
+Title:
+  PPC64 Regression QEMU-4.0.0
+
+Status in QEMU:
+  New
+
+Bug description:
+  I have been using QEMU-SYSTEM-PPC64 v3.1.0 to run CentOS7 PPC emulated
+  system. It stopped working when I upgraded to QEMU-4.0.0 . I
+  downgraded back to QEMU-3.1.0 and it started working again. The
+  problem is that my CentOS7 image will not boot up udner QEMU-4.0.0,
+  but works fine under QEMU-3.1.0.
+
+  I have an QCOW2 image available at
+  https://www.mediafire.com/file/d8dda05ro85whn1/linux-
+  centos7-ppc64.qcow2/file . NOTE: It is 15GB. Kind of large.
+
+  I run it as follows:
+
+     qemu-system-ppc64 \
+        -name "CENTOS7-PPC64" \
+        -cpu POWER7 -machine pseries \
+        -m 4096 \
+        -netdev bridge,id=3Dnetbr0,br=3Dbr0 \
+        -device e1000,netdev=3Dnetbr0,mac=3D52:54:3c:13:21:33 \
+        -hda "./linux-centos7-ppc64.qcow2" \
+        -monitor stdio
+
+  HOST: I am using Manjaro Linux on an Intel i7 machine with the QEMU
+  packages installed via the package manager of the distribution.
+
+  [jsantiago@jlsws0 ~]$ uname -a
+  Linux jlsws0.haivision.com 4.19.42-1-MANJARO #1 SMP PREEMPT Fri May 10 20=
+:52:43 UTC 2019 x86_64 GNU/Linux
+
+  jsantiago@jlsws0 ~]$ cpuinfo =
+
+  Intel(R) processor family information utility, Version 2019 Update 3 Buil=
+d 20190214 (id: b645a4a54)
+  Copyright (C) 2005-2019 Intel Corporation.  All rights reserved.
+
+  =3D=3D=3D=3D=3D  Processor composition  =3D=3D=3D=3D=3D
+  Processor name    : Intel(R) Core(TM) i7-6700K  =
+
+  Packages(sockets) : 1
+  Cores             : 4
+  Processors(CPUs)  : 8
+  Cores per package : 4
+  Threads per core  : 2
+
+  =3D=3D=3D=3D=3D  Processor identification  =3D=3D=3D=3D=3D
+  Processor	Thread Id.	Core Id.	Package Id.
+  0       	0   		0   		0   =
+
+  1       	0   		1   		0   =
+
+  2       	0   		2   		0   =
+
+  3       	0   		3   		0   =
+
+  4       	1   		0   		0   =
+
+  5       	1   		1   		0   =
+
+  6       	1   		2   		0   =
+
+  7       	1   		3   		0   =
+
+  =3D=3D=3D=3D=3D  Placement on packages  =3D=3D=3D=3D=3D
+  Package Id.	Core Id.	Processors
+  0   		0,1,2,3		(0,4)(1,5)(2,6)(3,7)
+
+  =3D=3D=3D=3D=3D  Cache sharing  =3D=3D=3D=3D=3D
+  Cache	Size		Processors
+  L1	32  KB		(0,4)(1,5)(2,6)(3,7)
+  L2	256 KB		(0,4)(1,5)(2,6)(3,7)
+  L3	8   MB		(0,1,2,3,4,5,6,7)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1829576/+subscriptions
 
