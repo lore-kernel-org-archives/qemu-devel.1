@@ -2,75 +2,88 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC2D7C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 08:55:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC228C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 08:55:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACFBC20833
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 08:55:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACFBC20833
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A15D220833
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 08:55:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A15D220833
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44719 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44721 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRYdo-0007Ne-OF
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 04:55:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60968)
+	id 1hRYe5-0007YJ-Rf
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 04:55:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hRYc8-0006Te-FO
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:53:17 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hRYad-0005KR-AH
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:51:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hRYc6-0004Kb-FX
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:53:16 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:51455)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hRYc4-0004Gu-GC
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:53:14 -0400
-Received: by mail-wm1-f67.google.com with SMTP id c77so4647386wmd.1
-	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 01:53:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=oOd5lsW+s33mNgpgerYCMx4ubO3sCKAzqMa2TV10bNU=;
-	b=B47I9kHJIRG8P22FFJjp+IzM9j+tKXFuOMfrHgNR6nixUdNsZ5qRggx/EthYTvY5t+
-	C2k0LbjGHUOqpOiYXQcXuZsxS+rb6DUIgsmNFQc+5epEQfGMBT1Bdb39KBxqBafD3K6W
-	wmnKOJPT5tzXCBJirFm/BLA0hwrn7ne3hLOKgr/ur35eHva/DDCW7Qrov+RZGLtBgDmO
-	RBqpvS7yqlxy92EvERu7ZAXS+hDQyqOKIbUtzRDjOJhBMTCPSj6y5MgQ/phr/kUsLEXG
-	6Nlm+VStenxctGaK0VxhMrGsFfLE0r37LUKsi0/ybZwQWhC/IW7vo+6J/kv0EPwmf8RY
-	YVUQ==
-X-Gm-Message-State: APjAAAU+RzgvHdRFL0dFu/JdZesieu6gUKWrBomhgLJuQABZTNFLITgs
-	jLE8RMvM/Cq4khSc+KDbhCMYGw==
-X-Google-Smtp-Source: APXvYqyjVqz2FfzbmCAlv/7tKNJa/P9Q0tGUzW+xTFHy7vQPGLlpX6QkqqT559R09cHQAEn2tXBHYg==
-X-Received: by 2002:a1c:1d09:: with SMTP id d9mr1420480wmd.55.1558083188151;
-	Fri, 17 May 2019 01:53:08 -0700 (PDT)
-Received: from steredhat (host151-251-static.12-87-b.business.telecomitalia.it.
-	[87.12.251.151]) by smtp.gmail.com with ESMTPSA id
-	y132sm12976137wmd.35.2019.05.17.01.53.07
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 17 May 2019 01:53:07 -0700 (PDT)
-Date: Fri, 17 May 2019 10:53:05 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Greg Kurz <groug@kaod.org>
-Message-ID: <20190517085305.l5hjm4zd5qys3grs@steredhat>
-References: <155800428514.543845.17558475870097990036.stgit@bahia.lan>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hRYab-0003lE-Sj
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:51:43 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:55216
+	helo=mail.default.ilande.uk0.bigv.io)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hRYab-0003ke-Kd
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:51:41 -0400
+Received: from host109-146-247-8.range109-146.btcentralplus.com
+	([109.146.247.8] helo=[192.168.1.65])
+	by mail.default.ilande.uk0.bigv.io with esmtpsa
+	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hRYZM-0000pX-M3; Fri, 17 May 2019 09:50:26 +0100
+To: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org
+References: <1557923493-4836-1-git-send-email-frederic.konrad@adacore.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+	mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+	3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+	E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+	PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+	PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+	AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+	OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+	NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+	mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+	z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+	T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+	DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+	y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+	2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+	14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+	YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+	Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+	BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+	opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+	NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+	imgcU9TTGC5qd9g=
+Message-ID: <c0bba828-7cc8-6ac9-a863-696e93796398@ilande.co.uk>
+Date: Fri, 17 May 2019 09:51:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <155800428514.543845.17558475870097990036.stgit@bahia.lan>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <1557923493-4836-1-git-send-email-frederic.konrad@adacore.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 109.146.247.8
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH] migration: Fix typo in
- migrate_add_blocker() error message
+X-Received-From: 46.43.2.167
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] Leon3 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,30 +95,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Juan Quintela <quintela@redhat.com>,
-	qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: peter.maydell@linaro.org, philmd@redhat.com, atar4qemu@gmail.com,
+	chouteau@adacore.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 16, 2019 at 12:58:05PM +0200, Greg Kurz wrote:
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  migration/migration.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 609e0df5d0c0..c15e75e0eebe 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1714,7 +1714,7 @@ int migrate_add_blocker(Error *reason, Error **errp)
->      if (only_migratable) {
->          error_propagate_prepend(errp, error_copy(reason),
->                                  "disallowing migration blocker "
-> -                                "(--only_migratable) for: ");
-> +                                "(--only-migratable) for: ");
->          return -EACCES;
->      }
+On 15/05/2019 13:31, KONRAD Frederic wrote:
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> Hi all,
+> 
+> Those are some little fixes for the leon3 machine:
+>   * The first patch makes an error message more friendly when no kernel / bios
+>     are provided.
+>   * The three next one remove the old-style create function as suggested by
+>     Mark.
+>   * The fifth part initializes the uart and the timer when no bios are
+>     provided.
+>   * The sixth part adds AHB and APB plug and play devices to allow to boot
+>     linux.
+>   * The last part adds myself to the MAINTAINERS for this board.
+> 
+> The test images are available here: https://www.gaisler.com/anonftp/linux/lin
+> ux-2.6/images/leon-linux-4.9/leon-linux-4.9-1.0/up/
+> 
+> Tested with:
+>   qemu-system-sparc -M leon3_generic --nographic --kernel image.ram
+> 
+> V2 -> V3:
+>   * rebased.
+>   * added patches 1, 2, 3, 4 as suggested by Mark.
+>   * fixed DEVICE_NATIVE_ENDIAN to DEVICE_BIG_ENDIAN in patch 6 as suggested by
+>     Mark.
+>   * added include/hw/*/grlib* to the MAINTAINED file as suggested by Mark.
+> V1 -> V2:
+>   * minor fixes in the first patch suggested by Philippe.
+> 
+> Regards,
+> Fred
+> 
+> KONRAD Frederic (7):
+>   leon3: fix the error message when no bios are provided
+>   grlib,irqmp: get rid of the old-style create function
+>   grlib,gptimer: get rid of the old-style create function
+>   grlib,apbuart: get rid of the old-style create function
+>   leon3: add a little bootloader
+>   leon3: introduce the plug and play mechanism
+>   MAINTAINERS: add myself for leon3
+> 
+>  MAINTAINERS                         |   3 +-
+>  hw/char/grlib_apbuart.c             |   4 +-
+>  hw/intc/grlib_irqmp.c               |   3 +-
+>  hw/misc/Makefile.objs               |   2 +
+>  hw/misc/grlib_ahb_apb_pnp.c         | 269 ++++++++++++++++++++++++++++++++++++
+>  hw/sparc/leon3.c                    | 157 ++++++++++++++++++---
+>  hw/timer/grlib_gptimer.c            |   4 +-
+>  include/hw/misc/grlib_ahb_apb_pnp.h |  60 ++++++++
+>  include/hw/sparc/grlib.h            |  78 +----------
+>  9 files changed, 483 insertions(+), 97 deletions(-)
+>  create mode 100644 hw/misc/grlib_ahb_apb_pnp.c
+>  create mode 100644 include/hw/misc/grlib_ahb_apb_pnp.h
+
+Thanks for sorting out the old-style functions, this version looks much better. I've
+applied this to my qemu-sparc branch and will send a PR shortly.
+
+
+ATB,
+
+Mark.
 
