@@ -2,93 +2,87 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9DE0C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 15:28:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28417C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 15:52:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BF0520449
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 15:28:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E83842083E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 15:52:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kY6yKTCq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BF0520449
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IaqaipM9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E83842083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50170 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50408 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRemv-0006rG-Ks
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 11:28:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53219)
+	id 1hRf9n-0005Sf-2x
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 11:52:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hRemB-0006YY-Bu
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 11:28:04 -0400
+	(envelope-from <bmeng.cn@gmail.com>) id 1hRf90-00058q-DF
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 11:51:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hRem9-0008WU-Jo
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 11:28:03 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:41318)
+	(envelope-from <bmeng.cn@gmail.com>) id 1hRf8z-0008TS-II
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 11:51:38 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:45069)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hRem7-0007t8-E4
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 11:27:59 -0400
-Received: by mail-pl1-x643.google.com with SMTP id f12so3501223plt.8
-	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 08:27:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=weCj/cPcQBb92IBSb1dPlYvmryMtX3SyUGLvbpxqS1Y=;
-	b=kY6yKTCqvgbzPsYj/Jsrc3UFiPndnY41f9Gbz7ugbksUmiOn4L5OO/2l7884Jxh1Nt
-	VP6ny5xZCDUKY0Ng5l4ajBFUgBiAAE1mYdu9QCgUeJJ4SNNjCbnNISDp6JvwXjW8Az53
-	WG/VBYIX3DC6Qoxd/HGJnwMt0Gay3YS2X8Q2tDzqGUL33rc7EZ7pTlOgHeyLf7q5+5Gd
-	D9kSuCQkft6T8gHL76JeRCb/gnYyfU0tDboYGPlqv9vdmlKKPr3vn4O8BMe5/dBjTsIz
-	efupj5O7qQfOFDWS6vAEqorT+9Uu6eYZwbvFjAo6eTeKpwVWuQoPrakKSxH0vT/XCn5N
-	w7gQ==
+	(Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+	id 1hRf8x-0008N0-Di; Fri, 17 May 2019 11:51:35 -0400
+Received: by mail-pl1-x644.google.com with SMTP id a5so3514324pls.12;
+	Fri, 17 May 2019 08:51:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:subject:date:message-id:in-reply-to:references;
+	bh=3zAQYjQsDk6oUPzzs0AgM3UySNo4uual9DRtUoAO6pM=;
+	b=IaqaipM9wsyddaBd0k7l+hr/riS3GbnPORDOHH05IpAgSh0lrZDDUj6Iep1GkvhJDf
+	zr6cIfCpBp4M7xgKY5Jh6lNbqIbVbI4MLWLIJUWrTfV8cwzbu1APRuC5RYVr6N4gmvu0
+	jnV72sjZ9UReJjAPKCcrcFR92Ml/rQn4tNTmv5fb+CseLmr4fOcJpuUmlmpDqmYGs4c3
+	R62GvNWQAxKV6yJ1l0J86K322n6J4An+8vSbyb9T3kbqXNtbKhVDxWgb8RDeEXd+5Nw0
+	R2gIHjIg8eccjK+2MBFL+T0cDuiWyjAkx0xPMkMaInY980TTRZsdys8sJmdk64La2QdT
+	9QYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=weCj/cPcQBb92IBSb1dPlYvmryMtX3SyUGLvbpxqS1Y=;
-	b=s+XWhNF/A5rpmbIZnDlABjhiwb1LAPD0aMT095VyrIJknmtDk4rLbVU/jF8YDyMj7c
-	457IPeHd3lH0OgkyFcNuECUZZH4zDGKlHC2d2QU6MmoxoluNvykP4RByNWhwerx+oaRb
-	VnO+sUn0zf0soMW2XWhNIEnWQm7fOLScJUaTPXw6FWvD+PArn0u17/gopsKhfpOEEB4v
-	VyBpH8An4/D0xh2caGV7Xe9I//BznnelXC9k/XohfIA1Ms98VREt9arQQcZEiEhtUew7
-	7md3KFzzRYpOmViF4EwylTZ86tYGqymuWKv64Ko72TQhT9yJM/oy1iDnwHi/qGN28vAA
-	HKyA==
-X-Gm-Message-State: APjAAAXDo40A4v5a519UpZNCGHlSWvTJn97B2i4NZFx1TIzor8SQTFaI
-	eeRKEU6bu2Zw7GTogqCNjSqVNQ==
-X-Google-Smtp-Source: APXvYqyOBmvdCp++qFMx+SWSGzra6qsn4quabFDGMjjZhGGq/qo1POOl4qOqFc0cqIfBkQV7vNkmAw==
-X-Received: by 2002:a17:902:148:: with SMTP id
-	66mr1020520plb.143.1558106872265; 
-	Fri, 17 May 2019 08:27:52 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id
-	q4sm10553858pgb.39.2019.05.17.08.27.50
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 17 May 2019 08:27:51 -0700 (PDT)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org
-References: <20190517045136.3509-1-richard.henderson@linaro.org>
-	<1d36d568-8fec-f81e-635f-a34560e04b2a@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <a90e775f-7039-8a67-313d-bac3856c3d13@linaro.org>
-Date: Fri, 17 May 2019 08:27:49 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <1d36d568-8fec-f81e-635f-a34560e04b2a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+	:references;
+	bh=3zAQYjQsDk6oUPzzs0AgM3UySNo4uual9DRtUoAO6pM=;
+	b=kWdvr8von6QSfwgP0BecR+97wHxORYdCVzHBWXpuXbOEuUy6WpFACwbvF6IdqT4Q+7
+	jz/EVCWdIPFTLDYJYSNQK2Lura37pO4GLZMCjQDTTfIHMh+rNjYRLuPeQwtLT3DpOMrW
+	2LUafiA9uLgZG3HaKaO1LJEMPSpQua9xkgZbl0oVS4wZYVx4W4bhCO1fiBBUVelVfNkX
+	E4TagWZ0xSIQuFES/Xlo7QXgzghH1nRY6klAnV//Oj5gwOWCCAABK+O736acAhLGXtI+
+	qjHJpC+onEXEyUuPr1sx8A3QkD+QuvGFYTXkbDbkKmn3G/TbKYtrHId6Z41usR22uD7t
+	q3Ug==
+X-Gm-Message-State: APjAAAXxWQUkrc0soR08CgPyouhFNmOPJib1r0VoPz1nT32w8aXGYn1H
+	TirGfE3VB+9uPnBDu5FZN534eQqG
+X-Google-Smtp-Source: APXvYqxPBxgHH9/6M15hHY4+uf1lwfsCs9teYzaMqmtCxeKz2k6oEtIetTviXRuA73Moh9/WcWDuyQ==
+X-Received: by 2002:a17:902:1621:: with SMTP id
+	g30mr16454605plg.326.1558108292036; 
+	Fri, 17 May 2019 08:51:32 -0700 (PDT)
+Received: from localhost.localdomain (unknown-224-80.windriver.com.
+	[147.11.224.80]) by smtp.gmail.com with ESMTPSA id
+	u123sm17564646pfu.67.2019.05.17.08.51.30
+	(version=TLS1 cipher=AES128-SHA bits=128/128);
+	Fri, 17 May 2019 08:51:31 -0700 (PDT)
+From: Bin Meng <bmeng.cn@gmail.com>
+To: qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+	Alistair Francis <Alistair.Francis@wdc.com>,
+	Palmer Dabbelt <palmer@sifive.com>
+Date: Fri, 17 May 2019 08:51:25 -0700
+Message-Id: <1558108285-19571-2-git-send-email-bmeng.cn@gmail.com>
+X-Mailer: git-send-email 1.7.1
+In-Reply-To: <1558108285-19571-1-git-send-email-bmeng.cn@gmail.com>
+References: <1558108285-19571-1-git-send-email-bmeng.cn@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::643
-Subject: Re: [Qemu-devel] [PATCH v14 00/13] RX architecture support
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: [Qemu-devel] [PATCH 2/2] riscv: sifive_u: Update the plic hart
+ config to support multicore
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,37 +94,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ysato@users.sourceforge.jp
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/17/19 1:00 AM, Philippe Mathieu-Daudé wrote:
->>   qemu/bitops.h: Add extract8 and extract16
->>   hw/registerfields.h: Add 8bit and 16bit register macros
->>   Add rx-softmmu
->>   MAINTAINERS: Add RX
-> 
-> Series:
-> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+At present the PLIC is instantiated to support only one hart, while
+the machine allows at most 4 harts to be created. When more than 1
+hart is configured, PLIC needs to instantiated to support multicore,
+otherwise an SMP OS does not work.
 
-Thanks, missed this because patchwork doesn't remember cover letters.
+Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+---
 
-> But please reorder patches before sending the pull request, see:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03671.html
-> 
-> - patch 9 first "Add extract8 and extract16"
-> - patch 10 then "Add 8bit and 16bit register macros"
-> - then other patches 1-8, 11-13
+ hw/riscv/sifive_u.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-I have reordered extract and register macros properly.
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index e2120ac..a416d5d 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -344,6 +344,8 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+     MemoryRegion *system_memory = get_system_memory();
+     MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+     qemu_irq plic_gpios[SIFIVE_U_PLIC_NUM_SOURCES];
++    char *plic_hart_config;
++    size_t plic_hart_config_len;
+     int i;
+     Error *err = NULL;
+     NICInfo *nd = &nd_table[0];
+@@ -357,9 +359,21 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+     memory_region_add_subregion(system_memory, memmap[SIFIVE_U_MROM].base,
+                                 mask_rom);
+ 
++    /* create PLIC hart topology configuration string */
++    plic_hart_config_len = (strlen(SIFIVE_U_PLIC_HART_CONFIG) + 1) * smp_cpus;
++    plic_hart_config = g_malloc0(plic_hart_config_len);
++    for (i = 0; i < smp_cpus; i++) {
++        if (i != 0) {
++            strncat(plic_hart_config, ",", plic_hart_config_len);
++        }
++        strncat(plic_hart_config, SIFIVE_U_PLIC_HART_CONFIG,
++                plic_hart_config_len);
++        plic_hart_config_len -= (strlen(SIFIVE_U_PLIC_HART_CONFIG) + 1);
++    }
++
+     /* MMIO */
+     s->plic = sifive_plic_create(memmap[SIFIVE_U_PLIC].base,
+-        (char *)SIFIVE_U_PLIC_HART_CONFIG,
++        plic_hart_config,
+         SIFIVE_U_PLIC_NUM_SOURCES,
+         SIFIVE_U_PLIC_NUM_PRIORITIES,
+         SIFIVE_U_PLIC_PRIORITY_BASE,
+-- 
+2.7.4
 
-> This will help if we unlikely have to bisect ;)
-
-Bisection is preserved because the rx port is enabled by
-patch 12, "Add rx-softmmu".  Eariler than that, the rx
-port simply is not built.
-
-
-r~
 
