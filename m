@@ -2,63 +2,62 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE73FC04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 06:23:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0BEDC04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 06:25:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80E3C20833
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 06:23:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80E3C20833
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8CE5520833
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 06:25:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CE5520833
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=birkelund.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43090 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43131 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRWHN-0007mZ-Iw
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 02:23:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41894)
+	id 1hRWJH-0000KB-IZ
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 02:25:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hRWGX-0007PL-Bc
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 02:22:50 -0400
+	(envelope-from <klaus@birkelund.eu>) id 1hRWIY-0008Ko-RA
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 02:24:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hRWGV-00079Q-DS
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 02:22:49 -0400
-Received: from 11.mo6.mail-out.ovh.net ([188.165.38.119]:35323)
+	(envelope-from <klaus@birkelund.eu>) id 1hRWIW-0000dR-Pp
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 02:24:54 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:39866)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hRWGU-00076K-6j
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 02:22:47 -0400
-Received: from player788.ha.ovh.net (unknown [10.108.57.150])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id E7B4B1CB639
-	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 08:22:41 +0200 (CEST)
-Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
-	(Authenticated sender: clg@kaod.org)
-	by player788.ha.ovh.net (Postfix) with ESMTPSA id A1B3C5D48401;
-	Fri, 17 May 2019 06:22:36 +0000 (UTC)
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
-References: <20190517041823.23871-1-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <9b88623f-bad7-e946-1ec8-a58dc0248746@kaod.org>
-Date: Fri, 17 May 2019 08:22:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(Exim 4.71) (envelope-from <klaus@birkelund.eu>)
+	id 1hRWIQ-0000Wm-Lr; Fri, 17 May 2019 02:24:46 -0400
+Received: from apples.localdomain (ip-5-186-120-196.cgn.fibianet.dk
+	[5.186.120.196])
+	by charlie.dont.surf (Postfix) with ESMTPSA id F0831BF488;
+	Fri, 17 May 2019 06:24:43 +0000 (UTC)
+Date: Fri, 17 May 2019 08:24:42 +0200
+From: Klaus Birkelund <klaus@birkelund.eu>
+To: "Heitke, Kenneth" <kenneth.heitke@intel.com>, qemu-block@nongnu.org,
+	keith.busch@intel.com, kwolf@redhat.com, qemu-devel@nongnu.org,
+	mreitz@redhat.com
+Message-ID: <20190517062442.GB17341@apples.localdomain>
+Mail-Followup-To: "Heitke, Kenneth" <kenneth.heitke@intel.com>,
+	qemu-block@nongnu.org, keith.busch@intel.com, kwolf@redhat.com,
+	qemu-devel@nongnu.org, mreitz@redhat.com
+References: <20190405214117.1850-1-kenneth.heitke@intel.com>
+	<20190514060225.GA1350@apples.localdomain>
+	<1f607df5-b523-e517-c439-392725fd441b@intel.com>
+	<20190517053504.GA17341@apples.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20190517041823.23871-1-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 5994572582292523929
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddtuddguddtkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190517053504.GA17341@apples.localdomain>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 188.165.38.119
-Subject: Re: [Qemu-devel] [PATCH] spapr: Add forgotten capability to
- migration stream
+X-Received-From: 128.199.63.193
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] nvme: add Get/Set Feature
+ Timestamp support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,78 +69,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/17/19 6:18 AM, David Gibson wrote:
-> spapr machine capabilities are supposed to be sent in the migration str=
-eam
-> so that we can sanity check the source and destination have compatible
-> configuration.  Unfortunately, when we added the hpt-max-page-size
-> capability, we forgot to add it to the migration state.  This means tha=
-t we
-> can generate spurious warnings when both ends are configured for large
-> pages, or potentially fail to warn if the source is configured for huge
-> pages, but the destination is not.
->=20
-> Fixes: 2309832afda "spapr: Maximum (HPT) pagesize property"
->=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+On Fri, May 17, 2019 at 07:35:04AM +0200, Klaus Birkelund wrote:
+> Hi Kenneth,
+> 
+> On Thu, May 16, 2019 at 05:24:47PM -0600, Heitke, Kenneth wrote:
+> > Hi Klaus, thank you for you review. I have one comment inline
+> > 
+> > On 5/14/2019 12:02 AM, Klaus Birkelund wrote:
+> > > On Fri, Apr 05, 2019 at 03:41:17PM -0600, Kenneth Heitke wrote:
+> > > > Signed-off-by: Kenneth Heitke <kenneth.heitke@intel.com>
+> > > > ---
+> > > >   hw/block/nvme.c       | 120 +++++++++++++++++++++++++++++++++++++++++-
+> > > >   hw/block/nvme.h       |   3 ++
+> > > >   hw/block/trace-events |   2 +
+> > > >   include/block/nvme.h  |   2 +
+> > > >   4 files changed, 125 insertions(+), 2 deletions(-)
+> > > > 
+> > > > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> > > > index 7caf92532a..e775e89299 100644
+> > > > --- a/hw/block/nvme.c
+> > > > +++ b/hw/block/nvme.c
+> > > > @@ -219,6 +219,30 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
+> > > >       return NVME_INVALID_FIELD | NVME_DNR;
+> > > >   }
+> > > > +static uint16_t nvme_dma_write_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
+> > > > +                                   uint64_t prp1, uint64_t prp2)
+> > > > +{
+> > > > +    QEMUSGList qsg;
+> > > > +    QEMUIOVector iov;
+> > > > +    uint16_t status = NVME_SUCCESS;
+> > > > +
+> > > > +    if (nvme_map_prp(&qsg, &iov, prp1, prp2, len, n)) {
+> > > > +        return NVME_INVALID_FIELD | NVME_DNR;
+> > > > +    }
+> > > > +    if (qsg.nsg > 0) {
+> > > > +        if (dma_buf_write(ptr, len, &qsg)) {
+> > > > +            status = NVME_INVALID_FIELD | NVME_DNR;
+> > > > +        }
+> > > > +        qemu_sglist_destroy(&qsg);
+> > > > +    } else {
+> > > > +        if (qemu_iovec_from_buf(&iov, 0, ptr, len) != len) {
+> > > 
+> > > This should be `qemu_iovec_to_buf`.
+> > > 
+> > 
+> > This function is transferring data from the "host" to the device so I
+> > believe I am using the correct function.
+> > 
+> 
+> Exactly, but this means that you need to populate `ptr` with data
+> described by the prps, hence dma_buf_*write* and qemu_iovec_*to*_buf. In
+> this case `ptr` is set to the address of the uint64_t timestamp, and
+> that is what we need to write to.
+> 
 
-
-
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-Thanks,
-
-C.
-
-> ---
->  hw/ppc/spapr.c         | 1 +
->  hw/ppc/spapr_caps.c    | 1 +
->  include/hw/ppc/spapr.h | 1 +
->  3 files changed, 3 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 8580a8dc67..bcae30ad26 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2125,6 +2125,7 @@ static const VMStateDescription vmstate_spapr =3D=
- {
->          &vmstate_spapr_cap_cfpc,
->          &vmstate_spapr_cap_sbbc,
->          &vmstate_spapr_cap_ibs,
-> +        &vmstate_spapr_cap_hpt_maxpagesize,
->          &vmstate_spapr_irq_map,
->          &vmstate_spapr_cap_nested_kvm_hv,
->          &vmstate_spapr_dtb,
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index 9b1c10baa6..658eb15a14 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -703,6 +703,7 @@ SPAPR_CAP_MIG_STATE(dfp, SPAPR_CAP_DFP);
->  SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
->  SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
->  SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
-> +SPAPR_CAP_MIG_STATE(hpt_maxpagesize, SPAPR_CAP_HPT_MAXPAGESIZE);
->  SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
->  SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
->  SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 7e32f309c2..9fc91c8f5e 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -849,6 +849,7 @@ extern const VMStateDescription vmstate_spapr_cap_d=
-fp;
->  extern const VMStateDescription vmstate_spapr_cap_cfpc;
->  extern const VMStateDescription vmstate_spapr_cap_sbbc;
->  extern const VMStateDescription vmstate_spapr_cap_ibs;
-> +extern const VMStateDescription vmstate_spapr_cap_hpt_maxpagesize;
->  extern const VMStateDescription vmstate_spapr_cap_nested_kvm_hv;
->  extern const VMStateDescription vmstate_spapr_cap_large_decr;
->  extern const VMStateDescription vmstate_spapr_cap_ccf_assist;
->=20
-
+I was going to argue with the fact that nvme_dma_read_prp uses
+qemu_iovec_from_buf. But it uses _to_buf which as far as I can tell is
+also wrong.
 
