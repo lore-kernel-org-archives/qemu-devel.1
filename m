@@ -2,62 +2,61 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 800E0C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D6A8C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:24:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45E5E2166E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:24:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45E5E2166E
+	by mail.kernel.org (Postfix) with ESMTPS id 3483A2166E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:24:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3483A2166E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49371 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49373 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRdmw-0000rK-DH
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 10:24:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41408)
+	id 1hRdn0-0000u8-Ce
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 10:24:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1hRdiI-0005lz-NK
+	(envelope-from <vkuznets@redhat.com>) id 1hRdiH-0005lx-NQ
 	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:20:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1hRdiG-0006CQ-Vh
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:19:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41086)
+	(envelope-from <vkuznets@redhat.com>) id 1hRdiF-0006Ax-Ma
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:19:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54952)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1hRdiG-0005r2-OH
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:19:56 -0400
+	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1hRdiF-0005wn-DZ
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:19:55 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9438EC09AD0F;
-	Fri, 17 May 2019 14:19:40 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7A34E307D913;
+	Fri, 17 May 2019 14:19:35 +0000 (UTC)
 Received: from vitty.brq.redhat.com (unknown [10.43.2.155])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id CFB0E78576;
-	Fri, 17 May 2019 14:19:38 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B3E0178578;
+	Fri, 17 May 2019 14:19:30 +0000 (UTC)
 From: Vitaly Kuznetsov <vkuznets@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 17 May 2019 16:19:19 +0200
-Message-Id: <20190517141924.19024-5-vkuznets@redhat.com>
+Date: Fri, 17 May 2019 16:19:17 +0200
+Message-Id: <20190517141924.19024-3-vkuznets@redhat.com>
 In-Reply-To: <20190517141924.19024-1-vkuznets@redhat.com>
 References: <20190517141924.19024-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Fri, 17 May 2019 14:19:40 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.48]);
+	Fri, 17 May 2019 14:19:35 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 4/9] i386/kvm: document existing Hyper-V
- enlightenments
+Subject: [Qemu-devel] [PATCH v2 2/9] i386/kvm: add support for
+ KVM_GET_SUPPORTED_HV_CPUID
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,275 +78,572 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently, there is no doc describing hv-* CPU flags, people are
-encouraged to get the information from Microsoft Hyper-V Top Level
-Functional specification (TLFS). There is, however, a bit of QEMU
-specifics.
+KVM now supports reporting supported Hyper-V features through CPUID
+(KVM_GET_SUPPORTED_HV_CPUID ioctl). Going forward, this is going to be
+the only way to announce new functionality and this has already happened
+with Direct Mode stimers.
+
+While we could just support KVM_GET_SUPPORTED_HV_CPUID for new features,
+it seems to be beneficial to use it for all Hyper-V enlightenments when
+possible. This way we can implement 'hv-all' pass-through mode giving the
+guest all supported Hyper-V features even when QEMU knows nothing about
+them.
+
+Implementation-wise we create a new kvm_hyperv_properties structure
+defining Hyper-V features, get_supported_hv_cpuid()/
+get_supported_hv_cpuid_legacy() returning the supported CPUID set and
+a bit over-engineered hv_cpuid_check_and_set() which we will also be
+used to set cpu->hyperv_* properties for 'hv-all' mode.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- docs/hyperv.txt | 181 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 181 insertions(+)
- create mode 100644 docs/hyperv.txt
+ target/i386/kvm.c | 474 ++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 356 insertions(+), 118 deletions(-)
 
-diff --git a/docs/hyperv.txt b/docs/hyperv.txt
-new file mode 100644
-index 0000000000..c423e0fca2
---- /dev/null
-+++ b/docs/hyperv.txt
-@@ -0,0 +1,181 @@
-+Hyper-V Enlightenments
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 3daac1e4f4..6ead422efa 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -684,156 +684,394 @@ static bool tsc_is_stable_and_known(CPUX86State *=
+env)
+         || env->user_tsc_khz;
+ }
+=20
+-static int hyperv_handle_properties(CPUState *cs)
++static struct {
++    const char *desc;
++    struct {
++        uint32_t fw;
++        uint32_t bits;
++    } flags[2];
++} kvm_hyperv_properties[] =3D {
++    [HYPERV_FEAT_RELAXED] =3D {
++        .desc =3D "relaxed timing (hv-relaxed)",
++        .flags =3D {
++            {.fw =3D FEAT_HYPERV_EAX,
++             .bits =3D HV_HYPERCALL_AVAILABLE},
++            {.fw =3D FEAT_HV_RECOMM_EAX,
++             .bits =3D HV_RELAXED_TIMING_RECOMMENDED}
++        }
++    },
++    [HYPERV_FEAT_VAPIC] =3D {
++        .desc =3D "virtual APIC (hv-vapic)",
++        .flags =3D {
++            {.fw =3D FEAT_HYPERV_EAX,
++             .bits =3D HV_HYPERCALL_AVAILABLE | HV_APIC_ACCESS_AVAILABLE=
+},
++            {.fw =3D FEAT_HV_RECOMM_EAX,
++             .bits =3D HV_APIC_ACCESS_RECOMMENDED}
++        }
++    },
++    [HYPERV_FEAT_TIME] =3D {
++        .desc =3D "clocksources (hv-time)",
++        .flags =3D {
++            {.fw =3D FEAT_HYPERV_EAX,
++             .bits =3D HV_HYPERCALL_AVAILABLE | HV_TIME_REF_COUNT_AVAILA=
+BLE |
++             HV_REFERENCE_TSC_AVAILABLE}
++        }
++    },
++    [HYPERV_FEAT_CRASH] =3D {
++        .desc =3D "crash MSRs (hv-crash)",
++        .flags =3D {
++            {.fw =3D FEAT_HYPERV_EDX,
++             .bits =3D HV_GUEST_CRASH_MSR_AVAILABLE}
++        }
++    },
++    [HYPERV_FEAT_RESET] =3D {
++        .desc =3D "reset MSR (hv-reset)",
++        .flags =3D {
++            {.fw =3D FEAT_HYPERV_EAX,
++             .bits =3D HV_RESET_AVAILABLE}
++        }
++    },
++    [HYPERV_FEAT_VPINDEX] =3D {
++        .desc =3D "VP_INDEX MSR (hv-vpindex)",
++        .flags =3D {
++            {.fw =3D FEAT_HYPERV_EAX,
++             .bits =3D HV_VP_INDEX_AVAILABLE}
++        }
++    },
++    [HYPERV_FEAT_RUNTIME] =3D {
++        .desc =3D "VP_RUNTIME MSR (hv-runtime)",
++        .flags =3D {
++            {.fw =3D FEAT_HYPERV_EAX,
++             .bits =3D HV_VP_RUNTIME_AVAILABLE}
++        }
++    },
++    [HYPERV_FEAT_SYNIC] =3D {
++        .desc =3D "synthetic interrupt controller (hv-synic)",
++        .flags =3D {
++            {.fw =3D FEAT_HYPERV_EAX,
++             .bits =3D HV_SYNIC_AVAILABLE}
++        }
++    },
++    [HYPERV_FEAT_STIMER] =3D {
++        .desc =3D "synthetic timers (hv-stimer)",
++        .flags =3D {
++            {.fw =3D FEAT_HYPERV_EAX,
++             .bits =3D HV_SYNTIMERS_AVAILABLE}
++        }
++    },
++    [HYPERV_FEAT_FREQUENCIES] =3D {
++        .desc =3D "frequency MSRs (hv-frequencies)",
++        .flags =3D {
++            {.fw =3D FEAT_HYPERV_EAX,
++             .bits =3D HV_ACCESS_FREQUENCY_MSRS},
++            {.fw =3D FEAT_HYPERV_EDX,
++             .bits =3D HV_FREQUENCY_MSRS_AVAILABLE}
++        }
++    },
++    [HYPERV_FEAT_REENLIGHTENMENT] =3D {
++        .desc =3D "reenlightenment MSRs (hv-reenlightenment)",
++        .flags =3D {
++            {.fw =3D FEAT_HYPERV_EAX,
++             .bits =3D HV_ACCESS_REENLIGHTENMENTS_CONTROL}
++        }
++    },
++    [HYPERV_FEAT_TLBFLUSH] =3D {
++        .desc =3D "paravirtualized TLB flush (hv-tlbflush)",
++        .flags =3D {
++            {.fw =3D FEAT_HV_RECOMM_EAX,
++             .bits =3D HV_REMOTE_TLB_FLUSH_RECOMMENDED |
++             HV_EX_PROCESSOR_MASKS_RECOMMENDED}
++        }
++    },
++    [HYPERV_FEAT_EVMCS] =3D {
++        .desc =3D "enlightened VMCS (hv-evmcs)",
++        .flags =3D {
++            {.fw =3D FEAT_HV_RECOMM_EAX,
++             .bits =3D HV_ENLIGHTENED_VMCS_RECOMMENDED}
++        }
++    },
++    [HYPERV_FEAT_IPI] =3D {
++        .desc =3D "paravirtualized IPI (hv-ipi)",
++        .flags =3D {
++            {.fw =3D FEAT_HV_RECOMM_EAX,
++             .bits =3D HV_CLUSTER_IPI_RECOMMENDED |
++             HV_EX_PROCESSOR_MASKS_RECOMMENDED}
++        }
++    },
++};
 +
++static struct kvm_cpuid2 *try_get_hv_cpuid(CPUState *cs, int max)
++{
++    struct kvm_cpuid2 *cpuid;
++    int r, size;
 +
-+1. Description
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+In some cases when implementing a hardware interface in software is slow=
-, KVM
-+implements its own paravirtualized interfaces. This works well for Linux=
- as
-+guest support for such features is added simultaneously with the feature=
- itself.
-+It may, however, be hard-to-impossible to add support for these interfac=
-es to
-+proprietary OSes, namely, Microsoft Windows.
++    size =3D sizeof(*cpuid) + max * sizeof(*cpuid->entries);
++    cpuid =3D g_malloc0(size);
++    cpuid->nent =3D max;
 +
-+KVM on x86 implements Hyper-V Enlightenments for Windows guests. These f=
-eatures
-+make Windows and Hyper-V guests think they're running on top of a Hyper-=
-V
-+compatible hypervisor and use Hyper-V specific features.
++    r =3D kvm_vcpu_ioctl(cs, KVM_GET_SUPPORTED_HV_CPUID, cpuid);
++    if (r =3D=3D 0 && cpuid->nent >=3D max) {
++        r =3D -E2BIG;
++    }
++    if (r < 0) {
++        if (r =3D=3D -E2BIG) {
++            g_free(cpuid);
++            return NULL;
++        } else {
++            fprintf(stderr, "KVM_GET_SUPPORTED_HV_CPUID failed: %s\n",
++                    strerror(-r));
++            exit(1);
++        }
++    }
++    return cpuid;
++}
 +
++/*
++ * Run KVM_GET_SUPPORTED_HV_CPUID ioctl(), allocating a buffer large eno=
+ugh
++ * for all entries.
++ */
++static struct kvm_cpuid2 *get_supported_hv_cpuid(CPUState *cs)
++{
++    struct kvm_cpuid2 *cpuid;
++    int max =3D 7; /* 0x40000000..0x40000005, 0x4000000A */
 +
-+2. Setup
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+No Hyper-V enlightenments are enabled by default by either KVM or QEMU. =
-In
-+QEMU, individual enlightenments can be enabled through CPU flags, e.g:
++    /*
++     * When the buffer is too small, KVM_GET_SUPPORTED_HV_CPUID fails wi=
+th
++     * -E2BIG, however, it doesn't report back the right size. Keep incr=
+easing
++     * it and re-trying until we succeed.
++     */
++    while ((cpuid =3D try_get_hv_cpuid(cs, max)) =3D=3D NULL) {
++        max++;
++    }
++    return cpuid;
++}
 +
-+  qemu-system-x86_64 --enable-kvm --cpu host,hv_relaxed,hv_vpindex,hv_ti=
-me, ...
++/*
++ * When KVM_GET_SUPPORTED_HV_CPUID is not supported we fill CPUID featur=
+e
++ * leaves from KVM_CAP_HYPERV* and present MSRs data.
++ */
++static struct kvm_cpuid2 *get_supported_hv_cpuid_legacy(CPUState *cs)
+ {
+     X86CPU *cpu =3D X86_CPU(cs);
+-    CPUX86State *env =3D &cpu->env;
++    struct kvm_cpuid2 *cpuid;
++    struct kvm_cpuid_entry2 *entry_feat, *entry_recomm;
 +
-+Sometimes there are dependencies between enlightenments, QEMU is suppose=
-d to
-+check that the supplied configuration is sane.
++    /* HV_CPUID_FEATURES, HV_CPUID_ENLIGHTMENT_INFO */
++    cpuid =3D g_malloc0(sizeof(*cpuid) + 2 * sizeof(*cpuid->entries));
++    cpuid->nent =3D 2;
 +
-+When any set of the Hyper-V enlightenments is enabled, QEMU changes hype=
-rvisor
-+identification (CPUID 0x40000000..0x4000000A) to Hyper-V. KVM identifica=
-tion
-+and features are kept in leaves 0x40000100..0x40000101.
++    /* HV_CPUID_VENDOR_AND_MAX_FUNCTIONS */
++    entry_feat =3D &cpuid->entries[0];
++    entry_feat->function =3D HV_CPUID_FEATURES;
+=20
+-    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_RELAXED)) {
+-        env->features[FEAT_HYPERV_EAX] |=3D HV_HYPERCALL_AVAILABLE;
++    entry_recomm =3D &cpuid->entries[1];
++    entry_recomm->function =3D HV_CPUID_ENLIGHTMENT_INFO;
++    entry_recomm->ebx =3D cpu->hyperv_spinlock_attempts;
 +
++    if (kvm_check_extension(cs->kvm_state, KVM_CAP_HYPERV) > 0) {
++        entry_feat->eax |=3D HV_HYPERCALL_AVAILABLE;
++        entry_feat->eax |=3D HV_APIC_ACCESS_AVAILABLE;
++        entry_feat->edx |=3D HV_CPU_DYNAMIC_PARTITIONING_AVAILABLE;
++        entry_recomm->eax |=3D HV_RELAXED_TIMING_RECOMMENDED;
++        entry_recomm->eax |=3D HV_APIC_ACCESS_RECOMMENDED;
+     }
+-    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_VAPIC)) {
+-        env->features[FEAT_HYPERV_EAX] |=3D HV_HYPERCALL_AVAILABLE;
+-        env->features[FEAT_HYPERV_EAX] |=3D HV_APIC_ACCESS_AVAILABLE;
 +
-+3. Existing enlightenments
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
++    if (kvm_check_extension(cs->kvm_state, KVM_CAP_HYPERV_TIME) > 0) {
++        entry_feat->eax |=3D HV_TIME_REF_COUNT_AVAILABLE;
++        entry_feat->eax |=3D HV_REFERENCE_TSC_AVAILABLE;
+     }
+-    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_TIME)) {
+-        if (kvm_check_extension(cs->kvm_state, KVM_CAP_HYPERV_TIME) <=3D=
+ 0) {
+-            fprintf(stderr, "Hyper-V clocksources "
+-                    "(requested by 'hv-time' cpu flag) "
+-                    "are not supported by kernel\n");
+-            return -ENOSYS;
+-        }
+-        env->features[FEAT_HYPERV_EAX] |=3D HV_HYPERCALL_AVAILABLE;
+-        env->features[FEAT_HYPERV_EAX] |=3D HV_TIME_REF_COUNT_AVAILABLE;
+-        env->features[FEAT_HYPERV_EAX] |=3D HV_REFERENCE_TSC_AVAILABLE;
 +
-+3.1. hv-relaxed
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+This feature tells guest OS to disable watchdog timeouts as it is runnin=
-g on a
-+hypervisor. It is known that some Windows versions will do this even whe=
-n they
-+see 'hypervisor' CPU flag.
++    if (has_msr_hv_frequencies) {
++        entry_feat->eax |=3D HV_ACCESS_FREQUENCY_MSRS;
++        entry_feat->edx |=3D HV_FREQUENCY_MSRS_AVAILABLE;
+     }
+-    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_FREQUENCIES)) {
+-        if (!has_msr_hv_frequencies) {
+-            fprintf(stderr, "Hyper-V frequency MSRs "
+-                    "(requested by 'hv-frequencies' cpu flag) "
+-                    "are not supported by kernel\n");
+-            return -ENOSYS;
+-        }
+-        env->features[FEAT_HYPERV_EAX] |=3D HV_ACCESS_FREQUENCY_MSRS;
+-        env->features[FEAT_HYPERV_EDX] |=3D HV_FREQUENCY_MSRS_AVAILABLE;
 +
-+3.2. hv-vapic
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Provides so-called VP Assist page MSR to guest allowing it to work with =
-APIC
-+more efficiently. In particular, this enlightenment allows paravirtualiz=
-ed
-+(exit-less) EOI processing.
++    if (has_msr_hv_crash) {
++        entry_feat->edx |=3D HV_GUEST_CRASH_MSR_AVAILABLE;
+     }
+-    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_CRASH)) {
+-        if (!has_msr_hv_crash) {
+-            fprintf(stderr, "Hyper-V crash MSRs "
+-                    "(requested by 'hv-crash' cpu flag) "
+-                    "are not supported by kernel\n");
+-            return -ENOSYS;
+-        }
+-        env->features[FEAT_HYPERV_EDX] |=3D HV_GUEST_CRASH_MSR_AVAILABLE=
+;
 +
-+3.3. hv-spinlocks=3Dxxx
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Enables paravirtualized spinlocks. The parameter indicates how many time=
-s
-+spinlock acquisition should be attempted before indicating the situation=
- to the
-+hypervisor. A special value 0xffffffff indicates "never to retry".
++    if (has_msr_hv_reenlightenment) {
++        entry_feat->eax |=3D HV_ACCESS_REENLIGHTENMENTS_CONTROL;
+     }
+-    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_REENLIGHTENMENT)) {
+-        if (!has_msr_hv_reenlightenment) {
+-            fprintf(stderr,
+-                    "Hyper-V Reenlightenment MSRs "
+-                    "(requested by 'hv-reenlightenment' cpu flag) "
+-                    "are not supported by kernel\n");
+-            return -ENOSYS;
+-        }
+-        env->features[FEAT_HYPERV_EAX] |=3D HV_ACCESS_REENLIGHTENMENTS_C=
+ONTROL;
 +
-+3.4. hv-vpindex
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Provides HV_X64_MSR_VP_INDEX (0x40000002) MSR to the guest which has Vir=
-tual
-+processor index information. This enlightenment makes sense in conjuncti=
-on with
-+hv-synic, hv-stimer and other enlightenments which require the guest to =
-know its
-+Virtual Processor indices (e.g. when VP index needs to be passed in a
-+hypercall).
++    if (has_msr_hv_reset) {
++        entry_feat->eax |=3D HV_RESET_AVAILABLE;
+     }
+-    env->features[FEAT_HYPERV_EDX] |=3D HV_CPU_DYNAMIC_PARTITIONING_AVAI=
+LABLE;
+-    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_RESET)) {
+-        if (!has_msr_hv_reset) {
+-            fprintf(stderr, "Hyper-V reset MSR "
+-                    "(requested by 'hv-reset' cpu flag) "
+-                    "is not supported by kernel\n");
+-            return -ENOSYS;
+-        }
+-        env->features[FEAT_HYPERV_EAX] |=3D HV_RESET_AVAILABLE;
 +
-+3.5. hv-runtime
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Provides HV_X64_MSR_VP_RUNTIME (0x40000010) MSR to the guest. The MSR ke=
-eps the
-+virtual processor run time in 100ns units. This gives guest operating sy=
-stem an
-+idea of how much time was 'stolen' from it (when the virtual CPU was pre=
-empted
-+to perform some other work).
++    if (has_msr_hv_vpindex) {
++        entry_feat->eax |=3D HV_VP_INDEX_AVAILABLE;
+     }
+-    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_VPINDEX)) {
+-        if (!has_msr_hv_vpindex) {
+-            fprintf(stderr, "Hyper-V VP_INDEX MSR "
+-                    "(requested by 'hv-vpindex' cpu flag) "
+-                    "is not supported by kernel\n");
+-            return -ENOSYS;
+-        }
+-        env->features[FEAT_HYPERV_EAX] |=3D HV_VP_INDEX_AVAILABLE;
 +
-+3.6. hv-crash
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Provides HV_X64_MSR_CRASH_P0..HV_X64_MSR_CRASH_P5 (0x40000100..0x4000010=
-5) and
-+HV_X64_MSR_CRASH_CTL (0x40000105) MSRs to the guest. These MSRs are writ=
-ten to
-+by the guest when it crashes, HV_X64_MSR_CRASH_P0..HV_X64_MSR_CRASH_P5 M=
-SRs
-+contain additional crash information. This information is outputted in Q=
-EMU log
-+and through QAPI.
-+Note: unlike under genuine Hyper-V, write to HV_X64_MSR_CRASH_CTL causes=
- guest
-+to shutdown. This effectively blocks crash dump generation by Windows.
++    if (has_msr_hv_runtime) {
++        entry_feat->eax |=3D HV_VP_RUNTIME_AVAILABLE;
+     }
+-    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_RUNTIME)) {
+-        if (!has_msr_hv_runtime) {
+-            fprintf(stderr, "Hyper-V VP_RUNTIME MSR "
+-                    "(requested by 'hv-runtime' cpu flag) "
+-                    "is not supported by kernel\n");
+-            return -ENOSYS;
 +
-+3.7. hv-time
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Enables two Hyper-V-specific clocksources available to the guest: MSR-ba=
-sed
-+Hyper-V clocksource (HV_X64_MSR_TIME_REF_COUNT, 0x40000020) and Referenc=
-e TSC
-+page (enabled via MSR HV_X64_MSR_REFERENCE_TSC, 0x40000021). Both clocks=
-ources
-+are per-guest, Reference TSC page clocksource allows for exit-less time =
-stamp
-+readings. Using this enlightenment leads to significant speedup of all t=
-imestamp
-+related operations.
++    if (has_msr_hv_synic) {
++        unsigned int cap =3D cpu->hyperv_synic_kvm_only ?
++            KVM_CAP_HYPERV_SYNIC : KVM_CAP_HYPERV_SYNIC2;
 +
-+3.8. hv-synic
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Enables Hyper-V Synthetic interrupt controller - an extension of a local=
- APIC.
-+When enabled, this enlightenment provides additional communication facil=
-ities
-+to the guest: SynIC messages and Events. This is a pre-requisite for
-+implementing VMBus devices (not yet in QEMU). Additionally, this enlight=
-enment
-+is needed to enable Hyper-V synthetic timers. SynIC is controlled throug=
-h MSRs
-+HV_X64_MSR_SCONTROL..HV_X64_MSR_EOM (0x40000080..0x40000084) and
-+HV_X64_MSR_SINT0..HV_X64_MSR_SINT15 (0x40000090..0x4000009F)
++        if (kvm_check_extension(cs->kvm_state, cap) > 0) {
++            entry_feat->eax |=3D HV_SYNIC_AVAILABLE;
+         }
+-        env->features[FEAT_HYPERV_EAX] |=3D HV_VP_RUNTIME_AVAILABLE;
+     }
+-    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC)) {
+-        unsigned int cap =3D KVM_CAP_HYPERV_SYNIC;
+-        if (!cpu->hyperv_synic_kvm_only) {
+-            if (!hyperv_feat_enabled(cpu, HYPERV_FEAT_VPINDEX)) {
+-                fprintf(stderr, "Hyper-V SynIC "
+-                        "(requested by 'hv-synic' cpu flag) "
+-                        "requires Hyper-V VP_INDEX ('hv-vpindex')\n");
+-            return -ENOSYS;
+-            }
+-            cap =3D KVM_CAP_HYPERV_SYNIC2;
+-        }
+=20
+-        if (!has_msr_hv_synic || !kvm_check_extension(cs->kvm_state, cap=
+)) {
+-            fprintf(stderr, "Hyper-V SynIC (requested by 'hv-synic' cpu =
+flag) "
+-                    "is not supported by kernel\n");
+-            return -ENOSYS;
+-        }
++    if (has_msr_hv_stimer) {
++        entry_feat->eax |=3D HV_SYNTIMERS_AVAILABLE;
++    }
+=20
+-        env->features[FEAT_HYPERV_EAX] |=3D HV_SYNIC_AVAILABLE;
++    if (kvm_check_extension(cs->kvm_state,
++                            KVM_CAP_HYPERV_TLBFLUSH) > 0) {
++        entry_recomm->eax |=3D HV_REMOTE_TLB_FLUSH_RECOMMENDED;
++        entry_recomm->eax |=3D HV_EX_PROCESSOR_MASKS_RECOMMENDED;
+     }
+-    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_STIMER)) {
+-        if (!has_msr_hv_stimer) {
+-            fprintf(stderr, "Hyper-V timers aren't supported by kernel\n=
+");
+-            return -ENOSYS;
+-        }
+-        env->features[FEAT_HYPERV_EAX] |=3D HV_SYNTIMERS_AVAILABLE;
 +
-+Requires: hv-vpindex
++    if (kvm_check_extension(cs->kvm_state,
++                            KVM_CAP_HYPERV_ENLIGHTENED_VMCS) > 0) {
++        entry_recomm->eax |=3D HV_ENLIGHTENED_VMCS_RECOMMENDED;
+     }
+-    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_RELAXED)) {
+-        env->features[FEAT_HV_RECOMM_EAX] |=3D HV_RELAXED_TIMING_RECOMME=
+NDED;
 +
-+3.9. hv-stimer
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Enables Hyper-V synthetic timers. There are four synthetic timers per vi=
-rtual
-+CPU controlled through HV_X64_MSR_STIMER0_CONFIG..HV_X64_MSR_STIMER3_COU=
-NT
-+(0x400000B0..0x400000B7) MSRs. These timers can work either in single-sh=
-ot or
-+periodic mode. It is known that certain Windows versions revert to using=
- HPET
-+(or even RTC when HPET is unavailable) extensively when this enlightenme=
-nt is
-+not provided; this can lead to significant CPU consumption, even when vi=
-rtual
-+CPU is idle.
++    if (kvm_check_extension(cs->kvm_state,
++                            KVM_CAP_HYPERV_SEND_IPI) > 0) {
++        entry_recomm->eax |=3D HV_CLUSTER_IPI_RECOMMENDED;
++        entry_recomm->eax |=3D HV_EX_PROCESSOR_MASKS_RECOMMENDED;
+     }
+-    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_VAPIC)) {
+-        env->features[FEAT_HV_RECOMM_EAX] |=3D HV_APIC_ACCESS_RECOMMENDE=
+D;
+-    }
+-    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_TLBFLUSH)) {
+-        if (kvm_check_extension(cs->kvm_state,
+-                                KVM_CAP_HYPERV_TLBFLUSH) <=3D 0) {
+-            fprintf(stderr, "Hyper-V TLB flush support "
+-                    "(requested by 'hv-tlbflush' cpu flag) "
+-                    " is not supported by kernel\n");
+-            return -ENOSYS;
+-        }
+-        env->features[FEAT_HV_RECOMM_EAX] |=3D HV_REMOTE_TLB_FLUSH_RECOM=
+MENDED;
+-        env->features[FEAT_HV_RECOMM_EAX] |=3D HV_EX_PROCESSOR_MASKS_REC=
+OMMENDED;
 +
-+Requires: hv-vpindex, hv-synic, hv-time
++    return cpuid;
++}
 +
-+3.10. hv-tlbflush
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Enables paravirtualized TLB shoot-down mechanism. On x86 architecture, r=
-emote
-+TLB flush procedure requires sending IPIs and waiting for other CPUs to =
-perform
-+local TLB flush. In virtualized environment some virtual CPUs may not ev=
-en be
-+scheduled at the time of the call and may not require flushing (or, flus=
-hing
-+may be postponed until the virtual CPU is scheduled). hv-tlbflush enligh=
-tenment
-+implements TLB shoot-down through hypervisor enabling the optimization.
++static int hv_cpuid_get_fw(struct kvm_cpuid2 *cpuid, int fw, uint32_t *r=
+)
++{
++    struct kvm_cpuid_entry2 *entry;
++    uint32_t func;
++    int reg;
 +
-+Requires: hv-vpindex
++    switch (fw) {
++    case FEAT_HYPERV_EAX:
++        reg =3D R_EAX;
++        func =3D HV_CPUID_FEATURES;
++        break;
++    case FEAT_HYPERV_EDX:
++        reg =3D R_EDX;
++        func =3D HV_CPUID_FEATURES;
++        break;
++    case FEAT_HV_RECOMM_EAX:
++        reg =3D R_EAX;
++        func =3D HV_CPUID_ENLIGHTMENT_INFO;
++        break;
++    default:
++        return -EINVAL;
+     }
+-    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_IPI)) {
+-        if (kvm_check_extension(cs->kvm_state,
+-                                KVM_CAP_HYPERV_SEND_IPI) <=3D 0) {
+-            fprintf(stderr, "Hyper-V IPI send support "
+-                    "(requested by 'hv-ipi' cpu flag) "
+-                    " is not supported by kernel\n");
+-            return -ENOSYS;
 +
-+3.11. hv-ipi
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Enables paravirtualized IPI send mechanism. HvCallSendSyntheticClusterIp=
-i
-+hypercall may target more than 64 virtual CPUs simultaneously, doing the=
- same
-+through APIC requires more than one access (and thus exit to the hypervi=
-sor).
++    entry =3D cpuid_find_entry(cpuid, func, 0);
++    if (!entry) {
++        return -ENOENT;
++    }
 +
-+Requires: hv-vpindex
++    switch (reg) {
++    case R_EAX:
++        *r =3D entry->eax;
++        break;
++    case R_EDX:
++        *r =3D entry->edx;
++        break;
++    default:
++        return -EINVAL;
++    }
 +
-+3.12. hv-vendor-id=3Dxxx
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+This changes Hyper-V identification in CPUID 0x40000000.EBX-EDX from the=
- default
-+"Microsoft Hv". The parameter should be no longer than 12 characters. Ac=
-cording
-+to the specification, guests shouldn't use this information and it is un=
-known
-+if there is a Windows version which acts differently.
-+Note: hv-vendor-id is not an enlightenment and thus doesn't enable Hyper=
--V
-+identification when specified without some other enlightenment.
++    return 0;
++}
 +
-+3.13. hv-reset
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Provides HV_X64_MSR_RESET (0x40000003) MSR to the guest allowing it to r=
-eset
-+itself by writing to it. Even when this MSR is enabled, it is not a reco=
-mmended
-+way for Windows to perform system reboot and thus it may not be used.
++static int hv_cpuid_check_and_set(CPUState *cs, struct kvm_cpuid2 *cpuid=
+,
++                                  int feature)
++{
++    X86CPU *cpu =3D X86_CPU(cs);
++    CPUX86State *env =3D &cpu->env;
++    uint32_t r, fw, bits;;
++    int i;
 +
-+3.14. hv-frequencies
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Provides HV_X64_MSR_TSC_FREQUENCY (0x40000022) and HV_X64_MSR_APIC_FREQU=
-ENCY
-+(0x40000023) allowing the guest to get its TSC/APIC frequencies without =
-doing
-+measurements.
++    if (!hyperv_feat_enabled(cpu, feature)) {
++        return 0;
++    }
 +
-+3.15 hv-reenlightenment
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+The enlightenment is nested specific, it targets Hyper-V on KVM guests. =
-When
-+enabled, it provides HV_X64_MSR_REENLIGHTENMENT_CONTROL (0x40000106),
-+HV_X64_MSR_TSC_EMULATION_CONTROL (0x40000107)and HV_X64_MSR_TSC_EMULATIO=
-N_STATUS
-+(0x40000108) MSRs allowing the guest to get notified when TSC frequency =
-changes
-+(only happens on migration) and keep using old frequency (through emulat=
-ion in
-+the hypervisor) until it is ready to switch to the new one. This, in con=
-junction
-+with hv-frequencies, allows Hyper-V on KVM to pass stable clocksource (R=
-eference
-+TSC page) to its own guests.
++    for (i =3D 0; i < ARRAY_SIZE(kvm_hyperv_properties[feature].flags); =
+i++) {
++        fw =3D kvm_hyperv_properties[feature].flags[i].fw;
++        bits =3D kvm_hyperv_properties[feature].flags[i].bits;
 +
-+Recommended: hv-frequencies
++        if (!fw) {
++            continue;
+         }
+-        env->features[FEAT_HV_RECOMM_EAX] |=3D HV_CLUSTER_IPI_RECOMMENDE=
+D;
+-        env->features[FEAT_HV_RECOMM_EAX] |=3D HV_EX_PROCESSOR_MASKS_REC=
+OMMENDED;
 +
-+3.16. hv-evmcs
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+The enlightenment is nested specific, it targets Hyper-V on KVM guests. =
-When
-+enabled, it provides Enlightened VMCS feature to the guest. The feature
-+implements paravirtualized protocol between L0 (KVM) and L1 (Hyper-V)
-+hypervisors making L2 exits to the hypervisor faster. The feature is Int=
-el-only.
-+Note: some virtualization features (e.g. Posted Interrupts) are disabled=
- when
-+hv-evmcs is enabled. It may make sense to measure your nested workload w=
-ith and
-+without the feature to find out if enabling it is beneficial.
++        if (hv_cpuid_get_fw(cpuid, fw, &r) || (r & bits) !=3D bits) {
++            fprintf(stderr,
++                    "Hyper-V %s is not supported by kernel\n",
++                    kvm_hyperv_properties[feature].desc);
++            return 1;
++        }
 +
-+Requires: hv-vapic
++        env->features[fw] |=3D bits;
+     }
 +
++    return 0;
++}
 +
-+4. Useful links
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Hyper-V Top Level Functional specification and other information:
-+https://github.com/MicrosoftDocs/Virtualization-Documentation
++static int hyperv_handle_properties(CPUState *cs)
++{
++    X86CPU *cpu =3D X86_CPU(cs);
++    CPUX86State *env =3D &cpu->env;
++    struct kvm_cpuid2 *cpuid;
++    int r =3D 0;
++
+     if (hyperv_feat_enabled(cpu, HYPERV_FEAT_EVMCS)) {
+         uint16_t evmcs_version;
+=20
+         if (kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_ENLIGHTENED_VMCS, 0,
+                                 (uintptr_t)&evmcs_version)) {
+-            fprintf(stderr, "Hyper-V Enlightened VMCS "
+-                    "(requested by 'hv-evmcs' cpu flag) "
+-                    "is not supported by kernel\n");
++            fprintf(stderr, "Hyper-V %s is not supported by kernel\n",
++                    kvm_hyperv_properties[HYPERV_FEAT_EVMCS].desc);
+             return -ENOSYS;
+         }
+         env->features[FEAT_HV_RECOMM_EAX] |=3D HV_ENLIGHTENED_VMCS_RECOM=
+MENDED;
+         env->features[FEAT_HV_NESTED_EAX] =3D evmcs_version;
+     }
+=20
+-    return 0;
++    if (kvm_check_extension(cs->kvm_state, KVM_CAP_HYPERV_CPUID) > 0) {
++        cpuid =3D get_supported_hv_cpuid(cs);
++    } else {
++        cpuid =3D get_supported_hv_cpuid_legacy(cs);
++    }
++
++    /* Features */
++    r |=3D hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_RELAXED);
++    r |=3D hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_VAPIC);
++    r |=3D hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_TIME);
++    r |=3D hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_CRASH);
++    r |=3D hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_RESET);
++    r |=3D hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_VPINDEX);
++    r |=3D hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_RUNTIME);
++    r |=3D hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_SYNIC);
++    r |=3D hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_STIMER);
++    r |=3D hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_FREQUENCIES);
++    r |=3D hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_REENLIGHTENMENT=
+);
++    r |=3D hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_TLBFLUSH);
++    r |=3D hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_EVMCS);
++    r |=3D hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_IPI);
++
++    /* Dependencies */
++    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC) &&
++        !cpu->hyperv_synic_kvm_only &&
++        !hyperv_feat_enabled(cpu, HYPERV_FEAT_VPINDEX)) {
++        fprintf(stderr, "Hyper-V %s requires %s\n",
++                kvm_hyperv_properties[HYPERV_FEAT_SYNIC].desc,
++                kvm_hyperv_properties[HYPERV_FEAT_VPINDEX].desc);
++        r |=3D 1;
++    }
++
++    /* Not exposed by KVM but needed to make CPU hotplug in Windows work=
+ */
++    env->features[FEAT_HYPERV_EDX] |=3D HV_CPU_DYNAMIC_PARTITIONING_AVAI=
+LABLE;
++
++    g_free(cpuid);
++
++    return r ? -ENOSYS : 0;
+ }
+=20
+ static int hyperv_init_vcpu(X86CPU *cpu)
 --=20
 2.20.1
 
