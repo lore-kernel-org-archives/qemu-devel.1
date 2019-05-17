@@ -2,82 +2,84 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12DBCC04AAF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 02:30:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE725C04AAF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 02:41:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D21AF204EC
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 02:30:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 769B2205ED
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 02:41:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y7IvYtfp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D21AF204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="poYWOHWT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 769B2205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39992 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40122 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRSdP-0003bA-TD
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 22:30:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38127)
+	id 1hRSoH-0006jQ-6b
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 22:41:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hRScd-0003KG-6h
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:29:24 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hRSmQ-0005Mf-Um
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:39:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hRScc-0004xl-2S
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:29:23 -0400
-Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:33267)
+	(envelope-from <richard.henderson@linaro.org>) id 1hRSmP-0001x8-Dp
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:39:30 -0400
+Received: from mail-pg1-x52a.google.com ([2607:f8b0:4864:20::52a]:41983)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hRScb-0004xE-R9
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:29:22 -0400
-Received: by mail-oi1-x231.google.com with SMTP id m204so4124961oib.0
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 19:29:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=icR+CWzDNIbdcZVyJIQbicm9aC17R9QLBeuDJuimjrk=;
-	b=Y7IvYtfpCkFmdvAIWL9Rf3zsUgeAKRp5qW/QHl0tZFc+BN8bS1ZvUDoG76HcbTf6xH
-	X4jlxl8TAZZsI+LgEgD29Dpjt9O3PjTBb2w2sJmcmhH44UcIX4/vfWjTFSaJDXg1XH6A
-	NsoGBiVLYsAAudke+ADhJkc/nCsNOtu8xfh6fSGQlOdtV83bE3q973ZGj4v/j6Ny47eQ
-	KY69vKkr418CuaHocTREnm8q0+R3Mmp52rEULTauDrLxPySIfw1L08WBgYezvOKHk9gn
-	akEQgwNeQF/rxDMJZxcKHwroQJ9RV9fQu/3vnYCMj80TNhJsYhyrnZsCWNN4yrq1tT4c
-	aQSw==
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hRSmO-0001un-Rw
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:39:29 -0400
+Received: by mail-pg1-x52a.google.com with SMTP id z3so2514417pgp.8
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 19:39:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=2mdUhA9QY53J9qxmmtiU77JLGo/5dq+rrvrp7LbuABM=;
+	b=poYWOHWTKxLBY7OV4mGt0f55815aBl2mHO1TmkX/jFJSDEfZ7s5HFWi9JimGO2UNFU
+	/cgN2lBQDaeClPabVrWop1BCoyph9RLVZDBiS5ad8+R0/fhoeXmnBTKiTUQxPVru6ZKG
+	iQO/HFsPy7CSQF7Hb3N7yI/zV3sKTOvUYc4fgofOIta0xysHvNB/9k/umIg0lOemoat/
+	wEnZNrtQqn0+RC7lcqANv2GQm26/hRtx3kmHhd6iYnJauzb94I4j00nQICD5JgvUomIP
+	03jRwRBm4HbYmkt8xyVaqaEr01FuPl0nQGPVGHu6meQGOziFN3nwH0k04LnqpC0aRjLz
+	8JWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=icR+CWzDNIbdcZVyJIQbicm9aC17R9QLBeuDJuimjrk=;
-	b=kIl8vKPONc6P/lXBcT2Un3aRxgtpb1p73xdxZHZcY3vtJ+gyw6Roeg8QsZofp+bUwl
-	K9LA2pPqiQ42+SsczCdZY533PAL/dkArBCqtJcRXXV4iPQo/yOwpPOUfB6r1tzpQPbp7
-	VmriDxpxKykarztIQLfefSq6PAdjzrf8bhag5Btkoo2laEqiGbmlNtTljScu/XZReNpC
-	8MBF91JbsHdVHG/FSlS1Aze+pyoG6xnL1vOETfk5Gie0ihRP2I2A+ko7NMnCqAzl+Vu6
-	Qw6JOTK7jxNN9Rym6cPOw5RaXGypRgRrZC5rKUoLNsPR6hdgaKc6b5QkLivARfXR+Z1u
-	tkBQ==
-X-Gm-Message-State: APjAAAXtXzNP20dl0GDtoPfJKq1/VQIEZVSrK+CwgXlkrZ5u9U6aYDpI
-	dQMqNz4MwySs1qtRJ2zI7T+X7yNRWgrrjpUlaOo=
-X-Google-Smtp-Source: APXvYqy8LJsTlX5pUbwmXFA8gHh98BdbqxAnelxpU9zO5I++1SLPwUfdM+rWq7ObYQ/PbuvEib8Ya3uFHEwBdssclFk=
-X-Received: by 2002:aca:fc43:: with SMTP id a64mr63726oii.129.1558060160123;
-	Thu, 16 May 2019 19:29:20 -0700 (PDT)
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=2mdUhA9QY53J9qxmmtiU77JLGo/5dq+rrvrp7LbuABM=;
+	b=OgbgAm3yECvCazAY9+vZ7f0BXLwJVnrDfAx5FSlSnww7a2N0lGitWH7h4ozq+o3n1k
+	1Ooq22rCEzvisRL0Y6vUFzjToY7UKe1UVXxnuOj31S6MdG+TrYFHU4+u8W6iV+lfTgGy
+	dyXgqsDROnHQrfeZNkZD4gS3G4YSxgdW+5AjdbOtcwWuLW2Loh5q4JYdD6oQJ9yxzAND
+	V86l5sF5uJrsl8w1oyJsT8pEyyXcXtBUsXg8glgW90Zcp/ddD5ARViWmosdhnKFij2jI
+	K+XPY/1OxGclquEioJL+CCg2Ys+gyk5pBNmdpApEpfDE0IWQvuyHdBaoimko+v8ZfB99
+	9hOg==
+X-Gm-Message-State: APjAAAU/a9cPotnabcC++0mAmt9g6qLp77yaXiwqJ4jEKR1+596sbFI3
+	gDFXcIzQE+68FRjMY5oIhZc+1gFJT5A=
+X-Google-Smtp-Source: APXvYqzQWqDj4V5ExCcI8eXIaKwatS2z8yEmhDKPUJPGHAc5rJ62sYDXjrvLPDH80EjbBgJFkAQWBA==
+X-Received: by 2002:a63:441c:: with SMTP id r28mr54053380pga.255.1558060766790;
+	Thu, 16 May 2019 19:39:26 -0700 (PDT)
+Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
+	[97.113.13.231])
+	by smtp.gmail.com with ESMTPSA id w6sm6984152pge.30.2019.05.16.19.39.25
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 16 May 2019 19:39:25 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Thu, 16 May 2019 19:38:59 -0700
+Message-Id: <20190517023924.1686-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-References: <20190424140643.62457-1-liq3ea@163.com>
-	<CAKXe6S+J7OgqJkrDByo3y9M5BGTaCN0Cjb0_WYxDyTvFGg-w8w@mail.gmail.com>
-In-Reply-To: <CAKXe6S+J7OgqJkrDByo3y9M5BGTaCN0Cjb0_WYxDyTvFGg-w8w@mail.gmail.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Fri, 17 May 2019 10:28:44 +0800
-Message-ID: <CAKXe6SL3x6S5Pco6ZdFvPpmwPhPj6d2B7mFLDbyGoSqcGB+KCQ@mail.gmail.com>
-To: Li Qiang <liq3ea@163.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::231
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] fw_cfg_test refactor and add two
- test cases
+X-Received-From: 2607:f8b0:4864:20::52a
+Subject: [Qemu-devel] [PATCH v8 00/25] Add qemu_getrandom and ARMv8.5-RNG etc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,55 +91,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
-	Qemu Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: lvivier@redhat.com, berrange@redhat.com, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping.....
+The change in v8 is to which objects are linked in to user-only
+from the crypto directory.  Daniel asked for all of crypto-obj-y
+to be added, but I have been unable to find a solution that works.
 
-Li Qiang <liq3ea@gmail.com> =E4=BA=8E2019=E5=B9=B45=E6=9C=889=E6=97=A5=E5=
-=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=885:57=E5=86=99=E9=81=93=EF=BC=9A
+If I add crypto-obj-y, then authz-obj-y must be included to resolve
+dependencies.  Daniel suggested splitting authz-obj-y into two, so
+that linux-user plus some of the tools need not link against libpam.
 
-> Ping.... this serials.
->
-> Thanks,
-> Li Qiang
->
-> Li Qiang <liq3ea@163.com> =E4=BA=8E2019=E5=B9=B44=E6=9C=8824=E6=97=A5=E5=
-=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8810:07=E5=86=99=E9=81=93=EF=BC=9A
->
->> In the disscuss of adding reboot timeout test case:
->> https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03304.html
->>
->> Philippe suggested we should uses the only related option for one
->> specific test. However currently we uses one QTestState for all the
->> test cases. In order to achieve Philippe's idea, I split the test case
->> for its own QTestState. As this patchset has changed a lot, I don't bump
->> the version.
->>
->> Change since v1:
->> Add a patch to store the reboot_timeout as little endian
->> Fix the endian issue per Thomas's review
->>
->> Li Qiang (5):
->>   tests: refactor fw_cfg_test
->>   tests: fw_cfg: add a function to get the fw_cfg file
->>   fw_cfg: reboot: store reboot-timeout as little endian
->>   tests: fw_cfg: add reboot_timeout test case
->>   tests: fw_cfg: add splash time test case
->>
->>  hw/nvram/fw_cfg.c     |   4 +-
->>  tests/fw_cfg-test.c   | 125 +++++++++++++++++++++++++++++++++++++++---
->>  tests/libqos/fw_cfg.c |  55 +++++++++++++++++++
->>  tests/libqos/fw_cfg.h |   9 +++
->>  4 files changed, 184 insertions(+), 9 deletions(-)
->>
->> --
->> 2.17.1
->>
->>
->>
+However, I tried that, and in the process managed to break testing.
+I'm not really sure what I did wrong:
+
+  TEST    check-speed: tests/benchmark-crypto-cipher
+  ERROR - too few tests run (expected 32, got 0)
+
+Or maybe it was broken before, but at least this way I'm not touching
+any of the variables that affect tests/Makefile.include.
+
+Given that user-only *is* being linked against the enabled crypto libs,
+the behaviour between static and non-static is identical, which is I
+believe the major portion of Daniel's request.  I think further cleanup
+to the makefiles can be done separately.
+
+
+r~
+
+
+Changes since v7:
+  * Re-instate the configure probe for --static from v5.
+  * Revert the changes to crypto-obj-y.
+  * Rename crypto-aes-obj-y to crypto-user-obj-y.
+  * Add crypto random number objects to crypto-user-obj-y.
+
+Changes since v6:
+  * Drop the crypto-obj-y, crypto-aes-obj-y, and configure changes.
+    This fixes the regression visible in make check-unit, due to
+    objects not being pulled in from libqemuutil.a.
+  * Add a crypto-rng-obj-y, and force it to be random-platform.o.
+    This avoids attempting to link the crypto libraries into the
+    user-only binaries.  Which in turn means we can drop all of
+    the configure changes to cope with the crypto libraries not
+    having the static libraries packaged by recent distros.
+
+Changes since v5:
+  * Merge crypto-obj-y into util-obj-y (patch 2).
+  * Fix leftover crypto-obj-aes-y reference (patch 2).
+  * Add ARM_CP_IO to the RNG registers (patch 22).
+  * Issue gen_io_start/end around ppc DARN (new patch 24).
+  * Issue gen_io_start/end around x86 rdrand (patch 25).
+
+Changes since v4:
+  * Do not autoenable nettle or gcrypt if linking is broken.
+    Fixes --static on fedora 30.
+  * Delay removal of srand() for -seed.
+  * Do not loop for -1 result for ppc64 DARN.
+
+Changes since v3:
+  * Do not autoenable gnutls if linking is broken.
+    Fixes --static on ubuntu 18.04.
+
+Changes since v2:
+  * Changes from review.
+    - getrandom is not exclusive of /dev/urandom fallback.
+    - vnc fails gracefully on crypto failure.
+    - a great renaming.
+  * Drop the "nonblock" argument, as it's not deliverable from the backend.
+  * Propagate Error back through qemu_guest_getrandom.
+  * Add qemu_guest_getrandom_nofail to centralize "Argh! Death!".
+  * Convert hw/misc/
+  * Implement ppc darn.
+  * Implement x86 rdrand.
+
+Changes since v1:
+  * Build crypto-obj-y for linux-user as well.
+  * Several patches to tidy crypto/random-platform.c.
+  * Use getrandom(2) in crypto/random-platform.c.
+  * Use qcrypto_random_bytes in ui/vnc.c.
+  * In qemu_getrandom:
+    - Use g_rand_int instead of srand48.
+    - Use qcrypto_random_bytes instead of getrandom directly.
+
+
+Richard Henderson (25):
+  configure: Link test before auto-enabling crypto libraries
+  build: Link user-only with crypto random number objects
+  crypto: Reverse code blocks in random-platform.c
+  crypto: Do not fail for EINTR during qcrypto_random_bytes
+  crypto: Use O_CLOEXEC in qcrypto_random_init
+  crypto: Use getrandom for qcrypto_random_bytes
+  crypto: Change the qcrypto_random_bytes buffer type to void*
+  ui/vnc: Split out authentication_failed
+  ui/vnc: Use gcrypto_random_bytes for start_auth_vnc
+  util: Add qemu_guest_getrandom and associated routines
+  cpus: Initialize pseudo-random seeds for all guest cpus
+  linux-user: Initialize pseudo-random seeds for all guest cpus
+  linux-user: Call qcrypto_init if not using -seed
+  linux-user: Use qemu_guest_getrandom_nofail for AT_RANDOM
+  linux-user/aarch64: Use qemu_guest_getrandom for PAUTH keys
+  linux-user: Remove srand call
+  aspeed/scu: Use qemu_guest_getrandom_nofail
+  hw/misc/nrf51_rng: Use qemu_guest_getrandom_nofail
+  hw/misc/bcm2835_rng: Use qemu_guest_getrandom_nofail
+  hw/misc/exynos4210_rng: Use qemu_guest_getrandom
+  target/arm: Put all PAC keys into a structure
+  target/arm: Implement ARMv8.5-RNG
+  target/ppc: Use gen_io_start/end around DARN
+  target/ppc: Use qemu_guest_getrandom for DARN
+  target/i386: Implement CPUID_EXT_RDRAND
+
+ Makefile                            |   4 +-
+ Makefile.objs                       |   2 +-
+ Makefile.target                     |   4 +-
+ include/crypto/random.h             |   2 +-
+ include/qemu/guest-random.h         |  68 ++++++++++++++++++
+ include/qom/cpu.h                   |   1 +
+ linux-user/aarch64/target_syscall.h |   2 -
+ target/arm/cpu.h                    |  17 +++--
+ target/i386/helper.h                |   2 +
+ cpus.c                              |   9 +++
+ crypto/random-gcrypt.c              |   2 +-
+ crypto/random-gnutls.c              |   2 +-
+ crypto/random-platform.c            | 104 +++++++++++++++++-----------
+ hw/misc/aspeed_scu.c                |  10 +--
+ hw/misc/bcm2835_rng.c               |  32 ++++-----
+ hw/misc/exynos4210_rng.c            |  11 ++-
+ hw/misc/nrf51_rng.c                 |   4 +-
+ linux-user/aarch64/cpu_loop.c       |  25 +------
+ linux-user/elfload.c                |   8 +--
+ linux-user/main.c                   |  33 +++++----
+ linux-user/syscall.c                |  34 +++++++--
+ target/arm/cpu64.c                  |   1 +
+ target/arm/helper.c                 |  64 ++++++++++++++---
+ target/arm/pauth_helper.c           |  18 ++---
+ target/i386/cpu.c                   |   5 +-
+ target/i386/int_helper.c            |  21 ++++++
+ target/i386/translate.c             |  62 +++++++++++++----
+ target/ppc/int_helper.c             |  39 +++++++----
+ target/ppc/translate.c              |  21 ++++--
+ ui/vnc.c                            |  53 ++++++--------
+ util/guest-random.c                 |  93 +++++++++++++++++++++++++
+ vl.c                                |   4 ++
+ configure                           |  87 +++++++++++++++--------
+ crypto/Makefile.objs                |  11 +--
+ qemu-options.hx                     |  10 +++
+ util/Makefile.objs                  |   1 +
+ 36 files changed, 610 insertions(+), 256 deletions(-)
+ create mode 100644 include/qemu/guest-random.h
+ create mode 100644 util/guest-random.c
+
+-- 
+2.17.1
+
+
