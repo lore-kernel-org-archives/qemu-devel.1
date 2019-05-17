@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B89FC04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 21:22:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AB45C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 21:26:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F6532087B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 21:22:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F6532087B
+	by mail.kernel.org (Postfix) with ESMTPS id C230D2087E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 21:26:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C230D2087E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53853 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53898 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRkIh-000640-9y
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 17:21:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57130)
+	id 1hRkMy-000722-PZ
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 17:26:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hRkHS-0005AE-Tb
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 17:20:44 -0400
+	(envelope-from <bounces@canonical.com>) id 1hRkMD-0006h6-Dy
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 17:25:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hRkHR-0006Mc-Pg
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 17:20:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41964)
+	(envelope-from <bounces@canonical.com>) id 1hRkMA-0000S2-AY
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 17:25:36 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42806)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hRkHR-0006Kh-JP
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 17:20:41 -0400
+	id 1hRkM9-0000Pr-AO
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 17:25:33 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hRkHO-00011K-GS
-	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 21:20:38 +0000
+	id 1hRkM7-0001UD-Dr
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 21:25:31 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6BD382E80CB
-	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 21:20:38 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 587212E80C9
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 21:25:31 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 May 2019 21:13:14 -0000
+Date: Fri, 17 May 2019 21:20:00 -0000
 From: Jose Santiago <1829576@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -56,13 +56,13 @@ X-Launchpad-Bug-Commenters: jlsantiago0
 X-Launchpad-Bug-Reporter: Jose Santiago (jlsantiago0)
 X-Launchpad-Bug-Modifier: Jose Santiago (jlsantiago0)
 References: <155812687142.26079.4364411221525864419.malonedeb@soybean.canonical.com>
-Message-Id: <155812759511.15229.3624601162436764160.launchpad@wampee.canonical.com>
+Message-Id: <155812800036.15148.4705478212363568183.launchpad@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18962";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 98332b9a5480edefb5e42a56dfd29baa24e1d038
+X-Launchpad-Hash: efb34ca699b37d2079afd269db698ce18a8760e9
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1829576] Re: QEMU-SYSTEM-PPC64 Regression
@@ -82,10 +82,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Summary changed:
-
-- PPC64 Regression QEMU-4.0.0
-+ QEMU-SYSTEM-PPC64 Regression QEMU-4.0.0
+** Tags added: ppc64
 
 -- =
 
