@@ -2,88 +2,63 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC228C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 08:55:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 291EAC04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:02:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A15D220833
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 08:55:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A15D220833
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id E3371204EC
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:02:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3371204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44721 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44846 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRYe5-0007YJ-Rf
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 04:55:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60683)
+	id 1hRYl5-0002S8-0L
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 05:02:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hRYad-0005KR-AH
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:51:44 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hRYjG-0001mK-Fg
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:00:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hRYab-0003lE-Sj
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:51:43 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:55216
-	helo=mail.default.ilande.uk0.bigv.io)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hRYab-0003ke-Kd
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:51:41 -0400
-Received: from host109-146-247-8.range109-146.btcentralplus.com
-	([109.146.247.8] helo=[192.168.1.65])
-	by mail.default.ilande.uk0.bigv.io with esmtpsa
-	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hRYZM-0000pX-M3; Fri, 17 May 2019 09:50:26 +0100
-To: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org
-References: <1557923493-4836-1-git-send-email-frederic.konrad@adacore.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
-	mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
-	3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
-	E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
-	PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
-	PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
-	AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
-	OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
-	NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
-	mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
-	z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
-	T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
-	DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
-	y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
-	2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
-	14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
-	YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
-	Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
-	BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
-	opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
-	NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
-	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
-	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
-	imgcU9TTGC5qd9g=
-Message-ID: <c0bba828-7cc8-6ac9-a863-696e93796398@ilande.co.uk>
-Date: Fri, 17 May 2019 09:51:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <imammedo@redhat.com>) id 1hRYjE-0008BZ-DV
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:00:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54844)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hRYjE-0008Ah-4i
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:00:36 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CB02A81120;
+	Fri, 17 May 2019 09:00:28 +0000 (UTC)
+Received: from Igors-MacBook-Pro (unknown [10.40.205.69])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C883C348F4;
+	Fri, 17 May 2019 09:00:20 +0000 (UTC)
+Date: Fri, 17 May 2019 11:00:13 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Like Xu <like.xu@linux.intel.com>
+Message-ID: <20190517110013.2fef51ee@Igors-MacBook-Pro>
+In-Reply-To: <1557131596-25403-3-git-send-email-like.xu@linux.intel.com>
+References: <1557131596-25403-1-git-send-email-like.xu@linux.intel.com>
+	<1557131596-25403-3-git-send-email-like.xu@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1557923493-4836-1-git-send-email-frederic.konrad@adacore.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 109.146.247.8
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.28]);
+	Fri, 17 May 2019 09:00:29 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH v3 0/7] Leon3 patches
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 02/10] cpu/topology: related call chains
+ refactoring to pass MachineState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,72 +70,407 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, philmd@redhat.com, atar4qemu@gmail.com,
-	chouteau@adacore.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Philippe =?UTF-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+	qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Alistair Francis <alistair23@gmail.com>,
+	Alex =?UTF-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/05/2019 13:31, KONRAD Frederic wrote:
+On Mon,  6 May 2019 16:33:08 +0800
+Like Xu <like.xu@linux.intel.com> wrote:
 
-> Hi all,
+> It's recommended to access smp variables via MachineState
+> as an incoming parameter. This approach applies on legacy
+> smbios_*_tables*(), *_machine_reset(), *__hot_add_cpu()
+> and related *_create_cpu() for later smp variables usages.
 > 
-> Those are some little fixes for the leon3 machine:
->   * The first patch makes an error message more friendly when no kernel / bios
->     are provided.
->   * The three next one remove the old-style create function as suggested by
->     Mark.
->   * The fifth part initializes the uart and the timer when no bios are
->     provided.
->   * The sixth part adds AHB and APB plug and play devices to allow to boot
->     linux.
->   * The last part adds myself to the MAINTAINERS for this board.
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> ---
+>  hw/arm/virt.c                |  2 +-
+>  hw/hppa/machine.c            |  2 +-
+>  hw/i386/pc.c                 |  9 ++++-----
+>  hw/mips/mips_malta.c         | 21 +++++++++++----------
+>  hw/ppc/pnv.c                 |  3 +--
+>  hw/ppc/spapr.c               |  3 +--
+>  hw/s390x/s390-virtio-ccw.c   |  6 +++---
+>  hw/smbios/smbios.c           | 26 +++++++++++++++-----------
+>  include/hw/boards.h          |  4 ++--
+>  include/hw/firmware/smbios.h |  5 +++--
+>  include/hw/i386/pc.h         |  2 +-
+>  qmp.c                        |  2 +-
+>  vl.c                         |  2 +-
+>  13 files changed, 45 insertions(+), 42 deletions(-)
 > 
-> The test images are available here: https://www.gaisler.com/anonftp/linux/lin
-> ux-2.6/images/leon-linux-4.9/leon-linux-4.9-1.0/up/
-> 
-> Tested with:
->   qemu-system-sparc -M leon3_generic --nographic --kernel image.ram
-> 
-> V2 -> V3:
->   * rebased.
->   * added patches 1, 2, 3, 4 as suggested by Mark.
->   * fixed DEVICE_NATIVE_ENDIAN to DEVICE_BIG_ENDIAN in patch 6 as suggested by
->     Mark.
->   * added include/hw/*/grlib* to the MAINTAINED file as suggested by Mark.
-> V1 -> V2:
->   * minor fixes in the first patch suggested by Philippe.
-> 
-> Regards,
-> Fred
-> 
-> KONRAD Frederic (7):
->   leon3: fix the error message when no bios are provided
->   grlib,irqmp: get rid of the old-style create function
->   grlib,gptimer: get rid of the old-style create function
->   grlib,apbuart: get rid of the old-style create function
->   leon3: add a little bootloader
->   leon3: introduce the plug and play mechanism
->   MAINTAINERS: add myself for leon3
-> 
->  MAINTAINERS                         |   3 +-
->  hw/char/grlib_apbuart.c             |   4 +-
->  hw/intc/grlib_irqmp.c               |   3 +-
->  hw/misc/Makefile.objs               |   2 +
->  hw/misc/grlib_ahb_apb_pnp.c         | 269 ++++++++++++++++++++++++++++++++++++
->  hw/sparc/leon3.c                    | 157 ++++++++++++++++++---
->  hw/timer/grlib_gptimer.c            |   4 +-
->  include/hw/misc/grlib_ahb_apb_pnp.h |  60 ++++++++
->  include/hw/sparc/grlib.h            |  78 +----------
->  9 files changed, 483 insertions(+), 97 deletions(-)
->  create mode 100644 hw/misc/grlib_ahb_apb_pnp.c
->  create mode 100644 include/hw/misc/grlib_ahb_apb_pnp.h
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 16ba67f..1b02ba4 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1290,7 +1290,7 @@ static void virt_build_smbios(VirtMachineState *vms)
+>                          vmc->smbios_old_sys_ver ? "1.0" : mc->name, false,
+>                          true, SMBIOS_ENTRY_POINT_30);
+>  
+> -    smbios_get_tables(NULL, 0, &smbios_tables, &smbios_tables_len,
+> +    smbios_get_tables(MACHINE(vms), NULL, 0, &smbios_tables, &smbios_tables_len,
+>                        &smbios_anchor, &smbios_anchor_len);
+>  
+>      if (smbios_anchor) {
+> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+> index d1b1d3c..416e67b 100644
+> --- a/hw/hppa/machine.c
+> +++ b/hw/hppa/machine.c
+> @@ -240,7 +240,7 @@ static void machine_hppa_init(MachineState *machine)
+>      cpu[0]->env.gr[21] = smp_cpus;
+>  }
+>  
+> -static void hppa_machine_reset(void)
+> +static void hppa_machine_reset(MachineState *ms)
+>  {
+>      int i;
+>  
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index d98b737..9bcd867 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -962,7 +962,7 @@ static void pc_build_smbios(PCMachineState *pcms)
+>      /* tell smbios about cpuid version and features */
+>      smbios_set_cpuid(cpu->env.cpuid_version, cpu->env.features[FEAT_1_EDX]);
+>  
+> -    smbios_tables = smbios_get_table_legacy(&smbios_tables_len);
+> +    smbios_tables = smbios_get_table_legacy(ms, &smbios_tables_len);
+>      if (smbios_tables) {
+>          fw_cfg_add_bytes(pcms->fw_cfg, FW_CFG_SMBIOS_ENTRIES,
+>                           smbios_tables, smbios_tables_len);
+> @@ -979,7 +979,7 @@ static void pc_build_smbios(PCMachineState *pcms)
+>              array_count++;
+>          }
+>      }
+> -    smbios_get_tables(mem_array, array_count,
+> +    smbios_get_tables(ms, mem_array, array_count,
+>                        &smbios_tables, &smbios_tables_len,
+>                        &smbios_anchor, &smbios_anchor_len);
+>      g_free(mem_array);
+> @@ -1534,9 +1534,8 @@ static void pc_new_cpu(const char *typename, int64_t apic_id, Error **errp)
+>      error_propagate(errp, local_err);
+>  }
+>  
+> -void pc_hot_add_cpu(const int64_t id, Error **errp)
+> +void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp)
+>  {
+> -    MachineState *ms = MACHINE(qdev_get_machine());
+>      int64_t apic_id = x86_cpu_apic_id_from_index(id);
+>      Error *local_err = NULL;
+>  
+> @@ -2622,7 +2621,7 @@ static void pc_machine_initfn(Object *obj)
+>      pc_system_flash_create(pcms);
+>  }
+>  
+> -static void pc_machine_reset(void)
+> +static void pc_machine_reset(MachineState *machine)
+>  {
+>      CPUState *cs;
+>      X86CPU *cpu;
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index 439665a..534e705 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -1124,14 +1124,14 @@ static void main_cpu_reset(void *opaque)
+>      }
+>  }
+>  
+> -static void create_cpu_without_cps(const char *cpu_type,
+> +static void create_cpu_without_cps(MachineState *ms, const char *cpu_type,
+>                                     qemu_irq *cbus_irq, qemu_irq *i8259_irq)
+>  {
+>      CPUMIPSState *env;
+>      MIPSCPU *cpu;
+>      int i;
+>  
+> -    for (i = 0; i < smp_cpus; i++) {
+> +    for (i = 0; i < ms->smp.cpus; i++) {
+>          cpu = MIPS_CPU(cpu_create(cpu_type));
+>  
+>          /* Init internal devices */
+> @@ -1146,7 +1146,7 @@ static void create_cpu_without_cps(const char *cpu_type,
+>      *cbus_irq = env->irq[4];
+>  }
+>  
+> -static void create_cps(MaltaState *s, const char *cpu_type,
+> +static void create_cps(MachineState *ms, MaltaState *s, const char *cpu_type,
+>                         qemu_irq *cbus_irq, qemu_irq *i8259_irq)
+>  {
+>      Error *err = NULL;
+> @@ -1155,7 +1155,7 @@ static void create_cps(MaltaState *s, const char *cpu_type,
+>      qdev_set_parent_bus(DEVICE(s->cps), sysbus_get_default());
+>  
+>      object_property_set_str(OBJECT(s->cps), cpu_type, "cpu-type", &err);
+> -    object_property_set_int(OBJECT(s->cps), smp_cpus, "num-vp", &err);
+> +    object_property_set_int(OBJECT(s->cps), ms->smp.cpus, "num-vp", &err);
+>      object_property_set_bool(OBJECT(s->cps), true, "realized", &err);
+>      if (err != NULL) {
+>          error_report("%s", error_get_pretty(err));
+> @@ -1168,13 +1168,14 @@ static void create_cps(MaltaState *s, const char *cpu_type,
+>      *cbus_irq = NULL;
+>  }
+>  
+> -static void mips_create_cpu(MaltaState *s, const char *cpu_type,
+> -                            qemu_irq *cbus_irq, qemu_irq *i8259_irq)
+> +static void mips_create_cpu(MachineState *ms, MaltaState *s,
+> +                            const char *cpu_type, qemu_irq *cbus_irq,
+> +                            qemu_irq *i8259_irq)
+>  {
+> -    if ((smp_cpus > 1) && cpu_supports_cps_smp(cpu_type)) {
+> -        create_cps(s, cpu_type, cbus_irq, i8259_irq);
+> +    if ((ms->smp.cpus > 1) && cpu_supports_cps_smp(cpu_type)) {
+> +        create_cps(ms, s, cpu_type, cbus_irq, i8259_irq);
+>      } else {
+> -        create_cpu_without_cps(cpu_type, cbus_irq, i8259_irq);
+> +        create_cpu_without_cps(ms, cpu_type, cbus_irq, i8259_irq);
+>      }
+>  }
+>  
+> @@ -1218,7 +1219,7 @@ void mips_malta_init(MachineState *machine)
+>      qdev_init_nofail(dev);
+>  
+>      /* create CPU */
+> -    mips_create_cpu(s, machine->cpu_type, &cbus_irq, &i8259_irq);
+> +    mips_create_cpu(machine, s, machine->cpu_type, &cbus_irq, &i8259_irq);
+                                   ^^^^^^^^^^^^^^
+if cpu_type always comes from machine->cpu_type, wherever mips_create_cpu() is called
+it would be better to drop this argument since you are passing in machine
+as the 1st argument
 
-Thanks for sorting out the old-style functions, this version looks much better. I've
-applied this to my qemu-sparc branch and will send a PR shortly.
+>  
+>      /* allocate RAM */
+>      if (ram_size > 2 * GiB) {
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index dfb4ea5..1e8c505 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -520,9 +520,8 @@ static void pnv_powerdown_notify(Notifier *n, void *opaque)
+>      }
+>  }
+>  
+> -static void pnv_reset(void)
+> +static void pnv_reset(MachineState *machine)
+>  {
+> -    MachineState *machine = MACHINE(qdev_get_machine());
+>      PnvMachineState *pnv = PNV_MACHINE(machine);
+>      void *fdt;
+>      Object *obj;
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 2ef3ce4..7fb34de 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1689,9 +1689,8 @@ static int spapr_reset_drcs(Object *child, void *opaque)
+>      return 0;
+>  }
+>  
+> -static void spapr_machine_reset(void)
+> +static void spapr_machine_reset(MachineState *machine)
+>  {
+> -    MachineState *machine = MACHINE(qdev_get_machine());
+>      SpaprMachineState *spapr = SPAPR_MACHINE(machine);
+>      PowerPCCPU *first_ppc_cpu;
+>      uint32_t rtas_limit;
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index bbc6e8f..ed1fe7a 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -338,7 +338,7 @@ static inline void s390_do_cpu_ipl(CPUState *cs, run_on_cpu_data arg)
+>      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
+>  }
+>  
+> -static void s390_machine_reset(void)
+> +static void s390_machine_reset(MachineState *machine)
+>  {
+>      enum s390_reset reset_type;
+>      CPUState *cs, *t;
+> @@ -439,9 +439,9 @@ static HotplugHandler *s390_get_hotplug_handler(MachineState *machine,
+>      return NULL;
+>  }
+>  
+> -static void s390_hot_add_cpu(const int64_t id, Error **errp)
+> +static void s390_hot_add_cpu(MachineState *machine,
+> +                             const int64_t id, Error **errp)
+>  {
+> -    MachineState *machine = MACHINE(qdev_get_machine());
+>      ObjectClass *oc;
+>  
+>      g_assert(machine->possible_cpus->cpus[0].cpu);
+> diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+> index 47be907..0bf9a01 100644
+> --- a/hw/smbios/smbios.c
+> +++ b/hw/smbios/smbios.c
+> @@ -26,6 +26,7 @@
+>  #include "sysemu/cpus.h"
+>  #include "hw/firmware/smbios.h"
+>  #include "hw/loader.h"
+> +#include "hw/boards.h"
+>  #include "exec/cpu-common.h"
+>  #include "smbios_build.h"
+>  
+> @@ -340,9 +341,10 @@ static void smbios_register_config(void)
+>  
+>  opts_init(smbios_register_config);
+>  
+> -static void smbios_validate_table(void)
+> +static void smbios_validate_table(MachineState *ms)
+>  {
+> -    uint32_t expect_t4_count = smbios_legacy ? smp_cpus : smbios_smp_sockets;
+> +    uint32_t expect_t4_count = smbios_legacy ?
+> +                                        ms->smp.cpus : smbios_smp_sockets;
+>  
+>      if (smbios_type4_count && smbios_type4_count != expect_t4_count) {
+>          error_report("Expected %d SMBIOS Type 4 tables, got %d instead",
+> @@ -427,7 +429,7 @@ static void smbios_build_type_1_fields(void)
+>      }
+>  }
+>  
+> -uint8_t *smbios_get_table_legacy(size_t *length)
+> +uint8_t *smbios_get_table_legacy(MachineState *ms, size_t *length)
+>  {
+>      if (!smbios_legacy) {
+>          *length = 0;
+> @@ -437,7 +439,7 @@ uint8_t *smbios_get_table_legacy(size_t *length)
+>      if (!smbios_immutable) {
+>          smbios_build_type_0_fields();
+>          smbios_build_type_1_fields();
+> -        smbios_validate_table();
+> +        smbios_validate_table(ms);
+>          smbios_immutable = true;
+>      }
+>      *length = smbios_entries_len;
+> @@ -569,7 +571,7 @@ static void smbios_build_type_3_table(void)
+>      SMBIOS_BUILD_TABLE_POST;
+>  }
+>  
+> -static void smbios_build_type_4_table(unsigned instance)
+> +static void smbios_build_type_4_table(MachineState *ms, unsigned instance)
+>  {
+>      char sock_str[128];
+>  
+> @@ -596,8 +598,8 @@ static void smbios_build_type_4_table(unsigned instance)
+>      SMBIOS_TABLE_SET_STR(4, serial_number_str, type4.serial);
+>      SMBIOS_TABLE_SET_STR(4, asset_tag_number_str, type4.asset);
+>      SMBIOS_TABLE_SET_STR(4, part_number_str, type4.part);
+> -    t->core_count = t->core_enabled = smp_cores;
+> -    t->thread_count = smp_threads;
+> +    t->core_count = t->core_enabled = ms->smp.cores;
+> +    t->thread_count = ms->smp.threads;
+>      t->processor_characteristics = cpu_to_le16(0x02); /* Unknown */
+>      t->processor_family2 = cpu_to_le16(0x01); /* Other */
+>  
+> @@ -838,7 +840,8 @@ static void smbios_entry_point_setup(void)
+>      }
+>  }
+>  
+> -void smbios_get_tables(const struct smbios_phys_mem_area *mem_array,
+> +void smbios_get_tables(MachineState *ms,
+> +                       const struct smbios_phys_mem_area *mem_array,
+>                         const unsigned int mem_array_size,
+>                         uint8_t **tables, size_t *tables_len,
+>                         uint8_t **anchor, size_t *anchor_len)
+> @@ -857,11 +860,12 @@ void smbios_get_tables(const struct smbios_phys_mem_area *mem_array,
+>          smbios_build_type_2_table();
+>          smbios_build_type_3_table();
+>  
+> -        smbios_smp_sockets = DIV_ROUND_UP(smp_cpus, smp_cores * smp_threads);
+> +        smbios_smp_sockets = DIV_ROUND_UP(ms->smp.cpus,
+> +                                          ms->smp.cores * ms->smp.threads);
+>          assert(smbios_smp_sockets >= 1);
+>  
+>          for (i = 0; i < smbios_smp_sockets; i++) {
+> -            smbios_build_type_4_table(i);
+> +            smbios_build_type_4_table(ms, i);
+>          }
+>  
+>          smbios_build_type_11_table();
+> @@ -887,7 +891,7 @@ void smbios_get_tables(const struct smbios_phys_mem_area *mem_array,
+>          smbios_build_type_38_table();
+>          smbios_build_type_127_table();
+>  
+> -        smbios_validate_table();
+> +        smbios_validate_table(ms);
+>          smbios_entry_point_setup();
+>          smbios_immutable = true;
+>      }
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index dc89c6d..a7eb0bf 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -171,8 +171,8 @@ struct MachineClass {
+>      const char *deprecation_reason;
+>  
+>      void (*init)(MachineState *state);
+> -    void (*reset)(void);
+> -    void (*hot_add_cpu)(const int64_t id, Error **errp);
+> +    void (*reset)(MachineState *state);
+> +    void (*hot_add_cpu)(MachineState *state, const int64_t id, Error **errp);
+>      int (*kvm_type)(MachineState *machine, const char *arg);
+>  
+>      BlockInterfaceType block_default_type;
+> diff --git a/include/hw/firmware/smbios.h b/include/hw/firmware/smbios.h
+> index 6fef32a..02a0ced 100644
+> --- a/include/hw/firmware/smbios.h
+> +++ b/include/hw/firmware/smbios.h
+> @@ -268,8 +268,9 @@ void smbios_set_cpuid(uint32_t version, uint32_t features);
+>  void smbios_set_defaults(const char *manufacturer, const char *product,
+>                           const char *version, bool legacy_mode,
+>                           bool uuid_encoded, SmbiosEntryPointType ep_type);
+> -uint8_t *smbios_get_table_legacy(size_t *length);
+> -void smbios_get_tables(const struct smbios_phys_mem_area *mem_array,
+> +uint8_t *smbios_get_table_legacy(MachineState *ms, size_t *length);
+> +void smbios_get_tables(MachineState *ms,
+> +                       const struct smbios_phys_mem_area *mem_array,
+>                         const unsigned int mem_array_size,
+>                         uint8_t **tables, size_t *tables_len,
+>                         uint8_t **anchor, size_t *anchor_len);
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 43df723..ce3c229 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -186,7 +186,7 @@ void pc_register_ferr_irq(qemu_irq irq);
+>  void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
+>  
+>  void pc_cpus_init(PCMachineState *pcms);
+> -void pc_hot_add_cpu(const int64_t id, Error **errp);
+> +void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp);
+>  
+>  void pc_guest_info_init(PCMachineState *pcms);
+>  
+> diff --git a/qmp.c b/qmp.c
+> index b92d62c..ba7aa04 100644
+> --- a/qmp.c
+> +++ b/qmp.c
+> @@ -123,7 +123,7 @@ void qmp_cpu_add(int64_t id, Error **errp)
+>  
+>      mc = MACHINE_GET_CLASS(current_machine);
+>      if (mc->hot_add_cpu) {
+> -        mc->hot_add_cpu(id, errp);
+> +        mc->hot_add_cpu(current_machine, id, errp);
+>      } else {
+>          error_setg(errp, "Not supported");
+>      }
+> diff --git a/vl.c b/vl.c
+> index 43fd247..34f05b2 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1706,7 +1706,7 @@ void qemu_system_reset(ShutdownCause reason)
+>      cpu_synchronize_all_states();
+>  
+>      if (mc && mc->reset) {
+> -        mc->reset();
+> +        mc->reset(current_machine);
+>      } else {
+>          qemu_devices_reset();
+>      }
 
-
-ATB,
-
-Mark.
 
