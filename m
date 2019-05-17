@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ABD8C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:44:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 413AAC04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:46:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EF032087B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:44:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EF032087B
+	by mail.kernel.org (Postfix) with ESMTPS id 01ED42087B
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:46:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01ED42087B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46111 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46172 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRaLk-0002lh-Ir
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 06:44:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49394)
+	id 1hRaNk-0004e3-5Q
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 06:46:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hRa6R-0006TZ-ET
+	(envelope-from <david@redhat.com>) id 1hRa6Q-0006HC-Qm
 	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:28:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hRa1m-0005E5-Ec
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:23:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40314)
+	(envelope-from <david@redhat.com>) id 1hRa1o-0005FV-7z
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:23:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54564)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hRa1m-0005DI-6g; Fri, 17 May 2019 06:23:50 -0400
+	id 1hRa1o-0005F3-0G; Fri, 17 May 2019 06:23:52 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 799A330832E4;
-	Fri, 17 May 2019 10:23:49 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 464D63179150;
+	Fri, 17 May 2019 10:23:51 +0000 (UTC)
 Received: from t460s.redhat.com (unknown [10.36.118.100])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 017A338E01;
-	Fri, 17 May 2019 10:23:47 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C236719732;
+	Fri, 17 May 2019 10:23:49 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 17 May 2019 12:21:31 +0200
-Message-Id: <20190517102145.21812-27-david@redhat.com>
+Date: Fri, 17 May 2019 12:21:32 +0200
+Message-Id: <20190517102145.21812-28-david@redhat.com>
 In-Reply-To: <20190517102145.21812-1-david@redhat.com>
 References: <20190517102145.21812-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Fri, 17 May 2019 10:23:49 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Fri, 17 May 2019 10:23:51 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 26/40] s390x/tcg: Implement
- VECTOR ELEMENT ROTATE LEFT LOGICAL
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 27/40] s390x/tcg: Implement
+ VECTOR ELEMENT ROTATE AND INSERT UNDER MASK
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,103 +76,108 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Take care of properly taking the modulo of the count. We might later
-want to come back and create a variant of VERLL where the base register
-is 0, resulting in an immediate.
+Use the new vector expansion for GVecGen3i.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/helper.h           |  4 +++
- target/s390x/insn-data.def      |  3 ++
- target/s390x/translate_vx.inc.c | 60 +++++++++++++++++++++++++++++++++
- target/s390x/vec_int_helper.c   | 31 +++++++++++++++++
- 4 files changed, 98 insertions(+)
+ target/s390x/helper.h           |  2 ++
+ target/s390x/insn-data.def      |  2 ++
+ target/s390x/translate_vx.inc.c | 51 +++++++++++++++++++++++++++++++++
+ target/s390x/vec_int_helper.c   | 20 +++++++++++++
+ 4 files changed, 75 insertions(+)
 
 diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 20b677917b..b3e15cfe8c 100644
+index b3e15cfe8c..d570f763d9 100644
 --- a/target/s390x/helper.h
 +++ b/target/s390x/helper.h
-@@ -198,6 +198,10 @@ DEF_HELPER_FLAGS_4(gvec_vmlo16, TCG_CALL_NO_RWG, voi=
+@@ -202,6 +202,8 @@ DEF_HELPER_FLAGS_4(gvec_verllv8, TCG_CALL_NO_RWG, voi=
 d, ptr, cptr, cptr, i32)
- DEF_HELPER_FLAGS_4(gvec_vmlo32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-i32)
- DEF_HELPER_FLAGS_3(gvec_vpopct8, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
- DEF_HELPER_FLAGS_3(gvec_vpopct16, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_verllv8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
- i32)
-+DEF_HELPER_FLAGS_4(gvec_verllv16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr=
+ DEF_HELPER_FLAGS_4(gvec_verllv16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr=
 , i32)
-+DEF_HELPER_FLAGS_4(gvec_verll8, TCG_CALL_NO_RWG, void, ptr, cptr, i64, i=
+ DEF_HELPER_FLAGS_4(gvec_verll8, TCG_CALL_NO_RWG, void, ptr, cptr, i64, i=
 32)
-+DEF_HELPER_FLAGS_4(gvec_verll16, TCG_CALL_NO_RWG, void, ptr, cptr, i64, =
+ DEF_HELPER_FLAGS_4(gvec_verll16, TCG_CALL_NO_RWG, void, ptr, cptr, i64, =
 i32)
++DEF_HELPER_FLAGS_4(gvec_verim8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
+i32)
++DEF_HELPER_FLAGS_4(gvec_verim16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
+ i32)
 =20
  #ifndef CONFIG_USER_ONLY
  DEF_HELPER_3(servc, i32, env, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 0f786d6ab1..e765c15941 100644
+index e765c15941..59c323a796 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1146,6 +1146,9 @@
-     F(0xe76f, VOC,     VRR_c, VE,  0, 0, 0, 0, voc, 0, IF_VEC)
- /* VECTOR POPULATION COUNT */
-     F(0xe750, VPOPCT,  VRR_a, V,   0, 0, 0, 0, vpopct, 0, IF_VEC)
-+/* VECTOR ELEMENT ROTATE LEFT LOGICAL */
-+    F(0xe773, VERLLV,  VRR_c, V,   0, 0, 0, 0, verllv, 0, IF_VEC)
-+    F(0xe733, VERLL,   VRS_a, V,   la2, 0, 0, 0, verll, 0, IF_VEC)
+@@ -1149,6 +1149,8 @@
+ /* VECTOR ELEMENT ROTATE LEFT LOGICAL */
+     F(0xe773, VERLLV,  VRR_c, V,   0, 0, 0, 0, verllv, 0, IF_VEC)
+     F(0xe733, VERLL,   VRS_a, V,   la2, 0, 0, 0, verll, 0, IF_VEC)
++/* VECTOR ELEMENT ROTATE AND INSERT UNDER MASK */
++    F(0xe772, VERIM,   VRI_d, V,   0, 0, 0, 0, verim, 0, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index 7e4876247e..0ca3bb3e6a 100644
+index 0ca3bb3e6a..a2de139cfc 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -185,6 +185,9 @@ static void get_vec_element_ptr_i64(TCGv_ptr ptr, uin=
+@@ -197,6 +197,9 @@ static void get_vec_element_ptr_i64(TCGv_ptr ptr, uin=
 t8_t reg, TCGv_i64 enr,
- #define gen_gvec_2(v1, v2, gen) \
-     tcg_gen_gvec_2(vec_full_reg_offset(v1), vec_full_reg_offset(v2), \
-                    16, 16, gen)
-+#define gen_gvec_2s(v1, v2, c, gen) \
-+    tcg_gen_gvec_2s(vec_full_reg_offset(v1), vec_full_reg_offset(v2), \
-+                    16, 16, c, gen)
- #define gen_gvec_3(v1, v2, v3, gen) \
-     tcg_gen_gvec_3(vec_full_reg_offset(v1), vec_full_reg_offset(v2), \
-                    vec_full_reg_offset(v3), 16, 16, gen)
-@@ -1845,3 +1848,60 @@ static DisasJumpType op_vpopct(DisasContext *s, Di=
-sasOps *o)
-     gen_gvec_2(get_field(s->fields, v1), get_field(s->fields, v2), &g[es=
-]);
+ #define gen_gvec_3_ptr(v1, v2, v3, ptr, data, fn) \
+     tcg_gen_gvec_3_ptr(vec_full_reg_offset(v1), vec_full_reg_offset(v2),=
+ \
+                        vec_full_reg_offset(v3), ptr, 16, 16, data, fn)
++#define gen_gvec_3i(v1, v2, v3, c, gen) \
++    tcg_gen_gvec_3i(vec_full_reg_offset(v1), vec_full_reg_offset(v2), \
++                    vec_full_reg_offset(v3), c, 16, 16, gen)
+ #define gen_gvec_4(v1, v2, v3, v4, gen) \
+     tcg_gen_gvec_4(vec_full_reg_offset(v1), vec_full_reg_offset(v2), \
+                    vec_full_reg_offset(v3), vec_full_reg_offset(v4), \
+@@ -1905,3 +1908,51 @@ static DisasJumpType op_verll(DisasContext *s, Dis=
+asOps *o)
+                 &g[es]);
      return DISAS_NEXT;
  }
 +
-+static void gen_rll_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++static void gen_rim_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b, int32_t c)
 +{
-+    TCGv_i32 t0 =3D tcg_temp_new_i32();
++    TCGv_i32 t =3D tcg_temp_new_i32();
 +
-+    tcg_gen_andi_i32(t0, b, 31);
-+    tcg_gen_rotl_i32(d, a, t0);
-+    tcg_temp_free_i32(t0);
++    tcg_gen_rotli_i32(t, a, c & 31);
++    tcg_gen_and_i32(t, t, b);
++    tcg_gen_andc_i32(d, d, b);
++    tcg_gen_or_i32(d, d, t);
++
++    tcg_temp_free_i32(t);
 +}
 +
-+static void gen_rll_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
++static void gen_rim_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b, int64_t c)
 +{
-+    TCGv_i64 t0 =3D tcg_temp_new_i64();
++    TCGv_i64 t =3D tcg_temp_new_i64();
 +
-+    tcg_gen_andi_i64(t0, b, 63);
-+    tcg_gen_rotl_i64(d, a, t0);
-+    tcg_temp_free_i64(t0);
++    tcg_gen_rotli_i64(t, a, c & 63);
++    tcg_gen_and_i64(t, t, b);
++    tcg_gen_andc_i64(d, d, b);
++    tcg_gen_or_i64(d, d, t);
++
++    tcg_temp_free_i64(t);
 +}
 +
-+static DisasJumpType op_verllv(DisasContext *s, DisasOps *o)
++static DisasJumpType op_verim(DisasContext *s, DisasOps *o)
 +{
-+    const uint8_t es =3D get_field(s->fields, m4);
-+    static const GVecGen3 g[4] =3D {
-+        { .fno =3D gen_helper_gvec_verllv8, },
-+        { .fno =3D gen_helper_gvec_verllv16, },
-+        { .fni4 =3D gen_rll_i32, },
-+        { .fni8 =3D gen_rll_i64, },
++    const uint8_t es =3D get_field(s->fields, m5);
++    const uint8_t i4 =3D get_field(s->fields, i4) &
++                       (NUM_VEC_ELEMENT_BITS(es) - 1);
++    static const GVecGen3i g[4] =3D {
++        { .fno =3D gen_helper_gvec_verim8, },
++        { .fno =3D gen_helper_gvec_verim16, },
++        { .fni4 =3D gen_rim_i32,
++          .load_dest =3D true, },
++        { .fni8 =3D gen_rim_i64,
++          .load_dest =3D true, },
 +    };
 +
 +    if (es > ES_64) {
@@ -180,94 +185,62 @@ sasOps *o)
 +        return DISAS_NORETURN;
 +    }
 +
-+    gen_gvec_3(get_field(s->fields, v1), get_field(s->fields, v2),
-+               get_field(s->fields, v3), &g[es]);
-+    return DISAS_NEXT;
-+}
-+
-+static DisasJumpType op_verll(DisasContext *s, DisasOps *o)
-+{
-+    const uint8_t es =3D get_field(s->fields, m4);
-+    static const GVecGen2s g[4] =3D {
-+        { .fno =3D gen_helper_gvec_verll8, },
-+        { .fno =3D gen_helper_gvec_verll16, },
-+        { .fni4 =3D gen_rll_i32, },
-+        { .fni8 =3D gen_rll_i64, },
-+    };
-+
-+    if (es > ES_64) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+    gen_gvec_2s(get_field(s->fields, v1), get_field(s->fields, v3), o->a=
-ddr1,
-+                &g[es]);
++    gen_gvec_3i(get_field(s->fields, v1), get_field(s->fields, v2),
++                get_field(s->fields, v3), i4, &g[es]);
 +    return DISAS_NEXT;
 +}
 diff --git a/target/s390x/vec_int_helper.c b/target/s390x/vec_int_helper.=
 c
-index fd8162f1f1..a3c8f09eac 100644
+index a3c8f09eac..b881fb722d 100644
 --- a/target/s390x/vec_int_helper.c
 +++ b/target/s390x/vec_int_helper.c
-@@ -478,3 +478,34 @@ void HELPER(gvec_vpopct##BITS)(void *v1, const void =
-*v2, uint32_t desc)        \
+@@ -14,6 +14,7 @@
+ #include "cpu.h"
+ #include "vec.h"
+ #include "exec/helper-proto.h"
++#include "tcg/tcg-gvec-desc.h"
+=20
+ static bool s390_vec_is_zero(const S390Vector *v)
+ {
+@@ -509,3 +510,22 @@ void HELPER(gvec_verll##BITS)(void *v1, const void *=
+v2, uint64_t count,        \
  }
- DEF_VPOPCT(8)
- DEF_VPOPCT(16)
+ DEF_VERLL(8)
+ DEF_VERLL(16)
 +
-+#define DEF_VERLLV(BITS)                                                =
++#define DEF_VERIM(BITS)                                                 =
        \
-+void HELPER(gvec_verllv##BITS)(void *v1, const void *v2, const void *v3,=
-       \
-+                               uint32_t desc)                           =
-       \
-+{                                                                       =
-       \
-+    int i;                                                              =
-       \
-+                                                                        =
-       \
-+    for (i =3D 0; i < (128 / BITS); i++) {                              =
-         \
-+        const uint##BITS##_t a =3D s390_vec_read_element##BITS(v2, i);  =
-         \
-+        const uint##BITS##_t b =3D s390_vec_read_element##BITS(v3, i);  =
-         \
-+                                                                        =
-       \
-+        s390_vec_write_element##BITS(v1, i, rol##BITS(a, b));           =
-       \
-+    }                                                                   =
-       \
-+}
-+DEF_VERLLV(8)
-+DEF_VERLLV(16)
-+
-+#define DEF_VERLL(BITS)                                                 =
-       \
-+void HELPER(gvec_verll##BITS)(void *v1, const void *v2, uint64_t count, =
++void HELPER(gvec_verim##BITS)(void *v1, const void *v2, const void *v3, =
        \
 +                              uint32_t desc)                            =
        \
 +{                                                                       =
        \
++    const uint8_t count =3D simd_data(desc);                            =
+         \
 +    int i;                                                              =
        \
 +                                                                        =
        \
 +    for (i =3D 0; i < (128 / BITS); i++) {                              =
          \
-+        const uint##BITS##_t a =3D s390_vec_read_element##BITS(v2, i);  =
++        const uint##BITS##_t a =3D s390_vec_read_element##BITS(v1, i);  =
          \
++        const uint##BITS##_t b =3D s390_vec_read_element##BITS(v2, i);  =
+         \
++        const uint##BITS##_t mask =3D s390_vec_read_element##BITS(v3, i)=
+;        \
++        const uint##BITS##_t d =3D (a & ~mask) | (rol##BITS(b, count) & =
+mask);   \
 +                                                                        =
        \
-+        s390_vec_write_element##BITS(v1, i, rol##BITS(a, count));       =
++        s390_vec_write_element##BITS(v1, i, d);                         =
        \
 +    }                                                                   =
        \
 +}
-+DEF_VERLL(8)
-+DEF_VERLL(16)
++DEF_VERIM(8)
++DEF_VERIM(16)
 --=20
 2.20.1
 
