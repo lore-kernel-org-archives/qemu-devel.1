@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BC7DC04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:40:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05474C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:41:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 027872087E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:40:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 027872087E
+	by mail.kernel.org (Postfix) with ESMTPS id CC10C2087B
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 10:41:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC10C2087B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46044 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46076 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRaHu-0007xK-6D
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 06:40:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49348)
+	id 1hRaIU-0008WL-W1
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 06:41:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hRa6Q-0006QX-6g
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:28:39 -0400
+	(envelope-from <david@redhat.com>) id 1hRa6N-0006TZ-T0
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:28:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hRa1q-0005Gi-Ar
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:23:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:25782)
+	(envelope-from <david@redhat.com>) id 1hRa1y-0005Jt-Px
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:24:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32836)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hRa1q-0005GR-2X; Fri, 17 May 2019 06:23:54 -0400
+	id 1hRa1y-0005Jl-Ic; Fri, 17 May 2019 06:24:02 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4FCA230BBEA3;
-	Fri, 17 May 2019 10:23:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D4F603082137;
+	Fri, 17 May 2019 10:24:01 +0000 (UTC)
 Received: from t460s.redhat.com (unknown [10.36.118.100])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8F38819732;
-	Fri, 17 May 2019 10:23:51 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 554B538E00;
+	Fri, 17 May 2019 10:23:59 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 17 May 2019 12:21:33 +0200
-Message-Id: <20190517102145.21812-29-david@redhat.com>
+Date: Fri, 17 May 2019 12:21:36 +0200
+Message-Id: <20190517102145.21812-32-david@redhat.com>
 In-Reply-To: <20190517102145.21812-1-david@redhat.com>
 References: <20190517102145.21812-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Fri, 17 May 2019 10:23:53 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.42]);
+	Fri, 17 May 2019 10:24:01 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 28/40] s390x/tcg: Implement
- VECTOR ELEMENT SHIFT
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 31/40] s390x/tcg: Implement
+ VECTOR SHIFT RIGHT ARITHMETIC
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,143 +76,122 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We can use all the fancy new vector helpers implemented by Richard.
-
-One important thing to take care of is always to properly mask of
-unused bits from the shift count.
+Similar to VECTOR SHIFT LEFT ARITHMETIC. Add s390_vec_sar() similar to
+s390_vec_shr().
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/insn-data.def      |  9 ++++
- target/s390x/translate_vx.inc.c | 84 +++++++++++++++++++++++++++++++++
- 2 files changed, 93 insertions(+)
+ target/s390x/helper.h           |  1 +
+ target/s390x/insn-data.def      |  4 ++++
+ target/s390x/translate_vx.inc.c | 17 +++++++++++++++++
+ target/s390x/vec_int_helper.c   | 26 ++++++++++++++++++++++++++
+ 4 files changed, 48 insertions(+)
 
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index b4ddc8a722..fda274d325 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -205,6 +205,7 @@ DEF_HELPER_FLAGS_4(gvec_verll16, TCG_CALL_NO_RWG, voi=
+d, ptr, cptr, i64, i32)
+ DEF_HELPER_FLAGS_4(gvec_verim8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
+i32)
+ DEF_HELPER_FLAGS_4(gvec_verim16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
+ i32)
+ DEF_HELPER_FLAGS_4(gvec_vsl, TCG_CALL_NO_RWG, void, ptr, cptr, i64, i32)
++DEF_HELPER_FLAGS_4(gvec_vsra, TCG_CALL_NO_RWG, void, ptr, cptr, i64, i32=
+)
+=20
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_3(servc, i32, env, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 59c323a796..f4b67bda7e 100644
+index 76aec5a21f..587de3eaac 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1151,6 +1151,15 @@
-     F(0xe733, VERLL,   VRS_a, V,   la2, 0, 0, 0, verll, 0, IF_VEC)
- /* VECTOR ELEMENT ROTATE AND INSERT UNDER MASK */
-     F(0xe772, VERIM,   VRI_d, V,   0, 0, 0, 0, verim, 0, IF_VEC)
-+/* VECTOR ELEMENT SHIFT LEFT */
-+    F(0xe770, VESLV,   VRR_c, V,   0, 0, 0, 0, vesv, 0, IF_VEC)
-+    F(0xe730, VESL,    VRS_a, V,   la2, 0, 0, 0, ves, 0, IF_VEC)
-+/* VECTOR ELEMENT SHIFT RIGHT ARITHMETIC */
-+    F(0xe77a, VESRAV,  VRR_c, V,   0, 0, 0, 0, vesv, 0, IF_VEC)
-+    F(0xe73a, VESRA,   VRS_a, V,   la2, 0, 0, 0, ves, 0, IF_VEC)
-+/* VECTOR ELEMENT SHIFT RIGHT LOGICAL */
-+    F(0xe778, VESRLV,  VRR_c, V,   0, 0, 0, 0, vesv, 0, IF_VEC)
-+    F(0xe738, VESRL,   VRS_a, V,   la2, 0, 0, 0, ves, 0, IF_VEC)
+@@ -1166,6 +1166,10 @@
+     F(0xe775, VSLB,    VRR_c, V,   0, 0, 0, 0, vsl, 0, IF_VEC)
+ /* VECTOR SHIFT LEFT DOUBLE BY BYTE */
+     F(0xe777, VSLDB,   VRI_d, V,   0, 0, 0, 0, vsldb, 0, IF_VEC)
++/* VECTOR SHIFT RIGHT ARITHMETIC */
++    F(0xe77e, VSRA,    VRR_c, V,   0, 0, 0, 0, vsra, 0, IF_VEC)
++/* VECTOR SHIFT RIGHT ARITHMETIC BY BYTE */
++    F(0xe77f, VSRAB,   VRR_c, V,   0, 0, 0, 0, vsra, 0, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index a2de139cfc..15353096c0 100644
+index 43f67e3f82..a5636f0733 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -218,6 +218,12 @@ static void get_vec_element_ptr_i64(TCGv_ptr ptr, ui=
-nt8_t reg, TCGv_i64 enr,
- #define gen_gvec_fn_2(fn, es, v1, v2) \
-     tcg_gen_gvec_##fn(es, vec_full_reg_offset(v1), vec_full_reg_offset(v=
-2), \
-                       16, 16)
-+#define gen_gvec_fn_2i(fn, es, v1, v2, c) \
-+    tcg_gen_gvec_##fn(es, vec_full_reg_offset(v1), vec_full_reg_offset(v=
-2), \
-+                      c, 16, 16)
-+#define gen_gvec_fn_2s(fn, es, v1, v2, s) \
-+    tcg_gen_gvec_##fn(es, vec_full_reg_offset(v1), vec_full_reg_offset(v=
-2), \
-+                      s, 16, 16)
- #define gen_gvec_fn_3(fn, es, v1, v2, v3) \
-     tcg_gen_gvec_##fn(es, vec_full_reg_offset(v1), vec_full_reg_offset(v=
-2), \
-                       vec_full_reg_offset(v3), 16, 16)
-@@ -1956,3 +1962,81 @@ static DisasJumpType op_verim(DisasContext *s, Dis=
+@@ -2089,3 +2089,20 @@ static DisasJumpType op_vsldb(DisasContext *s, Dis=
 asOps *o)
-                 get_field(s->fields, v3), i4, &g[es]);
+     tcg_temp_free(t2);
      return DISAS_NEXT;
  }
 +
-+static DisasJumpType op_vesv(DisasContext *s, DisasOps *o)
++static DisasJumpType op_vsra(DisasContext *s, DisasOps *o)
 +{
-+    const uint8_t es =3D get_field(s->fields, m4);
-+    const uint8_t v1 =3D get_field(s->fields, v1);
-+    const uint8_t v2 =3D get_field(s->fields, v2);
-+    const uint8_t v3 =3D get_field(s->fields, v3);
++    TCGv_i64 shift =3D tcg_temp_new_i64();
 +
-+    if (es > ES_64) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
++    read_vec_element_i64(shift, get_field(s->fields, v3), 7, ES_8);
++    if (s->fields->op2 =3D=3D 0x7e) {
++        tcg_gen_andi_i64(shift, shift, 0x7);
++    } else {
++        tcg_gen_andi_i64(shift, shift, 0x78);
 +    }
 +
-+    switch (s->fields->op2) {
-+    case 0x70:
-+        gen_gvec_fn_3(shlv, es, v1, v2, v3);
-+        break;
-+    case 0x7a:
-+        gen_gvec_fn_3(sarv, es, v1, v2, v3);
-+        break;
-+    case 0x78:
-+        gen_gvec_fn_3(shrv, es, v1, v2, v3);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
++    gen_gvec_2i_ool(get_field(s->fields, v1), get_field(s->fields, v2),
++                    shift, 0, gen_helper_gvec_vsra);
++    tcg_temp_free_i64(shift);
 +    return DISAS_NEXT;
 +}
-+
-+static DisasJumpType op_ves(DisasContext *s, DisasOps *o)
+diff --git a/target/s390x/vec_int_helper.c b/target/s390x/vec_int_helper.=
+c
+index 3df069f033..67e9f2b0ed 100644
+--- a/target/s390x/vec_int_helper.c
++++ b/target/s390x/vec_int_helper.c
+@@ -49,6 +49,26 @@ static void s390_vec_shl(S390Vector *d, const S390Vect=
+or *a, uint64_t count)
+     }
+ }
+=20
++static void s390_vec_sar(S390Vector *d, const S390Vector *a, uint64_t co=
+unt)
 +{
-+    const uint8_t es =3D get_field(s->fields, m4);
-+    const uint8_t d2 =3D get_field(s->fields, d2) &
-+                       (NUM_VEC_ELEMENT_BITS(es) - 1);
-+    const uint8_t v1 =3D get_field(s->fields, v1);
-+    const uint8_t v3 =3D get_field(s->fields, v3);
-+    TCGv_i32 shift;
++    uint64_t tmp;
 +
-+    if (es > ES_64) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    if (likely(!get_field(s->fields, b2))) {
-+        switch (s->fields->op2) {
-+        case 0x30:
-+            gen_gvec_fn_2i(shli, es, v1, v3, d2);
-+            break;
-+        case 0x3a:
-+            gen_gvec_fn_2i(sari, es, v1, v3, d2);
-+            break;
-+        case 0x38:
-+            gen_gvec_fn_2i(shri, es, v1, v3, d2);
-+            break;
-+        default:
-+            g_assert_not_reached();
-+        }
++    if (count =3D=3D 0) {
++        d->doubleword[0] =3D a->doubleword[0];
++        d->doubleword[1] =3D a->doubleword[1];
++    } else if (count =3D=3D 64) {
++        d->doubleword[1] =3D a->doubleword[0];
++        d->doubleword[0] =3D 0;
++    } else if (count < 64) {
++        tmp =3D a->doubleword[1] >> count;
++        d->doubleword[1] =3D deposit64(tmp, 64 - count, count, a->double=
+word[0]);
++        d->doubleword[0] =3D (int64_t)a->doubleword[0] >> count;
 +    } else {
-+        shift =3D tcg_temp_new_i32();
-+        tcg_gen_extrl_i64_i32(shift, o->addr1);
-+        tcg_gen_andi_i32(shift, shift, NUM_VEC_ELEMENT_BITS(es) - 1);
-+        switch (s->fields->op2) {
-+        case 0x30:
-+            gen_gvec_fn_2s(shls, es, v1, v3, shift);
-+            break;
-+        case 0x3a:
-+            gen_gvec_fn_2s(sars, es, v1, v3, shift);
-+            break;
-+        case 0x38:
-+            gen_gvec_fn_2s(shrs, es, v1, v3, shift);
-+            break;
-+        default:
-+            g_assert_not_reached();
-+        }
-+        tcg_temp_free_i32(shift);
++        d->doubleword[1] =3D (int64_t)a->doubleword[0] >> (count - 64);
++        d->doubleword[0] =3D 0;
 +    }
-+    return DISAS_NEXT;
++}
++
+ static void s390_vec_shr(S390Vector *d, const S390Vector *a, uint64_t co=
+unt)
+ {
+     uint64_t tmp;
+@@ -535,3 +555,9 @@ void HELPER(gvec_vsl)(void *v1, const void *v2, uint6=
+4_t count,
+ {
+     s390_vec_shl(v1, v2, count);
+ }
++
++void HELPER(gvec_vsra)(void *v1, const void *v2, uint64_t count,
++                       uint32_t desc)
++{
++    s390_vec_sar(v1, v2, count);
 +}
 --=20
 2.20.1
