@@ -2,74 +2,73 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15032C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 05:37:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91FE3C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 06:17:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9946320848
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 05:37:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9946320848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 504B920848
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 06:17:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 504B920848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42676 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43029 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRVYN-0005bd-Np
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 01:37:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36616)
+	id 1hRWBe-0005c7-6Y
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 02:17:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hRVXG-0004wO-0R
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 01:36:02 -0400
+	(envelope-from <bounces@canonical.com>) id 1hRUpI-0005s5-1B
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 00:50:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hRVXF-0004PL-2v
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 01:36:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34716)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hRVXE-0004OK-Q9
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 01:36:01 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7DB4D81DE6;
-	Fri, 17 May 2019 05:35:59 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
-	(colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 58AE01001DD2;
-	Fri, 17 May 2019 05:35:59 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com
-	(zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-	by colo-mx.corp.redhat.com (Postfix) with ESMTP id 0AB9A1806B10;
-	Fri, 17 May 2019 05:35:59 +0000 (UTC)
-Date: Fri, 17 May 2019 01:35:58 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: Jakub =?utf-8?Q?Staro=C5=84?= <jstaron@google.com>
-Message-ID: <1954162775.29408078.1558071358974.JavaMail.zimbra@redhat.com>
-In-Reply-To: <c06514fd-8675-ba74-4b7b-ff0eb4a91605@google.com>
-References: <20190514145422.16923-1-pagupta@redhat.com>
-	<20190514145422.16923-3-pagupta@redhat.com>
-	<c06514fd-8675-ba74-4b7b-ff0eb4a91605@google.com>
+	(envelope-from <bounces@canonical.com>) id 1hRUpG-0006ob-Jo
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 00:50:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48806)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hRUpG-0006lk-EK
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 00:50:34 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hRUpD-0006bb-Fr
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 04:50:31 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 73BDF2E8076
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 04:50:31 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.116.188, 10.4.195.1]
-Thread-Topic: virtio-pmem: Add virtio pmem driver
-Thread-Index: Jfq72a6Lppgn6G/na6kHvdhmTQkM6g==
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Fri, 17 May 2019 05:35:59 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 May 2019 04:36:24 -0000
+From: crocket <crockabiscuit@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: crockabiscuit
+X-Launchpad-Bug-Reporter: crocket (crockabiscuit)
+X-Launchpad-Bug-Modifier: crocket (crockabiscuit)
+Message-Id: <155806778498.21734.945063058665872727.malonedeb@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18962";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: dc7c6068cac3c0da05586a34dd0d52ce12a03f7d
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v9 2/7] virtio-pmem: Add virtio pmem driver
+X-Received-From: 91.189.90.7
+X-Mailman-Approved-At: Fri, 17 May 2019 02:15:56 -0400
+Subject: [Qemu-devel] [Bug 1829459] [NEW] qemu: qemu_thread_create: Invalid
+ argument
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,89 +77,318 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com,
-	jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
-	virtualization@lists.linux-foundation.org,
-	adilger kernel <adilger.kernel@dilger.ca>, smbarber@google.com,
-	zwisler@kernel.org, aarcange@redhat.com,
-	dave jiang <dave.jiang@intel.com>, linux-nvdimm@lists.01.org,
-	vishal l verma <vishal.l.verma@intel.com>, david@redhat.com,
-	willy@infradead.org, hch@infradead.org,
-	linux-acpi@vger.kernel.org, jmoyer@redhat.com,
-	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
-	riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
-	stefanha@redhat.com, imammedo@redhat.com,
-	dan j williams <dan.j.williams@intel.com>,
-	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
-	tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-	darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, pbonzini@redhat.com
+Reply-To: Bug 1829459 <1829459@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Public bug reported:
 
+# Version
 
-Hi Jakub,
+qemu-4.0.0
+glibc-2.28
 
-> 
-> On 5/14/19 7:54 AM, Pankaj Gupta wrote:
-> > +		if (!list_empty(&vpmem->req_list)) {
-> > +			req_buf = list_first_entry(&vpmem->req_list,
-> > +					struct virtio_pmem_request, list);
-> > +			req_buf->wq_buf_avail = true;
-> > +			wake_up(&req_buf->wq_buf);
-> > +			list_del(&req_buf->list);
-> Yes, this change is the right one, thank you!
+# commands used to launch qemu-aarch64 in user mode.
 
-Thank you for the confirmation.
+: ${QEMU_BINFMT_FLAGS:=3DOC}
 
-> 
-> > +	 /*
-> > +	  * If virtqueue_add_sgs returns -ENOSPC then req_vq virtual
-> > +	  * queue does not have free descriptor. We add the request
-> > +	  * to req_list and wait for host_ack to wake us up when free
-> > +	  * slots are available.
-> > +	  */
-> > +	while ((err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req,
-> > +					GFP_ATOMIC)) == -ENOSPC) {
-> > +
-> > +		dev_err(&vdev->dev, "failed to send command to virtio pmem" \
-> > +			"device, no free slots in the virtqueue\n");
-> > +		req->wq_buf_avail = false;
-> > +		list_add_tail(&req->list, &vpmem->req_list);
-> > +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +
-> > +		/* A host response results in "host_ack" getting called */
-> > +		wait_event(req->wq_buf, req->wq_buf_avail);
-> > +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	}
-> > +	err1 = virtqueue_kick(vpmem->req_vq);
-> > +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +
-> > +	/*
-> > +	 * virtqueue_add_sgs failed with error different than -ENOSPC, we can't
-> > +	 * do anything about that.
-> > +	 */
-> > +	if (err || !err1) {
-> > +		dev_info(&vdev->dev, "failed to send command to virtio pmem device\n");
-> > +		err = -EIO;
-> > +	} else {
-> > +		/* A host repsonse results in "host_ack" getting called */
-> > +		wait_event(req->host_acked, req->done);
-> > +		err = req->ret;
-> > +I confirm that the failures I was facing with the `-ENOSPC` error path are
-> > not present in v9.
+printf '%s\n' ':qemu-
+aarch64:M::\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\=
+xb7\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xf=
+e\xff\xff\xff:/usr/bin
+/qemu-aarch64:'"${QEMU_BINFMT_FLAGS}" >/proc/sys/fs/binfmt_misc/register
 
-Can I take it your reviewed/acked-by? or tested-by tag? for the virtio patch :)
+> sudo cp /usr/bin/qemu-aarch64 $RPI/usr/bin
+> sudo chroot $RPI /bin/ksh -l
 
-Thank you,
-Pankaj
+# host
 
-> 
-> Best,
-> Jakub Staron
-> 
-> 
+Gentoo Linux amd64
+
+# Guest
+
+Gentoo Linux aarch64
+
+# The problem that I have
+
+"emerge" program fails due to the error, "qemu: qemu_thread_create: Invalid=
+ argument".
+"emerge" is Gentoo's package manager that compiles and installs packages.
+
+# Workaround
+
+Disable pid-sandbox in emerge.
+
+# How to reproduce the issue
+
+Execute
+
+unshare --pid -- echo hello world
+
+or
+
+python -c "import portage.process; portage.process.spawn(['echo',
+'hello', 'world'], unshare_pid=3DTrue)"
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Description changed:
+
+  # Version
+  =
+
+  qemu-4.0.0
+  =
+
+  # commands used to launch qemu-aarch64 in user mode.
++ =
+
++ : ${QEMU_BINFMT_FLAGS:=3DOC}
+  =
+
+  printf '%s\n' ':qemu-
+  aarch64:M::\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x0=
+0\xb7\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\=
+xfe\xff\xff\xff:/usr/bin
+  /qemu-aarch64:'"${QEMU_BINFMT_FLAGS}" >/proc/sys/fs/binfmt_misc/register
+  =
+
+  > sudo cp /usr/bin/qemu-aarch64 $RPI/usr/bin
+  > sudo chroot $RPI /bin/ksh -l
+  =
+
+  # host
+  =
+
+  Gentoo Linux amd64
+  =
+
+  # Guest
+  =
+
+  Gentoo Linux aarch64
+  =
+
+  # The problem that I have
+  =
+
+  "emerge" program fails due to the error, "qemu: qemu_thread_create: Inval=
+id argument".
+  "emerge" is Gentoo's package manager that compiles and installs packages.
+  =
+
+  # How to reproduce the issue
+  =
+
+  Execute
+  =
+
+  unshare --pid -- echo hello world
+  =
+
+  or
+  =
+
+  python -c "import portage.process; portage.process.spawn(['echo',
+  'hello', 'world'], unshare_pid=3DTrue)"
+
+** Description changed:
+
+  # Version
+  =
+
+  qemu-4.0.0
+  =
+
+  # commands used to launch qemu-aarch64 in user mode.
+  =
+
+  : ${QEMU_BINFMT_FLAGS:=3DOC}
+  =
+
+  printf '%s\n' ':qemu-
+  aarch64:M::\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x0=
+0\xb7\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\=
+xfe\xff\xff\xff:/usr/bin
+  /qemu-aarch64:'"${QEMU_BINFMT_FLAGS}" >/proc/sys/fs/binfmt_misc/register
+  =
+
+  > sudo cp /usr/bin/qemu-aarch64 $RPI/usr/bin
+  > sudo chroot $RPI /bin/ksh -l
+  =
+
+  # host
+  =
+
+  Gentoo Linux amd64
+  =
+
+  # Guest
+  =
+
+  Gentoo Linux aarch64
+  =
+
+  # The problem that I have
+  =
+
+  "emerge" program fails due to the error, "qemu: qemu_thread_create: Inval=
+id argument".
+  "emerge" is Gentoo's package manager that compiles and installs packages.
+  =
+
++ # Workaround
++ =
+
++ Disable pid-sandbox in emerge.
++ =
+
+  # How to reproduce the issue
+  =
+
+  Execute
+  =
+
+  unshare --pid -- echo hello world
+  =
+
+  or
+  =
+
+  python -c "import portage.process; portage.process.spawn(['echo',
+  'hello', 'world'], unshare_pid=3DTrue)"
+
+** Description changed:
+
+  # Version
+  =
+
+  qemu-4.0.0
++ glibc-2.28
+  =
+
+  # commands used to launch qemu-aarch64 in user mode.
+  =
+
+  : ${QEMU_BINFMT_FLAGS:=3DOC}
+  =
+
+  printf '%s\n' ':qemu-
+  aarch64:M::\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x0=
+0\xb7\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\=
+xfe\xff\xff\xff:/usr/bin
+  /qemu-aarch64:'"${QEMU_BINFMT_FLAGS}" >/proc/sys/fs/binfmt_misc/register
+  =
+
+  > sudo cp /usr/bin/qemu-aarch64 $RPI/usr/bin
+  > sudo chroot $RPI /bin/ksh -l
+  =
+
+  # host
+  =
+
+  Gentoo Linux amd64
+  =
+
+  # Guest
+  =
+
+  Gentoo Linux aarch64
+  =
+
+  # The problem that I have
+  =
+
+  "emerge" program fails due to the error, "qemu: qemu_thread_create: Inval=
+id argument".
+  "emerge" is Gentoo's package manager that compiles and installs packages.
+  =
+
+  # Workaround
+  =
+
+  Disable pid-sandbox in emerge.
+  =
+
+  # How to reproduce the issue
+  =
+
+  Execute
+  =
+
+  unshare --pid -- echo hello world
+  =
+
+  or
+  =
+
+  python -c "import portage.process; portage.process.spawn(['echo',
+  'hello', 'world'], unshare_pid=3DTrue)"
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1829459
+
+Title:
+  qemu: qemu_thread_create: Invalid argument
+
+Status in QEMU:
+  New
+
+Bug description:
+  # Version
+
+  qemu-4.0.0
+  glibc-2.28
+
+  # commands used to launch qemu-aarch64 in user mode.
+
+  : ${QEMU_BINFMT_FLAGS:=3DOC}
+
+  printf '%s\n' ':qemu-
+  aarch64:M::\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x0=
+0\xb7\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\=
+xfe\xff\xff\xff:/usr/bin
+  /qemu-aarch64:'"${QEMU_BINFMT_FLAGS}"
+  >/proc/sys/fs/binfmt_misc/register
+
+  > sudo cp /usr/bin/qemu-aarch64 $RPI/usr/bin
+  > sudo chroot $RPI /bin/ksh -l
+
+  # host
+
+  Gentoo Linux amd64
+
+  # Guest
+
+  Gentoo Linux aarch64
+
+  # The problem that I have
+
+  "emerge" program fails due to the error, "qemu: qemu_thread_create: Inval=
+id argument".
+  "emerge" is Gentoo's package manager that compiles and installs packages.
+
+  # Workaround
+
+  Disable pid-sandbox in emerge.
+
+  # How to reproduce the issue
+
+  Execute
+
+  unshare --pid -- echo hello world
+
+  or
+
+  python -c "import portage.process; portage.process.spawn(['echo',
+  'hello', 'world'], unshare_pid=3DTrue)"
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1829459/+subscriptions
 
