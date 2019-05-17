@@ -2,114 +2,94 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E8CCC04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0068C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:15:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56F20216F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:13:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="MfGfBlIG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56F20216F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 73069216F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:15:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73069216F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49219 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49251 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRdbf-0002Zp-B0
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 10:13:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39391)
+	id 1hRddg-0003YK-83
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 10:15:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hRdY8-0000b7-Om
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:09:29 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hRdcr-0003EH-RQ
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:14:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hRdY7-00022e-OI
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:09:28 -0400
-Received: from mail-eopbgr150124.outbound.protection.outlook.com
-	([40.107.15.124]:9536
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hRdcq-0008Fq-M6
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:14:21 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:55764
+	helo=mail.default.ilande.uk0.bigv.io)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hRdY4-0001sc-Ty; Fri, 17 May 2019 10:09:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=kFSuzQE1o2314ljW+Lkzz5xMfeBD7yr3Fx8wBRynHo4=;
-	b=MfGfBlIGldZg++kTvtxfppBUBtvlKSnon1P/2mCcMXIyYQy+U3Rprh9k13O8hJeANonoKgtyFs8s91Nmn9bm7v89jXAXzdEUZlMOabLXOzfqYfitesZMl+4d8GAnSOmI6R52KkZNSFlbZYmYD8GHLjgEEQ1Gl0QRoAf+O7nUBOY=
-Received: from AM6PR08MB4675.eurprd08.prod.outlook.com (10.255.96.78) by
-	AM6PR08MB4310.eurprd08.prod.outlook.com (20.179.5.205) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1900.16; Fri, 17 May 2019 14:09:21 +0000
-Received: from AM6PR08MB4675.eurprd08.prod.outlook.com
-	([fe80::9051:3c85:28c6:a0c1]) by
-	AM6PR08MB4675.eurprd08.prod.outlook.com
-	([fe80::9051:3c85:28c6:a0c1%6]) with mapi id 15.20.1878.024;
-	Fri, 17 May 2019 14:09:21 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org"
-	<qemu-block@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH 1/2] qapi: support external bitmaps in
-	block-dirty-bitmap-merge
-Thread-Index: AQHVC+K+LXslWDoYQ06qoTk12qYFn6ZueC8AgADfJoCAAAUigA==
-Date: Fri, 17 May 2019 14:09:21 +0000
-Message-ID: <efe6d8d3-ba5f-88f6-c8b0-d4037ba678e2@virtuozzo.com>
-References: <20190516122725.132334-1-vsementsov@virtuozzo.com>
-	<20190516122725.132334-2-vsementsov@virtuozzo.com>
-	<04af0995-a4ef-d9cc-b4ca-1a5e837aafe1@redhat.com>
-	<2f7d9ea8-765b-fad1-36d5-225f3b4b2ccc@redhat.com>
-In-Reply-To: <2f7d9ea8-765b-fad1-36d5-225f3b4b2ccc@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0202CA0042.eurprd02.prod.outlook.com
-	(2603:10a6:3:e4::28) To AM6PR08MB4675.eurprd08.prod.outlook.com
-	(2603:10a6:20b:c2::14)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190517170919356
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 6d96d0c7-d40a-40b3-4a0a-08d6dad14222
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
-	SRVR:AM6PR08MB4310; 
-x-ms-traffictypediagnostic: AM6PR08MB4310:
-x-microsoft-antispam-prvs: <AM6PR08MB431037C353FEDE527DFFBBE6C10B0@AM6PR08MB4310.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:299;
-x-forefront-prvs: 0040126723
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(346002)(366004)(136003)(39850400004)(396003)(376002)(189003)(199004)(54906003)(256004)(110136005)(71190400001)(71200400001)(229853002)(5660300002)(11346002)(446003)(2616005)(76176011)(476003)(486006)(25786009)(6246003)(2501003)(4326008)(2201001)(86362001)(52116002)(186003)(99286004)(31696002)(102836004)(14454004)(386003)(6506007)(53546011)(31686004)(81166006)(81156014)(8676002)(8936002)(2906002)(26005)(316002)(6116002)(3846002)(53936002)(478600001)(66446008)(64756008)(66556008)(66476007)(73956011)(6512007)(66946007)(6436002)(36756003)(66066001)(68736007)(305945005)(6486002)(7736002)(14143004);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4310;
-	H:AM6PR08MB4675.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: ZjuRfGO6nww7psTKl0nmYN4p4u3nvwSe4gSYBcZnyQxD95RByfj+FFoSYzUBDf5Km7PXXAdDGS2hAUOdsGT/pqZ43wl9GnzHht8AB7UT+yAVzkaSEwHrIGnfMXN1EJ+WFt9lEoqY9+2LrC7maFs6O6uuOAW5Ri1Tsucs2hvx5zwb1yQHZNHWBwx5yxxRack+HNfXODK8z2EMPEk4ppEvtD0MMnoRWMDBVXqQ1Z2ZMim0HJZEEzf/gzYjIVGrlrA2hy50/dJ8kBiow+ZH4lU8N8RBztNlwwCVufxtJm4vrSVCN0/8aYubkfpiPk4AoEBB7W6XYZHnjcgcW8Xwn6uLkuuZqnxfhmm1mjVbLPeyuXsaxJZSNQVM5OwAkJkI7pOFLaHtB+HuZ3ix7O4C7EF/CO6Vqw4i1aMj2qqU+TXo1fQ=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E8D043891BDAAF4692C3CCA61A600DF1@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hRdcq-0008D6-En
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:14:20 -0400
+Received: from host109-146-247-8.range109-146.btcentralplus.com
+	([109.146.247.8] helo=[192.168.1.65])
+	by mail.default.ilande.uk0.bigv.io with esmtpsa
+	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hRdZy-000292-RM; Fri, 17 May 2019 15:11:23 +0100
+To: Artyom Tarasenko <atar4qemu@gmail.com>
+References: <1557003754-26473-1-git-send-email-atar4qemu@gmail.com>
+	<1557003754-26473-2-git-send-email-atar4qemu@gmail.com>
+	<d28ed626-f7f8-53df-208a-cbf6c06e3cc9@ilande.co.uk>
+	<CACXAS8BU-OamhTL03QNuukiKvy+vpdu8VRB4gWPe2+zz2nEymA@mail.gmail.com>
+	<5306bcc1-e308-05eb-9ce5-79553cee3a23@ilande.co.uk>
+	<CACXAS8AAXTy1xiQp2ftjEqhkXkbn-QG6Z=6AfKFCqJhT7eDF7Q@mail.gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+	mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+	3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+	E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+	PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+	PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+	AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+	OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+	NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+	mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+	z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+	T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+	DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+	y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+	2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+	14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+	YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+	Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+	BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+	opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+	NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+	imgcU9TTGC5qd9g=
+Message-ID: <643f0224-1230-33c8-8b4c-a5c688872b4e@ilande.co.uk>
+Date: Fri, 17 May 2019 15:12:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6d96d0c7-d40a-40b3-4a0a-08d6dad14222
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 May 2019 14:09:21.5845 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4310
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.15.124
-Subject: Re: [Qemu-devel] [PATCH 1/2] qapi: support external bitmaps in
- block-dirty-bitmap-merge
+In-Reply-To: <CACXAS8AAXTy1xiQp2ftjEqhkXkbn-QG6Z=6AfKFCqJhT7eDF7Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 109.146.247.8
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.43.2.167
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] lsi53c895a: hide 53c895a registers
+ in 53c810
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -121,50 +101,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
-	"mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>,
-	"armbru@redhat.com" <armbru@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+	qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTcuMDUuMjAxOSAxNjo1MCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gNS8xNi8xOSA3OjMyIFBN
-LCBKb2huIFNub3cgd3JvdGU6DQo+Pg0KPj4NCj4+IE9uIDUvMTYvMTkgODoyNyBBTSwgVmxhZGlt
-aXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+PiBBZGQgbmV3IG9wdGlvbmFsIHBhcmFt
-ZXRlciBtYWtpbmcgcG9zc2libGUgdG8gbWVyZ2UgYml0bWFwcyBmcm9tDQo+Pj4gZGlmZmVyZW50
-IG5vZGVzLiBJdCBpcyBuZWVkZWQgdG8gbWFpbnRhaW4gZXh0ZXJuYWwgc25hcHNob3RzIGR1cmlu
-Zw0KPj4+IGluY3JlbWVudGFsIGJhY2t1cCBjaGFpbiBoaXN0b3J5Lg0KPj4+DQo+Pj4gU2lnbmVk
-LW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96
-em8uY29tPg0KPj4+IC0tLQ0KPj4+ICAgcWFwaS9ibG9jay1jb3JlLmpzb24gfCAxMyArKysrKysr
-KysrLS0tDQo+Pj4gICBibG9jay9kaXJ0eS1iaXRtYXAuYyB8ICA5ICsrKysrKy0tLQ0KPj4+ICAg
-YmxvY2tkZXYuYyAgICAgICAgICAgfCA0NiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKyst
-LS0tLS0tLS0tLS0tLQ0KPj4+ICAgMyBmaWxlcyBjaGFuZ2VkLCA0OCBpbnNlcnRpb25zKCspLCAy
-MCBkZWxldGlvbnMoLSkNCj4gDQo+Pj4gLSMgQGJpdG1hcHM6IG5hbWUocykgb2YgdGhlIHNvdXJj
-ZSBkaXJ0eSBiaXRtYXAocykNCj4+PiArIyBAYml0bWFwczogbmFtZShzKSBvZiB0aGUgc291cmNl
-IGRpcnR5IGJpdG1hcChzKS4gVGhlIGZpZWxkIGlzIG9wdGlvbmFsDQo+Pj4gKyMgICAgICAgICAg
-IHNpbmNlIDQuMS4NCj4+PiArIw0KPj4+ICsjIEBleHRlcm5hbC1iaXRtYXBzOiBhZGRpdGlvbmFs
-IGxpc3Qgb2Ygc291cmNlIGRpcnR5IGJpdG1hcHMgd2l0aCBzcGVjaWZpZWQNCj4+PiArIyAgICAg
-ICAgICAgICAgICAgICAgbm9kZXMsIHdoaWNoIGFsbG93cyBtZXJnaW5nIGJpdG1hcHMgYmV0d2Vl
-biBkaWZmZXJlbnQNCj4+PiArIyAgICAgICAgICAgICAgICAgICAgbm9kZXMuIChTaW5jZTogNC4x
-KQ0KPj4+ICAgIw0KPj4+ICAgIyBTaW5jZTogNC4wDQo+Pj4gICAjIw0KPj4+ICAgeyAnc3RydWN0
-JzogJ0Jsb2NrRGlydHlCaXRtYXBNZXJnZScsDQo+Pj4gLSAgJ2RhdGEnOiB7ICdub2RlJzogJ3N0
-cicsICd0YXJnZXQnOiAnc3RyJywgJ2JpdG1hcHMnOiBbJ3N0ciddIH0gfQ0KPj4+ICsgICdkYXRh
-JzogeyAnbm9kZSc6ICdzdHInLCAndGFyZ2V0JzogJ3N0cicsICcqYml0bWFwcyc6IFsnc3RyJ10s
-DQo+Pj4gKyAgICAgICAgICAgICcqZXh0ZXJuYWwtYml0bWFwcyc6IFsnQmxvY2tEaXJ0eUJpdG1h
-cCddIH0gfQ0KPj4+ICAgDQo+Pg0KPj4gSSBndWVzcyB5b3UgY2FuIHNwZWNpZnkgb25lLCBvciBi
-b3RoLCBvciBtYXliZSBuZWl0aGVyISBTZWVtcyBmaW5lLg0KPiANCj4gDQo+Pg0KPj4gSSBkb24n
-dCB0aGluayBJIGxpa2UgdGhlIG5hbWUgImV4dGVybmFsLWJpdG1hcHMiIGJ1dCBJIGd1ZXNzIEkg
-ZG9uJ3QNCj4+IHJlYWxseSBoYXZlIGEgYmV0dGVyIHN1Z2dlc3Rpb24uDQo+IA0KPiBJIGRvIC0g
-d2UgY291bGQgdXNlIGFuIGFsdGVybmF0ZSB0eXBlIGluc3RlYWQ6DQo+IA0KPiB7ICdhbHRlcm5h
-dGUnOiAnQml0bWFwU291cmNlJywNCj4gICAgJ2RhdGEnOiB7ICdsb2NhbCc6ICdzdHInLA0KPiAg
-ICAgICAgICAgICAgICdleHRlcm5hbCc6ICdCbG9ja0RpcnR5Qml0bWFwJyB9IH0NCj4gDQo+IHRo
-ZW4gdXNlICdiaXRtYXBzJzogWydCaXRtYXBTb3VyY2UnXQ0KPiANCj4gc28gdGhhdCB0aGUgY2Fs
-bGVyIGNhbiBwYXNzOg0KPiANCj4gImJpdG1hcHMiOiBbICJiaXRtYXAxIiwgeyAibm9kZSI6ICJv
-dGhlciIsICJuYW1lIiwgImJpdG1hcDIiIH0gXQ0KPiANCj4gYW5kIHdlIG9ubHkgaGF2ZSB0byBk
-ZWFsIHdpdGggb25lIGFycmF5IGF0IGFsbCB0aW1lcywgYW5kIG5vdCBoYXZlIHRoZQ0KPiBuYW1l
-ICdleHRlcm5hbC1iaXRtYXBzJyB0byB3b3JyeSBhYm91dC4NCj4gDQoNCk9oLCBJIHdhbnRlZCB0
-byBkbyBzb21ldGhpbmcgbGlrZSB0aGlzLCBidXQgbG9va2VkIGF0IHVuaW9uIHR5cGUsICB3aGlj
-aCBhbHNvIG5lZWRzIHNvbWUNCmRpc2NyaW1pbmF0b3IgZmllbGQsIGFuZCBkZWNpZGVkIHRoYXQg
-aXQncyBpbXBvc3NpYmxlIHRvIG1ha2UgaXQgYmFja3dhcmQtY29tcGF0aWJsZS4NCg0KV2lsbCBy
-ZXNlbmQuDQoNCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On 07/05/2019 16:03, Artyom Tarasenko wrote:
+
+> On Mon, May 6, 2019 at 4:27 PM Mark Cave-Ayland
+> <mark.cave-ayland@ilande.co.uk> wrote:
+>>
+>> On 06/05/2019 09:42, Artyom Tarasenko wrote:
+>>
+>>> On Sun, May 5, 2019 at 12:43 PM Mark Cave-Ayland
+>>> <mark.cave-ayland@ilande.co.uk> wrote:
+>>>>
+>>>> On 04/05/2019 22:02, Artyom Tarasenko wrote:
+>>>>
+>>>>> AIX/PReP does access to the aliased IO registers of 53810.
+>>>>> Implement aliasing to make the AIX driver work.
+>>>>>
+>>>>> Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
+>>>>> ---
+>>>>>  hw/scsi/lsi53c895a.c | 17 ++++++++++++++---
+>>>>>  1 file changed, 14 insertions(+), 3 deletions(-)
+>>>>>
+>>>>> diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+>>>>> index da7239d..6b95699 100644
+>>>>> --- a/hw/scsi/lsi53c895a.c
+>>>>> +++ b/hw/scsi/lsi53c895a.c
+>>>>> @@ -2271,6 +2271,9 @@ static void lsi_scsi_realize(PCIDevice *dev, Error **errp)
+>>>>>      LSIState *s = LSI53C895A(dev);
+>>>>>      DeviceState *d = DEVICE(dev);
+>>>>>      uint8_t *pci_conf;
+>>>>> +    uint64_t mmio_size;
+>>>>> +    MemoryRegion *mr;
+>>>>> +    uint16_t type = PCI_DEVICE_GET_CLASS(dev)->device_id;
+>>>>>
+>>>>>      pci_conf = dev->config;
+>>>>>
+>>>>> @@ -2279,13 +2282,21 @@ static void lsi_scsi_realize(PCIDevice *dev, Error **errp)
+>>>>>      /* Interrupt pin A */
+>>>>>      pci_conf[PCI_INTERRUPT_PIN] = 0x01;
+>>>>>
+>>>>> -    memory_region_init_io(&s->mmio_io, OBJECT(s), &lsi_mmio_ops, s,
+>>>>> -                          "lsi-mmio", 0x400);
+>>>>>      memory_region_init_io(&s->ram_io, OBJECT(s), &lsi_ram_ops, s,
+>>>>>                            "lsi-ram", 0x2000);
+>>>>>      memory_region_init_io(&s->io_io, OBJECT(s), &lsi_io_ops, s,
+>>>>>                            "lsi-io", 256);
+>>>>> -
+>>>>> +    if (type == PCI_DEVICE_ID_LSI_53C895A) {
+>>>>> +        mmio_size = 0x400;
+>>>>> +    } else {
+>>>>> +        mr = g_new(MemoryRegion, 1);
+>>>>
+>>>> In general these days it's worth keeping the reference to the MemoryRegion within
+>>>> LSIState since then its lifecycle is more clearly defined.
+>>>
+>>> On the other hand, it's a PCI card, and can not be
+>>> hot-plugged/removed, so the lifecycle is pretty simple here.
+>>> Or am I missing something?
+>>
+>> Well Thomas has been working on a set of tests that for each machine will plug and
+>> unplug each device via the monitor to make sure that init/realize/unrealize work
+>> correctly so it would be good to ensure that these tests don't leak.
+> 
+> Makes sense, indeed.
+> 
+>> However...
+>>
+>>>>> +        memory_region_init_alias(mr, OBJECT(d), "lsi-io-alias", &s->io_io,
+>>>>> +                                 0, 0x80);
+>>>>> +        memory_region_add_subregion_overlap(&s->io_io, 0x80, mr, -1);
+>>>>> +        mmio_size = 0x80;
+>>>>
+>>>> This feels a little strange - is it possible to see from the datasheets that the
+>>>> 53C895A has 0x400 bytes MMIO whilst the 53C810 has 0x80 bytes MMIO? It's not clear to
+>>>> me where the aliasing is happening.
+>>>
+>>> These values are empiric. For 810 it can not be more than 0x80,
+>>> because the AIX does access the registers with the shift of 0x80.
+>>> For  895A we did already have 0x400.
+>>
+>> After a bit of searching I managed to locate an 810 datasheet and in Chapter 5 it
+>> clearly describes the IO space (s->io_io) as being 256 bytes in size which is the
+>> same as the 895A, but with 0x80-0xff aliased onto 0x00 - 0x7f.
+>>
+>> It feels to me that rather than complicate things with an additional alias
+>> MemoryRegion, the simplest solution would be to simply change the mask in
+>> lsi_io_read() and lsi_io_write() to be 0x7f rather than 0xff if we've instantiated a
+>> 810 rather than an 895A.
+> 
+> Initially I implemented it exactly as you suggest, via mask. But then
+> I thought that memory_region_init_alias makes aliasing more obvious.
+> I don't have a strong opinion on this one though.
+> 
+> @Paolo, what do you think?
+
+My general feeling is that memory region aliases are more aimed at mapping areas into
+different address spaces. In this particular case it seems to me that the memory
+region for both devices is still 256 bytes, but it's just that internally the address
+decoder ignores bit 7 on the 810.
+
+
+ATB,
+
+Mark.
 
