@@ -2,52 +2,52 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E75DC04AB4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A2CAC04E87
 	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 08:46:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 435E1206A3
+	by mail.kernel.org (Postfix) with ESMTPS id 5F2A120868
 	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 08:46:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 435E1206A3
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F2A120868
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=birkelund.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44596 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44594 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRYVf-0000Z0-87
+	id 1hRYVf-0000YB-HX
 	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 04:46:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59193)
+Received: from eggs.gnu.org ([209.51.188.92]:59195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <klaus@birkelund.eu>) id 1hRYTF-0007S3-AA
+	(envelope-from <klaus@birkelund.eu>) id 1hRYTF-0007S5-AF
 	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:44:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <klaus@birkelund.eu>) id 1hRYTC-00061t-PX
+	(envelope-from <klaus@birkelund.eu>) id 1hRYTD-00062A-2i
 	for qemu-devel@nongnu.org; Fri, 17 May 2019 04:44:04 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:40154)
+Received: from charlie.dont.surf ([128.199.63.193]:40192)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <klaus@birkelund.eu>)
-	id 1hRYT8-0005tR-Iv; Fri, 17 May 2019 04:43:58 -0400
+	id 1hRYT9-0005yA-NM; Fri, 17 May 2019 04:43:59 -0400
 Received: from apples.localdomain (ip-5-186-120-196.cgn.fibianet.dk
 	[5.186.120.196])
-	by charlie.dont.surf (Postfix) with ESMTPSA id 6A699C00AA;
-	Fri, 17 May 2019 08:43:55 +0000 (UTC)
+	by charlie.dont.surf (Postfix) with ESMTPSA id 87F25C06E4;
+	Fri, 17 May 2019 08:43:56 +0000 (UTC)
 From: Klaus Birkelund Jensen <klaus@birkelund.eu>
 To: qemu-block@nongnu.org
-Date: Fri, 17 May 2019 10:42:26 +0200
-Message-Id: <20190517084234.26923-1-klaus@birkelund.eu>
+Date: Fri, 17 May 2019 10:42:31 +0200
+Message-Id: <20190517084234.26923-6-klaus@birkelund.eu>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190517084234.26923-1-klaus@birkelund.eu>
+References: <20190517084234.26923-1-klaus@birkelund.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 128.199.63.193
-Subject: [Qemu-devel] [PATCH 0/8] nvme: v1.3, sgls,
- metadata and new 'ocssd' device
+Subject: [Qemu-devel] [PATCH 5/8] nvme: add support for metadata
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -65,101 +65,154 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+The new `ms` parameter may be used to indicate the number of metadata
+bytes provided per LBA.
 
-This series of patches contains a number of refactorings to the emulated
-nvme device, adds additional features, such as support for metadata and
-scatter gather lists, and bumps the supported NVMe version to 1.3.
-Lastly, it contains a new 'ocssd' device.
+Signed-off-by: Klaus Birkelund Jensen <klaus.jensen@cnexlabs.com>
+---
+ hw/block/nvme.c | 31 +++++++++++++++++++++++++++++--
+ hw/block/nvme.h | 11 ++++++++++-
+ 2 files changed, 39 insertions(+), 3 deletions(-)
 
-The motivation for the first seven patches is to set everything up for
-the final patch that adds a new 'ocssd' device and associated block
-driver that implements the OpenChannel 2.0 specification[1]. Many of us
-in the OpenChannel comunity have used a qemu fork[2] for emulation of
-OpenChannel devices. The fork is itself based on Keith's qemu-nvme
-tree[3] and we recently merged mainline qemu into it, but the result is
-still a "hybrid" nvme device that supports both conventional nvme and
-the OCSSD 2.0 spec through a 'dialect' mechanism. Merging instead of
-rebasing also created a pretty messy commit history and my efforts to
-try and rebase our work onto mainline was getting hairy to say the
-least. And I was never really happy with the dialect approach anyway.
-
-I have instead prepared this series of fresh patches that incrementally
-adds additional features to the nvme device to bring it into shape for
-finally introducing a new (and separate) 'ocssd' device that emulates an
-OpenChannel 2.0 device by reusing core functionality from the nvme
-device. Providing a separate ocssd device ensures that no ocssd specific
-stuff creeps into the nvme device.
-
-The ocssd device is backed by a new 'ocssd' block driver that holds
-internal meta data and keeps state permanent across power cycles. In the
-future I think we could use the same approach for the nvme device to
-keep internal metadata such as utilization and deallocated blocks. For
-now, the nvme device does not support the Deallocated and Unwritten
-Logical Block Error (DULBE) feature or the Data Set Management command
-as this would require such support.
-
-I have tried to make the patches to the nvme device in this series as
-digestible as possible, but I undestand that commit 310fcd5965e5 ("nvme:
-bump supported spec to 1.3") is pretty huge. I can try to chop it up if
-required, but the changes pretty much needs to be done in bulk to
-actually implement v1.3.
-
-This version was recently used to find a bug in use of SGLs in the Linux
-kernel, so I believe there is some value in introducing these new
-features. As for the ocssd device I believe that it is time it is
-included upstream and not kept seperately. I have knowledge of at least
-one other qemu fork implementing OCSSD 2.0 used by the SPDK team and I
-think we could all benefit from using a common implementation. The ocssd
-device is feature complete with respect to the OCSSD 2.0 spec (mandatory
-as well as optional features).
-
-  [1]: http://lightnvm.io/docs/OCSSD-2_0-20180129.pdf
-  [2]: https://github.com/OpenChannelSSD/qemu-nvme
-  [3]: http://git.infradead.org/users/kbusch/qemu-nvme.git
-
-
-Klaus Birkelund Jensen (8):
-  nvme: move device parameters to separate struct
-  nvme: bump supported spec to 1.3
-  nvme: simplify PRP mappings
-  nvme: allow multiple i/o's per request
-  nvme: add support for metadata
-  nvme: add support for scatter gather lists
-  nvme: keep a copy of the NVMe command in request
-  nvme: add an OpenChannel 2.0 NVMe device (ocssd)
-
- MAINTAINERS                |   14 +-
- Makefile.objs              |    1 +
- block.c                    |    2 +-
- block/Makefile.objs        |    2 +-
- block/nvme.c               |   20 +-
- block/ocssd.c              |  690 ++++++++++
- hw/block/Makefile.objs     |    2 +-
- hw/block/nvme.c            | 1405 -------------------
- hw/block/nvme.h            |   92 --
- hw/block/nvme/nvme.c       | 2485 +++++++++++++++++++++++++++++++++
- hw/block/nvme/ocssd.c      | 2647 ++++++++++++++++++++++++++++++++++++
- hw/block/nvme/ocssd.h      |  140 ++
- hw/block/nvme/trace-events |  136 ++
- hw/block/trace-events      |   91 --
- include/block/block_int.h  |    3 +
- include/block/nvme.h       |  152 ++-
- include/block/ocssd.h      |  231 ++++
- include/hw/block/nvme.h    |  233 ++++
- include/hw/pci/pci_ids.h   |    2 +
- qapi/block-core.json       |   47 +-
- 20 files changed, 6774 insertions(+), 1621 deletions(-)
- create mode 100644 block/ocssd.c
- delete mode 100644 hw/block/nvme.c
- delete mode 100644 hw/block/nvme.h
- create mode 100644 hw/block/nvme/nvme.c
- create mode 100644 hw/block/nvme/ocssd.c
- create mode 100644 hw/block/nvme/ocssd.h
- create mode 100644 hw/block/nvme/trace-events
- create mode 100644 include/block/ocssd.h
- create mode 100644 include/hw/block/nvme.h
-
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index c514f93f3867..675967a596d1 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -33,6 +33,8 @@
+  *   num_ns=3D<int>          : Namespaces to make out of the backing sto=
+rage,
+  *                           Default:1
+  *   num_queues=3D<int>      : Number of possible IO Queues, Default:64
++ *   ms=3D<int>              : Number of metadata bytes provided per LBA=
+,
++ *                           Default:0
+  *   cmb_size_mb=3D<int>     : Size of CMB in MBs, Default:0
+  *
+  * Parameters will be verified against conflicting capabilities and attr=
+ibutes
+@@ -386,6 +388,8 @@ static uint16_t nvme_blk_map(NvmeCtrl *n, NvmeCmd *cm=
+d, NvmeRequest *req)
+=20
+     uint32_t unit_len =3D nvme_ns_lbads_bytes(ns);
+     uint32_t len =3D req->nlb * unit_len;
++    uint32_t meta_unit_len =3D nvme_ns_ms(ns);
++    uint32_t meta_len =3D req->nlb * meta_unit_len;
+     uint64_t prp1 =3D le64_to_cpu(cmd->prp1);
+     uint64_t prp2 =3D le64_to_cpu(cmd->prp2);
+=20
+@@ -399,6 +403,19 @@ static uint16_t nvme_blk_map(NvmeCtrl *n, NvmeCmd *c=
+md, NvmeRequest *req)
+         return err;
+     }
+=20
++    qsg.nsg =3D 0;
++    qsg.size =3D 0;
++
++    if (cmd->mptr && n->params.ms) {
++        qemu_sglist_add(&qsg, le64_to_cpu(cmd->mptr), meta_len);
++
++        err =3D nvme_blk_setup(n, ns, &qsg, ns->blk_offset_md, meta_unit=
+_len,
++            req);
++        if (err) {
++            return err;
++        }
++    }
++
+     qemu_sglist_destroy(&qsg);
+=20
+     return NVME_SUCCESS;
+@@ -1902,6 +1919,11 @@ static int nvme_check_constraints(NvmeCtrl *n, Err=
+or **errp)
+         return 1;
+     }
+=20
++    if (params->ms && !is_power_of_2(params->ms)) {
++        error_setg(errp, "nvme: invalid metadata configuration");
++        return 1;
++    }
++
+     return 0;
+ }
+=20
+@@ -2066,17 +2088,20 @@ static void nvme_init_ctrl(NvmeCtrl *n)
+=20
+ static uint64_t nvme_ns_calc_blks(NvmeCtrl *n, NvmeNamespace *ns)
+ {
+-    return n->ns_size / nvme_ns_lbads_bytes(ns);
++    return n->ns_size / (nvme_ns_lbads_bytes(ns) + nvme_ns_ms(ns));
+ }
+=20
+ static void nvme_ns_init_identify(NvmeCtrl *n, NvmeIdNs *id_ns)
+ {
++    NvmeParams *params =3D &n->params;
++
+     id_ns->nlbaf =3D 0;
+     id_ns->flbas =3D 0;
+-    id_ns->mc =3D 0;
++    id_ns->mc =3D params->ms ? 0x2 : 0;
+     id_ns->dpc =3D 0;
+     id_ns->dps =3D 0;
+     id_ns->lbaf[0].lbads =3D BDRV_SECTOR_BITS;
++    id_ns->lbaf[0].ms =3D params->ms;
+ }
+=20
+ static int nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **e=
+rrp)
+@@ -2086,6 +2111,8 @@ static int nvme_init_namespace(NvmeCtrl *n, NvmeNam=
+espace *ns, Error **errp)
+     nvme_ns_init_identify(n, id_ns);
+=20
+     ns->ns_blks =3D nvme_ns_calc_blks(n, ns);
++    ns->blk_offset_md =3D ns->blk_offset + nvme_ns_lbads_bytes(ns) * ns-=
+>ns_blks;
++
+     id_ns->nuse =3D id_ns->ncap =3D id_ns->nsze =3D cpu_to_le64(ns->ns_b=
+lks);
+=20
+     return 0;
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index 711ca249eac5..81ee0c5173d5 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -8,13 +8,15 @@
+     DEFINE_PROP_UINT32("cmb_size_mb", _state, _props.cmb_size_mb, 0), \
+     DEFINE_PROP_UINT32("num_queues", _state, _props.num_queues, 64), \
+     DEFINE_PROP_UINT32("num_ns", _state, _props.num_ns, 1), \
+-    DEFINE_PROP_UINT8("mdts", _state, _props.mdts, 7)
++    DEFINE_PROP_UINT8("mdts", _state, _props.mdts, 7), \
++    DEFINE_PROP_UINT8("ms", _state, _props.ms, 0)
+=20
+ typedef struct NvmeParams {
+     char     *serial;
+     uint32_t num_queues;
+     uint32_t num_ns;
+     uint8_t  mdts;
++    uint8_t  ms;
+     uint32_t cmb_size_mb;
+ } NvmeParams;
+=20
+@@ -91,6 +93,7 @@ typedef struct NvmeNamespace {
+     uint32_t        id;
+     uint64_t        ns_blks;
+     uint64_t        blk_offset;
++    uint64_t        blk_offset_md;
+ } NvmeNamespace;
+=20
+ #define TYPE_NVME "nvme"
+@@ -154,4 +157,10 @@ static inline size_t nvme_ns_lbads_bytes(NvmeNamespa=
+ce *ns)
+     return 1 << nvme_ns_lbads(ns);
+ }
+=20
++static inline uint16_t nvme_ns_ms(NvmeNamespace *ns)
++{
++    NvmeIdNs *id =3D &ns->id_ns;
++    return le16_to_cpu(id->lbaf[NVME_ID_NS_FLBAS_INDEX(id->flbas)].ms);
++}
++
+ #endif /* HW_NVME_H */
 --=20
 2.21.0
+
 
