@@ -2,63 +2,66 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2887C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:18:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B44C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:19:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C11820818
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:18:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C11820818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2305120868
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:19:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2305120868
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45035 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45044 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRZ0K-0004IC-Cc
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 05:18:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36460)
+	id 1hRZ1g-0005ED-8z
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 05:19:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hRYzU-0003rf-85
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:17:25 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1hRZ0f-0004ak-TC
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:18:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hRYzS-0000xV-7D
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:17:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44502)
+	(envelope-from <frederic.konrad@adacore.com>) id 1hRZ0e-0001Pp-M1
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:18:37 -0400
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:58943
+	helo=smtp.eu.adacore.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hRYzR-0000x9-VK
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:17:22 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1hRZ0e-0001OM-CI
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:18:36 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by filtered-smtp.eu.adacore.com (Postfix) with ESMTP id 82A578139A;
+	Fri, 17 May 2019 11:18:32 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at eu.adacore.com
+Received: from smtp.eu.adacore.com ([127.0.0.1])
+	by localhost (smtp.eu.adacore.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id PB9IBmn-mfXv; Fri, 17 May 2019 11:18:32 +0200 (CEST)
+Received: from [10.10.126.96] (wifi-guest-96.act-europe.fr [10.10.126.96])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 77A98308FBB1;
-	Fri, 17 May 2019 09:17:14 +0000 (UTC)
-Received: from Igors-MacBook-Pro (unknown [10.40.205.69])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2F3931001E93;
-	Fri, 17 May 2019 09:17:11 +0000 (UTC)
-Date: Fri, 17 May 2019 11:17:05 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Like Xu <like.xu@linux.intel.com>
-Message-ID: <20190517111705.61932da0@Igors-MacBook-Pro>
-In-Reply-To: <1557131596-25403-5-git-send-email-like.xu@linux.intel.com>
-References: <1557131596-25403-1-git-send-email-like.xu@linux.intel.com>
-	<1557131596-25403-5-git-send-email-like.xu@linux.intel.com>
+	by smtp.eu.adacore.com (Postfix) with ESMTPSA id 5EAEA81399;
+	Fri, 17 May 2019 11:18:32 +0200 (CEST)
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
+References: <1557923493-4836-1-git-send-email-frederic.konrad@adacore.com>
+	<c0bba828-7cc8-6ac9-a863-696e93796398@ilande.co.uk>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <d2478601-56b1-fe62-ef33-3b7002dc5855@adacore.com>
+Date: Fri, 17 May 2019 11:18:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Fri, 17 May 2019 09:17:19 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 04/10] cpu/topology: add uncommon arch
- support for smp machine properties
+In-Reply-To: <c0bba828-7cc8-6ac9-a863-696e93796398@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 2a02:2ab8:224:1::a0a:d2
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] Leon3 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,171 +73,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Philippe =?UTF-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-	qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Alistair Francis <alistair23@gmail.com>,
-	Alex =?UTF-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, philmd@redhat.com, atar4qemu@gmail.com,
+	chouteau@adacore.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon,  6 May 2019 16:33:10 +0800
-Like Xu <like.xu@linux.intel.com> wrote:
-
-subject doesn't match what this patch is doing
-
-> Following the replace rules, the global smp variables in hppa/mips/openrisc
-if I didn't recall what rules might be, I wouldn't understand what it is about.
-
-> /sparc*/xtensa are replaced with smp machine properties. No semantic changes.
-
-It would be better to rephrase commit message and make it more verbose,
-note that commit message exists not only for reviewers but also
-for whomever comes later (without knowing about implied context).
-So commit message should explain insufficient details what patch is doing.
 
 
-> 
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> ---
->  hw/alpha/dp264.c           | 1 +
->  hw/hppa/machine.c          | 2 ++
->  hw/mips/boston.c           | 2 +-
->  hw/mips/mips_malta.c       | 2 ++
->  hw/openrisc/openrisc_sim.c | 1 +
->  hw/sparc/sun4m.c           | 2 ++
->  hw/sparc64/sun4u.c         | 4 ++--
->  hw/xtensa/sim.c            | 2 +-
->  hw/xtensa/xtfpga.c         | 1 +
->  9 files changed, 13 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-> index 0347eb8..9dfb835 100644
-> --- a/hw/alpha/dp264.c
-> +++ b/hw/alpha/dp264.c
-> @@ -63,6 +63,7 @@ static void clipper_init(MachineState *machine)
->      char *palcode_filename;
->      uint64_t palcode_entry, palcode_low, palcode_high;
->      uint64_t kernel_entry, kernel_low, kernel_high;
-> +    unsigned int smp_cpus = machine->smp.cpus;
->  
->      /* Create up to 4 cpus.  */
->      memset(cpus, 0, sizeof(cpus));
-> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-> index 416e67b..662838d 100644
-> --- a/hw/hppa/machine.c
-> +++ b/hw/hppa/machine.c
-> @@ -72,6 +72,7 @@ static void machine_hppa_init(MachineState *machine)
->      MemoryRegion *ram_region;
->      MemoryRegion *cpu_region;
->      long i;
-> +    unsigned int smp_cpus = machine->smp.cpus;
->  
->      ram_size = machine->ram_size;
->  
-> @@ -242,6 +243,7 @@ static void machine_hppa_init(MachineState *machine)
->  
->  static void hppa_machine_reset(MachineState *ms)
->  {
-> +    unsigned int smp_cpus = ms->smp.cpus;
->      int i;
->  
->      qemu_devices_reset();
-> diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-> index a8b29f6..ccbfac5 100644
-> --- a/hw/mips/boston.c
-> +++ b/hw/mips/boston.c
-> @@ -460,7 +460,7 @@ static void boston_mach_init(MachineState *machine)
->  
->      object_property_set_str(OBJECT(s->cps), machine->cpu_type, "cpu-type",
->                              &err);
-> -    object_property_set_int(OBJECT(s->cps), smp_cpus, "num-vp", &err);
-> +    object_property_set_int(OBJECT(s->cps), machine->smp.cpus, "num-vp", &err);
->      object_property_set_bool(OBJECT(s->cps), true, "realized", &err);
->  
->      if (err != NULL) {
-> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> index 534e705..70ff98b 100644
-> --- a/hw/mips/mips_malta.c
-> +++ b/hw/mips/mips_malta.c
-> @@ -1095,6 +1095,8 @@ static int64_t load_kernel (void)
->  
->  static void malta_mips_config(MIPSCPU *cpu)
->  {
-> +    MachineState *ms = MACHINE(qdev_get_machine());
-> +    unsigned int smp_cpus = ms->smp.cpus;
->      CPUMIPSState *env = &cpu->env;
->      CPUState *cs = CPU(cpu);
->  
-> diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
-> index 7d3b734..c84b9af 100644
-> --- a/hw/openrisc/openrisc_sim.c
-> +++ b/hw/openrisc/openrisc_sim.c
-> @@ -131,6 +131,7 @@ static void openrisc_sim_init(MachineState *machine)
->      qemu_irq *cpu_irqs[2];
->      qemu_irq serial_irq;
->      int n;
-> +    unsigned int smp_cpus = machine->smp.cpus;
->  
->      for (n = 0; n < smp_cpus; n++) {
->          cpu = OPENRISC_CPU(cpu_create(machine->cpu_type));
-> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-> index ca1e382..43e3434 100644
-> --- a/hw/sparc/sun4m.c
-> +++ b/hw/sparc/sun4m.c
-> @@ -853,6 +853,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
->      unsigned int num_vsimms;
->      DeviceState *dev;
->      SysBusDevice *s;
-> +    unsigned int smp_cpus = machine->smp.cpus;
-> +    unsigned int max_cpus = machine->smp.max_cpus;
->  
->      /* init CPUs */
->      for(i = 0; i < smp_cpus; i++) {
-> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index 399f2d7..0807f27 100644
-> --- a/hw/sparc64/sun4u.c
-> +++ b/hw/sparc64/sun4u.c
-> @@ -678,8 +678,8 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
->                                  &FW_CFG_IO(dev)->comb_iomem);
->  
->      fw_cfg = FW_CFG(dev);
-> -    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
-> -    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)max_cpus);
-> +    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)machine->smp.cpus);
-> +    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)machine->smp.max_cpus);
->      fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
->      fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, hwdef->machine_id);
->      fw_cfg_add_i64(fw_cfg, FW_CFG_KERNEL_ADDR, kernel_entry);
-> diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
-> index 12c7437..a4eef76 100644
-> --- a/hw/xtensa/sim.c
-> +++ b/hw/xtensa/sim.c
-> @@ -60,7 +60,7 @@ static void xtensa_sim_init(MachineState *machine)
->      const char *kernel_filename = machine->kernel_filename;
->      int n;
->  
-> -    for (n = 0; n < smp_cpus; n++) {
-> +    for (n = 0; n < machine->smp.cpus; n++) {
->          cpu = XTENSA_CPU(cpu_create(machine->cpu_type));
->          env = &cpu->env;
->  
-> diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-> index e05ef75..f7f3e11 100644
-> --- a/hw/xtensa/xtfpga.c
-> +++ b/hw/xtensa/xtfpga.c
-> @@ -238,6 +238,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
->      const unsigned system_io_size = 224 * MiB;
->      uint32_t freq = 10000000;
->      int n;
-> +    unsigned int smp_cpus = machine->smp.cpus;
->  
->      if (smp_cpus > 1) {
->          mx_pic = xtensa_mx_pic_init(31);
+Le 5/17/19 =C3=A0 10:51 AM, Mark Cave-Ayland a =C3=A9crit=C2=A0:
+> On 15/05/2019 13:31, KONRAD Frederic wrote:
+>=20
+>> Hi all,
+>>
+>> Those are some little fixes for the leon3 machine:
+>>    * The first patch makes an error message more friendly when no kern=
+el / bios
+>>      are provided.
+>>    * The three next one remove the old-style create function as sugges=
+ted by
+>>      Mark.
+>>    * The fifth part initializes the uart and the timer when no bios ar=
+e
+>>      provided.
+>>    * The sixth part adds AHB and APB plug and play devices to allow to=
+ boot
+>>      linux.
+>>    * The last part adds myself to the MAINTAINERS for this board.
+>>
+>> The test images are available here: https://www.gaisler.com/anonftp/li=
+nux/lin
+>> ux-2.6/images/leon-linux-4.9/leon-linux-4.9-1.0/up/
+>>
+>> Tested with:
+>>    qemu-system-sparc -M leon3_generic --nographic --kernel image.ram
+>>
+>> V2 -> V3:
+>>    * rebased.
+>>    * added patches 1, 2, 3, 4 as suggested by Mark.
+>>    * fixed DEVICE_NATIVE_ENDIAN to DEVICE_BIG_ENDIAN in patch 6 as sug=
+gested by
+>>      Mark.
+>>    * added include/hw/*/grlib* to the MAINTAINED file as suggested by =
+Mark.
+>> V1 -> V2:
+>>    * minor fixes in the first patch suggested by Philippe.
+>>
+>> Regards,
+>> Fred
+>>
+>> KONRAD Frederic (7):
+>>    leon3: fix the error message when no bios are provided
+>>    grlib,irqmp: get rid of the old-style create function
+>>    grlib,gptimer: get rid of the old-style create function
+>>    grlib,apbuart: get rid of the old-style create function
+>>    leon3: add a little bootloader
+>>    leon3: introduce the plug and play mechanism
+>>    MAINTAINERS: add myself for leon3
+>>
+>>   MAINTAINERS                         |   3 +-
+>>   hw/char/grlib_apbuart.c             |   4 +-
+>>   hw/intc/grlib_irqmp.c               |   3 +-
+>>   hw/misc/Makefile.objs               |   2 +
+>>   hw/misc/grlib_ahb_apb_pnp.c         | 269 ++++++++++++++++++++++++++=
+++++++++++
+>>   hw/sparc/leon3.c                    | 157 ++++++++++++++++++---
+>>   hw/timer/grlib_gptimer.c            |   4 +-
+>>   include/hw/misc/grlib_ahb_apb_pnp.h |  60 ++++++++
+>>   include/hw/sparc/grlib.h            |  78 +----------
+>>   9 files changed, 483 insertions(+), 97 deletions(-)
+>>   create mode 100644 hw/misc/grlib_ahb_apb_pnp.c
+>>   create mode 100644 include/hw/misc/grlib_ahb_apb_pnp.h
+>=20
+> Thanks for sorting out the old-style functions, this version looks much=
+ better. I've
 
+You're welcome!
+
+> applied this to my qemu-sparc branch and will send a PR shortly.
+>=20
+Great! Thanks!
+
+Regards,
+Fred
+
+>=20
+> ATB,
+>=20
+> Mark.
+>=20
 
