@@ -2,66 +2,80 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 951A3C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 11:10:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B2E7C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 11:10:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 595FB20879
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 11:10:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 595FB20879
+	by mail.kernel.org (Postfix) with ESMTPS id D1B252087E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 11:10:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1B252087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46599 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46619 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRakT-0000uw-Hk
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 07:10:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56563)
+	id 1hRakw-0001Pc-3i
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 07:10:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hRaff-0004ky-TX
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 07:05:05 -0400
+	(envelope-from <philmd@redhat.com>) id 1hRaA3-0001c8-K0
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:32:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hRac2-0001eb-I3
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 07:01:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48158)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hRabx-00014Q-1Q; Fri, 17 May 2019 07:01:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E556B30C1AF9;
-	Fri, 17 May 2019 11:00:52 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-213.ams2.redhat.com
-	[10.36.116.213])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 042845D9CD;
-	Fri, 17 May 2019 11:00:39 +0000 (UTC)
-Date: Fri, 17 May 2019 13:00:38 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190517110038.GD7009@localhost.localdomain>
-References: <20190517095628.10119-1-mreitz@redhat.com>
-	<20190517095628.10119-4-mreitz@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hRaA2-00039d-D3
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:32:23 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:52594)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hRaA2-00038a-5u
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 06:32:22 -0400
+Received: by mail-wm1-f68.google.com with SMTP id y3so6447127wmm.2
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 03:32:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=dz4geg7a/h3tNwmHON1BqrdrORqh70EUe9jtwjNR0x4=;
+	b=iFTXcwp4yn9j24MggkrML5dQYAkOp/kEKR/dczpycd2jSLtrok11l/O1YSBooUr8Fo
+	DEj9pg/I9gjHOnP1ES6VyFlyvvJBsvVoJvb4HG2up7rkLTkn4ljBpHgXd0KdnE8oZMlY
+	kNvUJZ/yNyByow+lV8Q/4D4/hwywyplJ7But8qcA5NSv/5J+nhxjf6xelbMVjJk2RnAC
+	MucsGKKy+48OETwJcgwbfzhDQlBpRnRJcqi//Uc4lIcKjh9b9xQwKIgvbHum/GLnzCjm
+	/ysbczfl93tVocIIEteG579LjECW488J1mJJlqp7Fwkoi8G+KSjuC9c8MkN3XIu0e1J3
+	1nzA==
+X-Gm-Message-State: APjAAAWP+VsxcJcqcmd2dhm48uKkMjKuWf59PQqOj4BOTIWUDHervpJX
+	qyckfUZ5fB9b1LroGhj1IhbwKw==
+X-Google-Smtp-Source: APXvYqzkp59ae/lRqeariaiC63dgDPTPX8nDwwweywt/hKz+vUTRsArKyDZ8ey/77egjgjUi3zYQJA==
+X-Received: by 2002:a1c:9c42:: with SMTP id f63mr1773551wme.23.1558089141116; 
+	Fri, 17 May 2019 03:32:21 -0700 (PDT)
+Received: from [192.168.1.43] (228.red-83-52-173.dynamicip.rima-tde.net.
+	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
+	q16sm8567530wmj.17.2019.05.17.03.32.19
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Fri, 17 May 2019 03:32:20 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+References: <20190507163416.24647-1-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <cfd72da5-720a-0684-f3c5-e0ea1360bef3@redhat.com>
+Date: Fri, 17 May 2019 12:32:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190507163416.24647-1-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190517095628.10119-4-mreitz@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Fri, 17 May 2019 11:00:57 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/4] iotests: Test driver whitelisting in
- 093
+	[fuzzy]
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [PATCH v2 00/16] hw: Use object_initialize_child
+ for correct reference counting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,174 +87,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Antony Pavlov <antonynpavlov@gmail.com>,
+	Paul Burton <pburton@wavecomp.com>, Andrew Jeffery <andrew@aj.id.au>,
+	Alistair Francis <alistair@alistair23.me>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+	Andrew Baumann <Andrew.Baumann@microsoft.com>,
+	Joel Stanley <joel@jms.id.au>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-arm@nongnu.org,
+	Peter Chubb <peter.chubb@nicta.com.au>,
+	=?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-ppc@nongnu.org,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	Aurelien Jarno <aurelien@aurel32.net>,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 17.05.2019 um 11:56 hat Max Reitz geschrieben:
-> null-aio may not be whitelisted.  If it is not, fall back to null-co.
-> This may run tests twice in the same configuration, but this is the
-> simplest way to effectively skip the tests in setUp() (without changing
-> the output, and while having the respective driver in a class
-> attribute).
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/093 | 15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
->=20
-> diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
-> index bd56c94708..d6f285001a 100755
-> --- a/tests/qemu-iotests/093
-> +++ b/tests/qemu-iotests/093
-> @@ -22,9 +22,11 @@
->  import iotests
-> =20
->  nsec_per_sec =3D 1000000000
-> +supported_null_drivers =3D list(filter(lambda f: f.startswith('null-')=
-,
-> +                                     iotests.supported_formats()))
+Hi Eduardo,
 
-Is this just a convoluted way of writing the following?
+On 5/7/19 6:34 PM, Philippe Mathieu-Daudé wrote:
+> Hi,
+> 
+> This series looks at Eduardo suggestions from [1]
+> and Thomas commit aff39be0ed97 to replace various
+> object_initialize + qdev_set_parent_bus calls by
+> sysbus_init_child_obj().
 
-    supported_null_drivers =3D [ f for f in iotests.supported_formats()
-                               if f.startswith('null-') ]
+Do you think you can take this series?
+Else, via which tree it should go?
 
->  class ThrottleTestCase(iotests.QMPTestCase):
-> -    test_img =3D "null-aio://"
-> +    test_driver =3D "null-aio"
->      max_drives =3D 3
-> =20
->      def blockstats(self, device):
-> @@ -36,9 +38,14 @@ class ThrottleTestCase(iotests.QMPTestCase):
->          raise Exception("Device not found for blockstats: %s" % device=
-)
-> =20
->      def setUp(self):
-> +        global supported_null_drivers
-> +        if self.test_driver not in supported_null_drivers:
-> +            # Silently fall back to supported driver
-> +            self.test_driver =3D supported_null_drivers[0]
+Thanks!
 
-I think this is what you mentioned in the cover letter:
+Phil.
 
-> Final note: The best thing would probably to skip the null-aio tests in
-> 093/136 if there is no null-aio support.  However, I didn=E2=80=99t get=
- anything
-> to work: Annotating with @iotests.skip_if_unsupported() didn=E2=80=99t =
-work
-> because the format name is a class instance attribute; and just
-> iotests.skipTest() didn=E2=80=99t work because that would print 's' cha=
-racters
->  instead of '.' in the output (and emit the number of skipped tests), s=
-o
-> the comparison against the reference output fails...
-
-With a little modification to the @skip_if_unsupported() decorator it
-can be done. I think I'd prefer this (hacked up on top of this series):
-
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index f811f69135..f83d56b156 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -789,8 +789,11 @@ def skip_if_unsupported(required_formats=3D[], read_=
-only=3DFalse):
-        Runs the test if all the required formats are whitelisted'''
-     def skip_test_decorator(func):
-         def func_wrapper(*args, **kwargs):
--            usf_list =3D list(set(required_formats) -
--                            set(supported_formats(read_only)))
-+            if callable(required_formats):
-+                fmts =3D required_formats(args[0])
-+            else:
-+                fmts =3D required_formats
-+            usf_list =3D list(set(fmts) - set(supported_formats(read_onl=
-y)))
-             if usf_list:
-                 case_notrun('{}: formats {} are not whitelisted'.format(
-                     args[0], usf_list))
-diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
-index d6f285001a..e23a8189bc 100755
---- a/tests/qemu-iotests/093
-+++ b/tests/qemu-iotests/093
-@@ -22,8 +22,6 @@
- import iotests
-
- nsec_per_sec =3D 1000000000
--supported_null_drivers =3D list(filter(lambda f: f.startswith('null-'),
--                                     iotests.supported_formats()))
-
- class ThrottleTestCase(iotests.QMPTestCase):
-     test_driver =3D "null-aio"
-@@ -37,11 +35,12 @@ class ThrottleTestCase(iotests.QMPTestCase):
-                 return stat['rd_bytes'], stat['rd_operations'], stat['wr=
-_bytes'], stat['wr_operations']
-         raise Exception("Device not found for blockstats: %s" % device)
-
-+    def required_driver(self):
-+        return self.test_driver
-+
-     def setUp(self):
--        global supported_null_drivers
--        if self.test_driver not in supported_null_drivers:
--            # Silently fall back to supported driver
--            self.test_driver =3D supported_null_drivers[0]
-+        if not self.required_driver() in iotests.supported_formats():
-+            return
-
-         self.vm =3D iotests.VM()
-         for i in range(0, self.max_drives):
-@@ -49,6 +48,9 @@ class ThrottleTestCase(iotests.QMPTestCase):
-         self.vm.launch()
-
-     def tearDown(self):
-+        if not self.required_driver() in iotests.supported_formats():
-+            return
-+
-         self.vm.shutdown()
-
-     def configure_throttle(self, ndrives, params):
-@@ -145,6 +147,7 @@ class ThrottleTestCase(iotests.QMPTestCase):
-         self.vm.qtest("clock_step %d" % ns)
-
-     # Connect N drives to a VM and test I/O in all of them
-+    @iotests.skip_if_unsupported(required_driver)
-     def test_all(self):
-         params =3D {"bps": 4096,
-                   "bps_rd": 4096,
-@@ -163,6 +166,7 @@ class ThrottleTestCase(iotests.QMPTestCase):
-                 self.do_test_throttle(ndrives, 5, limits)
-
-     # Connect N drives to a VM and test I/O in just one of them a time
-+    @iotests.skip_if_unsupported(required_driver)
-     def test_one(self):
-         params =3D {"bps": 4096,
-                   "bps_rd": 4096,
-@@ -180,6 +184,7 @@ class ThrottleTestCase(iotests.QMPTestCase):
-                 self.configure_throttle(self.max_drives, limits)
-                 self.do_test_throttle(1, 5, limits, drive)
-
-+    @iotests.skip_if_unsupported(required_driver)
-     def test_burst(self):
-         params =3D {"bps": 4096,
-                   "bps_rd": 4096,
-@@ -218,6 +223,7 @@ class ThrottleTestCase(iotests.QMPTestCase):
-     # Test that removing a drive from a throttle group should not
-     # affect the remaining members of the group.
-     # https://bugzilla.redhat.com/show_bug.cgi?id=3D1535914
-+    @iotests.skip_if_unsupported(required_driver)
-     def test_remove_group_member(self):
-         # Create a throttle group with two drives
-         # and set a 4 KB/s read limit.
-@@ -433,6 +439,6 @@ class ThrottleTestRemovableMedia(iotests.QMPTestCase)=
-:
-
-
- if __name__ =3D=3D '__main__':
--    if 'null-co' not in supported_null_drivers:
-+    if 'null-co' not in iotests.supported_formats():
-         iotests.notrun('null-co driver support missing')
-     iotests.main(supported_fmts=3D["raw"])
+> 
+> Important comment from Eduardo:
+> 
+>   It's possible, but we need a volunteer to review each
+>   hunk because the existing code might be (correctly)
+>   calling object_unref() (either immediately or when
+>   parent is finalized).
+> 
+> I tried to split it enough to make the review process
+> easier.
+> 
+> Regards,
+> 
+> Phil.
+> 
+> [*] https://patchwork.ozlabs.org/patch/943333/#1953608
+> v1: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg05931.html
+> 
+> Philippe Mathieu-Daudé (16):
+>   hw/ppc/pnv: Use object_initialize_child for correct reference counting
+>   hw/misc/macio: Use object_initialize_child for correct ref. counting
+>   hw/virtio: Use object_initialize_child for correct reference counting
+>   hw/arm/bcm2835: Use TYPE_PL011 instead of hardcoded string
+>   hw/arm/bcm2835: Use object_initialize() on PL011State
+>   hw/arm/bcm2835: Use object_initialize_child for correct ref. counting
+>   hw/arm/aspeed: Use object_initialize_child for correct ref. counting
+>   hw/arm: Use object_initialize_child for correct reference counting
+>   hw/mips: Use object_initialize() on MIPSCPSState
+>   hw/mips: Use object_initialize_child for correct reference counting
+>   hw/microblaze/zynqmp: Move the IPI state into the PMUSoC state
+>   hw/microblaze/zynqmp: Let the SoC manage the IPI devices
+>   hw/microblaze/zynqmp: Use object_initialize_child for correct ref.
+>     counting
+>   hw/microblaze/zynqmp: Use object_initialize_child for correct ref.
+>     counting
+>   hw/arm/mps2: Use object_initialize_child for correct reference
+>     counting
+>   hw/intc/nvic: Use object_initialize_child for correct reference
+>     counting
 
