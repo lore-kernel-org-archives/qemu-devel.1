@@ -2,66 +2,61 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0
+X-Spam-Status: No, score=-11.0 required=3.0
 	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ABD4C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 03:13:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A32C7C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 04:02:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 572F720848
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 03:13:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 572F720848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 76F4D2087B
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 04:02:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76F4D2087B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40612 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41807 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRTJS-00032D-JX
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 23:13:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44114)
+	id 1hRU4V-0003FM-BI
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 00:02:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hRTIa-0002j6-V5
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 23:12:46 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hRU3f-0002y6-5U
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 00:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hRTIZ-0001vC-0M
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 23:12:44 -0400
-Received: from mga12.intel.com ([192.55.52.136]:62011)
+	(envelope-from <pbonzini@redhat.com>) id 1hRU3e-0001hW-0l
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 00:01:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34688)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hRTIT-0001tm-Q8
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 23:12:39 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-	by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	16 May 2019 20:12:35 -0700
-X-ExtLoop1: 1
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by fmsmga004.fm.intel.com with ESMTP; 16 May 2019 20:12:34 -0700
-Date: Fri, 17 May 2019 11:12:03 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190517031203.GA17339@richard>
-References: <20190515121146.7248-1-mst@redhat.com>
-	<CAFEAcA95Uh=j+vGCT08+ztAc5Yk8RWGzApDZrrt5DS7XudGQhQ@mail.gmail.com>
-	<6d652ee6-ffee-6316-88f4-ba9f2a237817@redhat.com>
-	<CAP+75-XuuUamjbouNYRJzm2Qwtorwhbe+QX8BHBK_WaUc8F+7A@mail.gmail.com>
-	<20190517025903.GA17182@richard>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hRU3d-0001hA-PM
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 00:01:21 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9D171811DC
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 04:01:20 +0000 (UTC)
+Received: from 640k.localdomain.com (ovpn-112-17.ams2.redhat.com
+	[10.36.112.17])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 061F560A9A
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 04:01:19 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 17 May 2019 06:01:18 +0200
+Message-Id: <1558065678-21543-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190517025903.GA17182@richard>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 192.55.52.136
-Subject: Re: [Qemu-devel] [PULL 00/37] pci, pc, virtio: features, fixes
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.27]);
+	Fri, 17 May 2019 04:01:20 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL v2 00/21] Misc patches for 2019-05-15
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,119 +68,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, imammedo@redhat.com,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 17, 2019 at 10:59:03AM +0800, Wei Yang wrote:
->On Thu, May 16, 2019 at 08:53:04PM +0200, Philippe Mathieu-Daudé wrote:
->>On Thu, May 16, 2019 at 8:33 PM Philippe Mathieu-Daudé
->><philmd@redhat.com> wrote:
->>> On 5/16/19 6:04 PM, Peter Maydell wrote:
->>> > On Thu, 16 May 2019 at 13:17, Michael S. Tsirkin <mst@redhat.com> wrote:
->>> >>
->>> >> The following changes since commit efb4f3b62c69383a7308d7b739a3193e7c0ccae8:
->>> >>
->>> >>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-05-10 14:49:36 +0100)
->>> >>
->>> >> are available in the Git repository at:
->>> >>
->>> >>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->>> >>
->>> >> for you to fetch changes up to 0534d255dae78450d90d59db0f3a9a46b32ebd73:
->>> >>
->>> >>   tests: acpi: print error unable to dump ACPI table during rebuild (2019-05-14 21:19:14 -0400)
->>> >>
->>> >> ----------------------------------------------------------------
->>> >> pci, pc, virtio: features, fixes
->>> >>
->>> >> reconnect for vhost blk
->>> >> tests for UEFI
->>> >> misc other stuff
->>> >>
->>> >> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>> >>
->>> >> ----------------------------------------------------------------
->>> >
->>> > Hi -- this pullreq has a conflict in default-configs/arm-softmmu.mak
->>> > because the conversion of arm to Kconfig has landed in master.
->>> > Could you rebase and fix up to use whatever the Kconfig
->>> > equivalent of these changes is, please?
->>>
->>> Culprit is "hw/acpi: Consolidate build_mcfg to pci.c"
->>>
->>> The conflict doesn't look trivial to resolve (to me) so I'd rather see
->>> it reviewed (by Thomas). I suggest to drop the patch(es) from your PR :(
->>
->>Thomas, FYI I did this to resolve the conflict:
->>
->>- keep default-configs/arm-softmmu.mak from master:
->>
->>  git checkout origin/master default-configs/arm-softmmu.mak
->>
->>- applied the following !fixup snippet:
->>
->>-- >8 --
->>--- a/hw/acpi/Kconfig
->>+++ b/hw/acpi/Kconfig
->>@@ -25,7 +25,7 @@ config ACPI_NVDIMM
->>
->> config ACPI_PCI
->>     bool
->>-    depends on ACPI
->>+    depends on ACPI && PCI
->>
->>---
->>
->>I felt it easier to review on top of "hw/acpi: Improve build modularity"
->>https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg04718.html
->>
->
->Well, I hope this will not block the merge.
->
->I took a look in the change of default-configs/arm-softmmu.mak. The general
->idea from Thomas is put those hard-coded config to Kconfig.
->
->This is fine and what I need to change in my patch is to select ACPI_PCI in
->the proper place, if my understanding is correct.
->
->Two things I need to fix:
->
->  * add select ACPI_PCI in proper place of hw/arm/Kconfig
->  * add a dummy build_mcfg() for link when ACPI_PCI is not configured.
->
->Then I have two questions:
->
->  * In hw/arm/Kconfig, I don't see one option contains both PCI and ACPI. I am
->    confused where to put the select.
->  * put dummy build_mcfg() in aml-build.c works. Igor, do you like this? Or
->    you haver other preference?
+The following changes since commit e329ad2ab72c43b56df88b34954c2c7d839bb3=
+73:
 
-Hmm... put build_mcfg() in aml-build.c seems not work when we config both x86
-and arm. e.g. --target-list=x86_64-softmmu,arm-softmmu. Because we only have
-one aml-build.o object file.
+  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190513' into =
+staging (2019-05-14 10:08:47 +0100)
 
-What comes into my mind is wrap build_mcfg() with #ifdef CONFIG_ACPI_PCI.
+are available in the git repository at:
 
-Any better idea?
 
->
->>Sadly both series clash :(
->>
->>Regards,
->>
->>Phil.
->
->-- 
->Wei Yang
->Help you, Help me
+  git://github.com/bonzini/qemu.git tags/for-upstream
 
--- 
-Wei Yang
-Help you, Help me
+for you to fetch changes up to ff4a1ff34ba90203845d9668d4ef7d7b5973c64b:
+
+  hw/net/ne2000: Extract the PCI device from the chipset common code (201=
+9-05-15 11:56:54 +0200)
+
+----------------------------------------------------------------
+Mostly bugfixes and cleanups, the most important being
+"megasas: fix mapped frame size" from Peter Lieven.
+In addition, -realtime is marked as deprecated.
+
+----------------------------------------------------------------
+Chen Zhang (1):
+      hvf: Add missing break statement
+
+Igor Mammedov (1):
+      roms: assert if max rom size is less than the used size
+
+Laurent Vivier (5):
+      trace: only include trace-event-subdirs when they are needed
+      build: replace GENERATED_FILES by generated-files-y
+      configure: qemu-ga is only needed with softmmu targets
+      build: chardev is only needed for softmmu targets
+      build: don't build hardware objects with linux-user
+
+Marc-Andr=C3=A9 Lureau (1):
+      vl: fix -sandbox parsing crash when seccomp support is disabled
+
+Paolo Bonzini (2):
+      mips-fulong2e: obey -vga none
+      sun4m: obey -vga none
+
+Peter Lieven (1):
+      megasas: fix mapped frame size
+
+Philippe Mathieu-Daud=C3=A9 (5):
+      vl: Add missing descriptions to the VGA adapters list
+      hw/acpi/piix4: Move TYPE_PIIX4_PM to a public header
+      hw/i386/acpi: Add object_resolve_type_unambiguous to improve modula=
+rity
+      hw/i386/acpi: Assert a pointer is not null BEFORE using it
+      hw/net/ne2000: Extract the PCI device from the chipset common code
+
+Thomas Huth (3):
+      hw/input: Add a CONFIG_PS2 switch for the ps2.c file
+      Declare -realtime as deprecated
+      hw/char: Move multi-serial devices into separate file
+
+Vitaly Kuznetsov (1):
+      ioapic: allow buggy guests mishandling level-triggered interrupts t=
+o make progress
+
+Wei Yang (1):
+      memory: correct the comment to DIRTY_MEMORY_MIGRATION
+
+ Makefile                          |  43 ++++----
+ Makefile.objs                     |  22 ++--
+ Makefile.target                   |   6 +-
+ configure                         |   4 +-
+ hw/acpi/piix4.c                   |  13 ---
+ hw/char/Kconfig                   |   6 ++
+ hw/char/Makefile.objs             |   1 +
+ hw/char/serial-pci-multi.c        | 208 ++++++++++++++++++++++++++++++++=
+++++++
+ hw/char/serial-pci.c              | 170 -------------------------------
+ hw/core/loader.c                  |   1 +
+ hw/i386/acpi-build.c              |  22 +++-
+ hw/input/Kconfig                  |   5 +
+ hw/input/Makefile.objs            |   2 +-
+ hw/intc/ioapic.c                  |  57 ++++++++++-
+ hw/intc/trace-events              |   1 +
+ hw/isa/lpc_ich9.c                 |  11 --
+ hw/mips/mips_fulong2e.c           |  10 +-
+ hw/net/Kconfig                    |   7 +-
+ hw/net/Makefile.objs              |   3 +-
+ hw/net/ne2000-pci.c               | 132 ++++++++++++++++++++++++
+ hw/net/ne2000.c                   | 105 -------------------
+ hw/scsi/megasas.c                 |   2 +-
+ hw/sparc/sun4m.c                  |   6 +-
+ include/hw/acpi/piix4.h           |   2 +-
+ include/hw/i386/ich9.h            |   2 -
+ include/hw/i386/ioapic_internal.h |   3 +
+ memory.c                          |   4 +-
+ qemu-deprecated.texi              |   5 +
+ target/i386/hvf/hvf.c             |   1 +
+ target/s390x/Makefile.objs        |   2 +-
+ tests/Makefile.include            | 116 ++++++++++-----------
+ vl.c                              |  22 ++--
+ 32 files changed, 568 insertions(+), 426 deletions(-)
+ create mode 100644 hw/char/serial-pci-multi.c
+ create mode 100644 hw/net/ne2000-pci.c
+--=20
+1.8.3.1
 
