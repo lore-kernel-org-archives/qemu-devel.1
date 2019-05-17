@@ -2,61 +2,79 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACAF9C04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:49:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 666F2C04E87
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:49:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E5F02082E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:49:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E5F02082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2CA362173C
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 14:49:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l8CnzkuX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CA362173C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49715 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49717 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hReB0-0006mb-Fq
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 10:49:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45782)
+	id 1hReB3-0006pN-FH
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 10:49:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hRe4f-0001n3-2L
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:43:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hRe81-0004px-8b
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:46:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hRe4d-00043S-Kt
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:43:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:17787)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hRe4a-00040E-DH; Fri, 17 May 2019 10:43:00 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AF92E369CC;
-	Fri, 17 May 2019 14:42:54 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-116-213.ams2.redhat.com
-	[10.36.116.213])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 493915D719;
-	Fri, 17 May 2019 14:42:52 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Date: Fri, 17 May 2019 16:42:30 +0200
-Message-Id: <20190517144232.18965-5-kwolf@redhat.com>
-In-Reply-To: <20190517144232.18965-1-kwolf@redhat.com>
-References: <20190517144232.18965-1-kwolf@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hRe80-0002yD-3J
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:46:33 -0400
+Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:45191)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hRe7z-0002x4-RT
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 10:46:32 -0400
+Received: by mail-oi1-x229.google.com with SMTP id w144so5301178oie.12
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 07:46:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=XzzDWYDFaGbP/OBD76c2PpVm4hLOFCcvU4BRCXdFaGo=;
+	b=l8CnzkuXdOv6hafvX5PbqJW/UgbgdE4HEyLycU/I1FJxtf4iSn5/AEQvelET3lCBu7
+	qhMZEuiTDKsh3Hghr7/ieUe02HtyM+fsWDPypK7/765K7bO1AUXVVXmJcU+9Mhi2vOqk
+	G0g4BflMD5jI5hij5vUt05kMya+2h6oMKtRtxK2eWjXbniibaq0JC2LC5fH8G/jcOISu
+	qOdMfCXMh8MN3iNJ/sZwQHkAkGNpymtdJzloi57zVlN0A7TFF+9iP3iy0TmSBWhkTso9
+	mRXUEeyWv66A9zG3P5BG2/meQpNWX6/z1RSlFQdxXEAc1V21hTw/3l2g/WlTA2VkCaNX
+	wcdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=XzzDWYDFaGbP/OBD76c2PpVm4hLOFCcvU4BRCXdFaGo=;
+	b=NVpf+61B7H0wwcpLabEIHaD1nZrLlTGWpIisnLIen1LGX10wlbJYJCjcT1ORXK9K5T
+	+UTXkgZS1T7jnryPO7/tBO/cBS3E9YiflHYzbXnHDVF6eUQQpcQI7BhprOjfgFqr/Fz6
+	89dNCxHULH89tpDw56LxozXs9PmGDJKJpK1P+/6DKfFqq0ryYTxKLRy1x8MoQLG3B5BA
+	GZugXe5LJcS6KMqxjnBZqtKBfjSj75Yoemw3r0G9naxLoU8Fq2uCzErjOJYzU5w3cddz
+	QzISDq22aUbBvgr7pGYhvatgxafz1H9c4Z0s457qCZUKpH6Ily6x4OOQ28RbDLnDbefV
+	ki6g==
+X-Gm-Message-State: APjAAAUmkSp6vR0T3fuTUnjerCWTsifcsQBvEnVjzdHUcVyvmDCBJvOZ
+	TO6/t7vIqhpNiADrExqJaX5arUo1EDM+vXKU0RkGCQ==
+X-Google-Smtp-Source: APXvYqwMMl8HOC8TdD8lIIDH8bObcqV6KlwzFl6fmUddHOoj3FwOJ6uGUfeaVDBzBNfdnM45WsDk0NHNZp3FIEBOLBk=
+X-Received: by 2002:aca:845:: with SMTP id 66mr14583777oii.163.1558104389705; 
+	Fri, 17 May 2019 07:46:29 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Fri, 17 May 2019 14:42:54 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 4/6] qapi: Disentangle QAPIDoc code
+References: <1558084017-15947-1-git-send-email-jasowang@redhat.com>
+In-Reply-To: <1558084017-15947-1-git-send-email-jasowang@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 May 2019 15:46:18 +0100
+Message-ID: <CAFEAcA-v8QL29VYjxupx1ms2Wz7dGNSyXFeBKWHrgRa3jgDW2Q@mail.gmail.com>
+To: Jason Wang <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::229
+Subject: Re: [Qemu-devel] [PULL 0/4] Net patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,206 +86,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, pkrempa@redhat.com, armbru@redhat.com,
-	qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Documentation comment follow a certain structure: First, we have a text
-with a general description (called QAPIDoc.body). After this,
-descriptions of the arguments follow. Finally, we have part that
-contains various named sections.
+On Fri, 17 May 2019 at 10:07, Jason Wang <jasowang@redhat.com> wrote:
+>
+> The following changes since commit d8276573da58e8ce78dab8c46dd660efd664bcb7:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190510' into staging (2019-05-16 13:15:08 +0100)
+>
+> are available in the git repository at:
+>
+>   https://github.com/jasowang/qemu.git tags/net-pull-request
+>
+> for you to fetch changes up to 78e4f446d2569210a8558946b2321f9ff2ef47f6:
+>
+>   net/colo-compare.c: Fix a crash in COLO Primary. (2019-05-17 17:00:12 +0800)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
 
-The code doesn't show this structure but just checks the right side
-conditions so it happens to do the right set of things in the right
-phase. This is hard to follow, and adding support for documentation of
-features would be even harder.
 
-This restructures the code so that the three parts are clearly
-separated. The code becomes a bit longer, but easier to follow.
+Applied, thanks.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- scripts/qapi/common.py | 107 ++++++++++++++++++++++++++++++++---------
- 1 file changed, 83 insertions(+), 24 deletions(-)
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 71944e2e30..1d0f4847db 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -120,6 +120,27 @@ class QAPIDoc(object):
-         def connect(self, member):
-             self.member =3D member
-=20
-+    class SymbolPart:
-+        """
-+        Describes which part of the documentation we're parsing right no=
-w.
-+
-+        BODY means that we're ready to process freeform text into self.b=
-ody. A
-+        symbol name is only allowed if no other text was parsed yet. It =
-is
-+        interpreted as the symbol name that describes the currently docu=
-mented
-+        object. On getting the second symbol name, we proceed to ARGS.
-+
-+        ARGS means that we're parsing the arguments section. Any symbol =
-name is
-+        interpreted as an argument and an ArgSection is created for it.
-+
-+        VARIOUS is the final part where freeform sections may appear. Th=
-is
-+        includes named sections such as "Return:" as well as unnamed
-+        paragraphs. No symbols are allowed any more in this part.
-+        """
-+        # Can't make it a subclass of Enum because of Python 2
-+        BODY =3D 0
-+        ARGS =3D 1
-+        VARIOUS =3D 2
-+
-     def __init__(self, parser, info):
-         # self._parser is used to report errors with QAPIParseError.  Th=
-e
-         # resulting error position depends on the state of the parser.
-@@ -135,6 +156,7 @@ class QAPIDoc(object):
-         self.sections =3D []
-         # the current section
-         self._section =3D self.body
-+        self._part =3D QAPIDoc.SymbolPart.BODY
-=20
-     def has_section(self, name):
-         """Return True if we have a section with this name."""
-@@ -154,37 +176,84 @@ class QAPIDoc(object):
-             raise QAPIParseError(self._parser, "Missing space after #")
-         line =3D line[1:]
-=20
-+        if self._part =3D=3D QAPIDoc.SymbolPart.BODY:
-+            self._append_body_line(line)
-+        elif self._part =3D=3D QAPIDoc.SymbolPart.ARGS:
-+            self._append_args_line(line)
-+        elif self._part =3D=3D QAPIDoc.SymbolPart.VARIOUS:
-+            self._append_various_line(line)
-+        else:
-+            assert False
-+
-+
-+    def end_comment(self):
-+        self._end_section()
-+
-+    def _check_named_section(self, line, name):
-+        if name in ('Returns:', 'Since:',
-+                    # those are often singular or plural
-+                    'Note:', 'Notes:',
-+                    'Example:', 'Examples:',
-+                    'TODO:'):
-+            self._part =3D QAPIDoc.SymbolPart.VARIOUS
-+            return True
-+        return False
-+
-+    def _append_body_line(self, line):
-+        name =3D line.split(' ', 1)[0]
-         # FIXME not nice: things like '#  @foo:' and '# @foo: ' aren't
-         # recognized, and get silently treated as ordinary text
--        if self.symbol:
--            self._append_symbol_line(line)
--        elif not self.body.text and line.startswith('@'):
-+        if not self.symbol and not self.body.text and line.startswith('@=
-'):
-             if not line.endswith(':'):
-                 raise QAPIParseError(self._parser, "Line should end with=
- :")
-             self.symbol =3D line[1:-1]
-             # FIXME invalid names other than the empty string aren't fla=
-gged
-             if not self.symbol:
-                 raise QAPIParseError(self._parser, "Invalid name")
-+        elif self.symbol:
-+            # We already know that we document some symbol
-+            if name.startswith('@') and name.endswith(':'):
-+                self._part =3D QAPIDoc.SymbolPart.ARGS
-+                self._append_args_line(line)
-+            elif self.symbol and self._check_named_section(line, name):
-+                self._append_various_line(line)
-+            else:
-+                self._append_freeform(line.strip())
-         else:
--            self._append_freeform(line)
--
--    def end_comment(self):
--        self._end_section()
-+            # This is free-form documentation without a symbol
-+            self._append_freeform(line.strip())
-=20
--    def _append_symbol_line(self, line):
-+    def _append_args_line(self, line):
-         name =3D line.split(' ', 1)[0]
-=20
-         if name.startswith('@') and name.endswith(':'):
-             line =3D line[len(name)+1:]
-             self._start_args_section(name[1:-1])
--        elif name in ('Returns:', 'Since:',
--                      # those are often singular or plural
--                      'Note:', 'Notes:',
--                      'Example:', 'Examples:',
--                      'TODO:'):
-+        elif self._check_named_section(line, name):
-+            return self._append_various_line(line)
-+        elif (self._section.text.endswith('\n\n')
-+              and line and not line[0].isspace()):
-+            self._start_section()
-+            self._part =3D QAPIDoc.SymbolPart.VARIOUS
-+            return self._append_various_line(line)
-+
-+        self._append_freeform(line.strip())
-+
-+    def _append_various_line(self, line):
-+        name =3D line.split(' ', 1)[0]
-+
-+        if name.startswith('@') and name.endswith(':'):
-+            raise QAPIParseError(self._parser,
-+                                 "'%s' can't follow '%s' section"
-+                                 % (name, self.sections[0].name))
-+        elif self._check_named_section(line, name):
-             line =3D line[len(name)+1:]
-             self._start_section(name[:-1])
-=20
-+        if (not self._section.name or
-+            not self._section.name.startswith('Example')):
-+            line =3D line.strip()
-+
-         self._append_freeform(line)
-=20
-     def _start_args_section(self, name):
-@@ -194,10 +263,7 @@ class QAPIDoc(object):
-         if name in self.args:
-             raise QAPIParseError(self._parser,
-                                  "'%s' parameter name duplicated" % name=
-)
--        if self.sections:
--            raise QAPIParseError(self._parser,
--                                 "'@%s:' can't follow '%s' section"
--                                 % (name, self.sections[0].name))
-+        assert not self.sections
-         self._end_section()
-         self._section =3D QAPIDoc.ArgSection(name)
-         self.args[name] =3D self._section
-@@ -219,13 +285,6 @@ class QAPIDoc(object):
-             self._section =3D None
-=20
-     def _append_freeform(self, line):
--        in_arg =3D isinstance(self._section, QAPIDoc.ArgSection)
--        if (in_arg and self._section.text.endswith('\n\n')
--                and line and not line[0].isspace()):
--            self._start_section()
--        if (in_arg or not self._section.name
--                or not self._section.name.startswith('Example')):
--            line =3D line.strip()
-         match =3D re.match(r'(@\S+:)', line)
-         if match:
-             raise QAPIParseError(self._parser,
---=20
-2.20.1
-
+-- PMM
 
