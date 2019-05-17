@@ -2,57 +2,111 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82B3DC04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 13:20:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1102DC04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 13:24:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56AE020833
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 13:20:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56AE020833
+	by mail.kernel.org (Postfix) with ESMTPS id DBA9D20833
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 13:24:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBA9D20833
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48548 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48602 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRcmP-0001Ir-Kv
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 09:20:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58155)
+	id 1hRcqi-0002zV-EX
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 09:24:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hRcla-00011u-OR
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:19:19 -0400
+	(envelope-from <thuth@redhat.com>) id 1hRcpK-0002A2-8C
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:23:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hRclZ-0000vf-O1
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:19:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54326)
+	(envelope-from <thuth@redhat.com>) id 1hRcpH-0005vQ-H7
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:23:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44598)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hRclX-0000lV-Qu
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:19:17 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hRcpH-0005uQ-9W
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:23:07 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 970763DBC5;
-	Fri, 17 May 2019 13:19:03 +0000 (UTC)
-Received: from 640k.localdomain.com (ovpn-112-17.ams2.redhat.com
-	[10.36.112.17])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 92DD37C0AC;
-	Fri, 17 May 2019 13:19:02 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 17 May 2019 15:19:00 +0200
-Message-Id: <1558099140-53240-1-git-send-email-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+	by mx1.redhat.com (Postfix) with ESMTPS id 30BCB307D867;
+	Fri, 17 May 2019 13:22:51 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-117-142.ams2.redhat.com [10.36.117.142])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9C4906085B;
+	Fri, 17 May 2019 13:22:49 +0000 (UTC)
+To: Greg Kurz <groug@kaod.org>
+References: <155774341935.175576.9256391991091401927.stgit@bahia.lan>
+	<155774365069.175576.5671141718062840805.stgit@bahia.lan>
+	<20190517151711.7262e276@bahia.lan>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <7b4b93c9-761b-edbb-4538-b4e549afd48e@redhat.com>
+Date: Fri, 17 May 2019 15:22:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190517151711.7262e276@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Fri, 17 May 2019 13:19:03 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.48]);
+	Fri, 17 May 2019 13:22:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] checkpatch: detect doubly-encoded UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] virtfs: Fix documentation of -fsdev
+ and -virtfs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -64,60 +118,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Copy and pasting from Thunderbird's "view source" window results in double
-encoding of multibyte UTF-8 sequences.  The appearance of those sequences is
-very peculiar, so detect it and give an error despite the (low) possibility
-of false positives.
+On 17/05/2019 15.17, Greg Kurz wrote:
+> On Mon, 13 May 2019 12:34:10 +0200
+> Greg Kurz <groug@kaod.org> wrote:
+> 
+>> This fixes several things:
+>> - add "id" description to -virtfs documentation
+>> - split the description into several lines in both usage and documentation
+>>   for accurateness and clarity
+>> - add documentation and usage of the synth fsdriver
+>> - add "throttling.*" description to -fsdev local
+>> - add some missing periods
+>> - add proper reference to the virtfs-proxy-helper(1) manual page
+>> - document that the virtio device may be either virtio-9p-pci, virtio-9p-ccw
+>>   or virtio-9p-device, depending on the machine type
+>>
+>> Buglink: https://bugs.launchpad.net/qemu/+bug/1581976
+>> Signed-off-by: Greg Kurz <groug@kaod.org>
+>> ---
+>> v2: - mention virtfs-proxy-helper(1) change in the changelog
+>>     - mention virtio-9p-ccw and virtio-9p-device
+>> ---
+> 
+> Thomas,
+> 
+> Unless you (or anyone else) have some objections, I intend to apply this patch
+> and issue a pull request in a near future.
 
-As the major offender, I am also adding the same check to my applypatch-msg
-and commit-msg hooks, but this will also cause patchew to croak loudly when
-this mistake happens.
+Fine for me - I just lack the detailed 9p knowledge to provide a real
+"Reviewed-by" here, I hope you were not waiting for it? ... but if it
+helps, I can at least say:
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- scripts/checkpatch.pl | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 88682cb..b27e1de 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -262,6 +262,19 @@ our $UTF8	= qr{
- 	| $NON_ASCII_UTF8
- }x;
- 
-+# some readers default to ISO-8859-1 when showing email source. detect
-+# when UTF-8 is incorrectly interpreted as ISO-8859-1 and reencoded back.
-+# False positives are possible but very unlikely.
-+our $UTF8_MOJIBAKE = qr{
-+	\xC3[\x82-\x9F] \xC2[\x80-\xBF]                    # c2-df 80-bf
-+	| \xC3\xA0 \xC2[\xA0-\xBF] \xC2[\x80-\xBF]         # e0 a0-bf 80-bf
-+	| \xC3[\xA1-\xAC\xAE\xAF] (?: \xC2[\x80-\xBF]){2}  # e1-ec/ee/ef 80-bf 80-bf
-+	| \xC3\xAD \xC2[\x80-\x9F] \xC2[\x80-\xBF]         # ed 80-9f 80-bf
-+	| \xC3\xB0 \xC2[\x90-\xBF] (?: \xC2[\x80-\xBF]){2} # f0 90-bf 80-bf 80-bf
-+	| \xC3[\xB1-\xB3] (?: \xC2[\x80-\xBF]){3}          # f1-f3 80-bf 80-bf 80-bf
-+	| \xC3\xB4 \xC2[\x80-\x8F] (?: \xC2[\x80-\xBF]){2} # f4 80-b8 80-bf 80-bf
-+}x;
-+
- # There are still some false positives, but this catches most
- # common cases.
- our $typeTypedefs = qr{(?x:
-@@ -1506,6 +1519,9 @@ sub process {
- 			ERROR("Invalid UTF-8, patch and commit message should be encoded in UTF-8\n" . $hereptr);
- 		}
- 
-+		if ($rawline =~ m/$UTF8_MOJIBAKE/) {
-+			ERROR("Doubly-encoded UTF-8\n" . $herecurr);
-+		}
- # Check if it's the start of a commit log
- # (not a header line and we haven't seen the patch filename)
- 		if ($in_header_lines && $realfile =~ /^$/ &&
--- 
-1.8.3.1
-
+Acked-by: Thomas Huth <thuth@redhat.com>
 
