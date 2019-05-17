@@ -2,84 +2,79 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B53AC04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 02:57:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D5A8C04AAF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 02:59:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 328C720848
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 02:57:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HqnN2aDQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 328C720848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 620DD205C9
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 02:59:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 620DD205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40353 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40383 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRT4D-0003C9-AE
-	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 22:57:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39204)
+	id 1hRT5d-0004Ql-Lu
+	for qemu-devel@archiver.kernel.org; Thu, 16 May 2019 22:59:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hRSn7-0005y9-Vc
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:40:14 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hRT3y-0003HT-AL
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:57:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hRSmz-0002Hm-PW
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:40:10 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:43695)
+	(envelope-from <pbonzini@redhat.com>) id 1hRT3x-0003Az-5O
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:57:38 -0400
+Received: from mail-wr1-f43.google.com ([209.85.221.43]:36253)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hRSmv-0002E9-6F
-	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:40:02 -0400
-Received: by mail-pf1-x444.google.com with SMTP id c6so2857759pfa.10
-	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 19:39:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=bpjcbv60JSWpD1TbbxFv9kSVFeLonJbRE1N/VVDdCYY=;
-	b=HqnN2aDQgiFqND352ve6KVLTaO4Q9XVPo7FXMkHVE1WdPJ9RBrME/+ujRRC+5mD4Gl
-	yQb0yvKmninXLieoV5nYWKMq7w3iCbjq5nZECfsfnuQxGnoirZothbRwXt2xkf8L1Pej
-	7FASrYglahBrOJ511wPIIdA/AzVxVr1VlpY7hoTw5Frwxi5hQmUfmZAGsZQSVjRGkRTK
-	xSCey+7Qn4PwNlgmdcc/WpJIOzeLB5F0DEdWru25r1lp+9STa3paYjxuSTDgHoH9YbsB
-	w2kSdkS5R5jkkiY/X+t6SHNoT7WTBZkLeedOejqwXsD1Iw2p7sros9qNCe5BEZ8vq0e8
-	7Zew==
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hRT3w-0003Ah-VD
+	for qemu-devel@nongnu.org; Thu, 16 May 2019 22:57:37 -0400
+Received: by mail-wr1-f43.google.com with SMTP id s17so5455820wru.3
+	for <qemu-devel@nongnu.org>; Thu, 16 May 2019 19:57:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=bpjcbv60JSWpD1TbbxFv9kSVFeLonJbRE1N/VVDdCYY=;
-	b=DNIfeGP0g2E46ihkOIobI9WdkgMTFYV5qcjAXa7+A1I81s0afhJH4/daDI0oEBPMV7
-	HHMI31SbQXPCS3Gj3k6aJ1Ox73WyEnkaA2ovu7sr8zxS47gxmPwFLUf9d5lypkG6W4ep
-	RBa1DqKuz76Lb4JZPSa0CVkZRHn2oqgUEWHo5o3bV51KDdy9uK/KW3zbaUEEwBYSgdS5
-	emcWZcqj17ZZHv71zal+chXPHTI/YLpcXEf35uXOH+qkeKVrDqE3oFrLccAtykVB7SIC
-	ojc7FQVGRARQ/Nj/nxLv/78ls+FEH2ppNsL4ZufEjzha7DGH6AtEzhBoYG+lmzO+eqoF
-	CLuA==
-X-Gm-Message-State: APjAAAXcTzyL1sczLwOdr/OhomVr2+IJmHvfTfgltDz3DvggfDpp0fvL
-	NV44T6D7tXAntv3wTkPOECKkbQAvL00=
-X-Google-Smtp-Source: APXvYqzPhRr0N1Di7+jtQwzCaAbonStS3001NEvT4QgiOsEYQQb3C+FfEznyqXIhrofcc4m9rdEPBg==
-X-Received: by 2002:a65:5086:: with SMTP id r6mr54706673pgp.301.1558060796081; 
-	Thu, 16 May 2019 19:39:56 -0700 (PDT)
-Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
-	[97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id w6sm6984152pge.30.2019.05.16.19.39.55
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=VaY38fhqOGP9PGDK3srRL28PeYkiAkOCubxu5ar7h0w=;
+	b=D1dhoeLcvTojtOIm6TzYdvUfEFbBibfaAX43qCj0qxhDGKe93kR9o400zbjde16vNQ
+	TUVjaLRYzMTlbnULBmzQmZC1D0WUQu2jbjgRceJLOd0EQaxI5fFCVFNAgo/8qxeSxkGb
+	dF9SYzNPB0PR+qWIr4su68ZlECRrICcI80056weWK6dr3h2zG4u+1cLfa8LUXe7CGOKr
+	GkkO+nltDudJHWVfFDkTE4mlRCUvKUnzkx8pID8kYyjtv1eUJxuwct4MpAWmbSWm07/U
+	qd3oWxd5NL7KmpfTEGmX5weE9QPrTDgQk+J3wWxeV1eBwSNYYxmozgOdXXFkP9sdd0RR
+	cv7w==
+X-Gm-Message-State: APjAAAUXxIUKsghY9oZwIQ1jZRbMNxb8FpcAKjr0VyiwGTAzdWVgiYnO
+	zx6ifQUSG2ut3mMZKuPHZR9+cg==
+X-Google-Smtp-Source: APXvYqzKE8LEDwWLJOE4JJLdgs+lPK+nJedePsPCU1t8xftIdWFSEsQSJhxUF2o/JLIH0kS081et3g==
+X-Received: by 2002:adf:eb87:: with SMTP id t7mr31492093wrn.39.1558061855614; 
+	Thu, 16 May 2019 19:57:35 -0700 (PDT)
+Received: from [172.27.174.155] (23-24-245-141-static.hfc.comcastbusiness.net.
+	[23.24.245.141])
+	by smtp.gmail.com with ESMTPSA id w2sm5114184wrm.74.2019.05.16.19.57.32
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 16 May 2019 19:39:55 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Thu, 16 May 2019 19:39:23 -0700
-Message-Id: <20190517023924.1686-25-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190517023924.1686-1-richard.henderson@linaro.org>
-References: <20190517023924.1686-1-richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: [Qemu-devel] [PATCH v8 24/25] target/ppc: Use qemu_guest_getrandom
- for DARN
+	Thu, 16 May 2019 19:57:35 -0700 (PDT)
+To: whiteheadm@acm.org
+References: <CAP8WD_bf=0=tyCumcNpVLtneio+vbd4JuFMmtWqSwXWFC-7PMg@mail.gmail.com>
+	<6da0c28c-ef4f-8199-1cee-bf1f08387ff1@redhat.com>
+	<ea9cf5ec-f259-9a23-eae1-1b2250c367b0@redhat.com>
+	<CAP8WD_ZUVZJKk-tEfG8+yd6t_U9+A3a4s5_ohjU5KLP0tY5YwQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a471eb8d-0cc0-0205-c51d-ce3a75b6d799@redhat.com>
+Date: Fri, 17 May 2019 04:57:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <CAP8WD_ZUVZJKk-tEfG8+yd6t_U9+A3a4s5_ohjU5KLP0tY5YwQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.43
+Subject: Re: [Qemu-devel] Pentium Pro Feature Bugs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,85 +86,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, berrange@redhat.com, armbru@redhat.com
+Cc: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+	qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We now have an interface for guest visible random numbers.
+On 17/05/19 02:30, tedheadster wrote:
+> Paolo,
+>   I am running the kvm32 machine and I see a problem. Here is the
+> output of /proc/cpuinfo :
+> 
+> flags           : fpu vme de pse tsc msr pae mce cx8 apic mtrr pge mca
+> cmov constant_tsc
+> 
+> I see something rather important missing: cpuid.
+> 
+> A lot of stuff breaks without cpuid, and I am fairly sure that qemu is
+> supposed to 'hard code' in support for it. It is present with both my
+> i486 and i586 virtual machines.
+> 
+> - Matthew
+> 
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/ppc/int_helper.c | 39 +++++++++++++++++++++++++++------------
- 1 file changed, 27 insertions(+), 12 deletions(-)
+That's weird... The cpuid flag does not come from QEMU, it is a "soft"
+flag determined by trying to toggle EFLAGS.ID and EFLAGS.ID behaves the
+same for all CPU models.  What else do you see in /proc/cpuinfo?
 
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index f6a088ac08..9af779ad38 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -23,6 +23,8 @@
- #include "exec/helper-proto.h"
- #include "crypto/aes.h"
- #include "fpu/softfloat.h"
-+#include "qapi/error.h"
-+#include "qemu/guest-random.h"
- 
- #include "helper_regs.h"
- /*****************************************************************************/
-@@ -158,25 +160,38 @@ uint32_t helper_cmpeqb(target_ulong ra, target_ulong rb)
- #undef hasvalue
- 
- /*
-- * Return invalid random number.
-- *
-- * FIXME: Add rng backend or other mechanism to get cryptographically suitable
-- * random number
-+ * Return a random number.
-  */
--target_ulong helper_darn32(void)
-+uint64_t helper_darn32(void)
- {
--    return -1;
-+    Error *err = NULL;
-+    uint32_t ret;
-+
-+    if (qemu_guest_getrandom(&ret, sizeof(ret), &err) < 0) {
-+        qemu_log_mask(LOG_UNIMP, "darn: Crypto failure: %s",
-+                      error_get_pretty(err));
-+        error_free(err);
-+        return -1;
-+    }
-+
-+    return ret;
- }
- 
--target_ulong helper_darn64(void)
-+uint64_t helper_darn64(void)
- {
--    return -1;
-+    Error *err = NULL;
-+    uint64_t ret;
-+
-+    if (qemu_guest_getrandom(&ret, sizeof(ret), &err) < 0) {
-+        qemu_log_mask(LOG_UNIMP, "darn: Crypto failure: %s",
-+                      error_get_pretty(err));
-+        error_free(err);
-+        return -1;
-+    }
-+
-+    return ret;
- }
- 
--#endif
--
--#if defined(TARGET_PPC64)
--
- uint64_t helper_bpermd(uint64_t rs, uint64_t rb)
- {
-     int i;
--- 
-2.17.1
-
+Paolo
 
