@@ -2,87 +2,83 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2BEAC04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 22:17:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0820FC04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 22:23:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD4BD2087E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 22:17:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B70012166E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 22:23:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="BtLmtTNB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD4BD2087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UeBkrzL2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B70012166E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54392 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54453 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRlAG-0002mZ-SV
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 18:17:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37100)
+	id 1hRlG3-000451-0w
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 18:23:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=033a92d29=alistair.francis@wdc.com>)
-	id 1hRl62-0007um-9T
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 18:13:02 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hRlEq-0003YR-Gy
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 18:22:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=033a92d29=alistair.francis@wdc.com>)
-	id 1hRl60-0007LB-H6
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 18:12:58 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:41010)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=033a92d29=alistair.francis@wdc.com>)
-	id 1hRl5y-0007Ep-Sr; Fri, 17 May 2019 18:12:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-	d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-	t=1558131175; x=1589667175;
-	h=from:to:cc:subject:date:message-id:in-reply-to:
-	references:mime-version:content-transfer-encoding;
-	bh=vv3ooix0VzFZWoLjoANO1jDgrm6n68GaIIt8y5+y+Mc=;
-	b=BtLmtTNBmqqru9vysJeHU2CBq3jLXXu3Sx/l2w1R3T8WD2TEnfKbynEz
-	GRF06gbvScq3zZ1ORtShRIZkpls/Ot1jtVjuKNViKbbxm/gCuMT//VrEq
-	hZqjRxZ/3/LztC6CPfojHHv3Ffhukq9+GvxAZnOAuYhrFoW+xFpXZhJWS
-	1xw/Y9T1+ygmrWJLj3+f2h78ZTEqJIoIlNRvvWaMrX+3Hw/WqfNRcIwCU
-	Yomhn2dAg4hvw3Eko+JaGFci0MEo0LDwkK+1gG1XWIjJUa4UTLJ8FcpC3
-	9NHCcOStBWTA1T5MRCOOqkHDdNgJTB3lsRRNbhcQD+ZzboURVsQrrIFvQ A==;
-X-IronPort-AV: E=Sophos;i="5.60,481,1549900800"; d="scan'208";a="110242479"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
-	([199.255.45.14])
-	by ob1.hgst.iphmx.com with ESMTP; 18 May 2019 06:12:54 +0800
-IronPort-SDR: vH/6U/4IvdIE4ick20++OrPiFMIT4sJcWa5DP3gkcu4P0gPEnAUPz21HoZj6vLpmbf0DdXGJqw
-	GHjIxbZOy9L3tPPnj7GyHgZz+vLuJ8f791K/oItB89BBryJMLdRRin0JSifH9+CPvexoM9EHhI
-	d9F4SN/afdO0vT1Tnoi04VgKMyAsO+i3+NZTOllvdQOTkxhJtPYw2hbZ/bgE4cJwzTrbSQyBGS
-	vOCLcT/zxsTW+V+4N5ExutZCGUWnzi9hqCnDu/rQVDm0ZjDurgWhdKuEvON3GsUz9wgTeWIqlf
-	oQYJfV8foP7AFmnXatnO8L73
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-	by uls-op-cesaep01.wdc.com with ESMTP; 17 May 2019 14:48:23 -0700
-IronPort-SDR: iH/RJEhRyk0/GQs+jemQ0DfRKPSRCApmyHRz4ZNXzm4usHR5iJdBOx6SiXLzC754z4sT2aQErV
-	SY/xHEoVSqa16+dVQ11UgjeIvwDkQjzLl8nHTgBlUXKxVlfp5zywtUl6S/rTEKrkeVW5llvhgD
-	xYtRB4LfBIUsR9UBKNo0NKvzUhJkdUnC8SWySegp92iM6/1YP+2jioaaJIEGMMlI9sQPUGyVwD
-	W5K8mVQrk/Q2RHLXGrdO3UNcoqmp5fn+htTrLONRzJ2Si+Lt3gke4buAarNDwvQiHGkslGbEVS
-	ewc=
-Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
-	risc6-mainframe.int.fusionio.com) ([10.196.157.140])
-	by uls-op-cesaip01.wdc.com with ESMTP; 17 May 2019 15:12:53 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Date: Fri, 17 May 2019 15:11:06 -0700
-Message-Id: <7e9b4a6cc07a931e62da9c18c40849690eef7150.1558131003.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <cover.1558131003.git.alistair.francis@wdc.com>
-References: <cover.1558131003.git.alistair.francis@wdc.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hRlEp-0003uG-8e
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 18:22:04 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40598)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hRlEo-0003tP-W5
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 18:22:03 -0400
+Received: by mail-wm1-x344.google.com with SMTP id 15so3999103wmg.5
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 15:22:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=V+UChBMPtsHymbUISCl3PTFaxG7COM7bk4pcxEoHlJk=;
+	b=UeBkrzL27/F1hJzdMmcr6ir9PfT0Tv9SPxaj+5Zpn02cPMlLlbswuKhE99wUjHE0S3
+	IyNiRofhxfLe05c39wrkHX3C6IR8bdg/We/3NM5bqyOziRKpslvR2dfNm09dUhpRADuy
+	T2+dLFiXFDERemHEXxEbaYNXZUPQrJpmewF5dYUGRCT1doEGiernYFWSozJb7nz+Udt2
+	LKUm1Hrgrtdrxy/0Hrdw9wLkSQ5fYNih2tyPIINhqWS8f7rPYpNevduIrl7sKLtOpJvR
+	vtntEn34v193EYegf+Yj4RODhkWluGKorHH0Npdb9KHsGeDbU3SiTU82uLNyQPTkNP4w
+	7rgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=V+UChBMPtsHymbUISCl3PTFaxG7COM7bk4pcxEoHlJk=;
+	b=a4+2cC20qP5iDcC4lTJdGksYFhMPCpbiw0rg7hwfaluh3wbPrBCmFg8a1RFGFWyMIt
+	iMwgbaMxRxXNScm7ftu5MXV/ewS5AqhxrLaHB2kCaaDKUHfaUCHFz3oH/AlljDPRfymO
+	y83AMNicvHo4d6IVIvEmZjya9hAu+u8kK3Yf6wMMg7bK84e+zzWwOYzJ59yyYfYHM9/L
+	iHlVuM1+GAwa9x3bWdnLh2YQ3OCqTIAH+iyRG4KYASiQ+vkqeS7ta7hmLeugV2uEqTkS
+	3JDvzRTQHJXffLNAkPRKFwxzVQAblVRDJZBDSEhYGQO+owvRjFZRcIrbz3zfF48ShmQb
+	Pg5w==
+X-Gm-Message-State: APjAAAXzjH/XWheVdGclJeEgK1eFL1fAavNbaavR8RA4BYOI/BtVg/sC
+	H9zrHNI1fjPKi+K05i1e3VOuI5cjIodfS20lMHzSI6G+
+X-Google-Smtp-Source: APXvYqzNX6iNlTa0VzqvVA19ow3E79b9jd6a8F61tPithOcT7m0s64pGXkaVqYmx0BK2jumnZuNugWXvwwnnxOvt0Y0=
+X-Received: by 2002:a1c:f102:: with SMTP id p2mr3540651wmh.126.1558131720669; 
+	Fri, 17 May 2019 15:22:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190409161009.6322-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20190409161009.6322-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Sat, 18 May 2019 00:21:48 +0200
+Message-ID: <CAJ+F1CLEG8xgYYjuSroJ_tHOAaq+v+Ze7i_PushJ+s9yaCQdYA@mail.gmail.com>
+To: QEMU <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 216.71.154.45
-Subject: [Qemu-devel] [PATCH v1 4/4] target/riscv: Implement
- riscv_cpu_unassigned_access
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH v4 00/20] monitor: add asynchronous command
+ type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,81 +90,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, palmer@sifive.com, alistair.francis@wdc.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Michael Clark <mjc@sifive.com>
+On Tue, Apr 9, 2019 at 6:12 PM Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> Hi,
+>
+> HMP and QMP commands are handled synchronously in qemu today. But
+> there are benefits allowing the command handler to re-enter the main
+> loop if the command cannot be handled synchronously, or if it is
+> long-lasting. Some bugs such as rhbz#1230527 are difficult to solve
+> without it.
+>
+> The common solution is to use a pair of command+event in this case.
+> But this approach has a number of issues:
+> - you can't "fix" an existing command: you need a new API, and ad-hoc
+>   documentation for that command+signal association, and old/broken
+>   command deprecation
+> - since the reply event is broadcasted and 'id' is used for matching the
+>   request, it may conflict with other clients request 'id' space
+> - it is arguably less efficient and elegant (weird API, useless return
+>   in most cases, broadcast reply, no cancelling on disconnect etc)
+>
+> The following series implements an async command solution instead. By
+> introducing a session context and a command return handler, it can:
+> - defer the return, allowing the mainloop to reenter
+> - return only to the caller (instead of broadcast events for reply)
+> - optionnally allow cancellation when the client is gone
+> - track on-going qapi command(s) per client/session
+>
+> and without introduction of new QMP APIs or client visible change.
+>
+> Existing qemu commands can be gradually replaced by async:true
+> variants when needed, while carefully reviewing the concurrency
+> aspects. The async:true commands marshaller helpers are splitted in
+> half, the calling and return functions. The command is called with a
+> QmpReturn context, that can return immediately or later, using the
+> generated return helper, which allows for a step-by-step conversion.
+>
+> The screendump command is converted to an async:true version to solve
+> rhbz#1230527. The command shows basic cancellation (this could be
+> extended if needed). It could be further improved to do asynchronous
+> IO writes as well.
+>
+> v4:
+> - rebased, mostly adapting to new OOB code
+>   (there was not much feedback in v3 for the async command part,
+>    but preliminary patches got merged!)
+> - drop the RFC status
 
-This patch adds support for the riscv_cpu_unassigned_access call
-and will raise a load or store access fault.
+ping
 
-Signed-off-by: Michael Clark <mjc@sifive.com>
-[Changes by AF:
- - Squash two patches and rewrite commit message
- - Set baddr to the access address
-]
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/cpu.c        |  1 +
- target/riscv/cpu.h        |  2 ++
- target/riscv/cpu_helper.c | 16 ++++++++++++++++
- 3 files changed, 19 insertions(+)
+>
+> v3:
+> - complete rework, dropping the asynchronous commands visibility from
+>   the protocol side entirely (until there is a real need for it)
+> - rebased, with a few preliminary cleanup patches
+> - teach asynchronous commands to HMP
+>
+> v2:
+> - documentation fixes and improvements
+> - fix calling async commands sync without id
+> - fix bad hmp monitor assert
+> - add a few extra asserts
+> - add async with no-id failure and screendump test
+>
+> Marc-Andr=C3=A9 Lureau (20):
+>   qmp: constify QmpCommand and list
+>   json-lexer: make it safe to call destroy multiple times
+>   qmp: add QmpSession
+>   QmpSession: add a return callback
+>   QmpSession: add json parser and use it in qga
+>   monitor: use qmp session to parse json feed
+>   qga: simplify dispatch_return_cb
+>   QmpSession: introduce QmpReturn
+>   qmp: simplify qmp_return_error()
+>   QmpSession: keep a queue of pending commands
+>   QmpSession: return orderly
+>   qmp: introduce asynchronous command type
+>   scripts: learn 'async' qapi commands
+>   qmp: add qmp_return_is_cancelled()
+>   monitor: add qmp_return_get_monitor()
+>   console: add graphic_hw_update_done()
+>   console: make screendump asynchronous
+>   monitor: start making qmp_human_monitor_command() asynchronous
+>   monitor: teach HMP about asynchronous commands
+>   hmp: call the asynchronous QMP screendump to fix outdated/glitches
+>
+>  qapi/misc.json                          |   3 +-
+>  qapi/ui.json                            |   3 +-
+>  scripts/qapi/commands.py                | 151 ++++++++++++++---
+>  scripts/qapi/common.py                  |  15 +-
+>  scripts/qapi/doc.py                     |   3 +-
+>  scripts/qapi/introspect.py              |   3 +-
+>  hmp.h                                   |   3 +-
+>  include/monitor/monitor.h               |   3 +
+>  include/qapi/qmp/dispatch.h             |  89 +++++++++-
+>  include/qapi/qmp/json-parser.h          |   7 +-
+>  include/ui/console.h                    |   5 +
+>  hmp.c                                   |   6 +-
+>  hw/display/qxl-render.c                 |   9 +-
+>  hw/display/qxl.c                        |   1 +
+>  monitor.c                               | 198 ++++++++++++++--------
+>  qapi/qmp-dispatch.c                     | 214 +++++++++++++++++++-----
+>  qapi/qmp-registry.c                     |  33 +++-
+>  qga/commands.c                          |   2 +-
+>  qga/main.c                              |  51 ++----
+>  qobject/json-lexer.c                    |   5 +-
+>  qobject/json-streamer.c                 |   3 +-
+>  tests/test-qmp-cmds.c                   | 206 +++++++++++++++++++----
+>  ui/console.c                            | 100 +++++++++--
+>  hmp-commands.hx                         |   3 +-
+>  tests/qapi-schema/qapi-schema-test.json |   5 +
+>  tests/qapi-schema/qapi-schema-test.out  |   8 +
+>  tests/qapi-schema/test-qapi.py          |   8 +-
+>  27 files changed, 877 insertions(+), 260 deletions(-)
+>
+> --
+> 2.21.0.196.g041f5ea1cf
+>
+>
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index b7675707e0..bfe92235d3 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -356,6 +356,7 @@ static void riscv_cpu_class_init(ObjectClass *c, void *data)
-     cc->gdb_stop_before_watchpoint = true;
-     cc->disas_set_info = riscv_cpu_disas_set_info;
- #ifndef CONFIG_USER_ONLY
-+    cc->do_unassigned_access = riscv_cpu_unassigned_access;
-     cc->do_unaligned_access = riscv_cpu_do_unaligned_access;
-     cc->get_phys_page_debug = riscv_cpu_get_phys_page_debug;
- #endif
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index c17184f4e4..8250175811 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -264,6 +264,8 @@ void  riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
- bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                         MMUAccessType access_type, int mmu_idx,
-                         bool probe, uintptr_t retaddr);
-+void riscv_cpu_unassigned_access(CPUState *cpu, hwaddr addr, bool is_write,
-+                                 bool is_exec, int unused, unsigned size);
- char *riscv_isa_string(RISCVCPU *cpu);
- void riscv_cpu_list(void);
- 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 41d6db41c3..202b6f021d 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -356,6 +356,22 @@ hwaddr riscv_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-     return phys_addr;
- }
- 
-+void riscv_cpu_unassigned_access(CPUState *cs, hwaddr addr, bool is_write,
-+                                 bool is_exec, int unused, unsigned size)
-+{
-+    RISCVCPU *cpu = RISCV_CPU(cs);
-+    CPURISCVState *env = &cpu->env;
-+
-+    if (is_write) {
-+        cs->exception_index = RISCV_EXCP_STORE_AMO_ACCESS_FAULT;
-+    } else {
-+        cs->exception_index = RISCV_EXCP_LOAD_ACCESS_FAULT;
-+    }
-+
-+    env->badaddr = addr;
-+    riscv_raise_exception(&cpu->env, cs->exception_index, GETPC());
-+}
-+
- void riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-                                    MMUAccessType access_type, int mmu_idx,
-                                    uintptr_t retaddr)
--- 
-2.21.0
 
+--=20
+Marc-Andr=C3=A9 Lureau
 
