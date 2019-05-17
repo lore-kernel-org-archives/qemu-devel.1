@@ -2,93 +2,66 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 304EEC04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 17:04:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F697C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 17:09:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F075F20815
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 17:04:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AfBilimF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F075F20815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 38FA820848
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 17:09:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38FA820848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51315 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51359 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRgHJ-0004Lg-1C
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 13:04:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40441)
+	id 1hRgM6-0006Is-0f
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 13:09:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hRgCI-0001Ub-EF
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 12:59:07 -0400
+	(envelope-from <kenneth.heitke@intel.com>) id 1hRgLC-0005zi-NZ
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 13:08:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hRg1f-0004JK-5p
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 12:48:08 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:34013)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hRg1d-0004B5-FH
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 12:48:07 -0400
-Received: by mail-pl1-x642.google.com with SMTP id w7so3608281plz.1
-	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 09:48:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=oZ5wyOLL+nouFfOy0/Kky2b4dgnVAmw0MOGV8k1wDNs=;
-	b=AfBilimF5ecKBMUPkd9xWqdaEtkxK/pUzvKGwc1wfG4fSq2ZVhXLiBuZZB6b9/skzQ
-	C0t8RpmiPoj7ZqZPjT5Hg1/u7PFkY9l82EasfbDwdy4vQgbfBka10rEsVa4g/k1p/YyO
-	wZDIbqn0E3bsTqsTPXS3gjplWllo8227YolXO1KWugsjeEaukExoNSZZ9nXSWSt9Q8vi
-	XuQUf5uYAmH+IACI870hWqSIepDtbP3KSnSYHinQfKZdeaalbLr+TuuBjfh7TQlmTDdH
-	M+wpdQfokdBdXFE2eiJPjRmMZGhJy/DkrJtKLkb+edJaTe6VFCIDa2iOISxWsmDsnHSN
-	2WJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=oZ5wyOLL+nouFfOy0/Kky2b4dgnVAmw0MOGV8k1wDNs=;
-	b=AiCO3vS4H5ri6olt+2L4uzppERCDz9i2SXa3k+Id0zfAUFne43hrAfIyCmt49UBmZX
-	sHH1cseRfnLut+jDh7koJek5VXYX6ApV/OOyHcvh1NbejbUvcD4M/PJ5TuKehjFqmVpA
-	mpB4kjwBdNKsrHbqTHKNKqwJjVjR/q1ClbpiIltFw5BjRreC/kZz4sXx8/KV+ClT8Sw1
-	o9nAQYIf+5/AYLyTNe3BWx5QRBTUaZoqVkcGud0MsmJej53XstQR61kOwWPmhX/7nZaB
-	MIjW19jWZj/zS68oy85/igwuyqiNSy49EIkGTosxFJyR37nXekxdhcFXfLg7y9G6Nq22
-	yuaw==
-X-Gm-Message-State: APjAAAUiiCX+tAwjDG4z4X1BT/PxL2OP05ZRPAA330KRsTlHXaZqaPEr
-	OeLDwN3KEIJMQ4vv5H4aX6mJyQ==
-X-Google-Smtp-Source: APXvYqw+PAkmfMizIHcOOp4PyQTuWz+Tzzcgz/oC3+eRnMvRA5QsrWcIYBtdASf4RrLlZcQBE/I6vg==
-X-Received: by 2002:a17:902:2947:: with SMTP id
-	g65mr38767627plb.115.1558111682571; 
-	Fri, 17 May 2019 09:48:02 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id
-	k63sm13989287pfb.108.2019.05.17.09.48.01
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 17 May 2019 09:48:01 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190515203112.506-1-david@redhat.com>
-	<20190515203112.506-3-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <fcce920c-58e3-60ef-ebc0-bcbc2e651e87@linaro.org>
-Date: Fri, 17 May 2019 09:47:59 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	(envelope-from <kenneth.heitke@intel.com>) id 1hRgLB-0005bY-Lu
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 13:08:18 -0400
+Received: from mga11.intel.com ([192.55.52.93]:28260)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kenneth.heitke@intel.com>)
+	id 1hRgL9-0005UB-Cm; Fri, 17 May 2019 13:08:15 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+	by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	17 May 2019 10:08:11 -0700
+Received: from unknown (HELO [10.232.112.136]) ([10.232.112.136])
+	by orsmga008-auth.jf.intel.com with ESMTP/TLS/AES256-SHA;
+	17 May 2019 10:08:10 -0700
+To: qemu-block@nongnu.org, keith.busch@intel.com, kwolf@redhat.com,
+	qemu-devel@nongnu.org, mreitz@redhat.com
+References: <20190405214117.1850-1-kenneth.heitke@intel.com>
+	<20190514060225.GA1350@apples.localdomain>
+	<1f607df5-b523-e517-c439-392725fd441b@intel.com>
+	<20190517053504.GA17341@apples.localdomain>
+	<20190517062442.GB17341@apples.localdomain>
+From: "Heitke, Kenneth" <kenneth.heitke@intel.com>
+Message-ID: <b6b37b74-4fae-eb7d-dd6b-ae1ec8b34b1e@intel.com>
+Date: Fri, 17 May 2019 11:08:09 -0600
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190515203112.506-3-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190517062442.GB17341@apples.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::642
-Subject: Re: [Qemu-devel] [PATCH v1 2/5] s390x/tcg: Implement VECTOR FIND
- ELEMENT EQUAL
+X-Received-From: 192.55.52.93
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] nvme: add Get/Set Feature
+ Timestamp support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,50 +73,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/15/19 1:31 PM, David Hildenbrand wrote:
-> +#define DEF_VFEE(BITS)                                                         
-
-Same comment wrt inline functions applies.
-
-Here, because there's one result, writing to byte 7, I wonder if it isn't
-clearer to write the loop
-
-    first_equal = n;
-    first_zero = n;
-    for (i = n - 1; i >= 0; --i) {
-        if (data1 == data2) {
-            first_equal = i;
-        }
-        if (data1 == 0) {
-            first_zero = i;
-        }
-    }
-
-// As an aside, there are bit tricks for the above,
-// but let's stay simple(r) for now.
-
-    if (zs) {
-        if (first_equal < first_zero) {
-            cc = (first_zero < n ? 2 : 1);
-        } else {
-            first_equal = first_zero;
-            cc = (first_zero < n ? 0 : 3);
-        }
-    } else {
-        cc = (first_equal < n ? 1 : 3);
-    }
-    s390_vec_write_element64(v1, 0, first_equal);
-    s390_vec_write_element64(v1, 1, 0);
-
-Note that you don't need S390Vector tmp, since the result is written after all
-of the inputs are consumed.
 
 
-r~
+On 5/17/2019 12:24 AM, Klaus Birkelund wrote:
+> On Fri, May 17, 2019 at 07:35:04AM +0200, Klaus Birkelund wrote:
+>> Hi Kenneth,
+>>
+>> On Thu, May 16, 2019 at 05:24:47PM -0600, Heitke, Kenneth wrote:
+>>> Hi Klaus, thank you for you review. I have one comment inline
+>>>
+>>> On 5/14/2019 12:02 AM, Klaus Birkelund wrote:
+>>>> On Fri, Apr 05, 2019 at 03:41:17PM -0600, Kenneth Heitke wrote:
+>>>>> Signed-off-by: Kenneth Heitke <kenneth.heitke@intel.com>
+>>>>> ---
+>>>>>    hw/block/nvme.c       | 120 +++++++++++++++++++++++++++++++++++++++++-
+>>>>>    hw/block/nvme.h       |   3 ++
+>>>>>    hw/block/trace-events |   2 +
+>>>>>    include/block/nvme.h  |   2 +
+>>>>>    4 files changed, 125 insertions(+), 2 deletions(-)
+>>>>>
+>>>>> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+>>>>> index 7caf92532a..e775e89299 100644
+>>>>> --- a/hw/block/nvme.c
+>>>>> +++ b/hw/block/nvme.c
+>>>>> @@ -219,6 +219,30 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
+>>>>>        return NVME_INVALID_FIELD | NVME_DNR;
+>>>>>    }
+>>>>> +static uint16_t nvme_dma_write_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
+>>>>> +                                   uint64_t prp1, uint64_t prp2)
+>>>>> +{
+>>>>> +    QEMUSGList qsg;
+>>>>> +    QEMUIOVector iov;
+>>>>> +    uint16_t status = NVME_SUCCESS;
+>>>>> +
+>>>>> +    if (nvme_map_prp(&qsg, &iov, prp1, prp2, len, n)) {
+>>>>> +        return NVME_INVALID_FIELD | NVME_DNR;
+>>>>> +    }
+>>>>> +    if (qsg.nsg > 0) {
+>>>>> +        if (dma_buf_write(ptr, len, &qsg)) {
+>>>>> +            status = NVME_INVALID_FIELD | NVME_DNR;
+>>>>> +        }
+>>>>> +        qemu_sglist_destroy(&qsg);
+>>>>> +    } else {
+>>>>> +        if (qemu_iovec_from_buf(&iov, 0, ptr, len) != len) {
+>>>>
+>>>> This should be `qemu_iovec_to_buf`.
+>>>>
+>>>
+>>> This function is transferring data from the "host" to the device so I
+>>> believe I am using the correct function.
+>>>
+>>
+>> Exactly, but this means that you need to populate `ptr` with data
+>> described by the prps, hence dma_buf_*write* and qemu_iovec_*to*_buf. In
+>> this case `ptr` is set to the address of the uint64_t timestamp, and
+>> that is what we need to write to.
+>>
+> 
+> I was going to argue with the fact that nvme_dma_read_prp uses
+> qemu_iovec_from_buf. But it uses _to_buf which as far as I can tell is
+> also wrong.
+> 
+
+I think the iovec_to/from_buf is only used in the case of the controller 
+memory buffer. I'm trying to exercise that path to verify if the correct 
+functions are being used but I'm running into issues (io is being 
+directed to bar0 instead of bar2).
+
 
