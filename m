@@ -2,89 +2,62 @@ Return-Path: <SRS0=PxdI=TR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F1F2C04E87
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 13:03:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E162C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 13:03:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05D5E2087E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 13:03:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hhEqC2mX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05D5E2087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 70E942087E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 13:03:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70E942087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48326 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48328 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRcWE-0003XG-86
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 09:03:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53027)
+	id 1hRcWL-0003cj-Ie
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 09:03:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hRcSw-0001MP-MC
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:00:03 -0400
+	(envelope-from <jfreimann@redhat.com>) id 1hRcRq-0000Tx-5U
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 08:58:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hRcSv-0004ds-GS
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:00:02 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:39523)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
-	id 1hRcSv-0004al-4p
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 09:00:01 -0400
-Received: by mail-ed1-x541.google.com with SMTP id e24so10460678edq.6
-	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 06:00:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
-	:content-disposition:in-reply-to:user-agent;
-	bh=sm4IK8mTjMbbK1oBXVy4nB/0FIaM8FCZ/ND3BrEjTrI=;
-	b=hhEqC2mX26uAhqO5Bt1bdwMuvr3n621wEHtSTir5ZwkCFByxN1SVTguYUYCmvYRL3o
-	m4s3MkxZZ16BpkATxF8A3N4NCeRMkRwfgbAa+nDc+kbOjPLGc/6AdLuHzF/pfwdXC8lJ
-	BXPYbjzKB5NZeayHsvveY1fK017QpVUm0LO/lGqDgFAHvnRBL1co2GGVo1A3nC/+cSjM
-	32Ht0dqq1McQCAwryTKgv0h3coj9bNudxEjTfVtTRVCbpwTtT6STkReYlb9MQX8/KD1C
-	QZh6iUa1JqOM15dXgVvyTkdax0268deFBf/ml33HM3Ap/j2R8zehWwrvLWMUfFwzErlL
-	oI9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
-	:references:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=sm4IK8mTjMbbK1oBXVy4nB/0FIaM8FCZ/ND3BrEjTrI=;
-	b=IwMzgIr5SOvEF3l7eM8Ne2NS9h/pRSThnNqU9FtAR8LykuXAI6BcaoiEzQjBkOMtq6
-	XeKEoJS15V1hL5dOVw6WV5ajNsjlIg19o6bbKCUD4GLiT81WrIp4n5GWCFQKi2yZnlkR
-	hw0+nHPvEs8aSorBiXcKn9jSt/H4tyZNpAkJAmOdyyK8Nw+DiaTzsNI5FJTCovWR9/cy
-	G657IN/0Bdlaqw2s7eHUPuYNwOPscGn7ouy7aFiAY7keHWHJ/lOQnwFMpphDPZyGiZRv
-	sI8bypK4o3qOwbeUtKdXJnTVKao4LKSceMNe2GrNrn2MtCZEUj9UreaadkoWGyxSpQFI
-	MY8w==
-X-Gm-Message-State: APjAAAV2AI1F1nuwJo88n2Yt9JQH+rbLfPPMKnLVfv/DPmsYfS1wBH+t
-	Air14P7tWBrg79dVRO4YeqE=
-X-Google-Smtp-Source: APXvYqyocR8Tk6jZVRv7hmaVLXmRPRIP9PWvd7mETFtsUXKC9LBUg4biqWZvUJ3qK/8st96HWneP7w==
-X-Received: by 2002:a50:b7f8:: with SMTP id i53mr56591484ede.196.1558097999392;
-	Fri, 17 May 2019 05:59:59 -0700 (PDT)
-Received: from localhost ([185.92.221.13]) by smtp.gmail.com with ESMTPSA id
-	x18sm1530825ejd.66.2019.05.17.05.59.58
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 17 May 2019 05:59:58 -0700 (PDT)
-Date: Fri, 17 May 2019 12:59:57 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190517125957.56uoupbo3ai4jybr@master>
-References: <20190517005114.19456-1-richardw.yang@linux.intel.com>
-	<20190517131116.02b25408@Igors-MacBook-Pro>
+	(envelope-from <jfreimann@redhat.com>) id 1hRcRo-0003GG-Vf
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 08:58:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42812)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+	id 1hRcRo-0003Ez-PS
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 08:58:52 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 29F503092654
+	for <qemu-devel@nongnu.org>; Fri, 17 May 2019 12:58:52 +0000 (UTC)
+Received: from localhost (dhcp-192-241.str.redhat.com [10.33.192.241])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 40B355C241;
+	Fri, 17 May 2019 12:58:47 +0000 (UTC)
+From: Jens Freimann <jfreimann@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 17 May 2019 14:58:20 +0200
+Message-Id: <20190517125820.2885-5-jfreimann@redhat.com>
+In-Reply-To: <20190517125820.2885-1-jfreimann@redhat.com>
+References: <20190517125820.2885-1-jfreimann@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190517131116.02b25408@Igors-MacBook-Pro>
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::541
-Subject: Re: [Qemu-devel] [PATCH] hw/acpi: ACPI_PCI should depends on both
- ACPI and PCI
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.43]);
+	Fri, 17 May 2019 12:58:52 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 4/4] vfio/pci: unplug failover primary device
+ before migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,63 +69,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-Cc: mst@redhat.com, Wei Yang <richardw.yang@linux.intel.com>,
-	qemu-devel@nongnu.org
+Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+	mst@redhat.com, aadam@redhat.com, laine@redhat.com, ailan@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 17, 2019 at 01:11:16PM +0200, Igor Mammedov wrote:
->On Fri, 17 May 2019 08:51:14 +0800
->Wei Yang <richardw.yang@linux.intel.com> wrote:
->
->> Pointed out by Philippe Mathieu-Daud?? <philmd@redhat.com>.
->> 
->> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> ---
->>  hw/acpi/Kconfig | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->> 
->> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
->> index 7265843cc3..7c59cf900b 100644
->> --- a/hw/acpi/Kconfig
->> +++ b/hw/acpi/Kconfig
->> @@ -25,7 +25,7 @@ config ACPI_NVDIMM
->>  
->>  config ACPI_PCI
->>      bool
->> -    depends on ACPI
->> +    depends on ACPI && PCI
->>  
->>  config ACPI_VMGENID
->>      bool
->
->are you sure you didn't miss anything?
->
+As usual block all vfio-pci devices from being migrated, but make an
+exception for failover primary devices. This is achieved by setting
+unmigratable to 0 but also add a migration blocker for all vfio-pci
+devices except failover primary devices. These will be unplugged before
+migration happens by the migration handler of the corresponding
+virtio-net standby device.
 
-This patch is based on the comment in
-http://qemu.11.n7.nabble.com/PATCH-v4-0-6-Extract-build-mcfg-tt650106.html#a655913
+Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+---
+ hw/vfio/pci.c | 24 +++++++++++++++++++++++-
+ hw/vfio/pci.h |  1 +
+ 2 files changed, 24 insertions(+), 1 deletion(-)
 
-My understanding is not correct?
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 835249c61d..60cda7dbc9 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -34,6 +34,9 @@
+ #include "pci.h"
+ #include "trace.h"
+ #include "qapi/error.h"
++#include "migration/blocker.h"
++#include "qemu/option.h"
++#include "qemu/option_int.h"
+=20
+ #define MSIX_CAP_LENGTH 12
+=20
+@@ -2803,6 +2806,12 @@ static void vfio_unregister_req_notifier(VFIOPCIDe=
+vice *vdev)
+     vdev->req_enabled =3D false;
+ }
+=20
++static int has_standby_arg(void *opaque, const char *name,
++                           const char *value, Error **errp)
++{
++    return strcmp(name, "standby") =3D=3D 0;
++}
++
+ static void vfio_realize(PCIDevice *pdev, Error **errp)
+ {
+     VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
+@@ -2816,6 +2825,19 @@ static void vfio_realize(PCIDevice *pdev, Error **=
+errp)
+     int i, ret;
+     bool is_mdev;
+=20
++    if (qemu_opt_foreach(pdev->qdev.opts, has_standby_arg,
++                         (void *) pdev->qdev.opts, &err) =3D=3D 0) {
++        error_setg(&vdev->migration_blocker,
++                "VFIO device doesn't support migration");
++        ret =3D migrate_add_blocker(vdev->migration_blocker, &err);
++        if (err) {
++            error_propagate(errp, err);
++            error_free(vdev->migration_blocker);
++        }
++    } else {
++        pdev->qdev.allow_unplug_during_migration =3D true;
++    }
++
+     if (!vdev->vbasedev.sysfsdev) {
+         if (!(~vdev->host.domain || ~vdev->host.bus ||
+               ~vdev->host.slot || ~vdev->host.function)) {
+@@ -3258,7 +3280,7 @@ static Property vfio_pci_dev_properties[] =3D {
+=20
+ static const VMStateDescription vfio_pci_vmstate =3D {
+     .name =3D "vfio-pci",
+-    .unmigratable =3D 1,
++    .unmigratable =3D 0,
+ };
+=20
+ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index 1a87f91889..390ba2c767 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -170,6 +170,7 @@ typedef struct VFIOPCIDevice {
+     bool no_vfio_ioeventfd;
+     bool enable_ramfb;
+     VFIODisplay *dpy;
++    Error *migration_blocker;
+ } VFIOPCIDevice;
+=20
+ uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
+--=20
+2.21.0
 
->On Fri, 17 May 2019 10:37:42 +0200
->Philippe Mathieu-Daud?? <philmd@redhat.com> wrote:
->
->[...]
->> 
->> config ARM_VIRT
->>     ...
->>     select ACPI_PCI
->> 
->> config ACPI_PCI
->>     bool
->>     depends on ACPI && PCI
->> 
->
->
-
--- 
-Wei Yang
-Help you, Help me
 
