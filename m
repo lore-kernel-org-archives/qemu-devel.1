@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 643EBC04AB4
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:45:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB99C04AB4
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:45:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 347DA20833
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:45:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 347DA20833
+	by mail.kernel.org (Postfix) with ESMTPS id B1F0520833
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 May 2019 09:45:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1F0520833
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45325 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45327 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRZQO-0007XN-8f
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 05:45:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39854)
+	id 1hRZQS-0007YX-0I
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 05:45:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hRZM1-0004IQ-0Y
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hRZM0-0004IO-N5
 	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:40:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hRZLz-00022Y-NA
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hRZLz-00020W-7u
 	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:40:40 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:55346
+Received: from mail.ilande.co.uk ([46.43.2.167]:55336
 	helo=mail.default.ilande.uk0.bigv.io)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hRZLz-0001xo-F0
+	id 1hRZLz-0001tA-0a
 	for qemu-devel@nongnu.org; Fri, 17 May 2019 05:40:39 -0400
 Received: from host109-146-247-8.range109-146.btcentralplus.com
 	([109.146.247.8] helo=kentang.home)
 	by mail.default.ilande.uk0.bigv.io with esmtpsa
 	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
 	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hRZLD-00018L-7T; Fri, 17 May 2019 10:39:51 +0100
+	id 1hRZLF-00018L-J4; Fri, 17 May 2019 10:39:54 +0100
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Date: Fri, 17 May 2019 10:40:22 +0100
-Message-Id: <20190517094029.7667-2-mark.cave-ayland@ilande.co.uk>
+Date: Fri, 17 May 2019 10:40:27 +0100
+Message-Id: <20190517094029.7667-7-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.11.0
 In-Reply-To: <20190517094029.7667-1-mark.cave-ayland@ilande.co.uk>
 References: <20190517094029.7667-1-mark.cave-ayland@ilande.co.uk>
@@ -57,8 +57,7 @@ X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 46.43.2.167
-Subject: [Qemu-devel] [PULL 1/8] hw/char/escc: Lower irq when transmit
- buffer is filled
+Subject: [Qemu-devel] [PULL 6/8] leon3: add a little bootloader
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,61 +73,151 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
 
-The SCC/ESCC will briefly stop asserting an interrupt when the
-transmit FIFO is filled.
+This adds a little bootloader to the leon3_machine when a ram image is
+given through the kernel parameter and no bios are provided:
+  * The UART transmiter is enabled.
+  * The TIMER is initialized.
 
-This code doesn't model the transmit FIFO/shift register so the
-pending transmit interrupt is never deasserted which means that an
-edge-triggered interrupt controller will never see the low-to-high
-transition it needs to raise another interrupt. The practical
-consequence of this is that guest firmware with an interrupt service
-routine for the ESCC that does not send all of the data it has
-immediately will stop sending data if the following sequence of
-events occurs:
-1. Disable processor interrupts
-2. Write a character to the ESCC
-3. Add additional characters to a buffer which is drained by the ISR
-4. Enable processor interrupts
-
-In this case, the first character will be sent, the interrupt will
-fire and the ISR will output the second character. Since the pending
-transmit interrupt remains asserted, no additional interrupts will
-ever fire.
-
-This behavior was triggered by firmware for an embedded system with a
-Z85C30 which necessitated this patch.
-
-This patch fixes that situation by explicitly lowering the IRQ when a
-character is written to the buffer and no other interrupts are currently
-pending.
-
-Signed-off-by: Stephen Checkoway <stephen.checkoway@oberlin.edu>
+Reviewed-by: Fabien Chouteau <chouteau@adacore.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/char/escc.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ hw/sparc/leon3.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 71 insertions(+), 8 deletions(-)
 
-diff --git a/hw/char/escc.c b/hw/char/escc.c
-index 628f5f81f7..c5b05a63f1 100644
---- a/hw/char/escc.c
-+++ b/hw/char/escc.c
-@@ -509,6 +509,13 @@ static void escc_mem_write(void *opaque, hwaddr addr,
-         break;
-     case SERIAL_DATA:
-         trace_escc_mem_writeb_data(CHN_C(s), val);
-+        /*
-+         * Lower the irq when data is written to the Tx buffer and no other
-+         * interrupts are currently pending. The irq will be raised again once
-+         * the Tx buffer becomes empty below.
-+         */
-+        s->txint = 0;
-+        escc_update_irq(s);
-         s->tx = val;
-         if (s->wregs[W_TXCTRL2] & TXCTRL2_TXEN) { // tx enabled
-             if (qemu_chr_fe_backend_connected(&s->chr)) {
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index 4f586910f2..6ba63e68ca 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -44,6 +44,8 @@
+ #define CPU_CLK (40 * 1000 * 1000)
+ 
+ #define LEON3_PROM_FILENAME "u-boot.bin"
++#define LEON3_PROM_OFFSET    (0x00000000)
++#define LEON3_RAM_OFFSET     (0x40000000)
+ 
+ #define MAX_PILS 16
+ 
+@@ -62,6 +64,59 @@ typedef struct ResetData {
+     target_ulong sp;            /* initial stack pointer */
+ } ResetData;
+ 
++static uint32_t *gen_store_u32(uint32_t *code, hwaddr addr, uint32_t val)
++{
++    stl_p(code++, 0x82100000); /* mov %g0, %g1                */
++    stl_p(code++, 0x84100000); /* mov %g0, %g2                */
++    stl_p(code++, 0x03000000 +
++      extract32(addr, 10, 22));
++                               /* sethi %hi(addr), %g1        */
++    stl_p(code++, 0x82106000 +
++      extract32(addr, 0, 10));
++                               /* or %g1, addr, %g1           */
++    stl_p(code++, 0x05000000 +
++      extract32(val, 10, 22));
++                               /* sethi %hi(val), %g2         */
++    stl_p(code++, 0x8410a000 +
++      extract32(val, 0, 10));
++                               /* or %g2, val, %g2            */
++    stl_p(code++, 0xc4204000); /* st %g2, [ %g1 ]             */
++
++    return code;
++}
++
++/*
++ * When loading a kernel in RAM the machine is expected to be in a different
++ * state (eg: initialized by the bootloader). This little code reproduces
++ * this behavior.
++ */
++static void write_bootloader(CPUSPARCState *env, uint8_t *base,
++                             hwaddr kernel_addr)
++{
++    uint32_t *p = (uint32_t *) base;
++
++    /* Initialize the UARTs                                        */
++    /* *UART_CONTROL = UART_RECEIVE_ENABLE | UART_TRANSMIT_ENABLE; */
++    p = gen_store_u32(p, 0x80000108, 3);
++
++    /* Initialize the TIMER 0                                      */
++    /* *GPTIMER_SCALER_RELOAD = 40 - 1;                            */
++    p = gen_store_u32(p, 0x80000304, 39);
++    /* *GPTIMER0_COUNTER_RELOAD = 0xFFFE;                          */
++    p = gen_store_u32(p, 0x80000314, 0xFFFFFFFE);
++    /* *GPTIMER0_CONFIG = GPTIMER_ENABLE | GPTIMER_RESTART;        */
++    p = gen_store_u32(p, 0x80000318, 3);
++
++    /* JUMP to the entry point                                     */
++    stl_p(p++, 0x82100000); /* mov %g0, %g1 */
++    stl_p(p++, 0x03000000 + extract32(kernel_addr, 10, 22));
++                            /* sethi %hi(kernel_addr), %g1 */
++    stl_p(p++, 0x82106000 + extract32(kernel_addr, 0, 10));
++                            /* or kernel_addr, %g1 */
++    stl_p(p++, 0x81c04000); /* jmp  %g1 */
++    stl_p(p++, 0x01000000); /* nop */
++}
++
+ static void main_cpu_reset(void *opaque)
+ {
+     ResetData *s   = (ResetData *)opaque;
+@@ -142,7 +197,7 @@ static void leon3_generic_hw_init(MachineState *machine)
+     /* Reset data */
+     reset_info        = g_malloc0(sizeof(ResetData));
+     reset_info->cpu   = cpu;
+-    reset_info->sp    = 0x40000000 + ram_size;
++    reset_info->sp    = LEON3_RAM_OFFSET + ram_size;
+     qemu_register_reset(main_cpu_reset, reset_info);
+ 
+     /* Allocate IRQ manager */
+@@ -164,13 +219,13 @@ static void leon3_generic_hw_init(MachineState *machine)
+     }
+ 
+     memory_region_allocate_system_memory(ram, NULL, "leon3.ram", ram_size);
+-    memory_region_add_subregion(address_space_mem, 0x40000000, ram);
++    memory_region_add_subregion(address_space_mem, LEON3_RAM_OFFSET, ram);
+ 
+     /* Allocate BIOS */
+     prom_size = 8 * MiB;
+     memory_region_init_ram(prom, NULL, "Leon3.bios", prom_size, &error_fatal);
+     memory_region_set_readonly(prom, true);
+-    memory_region_add_subregion(address_space_mem, 0x00000000, prom);
++    memory_region_add_subregion(address_space_mem, LEON3_PROM_OFFSET, prom);
+ 
+     /* Load boot prom */
+     if (bios_name == NULL) {
+@@ -190,7 +245,7 @@ static void leon3_generic_hw_init(MachineState *machine)
+     }
+ 
+     if (bios_size > 0) {
+-        ret = load_image_targphys(filename, 0x00000000, bios_size);
++        ret = load_image_targphys(filename, LEON3_PROM_OFFSET, bios_size);
+         if (ret < 0 || ret > prom_size) {
+             error_report("could not load prom '%s'", filename);
+             exit(1);
+@@ -220,10 +275,18 @@ static void leon3_generic_hw_init(MachineState *machine)
+             exit(1);
+         }
+         if (bios_size <= 0) {
+-            /* If there is no bios/monitor, start the application.  */
+-            env->pc = entry;
+-            env->npc = entry + 4;
+-            reset_info->entry = entry;
++            /*
++             * If there is no bios/monitor just start the application but put
++             * the machine in an initialized state through a little
++             * bootloader.
++             */
++            uint8_t *bootloader_entry;
++
++            bootloader_entry = memory_region_get_ram_ptr(prom);
++            write_bootloader(env, bootloader_entry, entry);
++            env->pc = LEON3_PROM_OFFSET;
++            env->npc = LEON3_PROM_OFFSET + 4;
++            reset_info->entry = LEON3_PROM_OFFSET;
+         }
+     }
+ 
 -- 
 2.11.0
 
