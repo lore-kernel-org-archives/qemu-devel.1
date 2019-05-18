@@ -2,59 +2,56 @@ Return-Path: <SRS0=v56/=TT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DATE_IN_PAST_12_24,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DATE_IN_PAST_12_24,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F6DDC04AB4
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 12:58:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EEC6C04AB4
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 12:59:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C5BD21872
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 12:58:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C5BD21872
+	by mail.kernel.org (Postfix) with ESMTPS id 65AAF21872
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 12:59:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65AAF21872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48413 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48417 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSLOT-0000wF-J7
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 08:58:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44483)
+	id 1hSLPC-0001aQ-Ja
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 08:59:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hSLMc-0007ql-LM
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 08:56:31 -0400
+	(envelope-from <like.xu@linux.intel.com>) id 1hSLMd-0007s8-Ry
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 08:56:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1hSLMb-0002HF-GX
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 08:56:30 -0400
-Received: from mga14.intel.com ([192.55.52.115]:2556)
+	(envelope-from <like.xu@linux.intel.com>) id 1hSLMc-0002Hm-4U
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 08:56:31 -0400
+Received: from mga14.intel.com ([192.55.52.115]:2555)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <like.xu@linux.intel.com>)
-	id 1hSLMY-0002DS-Ak; Sun, 19 May 2019 08:56:26 -0400
+	id 1hSLMY-0002DD-Am; Sun, 19 May 2019 08:56:26 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
 	by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	19 May 2019 05:56:18 -0700
+	19 May 2019 05:56:17 -0700
 X-ExtLoop1: 1
 Received: from clx-ap-likexu.sh.intel.com ([10.239.48.98])
-	by fmsmga001.fm.intel.com with ESMTP; 19 May 2019 05:56:17 -0700
+	by fmsmga001.fm.intel.com with ESMTP; 19 May 2019 05:56:16 -0700
 From: Like Xu <like.xu@linux.intel.com>
 To: qemu-trivial@nongnu.org
-Date: Sun, 19 May 2019 04:54:19 +0800
-Message-Id: <20190518205428.90532-2-like.xu@linux.intel.com>
+Date: Sun, 19 May 2019 04:54:18 +0800
+Message-Id: <20190518205428.90532-1-like.xu@linux.intel.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190518205428.90532-1-like.xu@linux.intel.com>
-References: <20190518205428.90532-1-like.xu@linux.intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 192.55.52.115
-Subject: [Qemu-devel] [PATCH v3 01/10] hw/boards: Add struct CpuTopology to
- MachineState
+Subject: [Qemu-devel] [PATCH v3 00/10] Refactor cpu topo into machine
+ properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,71 +72,109 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The cpu topology property CpuTopology is added to the MachineState
-and its members are initialized with the leagcy global smp variables.
+This patch series make existing cores/threads/sockets into machine
+properties and get rid of global smp_* variables they use currently.
 
-From this commit, the code in the system emulation mode is supposed to
-use cpu topology variables from MachineState instead of the global ones
-defined in vl.c and there is no semantic change.
+The purpose of getting rid of globals is disentangle layer violations and
+let's do it one step at a time by replacing the smp_foo with qdev_get_machine()
+as few calls as possible and delay other related refactoring efforts.
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
----
- include/hw/boards.h | 15 +++++++++++++++
- vl.c                |  5 +++++
- 2 files changed, 20 insertions(+)
+==changelog==
 
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 6f7916f88f..bc23b5db1d 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -230,6 +230,20 @@ typedef struct DeviceMemoryState {
-     MemoryRegion mr;
- } DeviceMemoryState;
- 
-+/**
-+ * CpuTopology:
-+ * @cpus: the number of present logical processors on the machine
-+ * @cores: the number of cores in one package
-+ * @threads: the number of threads in one core
-+ * @max_cpus: the maximum number of logical processors on the machine
-+ */
-+typedef struct CpuTopology {
-+    unsigned int cpus;
-+    unsigned int cores;
-+    unsigned int threads;
-+    unsigned int max_cpus;
-+} CpuTopology;
-+
- /**
-  * MachineState:
-  */
-@@ -272,6 +286,7 @@ struct MachineState {
-     const char *cpu_type;
-     AccelState *accelerator;
-     CPUArchIdList *possible_cpus;
-+    CpuTopology smp;
-     struct NVDIMMState *nvdimms_state;
- };
- 
-diff --git a/vl.c b/vl.c
-index c8ca9ff6ff..40b006577b 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4133,6 +4133,11 @@ int main(int argc, char **argv, char **envp)
- 
-     smp_parse(qemu_opts_find(qemu_find_opts("smp-opts"), NULL));
- 
-+    current_machine->smp.cpus = smp_cpus;
-+    current_machine->smp.max_cpus = max_cpus;
-+    current_machine->smp.cores = smp_cores;
-+    current_machine->smp.threads = smp_threads;
-+
-     /* sanity-check smp_cpus and max_cpus against machine_class */
-     if (smp_cpus < machine_class->min_cpus) {
-         error_report("Invalid SMP CPUs %d. The min CPUs "
+v3:
+
+- rephrase commit messages
+- s/of/of present/ for CpuTopology comment
+- drop reduanct arguments such as cpu_type
+- use ms instead of macs in migration context
+- rebase to commit 1b46b4daa6
+
+v2: https://patchwork.ozlabs.org/cover/1095727/
+
+- pass MachineState via call chain with trivial fixups
+- replace smp_cpus directly at places if it's only used once
+- s/topo/smp/ and drop smp_ prefix inside CpuTopology structure
+- add more commit messages to explaining what patch does
+- fix Patchew build failure for xen usage
+- use macs rather than ms in migration context for MigrationState
+- cleanup unrelated and redundant changes
+- spilt OpenRISC and RISC-V related patches
+
+v1: https://patchwork.kernel.org/cover/10876667/
+
+Like Xu (10):
+  hw/boards: Add struct CpuTopology to MachineState
+  machine: Refactor smp-related call chains to pass MachineState
+  general: Replace global smp variables with smp machine properties
+  hw/ppc: Replace global smp variables with machine smp properties
+  hw/riscv: Replace global smp variables with machine smp properties
+  hw/s390x: Replace global smp variables with machine smp properties
+  hw/i386: Replace global smp variables with machine smp properties
+  hw/arm: Replace global smp variables with machine smp properties
+  hw: Replace global smp variables with MachineState for all remaining archs
+  vl.c: Replace smp global variables with smp machine properties
+
+ accel/kvm/kvm-all.c          |  4 +--
+ backends/hostmem.c           |  6 +++--
+ cpus.c                       |  6 +++--
+ exec.c                       |  3 ++-
+ gdbstub.c                    |  4 +++
+ hw/alpha/dp264.c             |  1 +
+ hw/arm/fsl-imx6.c            |  6 ++++-
+ hw/arm/fsl-imx6ul.c          |  6 ++++-
+ hw/arm/fsl-imx7.c            |  7 +++--
+ hw/arm/highbank.c            |  1 +
+ hw/arm/mcimx6ul-evk.c        |  2 +-
+ hw/arm/mcimx7d-sabre.c       |  2 +-
+ hw/arm/raspi.c               |  4 +--
+ hw/arm/realview.c            |  1 +
+ hw/arm/sabrelite.c           |  2 +-
+ hw/arm/vexpress.c            | 16 +++++++-----
+ hw/arm/virt.c                | 10 ++++++--
+ hw/arm/xlnx-zynqmp.c         | 16 +++++++-----
+ hw/cpu/core.c                |  4 ++-
+ hw/hppa/machine.c            |  4 ++-
+ hw/i386/acpi-build.c         | 13 ++++++----
+ hw/i386/kvmvapic.c           |  7 +++--
+ hw/i386/pc.c                 | 33 ++++++++++++++----------
+ hw/i386/xen/xen-hvm.c        |  4 +++
+ hw/mips/boston.c             |  2 +-
+ hw/mips/mips_malta.c         | 24 +++++++++--------
+ hw/openrisc/openrisc_sim.c   |  1 +
+ hw/ppc/e500.c                |  3 +++
+ hw/ppc/mac_newworld.c        |  3 ++-
+ hw/ppc/mac_oldworld.c        |  3 ++-
+ hw/ppc/pnv.c                 |  9 ++++---
+ hw/ppc/prep.c                |  4 +--
+ hw/ppc/spapr.c               | 37 ++++++++++++++++++--------
+ hw/ppc/spapr_rtas.c          |  4 ++-
+ hw/riscv/sifive_e.c          |  6 +++--
+ hw/riscv/sifive_plic.c       |  3 +++
+ hw/riscv/sifive_u.c          |  6 +++--
+ hw/riscv/spike.c             |  2 ++
+ hw/riscv/virt.c              |  1 +
+ hw/s390x/s390-virtio-ccw.c   |  9 ++++---
+ hw/s390x/sclp.c              |  2 +-
+ hw/smbios/smbios.c           | 26 +++++++++++--------
+ hw/sparc/sun4m.c             |  2 ++
+ hw/sparc64/sun4u.c           |  4 +--
+ hw/xtensa/sim.c              |  2 +-
+ hw/xtensa/xtfpga.c           |  1 +
+ include/hw/boards.h          | 19 ++++++++++++--
+ include/hw/firmware/smbios.h |  5 ++--
+ include/hw/i386/pc.h         |  2 +-
+ migration/postcopy-ram.c     |  8 +++++-
+ numa.c                       |  1 +
+ qmp.c                        |  2 +-
+ target/arm/cpu.c             |  8 +++++-
+ target/i386/cpu.c            |  4 ++-
+ target/openrisc/sys_helper.c |  6 ++++-
+ target/s390x/cpu.c           |  3 +++
+ target/s390x/excp_helper.c   |  5 ++++
+ tcg/tcg.c                    | 13 +++++++++-
+ vl.c                         | 50 +++++++++++++++++++-----------------
+ 59 files changed, 301 insertions(+), 141 deletions(-)
+
 -- 
 2.21.0
 
