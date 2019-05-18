@@ -2,82 +2,90 @@ Return-Path: <SRS0=ZZp+=TS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FE43C04AAF
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 11:38:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19305C04AAF
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 12:26:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E6AA20882
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 11:38:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D11AE20C01
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 12:26:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MG3C6sEw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E6AA20882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qxxYlFHJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D11AE20C01
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60910 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33524 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRxfe-0003WG-13
-	for qemu-devel@archiver.kernel.org; Sat, 18 May 2019 07:38:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57538)
+	id 1hRyPw-0002dF-VA
+	for qemu-devel@archiver.kernel.org; Sat, 18 May 2019 08:26:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jbi.octave@gmail.com>) id 1hRxeO-0002sk-QY
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 07:37:19 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hRyOp-0001lf-M1
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 08:25:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jbi.octave@gmail.com>) id 1hRxcw-0007zW-4B
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 07:35:49 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:56171)
+	(envelope-from <alex.bennee@linaro.org>) id 1hRyNB-00013Y-Kd
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 08:23:34 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:35751)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jbi.octave@gmail.com>)
-	id 1hRxcv-0007yc-OG
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 07:35:46 -0400
-Received: by mail-wm1-x343.google.com with SMTP id x64so9117849wmb.5
-	for <qemu-devel@nongnu.org>; Sat, 18 May 2019 04:35:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id;
-	bh=LNdEGZa2cuzs7DDgbeQPMkNPqeNyWP0kBwxV20E51Ug=;
-	b=MG3C6sEwL3RQj4s4+vuFyrTfh5tvWgEhIjncQf2mQPJ/XNEfEVf9B38AJ8TbtDu4xI
-	c4IcH4RPiD3F+tyrh0xpQ6v/P+lDdXQ+z/oDKWxtLSz/svXKjfO2DRex1IXzbtRAOfKO
-	6OoL2gjHnOK/nVooXkrtYO+u2ptgL20vRbVnoIE3E7gZI6G12es2cfZxh8uBuaQz7nKj
-	kItIPVbZUMCfCLAjgh61btfJFm2afE7L91rsWkFIsuJ8pwzNeyBfV9vNbWY2sST6Wzwk
-	CeDF9IkVqAg2ysNZHip2XMj4CLrCwhKx1EpFa9YLa4Cr80H3I0ztMzOWhr8H1RQy+58t
-	Ezcw==
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hRyNB-000138-Dg
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 08:23:33 -0400
+Received: by mail-wr1-x431.google.com with SMTP id m3so9573004wrv.2
+	for <qemu-devel@nongnu.org>; Sat, 18 May 2019 05:23:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=0VZdUeF3Nch++wkn1pZsmjfKPt5go1Jakb+zVn6hyJU=;
+	b=qxxYlFHJ8BdIwr8y9GSam22H/ZsQobC4T0Dl84k6iSuYaIqNQQkvUUzRI2g9zZe1RM
+	VHLlH035l1T4nfYdiSpAZeKYaxMHYYv8d120cUjZo5E81BqpPxlK2wvPrh9Fa+6llCo1
+	Zmq1I1VoU+N2s13v2f7RX4F1VgVpsJtnG76/rb3oFLTAeXfk0/6PFz/u8MeHiqaRnNQk
+	2HYs8UeeRERkbRHlAJmu3C9d1NKlk6FFhNSn9vWLa4FOinLpKj8wI1DUqRO4EB1fmr5h
+	zNwgd56hpWOBIDuwpyBMBfNtnXgTe/tP+35BpQlgjKU6GjqERbm6HCkkPXsur/HPERMO
+	9J5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id;
-	bh=LNdEGZa2cuzs7DDgbeQPMkNPqeNyWP0kBwxV20E51Ug=;
-	b=NyhZfNQzIy9bKndZHT5hVFNpTq6iIc3gFZ3BgaFomHNwOLyVvOX6UeXHYfoBue1Cxu
-	CCAJCjzbrzFvc5o66ZnhD2xGLBzAGtWVU4/oFPOTXfiDkUu8204mi48+pQIh24wD4wG7
-	d01oxuSGCVxjQuFqRlY9ahncvVWSU0/JeIXQVwk05OVPoMV07yRxNfg4yBZislPKDYuk
-	zCEoxUARBPDvVtGbbLu+kJsmzZ32CRyPGpj3hAp9nLh4GMzA53Gd9DjSNjSRL5wnd4vX
-	VMp9FalOG8Z3gxhsQL/fbjabFqPs9m5W+5I8iqU0dy//9ocUam36Owznk6GW9EgmlcSq
-	6WgQ==
-X-Gm-Message-State: APjAAAW8ZydhvBHtKmJlzIPaF1JyIUigOq0TmJQDRhuKiUvtIbVT4Cfx
-	A3ynS2IdpWc3mqx/NuwAwuFAO40W9m1d
-X-Google-Smtp-Source: APXvYqycLyo2p6HuXA2BQqDTafIZXBg+v3+uurV2t0oJE//0ZwWTNr99ben7MOMd4DCkOTlvJM1DlA==
-X-Received: by 2002:a1c:9c8c:: with SMTP id f134mr5289703wme.95.1558179343704; 
-	Sat, 18 May 2019 04:35:43 -0700 (PDT)
-Received: from localhost.lan (host-2-102-14-218.as13285.net. [2.102.14.218])
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=0VZdUeF3Nch++wkn1pZsmjfKPt5go1Jakb+zVn6hyJU=;
+	b=ZBOGIBdPFbLd1aD147VR7pco/VSADbacAscpakBBTvPtBS/iQcFutzKNwP43ezpYyJ
+	Fq52tG92W7izUAWG10D8vwRyFEobI2Y6nOGp+Bwt0GNDV6BKh9T9i3dzwrkpSy5EoVQO
+	9KizoObEyWHz/mMlzm3c7kdPg8ZxNwtSw393C+2druYbDCEfdtwRTfoYT1eYzBlRIb0K
+	Hl8sGH73kKmS7RLM3SPnbm+dk3ZZwL3wqbfB1DZ8lOUeDp5H7qS+8Va6IHzCvHo3X6PB
+	j3DTJvNFC34T33yIRPQP4Z2hT+ysywHc+aHydiMwqZ7jxJ5LtUDEPxR8LBvvZU2U/4Hj
+	mzjg==
+X-Gm-Message-State: APjAAAV/STR7rNbu9NI4CuoSTmSPFydNWH1QXyrG91dZ5CWADICR4qK6
+	nH/V7WyrhjEyL6ayiTEFEbSsHw==
+X-Google-Smtp-Source: APXvYqwmaTPjuXIsJF7QCstiHcYeAtBoe9iOS4xYSzPZwEmQz+2Lus8psHnovYxsBkZIuWPpPtA04Q==
+X-Received: by 2002:adf:eb89:: with SMTP id t9mr35897060wrn.109.1558182211455; 
+	Sat, 18 May 2019 05:23:31 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
 	by smtp.gmail.com with ESMTPSA id
-	a128sm2113488wmc.13.2019.05.18.04.35.42
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sat, 18 May 2019 04:35:42 -0700 (PDT)
-From: Jules Irenge <jbi.octave@gmail.com>
-To: mark.cave-ayland@ilande.co.uk
-Date: Sat, 18 May 2019 12:35:26 +0100
-Message-Id: <1558179326-15211-1-git-send-email-jbi.octave@gmail.com>
-X-Mailer: git-send-email 1.8.3.1
+	j206sm13547026wma.47.2019.05.18.05.23.30
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Sat, 18 May 2019 05:23:30 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 605A91FF87;
+	Sat, 18 May 2019 13:23:30 +0100 (BST)
+References: <20190517224450.15566-1-jan.bobek@gmail.com>
+User-agent: mu4e 1.3.1; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Jan Bobek <jan.bobek@gmail.com>
+In-reply-to: <20190517224450.15566-1-jan.bobek@gmail.com>
+Date: Sat, 18 May 2019 13:23:30 +0100
+Message-ID: <87sgtc54u5.fsf@zen.linaroharston>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH] target/sparc:Remove multiple errors and
- warnings generated by checkpatch tool within the file target/sparc/asi.h.
+X-Received-From: 2a00:1450:4864:20::431
+Subject: Re: [Qemu-devel] [RISU v2 00/11] Support for i386/x86_64 with
+ vector extensions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,437 +97,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jules Irenge <jbi.octave@gmail.com>, qemu-devel@nongnu.org,
-	atar4qemu@gmail.com
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Remove multiple errors and warnings generated by checkpatch.pl tool.\nERROR: code indent should never use tabs\nERROR: trailing whitespace\nWARNING: Block comments use a leading /* on a separate line
----
- target/sparc/asi.h | 352 ++++++++++++++++++++++++++++-------------------------
- 1 file changed, 183 insertions(+), 169 deletions(-)
 
-diff --git a/target/sparc/asi.h b/target/sparc/asi.h
-index d8d6284..1c8cd35 100644
---- a/target/sparc/asi.h
-+++ b/target/sparc/asi.h
-@@ -1,7 +1,8 @@
- #ifndef _SPARC_ASI_H
- #define _SPARC_ASI_H
- 
--/* asi.h:  Address Space Identifier values for the sparc.
-+/*
-+ * asi.h:  Address Space Identifier values for the sparc.
-  *
-  * Copyright (C) 1995,1996 David S. Miller (davem@caip.rutgers.edu)
-  *
-@@ -53,7 +54,8 @@
- #define ASI_M_DATAC_TAG     0x0E   /* Data Cache Tag; rw, ss */
- #define ASI_M_DATAC_DATA    0x0F   /* Data Cache Data; rw, ss */
- 
--/* The following cache flushing ASIs work only with the 'sta'
-+/*
-+ * The following cache flushing ASIs work only with the 'sta'
-  * instruction. Results are unpredictable for 'swap' and 'ldstuba',
-  * so don't do it.
-  */
-@@ -68,7 +70,9 @@
- /* Block-copy operations are available only on certain V8 cpus. */
- #define ASI_M_BCOPY         0x17   /* Block copy */
- 
--/* These affect only the ICACHE and are Ross HyperSparc and TurboSparc specific. */
-+/*
-+ * These affect only the ICACHE and are Ross HyperSparc and TurboSparc specific.
-+ */
- #define ASI_M_IFLUSH_PAGE   0x18   /* Flush I Cache Line (page); wo, ss */
- #define ASI_M_IFLUSH_SEG    0x19   /* Flush I Cache Line (seg); wo, ss */
- #define ASI_M_IFLUSH_REGION 0x1A   /* Flush I Cache Line (region); wo, ss */
-@@ -78,7 +82,8 @@
- /* Block-fill operations are available on certain V8 cpus */
- #define ASI_M_BFILL         0x1F
- 
--/* This allows direct access to main memory, actually 0x20 to 0x2f are
-+/*
-+ * This allows direct access to main memory, actually 0x20 to 0x2f are
-  * the available ASI's for physical ram pass-through, but I don't have
-  * any idea what the other ones do....
-  */
-@@ -101,8 +106,7 @@
- #define ASI_M_DC_FLCLEAR   0x37
- 
- #define ASI_M_DCDR         0x39   /* Data Cache Diagnostics Register rw, ss */
--
--#define ASI_M_VIKING_TMP1  0x40	  /* Emulation temporary 1 on Viking */
-+#define ASI_M_VIKING_TMP1  0x40   /* Emulation temporary 1 on Viking */
- /* only available on SuperSparc I */
- /* #define ASI_M_VIKING_TMP2  0x41 */  /* Emulation temporary 2 on Viking */
- 
-@@ -123,190 +127,200 @@
- #define ASI_LEON_FLUSH_PAGE     0x10
- 
- /* V9 Architecture mandary ASIs. */
--#define ASI_N			0x04 /* Nucleus				*/
--#define ASI_NL			0x0c /* Nucleus, little endian		*/
--#define ASI_AIUP		0x10 /* Primary, user			*/
--#define ASI_AIUS		0x11 /* Secondary, user			*/
--#define ASI_AIUPL		0x18 /* Primary, user, little endian	*/
--#define ASI_AIUSL		0x19 /* Secondary, user, little endian	*/
--#define ASI_P			0x80 /* Primary, implicit		*/
--#define ASI_S			0x81 /* Secondary, implicit		*/
--#define ASI_PNF			0x82 /* Primary, no fault		*/
--#define ASI_SNF			0x83 /* Secondary, no fault		*/
--#define ASI_PL			0x88 /* Primary, implicit, l-endian	*/
--#define ASI_SL			0x89 /* Secondary, implicit, l-endian	*/
--#define ASI_PNFL		0x8a /* Primary, no fault, l-endian	*/
--#define ASI_SNFL		0x8b /* Secondary, no fault, l-endian	*/
-+#define ASI_N                   0x04 /* Nucleus                         */
-+#define ASI_NL                  0x0c /* Nucleus, little endian          */
-+#define ASI_AIUP                0x10 /* Primary, user                   */
-+#define ASI_AIUS                0x11 /* Secondary, user                 */
-+#define ASI_AIUPL               0x18 /* Primary, user, little endian    */
-+#define ASI_AIUSL               0x19 /* Secondary, user, little endian  */
-+#define ASI_P                   0x80 /* Primary, implicit               */
-+#define ASI_S                   0x81 /* Secondary, implicit             */
-+#define ASI_PNF                 0x82 /* Primary, no fault               */
-+#define ASI_SNF                 0x83 /* Secondary, no fault             */
-+#define ASI_PL                  0x88 /* Primary, implicit, l-endian     */
-+#define ASI_SL                  0x89 /* Secondary, implicit, l-endian   */
-+#define ASI_PNFL                0x8a /* Primary, no fault, l-endian     */
-+#define ASI_SNFL                0x8b /* Secondary, no fault, l-endian   */
- 
--/* SpitFire and later extended ASIs.  The "(III)" marker designates
-+/*
-+ * SpitFire and later extended ASIs.  The "(III)" marker designates
-  * UltraSparc-III and later specific ASIs.  The "(CMT)" marker designates
-  * Chip Multi Threading specific ASIs.  "(NG)" designates Niagara specific
-  * ASIs, "(4V)" designates SUN4V specific ASIs.  "(NG4)" designates SPARC-T4
-  * and later ASIs.
-  */
- #define ASI_REAL                0x14 /* Real address, cachable          */
--#define ASI_PHYS_USE_EC		0x14 /* PADDR, E-cachable		*/
-+#define ASI_PHYS_USE_EC         0x14 /* PADDR, E-cachable               */
- #define ASI_REAL_IO             0x15 /* Real address, non-cachable      */
--#define ASI_PHYS_BYPASS_EC_E	0x15 /* PADDR, E-bit			*/
--#define ASI_BLK_AIUP_4V		0x16 /* (4V) Prim, user, block ld/st	*/
--#define ASI_BLK_AIUS_4V		0x17 /* (4V) Sec, user, block ld/st	*/
-+#define ASI_PHYS_BYPASS_EC_E    0x15 /* PADDR, E-bit                    */
-+#define ASI_BLK_AIUP_4V         0x16 /* (4V) Prim, user, block ld/st    */
-+#define ASI_BLK_AIUS_4V         0x17 /* (4V) Sec, user, block ld/st     */
- #define ASI_REAL_L              0x1c /* Real address, cachable, LE      */
--#define ASI_PHYS_USE_EC_L	0x1c /* PADDR, E-cachable, little endian*/
-+#define ASI_PHYS_USE_EC_L       0x1c /* PADDR, E-cachable, little endian*/
- #define ASI_REAL_IO_L           0x1d /* Real address, non-cachable, LE  */
--#define ASI_PHYS_BYPASS_EC_E_L	0x1d /* PADDR, E-bit, little endian	*/
--#define ASI_BLK_AIUP_L_4V	0x1e /* (4V) Prim, user, block, l-endian*/
--#define ASI_BLK_AIUS_L_4V	0x1f /* (4V) Sec, user, block, l-endian	*/
--#define ASI_SCRATCHPAD		0x20 /* (4V) Scratch Pad Registers	*/
--#define ASI_MMU			0x21 /* (4V) MMU Context Registers	*/
-+#define ASI_PHYS_BYPASS_EC_E_L  0x1d /* PADDR, E-bit, little endian     */
-+#define ASI_BLK_AIUP_L_4V       0x1e /* (4V) Prim, user, block, l-endian*/
-+#define ASI_BLK_AIUS_L_4V       0x1f /* (4V) Sec, user, block, l-endian */
-+#define ASI_SCRATCHPAD          0x20 /* (4V) Scratch Pad Registers      */
-+#define ASI_MMU                 0x21 /* (4V) MMU Context Registers      */
- #define ASI_TWINX_AIUP          0x22 /* twin load, primary user         */
- #define ASI_TWINX_AIUS          0x23 /* twin load, secondary user       */
--#define ASI_BLK_INIT_QUAD_LDD_AIUS 0x23 /* (NG) init-store, twin load,
--					 * secondary, user
--					 */
--#define ASI_NUCLEUS_QUAD_LDD	0x24 /* Cachable, qword load		*/
--#define ASI_QUEUE		0x25 /* (4V) Interrupt Queue Registers	*/
-+#define ASI_BLK_INIT_QUAD_LDD_AIUS 0x23 /*
-+                                         * (NG) init-store, twin load,
-+                                         * secondary, user
-+                                         */
-+#define ASI_NUCLEUS_QUAD_LDD    0x24 /* Cachable, qword load            */
-+#define ASI_QUEUE               0x25 /* (4V) Interrupt Queue Registers  */
- #define ASI_TWINX_REAL          0x26 /* twin load, real, cachable       */
--#define ASI_QUAD_LDD_PHYS_4V	0x26 /* (4V) Physical, qword load	*/
-+#define ASI_QUAD_LDD_PHYS_4V    0x26 /* (4V) Physical, qword load       */
- #define ASI_TWINX_N             0x27 /* twin load, nucleus              */
- #define ASI_TWINX_AIUP_L        0x2a /* twin load, primary user, LE     */
- #define ASI_TWINX_AIUS_L        0x2b /* twin load, secondary user, LE   */
--#define ASI_NUCLEUS_QUAD_LDD_L	0x2c /* Cachable, qword load, l-endian 	*/
-+#define ASI_NUCLEUS_QUAD_LDD_L  0x2c /* Cachable, qword load, l-endian  */
- #define ASI_TWINX_REAL_L        0x2e /* twin load, real, cachable, LE   */
--#define ASI_QUAD_LDD_PHYS_L_4V	0x2e /* (4V) Phys, qword load, l-endian	*/
-+#define ASI_QUAD_LDD_PHYS_L_4V  0x2e /* (4V) Phys, qword load, l-endian */
- #define ASI_TWINX_NL            0x2f /* twin load, nucleus, LE          */
--#define ASI_PCACHE_DATA_STATUS	0x30 /* (III) PCache data stat RAM diag	*/
--#define ASI_PCACHE_DATA		0x31 /* (III) PCache data RAM diag	*/
--#define ASI_PCACHE_TAG		0x32 /* (III) PCache tag RAM diag	*/
--#define ASI_PCACHE_SNOOP_TAG	0x33 /* (III) PCache snoop tag RAM diag	*/
--#define ASI_QUAD_LDD_PHYS	0x34 /* (III+) PADDR, qword load	*/
--#define ASI_WCACHE_VALID_BITS	0x38 /* (III) WCache Valid Bits diag	*/
--#define ASI_WCACHE_DATA		0x39 /* (III) WCache data RAM diag	*/
--#define ASI_WCACHE_TAG		0x3a /* (III) WCache tag RAM diag	*/
--#define ASI_WCACHE_SNOOP_TAG	0x3b /* (III) WCache snoop tag RAM diag	*/
--#define ASI_QUAD_LDD_PHYS_L	0x3c /* (III+) PADDR, qw-load, l-endian	*/
--#define ASI_SRAM_FAST_INIT	0x40 /* (III+) Fast SRAM init		*/
--#define ASI_CORE_AVAILABLE	0x41 /* (CMT) LP Available		*/
--#define ASI_CORE_ENABLE_STAT	0x41 /* (CMT) LP Enable Status		*/
--#define ASI_CORE_ENABLE		0x41 /* (CMT) LP Enable RW		*/
--#define ASI_XIR_STEERING	0x41 /* (CMT) XIR Steering RW		*/
--#define ASI_CORE_RUNNING_RW	0x41 /* (CMT) LP Running RW		*/
--#define ASI_CORE_RUNNING_W1S	0x41 /* (CMT) LP Running Write-One Set	*/
--#define ASI_CORE_RUNNING_W1C	0x41 /* (CMT) LP Running Write-One Clr	*/
--#define ASI_CORE_RUNNING_STAT	0x41 /* (CMT) LP Running Status		*/
--#define ASI_CMT_ERROR_STEERING	0x41 /* (CMT) Error Steering RW		*/
--#define ASI_DCACHE_INVALIDATE	0x42 /* (III) DCache Invalidate diag	*/
--#define ASI_DCACHE_UTAG		0x43 /* (III) DCache uTag diag		*/
--#define ASI_DCACHE_SNOOP_TAG	0x44 /* (III) DCache snoop tag RAM diag	*/
--#define ASI_LSU_CONTROL		0x45 /* Load-store control unit		*/
--#define ASI_DCU_CONTROL_REG	0x45 /* (III) DCache Unit Control reg	*/
--#define ASI_DCACHE_DATA		0x46 /* DCache data-ram diag access	*/
--#define ASI_DCACHE_TAG		0x47 /* Dcache tag/valid ram diag access*/
--#define ASI_INTR_DISPATCH_STAT	0x48 /* IRQ vector dispatch status	*/
--#define ASI_INTR_RECEIVE	0x49 /* IRQ vector receive status	*/
--#define ASI_UPA_CONFIG		0x4a /* UPA config space		*/
--#define ASI_JBUS_CONFIG		0x4a /* (IIIi) JBUS Config Register	*/
--#define ASI_SAFARI_CONFIG	0x4a /* (III) Safari Config Register	*/
--#define ASI_SAFARI_ADDRESS	0x4a /* (III) Safari Address Register	*/
--#define ASI_ESTATE_ERROR_EN	0x4b /* E-cache error enable space	*/
--#define ASI_AFSR		0x4c /* Async fault status register	*/
--#define ASI_AFAR		0x4d /* Async fault address register	*/
--#define ASI_EC_TAG_DATA		0x4e /* E-cache tag/valid ram diag acc	*/
--#define ASI_HYP_SCRATCHPAD	0x4f /* (4V) Hypervisor scratchpad	*/
--#define ASI_IMMU		0x50 /* Insn-MMU main register space	*/
--#define ASI_IMMU_TSB_8KB_PTR	0x51 /* Insn-MMU 8KB TSB pointer reg	*/
--#define ASI_IMMU_TSB_64KB_PTR	0x52 /* Insn-MMU 64KB TSB pointer reg	*/
--#define ASI_ITLB_DATA_IN	0x54 /* Insn-MMU TLB data in reg	*/
--#define ASI_ITLB_DATA_ACCESS	0x55 /* Insn-MMU TLB data access reg	*/
--#define ASI_ITLB_TAG_READ	0x56 /* Insn-MMU TLB tag read reg	*/
--#define ASI_IMMU_DEMAP		0x57 /* Insn-MMU TLB demap		*/
--#define ASI_DMMU		0x58 /* Data-MMU main register space	*/
--#define ASI_DMMU_TSB_8KB_PTR	0x59 /* Data-MMU 8KB TSB pointer reg	*/
--#define ASI_DMMU_TSB_64KB_PTR	0x5a /* Data-MMU 16KB TSB pointer reg	*/
--#define ASI_DMMU_TSB_DIRECT_PTR	0x5b /* Data-MMU TSB direct pointer reg	*/
--#define ASI_DTLB_DATA_IN	0x5c /* Data-MMU TLB data in reg	*/
--#define ASI_DTLB_DATA_ACCESS	0x5d /* Data-MMU TLB data access reg	*/
--#define ASI_DTLB_TAG_READ	0x5e /* Data-MMU TLB tag read reg	*/
--#define ASI_DMMU_DEMAP		0x5f /* Data-MMU TLB demap		*/
--#define ASI_IIU_INST_TRAP	0x60 /* (III) Instruction Breakpoint	*/
--#define ASI_INTR_ID		0x63 /* (CMT) Interrupt ID register	*/
--#define ASI_CORE_ID		0x63 /* (CMT) LP ID register		*/
--#define ASI_CESR_ID		0x63 /* (CMT) CESR ID register		*/
--#define ASI_IC_INSTR		0x66 /* Insn cache instrucion ram diag	*/
--#define ASI_IC_TAG		0x67 /* Insn cache tag/valid ram diag 	*/
--#define ASI_IC_STAG		0x68 /* (III) Insn cache snoop tag ram	*/
--#define ASI_IC_PRE_DECODE	0x6e /* Insn cache pre-decode ram diag	*/
--#define ASI_IC_NEXT_FIELD	0x6f /* Insn cache next-field ram diag	*/
--#define ASI_BRPRED_ARRAY	0x6f /* (III) Branch Prediction RAM diag*/
--#define ASI_BLK_AIUP		0x70 /* Primary, user, block load/store	*/
--#define ASI_BLK_AIUS		0x71 /* Secondary, user, block ld/st	*/
--#define ASI_MCU_CTRL_REG	0x72 /* (III) Memory controller regs	*/
--#define ASI_EC_DATA		0x74 /* (III) E-cache data staging reg	*/
--#define ASI_EC_CTRL		0x75 /* (III) E-cache control reg	*/
--#define ASI_EC_W		0x76 /* E-cache diag write access	*/
--#define ASI_UDB_ERROR_W		0x77 /* External UDB error regs W	*/
--#define ASI_UDB_CONTROL_W	0x77 /* External UDB control regs W	*/
--#define ASI_INTR_W		0x77 /* IRQ vector dispatch write	*/
--#define ASI_INTR_DATAN_W	0x77 /* (III) Out irq vector data reg N	*/
--#define ASI_INTR_DISPATCH_W	0x77 /* (III) Interrupt vector dispatch	*/
--#define ASI_BLK_AIUPL		0x78 /* Primary, user, little, blk ld/st*/
--#define ASI_BLK_AIUSL		0x79 /* Secondary, user, little, blk ld/st*/
--#define ASI_EC_R		0x7e /* E-cache diag read access	*/
--#define ASI_UDBH_ERROR_R	0x7f /* External UDB error regs rd hi	*/
--#define ASI_UDBL_ERROR_R	0x7f /* External UDB error regs rd low	*/
--#define ASI_UDBH_CONTROL_R	0x7f /* External UDB control regs rd hi	*/
--#define ASI_UDBL_CONTROL_R	0x7f /* External UDB control regs rd low*/
--#define ASI_INTR_R		0x7f /* IRQ vector dispatch read	*/
--#define ASI_INTR_DATAN_R	0x7f /* (III) In irq vector data reg N	*/
--#define ASI_PIC			0xb0 /* (NG4) PIC registers		*/
--#define ASI_PST8_P		0xc0 /* Primary, 8 8-bit, partial	*/
--#define ASI_PST8_S		0xc1 /* Secondary, 8 8-bit, partial	*/
--#define ASI_PST16_P		0xc2 /* Primary, 4 16-bit, partial	*/
--#define ASI_PST16_S		0xc3 /* Secondary, 4 16-bit, partial	*/
--#define ASI_PST32_P		0xc4 /* Primary, 2 32-bit, partial	*/
--#define ASI_PST32_S		0xc5 /* Secondary, 2 32-bit, partial	*/
--#define ASI_PST8_PL		0xc8 /* Primary, 8 8-bit, partial, L	*/
--#define ASI_PST8_SL		0xc9 /* Secondary, 8 8-bit, partial, L	*/
--#define ASI_PST16_PL		0xca /* Primary, 4 16-bit, partial, L	*/
--#define ASI_PST16_SL		0xcb /* Secondary, 4 16-bit, partial, L	*/
--#define ASI_PST32_PL		0xcc /* Primary, 2 32-bit, partial, L	*/
--#define ASI_PST32_SL		0xcd /* Secondary, 2 32-bit, partial, L	*/
--#define ASI_FL8_P		0xd0 /* Primary, 1 8-bit, fpu ld/st	*/
--#define ASI_FL8_S		0xd1 /* Secondary, 1 8-bit, fpu ld/st	*/
--#define ASI_FL16_P		0xd2 /* Primary, 1 16-bit, fpu ld/st	*/
--#define ASI_FL16_S		0xd3 /* Secondary, 1 16-bit, fpu ld/st	*/
--#define ASI_FL8_PL		0xd8 /* Primary, 1 8-bit, fpu ld/st, L	*/
--#define ASI_FL8_SL		0xd9 /* Secondary, 1 8-bit, fpu ld/st, L*/
--#define ASI_FL16_PL		0xda /* Primary, 1 16-bit, fpu ld/st, L	*/
--#define ASI_FL16_SL		0xdb /* Secondary, 1 16-bit, fpu ld/st,L*/
--#define ASI_BLK_COMMIT_P	0xe0 /* Primary, blk store commit	*/
--#define ASI_BLK_COMMIT_S	0xe1 /* Secondary, blk store commit	*/
-+#define ASI_PCACHE_DATA_STATUS  0x30 /* (III) PCache data stat RAM diag */
-+#define ASI_PCACHE_DATA         0x31 /* (III) PCache data RAM diag      */
-+#define ASI_PCACHE_TAG          0x32 /* (III) PCache tag RAM diag       */
-+#define ASI_PCACHE_SNOOP_TAG    0x33 /* (III) PCache snoop tag RAM diag */
-+#define ASI_QUAD_LDD_PHYS       0x34 /* (III+) PADDR, qword load        */
-+#define ASI_WCACHE_VALID_BITS   0x38 /* (III) WCache Valid Bits diag    */
-+#define ASI_WCACHE_DATA         0x39 /* (III) WCache data RAM diag      */
-+#define ASI_WCACHE_TAG          0x3a /* (III) WCache tag RAM diag       */
-+#define ASI_WCACHE_SNOOP_TAG    0x3b /* (III) WCache snoop tag RAM diag */
-+#define ASI_QUAD_LDD_PHYS_L     0x3c /* (III+) PADDR, qw-load, l-endian */
-+#define ASI_SRAM_FAST_INIT      0x40 /* (III+) Fast SRAM init           */
-+#define ASI_CORE_AVAILABLE      0x41 /* (CMT) LP Available              */
-+#define ASI_CORE_ENABLE_STAT    0x41 /* (CMT) LP Enable Status          */
-+#define ASI_CORE_ENABLE         0x41 /* (CMT) LP Enable RW              */
-+#define ASI_XIR_STEERING        0x41 /* (CMT) XIR Steering RW           */
-+#define ASI_CORE_RUNNING_RW     0x41 /* (CMT) LP Running RW             */
-+#define ASI_CORE_RUNNING_W1S    0x41 /* (CMT) LP Running Write-One Set  */
-+#define ASI_CORE_RUNNING_W1C    0x41 /* (CMT) LP Running Write-One Clr  */
-+#define ASI_CORE_RUNNING_STAT   0x41 /* (CMT) LP Running Status         */
-+#define ASI_CMT_ERROR_STEERING  0x41 /* (CMT) Error Steering RW         */
-+#define ASI_DCACHE_INVALIDATE   0x42 /* (III) DCache Invalidate diag    */
-+#define ASI_DCACHE_UTAG         0x43 /* (III) DCache uTag diag          */
-+#define ASI_DCACHE_SNOOP_TAG    0x44 /* (III) DCache snoop tag RAM diag */
-+#define ASI_LSU_CONTROL         0x45 /* Load-store control unit         */
-+#define ASI_DCU_CONTROL_REG     0x45 /* (III) DCache Unit Control re    */
-+#define ASI_DCACHE_DATA         0x46 /* DCache data-ram diag access     */
-+#define ASI_DCACHE_TAG          0x47 /* Dcache tag/valid ram diag access*/
-+#define ASI_INTR_DISPATCH_STAT  0x48 /* IRQ vector dispatch status      */
-+#define ASI_INTR_RECEIVE        0x49 /* IRQ vector receive status       */
-+#define ASI_UPA_CONFIG          0x4a /* UPA config space                */
-+#define ASI_JBUS_CONFIG         0x4a /* (IIIi) JBUS Config Register     */
-+#define ASI_SAFARI_CONFIG       0x4a /* (III) Safari Config Register    */
-+#define ASI_SAFARI_ADDRESS      0x4a /* (III) Safari Address Register   */
-+#define ASI_ESTATE_ERROR_EN     0x4b /* E-cache error enable space      */
-+#define ASI_AFSR                0x4c /* Async fault status register     */
-+#define ASI_AFAR                0x4d /* Async fault address register    */
-+#define ASI_EC_TAG_DATA         0x4e /* E-cache tag/valid ram diag acc  */
-+#define ASI_HYP_SCRATCHPAD      0x4f /* (4V) Hypervisor scratchpad      */
-+#define ASI_IMMU                0x50 /* Insn-MMU main register space    */
-+#define ASI_IMMU_TSB_8KB_PTR    0x51 /* Insn-MMU 8KB TSB pointer reg    */
-+#define ASI_IMMU_TSB_64KB_PTR   0x52 /* Insn-MMU 64KB TSB pointer reg   */
-+#define ASI_ITLB_DATA_IN        0x54 /* Insn-MMU TLB data in reg        */
-+#define ASI_ITLB_DATA_ACCESS    0x55 /* Insn-MMU TLB data access reg    */
-+#define ASI_ITLB_TAG_READ       0x56 /* Insn-MMU TLB tag read reg       */
-+#define ASI_IMMU_DEMAP          0x57 /* Insn-MMU TLB demap              */
-+#define ASI_DMMU                0x58 /* Data-MMU main register space    */
-+#define ASI_DMMU_TSB_8KB_PTR    0x59 /* Data-MMU 8KB TSB pointer reg    */
-+#define ASI_DMMU_TSB_64KB_PTR   0x5a /* Data-MMU 16KB TSB pointer reg   */
-+#define ASI_DMMU_TSB_DIRECT_PTR 0x5b /* Data-MMU TSB direct pointer reg */
-+#define ASI_DTLB_DATA_IN        0x5c /* Data-MMU TLB data in reg        */
-+#define ASI_DTLB_DATA_ACCESS    0x5d /* Data-MMU TLB data access reg    */
-+#define ASI_DTLB_TAG_READ       0x5e /* Data-MMU TLB tag read reg       */
-+#define ASI_DMMU_DEMAP          0x5f /* Data-MMU TLB demap              */
-+#define ASI_IIU_INST_TRAP       0x60 /* (III) Instruction Breakpoint    */
-+#define ASI_INTR_ID             0x63 /* (CMT) Interrupt ID register     */
-+#define ASI_CORE_ID             0x63 /* (CMT) LP ID register            */
-+#define ASI_CESR_ID             0x63 /* (CMT) CESR ID register          */
-+#define ASI_IC_INSTR            0x66 /* Insn cache instrucion ram diag  */
-+#define ASI_IC_TAG              0x67 /* Insn cache tag/valid ram diag   */
-+#define ASI_IC_STAG             0x68 /* (III) Insn cache snoop tag ram  */
-+#define ASI_IC_PRE_DECODE       0x6e /* Insn cache pre-decode ram diag  */
-+#define ASI_IC_NEXT_FIELD       0x6f /* Insn cache next-field ram diag  */
-+#define ASI_BRPRED_ARRAY        0x6f /* (III) Branch Prediction RAM diag*/
-+#define ASI_BLK_AIUP            0x70 /* Primary, user, block load/store */
-+#define ASI_BLK_AIUS            0x71 /* Secondary, user, block ld/st    */
-+#define ASI_MCU_CTRL_REG        0x72 /* (III) Memory controller regs    */
-+#define ASI_EC_DATA             0x74 /* (III) E-cache data staging reg  */
-+#define ASI_EC_CTRL             0x75 /* (III) E-cache control reg       */
-+#define ASI_EC_W                0x76 /* E-cache diag write access       */
-+#define ASI_UDB_ERROR_W         0x77 /* External UDB error regs W       */
-+#define ASI_UDB_CONTROL_W       0x77 /* External UDB control regs W     */
-+#define ASI_INTR_W              0x77 /* IRQ vector dispatch write       */
-+#define ASI_INTR_DATAN_W        0x77 /* (III) Out irq vector data reg N */
-+#define ASI_INTR_DISPATCH_W     0x77 /* (III) Interrupt vector dispatch */
-+#define ASI_BLK_AIUPL           0x78 /* Primary, user, little, blk ld/st*/
-+#define ASI_BLK_AIUSL           0x79 /* Secondary, user, little, blk ld/st*/
-+#define ASI_EC_R                0x7e /* E-cache diag read access        */
-+#define ASI_UDBH_ERROR_R        0x7f /* External UDB error regs rd hi   */
-+#define ASI_UDBL_ERROR_R        0x7f /* External UDB error regs rd low  */
-+#define ASI_UDBH_CONTROL_R      0x7f /* External UDB control regs rd hi */
-+#define ASI_UDBL_CONTROL_R      0x7f /* External UDB control regs rd low*/
-+#define ASI_INTR_R              0x7f /* IRQ vector dispatch read        */
-+#define ASI_INTR_DATAN_R        0x7f /* (III) In irq vector data reg N  */
-+#define ASI_PIC                 0xb0 /* (NG4) PIC registers             */
-+#define ASI_PST8_P              0xc0 /* Primary, 8 8-bit, partial       */
-+#define ASI_PST8_S              0xc1 /* Secondary, 8 8-bit, partial     */
-+#define ASI_PST16_P             0xc2 /* Primary, 4 16-bit, partial      */
-+#define ASI_PST16_S             0xc3 /* Secondary, 4 16-bit, partial    */
-+#define ASI_PST32_P             0xc4 /* Primary, 2 32-bit, partial      */
-+#define ASI_PST32_S             0xc5 /* Secondary, 2 32-bit, partial    */
-+#define ASI_PST8_PL             0xc8 /* Primary, 8 8-bit, partial, L    */
-+#define ASI_PST8_SL             0xc9 /* Secondary, 8 8-bit, partial, L  */
-+#define ASI_PST16_PL            0xca /* Primary, 4 16-bit, partial, L   */
-+#define ASI_PST16_SL            0xcb /* Secondary, 4 16-bit, partial, L */
-+#define ASI_PST32_PL            0xcc /* Primary, 2 32-bit, partial, L   */
-+#define ASI_PST32_SL            0xcd /* Secondary, 2 32-bit, partial, L */
-+#define ASI_FL8_P               0xd0 /* Primary, 1 8-bit, fpu ld/st     */
-+#define ASI_FL8_S               0xd1 /* Secondary, 1 8-bit, fpu ld/st   */
-+#define ASI_FL16_P              0xd2 /* Primary, 1 16-bit, fpu ld/st    */
-+#define ASI_FL16_S              0xd3 /* Secondary, 1 16-bit, fpu ld/st  */
-+#define ASI_FL8_PL              0xd8 /* Primary, 1 8-bit, fpu ld/st, L  */
-+#define ASI_FL8_SL              0xd9 /* Secondary, 1 8-bit, fpu ld/st, L*/
-+#define ASI_FL16_PL             0xda /* Primary, 1 16-bit, fpu ld/st, L */
-+#define ASI_FL16_SL             0xdb /* Secondary, 1 16-bit, fpu ld/st,L*/
-+#define ASI_BLK_COMMIT_P        0xe0 /* Primary, blk store commit       */
-+#define ASI_BLK_COMMIT_S        0xe1 /* Secondary, blk store commit     */
- #define ASI_TWINX_P             0xe2 /* twin load, primary implicit     */
--#define ASI_BLK_INIT_QUAD_LDD_P	0xe2 /* (NG) init-store, twin load,
--				      * primary, implicit */
-+#define ASI_BLK_INIT_QUAD_LDD_P 0xe2 /*
-+                                      *(NG) init-store, twin load,
-+                                      * primary, implicit
-+                                      */
- #define ASI_TWINX_S             0xe3 /* twin load, secondary implicit   */
--#define ASI_BLK_INIT_QUAD_LDD_S	0xe3 /* (NG) init-store, twin load,
--				      * secondary, implicit */
-+#define ASI_BLK_INIT_QUAD_LDD_S 0xe3 /*
-+                                      *(NG) init-store, twin load,
-+                                      * secondary, implicit
-+                                      */
- #define ASI_TWINX_PL            0xea /* twin load, primary implicit, LE */
- #define ASI_TWINX_SL            0xeb /* twin load, secondary implicit, LE */
--#define ASI_BLK_P		0xf0 /* Primary, blk ld/st		*/
--#define ASI_BLK_S		0xf1 /* Secondary, blk ld/st		*/
--#define ASI_ST_BLKINIT_MRU_P	0xf2 /* (NG4) init-store, twin load,
--				      * Most-Recently-Used, primary,
--				      * implicit
--				      */
--#define ASI_ST_BLKINIT_MRU_S	0xf2 /* (NG4) init-store, twin load,
--				      * Most-Recently-Used, secondary,
--				      * implicit
--				      */
--#define ASI_BLK_PL		0xf8 /* Primary, blk ld/st, little	*/
--#define ASI_BLK_SL		0xf9 /* Secondary, blk ld/st, little	*/
--#define ASI_ST_BLKINIT_MRU_PL	0xfa /* (NG4) init-store, twin load,
--				      * Most-Recently-Used, primary,
--				      * implicit, little-endian
--				      */
--#define ASI_ST_BLKINIT_MRU_SL	0xfb /* (NG4) init-store, twin load,
--				      * Most-Recently-Used, secondary,
--				      * implicit, little-endian
--				      */
-+#define ASI_BLK_P               0xf0 /* Primary, blk ld/st              */
-+#define ASI_BLK_S               0xf1 /* Secondary, blk ld/st            */
-+#define ASI_ST_BLKINIT_MRU_P    0xf2 /*
-+                                      *(NG4) init-store, twin load,
-+                                      * Most-Recently-Used, primary,
-+                                      * implicit
-+                                      */
-+#define ASI_ST_BLKINIT_MRU_S    0xf2 /*
-+                                      *(NG4) init-store, twin load,
-+                                      * Most-Recently-Used, secondary,
-+                                      * implicit
-+                                      */
-+#define ASI_BLK_PL              0xf8 /* Primary, blk ld/st, little      */
-+#define ASI_BLK_SL              0xf9 /* Secondary, blk ld/st, little    */
-+#define ASI_ST_BLKINIT_MRU_PL   0xfa /*
-+                                      *(NG4) init-store, twin load,
-+                                      * Most-Recently-Used, primary,
-+                                      * implicit, little-endian
-+                                      */
-+#define ASI_ST_BLKINIT_MRU_SL   0xfb /*
-+                                      * (NG4) init-store, twin load,
-+                                      * Most-Recently-Used, secondary,
-+                                      * implicit, little-endian
-+                                      */
- 
- #endif /* _SPARC_ASI_H */
--- 
-1.8.3.1
+Jan Bobek <jan.bobek@gmail.com> writes:
 
+> This patch series adds support for i386 and x86_64 architectures to
+> RISU.  Notably, vector registers (SSE, AVX, AVX-512) are supported for
+> verification of the apprentice. This is V2 of the series posted in
+> [1].
+>
+> I decided not to drop the register definitions from the second patch
+> as suggested by Alex Benn=C3=A9e [4], but replaced them in the fourth pat=
+ch
+> instead. This keeps the second and third patches code-motion only.
+>
+> I wasn't 100% sure how to acknowledge Richard's contributions in some
+> of the patches, and eventually decided to include a Suggested-by:
+> line. Let me know if that's (not) acceptable.
+
+Suggested-by: is a common tag for this sort of thing ;-)
+
+--
+Alex Benn=C3=A9e
 
