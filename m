@@ -2,81 +2,80 @@ Return-Path: <SRS0=ZZp+=TS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE703C04AAF
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 21:51:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B708C04AAF
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 22:03:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB77D20873
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 21:51:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3DA320833
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 22:03:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CMujSkON"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB77D20873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.fintelia.io header.i=@mg.fintelia.io header.b="oWJbAAVr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3DA320833
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fintelia.io
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39047 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39131 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hS7FC-0007pG-Ls
-	for qemu-devel@archiver.kernel.org; Sat, 18 May 2019 17:51:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48457)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fintelia@gmail.com>) id 1hS7EO-0007Mi-Mi
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 17:51:06 -0400
+	id 1hS7QR-0001QS-Vo
+	for qemu-devel@archiver.kernel.org; Sat, 18 May 2019 18:03:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49845)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
+	<bounce+f6f2a2.b78a48-qemu-devel=nongnu.org@mg.fintelia.io>)
+	id 1hS7PR-00016R-RR
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 18:02:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fintelia@gmail.com>) id 1hS7EN-0008Gm-Bd
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 17:51:04 -0400
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:38064)
+	(envelope-from
+	<bounce+f6f2a2.b78a48-qemu-devel=nongnu.org@mg.fintelia.io>)
+	id 1hS7PQ-000334-N1
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 18:02:29 -0400
+Received: from rs224.mailgun.us ([209.61.151.224]:47514)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fintelia@gmail.com>)
-	id 1hS7EK-0008Bp-3L; Sat, 18 May 2019 17:51:00 -0400
-Received: by mail-lf1-x144.google.com with SMTP id y19so7686159lfy.5;
-	Sat, 18 May 2019 14:50:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=TGYcq3uL2t5IesqkvoIlD28a6haYO9HahMhUN4ZmhBA=;
-	b=CMujSkON83qVIW5+8i/88Q7kwknN2U80FAVIGoqEINYwQXLo9g76yv5EIdipr5e1HK
-	nsYTpe5eBqtR9fRhEcr5rAb8Mv9A8pQ6Fg/U3OkpGe1bW6xUYhDhpQCoG8Hn0xT3Ha1L
-	z2SJxwGnzl4VvKv/jEG7ubfcLlzLdsf01Q9OrStNcWStSjo8cXXWVhr/EiAyun1aKBh3
-	fUgFuYG/9L2mzXCxY4O+GYgoIMWk1rrou+I4Y4L0HalaIcLhYfWKBh74PqM/xRLy4qws
-	j7PGx3rSqLgL4ffMGmfWodnYHAA1Sn1Ohti9Yf9OeaqsYpXbra5l8jt0+BB0JYXtcEgZ
-	uw4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=TGYcq3uL2t5IesqkvoIlD28a6haYO9HahMhUN4ZmhBA=;
-	b=EZM1CsHWB8R6vO6xqpQGUmmtqvPILJnBridmxW2VTiAuB7jzc+OjqIImef+TmaolkJ
-	YbfXPfTL0/K6TCy3lJN2z0hJ8bSPTLrom7RuOVqAlEtFY8u4nficltBDfax3WCoz8W34
-	LbTO3eWFSWAcZ4jsd1+mcdmW9m2tLOBV65+ENXCBkRmQxF2A51752AlIYaQIHtNW319R
-	/WYddHRI0tb92655jtzojbNcSnWwHlHcT7rlXUCRiXkQdUCeK2fsyvxGWCV3J3Kasbyf
-	dH58vMyL2V0ymrkmZPxoU4azXRTQD5EZMeUSR2r3wciokowHQ8azTRspLcA/I1XmwCT1
-	iyvA==
-X-Gm-Message-State: APjAAAUWW+47eZmUYT2mifZ17akJiXmIpLQLWL24nTFX8Hb+jWp/DFlm
-	NSvTkVjqwuK6tD7ATUPmaJCWlJaTzqouNyapU0I=
-X-Google-Smtp-Source: APXvYqwGyPG+j1NA7+y8PGXBReZStyTMYwKbrA9UMP748w3qUuZX8txoPyOjRNFSm+mNfNdyTna8MHoXz3Qfa89jzGE=
-X-Received: by 2002:ac2:528f:: with SMTP id q15mr13859490lfm.37.1558216257484; 
-	Sat, 18 May 2019 14:50:57 -0700 (PDT)
+	(Exim 4.71) (envelope-from
+	<bounce+f6f2a2.b78a48-qemu-devel=nongnu.org@mg.fintelia.io>)
+	id 1hS7PQ-000323-D8
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 18:02:28 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.fintelia.io;
+	q=dns/txt; 
+	s=mailo; t=1558216948; h=Content-Type: Cc: To: Subject: Message-ID:
+	Date: From: In-Reply-To: References: MIME-Version: Sender;
+	bh=Pp1xobOlKYPYu4GqMuL7HZHsGc+tPWvefC6y7//3JSk=;
+	b=oWJbAAVrDvqqo6/bGlpkhLxUroSIO9SDWbLETrrn93sSLB71iMPAgnmpXsQ8BfZz2rQ8z70U
+	oNGUm6IrIe7vURoEihBg6+DDi9WBEDERBAFk4ODXKDmkVbiHP9KiPHJr/d5h8qjwSMaQ/9fZ
+	RGU1AHq4r8PULoH5cZk1Nfs1/EU=
+X-Mailgun-Sending-Ip: 209.61.151.224
+X-Mailgun-Sid: WyI4YWE2MyIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiYjc4YTQ4Il0=
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com
+	[209.85.208.170])
+	by mxa.mailgun.org with ESMTP id 5ce07fc3.7f3cb94d3870-smtp-out-n03;
+	Sat, 18 May 2019 21:57:23 -0000 (UTC)
+Received: by mail-lj1-f170.google.com with SMTP id h21so9173172ljk.13;
+	Sat, 18 May 2019 14:57:22 -0700 (PDT)
+X-Gm-Message-State: APjAAAUb9lJBCRBTdLqL/PkyeF4BX3QnRkN7LLoU0SxxOySh/59Ph0Ej
+	1FnfOs1aNKEq9ylR5fjoOTIVTZm11zH+m9tqE20=
+X-Google-Smtp-Source: APXvYqyesf0WgP0PT07q34zcA6cl75Sa5n1HpvcHEsjQEgHFwsHcdkSO6gYP0zXIvPv9B72Td0Z51CTei/tUb1tVsMs=
+X-Received: by 2002:a2e:2bd7:: with SMTP id r84mr83167ljr.91.1558216641559;
+	Sat, 18 May 2019 14:57:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190518191323.4907-1-Hesham.Almatary@cl.cam.ac.uk>
-In-Reply-To: <20190518191323.4907-1-Hesham.Almatary@cl.cam.ac.uk>
-From: Jonathan Behrens <fintelia@gmail.com>
-Date: Sat, 18 May 2019 17:50:31 -0400
-Message-ID: <CANnJOVHoc3fAx=_iuOxaKjtWoUg2_npXu+CzQ+CcppevBmddtA@mail.gmail.com>
-To: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::144
+References: <20190517222342.26394-1-jonathan@fintelia.io>
+	<20190517222342.26394-3-jonathan@fintelia.io>
+	<CAKmqyKMG6ffhQ5VYgLZ3XVfZ2-E_O9BH6UCanmLJ3awDDUfS_w@mail.gmail.com>
+In-Reply-To: <CAKmqyKMG6ffhQ5VYgLZ3XVfZ2-E_O9BH6UCanmLJ3awDDUfS_w@mail.gmail.com>
+From: Jonathan Behrens <jonathan@fintelia.io>
+Date: Sat, 18 May 2019 17:56:55 -0400
+X-Gmail-Original-Message-ID: <CANnJOVFE51rFdV0h0T6_dV6r37kBLcBQCo7Csg8NOUoYkOELpQ@mail.gmail.com>
+Message-ID: <CANnJOVFE51rFdV0h0T6_dV6r37kBLcBQCo7Csg8NOUoYkOELpQ@mail.gmail.com>
+To: Alistair Francis <alistair23@gmail.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.61.151.224
 Content-Type: text/plain; charset="UTF-8"
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH 1/2] RISC-V: Raise access
- fault exceptions on PMP violations
+Subject: Re: [Qemu-devel] [PATCH for-4.1 2/2] target/riscv: Add support for
+ -bios "firmware_filename" flag
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,83 +97,22 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch assumes that translation failure should always raise a paging
-fault, but it should be possible for it to raise an access fault as well
-(since according to the spec "PMP  checks  are  also  applied  to
-page-table  accesses  for  virtual-address translation, for which the
-effective privilege mode is S."). I think the code to actually do the PMP
-checking during page table walks is currently unimplemented though...
+> I've never been fully convinced of this, why not just use the generic
+loader?
+
+If I understand you are proposing passing bbl (or other firmware) with the
+-kernel flag, and then vmlinux (or another kernel) with the -initrd flag?
+Wouldn't this result in losing the ability to pass a real init ramdisk to
+Linux? It also seems to open the possibility for strange bugs/compatibility
+issues later if firmware starts recognizing any "initrd" entries in the
+device tree as kernel code to jump into.
+
+I do wonder though how compatible the current design is with providing
+default firmware for riscv in the future.
+
+> This should be in a generic boot.c file and support added to all RISC-V
+boards.
+
+I can do this for v2.
 
 Jonathan
-
-On Sat, May 18, 2019 at 3:14 PM Hesham Almatary <
-Hesham.Almatary@cl.cam.ac.uk> wrote:
-
-> Section 3.6 in RISC-V v1.10 privilege specification states that PMP
-> violations
-> report "access exceptions." The current PMP implementation has
-> a bug which wrongly reports "page exceptions" on PMP violations.
->
-> This patch fixes this bug by reporting the correct PMP access exceptions
-> trap values.
->
-> Signed-off-by: Hesham Almatary <hesham.almatary@cl.cam.ac.uk>
-> ---
->  target/riscv/cpu_helper.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> index 41d6db41c3..b48de36114 100644
-> --- a/target/riscv/cpu_helper.c
-> +++ b/target/riscv/cpu_helper.c
-> @@ -318,12 +318,13 @@ restart:
->  }
->
->  static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
-> -                                MMUAccessType access_type)
-> +                                MMUAccessType access_type, bool
-> pmp_violation)
->  {
->      CPUState *cs = CPU(riscv_env_get_cpu(env));
->      int page_fault_exceptions =
->          (env->priv_ver >= PRIV_VERSION_1_10_0) &&
-> -        get_field(env->satp, SATP_MODE) != VM_1_10_MBARE;
-> +        get_field(env->satp, SATP_MODE) != VM_1_10_MBARE &&
-> +        !pmp_violation;
->      switch (access_type) {
->      case MMU_INST_FETCH:
->          cs->exception_index = page_fault_exceptions ?
-> @@ -389,6 +390,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address,
-> int size,
->      CPURISCVState *env = &cpu->env;
->      hwaddr pa = 0;
->      int prot;
-> +    bool pmp_violation = false;
->      int ret = TRANSLATE_FAIL;
->
->      qemu_log_mask(CPU_LOG_MMU, "%s ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
-> @@ -402,6 +404,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address,
-> int size,
->
->      if (riscv_feature(env, RISCV_FEATURE_PMP) &&
->          !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type))
-> {
-> +        pmp_violation = true;
->          ret = TRANSLATE_FAIL;
->      }
->      if (ret == TRANSLATE_SUCCESS) {
-> @@ -411,7 +414,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address,
-> int size,
->      } else if (probe) {
->          return false;
->      } else {
-> -        raise_mmu_exception(env, address, access_type);
-> +        raise_mmu_exception(env, address, access_type, pmp_violation);
->          riscv_raise_exception(env, cs->exception_index, retaddr);
->      }
->  #else
-> --
-> 2.17.1
->
->
->
