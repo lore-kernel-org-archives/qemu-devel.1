@@ -7,62 +7,60 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 132F6C04AB4
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 03:30:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64CD7C04E84
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 03:30:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA2A021783
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 03:30:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FB0421783
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 03:30:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="Fk8SHmxy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA2A021783
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="TftTTbdH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FB0421783
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56948 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56950 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRq3A-0001a0-Il
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 23:30:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51817)
+	id 1hRq3D-0001cy-BI
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 23:30:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hRq1V-0000bM-R9
+	(envelope-from <liq3ea@163.com>) id 1hRq1V-0000bK-Na
 	for qemu-devel@nongnu.org; Fri, 17 May 2019 23:28:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1hRq1U-00036p-U1
+	(envelope-from <liq3ea@163.com>) id 1hRq1U-00036i-SX
 	for qemu-devel@nongnu.org; Fri, 17 May 2019 23:28:37 -0400
-Received: from m12-18.163.com ([220.181.12.18]:40551)
+Received: from m12-18.163.com ([220.181.12.18]:40382)
 	by eggs.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <liq3ea@163.com>)
-	id 1hRq1T-00031E-Py; Fri, 17 May 2019 23:28:36 -0400
+	id 1hRq1T-0002zi-B4; Fri, 17 May 2019 23:28:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=ZkRZ93Zkgu3En+FaaA
-	Yw/AoU28oCCnJZpXGm1pEjk1s=; b=Fk8SHmxyQX4smd841NzyhDTYEPREzPt0jO
-	/JT1Rp+dDCuku1SMey7bxbRzSvYNu0V9kKdzCu2ue264REQGSxKExYsxnNlM1Uto
-	mC6Dv2dWQi58T0YulnSmpXyUHWqp/5f6JMyEAeAN00R/MBeIkSRNqFXijAwAYlqT
-	ZMM75JKPc=
+	s=s110527; h=From:Subject:Date:Message-Id; bh=m/jK5BRzZ77Fytp9Cm
+	+5i3Aa2DC0aXVgIOAmW6CJ4SI=; b=TftTTbdHITftWYsVcHK+E+P6mzGcFBJTX5
+	bgpwmo24XLwZoCsSryUM9a7h46k7TOPS4oCcg/3b5W6ZSPorFpf3kbDeN93qb3G1
+	f2nSF1iTT8DJvvhEw+RVfF1hdjLJXjKqklb2KEMvMyA12eZ2W1gifK5LJDElXFHp
+	qyKWIuqqg=
 Received: from localhost.localdomain (unknown [183.159.73.182])
-	by smtp14 (Coremail) with SMTP id EsCowACXzsrXe99czqL5Gg--.37649S3;
-	Sat, 18 May 2019 11:28:29 +0800 (CST)
+	by smtp14 (Coremail) with SMTP id EsCowACXzsrXe99czqL5Gg--.37649S2;
+	Sat, 18 May 2019 11:28:24 +0800 (CST)
 From: Li Qiang <liq3ea@163.com>
 To: alex.williamson@redhat.com,
 	lvivier@redhat.com
-Date: Fri, 17 May 2019 20:28:09 -0700
-Message-Id: <20190518032811.60341-2-liq3ea@163.com>
+Date: Fri, 17 May 2019 20:28:08 -0700
+Message-Id: <20190518032811.60341-1-liq3ea@163.com>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190518032811.60341-1-liq3ea@163.com>
-References: <20190518032811.60341-1-liq3ea@163.com>
-X-CM-TRANSID: EsCowACXzsrXe99czqL5Gg--.37649S3
-X-Coremail-Antispam: 1Uf129KBjvJXoW7tryfZF4Dtw4UXryUGr13XFb_yoW8uFWxpF
-	n7Ja4fWF4jgr4Yvw42k3W5AFZ8GF4kG347K34kCw1ay3W5GrnrZrWUAFWUArZ8Cry5ZFW3
-	ZF42yr4rAa1Fvr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Uj2NNUUUUU=
+X-CM-TRANSID: EsCowACXzsrXe99czqL5Gg--.37649S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWruFyfJF4DAr4xWw1DCF18AFb_yoWDAwcEy3
+	ZxZwsYk3s8CayxKrsxZa43Cw48Zw45tF48t3sYyrs2yr4UG3Z8CryDAFn7ZryfWr4fAry8
+	Grs2qr13GryUKjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRRo7KPUUUUU==
 X-Originating-IP: [183.159.73.182]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBLx24bVUMJXo4KgAAsz
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBZhi4bVaD1iSbFgAAsB
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 220.181.12.18
-Subject: [Qemu-devel] [PATCH 2/4] hw: vfio: drop TYPE_FOO MACRO in
- VMStateDescription
+Subject: [Qemu-devel] [PATCH 1/4] vfio: pci: make "vfio-pci-nohotplug" as
+ MACRO
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,84 +78,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As the vmstate structure names aren't related with
-the QOM type names.
-
 CC: qemu-trivial@nongnu.org
 Signed-off-by: Li Qiang <liq3ea@163.com>
 ---
- hw/vfio/amd-xgbe.c      | 2 +-
- hw/vfio/ap.c            | 2 +-
- hw/vfio/calxeda-xgmac.c | 2 +-
- hw/vfio/ccw.c           | 2 +-
- hw/vfio/platform.c      | 2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
+ hw/vfio/pci.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/hw/vfio/amd-xgbe.c b/hw/vfio/amd-xgbe.c
-index ee64a3b4a2..1b06c0f3ea 100644
---- a/hw/vfio/amd-xgbe.c
-+++ b/hw/vfio/amd-xgbe.c
-@@ -26,7 +26,7 @@ static void amd_xgbe_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 8cecb53d5c..08729e5875 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -40,6 +40,8 @@
+ #define TYPE_VFIO_PCI "vfio-pci"
+ #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
+ 
++#define TYPE_VIFO_PCI_NOHOTPLUG "vfio-pci-nohotplug"
++
+ static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+ static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+ 
+@@ -3304,8 +3306,8 @@ static void vfio_pci_nohotplug_dev_class_init(ObjectClass *klass, void *data)
  }
  
- static const VMStateDescription vfio_platform_amd_xgbe_vmstate = {
--    .name = TYPE_VFIO_AMD_XGBE,
-+    .name = "vfio-amd-xgbe",
-     .unmigratable = 1,
+ static const TypeInfo vfio_pci_nohotplug_dev_info = {
+-    .name = "vfio-pci-nohotplug",
+-    .parent = "vfio-pci",
++    .name = TYPE_VIFO_PCI_NOHOTPLUG,
++    .parent = TYPE_VFIO_PCI,
+     .instance_size = sizeof(VFIOPCIDevice),
+     .class_init = vfio_pci_nohotplug_dev_class_init,
  };
- 
-diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-index d8b79ebe53..564751650f 100644
---- a/hw/vfio/ap.c
-+++ b/hw/vfio/ap.c
-@@ -155,7 +155,7 @@ static void vfio_ap_reset(DeviceState *dev)
- }
- 
- static const VMStateDescription vfio_ap_vmstate = {
--    .name = VFIO_AP_DEVICE_TYPE,
-+    .name = "vfio-ap",
-     .unmigratable = 1,
- };
- 
-diff --git a/hw/vfio/calxeda-xgmac.c b/hw/vfio/calxeda-xgmac.c
-index e7767c4b02..6cc608b6ca 100644
---- a/hw/vfio/calxeda-xgmac.c
-+++ b/hw/vfio/calxeda-xgmac.c
-@@ -26,7 +26,7 @@ static void calxeda_xgmac_realize(DeviceState *dev, Error **errp)
- }
- 
- static const VMStateDescription vfio_platform_calxeda_xgmac_vmstate = {
--    .name = TYPE_VFIO_CALXEDA_XGMAC,
-+    .name = "vfio-calxeda-xgmac",
-     .unmigratable = 1,
- };
- 
-diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-index 31dd3a2a87..d9e39552e2 100644
---- a/hw/vfio/ccw.c
-+++ b/hw/vfio/ccw.c
-@@ -468,7 +468,7 @@ static Property vfio_ccw_properties[] = {
- };
- 
- static const VMStateDescription vfio_ccw_vmstate = {
--    .name = TYPE_VFIO_CCW,
-+    .name = "vfio-ccw",
-     .unmigratable = 1,
- };
- 
-diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-index 398db38f14..e59a0234dd 100644
---- a/hw/vfio/platform.c
-+++ b/hw/vfio/platform.c
-@@ -697,7 +697,7 @@ out:
- }
- 
- static const VMStateDescription vfio_platform_vmstate = {
--    .name = TYPE_VFIO_PLATFORM,
-+    .name = "vfio-platform",
-     .unmigratable = 1,
- };
- 
 -- 
 2.17.1
 
