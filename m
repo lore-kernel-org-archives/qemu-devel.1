@@ -2,77 +2,81 @@ Return-Path: <SRS0=ZZp+=TS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71E5FC04AAF
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 21:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE703C04AAF
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 21:51:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F5A420675
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 21:28:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB77D20873
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 21:51:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=comstyle.com header.i=@comstyle.com header.b="KYW57jAk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F5A420675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=comstyle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CMujSkON"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB77D20873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38845 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39047 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hS6sx-0003Mv-Kp
-	for qemu-devel@archiver.kernel.org; Sat, 18 May 2019 17:28:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45526)
+	id 1hS7FC-0007pG-Ls
+	for qemu-devel@archiver.kernel.org; Sat, 18 May 2019 17:51:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1hS6s7-000342-4v
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 17:28:04 -0400
+	(envelope-from <fintelia@gmail.com>) id 1hS7EO-0007Mi-Mi
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 17:51:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1hS6s6-000054-15
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 17:28:03 -0400
-Received: from speedy.comstyle.com ([206.51.28.2]:30052 helo=mail.comstyle.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <brad@comstyle.com>) id 1hS6s5-0008Ti-Nn
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 17:28:01 -0400
-Received: from mail.comstyle.com (localhost [127.0.0.1])
-	by mail.comstyle.com (Postfix) with ESMTP id 455ytK3ftBz4glt;
-	Sat, 18 May 2019 17:27:37 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=comstyle.com; h=subject:to
-	:cc:references:from:message-id:date:mime-version:in-reply-to
-	:content-type:content-transfer-encoding; s=selector1; bh=A9FX4Vr
-	RmZWTTMnlWGyMYmTprQE=; b=KYW57jAkDfiA490bdENqr5LCnR5BN6joa2O12Za
-	2Z0Vo3kFG0ISqcQEsgU/EtYsXM9sN4X43Toca4t5Cy5FrCsRmRM3VhljtWxF4e+4
-	NqHahwLXINb3kFMKjSd/W9Uu5Uinpzfu7IhR//qX5ZoVrOmovRhv+Y3q4M/BV21U
-	zp2A=
-DomainKey-Signature: a=rsa-sha1; c=nofws; d=comstyle.com; h=subject:to
-	:cc:references:from:message-id:date:mime-version:in-reply-to
-	:content-type:content-transfer-encoding; q=dns; s=selector1; b=m
-	7K1sMdXIEw+K7bhaf7LM+p46tnngjpJBZVe15ACdZvR5gvrqQ1w8ApxNp3qba79u
-	NnmnWEwDWYQ+U1SRU6o/wFNEmClYGE5ZpB9viLaAciLAAFoqKldoc7OFqbyeRGMN
-	jwAXHL632EXJ2oJJUxUB4bM7RauevUXhtpkv4rIFE4=
-Received: from [192.168.180.2] (toroon0812w-lp130-06-74-12-34-161.dsl.bell.ca
-	[74.12.34.161]) (using TLSv1.2 with cipher AES128-SHA (128/128 bits))
-	(No client certificate requested) (Authenticated sender: brad)
-	by mail.comstyle.com (Postfix) with ESMTPSA id 455ytK14Sdz4gls;
-	Sat, 18 May 2019 17:27:37 -0400 (EDT)
-To: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
-	qemu-devel@nongnu.org
-References: <20190510104633.9428-1-kraxel@redhat.com>
-	<33bef2cb-e556-a7e1-9b6f-a1d52a8569cc@redhat.com>
-From: Jim Payne <brad@comstyle.com>
-Message-ID: <14d4fec2-e158-a96c-7bd9-2ca960f1656c@comstyle.com>
-Date: Sat, 18 May 2019 17:27:46 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <fintelia@gmail.com>) id 1hS7EN-0008Gm-Bd
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 17:51:04 -0400
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:38064)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <fintelia@gmail.com>)
+	id 1hS7EK-0008Bp-3L; Sat, 18 May 2019 17:51:00 -0400
+Received: by mail-lf1-x144.google.com with SMTP id y19so7686159lfy.5;
+	Sat, 18 May 2019 14:50:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=TGYcq3uL2t5IesqkvoIlD28a6haYO9HahMhUN4ZmhBA=;
+	b=CMujSkON83qVIW5+8i/88Q7kwknN2U80FAVIGoqEINYwQXLo9g76yv5EIdipr5e1HK
+	nsYTpe5eBqtR9fRhEcr5rAb8Mv9A8pQ6Fg/U3OkpGe1bW6xUYhDhpQCoG8Hn0xT3Ha1L
+	z2SJxwGnzl4VvKv/jEG7ubfcLlzLdsf01Q9OrStNcWStSjo8cXXWVhr/EiAyun1aKBh3
+	fUgFuYG/9L2mzXCxY4O+GYgoIMWk1rrou+I4Y4L0HalaIcLhYfWKBh74PqM/xRLy4qws
+	j7PGx3rSqLgL4ffMGmfWodnYHAA1Sn1Ohti9Yf9OeaqsYpXbra5l8jt0+BB0JYXtcEgZ
+	uw4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=TGYcq3uL2t5IesqkvoIlD28a6haYO9HahMhUN4ZmhBA=;
+	b=EZM1CsHWB8R6vO6xqpQGUmmtqvPILJnBridmxW2VTiAuB7jzc+OjqIImef+TmaolkJ
+	YbfXPfTL0/K6TCy3lJN2z0hJ8bSPTLrom7RuOVqAlEtFY8u4nficltBDfax3WCoz8W34
+	LbTO3eWFSWAcZ4jsd1+mcdmW9m2tLOBV65+ENXCBkRmQxF2A51752AlIYaQIHtNW319R
+	/WYddHRI0tb92655jtzojbNcSnWwHlHcT7rlXUCRiXkQdUCeK2fsyvxGWCV3J3Kasbyf
+	dH58vMyL2V0ymrkmZPxoU4azXRTQD5EZMeUSR2r3wciokowHQ8azTRspLcA/I1XmwCT1
+	iyvA==
+X-Gm-Message-State: APjAAAUWW+47eZmUYT2mifZ17akJiXmIpLQLWL24nTFX8Hb+jWp/DFlm
+	NSvTkVjqwuK6tD7ATUPmaJCWlJaTzqouNyapU0I=
+X-Google-Smtp-Source: APXvYqwGyPG+j1NA7+y8PGXBReZStyTMYwKbrA9UMP748w3qUuZX8txoPyOjRNFSm+mNfNdyTna8MHoXz3Qfa89jzGE=
+X-Received: by 2002:ac2:528f:: with SMTP id q15mr13859490lfm.37.1558216257484; 
+	Sat, 18 May 2019 14:50:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <33bef2cb-e556-a7e1-9b6f-a1d52a8569cc@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+References: <20190518191323.4907-1-Hesham.Almatary@cl.cam.ac.uk>
+In-Reply-To: <20190518191323.4907-1-Hesham.Almatary@cl.cam.ac.uk>
+From: Jonathan Behrens <fintelia@gmail.com>
+Date: Sat, 18 May 2019 17:50:31 -0400
+Message-ID: <CANnJOVHoc3fAx=_iuOxaKjtWoUg2_npXu+CzQ+CcppevBmddtA@mail.gmail.com>
+To: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 206.51.28.2
-Subject: Re: [Qemu-devel] QEMU on OpenBSD is broken?
+X-Received-From: 2a00:1450:4864:20::144
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH 1/2] RISC-V: Raise access
+ fault exceptions on PMP violations
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -84,91 +88,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
-	Ed Maste <emaste@freebsd.org>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Kamil Rytarowski <kamil@netbsd.org>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+	Sagar Karandikar <sagark@eecs.berkeley.edu>,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Palmer Dabbelt <palmer@sifive.com>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+	Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/16/2019 9:04 PM, Thomas Huth wrote:
+This patch assumes that translation failure should always raise a paging
+fault, but it should be possible for it to raise an access fault as well
+(since according to the spec "PMP  checks  are  also  applied  to
+page-table  accesses  for  virtual-address translation, for which the
+effective privilege mode is S."). I think the code to actually do the PMP
+checking during page table walks is currently unimplemented though...
 
-> On 10/05/2019 12.46, Gerd Hoffmann wrote:
->> This patch series changes the way virtual machines for test builds are
->> managed.  They are created locally on the developer machine now.  The
->> installer is booted on the serial console and the scripts walks throug=
-h
->> the dialogs to install and configure the guest.
->>
->> That takes the download.patchew.org server out of the loop and makes i=
-t
->> alot easier to tweak the guest images (adding build dependencies for
->> example).
->>
->> The install scripts take care to apply host proxy settings (from *_pro=
-xy
->> environment variables) to the guest, so any package downloads will be
->> routed through the proxy and can be cached that way.  This also makes
->> them work behind strict firewalls.
->>
->> There are also a bunch of smaller tweaks for tests/vm to fix issues I
->> was struggling with.  See commit messages of individual patches for
->> details.
->>
->> Gerd Hoffmann (13):
->>    scripts: use git archive in archive-source
->>    tests/vm: send proxy environment variables over ssh
->>    tests/vm: use ssh with pty unconditionally
->>    tests/vm: run test builds on snapshot
->>    tests/vm: proper guest shutdown
->>    tests/vm: add vm-boot-{ssh,serial}-<guest> targets
->>    tests/vm: add DEBUG=3D1 to help text
->>    tests/vm: serial console support helpers
->>    tests/vm: openbsd autoinstall, using serial console
->>    tests/vm: freebsd autoinstall, using serial console
->>    tests/vm: netbsd autoinstall, using serial console
->>    tests/vm: fedora autoinstall, using serial console
->>    tests/vm: ubuntu.i386: apt proxy setup
-> freebsd, netbsd and fedora targets work fine for me, so for the patches
-> 1 - 8 and 10 - 12 :
+Jonathan
+
+On Sat, May 18, 2019 at 3:14 PM Hesham Almatary <
+Hesham.Almatary@cl.cam.ac.uk> wrote:
+
+> Section 3.6 in RISC-V v1.10 privilege specification states that PMP
+> violations
+> report "access exceptions." The current PMP implementation has
+> a bug which wrongly reports "page exceptions" on PMP violations.
 >
-> Tested-by: Thomas Huth <thuth@redhat.com>
+> This patch fixes this bug by reporting the correct PMP access exceptions
+> trap values.
 >
-> openbsd still fails for me:
+> Signed-off-by: Hesham Almatary <hesham.almatary@cl.cam.ac.uk>
+> ---
+>  target/riscv/cpu_helper.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
 >
->    TEST    check-qtest-arm: tests/tmp105-test
->    TEST    check-qtest-arm: tests/pca9552-test
->    TEST    check-qtest-arm: tests/ds1338-test
->    TEST    check-qtest-arm: tests/microbit-test
->    TEST    check-qtest-arm: tests/m25p80-test
->    TEST    check-qtest-arm: tests/test-arm-mptimer
->    TEST    check-qtest-arm: tests/boot-serial-test
-> qemu-system-arm: cannot set up guest memory 'ram': Cannot allocate memo=
-ry
-> Broken pipe
-
-How much memory is trying to be allocated here?
-
-The default maximum data size is set to 768MB. If there is a requirement=20
-to go beyond
-that then the default has to be adjusted in /etc/login.conf.
-
-datasize-max and datasize-cur
-
-default:\
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :path=3D/usr/bin /bin /usr/sb=
-in /sbin /usr/X11R6/bin=20
-/usr/local/bin /usr/local/sbin:\
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :umask=3D022:\
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :datasize-max=3D768M:\
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :datasize-cur=3D768M:\
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :maxproc-max=3D256:\
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :maxproc-cur=3D128:\
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :openfiles-max=3D1024:\
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :openfiles-cur=3D512:\
-
-
-
+> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+> index 41d6db41c3..b48de36114 100644
+> --- a/target/riscv/cpu_helper.c
+> +++ b/target/riscv/cpu_helper.c
+> @@ -318,12 +318,13 @@ restart:
+>  }
+>
+>  static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
+> -                                MMUAccessType access_type)
+> +                                MMUAccessType access_type, bool
+> pmp_violation)
+>  {
+>      CPUState *cs = CPU(riscv_env_get_cpu(env));
+>      int page_fault_exceptions =
+>          (env->priv_ver >= PRIV_VERSION_1_10_0) &&
+> -        get_field(env->satp, SATP_MODE) != VM_1_10_MBARE;
+> +        get_field(env->satp, SATP_MODE) != VM_1_10_MBARE &&
+> +        !pmp_violation;
+>      switch (access_type) {
+>      case MMU_INST_FETCH:
+>          cs->exception_index = page_fault_exceptions ?
+> @@ -389,6 +390,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address,
+> int size,
+>      CPURISCVState *env = &cpu->env;
+>      hwaddr pa = 0;
+>      int prot;
+> +    bool pmp_violation = false;
+>      int ret = TRANSLATE_FAIL;
+>
+>      qemu_log_mask(CPU_LOG_MMU, "%s ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
+> @@ -402,6 +404,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address,
+> int size,
+>
+>      if (riscv_feature(env, RISCV_FEATURE_PMP) &&
+>          !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type))
+> {
+> +        pmp_violation = true;
+>          ret = TRANSLATE_FAIL;
+>      }
+>      if (ret == TRANSLATE_SUCCESS) {
+> @@ -411,7 +414,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address,
+> int size,
+>      } else if (probe) {
+>          return false;
+>      } else {
+> -        raise_mmu_exception(env, address, access_type);
+> +        raise_mmu_exception(env, address, access_type, pmp_violation);
+>          riscv_raise_exception(env, cs->exception_index, retaddr);
+>      }
+>  #else
+> --
+> 2.17.1
+>
+>
+>
