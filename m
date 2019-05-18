@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D52D4C04AAF
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 19:12:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75644C04AAF
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 19:12:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A240920873
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 19:12:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 341482054F
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 19:12:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p/RQnUV5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A240920873
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tbQFSHmv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 341482054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37679 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37681 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hS4kU-0000qe-QR
-	for qemu-devel@archiver.kernel.org; Sat, 18 May 2019 15:12:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59166)
+	id 1hS4kl-00011U-HD
+	for qemu-devel@archiver.kernel.org; Sat, 18 May 2019 15:12:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hS4dP-0002lS-9E
+	(envelope-from <richard.henderson@linaro.org>) id 1hS4dP-0002qF-Kt
 	for qemu-devel@nongnu.org; Sat, 18 May 2019 15:04:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hS4b1-0002i6-JQ
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 15:02:17 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:34613)
+	(envelope-from <richard.henderson@linaro.org>) id 1hS4az-0002h8-3W
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 15:02:14 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:40197)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hS4b0-0002hS-Bm
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 15:02:14 -0400
-Received: by mail-pf1-x443.google.com with SMTP id n19so5269639pfa.1
-	for <qemu-devel@nongnu.org>; Sat, 18 May 2019 12:02:14 -0700 (PDT)
+	id 1hS4ay-0002gB-UF
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 15:02:13 -0400
+Received: by mail-pg1-x542.google.com with SMTP id d30so4826165pgm.7
+	for <qemu-devel@nongnu.org>; Sat, 18 May 2019 12:02:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references;
-	bh=OLftcOa71o3SDWkHEvzuYmmBM81jvFAhtQKjy7MXc3g=;
-	b=p/RQnUV5OvLoa08tg1eiYyRAFDHUcJ9wsisxXqmYbKQxz3Ro3VtXEpwq92DYEnyjFa
-	0jC1GTaD8xdDI4CHDwDqhPLwjBQsNtoHF7DLz8vQYRmIBbw7j9zTTCZnJODd/rOnc+Ea
-	0DPub1POc9Ie7g4+FC2130BiQU3skP845wCYJjxxlrP+ZuvMYQ01U2iFfTpVw4xuaX+8
-	pHOJXgW87ZF/vzTu5utNFA13disk+Y9Pg5ZCZ9UnTzJgnKkVyG+O/trZW/CmIiQVGBKs
-	yr8FdfbDo5teXICWo4PzsgP+sOzco3YmWzFl8mQQvcKDxdQtFjkT2IpZ6+7kdJyVGNeU
-	t1bQ==
+	bh=cyPCzZg9DUKeW2pqf+eu++K5/1I4IivLKFA9dQuPgvg=;
+	b=tbQFSHmv+dDsabC/U32Pcoi0BFI9mPCug1jfNkNmSBElKKsAGb7e+447Idhz2zljiv
+	EvxsGRRqscjDRKmwPGa7LgLIl3pJLbsVVRqxEYSLyISJMmnuiDnXdDXk6sniXz4Xezcg
+	sXaf8dWQXfN8oncx0MqCvtR4Xb/BhzCHr673aFGaqGWCYoAIeJNtOdlOv+XOFkkOMmvR
+	PyOmAJ8OPzw2eo6AtcL7fZggS/7qemeDrFRu0FqZ98ehzMHdhFEphY8loBtcmrg+Zi8x
+	YajK9+GBw2mlkHvMlBnqOQJrZEFJN3AZCcBei/Rcs6EEp/b7Z09OdYOSRRp4hFMKCXzh
+	jUug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references;
-	bh=OLftcOa71o3SDWkHEvzuYmmBM81jvFAhtQKjy7MXc3g=;
-	b=RaYm79eS00mTizjqjJ3Ppz8Yl2pKLbluum6jGsSyS2B5dJN/yr59zXw85x3cBnN8/I
-	gqBVdoYr+qglHD5pt7chAVrA6hfo6SfKpe/5RyggBQCiU7ZsNFKe8yHlACTGxVBAjmG9
-	uko3ExSx4B0KZBuylj0TqjO9pSaqfZATB4/Ih8qIdWq9qjscIs3IQuzKkClfFEkJ7Uh8
-	C5Kptd6dnurFsYDtqs2A0s8rfAe3bpYiwHeqA4Z/f3qSmN/7SIaEFYMyiIl7MIYuJEa7
-	yqn5m9mz3t2sjrhu3heDMWUPXmFQJeGWTmGNbB1K44j4umgz8Wkx4kGST5nEPvynF5PT
-	XtAQ==
-X-Gm-Message-State: APjAAAUj1cNrLKfNq1oYg2BC87/2GFqjC/WT8csLIPn0IZFLiHgMD5Tv
-	P8SmFVHUdalvPEcf7tDSOYeJGOIf1HE=
-X-Google-Smtp-Source: APXvYqwN2HnM/CD1gHQM9OWHU6RDZyAGSTuy6UVEcbbghCyN1Nxj8Ifoh2wcL000x8fq6M3344P26g==
-X-Received: by 2002:a63:1c4:: with SMTP id 187mr38120757pgb.317.1558206133167; 
-	Sat, 18 May 2019 12:02:13 -0700 (PDT)
+	bh=cyPCzZg9DUKeW2pqf+eu++K5/1I4IivLKFA9dQuPgvg=;
+	b=Ste4+FlI4P0/L/9vhdiADB2CnRM4skyGMfRpJI0B31FFdVP91Ej0hGbEVpgL3i3H53
+	AtfjpMtR9yuLj0biMor3gzHyY3Lqdyvm3zt9zczq0iD7hkjBT6V1p6AauRa8HzABCqEB
+	I+9BsuNSv/SNY3tTdKSBing3K0bGIpFGuMj1SzoVeiGRg8Y2rVNb397pUxY17Kh6xDWk
+	VuWFllfGtNEhvEnt1GGDUdpM0sit4yH1puYNKSMU5wZvsfSFeraqNolx/Pna/O1rufY+
+	Q4LlpjMDK7BQwGiVtSrJvMpPEVkTCsy8NvvXpnYp68AViEiipFll5p+OFc+f8Fdek/ho
+	CdyA==
+X-Gm-Message-State: APjAAAWhYXtdPqo+hpCFZttb4JKiV5n6rkBethiyRnJO/Y5Ysj+lYeiP
+	hjBvgSdiLPw+Sr1GFgllFP0FAMvTI4o=
+X-Google-Smtp-Source: APXvYqwtsb98oQBhy1fmkyb8Z8QIWVYUYf5UfMgHrmzMgTRg9ykcPZDJMa0k3XABR552U4UAgBWnSg==
+X-Received: by 2002:a63:6907:: with SMTP id e7mr22562145pgc.209.1558206131801; 
+	Sat, 18 May 2019 12:02:11 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231])
-	by smtp.gmail.com with ESMTPSA id m9sm2751274pgd.23.2019.05.18.12.02.11
+	by smtp.gmail.com with ESMTPSA id m9sm2751274pgd.23.2019.05.18.12.02.10
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sat, 18 May 2019 12:02:12 -0700 (PDT)
+	Sat, 18 May 2019 12:02:11 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sat, 18 May 2019 12:01:51 -0700
-Message-Id: <20190518190157.21255-11-richard.henderson@linaro.org>
+Date: Sat, 18 May 2019 12:01:50 -0700
+Message-Id: <20190518190157.21255-10-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190518190157.21255-1-richard.henderson@linaro.org>
 References: <20190518190157.21255-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::443
-Subject: [Qemu-devel] [PATCH 10/16] tcg/i386: Use umin/umax in expanding
- unsigned compare
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: [Qemu-devel] [PATCH 09/16] tcg/i386: Remove expansion for missing
+ minmax
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,116 +96,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Using umin(a, b) == a as an expansion for TCG_COND_LEU is a
-better alternative to (a - INT_MIN) <= (b - INT_MIN).
+This is now handled by code within tcg-op-vec.c.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/i386/tcg-target.inc.c | 80 +++++++++++++++++++++++++++++----------
- 1 file changed, 61 insertions(+), 19 deletions(-)
+ tcg/i386/tcg-target.inc.c | 37 -------------------------------------
+ 1 file changed, 37 deletions(-)
 
 diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 569a2c2120..6ec5e60448 100644
+index ffcafb1e14..569a2c2120 100644
 --- a/tcg/i386/tcg-target.inc.c
 +++ b/tcg/i386/tcg-target.inc.c
-@@ -3468,28 +3468,61 @@ static bool expand_vec_cmp_noinv(TCGType type, unsigned vece, TCGv_vec v0,
-                                  TCGv_vec v1, TCGv_vec v2, TCGCond cond)
+@@ -3297,7 +3297,6 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
+     case INDEX_op_smax_vec:
+     case INDEX_op_umin_vec:
+     case INDEX_op_umax_vec:
+-        return vece <= MO_32 ? 1 : -1;
+     case INDEX_op_abs_vec:
+         return vece <= MO_32;
+ 
+@@ -3551,25 +3550,6 @@ static void expand_vec_cmpsel(TCGType type, unsigned vece, TCGv_vec v0,
+     tcg_temp_free_vec(t);
+ }
+ 
+-static void expand_vec_minmax(TCGType type, unsigned vece,
+-                              TCGCond cond, bool min,
+-                              TCGv_vec v0, TCGv_vec v1, TCGv_vec v2)
+-{
+-    TCGv_vec t1 = tcg_temp_new_vec(type);
+-
+-    tcg_debug_assert(vece == MO_64);
+-
+-    tcg_gen_cmp_vec(cond, vece, t1, v1, v2);
+-    if (min) {
+-        TCGv_vec t2;
+-        t2 = v1, v1 = v2, v2 = t2;
+-    }
+-    vec_gen_4(INDEX_op_x86_vpblendvb_vec, type, vece,
+-              tcgv_vec_arg(v0), tcgv_vec_arg(v1),
+-              tcgv_vec_arg(v2), tcgv_vec_arg(t1));
+-    tcg_temp_free_vec(t1);
+-}
+-
+ void tcg_expand_vec_op(TCGOpcode opc, TCGType type, unsigned vece,
+                        TCGArg a0, ...)
  {
-     enum {
--        NEED_SWAP = 1,
--        NEED_INV  = 2,
--        NEED_BIAS = 4
--    };
--    static const uint8_t fixups[16] = {
--        [0 ... 15] = -1,
--        [TCG_COND_EQ] = 0,
--        [TCG_COND_NE] = NEED_INV,
--        [TCG_COND_GT] = 0,
--        [TCG_COND_LT] = NEED_SWAP,
--        [TCG_COND_LE] = NEED_INV,
--        [TCG_COND_GE] = NEED_SWAP | NEED_INV,
--        [TCG_COND_GTU] = NEED_BIAS,
--        [TCG_COND_LTU] = NEED_BIAS | NEED_SWAP,
--        [TCG_COND_LEU] = NEED_BIAS | NEED_INV,
--        [TCG_COND_GEU] = NEED_BIAS | NEED_SWAP | NEED_INV,
-+        NEED_INV  = 1,
-+        NEED_SWAP = 2,
-+        NEED_BIAS = 4,
-+        NEED_UMIN = 8,
-+        NEED_UMAX = 16,
-     };
-     TCGv_vec t1, t2;
-     uint8_t fixup;
+@@ -3609,23 +3589,6 @@ void tcg_expand_vec_op(TCGOpcode opc, TCGType type, unsigned vece,
+         expand_vec_cmpsel(type, vece, v0, v1, v2, v3, v4, va_arg(va, TCGArg));
+         break;
  
--    fixup = fixups[cond & 15];
--    tcg_debug_assert(fixup != 0xff);
-+    switch (cond) {
-+    case TCG_COND_EQ:
-+    case TCG_COND_GT:
-+        fixup = 0;
-+        break;
-+    case TCG_COND_NE:
-+    case TCG_COND_LE:
-+        fixup = NEED_INV;
-+        break;
-+    case TCG_COND_LT:
-+        fixup = NEED_SWAP;
-+        break;
-+    case TCG_COND_GE:
-+        fixup = NEED_SWAP | NEED_INV;
-+        break;
-+    case TCG_COND_LEU:
-+        if (vece <= MO_32) {
-+            fixup = NEED_UMIN;
-+        } else {
-+            fixup = NEED_BIAS | NEED_INV;
-+        }
-+        break;
-+    case TCG_COND_GTU:
-+        if (vece <= MO_32) {
-+            fixup = NEED_UMIN | NEED_INV;
-+        } else {
-+            fixup = NEED_BIAS;
-+        }
-+        break;
-+    case TCG_COND_GEU:
-+        if (vece <= MO_32) {
-+            fixup = NEED_UMAX;
-+        } else {
-+            fixup = NEED_BIAS | NEED_SWAP | NEED_INV;
-+        }
-+        break;
-+    case TCG_COND_LTU:
-+        if (vece <= MO_32) {
-+            fixup = NEED_UMAX | NEED_INV;
-+        } else {
-+            fixup = NEED_BIAS | NEED_SWAP;
-+        }
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
- 
-     if (fixup & NEED_INV) {
-         cond = tcg_invert_cond(cond);
-@@ -3500,7 +3533,16 @@ static bool expand_vec_cmp_noinv(TCGType type, unsigned vece, TCGv_vec v0,
+-    case INDEX_op_smin_vec:
+-        v2 = temp_tcgv_vec(arg_temp(a2));
+-        expand_vec_minmax(type, vece, TCG_COND_GT, true, v0, v1, v2);
+-        break;
+-    case INDEX_op_smax_vec:
+-        v2 = temp_tcgv_vec(arg_temp(a2));
+-        expand_vec_minmax(type, vece, TCG_COND_GT, false, v0, v1, v2);
+-        break;
+-    case INDEX_op_umin_vec:
+-        v2 = temp_tcgv_vec(arg_temp(a2));
+-        expand_vec_minmax(type, vece, TCG_COND_GTU, true, v0, v1, v2);
+-        break;
+-    case INDEX_op_umax_vec:
+-        v2 = temp_tcgv_vec(arg_temp(a2));
+-        expand_vec_minmax(type, vece, TCG_COND_GTU, false, v0, v1, v2);
+-        break;
+-
+     default:
+         break;
      }
- 
-     t1 = t2 = NULL;
--    if (fixup & NEED_BIAS) {
-+    if (fixup & (NEED_UMIN | NEED_UMAX)) {
-+        t1 = tcg_temp_new_vec(type);
-+        if (fixup & NEED_UMIN) {
-+            tcg_gen_umin_vec(vece, t1, v1, v2);
-+        } else {
-+            tcg_gen_umax_vec(vece, t1, v1, v2);
-+        }
-+        v2 = t1;
-+        cond = TCG_COND_EQ;
-+    } else if (fixup & NEED_BIAS) {
-         t1 = tcg_temp_new_vec(type);
-         t2 = tcg_temp_new_vec(type);
-         tcg_gen_dupi_vec(vece, t2, 1ull << ((8 << vece) - 1));
 -- 
 2.17.1
 
