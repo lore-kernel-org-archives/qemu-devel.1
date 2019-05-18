@@ -2,87 +2,92 @@ Return-Path: <SRS0=ZZp+=TS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 347F9C04AAF
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 15:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2631C04AAF
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 15:49:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E770420645
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 15:49:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B262C20645
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 15:49:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cjzaFHLu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E770420645
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xT7pa0WC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B262C20645
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35549 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35551 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hS1aI-0006sQ-8A
-	for qemu-devel@archiver.kernel.org; Sat, 18 May 2019 11:49:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36534)
+	id 1hS1ab-0007AH-Tu
+	for qemu-devel@archiver.kernel.org; Sat, 18 May 2019 11:49:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hS1YT-0005lM-HT
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 11:47:27 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hS1Vo-0003UL-Nj
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 11:44:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hS1YR-0001ko-Pr
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 11:47:25 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35920)
+	(envelope-from <richard.henderson@linaro.org>) id 1hS1Ii-0006ed-DD
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 11:31:09 -0400
+Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:33130)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1hS1YR-0001jv-Iz
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 11:47:23 -0400
-Received: by mail-oi1-x241.google.com with SMTP id y124so2925339oiy.3
-	for <qemu-devel@nongnu.org>; Sat, 18 May 2019 08:47:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-	:cc; bh=WkwU95LzPiehZ1TlhjVWM9ZXxwSRMu7DD9Hl3ThSfjM=;
-	b=cjzaFHLuW6rhYko8kgQchzcRlo+GjOIwH/n91P1hSmCFVIZ42gxrtyjlcSwocaRvMI
-	Ow4WRUhYyVpnej6pUP2u1NhOtYSe1S2/AC9gAKRY3mRksSWyxKrUTusB8zf5qEd3Nypo
-	ANE32sxZe47u5RbZdryHKRFrwoXwf5MfuzAdAIT2A6vqu/DJtFPKfN9Gsg20ypH3lVmA
-	BrFmm5hZ83d/2VxXrtGAgafUGh6Lb0f/ROJSAl9UmIsjVoUxppSLBglI/2D2bw1zrUrF
-	dg4XwdaFe5Vud0Vc0awiLKaMiffoab5W4G6xlYo6qVd+rlT/jMqmz2ICr/4M1KvcmGOy
-	/HOw==
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hS1Ii-0006e5-5u
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 11:31:08 -0400
+Received: by mail-pg1-x530.google.com with SMTP id h17so4709359pgv.0
+	for <qemu-devel@nongnu.org>; Sat, 18 May 2019 08:31:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=5pi2j4DvWtpw4Fl0j2MQzIazbqQ2B/eC+cMCr7GhPtg=;
+	b=xT7pa0WC+3zmvFmWqvDedlLEYBpz1tKh2MWRJRY0mSmxK8OhIfrqBeqZ8FinXoCnwH
+	Hq4l7sTCq4tkaXcaJn7MymTe9gAYprTTgVUMb8TDuISGV0Hqh9a/uJEZVpWr/8z+nfXx
+	svFfGYr9lXDN/eZilUJogifleB1viF9Xq4+qAsLApjsQqYxc/GzGsdPKKlZw4gIWcAHL
+	irV2SzGo02w2iRoVL5rwxl0A2JsgNMO+B3UdwcO/mE7iEyuQjt0dCLV/eCTGx2DZWqT1
+	gkrGZe6FDtwTZj4Y/lYfJ4LC/xXLJ2CdwGZXZE9QgKDlMsBoTuBshKyWqPVeWVEjo/8W
+	2hVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-	:message-id:subject:to:cc;
-	bh=WkwU95LzPiehZ1TlhjVWM9ZXxwSRMu7DD9Hl3ThSfjM=;
-	b=h6JrQfRQRdkMv19LbKFDSneKw7J087499Z2SE1sFzhAOuoSRClra0gNnYdggXDFK4E
-	b22XLB9KgCPKSwCRhrKllmGsLure4ODhOaN5WuUwsP7230rz9s73SAuuGsRldI8kOXBD
-	JWjP0ixV7kv5qlT+f24X1vNygFAJ46MhXibzt7e2v1M3+aHAs07eW6auwwvEGUCPzkzY
-	KZcf/AoHlIwXrK7FNltILL/kTsyt98hZ5zTG8yTcizQEyTkSQKqMYLV3sXsuo5+Roze6
-	E4T73ycDdbxr7lUv6scD9n9nYWeqwDRP0Irhln/QKlMO5oxSgiT4HkugPPc6bllciIBC
-	6vmw==
-X-Gm-Message-State: APjAAAVsrP2HRGwjHFfOMLg7RkkSEPBg3h8T5MEL4GkT8HafHYjhU4O/
-	EQGqcxjOYlXohVK0Gx75WPQnJwjYueITGzhqtpg=
-X-Google-Smtp-Source: APXvYqzhwTB5w2Xn85W9YHpvXygaNYiVi8A2XwqJs0XcTzEJuGmmg/W4SKcZTn5gqpx57vtEhx9uABqEqtfKpkinBwM=
-X-Received: by 2002:aca:6086:: with SMTP id u128mr1926417oib.79.1558194442011; 
-	Sat, 18 May 2019 08:47:22 -0700 (PDT)
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=5pi2j4DvWtpw4Fl0j2MQzIazbqQ2B/eC+cMCr7GhPtg=;
+	b=D/Ud53GfT64RNN+xseZWVDbrnb/Dc1mKoKwcRD9ZAHHeNifq9hK09kh+f++kroZkFj
+	mNsgR9YaSdqFnmXWVwrVz2F59XkG4rJYB4bgf0255PvC5L8PfPi8rtlIbRwJY9fX0f9q
+	5MDkMdPs8hCB13ca5nUgh2EB+TPeXORVQpRB3B+hcRKaY4T3rgDGnHvybXF8AGIb9rmT
+	JFhM4IR5Pwc/cOXEe0ZpHo/fsSmrE53m3UQ6EY9Rxr38NOwVs1wEEJq6B4SavKb6Glt/
+	jKTFNWn1e5xCgHaAytn81utUVYLPnjKm8o9bDT7hLJX5CDAR1huxjP2Ei1SGyBh6EBcd
+	L8yQ==
+X-Gm-Message-State: APjAAAXVbn27pviSYIBoGriJhMiAA2SHoi5E6uevsP2FnrkU1+MOUc82
+	rdyGXf+ZwL9sqJZjfMNaiB5tgpxEaK4=
+X-Google-Smtp-Source: APXvYqzWV3brZoLkwUQi6FgFpx4WrSU1wKdht/wjh2sZsA1FX5KrHbXM+ZxMfdZ33RLYBodl1ilLbg==
+X-Received: by 2002:a63:2325:: with SMTP id j37mr63441348pgj.137.1558193466823;
+	Sat, 18 May 2019 08:31:06 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
+	by smtp.gmail.com with ESMTPSA id
+	c127sm21275212pfb.107.2019.05.18.08.31.05
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Sat, 18 May 2019 08:31:06 -0700 (PDT)
+To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
+References: <20190517224450.15566-1-jan.bobek@gmail.com>
+	<20190517224450.15566-5-jan.bobek@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <d672c5c2-160c-fa03-6073-eca69ac1c1e8@linaro.org>
+Date: Sat, 18 May 2019 08:31:03 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Received: by 2002:a9d:3be5:0:0:0:0:0 with HTTP; Sat, 18 May 2019 08:47:21
-	-0700 (PDT)
-Received: by 2002:a9d:3be5:0:0:0:0:0 with HTTP; Sat, 18 May 2019 08:47:21
-	-0700 (PDT)
-In-Reply-To: <1554212605-16457-4-git-send-email-mateja.marjanovic@rt-rk.com>
-References: <1554212605-16457-1-git-send-email-mateja.marjanovic@rt-rk.com>
-	<1554212605-16457-4-git-send-email-mateja.marjanovic@rt-rk.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sat, 18 May 2019 17:47:21 +0200
-Message-ID: <CAL1e-=hntLN8fp_Su5hJD0ivxe7aAvbeyD1qvqMqq7oDUkwLng@mail.gmail.com>
-To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+In-Reply-To: <20190517224450.15566-5-jan.bobek@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v4 3/5] target/mips: Refactor and fix
- COPY_S.<B|H|W|D> instructions
+X-Received-From: 2607:f8b0:4864:20::530
+Subject: Re: [Qemu-devel] [RISU v2 04/11] risu_reginfo_i386: implement
+ arch-specific reginfo interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,171 +99,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net,
-	qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Apr 2, 2019 3:44 PM, "Mateja Marjanovic" <mateja.marjanovic@rt-rk.com>
-wrote:
->
-> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
->
-> The old version of the helper for the COPY_S.<B|H|W|D> MSA instructions
-> has been replaced with four helpers that don't use switch, and change
-> the endianness of the given index, when executed on a big endian host.
->
-> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+On 5/17/19 3:44 PM, Jan Bobek wrote:
+> CPU-specific code in risu_reginfo_* is expected to define and export
+> the following symbols:
+> 
+> - arch_long_opts, arch_extra_help, process_arch_opt
+> - reginfo_size
+> - reginfo_init
+> - reginfo_is_eq
+> - reginfo_dump, reginfo_dump_mismatch
+> 
+> Make risu_reginfo_i386.c implement this interface; and while we're at
+> it, expand the support to x86_64 as well.
+> 
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 > ---
+>  risu_reginfo_i386.h |  24 ++++----
+>  risu_reginfo_i386.c | 147 ++++++++++++++++++++++++++++++++++----------
+>  2 files changed, 127 insertions(+), 44 deletions(-)
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
->  target/mips/helper.h     |  7 +++++-
->  target/mips/msa_helper.c | 62
-+++++++++++++++++++++++++++++++++---------------
->  target/mips/translate.c  | 19 ++++++++++++++-
->  3 files changed, 67 insertions(+), 21 deletions(-)
->
-> diff --git a/target/mips/helper.h b/target/mips/helper.h
-> index 2f23b0d..4e49618 100644
-> --- a/target/mips/helper.h
-> +++ b/target/mips/helper.h
-> @@ -874,7 +874,7 @@ DEF_HELPER_5(msa_hsub_u_df, void, env, i32, i32, i32,
-i32)
->
->  DEF_HELPER_5(msa_sldi_df, void, env, i32, i32, i32, i32)
->  DEF_HELPER_5(msa_splati_df, void, env, i32, i32, i32, i32)
-> -DEF_HELPER_5(msa_copy_s_df, void, env, i32, i32, i32, i32)
-> +
->  DEF_HELPER_5(msa_copy_u_df, void, env, i32, i32, i32, i32)
->  DEF_HELPER_5(msa_insert_df, void, env, i32, i32, i32, i32)
->  DEF_HELPER_5(msa_insve_df, void, env, i32, i32, i32, i32)
-> @@ -936,6 +936,11 @@ DEF_HELPER_4(msa_pcnt_df, void, env, i32, i32, i32)
->  DEF_HELPER_4(msa_nloc_df, void, env, i32, i32, i32)
->  DEF_HELPER_4(msa_nlzc_df, void, env, i32, i32, i32)
->
-> +DEF_HELPER_4(msa_copy_s_b, void, env, i32, i32, i32)
-> +DEF_HELPER_4(msa_copy_s_h, void, env, i32, i32, i32)
-> +DEF_HELPER_4(msa_copy_s_w, void, env, i32, i32, i32)
-> +DEF_HELPER_4(msa_copy_s_d, void, env, i32, i32, i32)
-> +
->  DEF_HELPER_4(msa_fclass_df, void, env, i32, i32, i32)
->  DEF_HELPER_4(msa_ftrunc_s_df, void, env, i32, i32, i32)
->  DEF_HELPER_4(msa_ftrunc_u_df, void, env, i32, i32, i32)
-> diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-> index a500c59..5a06579 100644
-> --- a/target/mips/msa_helper.c
-> +++ b/target/mips/msa_helper.c
-> @@ -1232,29 +1232,53 @@ void helper_msa_splati_df(CPUMIPSState *env,
-uint32_t df, uint32_t wd,
->      msa_splat_df(df, pwd, pws, n);
->  }
->
-> -void helper_msa_copy_s_df(CPUMIPSState *env, uint32_t df, uint32_t rd,
-> -                          uint32_t ws, uint32_t n)
-> +void helper_msa_copy_s_b(CPUMIPSState *env, uint32_t rd,
-> +                         uint32_t ws, uint32_t n)
->  {
-> -    n %= DF_ELEMENTS(df);
-> +    n %= 16;
-> +#if defined(HOST_WORDS_BIGENDIAN)
-> +    if (n < 8) {
-> +        n = 8 - n - 1;
-> +    } else {
-> +        n = 24 - n - 1;
-> +    }
-> +#endif
-> +    env->active_tc.gpr[rd] = (int8_t)env->active_fpu.fpr[ws].wr.b[n];
-> +}
->
-> -    switch (df) {
-> -    case DF_BYTE:
-> -        env->active_tc.gpr[rd] = (int8_t)env->active_fpu.fpr[ws].wr.b[n];
-> -        break;
-> -    case DF_HALF:
-> -        env->active_tc.gpr[rd] =
-(int16_t)env->active_fpu.fpr[ws].wr.h[n];
-> -        break;
-> -    case DF_WORD:
-> -        env->active_tc.gpr[rd] =
-(int32_t)env->active_fpu.fpr[ws].wr.w[n];
-> -        break;
-> -#ifdef TARGET_MIPS64
-> -    case DF_DOUBLE:
-> -        env->active_tc.gpr[rd] =
-(int64_t)env->active_fpu.fpr[ws].wr.d[n];
-> -        break;
-> +void helper_msa_copy_s_h(CPUMIPSState *env, uint32_t rd,
-> +                         uint32_t ws, uint32_t n)
-> +{
-> +    n %= 8;
-> +#if defined(HOST_WORDS_BIGENDIAN)
-> +    if (n < 4) {
-> +        n = 4 - n - 1;
-> +    } else {
-> +        n = 12 - n - 1;
-> +    }
->  #endif
-> -    default:
-> -        assert(0);
-> +    env->active_tc.gpr[rd] = (int16_t)env->active_fpu.fpr[ws].wr.h[n];
-> +}
-> +
-> +void helper_msa_copy_s_w(CPUMIPSState *env, uint32_t rd,
-> +                         uint32_t ws, uint32_t n)
-> +{
-> +    n %= 4;
-> +#if defined(HOST_WORDS_BIGENDIAN)
-> +    if (n < 2) {
-> +        n = 2 - n - 1;
-> +    } else {
-> +        n = 6 - n - 1;
->      }
-> +#endif
-> +    env->active_tc.gpr[rd] = (int32_t)env->active_fpu.fpr[ws].wr.w[n];
-> +}
-> +
-> +void helper_msa_copy_s_d(CPUMIPSState *env, uint32_t rd,
-> +                         uint32_t ws, uint32_t n)
-> +{
-> +    n %= 2;
-> +    env->active_tc.gpr[rd] = (int64_t)env->active_fpu.fpr[ws].wr.d[n];
->  }
->
->  void helper_msa_copy_u_df(CPUMIPSState *env, uint32_t df, uint32_t rd,
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 189bbc4..f2ea378 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -29401,7 +29401,24 @@ static void gen_msa_elm_df(CPUMIPSState *env,
-DisasContext *ctx, uint32_t df,
->          switch (MASK_MSA_ELM(ctx->opcode)) {
->          case OPC_COPY_S_df:
->              if (likely(wd != 0)) {
-> -                gen_helper_msa_copy_s_df(cpu_env, tdf, twd, tws, tn);
-> +                switch (df) {
-> +                case DF_BYTE:
-> +                    gen_helper_msa_copy_s_b(cpu_env, twd, tws, tn);
-> +                    break;
-> +                case DF_HALF:
-> +                    gen_helper_msa_copy_s_h(cpu_env, twd, tws, tn);
-> +                    break;
-> +                case DF_WORD:
-> +                    gen_helper_msa_copy_s_w(cpu_env, twd, tws, tn);
-> +                    break;
-> +#if defined(TARGET_MIPS64)
-> +                case DF_DOUBLE:
-> +                    gen_helper_msa_copy_s_d(cpu_env, twd, tws, tn);
-> +                    break;
-> +#endif
-> +                default:
-> +                    assert(0);
-> +                }
->              }
->              break;
->          case OPC_COPY_U_df:
-> --
-> 2.7.4
->
->
+
+r~
+
+
