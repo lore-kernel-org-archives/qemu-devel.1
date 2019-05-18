@@ -2,66 +2,67 @@ Return-Path: <SRS0=ZZp+=TS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E46FCC04AB4
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 02:10:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 132F6C04AB4
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 03:30:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B997E21880
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 02:10:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B997E21880
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id BA2A021783
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 03:30:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="Fk8SHmxy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA2A021783
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56389 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56948 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRonh-0007DQ-O7
-	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 22:10:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42807)
+	id 1hRq3A-0001a0-Il
+	for qemu-devel@archiver.kernel.org; Fri, 17 May 2019 23:30:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kenneth.heitke@intel.com>) id 1hRomu-0006pT-9O
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 22:09:29 -0400
+	(envelope-from <liq3ea@163.com>) id 1hRq1V-0000bM-R9
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 23:28:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kenneth.heitke@intel.com>) id 1hRoYR-0001mG-70
-	for qemu-devel@nongnu.org; Fri, 17 May 2019 21:54:32 -0400
-Received: from mga02.intel.com ([134.134.136.20]:33247)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kenneth.heitke@intel.com>)
-	id 1hRoTY-0001K0-Q8; Fri, 17 May 2019 21:49:29 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-	by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	17 May 2019 18:49:20 -0700
-Received: from unknown (HELO [10.232.112.136]) ([10.232.112.136])
-	by orsmga008-auth.jf.intel.com with ESMTP/TLS/AES256-SHA;
-	17 May 2019 18:49:19 -0700
-To: qemu-block@nongnu.org, keith.busch@intel.com, kwolf@redhat.com,
-	qemu-devel@nongnu.org, mreitz@redhat.com
-References: <20190405214117.1850-1-kenneth.heitke@intel.com>
-	<20190514060225.GA1350@apples.localdomain>
-	<1f607df5-b523-e517-c439-392725fd441b@intel.com>
-	<20190517053504.GA17341@apples.localdomain>
-	<20190517062442.GB17341@apples.localdomain>
-From: "Heitke, Kenneth" <kenneth.heitke@intel.com>
-Message-ID: <78248b8b-2684-409a-1e33-77b4c0907cd6@intel.com>
-Date: Fri, 17 May 2019 19:49:18 -0600
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190517062442.GB17341@apples.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 134.134.136.20
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] nvme: add Get/Set Feature
- Timestamp support
+	(envelope-from <liq3ea@163.com>) id 1hRq1U-00036p-U1
+	for qemu-devel@nongnu.org; Fri, 17 May 2019 23:28:37 -0400
+Received: from m12-18.163.com ([220.181.12.18]:40551)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <liq3ea@163.com>)
+	id 1hRq1T-00031E-Py; Fri, 17 May 2019 23:28:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id; bh=ZkRZ93Zkgu3En+FaaA
+	Yw/AoU28oCCnJZpXGm1pEjk1s=; b=Fk8SHmxyQX4smd841NzyhDTYEPREzPt0jO
+	/JT1Rp+dDCuku1SMey7bxbRzSvYNu0V9kKdzCu2ue264REQGSxKExYsxnNlM1Uto
+	mC6Dv2dWQi58T0YulnSmpXyUHWqp/5f6JMyEAeAN00R/MBeIkSRNqFXijAwAYlqT
+	ZMM75JKPc=
+Received: from localhost.localdomain (unknown [183.159.73.182])
+	by smtp14 (Coremail) with SMTP id EsCowACXzsrXe99czqL5Gg--.37649S3;
+	Sat, 18 May 2019 11:28:29 +0800 (CST)
+From: Li Qiang <liq3ea@163.com>
+To: alex.williamson@redhat.com,
+	lvivier@redhat.com
+Date: Fri, 17 May 2019 20:28:09 -0700
+Message-Id: <20190518032811.60341-2-liq3ea@163.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190518032811.60341-1-liq3ea@163.com>
+References: <20190518032811.60341-1-liq3ea@163.com>
+X-CM-TRANSID: EsCowACXzsrXe99czqL5Gg--.37649S3
+X-Coremail-Antispam: 1Uf129KBjvJXoW7tryfZF4Dtw4UXryUGr13XFb_yoW8uFWxpF
+	n7Ja4fWF4jgr4Yvw42k3W5AFZ8GF4kG347K34kCw1ay3W5GrnrZrWUAFWUArZ8Cry5ZFW3
+	ZF42yr4rAa1Fvr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Uj2NNUUUUU=
+X-Originating-IP: [183.159.73.182]
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBLx24bVUMJXo4KgAAsz
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 220.181.12.18
+Subject: [Qemu-devel] [PATCH 2/4] hw: vfio: drop TYPE_FOO MACRO in
+ VMStateDescription
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,75 +74,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-trivial@nongnu.org, philmd@redhat.com, liq3ea@gmail.com,
+	qemu-devel@nongnu.org, Li Qiang <liq3ea@163.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+As the vmstate structure names aren't related with
+the QOM type names.
+
+CC: qemu-trivial@nongnu.org
+Signed-off-by: Li Qiang <liq3ea@163.com>
+---
+ hw/vfio/amd-xgbe.c      | 2 +-
+ hw/vfio/ap.c            | 2 +-
+ hw/vfio/calxeda-xgmac.c | 2 +-
+ hw/vfio/ccw.c           | 2 +-
+ hw/vfio/platform.c      | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/hw/vfio/amd-xgbe.c b/hw/vfio/amd-xgbe.c
+index ee64a3b4a2..1b06c0f3ea 100644
+--- a/hw/vfio/amd-xgbe.c
++++ b/hw/vfio/amd-xgbe.c
+@@ -26,7 +26,7 @@ static void amd_xgbe_realize(DeviceState *dev, Error **errp)
+ }
+ 
+ static const VMStateDescription vfio_platform_amd_xgbe_vmstate = {
+-    .name = TYPE_VFIO_AMD_XGBE,
++    .name = "vfio-amd-xgbe",
+     .unmigratable = 1,
+ };
+ 
+diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+index d8b79ebe53..564751650f 100644
+--- a/hw/vfio/ap.c
++++ b/hw/vfio/ap.c
+@@ -155,7 +155,7 @@ static void vfio_ap_reset(DeviceState *dev)
+ }
+ 
+ static const VMStateDescription vfio_ap_vmstate = {
+-    .name = VFIO_AP_DEVICE_TYPE,
++    .name = "vfio-ap",
+     .unmigratable = 1,
+ };
+ 
+diff --git a/hw/vfio/calxeda-xgmac.c b/hw/vfio/calxeda-xgmac.c
+index e7767c4b02..6cc608b6ca 100644
+--- a/hw/vfio/calxeda-xgmac.c
++++ b/hw/vfio/calxeda-xgmac.c
+@@ -26,7 +26,7 @@ static void calxeda_xgmac_realize(DeviceState *dev, Error **errp)
+ }
+ 
+ static const VMStateDescription vfio_platform_calxeda_xgmac_vmstate = {
+-    .name = TYPE_VFIO_CALXEDA_XGMAC,
++    .name = "vfio-calxeda-xgmac",
+     .unmigratable = 1,
+ };
+ 
+diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+index 31dd3a2a87..d9e39552e2 100644
+--- a/hw/vfio/ccw.c
++++ b/hw/vfio/ccw.c
+@@ -468,7 +468,7 @@ static Property vfio_ccw_properties[] = {
+ };
+ 
+ static const VMStateDescription vfio_ccw_vmstate = {
+-    .name = TYPE_VFIO_CCW,
++    .name = "vfio-ccw",
+     .unmigratable = 1,
+ };
+ 
+diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
+index 398db38f14..e59a0234dd 100644
+--- a/hw/vfio/platform.c
++++ b/hw/vfio/platform.c
+@@ -697,7 +697,7 @@ out:
+ }
+ 
+ static const VMStateDescription vfio_platform_vmstate = {
+-    .name = TYPE_VFIO_PLATFORM,
++    .name = "vfio-platform",
+     .unmigratable = 1,
+ };
+ 
+-- 
+2.17.1
 
 
-On 5/17/2019 12:24 AM, Klaus Birkelund wrote:
-> On Fri, May 17, 2019 at 07:35:04AM +0200, Klaus Birkelund wrote:
->> Hi Kenneth,
->>
->> On Thu, May 16, 2019 at 05:24:47PM -0600, Heitke, Kenneth wrote:
->>> Hi Klaus, thank you for you review. I have one comment inline
->>>
->>> On 5/14/2019 12:02 AM, Klaus Birkelund wrote:
->>>> On Fri, Apr 05, 2019 at 03:41:17PM -0600, Kenneth Heitke wrote:
->>>>> Signed-off-by: Kenneth Heitke <kenneth.heitke@intel.com>
->>>>> ---
->>>>>    hw/block/nvme.c       | 120 +++++++++++++++++++++++++++++++++++++++++-
->>>>>    hw/block/nvme.h       |   3 ++
->>>>>    hw/block/trace-events |   2 +
->>>>>    include/block/nvme.h  |   2 +
->>>>>    4 files changed, 125 insertions(+), 2 deletions(-)
->>>>>
->>>>> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
->>>>> index 7caf92532a..e775e89299 100644
->>>>> --- a/hw/block/nvme.c
->>>>> +++ b/hw/block/nvme.c
->>>>> @@ -219,6 +219,30 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
->>>>>        return NVME_INVALID_FIELD | NVME_DNR;
->>>>>    }
->>>>> +static uint16_t nvme_dma_write_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
->>>>> +                                   uint64_t prp1, uint64_t prp2)
->>>>> +{
->>>>> +    QEMUSGList qsg;
->>>>> +    QEMUIOVector iov;
->>>>> +    uint16_t status = NVME_SUCCESS;
->>>>> +
->>>>> +    if (nvme_map_prp(&qsg, &iov, prp1, prp2, len, n)) {
->>>>> +        return NVME_INVALID_FIELD | NVME_DNR;
->>>>> +    }
->>>>> +    if (qsg.nsg > 0) {
->>>>> +        if (dma_buf_write(ptr, len, &qsg)) {
->>>>> +            status = NVME_INVALID_FIELD | NVME_DNR;
->>>>> +        }
->>>>> +        qemu_sglist_destroy(&qsg);
->>>>> +    } else {
->>>>> +        if (qemu_iovec_from_buf(&iov, 0, ptr, len) != len) {
->>>>
->>>> This should be `qemu_iovec_to_buf`.
->>>>
->>>
->>> This function is transferring data from the "host" to the device so I
->>> believe I am using the correct function.
->>>
->>
->> Exactly, but this means that you need to populate `ptr` with data
->> described by the prps, hence dma_buf_*write* and qemu_iovec_*to*_buf. In
->> this case `ptr` is set to the address of the uint64_t timestamp, and
->> that is what we need to write to.
->>
-> 
-> I was going to argue with the fact that nvme_dma_read_prp uses
-> qemu_iovec_from_buf. But it uses _to_buf which as far as I can tell is
-> also wrong.
-> 
-
-Okay, I'm onboard. You're correct. I'll update my patch and re-submit. I 
-can also submit a patch to fix nvme_dma_read_prp() unless you or someone 
-else wants to.
-
-Thanks
 
