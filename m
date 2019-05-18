@@ -2,90 +2,63 @@ Return-Path: <SRS0=ZZp+=TS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19305C04AAF
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 12:26:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 504DFC04AAF
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 14:19:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D11AE20C01
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 12:26:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qxxYlFHJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D11AE20C01
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1C0B420675
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 14:19:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C0B420675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33524 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34757 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRyPw-0002dF-VA
-	for qemu-devel@archiver.kernel.org; Sat, 18 May 2019 08:26:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37289)
+	id 1hS0Bf-0000xa-0H
+	for qemu-devel@archiver.kernel.org; Sat, 18 May 2019 10:19:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hRyOp-0001lf-M1
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 08:25:16 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1hS0Ac-0000RD-Ob
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 10:18:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hRyNB-00013Y-Kd
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 08:23:34 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:35751)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hRyNB-000138-Dg
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 08:23:33 -0400
-Received: by mail-wr1-x431.google.com with SMTP id m3so9573004wrv.2
-	for <qemu-devel@nongnu.org>; Sat, 18 May 2019 05:23:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=0VZdUeF3Nch++wkn1pZsmjfKPt5go1Jakb+zVn6hyJU=;
-	b=qxxYlFHJ8BdIwr8y9GSam22H/ZsQobC4T0Dl84k6iSuYaIqNQQkvUUzRI2g9zZe1RM
-	VHLlH035l1T4nfYdiSpAZeKYaxMHYYv8d120cUjZo5E81BqpPxlK2wvPrh9Fa+6llCo1
-	Zmq1I1VoU+N2s13v2f7RX4F1VgVpsJtnG76/rb3oFLTAeXfk0/6PFz/u8MeHiqaRnNQk
-	2HYs8UeeRERkbRHlAJmu3C9d1NKlk6FFhNSn9vWLa4FOinLpKj8wI1DUqRO4EB1fmr5h
-	zNwgd56hpWOBIDuwpyBMBfNtnXgTe/tP+35BpQlgjKU6GjqERbm6HCkkPXsur/HPERMO
-	9J5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=0VZdUeF3Nch++wkn1pZsmjfKPt5go1Jakb+zVn6hyJU=;
-	b=ZBOGIBdPFbLd1aD147VR7pco/VSADbacAscpakBBTvPtBS/iQcFutzKNwP43ezpYyJ
-	Fq52tG92W7izUAWG10D8vwRyFEobI2Y6nOGp+Bwt0GNDV6BKh9T9i3dzwrkpSy5EoVQO
-	9KizoObEyWHz/mMlzm3c7kdPg8ZxNwtSw393C+2druYbDCEfdtwRTfoYT1eYzBlRIb0K
-	Hl8sGH73kKmS7RLM3SPnbm+dk3ZZwL3wqbfB1DZ8lOUeDp5H7qS+8Va6IHzCvHo3X6PB
-	j3DTJvNFC34T33yIRPQP4Z2hT+ysywHc+aHydiMwqZ7jxJ5LtUDEPxR8LBvvZU2U/4Hj
-	mzjg==
-X-Gm-Message-State: APjAAAV/STR7rNbu9NI4CuoSTmSPFydNWH1QXyrG91dZ5CWADICR4qK6
-	nH/V7WyrhjEyL6ayiTEFEbSsHw==
-X-Google-Smtp-Source: APXvYqwmaTPjuXIsJF7QCstiHcYeAtBoe9iOS4xYSzPZwEmQz+2Lus8psHnovYxsBkZIuWPpPtA04Q==
-X-Received: by 2002:adf:eb89:: with SMTP id t9mr35897060wrn.109.1558182211455; 
-	Sat, 18 May 2019 05:23:31 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	j206sm13547026wma.47.2019.05.18.05.23.30
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Sat, 18 May 2019 05:23:30 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 605A91FF87;
-	Sat, 18 May 2019 13:23:30 +0100 (BST)
-References: <20190517224450.15566-1-jan.bobek@gmail.com>
-User-agent: mu4e 1.3.1; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Jan Bobek <jan.bobek@gmail.com>
-In-reply-to: <20190517224450.15566-1-jan.bobek@gmail.com>
-Date: Sat, 18 May 2019 13:23:30 +0100
-Message-ID: <87sgtc54u5.fsf@zen.linaroharston>
+	(envelope-from <alex.williamson@redhat.com>) id 1hS0AY-0006B1-Rg
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 10:18:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35042)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1hS0AY-00069r-Lr; Sat, 18 May 2019 10:18:38 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9A86930821A3;
+	Sat, 18 May 2019 14:18:35 +0000 (UTC)
+Received: from x1.home (ovpn-117-92.phx2.redhat.com [10.3.117.92])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B85955C231;
+	Sat, 18 May 2019 14:18:30 +0000 (UTC)
+Date: Sat, 18 May 2019 08:18:30 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Li Qiang <liq3ea@163.com>
+Message-ID: <20190518081830.5adab426@x1.home>
+In-Reply-To: <20190518032811.60341-1-liq3ea@163.com>
+References: <20190518032811.60341-1-liq3ea@163.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::431
-Subject: Re: [Qemu-devel] [RISU v2 00/11] Support for i386/x86_64 with
- vector extensions
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Sat, 18 May 2019 14:18:35 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/4] vfio: pci: make "vfio-pci-nohotplug"
+ as MACRO
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,30 +70,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, qemu-trivial@nongnu.org, liq3ea@gmail.com,
+	qemu-devel@nongnu.org, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, 17 May 2019 20:28:08 -0700
+Li Qiang <liq3ea@163.com> wrote:
 
-Jan Bobek <jan.bobek@gmail.com> writes:
+Why?  (No commit message, nor cover letter)
 
-> This patch series adds support for i386 and x86_64 architectures to
-> RISU.  Notably, vector registers (SSE, AVX, AVX-512) are supported for
-> verification of the apprentice. This is V2 of the series posted in
-> [1].
->
-> I decided not to drop the register definitions from the second patch
-> as suggested by Alex Benn=C3=A9e [4], but replaced them in the fourth pat=
-ch
-> instead. This keeps the second and third patches code-motion only.
->
-> I wasn't 100% sure how to acknowledge Richard's contributions in some
-> of the patches, and eventually decided to include a Suggested-by:
-> line. Let me know if that's (not) acceptable.
+> CC: qemu-trivial@nongnu.org
+> Signed-off-by: Li Qiang <liq3ea@163.com>
+> ---
+>  hw/vfio/pci.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 8cecb53d5c..08729e5875 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -40,6 +40,8 @@
+>  #define TYPE_VFIO_PCI "vfio-pci"
+>  #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
+>  
+> +#define TYPE_VIFO_PCI_NOHOTPLUG "vfio-pci-nohotplug"
+> +
+>  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+>  static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+>  
+> @@ -3304,8 +3306,8 @@ static void vfio_pci_nohotplug_dev_class_init(ObjectClass *klass, void *data)
+>  }
+>  
+>  static const TypeInfo vfio_pci_nohotplug_dev_info = {
+> -    .name = "vfio-pci-nohotplug",
+> -    .parent = "vfio-pci",
+> +    .name = TYPE_VIFO_PCI_NOHOTPLUG,
+> +    .parent = TYPE_VFIO_PCI,
+>      .instance_size = sizeof(VFIOPCIDevice),
+>      .class_init = vfio_pci_nohotplug_dev_class_init,
+>  };
 
-Suggested-by: is a common tag for this sort of thing ;-)
-
---
-Alex Benn=C3=A9e
 
