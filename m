@@ -2,54 +2,73 @@ Return-Path: <SRS0=ZZp+=TS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6442C04AAF
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 07:40:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94D2BC04AAF
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 08:21:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91748206BF
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 07:40:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91748206BF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=birkelund.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 60BC420882
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 May 2019 08:21:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60BC420882
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58895 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59283 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hRtwt-0004HI-Qp
-	for qemu-devel@archiver.kernel.org; Sat, 18 May 2019 03:40:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58109)
+	id 1hRub4-00040G-FJ
+	for qemu-devel@archiver.kernel.org; Sat, 18 May 2019 04:21:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <klaus@birkelund.eu>) id 1hRtw2-0003xQ-Nw
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 03:39:15 -0400
+	(envelope-from <bounces@canonical.com>) id 1hRua7-0003Ww-2p
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 04:20:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <klaus@birkelund.eu>) id 1hRtw1-0005ST-UR
-	for qemu-devel@nongnu.org; Sat, 18 May 2019 03:39:14 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:43036)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <klaus@birkelund.eu>)
-	id 1hRtvz-0005PC-Lj; Sat, 18 May 2019 03:39:11 -0400
-Received: from apples.localdomain (ip-5-186-120-196.cgn.fibianet.dk
-	[5.186.120.196])
-	by charlie.dont.surf (Postfix) with ESMTPSA id A7E38BF659;
-	Sat, 18 May 2019 07:39:10 +0000 (UTC)
-From: Klaus Birkelund Jensen <klaus@birkelund.eu>
-To: qemu-block@nongnu.org
-Date: Sat, 18 May 2019 09:39:05 +0200
-Message-Id: <20190518073905.17178-1-klaus@birkelund.eu>
-X-Mailer: git-send-email 2.21.0
+	(envelope-from <bounces@canonical.com>) id 1hRua5-0000g9-Po
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 04:20:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47448)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hRua5-0000cU-KM
+	for qemu-devel@nongnu.org; Sat, 18 May 2019 04:20:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hRua3-0007kY-Io
+	for <qemu-devel@nongnu.org>; Sat, 18 May 2019 08:20:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 836502E8055
+	for <qemu-devel@nongnu.org>; Sat, 18 May 2019 08:20:35 +0000 (UTC)
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Sat, 18 May 2019 08:11:23 -0000
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: ppc64
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jlsantiago0 mark-cave-ayland
+X-Launchpad-Bug-Reporter: Jose Santiago (jlsantiago0)
+X-Launchpad-Bug-Modifier: Mark Cave-Ayland (mark-cave-ayland)
+References: <155812687142.26079.4364411221525864419.malonedeb@soybean.canonical.com>
+Message-Id: <155816708309.15348.3277800295860690681.malone@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18962";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 9a7c2afe3eb1aaaa1e56a6af1c05acd0bbcea847
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 128.199.63.193
-Subject: [Qemu-devel] [PATCH] nvme: fix copy direction in DMA reads going to
- CMB
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1829576] Re: QEMU-SYSTEM-PPC64 Regression
+ QEMU-4.0.0
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -58,37 +77,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, "Heitke,
-	Kenneth" <kenneth.heitke@intel.com>, qemu-devel@nongnu.org,
-	Max Reitz <mreitz@redhat.com>
+Reply-To: Bug 1829576 <1829576@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-`nvme_dma_read_prp` erronously used `qemu_iovec_*to*_buf` instead of
-`qemu_iovec_*from*_buf` when the request involved the controller memory
-buffer.
+I suspect that this may be related to the VSR register conversion. Can
+you try applying all of the patches below on top of 4.0 to see if they
+resolve the issue?
 
-Signed-off-by: Klaus Birkelund Jensen <klaus.jensen@cnexlabs.com>
----
- hw/block/nvme.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01254.html
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01256.html
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01257.html
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01260.html
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 7caf92532a09..63a5b58849fb 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -238,7 +238,7 @@ static uint16_t nvme_dma_read_prp(NvmeCtrl *n, uint8_=
-t *ptr, uint32_t len,
-         }
-         qemu_sglist_destroy(&qsg);
-     } else {
--        if (unlikely(qemu_iovec_to_buf(&iov, 0, ptr, len) !=3D len)) {
-+        if (unlikely(qemu_iovec_from_buf(&iov, 0, ptr, len) !=3D len)) {
-             trace_nvme_err_invalid_dma();
-             status =3D NVME_INVALID_FIELD | NVME_DNR;
-         }
---=20
-2.21.0
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1829576
+
+Title:
+  QEMU-SYSTEM-PPC64 Regression QEMU-4.0.0
+
+Status in QEMU:
+  New
+
+Bug description:
+  I have been using QEMU-SYSTEM-PPC64 v3.1.0 to run CentOS7 PPC emulated
+  system. It stopped working when I upgraded to QEMU-4.0.0 . I
+  downgraded back to QEMU-3.1.0 and it started working again. The
+  problem is that my CentOS7 image will not boot up udner QEMU-4.0.0,
+  but works fine under QEMU-3.1.0.
+
+  I have an QCOW2 image available at
+  https://www.mediafire.com/file/d8dda05ro85whn1/linux-
+  centos7-ppc64.qcow2/file . NOTE: It is 15GB. Kind of large.
+
+  I run it as follows:
+
+     qemu-system-ppc64 \
+        -name "CENTOS7-PPC64" \
+        -cpu POWER7 -machine pseries \
+        -m 4096 \
+        -netdev bridge,id=3Dnetbr0,br=3Dbr0 \
+        -device e1000,netdev=3Dnetbr0,mac=3D52:54:3c:13:21:33 \
+        -hda "./linux-centos7-ppc64.qcow2" \
+        -monitor stdio
+
+  HOST: I am using Manjaro Linux on an Intel i7 machine with the QEMU
+  packages installed via the package manager of the distribution.
+
+  [jsantiago@jlsws0 ~]$ uname -a
+  Linux jlsws0.haivision.com 4.19.42-1-MANJARO #1 SMP PREEMPT Fri May 10 20=
+:52:43 UTC 2019 x86_64 GNU/Linux
+
+  jsantiago@jlsws0 ~]$ cpuinfo =
+
+  Intel(R) processor family information utility, Version 2019 Update 3 Buil=
+d 20190214 (id: b645a4a54)
+  Copyright (C) 2005-2019 Intel Corporation.  All rights reserved.
+
+  =3D=3D=3D=3D=3D  Processor composition  =3D=3D=3D=3D=3D
+  Processor name    : Intel(R) Core(TM) i7-6700K  =
+
+  Packages(sockets) : 1
+  Cores             : 4
+  Processors(CPUs)  : 8
+  Cores per package : 4
+  Threads per core  : 2
+
+  =3D=3D=3D=3D=3D  Processor identification  =3D=3D=3D=3D=3D
+  Processor	Thread Id.	Core Id.	Package Id.
+  0       	0   		0   		0   =
+
+  1       	0   		1   		0   =
+
+  2       	0   		2   		0   =
+
+  3       	0   		3   		0   =
+
+  4       	1   		0   		0   =
+
+  5       	1   		1   		0   =
+
+  6       	1   		2   		0   =
+
+  7       	1   		3   		0   =
+
+  =3D=3D=3D=3D=3D  Placement on packages  =3D=3D=3D=3D=3D
+  Package Id.	Core Id.	Processors
+  0   		0,1,2,3		(0,4)(1,5)(2,6)(3,7)
+
+  =3D=3D=3D=3D=3D  Cache sharing  =3D=3D=3D=3D=3D
+  Cache	Size		Processors
+  L1	32  KB		(0,4)(1,5)(2,6)(3,7)
+  L2	256 KB		(0,4)(1,5)(2,6)(3,7)
+  L3	8   MB		(0,1,2,3,4,5,6,7)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1829576/+subscriptions
 
