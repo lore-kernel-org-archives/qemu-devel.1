@@ -4,83 +4,83 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFF59C04AB4
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:42:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AA7CC04AB4
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:43:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DC0620644
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:42:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B88620644
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:43:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Sg/4sKNr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DC0620644
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N0JHQqNf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B88620644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53175 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53179 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSSdn-0006yM-Nl
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 16:42:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50070)
+	id 1hSSe4-0007C2-DE
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 16:43:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hSSYo-0002jK-I1
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:35 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hSSZ0-0002tn-BR
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hSSYn-0003Nn-Cg
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:34 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:39842)
+	(envelope-from <richard.henderson@linaro.org>) id 1hSSYz-0003bb-2x
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:46 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36599)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hSSYn-0003Mi-5l
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:33 -0400
-Received: by mail-pl1-x641.google.com with SMTP id g9so5708797plm.6
-	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 13:37:33 -0700 (PDT)
+	id 1hSSYy-0003aR-SF
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:45 -0400
+Received: by mail-pl1-x644.google.com with SMTP id d21so5723612plr.3
+	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 13:37:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=eSYdriPx4kdDTBySMjSQ3hbHBLevuc9v6XaVM577ESk=;
-	b=Sg/4sKNreLI47I2kSXyvKrfz/F9UXr8TRh0XKbe/P//pAE2vgTHjX0USqkAoNdpenR
-	1AHiGGzNl8e+QgGrMqaEYMUrYdGlXuBYXWGsJ4XY4dz2IBBhEqpD/iOdJYDs/i1AS3NI
-	s0ZRWShf11oA39tEj2NZUPCj96dwvKsz2sD//woQ5rVHMgzvXDJX6dAEtnWLhD+wo9KU
-	oxiT4rBTbQJ1ckGTbgCqH1VSAJ/vaBV44QHHLMJZMA6+UnT5J+EwV4ax2Gv90NLjFnfI
-	9W9GwBGMCElBsP9R89Ujbsu1MgNks/D4GHqdQZhHmOeo4IrIr+bPeI55Kd/BgI/Mr7dy
-	HfwQ==
+	bh=nuZhVVs0grkA8++mqqAYSgCu6GK8Ulmk49OHI5Gid5E=;
+	b=N0JHQqNfxKmMMByWgPuV+E2KnwQJh2aUwKenfhLEps1BNQQOm69z+Lf51CpcuKx+GP
+	E6/amsaEG1/0Q0Ne71CAm4hiSCRcJw0mdF4VCwD+5CRBcG4BYlmqDvVhzqPO7slBj3DC
+	6nVr8j7UsdW9ubVZ4m4PuFxwPRBPBPLnLT3MbHfaWS8hS3QIDBAE67/bzsxvlxQsXGtv
+	rHsr4LvRhgn36ortXh79KOJILn0/dhsJ8vU4FKx+G8w1oiYSrRQPUcmSLMXN6YSKngjN
+	2qkKXeWL67f2yxqxQJjMgioVCNWiuoF3q07rDyb8mfgHD91xJh3IIbRtW3DKGAX6A4kU
+	1yaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=eSYdriPx4kdDTBySMjSQ3hbHBLevuc9v6XaVM577ESk=;
-	b=bS5B/KC70G0uN+dWCEmqizNw0DXlLQqfJwkri9/B+mTRu8hLQSEv5XYccOjDNfmx2c
-	TtHKAh597oU/lLuwydPlRlHB5YIqoBGvswOIkyXZYPC1QgsO+AKWnjc1Pbs+NNJqIM/9
-	kdrsN2lbmZWUd5CJWkaMOZ8dEF7qDyR75PliWUoXxUqnCduXxkUcN7NGxd5swwVect99
-	97NmWFFFg9HkbVBGiVfiIP/TuKJk/pFxDMgWmJG2s0f7ERIif3kFoYYgtg8E7CyowNz4
-	4hfxJVWQcvjZ4ph9C6A6Qd6PyP/qF/kKmVeI9hJeGAP5t5cfi4BCNvQIE3hKRbfl764h
-	yFIg==
-X-Gm-Message-State: APjAAAUiNWv6d/MG80Jwwe25tf7Ha1ZpRy/XldSguT77PuatZZUEBhK4
-	Z8hIZ4P6MlzrLtAwRHneG1MYJKHqCGI=
-X-Google-Smtp-Source: APXvYqzTc7xPJiOo2QTPVlHn5xM7bl2SbzTtj/ogb/Zg2ZCCUZedQSu/5j/to5T4ex4NoMGifEIhFQ==
-X-Received: by 2002:a17:902:bd46:: with SMTP id
-	b6mr10556307plx.173.1558298251963; 
-	Sun, 19 May 2019 13:37:31 -0700 (PDT)
+	bh=nuZhVVs0grkA8++mqqAYSgCu6GK8Ulmk49OHI5Gid5E=;
+	b=XV7T3Ya/AzpGbMLVjZl1b4ICDyqG/tAdlaPzHAbeq9Q0sLwQxCmmgi8UsZIJhq5FOh
+	KgxPuNYNNRGHvipg3aHKXasX5QMhP/iYc48Qam2wyAB/ke2RFkxGSjTGIYjk00r285db
+	dJ+zClnQqdBt6CxEySFTde3ZzmsXJQPUot4aYHG7tPn2BX8FeuWojW+6yLmeMVJZ1S98
+	6F4EPEXKtLebUnfwPfciTQFEh4XC0vHZ1wBkTuKK771lOCKfv84IpeUKzGGn+I78Il40
+	PQdv5hJ4673x/d85/Xgtvwo/eraYJIyVhfgBNC0Y2xV2sxz3udPUKbP1EWjbQDqW2GBy
+	Pd1w==
+X-Gm-Message-State: APjAAAU4Nx4pO4dO3FUb/0qj95URHpF1TgqIcJMijSg/1nBuCfFlnDcE
+	F19BJS7HSNaybhYmA9/YFaHliSLQXRs=
+X-Google-Smtp-Source: APXvYqwVSP0OO/yhtqjqnAcj4ng6ET73c+hfLNTliiTTRJGZk016O7ezEijepx31v9XNoKRMvYwbyQ==
+X-Received: by 2002:a17:902:201:: with SMTP id
+	1mr26870277plc.263.1558298263493; 
+	Sun, 19 May 2019 13:37:43 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231]) by smtp.gmail.com with ESMTPSA id
-	i7sm11397448pfo.19.2019.05.19.13.37.30
+	i7sm11397448pfo.19.2019.05.19.13.37.42
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sun, 19 May 2019 13:37:31 -0700 (PDT)
+	Sun, 19 May 2019 13:37:42 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sun, 19 May 2019 13:36:15 -0700
-Message-Id: <20190519203726.20729-4-richard.henderson@linaro.org>
+Date: Sun, 19 May 2019 13:36:22 -0700
+Message-Id: <20190519203726.20729-11-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190519203726.20729-1-richard.henderson@linaro.org>
 References: <20190519203726.20729-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: [Qemu-devel] [PATCH v7 03/74] linux-user: Share more code for open
- and openat
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: [Qemu-devel] [PATCH v7 10/74] linux-user: Split out pread64,
+ pwrite64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,132 +97,175 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The do_openat helper can have all of the code that is not directly
-related to the argument ordering of these two syscalls.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall-file.inc.c | 69 ++++++++++++++++-------------------
- 1 file changed, 31 insertions(+), 38 deletions(-)
+ linux-user/syscall-defs.h     |  6 ++++
+ linux-user/syscall-file.inc.c | 62 +++++++++++++++++++++++++++++++++++
+ linux-user/syscall.c          | 36 --------------------
+ linux-user/strace.list        |  6 ----
+ 4 files changed, 68 insertions(+), 42 deletions(-)
 
+diff --git a/linux-user/syscall-defs.h b/linux-user/syscall-defs.h
+index 130ba7e344..027793d5d0 100644
+--- a/linux-user/syscall-defs.h
++++ b/linux-user/syscall-defs.h
+@@ -21,6 +21,12 @@ SYSCALL_DEF(close, ARG_DEC);
+ SYSCALL_DEF(open, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
+ #endif
+ SYSCALL_DEF(openat, ARG_ATDIRFD, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
++SYSCALL_DEF_FULL(pread64, .impl = impl_pread64,
++                 .args = args_pread64_pwrite64,
++                 .arg_type = { ARG_DEC, ARG_PTR, ARG_DEC, ARG_DEC64 });
++SYSCALL_DEF_FULL(pwrite64, .impl = impl_pwrite64,
++                 .args = args_pread64_pwrite64,
++                 .arg_type = { ARG_DEC, ARG_PTR, ARG_DEC, ARG_DEC64 });
+ SYSCALL_DEF(read, ARG_DEC, ARG_PTR, ARG_DEC);
+ #ifdef TARGET_NR_readlink
+ SYSCALL_DEF(readlink, ARG_STR, ARG_PTR, ARG_DEC);
 diff --git a/linux-user/syscall-file.inc.c b/linux-user/syscall-file.inc.c
-index 7974148ccb..961eed13ae 100644
+index 2297ca1760..43aa6eeeb8 100644
 --- a/linux-user/syscall-file.inc.c
 +++ b/linux-user/syscall-file.inc.c
-@@ -227,8 +227,8 @@ static int open_net_route(void *cpu_env, int fd)
+@@ -323,6 +323,68 @@ SYSCALL_IMPL(openat)
+     return do_openat(cpu_env, arg1, arg2, arg3, arg4);
  }
- #endif
  
--static int do_openat(void *cpu_env, int dirfd, const char *pathname,
--                     int flags, mode_t mode)
-+static abi_long do_openat(void *cpu_env, int dirfd, abi_ulong target_path,
-+                          int target_flags, mode_t mode)
- {
-     struct fake_open {
-         const char *filename;
-@@ -247,9 +247,20 @@ static int do_openat(void *cpu_env, int dirfd, const char *pathname,
-         { NULL, NULL, NULL }
-     };
- 
-+    char *pathname = lock_user_string(target_path);
-+    int flags = target_to_host_bitmask(target_flags, fcntl_flags_tbl);
++/*
++ * Both pread64 and pwrite64 merge args into a 64-bit offset,
++ * but the input registers and ordering are target specific.
++ */
++#if TARGET_ABI_BITS == 32
++SYSCALL_ARGS(pread64_pwrite64)
++{
++    /* We have already assigned out[0-2].  */
++    int off = regpairs_aligned(cpu_env, TARGET_NR_pread64);
++    out[3] = target_offset64(in[3 + off], in[4 + off]);
++    return def;
++}
++#else
++#define args_pread64_pwrite64 NULL
++#endif
++
++SYSCALL_IMPL(pread64)
++{
++    int fd = arg1;
++    abi_ulong target_buf = arg2;
++    abi_ulong len = arg3;
++    uint64_t off = arg4;
++    void *p;
 +    abi_long ret;
 +
-+    if (!pathname) {
-+        return -TARGET_EFAULT;
-+    }
-+
-     if (is_proc_myself(pathname, "exe")) {
--        int execfd = qemu_getauxval(AT_EXECFD);
--        return execfd ? execfd : safe_openat(dirfd, exec_path, flags, mode);
-+        ret = qemu_getauxval(AT_EXECFD);
-+        if (ret == 0) {
-+            ret = get_errno(safe_openat(dirfd, exec_path, flags, mode));
++    if (target_buf == 0 && len == 0) {
++        /* Special-case NULL buffer and zero length, which should succeed */
++        p = NULL;
++    } else {
++        p = lock_user(VERIFY_WRITE, target_buf, len, 0);
++        if (!p) {
++            return -TARGET_EFAULT;
 +        }
-+        goto done;
-     }
- 
-     for (fake_open = fakes; fake_open->filename; fake_open++) {
-@@ -261,7 +272,7 @@ static int do_openat(void *cpu_env, int dirfd, const char *pathname,
-     if (fake_open->filename) {
-         const char *tmpdir;
-         char filename[PATH_MAX];
--        int fd, r;
-+        int fd;
- 
-         /* create temporary file to map stat to */
-         tmpdir = getenv("TMPDIR");
-@@ -271,55 +282,37 @@ static int do_openat(void *cpu_env, int dirfd, const char *pathname,
-         snprintf(filename, sizeof(filename), "%s/qemu-open.XXXXXX", tmpdir);
-         fd = mkstemp(filename);
-         if (fd < 0) {
--            return fd;
-+            ret = -TARGET_ENOENT;
-+            goto done;
-         }
-         unlink(filename);
- 
--        r = fake_open->fill(cpu_env, fd);
--        if (r) {
--            int e = errno;
-+        ret = fake_open->fill(cpu_env, fd);
-+        if (ret) {
-+            ret = get_errno(ret);
-             close(fd);
--            errno = e;
--            return r;
-+            goto done;
-         }
-         lseek(fd, 0, SEEK_SET);
--
--        return fd;
-+        ret = fd;
-+        goto done;
-     }
- 
--    return safe_openat(dirfd, path(pathname), flags, mode);
-+    ret = get_errno(safe_openat(dirfd, path(pathname), flags, mode));
-+ done:
-+    fd_trans_unregister(ret);
-+    unlock_user(pathname, target_path, 0);
++    }
++    ret = get_errno(pread64(fd, p, len, off));
++    unlock_user(p, target_buf, ret);
 +    return ret;
- }
- 
- #ifdef TARGET_NR_open
- SYSCALL_IMPL(open)
++}
++
++SYSCALL_IMPL(pwrite64)
++{
++    int fd = arg1;
++    abi_ulong target_buf = arg2;
++    abi_ulong len = arg3;
++    uint64_t off = arg4;
++    void *p;
++    abi_long ret;
++
++    if (target_buf == 0 && len == 0) {
++        /* Special-case NULL buffer and zero length, which should succeed */
++        p = 0;
++    } else {
++        p = lock_user(VERIFY_READ, target_buf, len, 1);
++        if (!p) {
++            return -TARGET_EFAULT;
++        }
++    }
++    ret = get_errno(pwrite64(fd, p, len, off));
++    unlock_user(p, target_buf, 0);
++    return ret;
++}
++
+ SYSCALL_IMPL(read)
  {
--    char *p = lock_user_string(arg1);
--    abi_long ret;
--
--    if (!p) {
--        return -TARGET_EFAULT;
--    }
--    ret = get_errno(do_openat(cpu_env, AT_FDCWD, p,
--                              target_to_host_bitmask(arg2, fcntl_flags_tbl),
--                              arg3));
--    fd_trans_unregister(ret);
--    unlock_user(p, arg1, 0);
--    return ret;
-+    return do_openat(cpu_env, AT_FDCWD, arg1, arg2, arg3);
- }
+     int fd = arg1;
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 8086626707..f636fb8bb3 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -9404,42 +9404,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+ #else
+ #error unreachable
  #endif
- 
- SYSCALL_IMPL(openat)
- {
--    char *p = lock_user_string(arg2);
--    abi_long ret;
--
--    if (!p) {
--        return -TARGET_EFAULT;
--    }
--    ret = get_errno(do_openat(cpu_env, arg1, p,
--                              target_to_host_bitmask(arg3, fcntl_flags_tbl),
--                              arg4));
--    fd_trans_unregister(ret);
--    unlock_user(p, arg2, 0);
--    return ret;
-+    return do_openat(cpu_env, arg1, arg2, arg3, arg4);
- }
+-#endif
+-#ifdef TARGET_NR_pread64
+-    case TARGET_NR_pread64:
+-        if (regpairs_aligned(cpu_env, num)) {
+-            arg4 = arg5;
+-            arg5 = arg6;
+-        }
+-        if (arg2 == 0 && arg3 == 0) {
+-            /* Special-case NULL buffer and zero length, which should succeed */
+-            p = 0;
+-        } else {
+-            p = lock_user(VERIFY_WRITE, arg2, arg3, 0);
+-            if (!p) {
+-                return -TARGET_EFAULT;
+-            }
+-        }
+-        ret = get_errno(pread64(arg1, p, arg3, target_offset64(arg4, arg5)));
+-        unlock_user(p, arg2, ret);
+-        return ret;
+-    case TARGET_NR_pwrite64:
+-        if (regpairs_aligned(cpu_env, num)) {
+-            arg4 = arg5;
+-            arg5 = arg6;
+-        }
+-        if (arg2 == 0 && arg3 == 0) {
+-            /* Special-case NULL buffer and zero length, which should succeed */
+-            p = 0;
+-        } else {
+-            p = lock_user(VERIFY_READ, arg2, arg3, 1);
+-            if (!p) {
+-                return -TARGET_EFAULT;
+-            }
+-        }
+-        ret = get_errno(pwrite64(arg1, p, arg3, target_offset64(arg4, arg5)));
+-        unlock_user(p, arg2, 0);
+-        return ret;
+ #endif
+     case TARGET_NR_getcwd:
+         if (!(p = lock_user(VERIFY_WRITE, arg1, arg2, 0)))
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index c4ae70b485..a11ad3c3c7 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -1025,9 +1025,6 @@
+ #ifdef TARGET_NR_prctl
+ { TARGET_NR_prctl, "prctl" , NULL, NULL, NULL },
+ #endif
+-#ifdef TARGET_NR_pread64
+-{ TARGET_NR_pread64, "pread64" , NULL, NULL, NULL },
+-#endif
+ #ifdef TARGET_NR_preadv
+ { TARGET_NR_preadv, "preadv" , NULL, NULL, NULL },
+ #endif
+@@ -1055,9 +1052,6 @@
+ #ifdef TARGET_NR_putpmsg
+ { TARGET_NR_putpmsg, "putpmsg" , NULL, NULL, NULL },
+ #endif
+-#ifdef TARGET_NR_pwrite64
+-{ TARGET_NR_pwrite64, "pwrite64" , NULL, NULL, NULL },
+-#endif
+ #ifdef TARGET_NR_pwritev
+ { TARGET_NR_pwritev, "pwritev" , NULL, NULL, NULL },
+ #endif
 -- 
 2.17.1
 
