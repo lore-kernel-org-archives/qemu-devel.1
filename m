@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C013AC04AB4
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:24:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C229C04AB4
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:26:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69D0C20675
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:24:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5231120675
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:26:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JTjGItOn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69D0C20675
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZPIP/XBV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5231120675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52897 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52941 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSSMY-0000va-DV
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 16:24:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46470)
+	id 1hSSNu-00028Z-EY
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 16:26:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hSSHq-0005PW-5h
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:20:03 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hSSHr-0005QA-Bw
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:20:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hSSHo-0007Js-IK
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:20:02 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:43740)
+	(envelope-from <richard.henderson@linaro.org>) id 1hSSHp-0007LN-N3
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:20:03 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:46766)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hSSHo-0007Ih-Ah
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:20:00 -0400
-Received: by mail-pg1-x544.google.com with SMTP id t22so5715991pgi.10
-	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 13:20:00 -0700 (PDT)
+	id 1hSSHp-0007KQ-FI
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:20:01 -0400
+Received: by mail-pf1-x443.google.com with SMTP id y11so6141176pfm.13
+	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 13:20:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=rXfSo9Gy+xV7gUMCOu/4nLM098jgkgLPcgtIQzZJ9xs=;
-	b=JTjGItOnSMUIYHEEx5LZcLs7Twjd7TMSj3wNUZ+d60cBs4W8wptlXMzptMdWdOtF4n
-	ZuoNaPGwTftRP4fsqpL9HToIITohaOSgoWS/xtKJXmGB6tq/Ank+ff+G+OB4bpZ28ebS
-	ayaDIgVw/SM6EDqCX2Rs5dLA0cF+kVAnS6uSTgaQ6YNzbPya4DLUJFrtNrJqZ3/xw7xg
-	9fMDZDIXTdDeP2eLN3NdzvHgHS/VMWW3WRpJGThf+Ar3mO1LDGl6ZgSh0WzCed9tJd0V
-	uXpBPIKwgc62LVdaC4AWght+LNHYtS69c4A9pbDvhLKuEIA+R0SVONZj2Jo/+eOvI1eb
-	rxmQ==
+	bh=zw4bkjQURlIrIACI3Vx6Yhusz3QTf2Vu+wCw/S+ioOk=;
+	b=ZPIP/XBVHL14gTd8DzkcGXeFHymuRsa1XzJo91HgZevi7HJ/izJQ/BsEm6C/iWa1qg
+	TzAWe1I04qKgz2Q1eWu69NaRwaZ8LiG5j82XRwsGrshqCa0hAAsCIrVSJnz1v2aVZq/l
+	LnP0PSOMsll0mZDJIBP/zjsJ6qdbJYVvKzaNR3jFaGfY5OB9DgV5K/z0nnqLWIpdX74b
+	G2JI4jQmC5JS3NGHzhw13l+vzJgAKiSKVWvr5yADt6ioiBO78cGAhK6Zoef0SbYjUxH5
+	aK6mHJAfpwI7579BsQUJ1/YxyXmLefh7XclYm3SqC/shUtr6kZXsl1B8lAM62wpoGxEs
+	5kuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=rXfSo9Gy+xV7gUMCOu/4nLM098jgkgLPcgtIQzZJ9xs=;
-	b=H/N/7ZQniFA8ZlgR15JMWN02AZxaUoaFevFNyvdk/c6Xv7Zp2Fg5VM6wPp4H0dMLU+
-	eL1DwamIsJjAVlkfHbShG5d2alMjUTGqejAY4ZmLOK1jn2IOt5wJQGavHr+/ZGkDh6N9
-	f1SXJLKXLtpoi8gvho6cvyGB5l4ODjZFFmRS9aNL0pmpxrxnQ73Fr+A6GZ3PbyjyMpnD
-	hjLLyb9Z3srMvm3FRnuKdrgcEpsdbMUI/2Pqi8Tba1iqguhg64f5MygGj6DZApOUKYRP
-	HJJPy2u4BGdcww6l0e7Fobvk3pRYJH/416QISPYpSjS7gKYzrOoGCMlbuwtIVBOZlfiZ
-	69Aw==
-X-Gm-Message-State: APjAAAWk8gASfPMPYbnJstcKJDDrc8xbs0jEWJPBZUoRKaZtd20s/50z
-	40rUdIabpDigGlk9o3Ti9vTJKWnt/Dc=
-X-Google-Smtp-Source: APXvYqwTh9zthvi2YP2sgcRlrl12LpIWwGDP+nVwqZOIdUWsa3pQ30xvbksYCzmUnS6gH4vZiUyOPA==
-X-Received: by 2002:a65:60d2:: with SMTP id r18mr24719608pgv.217.1558297198793;
-	Sun, 19 May 2019 13:19:58 -0700 (PDT)
+	bh=zw4bkjQURlIrIACI3Vx6Yhusz3QTf2Vu+wCw/S+ioOk=;
+	b=lbPg4GRUxPcacgYvnA5W5WZJOHfxY90jAdtAxADGfSOFmz1vQZcgujaXqhWQN3Qoyw
+	//3EMeHQPuYi55mJ0BzrePxCsWn3ronWFBgGJG976oYQTXMLYq+JJYCezcPg4n2TrW+p
+	Mt6TCBdM0IjesRSb5y/rNjFEKJh/yngBLqS5t2XW1NQw74DimtcOmr2jGH0JdeOovstX
+	pWe8Ht65znQ/wJ4bf5p1oFgBD1hDCIc3z0MJuqHBGyArstbLT8XLVvB7HS8Pc6X/6vMb
+	lXDGSZDcXmE/2qCk9K76+aihuPFkwz09+1v3nPhk4Co2EiiQrSCp49v0npOBwH6b5rZ6
+	WOMw==
+X-Gm-Message-State: APjAAAUXKS6xfQKpRvtrEOoZA9tAik4vAIlOrwP0hvhJbjICDB2xPHLz
+	nv+rboCCQg/U/envznDeXH/pvShJctA=
+X-Google-Smtp-Source: APXvYqxNXS7dkNPKfjWljNe+YNRBXhQS27Oiq7Ui/jxNyGTxkAM3gtZUFFQXPNEt2eUlqLxkC85zDA==
+X-Received: by 2002:a63:7413:: with SMTP id p19mr69066270pgc.259.1558297200058;
+	Sun, 19 May 2019 13:20:00 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231]) by smtp.gmail.com with ESMTPSA id
-	e14sm18166264pff.60.2019.05.19.13.19.57
+	e14sm18166264pff.60.2019.05.19.13.19.58
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sun, 19 May 2019 13:19:58 -0700 (PDT)
+	Sun, 19 May 2019 13:19:59 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sun, 19 May 2019 13:19:42 -0700
-Message-Id: <20190519201953.20161-3-richard.henderson@linaro.org>
+Date: Sun, 19 May 2019 13:19:43 -0700
+Message-Id: <20190519201953.20161-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190519201953.20161-1-richard.henderson@linaro.org>
 References: <20190519201953.20161-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: [Qemu-devel] [PATCH 02/13] linux-user: Rename cpu_clone_regs to
- cpu_clone_regs_child
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: [Qemu-devel] [PATCH 03/13] linux-user: Introduce
+ cpu_clone_regs_parent
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,291 +96,322 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We will need a target-specific hook for adjusting registers
-in the parent during clone.  To avoid confusion, rename the
-one we have to make it clear it affects the child.
+Add an empty inline function for each target, and invoke it
+from the proper places.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/aarch64/target_cpu.h    | 2 +-
- linux-user/alpha/target_cpu.h      | 2 +-
- linux-user/arm/target_cpu.h        | 2 +-
- linux-user/cris/target_cpu.h       | 2 +-
- linux-user/hppa/target_cpu.h       | 2 +-
- linux-user/i386/target_cpu.h       | 2 +-
- linux-user/m68k/target_cpu.h       | 2 +-
- linux-user/microblaze/target_cpu.h | 2 +-
- linux-user/mips/target_cpu.h       | 2 +-
- linux-user/nios2/target_cpu.h      | 2 +-
- linux-user/openrisc/target_cpu.h   | 3 ++-
- linux-user/ppc/target_cpu.h        | 2 +-
- linux-user/riscv/target_cpu.h      | 2 +-
- linux-user/s390x/target_cpu.h      | 2 +-
- linux-user/sh4/target_cpu.h        | 2 +-
- linux-user/sparc/target_cpu.h      | 2 +-
- linux-user/tilegx/target_cpu.h     | 2 +-
- linux-user/xtensa/target_cpu.h     | 3 ++-
- linux-user/syscall.c               | 4 ++--
- 19 files changed, 22 insertions(+), 20 deletions(-)
+ linux-user/aarch64/target_cpu.h    | 4 ++++
+ linux-user/alpha/target_cpu.h      | 4 ++++
+ linux-user/arm/target_cpu.h        | 4 ++++
+ linux-user/cris/target_cpu.h       | 4 ++++
+ linux-user/hppa/target_cpu.h       | 4 ++++
+ linux-user/i386/target_cpu.h       | 4 ++++
+ linux-user/m68k/target_cpu.h       | 4 ++++
+ linux-user/microblaze/target_cpu.h | 4 ++++
+ linux-user/mips/target_cpu.h       | 4 ++++
+ linux-user/nios2/target_cpu.h      | 4 ++++
+ linux-user/openrisc/target_cpu.h   | 4 ++++
+ linux-user/ppc/target_cpu.h        | 4 ++++
+ linux-user/riscv/target_cpu.h      | 4 ++++
+ linux-user/s390x/target_cpu.h      | 4 ++++
+ linux-user/sh4/target_cpu.h        | 4 ++++
+ linux-user/sparc/target_cpu.h      | 4 ++++
+ linux-user/tilegx/target_cpu.h     | 4 ++++
+ linux-user/xtensa/target_cpu.h     | 4 ++++
+ linux-user/syscall.c               | 2 ++
+ 19 files changed, 74 insertions(+)
 
 diff --git a/linux-user/aarch64/target_cpu.h b/linux-user/aarch64/target_cpu.h
-index a021c95fa4..abde35b104 100644
+index abde35b104..0182bfca07 100644
 --- a/linux-user/aarch64/target_cpu.h
 +++ b/linux-user/aarch64/target_cpu.h
-@@ -19,7 +19,7 @@
- #ifndef AARCH64_TARGET_CPU_H
- #define AARCH64_TARGET_CPU_H
+@@ -27,6 +27,10 @@ static inline void cpu_clone_regs_child(CPUARMState *env, target_ulong newsp)
+     env->xregs[0] = 0;
+ }
  
--static inline void cpu_clone_regs(CPUARMState *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUARMState *env, target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPUARMState *env)
++{
++}
++
+ static inline void cpu_set_tls(CPUARMState *env, target_ulong newtls)
  {
-     if (newsp) {
-         env->xregs[31] = newsp;
+     /* Note that AArch64 Linux keeps the TLS pointer in TPIDR; this is
 diff --git a/linux-user/alpha/target_cpu.h b/linux-user/alpha/target_cpu.h
-index ac4d255ae7..dc02f2234c 100644
+index dc02f2234c..140a459f73 100644
 --- a/linux-user/alpha/target_cpu.h
 +++ b/linux-user/alpha/target_cpu.h
-@@ -19,7 +19,7 @@
- #ifndef ALPHA_TARGET_CPU_H
- #define ALPHA_TARGET_CPU_H
+@@ -28,6 +28,10 @@ static inline void cpu_clone_regs_child(CPUAlphaState *env, target_ulong newsp)
+     env->ir[IR_A3] = 0;
+ }
  
--static inline void cpu_clone_regs(CPUAlphaState *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUAlphaState *env, target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPUAlphaState *env)
++{
++}
++
+ static inline void cpu_set_tls(CPUAlphaState *env, target_ulong newtls)
  {
-     if (newsp) {
-         env->ir[IR_SP] = newsp;
+     env->unique = newtls;
 diff --git a/linux-user/arm/target_cpu.h b/linux-user/arm/target_cpu.h
-index 8a3764919a..d35c997287 100644
+index d35c997287..3e66d5b106 100644
 --- a/linux-user/arm/target_cpu.h
 +++ b/linux-user/arm/target_cpu.h
-@@ -23,7 +23,7 @@
-    See validate_guest_space in linux-user/elfload.c.  */
- #define MAX_RESERVED_VA  0xffff0000ul
+@@ -31,6 +31,10 @@ static inline void cpu_clone_regs_child(CPUARMState *env, target_ulong newsp)
+     env->regs[0] = 0;
+ }
  
--static inline void cpu_clone_regs(CPUARMState *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUARMState *env, target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPUARMState *env)
++{
++}
++
+ static inline void cpu_set_tls(CPUARMState *env, target_ulong newtls)
  {
-     if (newsp) {
-         env->regs[13] = newsp;
+     if (access_secure_reg(env)) {
 diff --git a/linux-user/cris/target_cpu.h b/linux-user/cris/target_cpu.h
-index 2309343979..9c847caaef 100644
+index 9c847caaef..4da074b4fd 100644
 --- a/linux-user/cris/target_cpu.h
 +++ b/linux-user/cris/target_cpu.h
-@@ -20,7 +20,7 @@
- #ifndef CRIS_TARGET_CPU_H
- #define CRIS_TARGET_CPU_H
+@@ -28,6 +28,10 @@ static inline void cpu_clone_regs_child(CPUCRISState *env, target_ulong newsp)
+     env->regs[10] = 0;
+ }
  
--static inline void cpu_clone_regs(CPUCRISState *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUCRISState *env, target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPUCRISState *env)
++{
++}
++
+ static inline void cpu_set_tls(CPUCRISState *env, target_ulong newtls)
  {
-     if (newsp) {
-         env->regs[14] = newsp;
+     env->pregs[PR_PID] = (env->pregs[PR_PID] & 0xff) | newtls;
 diff --git a/linux-user/hppa/target_cpu.h b/linux-user/hppa/target_cpu.h
-index 1c539bdbd6..b98e5a1cfe 100644
+index b98e5a1cfe..6b323297af 100644
 --- a/linux-user/hppa/target_cpu.h
 +++ b/linux-user/hppa/target_cpu.h
-@@ -19,7 +19,7 @@
- #ifndef HPPA_TARGET_CPU_H
- #define HPPA_TARGET_CPU_H
+@@ -31,6 +31,10 @@ static inline void cpu_clone_regs_child(CPUHPPAState *env, target_ulong newsp)
+     env->iaoq_b = env->gr[31] + 4;
+ }
  
--static inline void cpu_clone_regs(CPUHPPAState *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUHPPAState *env, target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPUHPPAState *env)
++{
++}
++
+ static inline void cpu_set_tls(CPUHPPAState *env, target_ulong newtls)
  {
-     if (newsp) {
-         env->gr[30] = newsp;
+     env->cr[27] = newtls;
 diff --git a/linux-user/i386/target_cpu.h b/linux-user/i386/target_cpu.h
-index ece04d0966..e1c9e03490 100644
+index e1c9e03490..6dbb856c52 100644
 --- a/linux-user/i386/target_cpu.h
 +++ b/linux-user/i386/target_cpu.h
-@@ -20,7 +20,7 @@
- #ifndef I386_TARGET_CPU_H
- #define I386_TARGET_CPU_H
+@@ -28,6 +28,10 @@ static inline void cpu_clone_regs_child(CPUX86State *env, target_ulong newsp)
+     env->regs[R_EAX] = 0;
+ }
  
--static inline void cpu_clone_regs(CPUX86State *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUX86State *env, target_ulong newsp)
- {
-     if (newsp) {
-         env->regs[R_ESP] = newsp;
++static inline void cpu_clone_regs_parent(CPUX86State *env)
++{
++}
++
+ #if defined(TARGET_ABI32)
+ abi_long do_set_thread_area(CPUX86State *env, abi_ulong ptr);
+ 
 diff --git a/linux-user/m68k/target_cpu.h b/linux-user/m68k/target_cpu.h
-index 7a26f3c3fc..7637a98cab 100644
+index 7637a98cab..f1a53cdee5 100644
 --- a/linux-user/m68k/target_cpu.h
 +++ b/linux-user/m68k/target_cpu.h
-@@ -21,7 +21,7 @@
- #ifndef M68K_TARGET_CPU_H
- #define M68K_TARGET_CPU_H
+@@ -29,6 +29,10 @@ static inline void cpu_clone_regs_child(CPUM68KState *env, target_ulong newsp)
+     env->dregs[0] = 0;
+ }
  
--static inline void cpu_clone_regs(CPUM68KState *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUM68KState *env, target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPUM68KState *env)
++{
++}
++
+ static inline void cpu_set_tls(CPUM68KState *env, target_ulong newtls)
  {
-     if (newsp) {
-         env->aregs[7] = newsp;
+     CPUState *cs = CPU(m68k_env_get_cpu(env));
 diff --git a/linux-user/microblaze/target_cpu.h b/linux-user/microblaze/target_cpu.h
-index 73e139938c..526b80d54d 100644
+index 526b80d54d..5e285e9211 100644
 --- a/linux-user/microblaze/target_cpu.h
 +++ b/linux-user/microblaze/target_cpu.h
-@@ -19,7 +19,7 @@
- #ifndef MICROBLAZE_TARGET_CPU_H
- #define MICROBLAZE_TARGET_CPU_H
+@@ -27,6 +27,10 @@ static inline void cpu_clone_regs_child(CPUMBState *env, target_ulong newsp)
+     env->regs[3] = 0;
+ }
  
--static inline void cpu_clone_regs(CPUMBState *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUMBState *env, target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPUMBState *env)
++{
++}
++
+ static inline void cpu_set_tls(CPUMBState *env, target_ulong newtls)
  {
-     if (newsp) {
-         env->regs[R_SP] = newsp;
+     env->regs[21] = newtls;
 diff --git a/linux-user/mips/target_cpu.h b/linux-user/mips/target_cpu.h
-index 02cf5eeff7..c42660b047 100644
+index c42660b047..d0e0b1bac0 100644
 --- a/linux-user/mips/target_cpu.h
 +++ b/linux-user/mips/target_cpu.h
-@@ -19,7 +19,7 @@
- #ifndef MIPS_TARGET_CPU_H
- #define MIPS_TARGET_CPU_H
+@@ -28,6 +28,10 @@ static inline void cpu_clone_regs_child(CPUMIPSState *env, target_ulong newsp)
+     env->active_tc.gpr[2] = 0;
+ }
  
--static inline void cpu_clone_regs(CPUMIPSState *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUMIPSState *env, target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPUMIPSState *env)
++{
++}
++
+ static inline void cpu_set_tls(CPUMIPSState *env, target_ulong newtls)
  {
-     if (newsp) {
-         env->active_tc.gpr[29] = newsp;
+     env->active_tc.CP0_UserLocal = newtls;
 diff --git a/linux-user/nios2/target_cpu.h b/linux-user/nios2/target_cpu.h
-index 5596c05c9c..bec2ea79c4 100644
+index bec2ea79c4..01725ba004 100644
 --- a/linux-user/nios2/target_cpu.h
 +++ b/linux-user/nios2/target_cpu.h
-@@ -20,7 +20,7 @@
- #ifndef NIOS2_TARGET_CPU_H
- #define NIOS2_TARGET_CPU_H
+@@ -28,6 +28,10 @@ static inline void cpu_clone_regs_child(CPUNios2State *env, target_ulong newsp)
+     env->regs[R_RET0] = 0;
+ }
  
--static inline void cpu_clone_regs(CPUNios2State *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUNios2State *env, target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPUNios2State *env)
++{
++}
++
+ static inline void cpu_set_tls(CPUNios2State *env, target_ulong newtls)
  {
-     if (newsp) {
-         env->regs[R_SP] = newsp;
+     /*
 diff --git a/linux-user/openrisc/target_cpu.h b/linux-user/openrisc/target_cpu.h
-index 32ff135089..d163ba2e26 100644
+index d163ba2e26..6586951c5b 100644
 --- a/linux-user/openrisc/target_cpu.h
 +++ b/linux-user/openrisc/target_cpu.h
-@@ -20,7 +20,8 @@
- #ifndef OPENRISC_TARGET_CPU_H
- #define OPENRISC_TARGET_CPU_H
+@@ -29,6 +29,10 @@ static inline void cpu_clone_regs_child(CPUOpenRISCState *env,
+     cpu_set_gpr(env, 11, 0);
+ }
  
--static inline void cpu_clone_regs(CPUOpenRISCState *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUOpenRISCState *env,
-+                                        target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPUOpenRISCState *env)
++{
++}
++
+ static inline void cpu_set_tls(CPUOpenRISCState *env, target_ulong newtls)
  {
-     if (newsp) {
-         cpu_set_gpr(env, 1, newsp);
+     cpu_set_gpr(env, 10, newtls);
 diff --git a/linux-user/ppc/target_cpu.h b/linux-user/ppc/target_cpu.h
-index c4641834e7..34decf3876 100644
+index 34decf3876..00c9f5eb86 100644
 --- a/linux-user/ppc/target_cpu.h
 +++ b/linux-user/ppc/target_cpu.h
-@@ -19,7 +19,7 @@
- #ifndef PPC_TARGET_CPU_H
- #define PPC_TARGET_CPU_H
+@@ -27,6 +27,10 @@ static inline void cpu_clone_regs_child(CPUPPCState *env, target_ulong newsp)
+     env->gpr[3] = 0;
+ }
  
--static inline void cpu_clone_regs(CPUPPCState *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUPPCState *env, target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPUPPCState *env)
++{
++}
++
+ static inline void cpu_set_tls(CPUPPCState *env, target_ulong newtls)
  {
-     if (newsp) {
-         env->gpr[1] = newsp;
+ #if defined(TARGET_PPC64)
 diff --git a/linux-user/riscv/target_cpu.h b/linux-user/riscv/target_cpu.h
-index 90f9a4171e..d92153851c 100644
+index d92153851c..4ef1b23b4f 100644
 --- a/linux-user/riscv/target_cpu.h
 +++ b/linux-user/riscv/target_cpu.h
-@@ -1,7 +1,7 @@
- #ifndef RISCV_TARGET_CPU_H
- #define RISCV_TARGET_CPU_H
+@@ -10,6 +10,10 @@ static inline void cpu_clone_regs_child(CPURISCVState *env, target_ulong newsp)
+     env->gpr[xA0] = 0;
+ }
  
--static inline void cpu_clone_regs(CPURISCVState *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPURISCVState *env, target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPURISCVState *env)
++{
++}
++
+ static inline void cpu_set_tls(CPURISCVState *env, target_ulong newtls)
  {
-     if (newsp) {
-         env->gpr[xSP] = newsp;
+     env->gpr[xTP] = newtls;
 diff --git a/linux-user/s390x/target_cpu.h b/linux-user/s390x/target_cpu.h
-index aa181ceaee..e0baa98e75 100644
+index e0baa98e75..18e290ece8 100644
 --- a/linux-user/s390x/target_cpu.h
 +++ b/linux-user/s390x/target_cpu.h
-@@ -19,7 +19,7 @@
- #ifndef S390X_TARGET_CPU_H
- #define S390X_TARGET_CPU_H
+@@ -27,6 +27,10 @@ static inline void cpu_clone_regs_child(CPUS390XState *env, target_ulong newsp)
+     env->regs[2] = 0;
+ }
  
--static inline void cpu_clone_regs(CPUS390XState *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUS390XState *env, target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPUS390XState *env)
++{
++}
++
+ static inline void cpu_set_tls(CPUS390XState *env, target_ulong newtls)
  {
-     if (newsp) {
-         env->regs[15] = newsp;
+     env->aregs[0] = newtls >> 32;
 diff --git a/linux-user/sh4/target_cpu.h b/linux-user/sh4/target_cpu.h
-index b0be9a2c1b..854955aa5a 100644
+index 854955aa5a..b0e4ab23a7 100644
 --- a/linux-user/sh4/target_cpu.h
 +++ b/linux-user/sh4/target_cpu.h
-@@ -19,7 +19,7 @@
- #ifndef SH4_TARGET_CPU_H
- #define SH4_TARGET_CPU_H
+@@ -27,6 +27,10 @@ static inline void cpu_clone_regs_child(CPUSH4State *env, target_ulong newsp)
+     env->gregs[0] = 0;
+ }
  
--static inline void cpu_clone_regs(CPUSH4State *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUSH4State *env, target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPUSH4State *env)
++{
++}
++
+ static inline void cpu_set_tls(CPUSH4State *env, target_ulong newtls)
  {
-     if (newsp) {
-         env->gregs[15] = newsp;
+   env->gbr = newtls;
 diff --git a/linux-user/sparc/target_cpu.h b/linux-user/sparc/target_cpu.h
-index 1ffc0ae9f2..8511fc3f6f 100644
+index 8511fc3f6f..52c9d8c7db 100644
 --- a/linux-user/sparc/target_cpu.h
 +++ b/linux-user/sparc/target_cpu.h
-@@ -20,7 +20,7 @@
- #ifndef SPARC_TARGET_CPU_H
- #define SPARC_TARGET_CPU_H
+@@ -36,6 +36,10 @@ static inline void cpu_clone_regs_child(CPUSPARCState *env, target_ulong newsp)
+ #endif
+ }
  
--static inline void cpu_clone_regs(CPUSPARCState *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUSPARCState *env, target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPUSPARCState *env)
++{
++}
++
+ static inline void cpu_set_tls(CPUSPARCState *env, target_ulong newtls)
  {
-     if (newsp) {
-         env->regwptr[22] = newsp;
+     env->gregs[7] = newtls;
 diff --git a/linux-user/tilegx/target_cpu.h b/linux-user/tilegx/target_cpu.h
-index d1aa5824f2..dfca8d9598 100644
+index dfca8d9598..9577462821 100644
 --- a/linux-user/tilegx/target_cpu.h
 +++ b/linux-user/tilegx/target_cpu.h
-@@ -19,7 +19,7 @@
- #ifndef TILEGX_TARGET_CPU_H
- #define TILEGX_TARGET_CPU_H
+@@ -27,6 +27,10 @@ static inline void cpu_clone_regs_child(CPUTLGState *env, target_ulong newsp)
+     env->regs[TILEGX_R_RE] = 0;
+ }
  
--static inline void cpu_clone_regs(CPUTLGState *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUTLGState *env, target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPUTLGState *env)
++{
++}
++
+ static inline void cpu_set_tls(CPUTLGState *env, target_ulong newtls)
  {
-     if (newsp) {
-         env->regs[TILEGX_R_SP] = newsp;
+     env->regs[TILEGX_R_TP] = newtls;
 diff --git a/linux-user/xtensa/target_cpu.h b/linux-user/xtensa/target_cpu.h
-index e31efe3ea0..f436b160c4 100644
+index f436b160c4..42e66211cf 100644
 --- a/linux-user/xtensa/target_cpu.h
 +++ b/linux-user/xtensa/target_cpu.h
-@@ -4,7 +4,8 @@
- #ifndef XTENSA_TARGET_CPU_H
- #define XTENSA_TARGET_CPU_H
+@@ -15,6 +15,10 @@ static inline void cpu_clone_regs_child(CPUXtensaState *env,
+     env->regs[2] = 0;
+ }
  
--static inline void cpu_clone_regs(CPUXtensaState *env, target_ulong newsp)
-+static inline void cpu_clone_regs_child(CPUXtensaState *env,
-+                                        target_ulong newsp)
++static inline void cpu_clone_regs_parent(CPUXtensaState *env)
++{
++}
++
+ static inline void cpu_set_tls(CPUXtensaState *env, target_ulong newtls)
  {
-     if (newsp) {
-         env->regs[1] = newsp;
+     env->uregs[THREADPTR] = newtls;
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index f5ff6f5dc8..b9127a9601 100644
+index b9127a9601..f960556bf8 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -5534,7 +5534,7 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
-         /* we create a new CPU instance. */
+@@ -5535,6 +5535,7 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
          new_env = cpu_copy(env);
          /* Init regs that differ from the parent.  */
--        cpu_clone_regs(new_env, newsp);
-+        cpu_clone_regs_child(new_env, newsp);
+         cpu_clone_regs_child(new_env, newsp);
++        cpu_clone_regs_parent(env);
          new_cpu = ENV_GET_CPU(new_env);
          new_cpu->opaque = ts;
          ts->bprm = parent_ts->bprm;
-@@ -5612,7 +5612,7 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
-         ret = fork();
-         if (ret == 0) {
-             /* Child Process.  */
--            cpu_clone_regs(env, newsp);
-+            cpu_clone_regs_child(env, newsp);
-             fork_end(1);
-             /* There is a race condition here.  The parent process could
-                theoretically read the TID in the child process before the child
+@@ -5630,6 +5631,7 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
+             if (flags & CLONE_CHILD_CLEARTID)
+                 ts->child_tidptr = child_tidptr;
+         } else {
++            cpu_clone_regs_parent(env);
+             fork_end(0);
+         }
+     }
 -- 
 2.17.1
 
