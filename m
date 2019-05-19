@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 509B5C04AB4
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:26:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C628BC04AB4
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:27:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B00420675
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:26:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8398720675
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:27:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X6fHeKMu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B00420675
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a9sy3aEg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8398720675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52949 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52957 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSSOB-0002XQ-9j
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 16:26:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46670)
+	id 1hSSPH-0003fc-Hw
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 16:27:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hSSHw-0005Zb-Rq
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:20:09 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hSSHu-0005UU-OW
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:20:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hSSHv-0007VW-Nb
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:20:08 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35212)
+	(envelope-from <richard.henderson@linaro.org>) id 1hSSHt-0007Qx-GV
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:20:06 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43739)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hSSHv-0007U9-Eh
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:20:07 -0400
-Received: by mail-pg1-x543.google.com with SMTP id t1so4312941pgc.2
-	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 13:20:07 -0700 (PDT)
+	id 1hSSHt-0007Pg-9v
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:20:05 -0400
+Received: by mail-pg1-x542.google.com with SMTP id t22so5716038pgi.10
+	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 13:20:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=POxFIOq98+f7SlQ+Qq4/1i4zdlqYdJgB+ksVYwShoNE=;
-	b=X6fHeKMuPiTfBuayn2n8h1uxIIh2MAHKNf+IDOTzogrsS7fSUfxRFCo60t02Dp+IGR
-	2uGTqjHG+SmG1AWU9ij3988LS2vlCQNTvThjRm3IAABv7Go7Uzvg3oI2wWKsyr9XLPOF
-	JiFM4mw6UwQXbMoozGgcL5bEqfA+L//akEaGia/NniMliiHbDdvm3ApR0+4li1NHIu+D
-	jbxAveIMFxA0DPPc8S8Y3AzzizX3Tet53UmwoB8T1NLWAJ9Z+sCw51UswNVOf/Qw4biO
-	Tq0ZTgJ2ii470/JkasUsQ3H1cFx+9UTcPJDQ5/USJdLXiMi8GLgmtubCnIVFdlwvhT/w
-	s+uQ==
+	bh=+/qY9GymWVw9Tgqaah5CkydYCEaLw/iJ0Pj5fe5qwlo=;
+	b=a9sy3aEgGCerhkMJt5FtPjNy7lDtVevoCaD8WJaq57V0+wqBFkdo/A6n2/hHia9M+V
+	xH7kf4rUMrVMQ0zDF232WAkao9E6eTgZ4IyVnZ0b+eBeIfIGmH5Ey5Xri5hkNWMSz/7O
+	/iuC+UY6g5CexOSaNru9vKFlj8NGNX3/dAvfwoEhnZyQQ5Td2UrSAV7RubpyvFDmsdBi
+	TKiKA0Ir6izpIDP/kPkpVROGWHKXRPjbl+F91Y2aGgI63mWuFrhAMCxQ4rJPljHHL4sz
+	Ih9TpocUJCLF2bAm5mTdl/zw4lNj5s7HzAFsd1LXbuEgiuhikDhsxrNVWxKq+C9v+jtB
+	kk2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=POxFIOq98+f7SlQ+Qq4/1i4zdlqYdJgB+ksVYwShoNE=;
-	b=B6juy526ERg0BTxRUaYu6pWE5pyeB49t2w8tolSI6ZEgUTiDsIACZ1aiZWNS2CcsdF
-	il5LmS7hvbC6701jLNopH7kZGpr7hOh0+0XzpgxYofdTIj2Jl78zbAJeS0UCbDuQvTJg
-	pxw1utZflTuBjKfoz+dYNwmM7Lpp0aJmZRkSQ9oVazCF7QV9A/AfrryL8UU2+BFc36XK
-	uJCJdljd1e540ft1e/NY1biup5R4j9SioYzZ1WUombrzFGo94Fa7mQnU4qUOeYyQ8ZfI
-	gMupenljUwGugmtqbgdXPbqa0hfRmGQ4/43+ElqZuQu9uQnEG3PpgINWVTltLahshk9H
-	Mj/A==
-X-Gm-Message-State: APjAAAW5rGWf+Wt5LWLt1Y0e0txO/3ZxbKygL1/v6SSFut1KtCIxTIkw
-	zzGqwedu+55qXQeu+lOEZWjb+hV9z2g=
-X-Google-Smtp-Source: APXvYqxi0omESB0dgC987/mSzbNezeqTbWDRhKm6vwOjslMpfVaWVTuV0mqKIiwiTUv/InY9bTAHFg==
-X-Received: by 2002:a65:5244:: with SMTP id q4mr69698053pgp.79.1558297206298; 
-	Sun, 19 May 2019 13:20:06 -0700 (PDT)
+	bh=+/qY9GymWVw9Tgqaah5CkydYCEaLw/iJ0Pj5fe5qwlo=;
+	b=OcAecolrGKRCKrggDSlUUiulZ0Dhl9mjJ28WAPmbkpKR/UjO8COLdiJMIQNo4F/OuR
+	CE322NVQ4jTYvBDXzHwFdJ1tLX7ti+SxzoLxOdmsTh8i60H3Cxi5YEKgDbpu4MdTQ2fd
+	WJVlAqMOGDovc1pDRo4zXYcJn1tz1WjujWm+j6R+Gx3pA/NElEGccg5ym0eTWNB8ag5l
+	z0vMpLuOYNriHdhXk2hjtl4CXMRCaIMLVH2oX0U36P8Tz2X6IRnUYD7MGNT8R/1xhGWm
+	iD1Ve3P3tDxrmyTKROTk6Bn9OID2ZRnVqxzsgg+qQLujrD8TpBLfzDzR8bh3KqjzvxCc
+	tN2A==
+X-Gm-Message-State: APjAAAXuf9SZGXFnTIU76iXPr017Vb3pCsym9Gs3xEX17wjDXDc1Z4eW
+	o1NVITNsFRQ6Z70+Oq900BVlhTSK1Ew=
+X-Google-Smtp-Source: APXvYqzC7MhZ/rMiTFjTKKxwHghN7ynVKKx0Dl5w2dCPtrPxKkrEl1KGcOPs4OiaWkrEkA2uxR3kjA==
+X-Received: by 2002:a63:d652:: with SMTP id d18mr55026317pgj.112.1558297204034;
+	Sun, 19 May 2019 13:20:04 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231]) by smtp.gmail.com with ESMTPSA id
-	e14sm18166264pff.60.2019.05.19.13.20.05
+	e14sm18166264pff.60.2019.05.19.13.20.03
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sun, 19 May 2019 13:20:05 -0700 (PDT)
+	Sun, 19 May 2019 13:20:03 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sun, 19 May 2019 13:19:48 -0700
-Message-Id: <20190519201953.20161-9-richard.henderson@linaro.org>
+Date: Sun, 19 May 2019 13:19:46 -0700
+Message-Id: <20190519201953.20161-7-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190519201953.20161-1-richard.henderson@linaro.org>
 References: <20190519201953.20161-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::543
-Subject: [Qemu-devel] [PATCH 08/13] linux-user/sparc: Fix cpu_clone_regs
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: [Qemu-devel] [PATCH 06/13] linux-user/sparc: Use WREG constants in
+ sparc/target_cpu.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,66 +96,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We failed to set the secondary return value in %o1
-we failed to advance the PC past the syscall,
-we failed to adjust regwptr into the new structure,
-we stored the stack pointer into the wrong register.
+This fixes a naming bug wherein we used "UREG_FP" to access the
+stack pointer.  OTOH, the "UREG_FP" constant was also defined
+incorrectly such that it *did* reference the stack pointer.
+
+Note that the kernel legitimately uses the name "FP", because it
+utilizes the rolled stack window in processing the system call.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/sparc/target_cpu.h | 29 +++++++++++++++++++++++------
- 1 file changed, 23 insertions(+), 6 deletions(-)
+ linux-user/sparc/target_cpu.h | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
 diff --git a/linux-user/sparc/target_cpu.h b/linux-user/sparc/target_cpu.h
-index 2c80db4889..a81f8216b7 100644
+index 52c9d8c7db..2c80db4889 100644
 --- a/linux-user/sparc/target_cpu.h
 +++ b/linux-user/sparc/target_cpu.h
-@@ -22,22 +22,39 @@
+@@ -45,15 +45,9 @@ static inline void cpu_set_tls(CPUSPARCState *env, target_ulong newtls)
+     env->gregs[7] = newtls;
+ }
  
- static inline void cpu_clone_regs_child(CPUSPARCState *env, target_ulong newsp)
+-#ifndef UREG_I6
+-#define UREG_I6        6
+-#endif
+-#ifndef UREG_FP
+-#define UREG_FP        UREG_I6
+-#endif
+-
+ static inline abi_ulong get_sp_from_cpustate(CPUSPARCState *state)
  {
--    if (newsp) {
--        env->regwptr[22] = newsp;
--    }
--    /* syscall return for clone child: 0, and clear CF since
--     * this counts as a success return value.
-+    /*
-+     * After cpu_copy, env->regwptr is pointing into old_env.
-+     * Update the new cpu to use its own register window.
-      */
--    env->regwptr[0] = 0;
-+    env->regwptr = env->regbase + (env->cwp * 16);
+-    return state->regwptr[UREG_FP];
++    return state->regwptr[WREG_SP];
+ }
 +
-+    /* Set a new stack, if requested.  */
-+    if (newsp) {
-+        /* ??? The kernel appears to copy one stack frame to the new stack. */
-+        /* ??? The kernel force aligns the stack. */
-+        env->regwptr[WREG_SP] = newsp;
-+    }
-+
-+    /*
-+     * Syscall return for clone child: %o0 = 0 and clear CF since
-+     * this counts as a success return value.  %o1 = 1 to indicate
-+     * this is the child.  Advance the PC past the syscall.
-+     */
-+    env->regwptr[WREG_O0] = 0;
- #if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
-     env->xcc &= ~PSR_CARRY;
- #else
-     env->psr &= ~PSR_CARRY;
  #endif
-+    env->regwptr[WREG_O1] = 1;
-+    env->pc = env->npc;
-+    env->npc = env->npc + 4;
- }
- 
- static inline void cpu_clone_regs_parent(CPUSPARCState *env)
- {
-+    /* Set the second return value for the parent: %o1 = 0.  */
-+    env->regwptr[WREG_O1] = 0;
- }
- 
- static inline void cpu_set_tls(CPUSPARCState *env, target_ulong newtls)
 -- 
 2.17.1
 
