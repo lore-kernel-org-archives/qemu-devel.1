@@ -2,71 +2,71 @@ Return-Path: <SRS0=v56/=TT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F590C04AB4
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 13:41:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD815C04AB4
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 14:16:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CDD021872
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 13:41:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CDD021872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=clisp.org
+	by mail.kernel.org (Postfix) with ESMTPS id ACDF3216FD
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 14:16:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACDF3216FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49004 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49348 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSM4X-0000vy-CD
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 09:41:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51432)
+	id 1hSMcN-0007mz-Bu
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 10:16:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hSM3g-0000cT-Sd
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 09:41:02 -0400
+	(envelope-from <bounces@canonical.com>) id 1hSMb8-0007B4-6r
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 10:15:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hSM3f-0007OO-2y
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 09:41:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36226)
+	(envelope-from <bounces@canonical.com>) id 1hSMb6-00032s-Vr
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 10:15:34 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38508)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hSM3d-0007N4-Db
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 09:40:58 -0400
+	id 1hSMb6-00032R-QJ
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 10:15:32 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hSM3Z-0002B8-QF
-	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 13:40:53 +0000
+	id 1hSMb4-0004EU-Ed
+	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 14:15:30 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BCDCA2E80CC
-	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 13:40:53 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 656FD2E8050
+	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 14:15:30 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 19 May 2019 13:31:27 -0000
-From: Bruno Haible <bruno@clisp.org>
+Date: Sun, 19 May 2019 14:06:12 -0000
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
-	assignee=rth@twiddle.net; 
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: ppc64
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bruno-clisp rth stefanrin th-huth
-X-Launchpad-Bug-Reporter: Bruno Haible (bruno-clisp)
-X-Launchpad-Bug-Modifier: Bruno Haible (bruno-clisp)
-References: <149893001258.15852.11258418521313176097.malonedeb@wampee.canonical.com>
-Message-Id: <155827268776.27038.17410652496685191872.malone@soybean.canonical.com>
+X-Launchpad-Bug-Commenters: ivmn jlsantiago0 mark-cave-ayland
+X-Launchpad-Bug-Reporter: Jose Santiago (jlsantiago0)
+X-Launchpad-Bug-Modifier: Mark Cave-Ayland (mark-cave-ayland)
+References: <155812687142.26079.4364411221525864419.malonedeb@soybean.canonical.com>
+Message-Id: <155827477294.15473.827002672187220632.malone@wampee.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18962";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: b9c450203061cab4b7badfd8a4533142edd9ca92
+X-Launchpad-Hash: 03e0d6dd1d5cdb330ccee0a1b845f6647cefc39f
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1701835] Re: floating-point operation bugs in
- qemu-alpha
+Subject: [Qemu-devel] [Bug 1829576] Re: QEMU-SYSTEM-PPC64 Regression
+ QEMU-4.0.0
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -77,223 +77,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1701835 <1701835@bugs.launchpad.net>
+Reply-To: Bug 1829576 <1829576@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The patch mentioned in #15 fixes the issue:
-- The test programs test-cbrt ... test-truncf1 now all succeed.
-- The test program from comment #6, run with qemu-alpha, prints 680e8000000=
-00000, i.e. bit 59 is set.
+David has already queued the patches in his ppc-for-4.1 branch at
+https://github.com/dgibson/qemu/commits/ppc-for-4.1 so they will get
+merged soon. If you're working with git then I'd try testing the queued
+branch first and see if that resolves the issue.
 
-Thanks Richard!!
+Once the patches have been applied to master we'll add a CC to the
+stable list so the fixes will be included in the next 4.0 update.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1701835
+https://bugs.launchpad.net/bugs/1829576
 
 Title:
-  floating-point operation bugs in qemu-alpha
+  QEMU-SYSTEM-PPC64 Regression QEMU-4.0.0
 
 Status in QEMU:
-  In Progress
+  New
 
 Bug description:
-  When running the gnulib testsuite, I'm seeing test failures in the tests =
-for libm functions
-    cbrt
-    cbrtf
-    ceil
-    ceilf
-    coshf
-    exp2
-    exp2f
-    floor
-    floorf
-    fma
-    fmaf
-    fmal
-    frexp
-    frexpf
-    hypot
-    hypotf
-    hypotl
-    ilogb
-    ilogbf
-    isfinite
-    isinf
-    isnan
-    isnand
-    isnanf
-    ldexp
-    ldexpf
-    ldexpl
-    log1p
-    log1pf
-    log2
-    log2f
-    logb
-    logbf
-    logbl
-    rint
-    rintf
-    rintl
-    signbit
-    sqrt
-    sqrtf
-    strtod
-  that I don't see when running the same (statically linked) executables in=
- a VM, through qemu-system-alpha.
+  I have been using QEMU-SYSTEM-PPC64 v3.1.0 to run CentOS7 PPC emulated
+  system. It stopped working when I upgraded to QEMU-4.0.0 . I
+  downgraded back to QEMU-3.1.0 and it started working again. The
+  problem is that my CentOS7 image will not boot up udner QEMU-4.0.0,
+  but works fine under QEMU-3.1.0.
 
-  How to reproduce:
-  - Using gnulib, run ./gnulib-tool --create-testdir --dir=3D../testdir-mat=
-h --single-configure cbrt cbrtf ceil ceilf coshf exp2 exp2f float floor flo=
-orf fma fmaf fmal frexp frexpf hypot hypotf hypotl ilogb ilogbf isfinite is=
-inf isnan isnand isnanf ldexp ldexpf ldexpl log1p log1pf log2 log2f logb lo=
-gbf logbl math printf-frexp rint rintf rintl round roundf signbit sqrt sqrt=
-f strtod trunc truncf
-  - Copy the resulting directory to a VM running Linux 2.6.26 with qemu-sys=
-tem-alpha.
-  - There, configure and build the package:
-    mkdir build-native-static; cd build-native-static; ../configure CPPFLAG=
-S=3D"-Wall" LDFLAGS=3D"-static"; make; make check
-    Only 4 tests fail.
-  - Copy the resulting binaries back to the original x86_64 machine.
-  - Set environment variables for using qemu-alpha.
-  - Here, 50 tests fail that did not fail originally:
+  I have an QCOW2 image available at
+  https://www.mediafire.com/file/d8dda05ro85whn1/linux-
+  centos7-ppc64.qcow2/file . NOTE: It is 15GB. Kind of large.
 
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-cbrt
-  ../../gltests/test-cbrt.h:39: assertion 'err > - L_(4.0) * L_(16.0) / TWO=
-_MANT_DIG && err < L_(4.0) * L_(16.0) / TWO_MANT_DIG' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil2
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf2
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-coshf =
+  I run it as follows:
 
-  ../../gltests/test-coshf.c:37: assertion 'y >=3D 1.1854652f && y <=3D 1.1=
-854653f' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-float
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor2
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf2
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma1   =
+     qemu-system-ppc64 \
+        -name "CENTOS7-PPC64" \
+        -cpu POWER7 -machine pseries \
+        -m 4096 \
+        -netdev bridge,id=3Dnetbr0,br=3Dbr0 \
+        -device e1000,netdev=3Dnetbr0,mac=3D52:54:3c:13:21:33 \
+        -hda "./linux-centos7-ppc64.qcow2" \
+        -monitor stdio
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma2
-  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf2
-  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmal2
-  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexp
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexpf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypot =
+  HOST: I am using Manjaro Linux on an Intel i7 machine with the QEMU
+  packages installed via the package manager of the distribution.
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotl
-  ../../gltests/test-hypot.h:41: assertion 'z =3D=3D HUGEVAL' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogb =
+  [jsantiago@jlsws0 ~]$ uname -a
+  Linux jlsws0.haivision.com 4.19.42-1-MANJARO #1 SMP PREEMPT Fri May 10 20=
+:52:43 UTC 2019 x86_64 GNU/Linux
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogbf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isfinite
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isinf   =
+  jsantiago@jlsws0 ~]$ cpuinfo =
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnan
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand-nolibm
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand       =
+  Intel(R) processor family information utility, Version 2019 Update 3 Buil=
+d 20190214 (id: b645a4a54)
+  Copyright (C) 2005-2019 Intel Corporation.  All rights reserved.
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf-nolibm
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf       =
+  =3D=3D=3D=3D=3D  Processor composition  =3D=3D=3D=3D=3D
+  Processor name    : Intel(R) Core(TM) i7-6700K  =
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexp =
+  Packages(sockets) : 1
+  Cores             : 4
+  Processors(CPUs)  : 8
+  Cores per package : 4
+  Threads per core  : 2
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpl
-  ../../gltests/test-ldexp.h:99: assertion 'y =3D=3D expected' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1p =
+  =3D=3D=3D=3D=3D  Processor identification  =3D=3D=3D=3D=3D
+  Processor	Thread Id.	Core Id.	Package Id.
+  0       	0   		0   		0   =
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1pf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2  =
+  1       	0   		1   		0   =
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2f
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logb =
+  2       	0   		2   		0   =
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logbf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-math =
+  3       	0   		3   		0   =
 
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-printf-frexp
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rint        =
+  4       	1   		0   		0   =
 
-  ../../gltests/test-rint.c:63: assertion 'rint (0.7) =3D=3D 1.0' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintf
-  ../../gltests/test-rintf.c:63: assertion 'rintf (0.7f) =3D=3D 1.0f' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintl
-  ../../gltests/test-rintl.c:68: assertion 'rintl (0.7L) =3D=3D 1.0L' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-round1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-roundf1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-signbit
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-sqrt   =
+  5       	1   		1   		0   =
 
-  ../../gltests/test-sqrt.h:40: assertion 'err > - L_(16.0) / TWO_MANT_DIG =
-&& err < L_(16.0) / TWO_MANT_DIG' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-trunc1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-truncf1
-  Floating point exception (core dumped)
+  6       	1   		2   		0   =
+
+  7       	1   		3   		0   =
+
+  =3D=3D=3D=3D=3D  Placement on packages  =3D=3D=3D=3D=3D
+  Package Id.	Core Id.	Processors
+  0   		0,1,2,3		(0,4)(1,5)(2,6)(3,7)
+
+  =3D=3D=3D=3D=3D  Cache sharing  =3D=3D=3D=3D=3D
+  Cache	Size		Processors
+  L1	32  KB		(0,4)(1,5)(2,6)(3,7)
+  L2	256 KB		(0,4)(1,5)(2,6)(3,7)
+  L3	8   MB		(0,1,2,3,4,5,6,7)
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1701835/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1829576/+subscriptions
 
