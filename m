@@ -2,57 +2,56 @@ Return-Path: <SRS0=v56/=TT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D930CC04AB4
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 10:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29388C04AB4
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 10:58:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B048521743
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 10:58:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B048521743
+	by mail.kernel.org (Postfix) with ESMTPS id EBDFD21743
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 10:58:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBDFD21743
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46905 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46907 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSJWH-0006qk-Qg
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 06:58:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56589)
+	id 1hSJWN-0006tY-8J
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 06:58:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hSJRo-0003ET-6w
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hSJRo-0003EQ-5i
 	for qemu-devel@nongnu.org; Sun, 19 May 2019 06:53:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hSJRl-0001oI-Up
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hSJRl-0001oD-Uk
 	for qemu-devel@nongnu.org; Sun, 19 May 2019 06:53:44 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:42710 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:42712 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hSJRl-00015k-N6
+	id 1hSJRl-00015m-N3
 	for qemu-devel@nongnu.org; Sun, 19 May 2019 06:53:41 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 788351A2015;
+	by mail.rt-rk.com (Postfix) with ESMTP id 813191A0F04;
 	Sun, 19 May 2019 12:52:33 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
 	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 5CF951A0F04;
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 65A591A1FBA;
 	Sun, 19 May 2019 12:52:33 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 19 May 2019 12:52:14 +0200
-Message-Id: <1558263144-8776-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Sun, 19 May 2019 12:52:15 +0200
+Message-Id: <1558263144-8776-2-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1558263144-8776-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1558263144-8776-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PULL 00/10] MIPS queue for May 19th, 2019
+Subject: [Qemu-devel] [PULL 01/10] target/mips: Make the results of
+ DIV_<U|S>.<B|H|W|D> the same as on hardware
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,64 +68,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
 
-The following changes since commit 1b46b4daa6fbf45eddcf77877379a0afac341d=
-f9:
+MSA instructions DIV_<U|S>.<B|H|W|D> when dividing by zero,
+didn't return the same value when executed on a referent hardware
+(FPGA MIPS 64 r6, little endian) and when executed on QEMU, which
+is not a real bug, because the result when dividing by zero is
+UNPREDICTABLE [1] (page 141, 142).
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/ui-20190517-pull-requ=
-est' into staging (2019-05-17 17:25:19 +0100)
+[1] MIPS Architecture for Programmers
+    Volume IV-j: The MIPS64 SIMD
+    Architecture Module, Revision 1.12
 
-are available in the git repository at:
+Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Message-Id: <1554207110-9113-2-git-send-email-mateja.marjanovic@rt-rk.com>
+---
+ target/mips/msa_helper.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-  https://github.com/AMarkovic/qemu tags/mips-queue-may-19-2019
-
-for you to fetch changes up to 71074d1d2fae9a0c8dab87c5bb5271a71d6cb7ab:
-
-  mips: Decide to map PAGE_EXEC in map_address (2019-05-19 12:11:46 +0200=
-)
-
-----------------------------------------------------------------
-
-MIPS queue for May 19th, 2019
-
-  * A fix for HelenOS boot hang (related to the flag PAGE_EXEC)
-  * A set of fixes for emulation of MSA ASE on big endian hosts
-  * Improved usage of object_initialize() and object_initialize_child()
-  * Better handling of 'div by zero' cases in MSA ASE
-
-----------------------------------------------------------------
-
-Jakub Jerm=C3=A1=C5=99 (1):
-  mips: Decide to map PAGE_EXEC in map_address
-
-Mateja Marjanovic (7):
-  target/mips: Make the results of DIV_<U|S>.<B|H|W|D> the same as on
-    hardware
-  target/mips: Make the results of MOD_<U|S>.<B|H|W|D> the same as on
-    hardware
-  target/mips: Fix MSA instructions LD.<B|H|W|D> on big endian host
-  target/mips: Fix MSA instructions ST.<B|H|W|D> on big endian host
-  target/mips: Refactor and fix COPY_S.<B|H|W|D> instructions
-  target/mips: Refactor and fix COPY_U.<B|H|W> instructions
-  target/mips: Refactor and fix INSERT.<B|H|W|D> instructions
-
-Philippe Mathieu-Daud=C3=A9 (2):
-  hw/mips: Use object_initialize() on MIPSCPSState
-  hw/mips: Use object_initialize_child for correct reference counting
-
- hw/mips/boston.c         |  25 ++--
- hw/mips/cps.c            |  20 +--
- hw/mips/mips_malta.c     |  17 +--
- target/mips/helper.c     |  13 +-
- target/mips/helper.h     |  16 +-
- target/mips/msa_helper.c | 191 ++++++++++++++++--------
- target/mips/op_helper.c  | 376 +++++++++++++++++++++++++++++++++++++++++=
-+-----
- target/mips/translate.c  |  59 +++++++-
- 8 files changed, 574 insertions(+), 143 deletions(-)
-
---=20
+diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+index c74e3cd..596190b 100644
+--- a/target/mips/msa_helper.c
++++ b/target/mips/msa_helper.c
+@@ -641,14 +641,15 @@ static inline int64_t msa_div_s_df(uint32_t df, int64_t arg1, int64_t arg2)
+     if (arg1 == DF_MIN_INT(df) && arg2 == -1) {
+         return DF_MIN_INT(df);
+     }
+-    return arg2 ? arg1 / arg2 : 0;
++    return arg2 ? arg1 / arg2
++                : arg1 >= 0 ? -1 : 1;
+ }
+ 
+ static inline int64_t msa_div_u_df(uint32_t df, int64_t arg1, int64_t arg2)
+ {
+     uint64_t u_arg1 = UNSIGNED(arg1, df);
+     uint64_t u_arg2 = UNSIGNED(arg2, df);
+-    return u_arg2 ? u_arg1 / u_arg2 : 0;
++    return arg2 ? u_arg1 / u_arg2 : -1;
+ }
+ 
+ static inline int64_t msa_mod_s_df(uint32_t df, int64_t arg1, int64_t arg2)
+-- 
 2.7.4
 
 
