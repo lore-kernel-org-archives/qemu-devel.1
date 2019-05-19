@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65FEEC04AB4
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 21:27:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B20AC04AB4
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 21:29:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DE6320644
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 21:27:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BD3620578
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 21:29:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Wyiyg66m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DE6320644
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="brmejX2y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BD3620578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53845 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53874 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSTKm-0003uy-AB
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 17:27:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51154)
+	id 1hSTNB-00067J-8K
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 17:29:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hSSa6-00043I-PW
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:38:55 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hSSa1-0003xz-QC
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hSSa5-00050k-La
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:38:54 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:43849)
+	(envelope-from <richard.henderson@linaro.org>) id 1hSSa0-0004ub-Lo
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:38:49 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:34651)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hSSa5-0004zu-Fl
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:38:53 -0400
-Received: by mail-pf1-x441.google.com with SMTP id c6so6150984pfa.10
-	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 13:38:53 -0700 (PDT)
+	id 1hSSa0-0004to-EG
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:38:48 -0400
+Received: by mail-pl1-x642.google.com with SMTP id w7so5728149plz.1
+	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 13:38:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=aU9d9lkpIFkrBaZRLnqRF/xt/eULyJKQva2sHtEVO2Y=;
-	b=Wyiyg66mNE27W+tMaD3QGbxM7UM/xGOPeWqBMI2iw8v8/TM3SiNv2LyrY6PucPGRPn
-	nTXLOyc6CPNeeg/zdB4Br3Q/tmlsS9mccTrAgBpNcye/HHfi0l5TZwXp+5uCBSFJd2xM
-	IrCJrgIEpTgdoR1W9+0GFZRoDTuI09wDdIHJ9DtBEh8JvqELkA21k7IgkF/VYxFw+yKa
-	JRLkxnt1zrdXAEi8FuY2M2oWbsOWo1xLjZ+yqPZXw8Wn7dCdQdS8Gx+E+TKo8huuQ3ci
-	Uiz56Xp3/bSIiEOYhAYc9g45vFxCZteZkydvKb8QnIt+7kfCkAxiefDFzC7ZOFhw7vCp
-	LcyA==
+	bh=nKLZCrlKSTO+R1LDAJ7MTC0/n6ttp1lefRgjBzvM1II=;
+	b=brmejX2yIcPNjbKuVHCqV8AiCa1JJMdtPGr20MMLPBmCbCH8F8nnPJLHfbogkaawYS
+	5MWYoLGmRdwxv176WTA+TIj0WRt7ds8eDGCjowF36zkM3oTIhPG3UX5RHX75QmX9g0Bj
+	6M/v8WVOfulZJHBQ3O4Ni3A/c7faz1hQuBBJxe2CWZqUR2RsUGvTiCdCspP44hAuJPXJ
+	UuiP0ArLKSf57V3ghQKN5nnGFHdcqtHuVz9I/3+VSeeim6MKiAFQ18nIZ2o7OMaOS9mW
+	KH5iNAtVlaiVKV5Pa3XDzdIVwYIYTC1HGLWmt8otn3ZeyoyLyHeAYmcBNRWQXUdkuWkD
+	Rl4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=aU9d9lkpIFkrBaZRLnqRF/xt/eULyJKQva2sHtEVO2Y=;
-	b=YnFUYpEHkqFbc/jXdkEBSYEEWVz6FoMGH8oJTyPh0Rx+YOz0vUQnQ0BPhqQsW6VWsd
-	HG/XQ5OjTlV2nEmNGJ4CFtScD74n1sYppBd11LHEH904/tHPQfR0NXxyDYMXVpkEGuMR
-	pkdawOiv8Rk+BTsf0wV1UmcEIoGjjbqa3IKuGXoog4ppK14wnzu3CiA2L6kSXbK7gZHn
-	uRokgKi5l/CakCBYMDw1uEGdlGkNIqpZrHGlJIHTjEB3SDmFQVJkxex1Bv+32qB87y0e
-	VrCP3srtGa4MR8LNbHs40RsR0qaXLi/oKVkGR2ckImJ0FMS80QiX1pzZgxDY2E3BtNcM
-	khpw==
-X-Gm-Message-State: APjAAAVH0706r+GBJh3Pijzjl7eCpl7c3bL1rIjXVRaYfqMEAfWJ5Mku
-	DVLZV6XbNmTR/CiWPyx59Wamgea6FjI=
-X-Google-Smtp-Source: APXvYqwbQEu8iczkhLqkzwJvVvTaBqPi2+RANP+nmsrZ0pChsJd+oZzF3lMPyfOcRHF533TDTFnucw==
-X-Received: by 2002:a63:2d6:: with SMTP id 205mr70853544pgc.114.1558298332183; 
-	Sun, 19 May 2019 13:38:52 -0700 (PDT)
+	bh=nKLZCrlKSTO+R1LDAJ7MTC0/n6ttp1lefRgjBzvM1II=;
+	b=VYF5SPZW3eA+olqHHN5qPYjtbo0NHq4eNBh5e7U3Wx+dkXB9x+1kusPmsALi1Gh5zi
+	LFVjGi9bpn1wXCfAi381Mx+O5MPywFtD7jYHSjXbh6K6hH1ItkmQ4OHHF3gohT2X4YwQ
+	QwloM/C50HRC7OiWoonVnMP4+tTgtmVOR1OiVfskmBjhAptsfPAkt3ZQH67uA/j6u9PJ
+	FB55phQ+uQS+jkkjTJkSjOwLq4aLnB59YXF6Sbrg3cQCUxEY3OopYdMLey44X0bNbg7I
+	ixXXf37Dzry4Ph8GIoQLqKGxYryM+SC1LufJMzCHsze03HIlqK2KUMqCiCoJ2vY9z0o2
+	ByjA==
+X-Gm-Message-State: APjAAAW70IJ/xRNSiC+Zp2zcY6Y+afgs/cupL6GVyuoGBKyu+ZYIO1u3
+	Lz8ykUumjDzUShHqOSBRafWToesiFNg=
+X-Google-Smtp-Source: APXvYqwoY8LIbknPgI3tt0tbzZjCgLVQxU2Mu8tnrIdcxpWjztN2tUOZRLeefEWnWx8tw+TmhxixdQ==
+X-Received: by 2002:a17:902:6b8b:: with SMTP id
+	p11mr70527578plk.225.1558298327154; 
+	Sun, 19 May 2019 13:38:47 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231]) by smtp.gmail.com with ESMTPSA id
-	i7sm11397448pfo.19.2019.05.19.13.38.51
+	i7sm11397448pfo.19.2019.05.19.13.38.46
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sun, 19 May 2019 13:38:51 -0700 (PDT)
+	Sun, 19 May 2019 13:38:46 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sun, 19 May 2019 13:37:19 -0700
-Message-Id: <20190519203726.20729-68-richard.henderson@linaro.org>
+Date: Sun, 19 May 2019 13:37:15 -0700
+Message-Id: <20190519203726.20729-64-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190519203726.20729-1-richard.henderson@linaro.org>
 References: <20190519203726.20729-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::441
-Subject: [Qemu-devel] [PATCH v7 67/74] linux-user: Split out gettimeofday,
- settimeofday
+X-Received-From: 2607:f8b0:4864:20::642
+Subject: [Qemu-devel] [PATCH v7 63/74] linux-user: Split out sigreturn,
+ rt_sigreturn
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,141 +99,116 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall-defs.h     |  2 ++
- linux-user/syscall-time.inc.c | 33 +++++++++++++++++++++++++++++++++
- linux-user/syscall.c          | 31 -------------------------------
- linux-user/strace.list        |  6 ------
- 4 files changed, 35 insertions(+), 37 deletions(-)
+ linux-user/syscall-defs.h    |  4 ++++
+ linux-user/syscall-sig.inc.c | 18 ++++++++++++++++++
+ linux-user/syscall.c         | 12 ------------
+ linux-user/strace.list       |  6 ------
+ 4 files changed, 22 insertions(+), 18 deletions(-)
 
 diff --git a/linux-user/syscall-defs.h b/linux-user/syscall-defs.h
-index 446175af84..d109754c5f 100644
+index 11851535e1..77d750f66f 100644
 --- a/linux-user/syscall-defs.h
 +++ b/linux-user/syscall-defs.h
-@@ -77,6 +77,7 @@ SYSCALL_DEF(getrlimit, ARG_DEC, ARG_PTR);
+@@ -197,6 +197,7 @@ SYSCALL_DEF(rt_sigaction, ARG_SIGNAL, ARG_PTR, ARG_PTR, ARG_DEC);
+ SYSCALL_DEF(rt_sigpending, ARG_PTR, ARG_DEC);
+ SYSCALL_DEF(rt_sigprocmask, ARG_SIGPROCMASKHOW, ARG_PTR, ARG_PTR, ARG_DEC);
+ SYSCALL_DEF(rt_sigqueueinfo, ARG_DEC, ARG_SIGNAL, ARG_PTR);
++SYSCALL_DEF(rt_sigreturn);
+ SYSCALL_DEF(rt_sigsuspend, ARG_PTR, ARG_DEC);
+ SYSCALL_DEF(rt_sigtimedwait, ARG_PTR, ARG_PTR, ARG_PTR, ARG_DEC);
+ SYSCALL_DEF(rt_tgsigqueueinfo, ARG_DEC, ARG_DEC, ARG_SIGNAL, ARG_PTR);
+@@ -236,6 +237,9 @@ SYSCALL_DEF(sigprocmask, ARG_SIGPROCMASKHOW, ARG_HEX);
+ #elif defined(TARGET_NR_sigprocmask)
+ SYSCALL_DEF(sigprocmask, ARG_SIGPROCMASKHOW, ARG_PTR, ARG_PTR);
  #endif
- SYSCALL_DEF(getrusage, ARG_DEC, ARG_PTR);
- SYSCALL_DEF(getsid, ARG_DEC);
-+SYSCALL_DEF(gettimeofday, ARG_PTR);
- #ifdef TARGET_NR_getxpid
- SYSCALL_DEF(getxpid);
- #endif
-@@ -220,6 +221,7 @@ SYSCALL_DEF(setpgid, ARG_DEC, ARG_DEC);
- SYSCALL_DEF(setrlimit, ARG_DEC, ARG_PTR);
- #endif
- SYSCALL_DEF(setsid);
-+SYSCALL_DEF(settimeofday, ARG_PTR, ARG_PTR);
- #if !defined(SYSCALL_TABLE) || defined(TARGET_NR_semop)
- SYSCALL_DEF(semop, ARG_DEC, ARG_PTR, ARG_DEC);
- #endif
-diff --git a/linux-user/syscall-time.inc.c b/linux-user/syscall-time.inc.c
-index d1fb72bde0..1308af64ac 100644
---- a/linux-user/syscall-time.inc.c
-+++ b/linux-user/syscall-time.inc.c
-@@ -16,6 +16,39 @@
-  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
++#ifdef TARGET_NR_sigreturn
++SYSCALL_DEF(sigreturn);
++#endif
+ #if defined(TARGET_ALPHA)
+ SYSCALL_DEF(sigsuspend, ARG_HEX);
+ #elif defined(TARGET_NR_sigsuspend)
+diff --git a/linux-user/syscall-sig.inc.c b/linux-user/syscall-sig.inc.c
+index 774346838b..d5c0ccdcc3 100644
+--- a/linux-user/syscall-sig.inc.c
++++ b/linux-user/syscall-sig.inc.c
+@@ -206,6 +206,14 @@ SYSCALL_IMPL(rt_sigqueueinfo)
+     return get_errno(sys_rt_sigqueueinfo(arg1, arg2, &uinfo));
+ }
  
-+SYSCALL_IMPL(gettimeofday)
++SYSCALL_IMPL(rt_sigreturn)
 +{
-+    struct timeval tv;
-+    abi_long ret = get_errno(gettimeofday(&tv, NULL));
-+
-+    if (!is_error(ret) && copy_to_user_timeval(arg1, &tv)) {
-+        return -TARGET_EFAULT;
++    if (block_signals()) {
++        return -TARGET_ERESTARTSYS;
 +    }
-+    return ret;
++    return do_rt_sigreturn(cpu_env);
 +}
 +
-+SYSCALL_IMPL(settimeofday)
+ SYSCALL_IMPL(rt_sigsuspend)
+ {
+     CPUState *cpu = ENV_GET_CPU(cpu_env);
+@@ -471,6 +479,16 @@ SYSCALL_IMPL(sigprocmask)
+ }
+ #endif
+ 
++#ifdef TARGET_NR_sigreturn
++SYSCALL_IMPL(sigreturn)
 +{
-+    struct timeval tv, *ptv = NULL;
-+    struct timezone tz, *ptz = NULL;
-+
-+    if (arg1) {
-+        if (copy_from_user_timeval(&tv, arg1)) {
-+            return -TARGET_EFAULT;
-+        }
-+        ptv = &tv;
++    if (block_signals()) {
++        return -TARGET_ERESTARTSYS;
 +    }
-+
-+    if (arg2) {
-+        if (copy_from_user_timezone(&tz, arg2)) {
-+            return -TARGET_EFAULT;
-+        }
-+        ptz = &tz;
-+    }
-+
-+    return get_errno(settimeofday(ptv, ptz));
++    return do_sigreturn(cpu_env);
 +}
++#endif
 +
- #ifdef TARGET_NR_stime
- SYSCALL_IMPL(stime)
+ #ifdef TARGET_NR_sigsuspend
+ SYSCALL_IMPL(sigsuspend)
  {
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 5fe52c775d..b8bc44364d 100644
+index e489d12103..b8b18ac1de 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -4240,37 +4240,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+@@ -4240,18 +4240,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
      void *p;
  
      switch(num) {
--    case TARGET_NR_gettimeofday:
--        {
--            struct timeval tv;
--            ret = get_errno(gettimeofday(&tv, NULL));
--            if (!is_error(ret)) {
--                if (copy_to_user_timeval(arg1, &tv))
--                    return -TARGET_EFAULT;
--            }
+-#ifdef TARGET_NR_sigreturn
+-    case TARGET_NR_sigreturn:
+-        if (block_signals()) {
+-            return -TARGET_ERESTARTSYS;
 -        }
--        return ret;
--    case TARGET_NR_settimeofday:
--        {
--            struct timeval tv, *ptv = NULL;
--            struct timezone tz, *ptz = NULL;
--
--            if (arg1) {
--                if (copy_from_user_timeval(&tv, arg1)) {
--                    return -TARGET_EFAULT;
--                }
--                ptv = &tv;
--            }
--
--            if (arg2) {
--                if (copy_from_user_timezone(&tz, arg2)) {
--                    return -TARGET_EFAULT;
--                }
--                ptz = &tz;
--            }
--
--            return get_errno(settimeofday(ptv, ptz));
+-        return do_sigreturn(cpu_env);
+-#endif
+-    case TARGET_NR_rt_sigreturn:
+-        if (block_signals()) {
+-            return -TARGET_ERESTARTSYS;
 -        }
- #if defined(TARGET_NR_select)
-     case TARGET_NR_select:
- #if defined(TARGET_WANT_NI_OLD_SELECT)
+-        return do_rt_sigreturn(cpu_env);
+     case TARGET_NR_sethostname:
+         if (!(p = lock_user_string(arg1)))
+             return -TARGET_EFAULT;
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index 00a32bc616..635b952d2f 100644
+index 57445a8d81..b1c2f7851e 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
-@@ -296,9 +296,6 @@
- #ifdef TARGET_NR_gettid
- { TARGET_NR_gettid, "gettid" , "%s()", NULL, NULL },
+@@ -926,9 +926,6 @@
+ #ifdef TARGET_NR_rmdir
+ { TARGET_NR_rmdir, "rmdir" , NULL, NULL, NULL },
  #endif
--#ifdef TARGET_NR_gettimeofday
--{ TARGET_NR_gettimeofday, "gettimeofday" , NULL, NULL, NULL },
+-#ifdef TARGET_NR_rt_sigreturn
+-{ TARGET_NR_rt_sigreturn, "rt_sigreturn" , NULL, NULL, NULL },
 -#endif
- #ifdef TARGET_NR_getuid
- { TARGET_NR_getuid, "getuid" , "%s()", NULL, NULL },
+ #ifdef TARGET_NR_sched_getaffinity
+ { TARGET_NR_sched_getaffinity, "sched_getaffinity" , NULL, NULL, NULL },
  #endif
-@@ -1068,9 +1065,6 @@
- #ifdef TARGET_NR_set_tid_address
- { TARGET_NR_set_tid_address, "set_tid_address" , NULL, NULL, NULL },
+@@ -1113,9 +1110,6 @@
+ #ifdef TARGET_NR_signalfd4
+ { TARGET_NR_signalfd4, "signalfd4" , NULL, NULL, NULL },
  #endif
--#ifdef TARGET_NR_settimeofday
--{ TARGET_NR_settimeofday, "settimeofday" , NULL, NULL, NULL },
+-#ifdef TARGET_NR_sigreturn
+-{ TARGET_NR_sigreturn, "sigreturn" , NULL, NULL, NULL },
 -#endif
- #ifdef TARGET_NR_setuid
- { TARGET_NR_setuid, "setuid" , NULL, NULL, NULL },
+ #ifdef TARGET_NR_socket
+ { TARGET_NR_socket, "socket" , NULL, print_socket, NULL },
  #endif
 -- 
 2.17.1
