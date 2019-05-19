@@ -2,85 +2,107 @@ Return-Path: <SRS0=v56/=TT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A7A1C04AB4
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 10:33:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EFDCC04AB4
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 10:38:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE20321655
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 10:33:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A319D2166E
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 10:38:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uJY2pXbw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE20321655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavesemi.onmicrosoft.com header.i=@wavesemi.onmicrosoft.com header.b="PdM4XBBy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A319D2166E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46655 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46710 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSJ8P-0007jR-NA
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 06:33:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53699)
+	id 1hSJCm-0000df-NV
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 06:38:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hSJ7f-0007Qg-QY
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 06:32:56 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1hSJBr-0000ID-GA
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 06:37:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hSJ7e-0000Xl-Pe
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 06:32:55 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:45895)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hSJ7e-0000X9-J6
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 06:32:54 -0400
-Received: by mail-ed1-x543.google.com with SMTP id g57so18645315edc.12
-	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 03:32:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=ldvGV5dt3U5CH5tHgGE32f41mHDfeQEl0LUxd4CFfks=;
-	b=uJY2pXbwsEAa7YxZxX/1aFh7hQPRnsBSFsAVkO26VTuzizclIfwrU95V/9LiDRmwUB
-	7czp2oj9VVPSD4T0X/NsLAclZGTRlloZ5lQRrG/MokJg1HbOI8fDEcrz0R2Rn4nrjTzz
-	Na58QMSSZrVOzJhL9DHMBNkoPBuqLRUgIpuYEyN1RbznDzV0TMgB8vSPmGd747B1hegR
-	I49eiDkOvk2WUvTOp+GU/etI3yw1sODL4+3kXHvf+brwcJxhX3QELO+DGCYMZKQtTTyy
-	gUBk9UvpVq7bEdMzGYfAWznMlbRkx4ku8kiEO8Q4mmQgx6PpO/SQfDZ2KOd7ZSwCT06S
-	5MeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=ldvGV5dt3U5CH5tHgGE32f41mHDfeQEl0LUxd4CFfks=;
-	b=l3YnSYn3W89KDXR3Vy8QfkRdaiib8ymusH0TyHiwhHWEZEYtzyRE6C53nP00SzEDrN
-	aIuvo9Iz7u2YRwcrP3Dswwt4UWjBaGnk59XTrZqhOkla2VdS5T6dofAcgvu0sesMUjH8
-	F6MjNsjBMBcqJb6IBbiu4nBnoukr5oCCXw07x8bwVayMDounlIMpuWEGM5g70x1wjrgQ
-	YQ6aPnWj9jcuTo585qCibWnN+s79FJINYMrbloXmSVCrSqFBOZ9ezDc2+rQrdEMKakjF
-	1m94pNt8PZclUElAXwZgGGHP8PCX/fknMStDmQi+F41O1LUZ24YtA9j9vxEwGjNow27i
-	CAJw==
-X-Gm-Message-State: APjAAAViph+8+PHCfNK6qO/YyzELOiMDtBpUGj28Nb6puvcfc1hOv8uP
-	TzubtH7Hm+eYN+fi7LTVEryZAGcgeNA4h4v789ZF/w==
-X-Google-Smtp-Source: APXvYqzVj+6UuaXkVoeHMQVTzwIrluSU5V6FKmfLAZeTHxtf7wseZMOG1ngCqEMGTIaCBAhZChVJId/eUmtAjn3XnEU=
-X-Received: by 2002:a17:906:c355:: with SMTP id
-	ci21mr27897345ejb.202.1558261972525; 
-	Sun, 19 May 2019 03:32:52 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190502081554.5521-1-arilou@gmail.com>
-	<20190502081554.5521-10-arilou@gmail.com>
-	<87v9ybncdp.fsf@zen.linaroharston>
-In-Reply-To: <87v9ybncdp.fsf@zen.linaroharston>
-From: Jon Doron <arilou@gmail.com>
-Date: Sun, 19 May 2019 13:32:41 +0300
-Message-ID: <CAP7QCogCF-aQNt2ChpoXExCJydQB9ZhnrP6CdF9RJiFy5hA=SA@mail.gmail.com>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <amarkovic@wavecomp.com>) id 1hSJBq-0002rk-2t
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 06:37:15 -0400
+Received: from mail-eopbgr820101.outbound.protection.outlook.com
+	([40.107.82.101]:21093
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1hSJBp-0002qw-O8; Sun, 19 May 2019 06:37:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=wavesemi.onmicrosoft.com; s=selector1-wavesemi-onmicrosoft-com;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=6EBCuBHt2MSgrby0GKEs7yBzU5Hj5PrRe7GeL4mxeL0=;
+	b=PdM4XBByaKBQo7CaQoTCT+BWMosXP4twdmxV29IJipnhrSteOhy5BKQcEfDvUd2yb0TygwT13WSK09Tsmec35oK96O5l4fm3CIczk38SvJdR11ML2+PQtM6CCywRawUpeXDu0jDbX2nvCsN2XMYA33+tQJNAis5TYBRhok54v84=
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
+	BN6PR2201MB1091.namprd22.prod.outlook.com (10.174.90.158) with
+	Microsoft SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1900.16; Sun, 19 May 2019 10:37:06 +0000
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
+	([fe80::854a:15e2:b5f:e2c8]) by
+	BN6PR2201MB1251.namprd22.prod.outlook.com
+	([fe80::854a:15e2:b5f:e2c8%8]) with mapi id 15.20.1900.020;
+	Sun, 19 May 2019 10:37:05 +0000
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Eduardo Habkost <ehabkost@redhat.com>,
+	=?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Thread-Topic: [PATCH v2 00/16] hw: Use object_initialize_child for correct
+	reference counting
+Thread-Index: AQHVBPLEpwIZPqjpZ0yi9E6eCEd9HKZvLbQAgAB8EYCAAqguFw==
+Date: Sun, 19 May 2019 10:37:05 +0000
+Message-ID: <BN6PR2201MB12515EFFABCEAE4D13409F81C6050@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <20190507163416.24647-1-philmd@redhat.com>
+	<cfd72da5-720a-0684-f3c5-e0ea1360bef3@redhat.com>,
+	<20190517175621.GK4189@habkost.net>
+In-Reply-To: <20190517175621.GK4189@habkost.net>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=amarkovic@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 2c4b4dd9-0f0f-4b23-e430-08d6dc45f030
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
+	SRVR:BN6PR2201MB1091; 
+x-ms-traffictypediagnostic: BN6PR2201MB1091:
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <BN6PR2201MB1091FF0B4E478D5749DD3954C6050@BN6PR2201MB1091.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4303;
+x-forefront-prvs: 00429279BA
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(376002)(366004)(346002)(396003)(136003)(39830400003)(189003)(199004)(54164003)(9686003)(71200400001)(102836004)(71190400001)(4326008)(256004)(6306002)(14444005)(6116002)(3846002)(26005)(6246003)(7696005)(446003)(229853002)(55016002)(6436002)(55236004)(6506007)(99286004)(53546011)(25786009)(76176011)(11346002)(186003)(316002)(966005)(476003)(14454004)(486006)(68736007)(33656002)(8676002)(110136005)(478600001)(54906003)(81156014)(81166006)(66476007)(66556008)(64756008)(66446008)(8936002)(7736002)(66946007)(86362001)(73956011)(76116006)(5660300002)(7416002)(53936002)(305945005)(74316002)(2906002)(52536014)(66066001)(66574012);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1091;
+	H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: zFgg6E16c9cnROIOZIC2+trst7WQehyialv3ZzwQA0ikSndQeUeiwAw1bTRsELgDIYDbVXivbTXw9kXWa+XznXCGEl4QzQH0uB1+NVJ1Ef8urfgtS7J34TozTLGeK7tJtB1BRfXmxIQ+MBS4HyXKsd1VA611EWyS9nlTx/s9BNmRAdNtJRUbrLS0KI4lBOF9kI9o6t37hm+aYdypPAc81hLYDTnKTWMqs0Fut/B7fLZdLN77JueXRXue3efOeBd/64UYi34ALoWnPlV/YO07bx32/q2vLwo/zknHW6Ob1Axiwd2X4be0qTqrtjs1EMlwJEuXWvGBl7JPf6IRCQ/+EyeZfsHgpHOiSWS+LbWGwyZdqhoiOIn6j72MdBYW0RYPL8VBB9eRBSJt6P4eQGS3VVSnexzMBujCGVWPB/X/N28=
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::543
-Subject: Re: [Qemu-devel] [PATCH v9 09/27] gdbstub: Implement set register
- (P pkt) with new infra
+MIME-Version: 1.0
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2c4b4dd9-0f0f-4b23-e430-08d6dc45f030
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 May 2019 10:37:05.6551 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1091
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.82.101
+Subject: Re: [Qemu-devel] [PATCH v2 00/16] hw: Use object_initialize_child
+ for correct reference counting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,100 +114,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Michael S.
+	Tsirkin" <mst@redhat.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+	Paul Burton <pburton@wavecomp.com>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Antony Pavlov <antonynpavlov@gmail.com>,
+	Joel Stanley <joel@jms.id.au>, Thomas Huth <thuth@redhat.com>,
+	Alistair Francis <alistair@alistair23.me>,
+	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+	Peter Chubb <peter.chubb@nicta.com.au>,
+	=?iso-8859-1?Q?C=E9dric_Le_Goater?= <clg@kaod.org>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Andrew Jeffery <andrew@aj.id.au>,
+	=?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
+	Andrew Baumann <Andrew.Baumann@microsoft.com>,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	"qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-You are right but I was under the impression you want the patches to
-have the exact same logic of the original code, that why i kept
-adding those null packets and the parameter checks to be < N rather than !=
-=3D
 
-Now that I understand you prefer to fix the implementation ill review
-all the patches and add error replays accordingly
-
--- Jon.
-
-On Wed, May 15, 2019 at 3:14 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->
->
-> Jon Doron <arilou@gmail.com> writes:
->
-> > Signed-off-by: Jon Doron <arilou@gmail.com>
-> > ---
-> >  gdbstub.c | 39 ++++++++++++++++++++++++++++++---------
-> >  1 file changed, 30 insertions(+), 9 deletions(-)
+> > On 5/7/19 6:34 PM, Philippe Mathieu-Daud=E9 wrote:
+> > > Hi,
+> > >
+> > > This series looks at Eduardo suggestions from [1]
+> > > and Thomas commit aff39be0ed97 to replace various
+> > > object_initialize + qdev_set_parent_bus calls by
+> > > sysbus_init_child_obj().
 > >
-> > diff --git a/gdbstub.c b/gdbstub.c
-> > index b42425b24c..10e3f12a68 100644
-> > --- a/gdbstub.c
-> > +++ b/gdbstub.c
-> > @@ -1634,6 +1634,27 @@ static void handle_remove_bp(GdbCmdContext *gdb_=
-ctx, void *user_ctx)
-> >      put_packet(gdb_ctx->s, "E22");
-> >  }
+> > Do you think you can take this series?
+> > Else, via which tree it should go?
+>
+> I was expecting the maintainers of each architecture to apply the
+> patches for their areas.  But I'd be glad to merge it through my
+> tree if it makes it easier for everybody.
+>
+> Are the arm, microblaze, mips, and ppc maintainers OK with that?
+
+Hello, Eduardo.
+
+I am OK with two patches applicable to MIPS. Moreover, I am going
+to apply them to my pull request scheduled to be sent today. Sorry
+if that makes your part more difficult (you will have to skip two
+patches from this series). The reason for my urgency is that we in
+Wave start regression testing for QEMU 4.1 in MIPS environments, and
+we wanted these two patches integrated sooner rather than later.
+
+Thanks to everyone involved!
+
+Aleksandar
+
+________________________________________
+From: Eduardo Habkost <ehabkost@redhat.com>
+Sent: Friday, May 17, 2019 7:56:21 PM
+To: Philippe Mathieu-Daud=E9
+Cc: Markus Armbruster; Thomas Huth; qemu-devel@nongnu.org; Peter Maydell; P=
+hilippe Mathieu-Daud=E9; qemu-arm@nongnu.org; Aleksandar Markovic; Andrew J=
+effery; Peter Chubb; Alistair Francis; C=E9dric Le Goater; Aurelien Jarno; =
+David Gibson; Paul Burton; Antony Pavlov; Andrew Baumann; Joel Stanley; Mic=
+hael S. Tsirkin; Mark Cave-Ayland; qemu-ppc@nongnu.org; Edgar E. Iglesias; =
+Aleksandar Rikalo; Jean-Christophe Dubois
+Subject: Re: [PATCH v2 00/16] hw: Use object_initialize_child for correct r=
+eference counting
+
+On Fri, May 17, 2019 at 12:32:18PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> Hi Eduardo,
+>
+> On 5/7/19 6:34 PM, Philippe Mathieu-Daud=E9 wrote:
+> > Hi,
 > >
-> > +static void handle_set_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
-> > +{
-> > +    int reg_size;
-> > +
-> > +    if (!gdb_has_xml) {
-> > +        put_packet(gdb_ctx->s, "");
-> > +        return;
-> > +    }
-> > +
-> > +    if (gdb_ctx->num_params < 2) {
+> > This series looks at Eduardo suggestions from [1]
+> > and Thomas commit aff39be0ed97 to replace various
+> > object_initialize + qdev_set_parent_bus calls by
+> > sysbus_init_child_obj().
 >
-> !=3D 2?
+> Do you think you can take this series?
+> Else, via which tree it should go?
+
+I was expecting the maintainers of each architecture to apply the
+patches for their areas.  But I'd be glad to merge it through my
+tree if it makes it easier for everybody.
+
+Are the arm, microblaze, mips, and ppc maintainers OK with that?
+
 >
-> > +        put_packet(gdb_ctx->s, "");
-> > +        return;
-> > +    }
+> Thanks!
 >
-> I don't understand what these null put_packets have been added for.
-> Should we not report an E code on failure?
+> Phil.
 >
-> > +
-> > +    reg_size =3D strlen(gdb_ctx->params[1].data) / 2;
-> > +    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[1].data, reg_size);
-> > +    gdb_write_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf,
-> > +                       gdb_ctx->params[0].val_ull);
-> > +    put_packet(gdb_ctx->s, "OK");
-> > +}
-> > +
-> >  static int gdb_handle_packet(GDBState *s, const char *line_buf)
-> >  {
-> >      CPUState *cpu;
-> > @@ -1878,15 +1899,15 @@ static int gdb_handle_packet(GDBState *s, const=
- char *line_buf)
-> >          }
-> >          break;
-> >      case 'P':
-> > -        if (!gdb_has_xml)
-> > -            goto unknown_command;
-> > -        addr =3D strtoull(p, (char **)&p, 16);
-> > -        if (*p =3D=3D '=3D')
-> > -            p++;
-> > -        reg_size =3D strlen(p) / 2;
-> > -        hextomem(mem_buf, p, reg_size);
-> > -        gdb_write_register(s->g_cpu, mem_buf, addr);
-> > -        put_packet(s, "OK");
-> > +        {
-> > +            static const GdbCmdParseEntry set_reg_cmd_desc =3D {
-> > +                .handler =3D handle_set_reg,
-> > +                .cmd =3D "P",
-> > +                .cmd_startswith =3D 1,
-> > +                .schema =3D "L?s0"
-> > +            };
-> > +            cmd_parser =3D &set_reg_cmd_desc;
-> > +        }
-> >          break;
-> >      case 'Z':
-> >          {
->
->
-> --
-> Alex Benn=C3=A9e
+> >
+> > Important comment from Eduardo:
+> >
+> >   It's possible, but we need a volunteer to review each
+> >   hunk because the existing code might be (correctly)
+> >   calling object_unref() (either immediately or when
+> >   parent is finalized).
+> >
+> > I tried to split it enough to make the review process
+> > easier.
+> >
+> > Regards,
+> >
+> > Phil.
+> >
+> > [*] https://patchwork.ozlabs.org/patch/943333/#1953608
+> > v1: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg05931.html
+> >
+> > Philippe Mathieu-Daud=E9 (16):
+> >   hw/ppc/pnv: Use object_initialize_child for correct reference countin=
+g
+> >   hw/misc/macio: Use object_initialize_child for correct ref. counting
+> >   hw/virtio: Use object_initialize_child for correct reference counting
+> >   hw/arm/bcm2835: Use TYPE_PL011 instead of hardcoded string
+> >   hw/arm/bcm2835: Use object_initialize() on PL011State
+> >   hw/arm/bcm2835: Use object_initialize_child for correct ref. counting
+> >   hw/arm/aspeed: Use object_initialize_child for correct ref. counting
+> >   hw/arm: Use object_initialize_child for correct reference counting
+> >   hw/mips: Use object_initialize() on MIPSCPSState
+> >   hw/mips: Use object_initialize_child for correct reference counting
+> >   hw/microblaze/zynqmp: Move the IPI state into the PMUSoC state
+> >   hw/microblaze/zynqmp: Let the SoC manage the IPI devices
+> >   hw/microblaze/zynqmp: Use object_initialize_child for correct ref.
+> >     counting
+> >   hw/microblaze/zynqmp: Use object_initialize_child for correct ref.
+> >     counting
+> >   hw/arm/mps2: Use object_initialize_child for correct reference
+> >     counting
+> >   hw/intc/nvic: Use object_initialize_child for correct reference
+> >     counting
+
+--
+Eduardo
 
