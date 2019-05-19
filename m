@@ -4,82 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44110C04AB4
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:45:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 789D2C04AB4
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:46:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6DC020644
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:45:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 263AB20644
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:46:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dt6Oh+GY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6DC020644
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kul8EKJ+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 263AB20644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53236 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53238 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSSgs-0001BN-47
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 16:45:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50125)
+	id 1hSShf-00020p-8g
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 16:46:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hSSYs-0002m9-74
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:40 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hSSYw-0002nl-Ci
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hSSYq-0003Rl-Qa
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:38 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:36049)
+	(envelope-from <richard.henderson@linaro.org>) id 1hSSYv-0003Wm-4f
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:42 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:32972)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hSSYq-0003Qv-Jr
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:36 -0400
-Received: by mail-pg1-x544.google.com with SMTP id a3so5747684pgb.3
-	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 13:37:36 -0700 (PDT)
+	id 1hSSYu-0003Vo-Ug
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:41 -0400
+Received: by mail-pg1-x544.google.com with SMTP id h17so5751680pgv.0
+	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 13:37:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=T/gNF/+WQ4Pn+UuyOMg1wvHnA4fUii7t4Tux8xUmkoc=;
-	b=Dt6Oh+GYc5ECBGvXm8k40HNriBNshJGfarJIgu4ZyvWlyiJ7RPVRJRXbceNCNFeHdZ
-	+HXBwmHKQSKyam0OggyMej2UtxVQQEpbzY3AeIhhaoOKO4E6pHgV+Aq8mtJXE8UrCvfi
-	hDiaIpcW7AsenQSdR7tqqEN7Qsx4B2yWK2wMfKNQhk9J5H2/Dovott+pRkDvG0LIE6Tw
-	aTi/a8PkuqOpG4DnnbMTzxJC4ot9S02hjUALTRVErDxBZCG2JV+3zGlIXlJmEbTjHTBK
-	Q1sAILEQ7kqiIRPhk+errWRwwixVqmWL8sRbEIS3mUi0O/nu9kQK7iV8cgZcAmWzHLLY
-	EICg==
+	bh=v+DSPWFfKETKW6djLG4dV30pA06tpKN/mDvUPl9xg1M=;
+	b=kul8EKJ+Q4XjOZ96gaPQl3ei1QXKW4h4xkEUQ6XK080ElloUc1iEFs6lO9vKbFR9XY
+	7yItQEu89XB+RVe1GfGBGgx8UCwOw02bedJvIQWxH5IgnRZYvAtsHdVdQ72LooB5RrBc
+	hh4wqx6aRaaoEQtdJCY+ikK8aMH5LKP1PQT764rE9KUxkk+wpvSH4xFwHJhbu67LKWLg
+	9Q3APNNKUkiDWwaW65EAa+QJ2sHwD/LK4UQM+yZwYBdQwTLZ8Hnx+sHu0YxXID+X6OQH
+	F+i5qwjcdFRP6k+iuxxvvRgKUqWDUtbWSZEew2Zkk/rG2WpvE3jgcLSrqhGTgmHcQclh
+	ORBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=T/gNF/+WQ4Pn+UuyOMg1wvHnA4fUii7t4Tux8xUmkoc=;
-	b=qBDKjF0fH6RrsoBwNIC9hcKx4EoFP9kIj9UtZdFu+hD6NiEd3NLfzNA1I49Um3wkKt
-	is3CilLtKU6YhsFnmeCFGXBBwAxwTsV2JvElQOTpjwTxbIi5VFGXJn/Jd1NWYgBHJBcZ
-	Kwbp3vIHffUgbmL6vOXgiFrR1fnLmKY9gSx4ThJetqL0F7hwdmKOBLdzZM99Gr5cYvva
-	SYVeBqDcsTaYdD2veiydQveY+/Wrr221CNb8qfjUnCvyhCZ3LeTfn4gzTKVedHPb5VVt
-	woCdQP7NQ4qPz7Krlz9FiFkUyGm+vBm2HC+tVxnsGwotrR1hvML5kMbvErunCt3y4nIX
-	hrPg==
-X-Gm-Message-State: APjAAAU/3FzwhjuxQQzt1tYB9lzhpjZKZ+AtL27G54DUeuwQmE0B0GVw
-	7SMwxOB6DrqFK3e2rh7fGLrY0rBoElc=
-X-Google-Smtp-Source: APXvYqy8+fS70NI1GkAOCZBtCYqeXlqWSSt1gl0TgvzZGXd1GubkQOgY3SCjreK5VnBXdjJr+ndNWA==
-X-Received: by 2002:a65:5c89:: with SMTP id a9mr71871984pgt.334.1558298255333; 
-	Sun, 19 May 2019 13:37:35 -0700 (PDT)
+	bh=v+DSPWFfKETKW6djLG4dV30pA06tpKN/mDvUPl9xg1M=;
+	b=lDEuC6ATvINchhGeLD35ckGs9uuZ4F1GQYQ5D/RTIe0mS1Fr79kXalqn8ujlh4rpps
+	SlV/DsQ92iqMNskQoxeXGOfcW56HYbdEicnzViPOls3+uQkobveNWmUmu8fu6gOId0vA
+	GZotglboVrWPWCswmOQ3IWIyPYzNnAhgdB7f2k6ovmOrxn12OmvQOTTJyGu+mTipVV1N
+	u79UNwndAReKCnZLPhvT1beWic389wXxVGO0Mp87IENXxykkQ/41wFKI7JnB2syQgPQL
+	9fD3zIidm0nEhNC5cKzL2XXCIdfdPtk/q02M+iffRyjHDJv071kI5TiLzLSjhrD2muwh
+	vPIQ==
+X-Gm-Message-State: APjAAAWNBb9ya+pw8T4zCcqBQWU6Iyc7FNhRSxrccB/hfSEVP8Fp8NBM
+	ga5fnCWaYANDRUZ2hDpeib6jUVuk1UQ=
+X-Google-Smtp-Source: APXvYqwMA3kqcXRsnECaZ7cBhBGOMLDrpu6VEL+UHy5PpeAOF0u/w+6XXKE0g1Cosiz4qHMWiCq6JQ==
+X-Received: by 2002:a65:64da:: with SMTP id t26mr71680641pgv.322.1558298259460;
+	Sun, 19 May 2019 13:37:39 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231]) by smtp.gmail.com with ESMTPSA id
-	i7sm11397448pfo.19.2019.05.19.13.37.34
+	i7sm11397448pfo.19.2019.05.19.13.37.36
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sun, 19 May 2019 13:37:34 -0700 (PDT)
+	Sun, 19 May 2019 13:37:36 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sun, 19 May 2019 13:36:17 -0700
-Message-Id: <20190519203726.20729-6-richard.henderson@linaro.org>
+Date: Sun, 19 May 2019 13:36:19 -0700
+Message-Id: <20190519203726.20729-8-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190519203726.20729-1-richard.henderson@linaro.org>
 References: <20190519203726.20729-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2607:f8b0:4864:20::544
-Subject: [Qemu-devel] [PATCH v7 05/74] linux-user: Split out readlink,
- readlinkat
+Subject: [Qemu-devel] [PATCH v7 07/74] linux-user: Split out read, write
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,216 +95,171 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Split out a shared implementation for both of these;
-unify the best parts of /proc/self/exe checking.
-
-Remove the temporary forward declaration for is_proc_self.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall-defs.h     |  6 ++++
- linux-user/strace.c           | 29 ------------------
- linux-user/syscall-file.inc.c | 45 ++++++++++++++++++++++++++++
- linux-user/syscall.c          | 55 -----------------------------------
+ linux-user/syscall-defs.h     |  2 ++
+ linux-user/syscall-file.inc.c | 58 +++++++++++++++++++++++++++++++++++
+ linux-user/syscall.c          | 34 --------------------
  linux-user/strace.list        |  6 ----
- 5 files changed, 51 insertions(+), 90 deletions(-)
+ 4 files changed, 60 insertions(+), 40 deletions(-)
 
 diff --git a/linux-user/syscall-defs.h b/linux-user/syscall-defs.h
-index 1f3a9c47ab..d1a6c6fa3c 100644
+index 797426ae6f..b031de1375 100644
 --- a/linux-user/syscall-defs.h
 +++ b/linux-user/syscall-defs.h
-@@ -20,3 +20,9 @@
+@@ -21,9 +21,11 @@ SYSCALL_DEF(close, ARG_DEC);
  SYSCALL_DEF(open, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
  #endif
  SYSCALL_DEF(openat, ARG_ATDIRFD, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
-+#ifdef TARGET_NR_readlink
-+SYSCALL_DEF(readlink, ARG_STR, ARG_PTR, ARG_DEC);
-+#endif
-+#ifdef TARGET_NR_readlinkat
-+SYSCALL_DEF(readlinkat, ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_DEC);
-+#endif
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 24ef14b5e6..2f1c7e537f 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -2256,35 +2256,6 @@ print_fstatat64(const struct syscallname *name,
- #define print_newfstatat    print_fstatat64
++SYSCALL_DEF(read, ARG_DEC, ARG_PTR, ARG_DEC);
+ #ifdef TARGET_NR_readlink
+ SYSCALL_DEF(readlink, ARG_STR, ARG_PTR, ARG_DEC);
  #endif
- 
--#ifdef TARGET_NR_readlink
--static void
--print_readlink(const struct syscallname *name,
--    abi_long arg0, abi_long arg1, abi_long arg2,
--    abi_long arg3, abi_long arg4, abi_long arg5)
--{
--    print_syscall_prologue(name);
--    print_string(arg0, 0);
--    print_pointer(arg1, 0);
--    print_raw_param("%u", arg2, 1);
--    print_syscall_epilogue(name);
--}
--#endif
--
--#ifdef TARGET_NR_readlinkat
--static void
--print_readlinkat(const struct syscallname *name,
--    abi_long arg0, abi_long arg1, abi_long arg2,
--    abi_long arg3, abi_long arg4, abi_long arg5)
--{
--    print_syscall_prologue(name);
--    print_at_dirfd(arg0, 0);
--    print_string(arg1, 0);
--    print_pointer(arg2, 0);
--    print_raw_param("%u", arg3, 1);
--    print_syscall_epilogue(name);
--}
--#endif
--
- #ifdef TARGET_NR_rename
- static void
- print_rename(const struct syscallname *name,
+ #ifdef TARGET_NR_readlinkat
+ SYSCALL_DEF(readlinkat, ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_DEC);
+ #endif
++SYSCALL_DEF(write, ARG_DEC, ARG_PTR, ARG_DEC);
 diff --git a/linux-user/syscall-file.inc.c b/linux-user/syscall-file.inc.c
-index 30f8e35cdd..4ef0be2c6f 100644
+index d9b09c2cd2..e6adcc351c 100644
 --- a/linux-user/syscall-file.inc.c
 +++ b/linux-user/syscall-file.inc.c
-@@ -314,3 +314,48 @@ SYSCALL_IMPL(openat)
- {
+@@ -323,6 +323,32 @@ SYSCALL_IMPL(openat)
      return do_openat(cpu_env, arg1, arg2, arg3, arg4);
  }
-+
-+static abi_long do_readlinkat(int dirfd, abi_ulong target_path,
-+                              abi_ulong target_buf, abi_ulong bufsiz)
+ 
++SYSCALL_IMPL(read)
 +{
-+    char *p = lock_user_string(target_path);
-+    void *buf = lock_user(VERIFY_WRITE, target_buf, bufsiz, 0);
++    int fd = arg1;
++    abi_ulong target_p = arg2;
++    abi_ulong size = arg3;
++    void *p;
 +    abi_long ret;
 +
-+    if (!p || !buf) {
-+        ret = -TARGET_EFAULT;
-+    } else if (!bufsiz) {
-+        /* Short circuit this for the magic exe check. */
-+        ret = -TARGET_EINVAL;
-+    } else if (is_proc_myself((const char *)p, "exe")) {
-+        char real[PATH_MAX];
-+        char *temp = realpath(exec_path, real);
-+
-+        if (temp == NULL) {
-+            ret = -host_to_target_errno(errno);
-+        } else {
-+            ret = MIN(strlen(real), bufsiz);
-+            /* We cannot NUL terminate the string. */
-+            memcpy(buf, real, ret);
-+        }
-+    } else {
-+        ret = get_errno(readlinkat(dirfd, path(p), buf, bufsiz));
++    if (target_p == 0 && size == 0) {
++        return get_errno(safe_read(fd, NULL, 0));
 +    }
-+    unlock_user(buf, target_buf, ret);
-+    unlock_user(p, target_path, 0);
++    p = lock_user(VERIFY_WRITE, target_p, size, 0);
++    if (p == NULL) {
++        return -TARGET_EFAULT;
++    }
++    ret = get_errno(safe_read(fd, p, size));
++    if (!is_error(ret)) {
++        TargetFdDataFunc trans = fd_trans_host_to_target_data(fd);
++        if (trans) {
++            ret = trans(p, ret);
++        }
++    }
++    unlock_user(p, target_p, ret);
 +    return ret;
 +}
 +
-+#ifdef TARGET_NR_readlink
-+SYSCALL_IMPL(readlink)
-+{
-+    return do_readlinkat(AT_FDCWD, arg1, arg2, arg3);
-+}
-+#endif
+ static abi_long do_readlinkat(int dirfd, abi_ulong target_path,
+                               abi_ulong target_buf, abi_ulong bufsiz)
+ {
+@@ -367,3 +393,35 @@ SYSCALL_IMPL(readlinkat)
+     return do_readlinkat(arg1, arg2, arg3, arg4);
+ }
+ #endif
 +
-+#ifdef TARGET_NR_readlinkat
-+SYSCALL_IMPL(readlinkat)
++SYSCALL_IMPL(write)
 +{
-+    return do_readlinkat(arg1, arg2, arg3, arg4);
++    int fd = arg1;
++    abi_ulong target_p = arg2;
++    abi_ulong size = arg3;
++    TargetFdDataFunc trans;
++    abi_long ret;
++    void *p;
++
++    if (target_p == 0 && size == 0) {
++        return get_errno(safe_write(fd, NULL, 0));
++    }
++    p = lock_user(VERIFY_READ, target_p, size, 1);
++    if (p == NULL) {
++        return -TARGET_EFAULT;
++    }
++    trans = fd_trans_target_to_host_data(fd);
++    if (trans) {
++        void *copy = g_malloc(size);
++        memcpy(copy, p, size);
++        ret = trans(copy, size);
++        if (ret >= 0) {
++            ret = get_errno(safe_write(fd, copy, ret));
++        }
++        g_free(copy);
++    } else {
++        ret = get_errno(safe_write(fd, p, size));
++    }
++    unlock_user(p, target_p, 0);
++    return ret;
 +}
-+#endif
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index fe52ac15c2..53fb211f16 100644
+index d2b1bb76c4..de80ddb330 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -6633,8 +6633,6 @@ int host_to_target_waitstatus(int status)
-     return status;
- }
- 
--static int is_proc_myself(const char *filename, const char *entry);
+@@ -6782,40 +6782,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+         preexit_cleanup(cpu_env, arg1);
+         _exit(arg1);
+         return 0; /* avoid warning */
+-    case TARGET_NR_read:
+-        if (arg2 == 0 && arg3 == 0) {
+-            return get_errno(safe_read(arg1, 0, 0));
+-        } else {
+-            if (!(p = lock_user(VERIFY_WRITE, arg2, arg3, 0)))
+-                return -TARGET_EFAULT;
+-            ret = get_errno(safe_read(arg1, p, arg3));
+-            if (ret >= 0 &&
+-                fd_trans_host_to_target_data(arg1)) {
+-                ret = fd_trans_host_to_target_data(arg1)(p, ret);
+-            }
+-            unlock_user(p, arg2, ret);
+-        }
+-        return ret;
+-    case TARGET_NR_write:
+-        if (arg2 == 0 && arg3 == 0) {
+-            return get_errno(safe_write(arg1, 0, 0));
+-        }
+-        if (!(p = lock_user(VERIFY_READ, arg2, arg3, 1)))
+-            return -TARGET_EFAULT;
+-        if (fd_trans_target_to_host_data(arg1)) {
+-            void *copy = g_malloc(arg3);
+-            memcpy(copy, p, arg3);
+-            ret = fd_trans_target_to_host_data(arg1)(copy, arg3);
+-            if (ret >= 0) {
+-                ret = get_errno(safe_write(arg1, copy, ret));
+-            }
+-            g_free(copy);
+-        } else {
+-            ret = get_errno(safe_write(arg1, p, arg3));
+-        }
+-        unlock_user(p, arg2, 0);
+-        return ret;
 -
- #define TIMER_MAGIC 0x0caf0000
- #define TIMER_MAGIC_MASK 0xffff0000
- 
-@@ -8108,59 +8106,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         }
-         return ret;
- #endif
--#ifdef TARGET_NR_readlink
--    case TARGET_NR_readlink:
--        {
--            void *p2;
--            p = lock_user_string(arg1);
--            p2 = lock_user(VERIFY_WRITE, arg2, arg3, 0);
--            if (!p || !p2) {
--                ret = -TARGET_EFAULT;
--            } else if (!arg3) {
--                /* Short circuit this for the magic exe check. */
--                ret = -TARGET_EINVAL;
--            } else if (is_proc_myself((const char *)p, "exe")) {
--                char real[PATH_MAX], *temp;
--                temp = realpath(exec_path, real);
--                /* Return value is # of bytes that we wrote to the buffer. */
--                if (temp == NULL) {
--                    ret = get_errno(-1);
--                } else {
--                    /* Don't worry about sign mismatch as earlier mapping
--                     * logic would have thrown a bad address error. */
--                    ret = MIN(strlen(real), arg3);
--                    /* We cannot NUL terminate the string. */
--                    memcpy(p2, real, ret);
--                }
--            } else {
--                ret = get_errno(readlink(path(p), p2, arg3));
--            }
--            unlock_user(p2, arg2, ret);
--            unlock_user(p, arg1, 0);
--        }
--        return ret;
--#endif
--#if defined(TARGET_NR_readlinkat)
--    case TARGET_NR_readlinkat:
--        {
--            void *p2;
--            p  = lock_user_string(arg2);
--            p2 = lock_user(VERIFY_WRITE, arg3, arg4, 0);
--            if (!p || !p2) {
--                ret = -TARGET_EFAULT;
--            } else if (is_proc_myself((const char *)p, "exe")) {
--                char real[PATH_MAX], *temp;
--                temp = realpath(exec_path, real);
--                ret = temp == NULL ? get_errno(-1) : strlen(real) ;
--                snprintf((char *)p2, arg4, "%s", real);
--            } else {
--                ret = get_errno(readlinkat(arg1, path(p), p2, arg4));
--            }
--            unlock_user(p2, arg3, ret);
--            unlock_user(p, arg2, 0);
--        }
--        return ret;
--#endif
- #ifdef TARGET_NR_swapon
-     case TARGET_NR_swapon:
-         if (!(p = lock_user_string(arg1)))
+ #if defined(TARGET_NR_name_to_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
+     case TARGET_NR_name_to_handle_at:
+         ret = do_name_to_handle_at(arg1, arg2, arg3, arg4, arg5);
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index 2c7a595e19..53cee3db92 100644
+index 43d3088669..2d6bfec692 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
-@@ -1079,12 +1079,6 @@
- #ifdef TARGET_NR_readdir
- { TARGET_NR_readdir, "readdir" , NULL, NULL, NULL },
+@@ -1067,9 +1067,6 @@
+ #ifdef TARGET_NR_quotactl
+ { TARGET_NR_quotactl, "quotactl" , NULL, NULL, NULL },
  #endif
--#ifdef TARGET_NR_readlink
--{ TARGET_NR_readlink, "readlink" , NULL, print_readlink, NULL },
+-#ifdef TARGET_NR_read
+-{ TARGET_NR_read, "read" , "%s(%d,%#x,%d)", NULL, NULL },
 -#endif
--#ifdef TARGET_NR_readlinkat
--{ TARGET_NR_readlinkat, "readlinkat" , NULL, print_readlinkat, NULL },
+ #ifdef TARGET_NR_readahead
+ { TARGET_NR_readahead, "readahead" , NULL, NULL, NULL },
+ #endif
+@@ -1611,9 +1608,6 @@
+ #ifdef TARGET_NR_waitpid
+ { TARGET_NR_waitpid, "waitpid" , "%s(%d,%p,%#x)", NULL, NULL },
+ #endif
+-#ifdef TARGET_NR_write
+-{ TARGET_NR_write, "write" , "%s(%d,%#x,%d)", NULL, NULL },
 -#endif
- #ifdef TARGET_NR_readv
- { TARGET_NR_readv, "readv" , NULL, NULL, NULL },
+ #ifdef TARGET_NR_writev
+ { TARGET_NR_writev, "writev" , "%s(%d,%p,%#x)", NULL, NULL },
  #endif
 -- 
 2.17.1
