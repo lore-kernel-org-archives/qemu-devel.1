@@ -2,79 +2,84 @@ Return-Path: <SRS0=v56/=TT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5245C04AB4
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 04:31:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1F40C04AB4
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 04:32:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70F622083D
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 04:31:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 88DF32083D
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 04:32:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=comstyle.com header.i=@comstyle.com header.b="DSuGmk1o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70F622083D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=comstyle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RaKTvM87"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88DF32083D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43682 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43684 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSDTm-0006J6-9s
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 00:31:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44225)
+	id 1hSDUv-0007PV-PF
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 00:32:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1hSDSL-0005d5-A1
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 00:29:54 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hSDSl-0005xg-Lh
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 00:30:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1hSDQW-0003rz-DI
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 00:28:01 -0400
-Received: from speedy.comstyle.com ([206.51.28.2]:15857 helo=mail.comstyle.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <brad@comstyle.com>) id 1hSDQW-0003qh-5u
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 00:28:00 -0400
-Received: from mail.comstyle.com (localhost [127.0.0.1])
-	by mail.comstyle.com (Postfix) with ESMTP id 4568Bz3Jlqz4glt;
-	Sun, 19 May 2019 00:27:39 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=comstyle.com; h=subject
-	:from:to:cc:references:message-id:date:mime-version:in-reply-to
-	:content-type:content-transfer-encoding; s=selector1; bh=nxAemSt
-	j1rxV5DrCSBsXZFdwm6k=; b=DSuGmk1o+f5XWlAPuZ4Y5kap7NBStMUKt0n4yQo
-	M5wmOoW1FvEh+VG82Aqef04Gu3V3egst13KSgVBtnpZqAIHh8euvaponowNtKU2z
-	iwQ6RR4K7G9HCSlrM12QsR1Ekkr1KgGS7MYfpJ7okCGl/lWVKkixonpxm+R8Rel6
-	dF2c=
-DomainKey-Signature: a=rsa-sha1; c=nofws; d=comstyle.com; h=subject:from
-	:to:cc:references:message-id:date:mime-version:in-reply-to
-	:content-type:content-transfer-encoding; q=dns; s=selector1; b=E
-	K69C75P+S/2jlLZtkvyJWW8ohrD7ivGcuuFZyzKHwqvD7u0PHk1x4v2xHNCkhA64
-	voWEdMBf7EB9vJYaxtJ0I+iP+Mob8qIqMPbUtqZZetKYKZjLLifYaPfMPcBXazc1
-	1UcFdvKM9tqkrrIcJe1ePCwnhH9R/DqjXG8wFjr+Rc=
-Received: from [192.168.3.79] (toroon2719w-lp130-10-70-27-138-202.dsl.bell.ca
-	[70.27.138.202])
-	(using TLSv1.2 with cipher AES128-SHA (128/128 bits))
-	(No client certificate requested) (Authenticated sender: brad)
-	by mail.comstyle.com (Postfix) with ESMTPSA id 4568Bz0kJbz4gls;
-	Sun, 19 May 2019 00:27:39 -0400 (EDT)
-From: Brad Smith <brad@comstyle.com>
-To: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
-	qemu-devel@nongnu.org
-References: <20190510104633.9428-1-kraxel@redhat.com>
-	<33bef2cb-e556-a7e1-9b6f-a1d52a8569cc@redhat.com>
-	<14d4fec2-e158-a96c-7bd9-2ca960f1656c@comstyle.com>
-Message-ID: <fe6f4fe3-63a4-1d65-de2a-3fb03fc4a5df@comstyle.com>
-Date: Sun, 19 May 2019 00:27:49 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <14d4fec2-e158-a96c-7bd9-2ca960f1656c@comstyle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <richard.henderson@linaro.org>) id 1hSDEV-0004oC-6L
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 00:15:36 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:34026)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hSDEU-0004nI-UN
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 00:15:35 -0400
+Received: by mail-pg1-x543.google.com with SMTP id c13so5162668pgt.1
+	for <qemu-devel@nongnu.org>; Sat, 18 May 2019 21:15:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=i1NgkQuZk10k1ceiKaxM9hxXyQyjYikTQa3PtpV7vqI=;
+	b=RaKTvM87jfK7kpIweYbfN59cIiK5mmwsgMEK3bQKV/S7j943ZUbXrWSK4+vwkoxSCr
+	3rsS4hWRif0iFD78PnWJPTnEQoGSlleCCTsIdBAKpYKbW8E7wNzPOs7nhT4d9xV1VlaF
+	cp7qY0VCRB1+46xpHERqH8SBfBBH9vL35TTyVA5wGQbEGcYauWXp94g2kvxf8kvE/nEC
+	ihlOnmA6OiOotGTRXqDrvuf/xHXw9pT4VeX6HD1K4SqAU+CrEFJ4EPJIewdnl/v3Mqdc
+	Hi66oFqLvrSHSIK/fRlRy++oWiqdsCf1wGJTqnFyZC1Hd03aVgH0vjuUf6KLHBwR0nEY
+	DVDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=i1NgkQuZk10k1ceiKaxM9hxXyQyjYikTQa3PtpV7vqI=;
+	b=r4FNNTbK3PDdNnRojKQvP2TI9V5TJpfDG+yUfcJr0PC3yoRLG348ZMrMaI0bGT+Uge
+	wnrjtU1D5uiTDNW+XhSkK+VF8gdPmsbthag1ZWhvFqNfgl1IQ0VchFLMU3hhAfslOvnn
+	1L/GalgRkgUDr/gVa+p11ukZPFlbobzdyYH9oCwHHWAER0DvTOKVajQL2hLAAQmUNvaD
+	lKXXZfKuTp6NNcrn/iT+LpmdJ75hzO5aNMOETU9WStmkJqw4Wu67YgQmEMOblrLfd73b
+	M/V3Egvwpf/DLGnMLsOD1a2xg3cXLHmdDmiqiaA2faOHTbyJ97KobHtaEEl70soTb1MU
+	yBmA==
+X-Gm-Message-State: APjAAAWl6KuamtfeVgem+D8yQ1866ARIlo7QignFda/1MiUt90aOskzr
+	JzWXk3w8etUXbYp7KTY3AmPZzmtXxtY=
+X-Google-Smtp-Source: APXvYqxCHK2O+PfzuhCArKSiZIOCNOZrGIww3N7XxHV9V7XNHbJxJzSWJcxd1cyODU2UnMzb4D3dLg==
+X-Received: by 2002:a63:6988:: with SMTP id
+	e130mr68362551pgc.150.1558239332094; 
+	Sat, 18 May 2019 21:15:32 -0700 (PDT)
+Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
+	[97.113.13.231]) by smtp.gmail.com with ESMTPSA id
+	k63sm19381200pfb.108.2019.05.18.21.15.31
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Sat, 18 May 2019 21:15:31 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Sat, 18 May 2019 21:15:21 -0700
+Message-Id: <20190519041522.12327-7-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190519041522.12327-1-richard.henderson@linaro.org>
+References: <20190519041522.12327-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 206.51.28.2
-Subject: Re: [Qemu-devel] QEMU on OpenBSD is broken?
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: [Qemu-devel] [PATCH v4 6/7] tcg/ppc: Update vector support to v2.07
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,105 +91,336 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
-	Ed Maste <emaste@freebsd.org>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Kamil Rytarowski <kamil@netbsd.org>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: mark.cave-ayland@ilande.co.uk
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I just noticed when I had replied that my e-mail was sent from a differen=
-t
-name, by accident, as I was testing something with my e-mail client.
+This includes single-word loads and stores, lots of double-word
+arithmetic, and a few extra logical operations.
 
-On 5/18/2019 5:27 PM, Jim Payne wrote:
-> On 5/16/2019 9:04 PM, Thomas Huth wrote:
->
->> On 10/05/2019 12.46, Gerd Hoffmann wrote:
->>> This patch series changes the way virtual machines for test builds ar=
-e
->>> managed.=C2=A0 They are created locally on the developer machine now.=
-=C2=A0 The
->>> installer is booted on the serial console and the scripts walks throu=
-gh
->>> the dialogs to install and configure the guest.
->>>
->>> That takes the download.patchew.org server out of the loop and makes =
-it
->>> alot easier to tweak the guest images (adding build dependencies for
->>> example).
->>>
->>> The install scripts take care to apply host proxy settings (from=20
->>> *_proxy
->>> environment variables) to the guest, so any package downloads will be
->>> routed through the proxy and can be cached that way.=C2=A0 This also =
-makes
->>> them work behind strict firewalls.
->>>
->>> There are also a bunch of smaller tweaks for tests/vm to fix issues I
->>> was struggling with.=C2=A0 See commit messages of individual patches =
-for
->>> details.
->>>
->>> Gerd Hoffmann (13):
->>> =C2=A0=C2=A0 scripts: use git archive in archive-source
->>> =C2=A0=C2=A0 tests/vm: send proxy environment variables over ssh
->>> =C2=A0=C2=A0 tests/vm: use ssh with pty unconditionally
->>> =C2=A0=C2=A0 tests/vm: run test builds on snapshot
->>> =C2=A0=C2=A0 tests/vm: proper guest shutdown
->>> =C2=A0=C2=A0 tests/vm: add vm-boot-{ssh,serial}-<guest> targets
->>> =C2=A0=C2=A0 tests/vm: add DEBUG=3D1 to help text
->>> =C2=A0=C2=A0 tests/vm: serial console support helpers
->>> =C2=A0=C2=A0 tests/vm: openbsd autoinstall, using serial console
->>> =C2=A0=C2=A0 tests/vm: freebsd autoinstall, using serial console
->>> =C2=A0=C2=A0 tests/vm: netbsd autoinstall, using serial console
->>> =C2=A0=C2=A0 tests/vm: fedora autoinstall, using serial console
->>> =C2=A0=C2=A0 tests/vm: ubuntu.i386: apt proxy setup
->> freebsd, netbsd and fedora targets work fine for me, so for the patche=
-s
->> 1 - 8 and 10 - 12 :
->>
->> Tested-by: Thomas Huth <thuth@redhat.com>
->>
->> openbsd still fails for me:
->>
->> =C2=A0=C2=A0 TEST=C2=A0=C2=A0=C2=A0 check-qtest-arm: tests/tmp105-test
->> =C2=A0=C2=A0 TEST=C2=A0=C2=A0=C2=A0 check-qtest-arm: tests/pca9552-tes=
-t
->> =C2=A0=C2=A0 TEST=C2=A0=C2=A0=C2=A0 check-qtest-arm: tests/ds1338-test
->> =C2=A0=C2=A0 TEST=C2=A0=C2=A0=C2=A0 check-qtest-arm: tests/microbit-te=
-st
->> =C2=A0=C2=A0 TEST=C2=A0=C2=A0=C2=A0 check-qtest-arm: tests/m25p80-test
->> =C2=A0=C2=A0 TEST=C2=A0=C2=A0=C2=A0 check-qtest-arm: tests/test-arm-mp=
-timer
->> =C2=A0=C2=A0 TEST=C2=A0=C2=A0=C2=A0 check-qtest-arm: tests/boot-serial=
--test
->> qemu-system-arm: cannot set up guest memory 'ram': Cannot allocate=20
->> memory
->> Broken pipe
->
-> How much memory is trying to be allocated here?
->
-> The default maximum data size is set to 768MB. If there is a=20
-> requirement to go beyond
-> that then the default has to be adjusted in /etc/login.conf.
->
-> datasize-max and datasize-cur
->
-> default:\
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :path=3D/usr/bin /bin /usr/s=
-bin /sbin /usr/X11R6/bin=20
-> /usr/local/bin /usr/local/sbin:\
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :umask=3D022:\
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :datasize-max=3D768M:\
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :datasize-cur=3D768M:\
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :maxproc-max=3D256:\
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :maxproc-cur=3D128:\
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :openfiles-max=3D1024:\
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :openfiles-cur=3D512:\
->
->
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tcg/ppc/tcg-target.h     |   3 +-
+ tcg/ppc/tcg-target.inc.c | 111 +++++++++++++++++++++++++++++++--------
+ 2 files changed, 91 insertions(+), 23 deletions(-)
+
+diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
+index 40544f996d..b8355d0a56 100644
+--- a/tcg/ppc/tcg-target.h
++++ b/tcg/ppc/tcg-target.h
+@@ -61,6 +61,7 @@ typedef enum {
+ extern bool have_isa_altivec;
+ extern bool have_isa_2_06;
+ extern bool have_isa_2_06_vsx;
++extern bool have_isa_2_07_vsx;
+ extern bool have_isa_3_00;
+ 
+ /* optional instructions automatically implemented */
+@@ -147,7 +148,7 @@ extern bool have_isa_3_00;
+ #define TCG_TARGET_HAS_v256             0
+ 
+ #define TCG_TARGET_HAS_andc_vec         1
+-#define TCG_TARGET_HAS_orc_vec          0
++#define TCG_TARGET_HAS_orc_vec          have_isa_2_07_vsx
+ #define TCG_TARGET_HAS_not_vec          1
+ #define TCG_TARGET_HAS_neg_vec          0
+ #define TCG_TARGET_HAS_abs_vec          0
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index 6cb8c8f0eb..dedf0de04d 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -67,6 +67,7 @@ static tcg_insn_unit *tb_ret_addr;
+ bool have_isa_altivec;
+ bool have_isa_2_06;
+ bool have_isa_2_06_vsx;
++bool have_isa_2_07_vsx;
+ bool have_isa_3_00;
+ 
+ #define HAVE_ISA_2_06  have_isa_2_06
+@@ -473,10 +474,12 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define LVEWX      XO31(71)
+ #define LXSDX      XO31(588)      /* v2.06 */
+ #define LXVDSX     XO31(332)      /* v2.06 */
++#define LXSIWZX    XO31(12)       /* v2.07 */
+ 
+ #define STVX       XO31(231)
+ #define STVEWX     XO31(199)
+ #define STXSDX     XO31(716)      /* v2.06 */
++#define STXSIWX    XO31(140)      /* v2.07 */
+ 
+ #define VADDSBS    VX4(768)
+ #define VADDUBS    VX4(512)
+@@ -487,6 +490,7 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define VADDSWS    VX4(896)
+ #define VADDUWS    VX4(640)
+ #define VADDUWM    VX4(128)
++#define VADDUDM    VX4(192)       /* v2.07 */
+ 
+ #define VSUBSBS    VX4(1792)
+ #define VSUBUBS    VX4(1536)
+@@ -497,47 +501,62 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define VSUBSWS    VX4(1920)
+ #define VSUBUWS    VX4(1664)
+ #define VSUBUWM    VX4(1152)
++#define VSUBUDM    VX4(1216)      /* v2.07 */
+ 
+ #define VMAXSB     VX4(258)
+ #define VMAXSH     VX4(322)
+ #define VMAXSW     VX4(386)
++#define VMAXSD     VX4(450)       /* v2.07 */
+ #define VMAXUB     VX4(2)
+ #define VMAXUH     VX4(66)
+ #define VMAXUW     VX4(130)
++#define VMAXUD     VX4(194)       /* v2.07 */
+ #define VMINSB     VX4(770)
+ #define VMINSH     VX4(834)
+ #define VMINSW     VX4(898)
++#define VMINSD     VX4(962)       /* v2.07 */
+ #define VMINUB     VX4(514)
+ #define VMINUH     VX4(578)
+ #define VMINUW     VX4(642)
++#define VMINUD     VX4(706)       /* v2.07 */
+ 
+ #define VCMPEQUB   VX4(6)
+ #define VCMPEQUH   VX4(70)
+ #define VCMPEQUW   VX4(134)
++#define VCMPEQUD   VX4(199)       /* v2.07 */
+ #define VCMPGTSB   VX4(774)
+ #define VCMPGTSH   VX4(838)
+ #define VCMPGTSW   VX4(902)
++#define VCMPGTSD   VX4(967)       /* v2.07 */
+ #define VCMPGTUB   VX4(518)
+ #define VCMPGTUH   VX4(582)
+ #define VCMPGTUW   VX4(646)
++#define VCMPGTUD   VX4(711)       /* v2.07 */
+ 
+ #define VSLB       VX4(260)
+ #define VSLH       VX4(324)
+ #define VSLW       VX4(388)
++#define VSLD       VX4(1476)      /* v2.07 */
+ #define VSRB       VX4(516)
+ #define VSRH       VX4(580)
+ #define VSRW       VX4(644)
++#define VSRD       VX4(1732)      /* v2.07 */
+ #define VSRAB      VX4(772)
+ #define VSRAH      VX4(836)
+ #define VSRAW      VX4(900)
++#define VSRAD      VX4(964)       /* v2.07 */
+ #define VRLB       VX4(4)
+ #define VRLH       VX4(68)
+ #define VRLW       VX4(132)
++#define VRLD       VX4(196)       /* v2.07 */
+ 
+ #define VMULEUB    VX4(520)
+ #define VMULEUH    VX4(584)
++#define VMULEUW    VX4(648)       /* v2.07 */
+ #define VMULOUB    VX4(8)
+ #define VMULOUH    VX4(72)
++#define VMULOUW    VX4(136)       /* v2.07 */
++#define VMULUWM    VX4(137)       /* v2.07 */
+ #define VMSUMUHM   VX4(38)
+ 
+ #define VMRGHB     VX4(12)
+@@ -555,6 +574,9 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define VNOR       VX4(1284)
+ #define VOR        VX4(1156)
+ #define VXOR       VX4(1220)
++#define VEQV       VX4(1668)      /* v2.07 */
++#define VNAND      VX4(1412)      /* v2.07 */
++#define VORC       VX4(1348)      /* v2.07 */
+ 
+ #define VSPLTB     VX4(524)
+ #define VSPLTH     VX4(588)
+@@ -568,6 +590,11 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define XXPERMDI   (OPCD(60) | (10 << 3))   /* v2.06 */
+ #define XXSEL      (OPCD(60) | (3 << 4))    /* v2.06 */
+ 
++#define MFVSRD     XO31(51)       /* v2.07 */
++#define MFVSRWZ    XO31(115)      /* v2.07 */
++#define MTVSRD     XO31(179)      /* v2.07 */
++#define MTVSRWZ    XO31(179)      /* v2.07 */
++
+ #define RT(r) ((r)<<21)
+ #define RS(r) ((r)<<21)
+ #define RA(r) ((r)<<16)
+@@ -700,7 +727,15 @@ static bool tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
+         if (ret < 32 && arg < 32) {
+             tcg_out32(s, OR | SAB(arg, ret, arg));
+             break;
+-        } else if (ret < 32 || arg < 32) {
++        } else if (ret < 32 && have_isa_2_07_vsx) {
++            tcg_out32(s, (type == TCG_TYPE_I32 ? MFVSRWZ : MFVSRD)
++                      | VRT(arg) | RA(ret) | 1);
++            break;
++        } else if (arg < 32 && have_isa_2_07_vsx) {
++            tcg_out32(s, (type == TCG_TYPE_I32 ? MTVSRWZ : MTVSRD)
++                      | VRT(ret) | RA(arg) | 1);
++            break;
++        } else {
+             /* Altivec does not support vector/integer moves.  */
+             return false;
+         }
+@@ -1140,6 +1175,10 @@ static void tcg_out_ld(TCGContext *s, TCGType type, TCGReg ret,
+             tcg_out_mem_long(s, LWZ, LWZX, ret, base, offset);
+             break;
+         }
++        if (have_isa_2_07_vsx) {
++            tcg_out_mem_long(s, 0, LXSIWZX | 1, ret & 31, base, offset);
++            break;
++        }
+         assert((offset & 3) == 0);
+         tcg_out_mem_long(s, 0, LVEWX, ret & 31, base, offset);
+         shift = (offset - 4) & 0xc;
+@@ -1186,6 +1225,10 @@ static void tcg_out_st(TCGContext *s, TCGType type, TCGReg arg,
+             tcg_out_mem_long(s, STW, STWX, arg, base, offset);
+             break;
+         }
++        if (have_isa_2_07_vsx) {
++            tcg_out_mem_long(s, 0, STXSIWX | 1, arg & 31, base, offset);
++            break;
++        }
+         assert((offset & 3) == 0);
+         shift = (offset - 4) & 0xc;
+         if (shift) {
+@@ -2921,26 +2964,37 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
+     case INDEX_op_andc_vec:
+     case INDEX_op_not_vec:
+         return 1;
++    case INDEX_op_orc_vec:
++        return have_isa_2_07_vsx;
+     case INDEX_op_add_vec:
+     case INDEX_op_sub_vec:
+     case INDEX_op_smax_vec:
+     case INDEX_op_smin_vec:
+     case INDEX_op_umax_vec:
+     case INDEX_op_umin_vec:
++    case INDEX_op_shlv_vec:
++    case INDEX_op_shrv_vec:
++    case INDEX_op_sarv_vec:
++        return vece <= MO_32 || have_isa_2_07_vsx;
+     case INDEX_op_ssadd_vec:
+     case INDEX_op_sssub_vec:
+     case INDEX_op_usadd_vec:
+     case INDEX_op_ussub_vec:
+-    case INDEX_op_shlv_vec:
+-    case INDEX_op_shrv_vec:
+-    case INDEX_op_sarv_vec:
+         return vece <= MO_32;
+     case INDEX_op_cmp_vec:
+-    case INDEX_op_mul_vec:
+     case INDEX_op_shli_vec:
+     case INDEX_op_shri_vec:
+     case INDEX_op_sari_vec:
+-        return vece <= MO_32 ? -1 : 0;
++        return vece <= MO_32 || have_isa_2_07_vsx ? -1 : 0;
++    case INDEX_op_mul_vec:
++        switch (vece) {
++        case MO_8:
++        case MO_16:
++            return -1;
++        case MO_32:
++            return have_isa_2_07_vsx ? 1 : -1;
++        }
++        return 0;
+     case INDEX_op_bitsel_vec:
+         return have_isa_2_06_vsx;
+     default:
+@@ -3045,28 +3099,28 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+                            const TCGArg *args, const int *const_args)
+ {
+     static const uint32_t
+-        add_op[4] = { VADDUBM, VADDUHM, VADDUWM, 0 },
+-        sub_op[4] = { VSUBUBM, VSUBUHM, VSUBUWM, 0 },
+-        eq_op[4]  = { VCMPEQUB, VCMPEQUH, VCMPEQUW, 0 },
+-        gts_op[4] = { VCMPGTSB, VCMPGTSH, VCMPGTSW, 0 },
+-        gtu_op[4] = { VCMPGTUB, VCMPGTUH, VCMPGTUW, 0 },
++        add_op[4] = { VADDUBM, VADDUHM, VADDUWM, VADDUDM },
++        sub_op[4] = { VSUBUBM, VSUBUHM, VSUBUWM, VSUBUDM },
++        eq_op[4]  = { VCMPEQUB, VCMPEQUH, VCMPEQUW, VCMPEQUD },
++        gts_op[4] = { VCMPGTSB, VCMPGTSH, VCMPGTSW, VCMPGTSD },
++        gtu_op[4] = { VCMPGTUB, VCMPGTUH, VCMPGTUW, VCMPGTUD },
+         ssadd_op[4] = { VADDSBS, VADDSHS, VADDSWS, 0 },
+         usadd_op[4] = { VADDUBS, VADDUHS, VADDUWS, 0 },
+         sssub_op[4] = { VSUBSBS, VSUBSHS, VSUBSWS, 0 },
+         ussub_op[4] = { VSUBUBS, VSUBUHS, VSUBUWS, 0 },
+-        umin_op[4] = { VMINUB, VMINUH, VMINUW, 0 },
+-        smin_op[4] = { VMINSB, VMINSH, VMINSW, 0 },
+-        umax_op[4] = { VMAXUB, VMAXUH, VMAXUW, 0 },
+-        smax_op[4] = { VMAXSB, VMAXSH, VMAXSW, 0 },
+-        shlv_op[4] = { VSLB, VSLH, VSLW, 0 },
+-        shrv_op[4] = { VSRB, VSRH, VSRW, 0 },
+-        sarv_op[4] = { VSRAB, VSRAH, VSRAW, 0 },
++        umin_op[4] = { VMINUB, VMINUH, VMINUW, VMINUD },
++        smin_op[4] = { VMINSB, VMINSH, VMINSW, VMINSD },
++        umax_op[4] = { VMAXUB, VMAXUH, VMAXUW, VMAXUD },
++        smax_op[4] = { VMAXSB, VMAXSH, VMAXSW, VMAXSD },
++        shlv_op[4] = { VSLB, VSLH, VSLW, VSLD },
++        shrv_op[4] = { VSRB, VSRH, VSRW, VSRD },
++        sarv_op[4] = { VSRAB, VSRAH, VSRAW, VSRAD },
+         mrgh_op[4] = { VMRGHB, VMRGHH, VMRGHW, 0 },
+         mrgl_op[4] = { VMRGLB, VMRGLH, VMRGLW, 0 },
+-        muleu_op[4] = { VMULEUB, VMULEUH, 0, 0 },
+-        mulou_op[4] = { VMULOUB, VMULOUH, 0, 0 },
++        muleu_op[4] = { VMULEUB, VMULEUH, VMULEUW, 0 },
++        mulou_op[4] = { VMULOUB, VMULOUH, VMULOUW, 0 },
+         pkum_op[4] = { VPKUHUM, VPKUWUM, 0, 0 },
+-        rotl_op[4] = { VRLB, VRLH, VRLW, 0 };
++        rotl_op[4] = { VRLB, VRLH, VRLW, VRLD };
+ 
+     TCGType type = vecl + TCG_TYPE_V64;
+     TCGArg a0 = args[0], a1 = args[1], a2 = args[2];
+@@ -3089,6 +3143,10 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+     case INDEX_op_sub_vec:
+         insn = sub_op[vece];
+         break;
++    case INDEX_op_mul_vec:
++        tcg_debug_assert(vece == MO_32 && have_isa_2_07_vsx);
++        insn = VMULUWM;
++        break;
+     case INDEX_op_ssadd_vec:
+         insn = ssadd_op[vece];
+         break;
+@@ -3138,6 +3196,9 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+         insn = VNOR;
+         a2 = a1;
+         break;
++    case INDEX_op_orc_vec:
++        insn = VORC;
++        break;
+ 
+     case INDEX_op_cmp_vec:
+         switch (args[3]) {
+@@ -3218,7 +3279,7 @@ static void expand_vec_cmp(TCGType type, unsigned vece, TCGv_vec v0,
+ {
+     bool need_swap = false, need_inv = false;
+ 
+-    tcg_debug_assert(vece <= MO_32);
++    tcg_debug_assert(vece <= MO_32 || have_isa_2_07_vsx);
+ 
+     switch (cond) {
+     case TCG_COND_EQ:
+@@ -3282,6 +3343,7 @@ static void expand_vec_mul(TCGType type, unsigned vece, TCGv_vec v0,
+ 	break;
+ 
+     case MO_32:
++        tcg_debug_assert(!have_isa_2_07_vsx);
+         t3 = tcg_temp_new_vec(type);
+         t4 = tcg_temp_new_vec(type);
+         tcg_gen_dupi_vec(MO_8, t4, -16);
+@@ -3577,6 +3639,11 @@ static void tcg_target_init(TCGContext *s)
+             have_isa_2_06_vsx = true;
+         }
+     }
++    if (hwcap2 & PPC_FEATURE2_ARCH_2_07) {
++        if (hwcap & PPC_FEATURE_HAS_VSX) {
++            have_isa_2_07_vsx = true;
++        }
++    }
+ #ifdef PPC_FEATURE2_ARCH_3_00
+     if (hwcap2 & PPC_FEATURE2_ARCH_3_00) {
+         have_isa_3_00 = true;
+-- 
+2.17.1
+
 
