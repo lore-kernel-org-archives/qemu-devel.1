@@ -2,65 +2,54 @@ Return-Path: <SRS0=v56/=TT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 481C5C04AB4
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 16:06:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D2AAC04AB4
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 16:16:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DDE421872
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 16:06:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DDE421872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernkonzept.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2962A21851
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 16:16:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2962A21851
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50586 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50677 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSOKL-0002O2-CL
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 12:06:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42765)
+	id 1hSOUT-00061T-CF
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 12:16:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jakub.jermar@kernkonzept.com>) id 1hSOI4-00010L-QF
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 12:04:01 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hSOTN-0005I5-Vv
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 12:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jakub.jermar@kernkonzept.com>) id 1hSOI3-0000Bw-Rf
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 12:04:00 -0400
-Received: from serv1.kernkonzept.com ([2a01:4f8:1c1c:b490::2]:42463
-	helo=mx.kernkonzept.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jakub.jermar@kernkonzept.com>)
-	id 1hSOI3-0000AF-Lc
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 12:03:59 -0400
-Received: from 93-153-64-87.customers.tmcz.cz ([93.153.64.87]
-	helo=[192.168.0.108]) by mx.kernkonzept.com with esmtpsa
-	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
-	id 1hSOI0-0001yG-74; Sun, 19 May 2019 18:03:56 +0200
-To: Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <1558263144-8776-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<bb25cbee-9265-260a-681d-d7d390c007ee@kernkonzept.com>
-	<BN6PR2201MB125130243EB8B0ED9AE36848C6050@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<034a6cb7-7fb6-e59c-007b-4f8610db37a8@kernkonzept.com>
-	<BN6PR2201MB1251AE5715F377C587459080C6050@BN6PR2201MB1251.namprd22.prod.outlook.com>
-From: Jakub Jermar <jakub.jermar@kernkonzept.com>
-Organization: Kernkonzept
-Message-ID: <d97e3bee-85b4-9197-46a1-ab390181bbf3@kernkonzept.com>
-Date: Sun, 19 May 2019 18:03:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <BN6PR2201MB1251AE5715F377C587459080C6050@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a01:4f8:1c1c:b490::2
-Subject: Re: [Qemu-devel] [PULL 00/10] MIPS queue for May 19th, 2019
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hSOTN-0005jS-1G
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 12:15:41 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:52692 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1hSOTM-0005hi-Fq
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 12:15:40 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rt-rk.com (Postfix) with ESMTP id 77A271A202F;
+	Sun, 19 May 2019 18:15:37 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+	[10.10.13.43])
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 550601A1182;
+	Sun, 19 May 2019 18:15:37 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Date: Sun, 19 May 2019 18:15:21 +0200
+Message-Id: <1558282527-22183-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH v6 0/6] linux-user: A set of miscellaneous
+ patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,67 +61,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>
+Cc: lvivier@redhat.com, thuth@redhat.com, jcmvbkbc@gmail.com,
+	arikalo@wavecomp.com, daniel.santos@pobox.com,
+	amarkovic@wavecomp.com, nchen@wavecomp.com, philmd@redhat.com,
+	aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/19/19 5:16 PM, Aleksandar Markovic wrote:
->> From: Jakub Jermar <jakub.jermar@kernkonzept.com>
->>
->> On 5/19/19 2:00 PM, Aleksandar Markovic wrote:
->>>>>
->>>>>   * A fix for HelenOS boot hang (related to the flag PAGE_EXEC)
->>>>
->>>> This was rather a problem with failing non-executable page tests in
->>>> L4Re, not HelenOS. Even though I tested HelenOS for regressions.
->>>
->>> OK, Jakub, what would be your suggestion for a high-level description
->>> of this message for end users (it is definitely a change that affects end
->>> user)? Something like" Improved PAGE_EXEC flag handling"?
->>
->> It makes sure that referenced pages are not automatically marked
->> executable by QEMU (despite the XI bit).
->>
->> As a user-visible change, this might unbreak some tests that attempt to
->> execute data. Note that this fix does not affect pages that are not
->> referenced prior to being executed - those have worked fine.
->>
->> Otherwise for normal code that does not attempt to execute data, things
->> should not change at all.
->>
-> 
-> I changed the first item in MIPS section of 4.1 release notes (change log)
-> to be:
-> 
-> * Marking referenced memory pages as executable is improved (it is restricted to necessary cases only).
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Sounds good.
+This is a collection of misc patches for Linux user that I recently
+accumulated from variuous sources. All of them originate from problems
+observed on mips target. However, these changes actually affect and fix
+problems on multiple targets.
 
-> Thanks for your engaging in this issue!
+v5->v6:
 
-You are welcome.
+  - fixed a mistake in patch #4
+  - improved commit messages in patches #4 and #6
 
-Thanks to all for reviewing and testing this.
+v4->v5:
 
-Jakub
+  - added the patch on statx() support
+  - improved the patch on IPV6_<ADD|DROP>_MEMBERSHIP to take into
+    account the possibility of different names for a field
+  - minor corrections in commit messages
 
-> 
-> Aleksandar
-> 
-> 
->> Cheers,
->> Jakub
->>
->>> Thanks,
->>> Aleksandar
->>>
->>
->> --
->> Kernkonzept GmbH at Dresden, Germany, HRB 31129, CEO Dr.-Ing. Michael
->> Hohmuth
+v3->v4:
+
+  - improved commit messages (fixed some typos, improved relevance)
+
+v2->v3:
+
+  - updated and improved commit messages
+  - added IPV6_DROP_MEMBERSHIP support to the patch on setsockopt()'s
+    option
+
+v1->v2:
+
+  - added the patch on setsockopt()'s option IPV6_ADD_MEMBERSHIP
+  - improved the commit message of interp_info sanitizing patch
+
+
+Aleksandar Markovic (2):
+  linux-user: Fix support for SIOCATMARK and SIOCGPGRP ioctls for xtensa
+  linux-user: Add support for SIOCSPGRP ioctl for all targets
+
+Aleksandar Rikalo (1):
+  linux-user: Add support for statx() syscall
+
+Daniel Santos (1):
+  linux-user: Sanitize interp_info and, for mips only, init field fp_abi
+
+Neng Chen (2):
+  linux-user: Add support for SIOC<G|S>IFPFLAGS ioctls for all targets
+  linux-user: Add support for setsockopt() options
+    IPV6_<ADD|DROP>_MEMBERSHIP
+
+ linux-user/elfload.c      |   5 ++
+ linux-user/ioctls.h       |   3 +
+ linux-user/syscall.c      | 158 +++++++++++++++++++++++++++++++++++++++++++++-
+ linux-user/syscall_defs.h |  45 ++++++++++++-
+ 4 files changed, 209 insertions(+), 2 deletions(-)
 
 -- 
-Kernkonzept GmbH at Dresden, Germany, HRB 31129, CEO Dr.-Ing. Michael
-Hohmuth
+2.7.4
+
 
