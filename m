@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE0DEC04AB4
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:59:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0647BC04AB4
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 21:01:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A703720657
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:59:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B61C420657
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 21:01:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LEkc0h/Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A703720657
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AyIGZgac"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B61C420657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53400 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53450 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSSth-0003hU-Qe
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 16:59:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50643)
+	id 1hSSvi-0005Xl-0b
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 17:01:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hSSZc-0003cV-CZ
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:38:26 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hSSZI-0003No-Ro
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:38:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hSSZX-0004IY-Cv
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:38:23 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:44713)
+	(envelope-from <richard.henderson@linaro.org>) id 1hSSZH-0003z2-Os
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:38:04 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:42916)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hSSZV-0004DQ-EZ
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:38:19 -0400
-Received: by mail-pg1-x543.google.com with SMTP id z16so5723961pgv.11
-	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 13:38:15 -0700 (PDT)
+	id 1hSSZH-0003y7-IH
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:38:03 -0400
+Received: by mail-pf1-x443.google.com with SMTP id 13so6157230pfw.9
+	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 13:38:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=sa+0LXisYlSy7hSoDzn8UpDJzstJJhbCNrudoztrV7E=;
-	b=LEkc0h/QBHXlunyBD5L1PGRREg/PpgacaQCnfm6Pb2aEp74rXBRynD4UHPCxhSyEbB
-	Dp87VmOwvYQ5mAT2BiRevBudd7xG8a0TKIQje/zopsn9ujWGqV8tHZ2+/X1GsFcSVmcT
-	gDeAzwCNLxrqsDnD01gMKYTTwSGtvX9vTwvzrZ+fktzTY2SC8EoPLehdwdu6O7RDr7x3
-	4ywgsAHCfjSpZn096jVLVB6aXwG8Mw3744d6ATUjXHSH92t3Liip+DkjhNMeP/ub62NF
-	E0X3NiyUr3MDLTiuzKroE2qTlDFqrO3r9Wt8pezLMidFjGkIgcDNtw/6++Uax30FvRf9
-	QZNA==
+	bh=F+fKej9fPmaDrSPzKASFQtBx9UbES7Ex48WVScqi++Y=;
+	b=AyIGZgacVo1RSvmJgHsjrxMNdHL0qO6O7OQoHEIjI6sQOu1zg1i8IuMjvWUDjcCCGO
+	yW/1kZUtgIhqnnlF5WbemkE/r0epfOs0FbhBW8lbtEA6aK42VKZOHGlhBVUnu8CLCUoJ
+	Di/UinbDRth9n8uSqEMu4N+9OxNqet3+w9pns9w5KdAXGJQOGwd0xtvU/6CFhkvhSrWT
+	Bpi7hvMEI2Zb3QdWZko78kSNgewVZENWmqhwNRTe+c3wUj1I3B7tusF4XA6opr1xTpbO
+	shNs8SmS7BN5Oihg0fqJsLQ4PNtI1LSJm4yTHg0qOhji1sDU4gyqvpQhIA6q0MUh6CC6
+	T4yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=sa+0LXisYlSy7hSoDzn8UpDJzstJJhbCNrudoztrV7E=;
-	b=SRAHsCASa5RiuaqYmfeZ02zaT/8tX9uK+5XrzX6o5i5cwSJPx7T4Pe44ppVlU1H1F6
-	eo9TsX+f2FkpObhS78JIAFOu/e2dXq4NyBZO23nsUQjoEETGgj3SdNTOivQQday4PvC6
-	gxpoQ5dMidBeUtJ2zUIyOV+f4SMTm6+nkAlyjrqJTggpXCbbtYKFvj5WGumThPIksod/
-	hU994HHMoce8bmnPvkE74AXGUnv48ya593q7lHBPyqGsFLdeOCnVpTRiAL/YftOfzRnh
-	vkcvlzZ0A4Ko9b2UXI99I1k5Ft9rKNWJqqAp9Q5+Fnxl9XJnT3+XpSDNB8Ks4cKneDRR
-	aP7g==
-X-Gm-Message-State: APjAAAXw5OV+7gQHtnmcu2YgsyZJkEofOiuG2IJl7yVnQR/RPkJFahil
-	pRpcIKmyVenzXEEtVaGwzzp+/aEM8Q4=
-X-Google-Smtp-Source: APXvYqyDnlb7ZcxDcW40gyrfYyjBdyW6LSzwcLY3Fa+ozbuHGew5Sib0Dsg0hb3K1vfLbeecXzsrQw==
-X-Received: by 2002:a65:5cca:: with SMTP id b10mr71647708pgt.444.1558298294442;
-	Sun, 19 May 2019 13:38:14 -0700 (PDT)
+	bh=F+fKej9fPmaDrSPzKASFQtBx9UbES7Ex48WVScqi++Y=;
+	b=Ry2QXvOqb6LQl2ZWr6omxRW9LiE/5rrVTRNJfRdFtdAcDDdiN//1CBrozlq5IikZpL
+	zlhnLsJalazoBbX1geDvTxBgFaMrrNstohyxFnabe0MA9La23Cg37ehEur+MdwS7WnmP
+	YPjDL/KUSCOOUHwP7qD44iZBe6bq60wqz7KmUR3qbOIfwBVmKeLb2KQ/dfqM+yXayb2d
+	8Ll5OaojnuWXuTmCu6y6aJA6iNGSps0urjh4VHh6TdfQM3lvq59wy9kJpRAIF6LTqFJF
+	qUUZjLmTnpdzMWRDNHSQ6tlANO6DfEAHm0NobkNrcE+uuSMFvf24icAlKRMVzIGeYn5w
+	888w==
+X-Gm-Message-State: APjAAAVQOY94pO0utIt/w07+A8ZWa/7l6CUDWUzbJiPCUW/PB0xMek/p
+	Azo9Z3HxgBUMzdcwx+3GoEAzXTlHLtI=
+X-Google-Smtp-Source: APXvYqyJCY2nR0ZQQtVLHkL0GjYYLfqIhte6lhILpp06gc3oX0Sdh8iN0NVGyyEG2uGk+Fsg0yq9Zw==
+X-Received: by 2002:a63:d354:: with SMTP id u20mr22999650pgi.129.1558298282395;
+	Sun, 19 May 2019 13:38:02 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231]) by smtp.gmail.com with ESMTPSA id
-	i7sm11397448pfo.19.2019.05.19.13.38.13
+	i7sm11397448pfo.19.2019.05.19.13.38.01
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sun, 19 May 2019 13:38:13 -0700 (PDT)
+	Sun, 19 May 2019 13:38:01 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sun, 19 May 2019 13:36:47 -0700
-Message-Id: <20190519203726.20729-36-richard.henderson@linaro.org>
+Date: Sun, 19 May 2019 13:36:37 -0700
+Message-Id: <20190519203726.20729-26-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190519203726.20729-1-richard.henderson@linaro.org>
 References: <20190519203726.20729-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::543
-Subject: [Qemu-devel] [PATCH v7 35/74] linux-user: Split out utime, utimes,
- futimesat
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: [Qemu-devel] [PATCH v7 25/74] linux-user: Split out chdir
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,314 +95,107 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Note that chdir is universally provided.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall-defs.h     |  9 ++++
- linux-user/strace.c           | 41 ---------------
- linux-user/syscall-file.inc.c | 95 +++++++++++++++++++++++++++++++++++
- linux-user/syscall.c          | 63 -----------------------
- linux-user/strace.list        |  9 ----
- 5 files changed, 104 insertions(+), 113 deletions(-)
+ linux-user/syscall-defs.h     |  1 +
+ linux-user/strace.c           | 12 ------------
+ linux-user/syscall-file.inc.c | 14 ++++++++++++++
+ linux-user/syscall.c          |  6 ------
+ linux-user/strace.list        |  3 ---
+ 5 files changed, 15 insertions(+), 21 deletions(-)
 
 diff --git a/linux-user/syscall-defs.h b/linux-user/syscall-defs.h
-index 9d0dd7457b..2767e335d8 100644
+index 392bd1579c..3fad9d51f0 100644
 --- a/linux-user/syscall-defs.h
 +++ b/linux-user/syscall-defs.h
-@@ -36,6 +36,9 @@ SYSCALL_DEF(execve, ARG_STR, ARG_PTR, ARG_PTR);
- SYSCALL_DEF(execveat, ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_PTR, ARG_ATFLAG);
- SYSCALL_DEF(fchmod, ARG_DEC, ARG_MODEFLAG);
- SYSCALL_DEF(fchmodat, ARG_ATDIRFD, ARG_STR, ARG_MODEFLAG);
-+#ifdef TARGET_NR_futimesat
-+SYSCALL_DEF(futimesat, ARG_ATDIRFD, ARG_STR, ARG_PTR);
-+#endif
- #ifdef TARGET_NR_fork
- SYSCALL_DEF(fork);
- #endif
-@@ -172,6 +175,12 @@ SYSCALL_DEF(umount2, ARG_STR, ARG_UMOUNTFLAG);
- SYSCALL_DEF(unlink, ARG_STR);
- #endif
- SYSCALL_DEF(unlinkat, ARG_ATDIRFD, ARG_STR, ARG_UNLINKATFLAG);
-+#ifdef TARGET_NR_utime
-+SYSCALL_DEF(utime, ARG_STR, ARG_PTR);
-+#endif
-+#ifdef TARGET_NR_utimes
-+SYSCALL_DEF(utimes, ARG_STR, ARG_PTR);
-+#endif
- #ifdef TARGET_NR_vfork
- /* Emulate vfork() with fork().  */
- SYSCALL_DEF_FULL(vfork, .impl = impl_fork);
+@@ -19,6 +19,7 @@
+ SYSCALL_DEF_FULL(brk, .impl = impl_brk,
+                  .print_ret = print_syscall_ptr_ret,
+                  .arg_type = { ARG_PTR });
++SYSCALL_DEF(chdir, ARG_STR);
+ SYSCALL_DEF_ARGS(clone, ARG_CLONEFLAG, ARG_PTR, ARG_PTR, ARG_PTR, ARG_PTR);
+ SYSCALL_DEF(close, ARG_DEC);
+ #ifdef TARGET_NR_creat
 diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 278d235ae6..3a7a5c30ec 100644
+index 9d6c765715..b234274034 100644
 --- a/linux-user/strace.c
 +++ b/linux-user/strace.c
-@@ -1296,21 +1296,6 @@ print_fcntl(const struct syscallname *name,
- #endif
- 
- 
--#ifdef TARGET_NR_futimesat
--static void
--print_futimesat(const struct syscallname *name,
--    abi_long arg0, abi_long arg1, abi_long arg2,
--    abi_long arg3, abi_long arg4, abi_long arg5)
--{
--    print_syscall_prologue(name);
--    print_at_dirfd(arg0, 0);
--    print_string(arg1, 0);
--    print_timeval(arg2, 0);
--    print_timeval(arg2 + sizeof (struct target_timeval), 1);
--    print_syscall_epilogue(name);
--}
--#endif
--
- #if defined(TARGET_NR_socket)
- static void
- print_socket(const struct syscallname *name,
-@@ -2015,32 +2000,6 @@ print_symlinkat(const struct syscallname *name,
+@@ -1113,18 +1113,6 @@ print_access(const struct syscallname *name,
  }
  #endif
  
--#ifdef TARGET_NR_utime
+-#ifdef TARGET_NR_chdir
 -static void
--print_utime(const struct syscallname *name,
+-print_chdir(const struct syscallname *name,
 -    abi_long arg0, abi_long arg1, abi_long arg2,
 -    abi_long arg3, abi_long arg4, abi_long arg5)
 -{
 -    print_syscall_prologue(name);
--    print_string(arg0, 0);
--    print_pointer(arg1, 1);
+-    print_string(arg0, 1);
 -    print_syscall_epilogue(name);
 -}
 -#endif
 -
--#ifdef TARGET_NR_utimes
--static void
--print_utimes(const struct syscallname *name,
--    abi_long arg0, abi_long arg1, abi_long arg2,
--    abi_long arg3, abi_long arg4, abi_long arg5)
--{
--    print_syscall_prologue(name);
--    print_string(arg0, 0);
--    print_pointer(arg1, 1);
--    print_syscall_epilogue(name);
--}
--#endif
--
- #ifdef TARGET_NR_utimensat
+ #ifdef TARGET_NR_chroot
  static void
- print_utimensat(const struct syscallname *name,
+ print_chroot(const struct syscallname *name,
 diff --git a/linux-user/syscall-file.inc.c b/linux-user/syscall-file.inc.c
-index 345b4cb421..42e5cd2dc1 100644
+index 5acd8ecc10..76637fe71b 100644
 --- a/linux-user/syscall-file.inc.c
 +++ b/linux-user/syscall-file.inc.c
-@@ -84,6 +84,38 @@ SYSCALL_IMPL(fchmodat)
-     return do_fchmodat(arg1, arg2, arg3);
- }
+@@ -16,6 +16,20 @@
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
  
-+#ifdef TARGET_NR_futimesat
-+SYSCALL_IMPL(futimesat)
-+{
-+    int dirfd = arg1;
-+    abi_ulong target_path = arg2;
-+    abi_ulong target_tv = arg3;
-+    struct timeval *tvp, tv[2];
-+    char *p;
-+    abi_long ret;
-+
-+    if (target_tv) {
-+        if (copy_from_user_timeval(&tv[0], target_tv)
-+            || copy_from_user_timeval(&tv[1],
-+                                      target_tv +
-+                                      sizeof(struct target_timeval))) {
-+            return -TARGET_EFAULT;
-+        }
-+        tvp = tv;
-+    } else {
-+        tvp = NULL;
-+    }
-+
-+    p = lock_user_string(target_path);
-+    if (!p) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(futimesat(dirfd, path(p), tvp));
-+    unlock_user(p, target_path, 0);
-+    return ret;
-+}
-+#endif
-+
- static abi_long do_linkat(int olddirfd, abi_ulong target_oldpath,
-                           int newdirfd, abi_ulong target_newpath,
-                           int flags)
-@@ -873,6 +905,69 @@ SYSCALL_IMPL(unlinkat)
-     return do_unlinkat(arg1, arg2, arg3);
- }
- 
-+#ifdef TARGET_NR_utime
-+SYSCALL_IMPL(utime)
++SYSCALL_IMPL(chdir)
 +{
 +    abi_ulong target_path = arg1;
-+    abi_ulong target_times = arg2;
-+    struct utimbuf tbuf, *host_tbuf;
-+    struct target_utimbuf *target_tbuf;
-+    char *p;
++    char *p = lock_user_string(target_path);
 +    abi_long ret;
 +
-+    if (target_times) {
-+        if (!lock_user_struct(VERIFY_READ, target_tbuf, target_times, 1)) {
-+            return -TARGET_EFAULT;
-+        }
-+        tbuf.actime = tswapal(target_tbuf->actime);
-+        tbuf.modtime = tswapal(target_tbuf->modtime);
-+        unlock_user_struct(target_tbuf, arg2, 0);
-+        host_tbuf = &tbuf;
-+    } else {
-+        host_tbuf = NULL;
-+    }
-+
-+    p = lock_user_string(target_path);
 +    if (!p) {
 +        return -TARGET_EFAULT;
 +    }
-+    ret = get_errno(utime(p, host_tbuf));
++    ret = get_errno(chdir(p));
 +    unlock_user(p, target_path, 0);
 +    return ret;
 +}
-+#endif
 +
-+#ifdef TARGET_NR_utimes
-+SYSCALL_IMPL(utimes)
-+{
-+    abi_ulong target_path = arg1;
-+    abi_ulong target_tv = arg2;
-+    struct timeval *tvp, tv[2];
-+    char *p;
-+    abi_long ret;
-+
-+    if (target_tv) {
-+        if (copy_from_user_timeval(&tv[0], target_tv)
-+            || copy_from_user_timeval(&tv[1],
-+                                      target_tv +
-+                                      sizeof(struct target_timeval))) {
-+            return -TARGET_EFAULT;
-+        }
-+        tvp = tv;
-+    } else {
-+        tvp = NULL;
-+    }
-+
-+    p = lock_user_string(target_path);
-+    if (!p) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(utimes(p, tvp));
-+    unlock_user(p, target_path, 0);
-+    return ret;
-+}
-+#endif
-+
- SYSCALL_IMPL(write)
+ SYSCALL_IMPL(close)
  {
      int fd = arg1;
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 96e77ea38f..f66acbf27c 100644
+index affcd81273..0bf5901014 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -5380,69 +5380,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+@@ -5384,12 +5384,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
      void *p;
  
      switch(num) {
--#ifdef TARGET_NR_utime
--    case TARGET_NR_utime:
--        {
--            struct utimbuf tbuf, *host_tbuf;
--            struct target_utimbuf *target_tbuf;
--            if (arg2) {
--                if (!lock_user_struct(VERIFY_READ, target_tbuf, arg2, 1))
--                    return -TARGET_EFAULT;
--                tbuf.actime = tswapal(target_tbuf->actime);
--                tbuf.modtime = tswapal(target_tbuf->modtime);
--                unlock_user_struct(target_tbuf, arg2, 0);
--                host_tbuf = &tbuf;
--            } else {
--                host_tbuf = NULL;
--            }
--            if (!(p = lock_user_string(arg1)))
--                return -TARGET_EFAULT;
--            ret = get_errno(utime(p, host_tbuf));
--            unlock_user(p, arg1, 0);
--        }
+-    case TARGET_NR_chdir:
+-        if (!(p = lock_user_string(arg1)))
+-            return -TARGET_EFAULT;
+-        ret = get_errno(chdir(p));
+-        unlock_user(p, arg1, 0);
 -        return ret;
--#endif
--#ifdef TARGET_NR_utimes
--    case TARGET_NR_utimes:
--        {
--            struct timeval *tvp, tv[2];
--            if (arg2) {
--                if (copy_from_user_timeval(&tv[0], arg2)
--                    || copy_from_user_timeval(&tv[1],
--                                              arg2 + sizeof(struct target_timeval)))
--                    return -TARGET_EFAULT;
--                tvp = tv;
--            } else {
--                tvp = NULL;
--            }
--            if (!(p = lock_user_string(arg1)))
--                return -TARGET_EFAULT;
--            ret = get_errno(utimes(p, tvp));
--            unlock_user(p, arg1, 0);
--        }
--        return ret;
--#endif
--#if defined(TARGET_NR_futimesat)
--    case TARGET_NR_futimesat:
--        {
--            struct timeval *tvp, tv[2];
--            if (arg3) {
--                if (copy_from_user_timeval(&tv[0], arg3)
--                    || copy_from_user_timeval(&tv[1],
--                                              arg3 + sizeof(struct target_timeval)))
--                    return -TARGET_EFAULT;
--                tvp = tv;
--            } else {
--                tvp = NULL;
--            }
--            if (!(p = lock_user_string(arg2))) {
--                return -TARGET_EFAULT;
--            }
--            ret = get_errno(futimesat(arg1, path(p), tvp));
--            unlock_user(p, arg2, 0);
--        }
--        return ret;
--#endif
- #ifdef TARGET_NR_access
-     case TARGET_NR_access:
-         if (!(p = lock_user_string(arg1))) {
+ #ifdef TARGET_NR_time
+     case TARGET_NR_time:
+         {
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index 2a65457c76..3f92224b55 100644
+index c6bb475728..3f79159b63 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
-@@ -226,9 +226,6 @@
- #ifdef TARGET_NR_futex
- { TARGET_NR_futex, "futex" , NULL, print_futex, NULL },
+@@ -61,9 +61,6 @@
+ #ifdef TARGET_NR_capset
+ { TARGET_NR_capset, "capset" , "%s(%p,%p)", NULL, NULL },
  #endif
--#ifdef TARGET_NR_futimesat
--{ TARGET_NR_futimesat, "futimesat" , NULL, print_futimesat, NULL },
+-#ifdef TARGET_NR_chdir
+-{ TARGET_NR_chdir, "chdir" , NULL, print_chdir, NULL },
 -#endif
- #ifdef TARGET_NR_getcpu
- { TARGET_NR_getcpu, "getcpu" , "%s(%p,%d)", NULL, NULL },
- #endif
-@@ -1392,12 +1389,6 @@
- #ifdef TARGET_NR_ustat
- { TARGET_NR_ustat, "ustat" , "%s(%#x,%p)", NULL, NULL },
- #endif
--#ifdef TARGET_NR_utime
--{ TARGET_NR_utime, "utime" , NULL, print_utime, NULL },
--#endif
--#ifdef TARGET_NR_utimes
--{ TARGET_NR_utimes, "utimes" , NULL, print_utimes, NULL },
--#endif
- #ifdef TARGET_NR_utrap_install
- { TARGET_NR_utrap_install, "utrap_install" , NULL, NULL, NULL },
+ #ifdef TARGET_NR_chmod
+ { TARGET_NR_chmod, "chmod" , NULL, print_chmod, NULL },
  #endif
 -- 
 2.17.1
