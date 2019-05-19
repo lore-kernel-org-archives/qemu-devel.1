@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12115C04AB4
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:45:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44110C04AB4
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:45:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD41320644
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:45:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E6DC020644
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 20:45:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h9mbQQ3S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD41320644
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dt6Oh+GY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6DC020644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53234 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53236 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSSgo-00018F-Tt
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 16:45:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50275)
+	id 1hSSgs-0001BN-47
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 16:45:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hSSZ6-000347-6c
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:53 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hSSYs-0002m9-74
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hSSZ4-0003id-PS
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:52 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:35573)
+	(envelope-from <richard.henderson@linaro.org>) id 1hSSYq-0003Rl-Qa
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:38 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:36049)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hSSZ4-0003hq-JB
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:50 -0400
-Received: by mail-pl1-x644.google.com with SMTP id p1so336283plo.2
-	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 13:37:50 -0700 (PDT)
+	id 1hSSYq-0003Qv-Jr
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 16:37:36 -0400
+Received: by mail-pg1-x544.google.com with SMTP id a3so5747684pgb.3
+	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 13:37:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=VSlxea5X8kmlG4BCCYdaO6spDVy0J4IfrRmHvvWJsEo=;
-	b=h9mbQQ3SGTfIiYm6DeVYwSPJhUaB8QQBVG94ifShCK+mh+hBW7yDCIxug4QxQNRwtE
-	5n4KFaTt2nNUgT6++NfshS0weturRSOcJGQp8c5UHxko9TmrdeEnLbayqooSdX4SPHRi
-	sp2xjIfb3WInVj5vUBSOX7G1YZN8GwSAnaiXImnMHlyn1lyZh/sr1tNKIu7c6TM9Xbjc
-	8nIRGRtDOLxNoDcfUnaOcCIaEtAwZG7c5SRQBsWkDPFRIR6/EduXcaf8OOdzPP3XPvcc
-	yIgjCScjNkpUWUutc88dU4HtEtp1p3JgdSZXdb47hjE7D+G3QyLVFlPVJOYWBoNGzmLp
-	5+uQ==
+	bh=T/gNF/+WQ4Pn+UuyOMg1wvHnA4fUii7t4Tux8xUmkoc=;
+	b=Dt6Oh+GYc5ECBGvXm8k40HNriBNshJGfarJIgu4ZyvWlyiJ7RPVRJRXbceNCNFeHdZ
+	+HXBwmHKQSKyam0OggyMej2UtxVQQEpbzY3AeIhhaoOKO4E6pHgV+Aq8mtJXE8UrCvfi
+	hDiaIpcW7AsenQSdR7tqqEN7Qsx4B2yWK2wMfKNQhk9J5H2/Dovott+pRkDvG0LIE6Tw
+	aTi/a8PkuqOpG4DnnbMTzxJC4ot9S02hjUALTRVErDxBZCG2JV+3zGlIXlJmEbTjHTBK
+	Q1sAILEQ7kqiIRPhk+errWRwwixVqmWL8sRbEIS3mUi0O/nu9kQK7iV8cgZcAmWzHLLY
+	EICg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=VSlxea5X8kmlG4BCCYdaO6spDVy0J4IfrRmHvvWJsEo=;
-	b=ZAh6P6iK1EGuuyYK8ccvnlYLRyAXHcAF615HReNxyLPQTEVsDoXFt7VaGtStiVRpfL
-	g2aV86Q+3z3YZKTASBz0yBPHemEYiCQHJqcdTZJx58e5vFUeWXcUPByrL3qy76EEvlGI
-	7TYBP7lBbRTrO92WyUEYjs9Y0clCN7wGv/l2JZOMfmRbDFOSFXYKQEH0lfyFxIsGFF1z
-	Ao0fjhithkkiN3RMKNQZE9BtodmZl/8yjXAhJPZKZVVkMEX2q/5SOtGgLoWlKU84t7B7
-	duHx5kdY7ajKzDp2lH0SMHBtMfBnTi6wUMoJMwwfURDcVW5zPgBB7c3XaJmBGrsf5Zme
-	IiuQ==
-X-Gm-Message-State: APjAAAVyF6WRKgfPJpZLrJ7tWbBu3SqP+/JHi3xWH8Z62LCXaju/00jL
-	nKBXpK+kXHbReqzq+SZHdBjsV5fT+fM=
-X-Google-Smtp-Source: APXvYqztCFumxDkQltuLHOaBHvO51Ba8Q32k0VRxSQrFQ+MRgx0CuHlzAG0tD0zkrwESHoU4PFRlYg==
-X-Received: by 2002:a17:902:74c6:: with SMTP id
-	f6mr13664060plt.335.1558298269373; 
-	Sun, 19 May 2019 13:37:49 -0700 (PDT)
+	bh=T/gNF/+WQ4Pn+UuyOMg1wvHnA4fUii7t4Tux8xUmkoc=;
+	b=qBDKjF0fH6RrsoBwNIC9hcKx4EoFP9kIj9UtZdFu+hD6NiEd3NLfzNA1I49Um3wkKt
+	is3CilLtKU6YhsFnmeCFGXBBwAxwTsV2JvElQOTpjwTxbIi5VFGXJn/Jd1NWYgBHJBcZ
+	Kwbp3vIHffUgbmL6vOXgiFrR1fnLmKY9gSx4ThJetqL0F7hwdmKOBLdzZM99Gr5cYvva
+	SYVeBqDcsTaYdD2veiydQveY+/Wrr221CNb8qfjUnCvyhCZ3LeTfn4gzTKVedHPb5VVt
+	woCdQP7NQ4qPz7Krlz9FiFkUyGm+vBm2HC+tVxnsGwotrR1hvML5kMbvErunCt3y4nIX
+	hrPg==
+X-Gm-Message-State: APjAAAU/3FzwhjuxQQzt1tYB9lzhpjZKZ+AtL27G54DUeuwQmE0B0GVw
+	7SMwxOB6DrqFK3e2rh7fGLrY0rBoElc=
+X-Google-Smtp-Source: APXvYqy8+fS70NI1GkAOCZBtCYqeXlqWSSt1gl0TgvzZGXd1GubkQOgY3SCjreK5VnBXdjJr+ndNWA==
+X-Received: by 2002:a65:5c89:: with SMTP id a9mr71871984pgt.334.1558298255333; 
+	Sun, 19 May 2019 13:37:35 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
 	[97.113.13.231]) by smtp.gmail.com with ESMTPSA id
-	i7sm11397448pfo.19.2019.05.19.13.37.48
+	i7sm11397448pfo.19.2019.05.19.13.37.34
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sun, 19 May 2019 13:37:48 -0700 (PDT)
+	Sun, 19 May 2019 13:37:34 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sun, 19 May 2019 13:36:27 -0700
-Message-Id: <20190519203726.20729-16-richard.henderson@linaro.org>
+Date: Sun, 19 May 2019 13:36:17 -0700
+Message-Id: <20190519203726.20729-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190519203726.20729-1-richard.henderson@linaro.org>
 References: <20190519203726.20729-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: [Qemu-devel] [PATCH v7 15/74] linux-user: Split out exit
+X-Received-From: 2607:f8b0:4864:20::544
+Subject: [Qemu-devel] [PATCH v7 05/74] linux-user: Split out readlink,
+ readlinkat
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,149 +96,217 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Split out a shared implementation for both of these;
+unify the best parts of /proc/self/exe checking.
+
+Remove the temporary forward declaration for is_proc_self.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall-defs.h     |  1 +
- linux-user/syscall-proc.inc.c | 61 +++++++++++++++++++++++++++++++++++
- linux-user/syscall.c          | 38 +---------------------
- 3 files changed, 63 insertions(+), 37 deletions(-)
- create mode 100644 linux-user/syscall-proc.inc.c
+ linux-user/syscall-defs.h     |  6 ++++
+ linux-user/strace.c           | 29 ------------------
+ linux-user/syscall-file.inc.c | 45 ++++++++++++++++++++++++++++
+ linux-user/syscall.c          | 55 -----------------------------------
+ linux-user/strace.list        |  6 ----
+ 5 files changed, 51 insertions(+), 90 deletions(-)
 
 diff --git a/linux-user/syscall-defs.h b/linux-user/syscall-defs.h
-index 88f433e998..88aa1a6bfd 100644
+index 1f3a9c47ab..d1a6c6fa3c 100644
 --- a/linux-user/syscall-defs.h
 +++ b/linux-user/syscall-defs.h
-@@ -17,6 +17,7 @@
-  */
- 
- SYSCALL_DEF(close, ARG_DEC);
-+SYSCALL_DEF(exit, ARG_DEC);
- #ifdef TARGET_NR_ipc
- SYSCALL_DEF_ARGS(ipc, ARG_HEX, ARG_DEC, ARG_DEC, ARG_HEX, ARG_PTR, ARG_HEX);
+@@ -20,3 +20,9 @@
+ SYSCALL_DEF(open, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
  #endif
-diff --git a/linux-user/syscall-proc.inc.c b/linux-user/syscall-proc.inc.c
-new file mode 100644
-index 0000000000..96ad363c1a
---- /dev/null
-+++ b/linux-user/syscall-proc.inc.c
-@@ -0,0 +1,61 @@
-+/*
-+ *  Linux process related syscalls
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
+ SYSCALL_DEF(openat, ARG_ATDIRFD, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
++#ifdef TARGET_NR_readlink
++SYSCALL_DEF(readlink, ARG_STR, ARG_PTR, ARG_DEC);
++#endif
++#ifdef TARGET_NR_readlinkat
++SYSCALL_DEF(readlinkat, ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_DEC);
++#endif
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 24ef14b5e6..2f1c7e537f 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -2256,35 +2256,6 @@ print_fstatat64(const struct syscallname *name,
+ #define print_newfstatat    print_fstatat64
+ #endif
+ 
+-#ifdef TARGET_NR_readlink
+-static void
+-print_readlink(const struct syscallname *name,
+-    abi_long arg0, abi_long arg1, abi_long arg2,
+-    abi_long arg3, abi_long arg4, abi_long arg5)
+-{
+-    print_syscall_prologue(name);
+-    print_string(arg0, 0);
+-    print_pointer(arg1, 0);
+-    print_raw_param("%u", arg2, 1);
+-    print_syscall_epilogue(name);
+-}
+-#endif
+-
+-#ifdef TARGET_NR_readlinkat
+-static void
+-print_readlinkat(const struct syscallname *name,
+-    abi_long arg0, abi_long arg1, abi_long arg2,
+-    abi_long arg3, abi_long arg4, abi_long arg5)
+-{
+-    print_syscall_prologue(name);
+-    print_at_dirfd(arg0, 0);
+-    print_string(arg1, 0);
+-    print_pointer(arg2, 0);
+-    print_raw_param("%u", arg3, 1);
+-    print_syscall_epilogue(name);
+-}
+-#endif
+-
+ #ifdef TARGET_NR_rename
+ static void
+ print_rename(const struct syscallname *name,
+diff --git a/linux-user/syscall-file.inc.c b/linux-user/syscall-file.inc.c
+index 30f8e35cdd..4ef0be2c6f 100644
+--- a/linux-user/syscall-file.inc.c
++++ b/linux-user/syscall-file.inc.c
+@@ -314,3 +314,48 @@ SYSCALL_IMPL(openat)
+ {
+     return do_openat(cpu_env, arg1, arg2, arg3, arg4);
+ }
 +
-+
-+SYSCALL_IMPL(exit)
++static abi_long do_readlinkat(int dirfd, abi_ulong target_path,
++                              abi_ulong target_buf, abi_ulong bufsiz)
 +{
-+    CPUState *cpu = ENV_GET_CPU(cpu_env);
-+    int status = arg1;
++    char *p = lock_user_string(target_path);
++    void *buf = lock_user(VERIFY_WRITE, target_buf, bufsiz, 0);
++    abi_long ret;
 +
-+    /*
-+     * In old applications this may be used to implement _exit(2).
-+     * However in threaded applictions it is used for thread termination,
-+     * and _exit_group is used for application termination.
-+     * Do thread termination if we have more then one thread.
-+     */
-+    if (block_signals()) {
-+        return -TARGET_ERESTARTSYS;
-+    }
++    if (!p || !buf) {
++        ret = -TARGET_EFAULT;
++    } else if (!bufsiz) {
++        /* Short circuit this for the magic exe check. */
++        ret = -TARGET_EINVAL;
++    } else if (is_proc_myself((const char *)p, "exe")) {
++        char real[PATH_MAX];
++        char *temp = realpath(exec_path, real);
 +
-+    cpu_list_lock();
-+
-+    if (CPU_NEXT(first_cpu)) {
-+        TaskState *ts;
-+
-+        /* Remove the CPU from the list.  */
-+        QTAILQ_REMOVE_RCU(&cpus, cpu, node);
-+
-+        cpu_list_unlock();
-+
-+        ts = cpu->opaque;
-+        if (ts->child_tidptr) {
-+            put_user_u32(0, ts->child_tidptr);
-+            sys_futex(g2h(ts->child_tidptr), FUTEX_WAKE, INT_MAX,
-+                      NULL, NULL, 0);
++        if (temp == NULL) {
++            ret = -host_to_target_errno(errno);
++        } else {
++            ret = MIN(strlen(real), bufsiz);
++            /* We cannot NUL terminate the string. */
++            memcpy(buf, real, ret);
 +        }
-+        thread_cpu = NULL;
-+        object_unref(OBJECT(cpu));
-+        g_free(ts);
-+        rcu_unregister_thread();
-+        pthread_exit(NULL);
++    } else {
++        ret = get_errno(readlinkat(dirfd, path(p), buf, bufsiz));
 +    }
-+
-+    cpu_list_unlock();
-+    preexit_cleanup(cpu_env, status);
-+    _exit(status);
++    unlock_user(buf, target_buf, ret);
++    unlock_user(p, target_path, 0);
++    return ret;
 +}
++
++#ifdef TARGET_NR_readlink
++SYSCALL_IMPL(readlink)
++{
++    return do_readlinkat(AT_FDCWD, arg1, arg2, arg3);
++}
++#endif
++
++#ifdef TARGET_NR_readlinkat
++SYSCALL_IMPL(readlinkat)
++{
++    return do_readlinkat(arg1, arg2, arg3, arg4);
++}
++#endif
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 876426dd9c..c72d24aa76 100644
+index fe52ac15c2..53fb211f16 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -5681,43 +5681,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     void *p;
+@@ -6633,8 +6633,6 @@ int host_to_target_waitstatus(int status)
+     return status;
+ }
  
-     switch(num) {
--    case TARGET_NR_exit:
--        /* In old applications this may be used to implement _exit(2).
--           However in threaded applictions it is used for thread termination,
--           and _exit_group is used for application termination.
--           Do thread termination if we have more then one thread.  */
+-static int is_proc_myself(const char *filename, const char *entry);
 -
--        if (block_signals()) {
--            return -TARGET_ERESTARTSYS;
--        }
--
--        cpu_list_lock();
--
--        if (CPU_NEXT(first_cpu)) {
--            TaskState *ts;
--
--            /* Remove the CPU from the list.  */
--            QTAILQ_REMOVE_RCU(&cpus, cpu, node);
--
--            cpu_list_unlock();
--
--            ts = cpu->opaque;
--            if (ts->child_tidptr) {
--                put_user_u32(0, ts->child_tidptr);
--                sys_futex(g2h(ts->child_tidptr), FUTEX_WAKE, INT_MAX,
--                          NULL, NULL, 0);
+ #define TIMER_MAGIC 0x0caf0000
+ #define TIMER_MAGIC_MASK 0xffff0000
+ 
+@@ -8108,59 +8106,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+         }
+         return ret;
+ #endif
+-#ifdef TARGET_NR_readlink
+-    case TARGET_NR_readlink:
+-        {
+-            void *p2;
+-            p = lock_user_string(arg1);
+-            p2 = lock_user(VERIFY_WRITE, arg2, arg3, 0);
+-            if (!p || !p2) {
+-                ret = -TARGET_EFAULT;
+-            } else if (!arg3) {
+-                /* Short circuit this for the magic exe check. */
+-                ret = -TARGET_EINVAL;
+-            } else if (is_proc_myself((const char *)p, "exe")) {
+-                char real[PATH_MAX], *temp;
+-                temp = realpath(exec_path, real);
+-                /* Return value is # of bytes that we wrote to the buffer. */
+-                if (temp == NULL) {
+-                    ret = get_errno(-1);
+-                } else {
+-                    /* Don't worry about sign mismatch as earlier mapping
+-                     * logic would have thrown a bad address error. */
+-                    ret = MIN(strlen(real), arg3);
+-                    /* We cannot NUL terminate the string. */
+-                    memcpy(p2, real, ret);
+-                }
+-            } else {
+-                ret = get_errno(readlink(path(p), p2, arg3));
 -            }
--            thread_cpu = NULL;
--            object_unref(OBJECT(cpu));
--            g_free(ts);
--            rcu_unregister_thread();
--            pthread_exit(NULL);
+-            unlock_user(p2, arg2, ret);
+-            unlock_user(p, arg1, 0);
 -        }
--
--        cpu_list_unlock();
--        preexit_cleanup(cpu_env, arg1);
--        _exit(arg1);
--        return 0; /* avoid warning */
-     case TARGET_NR_brk:
-         return do_brk(arg1);
- #ifdef TARGET_NR_fork
-@@ -9975,6 +9938,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
- #include "syscall-file.inc.c"
- #include "syscall-ipc.inc.c"
- #include "syscall-mem.inc.c"
-+#include "syscall-proc.inc.c"
- 
- #undef SYSCALL_IMPL
- #undef SYSCALL_ARGS
+-        return ret;
+-#endif
+-#if defined(TARGET_NR_readlinkat)
+-    case TARGET_NR_readlinkat:
+-        {
+-            void *p2;
+-            p  = lock_user_string(arg2);
+-            p2 = lock_user(VERIFY_WRITE, arg3, arg4, 0);
+-            if (!p || !p2) {
+-                ret = -TARGET_EFAULT;
+-            } else if (is_proc_myself((const char *)p, "exe")) {
+-                char real[PATH_MAX], *temp;
+-                temp = realpath(exec_path, real);
+-                ret = temp == NULL ? get_errno(-1) : strlen(real) ;
+-                snprintf((char *)p2, arg4, "%s", real);
+-            } else {
+-                ret = get_errno(readlinkat(arg1, path(p), p2, arg4));
+-            }
+-            unlock_user(p2, arg3, ret);
+-            unlock_user(p, arg2, 0);
+-        }
+-        return ret;
+-#endif
+ #ifdef TARGET_NR_swapon
+     case TARGET_NR_swapon:
+         if (!(p = lock_user_string(arg1)))
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index 2c7a595e19..53cee3db92 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -1079,12 +1079,6 @@
+ #ifdef TARGET_NR_readdir
+ { TARGET_NR_readdir, "readdir" , NULL, NULL, NULL },
+ #endif
+-#ifdef TARGET_NR_readlink
+-{ TARGET_NR_readlink, "readlink" , NULL, print_readlink, NULL },
+-#endif
+-#ifdef TARGET_NR_readlinkat
+-{ TARGET_NR_readlinkat, "readlinkat" , NULL, print_readlinkat, NULL },
+-#endif
+ #ifdef TARGET_NR_readv
+ { TARGET_NR_readv, "readv" , NULL, NULL, NULL },
+ #endif
 -- 
 2.17.1
 
