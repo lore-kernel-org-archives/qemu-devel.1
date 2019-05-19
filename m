@@ -6,55 +6,52 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EE9DC072AD
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 10:58:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A4C9C04AB4
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 11:00:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4835421743
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 10:58:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4835421743
+	by mail.kernel.org (Postfix) with ESMTPS id 56F7D2177B
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 May 2019 11:00:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56F7D2177B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46911 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46962 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSJWh-0007CQ-Ay
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 06:58:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56657)
+	id 1hSJYW-0000Nu-N4
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 07:00:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hSJS1-0003MA-Qy
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 06:53:59 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hSJRo-0003ES-5p
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 06:53:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hSJRs-0001tS-Ap
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 06:53:52 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:45754 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hSJRm-0001oT-1X
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 06:53:44 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:42755 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hSJRo-0001ol-6p
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 06:53:46 -0400
+	id 1hSJRl-00016F-Le
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 06:53:41 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 1C0B01A1DAE;
-	Sun, 19 May 2019 12:52:34 +0200 (CEST)
+	by mail.rt-rk.com (Postfix) with ESMTP id D6A571A204A;
+	Sun, 19 May 2019 12:52:33 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
 	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id DB0BF1A2049;
+	by mail.rt-rk.com (Postfix) with ESMTPSA id B1E321A1DF4;
 	Sun, 19 May 2019 12:52:33 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 19 May 2019 12:52:23 +0200
-Message-Id: <1558263144-8776-10-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Sun, 19 May 2019 12:52:18 +0200
+Message-Id: <1558263144-8776-5-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1558263144-8776-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1558263144-8776-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PULL 09/10] hw/mips: Use object_initialize_child for
- correct reference counting
+Subject: [Qemu-devel] [PULL 04/10] target/mips: Fix MSA instructions
+ ST.<B|H|W|D> on big endian host
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,163 +68,224 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
 
-As explained in commit aff39be0ed97:
+Fix the case when the host is a big endian machine, and change
+the approach toward ST.<B|H|W|D> instruction helpers.
 
-  Both functions, object_initialize() and object_property_add_child()
-  increase the reference counter of the new object, so one of the
-  references has to be dropped afterwards to get the reference
-  counting right. Otherwise the child object will not be properly
-  cleaned up when the parent gets destroyed.
-  Thus let's use now object_initialize_child() instead to get the
-  reference counting here right.
-
-This patch was generated using the following Coccinelle script:
-
- @use_sysbus_init_child_obj_missing_parent@
- expression child_ptr;
- expression child_type;
- expression child_size;
- @@
- -   object_initialize(child_ptr, child_size, child_type);
-     ...
- -   qdev_set_parent_bus(DEVICE(child_ptr), sysbus_get_default());
-     ...
- ?-  object_unref(OBJECT(child_ptr));
- +   sysbus_init_child_obj(OBJECT(PARENT_OBJ), "CHILD_NAME", child_ptr,
- +                         child_size, child_type);
-
-We let the Malta/Boston machines adopt the CPS child, and similarly
-the CPS adopts the ITU/CPC/GIC/GCR children.
-
-While the object_initialize() function doesn't take an
-'Error *errp' argument, the object_initialize_child() does.
-Since this code is used when a machine is created (and is not
-yet running), we deliberately choose to use the &error_abort
-argument instead of ignoring errors if an object creation failed.
-This choice also matches when using sysbus_init_child_obj(),
-since its code is:
-
-  void sysbus_init_child_obj(Object *parent,
-                             const char *childname, void *child,
-                             size_t childsize, const char *childtype)
-  {
-      object_initialize_child(parent, childname, child, childsize,
-                              childtype, &error_abort, NULL);
-
-      qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
-  }
-
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Inspired-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20190507163416.24647-11-philmd@redhat.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Message-Id: <1554212605-16457-3-git-send-email-mateja.marjanovic@rt-rk.com>
 ---
- hw/mips/boston.c     |  4 ++--
- hw/mips/cps.c        | 20 ++++++++------------
- hw/mips/mips_malta.c |  4 ++--
- 3 files changed, 12 insertions(+), 16 deletions(-)
+ target/mips/op_helper.c | 188 ++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 168 insertions(+), 20 deletions(-)
 
-diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-index cb3ea85..1ffccc8 100644
---- a/hw/mips/boston.c
-+++ b/hw/mips/boston.c
-@@ -455,8 +455,8 @@ static void boston_mach_init(MachineState *machine)
-=20
-     is_64b =3D cpu_supports_isa(machine->cpu_type, ISA_MIPS64);
-=20
--    object_initialize(&s->cps, sizeof(s->cps), TYPE_MIPS_CPS);
--    qdev_set_parent_bus(DEVICE(&s->cps), sysbus_get_default());
-+    sysbus_init_child_obj(OBJECT(machine), "cps", OBJECT(&s->cps),
-+                          sizeof(s->cps), TYPE_MIPS_CPS);
-     object_property_set_str(OBJECT(&s->cps), machine->cpu_type, "cpu-typ=
-e",
-                             &err);
-     object_property_set_int(OBJECT(&s->cps), smp_cpus, "num-vp", &err);
-diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-index fc97f59..649b35a 100644
---- a/hw/mips/cps.c
-+++ b/hw/mips/cps.c
-@@ -94,9 +94,8 @@ static void mips_cps_realize(DeviceState *dev, Error **=
-errp)
-=20
-     /* Inter-Thread Communication Unit */
-     if (itu_present) {
--        object_initialize(&s->itu, sizeof(s->itu), TYPE_MIPS_ITU);
--        qdev_set_parent_bus(DEVICE(&s->itu), sysbus_get_default());
--
-+        sysbus_init_child_obj(OBJECT(dev), "itu", &s->itu, sizeof(s->itu=
-),
-+                              TYPE_MIPS_ITU);
-         object_property_set_int(OBJECT(&s->itu), 16, "num-fifo", &err);
-         object_property_set_int(OBJECT(&s->itu), 16, "num-semaphores", &=
-err);
-         object_property_set_bool(OBJECT(&s->itu), saar_present, "saar-pr=
-esent",
-@@ -115,9 +114,8 @@ static void mips_cps_realize(DeviceState *dev, Error =
-**errp)
-     }
-=20
-     /* Cluster Power Controller */
--    object_initialize(&s->cpc, sizeof(s->cpc), TYPE_MIPS_CPC);
--    qdev_set_parent_bus(DEVICE(&s->cpc), sysbus_get_default());
--
-+    sysbus_init_child_obj(OBJECT(dev), "cpc", &s->cpc, sizeof(s->cpc),
-+                          TYPE_MIPS_CPC);
-     object_property_set_int(OBJECT(&s->cpc), s->num_vp, "num-vp", &err);
-     object_property_set_int(OBJECT(&s->cpc), 1, "vp-start-running", &err=
-);
-     object_property_set_bool(OBJECT(&s->cpc), true, "realized", &err);
-@@ -130,9 +128,8 @@ static void mips_cps_realize(DeviceState *dev, Error =
-**errp)
-                             sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->cp=
-c), 0));
-=20
-     /* Global Interrupt Controller */
--    object_initialize(&s->gic, sizeof(s->gic), TYPE_MIPS_GIC);
--    qdev_set_parent_bus(DEVICE(&s->gic), sysbus_get_default());
--
-+    sysbus_init_child_obj(OBJECT(dev), "gic", &s->gic, sizeof(s->gic),
-+                          TYPE_MIPS_GIC);
-     object_property_set_int(OBJECT(&s->gic), s->num_vp, "num-vp", &err);
-     object_property_set_int(OBJECT(&s->gic), 128, "num-irq", &err);
-     object_property_set_bool(OBJECT(&s->gic), true, "realized", &err);
-@@ -147,9 +144,8 @@ static void mips_cps_realize(DeviceState *dev, Error =
-**errp)
-     /* Global Configuration Registers */
-     gcr_base =3D env->CP0_CMGCRBase << 4;
-=20
--    object_initialize(&s->gcr, sizeof(s->gcr), TYPE_MIPS_GCR);
--    qdev_set_parent_bus(DEVICE(&s->gcr), sysbus_get_default());
--
-+    sysbus_init_child_obj(OBJECT(dev), "gcr", &s->gcr, sizeof(s->gcr),
-+                          TYPE_MIPS_GCR);
-     object_property_set_int(OBJECT(&s->gcr), s->num_vp, "num-vp", &err);
-     object_property_set_int(OBJECT(&s->gcr), 0x800, "gcr-rev", &err);
-     object_property_set_int(OBJECT(&s->gcr), gcr_base, "gcr-base", &err)=
-;
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 04f2117..aff8464 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -1151,8 +1151,8 @@ static void create_cps(MaltaState *s, const char *c=
-pu_type,
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index a8ae438..c0a612a 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -4550,31 +4550,179 @@ static inline void ensure_writable_pages(CPUMIPSState *env,
+ #endif
+ }
+ 
+-#define MSA_ST_DF(DF, TYPE, ST_INSN, ...)                               \
+-void helper_msa_st_ ## TYPE(CPUMIPSState *env, uint32_t wd,             \
+-                            target_ulong addr)                          \
+-{                                                                       \
+-    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);                          \
+-    int mmu_idx = cpu_mmu_index(env, false);				\
+-    int i;                                                              \
+-    MEMOP_IDX(DF)                                                       \
+-    ensure_writable_pages(env, addr, mmu_idx, GETPC());                 \
+-    for (i = 0; i < DF_ELEMENTS(DF); i++) {                             \
+-        ST_INSN(env, addr + (i << DF), pwd->TYPE[i], ##__VA_ARGS__);    \
+-    }                                                                   \
++void helper_msa_st_b(CPUMIPSState *env, uint32_t wd,
++                     target_ulong addr)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    MEMOP_IDX(DF_BYTE)
++#if !defined(CONFIG_USER_ONLY)
++#if !defined(HOST_WORDS_BIGENDIAN)
++    helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[0],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[1],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[2],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (3  << DF_BYTE), pwd->b[3],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (4  << DF_BYTE), pwd->b[4],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (5  << DF_BYTE), pwd->b[5],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (6  << DF_BYTE), pwd->b[6],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (7  << DF_BYTE), pwd->b[7],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (8  << DF_BYTE), pwd->b[8],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (9  << DF_BYTE), pwd->b[9],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b[10], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b[11], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b[12], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b[13], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b[14], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b[15], oi, GETPC());
++#else
++    helper_ret_stb_mmu(env, addr + (7  << DF_BYTE), pwd->b[0],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (6  << DF_BYTE), pwd->b[1],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (5  << DF_BYTE), pwd->b[2],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (4  << DF_BYTE), pwd->b[3],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (3  << DF_BYTE), pwd->b[4],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[5],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[6],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[7],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b[8],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b[9],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b[10], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b[11], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b[12], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b[13], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (9  << DF_BYTE), pwd->b[14], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (8  << DF_BYTE), pwd->b[15], oi, GETPC());
++#endif
++#else
++#if !defined(HOST_WORDS_BIGENDIAN)
++    cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[0]);
++    cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[1]);
++    cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[2]);
++    cpu_stb_data(env, addr + (3  << DF_BYTE), pwd->b[3]);
++    cpu_stb_data(env, addr + (4  << DF_BYTE), pwd->b[4]);
++    cpu_stb_data(env, addr + (5  << DF_BYTE), pwd->b[5]);
++    cpu_stb_data(env, addr + (6  << DF_BYTE), pwd->b[6]);
++    cpu_stb_data(env, addr + (7  << DF_BYTE), pwd->b[7]);
++    cpu_stb_data(env, addr + (8  << DF_BYTE), pwd->b[8]);
++    cpu_stb_data(env, addr + (9  << DF_BYTE), pwd->b[9]);
++    cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[10]);
++    cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[11]);
++    cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[12]);
++    cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[13]);
++    cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[14]);
++    cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[15]);
++#else
++    cpu_stb_data(env, addr + (7  << DF_BYTE), pwd->b[0]);
++    cpu_stb_data(env, addr + (6  << DF_BYTE), pwd->b[1]);
++    cpu_stb_data(env, addr + (5  << DF_BYTE), pwd->b[2]);
++    cpu_stb_data(env, addr + (4  << DF_BYTE), pwd->b[3]);
++    cpu_stb_data(env, addr + (3  << DF_BYTE), pwd->b[4]);
++    cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[5]);
++    cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[6]);
++    cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[7]);
++    cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[8]);
++    cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[9]);
++    cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[10]);
++    cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[11]);
++    cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[12]);
++    cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[13]);
++    cpu_stb_data(env, addr + (9  << DF_BYTE), pwd->b[14]);
++    cpu_stb_data(env, addr + (8  << DF_BYTE), pwd->b[15]);
++#endif
++#endif
++}
++
++void helper_msa_st_h(CPUMIPSState *env, uint32_t wd,
++                     target_ulong addr)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    MEMOP_IDX(DF_HALF)
++#if !defined(CONFIG_USER_ONLY)
++#if !defined(HOST_WORDS_BIGENDIAN)
++    helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[0], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[1], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[2], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[3], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[4], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[5], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[6], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[7], oi, GETPC());
++#else
++    helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[0], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[1], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[2], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[3], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[4], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[5], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[6], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[7], oi, GETPC());
++#endif
++#else
++#if !defined(HOST_WORDS_BIGENDIAN)
++    cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[0]);
++    cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[1]);
++    cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[2]);
++    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[3]);
++    cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[4]);
++    cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[5]);
++    cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[6]);
++    cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[7]);
++#else
++    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[0]);
++    cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[1]);
++    cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[2]);
++    cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[3]);
++    cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[4]);
++    cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[5]);
++    cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[6]);
++    cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[7]);
++#endif
++#endif
+ }
+ 
++void helper_msa_st_w(CPUMIPSState *env, uint32_t wd,
++                     target_ulong addr)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    MEMOP_IDX(DF_WORD)
+ #if !defined(CONFIG_USER_ONLY)
+-MSA_ST_DF(DF_BYTE,   b, helper_ret_stb_mmu, oi, GETPC())
+-MSA_ST_DF(DF_HALF,   h, helper_ret_stw_mmu, oi, GETPC())
+-MSA_ST_DF(DF_WORD,   w, helper_ret_stl_mmu, oi, GETPC())
+-MSA_ST_DF(DF_DOUBLE, d, helper_ret_stq_mmu, oi, GETPC())
++#if !defined(HOST_WORDS_BIGENDIAN)
++    helper_ret_stl_mmu(env, addr + (0 << DF_WORD), oi, GETPC(), pwd->w[0]);
++    helper_ret_stl_mmu(env, addr + (1 << DF_WORD), oi, GETPC(), pwd->w[1]);
++    helper_ret_stl_mmu(env, addr + (2 << DF_WORD), oi, GETPC(), pwd->w[2]);
++    helper_ret_stl_mmu(env, addr + (3 << DF_WORD), oi, GETPC(), pwd->w[3]);
+ #else
+-MSA_ST_DF(DF_BYTE,   b, cpu_stb_data)
+-MSA_ST_DF(DF_HALF,   h, cpu_stw_data)
+-MSA_ST_DF(DF_WORD,   w, cpu_stl_data)
+-MSA_ST_DF(DF_DOUBLE, d, cpu_stq_data)
++    helper_ret_stl_mmu(env, addr + (1 << DF_WORD), oi, GETPC(), pwd->w[0]);
++    helper_ret_stl_mmu(env, addr + (0 << DF_WORD), oi, GETPC(), pwd->w[1]);
++    helper_ret_stl_mmu(env, addr + (3 << DF_WORD), oi, GETPC(), pwd->w[2]);
++    helper_ret_stl_mmu(env, addr + (2 << DF_WORD), oi, GETPC(), pwd->w[3]);
+ #endif
++#else
++#if !defined(HOST_WORDS_BIGENDIAN)
++    cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[0]);
++    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[1]);
++    cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[2]);
++    cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[3]);
++#else
++    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[0]);
++    cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[1]);
++    cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[2]);
++    cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[3]);
++#endif
++#endif
++}
++
++void helper_msa_st_d(CPUMIPSState *env, uint32_t wd,
++                     target_ulong addr)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    MEMOP_IDX(DF_DOUBLE)
++#if !defined(CONFIG_USER_ONLY)
++    helper_ret_stq_mmu(env, addr + (0 << DF_DOUBLE), pwd->d[0], oi, GETPC());
++    helper_ret_stq_mmu(env, addr + (1 << DF_DOUBLE), pwd->d[1], oi, GETPC());
++#else
++    cpu_stq_data(env, addr + (0 << DF_DOUBLE), pwd->d[0]);
++    cpu_stq_data(env, addr + (1 << DF_DOUBLE), pwd->d[1]);
++#endif
++}
+ 
+ void helper_cache(CPUMIPSState *env, target_ulong addr, uint32_t op)
  {
-     Error *err =3D NULL;
-=20
--    object_initialize(&s->cps, sizeof(s->cps), TYPE_MIPS_CPS);
--    qdev_set_parent_bus(DEVICE(&s->cps), sysbus_get_default());
-+    sysbus_init_child_obj(OBJECT(s), "cps", OBJECT(&s->cps), sizeof(s->c=
-ps),
-+                          TYPE_MIPS_CPS);
-     object_property_set_str(OBJECT(&s->cps), cpu_type, "cpu-type", &err)=
-;
-     object_property_set_int(OBJECT(&s->cps), smp_cpus, "num-vp", &err);
-     object_property_set_bool(OBJECT(&s->cps), true, "realized", &err);
---=20
+-- 
 2.7.4
 
 
