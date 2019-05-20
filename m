@@ -2,90 +2,86 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EB28C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C6B0C04E87
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:37:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E494204FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:32:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 16EDD216FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:37:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="guNvbUPn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E494204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eDRwy3oN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16EDD216FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34797 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34847 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hShSy-0004bU-Hb
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 08:32:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37980)
+	id 1hShXc-0006TI-KG
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 08:37:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hShR4-0003Qw-1Q
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:30:35 -0400
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hShW2-0005I8-W9
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hShR1-0004vN-Tz
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:30:33 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:38009)
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hShW1-0007qt-Bq
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:35:42 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42042)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hShQu-0004om-FU
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:30:29 -0400
-Received: by mail-wr1-x434.google.com with SMTP id d18so14403032wrs.5
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 05:30:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=xrwvphnno6l4ixveJHj+AxfroZn4GSIECtB/pT+LZo0=;
-	b=guNvbUPn+75q+4cCNaxrJTth5vsxsH5h1qlOjsZevvfZVo2aK+z3SPIXDR8BtD8h3l
-	isQkIiUMd2BZ7mJP5Tec/A4VFJdcKnr+2IMoNtYl5LrkeXY0x8mRKckCBgMk/djS82SV
-	0fM9aJaIHF5en9cQfUa8XUEh8ZewstxrEbGn9VXwHZlQoTa+ZUi0g6DvFcSHEA34DhYB
-	2CUniLw8TJeO6JOE154M+2bVIw6/tkwXPVqi0WAW/Lulbg4hsKjDryANtLceERaz7Kq0
-	PYqhwGaINfqfP69t1+onsuJdkew/Ld8VB+UFrip2TwbmHrBy+amYQRGbCi5LSo5MUOjT
-	QyhA==
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1hShW1-0007ot-5e
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:35:41 -0400
+Received: by mail-ot1-x341.google.com with SMTP id i2so7425339otr.9
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 05:35:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+	:cc; bh=i6/gwCq5cQhTWhm9SP8esc5pJWj7TzyVU42WW0EvQPg=;
+	b=eDRwy3oNOHiG+gCQwnrzknAaBEvgjJkdKOVNgVA2Pg89ujYQHMWnkHarVaD+/PbE+q
+	yik7AjKsPmrq1/GXclmlvi7KsowJyXOf4NXoZoumIvBaS28tYqM7vI/UDIvlVojBVDcV
+	wIh8qyrplcYjTHgt0T/p3C47BS0ZYL2R0zauT4qcApQEJVRmXiyCRJ9AYG8zuEyTkD1f
+	/ry88F7PXSB+pYovZQashIvpm1B2us3tsAZgkBlaipsK6IhdcTU4EJiXs6o0PJ26cydg
+	3AN6QjgDfkdUbwO093l7VqxB+ciSYweblttoAu8fuU21Fe9OW9kxkNF9vEekjaa+KEKR
+	qZ+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=xrwvphnno6l4ixveJHj+AxfroZn4GSIECtB/pT+LZo0=;
-	b=tUQxqRt5b89KnFaGuK8AqthUheohw9mJmD4J/Uph0kh0oIE782+C+sy7YYRjJF6HYd
-	3+lkgOzivoVNcGrZNEukQC7xKau3C+bNXte8r+Um9aeKO6fKtH/7xw2gTPpjABIZr1YX
-	n5hgHOI1MBzg4sagdwkBH7NNGctfm/FfWbKl9dBwio8EVIkwjZwQ69CCxDigYg+yh71l
-	LmXyxL374mzXYg/BlA2hvVfKUYDft8LBc7pvCpPARjQl1eyeGBIj3foNLicwQW++yieL
-	30PY9hWYZSQGck8Wh5VSt7hh9M3anj7FxJ3VhVUIAyk6kXW3Y+m5sgSPl+LzcbqMt7B7
-	dEYQ==
-X-Gm-Message-State: APjAAAXI+9R0jTY7yRFdFDE3tJDjICzZdeyqHq7AhMpx3jXEE3uJHUSt
-	8sxxCw4sowzDaOAfXAk49bepMA==
-X-Google-Smtp-Source: APXvYqxVz8guds4p5tOe3lyNVL8Ir3skm20VW1uXCeX/DHjDMv4ncBVhpwL6fOVCClfQ7GAbJ9SUkw==
-X-Received: by 2002:a5d:4946:: with SMTP id r6mr32592842wrs.310.1558355418769; 
-	Mon, 20 May 2019 05:30:18 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	88sm42391956wrc.33.2019.05.20.05.30.18
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Mon, 20 May 2019 05:30:18 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id BE09D1FF87;
-	Mon, 20 May 2019 13:30:17 +0100 (BST)
-References: <20190517224450.15566-1-jan.bobek@gmail.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Jan Bobek <jan.bobek@gmail.com>
-In-reply-to: <20190517224450.15566-1-jan.bobek@gmail.com>
-Date: Mon, 20 May 2019 13:30:17 +0100
-Message-ID: <87v9y5gvfq.fsf@zen.linaroharston>
+	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+	:message-id:subject:to:cc;
+	bh=i6/gwCq5cQhTWhm9SP8esc5pJWj7TzyVU42WW0EvQPg=;
+	b=chB5e/Wn7D1G/Va/YIzARtH0BymOrOA+4vlYWJosaOIKDsf5jnnPM1np9+3biFAg/O
+	E03Ahgrp5gPc/iM+KS0cVyR6UC/gWsA6M3e2iXQsHt5K/ssvvyrhm6FB+rTCLQKd5a75
+	6gaZTD9sYreHR9+3JtH6DVycE3Z/WaA+vSPoZqIAoe+J8WXNRAaw1c9k+USsrlIomyaP
+	twrXFA4imAr8Dh3kSfiv/SS1fHNDnh+FwhszavpfZAKXU/PLUBxvC2464QmDjJvQ+Rvb
+	uGAgbkyBIuzTzCghpJoaFWEczelgZ93nmNKgN+drSzF3BISM0n1YvJ50wx38eMaLzo/8
+	mxCg==
+X-Gm-Message-State: APjAAAXkXW3zOgqoWisjptAGX3IP/ogHD73Wh2kbkh2dR2y9gQiQ4/JJ
+	3lNzoxK952xRfOO401DKxZtE2hDiEVY6QEzWWPDxfg==
+X-Google-Smtp-Source: APXvYqy4e3CcJY2q9viOxQlyaHjyWSDInfbAz5MJKXwN9Vndm+kqNktj9YgCP3MjYfD1Z1qKMW2wE3p9gxkN3GhcWlA=
+X-Received: by 2002:a9d:7858:: with SMTP id c24mr2825otm.64.1558355735854;
+	Mon, 20 May 2019 05:35:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Mon, 20 May 2019 05:35:35
+	-0700 (PDT)
+Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Mon, 20 May 2019 05:35:35
+	-0700 (PDT)
+In-Reply-To: <CAFEAcA842fq=CG+y_qGySWV3i_JNPEk0iQwCJxed6cQcCMidWA@mail.gmail.com>
+References: <1558263144-8776-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<CAFEAcA842fq=CG+y_qGySWV3i_JNPEk0iQwCJxed6cQcCMidWA@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 20 May 2019 14:35:35 +0200
+Message-ID: <CAL1e-=i91f-vgyFJOJhN51JaUoTZgdhby_F_YyeTr_KYWBsZeA@mail.gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::434
-Subject: Re: [Qemu-devel] [RISU v2 00/11] Support for i386/x86_64 with
- vector extensions
+X-Received-From: 2607:f8b0:4864:20::341
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PULL 00/10] MIPS queue for May 19th, 2019
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,52 +93,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Jan Bobek <jan.bobek@gmail.com> writes:
-
-> This patch series adds support for i386 and x86_64 architectures to
-> RISU.  Notably, vector registers (SSE, AVX, AVX-512) are supported for
-> verification of the apprentice. This is V2 of the series posted in
-> [1].
+On May 20, 2019 2:11 PM, "Peter Maydell" <peter.maydell@linaro.org> wrote:
 >
-> I decided not to drop the register definitions from the second patch
-> as suggested by Alex Benn=C3=A9e [4], but replaced them in the fourth pat=
-ch
-> instead. This keeps the second and third patches code-motion only.
+> On Sun, 19 May 2019 at 11:52, Aleksandar Markovic
+> <aleksandar.markovic@rt-rk.com> wrote:
+> >
+> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> >
+> > The following changes since commit
+1b46b4daa6fbf45eddcf77877379a0afac341df9:
+> >
+> >   Merge remote-tracking branch
+'remotes/kraxel/tags/ui-20190517-pull-request' into staging (2019-05-17
+17:25:19 +0100)
+> >
+> > are available in the git repository at:
+> >
+> >   https://github.com/AMarkovic/qemu tags/mips-queue-may-19-2019
+> >
+> > for you to fetch changes up to 71074d1d2fae9a0c8dab87c5bb5271a71d6cb7ab:
+> >
+> >   mips: Decide to map PAGE_EXEC in map_address (2019-05-19 12:11:46
++0200)
+> >
+> > ----------------------------------------------------------------
+> >
+> > MIPS queue for May 19th, 2019
+> >
+> >   * A fix for HelenOS boot hang (related to the flag PAGE_EXEC)
+> >   * A set of fixes for emulation of MSA ASE on big endian hosts
+> >   * Improved usage of object_initialize() and object_initialize_child()
+> >   * Better handling of 'div by zero' cases in MSA ASE
+> >
+> > ----------------------------------------------------------------
 >
-> I wasn't 100% sure how to acknowledge Richard's contributions in some
-> of the patches, and eventually decided to include a Suggested-by:
-> line. Let me know if that's (not) acceptable.
+> Hi -- I'm afraid this fails to build with clang:
+> /home/petmay01/linaro/qemu-for-merges/target/mips/op_helper.c:4536:20:
+> error: unused function 'ensure_writable_pages'
+> [-Werror,-Wunused-function]
+> static inline void ensure_writable_pages(CPUMIPSState *env,
+>                    ^
+> 1 error generated.
 >
->  -Jan
+> It looks like "target/mips: Fix MSA instructions ST.<B|H|W|D>
+> on big endian host" removed the last use of this function
+> but didn't remove the now-unused definition.
 >
-> Changes in V2:
->   - included Richard Henderson's fix-ups [2] and vector register
->     support [3]
->   - replaced the magic numbers for XSAVE feature sets with symbolic
->     constants
->   - symbolic names ("sse", "avx", "avx512") as well as numbers are
->     accepted for the parameter --xfeatures
+> (clang is pickier than gcc about not allowing unused 'static
+> inline' functions -- gcc ignores them anywhere, clang only if
+> they're in .h files.)
+>
 
-I'm not sure where my test went wrong but I guess it's around xfeatures.
-The code says required argument but risu doesn't seem to stop me not
-specifying it. I suspect we should default to the most minimal x86_64 we
-can and explicitly enable extra features.
+Ughhh... Sorry. I should have had a script for this. I'll send v2 in few
+days.
 
-Storing xfeat in the stream is a good idea so people don't mix up their
-dumps but we probably need more validation when running in master mode
-that the feature you have enabled is actually available on the
-processor. Otherwise you'll potentially end up generating test streams
-on HW with no support and just get a bunch of undef noise ;-)
+Regards,
+Aleksandar
 
-However the series is looking pretty good so far. Looking forward to the
-next iteration.
-
---
-Alex Benn=C3=A9e
-
+> thanks
+> -- PMm
+>
