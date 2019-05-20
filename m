@@ -6,60 +6,60 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8066C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:43:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE4D9C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:45:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A97CB21479
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:43:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A97CB21479
+	by mail.kernel.org (Postfix) with ESMTPS id B008F21479
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:45:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B008F21479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43803 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43810 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSrwb-0000Yx-VA
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 19:43:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45157)
+	id 1hSrxk-00019X-Qh
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 19:45:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hSrRB-0007kU-QG
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:22 -0400
+	(envelope-from <mst@redhat.com>) id 1hSrRE-0007nK-JM
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hSrRA-0008Hq-Rq
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:21 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:41840)
+	(envelope-from <mst@redhat.com>) id 1hSrRD-0008JU-Og
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:24 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:44765)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hSrRA-0008H9-Mc
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:20 -0400
-Received: by mail-qt1-f196.google.com with SMTP id y22so18334039qtn.8
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 16:11:19 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hSrRD-0008JO-Ku
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:23 -0400
+Received: by mail-qt1-f195.google.com with SMTP id f24so18319260qtk.11
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 16:11:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
 	:mime-version:content-disposition:content-transfer-encoding
 	:in-reply-to;
-	bh=AA6TCSyeHGpA1YTEQq8+big2sU8sv1fUdc6SF09NwiI=;
-	b=I3q6cQFyA0+1TC0Kybl72TwbCqk5qLaHYZUeyRbDBrtbNnh5YZzupMrgnsOuiVBS0r
-	WLPy7YANIvHKyQarAculWLziDg1cXv4UBRpnu6juX41yt+E3F5fKaV1WQy9lzPNhqOkJ
-	mCAP+FdduhrYLn0nvkedAds1lme3OI38vQ/hh00EsQZS91luaIwLe97BmQMwLW7dQa16
-	wp2xlqq3fRBdIzsIhgprn/CEXbvPNLkrUqEVoz7wo26k61rAbkaPNY/JMPqV3ST47OxK
-	e8PxKaCeHXwpbDvpjo2ZQ3H2LDbqH1vAuqK4MCOiAKCROQcVb/J/tBPfpQJwMdGOJytz
-	93jA==
-X-Gm-Message-State: APjAAAXxeqZq+EEEEnYctGFIZwxsbp6qIR6cjilFy8niQFfiZ1b7VxTb
-	3fRT6u/rTYYkZLavyYqI3E8uOZ5FWT0=
-X-Google-Smtp-Source: APXvYqweO2FSf0KBGfsyOLamyL6ph93dcAE15sECr94j0y8FXYuWHwb7WtfCcH4bsErdVwDCSOeXCA==
-X-Received: by 2002:ac8:313d:: with SMTP id g58mr58182578qtb.289.1558393879125;
-	Mon, 20 May 2019 16:11:19 -0700 (PDT)
+	bh=RTRIxsVKqqdz/HWRVEdKM6QUXrcO4t5UGM0Rdb91dxE=;
+	b=jyu+FkF7i05I8Vu46anedF9on3MUFNm7oWG4BVzKORcEq3IiSl43MnkayT9Ru4KGxK
+	2ameI2w2qZyFQcaDE4Sgr6KPV8vvlnW5y6PiqW+BiNsstKHFazvYgiNHMZg24MYkpzue
+	a/E0YY9mrBOJ40Koz7bj0BEktkEv/7yAeExb+FE6Luw1vLb1RQv4Ci4VltaDBX0iX3WE
+	UjYgcO9nTF9q23H1hB9URYhp8AGSqLwt+Yn54zS0pRkrAz3GoVAJ4h2aEKLtzucpMGa8
+	2IBWXUEUEpNg02TQogwJbOajvrPs5ekGNmu3vcCwvMUU0O9PBX2N5VHcYfGuyyB2HC3S
+	/6mA==
+X-Gm-Message-State: APjAAAXWmNfC5hQ60LHaVixib9CfqtRLzQ/lKcQswJrAqttZ7XGBzSK8
+	t9X4kUCEHc53t0HExWPCGquh9vDj1Rs=
+X-Google-Smtp-Source: APXvYqyPW3rvgR0EDfQOLmJ26yF4BMuEdOZmnKHL4DStmURZIzO1J3b5kJh20iF9OICPghykgGaeqQ==
+X-Received: by 2002:a0c:9ac8:: with SMTP id k8mr62251227qvf.132.1558393882954; 
+	Mon, 20 May 2019 16:11:22 -0700 (PDT)
 Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
-	[173.76.105.71])
-	by smtp.gmail.com with ESMTPSA id x6sm9127190qti.88.2019.05.20.16.11.17
+	[173.76.105.71]) by smtp.gmail.com with ESMTPSA id
+	t187sm1528417qkh.10.2019.05.20.16.11.21
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Mon, 20 May 2019 16:11:18 -0700 (PDT)
-Date: Mon, 20 May 2019 19:11:17 -0400
+	Mon, 20 May 2019 16:11:22 -0700 (PDT)
+Date: Mon, 20 May 2019 19:11:21 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <1556808723-226478-5-git-send-email-imammedo@redhat.com>
+Message-ID: <1556808723-226478-7-git-send-email-imammedo@redhat.com>
 References: <20190520231008.20140-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -70,8 +70,9 @@ X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
 X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.160.196
-Subject: [Qemu-devel] [PULL v2 25/36] tests: acpi: make pointer to RSDP 64bit
+X-Received-From: 209.85.160.195
+Subject: [Qemu-devel] [PULL v2 27/36] tests: acpi: skip FACS table if board
+ uses hw reduced ACPI profile
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,87 +92,44 @@ Cc: Laurent Vivier <lvivier@redhat.com>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190520231117.Z4A_VKu7lY8R5nCNEq7ejZGQbUJYftPjNtOfUwElNUc@z>
+Message-ID: <20190520231121.8RDRw8W72NiZuu7R-lW5KDvnBVtvZ7oX5yARBUENK8c@z>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-In case of UEFI, RSDP doesn't have to be located in lowmem,
-it could be placed at any address. Make sure that test won't
-break if it is placed above the first 4Gb of address space.
-
-PS:
-While at it cleanup some local variables as we don't really
-need them.
+If FADT has HW_REDUCED_ACPI flag set, do not attempt to fetch
+FACS as it's not provided by the board.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <1556808723-226478-5-git-send-email-imammedo@redhat.com>
 Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <1556808723-226478-7-git-send-email-imammedo@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/acpi-utils.h       |  2 +-
- tests/acpi-utils.c       |  2 +-
- tests/bios-tables-test.c | 10 ++++------
- 3 files changed, 6 insertions(+), 8 deletions(-)
+ tests/bios-tables-test.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-index a4f43a18ae..0ceb499469 100644
---- a/tests/acpi-utils.h
-+++ b/tests/acpi-utils.h
-@@ -46,7 +46,7 @@ typedef struct {
- 
- uint8_t acpi_calc_checksum(const uint8_t *data, int len);
- uint32_t acpi_find_rsdp_address(QTestState *qts);
--void acpi_fetch_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table);
-+void acpi_fetch_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table);
- void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
-                       const uint8_t *addr_ptr, int addr_size, const char *sig,
-                       bool verify_checksum);
-diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
-index a0d49c4371..c216b9e0e9 100644
---- a/tests/acpi-utils.c
-+++ b/tests/acpi-utils.c
-@@ -51,7 +51,7 @@ uint32_t acpi_find_rsdp_address(QTestState *qts)
-     return off;
- }
- 
--void acpi_fetch_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table)
-+void acpi_fetch_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table)
- {
-     uint8_t revision;
- 
 diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index d6ab1218da..a164d274a2 100644
+index d165a1bd62..e2fc34143d 100644
 --- a/tests/bios-tables-test.c
 +++ b/tests/bios-tables-test.c
-@@ -26,7 +26,7 @@
- typedef struct {
-     const char *machine;
-     const char *variant;
--    uint32_t rsdp_addr;
-+    uint64_t rsdp_addr;
-     uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
-     GArray *tables;
-     uint32_t smbios_ep_addr;
-@@ -86,13 +86,11 @@ static void test_acpi_rsdp_address(test_data *data)
+@@ -147,9 +147,13 @@ static void test_acpi_fadt_table(test_data *data)
+     g_assert(compare_signature(&table, "FACP"));
  
- static void test_acpi_rsdp_table(test_data *data)
- {
--    uint8_t *rsdp_table = data->rsdp_table, revision;
--    uint32_t addr = data->rsdp_addr;
-+    uint8_t *rsdp_table = data->rsdp_table;
+     /* Since DSDT/FACS isn't in RSDT, add them to ASL test list manually */
+-    acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
+-                     fadt_aml + 36 /* FIRMWARE_CTRL */, 4, "FACS", false);
+-    g_array_append_val(data->tables, table);
++    memcpy(&val, fadt_aml + 112 /* Flags */, 4);
++    val = le32_to_cpu(val);
++    if (!(val & 1UL << 20 /* HW_REDUCED_ACPI */)) {
++        acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
++                         fadt_aml + 36 /* FIRMWARE_CTRL */, 4, "FACS", false);
++        g_array_append_val(data->tables, table);
++    }
  
--    acpi_fetch_rsdp_table(data->qts, addr, rsdp_table);
--    revision = rsdp_table[15 /* Revision offset */];
-+    acpi_fetch_rsdp_table(data->qts, data->rsdp_addr, rsdp_table);
- 
--    switch (revision) {
-+    switch (rsdp_table[15 /* Revision offset */]) {
-     case 0: /* ACPI 1.0 RSDP */
-         /* With rev 1, checksum is only for the first 20 bytes */
-         g_assert(!acpi_calc_checksum(rsdp_table,  20));
+     memcpy(&val, fadt_aml + dsdt_offset, 4);
+     val = le32_to_cpu(val);
 -- 
 MST
 
