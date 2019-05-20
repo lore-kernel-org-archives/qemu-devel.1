@@ -3,60 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59990C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:55:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED79DC04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:56:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3191E20645
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:55:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3191E20645
+	by mail.kernel.org (Postfix) with ESMTPS id BA68320645
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:56:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA68320645
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35131 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35166 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hShp0-0007pD-DN
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 08:55:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43471)
+	id 1hShpw-0000Ig-0l
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 08:56:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hShhi-0002Tv-1v
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:47 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hShhd-0002SC-T1
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hShhg-0006CI-09
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55960)
+	(envelope-from <kraxel@redhat.com>) id 1hShha-00060G-7V
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47516)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hShhd-0005w2-V2
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:42 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hShhV-0005vK-4U
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:35 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9748C307D860;
-	Mon, 20 May 2019 12:47:25 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DA01030842B3;
+	Mon, 20 May 2019 12:47:28 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
 	[10.36.117.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4A25E5129E;
-	Mon, 20 May 2019 12:47:18 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 33B775DE81;
+	Mon, 20 May 2019 12:47:24 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 02EDA11AB8; Mon, 20 May 2019 14:47:17 +0200 (CEST)
+	id 238F31753D; Mon, 20 May 2019 14:47:17 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 20 May 2019 14:47:04 +0200
-Message-Id: <20190520124716.30472-3-kraxel@redhat.com>
+Date: Mon, 20 May 2019 14:47:08 +0200
+Message-Id: <20190520124716.30472-7-kraxel@redhat.com>
 In-Reply-To: <20190520124716.30472-1-kraxel@redhat.com>
 References: <20190520124716.30472-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Mon, 20 May 2019 12:47:25 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Mon, 20 May 2019 12:47:28 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 02/14] tests/vm: python3 fixes
+Subject: [Qemu-devel] [PATCH v3 06/14] tests/vm: proper guest shutdown
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,60 +77,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add proper unicode handling when processing strings.
-Also need to explicitly say we want int not float.
+When not running in snapshot mode ask the guest to poweroff and wait for
+this to finish instead of simply quitting qemu, so the guest can flush
+pending updates to disk.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/vm/basevm.py | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ tests/vm/basevm.py | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
 diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 0556bdcf9e9f..3126fb10a819 100755
+index 878f1a7a32b8..465c7b80d011 100755
 --- a/tests/vm/basevm.py
 +++ b/tests/vm/basevm.py
-@@ -73,7 +73,7 @@ class BaseVM(object):
-             "-vnc", "127.0.0.1:0,to=20",
-             "-serial", "file:%s" % os.path.join(self._tmpdir, "serial.out")]
-         if vcpus and vcpus > 1:
--            self._args += ["-smp", str(vcpus)]
-+            self._args += ["-smp", "%d" % vcpus]
-         if kvm_available(self.arch):
-             self._args += ["-enable-kvm"]
-         else:
-@@ -85,12 +85,12 @@ class BaseVM(object):
-             if not sha256sum:
-                 return True
-             checksum = subprocess.check_output(["sha256sum", fname]).split()[0]
--            return sha256sum == checksum
-+            return sha256sum == checksum.decode("utf-8")
+@@ -51,6 +51,8 @@ class BaseVM(object):
+     name = "#base"
+     # The guest architecture, to be overridden by subclasses
+     arch = "#arch"
++    # command to halt the guest, can be overridden by subclasses
++    poweroff = "poweroff"
+     def __init__(self, debug=False, vcpus=None):
+         self._guest = None
+         self._tmpdir = os.path.realpath(tempfile.mkdtemp(prefix="vm-test-",
+@@ -201,6 +203,10 @@ class BaseVM(object):
+     def wait(self):
+         self._guest.wait()
  
-         cache_dir = os.path.expanduser("~/.cache/qemu-vm/download")
-         if not os.path.exists(cache_dir):
-             os.makedirs(cache_dir)
--        fname = os.path.join(cache_dir, hashlib.sha1(url).hexdigest())
-+        fname = os.path.join(cache_dir, hashlib.sha1(url.encode("utf-8")).hexdigest())
-         if os.path.exists(fname) and check_sha256sum(fname):
-             return fname
-         logging.debug("Downloading %s to %s...", url, fname)
-@@ -134,7 +134,7 @@ class BaseVM(object):
-         raise NotImplementedError
++    def graceful_shutdown(self):
++        self.ssh_root(self.poweroff)
++        self._guest.wait()
++
+     def qmp(self, *args, **kwargs):
+         return self._guest.qmp(*args, **kwargs)
  
-     def add_source_dir(self, src_dir):
--        name = "data-" + hashlib.sha1(src_dir).hexdigest()[:5]
-+        name = "data-" + hashlib.sha1(src_dir.encode("utf-8")).hexdigest()[:5]
-         tarfile = os.path.join(self._tmpdir, name + ".tar")
-         logging.debug("Creating archive %s for src_dir dir: %s", tarfile, src_dir)
-         subprocess.check_call(["./scripts/archive-source.sh", tarfile],
-@@ -256,7 +256,7 @@ def main(vmcls):
-             vm.add_source_dir(args.build_qemu)
-             cmd = [vm.BUILD_SCRIPT.format(
-                    configure_opts = " ".join(argv),
--                   jobs=args.jobs,
-+                   jobs=int(args.jobs),
-                    target=args.build_target,
-                    verbose = "V=1" if args.verbose else "")]
-         else:
+@@ -277,11 +283,13 @@ def main(vmcls):
+         traceback.print_exc()
+         return 2
+ 
+-    if args.interactive:
+-        if vm.ssh(*cmd) == 0:
+-            return 0
++    exitcode = 0
++    if vm.ssh(*cmd) != 0:
++        exitcode = 3
++    if exitcode != 0 and args.interactive:
+         vm.ssh()
+-        return 3
+-    else:
+-        if vm.ssh(*cmd) != 0:
+-            return 3
++
++    if not args.snapshot:
++        vm.graceful_shutdown()
++
++    return exitcode
 -- 
 2.18.1
 
