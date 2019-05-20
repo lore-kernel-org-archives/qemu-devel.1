@@ -2,87 +2,65 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2ACEC04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 13:01:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B56C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 13:02:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B100A20856
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 13:01:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vPv9J7lH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B100A20856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 12BAA20856
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 13:02:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12BAA20856
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35289 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35325 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hShvF-0004yn-UB
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 09:01:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46687)
+	id 1hShwB-0005vA-Ct
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 09:02:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hShtO-0003ir-9h
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:59:52 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hShhi-0002Tx-37
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hShtL-0003kH-KY
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:59:50 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:46903)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1hShtL-0003k6-Cd
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:59:47 -0400
-Received: by mail-ot1-x342.google.com with SMTP id j49so12796111otc.13
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 05:59:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-	:cc; bh=QmqnpPEQ27267a/j8Fgmsg0FbWWNt+dEUfvrII2Xw5c=;
-	b=vPv9J7lHbsDD1aNerBCUk5BoKwQr01URIBBP0pBvfLaPshjSxSmxgE+wzLJNrJP3gy
-	dgY933WdB5WMqAIPITvKBoABXn9nqsQhUX5CSHukkJ9g0MF+yY7BUjLbRlHpY93K7icw
-	VcqVEKVZDpJu386PLa1cRSxRTxUBwx4DK/gC0kj57LeUDPU/dAkrUSbhRrt/ehjuTOjD
-	3L2EzNKxZ/raVT5+BaQyqPI802ots1/YjP3RhaUA+rbGl5pQylo/sGlpPRLqbsAOpgfD
-	bbbMZL+VWfAfstMBMQkMYV/KO8IwGCRuzoGCt7gU6hzHs6G4CuXqlwQLeNgO4ogMYNnM
-	qZKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-	:message-id:subject:to:cc;
-	bh=QmqnpPEQ27267a/j8Fgmsg0FbWWNt+dEUfvrII2Xw5c=;
-	b=SpgB+Nhf3mGE4P4pUTQERh23cYyEVsIhLvBpNKIes8LS7iacfIlHR7xEP7MNdLFVmb
-	rMih7BVJTWEQ2DM0OUrJxdJ1btKXbyXq8FHf8IhngFW+0eMuJpUT6wELxqwOn4lEeUv5
-	Qm4KtJBTZLyqsISjxqp4d/VbJ/nf1HZ46vzMIfAzcJ4N4wNKxidJDIJA10IXO3TWd/tw
-	cQFSh7LnY2Gz+rVZtV//GPLlugDF2ApCXMEfUyEgyu/Wc/5YQ/0EJekHj02gBmENQfgi
-	EYft9xXie4xuFkE55wvBcmFN29vboDEBCbSbwbVwLHIVVsFNXKdsGsJ6O1qstUg/8XvK
-	RJ1Q==
-X-Gm-Message-State: APjAAAX2GvyBBPm0kiY3jMYtrpY0SmrcdnKkQu+578g1QiQXucWd0D4E
-	GO1bUj2eCYBRMsQbwAZNhd5xh8KOK3lL5X52BfY=
-X-Google-Smtp-Source: APXvYqwDoy45Odw/IXbObw/crv1GCzWysbi8j6YHMFzt+aFCnAqVKRiUud1rCHiHZlLY0az3k9BRaVAPJo+DAmOMkxg=
-X-Received: by 2002:a9d:7858:: with SMTP id c24mr72785otm.64.1558357186512;
-	Mon, 20 May 2019 05:59:46 -0700 (PDT)
+	(envelope-from <kraxel@redhat.com>) id 1hShhg-0006Cd-2B
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55970)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hShhd-0005wC-UQ
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:42 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E6402307D868;
+	Mon, 20 May 2019 12:47:25 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
+	[10.36.117.74])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 366A86085B;
+	Mon, 20 May 2019 12:47:25 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id 4D6F3A205; Mon, 20 May 2019 14:47:17 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 20 May 2019 14:47:13 +0200
+Message-Id: <20190520124716.30472-12-kraxel@redhat.com>
+In-Reply-To: <20190520124716.30472-1-kraxel@redhat.com>
+References: <20190520124716.30472-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Mon, 20 May 2019 05:59:45
-	-0700 (PDT)
-Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Mon, 20 May 2019 05:59:45
-	-0700 (PDT)
-In-Reply-To: <1554212605-16457-3-git-send-email-mateja.marjanovic@rt-rk.com>
-References: <1554212605-16457-1-git-send-email-mateja.marjanovic@rt-rk.com>
-	<1554212605-16457-3-git-send-email-mateja.marjanovic@rt-rk.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 20 May 2019 14:59:45 +0200
-Message-ID: <CAL1e-=j6+P=WVAyUfbEqh1iXLiN6cAjgv0YPZj+RSFaWgEVFog@mail.gmail.com>
-To: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/mips: Fix MSA instructions
- ST.<B|H|W|D> on big endian host
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.48]);
+	Mon, 20 May 2019 12:47:26 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3 11/14] tests/vm: freebsd autoinstall,
+ using serial console
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,301 +72,260 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net,
-	qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Apr 2, 2019 3:47 PM, "Mateja Marjanovic" <mateja.marjanovic@rt-rk.com>
-wrote:
->
-> From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
->
-> Fix the case when the host is a big endian machine, and change
-> the approach toward ST.<B|H|W|D> instruction helpers.
->
-> Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-> ---
+Instead of fetching the prebuilt image from patchew download the install
+iso and prepare the image locally.  Install to disk, using the serial
+console.  Create qemu user, configure ssh login.  Install packages
+needed for qemu builds.
 
-Hello, Mateja.
+Note that freebsd package downloads are delivered as non-cachable
+content, so I had to configure squid with "ignore-no-store
+ignore-private ignore-reload" for pkgmir.geo.freebsd.org to make the
+caching actually work.
 
-There is unfortunatelly still a slight problem with the new implementation:
-it looks like the invocations to ensure_writable_pages() in new helpers are
-missing. Or, perhaps, there is a reason you removed them. Please reanalyse
-and reexplain. But thanks for previous efforts.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/vm/freebsd | 179 ++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 169 insertions(+), 10 deletions(-)
 
-Yours,
-Aleksandar
+diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+index b0066017a617..eb029bdfede9 100755
+--- a/tests/vm/freebsd
++++ b/tests/vm/freebsd
+@@ -2,43 +2,202 @@
+ #
+ # FreeBSD VM image
+ #
+-# Copyright 2017 Red Hat Inc.
++# Copyright 2017-2019 Red Hat Inc.
+ #
+ # Authors:
+ #  Fam Zheng <famz@redhat.com>
++#  Gerd Hoffmann <kraxel@redhat.com>
+ #
+ # This code is licensed under the GPL version 2 or later.  See
+ # the COPYING file in the top-level directory.
+ #
+=20
+ import os
++import re
+ import sys
++import time
++import socket
+ import subprocess
+ import basevm
+=20
+ class FreeBSDVM(basevm.BaseVM):
+     name =3D "freebsd"
+     arch =3D "x86_64"
++
++    link =3D "https://download.freebsd.org/ftp/releases/ISO-IMAGES/12.0/=
+FreeBSD-12.0-RELEASE-amd64-disc1.iso.xz"
++    csum =3D "1d40015bea89d05b8bd13e2ed80c40b522a9ec1abd8e7c8b80954fb485=
+fb99db"
++    size =3D "20G"
++    pkgs =3D [
++        # build tools
++        "git",
++        "pkgconf",
++        "bzip2",
++
++        # gnu tools
++        "bash",
++        "gmake",
++        "gsed",
++        "flex", "bison",
++
++        # libs: crypto
++        "gnutls",
++
++        # libs: images
++        "jpeg-turbo",
++        "png",
++
++        # libs: ui
++        "sdl2",
++        "gtk3",
++        "libxkbcommon",
++
++        # libs: opengl
++        "libepoxy",
++        "mesa-libs",
++    ]
++
+     BUILD_SCRIPT =3D """
+         set -e;
+-        rm -rf /var/tmp/qemu-test.*
+-        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
++        rm -rf /home/qemu/qemu-test.*
++        cd $(mktemp -d /home/qemu/qemu-test.XXXXXX);
++        mkdir src build; cd src;
+         tar -xf /dev/vtbd1;
+-        ./configure {configure_opts};
++        cd ../build
++        ../src/configure --python=3Dpython3.6 {configure_opts};
+         gmake --output-sync -j{jobs} {target} {verbose};
+     """
+=20
++    def console_boot_serial(self):
++        self.console_wait_send("Autoboot", "3")
++        self.console_wait_send("OK", "set console=3Dcomconsole\n")
++        self.console_wait_send("OK", "boot\n")
++
+     def build_image(self, img):
+-        cimg =3D self._download_with_cache("http://download.patchew.org/=
+freebsd-11.1-amd64.img.xz",
+-                sha256sum=3D'adcb771549b37bc63826c501f05121a206ed3d9f55f=
+49145908f7e1432d65891')
+-        img_tmp_xz =3D img + ".tmp.xz"
++        self.print_step("Downloading install iso")
++        cimg =3D self._download_with_cache(self.link, sha256sum=3Dself.c=
+sum)
+         img_tmp =3D img + ".tmp"
+-        sys.stderr.write("Extracting the image...\n")
+-        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
+-        subprocess.check_call(["xz", "-dvf", img_tmp_xz])
++        iso =3D img + ".install.iso"
++        iso_xz =3D iso + ".xz"
++
++        self.print_step("Preparing iso and disk image")
++        subprocess.check_call(["cp", "-f", cimg, iso_xz])
++        subprocess.check_call(["xz", "-dvf", iso_xz])
++        subprocess.check_call(["qemu-img", "create", "-f", "qcow2",
++                               img_tmp, self.size])
++
++        self.print_step("Booting installer")
++        self.boot(img_tmp, extra_args =3D [
++            "-machine", "graphics=3Doff",
++            "-cdrom", iso
++        ])
++        self.console_init()
++        self.console_boot_serial()
++        self.console_wait_send("Console type",          "xterm\n")
++
++        # pre-install configuration
++        self.console_wait_send("Welcome",               "\n")
++        self.console_wait_send("Keymap Selection",      "\n")
++        self.console_wait_send("Set Hostname",          "freebsd\n")
++        self.console_wait_send("Distribution Select",   "\n")
++        self.console_wait_send("Partitioning",          "\n")
++        self.console_wait_send("Partition",             "\n")
++        self.console_wait_send("Scheme",                "\n")
++        self.console_wait_send("Editor",                "f")
++        self.console_wait_send("Confirmation",          "c")
++
++        self.print_step("Installation started now, this will take a whil=
+e")
++
++        # post-install configuration
++        self.console_wait("New Password:")
++        self.console_send("%s\n" % self.ROOT_PASS)
++        self.console_wait("Retype New Password:")
++        self.console_send("%s\n" % self.ROOT_PASS)
++
++        self.console_wait_send("Network Configuration", "\n")
++        self.console_wait_send("IPv4",                  "y")
++        self.console_wait_send("DHCP",                  "y")
++        self.console_wait_send("IPv6",                  "n")
++        self.console_wait_send("Resolver",              "\n")
++
++        self.console_wait_send("Time Zone Selector",    "a\n")
++        self.console_wait_send("Confirmation",          "y")
++        self.console_wait_send("Time & Date",           "\n")
++        self.console_wait_send("Time & Date",           "\n")
++
++        self.console_wait_send("System Configuration",  "\n")
++        self.console_wait_send("System Hardening",      "\n")
++
++        # qemu user
++        self.console_wait_send("Add User Accounts", "y")
++        self.console_wait("Username")
++        self.console_send("%s\n" % self.GUEST_USER)
++        self.console_wait("Full name")
++        self.console_send("%s\n" % self.GUEST_USER)
++        self.console_wait_send("Uid",                   "\n")
++        self.console_wait_send("Login group",           "\n")
++        self.console_wait_send("Login group",           "\n")
++        self.console_wait_send("Login class",           "\n")
++        self.console_wait_send("Shell",                 "\n")
++        self.console_wait_send("Home directory",        "\n")
++        self.console_wait_send("Home directory perm",   "\n")
++        self.console_wait_send("Use password",          "\n")
++        self.console_wait_send("Use an empty password", "\n")
++        self.console_wait_send("Use a random password", "\n")
++        self.console_wait("Enter password:")
++        self.console_send("%s\n" % self.GUEST_PASS)
++        self.console_wait("Enter password again:")
++        self.console_send("%s\n" % self.GUEST_PASS)
++        self.console_wait_send("Lock out",              "\n")
++        self.console_wait_send("OK",                    "yes\n")
++        self.console_wait_send("Add another user",      "no\n")
++
++        self.console_wait_send("Final Configuration",   "\n")
++        self.console_wait_send("Manual Configuration",  "\n")
++        self.console_wait_send("Complete",              "\n")
++
++        self.print_step("Installation finished, rebooting")
++        self.console_boot_serial()
++
++        # setup qemu user
++        prompt =3D "$"
++        self.console_ssh_init(prompt, self.GUEST_USER, self.GUEST_PASS)
++        self.console_wait_send(prompt, "exit\n")
++
++        # setup root user
++        prompt =3D "root@freebsd:~ #"
++        self.console_ssh_init(prompt, "root", self.ROOT_PASS)
++        self.console_sshd_config(prompt)
++
++        # setup serial console
++        self.console_wait(prompt)
++        self.console_send("echo 'console=3Dcomconsole' >> /boot/loader.c=
+onf\n")
++
++        # setup boot delay
++        self.console_wait(prompt)
++        self.console_send("echo 'autoboot_delay=3D1' >> /boot/loader.con=
+f\n")
++
++        # setup virtio-blk #1 (tarfile)
++        self.console_wait(prompt)
++        self.console_send("echo 'chmod 666 /dev/vtbd1' >> /etc/rc.local\=
+n")
++
++        self.print_step("Configuration finished, rebooting")
++        self.console_wait_send(prompt, "reboot\n")
++        self.console_wait("login:")
++        self.wait_ssh()
++
++        self.print_step("Installing packages")
++        self.ssh_root_check("pkg install -y %s\n" % " ".join(self.pkgs))
++
++        # shutdown
++        self.ssh_root(self.poweroff)
++        self.console_wait("Uptime:")
++        self.wait()
++
+         if os.path.exists(img):
+             os.remove(img)
+         os.rename(img_tmp, img)
++        os.remove(iso)
++        self.print_step("All done")
+=20
+ if __name__ =3D=3D "__main__":
+     sys.exit(basevm.main(FreeBSDVM))
+--=20
+2.18.1
 
->  target/mips/op_helper.c | 188
-++++++++++++++++++++++++++++++++++++++++++------
->  1 file changed, 168 insertions(+), 20 deletions(-)
->
-> diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-> index 45be406..d94909a 100644
-> --- a/target/mips/op_helper.c
-> +++ b/target/mips/op_helper.c
-> @@ -4565,31 +4565,179 @@ static inline void
-ensure_writable_pages(CPUMIPSState *env,
->  #endif
->  }
->
-> -#define MSA_ST_DF(DF, TYPE, ST_INSN, ...)                               \
-> -void helper_msa_st_ ## TYPE(CPUMIPSState *env, uint32_t wd,             \
-> -                            target_ulong addr)                          \
-> -{                                                                       \
-> -    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);                          \
-> -    int mmu_idx = cpu_mmu_index(env, false);                           \
-> -    int i;                                                              \
-> -    MEMOP_IDX(DF)                                                       \
-> -    ensure_writable_pages(env, addr, mmu_idx, GETPC());                 \
-> -    for (i = 0; i < DF_ELEMENTS(DF); i++) {                             \
-> -        ST_INSN(env, addr + (i << DF), pwd->TYPE[i], ##__VA_ARGS__);    \
-> -    }                                                                   \
-> +void helper_msa_st_b(CPUMIPSState *env, uint32_t wd,
-> +                     target_ulong addr)
-> +{
-> +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-> +    MEMOP_IDX(DF_BYTE)
-> +#if !defined(CONFIG_USER_ONLY)
-> +#if !defined(HOST_WORDS_BIGENDIAN)
-> +    helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[0],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[1],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[2],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (3  << DF_BYTE), pwd->b[3],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (4  << DF_BYTE), pwd->b[4],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (5  << DF_BYTE), pwd->b[5],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (6  << DF_BYTE), pwd->b[6],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (7  << DF_BYTE), pwd->b[7],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (8  << DF_BYTE), pwd->b[8],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (9  << DF_BYTE), pwd->b[9],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b[10], oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b[11], oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b[12], oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b[13], oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b[14], oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b[15], oi,
-GETPC());
-> +#else
-> +    helper_ret_stb_mmu(env, addr + (7  << DF_BYTE), pwd->b[0],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (6  << DF_BYTE), pwd->b[1],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (5  << DF_BYTE), pwd->b[2],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (4  << DF_BYTE), pwd->b[3],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (3  << DF_BYTE), pwd->b[4],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[5],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[6],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[7],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b[8],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b[9],  oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b[10], oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b[11], oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b[12], oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b[13], oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (9  << DF_BYTE), pwd->b[14], oi,
-GETPC());
-> +    helper_ret_stb_mmu(env, addr + (8  << DF_BYTE), pwd->b[15], oi,
-GETPC());
-> +#endif
-> +#else
-> +#if !defined(HOST_WORDS_BIGENDIAN)
-> +    cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[0]);
-> +    cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[1]);
-> +    cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[2]);
-> +    cpu_stb_data(env, addr + (3  << DF_BYTE), pwd->b[3]);
-> +    cpu_stb_data(env, addr + (4  << DF_BYTE), pwd->b[4]);
-> +    cpu_stb_data(env, addr + (5  << DF_BYTE), pwd->b[5]);
-> +    cpu_stb_data(env, addr + (6  << DF_BYTE), pwd->b[6]);
-> +    cpu_stb_data(env, addr + (7  << DF_BYTE), pwd->b[7]);
-> +    cpu_stb_data(env, addr + (8  << DF_BYTE), pwd->b[8]);
-> +    cpu_stb_data(env, addr + (9  << DF_BYTE), pwd->b[9]);
-> +    cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[10]);
-> +    cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[11]);
-> +    cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[12]);
-> +    cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[13]);
-> +    cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[14]);
-> +    cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[15]);
-> +#else
-> +    cpu_stb_data(env, addr + (7  << DF_BYTE), pwd->b[0]);
-> +    cpu_stb_data(env, addr + (6  << DF_BYTE), pwd->b[1]);
-> +    cpu_stb_data(env, addr + (5  << DF_BYTE), pwd->b[2]);
-> +    cpu_stb_data(env, addr + (4  << DF_BYTE), pwd->b[3]);
-> +    cpu_stb_data(env, addr + (3  << DF_BYTE), pwd->b[4]);
-> +    cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[5]);
-> +    cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[6]);
-> +    cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[7]);
-> +    cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[8]);
-> +    cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[9]);
-> +    cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[10]);
-> +    cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[11]);
-> +    cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[12]);
-> +    cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[13]);
-> +    cpu_stb_data(env, addr + (9  << DF_BYTE), pwd->b[14]);
-> +    cpu_stb_data(env, addr + (8  << DF_BYTE), pwd->b[15]);
-> +#endif
-> +#endif
-> +}
-> +
-> +void helper_msa_st_h(CPUMIPSState *env, uint32_t wd,
-> +                     target_ulong addr)
-> +{
-> +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-> +    MEMOP_IDX(DF_HALF)
-> +#if !defined(CONFIG_USER_ONLY)
-> +#if !defined(HOST_WORDS_BIGENDIAN)
-> +    helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[0], oi,
-GETPC());
-> +    helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[1], oi,
-GETPC());
-> +    helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[2], oi,
-GETPC());
-> +    helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[3], oi,
-GETPC());
-> +    helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[4], oi,
-GETPC());
-> +    helper_ret_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[5], oi,
-GETPC());
-> +    helper_ret_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[6], oi,
-GETPC());
-> +    helper_ret_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[7], oi,
-GETPC());
-> +#else
-> +    helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[0], oi,
-GETPC());
-> +    helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[1], oi,
-GETPC());
-> +    helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[2], oi,
-GETPC());
-> +    helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[3], oi,
-GETPC());
-> +    helper_ret_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[4], oi,
-GETPC());
-> +    helper_ret_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[5], oi,
-GETPC());
-> +    helper_ret_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[6], oi,
-GETPC());
-> +    helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[7], oi,
-GETPC());
-> +#endif
-> +#else
-> +#if !defined(HOST_WORDS_BIGENDIAN)
-> +    cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[0]);
-> +    cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[1]);
-> +    cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[2]);
-> +    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[3]);
-> +    cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[4]);
-> +    cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[5]);
-> +    cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[6]);
-> +    cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[7]);
-> +#else
-> +    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[0]);
-> +    cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[1]);
-> +    cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[2]);
-> +    cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[3]);
-> +    cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[4]);
-> +    cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[5]);
-> +    cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[6]);
-> +    cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[7]);
-> +#endif
-> +#endif
->  }
->
-> +void helper_msa_st_w(CPUMIPSState *env, uint32_t wd,
-> +                     target_ulong addr)
-> +{
-> +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-> +    MEMOP_IDX(DF_WORD)
->  #if !defined(CONFIG_USER_ONLY)
-> -MSA_ST_DF(DF_BYTE,   b, helper_ret_stb_mmu, oi, GETPC())
-> -MSA_ST_DF(DF_HALF,   h, helper_ret_stw_mmu, oi, GETPC())
-> -MSA_ST_DF(DF_WORD,   w, helper_ret_stl_mmu, oi, GETPC())
-> -MSA_ST_DF(DF_DOUBLE, d, helper_ret_stq_mmu, oi, GETPC())
-> +#if !defined(HOST_WORDS_BIGENDIAN)
-> +    helper_ret_stl_mmu(env, addr + (0 << DF_WORD), oi, GETPC(),
-pwd->w[0]);
-> +    helper_ret_stl_mmu(env, addr + (1 << DF_WORD), oi, GETPC(),
-pwd->w[1]);
-> +    helper_ret_stl_mmu(env, addr + (2 << DF_WORD), oi, GETPC(),
-pwd->w[2]);
-> +    helper_ret_stl_mmu(env, addr + (3 << DF_WORD), oi, GETPC(),
-pwd->w[3]);
->  #else
-> -MSA_ST_DF(DF_BYTE,   b, cpu_stb_data)
-> -MSA_ST_DF(DF_HALF,   h, cpu_stw_data)
-> -MSA_ST_DF(DF_WORD,   w, cpu_stl_data)
-> -MSA_ST_DF(DF_DOUBLE, d, cpu_stq_data)
-> +    helper_ret_stl_mmu(env, addr + (1 << DF_WORD), oi, GETPC(),
-pwd->w[0]);
-> +    helper_ret_stl_mmu(env, addr + (0 << DF_WORD), oi, GETPC(),
-pwd->w[1]);
-> +    helper_ret_stl_mmu(env, addr + (3 << DF_WORD), oi, GETPC(),
-pwd->w[2]);
-> +    helper_ret_stl_mmu(env, addr + (2 << DF_WORD), oi, GETPC(),
-pwd->w[3]);
->  #endif
-> +#else
-> +#if !defined(HOST_WORDS_BIGENDIAN)
-> +    cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[0]);
-> +    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[1]);
-> +    cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[2]);
-> +    cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[3]);
-> +#else
-> +    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[0]);
-> +    cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[1]);
-> +    cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[2]);
-> +    cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[3]);
-> +#endif
-> +#endif
-> +}
-> +
-> +void helper_msa_st_d(CPUMIPSState *env, uint32_t wd,
-> +                     target_ulong addr)
-> +{
-> +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-> +    MEMOP_IDX(DF_DOUBLE)
-> +#if !defined(CONFIG_USER_ONLY)
-> +    helper_ret_stq_mmu(env, addr + (0 << DF_DOUBLE), pwd->d[0], oi,
-GETPC());
-> +    helper_ret_stq_mmu(env, addr + (1 << DF_DOUBLE), pwd->d[1], oi,
-GETPC());
-> +#else
-> +    cpu_stq_data(env, addr + (0 << DF_DOUBLE), pwd->d[0]);
-> +    cpu_stq_data(env, addr + (1 << DF_DOUBLE), pwd->d[1]);
-> +#endif
-> +}
->
->  void helper_cache(CPUMIPSState *env, target_ulong addr, uint32_t op)
->  {
-> --
-> 2.7.4
->
->
+
