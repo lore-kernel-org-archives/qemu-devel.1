@@ -2,59 +2,82 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17C14C04AB4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 01:06:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33812C04AB4
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 01:29:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D58DA20675
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 01:06:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D58DA20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id E7A2620815
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 01:29:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h1hcWFru"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7A2620815
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55792 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56007 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSWlL-0005Hm-3Y
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 21:06:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59656)
+	id 1hSX7F-0000vN-Te
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 21:29:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hSWfp-00019d-V0
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 21:01:07 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1hSX6K-0000Xo-JX
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 21:28:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hSWfo-0006jF-7g
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 21:01:05 -0400
-Received: from mga04.intel.com ([192.55.52.120]:13790)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hSWfk-0006aZ-Fw; Sun, 19 May 2019 21:01:00 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-	by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	19 May 2019 18:00:59 -0700
-X-ExtLoop1: 1
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by orsmga008.jf.intel.com with ESMTP; 19 May 2019 18:00:57 -0700
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org
-Date: Mon, 20 May 2019 08:59:56 +0800
-Message-Id: <20190520005957.6953-6-richardw.yang@linux.intel.com>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190520005957.6953-1-richardw.yang@linux.intel.com>
-References: <20190520005957.6953-1-richardw.yang@linux.intel.com>
+	(envelope-from <liq3ea@gmail.com>) id 1hSX6I-0003Gv-OR
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 21:28:28 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:43013)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>)
+	id 1hSX6H-0003GE-Ok; Sun, 19 May 2019 21:28:26 -0400
+Received: by mail-oi1-x242.google.com with SMTP id t187so8780433oie.10;
+	Sun, 19 May 2019 18:28:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=iwd3H7j1Rkw3fNfho1CBYGCEkGb8ak8eTd6zR2yanWM=;
+	b=h1hcWFru1pTUyDOYnF5ELVqLUsQFgUaG3DAa66KhMCwfJRhrbD8h0R2l0cu3Fy+u4F
+	rhzHm/QZI3KuNuxmZR/n2NBFzSE2Rh0GYUh8y5sLNfIqoB+Oh1RHva8/7X+vaw7SWPQR
+	pbpuEqNuyMivoZdixiaMiZ4oooU2R01ZfS6Yo8+kn6aaIWyiYTZmovz3MSAt9nM7As2f
+	tFT7xOhjhb4MhlYU3IPH9F1CKSwAg0EtGhZeZFO120uMB/ex+HSz9iiAQmS7zoB57L7p
+	IIeqQa2hVIVLJHl2wbrkR9US5Xar9sOLBsAP2b36IDmrna7HisIVM6qlYe07EyGRP6Y2
+	nGog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=iwd3H7j1Rkw3fNfho1CBYGCEkGb8ak8eTd6zR2yanWM=;
+	b=oDpj1/d8rUCZdDnoR2sKcSz7S3iJkRonD8ScoOM5iGf+IrfM6VKzNeNwNHBKIttkmw
+	ZU/5XvMc3oqYN7FQ7E9hxkjKjrPC4en15zaJXhnxNXPSVnJi14hdqTJd/LzqSP+8izi8
+	8OXmWUN0NwyoYKpSorzR+7pdho0fUnz0744rtcjNa7edLAeY6/okMaqXelUefjbxbmcy
+	uLJQy9aNgWTnwAIF5424yON4vbHbVFSK0xrQuISeUtFL4y2ctJb2ZIwvjn42cy91qfMn
+	QVsBC++WNFrOhDwz4ew9eulJe14e38FAKgwAYWRuhNyNH8kMqGA4CMWDhQVlqIG8gQ4X
+	IUbA==
+X-Gm-Message-State: APjAAAWkbyRmnQ7/78hfPt+//d3zHZxtznQqXVAdlOEDBUeFb1glyH5J
+	ui6ox/BWPN1bZO5OIQW7bjHWlPo0zR7qHhvSAZU=
+X-Google-Smtp-Source: APXvYqzA68gsO/rd6NA6hNLuIUxSUhAz507RHNesga+3O8CzHW1Da5lg0v7sr6TdWL/Gf0bS/BL5KdCyCbpVAB1iseE=
+X-Received: by 2002:aca:fc43:: with SMTP id a64mr1587143oii.129.1558315703318; 
+	Sun, 19 May 2019 18:28:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20190518032811.60341-1-liq3ea@163.com>
+	<20190518081830.5adab426@x1.home>
+In-Reply-To: <20190518081830.5adab426@x1.home>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 20 May 2019 09:27:47 +0800
+Message-ID: <CAKXe6SK=Uw7ZNPDvWHFoTHynFsOrEDcAK-+p2ft7YMpo86uC+A@mail.gmail.com>
+To: Alex Williamson <alex.williamson@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 192.55.52.120
-Subject: [Qemu-devel] [PATCH v5 5/6] hw/acpi: Consolidate build_mcfg to pci.c
+X-Received-From: 2607:f8b0:4864:20::242
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH 1/4] vfio: pci: make "vfio-pci-nohotplug"
+ as MACRO
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,215 +89,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, thuth@redhat.com,
-	mst@redhat.com, shannon.zhaosl@gmail.com,
-	Wei Yang <richardw.yang@linux.intel.com>, imammedo@redhat.com,
-	philmd@redhat.com
+Cc: lvivier@redhat.com, qemu-trivial@nongnu.org, Li Qiang <liq3ea@163.com>,
+	Qemu Developers <qemu-devel@nongnu.org>,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now we have two identical build_mcfg functions.
+Alex Williamson <alex.williamson@redhat.com> =E4=BA=8E2019=E5=B9=B45=E6=9C=
+=8818=E6=97=A5=E5=91=A8=E5=85=AD =E4=B8=8B=E5=8D=8810:18=E5=86=99=E9=81=93=
+=EF=BC=9A
 
-Consolidate them in acpi/pci.c.
+> On Fri, 17 May 2019 20:28:08 -0700
+> Li Qiang <liq3ea@163.com> wrote:
+>
+> Why?  (No commit message, nor cover letter)
+>
+>
+Once I think these are trivial so no cover letter and lack some commit
+message.
+I will add some commit message in the next revision.
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+For this patch, this is more consistent with QOMConventions:
+-->https://wiki.qemu.org/Documentation/QOMConventions
 
----
-v4:
-  * ACPI_PCI depends on both ACPI and PCI
-  * rebase on latest master, adjust arm Kconfig
-v3:
-  * adjust changelog based on Igor's suggestion
----
- default-configs/i386-softmmu.mak |  1 +
- hw/acpi/Kconfig                  |  4 +++
- hw/acpi/Makefile.objs            |  1 +
- hw/acpi/pci.c                    | 46 ++++++++++++++++++++++++++++++++
- hw/arm/Kconfig                   |  1 +
- hw/arm/virt-acpi-build.c         | 17 ------------
- hw/i386/acpi-build.c             | 18 +------------
- include/hw/acpi/pci.h            |  1 +
- 8 files changed, 55 insertions(+), 34 deletions(-)
- create mode 100644 hw/acpi/pci.c
-
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index ba3fb3ff50..cd5ea391e8 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -25,3 +25,4 @@
- CONFIG_ISAPC=y
- CONFIG_I440FX=y
- CONFIG_Q35=y
-+CONFIG_ACPI_PCI=y
-diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-index eca3beed75..7c59cf900b 100644
---- a/hw/acpi/Kconfig
-+++ b/hw/acpi/Kconfig
-@@ -23,6 +23,10 @@ config ACPI_NVDIMM
-     bool
-     depends on ACPI
- 
-+config ACPI_PCI
-+    bool
-+    depends on ACPI && PCI
-+
- config ACPI_VMGENID
-     bool
-     default y
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index 2d46e3789a..661a9b8c2f 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -11,6 +11,7 @@ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
- common-obj-y += acpi_interface.o
- common-obj-y += bios-linker-loader.o
- common-obj-y += aml-build.o
-+common-obj-$(CONFIG_ACPI_PCI) += pci.o
- common-obj-$(CONFIG_TPM) += tpm.o
- 
- common-obj-$(CONFIG_IPMI) += ipmi.o
-diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
-new file mode 100644
-index 0000000000..fa0fa30bb9
---- /dev/null
-+++ b/hw/acpi/pci.c
-@@ -0,0 +1,46 @@
-+/*
-+ * Support for generating PCI related ACPI tables and passing them to Guests
-+ *
-+ * Copyright (C) 2006 Fabrice Bellard
-+ * Copyright (C) 2008-2010  Kevin O'Connor <kevin@koconnor.net>
-+ * Copyright (C) 2013-2019 Red Hat Inc
-+ * Copyright (C) 2019 Intel Corporation
-+ *
-+ * Author: Wei Yang <richardw.yang@linux.intel.com>
-+ * Author: Michael S. Tsirkin <mst@redhat.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/acpi/aml-build.h"
-+#include "hw/acpi/pci.h"
-+#include "hw/pci/pcie_host.h"
-+
-+void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-+{
-+    AcpiTableMcfg *mcfg;
-+    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
-+
-+    mcfg = acpi_data_push(table_data, len);
-+    mcfg->allocation[0].address = cpu_to_le64(info->base);
-+
-+    /* Only a single allocation so no need to play with segments */
-+    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
-+    mcfg->allocation[0].start_bus_number = 0;
-+    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
-+
-+    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-+}
-+
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index af8cffde9c..9aced9d54d 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -19,6 +19,7 @@ config ARM_VIRT
-     select PLATFORM_BUS
-     select SMBIOS
-     select VIRTIO_MMIO
-+    select ACPI_PCI
- 
- config CHEETAH
-     bool
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index e7c96d658e..4a64f9985c 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -546,23 +546,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-                  "SRAT", table_data->len - srat_start, 3, NULL, NULL);
- }
- 
--static void
--build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
--{
--    AcpiTableMcfg *mcfg;
--    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
--
--    mcfg = acpi_data_push(table_data, len);
--    mcfg->allocation[0].address = cpu_to_le64(info->base);
--
--    /* Only a single allocation so no need to play with segments */
--    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
--    mcfg->allocation[0].start_bus_number = 0;
--    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
--
--    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
--}
--
- /* GTDT */
- static void
- build_gtdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 0d78d73894..85dc1640bc 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2405,22 +2405,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-                  table_data->len - srat_start, 1, NULL, NULL);
- }
- 
--static void
--build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
--{
--    AcpiTableMcfg *mcfg;
--    int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
--
--    mcfg = acpi_data_push(table_data, len);
--    mcfg->allocation[0].address = cpu_to_le64(info->base);
--    /* Only a single allocation so no need to play with segments */
--    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
--    mcfg->allocation[0].start_bus_number = 0;
--    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
--
--    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
--}
--
- /*
-  * VT-d spec 8.1 DMA Remapping Reporting Structure
-  * (version Oct. 2014 or later)
-@@ -2690,7 +2674,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-     }
-     if (acpi_get_mcfg(&mcfg)) {
-         acpi_add_table(table_offsets, tables_blob);
--        build_mcfg_q35(tables_blob, tables->linker, &mcfg);
-+        build_mcfg(tables_blob, tables->linker, &mcfg);
-     }
-     if (x86_iommu_get_default()) {
-         IommuType IOMMUType = x86_iommu_get_type();
-diff --git a/include/hw/acpi/pci.h b/include/hw/acpi/pci.h
-index 124af7d32a..8bbd32cf45 100644
---- a/include/hw/acpi/pci.h
-+++ b/include/hw/acpi/pci.h
-@@ -30,4 +30,5 @@ typedef struct AcpiMcfgInfo {
-     uint32_t size;
- } AcpiMcfgInfo;
- 
-+void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info);
- #endif
--- 
-2.19.1
+Thanks,
+Li Qiang
 
 
+> > CC: qemu-trivial@nongnu.org
+> > Signed-off-by: Li Qiang <liq3ea@163.com>
+> > ---
+> >  hw/vfio/pci.c | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index 8cecb53d5c..08729e5875 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -40,6 +40,8 @@
+> >  #define TYPE_VFIO_PCI "vfio-pci"
+> >  #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PC=
+I)
+> >
+> > +#define TYPE_VIFO_PCI_NOHOTPLUG "vfio-pci-nohotplug"
+> > +
+> >  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+> >  static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+> >
+> > @@ -3304,8 +3306,8 @@ static void
+> vfio_pci_nohotplug_dev_class_init(ObjectClass *klass, void *data)
+> >  }
+> >
+> >  static const TypeInfo vfio_pci_nohotplug_dev_info =3D {
+> > -    .name =3D "vfio-pci-nohotplug",
+> > -    .parent =3D "vfio-pci",
+> > +    .name =3D TYPE_VIFO_PCI_NOHOTPLUG,
+> > +    .parent =3D TYPE_VFIO_PCI,
+> >      .instance_size =3D sizeof(VFIOPCIDevice),
+> >      .class_init =3D vfio_pci_nohotplug_dev_class_init,
+> >  };
+>
+>
