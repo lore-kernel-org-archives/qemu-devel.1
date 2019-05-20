@@ -2,86 +2,93 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C6B0C04E87
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:37:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A8B4C04E87
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:42:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16EDD216FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:37:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CBBC0216B7
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:42:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eDRwy3oN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16EDD216FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HFTLRZ1h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBBC0216B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34847 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34975 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hShXc-0006TI-KG
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 08:37:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39821)
+	id 1hShc9-0000Mw-KW
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 08:42:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hShW2-0005I8-W9
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:35:45 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hShar-0007ia-0o
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:40:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hShW1-0007qt-Bq
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:35:42 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42042)
+	(envelope-from <alex.bennee@linaro.org>) id 1hShaq-0001UK-6m
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:40:40 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51443)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1hShW1-0007ot-5e
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:35:41 -0400
-Received: by mail-ot1-x341.google.com with SMTP id i2so7425339otr.9
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 05:35:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-	:cc; bh=i6/gwCq5cQhTWhm9SP8esc5pJWj7TzyVU42WW0EvQPg=;
-	b=eDRwy3oNOHiG+gCQwnrzknAaBEvgjJkdKOVNgVA2Pg89ujYQHMWnkHarVaD+/PbE+q
-	yik7AjKsPmrq1/GXclmlvi7KsowJyXOf4NXoZoumIvBaS28tYqM7vI/UDIvlVojBVDcV
-	wIh8qyrplcYjTHgt0T/p3C47BS0ZYL2R0zauT4qcApQEJVRmXiyCRJ9AYG8zuEyTkD1f
-	/ry88F7PXSB+pYovZQashIvpm1B2us3tsAZgkBlaipsK6IhdcTU4EJiXs6o0PJ26cydg
-	3AN6QjgDfkdUbwO093l7VqxB+ciSYweblttoAu8fuU21Fe9OW9kxkNF9vEekjaa+KEKR
-	qZ+g==
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hShap-0001U6-VP
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:40:40 -0400
+Received: by mail-wm1-x343.google.com with SMTP id c77so11658619wmd.1
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 05:40:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=4gUoSOtHM7EmjVYdXkTbZPZ2KJrZvuf0H5L1g00TcZs=;
+	b=HFTLRZ1hv5qrRIolJRESw7lcLVKprKKTBCarW9iGENeyzcReQXWiO9vbyoWCrsBDv9
+	3/h97uOZgJf8R2Yqut51bMKzdmzy4DED2Xkoe3c2bBJT9Qn4YuJ9VrZekZTjAbkANJOI
+	piQgGadjv/7qg3oqknuI3amVvib7FPUsaL8+X44u+EqrEFWKrzP99IP1OVYwg2u3Q/GA
+	VKAgmi82DdLlIAGJ3pKOEGHGOl1jbVNtp1+/qznaMuv/Fd0Y1BnTSLTYh+olMVv2JQh0
+	xOOQKSWuZdN9y/rSQmnxVAW8HN9P5S7jy1LE+yTvXOsYxKEXeSO8ETNajQWTqhOaURUw
+	hvIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-	:message-id:subject:to:cc;
-	bh=i6/gwCq5cQhTWhm9SP8esc5pJWj7TzyVU42WW0EvQPg=;
-	b=chB5e/Wn7D1G/Va/YIzARtH0BymOrOA+4vlYWJosaOIKDsf5jnnPM1np9+3biFAg/O
-	E03Ahgrp5gPc/iM+KS0cVyR6UC/gWsA6M3e2iXQsHt5K/ssvvyrhm6FB+rTCLQKd5a75
-	6gaZTD9sYreHR9+3JtH6DVycE3Z/WaA+vSPoZqIAoe+J8WXNRAaw1c9k+USsrlIomyaP
-	twrXFA4imAr8Dh3kSfiv/SS1fHNDnh+FwhszavpfZAKXU/PLUBxvC2464QmDjJvQ+Rvb
-	uGAgbkyBIuzTzCghpJoaFWEczelgZ93nmNKgN+drSzF3BISM0n1YvJ50wx38eMaLzo/8
-	mxCg==
-X-Gm-Message-State: APjAAAXkXW3zOgqoWisjptAGX3IP/ogHD73Wh2kbkh2dR2y9gQiQ4/JJ
-	3lNzoxK952xRfOO401DKxZtE2hDiEVY6QEzWWPDxfg==
-X-Google-Smtp-Source: APXvYqy4e3CcJY2q9viOxQlyaHjyWSDInfbAz5MJKXwN9Vndm+kqNktj9YgCP3MjYfD1Z1qKMW2wE3p9gxkN3GhcWlA=
-X-Received: by 2002:a9d:7858:: with SMTP id c24mr2825otm.64.1558355735854;
-	Mon, 20 May 2019 05:35:35 -0700 (PDT)
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=4gUoSOtHM7EmjVYdXkTbZPZ2KJrZvuf0H5L1g00TcZs=;
+	b=InjfH6TQlH86FIhxiPSitoIGdlsVIqlmoaykSw4Vufc4GUbNNwM5VR2xB7CZhq1YmU
+	vw56gpI4x59MfFl3i0uwhS+yMokNybwXTBDigne7MPwhulIsJA37V5owToNgrI5myhAc
+	2YJIEyW1ZIjPYBK43W4/udSIUmfMAgqWilPd4/Qda2F2S2GMhCTigfog1N2sihfvf+k6
+	te3Bx5sZ2NzclSN1KWPUF8iZjUENJgh3X4tp3nxPC1t/2el+bYG3okhzZDxsTnsbwH+3
+	dhKhZ7oBsSJBbGYEzQlGVkgDiFPRtPwM2VfsNoWoJjQXU1766zs3lfPhR2ZyxvAblHv7
+	r66Q==
+X-Gm-Message-State: APjAAAXi7Hu+CtB8jr6aYroRUoFcrFoijF9VYrx+YUZpFFxnzbeCUYgd
+	QWZPZJiU98WPCB40TRDtwwMaCg==
+X-Google-Smtp-Source: APXvYqzFtYsfuxGUSvvmFI5D/JoaUlc85rjwwoSKdNcxSdtTZbkQIcuFt9TcjY8z0SPwVLKBCO+fjw==
+X-Received: by 2002:a1c:9904:: with SMTP id b4mr31083552wme.1.1558356038597;
+	Mon, 20 May 2019 05:40:38 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	d17sm11011515wrw.18.2019.05.20.05.40.37
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Mon, 20 May 2019 05:40:37 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 7A5711FF87;
+	Mon, 20 May 2019 13:40:37 +0100 (BST)
+References: <20190502081554.5521-1-arilou@gmail.com>
+	<20190502081554.5521-25-arilou@gmail.com>
+	<87a7fnmx2t.fsf@zen.linaroharston>
+	<CAP7QCohe8gHEUhSed+yVi4gkYmJx+KoYzAikOs4uFNAWHxQgwg@mail.gmail.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Jon Doron <arilou@gmail.com>
+In-reply-to: <CAP7QCohe8gHEUhSed+yVi4gkYmJx+KoYzAikOs4uFNAWHxQgwg@mail.gmail.com>
+Date: Mon, 20 May 2019 13:40:37 +0100
+Message-ID: <87tvdpguyi.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Mon, 20 May 2019 05:35:35
-	-0700 (PDT)
-Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Mon, 20 May 2019 05:35:35
-	-0700 (PDT)
-In-Reply-To: <CAFEAcA842fq=CG+y_qGySWV3i_JNPEk0iQwCJxed6cQcCMidWA@mail.gmail.com>
-References: <1558263144-8776-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<CAFEAcA842fq=CG+y_qGySWV3i_JNPEk0iQwCJxed6cQcCMidWA@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 20 May 2019 14:35:35 +0200
-Message-ID: <CAL1e-=i91f-vgyFJOJhN51JaUoTZgdhby_F_YyeTr_KYWBsZeA@mail.gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PULL 00/10] MIPS queue for May 19th, 2019
+X-Received-From: 2a00:1450:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH v9 24/27] gdbstub: Add another handler for
+ setting qemu.sstep
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,70 +100,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On May 20, 2019 2:11 PM, "Peter Maydell" <peter.maydell@linaro.org> wrote:
->
-> On Sun, 19 May 2019 at 11:52, Aleksandar Markovic
-> <aleksandar.markovic@rt-rk.com> wrote:
-> >
-> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> >
-> > The following changes since commit
-1b46b4daa6fbf45eddcf77877379a0afac341df9:
-> >
-> >   Merge remote-tracking branch
-'remotes/kraxel/tags/ui-20190517-pull-request' into staging (2019-05-17
-17:25:19 +0100)
-> >
-> > are available in the git repository at:
-> >
-> >   https://github.com/AMarkovic/qemu tags/mips-queue-may-19-2019
-> >
-> > for you to fetch changes up to 71074d1d2fae9a0c8dab87c5bb5271a71d6cb7ab:
-> >
-> >   mips: Decide to map PAGE_EXEC in map_address (2019-05-19 12:11:46
-+0200)
-> >
-> > ----------------------------------------------------------------
-> >
-> > MIPS queue for May 19th, 2019
-> >
-> >   * A fix for HelenOS boot hang (related to the flag PAGE_EXEC)
-> >   * A set of fixes for emulation of MSA ASE on big endian hosts
-> >   * Improved usage of object_initialize() and object_initialize_child()
-> >   * Better handling of 'div by zero' cases in MSA ASE
-> >
-> > ----------------------------------------------------------------
->
-> Hi -- I'm afraid this fails to build with clang:
-> /home/petmay01/linaro/qemu-for-merges/target/mips/op_helper.c:4536:20:
-> error: unused function 'ensure_writable_pages'
-> [-Werror,-Wunused-function]
-> static inline void ensure_writable_pages(CPUMIPSState *env,
->                    ^
-> 1 error generated.
->
-> It looks like "target/mips: Fix MSA instructions ST.<B|H|W|D>
-> on big endian host" removed the last use of this function
-> but didn't remove the now-unused definition.
->
-> (clang is pickier than gcc about not allowing unused 'static
-> inline' functions -- gcc ignores them anywhere, clang only if
-> they're in .h files.)
->
 
-Ughhh... Sorry. I should have had a script for this. I'll send v2 in few
-days.
+Jon Doron <arilou@gmail.com> writes:
 
-Regards,
-Aleksandar
-
-> thanks
-> -- PMm
+> On Wed, May 15, 2019 at 8:44 PM Alex Benn=C3=A9e <alex.bennee@linaro.org>=
+ wrote:
+>>
+>>
+>> Jon Doron <arilou@gmail.com> writes:
+>>
+>> > Follow GDB general query/set packet conventions, qemu.sstep can now
+>> > be set with the following command as well:
+>> > gdb> maint packet Qqemu.sstep:Value
+>>
+>> I;m not sure about exposing internal values to a protocol like this.
+>> Maybe text based flags would be better?
+>>
 >
+> We kinda have to at this point as this was the original implementation
+> or we might end up breaking up the "API"
+> see commit: 60897d369f10b464720d8a6de4553c47943ea927
+
+Ahh yes I see. TIL I guess ;-)
+
+--
+Alex Benn=C3=A9e
+
