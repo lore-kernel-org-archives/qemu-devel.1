@@ -2,91 +2,90 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1B9DC04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:21:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EB28C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:32:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81887214AE
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:21:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E494204FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:32:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p2Vsmyws"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81887214AE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="guNvbUPn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E494204FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34702 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34797 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hShIh-0001Xn-Kc
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 08:21:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35329)
+	id 1hShSy-0004bU-Hb
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 08:32:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hShFU-0007vi-H3
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:18:37 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hShR4-0003Qw-1Q
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:30:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hShFR-0007Do-2J
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:18:34 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39267)
+	(envelope-from <alex.bennee@linaro.org>) id 1hShR1-0004vN-Tz
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:30:33 -0400
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:38009)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hShFQ-0007DK-Rk
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:18:33 -0400
-Received: by mail-wr1-x441.google.com with SMTP id w8so14361445wrl.6
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 05:18:32 -0700 (PDT)
+	id 1hShQu-0004om-FU
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:30:29 -0400
+Received: by mail-wr1-x434.google.com with SMTP id d18so14403032wrs.5
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 05:30:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=references:user-agent:from:to:cc:subject:in-reply-to:date
 	:message-id:mime-version:content-transfer-encoding;
-	bh=hTOA/AJ+cnqEXw5KfnctqGUuQgzQPrNruStOu/z+Jkc=;
-	b=p2VsmywsgKOgPcHvBC8P0ZSkZebcY4y+YophOAgv8Bsbja7kOY3m/BSRRm8sIDqTKn
-	rUw7uaAKNd3komUWJTf/0jtmIDuhYaywXDuKymG3SBWAawDlOeSb4AmwGv+rPY7QpZYH
-	RS4hRlsHGthFc7RwOttcdFX+CrvJe2x2yMxf3DH7zYvjjez8fyc4fgJ/LUXNSCDF78Do
-	XXbJriIMbyqAi9alkEODB/8gKET0bjrFi73+9bX4j9DOBJQona2eDNoVXbKJZINwqmFR
-	T9ohj2VbiBVVYXpnZtBtZMm/wAIW2PXCC10rzfQtj1aLM9bOQrN/B0ZNwK8tMwGOV6RN
-	gbtg==
+	bh=xrwvphnno6l4ixveJHj+AxfroZn4GSIECtB/pT+LZo0=;
+	b=guNvbUPn+75q+4cCNaxrJTth5vsxsH5h1qlOjsZevvfZVo2aK+z3SPIXDR8BtD8h3l
+	isQkIiUMd2BZ7mJP5Tec/A4VFJdcKnr+2IMoNtYl5LrkeXY0x8mRKckCBgMk/djS82SV
+	0fM9aJaIHF5en9cQfUa8XUEh8ZewstxrEbGn9VXwHZlQoTa+ZUi0g6DvFcSHEA34DhYB
+	2CUniLw8TJeO6JOE154M+2bVIw6/tkwXPVqi0WAW/Lulbg4hsKjDryANtLceERaz7Kq0
+	PYqhwGaINfqfP69t1+onsuJdkew/Ld8VB+UFrip2TwbmHrBy+amYQRGbCi5LSo5MUOjT
+	QyhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:references:user-agent:from:to:cc:subject
 	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=hTOA/AJ+cnqEXw5KfnctqGUuQgzQPrNruStOu/z+Jkc=;
-	b=dfvmnc3v6KcHJKOhQ/875szQ5g54yRjm1v97qNfWmbmXNSVhGbuGI0Tv7d/eFEn5/A
-	iNurOAF5mYbARtu9xnq04uQqeObdsTEHK8Acj/fH9/vEj3ZZissxzD9IzidtErCdLYZL
-	eU7rdKMSecW7GwXrmxzlAm1FE07cix/nVnnDEtQvOivdWv13zK//6o+rRysKE5BK2mGP
-	UW+liI+RI5EeDKhw9THbfOFkPYbo4wSzBGSuct8nr1fUAyvLPN/vX6gXljzICCkJyiPC
-	xrVsg4Sxvc/l0GroSQLLBfFPe28nkSGT7O/1XwnLer22Qi7teGhEiF04ad40iYOLgZHG
-	+nRA==
-X-Gm-Message-State: APjAAAXYwbZPlTK6RaqitnpZGXPez/qcAcBLrtK/Mwdj1Fe/ju34v8zQ
-	FCnj1oVjVYMCBlzsEu8kKLGcQQ==
-X-Google-Smtp-Source: APXvYqxJEnJaTHzd3d0xMF9gFlusvihOLTZf7bxtOIstPMaabsYkcZBxOmwpX6dq+PH1DmjYJvJgLg==
-X-Received: by 2002:a5d:400b:: with SMTP id n11mr44611969wrp.123.1558354711811;
-	Mon, 20 May 2019 05:18:31 -0700 (PDT)
+	bh=xrwvphnno6l4ixveJHj+AxfroZn4GSIECtB/pT+LZo0=;
+	b=tUQxqRt5b89KnFaGuK8AqthUheohw9mJmD4J/Uph0kh0oIE782+C+sy7YYRjJF6HYd
+	3+lkgOzivoVNcGrZNEukQC7xKau3C+bNXte8r+Um9aeKO6fKtH/7xw2gTPpjABIZr1YX
+	n5hgHOI1MBzg4sagdwkBH7NNGctfm/FfWbKl9dBwio8EVIkwjZwQ69CCxDigYg+yh71l
+	LmXyxL374mzXYg/BlA2hvVfKUYDft8LBc7pvCpPARjQl1eyeGBIj3foNLicwQW++yieL
+	30PY9hWYZSQGck8Wh5VSt7hh9M3anj7FxJ3VhVUIAyk6kXW3Y+m5sgSPl+LzcbqMt7B7
+	dEYQ==
+X-Gm-Message-State: APjAAAXI+9R0jTY7yRFdFDE3tJDjICzZdeyqHq7AhMpx3jXEE3uJHUSt
+	8sxxCw4sowzDaOAfXAk49bepMA==
+X-Google-Smtp-Source: APXvYqxVz8guds4p5tOe3lyNVL8Ir3skm20VW1uXCeX/DHjDMv4ncBVhpwL6fOVCClfQ7GAbJ9SUkw==
+X-Received: by 2002:a5d:4946:: with SMTP id r6mr32592842wrs.310.1558355418769; 
+	Mon, 20 May 2019 05:30:18 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
 	by smtp.gmail.com with ESMTPSA id
-	e2sm13149138wme.32.2019.05.20.05.18.31
+	88sm42391956wrc.33.2019.05.20.05.30.18
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Mon, 20 May 2019 05:18:31 -0700 (PDT)
+	Mon, 20 May 2019 05:30:18 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id DF4DF1FF87;
-	Mon, 20 May 2019 13:18:30 +0100 (BST)
+	by zen.linaroharston (Postfix) with ESMTP id BE09D1FF87;
+	Mon, 20 May 2019 13:30:17 +0100 (BST)
 References: <20190517224450.15566-1-jan.bobek@gmail.com>
-	<20190517224450.15566-11-jan.bobek@gmail.com>
 User-agent: mu4e 1.3.2; emacs 26.1
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Jan Bobek <jan.bobek@gmail.com>
-In-reply-to: <20190517224450.15566-11-jan.bobek@gmail.com>
-Date: Mon, 20 May 2019 13:18:30 +0100
-Message-ID: <87woilgvzd.fsf@zen.linaroharston>
+In-reply-to: <20190517224450.15566-1-jan.bobek@gmail.com>
+Date: Mon, 20 May 2019 13:30:17 +0100
+Message-ID: <87v9y5gvfq.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [RISU v2 10/11] risu_reginfo_i386: replace
- xfeature constants with symbolic names
+X-Received-From: 2a00:1450:4864:20::434
+Subject: Re: [Qemu-devel] [RISU v2 00/11] Support for i386/x86_64 with
+ vector extensions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -106,136 +105,43 @@ Sender: "Qemu-devel"
 
 Jan Bobek <jan.bobek@gmail.com> writes:
 
-> The original code used "magic numbers", which made it unclear in
-> some places. Include a reference to the Intel manual where the
-> constants' meaning is discussed.
+> This patch series adds support for i386 and x86_64 architectures to
+> RISU.  Notably, vector registers (SSE, AVX, AVX-512) are supported for
+> verification of the apprentice. This is V2 of the series posted in
+> [1].
 >
-> Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
+> I decided not to drop the register definitions from the second patch
+> as suggested by Alex Benn=C3=A9e [4], but replaced them in the fourth pat=
+ch
+> instead. This keeps the second and third patches code-motion only.
+>
+> I wasn't 100% sure how to acknowledge Richard's contributions in some
+> of the patches, and eventually decided to include a Suggested-by:
+> line. Let me know if that's (not) acceptable.
+>
+>  -Jan
+>
+> Changes in V2:
+>   - included Richard Henderson's fix-ups [2] and vector register
+>     support [3]
+>   - replaced the magic numbers for XSAVE feature sets with symbolic
+>     constants
+>   - symbolic names ("sse", "avx", "avx512") as well as numbers are
+>     accepted for the parameter --xfeatures
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+I'm not sure where my test went wrong but I guess it's around xfeatures.
+The code says required argument but risu doesn't seem to stop me not
+specifying it. I suspect we should default to the most minimal x86_64 we
+can and explicitly enable extra features.
 
-> ---
->  risu_reginfo_i386.c | 48 +++++++++++++++++++++++++++++++--------------
->  1 file changed, 33 insertions(+), 15 deletions(-)
->
-> diff --git a/risu_reginfo_i386.c b/risu_reginfo_i386.c
-> index 35ff7c8..aba5ae3 100644
-> --- a/risu_reginfo_i386.c
-> +++ b/risu_reginfo_i386.c
-> @@ -22,7 +22,25 @@
->
->  #include <asm/sigcontext.h>
->
-> -static uint64_t xfeatures =3D 3;  /* SSE */
-> +/*
-> + * Refer to "Intel(R) 64 and IA-32 Architectures Software Developer's
-> + * Manual", Volume 1, Section 13.1 "XSAVE-Supported Features and
-> + * State-Component Bitmaps" for detailed discussion of these constants
-> + * and their meaning.
-> + */
-> +enum {
-> +    XFEAT_X87              =3D 1 << 0,
-> +    XFEAT_SSE              =3D 1 << 1,
-> +    XFEAT_AVX              =3D 1 << 2,
-> +    XFEAT_AVX512_OPMASK    =3D 1 << 5,
-> +    XFEAT_AVX512_ZMM_HI256 =3D 1 << 6,
-> +    XFEAT_AVX512_HI16_ZMM  =3D 1 << 7,
-> +    XFEAT_AVX512           =3D XFEAT_AVX512_OPMASK
-> +                           | XFEAT_AVX512_ZMM_HI256
-> +                           | XFEAT_AVX512_HI16_ZMM
-> +};
-> +
-> +static uint64_t xfeatures =3D XFEAT_X87 | XFEAT_SSE;
->
->  static const struct option extra_ops[] =3D {
->      {"xfeatures", required_argument, NULL, FIRST_ARCH_OPT },
-> @@ -160,34 +178,34 @@ void reginfo_init(struct reginfo *ri, ucontext_t *u=
-c)
->       * Now we know that _fpstate contains XSAVE data.
->       */
->
-> -    if (features & (1 << 2)) {
-> +    if (features & XFEAT_AVX) {
->          /* YMM_Hi128 state */
-> -        void *buf =3D xsave_feature_buf(xs, 2);
-> +        void *buf =3D xsave_feature_buf(xs, XFEAT_AVX);
->          for (i =3D 0; i < nvecregs; ++i) {
->              memcpy(&ri->vregs[i].q[2], buf + 16 * i, 16);
->          }
->      }
->
-> -    if (features & (1 << 5)) {
-> +    if (features & XFEAT_AVX512_OPMASK) {
->          /* Opmask state */
-> -        uint64_t *buf =3D xsave_feature_buf(xs, 5);
-> +        uint64_t *buf =3D xsave_feature_buf(xs, XFEAT_AVX512_OPMASK);
->          for (i =3D 0; i < 8; ++i) {
->              ri->kregs[i] =3D buf[i];
->          }
->      }
->
-> -    if (features & (1 << 6)) {
-> +    if (features & XFEAT_AVX512_ZMM_HI256) {
->          /* ZMM_Hi256 state */
-> -        void *buf =3D xsave_feature_buf(xs, 6);
-> +        void *buf =3D xsave_feature_buf(xs, XFEAT_AVX512_ZMM_HI256);
->          for (i =3D 0; i < nvecregs; ++i) {
->              memcpy(&ri->vregs[i].q[4], buf + 32 * i, 32);
->          }
->      }
->
->  #ifdef __x86_64__
-> -    if (features & (1 << 7)) {
-> +    if (features & XFEAT_AVX512_HI16_ZMM) {
->          /* Hi16_ZMM state */
-> -        void *buf =3D xsave_feature_buf(xs, 7);
-> +        void *buf =3D xsave_feature_buf(xs, XFEAT_AVX512_HI16_ZMM);
->          for (i =3D 0; i < 16; ++i) {
->              memcpy(&ri->vregs[i + 16], buf + 64 * i, 64);
->          }
-> @@ -243,7 +261,7 @@ static const char *const regname[NGREG] =3D {
->  static int get_nvecregs(uint64_t features)
->  {
->  #ifdef __x86_64__
-> -    return features & (1 << 7) ? 32 : 16;
-> +    return features & XFEAT_AVX512_HI16_ZMM ? 32 : 16;
->  #else
->      return 8;
->  #endif
-> @@ -251,9 +269,9 @@ static int get_nvecregs(uint64_t features)
->
->  static int get_nvecquads(uint64_t features)
->  {
-> -    if (features & (1 << 6)) {
-> +    if (features & XFEAT_AVX512_ZMM_HI256) {
->          return 8;
-> -    } else if (features & (1 << 2)) {
-> +    } else if (features & XFEAT_AVX) {
->          return 4;
->      } else {
->          return 2;
-> @@ -262,9 +280,9 @@ static int get_nvecquads(uint64_t features)
->
->  static char get_vecletter(uint64_t features)
->  {
-> -    if (features & (1 << 6 | 1 << 7)) {
-> +    if (features & (XFEAT_AVX512_ZMM_HI256 | XFEAT_AVX512_HI16_ZMM)) {
->          return 'z';
-> -    } else if (features & (1 << 2)) {
-> +    } else if (features & XFEAT_AVX) {
->          return 'y';
->      } else {
->          return 'x';
-> @@ -301,7 +319,7 @@ int reginfo_dump(struct reginfo *ri, FILE *f)
->          }
->      }
->
-> -    if (features & (1 << 5)) {
-> +    if (features & XFEAT_AVX512_OPMASK) {
->          for (i =3D 0; i < 8; i++) {
->              fprintf(f, "  k%-5d: %016" PRIx64 "\n", i, ri->kregs[i]);
->          }
+Storing xfeat in the stream is a good idea so people don't mix up their
+dumps but we probably need more validation when running in master mode
+that the feature you have enabled is actually available on the
+processor. Otherwise you'll potentially end up generating test streams
+on HW with no support and just get a bunch of undef noise ;-)
 
+However the series is looking pretty good so far. Looking forward to the
+next iteration.
 
 --
 Alex Benn=C3=A9e
