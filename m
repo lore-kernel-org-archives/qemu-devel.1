@@ -2,83 +2,61 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 820DDC04AB4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 01:30:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CE38C04AB4
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 02:05:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49CE22081C
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 01:30:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DrjGWVE8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49CE22081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D5F6C2082C
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 02:05:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5F6C2082C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56047 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56321 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSX8e-0001gA-I9
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 21:30:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35441)
+	id 1hSXgK-00076G-2A
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 22:05:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hSX7o-0001DJ-7D
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 21:30:01 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hSXfD-0006iD-RW
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 22:04:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hSX7m-0004LE-O1
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 21:30:00 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:38511)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>)
-	id 1hSX7m-0004Kr-Hn; Sun, 19 May 2019 21:29:58 -0400
-Received: by mail-oi1-x241.google.com with SMTP id u199so8800459oie.5;
-	Sun, 19 May 2019 18:29:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=S9RNOcgssDqjMUxMAN7FCHPIqt7bbrCMTaGyjBJsw5I=;
-	b=DrjGWVE8CJrcWokPgSI35UqKojYyTngbigv0dX3IUMUrlOg17GUZ5O9EPFVRr6zJ2I
-	yZ/WExlb/FnHQ/afbh8YLrOorgZ4mTGJw2i2kFOAB4BaPVB8HJmNXhtSYQtpUQavnOG7
-	LllCoaC89NzRTmSJRktipd6IVjbt5/bNHFdK6yDqduPd72FnN6tCoL7G7uHXyXZUa7aR
-	qg6wQgi/stwtZahi4cXX24hpkmG1zuUo6D/7bGGjXl2BlFh2bDZsz71mFfRUdWT3Aol+
-	+iyAkwlEjbvc2K7U+LKXAXF8l7KHOOgqRtw8o2B3RhUrVS8L44E4LmOkVtDNBM0KjR/b
-	fQZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=S9RNOcgssDqjMUxMAN7FCHPIqt7bbrCMTaGyjBJsw5I=;
-	b=GB2be2hmMGs4xr2j0TzGJKN33pwtijCISTyCT0C++3vIsAdVvIbE5skAVFwwuQe34g
-	AkYsi+K9BF5BDMbViWoQ6gHd+F1DUj1cARgnjaSx+tohD8/U9SPtcQymw1JvBfDVosmw
-	ag1NwblUKaQe+T6mY6WiAn4yHYfJL/bSeWlenMfyn7KHGD2ATbkrVrtKma597Klp/QeD
-	cVunc17IdbFH6WCparZlWOaQwbl/c4raARbjPmZAlosjGV4rAO1Px8/C+H0Ne+agkNBy
-	NRL1kZOf3hHBtgPsmaJbh8lf3YgO4qZKdVBoBsoGmif8whWG9zVR7I6r+dxaudv9ZMQc
-	eplQ==
-X-Gm-Message-State: APjAAAVKtegnklg0R5Te7OfZPbWo/34QOPeqYFZMXlVAM5LUj01ic3m0
-	cYDgrk9QZ1txY9uU0XDCAoZJZpTNo8YsEIKyaGs=
-X-Google-Smtp-Source: APXvYqyk7qwpkGaaebF00xshUHpdSJEkEJ2WNcLhAQQSXVCtNPOB/f2YGDXlvxYcLwdJ3eYelrL7uEGVmWpGCYOvWJo=
-X-Received: by 2002:aca:fd45:: with SMTP id b66mr22383587oii.157.1558315797622;
-	Sun, 19 May 2019 18:29:57 -0700 (PDT)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hSXfA-0007Jm-W4
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 22:04:30 -0400
+Received: from mga01.intel.com ([192.55.52.88]:34696)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1hSXfA-0007I2-D9
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 22:04:28 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+	by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	19 May 2019 19:04:24 -0700
+X-ExtLoop1: 1
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+	by orsmga007.jf.intel.com with ESMTP; 19 May 2019 19:04:22 -0700
+Date: Mon, 20 May 2019 10:03:52 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: Juan Quintela <quintela@redhat.com>
+Message-ID: <20190520020352.GA9990@richard>
+References: <20190515121544.4597-1-quintela@redhat.com>
+	<20190515121544.4597-4-quintela@redhat.com>
 MIME-Version: 1.0
-References: <20190518032811.60341-1-liq3ea@163.com>
-	<20190518032811.60341-2-liq3ea@163.com>
-	<20190518082020.6b223ab0@x1.home>
-In-Reply-To: <20190518082020.6b223ab0@x1.home>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Mon, 20 May 2019 09:29:21 +0800
-Message-ID: <CAKXe6SLsoyCh=O1yyOFOukYdFoeySpSS1H8QG7fhp1ZQ35vD+g@mail.gmail.com>
-To: Alex Williamson <alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190515121544.4597-4-quintela@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 2/4] hw: vfio: drop TYPE_FOO MACRO in
- VMStateDescription
+X-Received-From: 192.55.52.88
+Subject: Re: [Qemu-devel] [PATCH v3 3/8] tests: Add migration multifd test
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,111 +68,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, qemu-trivial@nongnu.org, Li Qiang <liq3ea@163.com>,
-	Qemu Developers <qemu-devel@nongnu.org>,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Alex Williamson <alex.williamson@redhat.com> =E4=BA=8E2019=E5=B9=B45=E6=9C=
-=8818=E6=97=A5=E5=91=A8=E5=85=AD =E4=B8=8B=E5=8D=8810:20=E5=86=99=E9=81=93=
-=EF=BC=9A
+On Wed, May 15, 2019 at 02:15:39PM +0200, Juan Quintela wrote:
+>We set multifd-channels.
+>
+>Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>Reviewed-by: Thomas Huth <thuth@redhat.com>
+>Signed-off-by: Juan Quintela <quintela@redhat.com>
+>---
+> tests/migration-test.c | 48 ++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 48 insertions(+)
+>
+>diff --git a/tests/migration-test.c b/tests/migration-test.c
+>index 0b25aa3d6c..ff480e0682 100644
+>--- a/tests/migration-test.c
+>+++ b/tests/migration-test.c
+>@@ -1028,6 +1028,53 @@ static void test_precopy_tcp(void)
+>     g_free(uri);
+> }
+> 
+>+static void test_multifd_tcp(void)
+>+{
+>+    char *uri;
+>+    QTestState *from, *to;
+>+
+>+    if (test_migrate_start(&from, &to, "tcp:127.0.0.1:0", false, false)) {
+>+        return;
+>+    }
+>+
+>+    /*
+>+     * We want to pick a speed slow enough that the test completes
+>+     * quickly, but that it doesn't complete precopy even on a slow
+>+     * machine, so also set the downtime.
+>+     */
+>+    /* 1 ms should make it not converge*/
+>+    migrate_set_parameter_int(from, "downtime-limit", 1);
+>+    /* 1GB/s */
+>+    migrate_set_parameter_int(from, "max-bandwidth", 1000000000);
+>+
+>+    migrate_set_parameter_int(from, "multifd-channels", 2);
+>+    migrate_set_parameter_int(to, "multifd-channels", 2);
+>+
+>+    migrate_set_capability(from, "multifd", "true");
+>+    migrate_set_capability(to, "multifd", "true");
 
-> On Fri, 17 May 2019 20:28:09 -0700
-> Li Qiang <liq3ea@163.com> wrote:
->
-> > As the vmstate structure names aren't related with
-> > the QOM type names.
->
-> Seems contrary to the first patch in the series.
->
->
-No, once there is a discussion of this:
--->https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg02175.html
+Hi, Juan
 
-Thanks,
-Li Qiang
+In case to test multifd, what's the minimum configuration? Set multifd
+capability at both side is fine?
 
-
-
-> > CC: qemu-trivial@nongnu.org
-> > Signed-off-by: Li Qiang <liq3ea@163.com>
-> > ---
-> >  hw/vfio/amd-xgbe.c      | 2 +-
-> >  hw/vfio/ap.c            | 2 +-
-> >  hw/vfio/calxeda-xgmac.c | 2 +-
-> >  hw/vfio/ccw.c           | 2 +-
-> >  hw/vfio/platform.c      | 2 +-
-> >  5 files changed, 5 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/hw/vfio/amd-xgbe.c b/hw/vfio/amd-xgbe.c
-> > index ee64a3b4a2..1b06c0f3ea 100644
-> > --- a/hw/vfio/amd-xgbe.c
-> > +++ b/hw/vfio/amd-xgbe.c
-> > @@ -26,7 +26,7 @@ static void amd_xgbe_realize(DeviceState *dev, Error
-> **errp)
-> >  }
-> >
-> >  static const VMStateDescription vfio_platform_amd_xgbe_vmstate =3D {
-> > -    .name =3D TYPE_VFIO_AMD_XGBE,
-> > +    .name =3D "vfio-amd-xgbe",
-> >      .unmigratable =3D 1,
-> >  };
-> >
-> > diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-> > index d8b79ebe53..564751650f 100644
-> > --- a/hw/vfio/ap.c
-> > +++ b/hw/vfio/ap.c
-> > @@ -155,7 +155,7 @@ static void vfio_ap_reset(DeviceState *dev)
-> >  }
-> >
-> >  static const VMStateDescription vfio_ap_vmstate =3D {
-> > -    .name =3D VFIO_AP_DEVICE_TYPE,
-> > +    .name =3D "vfio-ap",
-> >      .unmigratable =3D 1,
-> >  };
-> >
-> > diff --git a/hw/vfio/calxeda-xgmac.c b/hw/vfio/calxeda-xgmac.c
-> > index e7767c4b02..6cc608b6ca 100644
-> > --- a/hw/vfio/calxeda-xgmac.c
-> > +++ b/hw/vfio/calxeda-xgmac.c
-> > @@ -26,7 +26,7 @@ static void calxeda_xgmac_realize(DeviceState *dev,
-> Error **errp)
-> >  }
-> >
-> >  static const VMStateDescription vfio_platform_calxeda_xgmac_vmstate =
-=3D {
-> > -    .name =3D TYPE_VFIO_CALXEDA_XGMAC,
-> > +    .name =3D "vfio-calxeda-xgmac",
-> >      .unmigratable =3D 1,
-> >  };
-> >
-> > diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> > index 31dd3a2a87..d9e39552e2 100644
-> > --- a/hw/vfio/ccw.c
-> > +++ b/hw/vfio/ccw.c
-> > @@ -468,7 +468,7 @@ static Property vfio_ccw_properties[] =3D {
-> >  };
-> >
-> >  static const VMStateDescription vfio_ccw_vmstate =3D {
-> > -    .name =3D TYPE_VFIO_CCW,
-> > +    .name =3D "vfio-ccw",
-> >      .unmigratable =3D 1,
-> >  };
-> >
-> > diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-> > index 398db38f14..e59a0234dd 100644
-> > --- a/hw/vfio/platform.c
-> > +++ b/hw/vfio/platform.c
-> > @@ -697,7 +697,7 @@ out:
-> >  }
-> >
-> >  static const VMStateDescription vfio_platform_vmstate =3D {
-> > -    .name =3D TYPE_VFIO_PLATFORM,
-> > +    .name =3D "vfio-platform",
-> >      .unmigratable =3D 1,
-> >  };
-> >
+>+    /* Wait for the first serial output from the source */
+>+    wait_for_serial("src_serial");
+>+
+>+    uri = migrate_get_socket_address(to, "socket-address");
+>+
+>+    migrate(from, uri, "{}");
+>+
+>+    wait_for_migration_pass(from);
+>+
+>+    /* 300ms it should converge */
+>+    migrate_set_parameter_int(from, "downtime-limit", 600);
+>+
+>+    if (!got_stop) {
+>+        qtest_qmp_eventwait(from, "STOP");
+>+    }
+>+    qtest_qmp_eventwait(to, "RESUME");
+>+
+>+    wait_for_serial("dest_serial");
+>+    wait_for_migration_complete(from);
+>+
+>+    test_migrate_end(from, to, true);
+>+}
+>+
+> int main(int argc, char **argv)
+> {
+>     char template[] = "/tmp/migration-test-XXXXXX";
+>@@ -1082,6 +1129,7 @@ int main(int argc, char **argv)
+>     qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
+>     /* qtest_add_func("/migration/ignore_shared", test_ignore_shared); */
+>     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
+>+    qtest_add_func("/migration/multifd/tcp", test_multifd_tcp);
+> 
+>     ret = g_test_run();
+> 
+>-- 
+>2.21.0
 >
->
+
+-- 
+Wei Yang
+Help you, Help me
+
