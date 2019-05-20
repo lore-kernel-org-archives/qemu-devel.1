@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95B4AC04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F4CC04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:38:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D629214DA
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:38:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 58317214DA
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:38:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qkz0Jidp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D629214DA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Jwmi22dV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58317214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38362 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38364 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSlJ1-00020h-Il
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 12:38:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42706)
+	id 1hSlJJ-0002Gu-Ga
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 12:38:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hSl9B-00031V-KH
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:28:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hSl9H-000387-Ap
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:28:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hSl98-0001Fi-1d
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:28:19 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36382)
+	(envelope-from <peter.maydell@linaro.org>) id 1hSl9E-0001Hz-NK
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:28:27 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37148)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hSl95-0001DE-Rg
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:28:17 -0400
-Received: by mail-wm1-x343.google.com with SMTP id j187so5782wmj.1
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 09:28:14 -0700 (PDT)
+	id 1hSl9B-0001FI-JJ
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:28:23 -0400
+Received: by mail-wr1-x443.google.com with SMTP id e15so15346985wrs.4
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 09:28:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
 	:content-transfer-encoding;
-	bh=cEu3plm2JnEz4zF57Dl9xMi74nNuVpPFcKATYhpH4io=;
-	b=qkz0JidpSNoylM3MLl+G/1xILgwruSaa0LidMNP2QzD4hAIsK38BUX3FD1j9YZL6+7
-	i0+EJHW60XWI2mCLmDP5qESUX1MFZ8sDWPQHZjCss1cU/px3Sbb93egRJSWUGV5SbjP0
-	EK/pu/KqdQohweqbdJdiXssoXVCntTbTNQ5AxcDnIOhTw+toXQaMVVXeEyeVe5+yhbmg
-	jrFTJpqwswULv6YT3pjiichaQuUouJVszIShqgQ+zPzaLcfymrmoZ6pzF0KIju2lrChr
-	jsP9l4/laWS6nyLniItVXsrrM3ikxMvhwlggS2qyub07USqGlPX9WuOO5E8on/eOMnjA
-	b6EQ==
+	bh=PkWoGkmjDkhsD31RM3UCQj/839ATuI528gwh2A5xGB8=;
+	b=Jwmi22dVbDnOydNY0B5odrgKV11CmiOu58HW75RFMOF+ajMvP6M8TNN9G0wVXg1w4g
+	DPknhgM5CQc/ZvzQ2kefCY+bRy8vbb0F1sD4ZlbFWwost/aaHmEE+YJvbgm+RuDWxTa3
+	Hn7SexgatDSuWC3WRjuu+f8Pk+/Gt7rSwQbCpVjh5kqgpLHmGFRvsinQszxZAuFgODMm
+	rC2geh8z3gCmt/zg6PBCUhI9iLyNThh/rTKFhCnQaKvtkd8lm4dwZc7hGLTfWeUXOfKC
+	x1s6JXp/Zho6Pay/ztjRqgVwfVPzxQa1oIzJB9OMYZxA2eQ/6p9Pze4kA46UvvQGeDpO
+	A2pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=cEu3plm2JnEz4zF57Dl9xMi74nNuVpPFcKATYhpH4io=;
-	b=VlWtl9vfZpUB52rneLEvj2DT3f9cTxL31nvd7hOTTtwZ21hpAkj+tm1JbKLJuaKKWx
-	SHsLGduexJFs0ZJlve3A2R+l+mpCc2WyTjisfArR6V6ZnaEOdujKJD9ZUD0dbX3nXGjE
-	VTFuvQrE6QqC1bcXAYGUSrR4GQln2AZQnbvNBhPm68abzcgQCrI0S+6kzodXB0YVFDW5
-	e6Epjv9hKYFKyd6/HzUZjdLnlpb/Mg6bBXmrprHu+jx6S0MG/yJZR+JQ6z3YWsoAlIsq
-	SfPS2XMn2iyd0wLuD35GTUMpFDu5Vpc/WzZX5VuY9NmM3HMdTY9Ihj3+E+7RZufcvapT
-	IF0Q==
-X-Gm-Message-State: APjAAAUXJeqnpdFBNTzf3jD175wl52ESMQkE1UlM7Y1hKJA5CUJ/0fR7
-	88d0Uusyuen5XjI0/dL2VSyu7Q==
-X-Google-Smtp-Source: APXvYqzFaWlrUc9e2BOWC7brgFQAbju6M8BhJRvMNQA4FGEf0eeba7mBfCEZNbaXJ9WPEgg9GSxAIg==
-X-Received: by 2002:a1c:e906:: with SMTP id q6mr2872014wmc.47.1558369693589;
-	Mon, 20 May 2019 09:28:13 -0700 (PDT)
+	bh=PkWoGkmjDkhsD31RM3UCQj/839ATuI528gwh2A5xGB8=;
+	b=hiNxr9eUbp0ZFNV96OEE0fVt7wuyfxFU3wd2/ttDqUpvETEUlyijvZqPMBpundUrYM
+	gUdqWk/xe6T1z4lqeZp1lxqPXAL8x2grX7p5jofpudO1kcS6G4zyQopeR8KQgQ2+kdfP
+	6yYCpgwh3roXZDQbQ3ezjrIhuMUdeB34Dz1A7vXIEBRGdI14/5khjQEqMQh/5ezLVb9i
+	81+n4ziF6tlu7ALUv20fRAzewGHb8gS/vg/VN/xMJmml0nsG58rZHFVOaPM9zyxwLZaM
+	xt8E4mD8UooUDCxFkkBR7ySCuH6Bptm5gmNQQwqAaklrtceyHpmvz/p5R5XFRtIOWd5j
+	9ypg==
+X-Gm-Message-State: APjAAAUAiSAT2P5jNuDfXUcWAmwAFUmloni5xBg9fVhHRU0B/MyPOVWn
+	oY2TlSV9KnknkBfhX+VO6DRey6CjmOQ=
+X-Google-Smtp-Source: APXvYqyvwza0d1YNjIod0mAxx1dxR6SAwz/9cS1l0kmdV0f5hiAqggXktcxHUsBwJ1fehZDLGDyw/w==
+X-Received: by 2002:a5d:4907:: with SMTP id x7mr33644400wrq.199.1558369697410; 
+	Mon, 20 May 2019 09:28:17 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id x2sm5830394wrs.39.2019.05.20.09.28.12
+	by smtp.gmail.com with ESMTPSA id x2sm5830394wrs.39.2019.05.20.09.28.15
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 20 May 2019 09:28:12 -0700 (PDT)
+	Mon, 20 May 2019 09:28:16 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Mon, 20 May 2019 17:28:06 +0100
-Message-Id: <20190520162809.2677-2-peter.maydell@linaro.org>
+Date: Mon, 20 May 2019 17:28:09 +0100
+Message-Id: <20190520162809.2677-5-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190520162809.2677-1-peter.maydell@linaro.org>
 References: <20190520162809.2677-1-peter.maydell@linaro.org>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH 1/4] hw/intc/arm_gicv3: Fix decoding of ID
- register range
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH 4/4] hw/intc/arm_gicv3: Fix writes to
+ ICC_CTLR_EL3
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,42 +98,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The GIC ID registers cover an area 0x30 bytes in size
-(12 registers, 4 bytes each). We were incorrectly decoding
-only the first 0x20 bytes.
+The ICC_CTLR_EL3 register includes some bits which are aliases
+of bits in the ICC_CTLR_EL1(S) and (NS) registers. QEMU chooses
+to keep those bits in the cs->icc_ctlr_el1[] struct fields.
+Unfortunately a missing '~' in the code to update the bits
+in those fields meant that writing to ICC_CTLR_EL3 would corrupt
+the ICC_CLTR_EL1 register values.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/arm_gicv3_dist.c   | 2 +-
- hw/intc/arm_gicv3_redist.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/intc/arm_gicv3_cpuif.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/intc/arm_gicv3_dist.c b/hw/intc/arm_gicv3_dist.c
-index 53c55c57291..335386ff3ac 100644
---- a/hw/intc/arm_gicv3_dist.c
-+++ b/hw/intc/arm_gicv3_dist.c
-@@ -533,7 +533,7 @@ static MemTxResult gicd_readl(GICv3State *s, hwaddr offset,
-         }
-         return MEMTX_OK;
+diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
+index 000bdbd6247..3b212d91c8f 100644
+--- a/hw/intc/arm_gicv3_cpuif.c
++++ b/hw/intc/arm_gicv3_cpuif.c
+@@ -1856,7 +1856,7 @@ static void icc_ctlr_el3_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     trace_gicv3_icc_ctlr_el3_write(gicv3_redist_affid(cs), value);
+ 
+     /* *_EL1NS and *_EL1S bits are aliases into the ICC_CTLR_EL1 bits. */
+-    cs->icc_ctlr_el1[GICV3_NS] &= (ICC_CTLR_EL1_CBPR | ICC_CTLR_EL1_EOIMODE);
++    cs->icc_ctlr_el1[GICV3_NS] &= ~(ICC_CTLR_EL1_CBPR | ICC_CTLR_EL1_EOIMODE);
+     if (value & ICC_CTLR_EL3_EOIMODE_EL1NS) {
+         cs->icc_ctlr_el1[GICV3_NS] |= ICC_CTLR_EL1_EOIMODE;
      }
--    case GICD_IDREGS ... GICD_IDREGS + 0x1f:
-+    case GICD_IDREGS ... GICD_IDREGS + 0x2f:
-         /* ID registers */
-         *data = gicv3_idreg(offset - GICD_IDREGS);
-         return MEMTX_OK;
-diff --git a/hw/intc/arm_gicv3_redist.c b/hw/intc/arm_gicv3_redist.c
-index 3b0ba6de1ab..9bb11423382 100644
---- a/hw/intc/arm_gicv3_redist.c
-+++ b/hw/intc/arm_gicv3_redist.c
-@@ -233,7 +233,7 @@ static MemTxResult gicr_readl(GICv3CPUState *cs, hwaddr offset,
-         }
-         *data = cs->gicr_nsacr;
-         return MEMTX_OK;
--    case GICR_IDREGS ... GICR_IDREGS + 0x1f:
-+    case GICR_IDREGS ... GICR_IDREGS + 0x2f:
-         *data = gicv3_idreg(offset - GICR_IDREGS);
-         return MEMTX_OK;
-     default:
+@@ -1864,7 +1864,7 @@ static void icc_ctlr_el3_write(CPUARMState *env, const ARMCPRegInfo *ri,
+         cs->icc_ctlr_el1[GICV3_NS] |= ICC_CTLR_EL1_CBPR;
+     }
+ 
+-    cs->icc_ctlr_el1[GICV3_S] &= (ICC_CTLR_EL1_CBPR | ICC_CTLR_EL1_EOIMODE);
++    cs->icc_ctlr_el1[GICV3_S] &= ~(ICC_CTLR_EL1_CBPR | ICC_CTLR_EL1_EOIMODE);
+     if (value & ICC_CTLR_EL3_EOIMODE_EL1S) {
+         cs->icc_ctlr_el1[GICV3_S] |= ICC_CTLR_EL1_EOIMODE;
+     }
 -- 
 2.20.1
 
