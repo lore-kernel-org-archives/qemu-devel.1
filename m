@@ -2,108 +2,87 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE76C04AAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 05:59:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CB29C04AAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 06:05:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C2B720815
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 05:58:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C2B720815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2C1FD20851
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 06:05:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PHzBCN6a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C1FD20851
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58395 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58439 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSbK6-0000UR-UT
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 01:58:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45700)
+	id 1hSbQ6-0001mU-EE
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 02:05:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hSbJK-0000Cq-FB
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 01:58:11 -0400
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hSbPC-0001V1-Ch
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:04:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hSbJF-0000LR-CU
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 01:58:08 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46028
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
-	id 1hSbJF-0000Ek-4O
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 01:58:05 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4K5qxrs133091
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 01:57:59 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2skp2x8xvf-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 01:57:58 -0400
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
-	Mon, 20 May 2019 06:57:58 +0100
-Received: from b03cxnp07028.gho.boulder.ibm.com (9.17.130.15)
-	by e31.co.us.ibm.com (192.168.1.131) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Mon, 20 May 2019 06:57:54 +0100
-Received: from b03ledav003.gho.boulder.ibm.com
-	(b03ledav003.gho.boulder.ibm.com [9.17.130.234])
-	by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x4K5vr1F31916122
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Mon, 20 May 2019 05:57:53 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BC2AC6A057;
-	Mon, 20 May 2019 05:57:53 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 907306A054;
-	Mon, 20 May 2019 05:57:51 +0000 (GMT)
-Received: from [9.199.52.184] (unknown [9.199.52.184])
-	by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
-	Mon, 20 May 2019 05:57:51 +0000 (GMT)
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <155591636364.20338.844048953355207313.stgit@aravinda>
-	<155591662496.20338.3862565585716109724.stgit@aravinda>
-	<20190516125445.79d0ba34@bahia.lan>
-	<d087094a-6459-0eda-0fee-935cd3b5bdbc@linux.vnet.ibm.com>
-	<20190516141746.GB3005@work-vm>
-From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Date: Mon, 20 May 2019 11:27:49 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.6.0
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hSbP9-0005fC-TZ
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:04:14 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:41357)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1hSbP9-0005dQ-J0
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:04:11 -0400
+Received: by mail-oi1-x242.google.com with SMTP id y10so9089047oia.8
+	for <qemu-devel@nongnu.org>; Sun, 19 May 2019 23:04:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+	:cc; bh=UqPswRAyKQ5AkV4oqsOuTlUr1ujfkF/aKROS2Oef6ac=;
+	b=PHzBCN6aBaocxOk/FfxYRhfZgLt5E5Gg30+XlQltAgZU7/E0XpnZqK0HpyMOmoLK2c
+	0gSvlgqt9dogrQ00jP3JUS8IQwcIrWn/IP6cToa3ZlKB5v61d89x3+9ypwkNmMqlewt5
+	wE1WW/e9UyB9yx8GkUoDdO0c3VSnDTcTQQyw5m7uiFcJZVj9ecAWtYzWgx0fFnU7PJ2f
+	QZxmP82qEOCDPvOEqW1x0nT6w5t/zUazibLPXY8aCO/WdrWdbQZe3KA4JV1/jsSyhLlC
+	kmZPROWsDV6z0saNUIL4IlLRFZhdYf5LgNMq8Xjsm66Oscd0KDJdQPAKocKgIwvuixQq
+	sqlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+	:message-id:subject:to:cc;
+	bh=UqPswRAyKQ5AkV4oqsOuTlUr1ujfkF/aKROS2Oef6ac=;
+	b=J6uju/vscxueW4LMZ61IfEx5FV29cRSfGVrq+GngZTLXX0jmoAR+ff21C/ydHjZPXf
+	ngxJpKl8LtHAKcToxL/jGIVZtSUPys9FRQFKJLTZydJRrwnZA4J8jzUh1dnVWy1N7dcb
+	/YkEKt6Q0RW3+UtiBPtaBkfCno5vr+TMTbq7lEnof8vkXXu4nEWXS6ihWI10B2gjQHep
+	hUVpHnhZJYlVcHPKckqcYyxHpaxjitNHhn/sBslFrLW34ELzE9nNyPDxzKp8VlVOO3Uc
+	sCtQzLCs/o3x+c6mi/wRciuxUGvax2wDGiL10qVx0e0JgNnNL4vy6giuXK7b858L8y/V
+	NCLg==
+X-Gm-Message-State: APjAAAX4OuKbVArzU1EPGMiUNwQ1XaqvhcOx5r7KX8WBsafhVBmOxjd3
+	P4r00bLWXzgTav35UwyTTOz6DAcKsWxjBSUo4II=
+X-Google-Smtp-Source: APXvYqyat1jy18jp9b7QyOtir4Plf8Hs1cZzSGrE3ECWYYzb8ZQ1ycveQUGgsBzLOKRlg6/cBja9WpjE3i1Nm/Zav/g=
+X-Received: by 2002:aca:5d06:: with SMTP id r6mr21775038oib.62.1558332249445; 
+	Sun, 19 May 2019 23:04:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190516141746.GB3005@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19052005-8235-0000-0000-00000E9977DF
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011128; HX=3.00000242; KW=3.00000007;
-	PH=3.00000004; SC=3.00000286; SDB=6.01205893; UDB=6.00633175;
-	IPR=6.00986851; 
-	MB=3.00026966; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-20 05:57:57
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052005-8236-0000-0000-000045A2B21A
-Message-Id: <3a8531a3-c6c6-3b99-7493-ff697434a31e@linux.vnet.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-20_03:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1905200043
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v8 6/6] migration: Block
- migration while handling machine check
+Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Sun, 19 May 2019 23:04:08
+	-0700 (PDT)
+Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Sun, 19 May 2019 23:04:08
+	-0700 (PDT)
+In-Reply-To: <20190519203726.20729-63-richard.henderson@linaro.org>
+References: <20190519203726.20729-1-richard.henderson@linaro.org>
+	<20190519203726.20729-63-richard.henderson@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 20 May 2019 08:04:08 +0200
+Message-ID: <CAL1e-=jHwYPGqqS3GLthO+1xYCc9mX_zgxXu+2gRsCOb0rnN_A@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::242
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v7 62/74] linux-user: Split out
+ rt_sigqueueinfo, rt_tgsigqueueinfo
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -115,170 +94,335 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@au1.ibm.com, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
-	paulus@ozlabs.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On May 19, 2019 11:25 PM, "Richard Henderson" <richard.henderson@linaro.org=
+>
+wrote:
+>
+> This does drop the (questionable) siginfo_t printing.
+> But since we already do not handle more important things
+> in this area like sigset_t, this does not feel a loss.
+>
 
+What is the most questionable here is the reasoning =E2=80=9Cwe don't handl=
+e one
+thing, therefore let's drop another=E2=80=9D.
 
-On Thursday 16 May 2019 07:47 PM, Dr. David Alan Gilbert wrote:
-> * Aravinda Prasad (aravinda@linux.vnet.ibm.com) wrote:
->>
->>
->> On Thursday 16 May 2019 04:24 PM, Greg Kurz wrote:
->>> On Mon, 22 Apr 2019 12:33:45 +0530
->>> Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
->>>
->>>> Block VM migration requests until the machine check
->>>> error handling is complete as (i) these errors are
->>>> specific to the source hardware and is irrelevant on
->>>> the target hardware, (ii) these errors cause data
->>>> corruption and should be handled before migration.
->>>>
->>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
->>>> ---
->>>>  hw/ppc/spapr_events.c  |   17 +++++++++++++++++
->>>>  hw/ppc/spapr_rtas.c    |    4 ++++
->>>>  include/hw/ppc/spapr.h |    3 +++
->>>>  3 files changed, 24 insertions(+)
->>>>
->>>> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
->>>> index 4032db0..45b990c 100644
->>>> --- a/hw/ppc/spapr_events.c
->>>> +++ b/hw/ppc/spapr_events.c
->>>> @@ -41,6 +41,7 @@
->>>>  #include "qemu/bcd.h"
->>>>  #include "hw/ppc/spapr_ovec.h"
->>>>  #include <libfdt.h>
->>>> +#include "migration/blocker.h"
->>>>  
->>>>  #define RTAS_LOG_VERSION_MASK                   0xff000000
->>>>  #define   RTAS_LOG_VERSION_6                    0x06000000
->>>> @@ -864,6 +865,22 @@ static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
->>>>  void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
->>>>  {
->>>>      SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
->>>> +    int ret;
->>>> +    Error *local_err = NULL;
->>>> +
->>>> +    error_setg(&spapr->migration_blocker,
->>>> +            "Live migration not supported during machine check handling");
->>>> +    ret = migrate_add_blocker(spapr->migration_blocker, &local_err);
->>>
->>> migrate_add_blocker() propagates the reason of the failure in local_err,
->>> ie. because a migration is already in progress or --only-migratable was
->>> passed on the QEMU command line, along with the error message passed in
->>> the first argument. This means that...
->>>
->>>> +    if (ret < 0) {
->>>> +        /*
->>>> +         * We don't want to abort and let the migration to continue. In a
->>>> +         * rare case, the machine check handler will run on the target
->>>> +         * hardware. Though this is not preferable, it is better than aborting
->>>> +         * the migration or killing the VM.
->>>> +         */
->>>> +        error_free(spapr->migration_blocker);
->>>> +        fprintf(stderr, "Warning: Machine check during VM migration\n");
->>>
->>> ... you should just do:
->>>
->>>         error_report_err(local_err);
->>>
->>> This also takes care of freeing local_err which would be leaked otherwise.
->>
->> Sure. I am planning to use warn_report_err() as I don't want to abort.
-> 
-> I worry what the high level effect of this blocker will be.
-> Since failing hardware is a common reason for wanting to do a migrate
-> I worry that if the hardware is reporting lots of errors you might not
-> be able to migrate the VM to more solid hardware because of this
-> blocker.
+If you find siginfo_t printing questionable, then provide a better one, not
+remove it altogether.
 
-We handle two cases, (i) migration initiated during error handling which
-we block as we don't want to migrate when we are handling the error. For
-example, for memory errors, we need to take some actions like poisoning
-the page. If we allow migration during error handling, the handler may
-execute on the target host and may poison a clean page on the target.
-But, a migration retry will succeed, (ii) errors reported after
-migration is initiated: in such cases we let the migration continue
-without blocking/aborting.
+I find that the current printing is useful in many circumstances, there is
+a lot of energy of former contributors invested into it, and should not be
+deleted just like that. It does feel like a loss.
 
-This is because memory errors are not very frequent, but are still
-important to handle as it can cause data corruption. However, if the
-hardware is reporting lots of errors, then the chances of host itself
-crashing is very high.
+Aleksandar
 
-> 
-> Dave
-> 
->> Regards,
->> Aravinda
->>
->>>
->>>> +    }
->>>>  
->>>>      while (spapr->mc_status != -1) {
->>>>          /*
->>>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
->>>> index 997cf19..1229a0e 100644
->>>> --- a/hw/ppc/spapr_rtas.c
->>>> +++ b/hw/ppc/spapr_rtas.c
->>>> @@ -50,6 +50,7 @@
->>>>  #include "target/ppc/mmu-hash64.h"
->>>>  #include "target/ppc/mmu-book3s-v3.h"
->>>>  #include "kvm_ppc.h"
->>>> +#include "migration/blocker.h"
->>>>  
->>>>  static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
->>>>                                     uint32_t token, uint32_t nargs,
->>>> @@ -396,6 +397,9 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
->>>>          spapr->mc_status = -1;
->>>>          qemu_cond_signal(&spapr->mc_delivery_cond);
->>>>          rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->>>> +        migrate_del_blocker(spapr->migration_blocker);
->>>> +        error_free(spapr->migration_blocker);
->>>> +        spapr->migration_blocker = NULL;
->>>>      }
->>>>  }
->>>>  
->>>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->>>> index 9d16ad1..dda5fd2 100644
->>>> --- a/include/hw/ppc/spapr.h
->>>> +++ b/include/hw/ppc/spapr.h
->>>> @@ -10,6 +10,7 @@
->>>>  #include "hw/ppc/spapr_irq.h"
->>>>  #include "hw/ppc/spapr_xive.h"  /* For SpaprXive */
->>>>  #include "hw/ppc/xics.h"        /* For ICSState */
->>>> +#include "qapi/error.h"
->>>>  
->>>>  struct SpaprVioBus;
->>>>  struct SpaprPhbState;
->>>> @@ -213,6 +214,8 @@ struct SpaprMachineState {
->>>>      SpaprCapabilities def, eff, mig;
->>>>  
->>>>      unsigned gpu_numa_id;
->>>> +
->>>> +    Error *migration_blocker;
->>>>  };
->>>>  
->>>>  #define H_SUCCESS         0
->>>>
->>>>
->>>
->>
->> -- 
->> Regards,
->> Aravinda
->>
->>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  linux-user/syscall-defs.h    |   2 +
+>  linux-user/strace.c          | 138 -----------------------------------
+>  linux-user/syscall-sig.inc.c |  30 ++++++++
+>  linux-user/syscall.c         |  26 -------
+>  linux-user/strace.list       |   6 --
+>  5 files changed, 32 insertions(+), 170 deletions(-)
+>
+> diff --git a/linux-user/syscall-defs.h b/linux-user/syscall-defs.h
+> index 24289ed413..11851535e1 100644
+> --- a/linux-user/syscall-defs.h
+> +++ b/linux-user/syscall-defs.h
+> @@ -196,8 +196,10 @@ SYSCALL_DEF(rt_sigaction, ARG_SIGNAL, ARG_PTR,
+ARG_PTR, ARG_DEC);
+>  #endif
+>  SYSCALL_DEF(rt_sigpending, ARG_PTR, ARG_DEC);
+>  SYSCALL_DEF(rt_sigprocmask, ARG_SIGPROCMASKHOW, ARG_PTR, ARG_PTR,
+ARG_DEC);
+> +SYSCALL_DEF(rt_sigqueueinfo, ARG_DEC, ARG_SIGNAL, ARG_PTR);
+>  SYSCALL_DEF(rt_sigsuspend, ARG_PTR, ARG_DEC);
+>  SYSCALL_DEF(rt_sigtimedwait, ARG_PTR, ARG_PTR, ARG_PTR, ARG_DEC);
+> +SYSCALL_DEF(rt_tgsigqueueinfo, ARG_DEC, ARG_DEC, ARG_SIGNAL, ARG_PTR);
+>  #if !defined(SYSCALL_TABLE) || defined(TARGET_NR_semctl)
+>  SYSCALL_DEF(semctl, ARG_DEC, ARG_DEC, ARG_DEC, ARG_HEX);
+>  #endif
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index 886663af2e..2e70a3910c 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -167,93 +167,6 @@ static void print_si_code(int arg)
+>      gemu_log("%s", codename);
+>  }
+>
+> -static void get_target_siginfo(target_siginfo_t *tinfo,
+> -                                const target_siginfo_t *info)
+> -{
+> -    abi_ulong sival_ptr;
+> -
+> -    int sig;
+> -    int si_errno;
+> -    int si_code;
+> -    int si_type;
+> -
+> -    __get_user(sig, &info->si_signo);
+> -    __get_user(si_errno, &tinfo->si_errno);
+> -    __get_user(si_code, &info->si_code);
+> -
+> -    tinfo->si_signo =3D sig;
+> -    tinfo->si_errno =3D si_errno;
+> -    tinfo->si_code =3D si_code;
+> -
+> -    /* Ensure we don't leak random junk to the guest later */
+> -    memset(tinfo->_sifields._pad, 0, sizeof(tinfo->_sifields._pad));
+> -
+> -    /* This is awkward, because we have to use a combination of
+> -     * the si_code and si_signo to figure out which of the union's
+> -     * members are valid. (Within the host kernel it is always possible
+> -     * to tell, but the kernel carefully avoids giving userspace the
+> -     * high 16 bits of si_code, so we don't have the information to
+> -     * do this the easy way...) We therefore make our best guess,
+> -     * bearing in mind that a guest can spoof most of the si_codes
+> -     * via rt_sigqueueinfo() if it likes.
+> -     *
+> -     * Once we have made our guess, we record it in the top 16 bits of
+> -     * the si_code, so that print_siginfo() later can use it.
+> -     * print_siginfo() will strip these top bits out before printing
+> -     * the si_code.
+> -     */
+> -
+> -    switch (si_code) {
+> -    case SI_USER:
+> -    case SI_TKILL:
+> -    case SI_KERNEL:
+> -        /* Sent via kill(), tkill() or tgkill(), or direct from the
+kernel.
+> -         * These are the only unspoofable si_code values.
+> -         */
+> -        __get_user(tinfo->_sifields._kill._pid,
+&info->_sifields._kill._pid);
+> -        __get_user(tinfo->_sifields._kill._uid,
+&info->_sifields._kill._uid);
+> -        si_type =3D QEMU_SI_KILL;
+> -        break;
+> -    default:
+> -        /* Everything else is spoofable. Make best guess based on signal
+*/
+> -        switch (sig) {
+> -        case TARGET_SIGCHLD:
+> -            __get_user(tinfo->_sifields._sigchld._pid,
+> -                       &info->_sifields._sigchld._pid);
+> -            __get_user(tinfo->_sifields._sigchld._uid,
+> -                       &info->_sifields._sigchld._uid);
+> -            __get_user(tinfo->_sifields._sigchld._status,
+> -                       &info->_sifields._sigchld._status);
+> -            __get_user(tinfo->_sifields._sigchld._utime,
+> -                       &info->_sifields._sigchld._utime);
+> -            __get_user(tinfo->_sifields._sigchld._stime,
+> -                       &info->_sifields._sigchld._stime);
+> -            si_type =3D QEMU_SI_CHLD;
+> -            break;
+> -        case TARGET_SIGIO:
+> -            __get_user(tinfo->_sifields._sigpoll._band,
+> -                       &info->_sifields._sigpoll._band);
+> -            __get_user(tinfo->_sifields._sigpoll._fd,
+> -                       &info->_sifields._sigpoll._fd);
+> -            si_type =3D QEMU_SI_POLL;
+> -            break;
+> -        default:
+> -            /* Assume a sigqueue()/mq_notify()/rt_sigqueueinfo() source.
+*/
+> -            __get_user(tinfo->_sifields._rt._pid,
+&info->_sifields._rt._pid);
+> -            __get_user(tinfo->_sifields._rt._uid,
+&info->_sifields._rt._uid);
+> -            /* XXX: potential problem if 64 bit */
+> -            __get_user(sival_ptr,
+&info->_sifields._rt._sigval.sival_ptr);
+> -            tinfo->_sifields._rt._sigval.sival_ptr =3D sival_ptr;
+> -
+> -            si_type =3D QEMU_SI_RT;
+> -            break;
+> -        }
+> -        break;
+> -    }
+> -
+> -    tinfo->si_code =3D deposit32(si_code, 16, 16, si_type);
+> -}
+> -
+>  static void print_siginfo(const target_siginfo_t *tinfo)
+>  {
+>      /* Print a target_siginfo_t in the format desired for printing
+> @@ -1585,57 +1498,6 @@ print_fstat(const struct syscallname *name,
+>  #define print_fstat64     print_fstat
+>  #endif
+>
+> -#ifdef TARGET_NR_rt_sigqueueinfo
+> -static void
+> -print_rt_sigqueueinfo(const struct syscallname *name,
+> -    abi_long arg0, abi_long arg1, abi_long arg2,
+> -    abi_long arg3, abi_long arg4, abi_long arg5)
+> -{
+> -    void *p;
+> -    target_siginfo_t uinfo;
+> -
+> -    print_syscall_prologue(name);
+> -    print_raw_param("%d", arg0, 0);
+> -    print_signal(arg1, 0);
+> -    p =3D lock_user(VERIFY_READ, arg2, sizeof(target_siginfo_t), 1);
+> -    if (p) {
+> -        get_target_siginfo(&uinfo, p);
+> -        print_siginfo(&uinfo);
+> -
+> -        unlock_user(p, arg2, 0);
+> -    } else {
+> -        print_pointer(arg2, 1);
+> -    }
+> -    print_syscall_epilogue(name);
+> -}
+> -#endif
+> -
+> -#ifdef TARGET_NR_rt_tgsigqueueinfo
+> -static void
+> -print_rt_tgsigqueueinfo(const struct syscallname *name,
+> -    abi_long arg0, abi_long arg1, abi_long arg2,
+> -    abi_long arg3, abi_long arg4, abi_long arg5)
+> -{
+> -    void *p;
+> -    target_siginfo_t uinfo;
+> -
+> -    print_syscall_prologue(name);
+> -    print_raw_param("%d", arg0, 0);
+> -    print_raw_param("%d", arg1, 0);
+> -    print_signal(arg2, 0);
+> -    p =3D lock_user(VERIFY_READ, arg3, sizeof(target_siginfo_t), 1);
+> -    if (p) {
+> -        get_target_siginfo(&uinfo, p);
+> -        print_siginfo(&uinfo);
+> -
+> -        unlock_user(p, arg3, 0);
+> -    } else {
+> -        print_pointer(arg3, 1);
+> -    }
+> -    print_syscall_epilogue(name);
+> -}
+> -#endif
+> -
+>  #ifdef TARGET_NR_syslog
+>  static void
+>  print_syslog_action(abi_ulong arg, int last)
+> diff --git a/linux-user/syscall-sig.inc.c b/linux-user/syscall-sig.inc.c
+> index 5f2c0ba499..774346838b 100644
+> --- a/linux-user/syscall-sig.inc.c
+> +++ b/linux-user/syscall-sig.inc.c
+> @@ -191,6 +191,21 @@ SYSCALL_IMPL(rt_sigprocmask)
+>      return ret;
+>  }
+>
+> +SYSCALL_IMPL(rt_sigqueueinfo)
+> +{
+> +    siginfo_t uinfo;
+> +    void *p;
+> +
+> +    p =3D lock_user(VERIFY_READ, arg3, sizeof(target_siginfo_t), 1);
+> +    if (!p) {
+> +        return -TARGET_EFAULT;
+> +    }
+> +    target_to_host_siginfo(&uinfo, p);
+> +    unlock_user(p, arg3, 0);
+> +
+> +    return get_errno(sys_rt_sigqueueinfo(arg1, arg2, &uinfo));
+> +}
+> +
+>  SYSCALL_IMPL(rt_sigsuspend)
+>  {
+>      CPUState *cpu =3D ENV_GET_CPU(cpu_env);
+> @@ -252,6 +267,21 @@ SYSCALL_IMPL(rt_sigtimedwait)
+>      return ret;
+>  }
+>
+> +SYSCALL_IMPL(rt_tgsigqueueinfo)
+> +{
+> +    siginfo_t uinfo;
+> +    void *p;
+> +
+> +    p =3D lock_user(VERIFY_READ, arg4, sizeof(target_siginfo_t), 1);
+> +    if (!p) {
+> +        return -TARGET_EFAULT;
+> +    }
+> +    target_to_host_siginfo(&uinfo, p);
+> +    unlock_user(p, arg4, 0);
+> +
+> +    return get_errno(sys_rt_tgsigqueueinfo(arg1, arg2, arg3, &uinfo));
+> +}
+> +
+>  #ifdef TARGET_NR_sigaction
+>  SYSCALL_IMPL(sigaction)
+>  {
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 8a05d3e32a..e489d12103 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -4240,32 +4240,6 @@ static abi_long do_syscall1(void *cpu_env, int
+num, abi_long arg1,
+>      void *p;
+>
+>      switch(num) {
+> -    case TARGET_NR_rt_sigqueueinfo:
+> -        {
+> -            siginfo_t uinfo;
+> -
+> -            p =3D lock_user(VERIFY_READ, arg3, sizeof(target_siginfo_t),
+1);
+> -            if (!p) {
+> -                return -TARGET_EFAULT;
+> -            }
+> -            target_to_host_siginfo(&uinfo, p);
+> -            unlock_user(p, arg3, 0);
+> -            ret =3D get_errno(sys_rt_sigqueueinfo(arg1, arg2, &uinfo));
+> -        }
+> -        return ret;
+> -    case TARGET_NR_rt_tgsigqueueinfo:
+> -        {
+> -            siginfo_t uinfo;
+> -
+> -            p =3D lock_user(VERIFY_READ, arg4, sizeof(target_siginfo_t),
+1);
+> -            if (!p) {
+> -                return -TARGET_EFAULT;
+> -            }
+> -            target_to_host_siginfo(&uinfo, p);
+> -            unlock_user(p, arg4, 0);
+> -            ret =3D get_errno(sys_rt_tgsigqueueinfo(arg1, arg2, arg3,
+&uinfo));
+> -        }
+> -        return ret;
+>  #ifdef TARGET_NR_sigreturn
+>      case TARGET_NR_sigreturn:
+>          if (block_signals()) {
+> diff --git a/linux-user/strace.list b/linux-user/strace.list
+> index 0b2c057673..57445a8d81 100644
+> --- a/linux-user/strace.list
+> +++ b/linux-user/strace.list
+> @@ -926,15 +926,9 @@
+>  #ifdef TARGET_NR_rmdir
+>  { TARGET_NR_rmdir, "rmdir" , NULL, NULL, NULL },
+>  #endif
+> -#ifdef TARGET_NR_rt_sigqueueinfo
+> -{ TARGET_NR_rt_sigqueueinfo, "rt_sigqueueinfo" , NULL,
+print_rt_sigqueueinfo, NULL },
+> -#endif
+>  #ifdef TARGET_NR_rt_sigreturn
+>  { TARGET_NR_rt_sigreturn, "rt_sigreturn" , NULL, NULL, NULL },
+>  #endif
+> -#ifdef TARGET_NR_rt_tgsigqueueinfo
+> -{ TARGET_NR_rt_tgsigqueueinfo, "rt_tgsigqueueinfo" , NULL,
+print_rt_tgsigqueueinfo, NULL },
+> -#endif
+>  #ifdef TARGET_NR_sched_getaffinity
+>  { TARGET_NR_sched_getaffinity, "sched_getaffinity" , NULL, NULL, NULL },
+>  #endif
 > --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
-
--- 
-Regards,
-Aravinda
-
-
+> 2.17.1
+>
+>
