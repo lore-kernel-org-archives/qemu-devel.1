@@ -2,61 +2,79 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A163C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:51:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA0C0C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:51:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75750206B6
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:51:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75750206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ADE3F206B6
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:51:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ol6aQQbZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADE3F206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39607 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39609 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSmRH-0006XZ-IN
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 13:51:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55192)
+	id 1hSmRV-0006hv-R6
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 13:51:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:32797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hSloC-0006An-UB
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:10:46 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hSm7q-0007Kn-2n
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:31:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hSloB-0005Mn-3x
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:10:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43508)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
-	id 1hSlo9-0005Le-Sd; Mon, 20 May 2019 13:10:43 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 46E8830842B3;
-	Mon, 20 May 2019 17:10:36 +0000 (UTC)
-Received: from localhost (ovpn-204-110.brq.redhat.com [10.40.204.110])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id CD49F60BFC;
-	Mon, 20 May 2019 17:10:34 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 May 2019 19:02:50 +0200
-Message-Id: <20190520170302.13643-43-cohuck@redhat.com>
-In-Reply-To: <20190520170302.13643-1-cohuck@redhat.com>
-References: <20190520170302.13643-1-cohuck@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hSm7o-0000Nc-N2
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:31:01 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41975)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hSm7o-0000M5-GH
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:31:00 -0400
+Received: by mail-ot1-x342.google.com with SMTP id l25so5377326otp.8
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 10:30:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=upzeKs69iuDfmu9GfUKqLaEkv6m2wZsZqpcg5PjDTMg=;
+	b=Ol6aQQbZysEyYvH38GHWuDQ6aLsvn6itJn8eGIlmoC1b7oG0RXP0gS+tCNh5dhHSpH
+	mGYmdRz5D6jm1szMgH3x9VIiP+uYF8lPjf5uJlX9aoaOfOiEYb2zG6IElOCOr+XP2Apq
+	yQBf3yS/OwZ/9XF2tSgeP5ee0wKHQhu0k5Bj0v+MGVidVxrc6yFNVRDk2OD04ETGq8qt
+	JKC8tOPWFyc9Gr37luYo0jqae5fZwVWl1m4xJkoXBmvzY4mtzM+dvCGNvOOUXbbr6p1j
+	FQTVsKTUvmWVGd8igEYpZww0jYqaKSk7otNaJc+ioIZip2s4Du7qguKJ7IofIws9E1tH
+	qyUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=upzeKs69iuDfmu9GfUKqLaEkv6m2wZsZqpcg5PjDTMg=;
+	b=uB3ryyilJRmjsdN+/oXhJ0WyypLcZT1+beibvlwHPh1KQKuY0GW383NH6+Xzw6bf8I
+	tnxiFgbVvihFMcYPmO3kyJomh5NE8PBaS1upCoMi+aNNB6nnuuqCwDPRthj9nLxn/BxR
+	TGZezllQVxcJ6nArg9Eb894C1B+BY6dKql6u20eYUeyLxWjnVXB/Hler3nMpcRPyW6CH
+	guHxbjdKI5cjY8efqlEtrERoVL6yXEviyqjowIP2YhjG/L14TQg/SyfxkTkS7JuUcRpo
+	b2yAd5UMcYhUIY/fIBgy2M+Xt47HqSqdsttHkcKEfCZ8kxi9aRP1lSD7/A3dr/qrP2+W
+	W8rA==
+X-Gm-Message-State: APjAAAU+zgum5CucDhYKvQ/nH+PsL8BruIb4Xzawjtw88UWJ4CSJ0edV
+	mx4PG5NODRjkTh7HLl4NA4YxyJ2ptyzoS5i3NJ1YDw==
+X-Google-Smtp-Source: APXvYqxgEsPdvQPvbNrDgtS0daANgMM6g941hiCS+KD4WbpZWdZy9ESM/PZCogBlfug27XSIN43PH9gO5z/fiEgBi/k=
+X-Received: by 2002:a9d:6b0d:: with SMTP id g13mr9137781otp.91.1558373457035; 
+	Mon, 20 May 2019 10:30:57 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Mon, 20 May 2019 17:10:36 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 42/54] s390x/tcg: Implement VECTOR SUM ACROSS
- DOUBLEWORD
+References: <20190520170302.13643-1-cohuck@redhat.com>
+In-Reply-To: <20190520170302.13643-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 May 2019 18:30:46 +0100
+Message-ID: <CAFEAcA9Da213mDF9kBOhfV_m_K7X=MEGcNkfZ-2whDmDQYrABw@mail.gmail.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PULL 00/54] s390x update
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,80 +86,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
-	qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+On Mon, 20 May 2019 at 18:03, Cornelia Huck <cohuck@redhat.com> wrote:
+>
+> The following changes since commit d8276573da58e8ce78dab8c46dd660efd664bcb7:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190510' into staging (2019-05-16 13:15:08 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/cohuck/qemu tags/s390x-20190520
+>
+> for you to fetch changes up to f9de88d07258b7288b59ebca77ff1da75b0e8e9f:
+>
+>   s390x/cpumodel: wire up 8561 and 8562 as gen15 machines (2019-05-20 08:35:42 +0200)
+>
+> ----------------------------------------------------------------
+> s390x update:
+> - have the bios tolerate bootmap signature entries
+> - next chunk of vector instruction support in tcg
+> - a headers update against Linux 5.2-rc1
+> - add more facilities and gen15 machines to the cpu model
+>
+> ----------------------------------------------------------------
 
-Perform the calculations without a helper. Only 16 bit or 32 bit values
-have to be added.
+Hi -- this fails to build on aarch64:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c | 29 +++++++++++++++++++++++++++++
- 2 files changed, 31 insertions(+)
+In file included from /home/pm215/qemu/linux-headers/linux/kvm.h:14:0,
+                 from /home/pm215/qemu/target/arm/kvm-consts.h:18,
+                 from /home/pm215/qemu/target/arm/cpu.h:23,
+                 from /home/pm215/qemu/disas.c:8:
+/home/pm215/qemu/build/all/linux-headers/asm/kvm.h:38:29: fatal error:
+asm/sve_context.h: No such file or directory
+ #include <asm/sve_context.h>
+                             ^
+compilation terminated.
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index a8d90517f613..dd370030824e 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1182,6 +1182,8 @@
-     F(0xe7bf, VSBI,    VRR_d, V,   0, 0, 0, 0, vsbi, 0, IF_VEC)
- /* VECTOR SUBTRACT WITH BORROW COMPUTE BORROW INDICATION */
-     F(0xe7bd, VSBCBI,  VRR_d, V,   0, 0, 0, 0, vsbcbi, 0, IF_VEC)
-+/* VECTOR SUM ACROSS DOUBLEWORD */
-+    F(0xe765, VSUMG,   VRR_c, V,   0, 0, 0, 0, vsumg, 0, IF_VEC)
-=20
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
-inc.c
-index 85cd5f03b352..7b4efee5c0a2 100644
---- a/target/s390x/translate_vx.inc.c
-+++ b/target/s390x/translate_vx.inc.c
-@@ -2252,3 +2252,32 @@ static DisasJumpType op_vsbcbi(DisasContext *s, Di=
-sasOps *o)
-                       get_field(s->fields, v4));
-     return DISAS_NEXT;
- }
-+
-+static DisasJumpType op_vsumg(DisasContext *s, DisasOps *o)
-+{
-+    const uint8_t es =3D get_field(s->fields, m4);
-+    TCGv_i64 sum, tmp;
-+    uint8_t dst_idx;
-+
-+    if (es =3D=3D ES_8 || es > ES_32) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    sum =3D tcg_temp_new_i64();
-+    tmp =3D tcg_temp_new_i64();
-+    for (dst_idx =3D 0; dst_idx < 2; dst_idx++) {
-+        uint8_t idx =3D dst_idx * NUM_VEC_ELEMENTS(es) / 2;
-+        const uint8_t max_idx =3D idx + NUM_VEC_ELEMENTS(es) / 2 - 1;
-+
-+        read_vec_element_i64(sum, get_field(s->fields, v3), max_idx, es)=
-;
-+        for (; idx <=3D max_idx; idx++) {
-+            read_vec_element_i64(tmp, get_field(s->fields, v2), idx, es)=
-;
-+            tcg_gen_add_i64(sum, sum, tmp);
-+        }
-+        write_vec_element_i64(sum, get_field(s->fields, v1), dst_idx, ES=
-_64);
-+    }
-+    tcg_temp_free_i64(sum);
-+    tcg_temp_free_i64(tmp);
-+    return DISAS_NEXT;
-+}
---=20
-2.20.1
+Looks like we need to fix update-linux-headers.sh to account for
+that new header file before we can do the header sync.
 
+thanks
+-- PMM
 
