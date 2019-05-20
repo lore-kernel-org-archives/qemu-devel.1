@@ -2,59 +2,73 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 923AEC04AB4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 03:23:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEDC2C04AAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 03:47:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 541552082C
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 03:23:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 541552082C
+	by mail.kernel.org (Postfix) with ESMTPS id A573420657
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 03:47:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A573420657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57156 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57357 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSYtz-0004Ml-Lb
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 23:23:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49318)
+	id 1hSZGX-00012W-T0
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 23:47:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hSYgA-0002NY-3t
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 23:09:35 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hSZFo-0000lw-4E
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 23:46:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hSYg8-0001sU-Bu
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 23:09:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50292)
+	(envelope-from <pagupta@redhat.com>) id 1hSZFm-0000tR-Hh
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 23:46:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57238)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hSYg8-0001s2-1A
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 23:09:32 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hSZFm-0000m3-8P
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 23:46:22 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 41389307D910
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 03:09:31 +0000 (UTC)
-Received: from xz-x1.nay.redhat.com (dhcp-15-205.nay.redhat.com [10.66.15.205])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 25CDC1001E66;
-	Mon, 20 May 2019 03:09:28 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 20 May 2019 11:08:39 +0800
-Message-Id: <20190520030839.6795-16-peterx@redhat.com>
-In-Reply-To: <20190520030839.6795-1-peterx@redhat.com>
-References: <20190520030839.6795-1-peterx@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+	by mx1.redhat.com (Postfix) with ESMTPS id E5BE4149A2;
+	Mon, 20 May 2019 03:46:19 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+	(colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 87095611A1;
+	Mon, 20 May 2019 03:46:19 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com
+	(zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+	by colo-mx.corp.redhat.com (Postfix) with ESMTP id 8446B18089C8;
+	Mon, 20 May 2019 03:46:18 +0000 (UTC)
+Date: Sun, 19 May 2019 23:46:17 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: Jakub =?utf-8?Q?Staro=C5=84?= <jstaron@google.com>
+Message-ID: <1902045958.29774859.1558323977950.JavaMail.zimbra@redhat.com>
+In-Reply-To: <5e27fa73-53f5-007a-e0c1-f32f83e5764f@google.com>
+References: <20190514145422.16923-1-pagupta@redhat.com>
+	<20190514145422.16923-3-pagupta@redhat.com>
+	<c06514fd-8675-ba74-4b7b-ff0eb4a91605@google.com>
+	<1954162775.29408078.1558071358974.JavaMail.zimbra@redhat.com>
+	<5e27fa73-53f5-007a-e0c1-f32f83e5764f@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.42, 10.4.195.12]
+Thread-Topic: virtio-pmem: Add virtio pmem driver
+Thread-Index: 4LLaKD2mAqtUZ1AopBm+Wwx4LVVjgQ==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Mon, 20 May 2019 03:09:31 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.38]);
+	Mon, 20 May 2019 03:46:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 15/15] migration: Split log_clear() into
- smaller chunks
+Subject: Re: [Qemu-devel] [PATCH v9 2/7] virtio-pmem: Add virtio pmem driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,299 +80,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	"Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-	peterx@redhat.com, Juan Quintela <quintela@redhat.com>
+Cc: jack@suse.cz, kvm@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
+	david@fromorbit.com, qemu-devel@nongnu.org,
+	virtualization@lists.linux-foundation.org,
+	adilger kernel <adilger.kernel@dilger.ca>, smbarber@google.com,
+	zwisler@kernel.org, aarcange@redhat.com,
+	dave jiang <dave.jiang@intel.com>, linux-nvdimm@lists.01.org,
+	vishal l verma <vishal.l.verma@intel.com>, david@redhat.com,
+	willy@infradead.org, hch@infradead.org,
+	linux-acpi@vger.kernel.org, jmoyer@redhat.com,
+	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
+	riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
+	stefanha@redhat.com, pbonzini@redhat.com,
+	dan j williams <dan.j.williams@intel.com>,
+	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
+	tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
+	cohuck@redhat.com, rjw@rjwysocki.net,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, imammedo@redhat.com,
+	darrick wong <darrick.wong@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently we are doing log_clear() right after log_sync() which mostly
-keeps the old behavior when log_clear() was still part of log_sync().
 
-This patch tries to further optimize the migration log_clear() code
-path to split huge log_clear()s into smaller chunks.
+> On 5/16/19 10:35 PM, Pankaj Gupta wrote:
+> > Can I take it your reviewed/acked-by? or tested-by tag? for the virtio
+> > patch :)I don't feel that I have enough expertise to give the reviewed-by
+> > tag, but you can
+> take my acked-by + tested-by.
+> 
+> Acked-by: Jakub Staron <jstaron@google.com>
+> Tested-by: Jakub Staron <jstaron@google.com>
+> 
+> No kernel panics/stalls encountered during testing this patches (v9) with
+> QEMU + xfstests.
 
-We do this by spliting the whole guest memory region into memory
-chunks, whose size is decided by MigrationState.clear_bitmap_shift (an
-example will be given below).  With that, we don't do the dirty bitmap
-clear operation on the remote node (e.g., KVM) when we fetch the dirty
-bitmap, instead we explicitly clear the dirty bitmap for the memory
-chunk for each of the first time we send a page in that chunk.
+Thank you for testing and confirming the results. I will add your tested &
+acked-by in v10.
 
-Here comes an example.
+> Some CPU stalls encountered while testing with crosvm instead of QEMU with
+> xfstests
+> (test generic/464) but no repro for QEMU, so the fault may be on the side of
+> crosvm.
 
-Assuming the guest has 64G memory, then before this patch the KVM
-ioctl KVM_CLEAR_DIRTY_LOG will be a single one covering 64G memory.
-If after the patch, let's assume when the clear bitmap shift is 18,
-then the memory chunk size on x86_64 will be 1UL<<18 * 4K = 1GB.  Then
-instead of sending a big 64G ioctl, we'll send 64 small ioctls, each
-of the ioctl will cover 1G of the guest memory.  For each of the 64
-small ioctls, we'll only send if any of the page in that small chunk
-was going to be sent right away.
+yes, looks like crosvm related as we did not see any of this in my and your
+testing with Qemu. 
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- include/exec/ram_addr.h | 75 +++++++++++++++++++++++++++++++++++++++--
- migration/migration.c   |  4 +++
- migration/migration.h   | 27 +++++++++++++++
- migration/ram.c         | 44 ++++++++++++++++++++++++
- migration/trace-events  |  1 +
- 5 files changed, 149 insertions(+), 2 deletions(-)
+> 
+> 
+> The dump for the crosvm/xfstests stall:
+> [ 2504.175276] rcu: INFO: rcu_sched detected stalls on CPUs/tasks:
+> [ 2504.176681] rcu:     0-...!: (1 GPs behind) idle=9b2/1/0x4000000000000000
+> softirq=1089198/1089202 fqs=0
+> [ 2504.178270] rcu:     2-...!: (1 ticks this GP)
+> idle=cfe/1/0x4000000000000002 softirq=1055108/1055110 fqs=0
+> [ 2504.179802] rcu:     3-...!: (1 GPs behind) idle=1d6/1/0x4000000000000002
+> softirq=1046798/1046802 fqs=0
+> [ 2504.181215] rcu:     4-...!: (2 ticks this GP)
+> idle=522/1/0x4000000000000002 softirq=1249063/1249064 fqs=0
+> [ 2504.182625] rcu:     5-...!: (1 GPs behind) idle=6da/1/0x4000000000000000
+> softirq=1131036/1131047 fqs=0
+> [ 2504.183955]  (detected by 3, t=0 jiffies, g=1232529, q=1370)
+> [ 2504.184762] Sending NMI from CPU 3 to CPUs 0:
+> [ 2504.186400] NMI backtrace for cpu 0
+> [ 2504.186401] CPU: 0 PID: 6670 Comm: 464 Not tainted 5.1.0+ #1
+> [ 2504.186401] Hardware name: ChromiumOS crosvm, BIOS 0
+> [ 2504.186402] RIP: 0010:queued_spin_lock_slowpath+0x1c/0x1e0
+> [ 2504.186402] Code: e7 89 c8 f0 44 0f b1 07 39 c1 75 dc f3 c3 0f 1f 44 00 00
+> ba 01 00 00 00 8b 07 85 c0 75 0a f0 0f b1 17 85 c0 75 f2 f3 c3 f3 90 <eb> ec
+> 81 fe 00 01 00 00 0f 84 ab 00 00 00 81 e6 00 ff ff ff 75 44
+> [ 2504.186403] RSP: 0018:ffffc90000003ee8 EFLAGS: 00000002
+> [ 2504.186404] RAX: 0000000000000001 RBX: 0000000000000246 RCX:
+> 0000000000404044
+> [ 2504.186404] RDX: 0000000000000001 RSI: 0000000000000001 RDI:
+> ffffffff8244a280
+> [ 2504.186405] RBP: ffffffff8244a280 R08: 00000000000f4200 R09:
+> 0000024709ed6c32
+> [ 2504.186405] R10: 0000000000000000 R11: 0000000000000001 R12:
+> ffffffff8244a280
+> [ 2504.186405] R13: 0000000000000009 R14: 0000000000000009 R15:
+> 0000000000000000
+> [ 2504.186406] FS:  0000000000000000(0000) GS:ffff8880cc600000(0000)
+> knlGS:0000000000000000
+> [ 2504.186406] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [ 2504.186406] CR2: 00007efd6b0f15d8 CR3: 000000000260a006 CR4:
+> 0000000000360ef0
+> [ 2504.186407] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
+> 0000000000000000
+> [ 2504.186407] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:
+> 0000000000000400
+> [ 2504.186407] Call Trace:
+> [ 2504.186408]  <IRQ>
+> [ 2504.186408]  _raw_spin_lock_irqsave+0x1d/0x30
+> [ 2504.186408]  rcu_core+0x3b6/0x740
+> [ 2504.186408]  ? __hrtimer_run_queues+0x133/0x280
+> [ 2504.186409]  ? recalibrate_cpu_khz+0x10/0x10
+> [ 2504.186409]  __do_softirq+0xd8/0x2e4
+> [ 2504.186409]  irq_exit+0xa3/0xb0
+> [ 2504.186410]  smp_apic_timer_interrupt+0x67/0x120
+> [ 2504.186410]  apic_timer_interrupt+0xf/0x20
+> [ 2504.186410]  </IRQ>
+> [ 2504.186410] RIP: 0010:unmap_page_range+0x47a/0x9b0
+> [ 2504.186411] Code: 0f 46 46 10 49 39 6e 18 49 89 46 10 48 89 e8 49 0f 43 46
+> 18 41 80 4e 20 08 4d 85 c9 49 89 46 18 0f 84 68 ff ff ff 49 8b 51 08 <48> 8d
+> 42 ff 83 e2 01 49 0f 44 c1 f6 40 18 01 75 38 48 ba ff 0f 00
+> [ 2504.186411] RSP: 0018:ffffc900036cbcc8 EFLAGS: 00000282 ORIG_RAX:
+> ffffffffffffff13
+> [ 2504.186412] RAX: ffffffffffffffff RBX: 800000003751d045 RCX:
+> 0000000000000001
+> [ 2504.186413] RDX: ffffea0002e09288 RSI: 000000000269b000 RDI:
+> ffff8880b6525e40
+> [ 2504.186413] RBP: 000000000269c000 R08: 0000000000000000 R09:
+> ffffea0000dd4740
+> [ 2504.186413] R10: ffffea0001755700 R11: ffff8880cc62d120 R12:
+> 0000000002794000
+> [ 2504.186414] R13: 000000000269b000 R14: ffffc900036cbdf0 R15:
+> ffff8880572434d8
+> [ 2504.186414]  ? unmap_page_range+0x420/0x9b0
+> [ 2504.186414]  ? release_pages+0x175/0x390
+> [ 2504.186414]  unmap_vmas+0x7c/0xe0
+> [ 2504.186415]  exit_mmap+0xa4/0x190
+> [ 2504.186415]  mmput+0x3b/0x100
+> [ 2504.186415]  do_exit+0x276/0xc10
+> [ 2504.186415]  do_group_exit+0x35/0xa0
+> [ 2504.186415]  __x64_sys_exit_group+0xf/0x10
+> [ 2504.186416]  do_syscall_64+0x43/0x120
+> [ 2504.186416]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> [ 2504.186416] RIP: 0033:0x7efd6ae10618
+> [ 2504.186416] Code: Bad RIP value.
+> [ 2504.186417] RSP: 002b:00007ffcac9bde38 EFLAGS: 00000246 ORIG_RAX:
+> 00000000000000e7
+> [ 2504.186417] RAX: ffffffffffffffda RBX: 0000000000000000 RCX:
+> 00007efd6ae10618
+> [ 2504.186418] RDX: 0000000000000000 RSI: 000000000000003c RDI:
+> 0000000000000000
+> [ 2504.186418] RBP: 00007efd6b0ed8e0 R08: 00000000000000e7 R09:
+> ffffffffffffff98
+> [ 2504.186418] R10: 00007ffcac9bddb8 R11: 0000000000000246 R12:
+> 00007efd6b0ed8e0
+> [ 2504.186419] R13: 00007efd6b0f2c20 R14: 0000000000000060 R15:
+> 000000000070e705
+> [ 2504.186421] NMI backtrace for cpu 3
+> [ 2504.226980] CPU: 3 PID: 6596 Comm: xfs_io Not tainted 5.1.0+ #1
+> [ 2504.227661] Hardware name: ChromiumOS crosvm, BIOS 0
+> [ 2504.228261] Call Trace:
+> [ 2504.228552]  <IRQ>
+> [ 2504.228795]  dump_stack+0x46/0x5b
+> [ 2504.229180]  nmi_cpu_backtrace+0x89/0x90
+> [ 2504.229649]  ? lapic_can_unplug_cpu+0x90/0x90
+> [ 2504.230157]  nmi_trigger_cpumask_backtrace+0x82/0xc0
+> [ 2504.230751]  rcu_dump_cpu_stacks+0x8b/0xb7
+> [ 2504.231222]  rcu_sched_clock_irq+0x6f6/0x720
+> [ 2504.231726]  ? tick_sched_do_timer+0x50/0x50
+> [ 2504.232214]  update_process_times+0x23/0x50
+> [ 2504.232693]  tick_sched_handle+0x2f/0x40
+> [ 2504.233144]  tick_sched_timer+0x32/0x70
+> [ 2504.233594]  __hrtimer_run_queues+0x103/0x280
+> [ 2504.234092]  hrtimer_interrupt+0xe0/0x240
+> [ 2504.234580]  smp_apic_timer_interrupt+0x5d/0x120
+> [ 2504.235152]  apic_timer_interrupt+0xf/0x20
+> [ 2504.235627]  </IRQ>
+> [ 2504.235879] RIP: 0010:__memcpy_flushcache+0x4b/0x180
+> [ 2504.236452] Code: 8d 5d e0 4c 8d 62 20 48 89 f7 48 29 d7 48 89 d9 48 83 e1
+> e0 4c 01 e1 48 8d 04 17 4c 8b 02 4c 8b 4a 08 4c 8b 52 10 4c 8b 5a 18 <4c> 0f
+> c3 00 4c 0f c3 48 08 4c 0f c3 50 10 4c 0f c3 58 18 48 83 c2
+> [ 2504.238592] RSP: 0018:ffffc90003ae38e8 EFLAGS: 00010286 ORIG_RAX:
+> ffffffffffffff13
+> [ 2504.239467] RAX: ffff888341800000 RBX: 0000000000000fe0 RCX:
+> ffff88801bd22000
+> [ 2504.240277] RDX: ffff88801bd21000 RSI: ffff888341800000 RDI:
+> 0000000325adf000
+> [ 2504.241092] RBP: 0000000000001000 R08: cdcdcdcdcdcdcdcd R09:
+> cdcdcdcdcdcdcdcd
+> [ 2504.241908] R10: cdcdcdcdcdcdcdcd R11: cdcdcdcdcdcdcdcd R12:
+> ffff88801bd21020
+> [ 2504.242751] R13: ffff8880b916b600 R14: ffff888341800000 R15:
+> ffffea00006f4840
+> [ 2504.243602]  write_pmem+0x61/0x90
+> [ 2504.244002]  pmem_do_bvec+0x178/0x2c0
+> [ 2504.244469]  ? chksum_update+0xe/0x20
+> [ 2504.244908]  pmem_make_request+0xf7/0x270
+> [ 2504.245509]  generic_make_request+0x199/0x3f0
+> [ 2504.246179]  ? submit_bio+0x67/0x130
+> [ 2504.246710]  submit_bio+0x67/0x130
+> [ 2504.247117]  ext4_io_submit+0x44/0x50
+> [ 2504.247556]  ext4_writepages+0x621/0xe80
+> [ 2504.248028]  ? 0xffffffff81000000
+> [ 2504.248418]  ? do_writepages+0x46/0xd0
+> [ 2504.248880]  ? ext4_mark_inode_dirty+0x1d0/0x1d0
+> [ 2504.249417]  do_writepages+0x46/0xd0
+> [ 2504.249833]  ? release_pages+0x175/0x390
+> [ 2504.250290]  ? __filemap_fdatawrite_range+0x7c/0xb0
+> [ 2504.250879]  __filemap_fdatawrite_range+0x7c/0xb0
+> [ 2504.251427]  ext4_release_file+0x67/0xa0
+> [ 2504.251897]  __fput+0xb1/0x220
+> [ 2504.252260]  task_work_run+0x79/0xa0
+> [ 2504.252676]  do_exit+0x2ca/0xc10
+> [ 2504.253063]  ? __switch_to_asm+0x40/0x70
+> [ 2504.253530]  ? __switch_to_asm+0x34/0x70
+> [ 2504.253995]  ? __switch_to_asm+0x40/0x70
+> [ 2504.254446]  do_group_exit+0x35/0xa0
+> [ 2504.254865]  get_signal+0x14e/0x7a0
+> [ 2504.255281]  ? __switch_to_asm+0x34/0x70
+> [ 2504.255749]  ? __switch_to_asm+0x40/0x70
+> [ 2504.256224]  do_signal+0x2b/0x5e0
+> [ 2504.256619]  ? __switch_to_asm+0x40/0x70
+> [ 2504.257086]  ? __switch_to_asm+0x34/0x70
+> [ 2504.257552]  ? __switch_to_asm+0x40/0x70
+> [ 2504.258022]  ? __switch_to_asm+0x34/0x70
+> [ 2504.258488]  ? __schedule+0x253/0x530
+> [ 2504.258943]  ? __switch_to_asm+0x34/0x70
+> [ 2504.259398]  exit_to_usermode_loop+0x87/0xa0
+> [ 2504.259900]  do_syscall_64+0xf7/0x120
+> [ 2504.260326]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> [ 2504.260923] RIP: 0033:0x7faf347e28bd
+> [ 2504.261348] Code: Bad RIP value.
+> [ 2504.261727] RSP: 002b:00007faf33fc5f40 EFLAGS: 00000293 ORIG_RAX:
+> 0000000000000022
+> [ 2504.262594] RAX: fffffffffffffdfe RBX: 0000000000000000 RCX:
+> 00007faf347e28bd
+> [ 2504.263416] RDX: 8b9da1f4246cdb38 RSI: 0000000000000000 RDI:
+> 0000000000000000
+> [ 2504.264215] RBP: 0000000000000000 R08: 00007faf33fc6700 R09:
+> 00007faf33fc6700
+> [ 2504.265061] R10: 000000000000012d R11: 0000000000000293 R12:
+> 00007ffdf142327e
+> [ 2504.266082] R13: 00007ffdf142327f R14: 00007faf337c6000 R15:
+> 0000000000000003
+> 
+> Arch: x86_64
+> Kernel: stable top with virtio-pmem v9 patches applied
+> Distro: Debian Stretch
+> 
+> But as I said, it may be just a problem with crosvm.
+Right.
 
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 896324281a..c2db157d98 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -50,8 +50,69 @@ struct RAMBlock {
-     unsigned long *unsentmap;
-     /* bitmap of already received pages in postcopy */
-     unsigned long *receivedmap;
-+
-+    /*
-+     * bitmap of already cleared dirty bitmap.  Set this up to
-+     * non-NULL to enable the capability to postpone and split
-+     * clearing of dirty bitmap on the remote node (e.g., KVM).  The
-+     * bitmap will be set only when doing global sync.
-+     *
-+     * NOTE: this bitmap is different comparing to the other bitmaps
-+     * in that one bit can represent multiple guest pages (which is
-+     * decided by the `clear_bmap_shift' variable below).  On
-+     * destination side, this should always be NULL, and the variable
-+     * `clear_bmap_shift' is meaningless.
-+     */
-+    unsigned long *clear_bmap;
-+    uint8_t clear_bmap_shift;
- };
- 
-+/**
-+ * clear_bmap_size: calculate clear bitmap size
-+ *
-+ * @pages: number of guest pages
-+ * @shift: guest page number shift
-+ *
-+ * Returns: number of bits for the clear bitmap
-+ */
-+static inline long clear_bmap_size(uint64_t pages, uint8_t shift)
-+{
-+    return DIV_ROUND_UP(pages, 1UL << shift);
-+}
-+
-+/**
-+ * clear_bmap_set: set clear bitmap for the page range
-+ *
-+ * @rb: the ramblock to operate on
-+ * @start: the start page number
-+ * @size: number of pages to set in the bitmap
-+ *
-+ * Returns: None
-+ */
-+static inline void clear_bmap_set(RAMBlock *rb, uint64_t start,
-+                                  uint64_t npages)
-+{
-+    uint8_t shift = rb->clear_bmap_shift;
-+
-+    bitmap_set_atomic(rb->clear_bmap, start >> shift,
-+                      clear_bmap_size(npages, shift));
-+}
-+
-+/**
-+ * clear_bmap_test_and_clear: test clear bitmap for the page, clear if set
-+ *
-+ * @rb: the ramblock to operate on
-+ * @page: the page number to check
-+ *
-+ * Returns: true if the bit was set, false otherwise
-+ */
-+static inline bool clear_bmap_test_and_clear(RAMBlock *rb, uint64_t page)
-+{
-+    uint8_t shift = rb->clear_bmap_shift;
-+
-+    return bitmap_test_and_clear_atomic(rb->clear_bmap, page >> shift, 1);
-+}
-+
- static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
- {
-     return (b && b->host && offset < b->used_length) ? true : false;
-@@ -462,8 +523,18 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
-             }
-         }
- 
--        /* TODO: split the huge bitmap into smaller chunks */
--        memory_region_clear_dirty_bitmap(rb->mr, start, length);
-+        if (rb->clear_bmap) {
-+            /*
-+             * Postpone the dirty bitmap clear to the point before we
-+             * really send the pages, also we will split the clear
-+             * dirty procedure into smaller chunks.
-+             */
-+            clear_bmap_set(rb, start >> TARGET_PAGE_BITS,
-+                           length >> TARGET_PAGE_BITS);
-+        } else {
-+            /* Slow path - still do that in a huge chunk */
-+            memory_region_clear_dirty_bitmap(rb->mr, start, length);
-+        }
-     } else {
-         ram_addr_t offset = rb->offset;
- 
-diff --git a/migration/migration.c b/migration/migration.c
-index d0a0f68f11..780d8af404 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -3362,6 +3362,8 @@ void migration_global_dump(Monitor *mon)
-                    ms->send_section_footer ? "on" : "off");
-     monitor_printf(mon, "decompress-error-check: %s\n",
-                    ms->decompress_error_check ? "on" : "off");
-+    monitor_printf(mon, "clear-bitmap-shift: %u\n",
-+                   ms->clear_bitmap_shift);
- }
- 
- #define DEFINE_PROP_MIG_CAP(name, x)             \
-@@ -3376,6 +3378,8 @@ static Property migration_properties[] = {
-                      send_section_footer, true),
-     DEFINE_PROP_BOOL("decompress-error-check", MigrationState,
-                       decompress_error_check, true),
-+    DEFINE_PROP_UINT8("x-clear-bitmap-shift", MigrationState,
-+                      clear_bitmap_shift, CLEAR_BITMAP_SHIFT_DEFAULT),
- 
-     /* Migration parameters */
-     DEFINE_PROP_UINT8("x-compress-level", MigrationState,
-diff --git a/migration/migration.h b/migration/migration.h
-index 780a096857..6e3178d8b2 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -27,6 +27,23 @@ struct PostcopyBlocktimeContext;
- 
- #define  MIGRATION_RESUME_ACK_VALUE  (1)
- 
-+/*
-+ * 1<<6=64 pages -> 256K chunk when page size is 4K.  This gives us
-+ * the benefit that all the chunks are 64 pages aligned then the
-+ * bitmaps are always aligned to LONG.
-+ */
-+#define CLEAR_BITMAP_SHIFT_MIN             6
-+/*
-+ * 1<<18=256K pages -> 1G chunk when page size is 4K.  This is the
-+ * default value to use if no one specified.
-+ */
-+#define CLEAR_BITMAP_SHIFT_DEFAULT        18
-+/*
-+ * 1<<31=2G pages -> 8T chunk when page size is 4K.  This should be
-+ * big enough and make sure we won't overflow easily.
-+ */
-+#define CLEAR_BITMAP_SHIFT_MAX            31
-+
- /* State for the incoming migration */
- struct MigrationIncomingState {
-     QEMUFile *from_src_file;
-@@ -233,6 +250,16 @@ struct MigrationState
-      * do not trigger spurious decompression errors.
-      */
-     bool decompress_error_check;
-+
-+    /*
-+     * This decides the size of guest memory chunk that will be used
-+     * to track dirty bitmap clearing.  The size of memory chunk will
-+     * be GUEST_PAGE_SIZE << N.  Say, N=0 means we will clear dirty
-+     * bitmap for each page to send (1<<0=1); N=10 means we will clear
-+     * dirty bitmap only once for 1<<10=1K continuous guest pages
-+     * (which is in 4M chunk).
-+     */
-+    uint8_t clear_bitmap_shift;
- };
- 
- void migrate_set_state(int *state, int old_state, int new_state);
-diff --git a/migration/ram.c b/migration/ram.c
-index 05f9f36c7c..b22314c165 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1668,6 +1668,33 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs,
-     bool ret;
- 
-     qemu_mutex_lock(&rs->bitmap_mutex);
-+
-+    /*
-+     * Clear dirty bitmap if needed.  This _must_ be called before we
-+     * send any of the page in the chunk because we need to make sure
-+     * we can capture further page content changes when we sync dirty
-+     * log the next time.  So as long as we are going to send any of
-+     * the page in the chunk we clear the remote dirty bitmap for all.
-+     * Clearing it earlier won't be a problem, but too late will.
-+     */
-+    if (rb->clear_bmap && clear_bmap_test_and_clear(rb, page)) {
-+        uint8_t shift = rb->clear_bmap_shift;
-+        hwaddr size = 1ULL << (TARGET_PAGE_BITS + shift);
-+        hwaddr start = (page << TARGET_PAGE_BITS) & (-size);
-+
-+        /*
-+         * CLEAR_BITMAP_SHIFT_MIN should always guarantee this... this
-+         * can make things easier sometimes since then start address
-+         * of the small chunk will always be 64 pages aligned so the
-+         * bitmap will always be aligned to unsigned long.  We should
-+         * even be able to remove this restriction but I'm simply
-+         * keeping it.
-+         */
-+        assert(shift >= 6);
-+        trace_migration_bitmap_clear_dirty(rb->idstr, start, size, page);
-+        memory_region_clear_dirty_bitmap(rb->mr, start, size);
-+    }
-+
-     ret = test_and_clear_bit(page, rb->bmap);
- 
-     if (ret) {
-@@ -2685,6 +2712,8 @@ static void ram_save_cleanup(void *opaque)
-     memory_global_dirty_log_stop();
- 
-     RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-+        g_free(block->clear_bmap);
-+        block->clear_bmap = NULL;
-         g_free(block->bmap);
-         block->bmap = NULL;
-         g_free(block->unsentmap);
-@@ -3195,15 +3224,30 @@ static int ram_state_init(RAMState **rsp)
- 
- static void ram_list_init_bitmaps(void)
- {
-+    MigrationState *ms = migrate_get_current();
-     RAMBlock *block;
-     unsigned long pages;
-+    uint8_t shift;
- 
-     /* Skip setting bitmap if there is no RAM */
-     if (ram_bytes_total()) {
-+        shift = ms->clear_bitmap_shift;
-+        if (shift > CLEAR_BITMAP_SHIFT_MAX) {
-+            error_report("clear_bitmap_shift (%u) too big, using "
-+                         "max value (%u)", shift, CLEAR_BITMAP_SHIFT_MAX);
-+            shift = CLEAR_BITMAP_SHIFT_MAX;
-+        } else if (shift < CLEAR_BITMAP_SHIFT_MIN) {
-+            error_report("clear_bitmap_shift (%u) too small, using "
-+                         "min value (%u)", shift, CLEAR_BITMAP_SHIFT_MIN);
-+            shift = CLEAR_BITMAP_SHIFT_MIN;
-+        }
-+
-         RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-             pages = block->max_length >> TARGET_PAGE_BITS;
-             block->bmap = bitmap_new(pages);
-             bitmap_set(block->bmap, 0, pages);
-+            block->clear_bmap_shift = shift;
-+            block->clear_bmap = bitmap_new(clear_bmap_size(pages, shift));
-             if (migrate_postcopy_ram()) {
-                 block->unsentmap = bitmap_new(pages);
-                 bitmap_set(block->unsentmap, 0, pages);
-diff --git a/migration/trace-events b/migration/trace-events
-index de2e136e57..2c45974330 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -79,6 +79,7 @@ get_queued_page(const char *block_name, uint64_t tmp_offset, unsigned long page_
- get_queued_page_not_dirty(const char *block_name, uint64_t tmp_offset, unsigned long page_abs, int sent) "%s/0x%" PRIx64 " page_abs=0x%lx (sent=%d)"
- migration_bitmap_sync_start(void) ""
- migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
-+migration_bitmap_clear_dirty(char *str, uint64_t start, uint64_t size, unsigned long page) "rb %s start 0x%"PRIx64" size 0x%"PRIx64" page 0x%lx"
- migration_throttle(void) ""
- multifd_recv(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t flags, uint32_t next_packet_size) "channel %d packet number %" PRIu64 " pages %d flags 0x%x next packet size %d"
- multifd_recv_sync_main(long packet_num) "packet num %ld"
--- 
-2.17.1
-
+Thanks,
+Pankaj
+> 
+> 
+> Thank you,
+> Jakub Staron
+> 
+> 
 
