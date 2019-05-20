@@ -6,77 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54851C04AAC
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F063CC04E87
 	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:38:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 284F4206B6
+	by mail.kernel.org (Postfix) with ESMTPS id CA8DF206B6
 	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:38:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 284F4206B6
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA8DF206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39337 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39339 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSmEo-00044N-4X
+	id 1hSmEo-00044T-Mg
 	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 13:38:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58452)
+Received: from eggs.gnu.org ([209.51.188.92]:55160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hSlxr-0006Y1-B2
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:20:46 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hSlo5-00063R-Mc
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:10:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hSlxp-0003bc-W0
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:20:43 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:39062)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hSlxp-0003aO-QY
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:20:41 -0400
-Received: by mail-wr1-f67.google.com with SMTP id w8so15516545wrl.6
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 10:20:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=rGovGWCGVTw0/7S/ozvyRwUzMR8pvgv1I3ri6GNXBsM=;
-	b=Bt+XJKUAZXBgFYdQ95sc+g+N8unV5HUJnCZaFDmGuiJERYgIIfFxGDktVbpzQqHiQR
-	nVVyaBz9he5Nr/MTrpTX3GNCcpQIjD7dDZNMPLVlPrpGaOnJtfkkiQxnBCgVBWbLtqdF
-	dhriEbRsjkRDXYGRmqX2Z3o2EF8XGXKQ4u5Br0gWByOYyIdOSN5/RvrX+/tvGBHGUxvE
-	Zhw3mFkQAcfP3rlu7HsoskUSLJx6fjLpeMumMwxR4s3Y+CvBKMBDkC03QFxjTHyLc9b4
-	XPbpq0ASMi9/oS+1JZvZj2mC10NcJpMSdh96cJx9JSqLnw6IJwjhbwqvejFepgU/KJEt
-	kYnQ==
-X-Gm-Message-State: APjAAAX+HteS9LacmAYLzFmGuUMzXWtSTxbMUdO28RJjitI1ns0LVwW3
-	UxUU0VFs05F6fTsN/R7XuxogIGa4e9E=
-X-Google-Smtp-Source: APXvYqxj8drm7J/dgxmJLey5IICAeHzk9/62+x/iWe2XbG+Aod+yz5Ogx9uulEnde6KMYCU/H//m1Q==
-X-Received: by 2002:adf:e850:: with SMTP id d16mr32604035wrn.269.1558372839839;
-	Mon, 20 May 2019 10:20:39 -0700 (PDT)
-Received: from [192.168.1.43] (228.red-83-52-173.dynamicip.rima-tde.net.
-	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
-	k17sm15291292wrm.73.2019.05.20.10.20.39
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 20 May 2019 10:20:39 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-References: <20190520162809.2677-1-peter.maydell@linaro.org>
-	<20190520162809.2677-5-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <0d39932f-8959-cb68-1ac7-ac79cfdb98a9@redhat.com>
-Date: Mon, 20 May 2019 19:20:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <cohuck@redhat.com>) id 1hSlo4-0005KM-2P
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:10:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53500)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
+	id 1hSlo3-0005JT-TS; Mon, 20 May 2019 13:10:36 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E2D6A3082E8E;
+	Mon, 20 May 2019 17:10:22 +0000 (UTC)
+Received: from localhost (ovpn-204-110.brq.redhat.com [10.40.204.110])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 38BB05C297;
+	Mon, 20 May 2019 17:10:16 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 May 2019 19:02:48 +0200
+Message-Id: <20190520170302.13643-41-cohuck@redhat.com>
+In-Reply-To: <20190520170302.13643-1-cohuck@redhat.com>
+References: <20190520170302.13643-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190520162809.2677-5-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Mon, 20 May 2019 17:10:27 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH 4/4] hw/intc/arm_gicv3: Fix writes to
- ICC_CTLR_EL3
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 40/54] s390x/tcg: Implement VECTOR SUBTRACT WITH
+ BORROW INDICATION
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,52 +68,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-s390x@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+	qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+From: David Hildenbrand <david@redhat.com>
 
-On 5/20/19 6:28 PM, Peter Maydell wrote:
-> The ICC_CTLR_EL3 register includes some bits which are aliases
-> of bits in the ICC_CTLR_EL1(S) and (NS) registers. QEMU chooses
-> to keep those bits in the cs->icc_ctlr_el1[] struct fields.
-> Unfortunately a missing '~' in the code to update the bits
-> in those fields meant that writing to ICC_CTLR_EL3 would corrupt
-> the ICC_CLTR_EL1 register values.
+Fairly easy as only 128-bit handling is required. Simply perform the
+subtraction and then subtract the borrow.
 
-How did you notice? Simply reviewing?
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/insn-data.def      |  2 ++
+ target/s390x/translate_vx.inc.c | 26 ++++++++++++++++++++++++++
+ 2 files changed, 28 insertions(+)
 
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 94de3c9c7d30..a60d8531dc52 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1178,6 +1178,8 @@
+     F(0xe7f7, VS,      VRR_c, V,   0, 0, 0, 0, vs, 0, IF_VEC)
+ /* VECTOR SUBTRACT COMPUTE BORROW INDICATION */
+     F(0xe7f5, VSCBI,   VRR_c, V,   0, 0, 0, 0, vscbi, 0, IF_VEC)
++/* VECTOR SUBTRACT WITH BORROW INDICATION */
++    F(0xe7bf, VSBI,    VRR_d, V,   0, 0, 0, 0, vsbi, 0, IF_VEC)
+=20
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
+diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
+inc.c
+index b7052f73f8a5..66a938a90972 100644
+--- a/target/s390x/translate_vx.inc.c
++++ b/target/s390x/translate_vx.inc.c
+@@ -2192,3 +2192,29 @@ static DisasJumpType op_vscbi(DisasContext *s, Dis=
+asOps *o)
+                get_field(s->fields, v3), &g[es]);
+     return DISAS_NEXT;
+ }
++
++static void gen_sbi2_i64(TCGv_i64 dl, TCGv_i64 dh, TCGv_i64 al, TCGv_i64=
+ ah,
++                         TCGv_i64 bl, TCGv_i64 bh, TCGv_i64 cl, TCGv_i64=
+ ch)
++{
++    TCGv_i64 tl =3D tcg_temp_new_i64();
++    TCGv_i64 zero =3D tcg_const_i64(0);
++
++    tcg_gen_andi_i64(tl, cl, 1);
++    tcg_gen_sub2_i64(dl, dh, al, ah, bl, bh);
++    tcg_gen_sub2_i64(dl, dh, dl, dh, tl, zero);
++    tcg_temp_free_i64(tl);
++    tcg_temp_free_i64(zero);
++}
++
++static DisasJumpType op_vsbi(DisasContext *s, DisasOps *o)
++{
++    if (get_field(s->fields, m5) !=3D ES_128) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++
++    gen_gvec128_4_i64(gen_sbi2_i64, get_field(s->fields, v1),
++                      get_field(s->fields, v2), get_field(s->fields, v3)=
+,
++                      get_field(s->fields, v4));
++    return DISAS_NEXT;
++}
+--=20
+2.20.1
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->  hw/intc/arm_gicv3_cpuif.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-> index 000bdbd6247..3b212d91c8f 100644
-> --- a/hw/intc/arm_gicv3_cpuif.c
-> +++ b/hw/intc/arm_gicv3_cpuif.c
-> @@ -1856,7 +1856,7 @@ static void icc_ctlr_el3_write(CPUARMState *env, const ARMCPRegInfo *ri,
->      trace_gicv3_icc_ctlr_el3_write(gicv3_redist_affid(cs), value);
->  
->      /* *_EL1NS and *_EL1S bits are aliases into the ICC_CTLR_EL1 bits. */
-> -    cs->icc_ctlr_el1[GICV3_NS] &= (ICC_CTLR_EL1_CBPR | ICC_CTLR_EL1_EOIMODE);
-> +    cs->icc_ctlr_el1[GICV3_NS] &= ~(ICC_CTLR_EL1_CBPR | ICC_CTLR_EL1_EOIMODE);
->      if (value & ICC_CTLR_EL3_EOIMODE_EL1NS) {
->          cs->icc_ctlr_el1[GICV3_NS] |= ICC_CTLR_EL1_EOIMODE;
->      }
-> @@ -1864,7 +1864,7 @@ static void icc_ctlr_el3_write(CPUARMState *env, const ARMCPRegInfo *ri,
->          cs->icc_ctlr_el1[GICV3_NS] |= ICC_CTLR_EL1_CBPR;
->      }
->  
-> -    cs->icc_ctlr_el1[GICV3_S] &= (ICC_CTLR_EL1_CBPR | ICC_CTLR_EL1_EOIMODE);
-> +    cs->icc_ctlr_el1[GICV3_S] &= ~(ICC_CTLR_EL1_CBPR | ICC_CTLR_EL1_EOIMODE);
->      if (value & ICC_CTLR_EL3_EOIMODE_EL1S) {
->          cs->icc_ctlr_el1[GICV3_S] |= ICC_CTLR_EL1_EOIMODE;
->      }
-> 
 
