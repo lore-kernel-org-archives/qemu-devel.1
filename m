@@ -6,73 +6,71 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F92AC04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:15:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B65A4C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:15:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 331372171F
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:15:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 331372171F
+	by mail.kernel.org (Postfix) with ESMTPS id 88EB92171F
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:15:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88EB92171F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43361 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43391 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSrV1-0002Bv-CB
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 19:15:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44758)
+	id 1hSrVS-0002WY-Ke
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 19:15:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hSrQR-0006uN-6S
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:10:36 -0400
+	(envelope-from <mst@redhat.com>) id 1hSrQg-00074I-LP
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:10:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hSrQQ-0007po-AN
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:10:35 -0400
-Received: from mail-qt1-f177.google.com ([209.85.160.177]:37105)
+	(envelope-from <mst@redhat.com>) id 1hSrQf-00080N-LL
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:10:50 -0400
+Received: from mail-qk1-f178.google.com ([209.85.222.178]:41326)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hSrQQ-0007pA-6D
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:10:34 -0400
-Received: by mail-qt1-f177.google.com with SMTP id o7so18383479qtp.4
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 16:10:33 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hSrQf-0007zu-Gs
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:10:49 -0400
+Received: by mail-qk1-f178.google.com with SMTP id m18so91617qki.8
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 16:10:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:content-transfer-encoding
-	:in-reply-to;
-	bh=D9bFlV1mFhqIN7vSvELu+0BvpSNRsw3rERLU4meV1WU=;
-	b=p5fPuhCxEaCw33eZsB46fDOOEbq+rUD/BrY7IsrgR7v/tb5XR2mK/vfuRTE7/rYBYM
-	IaPNorzK4pesqdsIo/sMxa5Z5w6af8R8BXDZ6Ey6zxV5vxOP3DoUGL0hpSMs7GgLZbVz
-	mpZwNC4k5wuA8e/nK6MxsfvWUayVsFPV90S4mkFbel3cR0rd9cmVJ4tlm9xdEw9au14Y
-	VsfKD0Y3ByzA8wI1Y2UJWvoNMZZ+S3Xruy0x28IJvbzRkaY3Tzlmr4p/8LDcVMCS/qEK
-	xS97YMlF/DbtxxBGt4pwNg38j8Xl9nej6UQg5Y0N2P3CyDBOy3ZA2kyIAfbEYJOJv+gX
-	VcyA==
-X-Gm-Message-State: APjAAAUDbukLXB0SIo3FI7emw1O4YXJpCH4YSZPf8KbINTtWVzJQAuuz
-	7E41X0b6PtBDTyMnfNubO+twSAzTajM=
-X-Google-Smtp-Source: APXvYqwLTzXjvTIxMKkBywnHPU76WHCDjgDUgWuvjOInlRjriorTyJcrSzye0bsxjdGJUNLg0CMtbg==
-X-Received: by 2002:aed:2428:: with SMTP id r37mr64395094qtc.213.1558393832561;
-	Mon, 20 May 2019 16:10:32 -0700 (PDT)
+	:mime-version:content-disposition:in-reply-to;
+	bh=CpsnX50FvethOzWJ3djTyRAM8ldWob1tvvlTZoMS0wc=;
+	b=FAZvXbV+fMwH5eFffkJSyj/jUkOTbDXRMuGR6dOgayeauED3VRRrluLoAsopItRkLO
+	3AILasMWrvwJk5volzZBWx0MIKbkp8/GG6Xl8Lgds7553CAeD5CVhKUtdUSTPrWiETL5
+	SCBF6r1SPNk5X44ilBfuAw6H4h3WzaMGo924on/bfjlsWYXtZC4bWk/1bziRAIVjreGC
+	zofIBlIZB1x/rNjEOzhtsTxdHtPC9AYhsVX1yCnOJNI1vy2O6ax75ddF+NcTckISI9GC
+	Y62ZdSiAHNeR3ERZuB0PttQ++0eRsl/xB5SzJ3MiVc1Td8FEv8BbeQvvgy4GWyAdBgJh
+	JvbA==
+X-Gm-Message-State: APjAAAVdxjRhq5YTP6wNaxf8AL05HqczNHzug/8yhQCENhhQI5QvQJK4
+	xUi+RTCKxCiivIET4Bpli2WlILYQOSE=
+X-Google-Smtp-Source: APXvYqwcJG7drmG1kULlno37AjXYV51bcFabQtN5QFzcVl1n9YgBWIEJ9HtV5xegOJmV6YBlrsDRVg==
+X-Received: by 2002:a37:4c1:: with SMTP id 184mr21630128qke.322.1558393848690; 
+	Mon, 20 May 2019 16:10:48 -0700 (PDT)
 Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
-	[173.76.105.71]) by smtp.gmail.com with ESMTPSA id
-	c32sm5793908qtd.61.2019.05.20.16.10.31
+	[173.76.105.71])
+	by smtp.gmail.com with ESMTPSA id v13sm8822809qkj.3.2019.05.20.16.10.47
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Mon, 20 May 2019 16:10:31 -0700 (PDT)
-Date: Mon, 20 May 2019 19:10:30 -0400
+	Mon, 20 May 2019 16:10:48 -0700 (PDT)
+Date: Mon, 20 May 2019 19:10:46 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <20190215103239.28640-3-berrange@redhat.com>
+Message-ID: <20190320112646.3712-8-xieyongji@baidu.com>
 References: <20190520231008.20140-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 In-Reply-To: <20190520231008.20140-1-mst@redhat.com>
 X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
 X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.160.177
-Subject: [Qemu-devel] [PULL v2 02/36] Revert "globals: Allow global
- properties to be optional"
+X-Received-From: 209.85.222.178
+Subject: [Qemu-devel] [PULL v2 10/36] contrib/vhost-user-blk: enable
+ inflight I/O tracking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -84,68 +82,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-	Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Xie Yongji <xieyongji@baidu.com>,
+	Zhang Yu <zhangyu31@baidu.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190520231030.C7uccTFANBkamcEcAUMLWDTMJGthAGyV2a8Xd_EZdKY@z>
+Message-ID: <20190520231046.mdfiJI4HcxpYHETHWX9sUFlUoBI8OreaZeGZW-De5Cg@z>
 
-From: Daniel P. Berrangé <berrange@redhat.com>
+From: Xie Yongji <xieyongji@baidu.com>
 
-This reverts commit d7741743f4f3d2683d1bb6938f88dc0167c21afa.
+This patch enables inflight I/O tracking for
+vhost-user-blk backend so that we could restart it safely.
 
-Relying on setting properties on parents types which may not
-be relevant to certain sub-classes had unexpected side-effects
-causing bugs in device config defaults. It is preferrable to
-be explicit about which devices get which properties, even if
-this needs repetition.
-
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20190215103239.28640-3-berrange@redhat.com>
+Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
+Message-Id: <20190320112646.3712-8-xieyongji@baidu.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/qdev-core.h | 3 ---
- qom/object.c           | 3 ---
- 2 files changed, 6 deletions(-)
+ contrib/vhost-user-blk/vhost-user-blk.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 33ed3b8dde..fa55dc10ae 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -251,8 +251,6 @@ struct PropertyInfo {
- /**
-  * GlobalProperty:
-  * @used: Set to true if property was used when initializing a device.
-- * @optional: If set to true, GlobalProperty will be skipped without errors
-- *            if the property doesn't exist.
-  *
-  * An error is fatal for non-hotplugged devices, when the global is applied.
-  */
-@@ -261,7 +259,6 @@ typedef struct GlobalProperty {
-     const char *property;
-     const char *value;
-     bool used;
--    bool optional;
- } GlobalProperty;
+diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-blk/vhost-user-blk.c
+index 43583f2659..86a3987744 100644
+--- a/contrib/vhost-user-blk/vhost-user-blk.c
++++ b/contrib/vhost-user-blk/vhost-user-blk.c
+@@ -398,7 +398,8 @@ vub_get_features(VuDev *dev)
+ static uint64_t
+ vub_get_protocol_features(VuDev *dev)
+ {
+-    return 1ull << VHOST_USER_PROTOCOL_F_CONFIG;
++    return 1ull << VHOST_USER_PROTOCOL_F_CONFIG |
++           1ull << VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD;
+ }
  
- static inline void
-diff --git a/qom/object.c b/qom/object.c
-index d3412e7fdc..99c4fa707e 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -385,9 +385,6 @@ void object_apply_global_props(Object *obj, const GPtrArray *props, Error **errp
-         if (object_dynamic_cast(obj, p->driver) == NULL) {
-             continue;
-         }
--        if (p->optional && !object_property_find(obj, p->property, NULL)) {
--            continue;
--        }
-         p->used = true;
-         object_property_parse(obj, p->value, p->property, &err);
-         if (err != NULL) {
+ static int
 -- 
 MST
 
