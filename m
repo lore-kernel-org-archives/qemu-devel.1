@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74AB3C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:28:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ECF3C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:29:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36A1420815
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:28:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36A1420815
+	by mail.kernel.org (Postfix) with ESMTPS id 13DB320815
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:29:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13DB320815
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38190 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38213 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSl8y-0002V2-D1
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 12:28:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38737)
+	id 1hSlAT-0003xg-7e
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 12:29:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hSkx8-00006C-8V
+	(envelope-from <kwolf@redhat.com>) id 1hSkx8-000068-7A
 	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:15:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hSkx4-0003iH-KD
+	(envelope-from <kwolf@redhat.com>) id 1hSkx4-0003i6-Hu
 	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:15:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:14384)
+Received: from mx1.redhat.com ([209.132.183.28]:45330)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hSkwz-0003eb-Ez; Mon, 20 May 2019 12:15:45 -0400
+	id 1hSkwz-0003eZ-Di; Mon, 20 May 2019 12:15:45 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 89EB93D3C;
-	Mon, 20 May 2019 16:15:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2AA66309B15E;
+	Mon, 20 May 2019 16:15:39 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-117-208.ams2.redhat.com
 	[10.36.117.208])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id F1E9718AA0;
-	Mon, 20 May 2019 16:15:31 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 45B27601A0;
+	Mon, 20 May 2019 16:15:38 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon, 20 May 2019 18:14:43 +0200
-Message-Id: <20190520161453.30723-15-kwolf@redhat.com>
+Date: Mon, 20 May 2019 18:14:46 +0200
+Message-Id: <20190520161453.30723-18-kwolf@redhat.com>
 In-Reply-To: <20190520161453.30723-1-kwolf@redhat.com>
 References: <20190520161453.30723-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
+	(mx1.redhat.com [10.5.110.49]);
 	Mon, 20 May 2019 16:15:39 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 14/24] blockjob: Propagate AioContext change to
- all job nodes
+Subject: [Qemu-devel] [PULL 17/24] block/file-posix: Unaligned O_DIRECT
+ block-status
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,151 +74,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Block jobs require that all of the nodes the job is using are in the
-same AioContext. Therefore all BdrvChild objects of the job propagate
-.(can_)set_aio_context to all other job nodes, so that the switch is
-checked and performed consistently even if both nodes are in different
-subtrees.
+From: Max Reitz <mreitz@redhat.com>
 
+Currently, qemu crashes whenever someone queries the block status of an
+unaligned image tail of an O_DIRECT image:
+$ echo > foo
+$ qemu-img map --image-opts driver=3Dfile,filename=3Dfoo,cache.direct=3Do=
+n
+Offset          Length          Mapped to       File
+qemu-img: block/io.c:2093: bdrv_co_block_status: Assertion `*pnum &&
+QEMU_IS_ALIGNED(*pnum, align) && align > offset - aligned_offset'
+failed.
+
+This is because bdrv_co_block_status() checks that the result returned
+by the driver's implementation is aligned to the request_alignment, but
+file-posix can fail to do so, which is actually mentioned in a comment
+there: "[...] possibly including a partial sector at EOF".
+
+Fix this by rounding up those partial sectors.
+
+There are two possible alternative fixes:
+(1) We could refuse to open unaligned image files with O_DIRECT
+    altogether.  That sounds reasonable until you realize that qcow2
+    does necessarily not fill up its metadata clusters, and that nobody
+    runs qemu-img create with O_DIRECT.  Therefore, unpreallocated qcow2
+    files usually have an unaligned image tail.
+
+(2) bdrv_co_block_status() could ignore unaligned tails.  It actually
+    throws away everything past the EOF already, so that sounds
+    reasonable.
+    Unfortunately, the block layer knows file lengths only with a
+    granularity of BDRV_SECTOR_SIZE, so bdrv_co_block_status() usually
+    would have to guess whether its file length information is inexact
+    or whether the driver is broken.
+
+Fixing what raw_co_block_status() returns is the safest thing to do.
+
+There seems to be no other block driver that sets request_alignment and
+does not make sure that it always returns aligned values.
+
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/backup.c |  8 --------
- block/mirror.c | 10 +---------
- blockjob.c     | 34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 35 insertions(+), 17 deletions(-)
+ block/file-posix.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/block/backup.c b/block/backup.c
-index 910ed764aa..916817d8b1 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -300,13 +300,6 @@ static void backup_clean(Job *job)
-     s->target =3D NULL;
- }
+diff --git a/block/file-posix.c b/block/file-posix.c
+index e09e15bbf8..d018429672 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -2488,6 +2488,8 @@ static int coroutine_fn raw_co_block_status(BlockDr=
+iverState *bs,
+     off_t data =3D 0, hole =3D 0;
+     int ret;
 =20
--static void backup_attached_aio_context(BlockJob *job, AioContext *aio_c=
-ontext)
--{
--    BackupBlockJob *s =3D container_of(job, BackupBlockJob, common);
--
--    blk_set_aio_context(s->target, aio_context);
--}
--
- void backup_do_checkpoint(BlockJob *job, Error **errp)
- {
-     BackupBlockJob *backup_job =3D container_of(job, BackupBlockJob, com=
-mon);
-@@ -558,7 +551,6 @@ static const BlockJobDriver backup_job_driver =3D {
-         .abort                  =3D backup_abort,
-         .clean                  =3D backup_clean,
-     },
--    .attached_aio_context   =3D backup_attached_aio_context,
-     .drain                  =3D backup_drain,
- };
-=20
-diff --git a/block/mirror.c b/block/mirror.c
-index ff15cfb197..ec4bd9f404 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1142,13 +1142,6 @@ static bool mirror_drained_poll(BlockJob *job)
-     return !!s->in_flight;
- }
-=20
--static void mirror_attached_aio_context(BlockJob *job, AioContext *new_c=
-ontext)
--{
--    MirrorBlockJob *s =3D container_of(job, MirrorBlockJob, common);
--
--    blk_set_aio_context(s->target, new_context);
--}
--
- static void mirror_drain(BlockJob *job)
- {
-     MirrorBlockJob *s =3D container_of(job, MirrorBlockJob, common);
-@@ -1178,7 +1171,6 @@ static const BlockJobDriver mirror_job_driver =3D {
-         .complete               =3D mirror_complete,
-     },
-     .drained_poll           =3D mirror_drained_poll,
--    .attached_aio_context   =3D mirror_attached_aio_context,
-     .drain                  =3D mirror_drain,
- };
-=20
-@@ -1196,7 +1188,6 @@ static const BlockJobDriver commit_active_job_drive=
-r =3D {
-         .complete               =3D mirror_complete,
-     },
-     .drained_poll           =3D mirror_drained_poll,
--    .attached_aio_context   =3D mirror_attached_aio_context,
-     .drain                  =3D mirror_drain,
- };
-=20
-@@ -1612,6 +1603,7 @@ static void mirror_start_job(const char *job_id, Bl=
-ockDriverState *bs,
-          * ensure that. */
-         blk_set_force_allow_inactivate(s->target);
-     }
-+    blk_set_allow_aio_context_change(s->target, true);
-=20
-     s->replaces =3D g_strdup(replaces);
-     s->on_source_error =3D on_source_error;
-diff --git a/blockjob.c b/blockjob.c
-index 730101d282..24e6093a9c 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -183,11 +183,44 @@ static void child_job_drained_end(BdrvChild *c)
-     job_resume(&job->job);
- }
-=20
-+static bool child_job_can_set_aio_ctx(BdrvChild *c, AioContext *ctx,
-+                                      GSList **ignore, Error **errp)
-+{
-+    BlockJob *job =3D c->opaque;
-+    GSList *l;
++    assert(QEMU_IS_ALIGNED(offset | bytes, bs->bl.request_alignment));
 +
-+    for (l =3D job->nodes; l; l =3D l->next) {
-+        BdrvChild *sibling =3D l->data;
-+        if (!bdrv_child_can_set_aio_context(sibling, ctx, ignore, errp))=
- {
-+            return false;
+     ret =3D fd_open(bs);
+     if (ret < 0) {
+         return ret;
+@@ -2513,6 +2515,20 @@ static int coroutine_fn raw_co_block_status(BlockD=
+riverState *bs,
+         /* On a data extent, compute bytes to the end of the extent,
+          * possibly including a partial sector at EOF. */
+         *pnum =3D MIN(bytes, hole - offset);
++
++        /*
++         * We are not allowed to return partial sectors, though, so
++         * round up if necessary.
++         */
++        if (!QEMU_IS_ALIGNED(*pnum, bs->bl.request_alignment)) {
++            int64_t file_length =3D raw_getlength(bs);
++            if (file_length > 0) {
++                /* Ignore errors, this is just a safeguard */
++                assert(hole =3D=3D file_length);
++            }
++            *pnum =3D ROUND_UP(*pnum, bs->bl.request_alignment);
 +        }
-+    }
-+    return true;
-+}
 +
-+static void child_job_set_aio_ctx(BdrvChild *c, AioContext *ctx,
-+                                  GSList **ignore)
-+{
-+    BlockJob *job =3D c->opaque;
-+    GSList *l;
-+
-+    for (l =3D job->nodes; l; l =3D l->next) {
-+        BdrvChild *sibling =3D l->data;
-+        if (g_slist_find(*ignore, sibling)) {
-+            continue;
-+        }
-+        *ignore =3D g_slist_prepend(*ignore, sibling);
-+        bdrv_set_aio_context_ignore(sibling->bs, ctx, ignore);
-+    }
-+}
-+
- static const BdrvChildRole child_job =3D {
-     .get_parent_desc    =3D child_job_get_parent_desc,
-     .drained_begin      =3D child_job_drained_begin,
-     .drained_poll       =3D child_job_drained_poll,
-     .drained_end        =3D child_job_drained_end,
-+    .can_set_aio_ctx    =3D child_job_can_set_aio_ctx,
-+    .set_aio_ctx        =3D child_job_set_aio_ctx,
-     .stay_at_node       =3D true,
- };
-=20
-@@ -440,6 +473,7 @@ void *block_job_create(const char *job_id, const Bloc=
-kJobDriver *driver,
-=20
-     blk_add_aio_context_notifier(blk, block_job_attached_aio_context,
-                                  block_job_detach_aio_context, job);
-+    blk_set_allow_aio_context_change(blk, true);
-=20
-     /* Only set speed when necessary to avoid NotSupported error */
-     if (speed !=3D 0) {
+         ret =3D BDRV_BLOCK_DATA;
+     } else {
+         /* On a hole, compute bytes to the beginning of the next extent.=
+  */
 --=20
 2.20.1
 
