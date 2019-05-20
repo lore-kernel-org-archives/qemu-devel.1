@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B04C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:53:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9645C04AAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:53:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9C9A20645
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:53:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9C9A20645
+	by mail.kernel.org (Postfix) with ESMTPS id 9148E20645
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:53:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9148E20645
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35109 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35113 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hShn3-00065e-07
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 08:53:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43363)
+	id 1hShnK-0006Qd-Rv
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 08:53:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hShhT-0002J4-8r
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:32 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hShhj-0002VL-VW
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hShhP-0005sr-Td
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55904)
+	(envelope-from <kraxel@redhat.com>) id 1hShhg-0006E1-Df
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51410)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hShhP-0005rf-L7
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:27 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hShhg-0005vi-06
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:44 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5940A307D85A;
-	Mon, 20 May 2019 12:47:25 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A9AD280F6D;
+	Mon, 20 May 2019 12:47:29 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
 	[10.36.117.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B07D3704DC;
-	Mon, 20 May 2019 12:47:24 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BFF9960FA6;
+	Mon, 20 May 2019 12:47:25 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 3C4D7A1E7; Mon, 20 May 2019 14:47:17 +0200 (CEST)
+	id 56107A206; Mon, 20 May 2019 14:47:17 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 20 May 2019 14:47:11 +0200
-Message-Id: <20190520124716.30472-10-kraxel@redhat.com>
+Date: Mon, 20 May 2019 14:47:14 +0200
+Message-Id: <20190520124716.30472-13-kraxel@redhat.com>
 In-Reply-To: <20190520124716.30472-1-kraxel@redhat.com>
 References: <20190520124716.30472-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Mon, 20 May 2019 12:47:25 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.27]);
+	Mon, 20 May 2019 12:47:29 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 09/14] tests/vm: serial console support
- helpers
+Subject: [Qemu-devel] [PATCH v3 12/14] tests/vm: netbsd autoinstall,
+ using serial console
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,25 +78,25 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a bunch of helpers to talk to the guest using the
-serial console.
-
-Also drop the hard-coded -serial parameter for the vm
-so QEMUMachine.set_console() actually works.
+Instead of fetching the prebuilt image from patchew download the install
+iso and prepare the image locally.  Install to disk, using the serial
+console.  Create qemu user, configure ssh login.  Install packages
+needed for qemu builds.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Kamil Rytarowski <n54@gmx.com>
 Tested-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/vm/basevm.py | 85 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 82 insertions(+), 3 deletions(-)
+ tests/vm/netbsd | 187 +++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 177 insertions(+), 10 deletions(-)
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 465c7b80d011..17281eaf99e4 100755
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
+diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+index 4c6624ea5ed5..6dbfc1b0fbe3 100755
+--- a/tests/vm/netbsd
++++ b/tests/vm/netbsd
 @@ -2,10 +2,11 @@
  #
- # VM testing base class
+ # NetBSD VM image
  #
 -# Copyright 2017 Red Hat Inc.
 +# Copyright 2017-2019 Red Hat Inc.
@@ -107,117 +107,214 @@ index 465c7b80d011..17281eaf99e4 100755
  #
  # This code is licensed under the GPL version 2 or later.  See
  # the COPYING file in the top-level directory.
-@@ -13,7 +14,9 @@
+@@ -13,32 +14,198 @@
  
- from __future__ import print_function
  import os
-+import re
  import sys
-+import socket
- import logging
- import time
- import datetime
-@@ -79,8 +82,7 @@ class BaseVM(object):
-             "-cpu", "max",
-             "-netdev", "user,id=vnet,hostfwd=:127.0.0.1:0-:22",
-             "-device", "virtio-net-pci,netdev=vnet",
--            "-vnc", "127.0.0.1:0,to=20",
--            "-serial", "file:%s" % os.path.join(self._tmpdir, "serial.out")]
-+            "-vnc", "127.0.0.1:0,to=20"]
-         if vcpus and vcpus > 1:
-             self._args += ["-smp", "%d" % vcpus]
-         if kvm_available(self.arch):
-@@ -161,6 +163,8 @@ class BaseVM(object):
-         logging.debug("QEMU args: %s", " ".join(args))
-         qemu_bin = os.environ.get("QEMU", "qemu-system-" + self.arch)
-         guest = QEMUMachine(binary=qemu_bin, args=args)
-+        guest.set_machine('pc')
-+        guest.set_console()
-         try:
-             guest.launch()
-         except:
-@@ -183,6 +187,81 @@ class BaseVM(object):
-             raise Exception("Cannot find ssh port from 'info usernet':\n%s" % \
-                             usernet_info)
++import time
+ import subprocess
+ import basevm
  
-+    def console_init(self, timeout = 120):
-+        vm = self._guest
-+        vm.console_socket.settimeout(timeout)
+ class NetBSDVM(basevm.BaseVM):
+     name = "netbsd"
+     arch = "x86_64"
 +
-+    def console_log(self, text):
-+        for line in re.split("[\r\n]", text):
-+            # filter out terminal escape sequences
-+            line = re.sub("\x1b\[[0-9;?]*[a-zA-Z]", "", line)
-+            line = re.sub("\x1b\([0-9;?]*[a-zA-Z]", "", line)
-+            # replace unprintable chars
-+            line = re.sub("\x1b", "<esc>", line)
-+            line = re.sub("[\x00-\x1f]", ".", line)
-+            if line == "":
-+                continue
-+            # log console line
-+            sys.stderr.write("con recv: %s\n" % line)
++    link = "https://cdn.netbsd.org/pub/NetBSD/NetBSD-8.0/images/NetBSD-8.0-amd64.iso"
++    size = "20G"
++    pkgs = [
++        # tools
++        "git-base",
++        "pkgconf",
++        "xz",
++        "python37",
 +
-+    def console_wait(self, expect):
-+        vm = self._guest
-+        output = ""
-+        while True:
-+            try:
-+                chars = vm.console_socket.recv(1024)
-+            except socket.timeout:
-+                sys.stderr.write("console: *** read timeout ***\n")
-+                sys.stderr.write("console: waiting for: '%s'\n" % expect)
-+                sys.stderr.write("console: line buffer:\n")
-+                sys.stderr.write("\n")
-+                self.console_log(output.rstrip())
-+                sys.stderr.write("\n")
-+                raise
-+            output += chars.decode("latin1")
-+            if expect in output:
-+                break
-+            if "\r" in output or "\n" in output:
-+                lines = re.split("[\r\n]", output)
-+                output = lines.pop()
-+                if self.debug:
-+                    self.console_log("\n".join(lines))
-+        if self.debug:
-+            self.console_log(output)
++        # gnu tools
++        "bash",
++        "gmake",
++        "gsed",
++        "flex", "bison",
 +
-+    def console_send(self, command):
-+        vm = self._guest
-+        if self.debug:
-+            logline = re.sub("\n", "<enter>", command)
-+            logline = re.sub("[\x00-\x1f]", ".", logline)
-+            sys.stderr.write("con send: %s\n" % logline)
-+        for char in list(command):
-+            vm.console_socket.send(char.encode("utf-8"))
-+            time.sleep(0.01)
++        # libs: crypto
++        "gnutls",
 +
-+    def console_wait_send(self, wait, command):
-+        self.console_wait(wait)
-+        self.console_send(command)
++        # libs: images
++        "jpeg",
++        "png",
 +
-+    def console_ssh_init(self, prompt, user, pw):
-+        sshkey_cmd = "echo '%s' > .ssh/authorized_keys\n" % SSH_PUB_KEY.rstrip()
-+        self.console_wait_send("login:",    "%s\n" % user)
-+        self.console_wait_send("Password:", "%s\n" % pw)
-+        self.console_wait_send(prompt,      "mkdir .ssh\n")
-+        self.console_wait_send(prompt,      sshkey_cmd)
-+        self.console_wait_send(prompt,      "chmod 755 .ssh\n")
-+        self.console_wait_send(prompt,      "chmod 644 .ssh/authorized_keys\n")
++	# libs: ui
++        "SDL2",
++        "gtk3+",
++        "libxkbcommon",
++    ]
 +
-+    def console_sshd_config(self, prompt):
+     BUILD_SCRIPT = """
+         set -e;
+-        rm -rf /var/tmp/qemu-test.*
+-        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
++        rm -rf /home/qemu/qemu-test.*
++        cd $(mktemp -d /home/qemu/qemu-test.XXXXXX);
++        mkdir src build; cd src;
+         tar -xf /dev/rld1a;
+-        ./configure --python=python2.7 {configure_opts};
++        cd ../build
++        ../src/configure --python=python3.7 --disable-opengl {configure_opts};
+         gmake --output-sync -j{jobs} {target} {verbose};
+     """
++    poweroff = "/sbin/poweroff"
+ 
+     def build_image(self, img):
+-        cimg = self._download_with_cache("http://download.patchew.org/netbsd-7.1-amd64.img.xz",
+-                                         sha256sum='b633d565b0eac3d02015cd0c81440bd8a7a8df8512615ac1ee05d318be015732')
+-        img_tmp_xz = img + ".tmp.xz"
++        cimg = self._download_with_cache(self.link)
+         img_tmp = img + ".tmp"
+-        sys.stderr.write("Extracting the image...\n")
+-        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
+-        subprocess.check_call(["xz", "-dvf", img_tmp_xz])
++        iso = img + ".install.iso"
++
++        self.print_step("Preparing iso and disk image")
++        subprocess.check_call(["cp", "-f", cimg, iso])
++        subprocess.check_call(["qemu-img", "create", "-f", "qcow2",
++                               img_tmp, self.size])
++
++        self.print_step("Booting installer")
++        self.boot(img_tmp, extra_args = [
++            "-device", "VGA",
++            "-machine", "graphics=off",
++            "-cdrom", iso
++        ])
++        self.console_init()
++        self.console_wait("Primary Bootstrap")
++
++        # serial console boot menu output doesn't work for some
++        # reason, so we have to fly blind ...
++        for char in list("5consdev com0\n"):
++            time.sleep(0.2)
++            self.console_send(char)
++            self.console_wait("")
++        self.console_wait_send("> ", "boot\n")
++
++        self.console_wait_send("Terminal type",            "xterm\n")
++        self.console_wait_send("a: Installation messages", "a\n")
++        self.console_wait_send("b: US-English",            "b\n")
++        self.console_wait_send("a: Install NetBSD",        "a\n")
++        self.console_wait("Shall we continue?")
++        self.console_wait_send("b: Yes",                   "b\n")
++
++        self.console_wait_send("a: ld0",                   "a\n")
++        self.console_wait_send("a: This is the correct",   "a\n")
++        self.console_wait_send("b: Use the entire disk",   "b\n")
++        self.console_wait("NetBSD bootcode")
++        self.console_wait_send("a: Yes",                   "a\n")
++        self.console_wait_send("b: Use existing part",     "b\n")
++        self.console_wait_send("x: Partition sizes ok",    "x\n")
++        self.console_wait_send("for your NetBSD disk",     "\n")
++        self.console_wait("Shall we continue?")
++        self.console_wait_send("b: Yes",                   "b\n")
++
++        self.console_wait_send("b: Use serial port com0",  "b\n")
++        self.console_wait_send("f: Set serial baud rate",  "f\n")
++        self.console_wait_send("a: 9600",                  "a\n")
++        self.console_wait_send("x: Exit",                  "x\n")
++
++        self.console_wait_send("a: Full installation",     "a\n")
++        self.console_wait_send("a: CD-ROM",                "a\n")
++
++        self.print_step("Installation started now, this will take a while")
++        self.console_wait_send("Hit enter to continue",    "\n")
++
++        self.console_wait_send("d: Change root password",  "d\n")
++        self.console_wait_send("a: Yes",                   "a\n")
++        self.console_wait("New password:")
++        self.console_send("%s\n" % self.ROOT_PASS)
++        self.console_wait("New password:")
++        self.console_send("%s\n" % self.ROOT_PASS)
++        self.console_wait("Retype new password:")
++        self.console_send("%s\n" % self.ROOT_PASS)
++
++        self.console_wait_send("o: Add a user",            "o\n")
++        self.console_wait("username")
++        self.console_send("%s\n" % self.GUEST_USER)
++        self.console_wait("to group wheel")
++        self.console_wait_send("a: Yes",                   "a\n")
++        self.console_wait_send("a: /bin/sh",               "a\n")
++        self.console_wait("New password:")
++        self.console_send("%s\n" % self.GUEST_PASS)
++        self.console_wait("New password:")
++        self.console_send("%s\n" % self.GUEST_PASS)
++        self.console_wait("Retype new password:")
++        self.console_send("%s\n" % self.GUEST_PASS)
++
++        self.console_wait_send("a: Configure network",     "a\n")
++        self.console_wait_send("a: vioif0",                "a\n")
++        self.console_wait_send("Network media type",       "\n")
++        self.console_wait("autoconfiguration")
++        self.console_wait_send("a: Yes",                   "a\n")
++        self.console_wait_send("DNS domain",               "localnet\n")
++        self.console_wait("Are they OK?")
++        self.console_wait_send("a: Yes",                   "a\n")
++        self.console_wait("installed in /etc")
++        self.console_wait_send("a: Yes",                   "a\n")
++
++        self.console_wait_send("e: Enable install",        "e\n")
++        proxy = os.environ.get("http_proxy")
++        if not proxy is None:
++            self.console_wait_send("f: Proxy",             "f\n")
++            self.console_wait("Proxy")
++            self.console_send("%s\n" % proxy)
++        self.console_wait_send("x: Install pkgin",         "x\n")
++        self.console_init(1200)
++        self.console_wait_send("Hit enter to continue", "\n")
++        self.console_init()
++
++        self.console_wait_send("g: Enable sshd",           "g\n")
++        self.console_wait_send("x: Finished conf",         "x\n")
++        self.console_wait_send("Hit enter to continue",    "\n")
++
++        self.print_step("Installation finished, rebooting")
++        self.console_wait_send("d: Reboot the computer",   "d\n")
++
++        # setup qemu user
++        prompt = "localhost$"
++        self.console_ssh_init(prompt, self.GUEST_USER, self.GUEST_PASS)
++        self.console_wait_send(prompt, "exit\n")
++
++        # setup root user
++        prompt = "localhost#"
++        self.console_ssh_init(prompt, "root", self.ROOT_PASS)
++        self.console_sshd_config(prompt)
++
++        # setup virtio-blk #1 (tarfile)
 +        self.console_wait(prompt)
-+        self.console_send("echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config\n")
-+        for var in self.envvars:
-+            self.console_wait(prompt)
-+            self.console_send("echo 'AcceptEnv %s' >> /etc/ssh/sshd_config\n" % var)
++        self.console_send("echo 'chmod 666 /dev/rld1a' >> /etc/rc.local\n")
 +
-+    def print_step(self, text):
-+        sys.stderr.write("### %s ...\n" % text)
++        # turn off mprotect (conflicts with tcg)
++        self.console_wait(prompt)
++        self.console_send("echo security.pax.mprotect.enabled=0 >> /etc/sysctl.conf\n")
 +
-     def wait_ssh(self, seconds=300):
-         starttime = datetime.datetime.now()
-         endtime = starttime + datetime.timedelta(seconds=seconds)
++        self.print_step("Configuration finished, rebooting")
++        self.console_wait_send(prompt, "reboot\n")
++        self.console_wait("login:")
++        self.wait_ssh()
++
++        self.print_step("Installing packages")
++        self.ssh_root_check("pkgin update\n")
++        self.ssh_root_check("pkgin -y install %s\n" % " ".join(self.pkgs))
++
++        # shutdown
++        self.ssh_root(self.poweroff)
++        self.console_wait("entering state S5")
++        self.wait()
++
+         if os.path.exists(img):
+             os.remove(img)
+         os.rename(img_tmp, img)
++        os.remove(iso)
++        self.print_step("All done")
+ 
+ if __name__ == "__main__":
+     sys.exit(basevm.main(NetBSDVM))
 -- 
 2.18.1
 
