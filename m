@@ -6,58 +6,60 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA845C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:52:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91700C04E87
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:53:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93F0220815
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:52:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93F0220815
+	by mail.kernel.org (Postfix) with ESMTPS id 63D19213F2
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:53:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63D19213F2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35107 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35111 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hShlr-0005Gp-GR
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 08:52:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43364)
+	id 1hShn3-000682-Hx
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 08:53:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hShhT-0002J5-8s
+	(envelope-from <kraxel@redhat.com>) id 1hShhT-0002J3-8n
 	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hShhP-0005sZ-L8
+	(envelope-from <kraxel@redhat.com>) id 1hShhP-0005sx-VX
 	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59542)
+Received: from mx1.redhat.com ([209.132.183.28]:59574)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hShhN-0005ns-PV
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:25 -0400
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hShhP-0005rw-Pe
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:27 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 97B0B3082E69;
-	Mon, 20 May 2019 12:47:23 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1944F3082E68;
+	Mon, 20 May 2019 12:47:26 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
 	[10.36.117.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 821CD78409;
-	Mon, 20 May 2019 12:47:18 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 753B750A63;
+	Mon, 20 May 2019 12:47:24 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 134901753B; Mon, 20 May 2019 14:47:17 +0200 (CEST)
+	id 33F331753F; Mon, 20 May 2019 14:47:17 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 20 May 2019 14:47:06 +0200
-Message-Id: <20190520124716.30472-5-kraxel@redhat.com>
+Date: Mon, 20 May 2019 14:47:10 +0200
+Message-Id: <20190520124716.30472-9-kraxel@redhat.com>
 In-Reply-To: <20190520124716.30472-1-kraxel@redhat.com>
 References: <20190520124716.30472-1-kraxel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
 	(mx1.redhat.com [10.5.110.46]);
-	Mon, 20 May 2019 12:47:23 +0000 (UTC)
+	Mon, 20 May 2019 12:47:26 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 04/14] tests/vm: use ssh with pty
- unconditionally
+Subject: [Qemu-devel] [PATCH v3 08/14] tests/vm: add DEBUG=1 to help text
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,61 +80,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allways ask ssh to run with a pseudo terminal.
-Not having a terminal causes problems now and then.
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/vm/basevm.py | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+ tests/vm/Makefile.include | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 640f3226929d..878f1a7a32b8 100755
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -106,16 +106,14 @@ class BaseVM(object):
-         os.rename(fname + ".download", fname)
-         return fname
- 
--    def _ssh_do(self, user, cmd, check, interactive=False):
--        ssh_cmd = ["ssh", "-q",
-+    def _ssh_do(self, user, cmd, check):
-+        ssh_cmd = ["ssh", "-q", "-t",
-                    "-o", "StrictHostKeyChecking=no",
-                    "-o", "UserKnownHostsFile=" + os.devnull,
-                    "-o", "ConnectTimeout=1",
-                    "-p", self.ssh_port, "-i", self._ssh_key_file]
-         for var in self.envvars:
-             ssh_cmd += ['-o', "SendEnv=%s" % var ]
--        if interactive:
--            ssh_cmd += ['-t']
-         assert not isinstance(cmd, str)
-         ssh_cmd += ["%s@127.0.0.1" % user] + list(cmd)
-         logging.debug("ssh_cmd: %s", " ".join(ssh_cmd))
-@@ -127,9 +125,6 @@ class BaseVM(object):
-     def ssh(self, *cmd):
-         return self._ssh_do(self.GUEST_USER, cmd, False)
- 
--    def ssh_interactive(self, *cmd):
--        return self._ssh_do(self.GUEST_USER, cmd, False, True)
--
-     def ssh_root(self, *cmd):
-         return self._ssh_do("root", cmd, False)
- 
-@@ -283,9 +278,9 @@ def main(vmcls):
-         return 2
- 
-     if args.interactive:
--        if vm.ssh_interactive(*cmd) == 0:
-+        if vm.ssh(*cmd) == 0:
-             return 0
--        vm.ssh_interactive()
-+        vm.ssh()
-         return 3
-     else:
-         if vm.ssh(*cmd) != 0:
--- 
+diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+index 47084d5717c6..a018288b061c 100644
+--- a/tests/vm/Makefile.include
++++ b/tests/vm/Makefile.include
+@@ -25,6 +25,8 @@ vm-test:
+ 	@echo "  vm-boot-ssh-<guest>             - Boot guest and login via ssh=
+"
+ 	@echo
+ 	@echo "Special variables:"
++	@echo "    DEBUG=3D1                       - be verbose, also start int=
+eractive"
++	@echo "	                                   shell on build failures"
+ 	@echo "    BUILD_TARGET=3Dfoo		 - override the build target"
+ 	@echo "    TARGET_LIST=3Da,b,c    	 - Override target list in builds."
+ 	@echo '    EXTRA_CONFIGURE_OPTS=3D"..."'
+--=20
 2.18.1
 
 
