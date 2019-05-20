@@ -3,64 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02688C04E87
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:49:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2C43C04AAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:49:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D09DE20645
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:49:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D09DE20645
+	by mail.kernel.org (Postfix) with ESMTPS id 77D4120645
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 12:49:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77D4120645
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35055 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35057 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hShjd-0003Qq-TV
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 08:49:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43355)
+	id 1hShjg-0003UE-JL
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 08:49:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hShhS-0002IP-3j
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:30 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hShhT-0002J2-8n
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hShhP-0005sP-KC
+	(envelope-from <kraxel@redhat.com>) id 1hShhP-0005sj-QV
 	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46240)
+Received: from mx1.redhat.com ([209.132.183.28]:42804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hShhN-0005nl-NV
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:25 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hShhN-0005qs-U5
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 08:47:27 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 21AA14628B;
-	Mon, 20 May 2019 12:47:23 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 92A373073AFE;
+	Mon, 20 May 2019 12:47:24 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
 	[10.36.117.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 51E5E5B0BE;
-	Mon, 20 May 2019 12:47:18 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2D2E46085B;
+	Mon, 20 May 2019 12:47:24 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 0B1B116E30; Mon, 20 May 2019 14:47:17 +0200 (CEST)
+	id 1B5D51753C; Mon, 20 May 2019 14:47:17 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 20 May 2019 14:47:05 +0200
-Message-Id: <20190520124716.30472-4-kraxel@redhat.com>
+Date: Mon, 20 May 2019 14:47:07 +0200
+Message-Id: <20190520124716.30472-6-kraxel@redhat.com>
 In-Reply-To: <20190520124716.30472-1-kraxel@redhat.com>
 References: <20190520124716.30472-1-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Mon, 20 May 2019 12:47:23 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.41]);
+	Mon, 20 May 2019 12:47:24 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 03/14] tests/vm: send proxy environment
- variables over ssh
+Subject: [Qemu-devel] [PATCH v3 05/14] tests/vm: run test builds on snapshot
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -81,47 +77,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Packages are fetched via proxy that way, if configured on the host.
-That might be required to pass firewalls, and it allows to route
-package downloads through a caching proxy server.
+The build script doesn't shutdown the guest VMs properly,
+which results in filesystem corruption and guest boot
+failures sooner or later.
 
-Needs AcceptEnv setup in sshd_config on the guest side to work.
+Use the --snapshot to run builds on a snapshot,
+That way killing the VM doesn't corrupt the base image.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/vm/basevm.py | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ tests/vm/Makefile.include | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 3126fb10a819..640f3226929d 100755
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -38,6 +38,13 @@ class BaseVM(object):
-     GUEST_PASS =3D "qemupass"
-     ROOT_PASS =3D "qemupass"
-=20
-+    envvars =3D [
-+        "https_proxy",
-+        "http_proxy",
-+        "ftp_proxy",
-+        "no_proxy",
-+    ]
-+
-     # The script to run in the guest that builds QEMU
-     BUILD_SCRIPT =3D ""
-     # The guest name, to be overridden by subclasses
-@@ -105,6 +112,8 @@ class BaseVM(object):
-                    "-o", "UserKnownHostsFile=3D" + os.devnull,
-                    "-o", "ConnectTimeout=3D1",
-                    "-p", self.ssh_port, "-i", self._ssh_key_file]
-+        for var in self.envvars:
-+            ssh_cmd +=3D ['-o', "SendEnv=3D%s" % var ]
-         if interactive:
-             ssh_cmd +=3D ['-t']
-         assert not isinstance(cmd, str)
---=20
+diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+index 992d823f6bd2..d628e0a986f6 100644
+--- a/tests/vm/Makefile.include
++++ b/tests/vm/Makefile.include
+@@ -53,6 +53,7 @@ vm-build-%: $(IMAGES_DIR)/%.img
+ 		$(if $(V),--verbose) \
+ 		--image "$<" \
+ 		$(if $(BUILD_TARGET),--build-target $(BUILD_TARGET)) \
++		--snapshot \
+ 		--build-qemu $(SRC_PATH) -- \
+ 		$(if $(TARGET_LIST),--target-list=$(TARGET_LIST)) \
+ 		$(if $(EXTRA_CONFIGURE_OPTS),$(EXTRA_CONFIGURE_OPTS)), \
+-- 
 2.18.1
 
 
