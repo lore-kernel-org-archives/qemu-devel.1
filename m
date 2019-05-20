@@ -6,71 +6,74 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA50FC04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:46:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03EAAC04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:47:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB7C421479
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:46:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB7C421479
+	by mail.kernel.org (Postfix) with ESMTPS id C6C7A21479
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:47:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6C7A21479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43846 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43852 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSryt-0001p5-23
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 19:46:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45227)
+	id 1hSs01-0002XH-5F
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 19:47:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hSrRN-0007ud-Ly
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:34 -0400
+	(envelope-from <mst@redhat.com>) id 1hSrRY-0008AQ-UY
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hSrRK-0008M9-2B
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:33 -0400
-Received: from mail-qt1-f179.google.com ([209.85.160.179]:44976)
+	(envelope-from <mst@redhat.com>) id 1hSrRR-0008Og-IE
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:39 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:42746)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hSrRJ-0008Lr-Nj
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:29 -0400
-Received: by mail-qt1-f179.google.com with SMTP id f24so18319509qtk.11
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 16:11:29 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hSrRN-0008Mc-MV
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:33 -0400
+Received: by mail-qk1-f195.google.com with SMTP id d4so9898068qkc.9
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 16:11:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to;
-	bh=im+qbcew1Qe+0x5KgoK3OVmxTwCql9ERQ/Z1WYRFGjA=;
-	b=BtPYIj5rooHzWMNXadVcUIJhafpdpOzvNzqmbEMpP0nG7SOiHyevcXBwbdJuOe/Ij5
-	mb6IbKT3wsXpnbKlZI7iI49YFfntpbM2qEfpb+54dEJzeMjWnOI+jCDbLZ5GzlL0Ftz3
-	uIbX9mv9jxdGw9V/q5hxaoP8oI5tayhF2/z4BtD9kY2C6tQpbXKBd/BmvZ3gS+5+EKyW
-	nQ5/ASOoRnaXdxyNEdJQfXKfuvaaMOXybTKOHQhCmx3jbUWNviUyV1+p5izUEh/AYtin
-	sEHfa/cwzaR9x6f/2XGX9GyKvS+J4PBWFKVDgPGHynJsNcYtaGvO/GT/jHbIqxMQyu0Q
-	Zj4A==
-X-Gm-Message-State: APjAAAWIjFZ/6LKTVcDbnX4T5O+oerBpnrIXmXnskcL9FT+Kspo2b0qS
-	BLOahRCDSk4f9vL7dadNMbguwAx1Plo=
-X-Google-Smtp-Source: APXvYqzfQQQK5DbrH/STmweHo7Y96QyO2S7nZhxkfJ4l3gCJVWGcdClbgB/T0X9XNG8JZJC/r6DOkA==
-X-Received: by 2002:aed:2209:: with SMTP id n9mr62800885qtc.377.1558393888894; 
-	Mon, 20 May 2019 16:11:28 -0700 (PDT)
+	:mime-version:content-disposition:content-transfer-encoding
+	:in-reply-to;
+	bh=O6n0khQFEgae8Zf5gTf32VcUPNdO94dtxMG+VrGCx/0=;
+	b=V3Thkzrtod4U08vcnHOjxc4I5ajtQCiDCQtKKsrnhANnTypiumLCkvRO716PxaVOH1
+	k6aFbqRBI7Jm+kGobuV4WbjbtD7tXfVdQK+KEVLvVCxuiJEv3yi28R6l9MhpQ4PG/Gmt
+	gZ0+l/wwsCygbF69a1e7eLlUziamJAOJnPnvsPlIn2jPMXCEfudshu0Uh0P0sNJvs3fz
+	6JmdBT/TMwBLj7AmU5x2EVpD9+MusNajPlAOyOveuPn2GDsP7NjBvrAHSwIz4B1d32gv
+	irkrcnjoCqFxYlethlkmY2N123voo/PgHJjWKmWLLnOefpUhR5116kmfoF8G0tB5fx3B
+	xqlw==
+X-Gm-Message-State: APjAAAXPnEMTPbS2jizXPZAU9tVlu31XdmtJbVZjSymGfnywXKLTv0e/
+	T2Rq15f25/jgb3q0VhrC2+Pbny1Pv9c=
+X-Google-Smtp-Source: APXvYqwVa6ENFueyW98YWb0rRgThjxJXZvwZu/FPi0w4UGHoIpKTG3lbSQrlG9Ic761VVCgFO+AExA==
+X-Received: by 2002:a37:dcc4:: with SMTP id
+	v187mr27360335qki.290.1558393891002; 
+	Mon, 20 May 2019 16:11:31 -0700 (PDT)
 Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
 	[173.76.105.71]) by smtp.gmail.com with ESMTPSA id
-	q66sm9146961qke.66.2019.05.20.16.11.27
+	f21sm8286074qkl.72.2019.05.20.16.11.29
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Mon, 20 May 2019 16:11:28 -0700 (PDT)
-Date: Mon, 20 May 2019 19:11:27 -0400
+	Mon, 20 May 2019 16:11:30 -0700 (PDT)
+Date: Mon, 20 May 2019 19:11:29 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <1556808723-226478-10-git-send-email-imammedo@redhat.com>
+Message-ID: <1556808723-226478-11-git-send-email-imammedo@redhat.com>
 References: <20190520231008.20140-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 In-Reply-To: <20190520231008.20140-1-mst@redhat.com>
 X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
 X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.160.179
-Subject: [Qemu-devel] [PULL v2 30/36] tests: acpi: add a way to start tests
- with UEFI firmware
+X-Received-From: 209.85.222.195
+Subject: [Qemu-devel] [PULL v2 31/36] tests: acpi: ignore SMBIOS tests when
+ UEFI firmware is used
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -83,112 +86,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Laurent Vivier <lvivier@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Laszlo Ersek <lersek@redhat.com>
+	Peter Maydell <peter.maydell@linaro.org>,
+	Thomas Huth <thuth@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190520231127.aBpE2K_ctdX8m8wLXwxejfXRUs7C2O2llP0s7cSM-WY@z>
+Message-ID: <20190520231129.oPaBiUVWn_TlKHbV-d5t_C8hc4ys7suqr4TOJ0ag3-c@z>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-For testcase to use UEFI firmware, one needs to provide and specify
-firmware and varstore blob names in test_data { uefi_fl1, uefi_fl2 }
-fields respectively and RAM start address plus size where to look for
-test structure signature. Additionally testcase should specify
-bootable cdrom image from uefi-boot-images with EFI test utility.
+once FW provides a pointer to SMBIOS entry point like it does for
+RSDP it should be possible to enable this one the same way.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Message-Id: <1556808723-226478-10-git-send-email-imammedo@redhat.com>
+Message-Id: <1556808723-226478-11-git-send-email-imammedo@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/bios-tables-test.c | 50 +++++++++++++++++++++++++++-------------
- 1 file changed, 34 insertions(+), 16 deletions(-)
+ tests/bios-tables-test.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 4d13a3cce6..84e1ce2972 100644
+index 84e1ce2972..8302ffc2cd 100644
 --- a/tests/bios-tables-test.c
 +++ b/tests/bios-tables-test.c
-@@ -26,6 +26,11 @@
- typedef struct {
-     const char *machine;
-     const char *variant;
-+    const char *uefi_fl1;
-+    const char *uefi_fl2;
-+    const char *cd;
-+    const uint64_t ram_start;
-+    const uint64_t scan_len;
-     uint64_t rsdp_addr;
-     uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
-     GArray *tables;
-@@ -77,13 +82,6 @@ static void free_test_data(test_data *data)
-     g_array_free(data->tables, true);
- }
+@@ -569,8 +569,15 @@ static void test_acpi_one(const char *params, test_data *data)
+         }
+     }
  
--static void test_acpi_rsdp_address(test_data *data)
--{
--    uint32_t off = acpi_find_rsdp_address(data->qts);
--    g_assert_cmphex(off, <, 0x100000);
--    data->rsdp_addr = off;
--}
--
- static void test_acpi_rsdp_table(test_data *data)
- {
-     uint8_t *rsdp_table = data->rsdp_table;
-@@ -524,21 +522,41 @@ static void test_smbios_structs(test_data *data)
- static void test_acpi_one(const char *params, test_data *data)
- {
-     char *args;
-+    bool use_uefi = data->uefi_fl1 && data->uefi_fl2;
- 
--    /* Disable kernel irqchip to be able to override apic irq0. */
--    args = g_strdup_printf("-machine %s,accel=%s,kernel-irqchip=off "
--                           "-net none -display none %s "
--                           "-drive id=hd0,if=none,file=%s,format=raw "
--                           "-device ide-hd,drive=hd0 ",
--                           data->machine, "kvm:tcg",
--                           params ? params : "", disk);
-+    if (use_uefi) {
-+        /*
-+         * TODO: convert '-drive if=pflash' to new syntax (see e33763be7cd3)
-+         * when arm/virt boad starts to support it.
-+         */
-+        args = g_strdup_printf("-machine %s,accel=%s -nodefaults -nographic "
-+            "-drive if=pflash,format=raw,file=%s,readonly "
-+            "-drive if=pflash,format=raw,file=%s,snapshot=on -cdrom %s %s",
-+            data->machine, "kvm:tcg", data->uefi_fl1, data->uefi_fl2,
-+            data->cd, params ? params : "");
-+
-+    } else {
-+        /* Disable kernel irqchip to be able to override apic irq0. */
-+        args = g_strdup_printf("-machine %s,accel=%s,kernel-irqchip=off "
-+            "-net none -display none %s "
-+            "-drive id=hd0,if=none,file=%s,format=raw "
-+            "-device ide-hd,drive=hd0 ",
-+             data->machine, "kvm:tcg", params ? params : "", disk);
+-    test_smbios_entry_point(data);
+-    test_smbios_structs(data);
++    /*
++     * TODO: make SMBIOS tests work with UEFI firmware,
++     * Bug on uefi-test-tools to provide entry point:
++     * https://bugs.launchpad.net/qemu/+bug/1821884
++     */
++    if (!use_uefi) {
++        test_smbios_entry_point(data);
++        test_smbios_structs(data);
 +    }
  
-     data->qts = qtest_init(args);
- 
--    boot_sector_test(data->qts);
-+    if (use_uefi) {
-+        g_assert(data->scan_len);
-+        data->rsdp_addr = acpi_find_rsdp_address_uefi(data->qts,
-+            data->ram_start, data->scan_len);
-+    } else {
-+        boot_sector_test(data->qts);
-+        data->rsdp_addr = acpi_find_rsdp_address(data->qts);
-+        g_assert_cmphex(data->rsdp_addr, <, 0x100000);
-+    }
- 
-     data->tables = g_array_new(false, true, sizeof(AcpiSdtTable));
--    test_acpi_rsdp_address(data);
-     test_acpi_rsdp_table(data);
-     test_acpi_rxsdt_table(data);
-     test_acpi_fadt_table(data);
+     assert(!global_qtest);
+     qtest_quit(data->qts);
 -- 
 MST
 
