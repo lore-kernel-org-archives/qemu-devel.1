@@ -2,64 +2,57 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18FE5C04AB4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 00:36:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 006D5C04AB4
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 01:02:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9435206B6
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 00:36:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9435206B6
+	by mail.kernel.org (Postfix) with ESMTPS id C44A420675
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 01:02:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C44A420675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55497 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55719 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSWIL-0004pe-7H
-	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 20:36:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56449)
+	id 1hSWhT-00027y-0a
+	for qemu-devel@archiver.kernel.org; Sun, 19 May 2019 21:02:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hSWHV-0004Bt-6s
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 20:35:58 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hSWfb-0000bP-Pf
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 21:00:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hSWHR-00060A-Ni
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 20:35:55 -0400
-Received: from mga05.intel.com ([192.55.52.43]:59507)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hSWfa-0006bE-QE
+	for qemu-devel@nongnu.org; Sun, 19 May 2019 21:00:51 -0400
+Received: from mga17.intel.com ([192.55.52.151]:52449)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hSWHO-0005vv-SM
-	for qemu-devel@nongnu.org; Sun, 19 May 2019 20:35:52 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+	id 1hSWfY-0006Zf-AQ; Sun, 19 May 2019 21:00:48 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-	by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	19 May 2019 17:35:46 -0700
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+	by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	19 May 2019 18:00:45 -0700
 X-ExtLoop1: 1
 Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by fmsmga001.fm.intel.com with ESMTP; 19 May 2019 17:35:45 -0700
-Date: Mon, 20 May 2019 08:35:14 +0800
+	by orsmga007.jf.intel.com with ESMTP; 19 May 2019 18:00:43 -0700
 From: Wei Yang <richardw.yang@linux.intel.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190520003514.GB18144@richard>
-References: <20190517005114.19456-1-richardw.yang@linux.intel.com>
-	<20190517131116.02b25408@Igors-MacBook-Pro>
-	<20190517125957.56uoupbo3ai4jybr@master>
-	<20190517162903.4fc94708@Igors-MacBook-Pro>
+To: qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org
+Date: Mon, 20 May 2019 08:59:51 +0800
+Message-Id: <20190520005957.6953-1-richardw.yang@linux.intel.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190517162903.4fc94708@Igors-MacBook-Pro>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 192.55.52.43
-Subject: Re: [Qemu-devel] [PATCH] hw/acpi: ACPI_PCI should depends on both
- ACPI and PCI
+X-Received-From: 192.55.52.151
+Subject: [Qemu-devel] [PATCH v5 0/6] Extract build_mcfg
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,76 +64,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com,
-	Wei Yang <richardw.yang@linux.intel.com>,
-	Wei Yang <richard.weiyang@gmail.com>
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, thuth@redhat.com,
+	mst@redhat.com, shannon.zhaosl@gmail.com,
+	Wei Yang <richardw.yang@linux.intel.com>, imammedo@redhat.com,
+	philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 17, 2019 at 04:29:03PM +0200, Igor Mammedov wrote:
->On Fri, 17 May 2019 12:59:57 +0000
->Wei Yang <richard.weiyang@gmail.com> wrote:
->
->> On Fri, May 17, 2019 at 01:11:16PM +0200, Igor Mammedov wrote:
->> >On Fri, 17 May 2019 08:51:14 +0800
->> >Wei Yang <richardw.yang@linux.intel.com> wrote:
->> >
->> >> Pointed out by Philippe Mathieu-Daud?? <philmd@redhat.com>.
->> >> 
->> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> >> ---
->> >>  hw/acpi/Kconfig | 2 +-
->> >>  1 file changed, 1 insertion(+), 1 deletion(-)
->> >> 
->> >> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
->> >> index 7265843cc3..7c59cf900b 100644
->> >> --- a/hw/acpi/Kconfig
->> >> +++ b/hw/acpi/Kconfig
->> >> @@ -25,7 +25,7 @@ config ACPI_NVDIMM
->> >>  
->> >>  config ACPI_PCI
->> >>      bool
->> >> -    depends on ACPI
->> >> +    depends on ACPI && PCI
->> >>  
->> >>  config ACPI_VMGENID
->> >>      bool
->> >
->> >are you sure you didn't miss anything?
->> >
->> 
->> This patch is based on the comment in
->> http://qemu.11.n7.nabble.com/PATCH-v4-0-6-Extract-build-mcfg-tt650106.html#a655913
->> 
->> My understanding is not correct?
->
->That wasn't the end of discussion, it continued on until Philippe suggested
->the below changes
->
+This patch set tries to generalize MCFG table build process. And it is
+based on one un-merged patch from Igor, which is included in this serials.
 
-Yep, just see the latest reply.
+v4->v5:
+    * ACPI_PCI depends on both ACPI and PCI
+    * rebase on latest master, adjust arm Kconfig
+    * miss the reserved[8] of MCFG, add it back
+    * make sure bios-tables-test all OK
 
->> 
->> >On Fri, 17 May 2019 10:37:42 +0200
->> >Philippe Mathieu-Daud?? <philmd@redhat.com> wrote:
->> >
->> >[...]
->> >> 
->> >> config ARM_VIRT
->> >>     ...
->> >>     select ACPI_PCI
->> >> 
->> >> config ACPI_PCI
->> >>     bool
->> >>     depends on ACPI && PCI
->> >> 
->> >
->> >
->> 
+v3->v4:
+    * adjust comment to give more information about MCFG table
+
+v2->v3:
+    * Includes the un-merged patch from Igor
+    * use build_append_foo() API to construct MCFG
+
+Igor Mammedov (1):
+  q35: acpi: do not create dummy MCFG table
+
+Wei Yang (5):
+  hw/arm/virt-acpi-build: remove unnecessary variable mcfg_start
+  i386, acpi: remove mcfg_ prefix in AcpiMcfgInfo members
+  hw/arm/virt-acpi-build: pass AcpiMcfgInfo to build_mcfg()
+  hw/acpi: Consolidate build_mcfg to pci.c
+  acpi: pci: use build_append_foo() API to construct MCFG
+
+ default-configs/i386-softmmu.mak |  1 +
+ hw/acpi/Kconfig                  |  4 +++
+ hw/acpi/Makefile.objs            |  1 +
+ hw/acpi/pci.c                    | 57 ++++++++++++++++++++++++++++++++
+ hw/arm/Kconfig                   |  1 +
+ hw/arm/virt-acpi-build.c         | 31 +++++------------
+ hw/i386/acpi-build.c             | 44 ++++--------------------
+ include/hw/acpi/acpi-defs.h      | 18 ----------
+ include/hw/acpi/pci.h            | 34 +++++++++++++++++++
+ 9 files changed, 113 insertions(+), 78 deletions(-)
+ create mode 100644 hw/acpi/pci.c
+ create mode 100644 include/hw/acpi/pci.h
 
 -- 
-Wei Yang
-Help you, Help me
+2.19.1
+
 
