@@ -2,67 +2,83 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B095C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 14:20:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0DB6C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 14:33:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6249214AE
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 14:20:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6249214AE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 70B46213F2
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 14:33:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="LvX0XbGQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70B46213F2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36381 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36541 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSj98-00065d-W6
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 10:20:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35595)
+	id 1hSjML-0001Ed-NM
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 10:33:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hSj7S-0005AX-UH
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 10:18:28 -0400
+	(envelope-from <damien.hedde@greensocs.com>) id 1hSjLG-0000qw-4K
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 10:32:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hSj7R-00036b-J7
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 10:18:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36380)
+	(envelope-from <damien.hedde@greensocs.com>) id 1hSjLE-0002HP-DA
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 10:32:42 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:38268)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1hSj7R-0002y8-Aw
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 10:18:25 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A3924300B916;
-	Mon, 20 May 2019 14:17:50 +0000 (UTC)
-Received: from [10.36.116.113] (ovpn-116-113.ams2.redhat.com [10.36.116.113])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E01011001E75;
-	Mon, 20 May 2019 14:17:43 +0000 (UTC)
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <20190409155831.18764-1-eric.auger@redhat.com>
-	<20190515165258.0855fcb9@x1.home>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <64fcfab2-9409-7af9-b40d-ff9143f43ccb@redhat.com>
-Date: Mon, 20 May 2019 16:17:40 +0200
+	(Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+	id 1hSjLA-0002Df-8H; Mon, 20 May 2019 10:32:36 -0400
+Received: from [172.16.11.119] (unknown [172.16.11.119])
+	by beetle.greensocs.com (Postfix) with ESMTPSA id 8AE3B96F50;
+	Mon, 20 May 2019 14:32:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+	s=mail; t=1558362753;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	content-transfer-encoding:content-transfer-encoding:
+	in-reply-to:in-reply-to:references:references;
+	bh=UQYgxxekaeDJwFVWw6OnzMrR0hdYDfDRg/54Y/1pLiM=;
+	b=LvX0XbGQqKK0TxrW8ye5WpOSzPWk0UuQVZaPXnfhP04VswKgn+8nZ8muXBvIH428BMx1Z9
+	3Abhwce364k78rKv3dRgWzVR2U05K9MlySXsCQ/Y1DV3JM7N9C5f8VEX9UwOXHMNKnYAbd
+	UR61UMjrMclapcUgmS3oA6GAoWh1Gc8=
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <cover.1553510737.git.damien.hedde@greensocs.com>
+	<CAFEAcA-84KBmZhRqugQzmEkWVcFBuSAdLtp_HGjRxLeVj1SLXA@mail.gmail.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <dac12db2-9583-4a30-2188-e5b101e13ecf@greensocs.com>
+Date: Mon, 20 May 2019 16:32:31 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.4.0
+	Thunderbird/60.5.3
 MIME-Version: 1.0
-In-Reply-To: <20190515165258.0855fcb9@x1.home>
+In-Reply-To: <CAFEAcA-84KBmZhRqugQzmEkWVcFBuSAdLtp_HGjRxLeVj1SLXA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-US-large
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Mon, 20 May 2019 14:17:55 +0000 (UTC)
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+	s=mail; t=1558362753;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	content-transfer-encoding:content-transfer-encoding:
+	in-reply-to:in-reply-to:references:references;
+	bh=UQYgxxekaeDJwFVWw6OnzMrR0hdYDfDRg/54Y/1pLiM=;
+	b=i9CjjQkVkezIatChgGRfngeQ/PPN9d8+cZTPgTuYOhORSYqiqgGYspcAmXCadqvCSarkyY
+	9dAGqOcBvWMglMAVsRfiGwWzAn0Xug8YUEsSVTKhBVXdUXnKDA/CquAdCVmuv6z+hF7YLB
+	Iki4ANqSTi8RvOmDy3V8pzwLAUCxTyQ=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1558362753; a=rsa-sha256; cv=none;
+	b=3JeVbGN1+bfumh6FaCGSfHmSVuA29z2zjLLHMaF0cxJWDRN8LU83VxDv5XEBPmBh/O+z8e
+	kf179eAFLpRyS2Cm6h+huO46Q8nHIYE8TbLVbjOCkBpPkRAg6mk+QACA0dlscnDNm6fgVq
+	DjdkfALCxgwBsa64fy83xrohGENaYFU=
+ARC-Authentication-Results: i=1; ORIGINATING;
+	auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1] vfio/common: Introduce
- vfio_set_irq_signaling helper
+X-Received-From: 5.135.226.135
+Subject: Re: [Qemu-devel] [RFC 00/17] multi-phase reset mechanism
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,200 +90,237 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@ozlabs.ru, cohuck@redhat.com, qemu-devel@nongnu.org,
-	eric.auger.pro@gmail.com
+Cc: Edgar Iglesias <edgar.iglesias@xilinx.com>,
+	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	Mark Burton <mark.burton@greensocs.com>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Markus Armbruster <armbru@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	=?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alex,
+Hi,
 
-On 5/16/19 12:52 AM, Alex Williamson wrote:
-> On Tue,  9 Apr 2019 17:58:31 +0200
-> Eric Auger <eric.auger@redhat.com> wrote:
-> 
->> The code used to assign an interrupt index/subindex to an
->> eventfd is duplicated many times. Let's introduce an helper that
->> allows to set/unset the signaling for an ACTION_TRIGGER or
->> ACTION_UNMASK action.
+On 5/16/19 2:41 PM, Peter Maydell wrote:
+> On Mon, 25 Mar 2019 at 11:02, Damien Hedde <damien.hedde@greensocs.com> wrote:
 >>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Hi all,
 >>
->> ---
+>> This series is a proposal to implement the multi-phase reset we've discussed
+>> here (https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg00310.html) and
+>> more recently there
+>> (https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg00081.html).
 >>
->> This is a follow-up to
->> [PATCH v2 0/2] vfio-pci: Introduce vfio_set_event_handler().
->> It looks to me that introducing vfio_set_irq_signaling() has more
->> benefits in term of code reduction and the helper abstraction
->> looks cleaner.
->> ---
->>  hw/vfio/common.c              |  61 +++++++++
->>  hw/vfio/pci.c                 | 224 ++++++++--------------------------
->>  hw/vfio/platform.c            |  55 +++------
->>  include/hw/vfio/vfio-common.h |   2 +
->>  4 files changed, 134 insertions(+), 208 deletions(-)
->>
->> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->> index 4374cc6176..f88fd10ca3 100644
->> --- a/hw/vfio/common.c
->> +++ b/hw/vfio/common.c
->> @@ -95,6 +95,67 @@ void vfio_mask_single_irqindex(VFIODevice *vbasedev, int index)
->>      ioctl(vbasedev->fd, VFIO_DEVICE_SET_IRQS, &irq_set);
->>  }
->>  
->> +static inline const char *action_to_str(int action)
->> +{
->> +    switch (action) {
->> +    case VFIO_IRQ_SET_ACTION_MASK:
->> +        return "MASK";
->> +    case VFIO_IRQ_SET_ACTION_UNMASK:
->> +        return "UNMASK";
->> +    case VFIO_IRQ_SET_ACTION_TRIGGER:
->> +        return "TRIGGER";
->> +    default:
->> +        return "UNKNOWN ACTION";
->> +    }
->> +}
->> +
->> +int vfio_set_irq_signaling(VFIODevice *vbasedev, int index, int subindex,
->> +                           int action, int fd, Error **errp)
->> +{
->> +    struct vfio_irq_info irq_info = { .argsz = sizeof(irq_info),
->> +                                      .index = index };
->> +    struct vfio_irq_set *irq_set;
->> +    int argsz, ret = 0;
->> +    int32_t *pfd;
->> +
->> +    ret = ioctl(vbasedev->fd, VFIO_DEVICE_GET_IRQ_INFO, &irq_info);
->> +    if (ret < 0) {
->> +        error_setg_errno(errp, errno, "index %d does not exist", index);
->> +        goto error;
->> +    }
->> +    if (irq_info.count < subindex + 1) {
->> +        error_setg_errno(errp, errno, "subindex %d does not exist", subindex);
->> +        goto error;
->> +    }
->> +
->> +    argsz = sizeof(*irq_set) + sizeof(*pfd);
->> +
->> +    irq_set = g_malloc0(argsz);
->> +    irq_set->argsz = argsz;
->> +    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD | action;
->> +    irq_set->index = index;
->> +    irq_set->start = subindex;
->> +    irq_set->count = 1;
->> +    pfd = (int32_t *)&irq_set->data;
->> +    *pfd = fd;
->> +
->> +    ret = ioctl(vbasedev->fd, VFIO_DEVICE_SET_IRQS, irq_set);
+>> To summarize, we need a multi-phase reset to allow for a more complex
+>> initialization of a platform. In particular we need to "propagate" a clock
+>> tree, but we have to ensure that every device is initialized first.
 > 
-> Hi Eric,
-> 
-> Sorry for the long delay.  While I like the code reduction and
-> simplification, is it really acceptable that every SET_IRQS ioctl is
-> now a GET_IRQ_INFO + SET_IRQS?  Are we trying to protect against
-> devices dynamically changing their interrupt support?  Do we not trust
-> the callers?
-I agree this is generally not needed. I will remove the check.
-> 
->> +
->> +    g_free(irq_set);
->> +
->> +    if (ret) {
->> +        error_setg_errno(errp, -ret, "VFIO_DEVICE_SET_IRQS failure");
->> +        goto error;
->> +    }
->> +    return 0;
->> +error:
->> +    error_prepend(errp,
->> +                  "Failed to %s %s eventfd signaling for interrupt [%d,%d]: ",
->> +                  fd < 0 ? "tear down" : "set up", action_to_str(action),
->> +                  index, subindex);
+> Hi; I finally managed to get my thoughts about reset coherent
+> enough to write down in an email.
 > 
 > 
-> Maybe icing on the cake, but this leaves me wishing it printed "MSIX-3"
-> rather than "[2,3]" for a PCI device ;)
-OK
+> OVERVIEW
+> 
+> I had a read through the patchset and spent a while trying to
+> understand what we currently have.
+> 
+> Our current (device) reset model is:
+>  * single-phase
+>     -- there is only one 'reset' method
+>  * implicit
+>     -- devices don't need to be explicitly registered anywhere
+>        in a "reset hierarchy"; instead they are reset by virtue
+>        of being in the bus heirarchy they are already in
+>  * bus-based
+>     -- sysbus reset is registered in vl.c; free-floating other buses[*]
+>        (ie those with a NULL parent) have a reset registered in qbus_realize;
+>        buses with parents (ie anything with a non-NULL parent passed to
+>        qbus_create() or qbus_create_inplace()) will get traversed by
+>        the recursive traversal of whatever bus their parent is on.
+>  * not exhaustive
+>     -- any devices not put on a bus, or put on a bus whose parent device
+>        is not on a bus, will not get reset
+>  * not modelling GPIO reset signal lines
+> 
+> [*] It turns out we actually don't have any of these any more, so
+> we can remove the code that deals with them. The only parentless bus
+> is the main system bus, which is the root of the "reset hierarchy".
+> 
+> This patchset is trying to address:
+>  * changing to multi-phase
+>  * modelling of GPIO reset signal lines
+> 
+> It leaves reset as bus-based: currently we do this via qbus_walk_children/
+> qdev_walk_children, which traverse the bus->children and dev->child_bus
+> lists, and in the patchset's implementation of Resettable for qdev/qbus
+> the methods iterate through those.
+> 
+> I think this is reasonable -- we don't want to try to tackle every
+> reset related problem at once. The two issues the patchset is looking
+> at fit well together, because the GPIO-reset-lines are a motivation
+> for switching to multiphase (you need to handle both entering and
+> leaving reset).
+> 
+> ("not exhaustive" is the thing we should really try to
+> fix at some point, but I have no good ideas for how to do this.)
+> 
+> API DESIGN
+> 
+> On what the right APIs should be: I think we should separate
+> "the API that's nice for devices to implement" from "the API that's
+> nice for callers wanting to reset a device". Here's my suggestion
+> for doing that:
 > 
 > 
->> +    return ret;
->> +}
->> +
->>  /*
->>   * IO Port/MMIO - Beware of the endians, VFIO is always little endian
->>   */
->> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->> index 504019c458..cd93ff6fa3 100644
->> --- a/hw/vfio/pci.c
->> +++ b/hw/vfio/pci.c
-> [snip]
->> @@ -2718,77 +2630,43 @@ static void vfio_req_notifier_handler(void *opaque)
->>  
->>  static void vfio_register_req_notifier(VFIOPCIDevice *vdev)
->>  {
->> -    struct vfio_irq_info irq_info = { .argsz = sizeof(irq_info),
->> -                                      .index = VFIO_PCI_REQ_IRQ_INDEX };
->> -    int argsz;
->> -    struct vfio_irq_set *irq_set;
->> -    int32_t *pfd;
->> +    Error *err = NULL;
->> +    int32_t fd;
->>  
->>      if (!(vdev->features & VFIO_FEATURE_ENABLE_REQ)) {
->>          return;
->>      }
->>  
->> -    if (ioctl(vdev->vbasedev.fd,
->> -              VFIO_DEVICE_GET_IRQ_INFO, &irq_info) < 0 || irq_info.count < 1) {
->> -        return;
->> -    }
+> Have the Resettable interface be:
+>  * init
+>  * hold
+>  * exit
+>  * get_reset_count
+>  * increment_reset_count (returns previous count)
+>  * decrement_reset_count (returns new count)
+>  * some method for "iterate over any Resettable child objects"
+>    (probably a "call this callback for each child" type API)
 > 
-> Here we used GET_IRQ_INFO to quietly only enable the request notifier
-> when it's available, now it looks like this is no longer quiet if that
-> support is unavailable.  Is that intentional?  Thanks,
-not really I acknowledge ;-) I will restore that quiet check here.
+> Individual devices implement init/hold/exit
+> Device base class implements the reset_count methods
+> Device base class implements a default 'init' method that calls dc->reset
+>   and default hold/exit that are no-ops
+> Device base class has a new vmstate subsection which migrates the
+>   reset count, subsection's needed function says "only send
+>   if reset count is non-zero". Back-compat here should be fine
+>   as current machines don't implement any way that a device in
+>   the system can be being held in reset at the point where a
+>   migration happens. If future changes add features to a
+>   machine model that permit that, the migration is forwards-compatible.
+> Device base class implements the iterate-over-children method to
+>  iterate over the dev->child_bus buses
+> Bus base class implements reset_count methods
+> Bus base class implements default no-op init/hold/exit
+> Bus base class implements the iterate-over-children method to
+>  iterate over the bus->children devices
+> Handling migration of the bus base class reset count is a little
+>  awkward -- we'll need to put it in a vmstate subsection which
+>  is part of the vmstate of the device which owns the bus.
+>  (I talked to David Gilbert on IRC about this and have some
+>  possibilities for how to do it, but will postpone writing them
+>  out until we've decided whether we like the APIs.)
 
-Thanks
+If:
+  1. we say we cannot use a Bus as holdable reset entry point (we can
+reset it but not (de)assert_reset it without passing by its parent Device)
+  2. if there is no additional reset dedicated state (right now a reset
+on a bus mostly propagates it to sub-devices)
+Then we have no state migration needed for buses and we can probably
+find a way to use the parent Device's reset_count.
 
-Eric
+This is somewhat related to the API TRANSITION part below but I was
+wondering if I should add some kind of flag in the interface class to
+indicate the support of "migration-during-reset" functionality. It could
+be used to at least warn when trying to hold the reset state in such an
+class.
+This flag will default to false and one would have to set it when
+implementing the functionality for a given object class (like I did with
+the cadence_uart device).
+Maybe a similar flag can be used to allow/forbid using a class as an
+holdable reset entry point.
+
 > 
-> Alex
+> The "API for devices to implement" is then the init/hold/exit
+> methods of the Resettable interface -- they don't need to worry
+> about these methods possibly being called multiple times, and
+> they don't need to handle the reference count or passing on
+> the calling of the phase methods to their children. They
+> just need to implement the correct behaviour for their device
+> for this phase.
 > 
->> -
->>      if (event_notifier_init(&vdev->req_notifier, 0)) {
->>          error_report("vfio: Unable to init event notifier for device request");
->>          return;
->>      }
->>  
->> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
->> +    fd = event_notifier_get_fd(&vdev->req_notifier);
->> +    qemu_set_fd_handler(fd, vfio_req_notifier_handler, NULL, vdev);
->>  
->> -    irq_set = g_malloc0(argsz);
->> -    irq_set->argsz = argsz;
->> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
->> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
->> -    irq_set->index = VFIO_PCI_REQ_IRQ_INDEX;
->> -    irq_set->start = 0;
->> -    irq_set->count = 1;
->> -    pfd = (int32_t *)&irq_set->data;
->> -
->> -    *pfd = event_notifier_get_fd(&vdev->req_notifier);
->> -    qemu_set_fd_handler(*pfd, vfio_req_notifier_handler, NULL, vdev);
->> -
->> -    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
->> -        error_report("vfio: Failed to set up device request notification");
->> -        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
->> +    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_REQ_IRQ_INDEX, 0,
->> +                           VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
->> +        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
->> +        qemu_set_fd_handler(fd, NULL, NULL, vdev);
->>          event_notifier_cleanup(&vdev->req_notifier);
->>      } else {
->>          vdev->req_enabled = true;
->>      }
->> -
->> -    g_free(irq_set);
->>  }
+> The "API for callers wanting to reset a device" is a set of
+> helper functions that take a pointer to a Resettable object.
+> It's these that deal with the reset count and children:
 > 
+> resettable_assert_reset(Resettable *r)
+> {
+>    if (r->increment_reset_count() == 0) {
+>        r->init();
+>        r->foreach_child(do_call_init);
+>        r->hold();
+>        r->foreach_child(do_call_hold);
+>    }
+> }
+> 
+> resettable_deassert_reset(Resettable *r)
+> {
+>    if (r->decrement_reset_count() == 0) {
+>       r->foreach_child(do_call_exit);
+>       r->exit();
+>    }
+> }
+> 
+> plus a utility function for "call assert then deassert",
+> and maybe one that wraps the get_reset_count method.
+> So callers that want to reset devices (or buses) don't need
+> to care about phases, they just assert and then deassert reset.
+> 
+> Do you think that works ?
+
+I'll have to handle cold/warm cases but I think it will work.
+
+> 
+> 
+> API TRANSITIONS
+> 
+> The other issue here is API transitions: the patchset essentially
+> obsoletes the old DeviceClass::reset function, for instance. I think
+> we should be clear about what the old and new APIs here are, and
+> what our plans for transitioning to the new ones are. In some cases
+> there are really very few users of the old API -- for instance the
+> patchset makes qbus_reset_all(bus) a synonym for qbus_reset(bus, false),
+> but there are only a dozen or so users of qbus_reset_all(). I think
+> we should just go ahead and convert them all. (For purposes of
+> structuring the patchset starting with a patch that says "reimplement
+> qbus_reset_all() in terms of qbus_reset()" is OK, but then we should
+> fix up the callers afterwards.) There are of course a lot more
+> implementations of DeviceState::reset so transitioning away from
+> that is a lot trickier, but we could look at a coccinelle script
+> that could automate it.
+> 
+> If you could describe in the cover letter of the next version of
+> the patchseries all the old APIs being deprecated and the new
+> ones that replace them, I think that would be very helpful.>
+> 
+> MISCELLANEOUS MINOR POINTS
+> 
+> I know I suggested the idea of a ResetDomain object, but in the
+> series as it stands I'm not sure it's serving very much purpose;
+> perhaps we should drop it for the moment (just leaving the legacy
+> reset handlers and sysbus reset the way they are) ? We can come back
+> to it later as a concept.
+
+I'm ok with that. It seems unnecessary at that point given that it was
+not used by Device/Bus classes. It will make the series simplier.
+
+> 
+> The "support reset via GPIO line" patch looks generally OK, but
+> you can't just add fields to the DeviceState vmstate struct -- you'll
+> break migration from older QEMU versions. The new fields need to
+> go in a vmstate subsection with an appropriate 'needed' function.
+> 
+> We should definitely make sure we have good documentation for
+> what device authors should do to implement reset.
+
+I agree, I did not want to commit too much into it before having a more
+satisfying API. I'll work on it for the next version.
+
+> 
+> thanks
+> -- PMM
+> 
+
+Thanks a lot for the review,
+Damien
 
