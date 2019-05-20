@@ -2,61 +2,61 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95687C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:53:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 849C3C04E87
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:54:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73922206B6
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:53:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73922206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 63DE0206B6
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:54:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63DE0206B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=birkelund.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39649 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39653 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSmTf-00007S-Lc
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 13:53:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55341)
+	id 1hSmUP-0000gs-HK
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 13:54:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hSlog-0006za-Qi
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:11:16 -0400
+	(envelope-from <klaus@birkelund.eu>) id 1hSmAS-0000sX-TO
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:33:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hSloe-0005Zf-Th
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:11:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47018)
+	(envelope-from <klaus@birkelund.eu>) id 1hSmAR-0001nD-2Y
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:33:44 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:50142)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
-	id 1hSlod-0005Yj-AW; Mon, 20 May 2019 13:11:11 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B482D356EA;
-	Mon, 20 May 2019 17:10:57 +0000 (UTC)
-Received: from localhost (ovpn-204-110.brq.redhat.com [10.40.204.110])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C099460BFC;
-	Mon, 20 May 2019 17:10:38 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 May 2019 19:02:51 +0200
-Message-Id: <20190520170302.13643-44-cohuck@redhat.com>
-In-Reply-To: <20190520170302.13643-1-cohuck@redhat.com>
-References: <20190520170302.13643-1-cohuck@redhat.com>
+	(Exim 4.71) (envelope-from <klaus@birkelund.eu>)
+	id 1hSmAN-0001jH-9m; Mon, 20 May 2019 13:33:39 -0400
+Received: from apples.localdomain (ip-5-186-120-196.cgn.fibianet.dk
+	[5.186.120.196])
+	by charlie.dont.surf (Postfix) with ESMTPSA id EB9F2BF42F;
+	Mon, 20 May 2019 17:33:35 +0000 (UTC)
+Date: Mon, 20 May 2019 19:33:31 +0200
+From: Klaus Birkelund <klaus@birkelund.eu>
+To: Eric Blake <eblake@redhat.com>
+Message-ID: <20190520173331.GA18987@apples.localdomain>
+Mail-Followup-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org,
+	Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>,
+	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+References: <20190517084234.26923-1-klaus@birkelund.eu>
+	<20190517084234.26923-9-klaus@birkelund.eu>
+	<f94686a4-b402-36c6-8070-185c0416b303@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Mon, 20 May 2019 17:11:00 +0000 (UTC)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <f94686a4-b402-36c6-8070-185c0416b303@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 43/54] s390x/tcg: Implement VECTOR SUM ACROSS
- QUADWORD
+X-Received-From: 128.199.63.193
+Subject: Re: [Qemu-devel] [PATCH 8/8] nvme: add an OpenChannel 2.0 NVMe
+ device (ocssd)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,80 +68,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
-	qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
+Cc: Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+On Mon, May 20, 2019 at 11:45:00AM -0500, Eric Blake wrote:
+> On 5/17/19 3:42 AM, Klaus Birkelund Jensen wrote:
+> > This adds a new 'ocssd' block device that emulates an OpenChannel 2.0
+> > device. The device is backed by a new 'ocssd' block backend that is
+> > based on the raw format driver but includes a header that holds the
+> > device geometry and write data requirements. This new block backend i=
+s
+> > special in that the size is not specified explicitly but in terms of
+> > sector size, number of chunks, number of parallel units, etc. This
+> > called for the addition of the `no_size_required` field in `struct
+> > BlockDriver` to not fail image creation when the size parameter is
+> > missing.
+> >=20
+> > The ocssd device is an individual device but shares a lot of code wit=
+h
+> > the nvme device. Thus, some core functionality of nvme/nvme.c has bee=
+n
+> > exported for use by nvme/ocssd.c.
+> >=20
+> > Thank you to the following people for their contributions to the
+> > original qemu-nvme (github.com/OpenChannelSSD/qemu-nvme) implementati=
+on.
+> >=20
+> >   Matias Bj=F8rling <mb@lightnvm.io>
+> >   Javier Gonz=E1lez <javier@javigon.com>
+> >   Simon Andreas Frimann Lund <ocssd@safl.dk>
+> >   Hans Holmberg <hans@owltronix.com>
+> >   Jesper Devantier <contact@pseudonymous.me>
+> >   Young Tack Jin <youngtack.jin@circuitblvd.com>
+> >=20
+> > Signed-off-by: Klaus Birkelund Jensen <klaus.jensen@cnexlabs.com>
+> > ---
+> >  MAINTAINERS                     |   14 +-
+> >  Makefile.objs                   |    1 +
+> >  block.c                         |    2 +-
+> >  block/Makefile.objs             |    2 +-
+> >  block/nvme.c                    |    2 +-
+> >  block/ocssd.c                   |  690 ++++++++
+> >  hw/block/Makefile.objs          |    2 +-
+> >  hw/block/{ =3D> nvme}/nvme.c      |  192 ++-
+> >  hw/block/nvme/ocssd.c           | 2647 +++++++++++++++++++++++++++++=
+++
+> >  hw/block/nvme/ocssd.h           |  140 ++
+> >  hw/block/nvme/trace-events      |  136 ++
+> >  hw/block/trace-events           |  109 --
+> >  include/block/block_int.h       |    3 +
+> >  include/block/nvme.h            |   12 +-
+> >  include/block/ocssd.h           |  231 +++
+> >  {hw =3D> include/hw}/block/nvme.h |   61 +
+> >  include/hw/pci/pci_ids.h        |    2 +
+> >  qapi/block-core.json            |   47 +-
+> >  18 files changed, 4121 insertions(+), 172 deletions(-)
+> >  create mode 100644 block/ocssd.c
+> >  rename hw/block/{ =3D> nvme}/nvme.c (94%)
+> >  create mode 100644 hw/block/nvme/ocssd.c
+> >  create mode 100644 hw/block/nvme/ocssd.h
+> >  create mode 100644 hw/block/nvme/trace-events
+> >  create mode 100644 include/block/ocssd.h
+> >  rename {hw =3D> include/hw}/block/nvme.h (63%)
+>=20
+> Feels big; are you sure this can't be split into smaller pieces to ease
+> review?
+>=20
 
-Similar to VECTOR SUM ACROSS DOUBLEWORD, however without a loop and
-using 128-bit calculations.
+I know, but I'm not sure how to meaningfully split it up. Would you
+prefer that I move files in one commit? Changed stuff to nvme.{c,h} is
+mostly removing static from functions and creating a prototype in the
+header files to allow the ocssd device to use the functions. The commit
+should be restricted to just adding the ocssd device. Any features and
+additions required in the nvme device are added in previous commits.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+)
+> I'm focusing just on the qapi portions:
+>=20
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index dd370030824e..2483ee01d7fe 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1184,6 +1184,8 @@
-     F(0xe7bd, VSBCBI,  VRR_d, V,   0, 0, 0, 0, vsbcbi, 0, IF_VEC)
- /* VECTOR SUM ACROSS DOUBLEWORD */
-     F(0xe765, VSUMG,   VRR_c, V,   0, 0, 0, 0, vsumg, 0, IF_VEC)
-+/* VECTOR SUM ACROSS QUADWORD */
-+    F(0xe767, VSUMQ,   VRR_c, V,   0, 0, 0, 0, vsumq, 0, IF_VEC)
-=20
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
-inc.c
-index 7b4efee5c0a2..16bfbfce5738 100644
---- a/target/s390x/translate_vx.inc.c
-+++ b/target/s390x/translate_vx.inc.c
-@@ -2281,3 +2281,35 @@ static DisasJumpType op_vsumg(DisasContext *s, Dis=
-asOps *o)
-     tcg_temp_free_i64(tmp);
-     return DISAS_NEXT;
- }
-+
-+static DisasJumpType op_vsumq(DisasContext *s, DisasOps *o)
-+{
-+    const uint8_t es =3D get_field(s->fields, m4);
-+    const uint8_t max_idx =3D NUM_VEC_ELEMENTS(es) - 1;
-+    TCGv_i64 sumh, suml, zero, tmpl;
-+    uint8_t idx;
-+
-+    if (es < ES_32 || es > ES_64) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    sumh =3D tcg_const_i64(0);
-+    suml =3D tcg_temp_new_i64();
-+    zero =3D tcg_const_i64(0);
-+    tmpl =3D tcg_temp_new_i64();
-+
-+    read_vec_element_i64(suml, get_field(s->fields, v3), max_idx, es);
-+    for (idx =3D 0; idx <=3D max_idx; idx++) {
-+        read_vec_element_i64(tmpl, get_field(s->fields, v2), idx, es);
-+        tcg_gen_add2_i64(suml, sumh, suml, sumh, tmpl, zero);
-+    }
-+    write_vec_element_i64(sumh, get_field(s->fields, v1), 0, ES_64);
-+    write_vec_element_i64(suml, get_field(s->fields, v1), 1, ES_64);
-+
-+    tcg_temp_free_i64(sumh);
-+    tcg_temp_free_i64(suml);
-+    tcg_temp_free_i64(zero);
-+    tcg_temp_free_i64(tmpl);
-+    return DISAS_NEXT;
-+}
---=20
-2.20.1
+Thank you for the review of that, but it looks like this will all be
+dropped from a v2 (see mail from Kevin), because it's simply bad
+design to have the driver and device depend so closely on each other.
 
+
+Thanks,
+Klaus
 
