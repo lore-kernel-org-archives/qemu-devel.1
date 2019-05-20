@@ -2,50 +2,108 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EF1EC04AAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 06:21:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 650F1C04AAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 06:23:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB87F206BA
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 06:21:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB87F206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 278D6206B6
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 06:23:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 278D6206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58659 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58672 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSbgJ-0008IU-R4
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 02:21:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48782)
+	id 1hSbhk-0000ea-7t
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 02:23:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1hSbfT-0007u7-Rt
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:21:05 -0400
+	(envelope-from <lvivier@redhat.com>) id 1hSbgN-0008Pk-4b
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:22:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1hSbfS-0003Xr-Fd
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:21:03 -0400
-Received: from relay.sw.ru ([185.231.240.75]:36658)
+	(envelope-from <lvivier@redhat.com>) id 1hSbgM-0003yS-45
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:21:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46086)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1hSbfO-0003VB-VH; Mon, 20 May 2019 02:20:59 -0400
-Received: from [10.94.4.71] (helo=dptest2.qa.sw.ru)
-	by relay.sw.ru with esmtp (Exim 4.91)
-	(envelope-from <dplotnikov@virtuozzo.com>)
-	id 1hSbfJ-0006BF-Pg; Mon, 20 May 2019 09:20:53 +0300
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-To: eblake@redhat.com,
-	kwolf@redhat.com,
-	mreitz@redhat.com
-Date: Mon, 20 May 2019 09:20:23 +0300
-Message-Id: <20190520062023.11599-1-dplotnikov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v2] [RFC] qcow2: add compression type feature
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>)
+	id 1hSbgL-0003kG-St; Mon, 20 May 2019 02:21:58 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 59C26C049D67;
+	Mon, 20 May 2019 06:21:40 +0000 (UTC)
+Received: from [10.40.205.57] (unknown [10.40.205.57])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 714A95D9CA;
+	Mon, 20 May 2019 06:21:33 +0000 (UTC)
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
+	aik@ozlabs.ru
+References: <20190520060550.29481-1-david@gibson.dropbear.id.au>
+From: Laurent Vivier <lvivier@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <6d4a50ac-168d-7390-a5f8-eb5d2d5738a7@redhat.com>
+Date: Mon, 20 May 2019 08:21:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190520060550.29481-1-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.31]);
+	Mon, 20 May 2019 06:21:40 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] Fix phb_placement backwards compatibility
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -57,228 +115,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, den@virtuozzo.com
+Cc: gkurz@kaod.org, alex.williamson@redhat.com, qemu-devel@nongnu.org,
+	clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The patch adds some preparation parts for incompatible compression type
-feature into QCOW2 header that indicates that *all* compressed clusters
-must be (de)compressed using a certain compression type.
+On 20/05/2019 08:05, David Gibson wrote:
+> When we added support for NVLink2 passthrough devices, we changed the
+> phb_placement hook to handle the placement of NVLink2 bridges' specific
+> resources.  For compatibility we use a version that doesn't do this
+> allocation  for old machine types.
+> 
+> However, because of the delay between when the patch was posted and when
+> it was merged, we ended up with that compatibility hook applying for
+> machine versions 3.1 and earlier whereas it should apply for 4.0 and
+> earlier (since the patch was applied early in the 4.1 tree).
+> 
+> Fixes: ec132efaa81 "spapr: Support NVIDIA V100 GPU with NVLink2"
+> 
+> Reported-by: Laurent Vivier <lvivier@redhat.com>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr.c | 28 +++++++++++++++-------------
+>  1 file changed, 15 insertions(+), 13 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index bcae30ad26..39e698e9b0 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -4411,18 +4411,7 @@ DEFINE_SPAPR_MACHINE(4_1, "4.1", true);
+>  /*
+>   * pseries-4.0
+>   */
+> -static void spapr_machine_4_0_class_options(MachineClass *mc)
+> -{
+> -    spapr_machine_4_1_class_options(mc);
+> -    compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len);
+> -}
+> -
+> -DEFINE_SPAPR_MACHINE(4_0, "4.0", false);
+> -
+> -/*
+> - * pseries-3.1
+> - */
+> -static void phb_placement_3_1(SpaprMachineState *spapr, uint32_t index,
+> +static void phb_placement_4_0(SpaprMachineState *spapr, uint32_t index,
+>                                uint64_t *buid, hwaddr *pio,
+>                                hwaddr *mmio32, hwaddr *mmio64,
+>                                unsigned n_dma, uint32_t *liobns,
+> @@ -4434,6 +4423,20 @@ static void phb_placement_3_1(SpaprMachineState *spapr, uint32_t index,
+>      *nv2atsd = 0;
+>  }
+>  
+> +static void spapr_machine_4_0_class_options(MachineClass *mc)
+> +{
+> +    SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+> +
+> +    spapr_machine_4_1_class_options(mc);
+> +    compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len);
+> +    smc->phb_placement = phb_placement_4_0;
+> +}
+> +
+> +DEFINE_SPAPR_MACHINE(4_0, "4.0", false);
+> +
+> +/*
+> + * pseries-3.1
+> + */
+>  static void spapr_machine_3_1_class_options(MachineClass *mc)
+>  {
+>      SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+> @@ -4449,7 +4452,6 @@ static void spapr_machine_3_1_class_options(MachineClass *mc)
+>      smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
+>      smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
+>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_OFF;
+> -    smc->phb_placement = phb_placement_3_1;
+>  }
+>  
+>  DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
+> 
 
-It is implied that the compression type is set on the image creation and
-can be changed only later by image conversion, thus the only compression
-algorithm is used for the image.
-
-The plan is to add support for ZSTD and then may be something more effective
-in the future.
-
-ZSTD compression algorithm consumes 3-5 times less CPU power with a
-comparable compression ratio with zlib. It would be wise to use it for
-data compression e.g. for backups.
-
-The default compression is ZLIB.
-
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
----
- block/qcow2.c          | 25 +++++++++++++++++++++++++
- block/qcow2.h          | 29 ++++++++++++++++++++++-------
- docs/interop/qcow2.txt | 34 +++++++++++++++++++++++++++++++++-
- qapi/block-core.json   | 13 +++++++++++++
- 4 files changed, 93 insertions(+), 8 deletions(-)
-
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 3ace3b2209..bca506b80f 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -74,6 +74,7 @@ typedef struct {
- #define  QCOW2_EXT_MAGIC_CRYPTO_HEADER 0x0537be77
- #define  QCOW2_EXT_MAGIC_BITMAPS 0x23852875
- #define  QCOW2_EXT_MAGIC_DATA_FILE 0x44415441
-+#define  QCOW2_EXT_MAGIC_COMPRESSION_TYPE 0x434D5052
- 
- static int coroutine_fn
- qcow2_co_preadv_compressed(BlockDriverState *bs,
-@@ -398,6 +399,9 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
- #endif
-             break;
- 
-+        case QCOW2_EXT_MAGIC_COMPRESSION_TYPE:
-+            /* Setting compression type to BDRVQcow2State->compression_type */
-+            /* from the image header is going to be here */
-         case QCOW2_EXT_MAGIC_DATA_FILE:
-         {
-             s->image_data_file = g_malloc0(ext.len + 1);
-@@ -2553,6 +2557,11 @@ int qcow2_update_header(BlockDriverState *bs)
-                 .bit  = QCOW2_COMPAT_LAZY_REFCOUNTS_BITNR,
-                 .name = "lazy refcounts",
-             },
-+            {
-+                .type = QCOW2_FEAT_TYPE_INCOMPATIBLE,
-+                .bit  = QCOW2_INCOMPAT_COMPRESSION_TYPE_BITNR,
-+                .name = "compression type",
-+            },
-         };
- 
-         ret = header_ext_add(buf, QCOW2_EXT_MAGIC_FEATURE_TABLE,
-@@ -2583,6 +2592,22 @@ int qcow2_update_header(BlockDriverState *bs)
-         buflen -= ret;
-     }
- 
-+    /* Compression type extension */
-+    if (s->compression_type != 0) {
-+        Qcow2CompressionTypeExt comp_header = {
-+            .compression_type = cpu_to_be32(s->compression_type),
-+        };
-+        ret = header_ext_add(buf, QCOW2_EXT_MAGIC_COMPRESSION_TYPE,
-+                             &comp_header,
-+                             cpu_to_be64(sizeof(comp_header)),
-+                             buflen);
-+        if (ret < 0) {
-+            goto fail;
-+        }
-+        buf += ret;
-+        buflen -= ret;
-+    }
-+
-     /* Keep unknown header extensions */
-     QLIST_FOREACH(uext, &s->unknown_header_ext, next) {
-         ret = header_ext_add(buf, uext->magic, uext->data, uext->len, buflen);
-diff --git a/block/qcow2.h b/block/qcow2.h
-index fdee297f33..08468ab97d 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -198,16 +198,20 @@ enum {
- 
- /* Incompatible feature bits */
- enum {
--    QCOW2_INCOMPAT_DIRTY_BITNR      = 0,
--    QCOW2_INCOMPAT_CORRUPT_BITNR    = 1,
--    QCOW2_INCOMPAT_DATA_FILE_BITNR  = 2,
--    QCOW2_INCOMPAT_DIRTY            = 1 << QCOW2_INCOMPAT_DIRTY_BITNR,
--    QCOW2_INCOMPAT_CORRUPT          = 1 << QCOW2_INCOMPAT_CORRUPT_BITNR,
--    QCOW2_INCOMPAT_DATA_FILE        = 1 << QCOW2_INCOMPAT_DATA_FILE_BITNR,
-+    QCOW2_INCOMPAT_DIRTY_BITNR            = 0,
-+    QCOW2_INCOMPAT_CORRUPT_BITNR          = 1,
-+    QCOW2_INCOMPAT_DATA_FILE_BITNR        = 2,
-+    QCOW2_INCOMPAT_COMPRESSION_TYPE_BITNR = 3,
-+    QCOW2_INCOMPAT_DIRTY                  = 1 << QCOW2_INCOMPAT_DIRTY_BITNR,
-+    QCOW2_INCOMPAT_CORRUPT                = 1 << QCOW2_INCOMPAT_CORRUPT_BITNR,
-+    QCOW2_INCOMPAT_DATA_FILE              = 1 << QCOW2_INCOMPAT_DATA_FILE_BITNR,
-+    QCOW2_INCOMPAT_COMPRESSION_TYPE       =
-+        1 << QCOW2_INCOMPAT_COMPRESSION_TYPE_BITNR,
- 
-     QCOW2_INCOMPAT_MASK             = QCOW2_INCOMPAT_DIRTY
-                                     | QCOW2_INCOMPAT_CORRUPT
--                                    | QCOW2_INCOMPAT_DATA_FILE,
-+                                    | QCOW2_INCOMPAT_DATA_FILE
-+                                    | QCOW2_INCOMPAT_COMPRESSION_TYPE,
- };
- 
- /* Compatible feature bits */
-@@ -263,6 +267,10 @@ typedef struct Qcow2BitmapHeaderExt {
-     uint64_t bitmap_directory_offset;
- } QEMU_PACKED Qcow2BitmapHeaderExt;
- 
-+typedef struct Qcow2CompressionTypeExt {
-+    uint32_t compression_type;
-+} QEMU_PACKED Qcow2CompressionTypeExt;
-+
- typedef struct BDRVQcow2State {
-     int cluster_bits;
-     int cluster_size;
-@@ -350,6 +358,13 @@ typedef struct BDRVQcow2State {
-     int nb_compress_threads;
- 
-     BdrvChild *data_file;
-+    /**
-+     * Compression type used for the image. Default: 0 - ZLIB
-+     * The image compression type is set on image creation.
-+     * The only way to change the compression type is to convert the image
-+     * with the desired compression type set
-+     */
-+    uint32_t compression_type;
- } BDRVQcow2State;
- 
- typedef struct Qcow2COWRegion {
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index af5711e533..a070e82e1a 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -109,7 +109,14 @@ in the description of a field.
-                                 An External Data File Name header extension may
-                                 be present if this bit is set.
- 
--                    Bits 3-63:  Reserved (set to 0)
-+                    Bit 3:      Compression type. If the bit is set, then the
-+                                type of compression the image uses is set in the
-+                                header extension. When the bit is set the
-+                                compression type extension header must be present.
-+                                When the bit is not set the compression type
-+                                header must absent.
-+
-+                    Bits 4-63:  Reserved (set to 0)
- 
-          80 -  87:  compatible_features
-                     Bitmask of compatible features. An implementation can
-@@ -175,6 +182,7 @@ be stored. Each extension has a structure like the following:
-                         0x23852875 - Bitmaps extension
-                         0x0537be77 - Full disk encryption header pointer
-                         0x44415441 - External data file name string
-+                        0x434D5052 - Compression type extension
-                         other      - Unknown header extension, can be safely
-                                      ignored
- 
-@@ -771,3 +779,27 @@ In the image file the 'enabled' state is reflected by the 'auto' flag. If this
- flag is set, the software must consider the bitmap as 'enabled' and start
- tracking virtual disk changes to this bitmap from the first write to the
- virtual disk. If this flag is not set then the bitmap is disabled.
-+
-+
-+== Compression type extension ==
-+
-+The compression type extension is an optional header extension. It stores the
-+ID of the compressor which has to be used to compress/decompress disk clusters.
-+A single compression type is applied to all compressed disk clusters,
-+with no way to change compression types per cluster. Two clusters of the image
-+couldn't be compressed with different compressors.
-+
-+The compression type is set on the image creation. The only way to change
-+the compression type is to convert the image explicitly.
-+
-+The compression type extension is present if and only if the incompatible
-+compression type bit is set. When the bit is not set the compression type
-+header must absent.
-+
-+When the compression type bit is not set and the compression type header
-+extension is absent ZLIB compression is used for compressed clusters.
-+This defines default image compression type: ZLIB.
-+
-+Available compression types:
-+    ID    0: Invalid value
-+          1: ZSTD
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 7ccbfff9d0..9bde1372ba 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -5257,3 +5257,16 @@
-   'data' : { 'node-name': 'str',
-              'iothread': 'StrOrNull',
-              '*force': 'bool' } }
-+
-+##
-+# @Qcow2CompressionType:
-+#
-+# Compression type used in qcow2 image file
-+#
-+# @zlib - gzip compressor
-+# @zstd - zstd compression
-+#
-+# Since: 4.1
-+##
-+{ 'enum': 'Qcow2CompressionType',
-+  'data': [ 'zlib', 'zstd' ] }
--- 
-2.17.0
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
 
