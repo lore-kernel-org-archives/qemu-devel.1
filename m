@@ -6,57 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D160C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 21:46:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F44FC04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 21:48:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9A682173C
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 21:46:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9A682173C
+	by mail.kernel.org (Postfix) with ESMTPS id 57F9E2171F
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 21:48:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57F9E2171F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42391 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42403 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSq7M-00013u-6Y
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 17:46:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57775)
+	id 1hSq8c-0001nW-JQ
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 17:48:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hSq4c-0007Pu-MI
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 17:44:00 -0400
+	(envelope-from <philmd@redhat.com>) id 1hSpyQ-00028P-Su
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 17:37:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hSq4b-00008Q-Rj
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 17:43:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59072)
+	(envelope-from <philmd@redhat.com>) id 1hSpyP-000409-3s
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 17:37:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57826)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>)
-	id 1hSq4Z-00006K-P2; Mon, 20 May 2019 17:43:55 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hSpyN-0003wR-4U
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 17:37:32 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 09CA030842A0;
-	Mon, 20 May 2019 21:43:55 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id AF3123084295;
+	Mon, 20 May 2019 21:37:28 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-28.brq.redhat.com [10.40.204.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 12B8F1001E6C;
-	Mon, 20 May 2019 21:43:51 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F33F5D704;
+	Mon, 20 May 2019 21:37:21 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 20 May 2019 23:43:39 +0200
-Message-Id: <20190520214342.13709-2-philmd@redhat.com>
-In-Reply-To: <20190520214342.13709-1-philmd@redhat.com>
-References: <20190520214342.13709-1-philmd@redhat.com>
+Date: Mon, 20 May 2019 23:36:58 +0200
+Message-Id: <20190520213700.12620-6-philmd@redhat.com>
+In-Reply-To: <20190520213700.12620-1-philmd@redhat.com>
+References: <20190520213700.12620-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
 	(mx1.redhat.com [10.5.110.40]);
-	Mon, 20 May 2019 21:43:55 +0000 (UTC)
+	Mon, 20 May 2019 21:37:28 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/4] hw/arm/exynos4: Remove unuseful debug code
+Subject: [Qemu-devel] [PATCH v3 5/7] hw/nvram/fw_cfg: Store 'reboot-timeout'
+ as little endian
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,63 +69,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Igor Mitsyanko <i.mitsyanko@gmail.com>,
-	Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Guenter Roeck <linux@roeck-us.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Laszlo Ersek <lersek@redhat.com>, Li Qiang <liq3ea@163.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Li Qiang <liq3ea@163.com>
+
+The current codebase is not specific about the endianess of the
+fw_cfg 'file' entry 'reboot-timeout'.
+
+Per docs/specs/fw_cfg.txt:
+
+  =3D=3D=3D All Other Data Items =3D=3D=3D
+
+  Please consult the QEMU source for the most up-to-date
+  and authoritative list of selector keys and their respective
+  items' purpose, format and writeability.
+
+Checking the git history, this code was introduced in commit
+ac05f3492421, very similar to commit 3d3b8303c6f8 for the
+'boot-menu-wait' entry, which explicitely use little-endian.
+
+OVMF consumes 'boot-menu-wait' as little-endian, however it does
+not consume 'reboot-timeout'.
+
+Regarding the git history and OVMF use, we choose to explicit
+'reboot-timeout' endianess as little-endian.
+
+Signed-off-by: Li Qiang <liq3ea@163.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20190424140643.62457-4-liq3ea@163.com>
+[PMD: Reword commit description based on review comments]
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/arm/exynos4_boards.c | 24 ------------------------
- 1 file changed, 24 deletions(-)
+ hw/nvram/fw_cfg.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
-index ea8100f65a8..f0c24b7992e 100644
---- a/hw/arm/exynos4_boards.c
-+++ b/hw/arm/exynos4_boards.c
-@@ -35,20 +35,6 @@
- #include "hw/net/lan9118.h"
- #include "hw/boards.h"
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index 5c3a46ce6f2..df4242fc9cb 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -178,6 +178,7 @@ static void fw_cfg_reboot(FWCfgState *s)
+ {
+     const char *reboot_timeout =3D NULL;
+     int64_t rt_val =3D -1;
++    uint32_t rt_le32;
 =20
--#undef DEBUG
--
--//#define DEBUG
--
--#ifdef DEBUG
--    #undef PRINT_DEBUG
--    #define  PRINT_DEBUG(fmt, args...) \
--        do { \
--            fprintf(stderr, "  [%s:%d]   "fmt, __func__, __LINE__, ##arg=
-s); \
--        } while (0)
--#else
--    #define  PRINT_DEBUG(fmt, args...)  do {} while (0)
--#endif
--
- #define SMDK_LAN9118_BASE_ADDR      0x05000000
+     /* get user configuration */
+     QemuOptsList *plist =3D qemu_find_opts("boot-opts");
+@@ -194,7 +195,8 @@ static void fw_cfg_reboot(FWCfgState *s)
+         }
+     }
 =20
- typedef enum Exynos4BoardType {
-@@ -140,16 +126,6 @@ exynos4_boards_init_common(MachineState *machine,
-     exynos4_board_binfo.gic_cpu_if_addr =3D
-             EXYNOS4210_SMP_PRIVATE_BASE_ADDR + 0x100;
+-    fw_cfg_add_file(s, "etc/boot-fail-wait", g_memdup(&rt_val, 4), 4);
++    rt_le32 =3D cpu_to_le32(rt_val);
++    fw_cfg_add_file(s, "etc/boot-fail-wait", g_memdup(&rt_le32, 4), 4);
+ }
 =20
--    PRINT_DEBUG("\n ram_size: %luMiB [0x%08lx]\n"
--            " kernel_filename: %s\n"
--            " kernel_cmdline: %s\n"
--            " initrd_filename: %s\n",
--            exynos4_board_ram_size[board_type] / 1048576,
--            exynos4_board_ram_size[board_type],
--            machine->kernel_filename,
--            machine->kernel_cmdline,
--            machine->initrd_filename);
--
-     exynos4_boards_init_ram(s, get_system_memory(),
-                             exynos4_board_ram_size[board_type]);
-=20
+ static void fw_cfg_write(FWCfgState *s, uint8_t value)
 --=20
 2.20.1
 
