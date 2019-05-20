@@ -6,72 +6,73 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A13CBC04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F92AC04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:15:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76E202171F
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:12:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76E202171F
+	by mail.kernel.org (Postfix) with ESMTPS id 331372171F
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:15:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 331372171F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43334 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43361 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSrSb-0000CG-J8
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 19:12:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44862)
+	id 1hSrV1-0002Bv-CB
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 19:15:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hSrQe-00071q-8P
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:10:49 -0400
+	(envelope-from <mst@redhat.com>) id 1hSrQR-0006uN-6S
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:10:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hSrQd-0007yQ-1u
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:10:48 -0400
-Received: from mail-qk1-f173.google.com ([209.85.222.173]:42202)
+	(envelope-from <mst@redhat.com>) id 1hSrQQ-0007po-AN
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:10:35 -0400
+Received: from mail-qt1-f177.google.com ([209.85.160.177]:37105)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hSrQc-0007xJ-Te
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:10:46 -0400
-Received: by mail-qk1-f173.google.com with SMTP id d4so9897087qkc.9
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 16:10:45 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hSrQQ-0007pA-6D
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:10:34 -0400
+Received: by mail-qt1-f177.google.com with SMTP id o7so18383479qtp.4
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 16:10:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to;
-	bh=UziJRori9S+z3EUDEkru1+Hy2CIhR7bIJWpVumMrw3A=;
-	b=A96IyChsJpa207i0TX2eC8Z3PBTpqwPq86iFP0+Ob9ISHzjkzcyjryFXlV6/LJwle4
-	OqhFQJ7Nw3tzYlK1uhDt5CWqC4+Z6+HEDBHAXAE5Mfdspk/69HXDl6oShsLUIjP1f1cD
-	emGpVMHsjAyMJIkRtBCQsDhN1paxaOO2rCTZebLKa0GZU36blncrF7xybQRV2qYcVqyN
-	p1fVsfUKt1kGXpUwyPguU0/twwFH4wm/ycQjgjkypLH9vjnu/7zUbgPmZSDEGS7UaE/U
-	KVJqT93kZhsHunuF0YUsaHvoICyaO86C2qmYdKFVS85aK4YvRPTZuZd9U7GZskwVcIkI
-	BfLw==
-X-Gm-Message-State: APjAAAW40qnyByvHc6rBBwABcG8Q6fM9JKhf19+XUMCWXATFqJnzLmdY
-	Fhjr41QmCA1hV0U3goaEJSIuNGCGstg=
-X-Google-Smtp-Source: APXvYqz2rTBU9KNH3081hKqTG7bjmgyGNQiye0rfDSRKBkyfbUlQwmCWvmVPGFTb4urcI/qABbDFhA==
-X-Received: by 2002:a37:a5c6:: with SMTP id
-	o189mr60288869qke.318.1558393844859; 
-	Mon, 20 May 2019 16:10:44 -0700 (PDT)
+	:mime-version:content-disposition:content-transfer-encoding
+	:in-reply-to;
+	bh=D9bFlV1mFhqIN7vSvELu+0BvpSNRsw3rERLU4meV1WU=;
+	b=p5fPuhCxEaCw33eZsB46fDOOEbq+rUD/BrY7IsrgR7v/tb5XR2mK/vfuRTE7/rYBYM
+	IaPNorzK4pesqdsIo/sMxa5Z5w6af8R8BXDZ6Ey6zxV5vxOP3DoUGL0hpSMs7GgLZbVz
+	mpZwNC4k5wuA8e/nK6MxsfvWUayVsFPV90S4mkFbel3cR0rd9cmVJ4tlm9xdEw9au14Y
+	VsfKD0Y3ByzA8wI1Y2UJWvoNMZZ+S3Xruy0x28IJvbzRkaY3Tzlmr4p/8LDcVMCS/qEK
+	xS97YMlF/DbtxxBGt4pwNg38j8Xl9nej6UQg5Y0N2P3CyDBOy3ZA2kyIAfbEYJOJv+gX
+	VcyA==
+X-Gm-Message-State: APjAAAUDbukLXB0SIo3FI7emw1O4YXJpCH4YSZPf8KbINTtWVzJQAuuz
+	7E41X0b6PtBDTyMnfNubO+twSAzTajM=
+X-Google-Smtp-Source: APXvYqwLTzXjvTIxMKkBywnHPU76WHCDjgDUgWuvjOInlRjriorTyJcrSzye0bsxjdGJUNLg0CMtbg==
+X-Received: by 2002:aed:2428:: with SMTP id r37mr64395094qtc.213.1558393832561;
+	Mon, 20 May 2019 16:10:32 -0700 (PDT)
 Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
 	[173.76.105.71]) by smtp.gmail.com with ESMTPSA id
-	m8sm12396200qta.10.2019.05.20.16.10.43
+	c32sm5793908qtd.61.2019.05.20.16.10.31
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Mon, 20 May 2019 16:10:44 -0700 (PDT)
-Date: Mon, 20 May 2019 19:10:43 -0400
+	Mon, 20 May 2019 16:10:31 -0700 (PDT)
+Date: Mon, 20 May 2019 19:10:30 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <20190320112646.3712-6-xieyongji@baidu.com>
+Message-ID: <20190215103239.28640-3-berrange@redhat.com>
 References: <20190520231008.20140-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 In-Reply-To: <20190520231008.20140-1-mst@redhat.com>
 X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
 X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.222.173
-Subject: [Qemu-devel] [PULL v2 08/36] vhost-user-blk: Add return value for
- vhost_user_blk_start()
+X-Received-From: 209.85.160.177
+Subject: [Qemu-devel] [PULL v2 02/36] Revert "globals: Allow global
+ properties to be optional"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -83,72 +84,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
-	Zhang Yu <zhangyu31@baidu.com>, qemu-block@nongnu.org,
-	Max Reitz <mreitz@redhat.com>, Xie Yongji <xieyongji@baidu.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+	Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190520231043.b6LJhW9zdvsTAkn2FOYJUkzhE4a0L6CYHPKZ-zDhBkM@z>
+Message-ID: <20190520231030.C7uccTFANBkamcEcAUMLWDTMJGthAGyV2a8Xd_EZdKY@z>
 
-From: Xie Yongji <xieyongji@baidu.com>
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-Add a return value for vhost_user_blk_start() to check whether
-we start vhost-user backend successfully or not.
+This reverts commit d7741743f4f3d2683d1bb6938f88dc0167c21afa.
 
-Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
-Message-Id: <20190320112646.3712-6-xieyongji@baidu.com>
+Relying on setting properties on parents types which may not
+be relevant to certain sub-classes had unexpected side-effects
+causing bugs in device config defaults. It is preferrable to
+be explicit about which devices get which properties, even if
+this needs repetition.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-Id: <20190215103239.28640-3-berrange@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/block/vhost-user-blk.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ include/hw/qdev-core.h | 3 ---
+ qom/object.c           | 3 ---
+ 2 files changed, 6 deletions(-)
 
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index 39e1adc60a..6802c19d65 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -103,7 +103,7 @@ const VhostDevConfigOps blk_ops = {
-     .vhost_dev_config_notifier = vhost_user_blk_handle_config_change,
- };
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 33ed3b8dde..fa55dc10ae 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -251,8 +251,6 @@ struct PropertyInfo {
+ /**
+  * GlobalProperty:
+  * @used: Set to true if property was used when initializing a device.
+- * @optional: If set to true, GlobalProperty will be skipped without errors
+- *            if the property doesn't exist.
+  *
+  * An error is fatal for non-hotplugged devices, when the global is applied.
+  */
+@@ -261,7 +259,6 @@ typedef struct GlobalProperty {
+     const char *property;
+     const char *value;
+     bool used;
+-    bool optional;
+ } GlobalProperty;
  
--static void vhost_user_blk_start(VirtIODevice *vdev)
-+static int vhost_user_blk_start(VirtIODevice *vdev)
- {
-     VHostUserBlk *s = VHOST_USER_BLK(vdev);
-     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
-@@ -112,13 +112,13 @@ static void vhost_user_blk_start(VirtIODevice *vdev)
- 
-     if (!k->set_guest_notifiers) {
-         error_report("binding does not support guest notifiers");
--        return;
-+        return -ENOSYS;
-     }
- 
-     ret = vhost_dev_enable_notifiers(&s->dev, vdev);
-     if (ret < 0) {
-         error_report("Error enabling host notifiers: %d", -ret);
--        return;
-+        return ret;
-     }
- 
-     ret = k->set_guest_notifiers(qbus->parent, s->dev.nvqs, true);
-@@ -157,12 +157,13 @@ static void vhost_user_blk_start(VirtIODevice *vdev)
-         vhost_virtqueue_mask(&s->dev, vdev, i, false);
-     }
- 
--    return;
-+    return ret;
- 
- err_guest_notifiers:
-     k->set_guest_notifiers(qbus->parent, s->dev.nvqs, false);
- err_host_notifiers:
-     vhost_dev_disable_notifiers(&s->dev, vdev);
-+    return ret;
- }
- 
- static void vhost_user_blk_stop(VirtIODevice *vdev)
+ static inline void
+diff --git a/qom/object.c b/qom/object.c
+index d3412e7fdc..99c4fa707e 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -385,9 +385,6 @@ void object_apply_global_props(Object *obj, const GPtrArray *props, Error **errp
+         if (object_dynamic_cast(obj, p->driver) == NULL) {
+             continue;
+         }
+-        if (p->optional && !object_property_find(obj, p->property, NULL)) {
+-            continue;
+-        }
+         p->used = true;
+         object_property_parse(obj, p->value, p->property, &err);
+         if (err != NULL) {
 -- 
 MST
 
