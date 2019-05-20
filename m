@@ -2,64 +2,113 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D6AEC46470
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 09:13:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8052C04AAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 09:19:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA0D120675
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 09:13:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA0D120675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6C72720675
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 09:19:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C72720675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60536 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60597 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSeML-000487-1o
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 05:13:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54331)
+	id 1hSeRh-0005do-OX
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 05:19:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hSeLO-0003jZ-Go
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 05:12:32 -0400
+	(envelope-from <david@redhat.com>) id 1hSeQd-0005F3-Br
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 05:17:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hSeLN-0007nt-2w
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 05:12:30 -0400
-Received: from 10.mo3.mail-out.ovh.net ([87.98.165.232]:57772)
+	(envelope-from <david@redhat.com>) id 1hSeQc-0001Ye-Ct
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 05:17:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43100)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hSeLM-0007mg-Rl
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 05:12:29 -0400
-Received: from player697.ha.ovh.net (unknown [10.109.143.209])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 171DF213A75
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 11:12:25 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
-	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
-	by player697.ha.ovh.net (Postfix) with ESMTPSA id 61C7F5F49F5C;
-	Mon, 20 May 2019 09:12:21 +0000 (UTC)
-Date: Mon, 20 May 2019 11:12:20 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190520111220.2006bdac@bahia.lan>
-In-Reply-To: <20190520061432.GC27407@umbus.fritz.box>
-References: <20190517041823.23871-1-david@gibson.dropbear.id.au>
-	<20190517191430.7daa11be@bahia.lan>
-	<20190520061432.GC27407@umbus.fritz.box>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hSeQc-0001Uv-4K; Mon, 20 May 2019 05:17:54 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 39B903082AFF;
+	Mon, 20 May 2019 09:17:45 +0000 (UTC)
+Received: from [10.36.117.43] (ovpn-117-43.ams2.redhat.com [10.36.117.43])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 95C0F60CBC;
+	Mon, 20 May 2019 09:17:41 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190515203112.506-1-david@redhat.com>
+	<20190515203112.506-3-david@redhat.com>
+	<fcce920c-58e3-60ef-ebc0-bcbc2e651e87@linaro.org>
+	<de30b861-b2ca-c83e-9058-1286047ab3d7@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <066763ac-43c8-dea7-2762-c596bfc7c465@redhat.com>
+Date: Mon, 20 May 2019 11:17:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/PEC=DXMtw90ggf8LYf04mMe";
-	protocol="application/pgp-signature"
-X-Ovh-Tracer-Id: 8032451411610343910
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddtkedgudefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+In-Reply-To: <de30b861-b2ca-c83e-9058-1286047ab3d7@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Mon, 20 May 2019 09:17:45 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 87.98.165.232
-Subject: Re: [Qemu-devel] [PATCH] spapr: Add forgotten capability to
- migration stream
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v1 2/5] s390x/tcg: Implement VECTOR FIND
+ ELEMENT EQUAL
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,230 +120,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/PEC=DXMtw90ggf8LYf04mMe
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, 20 May 2019 16:14:32 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Fri, May 17, 2019 at 07:14:30PM +0200, Greg Kurz wrote:
-> > On Fri, 17 May 2019 14:18:23 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >  =20
-> > > spapr machine capabilities are supposed to be sent in the migration s=
-tream
-> > > so that we can sanity check the source and destination have compatible
-> > > configuration.  Unfortunately, when we added the hpt-max-page-size
-> > > capability, we forgot to add it to the migration state.  This means t=
-hat we
-> > > can generate spurious warnings when both ends are configured for large
-> > > pages, or potentially fail to warn if the source is configured for hu=
-ge
-> > > pages, but the destination is not.
-> > >=20
-> > > Fixes: 2309832afda "spapr: Maximum (HPT) pagesize property"
-> > >  =20
-> >=20
-> > Sorry I didn't spot that during review :-\
-> >  =20
-> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > --- =20
-> >=20
-> > This breaks backward migration if the cap is set to a non-default
-> > value, since older QEMUs don't expect the "spapr/cap/hpt_maxpagesize"
-> > subsection. =20
->=20
-> Ah, crud, that's a serious pain.
->=20
-> > This being said, I'm not sure any other value but the current default (=
-16)
-> > actually works, so maybe we don't care. If so, =20
->=20
-> Alas, it really does work with value 24 (giving you POWER8 16MiB
-
-My bad... you're right :)
-
-> pages).  And migration even works as long as it's 24 at both ends,
-> although it emits a bogus warning.
->=20
-
-Yeah I saw that... no big deal I guess. BTW, since dst >=3D src is legal,
-do we really need to keep this warning around for future releases ?
-
-> > Reviewed-by: Greg Kurz <groug@kaod.org>
-> >=20
-> > Otherwise, I was thinking about something like this: =20
->=20
-> Yeah, I think something like the below is the best we can do.
->=20
-> > 8<=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
-> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index 9fc91c8f5eac..4f5becf1f3cc 100644
-> > --- a/include/hw/ppc/spapr.h
-> > +++ b/include/hw/ppc/spapr.h
-> > @@ -119,6 +119,7 @@ struct SpaprMachineClass {
-> >      bool pre_2_10_has_unused_icps;
-> >      bool legacy_irq_allocation;
-> >      bool broken_host_serial_model; /* present real host info to the gu=
-est */
-> > +    bool pre_4_1_migration; /* don't migrate hpt-max-page-size */
-> > =20
-> >      void (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
-> >                            uint64_t *buid, hwaddr *pio,=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index bcae30ad26c3..c8b3cccd5375 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -4413,8 +4413,12 @@ DEFINE_SPAPR_MACHINE(4_1, "4.1", true);
-> >   */
-> >  static void spapr_machine_4_0_class_options(MachineClass *mc)
-> >  {
-> > +    SpaprMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-> > +
-> >      spapr_machine_4_1_class_options(mc);
-> >      compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_le=
-n);
-> > +
-> > +    smc->pre_4_1_migration =3D true;
-> >  }
-> > =20
-> >  DEFINE_SPAPR_MACHINE(4_0, "4.0", false);
-> > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> > index 658eb15a147b..8a77bbdcf322 100644
-> > --- a/hw/ppc/spapr_caps.c
-> > +++ b/hw/ppc/spapr_caps.c
-> > @@ -64,6 +64,7 @@ typedef struct SpaprCapabilityInfo {
-> >      void (*apply)(SpaprMachineState *spapr, uint8_t val, Error **errp);
-> >      void (*cpu_apply)(SpaprMachineState *spapr, PowerPCCPU *cpu,
-> >                        uint8_t val, Error **errp);
-> > +    bool (*migrate_needed)(void *opaque);
-> >  } SpaprCapabilityInfo;
-> > =20
-> >  static void spapr_cap_get_bool(Object *obj, Visitor *v, const char *na=
-me,
-> > @@ -350,6 +351,11 @@ static void cap_hpt_maxpagesize_apply(SpaprMachine=
-State *spapr,
-> >      spapr_check_pagesize(spapr, qemu_minrampagesize(), errp);
-> >  }
-> > =20
-> > +static bool cap_hpt_maxpagesize_migrate_needed(void *opaque)
-> > +{
-> > +    return SPAPR_MACHINE_CLASS(opaque)->pre_4_1_migration;
-
-And, of course, this should rather be:
-
-    return !SPAPR_MACHINE_GET_CLASS(opaque)->pre_4_1_migration;
-
-> > +}
-> > +
-> >  static bool spapr_pagesize_cb(void *opaque, uint32_t seg_pshift,
-> >                                uint32_t pshift)
-> >  {
-> > @@ -542,6 +548,7 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM]=
- =3D {
-> >          .type =3D "int",
-> >          .apply =3D cap_hpt_maxpagesize_apply,
-> >          .cpu_apply =3D cap_hpt_maxpagesize_cpu_apply,
-> > +        .migrate_needed =3D cap_hpt_maxpagesize_migrate_needed,
-> >      },
-> >      [SPAPR_CAP_NESTED_KVM_HV] =3D {
-> >          .name =3D "nested-hv",
-> > @@ -679,8 +686,11 @@ int spapr_caps_post_migration(SpaprMachineState *s=
-papr)
-> >  static bool spapr_cap_##sname##_needed(void *opaque)    \
-> >  {                                                       \
-> >      SpaprMachineState *spapr =3D opaque;                  \
-> > +    bool (*needed)(void *opaque) =3D                      \
-> > +        capability_table[cap].migrate_needed;           \
-> >                                                          \
-> > -    return spapr->cmd_line_caps[cap] &&                 \
-> > +    return needed ? needed(opaque) : true &&            \
-> > +           spapr->cmd_line_caps[cap] &&                 \
-> >             (spapr->eff.caps[cap] !=3D                     \
-> >              spapr->def.caps[cap]);                      \
-> >  }                                                       \
-> > 8<=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-> >=20
-> >  =20
-> > >  hw/ppc/spapr.c         | 1 +
-> > >  hw/ppc/spapr_caps.c    | 1 +
-> > >  include/hw/ppc/spapr.h | 1 +
-> > >  3 files changed, 3 insertions(+)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index 8580a8dc67..bcae30ad26 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -2125,6 +2125,7 @@ static const VMStateDescription vmstate_spapr =
-=3D {
-> > >          &vmstate_spapr_cap_cfpc,
-> > >          &vmstate_spapr_cap_sbbc,
-> > >          &vmstate_spapr_cap_ibs,
-> > > +        &vmstate_spapr_cap_hpt_maxpagesize,
-> > >          &vmstate_spapr_irq_map,
-> > >          &vmstate_spapr_cap_nested_kvm_hv,
-> > >          &vmstate_spapr_dtb,
-> > > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> > > index 9b1c10baa6..658eb15a14 100644
-> > > --- a/hw/ppc/spapr_caps.c
-> > > +++ b/hw/ppc/spapr_caps.c
-> > > @@ -703,6 +703,7 @@ SPAPR_CAP_MIG_STATE(dfp, SPAPR_CAP_DFP);
-> > >  SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
-> > >  SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
-> > >  SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
-> > > +SPAPR_CAP_MIG_STATE(hpt_maxpagesize, SPAPR_CAP_HPT_MAXPAGESIZE);
-> > >  SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
-> > >  SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
-> > >  SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
-> > > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > > index 7e32f309c2..9fc91c8f5e 100644
-> > > --- a/include/hw/ppc/spapr.h
-> > > +++ b/include/hw/ppc/spapr.h
-> > > @@ -849,6 +849,7 @@ extern const VMStateDescription vmstate_spapr_cap=
-_dfp;
-> > >  extern const VMStateDescription vmstate_spapr_cap_cfpc;
-> > >  extern const VMStateDescription vmstate_spapr_cap_sbbc;
-> > >  extern const VMStateDescription vmstate_spapr_cap_ibs;
-> > > +extern const VMStateDescription vmstate_spapr_cap_hpt_maxpagesize;
-> > >  extern const VMStateDescription vmstate_spapr_cap_nested_kvm_hv;
-> > >  extern const VMStateDescription vmstate_spapr_cap_large_decr;
-> > >  extern const VMStateDescription vmstate_spapr_cap_ccf_assist; =20
-> >  =20
->=20
+On 17.05.19 19:42, Richard Henderson wrote:
+> On 5/17/19 9:47 AM, Richard Henderson wrote:
+>>     first_equal = n;
+>>     first_zero = n;
+>>     for (i = n - 1; i >= 0; --i) {
+>>         if (data1 == data2) {
+>>             first_equal = i;
+>>         }
+>>         if (data1 == 0) {
+>>             first_zero = i;
+>>         }
+>>     }
+>>
+>> // As an aside, there are bit tricks for the above,
+>> // but let's stay simple(r) for now.
+> 
+> What the hell, it's not /that/ tricky.
+> 
+> 
+> /*
+>  * Returns a bit set in the MSB of each element that is zero,
+>  * as defined by the mask M.
+>  */
+> static inline uint64_t zero_search(uint64_t a, uint64_t m)
+> {
+>     return ~(((a & m) + m) | a | m);
+> }
+> 
+> /*
+>  * Returns the byte offset for the first match, or 16 for no match.
+>  */
+> static inline int match_index(uint64_t c0, uint64_t c1)
+> {
+>     return (c0 ? clz64(c0) : clz64(c1) + 64) >> 3;
+> }
+> 
+> Use
+> 
+>   dup_const(MO_8, 0x7f)
+>   dup_const(MO_16, 0x7fff)
+>   dup_const(MO_32, 0x7fffffff)
+> 
+> for the M parameter for the different element sizes.
+> 
+>     uint64_t a0, a1, b0, b1, e0, e1, z0, z1;
+> 
+>     a0 = s390_vec_read_element64(v2, 0);
+>     a1 = s390_vec_read_element64(v2, 1);
+>     b0 = s390_vec_read_element64(v3, 0);
+>     b1 = s390_vec_read_element64(v3, 1);
+>     e0 = zero_search(a0 ^ b0, m);
+>     e1 = zero_search(a1 ^ b1, m);
+>     first_equal = match_index(e0, e1);
+> 
+>     if (zs) {
+>         z0 = zero_search(a0, m);
+>         z1 = zero_search(a1, m);
+>         first_zero = match_index(z0, z1);
+>     ...
+> 
+> 
+> r~
+> 
 
 
---Sig_/PEC=DXMtw90ggf8LYf04mMe
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Crazy stuff, seems to work (not that I am surprised :D )
 
------BEGIN PGP SIGNATURE-----
+I now have:
 
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlzib3QACgkQcdTV5YIv
-c9bt/g//YWl246trvn1mUFBGGNLop146twIq2MuT9xNFOL9psoJQD520AurFq/30
-msGuhG2LqUtVjaizhGoMYUSZ0PL6lF1EN+MwVLXblxBHW92Rxz6FUecpxFlTMmYG
-kJKTRQslY8k/Et5hEVujBlKvaL/cdflSDmTjcMwJ1Po/xzsmXYmYJtTqtWPH1IXi
-wa8Ozu6cHm0gavWyvL9Jq1VGI76nlvpVWz0xsMkDvt0g1gS7y7lC1KzpCQFz9XHR
-Z7drSRiu35EMWqLYwUCXK/hZLrqIjieodJhFAORzWljHQRmLUbkS4LvvwQQ9fn2h
-+IXs/tz5Lw9qodoiOsOR/prXGCEjUplz0s4vLHJi7kaVsXatPK1jNBT1clRZimQY
-89/gJ4K8/4PIQImCtvcaF5CD8NW3q+XC8LsFS4uMPPehnRT/ywp/TUyjsac8hhyv
-R1p+Csz3CM0tFNW2KL6XqLQsHEpn2AKi6sQSZZ9JLWNDS4yTMOOC7O4XTt6XwYE9
-fnDHl3l4GiPysHACWP5bEfRWU9sF+ODcq6RobL0VkeEoZN5usVD1Ci0GPmH+Ofwr
-nE9nY2FmCV0QHUp1rmanoMomo4eeFPCH0Bb6LQ53snuDfzKS2OhqxE/at1oym/vm
-vOQ+Xx6mBSnn5vCWgRDpRMoiptqRQCiVtR0wn0LqbcMaATA1DTA=
-=/4cp
------END PGP SIGNATURE-----
++static int vfee(void *v1, const void *v2, const void *v3, bool zs,
+uint8_t es)
++{
++    const uint64_t mask = dup_const(es, -1ull >> (65 - (1 << es) * 8));
++    uint64_t a0, a1, b0, b1, e0, e1, z0, z1;
++    uint64_t first_zero = 16;
++    uint64_t first_equal;
++
++    a0 = s390_vec_read_element64(v2, 0);
++    a1 = s390_vec_read_element64(v2, 1);
++    b0 = s390_vec_read_element64(v3, 0);
++    b1 = s390_vec_read_element64(v3, 1);
++    e0 = zero_search(a0 ^ b0, mask);
++    e1 = zero_search(a1 ^ b1, mask);
++    first_equal = match_index(e0, e1);
++
++    if (zs) {
++        z0 = zero_search(a0, mask);
++        z1 = zero_search(a1, mask);
++        first_zero = match_index(z0, z1);
++    }
++
++    /* zero out the destination vector */
++    s390_vec_write_element64(v1, 0, 0);
++    s390_vec_write_element64(v1, 1, 0);
++
++    if (first_zero == 16 && first_equal == 16) {
++        s390_vec_write_element8(v1, 7, 16);
++        return 3; /* no match */
++    } else if (first_zero == 16) {
++        s390_vec_write_element8(v1, 7, first_equal);
++        return 1; /* matching elements, no match for zero */
++    } else if (first_equal < first_zero) {
++        s390_vec_write_element8(v1, 7, first_equal);
++        return 2; /* matching elements before match for zero */
++    }
++    s390_vec_write_element8(v1, 7, first_zero);
++    return 0; /* match for zero */
++}
 
---Sig_/PEC=DXMtw90ggf8LYf04mMe--
+
+-- 
+
+Thanks,
+
+David / dhildenb
 
