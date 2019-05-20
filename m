@@ -3,61 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E47C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:21:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F3DC04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:21:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC229214DA
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:21:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC229214DA
+	by mail.kernel.org (Postfix) with ESMTPS id 7DDD5214DA
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:21:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DDD5214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38088 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38090 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSl25-0004Ch-3a
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 12:21:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38422)
+	id 1hSl27-0004FY-Ob
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 12:21:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hSkwq-0008EE-Jn
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:15:37 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hSkws-0008Go-BH
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:15:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hSkwp-0003Y8-LC
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:15:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34788)
+	(envelope-from <kwolf@redhat.com>) id 1hSkwq-0003ZY-Vt
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:15:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51642)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hSkwm-0003LT-Jn; Mon, 20 May 2019 12:15:32 -0400
+	id 1hSkwm-0003Q3-LI; Mon, 20 May 2019 12:15:32 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ED5503092651;
-	Mon, 20 May 2019 16:15:11 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 637798CB40;
+	Mon, 20 May 2019 16:15:16 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-117-208.ams2.redhat.com
 	[10.36.117.208])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0E68A601A0;
-	Mon, 20 May 2019 16:15:09 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 77C39189B6;
+	Mon, 20 May 2019 16:15:14 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon, 20 May 2019 18:14:34 +0200
-Message-Id: <20190520161453.30723-6-kwolf@redhat.com>
+Date: Mon, 20 May 2019 18:14:36 +0200
+Message-Id: <20190520161453.30723-8-kwolf@redhat.com>
 In-Reply-To: <20190520161453.30723-1-kwolf@redhat.com>
 References: <20190520161453.30723-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Mon, 20 May 2019 16:15:11 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.26]);
+	Mon, 20 May 2019 16:15:19 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 05/24] iotest: fix 169: do not run qmp_cont in
- RUN_STATE_FINISH_MIGRATE
+Subject: [Qemu-devel] [PULL 07/24] block: Add bdrv_try_set_aio_context()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,44 +73,203 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Eventually, we want to make sure that all parents and all children of a
+node are in the same AioContext as the node itself. This means that
+changing the AioContext may fail because one of the other involved
+parties (e.g. a guest device that was configured with an iothread)
+cannot allow switching to a different AioContext.
 
-qmp_cont fails if vm in RUN_STATE_FINISH_MIGRATE, so let's wait for
-final RUN_STATE_POSTMIGRATE. Also, while being here, check qmp_cont
-result.
+Introduce a set of functions that allow to first check whether all
+involved nodes can switch to a new context and only then do the actual
+switch. The check recursively covers children and parents.
 
-Reported-by: Max Reitz <mreitz@redhat.com>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Tested-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/169 | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ include/block/block.h     |  8 ++++
+ include/block/block_int.h |  3 ++
+ block.c                   | 92 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 103 insertions(+)
 
-diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
-index 527aebd0cb..7e06cc1145 100755
---- a/tests/qemu-iotests/169
-+++ b/tests/qemu-iotests/169
-@@ -102,12 +102,17 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase)=
-:
-             event =3D self.vm_a.event_wait('MIGRATION')
-             if event['data']['status'] =3D=3D 'completed':
-                 break
-+        while True:
-+            result =3D self.vm_a.qmp('query-status')
-+            if (result['return']['status'] =3D=3D 'postmigrate'):
-+                break
+diff --git a/include/block/block.h b/include/block/block.h
+index 5e2b98b0ee..fc0239a887 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -586,6 +586,14 @@ void bdrv_coroutine_enter(BlockDriverState *bs, Coro=
+utine *co);
+  * This function must be called with iothread lock held.
+  */
+ void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)=
+;
++int bdrv_try_set_aio_context(BlockDriverState *bs, AioContext *ctx,
++                             Error **errp);
++int bdrv_child_try_set_aio_context(BlockDriverState *bs, AioContext *ctx=
+,
++                                   BdrvChild *ignore_child, Error **errp=
+);
++bool bdrv_child_can_set_aio_context(BdrvChild *c, AioContext *ctx,
++                                    GSList **ignore, Error **errp);
++bool bdrv_can_set_aio_context(BlockDriverState *bs, AioContext *ctx,
++                              GSList **ignore, Error **errp);
+ int bdrv_probe_blocksizes(BlockDriverState *bs, BlockSizes *bsz);
+ int bdrv_probe_geometry(BlockDriverState *bs, HDGeometry *geo);
 =20
-         # test that bitmap is still here
-         removed =3D (not migrate_bitmaps) and persistent
-         self.check_bitmap(self.vm_a, False if removed else sha256)
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 94d45c9708..b150c5f047 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -691,6 +691,9 @@ struct BdrvChildRole {
+      * can update its reference. */
+     int (*update_filename)(BdrvChild *child, BlockDriverState *new_base,
+                            const char *filename, Error **errp);
++
++    bool (*can_set_aio_ctx)(BdrvChild *child, AioContext *ctx,
++                            GSList **ignore, Error **errp);
+ };
 =20
--        self.vm_a.qmp('cont')
-+        result =3D self.vm_a.qmp('cont')
-+        self.assert_qmp(result, 'return', {})
+ extern const BdrvChildRole child_file;
+diff --git a/block.c b/block.c
+index 6999aad446..8ff6ab1152 100644
+--- a/block.c
++++ b/block.c
+@@ -936,6 +936,13 @@ static int bdrv_child_cb_inactivate(BdrvChild *child=
+)
+     return 0;
+ }
 =20
-         # test that bitmap is still here after invalidation
-         self.check_bitmap(self.vm_a, sha256)
++static bool bdrv_child_cb_can_set_aio_ctx(BdrvChild *child, AioContext *=
+ctx,
++                                          GSList **ignore, Error **errp)
++{
++    BlockDriverState *bs =3D child->opaque;
++    return bdrv_can_set_aio_context(bs, ctx, ignore, errp);
++}
++
+ /*
+  * Returns the options and flags that a temporary snapshot should get, b=
+ased on
+  * the originally requested flags (the originally requested image will h=
+ave
+@@ -1003,6 +1010,7 @@ const BdrvChildRole child_file =3D {
+     .attach          =3D bdrv_child_cb_attach,
+     .detach          =3D bdrv_child_cb_detach,
+     .inactivate      =3D bdrv_child_cb_inactivate,
++    .can_set_aio_ctx =3D bdrv_child_cb_can_set_aio_ctx,
+ };
+=20
+ /*
+@@ -1029,6 +1037,7 @@ const BdrvChildRole child_format =3D {
+     .attach          =3D bdrv_child_cb_attach,
+     .detach          =3D bdrv_child_cb_detach,
+     .inactivate      =3D bdrv_child_cb_inactivate,
++    .can_set_aio_ctx =3D bdrv_child_cb_can_set_aio_ctx,
+ };
+=20
+ static void bdrv_backing_attach(BdrvChild *c)
+@@ -1152,6 +1161,7 @@ const BdrvChildRole child_backing =3D {
+     .drained_end     =3D bdrv_child_cb_drained_end,
+     .inactivate      =3D bdrv_child_cb_inactivate,
+     .update_filename =3D bdrv_backing_update_filename,
++    .can_set_aio_ctx =3D bdrv_child_cb_can_set_aio_ctx,
+ };
+=20
+ static int bdrv_open_flags(BlockDriverState *bs, int flags)
+@@ -5750,6 +5760,88 @@ void bdrv_set_aio_context(BlockDriverState *bs, Ai=
+oContext *new_context)
+     aio_context_release(new_context);
+ }
+=20
++static bool bdrv_parent_can_set_aio_context(BdrvChild *c, AioContext *ct=
+x,
++                                            GSList **ignore, Error **err=
+p)
++{
++    if (g_slist_find(*ignore, c)) {
++        return true;
++    }
++    *ignore =3D g_slist_prepend(*ignore, c);
++
++    /* A BdrvChildRole that doesn't handle AioContext changes cannot
++     * tolerate any AioContext changes */
++    if (!c->role->can_set_aio_ctx) {
++        char *user =3D bdrv_child_user_desc(c);
++        error_setg(errp, "Changing iothreads is not supported by %s", us=
+er);
++        g_free(user);
++        return false;
++    }
++    if (!c->role->can_set_aio_ctx(c, ctx, ignore, errp)) {
++        assert(!errp || *errp);
++        return false;
++    }
++    return true;
++}
++
++bool bdrv_child_can_set_aio_context(BdrvChild *c, AioContext *ctx,
++                                    GSList **ignore, Error **errp)
++{
++    if (g_slist_find(*ignore, c)) {
++        return true;
++    }
++    *ignore =3D g_slist_prepend(*ignore, c);
++    return bdrv_can_set_aio_context(c->bs, ctx, ignore, errp);
++}
++
++/* @ignore will accumulate all visited BdrvChild object. The caller is
++ * responsible for freeing the list afterwards. */
++bool bdrv_can_set_aio_context(BlockDriverState *bs, AioContext *ctx,
++                              GSList **ignore, Error **errp)
++{
++    BdrvChild *c;
++
++    if (bdrv_get_aio_context(bs) =3D=3D ctx) {
++        return true;
++    }
++
++    QLIST_FOREACH(c, &bs->parents, next_parent) {
++        if (!bdrv_parent_can_set_aio_context(c, ctx, ignore, errp)) {
++            return false;
++        }
++    }
++    QLIST_FOREACH(c, &bs->children, next) {
++        if (!bdrv_child_can_set_aio_context(c, ctx, ignore, errp)) {
++            return false;
++        }
++    }
++
++    return true;
++}
++
++int bdrv_child_try_set_aio_context(BlockDriverState *bs, AioContext *ctx=
+,
++                                   BdrvChild *ignore_child, Error **errp=
+)
++{
++    GSList *ignore;
++    bool ret;
++
++    ignore =3D ignore_child ? g_slist_prepend(NULL, ignore_child) : NULL=
+;
++    ret =3D bdrv_can_set_aio_context(bs, ctx, &ignore, errp);
++    g_slist_free(ignore);
++
++    if (!ret) {
++        return -EPERM;
++    }
++
++    bdrv_set_aio_context(bs, ctx);
++    return 0;
++}
++
++int bdrv_try_set_aio_context(BlockDriverState *bs, AioContext *ctx,
++                             Error **errp)
++{
++    return bdrv_child_try_set_aio_context(bs, ctx, NULL, errp);
++}
++
+ void bdrv_add_aio_context_notifier(BlockDriverState *bs,
+         void (*attached_aio_context)(AioContext *new_context, void *opaq=
+ue),
+         void (*detach_aio_context)(void *opaque), void *opaque)
 --=20
 2.20.1
 
