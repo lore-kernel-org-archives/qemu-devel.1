@@ -2,92 +2,65 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A12FC04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:47:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BECCBC04E87
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:48:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4C21214DA
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:47:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4C21214DA
+	by mail.kernel.org (Postfix) with ESMTPS id 9203121743
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:48:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9203121743
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38530 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38544 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSlRI-0001hb-GM
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 12:47:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48350)
+	id 1hSlT0-0002tM-0A
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 12:48:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hSlPQ-0000F5-7a
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:45:09 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hSlIY-00020m-Lf
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:38:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hSlPO-0001FT-NW
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:45:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50370)
+	(envelope-from <dgilbert@redhat.com>) id 1hSlIX-0005sk-Gg
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:38:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54950)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hSlPK-0001DY-Vl; Mon, 20 May 2019 12:45:03 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hSlIX-0005sF-7w
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:38:01 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E13867EBDC;
-	Mon, 20 May 2019 16:45:01 +0000 (UTC)
-Received: from [10.3.116.56] (ovpn-116-56.phx2.redhat.com [10.3.116.56])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3373C17CD3;
-	Mon, 20 May 2019 16:45:01 +0000 (UTC)
-To: Klaus Birkelund Jensen <klaus@birkelund.eu>, qemu-block@nongnu.org
-References: <20190517084234.26923-1-klaus@birkelund.eu>
-	<20190517084234.26923-9-klaus@birkelund.eu>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <f94686a4-b402-36c6-8070-185c0416b303@redhat.com>
-Date: Mon, 20 May 2019 11:45:00 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 97BE1F74A0
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 16:38:00 +0000 (UTC)
+Received: from work-vm (ovpn-116-127.ams2.redhat.com [10.36.116.127])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6A8A858821;
+	Mon, 20 May 2019 16:37:59 +0000 (UTC)
+Date: Mon, 20 May 2019 17:37:57 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <20190520163756.GI2726@work-vm>
+References: <20190520030839.6795-1-peterx@redhat.com>
+	<20190520030839.6795-14-peterx@redhat.com>
+	<5d9174bc-0f3b-100f-e400-eeb94680020a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190517084234.26923-9-klaus@birkelund.eu>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="6iX2ARR7hZ2FehcUGWzivgn28DXPqxRKK"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5d9174bc-0f3b-100f-e400-eeb94680020a@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Mon, 20 May 2019 16:45:01 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.38]);
+	Mon, 20 May 2019 16:38:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 8/8] nvme: add an OpenChannel 2.0 NVMe
- device (ocssd)
+Subject: Re: [Qemu-devel] [PATCH v2 13/15] qmp: Expose
+ manual_dirty_log_protect via "query-kvm"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,240 +72,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>,
-	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org,
+	Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6iX2ARR7hZ2FehcUGWzivgn28DXPqxRKK
-From: Eric Blake <eblake@redhat.com>
-To: Klaus Birkelund Jensen <klaus@birkelund.eu>, qemu-block@nongnu.org
-Cc: Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <f94686a4-b402-36c6-8070-185c0416b303@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 8/8] nvme: add an OpenChannel 2.0 NVMe device
- (ocssd)
-References: <20190517084234.26923-1-klaus@birkelund.eu>
- <20190517084234.26923-9-klaus@birkelund.eu>
-In-Reply-To: <20190517084234.26923-9-klaus@birkelund.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> On 20/05/19 05:08, Peter Xu wrote:
+> > Expose the new capability via "query-kvm" QMP command too so we know
+> > whether that's turned on on the source VM when we want.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> 
+> Is this useful?  We could I guess make a migration capability in order
+> to benchmark with the old code, but otherwise I would just make this a
+> "hidden" optimization just like many others (same for patch 14).
+> 
+> In other words, there are many other capabilities that we could inform
+> the user about, I don't see what makes manual_dirty_log_protect special.
 
-On 5/17/19 3:42 AM, Klaus Birkelund Jensen wrote:
-> This adds a new 'ocssd' block device that emulates an OpenChannel 2.0
-> device. The device is backed by a new 'ocssd' block backend that is
-> based on the raw format driver but includes a header that holds the
-> device geometry and write data requirements. This new block backend is
-> special in that the size is not specified explicitly but in terms of
-> sector size, number of chunks, number of parallel units, etc. This
-> called for the addition of the `no_size_required` field in `struct
-> BlockDriver` to not fail image creation when the size parameter is
-> missing.
->=20
-> The ocssd device is an individual device but shares a lot of code with
-> the nvme device. Thus, some core functionality of nvme/nvme.c has been
-> exported for use by nvme/ocssd.c.
->=20
-> Thank you to the following people for their contributions to the
-> original qemu-nvme (github.com/OpenChannelSSD/qemu-nvme) implementation=
-=2E
->=20
->   Matias Bj=C3=B8rling <mb@lightnvm.io>
->   Javier Gonz=C3=A1lez <javier@javigon.com>
->   Simon Andreas Frimann Lund <ocssd@safl.dk>
->   Hans Holmberg <hans@owltronix.com>
->   Jesper Devantier <contact@pseudonymous.me>
->   Young Tack Jin <youngtack.jin@circuitblvd.com>
->=20
-> Signed-off-by: Klaus Birkelund Jensen <klaus.jensen@cnexlabs.com>
-> ---
->  MAINTAINERS                     |   14 +-
->  Makefile.objs                   |    1 +
->  block.c                         |    2 +-
->  block/Makefile.objs             |    2 +-
->  block/nvme.c                    |    2 +-
->  block/ocssd.c                   |  690 ++++++++
->  hw/block/Makefile.objs          |    2 +-
->  hw/block/{ =3D> nvme}/nvme.c      |  192 ++-
->  hw/block/nvme/ocssd.c           | 2647 +++++++++++++++++++++++++++++++=
+Yes agreed, if your kernel has it then just use it.
 
->  hw/block/nvme/ocssd.h           |  140 ++
->  hw/block/nvme/trace-events      |  136 ++
->  hw/block/trace-events           |  109 --
->  include/block/block_int.h       |    3 +
->  include/block/nvme.h            |   12 +-
->  include/block/ocssd.h           |  231 +++
->  {hw =3D> include/hw}/block/nvme.h |   61 +
->  include/hw/pci/pci_ids.h        |    2 +
->  qapi/block-core.json            |   47 +-
->  18 files changed, 4121 insertions(+), 172 deletions(-)
->  create mode 100644 block/ocssd.c
->  rename hw/block/{ =3D> nvme}/nvme.c (94%)
->  create mode 100644 hw/block/nvme/ocssd.c
->  create mode 100644 hw/block/nvme/ocssd.h
->  create mode 100644 hw/block/nvme/trace-events
->  create mode 100644 include/block/ocssd.h
->  rename {hw =3D> include/hw}/block/nvme.h (63%)
+Dave
 
-Feels big; are you sure this can't be split into smaller pieces to ease
-review?
-
-I'm focusing just on the qapi portions:
-
-
-> +++ b/qapi/block-core.json
-> @@ -113,6 +113,44 @@
->        'extents': ['ImageInfo']
->    } }
-> =20
-> +##
-> +# @ImageInfoSpecificOcssd:
-> +#
-> +# @num-ns: number of namespaces
-> +#
-> +# @namespaces: List of namespsaces
-
-Inconsistent on whether you start with lower or upper case.
-
-> +#
-> +# Since: 4.1
-> +##
-> +{ 'struct': 'ImageInfoSpecificOcssd',
-> +  'data': {
-> +      'num-ns': 'int',
-> +      'sector-size': 'int',
-> +      'metadata-size': 'int',
-> +      'namespaces': ['ImageInfoSpecificOcssdNS']
-
-Is num-ns redundant information (that is, if I count the length of the
-array in namespaces, I don't need num-ns)?
-
-You failed to document sector-size and metadata-size.
-
-> +  } }
-> +
-> +##
-> +# @ImageInfoSpecificOcssdNS:
-> +#
-> +# @num-grp: number of groups
-> +#
-> +# @num-pu: number of parallel units per group
-> +#
-> +# @num-chk: number of chunks per parallel unit
-> +#
-> +# @num-sec: number of sectors per chunk
-
-Why the abbreviation? Machines don't care if they have to pass something
-slightly longer, and if it makes the job easier for the human reading
-the machine traces, then spelling things out (such as 'num-groups'),
-then abbreviation didn't buy us anything useful.
-
-> +#
-> +# Since: 3.1
-
-You missed 3.1 by a long shot. The next release is 4.1.
-
-> +##
-> +{ 'struct': 'ImageInfoSpecificOcssdNS',
-> +  'data': {
-> +      'num-grp': 'int',
-> +      'num-pu': 'int',
-> +      'num-chk': 'int',
-> +      'num-sec': 'int'
-> +  } }
-> +
->  ##
->  # @ImageInfoSpecific:
->  #
-> @@ -124,6 +162,7 @@
->    'data': {
->        'qcow2': 'ImageInfoSpecificQCow2',
->        'vmdk': 'ImageInfoSpecificVmdk',
-> +      'ocssd': 'ImageInfoSpecificOcssd',
-
-Perhaps missing a doc comment that ocssd is new to 4.1; although it may
-be implied by the documentation adding 'occsd' to the list of overall
-block types elsewhere....
-
->        # If we need to add block driver specific parameters for
->        # LUKS in future, then we'll subclass QCryptoBlockInfoLUKS
->        # to define a ImageInfoSpecificLUKS
-> @@ -282,7 +321,7 @@
->  # @drv: the name of the block format used to open the backing device. =
-As of
->  #       0.14.0 this can be: 'blkdebug', 'bochs', 'cloop', 'cow', 'dmg'=
-,
->  #       'file', 'file', 'ftp', 'ftps', 'host_cdrom', 'host_device',
-> -#       'http', 'https', 'luks', 'nbd', 'parallels', 'qcow',
-> +#       'http', 'https', 'luks', 'nbd', 'ocssd', 'parallels', 'qcow',
->  #       'qcow2', 'raw', 'vdi', 'vmdk', 'vpc', 'vvfat'
->  #       2.2: 'archipelago' added, 'cow' dropped
->  #       2.3: 'host_floppy' deprecated
-> @@ -290,6 +329,7 @@
->  #       2.6: 'luks' added
->  #       2.8: 'replication' added, 'tftp' dropped
->  #       2.9: 'archipelago' dropped
-> +#       4.1: 'ocssd' added
-
-=2E..here
-
->  #
->  # @backing_file: the name of the backing file (for copy-on-write)
->  #
-> @@ -2815,8 +2855,8 @@
->    'data': [ 'blkdebug', 'blklogwrites', 'blkverify', 'bochs', 'cloop',=
-
->              'copy-on-read', 'dmg', 'file', 'ftp', 'ftps', 'gluster',
->              'host_cdrom', 'host_device', 'http', 'https', 'iscsi', 'lu=
-ks',
-> -            'nbd', 'nfs', 'null-aio', 'null-co', 'nvme', 'parallels', =
-'qcow',
-> -            'qcow2', 'qed', 'quorum', 'raw', 'rbd',
-> +            'nbd', 'nfs', 'null-aio', 'null-co', 'nvme', 'ocssd', 'par=
-allels',
-> +            'qcow', 'qcow2', 'qed', 'quorum', 'raw', 'rbd',
->              { 'name': 'replication', 'if': 'defined(CONFIG_REPLICATION=
-)' },
->              'sheepdog',
->              'ssh', 'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', =
-'vxhs' ] }
-> @@ -3917,6 +3957,7 @@
->        'null-aio':   'BlockdevOptionsNull',
->        'null-co':    'BlockdevOptionsNull',
->        'nvme':       'BlockdevOptionsNVMe',
-> +      'ocssd':      'BlockdevOptionsGenericFormat',
-
-I guess you don't support qemu creating one of these devices yet?
-
->        'parallels':  'BlockdevOptionsGenericFormat',
->        'qcow2':      'BlockdevOptionsQcow2',
->        'qcow':       'BlockdevOptionsQcow',
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---6iX2ARR7hZ2FehcUGWzivgn28DXPqxRKK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzi2YwACgkQp6FrSiUn
-Q2rsfAf/UV784Ckd0piM4V81UA7CTQYL87t+QN2PY8yjiehze0X4eRKjIL4qJtUL
-1VAZiVta7cSCHJAyzCTl6jjWbsyImxbbCgH5EzzRrOoE77xopjuKM8SwRbNDDt1X
-wSU3AXhuSrfApAXXwCTZqkwyw8/hhQz6xYqkQF+jwwOlDFNU1MQdpzUeNiOJvdSc
-X80jFIs6d12OXWdkSmNfeEHl/WzRXPgjBuu2GBu3IEdtcXFNdhweE7NFPnVEvwFl
-EMo/lceIMVxvaPEs5iqqDghskHCHGL6uxOepMJp0US7DXrJa4HA62PTgfs9dAlNy
-o84sK95fsin21TXGiH3oMUALcq7QGA==
-=ul4O
------END PGP SIGNATURE-----
-
---6iX2ARR7hZ2FehcUGWzivgn28DXPqxRKK--
+> Paolo
+> 
+> > ---
+> >  accel/kvm/kvm-all.c  | 5 +++++
+> >  include/sysemu/kvm.h | 2 ++
+> >  qapi/misc.json       | 6 +++++-
+> >  qmp.c                | 1 +
+> >  4 files changed, 13 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> > index 062bf8b5b0..c79d6b51e2 100644
+> > --- a/accel/kvm/kvm-all.c
+> > +++ b/accel/kvm/kvm-all.c
+> > @@ -169,6 +169,11 @@ int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
+> >      return 1;
+> >  }
+> >  
+> > +bool kvm_manual_dirty_log_protect_enabled(void)
+> > +{
+> > +    return kvm_state && kvm_state->manual_dirty_log_protect;
+> > +}
+> > +
+> >  /* Must be with slots_lock held */
+> >  static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
+> >  {
+> > diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> > index a6d1cd190f..30757f1425 100644
+> > --- a/include/sysemu/kvm.h
+> > +++ b/include/sysemu/kvm.h
+> > @@ -547,4 +547,6 @@ int kvm_set_one_reg(CPUState *cs, uint64_t id, void *source);
+> >  int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target);
+> >  struct ppc_radix_page_info *kvm_get_radix_page_info(void);
+> >  int kvm_get_max_memslots(void);
+> > +bool kvm_manual_dirty_log_protect_enabled(void);
+> > +
+> >  #endif
+> > diff --git a/qapi/misc.json b/qapi/misc.json
+> > index 8b3ca4fdd3..ce7a76755a 100644
+> > --- a/qapi/misc.json
+> > +++ b/qapi/misc.json
+> > @@ -253,9 +253,13 @@
+> >  #
+> >  # @present: true if KVM acceleration is built into this executable
+> >  #
+> > +# @manual-dirty-log-protect: true if manual dirty log protect is enabled
+> > +#
+> >  # Since: 0.14.0
+> >  ##
+> > -{ 'struct': 'KvmInfo', 'data': {'enabled': 'bool', 'present': 'bool'} }
+> > +{ 'struct': 'KvmInfo', 'data':
+> > +  {'enabled': 'bool', 'present': 'bool',
+> > +   'manual-dirty-log-protect': 'bool' } }
+> >  
+> >  ##
+> >  # @query-kvm:
+> > diff --git a/qmp.c b/qmp.c
+> > index b92d62cd5f..047bef032e 100644
+> > --- a/qmp.c
+> > +++ b/qmp.c
+> > @@ -73,6 +73,7 @@ KvmInfo *qmp_query_kvm(Error **errp)
+> >  
+> >      info->enabled = kvm_enabled();
+> >      info->present = kvm_available();
+> > +    info->manual_dirty_log_protect = kvm_manual_dirty_log_protect_enabled();
+> >  
+> >      return info;
+> >  }
+> > 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
