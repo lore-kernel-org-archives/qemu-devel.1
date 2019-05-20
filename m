@@ -4,61 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B21CC04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:24:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09DC1C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:24:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3185220862
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:24:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3185220862
+	by mail.kernel.org (Postfix) with ESMTPS id D021B20862
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:24:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D021B20862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43506 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43508 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSre4-0001fZ-8I
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 19:24:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44832)
+	id 1hSreK-0001tA-2V
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 19:24:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hSrQc-00071n-S9
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:10:48 -0400
+	(envelope-from <mst@redhat.com>) id 1hSrRD-0007mE-DB
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hSrQa-0007x0-VH
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:10:46 -0400
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:38269)
+	(envelope-from <mst@redhat.com>) id 1hSrRC-0008Ii-Ej
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:23 -0400
+Received: from mail-qt1-f180.google.com ([209.85.160.180]:34845)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hSrQa-0007wE-RE
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:10:44 -0400
-Received: by mail-qk1-f194.google.com with SMTP id a64so9928736qkg.5
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 16:10:43 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hSrRB-0008I9-Pk
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:21 -0400
+Received: by mail-qt1-f180.google.com with SMTP id a39so18398526qtk.2
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 16:11:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
 	:mime-version:content-disposition:in-reply-to;
-	bh=lqcRP5TOl9HEzw5AKgljD79bRAyUWWqCwFejvOysXuY=;
-	b=IvYiI2vrBxKS287eTxojop33QCbfDdWv030qApxAX777XHXeBri77QLjIsyyCtTaIN
-	Ua38C5xPstjuukBAwlz8BmWzhdLQynS4kV9YSjxWLWI3V7v5pts8m41cESJ5vLxOrDSE
-	ii14zLMAaasvPmU13hs77aNEzQeI6/jxaJUOC/V2c6CDIH3iX9JLzj/oR7D/yBKUQ7yB
-	2JeYbKT7yrslCA6GNSp5dn7RD2km7RlW2vwtjBonWnuKnSY5mqEZvboFH3ecXRd7XRWV
-	gplrHkrvJUGb25yBvQFW3EbbTS7K6tScihvHgYfHyRvud6W7zMpla+82To/9z15SlXiG
-	Zekg==
-X-Gm-Message-State: APjAAAWfqauPHLxuJCKvaIWlzoTKGGGsFOcB3sRqRsqEL+79bIIw1Oci
-	BwQMSABSUkOMTx1kOa1Xo8kzVgfa/p8=
-X-Google-Smtp-Source: APXvYqyxc7pF7zxphLR/xz6dXJKprUw9GGfLdFdEBJq+a2gqBz0T2Oaxg6uLDE3Q1H/v0GP0ayRgwg==
-X-Received: by 2002:a37:6ca:: with SMTP id 193mr59713585qkg.64.1558393842882; 
-	Mon, 20 May 2019 16:10:42 -0700 (PDT)
+	bh=lNTYO0MId4gzUO1w6UtHVs4DCqDNXlBKY0mc09csDo8=;
+	b=j5uvziY3sT9YuRE84klb7pIx5QFslVEtrjhmqh8MH5rym2Ab3pVRSWaR4/DwW3FMra
+	eR6QxCqtrgJV39UUlPM7TjPWSUailIoiL0DihMZT29ah74lEcQLIi0OShJk3itw1I60R
+	Zd66+DUXNY4XmN7PQPKOzwS2QIeGY7Foz6s1pE+mjf+uSKp6ti2BFmactl8DPcYDmuqZ
+	gfSQtzEw6haPQ1JBhAx2CrX2UMCWNp1RDYn6vFqNXC7tkF58qHgM8zXTddNPjOi8+PPV
+	16MKwzk3N7AA7bfM3+L7uuBTurUYXO30Vj1MDs6RuWqVuuaAbVJC8cwlBnTBKJE9mscx
+	FIpw==
+X-Gm-Message-State: APjAAAXuEgMry5eKa6th+mcO575OEQi5RRBPCGC4XYcYP4+1tqFw84OT
+	gGqbRb5vqd35ttW0a1pUN385RBly/38=
+X-Google-Smtp-Source: APXvYqzUxLyXf5SRpIKnr+lSmq3PPOp522ROXuffdunxsNT35HwMFXkf67Ssf6F4EiJrwNqll3Z7Aw==
+X-Received: by 2002:ac8:1c51:: with SMTP id j17mr64276477qtk.7.1558393880965; 
+	Mon, 20 May 2019 16:11:20 -0700 (PDT)
 Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
 	[173.76.105.71]) by smtp.gmail.com with ESMTPSA id
-	m8sm12396121qta.10.2019.05.20.16.10.41
+	t58sm10680212qtj.4.2019.05.20.16.11.19
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Mon, 20 May 2019 16:10:42 -0700 (PDT)
-Date: Mon, 20 May 2019 19:10:41 -0400
+	Mon, 20 May 2019 16:11:20 -0700 (PDT)
+Date: Mon, 20 May 2019 19:11:19 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <20190320112646.3712-5-xieyongji@baidu.com>
+Message-ID: <1556808723-226478-6-git-send-email-imammedo@redhat.com>
 References: <20190520231008.20140-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -68,9 +68,9 @@ X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
 X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.222.194
-Subject: [Qemu-devel] [PULL v2 07/36] vhost-user-blk: Only start vhost-user
- backend with the first kick
+X-Received-From: 209.85.160.180
+Subject: [Qemu-devel] [PULL v2 26/36] tests: acpi: fetch X_DSDT if pointer
+ to DSDT is 0
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,42 +82,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
-	Zhang Yu <zhangyu31@baidu.com>, qemu-block@nongnu.org,
-	Max Reitz <mreitz@redhat.com>, Xie Yongji <xieyongji@baidu.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+	Wei Yang <richardw.yang@linux.intel.com>,
+	Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190520231041.MSnRoVOrjhqMgSjamDals68dVfVIwoculAPJSK0A9zY@z>
+Message-ID: <20190520231119.U5dbsJzfpdRO_LU-qcwcNG2pzM5Yc7-3Qh3uc6i91ns@z>
 
-From: Xie Yongji <xieyongji@baidu.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-We should only start vhost-user backend at the first kick for
-virtio 1.0 transitional devices.
+that way it would be possible to test a DSDT pointed by
+64bit X_DSDT field in FADT.
 
-Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
-Message-Id: <20190320112646.3712-5-xieyongji@baidu.com>
+PS:
+it will allow to enable testing arm/virt board, which sets
+only newer X_DSDT field.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <1556808723-226478-6-git-send-email-imammedo@redhat.com>
+Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/block/vhost-user-blk.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ tests/bios-tables-test.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index 700c1dd111..39e1adc60a 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -239,8 +239,7 @@ static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-     VHostUserBlk *s = VHOST_USER_BLK(vdev);
-     int i;
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index a164d274a2..d165a1bd62 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -140,6 +140,9 @@ static void test_acpi_fadt_table(test_data *data)
+     AcpiSdtTable table = g_array_index(data->tables, typeof(table), 0);
+     uint8_t *fadt_aml = table.aml;
+     uint32_t fadt_len = table.aml_len;
++    uint32_t val;
++    int dsdt_offset = 40 /* DSDT */;
++    int dsdt_entry_size = 4;
  
--    if (!(virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
--        !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1))) {
-+    if (!vdev->start_on_kick) {
-         return;
-     }
+     g_assert(compare_signature(&table, "FACP"));
  
+@@ -148,8 +151,14 @@ static void test_acpi_fadt_table(test_data *data)
+                      fadt_aml + 36 /* FIRMWARE_CTRL */, 4, "FACS", false);
+     g_array_append_val(data->tables, table);
+ 
++    memcpy(&val, fadt_aml + dsdt_offset, 4);
++    val = le32_to_cpu(val);
++    if (!val) {
++        dsdt_offset = 140 /* X_DSDT */;
++        dsdt_entry_size = 8;
++    }
+     acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
+-                     fadt_aml + 40 /* DSDT */, 4, "DSDT", true);
++                     fadt_aml + dsdt_offset, dsdt_entry_size, "DSDT", true);
+     g_array_append_val(data->tables, table);
+ 
+     memset(fadt_aml + 36, 0, 4); /* sanitize FIRMWARE_CTRL ptr */
 -- 
 MST
 
