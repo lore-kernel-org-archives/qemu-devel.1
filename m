@@ -2,85 +2,81 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4535DC04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 18:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DCB4C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 18:04:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8AE5206B6
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 18:00:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MkdGSm6e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8AE5206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2E94620863
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 18:04:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E94620863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39790 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39863 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSma0-0004vC-8n
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 14:00:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40702)
+	id 1hSmec-0007db-8M
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 14:04:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1hSmYp-0004Az-H7
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:58:56 -0400
+	(envelope-from <philmd@redhat.com>) id 1hSmcy-0006pX-K7
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 14:03:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1hSmYo-0005Zn-2V
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:58:55 -0400
-Received: from mail-lf1-x12a.google.com ([2a00:1450:4864:20::12a]:45011)
+	(envelope-from <philmd@redhat.com>) id 1hSmcx-0007k1-4k
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 14:03:12 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:35275)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1hSmYn-0005YO-LA
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:58:54 -0400
-Received: by mail-lf1-x12a.google.com with SMTP id n134so10966513lfn.11
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 10:58:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=qRwUurolprRKP/X/J1iGJKrcp2YtMyO7x8Il5r2/m3U=;
-	b=MkdGSm6eeqEZZcNv2jJJQU66X/klxauM2ycXhhHqMJ6GDVoN6eVU6FGdUGSNUjiKZ3
-	Z9IQJsS+Ul6u2eGdZkiZibNdWevAItsZ7ns7hPyDDC59hoqUUWKpK9zwtNyjblG+99bX
-	9XOE0fS0UT7i3j0tHdsqlI7eE4LSB0csTigrOM6gUY74XkdJYsxWwdAH2SFDfAaN24QN
-	HixomhpatuNre3PqSQ6CbUQypUXD5+ajsqGqoPfJ0eBhFLjFB1F10585rQBhn1AhI3q0
-	ACykfFj8snSwFGelgZBf+knisKHPvUsJTbquYBRyARk8p4WsokDC32wnLlkEQRwJtWDs
-	2QOQ==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hSmcw-0007jf-Ul
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 14:03:11 -0400
+Received: by mail-wm1-f68.google.com with SMTP id q15so272664wmj.0
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 11:03:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=qRwUurolprRKP/X/J1iGJKrcp2YtMyO7x8Il5r2/m3U=;
-	b=GKDeGDtB/9SNVdx4Q7XVi2WpyLgSvmBTfieaP9P0DArymRs+RZU/jkHxnEdNLEVk/S
-	BxBHELKzR2H7fYWKNASy0DqTvEttELCDUAYXFCzCjevnsffYKGVG+bIAg8tRH2FCz45L
-	mRrD571Y0Za4hL/oek0/K3jvQ/Qu2Xcnkd7sjMmTj/x7yG28Qmsn17M2uj4YSMUpfZOG
-	y917VkDwZZs08HSvgwp+Fv51FaWUzna1hCS2WsteQpkThLLq5UNKLkPxfdAzLdOlWanB
-	OH1Vj6Q9gimfiBV+hBdzS/dhl0dbLgcVykEermZZBwsjHydF8mfG3Jr0F5yjGcT4auL8
-	bE1g==
-X-Gm-Message-State: APjAAAUohh8rXV8J3LVi8gC0qFLXR9skDqX3/ho2DO+Ftat1WErOoDYr
-	HJS2f25NKM6kGEygVnKrci+v9CMW
-X-Google-Smtp-Source: APXvYqxqP5SkGtPxCw3PGg75DpWkuXk/kFJRV1bsEca9EMTBttotYxS5TlCynFy/Tsx1nG0Nlvvk2g==
-X-Received: by 2002:ac2:4471:: with SMTP id y17mr10901552lfl.23.1558375129429; 
-	Mon, 20 May 2019 10:58:49 -0700 (PDT)
-Received: from octofox.cadence.com
-	(jcmvbkbc-1-pt.tunnel.tserv24.sto1.ipv6.he.net. [2001:470:27:1fa::2])
-	by smtp.gmail.com with ESMTPSA id l15sm3942002ljh.0.2019.05.20.10.58.47
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 20 May 2019 10:58:48 -0700 (PDT)
-From: Max Filippov <jcmvbkbc@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 20 May 2019 10:58:37 -0700
-Message-Id: <20190520175837.4561-1-jcmvbkbc@gmail.com>
-X-Mailer: git-send-email 2.11.0
+	bh=eNJJcMQo6ndzqZiH5DPLKIJCz1165S6P25dcqq9dkyo=;
+	b=UXD+qL9ZGvIuKHg/jNvdLqkWg//nI/Jx5Hqe/BN1FUKc7eGdejSkFLe3a3cDUH6zSG
+	zecMkJy1ydg/ywP08ffM2BQhzt9jEUlG6KW2TzZQ8VB38Oo0vuFLKhFWfHDc3z4/1enS
+	HME/PRfe+Y23NsZ3wySljkRXf8rEe8jSWsA6AfUOabvICo3VVkYv66BPaMFFB2GM7wVd
+	mBd+6clac3X1/fi0rbTIJLht3HefxWuUg5mA1AF2eZQHjHudDST03DSMXvpaIKD2Se9M
+	+cd9aZvAn1YmqtG6McZElfU+53l0dKm1zTmRJ9jbYGftQrOhdUYlretgLIV+o6AdfBJz
+	wz1A==
+X-Gm-Message-State: APjAAAU6MjxeCKJHsfFg5WeS7sMNkTdlBwJt03i3aCEaCyAG7WI1VTQa
+	I6LbYD5Zpjo45JVL6xE5H+kmEQ==
+X-Google-Smtp-Source: APXvYqyDU2ov9GTE/5R0DgPChvoZXR3aOJ7PxD5OimnLBfpFNKeVWuD8wQ3HMXFqP14VYWF2MhWJQA==
+X-Received: by 2002:a05:600c:23ce:: with SMTP id
+	p14mr292098wmb.36.1558375389047; 
+	Mon, 20 May 2019 11:03:09 -0700 (PDT)
+Received: from [192.168.1.43] (228.red-83-52-173.dynamicip.rima-tde.net.
+	[83.52.173.228])
+	by smtp.gmail.com with ESMTPSA id y2sm525230wmg.9.2019.05.20.11.03.08
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Mon, 20 May 2019 11:03:08 -0700 (PDT)
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20190520124716.30472-1-kraxel@redhat.com>
+	<20190520124716.30472-5-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <6eebf1ed-11f6-93ca-995c-1dd24dd687ce@redhat.com>
+Date: Mon, 20 May 2019 20:03:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20190520124716.30472-5-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::12a
-Subject: [Qemu-devel] [PULL 0/9] target/xtensa queue
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [PATCH v3 04/14] tests/vm: use ssh with pty
+ unconditionally
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,66 +88,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
+Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
+	Kamil Rytarowski <kamil@netbsd.org>,
+	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+On 5/20/19 2:47 PM, Gerd Hoffmann wrote:
+> Allways ask ssh to run with a pseudo terminal.
+> Not having a terminal causes problems now and then.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Tested-by: Thomas Huth <thuth@redhat.com>
 
-please pull the following batch of updates to target/xtensa:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The following changes since commit efb4f3b62c69383a7308d7b739a3193e7c0ccae8:
-
-  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-05-10 14:49:36 +0100)
-
-are available in the git repository at:
-
-  git://github.com/OSLL/qemu-xtensa.git tags/20190520-xtensa
-
-for you to fetch changes up to b345e140534ea17814b02bdf8798f18db6295304:
-
-  target/xtensa: implement exclusive access option (2019-05-15 10:31:52 -0700)
-
-----------------------------------------------------------------
-target/xtensa: SR reorganization and options for modern cores
-
-Reorganize special register handling to support configurations with
-conflicting SR definitions.
-
-Implement options used by the modern xtensa cores:
-- memory protection unit;
-- block prefetch;
-- exclusive access
-
-Add special register definitions and IRQ types for ECC/parity,
-gather/scatter and IDMA.
-
-----------------------------------------------------------------
-Max Filippov (9):
-      target/xtensa: get rid of centralized SR properties
-      target/xtensa: make internal MMU functions static
-      target/xtensa: define IDMA and gather/scatter IRQ types
-      target/xtensa: add parity/ECC option SRs
-      target/xtensa: implement MPU option
-      target/xtensa: implement DIWBUI.P opcode
-      target/xtensa: implement block prefetch option opcodes
-      target/xtensa: update list of exception causes
-      target/xtensa: implement exclusive access option
-
- target/xtensa/cpu.c               |    2 +-
- target/xtensa/cpu.h               |   58 +-
- target/xtensa/helper.c            |    1 +
- target/xtensa/helper.h            |    6 +
- target/xtensa/mmu_helper.c        |  532 ++++++-
- target/xtensa/op_helper.c         |   42 +
- target/xtensa/overlay_tool.h      |   43 +-
- target/xtensa/translate.c         | 2951 ++++++++++++++++++++++++-------------
- tests/tcg/xtensa/test_exclusive.S |   48 +
- 9 files changed, 2574 insertions(+), 1109 deletions(-)
- create mode 100644 tests/tcg/xtensa/test_exclusive.S
-
--- 
-Thanks.
--- Max
+> ---
+>  tests/vm/basevm.py | 13 ++++---------
+>  1 file changed, 4 insertions(+), 9 deletions(-)
+> 
+> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> index 640f3226929d..878f1a7a32b8 100755
+> --- a/tests/vm/basevm.py
+> +++ b/tests/vm/basevm.py
+> @@ -106,16 +106,14 @@ class BaseVM(object):
+>          os.rename(fname + ".download", fname)
+>          return fname
+>  
+> -    def _ssh_do(self, user, cmd, check, interactive=False):
+> -        ssh_cmd = ["ssh", "-q",
+> +    def _ssh_do(self, user, cmd, check):
+> +        ssh_cmd = ["ssh", "-q", "-t",
+>                     "-o", "StrictHostKeyChecking=no",
+>                     "-o", "UserKnownHostsFile=" + os.devnull,
+>                     "-o", "ConnectTimeout=1",
+>                     "-p", self.ssh_port, "-i", self._ssh_key_file]
+>          for var in self.envvars:
+>              ssh_cmd += ['-o', "SendEnv=%s" % var ]
+> -        if interactive:
+> -            ssh_cmd += ['-t']
+>          assert not isinstance(cmd, str)
+>          ssh_cmd += ["%s@127.0.0.1" % user] + list(cmd)
+>          logging.debug("ssh_cmd: %s", " ".join(ssh_cmd))
+> @@ -127,9 +125,6 @@ class BaseVM(object):
+>      def ssh(self, *cmd):
+>          return self._ssh_do(self.GUEST_USER, cmd, False)
+>  
+> -    def ssh_interactive(self, *cmd):
+> -        return self._ssh_do(self.GUEST_USER, cmd, False, True)
+> -
+>      def ssh_root(self, *cmd):
+>          return self._ssh_do("root", cmd, False)
+>  
+> @@ -283,9 +278,9 @@ def main(vmcls):
+>          return 2
+>  
+>      if args.interactive:
+> -        if vm.ssh_interactive(*cmd) == 0:
+> +        if vm.ssh(*cmd) == 0:
+>              return 0
+> -        vm.ssh_interactive()
+> +        vm.ssh()
+>          return 3
+>      else:
+>          if vm.ssh(*cmd) != 0:
+> 
 
