@@ -2,82 +2,65 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7104BC04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F418C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:06:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4256521479
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:06:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4256521479
+	by mail.kernel.org (Postfix) with ESMTPS id 2526E21479
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:06:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2526E21479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43282 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43284 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSrMB-0005cS-F7
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 19:06:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43823)
+	id 1hSrMU-0005ra-Az
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 19:06:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hSrKn-0004xS-LP
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:04:46 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hSrKx-00052e-36
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:04:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hSrKf-00057w-88
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:04:40 -0400
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:40922)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hSrKb-00055r-Hg
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:04:35 -0400
-Received: by mail-qk1-f195.google.com with SMTP id q197so9905772qke.7
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 16:04:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:content-transfer-encoding
-	:in-reply-to;
-	bh=/FpleUe2HMMNa9Jbdwt1FroyJe/Y2dPsv4pkqvdEldk=;
-	b=Y2i/bXBjPmROaRHj3I/fHVe2SSxaYq193TQIWCRhSl2irU0Hz+cpqBrqZV094/BFfv
-	F4ELzhtSNEqEZMaG6LAJZlj8c0WAKfYVREyb0xYs4n/27ylP5GBYt9CnlhTpPuaG0QW2
-	2qpKDWv9aIxOYRMOU37enj+WoMBl09CvsvhS6YhHGjGIEQjz4QbC9oz+ZsFAHWyIWZ0n
-	wh3ynXfDTsBroXgGtOY6zhCr4sMOdz6cI4XSXHkn6qJIBxS2A1ccAnFV6O8aWnvKy+E1
-	QeonCjbX4aS6yW5kidRCARIGJkrJ8Kbc7KZsGccAVjc59m9vONmrnv676zPiwU8NoyHm
-	6h0Q==
-X-Gm-Message-State: APjAAAXK4WLEXZwcsF8unVzbMH4+AgwgQJ39C6iB1oloE8JQYrUKt0oF
-	Kcaurp5XwK1qX/AVgpgeq0QPNg==
-X-Google-Smtp-Source: APXvYqx4XGYn8Ckfj12PGpW5nClx2OoZOfWQm4kNVwZHm5PMdavXJdRpfK1uHSoO1oZRL2mtoDstbg==
-X-Received: by 2002:a05:620a:1116:: with SMTP id
-	o22mr59569418qkk.23.1558393472000; 
-	Mon, 20 May 2019 16:04:32 -0700 (PDT)
-Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
-	[173.76.105.71]) by smtp.gmail.com with ESMTPSA id
-	r16sm6502126qkk.36.2019.05.20.16.04.30
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Mon, 20 May 2019 16:04:30 -0700 (PDT)
-Date: Mon, 20 May 2019 19:04:29 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190520185944-mutt-send-email-mst@kernel.org>
-References: <20190419003053.8260-1-richardw.yang@linux.intel.com>
-	<20190419003053.8260-7-richardw.yang@linux.intel.com>
-	<20190514211015-mutt-send-email-mst@kernel.org>
-	<d9d265e1-1052-9d8d-c749-5d1e5901f567@redhat.com>
-	<20190516074110.GA11938@richard>
-	<CAP+75-XHpLkekrmSxK8FFGkpPJQH=V0+2d6RonQTyJNcSHGaEg@mail.gmail.com>
-	<20190516190033.6c8d382f@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1hSrKv-0005Ep-9I
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:04:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44556)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hSrKu-0005Di-Vb
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:04:53 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3B20759467;
+	Mon, 20 May 2019 23:04:52 +0000 (UTC)
+Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A796F60BE2;
+	Mon, 20 May 2019 23:04:49 +0000 (UTC)
+Date: Mon, 20 May 2019 20:04:47 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Message-ID: <20190520230447.GH10764@habkost.net>
+References: <8c0a113e959cc2419aa52253c261e111ac9caf4a.camel@gmail.com>
+	<81b5a062-2bb5-8b2f-6a33-1f886211fc09@redhat.com>
+	<58d6c6ea-cf6e-d6d4-0605-dee933acf0f1@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190516190033.6c8d382f@redhat.com>
+In-Reply-To: <58d6c6ea-cf6e-d6d4-0605-dee933acf0f1@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.39]);
+	Mon, 20 May 2019 23:04:52 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.222.195
-Subject: Re: [Qemu-devel] [PATCH v4 6/6] acpi: pci: use build_append_foo()
- API to construct MCFG
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] QMP Example Formatting in ReST, Sphinx,
+ and Pygments (was: Re:  [Bug] Docs build fails at interop.rst)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,83 +72,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
-	Wei Yang <richardw.yang@linux.intel.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Gabriel Barreto <sbarreto.gabriel@gmail.com>,
+	Aarushi Mehta <mehta.aaru20@gmail.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 16, 2019 at 07:00:33PM +0200, Igor Mammedov wrote:
-> On Thu, 16 May 2019 13:01:31 +0200
-> Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+On Mon, May 20, 2019 at 05:25:28PM -0400, John Snow wrote:
 > 
-> > On Thu, May 16, 2019 at 9:41 AM Wei Yang <richardw.yang@linux.intel.com> wrote:
-> > >
-> > > On Wed, May 15, 2019 at 07:29:17AM +0200, Philippe Mathieu-Daudé wrote:  
-> > > >
-> > > >Thanks Michael for testing...
-> > > >
-> > > >Wei, can you add a MCFG test in tests/bios-tables-test.c?
-> > > >  
-> > >
-> > > I took a look into the test, current q35 has already has a reference MCFG in
-> > > tests/data/acpi/q35/MCFG.
-> > >
-> > > And there would be a warning message when reserved[8] is missed.
-> > >
-> > >     /x86_64/acpi/q35/bridge: acpi-test: Warning! MCFG mismatch.
-> > >
-> > > Is this enough? Or what more information prefer to add?  
-> > 
-> > Well, the test has to fail for any mismatch (not a simple warning).
-> > 
-> > A mismatch failure seems to be enough IMHO.
-> Warning is sufficient, we do not fail ACPI tests on mismatch.
-> It was a policy decision for APCI tests as far as I remember.
-> We might reconsider it in the future but it shouldn't affect this patch.
-
-Yes. And the reason is that conflicts in binary expected files are
-impossible to resolve. So it's important that we can
-fix expected files after a patch that changes them.
-
-I actually have an idea for a better way to fix this:
-a special list of "warn on mismatch" files.
-
-A patch changing tables will add the changed tables to the list.
-Then maintainer knows to inspec the diff manually
-and re-generate expected files, and remove the
-changed tables from the list.
-
-
-
-Another thing we should do is drop dependency on IASL:
-
-if IASL is present we should use it to show diff to simplify debugging
-but at this point a verbatim difference is good enough if IASL is not
-installed.
-
-
-And I agree 100%: all this is a subject for a separate patch(set).
-
-
-
 > 
+> On 5/20/19 12:37 PM, John Snow wrote:
 > > 
-> > > >>> -    AcpiMcfgAllocation allocation[0];
-> > > >>> -} QEMU_PACKED;
-> > > >>> -typedef struct AcpiTableMcfg AcpiTableMcfg;
-> > > >>> -
-> > > >>>  /*
-> > > >>>   * TCPA Description Table
-> > > >>>   *
-> > > >>> --
-> > > >>> 2.19.1  
-> > >
-> > > --
-> > > Wei Yang
-> > > Help you, Help me  
 > > 
+> > On 5/20/19 7:30 AM, Aarushi Mehta wrote:
+> >> https://paste.fedoraproject.org/paste/kOPx4jhtUli---TmxSLrlw
+> >> running python3-sphinx-2.0.1-1.fc31.noarch on Fedora release 31
+> >> (Rawhide)
+> >>
+> >> uname - a
+> >> Linux iouring 5.1.0-0.rc6.git3.1.fc31.x86_64 #1 SMP Thu Apr 25 14:25:32
+> >> UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+> >>
+> >> Reverting commmit 90edef80a0852cf8a3d2668898ee40e8970e431
+> >> allows for the build to occur
+> >>
+> >> Regards
+> >> Aarushi Mehta
+> >>
+> >>
+> > 
+> > Ah, dang. The blocks aren't strictly conforming json, but the version I
+> > tested this under didn't seem to care. Your version is much newer. (I
+> > was using 1.7 as provided by Fedora 29.)
+> > 
+> > For now, try reverting 9e5b6cb87db66dfb606604fe6cf40e5ddf1ef0e7 instead,
+> > which should at least turn off the "warnings as errors" option, but I
+> > don't think that reverting -n will turn off this warning.
+> > 
+> > I'll try to get ahold of this newer version and see if I can't fix it
+> > more appropriately.
+> > 
+> > --js
+> > 
+> 
+> ...Sigh, okay.
+> 
+> So, I am still not actually sure what changed from pygments 2.2 and
+> sphinx 1.7 to pygments 2.4 and sphinx 2.0.1, but it appears as if Sphinx
+> by default always tries to do add a filter to the pygments lexer that
+> raises an error on highlighting failure, instead of the default behavior
+> which is to just highlight those errors in the output. There is no
+> option to Sphinx that I am aware of to retain this lexing behavior.
+> (Effectively, it's strict or nothing.)
+> 
+> This approach, apparently, is broken in Sphinx 1.7/Pygments 2.2, so the
+> build works with our malformed json.
+> 
+> There are a few options:
+> 
+> 1. Update conf.py to ignore these warnings (and all future lexing
+> errors), and settle for the fact that there will be no QMP highlighting
+> wherever we use the directionality indicators ('->', '<-').
+> 
+> 2. Update bitmaps.rst to remove the directionality indicators.
+> 
+> 3. Update bitmaps.rst to format the QMP blocks as raw text instead of JSON.
+> 
+> 4. Update bitmaps.rst to remove the "json" specification from the code
+> block. This will cause sphinx to "guess" the formatting, and the
+> pygments guesser will decide it's Python3.
+> 
+> This will parse well enough, but will mis-highlight 'true' and 'false'
+> which are not python keywords. This approach may break in the future if
+> the Python3 lexer is upgraded to be stricter (because '->' and '<-' are
+> still invalid), and leaves us at the mercy of both the guesser and the
+> lexer.
+> 
+> I'm not actually sure what I dislike the least; I think I dislike #1 the
+> most. #4 gets us most of what we want but is perhaps porcelain.
+> 
+> I suspect if we attempt to move more of our documentation to ReST and
+> Sphinx that we will need to answer for ourselves how we intend to
+> document QMP code flow examples.
+
+Writing a custom lexer that handles "<-" and "->" was simple (see below).
+
+Now, is it possible to convince Sphinx to register and use a custom lexer?
+
+$ cat > /tmp/lexer.py <<EOF
+from pygments.lexer import RegexLexer, DelegatingLexer
+from pygments.lexers.data import JsonLexer
+import re
+from pygments.token import *
+
+class QMPExampleMarkersLexer(RegexLexer):
+    tokens = {
+        'root': [
+            (r' *-> *', Generic.Prompt),
+            (r' *<- *', Generic.Output),
+        ]
+    }
+
+class QMPExampleLexer(DelegatingLexer):
+    def __init__(self, **options):
+        super(QMPExampleLexer, self).__init__(JsonLexer, QMPExampleMarkersLexer, Error, **options)
+EOF
+$ pygmentize -l /tmp/lexer.py:QMPExampleLexer -x -f html <<EOF
+    -> {
+         "execute": "drive-backup",
+         "arguments": {
+           "device": "drive0",
+           "bitmap": "bitmap0",
+           "target": "drive0.inc0.qcow2",
+           "format": "qcow2",
+           "sync": "incremental",
+           "mode": "existing"
+         }
+       }
+
+    <- { "return": {} }
+EOF
+<div class="highlight"><pre><span></span><span class="gp">    -&gt; </span><span class="p">{</span>
+         <span class="nt">&quot;execute&quot;</span><span class="p">:</span> <span class="s2">&quot;drive-backup&quot;</span><span class="p">,</span>
+         <span class="nt">&quot;arguments&quot;</span><span class="p">:</span> <span class="p">{</span>
+           <span class="nt">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;drive0&quot;</span><span class="p">,</span>
+           <span class="nt">&quot;bitmap&quot;</span><span class="p">:</span> <span class="s2">&quot;bitmap0&quot;</span><span class="p">,</span>
+           <span class="nt">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;drive0.inc0.qcow2&quot;</span><span class="p">,</span>
+           <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;qcow2&quot;</span><span class="p">,</span>
+           <span class="nt">&quot;sync&quot;</span><span class="p">:</span> <span class="s2">&quot;incremental&quot;</span><span class="p">,</span>
+           <span class="nt">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;existing&quot;</span>
+         <span class="p">}</span>
+       <span class="p">}</span>
+
+<span class="go">    &lt;- </span><span class="p">{</span> <span class="nt">&quot;return&quot;</span><span class="p">:</span> <span class="p">{}</span> <span class="p">}</span>
+</pre></div>
+$ 
+
+
+-- 
+Eduardo
 
