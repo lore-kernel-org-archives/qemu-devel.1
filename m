@@ -6,71 +6,73 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D6FC04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:22:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40AD3C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:23:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B896820862
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:22:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B896820862
+	by mail.kernel.org (Postfix) with ESMTPS id 13CE020862
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 23:23:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13CE020862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43478 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43491 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSrbY-000804-Ot
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 19:22:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45107)
+	id 1hSrcZ-0000Pu-6b
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 19:23:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hSrR3-0007dH-3u
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:14 -0400
+	(envelope-from <mst@redhat.com>) id 1hSrQu-0007Uo-S3
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hSrR1-0008CV-U8
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:13 -0400
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:41900)
+	(envelope-from <mst@redhat.com>) id 1hSrQt-00088f-T4
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:04 -0400
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:34799)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hSrR1-0008C7-OY
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:11 -0400
-Received: by mail-qk1-f196.google.com with SMTP id m18so92144qki.8
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 16:11:11 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hSrQt-00088V-Ou
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 19:11:03 -0400
+Received: by mail-qk1-f194.google.com with SMTP id j20so9935471qke.1
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 16:11:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to;
-	bh=msyvcVYsP3DYZeJrb9pSd9mjMLqWB65TS3wRXlKOwsQ=;
-	b=BxWjwakHImlHSngS1lbwtjQDHQ6pbtr6uYo+gH21ug7J5v+78S9CdIBTV/7IntS4Rb
-	A4ghVLWA3d3W/9k1HLL3uHiHyjOTQmcuLRUn26TFUqEz2EWWHxlN4UvnsdDy3WBhMtba
-	Tj6Dmxf0Cggmm+zf4r1PlQi36SCfZuuhv8KNsw0OrPnUBfXW6h5RJaZeSr+v72AlsB7c
-	Jm/06iFTisJJ0lBVrMx+/qK3IYydl3MwIOiG7ijySAsmAq/4AXwx7QEERMjKIc/Jh1LZ
-	eVJ2ihWdWPO1dURB23Y6Cey7cArNE1O91z+LB+o+DyIy9PMdDMVSC1coycLQr9JR8Ss8
-	oq2A==
-X-Gm-Message-State: APjAAAXwZG5GqDJlbEnuvWG7HsjG/zMtrC+DxQNIi+P4Ebp4dHaCzqdE
-	kv9mMAQNfpe1gakq+mMdoxjgUmYFwUI=
-X-Google-Smtp-Source: APXvYqxp23ZfJn9INY+Zw6SoKrqSGNb5yN/aPBO/0s9K9GS/sXrL92CowU56KyLotdWfg9qh2MNxIQ==
-X-Received: by 2002:a05:620a:231:: with SMTP id
-	u17mr27966989qkm.359.1558393870969; 
-	Mon, 20 May 2019 16:11:10 -0700 (PDT)
+	:mime-version:content-disposition:content-transfer-encoding
+	:in-reply-to;
+	bh=UofgOHu7Pk5Y22IRdt+4IqgkyvUl0zz/RRsufolKgk8=;
+	b=BBapQhhyYeLIThfBPVM+xRF2BnIGDihq8RPjGN1s/BEgdsdjTvimNOH6VQyZ/pLGst
+	cjHaXUyIMOvFfUxzk87jsMpNzcwX9Kk/foPOyc7idc/UVAu/YB+rKKnRcBUAxncoq6n7
+	lkOxpFYG4J9H2eOzH/esI1CJ9wTCAL82ERYxWT7yv/Vji9D3WKo3rwTuihvNq73Y+cOn
+	zVbMJ78nIoZqw9LubPPhAqBiuroehG+2CGLg8AXMUw/bkA0SiaYn5nZQoYCGYtAnhVB9
+	0VYISZzg57HRWZ+dvTBtMo+8IyQDbtwHakl9l1QpFawdpPGvrqZwCJvhWcCEdCeR0rWu
+	8M+A==
+X-Gm-Message-State: APjAAAWTAwUBkZrNulQCYPVvb43hbmUk9dS8qkggJoqUOK9Gq9pAvuun
+	311LQ8lP09j13bcMN6+hQtUIKPFdFrs=
+X-Google-Smtp-Source: APXvYqw61v6L22tDpT7MNnSGTLrSiRps7OlDfawt4FRiembMasW3RRwEwFM+Uk4c2uHqA+RWFFLlnw==
+X-Received: by 2002:ae9:f30c:: with SMTP id p12mr15861675qkg.171.1558393862985;
+	Mon, 20 May 2019 16:11:02 -0700 (PDT)
 Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
 	[173.76.105.71]) by smtp.gmail.com with ESMTPSA id
-	c30sm12172385qta.25.2019.05.20.16.11.09
+	t58sm10679849qtj.4.2019.05.20.16.11.01
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Mon, 20 May 2019 16:11:10 -0700 (PDT)
-Date: Mon, 20 May 2019 19:11:09 -0400
+	Mon, 20 May 2019 16:11:02 -0700 (PDT)
+Date: Mon, 20 May 2019 19:11:01 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <20190424041959.4087-3-david@gibson.dropbear.id.au>
+Message-ID: <20190419003053.8260-4-richardw.yang@linux.intel.com>
 References: <20190520231008.20140-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 In-Reply-To: <20190520231008.20140-1-mst@redhat.com>
 X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
 X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.222.196
-Subject: [Qemu-devel] [PULL v2 21/36] pci: Simplify pci_bus_is_root()
+X-Received-From: 209.85.222.194
+Subject: [Qemu-devel] [PULL v2 17/36] i386,
+ acpi: remove mcfg_ prefix in AcpiMcfgInfo members
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,169 +84,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>,
-	Peter Xu <peterx@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>,
-	David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	Wei Yang <richardw.yang@linux.intel.com>,
+	Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190520231109.R4qofoLXCFAOMwM62_gn9nT7ZCgQm8ljyGDoaHsgrkY@z>
+Message-ID: <20190520231101.DpLnAwRCEW17DoCzKiwYFdeuIlDEDQvbpSBjT_s49uo@z>
 
-From: David Gibson <david@gibson.dropbear.id.au>
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-pci_bus_is_root() currently relies on a method in the PCIBusClass.
-But it's always known if a PCI bus is a root bus when we create it, so
-using a dynamic method is overkill.
+This is obvious the member in AcpiMcfgInfo describe MCFG's property.
 
-This replaces it with an IS_ROOT bit in a new flags field, which is set on
-root buses and otherwise clear.  As a bonus this removes the special
-is_root logic from pci_expander_bridge, since it already creates its bus
-as a root bus.
+Remove the mcfg_ prefix.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Message-Id: <20190424041959.4087-3-david@gibson.dropbear.id.au>
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190419003053.8260-4-richardw.yang@linux.intel.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/pci/pci.h                |  1 -
- include/hw/pci/pci_bus.h            | 12 +++++++++++-
- hw/pci-bridge/pci_expander_bridge.c |  6 ------
- hw/pci/pci.c                        | 14 ++------------
- hw/virtio/virtio-pci.c              |  1 +
- 5 files changed, 14 insertions(+), 20 deletions(-)
+ hw/i386/acpi-build.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index fdd4c43d3a..edf44de21d 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -395,7 +395,6 @@ typedef PCIINTxRoute (*pci_route_irq_fn)(void *opaque, int pin);
- #define TYPE_PCIE_BUS "PCIE"
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 4fb6184cbc..9c1152c819 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -88,8 +88,8 @@
+ #define ACPI_BUILD_IOAPIC_ID 0x0
  
- bool pci_bus_is_express(PCIBus *bus);
--bool pci_bus_is_root(PCIBus *bus);
- bool pci_bus_allows_extended_config_space(PCIBus *bus);
+ typedef struct AcpiMcfgInfo {
+-    uint64_t mcfg_base;
+-    uint32_t mcfg_size;
++    uint64_t base;
++    uint32_t size;
+ } AcpiMcfgInfo;
  
- void pci_root_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
-diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
-index f6df834170..aea98d5040 100644
---- a/include/hw/pci/pci_bus.h
-+++ b/include/hw/pci/pci_bus.h
-@@ -15,14 +15,19 @@ typedef struct PCIBusClass {
-     BusClass parent_class;
-     /*< public >*/
+ typedef struct AcpiPmInfo {
+@@ -2416,11 +2416,11 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+     int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
  
--    bool (*is_root)(PCIBus *bus);
-     int (*bus_num)(PCIBus *bus);
-     uint16_t (*numa_node)(PCIBus *bus);
-     bool (*allows_extended_config_space)(PCIBus *bus);
- } PCIBusClass;
+     mcfg = acpi_data_push(table_data, len);
+-    mcfg->allocation[0].address = cpu_to_le64(info->mcfg_base);
++    mcfg->allocation[0].address = cpu_to_le64(info->base);
+     /* Only a single allocation so no need to play with segments */
+     mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+     mcfg->allocation[0].start_bus_number = 0;
+-    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->mcfg_size - 1);
++    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
  
-+enum PCIBusFlags {
-+    /* This bus is the root of a PCI domain */
-+    PCI_BUS_IS_ROOT                                         = 0x0001,
-+};
-+
- struct PCIBus {
-     BusState qbus;
-+    enum PCIBusFlags flags;
-     PCIIOMMUFunc iommu_fn;
-     void *iommu_opaque;
-     uint8_t devfn_min;
-@@ -47,4 +52,9 @@ struct PCIBus {
-     Notifier machine_done;
- };
- 
-+static inline bool pci_bus_is_root(PCIBus *bus)
-+{
-+    return !!(bus->flags & PCI_BUS_IS_ROOT);
-+}
-+
- #endif /* QEMU_PCI_BUS_H */
-diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
-index e62de4218f..ca66bc721a 100644
---- a/hw/pci-bridge/pci_expander_bridge.c
-+++ b/hw/pci-bridge/pci_expander_bridge.c
-@@ -66,11 +66,6 @@ static int pxb_bus_num(PCIBus *bus)
-     return pxb->bus_nr;
+     build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
  }
- 
--static bool pxb_is_root(PCIBus *bus)
--{
--    return true; /* by definition */
--}
--
- static uint16_t pxb_bus_numa_node(PCIBus *bus)
- {
-     PXBDev *pxb = convert_to_pxb(bus->parent_dev);
-@@ -83,7 +78,6 @@ static void pxb_bus_class_init(ObjectClass *class, void *data)
-     PCIBusClass *pbc = PCI_BUS_CLASS(class);
- 
-     pbc->bus_num = pxb_bus_num;
--    pbc->is_root = pxb_is_root;
-     pbc->numa_node = pxb_bus_numa_node;
- }
- 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index a78023f669..b386777045 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -129,14 +129,9 @@ static void pci_bus_unrealize(BusState *qbus, Error **errp)
-     vmstate_unregister(NULL, &vmstate_pcibus, bus);
- }
- 
--static bool pcibus_is_root(PCIBus *bus)
--{
--    return !bus->parent_dev;
--}
--
- static int pcibus_num(PCIBus *bus)
- {
--    if (pcibus_is_root(bus)) {
-+    if (pci_bus_is_root(bus)) {
-         return 0; /* pci host bridge */
+@@ -2589,15 +2589,15 @@ static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
+     if (!o) {
+         return false;
      }
-     return bus->parent_dev->config[PCI_SECONDARY_BUS];
-@@ -164,7 +159,6 @@ static void pci_bus_class_init(ObjectClass *klass, void *data)
-     k->unrealize = pci_bus_unrealize;
-     k->reset = pcibus_reset;
+-    mcfg->mcfg_base = qnum_get_uint(qobject_to(QNum, o));
++    mcfg->base = qnum_get_uint(qobject_to(QNum, o));
+     qobject_unref(o);
+-    if (mcfg->mcfg_base == PCIE_BASE_ADDR_UNMAPPED) {
++    if (mcfg->base == PCIE_BASE_ADDR_UNMAPPED) {
+         return false;
+     }
  
--    pbc->is_root = pcibus_is_root;
-     pbc->bus_num = pcibus_num;
-     pbc->numa_node = pcibus_numa_node;
-     pbc->allows_extended_config_space = pcibus_allows_extended_config_space;
-@@ -398,6 +392,7 @@ static void pci_root_bus_init(PCIBus *bus, DeviceState *parent,
-     bus->slot_reserved_mask = 0x0;
-     bus->address_space_mem = address_space_mem;
-     bus->address_space_io = address_space_io;
-+    bus->flags |= PCI_BUS_IS_ROOT;
- 
-     /* host bridge */
-     QLIST_INIT(&bus->child);
-@@ -415,11 +410,6 @@ bool pci_bus_is_express(PCIBus *bus)
-     return object_dynamic_cast(OBJECT(bus), TYPE_PCIE_BUS);
+     o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NULL);
+     assert(o);
+-    mcfg->mcfg_size = qnum_get_uint(qobject_to(QNum, o));
++    mcfg->size = qnum_get_uint(qobject_to(QNum, o));
+     qobject_unref(o);
+     return true;
  }
- 
--bool pci_bus_is_root(PCIBus *bus)
--{
--    return PCI_BUS_GET_CLASS(bus)->is_root(bus);
--}
--
- bool pci_bus_allows_extended_config_space(PCIBus *bus)
- {
-     return PCI_BUS_GET_CLASS(bus)->allows_extended_config_space(bus);
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 509c1ff555..9056cdfa3c 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -20,6 +20,7 @@
- #include "standard-headers/linux/virtio_pci.h"
- #include "hw/virtio/virtio.h"
- #include "hw/pci/pci.h"
-+#include "hw/pci/pci_bus.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "hw/pci/msi.h"
 -- 
 MST
 
