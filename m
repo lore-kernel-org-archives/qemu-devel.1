@@ -2,83 +2,140 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0031C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 22:39:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7866DC04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 22:39:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B6FB20862
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 22:39:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q7yrwjEj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B6FB20862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3E39C20862
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 22:39:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E39C20862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42990 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42992 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSqw5-0004f0-Ms
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 18:39:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39215)
+	id 1hSqwY-0004z0-IY
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 18:39:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hSqum-0003p5-1n
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 18:37:53 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hSqvL-0004Fw-Ev
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 18:38:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hSquk-0001r8-PJ
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 18:37:52 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:40709)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hSquk-0001pe-Hq; Mon, 20 May 2019 18:37:50 -0400
-Received: by mail-lf1-x142.google.com with SMTP id h13so11516104lfc.7;
-	Mon, 20 May 2019 15:37:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=PY+CsTSh8GPctl9g5Hg+Op4ObYrj5XAFUZbl6/vgehY=;
-	b=Q7yrwjEjcsduDgJCtw54glcG/sGGBm0t3Zxfc0dSesXxtHPDmNUdfXrEHCLj/2xOgF
-	sdwFijhvQ4pHFXvgUn/+KNm87pnEAoNhMab5wiY8PH2lSCc/By8/RVyQBrGnmmJ0BaRb
-	SdQiesyVH7MJc/uqMFagRb+oFhrPbiqsquVHV3xJ0PSAIb9NcqfPDUnfJ5eqDNL7KtSM
-	V8tRvetyucO7x+k92wVZrseCNh3qW26m+0D4Dw4rjk2Zp9jdJBM+VGhasTaTnqJTInDC
-	Z5dw2sdmLmZqjcl3CULi/3Cby6GGysIGtJsJqh7vlcF/OCAp+JGCmPsPHEvlkt0pASfv
-	jwpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=PY+CsTSh8GPctl9g5Hg+Op4ObYrj5XAFUZbl6/vgehY=;
-	b=WSSeCqVIvw6aYmnGHHbYqq2KkOnSFmtZmZxH/pl4iAdJ9AwwftfX7JvxuA1etlKQCt
-	7WFiFsCCTs+IEgPfcjDh3kKF/93WQJPYMudPq6tgG2EDBPexz+dFZt5iH0KUe14iCKOb
-	8p/KxL7kHj29muhItkAlpfv9Y6Sv0XOskM1zGb0N24UAzIrstizExtIHVVR/5LtNX0aG
-	fjJkzHgEHuBcGwo2q9F/TTHjSxu0tPyBoTZB5wsJfM7cApF34tTnNeO9+eAQ0hCwUWJ9
-	O2ni2fDq5s3LILAjw+nyWIa2PhwVbU2o6aSIJpBsCox7hT8Xb6ie2ca9xgjRUl5iJsGP
-	/Uiw==
-X-Gm-Message-State: APjAAAX6PyFgj0RfwuaP2FRhyY4o8JQUBmuXEuN4J0T7DHI7jGcd38KP
-	X9Ym4ZcLNnS/Zzf3NYz3Xxnn2Zo+Nht6JnNq1qI=
-X-Google-Smtp-Source: APXvYqx8p2XoW5ANxvB/gwA8UAQFQsPr+waU/Q96WsWA/j3TdDpVJVNwcvoXjGyxePASgLUr+DjWSB9SdxGNWsfIMGg=
-X-Received: by 2002:a19:4bd1:: with SMTP id y200mr39051168lfa.25.1558391868543;
-	Mon, 20 May 2019 15:37:48 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1hSqvK-0002JF-7b
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 18:38:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44350)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
+	id 1hSqvG-0002GC-RT; Mon, 20 May 2019 18:38:23 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 24925C049DFC;
+	Mon, 20 May 2019 22:38:22 +0000 (UTC)
+Received: from [10.18.17.162] (dhcp-17-162.bos.redhat.com [10.18.17.162])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7F81F5D704;
+	Mon, 20 May 2019 22:38:21 +0000 (UTC)
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190510211119.29376-1-jsnow@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <fc38cdc4-dc42-d476-6a27-bcb85adafb7d@redhat.com>
+Date: Mon, 20 May 2019 18:38:21 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190520220635.10961-1-f4bug@amsat.org>
-	<20190520220635.10961-3-f4bug@amsat.org>
-In-Reply-To: <20190520220635.10961-3-f4bug@amsat.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 20 May 2019 15:35:33 -0700
-Message-ID: <CAKmqyKMsVgy-f4oPZ9UaFZHqt5Q+D7=2sr=5tFqY_eU-Jws2Jg@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::142
-Subject: Re: [Qemu-devel] [PATCH 2/2] BootLinuxConsoleTest: Test the
- SmartFusion2 board
+In-Reply-To: <20190510211119.29376-1-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.31]);
+	Mon, 20 May 2019 22:38:22 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] blockdev: loosen restrictions on
+ drive-backup source node
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,88 +147,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Alistair Francis <alistair@alistair23.me>,
-	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
-	Cleber Rosa <crosa@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
-	Caio Carrara <ccarrara@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 20, 2019 at 3:09 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
->
-> Similar to the x86_64/pc test, it boots a Linux kernel on an
-> Emcraft board and verify the serial is working.
->
-> If ARM is a target being built, "make check-acceptance" will
-> automatically include this test by the use of the "arch:arm" tags.
->
-> Alternatively, this test can be run using:
->
->   $ avocado run -t arch:arm tests/acceptance
->   $ avocado run -t machine:emcraft-sf2 tests/acceptance
->
-> Based on the recommended test setup from Subbaraya Sundeep:
-> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg03810.html
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Alistair
-
+On 5/10/19 5:11 PM, John Snow wrote:
+> We mandate that the source node must be a root node; but there's no reason
+> I am aware of that it needs to be restricted to such. In some cases, we need
+> to make sure that there's a medium present, but in the general case we can
+> allow the backup job itself to do the graph checking.
+> 
+> This patch helps improve the error message when you try to backup from
+> the same node more than once, which is reflected in the change to test
+> 056.
+> 
+> For backups with bitmaps, it will also show a better error message that
+> the bitmap is in use instead of giving you something cryptic like "need
+> a root node."
+> 
+> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1707303
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  tests/acceptance/boot_linux_console.py | 27 ++++++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
->
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
-ot_linux_console.py
-> index f593f3858e..844cb80bb5 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -178,6 +178,33 @@ class BootLinuxConsole(Test):
->          console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
-ine
->          self.wait_for_console_pattern(console_pattern)
->
-> +    def test_arm_emcraft_sf2(self):
-> +        """
-> +        :avocado: tags=3Darch:arm
-> +        :avocado: tags=3Dmachine:emcraft-sf2
-> +        :avocado: tags=3Dendian:little
-> +        """
-> +        uboot_url =3D ('https://raw.githubusercontent.com/'
-> +                     'Subbaraya-Sundeep/qemu-test-binaries/'
-> +                     'fa030bd77a014a0b8e360d3b7011df89283a2f0b/u-boot')
-> +        uboot_hash =3D 'abba5d9c24cdd2d49cdc2a8aa92976cf20737eff'
-> +        uboot_path =3D self.fetch_asset(uboot_url, asset_hash=3Duboot_ha=
-sh)
-> +        spi_url =3D ('https://raw.githubusercontent.com/'
-> +                   'Subbaraya-Sundeep/qemu-test-binaries/'
-> +                   'fa030bd77a014a0b8e360d3b7011df89283a2f0b/spi.bin')
-> +        spi_hash =3D '85f698329d38de63aea6e884a86fbde70890a78a'
-> +        spi_path =3D self.fetch_asset(spi_url, asset_hash=3Dspi_hash)
-> +
-> +        self.vm.set_machine('emcraft-sf2')
-> +        self.vm.set_console()
-> +        kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE
-> +        self.vm.add_args('-kernel', uboot_path,
-> +                         '-append', kernel_command_line,
-> +                         '-drive', 'file=3D' + spi_path + ',if=3Dmtd,for=
-mat=3Draw',
-> +                         '-no-reboot')
-> +        self.vm.launch()
-> +        self.wait_for_console_pattern('init started: BusyBox')
-> +
->      def test_s390x_s390_ccw_virtio(self):
->          """
->          :avocado: tags=3Darch:s390x
-> --
-> 2.19.1
->
->
+>  blockdev.c             | 6 +++++-
+>  tests/qemu-iotests/056 | 2 +-
+>  2 files changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/blockdev.c b/blockdev.c
+> index 79fbac8450..27cb72f7aa 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -3450,7 +3450,7 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
+>          backup->compress = false;
+>      }
+>  
+> -    bs = qmp_get_root_bs(backup->device, errp);
+> +    bs = bdrv_lookup_bs(backup->device, backup->device, errp);
+>      if (!bs) {
+>          return NULL;
+>      }
+> @@ -3459,6 +3459,10 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
+>      aio_context_acquire(aio_context);
+>  
+>      if (!backup->has_format) {
+> +        if (!bs->drv) {
+> +            error_setg(errp, "Device has no medium");
+> +            return NULL;
+> +        }
+
+Pinging my own patch with a review comment. It is weird that I shuffled
+the error checking down below a conditional, but it's the only case
+where we directly need do access bs->drv now.
+
+Otherwise, block/backup already checks for this in its own routine and I
+felt like it was best to let the job handle if it had the right type of
+arguments instead of splitting that out up here.
+
+Still, it probably looks weird to see the "Device has no medium" error
+in a conditional here, so if this patch looks okay otherwise, I can send
+a v2 with that error checking shuffled back up to top-level to maintain
+some consistency with how the error checking used to be handled.
+
+>          backup->format = backup->mode == NEW_IMAGE_MODE_EXISTING ?
+>                           NULL : (char*) bs->drv->format_name;
+>      }
+> diff --git a/tests/qemu-iotests/056 b/tests/qemu-iotests/056
+> index 3df323984d..f40fc11a09 100755
+> --- a/tests/qemu-iotests/056
+> +++ b/tests/qemu-iotests/056
+> @@ -214,7 +214,7 @@ class BackupTest(iotests.QMPTestCase):
+>          res = self.vm.qmp('query-block-jobs')
+>          self.assert_qmp(res, 'return[0]/status', 'concluded')
+>          # Leave zombie job un-dismissed, observe a failure:
+> -        res = self.qmp_backup_and_wait(serror='Need a root block node',
+> +        res = self.qmp_backup_and_wait(serror="Node 'drive0' is busy: block device is in use by block job: backup",
+>                                         device='drive0', format=iotests.imgfmt,
+>                                         sync='full', target=self.dest_img,
+>                                         auto_dismiss=False)
+> 
 
