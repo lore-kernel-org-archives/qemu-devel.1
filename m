@@ -2,58 +2,93 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50A87C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 18:12:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C59C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 18:24:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B2472081C
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 18:12:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B2472081C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 16D772173E
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 18:24:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZjuDsP6g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16D772173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39987 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40088 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSmm6-0005yZ-0A
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 14:12:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43745)
+	id 1hSmxI-0001Jp-Rt
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 14:24:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hSml0-0004iD-1v
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 14:11:30 -0400
+	(envelope-from <danielhb413@gmail.com>) id 1hSmwB-0000ii-I7
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 14:23:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hSmkx-0003YX-Uf
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 14:11:29 -0400
-Received: from 4.mo178.mail-out.ovh.net ([46.105.49.171]:34364)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hSmkw-0003XB-SP
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 14:11:27 -0400
-Received: from player750.ha.ovh.net (unknown [10.109.159.35])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id A5C4B67D50
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 20:11:23 +0200 (CEST)
-Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
-	(Authenticated sender: clg@kaod.org)
-	by player750.ha.ovh.net (Postfix) with ESMTPSA id 49B41610F68A;
-	Mon, 20 May 2019 18:11:15 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: Jason Wang <jasowang@redhat.com>
-Date: Mon, 20 May 2019 20:11:11 +0200
-Message-Id: <20190520181111.20407-1-clg@kaod.org>
-X-Mailer: git-send-email 2.20.1
+	(envelope-from <danielhb413@gmail.com>) id 1hSmw9-0000im-S5
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 14:23:03 -0400
+Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:33152)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1hSmw9-0000hv-1k
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 14:23:01 -0400
+Received: by mail-qt1-x841.google.com with SMTP id m32so17496848qtf.0
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 11:22:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=subject:to:cc:references:from:message-id:date:user-agent
+	:mime-version:in-reply-to:content-transfer-encoding:content-language;
+	bh=wVmUifK244luM5YlAWDZA91iS0hO4NaIrogfaVIpols=;
+	b=ZjuDsP6ggOMlOsukO6UvCUIAqRTUTrheDFbtLRdTM/EekEsSZkj+Z4DUFrUxXmLHHv
+	GitqLrofrN2WBr2TKG5SJRavUVK/NWiCcK40vCNpS1hBRRDy4/uouR5WM2f2LljuGRFN
+	mPA6tZTsCpsDxw89TE3QcC47O76lyjV/8e2QYlfBe4eg9TCunEZl3IKJ8GKOBlZO8ago
+	33iQ8Ik9AEOZBJe4UEbyZKjTrgRlpGvxxKQ0soNggKEIVhlSLyjJ9k29SfyKMePX5qzb
+	A+g+A6Wbr+j0Aq2XdEmnJbAIx3vJbD/Rmy2RwsCBXzOiQ/Agfa/xE8/Cm89p1sSiN09S
+	DcjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-transfer-encoding
+	:content-language;
+	bh=wVmUifK244luM5YlAWDZA91iS0hO4NaIrogfaVIpols=;
+	b=Y3TSef6lXtpaU0xxWlXXj30tx/BnfLw3EHrYOaAB5bNG4UtcfbCHNhdIMtdnio7ZX8
+	NhpYrYckfY4KSeFLRtD5kvRjU6Ut9LnyIGEqgf4NXWlbvLxyUkpNM6Egvho8yxVArbOA
+	WcbzsxHURfeb7FFyUEpsCqnIhADRvNTOeJq8f9ndEZJWPlQoW9DjLBSX8Xv5dJIO0nAN
+	GTo7iC0q0Kzg7VBJ/OKFXUsabxguE02+BzKmI/lOdI95OS8WVGKUj3JDdFzg5J/3JOnF
+	VnXB2OuLbVfrZUGitUp88YqDh6bZY8hZIOnuybMM82ypAJNQUspQu82LRTIhtWtmja30
+	n6hw==
+X-Gm-Message-State: APjAAAU9AJe0BoihfY0LZ3DxFNyxa7uksadA4lAVWHGmS2E6Kuwo3YAj
+	vX4UmXW6TCcLewJKdbzO+Pw=
+X-Google-Smtp-Source: APXvYqxNebuDtZKesdyaz2TmFjFazyZhd2bqWQaL/6O6kRXpFrFVS3rcDjm5uYgVF9rfpZjI88mUTg==
+X-Received: by 2002:a0c:baa7:: with SMTP id x39mr16590083qvf.100.1558376577024;
+	Mon, 20 May 2019 11:22:57 -0700 (PDT)
+Received: from ?IPv6:2804:431:f701:9e22:ebb5:4019:e2bd:55e4?
+	([2804:431:f701:9e22:ebb5:4019:e2bd:55e4])
+	by smtp.gmail.com with ESMTPSA id
+	v3sm13634943qtc.97.2019.05.20.11.22.55
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Mon, 20 May 2019 11:22:56 -0700 (PDT)
+To: P J P <ppandit@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+References: <20190519084815.7410-1-ppandit@redhat.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <d3626247-a6b1-afd3-4f48-8fbbe3ad5dbb@gmail.com>
+Date: Mon, 20 May 2019 15:22:53 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 17134789207616162815
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddtkedguddvgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.49.171
-Subject: [Qemu-devel] [PATCH] ftgmac100: do not link to netdev
+In-Reply-To: <20190519084815.7410-1-ppandit@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::841
+Subject: Re: [Qemu-devel] [PATCH v2] qga: check length of command-line &
+ environment variables
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -65,40 +100,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
-	qemu-devel@nongnu.org, Wim Vervoorn <wvervoorn@eltan.com>,
-	qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
-	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Cc: "Daniel P . Berrange" <berrange@redhat.com>,
+	Michael Roth <mdroth@linux.vnet.ibm.com>,
+	Niu Guoxiang <niuguoxiang@huawei.com>,
+	Prasad J Pandit <pjp@fedoraproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qdev_set_nic_properties() is already used in the Aspeed SoC level to
-bind the ftgmac100 device to the netdev.
 
-This is fixing support for multiple net devices.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- hw/net/ftgmac100.c | 2 --
- 1 file changed, 2 deletions(-)
+On 5/19/19 5:48 AM, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+>
+> Qemu guest agent while executing user commands does not seem to
+> check length of argument list and/or environment variables passed.
+> It may lead to integer overflow or infinite loop issues. Add check
+> to avoid it.
+>
+> Reported-by: Niu Guoxiang <niuguoxiang@huawei.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
 
-diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-index 790430346b51..d9986c6baa92 100644
---- a/hw/net/ftgmac100.c
-+++ b/hw/net/ftgmac100.c
-@@ -1016,8 +1016,6 @@ static void ftgmac100_realize(DeviceState *dev, Err=
-or **errp)
-     sysbus_init_irq(sbd, &s->irq);
-     qemu_macaddr_default_if_unset(&s->conf.macaddr);
-=20
--    s->conf.peers.ncs[0] =3D nd_table[0].netdev;
--
-     s->nic =3D qemu_new_nic(&net_ftgmac100_info, &s->conf,
-                           object_get_typename(OBJECT(dev)), DEVICE(dev)-=
->id,
-                           s);
---=20
-2.20.1
+Reviewed-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+
+>   qga/commands-posix.c   | 18 ++++++++++++++++++
+>   qga/commands-win32.c   | 13 +++++++++++++
+>   qga/commands.c         |  8 ++++++--
+>   qga/guest-agent-core.h |  2 ++
+>   4 files changed, 39 insertions(+), 2 deletions(-)
+>
+> Update v2: add helper function ga_get_arg_max()
+>    -> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg06360.html
+>
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index 7ee6a33cce..e0455722e0 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -60,6 +60,24 @@ extern char **environ;
+>   #endif
+>   #endif
+>   
+> +size_t ga_get_arg_max(void)
+> +{
+> +    /* Since kernel 2.6.23, most architectures support argument size limit
+> +     * derived from the soft RLIMIT_STACK resource limit (see getrlimit(2)).
+> +     * For these architectures, the total size is limited to 1/4 of the
+> +     * allowed stack size. (see execve(2))
+> +     *
+> +     * struct rlimit r;
+> +     *
+> +     * getrlimit(RLIMIT_STACK, &r);
+> +     * ARG_MAX = r.rlim_cur / 4;
+> +     *
+> +     * ARG_MAX is _NOT_ the maximum number of arguments. It is size of the
+> +     * memory used to hold command line arguments and environment variables.
+> +     */
+> +    return sysconf(_SC_ARG_MAX);
+> +}
+> +
+>   static void ga_wait_child(pid_t pid, int *status, Error **errp)
+>   {
+>       pid_t rpid;
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 6b67f16faf..47bbddd74a 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -92,6 +92,19 @@ static OpenFlags guest_file_open_modes[] = {
+>       g_free(suffix); \
+>   } while (0)
+>   
+> +size_t ga_get_arg_max(void)
+> +{
+> +    /* Win32 environment has different values for the ARG_MAX constant.
+> +     * We'll go with the maximum here.
+> +     *
+> +     * https://devblogs.microsoft.com/oldnewthing/?p=41553
+> +     *
+> +     * ARG_MAX is _NOT_ the maximum number of arguments. It is size of the
+> +     * memory used to hold command line arguments and environment variables.
+> +     */
+> +    return 32767;
+> +}
+> +
+>   static OpenFlags *find_open_flag(const char *mode_str)
+>   {
+>       int mode;
+> diff --git a/qga/commands.c b/qga/commands.c
+> index 0c7d1385c2..425a4c405f 100644
+> --- a/qga/commands.c
+> +++ b/qga/commands.c
+> @@ -231,17 +231,21 @@ static char **guest_exec_get_args(const strList *entry, bool log)
+>       int count = 1, i = 0;  /* reserve for NULL terminator */
+>       char **args;
+>       char *str; /* for logging array of arguments */
+> -    size_t str_size = 1;
+> +    size_t str_size = 1, arg_max;
+>   
+> +    arg_max = ga_get_arg_max();
+>       for (it = entry; it != NULL; it = it->next) {
+>           count++;
+>           str_size += 1 + strlen(it->value);
+> +        if (str_size >= arg_max || count >= arg_max / 2) {
+> +            break;
+> +        }
+>       }
+>   
+>       str = g_malloc(str_size);
+>       *str = 0;
+>       args = g_malloc(count * sizeof(char *));
+> -    for (it = entry; it != NULL; it = it->next) {
+> +    for (it = entry; it != NULL && i < count; it = it->next) {
+>           args[i++] = it->value;
+>           pstrcat(str, str_size, it->value);
+>           if (it->next) {
+> diff --git a/qga/guest-agent-core.h b/qga/guest-agent-core.h
+> index 60eae16f27..300ff7e482 100644
+> --- a/qga/guest-agent-core.h
+> +++ b/qga/guest-agent-core.h
+> @@ -46,6 +46,8 @@ const char *ga_fsfreeze_hook(GAState *s);
+>   int64_t ga_get_fd_handle(GAState *s, Error **errp);
+>   int ga_parse_whence(GuestFileWhence *whence, Error **errp);
+>   
+> +size_t ga_get_arg_max(void);
+> +
+>   #ifndef _WIN32
+>   void reopen_fd_to_null(int fd);
+>   #endif
 
 
