@@ -6,77 +6,56 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EFB0C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:46:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCBA3C04E87
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:46:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF8EA206B6
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:46:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF8EA206B6
+	by mail.kernel.org (Postfix) with ESMTPS id 9BC25216B7
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:46:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BC25216B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39522 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39524 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSmMO-0002lA-6x
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 13:46:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59624)
+	id 1hSmMb-0002vU-QE
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 13:46:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hSm2P-0002ai-4q
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:25:26 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hSlqm-0000Of-C6
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:13:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hSm2M-000645-9m
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:25:25 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:39555)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hSm2M-00063E-4R
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:25:22 -0400
-Received: by mail-wr1-f66.google.com with SMTP id w8so15530913wrl.6
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 10:25:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=YAGafpKWlTBR5z7xtPZCtG1bD5UHiFNT7IoDod/KXlQ=;
-	b=HbnYQkyFWwcxnSlygLCaDeFnot1zwnrzNqWOjkw5Q+7lizQBLXJVNWcEs+U4iYCNHU
-	1/uYuyrYC9lByE8Z9LdJTVfyaFUhUwqZKcKu7iF44vSanyieZ58d5BLtlq6EuZGnTAzX
-	i3ZiZt7upFq7HDiVav60vFTclenaQbSX5uR7/eyX64Zlu+twY8iCBCdTMqpTHWa/WC7D
-	CY2mXZwwKgq0mUtxg/4XhuI0fZ0bcJDngPyQ6W1ytMJ/n/8S5KXSCYXMAIycUcIKA/yL
-	1HxSikluP7SI/ylHUG5FRz2KK7s7Vgu256Lro2i4mj5zWjqEcAnzaiByXXgcrSjViCKY
-	YgHQ==
-X-Gm-Message-State: APjAAAUzIQN5p35+5sme50sASIi/CgPVMXtBSdgH8VpZf8tqisDZag6o
-	PAPs2ug7lMOvuBICrS+KEnH8q1GwFDU=
-X-Google-Smtp-Source: APXvYqzUZqNB5TWQnZVAqub5zdluxBkd0/RqSoZnRMSQn2O/OoLy253CTAvUWRv56MWb8hsVwiUiog==
-X-Received: by 2002:a5d:6b50:: with SMTP id x16mr1833026wrw.220.1558373120421; 
-	Mon, 20 May 2019 10:25:20 -0700 (PDT)
-Received: from [192.168.1.43] (228.red-83-52-173.dynamicip.rima-tde.net.
-	[83.52.173.228])
-	by smtp.gmail.com with ESMTPSA id 67sm160459wmd.38.2019.05.20.10.25.19
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 20 May 2019 10:25:19 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-References: <20190520162809.2677-1-peter.maydell@linaro.org>
-	<20190520162809.2677-4-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <1d95fef3-b59d-69b2-5776-7494f74dbd0f@redhat.com>
-Date: Mon, 20 May 2019 19:25:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <cohuck@redhat.com>) id 1hSlqk-0006s0-8h
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:13:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:61913)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
+	id 1hSlqi-0006qr-OA; Mon, 20 May 2019 13:13:22 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8778730917AB;
+	Mon, 20 May 2019 17:13:19 +0000 (UTC)
+Received: from localhost (ovpn-204-110.brq.redhat.com [10.40.204.110])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 06EA5100200A;
+	Mon, 20 May 2019 17:13:13 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 May 2019 19:03:01 +0200
+Message-Id: <20190520170302.13643-54-cohuck@redhat.com>
+In-Reply-To: <20190520170302.13643-1-cohuck@redhat.com>
+References: <20190520170302.13643-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190520162809.2677-4-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.41]);
+	Mon, 20 May 2019 17:13:19 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH 3/4] hw/intc/arm_gicv3: Fix write of
- ICH_VMCR_EL2.{VBPR0, VBPR1}
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 53/54] s390x/cpumodel: add gen15 defintions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,37 +67,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+	Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+	David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/20/19 6:28 PM, Peter Maydell wrote:
-> In ich_vmcr_write() we enforce "writes of BPR fields to less than
-> their minimum sets them to the minimum" by doing a "read vbpr and
-> write it back" operation.  A typo here meant that we weren't handling
-> writes to these fields correctly, because we were reading from VBPR0
-> but writing to VBPR1.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+add several new features (msa9, sort, deflate, additional vector
+instructions, new general purpose instructions) to generation 15.
 
-> ---
->  hw/intc/arm_gicv3_cpuif.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-> index cbad6037f19..000bdbd6247 100644
-> --- a/hw/intc/arm_gicv3_cpuif.c
-> +++ b/hw/intc/arm_gicv3_cpuif.c
-> @@ -2366,7 +2366,7 @@ static void ich_vmcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
->      /* Enforce "writing BPRs to less than minimum sets them to the minimum"
->       * by reading and writing back the fields.
->       */
-> -    write_vbpr(cs, GICV3_G1, read_vbpr(cs, GICV3_G0));
-> +    write_vbpr(cs, GICV3_G0, read_vbpr(cs, GICV3_G0));
->      write_vbpr(cs, GICV3_G1, read_vbpr(cs, GICV3_G1));
->  
->      gicv3_cpuif_virt_update(cs);
-> 
+Also disable csske and bpb from the default and base models >=3D15.
+This will allow to migrate gen15 machines to future machines that
+do not have these features.
+
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-Id: <20190429090250.7648-9-borntraeger@de.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ target/s390x/gen-features.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
+
+diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+index 8fc2e8e72fc9..c346b76bdfbe 100644
+--- a/target/s390x/gen-features.c
++++ b/target/s390x/gen-features.c
+@@ -13,6 +13,7 @@
+=20
+ #include <inttypes.h>
+ #include <stdio.h>
++#include <string.h>
+ #include "cpu_features_def.h"
+=20
+ #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
+@@ -419,6 +420,10 @@ static uint16_t base_GEN14_GA1[] =3D {
+=20
+ #define base_GEN14_GA2 EmptyFeat
+=20
++static uint16_t base_GEN15_GA1[] =3D {
++    S390_FEAT_MISC_INSTRUCTION_EXT3,
++};
++
+ /* Full features (in order of release)
+  * Automatically includes corresponding base features.
+  * Full features are all features this hardware supports even if kvm/QEM=
+U do not
+@@ -548,6 +553,16 @@ static uint16_t full_GEN14_GA1[] =3D {
+=20
+ #define full_GEN14_GA2 EmptyFeat
+=20
++static uint16_t full_GEN15_GA1[] =3D {
++    S390_FEAT_VECTOR_ENH2,
++    S390_FEAT_GROUP_ENH_SORT,
++    S390_FEAT_GROUP_DEFLATE_CONVERSION,
++    S390_FEAT_VECTOR_BCD_ENH,
++    S390_FEAT_GROUP_MSA_EXT_9,
++    S390_FEAT_GROUP_MSA_EXT_9_PCKMO,
++    S390_FEAT_ETOKEN,
++};
++
+ /* Default features (in order of release)
+  * Automatically includes corresponding base features.
+  * Default features are all features this version of QEMU supports for t=
+his
+@@ -624,6 +639,16 @@ static uint16_t default_GEN14_GA1[] =3D {
+=20
+ #define default_GEN14_GA2 EmptyFeat
+=20
++static uint16_t default_GEN15_GA1[] =3D {
++    S390_FEAT_VECTOR_ENH2,
++    S390_FEAT_GROUP_ENH_SORT,
++    S390_FEAT_GROUP_DEFLATE_CONVERSION,
++    S390_FEAT_VECTOR_BCD_ENH,
++    S390_FEAT_GROUP_MSA_EXT_9,
++    S390_FEAT_GROUP_MSA_EXT_9_PCKMO,
++    S390_FEAT_ETOKEN,
++};
++
+ /* QEMU (CPU model) features */
+=20
+ static uint16_t qemu_V2_11[] =3D {
+@@ -740,6 +765,7 @@ static CpuFeatDefSpec CpuFeatDef[] =3D {
+     CPU_FEAT_INITIALIZER(GEN13_GA2),
+     CPU_FEAT_INITIALIZER(GEN14_GA1),
+     CPU_FEAT_INITIALIZER(GEN14_GA2),
++    CPU_FEAT_INITIALIZER(GEN15_GA1),
+ };
+=20
+ #define FEAT_GROUP_INITIALIZER(_name)                  \
+@@ -808,6 +834,11 @@ static void set_bits(uint64_t list[], BitSpec bits)
+     }
+ }
+=20
++static inline void clear_bit(uint64_t list[], unsigned long nr)
++{
++    list[nr / 64] &=3D ~(1ULL << (nr % 64));
++}
++
+ static void print_feature_defs(void)
+ {
+     uint64_t base_feat[S390_FEAT_MAX / 64 + 1] =3D {};
+@@ -818,6 +849,12 @@ static void print_feature_defs(void)
+     printf("\n/* CPU model feature list data */\n");
+=20
+     for (i =3D 0; i < ARRAY_SIZE(CpuFeatDef); i++) {
++        /* With gen15 CSSKE and BPB are deprecated */
++        if (strcmp(CpuFeatDef[i].name, "S390_FEAT_LIST_GEN15_GA1") =3D=3D=
+ 0) {
++            clear_bit(base_feat, S390_FEAT_CONDITIONAL_SSKE);
++            clear_bit(default_feat, S390_FEAT_CONDITIONAL_SSKE);
++            clear_bit(default_feat, S390_FEAT_BPB);
++        }
+         set_bits(base_feat, CpuFeatDef[i].base_bits);
+         /* add the base to the default features */
+         set_bits(default_feat, CpuFeatDef[i].base_bits);
+--=20
+2.20.1
+
 
