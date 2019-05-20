@@ -2,108 +2,70 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 650F1C04AAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 06:23:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 503C8C04AAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 06:23:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 278D6206B6
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 06:23:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 278D6206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 264A4206B6
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 06:23:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 264A4206B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58672 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58679 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSbhk-0000ea-7t
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 02:23:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48933)
+	id 1hSbiA-0000zp-Dx
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 02:23:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hSbgN-0008Pk-4b
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:22:00 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hSbfo-0008AJ-L3
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:21:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hSbgM-0003yS-45
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:21:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46086)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>)
-	id 1hSbgL-0003kG-St; Mon, 20 May 2019 02:21:58 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 59C26C049D67;
-	Mon, 20 May 2019 06:21:40 +0000 (UTC)
-Received: from [10.40.205.57] (unknown [10.40.205.57])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 714A95D9CA;
-	Mon, 20 May 2019 06:21:33 +0000 (UTC)
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
-	aik@ozlabs.ru
-References: <20190520060550.29481-1-david@gibson.dropbear.id.au>
-From: Laurent Vivier <lvivier@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-Message-ID: <6d4a50ac-168d-7390-a5f8-eb5d2d5738a7@redhat.com>
-Date: Mon, 20 May 2019 08:21:32 +0200
+	(envelope-from <laurent@vivier.eu>) id 1hSbfl-0003cR-Og
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:21:24 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:49501)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hSbfl-0003bo-3Z
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:21:21 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1MAfQk-1hM3AS2cyO-00B3B4; Mon, 20 May 2019 08:21:16 +0200
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190519203726.20729-1-richard.henderson@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <93793c2d-9fe1-d246-a678-2511b66d0a3e@vivier.eu>
+Date: Mon, 20 May 2019 08:21:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
 	Thunderbird/52.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190520060550.29481-1-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190519203726.20729-1-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Mon, 20 May 2019 06:21:40 +0000 (UTC)
+X-Provags-ID: V03:K1:ZMXyUCHVlhKuKocdhv7dfdWdeuteW7n09siobfTJ2migoG4i8H4
+	txWiWjiehJKguCs+trJOj09/LdrTIBFtmYPpKvuAbt43Li1b+s7wtJbhUE9/IEAvYYp3ppY
+	EnssssLJNXifg5hiwu1mhcZZLRm7Y1Mse5V7j4S+ArI14HPIhRGLmdtqHDx4haEy0UsbmzL
+	qZhZJfrLU948zpMcLpHHA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:XWhfqq3+6wo=:zR5+XrwQHhvkXNCRe91xMK
+	D5rqEYEWg1Anm2HU6uF3+MgTMz7i1PpwSIzyhOHO6zoCjJycFahSZZLcwnjX7MZF73md3jdOk
+	Txq5eZRXbwm5baFYGzcdIEXQHeLDu1OZebwF4wwgesX55dz53f90qXL1KTfqplSHxHvf/0Xg1
+	R4k9FRw1m2RCO3ILBWnMoJIBeHcrx+bWe7yrvSWPrbUsmd8TABhsa4BKkC7HGkBeuVQqsxT8r
+	TuVz3+4urnPSP0rSY1sFZr6xJZo1U74eI0xeHwnqnFzd2+LOpZoTh6AZ7g+E0wpEc82u7mIUm
+	I2BRGBXXBMyMBSKizK3WIU8/mWP8T5MvXygcHSCqNm8rKzC88EeFnyLORG1etqX0D121B0nup
+	Bi0UOI5oN5h9WFvkrsp6W5vjpWySKbgfeFQM/7x/SeeMIzwPzPfu3KX/R9KjWiPR0vJ1CvYDq
+	+mHMxmvA0u/h/Y2Wzh6nQG0NpbwnWtI4MWOEAS1+iPKx+wtJdqWmBUyxNcrwWQRxnkD8y+6rR
+	4uvm+FEUXvwTKB0u9zx3POH9/pLURgB0YYSbnS7stDSuMvZ40Stql5A+8X8fdafEUoCow91aH
+	lhli6oUCunp74ODzAc//cw3RLwD1WohWmW7yOF/C7xhJs7a/+sUYVDoeFYZZULF1CrwD/k76K
+	e1XCHoQjBzvtFKwCqtl/j2pOArcKNJwGaxf4ZmxE4DIIhRdNZUDoGSvP5u/7ZGGd2iZSG9Lwm
+	L+Qwa5ZuWkddzSz8vpmpIi2QBzpwFE2Ppg+m2FYpKWEM2JHYBr4zWYI/HQQ=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] Fix phb_placement backwards compatibility
+X-Received-From: 217.72.192.73
+Subject: Re: [Qemu-devel] [PATCH v7 00/74] linux-user: Split do_syscall
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -115,86 +77,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: gkurz@kaod.org, alex.williamson@redhat.com, qemu-devel@nongnu.org,
-	clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/05/2019 08:05, David Gibson wrote:
-> When we added support for NVLink2 passthrough devices, we changed the
-> phb_placement hook to handle the placement of NVLink2 bridges' specific
-> resources.  For compatibility we use a version that doesn't do this
-> allocation  for old machine types.
+On 19/05/2019 22:36, Richard Henderson wrote:
+> Based-on: <20190519201953.20161-1-richard.henderson@linaro.org>
+> Aka "linux-user: path, clone, sparc, shmat fixes"
 > 
-> However, because of the delay between when the patch was posted and when
-> it was merged, we ended up with that compatibility hook applying for
-> machine versions 3.1 and earlier whereas it should apply for 4.0 and
-> earlier (since the patch was applied early in the 4.1 tree).
+> Version 6 was
+> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg04794.html
 > 
-> Fixes: ec132efaa81 "spapr: Support NVIDIA V100 GPU with NVLink2"
+> Since v5, I've fixed the ioctl failure that Laurent found, and
+> have done a few more syscalls.
 > 
-> Reported-by: Laurent Vivier <lvivier@redhat.com>
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/spapr.c | 28 +++++++++++++++-------------
->  1 file changed, 15 insertions(+), 13 deletions(-)
+> I've tried to do more testing with LTP, but it's a really annoying
+> testsuite.  There are at least 3 tests that hang forever (before
+> and after this patch set), and the host kernel's OOM handler kills
+> my login session, ending the test run.  This seems to be different
+> behaviour than I was seeing in January, when I did have test runs
+> that completed successfully.
 > 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index bcae30ad26..39e698e9b0 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -4411,18 +4411,7 @@ DEFINE_SPAPR_MACHINE(4_1, "4.1", true);
->  /*
->   * pseries-4.0
->   */
-> -static void spapr_machine_4_0_class_options(MachineClass *mc)
-> -{
-> -    spapr_machine_4_1_class_options(mc);
-> -    compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len);
-> -}
-> -
-> -DEFINE_SPAPR_MACHINE(4_0, "4.0", false);
-> -
-> -/*
-> - * pseries-3.1
-> - */
-> -static void phb_placement_3_1(SpaprMachineState *spapr, uint32_t index,
-> +static void phb_placement_4_0(SpaprMachineState *spapr, uint32_t index,
->                                uint64_t *buid, hwaddr *pio,
->                                hwaddr *mmio32, hwaddr *mmio64,
->                                unsigned n_dma, uint32_t *liobns,
-> @@ -4434,6 +4423,20 @@ static void phb_placement_3_1(SpaprMachineState *spapr, uint32_t index,
->      *nv2atsd = 0;
->  }
->  
-> +static void spapr_machine_4_0_class_options(MachineClass *mc)
-> +{
-> +    SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-> +
-> +    spapr_machine_4_1_class_options(mc);
-> +    compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len);
-> +    smc->phb_placement = phb_placement_4_0;
-> +}
-> +
-> +DEFINE_SPAPR_MACHINE(4_0, "4.0", false);
-> +
-> +/*
-> + * pseries-3.1
-> + */
->  static void spapr_machine_3_1_class_options(MachineClass *mc)
->  {
->      SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-> @@ -4449,7 +4452,6 @@ static void spapr_machine_3_1_class_options(MachineClass *mc)
->      smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
->      smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
->      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_OFF;
-> -    smc->phb_placement = phb_placement_3_1;
->  }
->  
->  DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
+> OTOH, looking back at the v6 cover letter, I now see that I was
+> testing armhf and i386 as guests, whereas this time I was trying
+> aarch64 and ppc64 as guests.  32-bit guests unable to trigger the
+> host OOM killer?
 > 
+> Laurent, is there anything special that you're doing to see these
+> tests run to completion?
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+I'm running them in a container ('unshare chroot') and aarch64 needs a 
+patch that hasn't been merged:
 
+   "[PATCH] linux-user: check valid address in access_ok()"
+   https://patchew.org/QEMU/20190208173520.15007-1-remi@remlab.net/
+
+I have a skipfile that contains:
+
+futex_wait03
+mmap13
+mmap16
+msgctl10
+msgctl11
+ptrace01
+ptrace02
+ptrace03
+ptrace05
+remap_file_pages01
+remap_file_pages02
+sendmsg01
+fork13
+fork14
+creat07
+mremap03
+
+but I didn't update it for a while.
+
+I will test as soon as possible your series in my environment.
+
+Thanks,
+Laurent
 
