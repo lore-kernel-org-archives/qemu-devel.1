@@ -6,76 +6,79 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D997C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 11:10:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C05C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 11:25:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22CB520675
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 11:10:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22CB520675
+	by mail.kernel.org (Postfix) with ESMTPS id C9D5020856
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 11:25:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9D5020856
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33486 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33642 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSgBi-0003kN-8h
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 07:10:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46285)
+	id 1hSgQQ-0007Gm-NO
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 07:25:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hSgAr-0003Me-Km
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 07:09:46 -0400
+	(envelope-from <philmd@redhat.com>) id 1hSgPW-0006sW-7D
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 07:24:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hSgAq-0006KQ-KC
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 07:09:45 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:40496)
+	(envelope-from <philmd@redhat.com>) id 1hSgPV-0007m1-9M
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 07:24:54 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:34000)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hSgAq-0006Ik-F5
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 07:09:44 -0400
-Received: by mail-wm1-f67.google.com with SMTP id 15so8535067wmg.5
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 04:09:44 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hSgPV-0007lO-3X
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 07:24:53 -0400
+Received: by mail-wr1-f67.google.com with SMTP id f8so7765290wrt.1
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 04:24:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=Fi9JkrAxVjZQtxgJ9kWkUXilTWmZw7lNfIgiEeQhb0Q=;
-	b=tuk8MLw2oNQJp1XDP05pJv9Yb7H9b99w0ECcyv2LrhAstoGjQw5dhRiY1Af5YxN2GN
-	+NF1dnvfS98mH5sTAW1kHuLat0goq2D7rLeTmpOywZ11Jm8UuaANzdG5K+7Z5mrSAXfh
-	UOm/1As6BLV60S4MjVAIQoMv+DPAo0ddopcVoH9rejKwbnhJr0430RqB5zT5LoGYtyUZ
-	dggyNr0EFjzU1poBVV88om2XRiMyoAKzC6cM4p4dRDrl2lvOipC5kyKBusGMm9YP6K1Z
-	EnU1d46NQvaMOu/THZTKJbxOYZ1VsVzPY+5OGE28cgXPiZ/UqfVfpB9L/qf+cnsdDDSR
-	q3Tg==
-X-Gm-Message-State: APjAAAUXewQ0+Wpk1yN0An8LcX4SzbfxrIRD4xL6zH5LHEptpjuxSBa7
-	ZCFXqPSvhhthVTZSR3csqCHLtw==
-X-Google-Smtp-Source: APXvYqy+1aW9pgXsrVnWumvzKq/XYfoh/EN+Rz+DBOymuwfy4z+tSQxUxdYqSovvfT5TEf6Klcud1g==
-X-Received: by 2002:a1c:ca0b:: with SMTP id a11mr41833907wmg.52.1558350583228; 
-	Mon, 20 May 2019 04:09:43 -0700 (PDT)
+	bh=hzOrpazV6gdgKD+C58Z37W5Xkj5dzNf7NY4r1mWP11g=;
+	b=CAsG7JyA738RIRcdUpPBmx9SAIZ55+6gZwc2nsfHF8QcmU8zcaF0o8WBTiYqq5EPwU
+	0z5nRtkL1yFgtHMN74AFiMV6EUYQ5MGgWJjGjIMx64/5BWNw1cWrmuoZ/bx4mOvqFYSf
+	f6iSqsUPmoolwvfx9neavb6zmjhKcM3mwEWZWOafGcRGvyA67AciRYui0l0Stny4hB3W
+	slZhsVvSie7sZzAWgjH01u+OCeDm8bLKCTwz3ecG3yqBmH05kqF/gOCVrZ4mumXhkbgA
+	c5+zZFbas1EoZi/4ueu15svjsm85yOKXFlLDLHiJK72P0B69x0AL1mDj3GlFCz666r+H
+	v7LQ==
+X-Gm-Message-State: APjAAAULdeAhr6elDwLnxna1W7LKl+IK4txs4d5Q5cwcc2kkg7v6cSN2
+	FxJyi5i2de7+ouN7qz4wafNbgQ==
+X-Google-Smtp-Source: APXvYqzRhrkLlhJkbfvCKXHlHbDFIEQal8U8v4g2gTrHKYYKPoACuGQEDCCzajvbllfhBcJN+eWMVg==
+X-Received: by 2002:adf:ec0b:: with SMTP id x11mr8721035wrn.88.1558351491807; 
+	Mon, 20 May 2019 04:24:51 -0700 (PDT)
 Received: from [192.168.1.38] (228.red-83-52-173.dynamicip.rima-tde.net.
 	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
-	t15sm15489459wmt.2.2019.05.20.04.09.42
+	a62sm2487549wmh.11.2019.05.20.04.24.50
 	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 20 May 2019 04:09:42 -0700 (PDT)
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-	Peter Maydell <peter.maydell@linaro.org>
-References: <20190506142042.28096-1-clg@kaod.org>
-	<b12201c8-7d5f-2108-6666-75543c38f243@kaod.org>
+	Mon, 20 May 2019 04:24:51 -0700 (PDT)
+To: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+References: <20190510104633.9428-1-kraxel@redhat.com>
+	<20190510104633.9428-11-kraxel@redhat.com>
+	<40966599-9a55-8078-bc49-e2597ce5d498@redhat.com>
+	<20190520052615.ty2bpmxdoajjqvk6@sirius.home.kraxel.org>
+	<84415abd-3066-90db-e10d-51f756aa6767@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
 	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <f1ca56fd-c83d-8ad6-29c9-a8fc6af4531c@redhat.com>
-Date: Mon, 20 May 2019 13:09:41 +0200
+Message-ID: <94272c6c-c12a-5411-4981-332bdb37631b@redhat.com>
+Date: Mon, 20 May 2019 13:24:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <b12201c8-7d5f-2108-6666-75543c38f243@kaod.org>
+In-Reply-To: <84415abd-3066-90db-e10d-51f756aa6767@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] aspeed: cleanups and extensions
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH v2 10/13] tests/vm: freebsd autoinstall,
+ using serial console
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,69 +90,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
+Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
+	qemu-devel@nongnu.org, Kamil Rytarowski <kamil@netbsd.org>,
+	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/20/19 9:47 AM, Cédric Le Goater wrote:
-> Hello,
-> 
-> On 5/6/19 4:20 PM, Cédric Le Goater wrote:
->> Hello,
+On 5/20/19 9:14 AM, Thomas Huth wrote:
+> On 20/05/2019 07.26, Gerd Hoffmann wrote:
+>> On Sun, May 19, 2019 at 12:55:09AM +0200, Philippe Mathieu-Daudé wrote:
+>>> Hi Gerd,
+>>>
+>>> On 5/10/19 12:46 PM, Gerd Hoffmann wrote:
+>>>> Instead of fetching the prebuilt image from patchew download the install
+>>>> iso and prepare the image locally.  Install to disk, using the serial
+>>>> console.  Create qemu user, configure ssh login.  Install packages
+>>>> needed for qemu builds.
+>>>
+>>> I'm impressed how charmly this works :)
+>>>
+>>> 3 comments so far.
+>>>
+>>> 1/ We could record (in tests/vm/freebsd header?) roughly how many local
+>>> storage will be used (or display in 'make vm-help'?). FYI this image
+>>> takes ~3.1GiB.
 >>
->> Here is a series adding a couple of cleanups to the Aspeed SoCs to
->> prepare ground for extensions and new SoCs.
+>> vm-help would be more useful I think.
 >>
->> Thanks,
+>>> 2/ "Autoboot in 9 seconds, hit [Enter] to boot or any other key to stop"
 >>
->> C.
+>> Probably tweakable via loader.conf, I'll check.
 >>
->> Changes since v1:
+>>> 3/ I am a bit annoyed it overwrote my previous
+>>> ~/.cache/qemu-vm/images/freebsd.img VM. Not sure what's the best hash to
+>>> use, maybe "git log -n 1 --pretty=format:%H -- tests/vm/freebsd"?
+>>> (Similarly for other images).
 >>
->>  - moved enum defining the Aspeed controller names under aspeed_soc.h
->>  - removed AspeedSoCInfo 'sdram_base' field
->>  - fixed clang compilation
+>> Then use ~/.cache/qemu-vm/images/freebsd-${hash}.img ?
 >>
->> Cédric Le Goater (3):
->>   aspeed: add a per SoC mapping for the interrupt space
->>   aspeed: add a per SoC mapping for the memory space
-> 
-> I think these two patches are fine to go even if Philippe's comments 
-> are not addressed. There are valid but not a blocker to me.  
+>> Which will fill ~/.cache/qemu-vm/images with stale images over time,
+>> which isn't great either ...
+>>
+>> Or do you have something else in mind?
 
-OK, so:
+Maybe we can simply use a ${VM_IMG_VERSION} and manually increase it
+when there are significant changes.
 
-patches 1 & 2:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+We could add a "make vm-clean-cache-older-than-%" parsing the
+"20days/3months/2y" formats?
 
-Peter, can you apply them?
+> I'd vote to keep the current approach to overwrite "freebsd.img". It's a
+> "cache" directory - if you want to have something persisten, Philippe, I
+> think you should simply copy your image to a different location instead.
 
-> 
->>   aspeed: use sysbus_init_child_obj() to initialize children
-> 
-> Philippe has taken over this patch in a larger series which will go 
-> through Eduardo's tree, if I understood well the emails. When merged, 
-> we can try to re-merge the RTC patchset from Joel. I think we made 
-> things a little more complex than they should have been. 
+My concern came when thinking about bisecting:
 
-Sorry if I made things more complex. I went on PTO after sending
-"hw/arm: Use object_initialize_child for correct reference counting" [*]
-then was slow to address Thomas/Markus comments.
-Then maybe I should start pinging maintainer more aggressively when my
-series are reviewed but not merged, to not delay further developments.
+$ git log --oneline \
+  $(git log --pretty=format:%H \
+    --diff-filter=A -- tests/vm/freebsd)..origin/master | wc -l
+13016
 
-I took note of your comment and will try to keep things simple the next
-time.
+But then I only used "make check-vm" while bisecting twice, so I can
+stop worrying about testing old VMs.
 
 Regards,
 
 Phil.
-
-> 
-> Thanks,
-> 
-> C.
-
 
