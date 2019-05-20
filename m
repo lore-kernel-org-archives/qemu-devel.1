@@ -2,62 +2,62 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 070F8C04AAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 06:40:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42344C04AAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 06:43:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D40F320815
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 06:40:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D40F320815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1941E206B6
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 06:43:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1941E206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58913 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58945 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSby1-0007I8-2g
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 02:40:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52411)
+	id 1hSc1A-0008P9-C4
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 02:43:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hSbxJ-00071C-3m
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:39:30 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hSc0O-00085R-PM
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:42:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hSbxH-00031P-5r
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:39:29 -0400
-Received: from mga01.intel.com ([192.55.52.88]:42523)
+	(envelope-from <cohuck@redhat.com>) id 1hSc0N-0004cN-Vp
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:42:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50508)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hSbxD-0002zV-GS
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 02:39:25 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-	by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	19 May 2019 23:39:21 -0700
-X-ExtLoop1: 1
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by orsmga008.jf.intel.com with ESMTP; 19 May 2019 23:39:19 -0700
-Date: Mon, 20 May 2019 14:38:49 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Juan Quintela <quintela@redhat.com>
-Message-ID: <20190520063849.GB6718@richard>
-References: <20190515121544.4597-1-quintela@redhat.com>
-	<20190515121544.4597-2-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
+	id 1hSc0N-0004bH-Q5; Mon, 20 May 2019 02:42:39 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AAE3230832E1;
+	Mon, 20 May 2019 06:42:34 +0000 (UTC)
+Received: from gondolin (ovpn-204-110.brq.redhat.com [10.40.204.110])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6AF91600C6;
+	Mon, 20 May 2019 06:42:27 +0000 (UTC)
+Date: Mon, 20 May 2019 08:42:23 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <20190520084223.297cf9d6.cohuck@redhat.com>
+In-Reply-To: <20190429090250.7648-1-borntraeger@de.ibm.com>
+References: <20190429090250.7648-1-borntraeger@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190515121544.4597-2-quintela@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 192.55.52.88
-Subject: Re: [Qemu-devel] [PATCH v3 1/8] migration: fix multifd_recv event
- typo
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.44]);
+	Mon, 20 May 2019 06:42:34 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 0/9] s390x: new guest features
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,44 +69,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
+	Collin Walling <walling@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+	Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, May 15, 2019 at 02:15:37PM +0200, Juan Quintela wrote:
->It uses num in multifd_send().  Make it coherent.
->
->Signed-off-by: Juan Quintela <quintela@redhat.com>
+On Mon, 29 Apr 2019 05:02:41 -0400
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
+> Adding gen15.
+> 
+> v2->v3: - merge  deprecation patch into gen 15 patch
+> 	- fix comments
+> 	- use gen15a and gen15b instead of cpuid
+> v1->v2: - rework csske deprecation
+> 	- white space fixes
+> 	- also require msa4 for msa9
+> 
+> Christian Borntraeger (9):
+>   linux header sync
+>   s390x/cpumodel: ignore csske for expansion
+>   s390x/cpumodel: Miscellaneous-Instruction-Extensions Facility 3
+>   s390x/cpumodel: msa9 facility
+>   s390x/cpumodel: vector enhancements
+>   s390x/cpumodel: enhanced sort facility
+>   s390x/cpumodel: add Deflate-conversion facility
+>   s390x/cpumodel: add gen15 defintions
+>   s390x/cpumodel: wire up 8561 and 8562 as gen15 machines
+> 
+>  linux-headers/asm-s390/kvm.h    |   5 +-
+>  target/s390x/cpu_features.c     |  54 ++++++++++++++++
+>  target/s390x/cpu_features.h     |   3 +
+>  target/s390x/cpu_features_def.h |  49 +++++++++++++++
+>  target/s390x/cpu_models.c       |  13 ++--
+>  target/s390x/gen-features.c     | 105 ++++++++++++++++++++++++++++++++
+>  target/s390x/kvm.c              |  18 ++++++
+>  7 files changed, 242 insertions(+), 5 deletions(-)
+> 
 
->---
-> migration/trace-events | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/migration/trace-events b/migration/trace-events
->index de2e136e57..cd50a1e659 100644
->--- a/migration/trace-events
->+++ b/migration/trace-events
->@@ -80,7 +80,7 @@ get_queued_page_not_dirty(const char *block_name, uint64_t tmp_offset, unsigned
-> migration_bitmap_sync_start(void) ""
-> migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
-> migration_throttle(void) ""
->-multifd_recv(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t flags, uint32_t next_packet_size) "channel %d packet number %" PRIu64 " pages %d flags 0x%x next packet size %d"
->+multifd_recv(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t flags, uint32_t next_packet_size) "channel %d packet_num %" PRIu64 " pages %d flags 0x%x next packet size %d"
-> multifd_recv_sync_main(long packet_num) "packet num %ld"
-> multifd_recv_sync_main_signal(uint8_t id) "channel %d"
-> multifd_recv_sync_main_wait(uint8_t id) "channel %d"
->-- 
->2.21.0
->
-
--- 
-Wei Yang
-Help you, Help me
+Thanks, queued to s390-next (with a proper header sync against
+5.2-rc1).
 
