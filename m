@@ -6,57 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98142C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:25:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BACC8C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:26:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7207B21479
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:25:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7207B21479
+	by mail.kernel.org (Postfix) with ESMTPS id 8E4BD21479
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:26:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E4BD21479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38134 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38184 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSl6E-0007xH-JA
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 12:25:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38719)
+	id 1hSl7h-00014a-Np
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 12:26:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hSkx7-00005W-G5
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:15:54 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hSkwx-0008Nq-Tl
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:15:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hSkx4-0003iM-Kp
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:15:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45328)
+	(envelope-from <kwolf@redhat.com>) id 1hSkww-0003dP-UY
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:15:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40172)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hSkwz-0003ea-Ez; Mon, 20 May 2019 12:15:45 -0400
+	id 1hSkwu-0003bu-Ff; Mon, 20 May 2019 12:15:40 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BE1F9309B143;
-	Mon, 20 May 2019 16:15:36 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EDF8B9D51C;
+	Mon, 20 May 2019 16:15:37 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-117-208.ams2.redhat.com
 	[10.36.117.208])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D16BF78386;
-	Mon, 20 May 2019 16:15:35 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 11F76601A0;
+	Mon, 20 May 2019 16:15:36 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon, 20 May 2019 18:14:44 +0200
-Message-Id: <20190520161453.30723-16-kwolf@redhat.com>
+Date: Mon, 20 May 2019 18:14:45 +0200
+Message-Id: <20190520161453.30723-17-kwolf@redhat.com>
 In-Reply-To: <20190520161453.30723-1-kwolf@redhat.com>
 References: <20190520161453.30723-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Mon, 20 May 2019 16:15:39 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Mon, 20 May 2019 16:15:38 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 15/24] blockjob: Remove AioContext notifiers
+Subject: [Qemu-devel] [PULL 16/24] test-block-iothread: Test AioContext
+ propagation for block jobs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,111 +74,101 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The notifiers made sure that the job is quiesced and that the
-job->aio_context field is updated. The first part is unnecessary today
-since bdrv_set_aio_context_ignore() drains the block node, and this
-means drainig the block job, too. The second part can be done in the
-.set_aio_ctx callback of the block job BdrvChildRole.
-
-The notifiers were problematic because they poll the AioContext while
-the graph is in an inconsistent state with some nodes already in the new
-context, but others still in the old context. So removing the notifiers
-not only simplifies the code, but actually makes the code safer.
-
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- blockjob.c | 43 ++-----------------------------------------
- 1 file changed, 2 insertions(+), 41 deletions(-)
+ tests/test-block-iothread.c | 71 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
 
-diff --git a/blockjob.c b/blockjob.c
-index 24e6093a9c..9ca942ba01 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -81,10 +81,6 @@ BlockJob *block_job_get(const char *id)
-     }
+diff --git a/tests/test-block-iothread.c b/tests/test-block-iothread.c
+index 938831c9bd..59f692892e 100644
+--- a/tests/test-block-iothread.c
++++ b/tests/test-block-iothread.c
+@@ -588,6 +588,76 @@ static void test_propagate_diamond(void)
+     bdrv_unref(bs_a);
  }
 =20
--static void block_job_attached_aio_context(AioContext *new_context,
--                                           void *opaque);
--static void block_job_detach_aio_context(void *opaque);
--
- void block_job_free(Job *job)
- {
-     BlockJob *bjob =3D container_of(job, BlockJob, job);
-@@ -92,28 +88,10 @@ void block_job_free(Job *job)
-=20
-     bs->job =3D NULL;
-     block_job_remove_all_bdrv(bjob);
--    blk_remove_aio_context_notifier(bjob->blk,
--                                    block_job_attached_aio_context,
--                                    block_job_detach_aio_context, bjob);
-     blk_unref(bjob->blk);
-     error_free(bjob->blocker);
- }
-=20
--static void block_job_attached_aio_context(AioContext *new_context,
--                                           void *opaque)
--{
--    BlockJob *job =3D opaque;
--    const JobDriver *drv =3D job->job.driver;
--    BlockJobDriver *bjdrv =3D container_of(drv, BlockJobDriver, job_driv=
-er);
--
--    job->job.aio_context =3D new_context;
--    if (bjdrv->attached_aio_context) {
--        bjdrv->attached_aio_context(job, new_context);
--    }
--
--    job_resume(&job->job);
--}
--
- void block_job_drain(Job *job)
- {
-     BlockJob *bjob =3D container_of(job, BlockJob, job);
-@@ -126,23 +104,6 @@ void block_job_drain(Job *job)
-     }
- }
-=20
--static void block_job_detach_aio_context(void *opaque)
--{
--    BlockJob *job =3D opaque;
--
--    /* In case the job terminates during aio_poll()... */
--    job_ref(&job->job);
--
--    job_pause(&job->job);
--
--    while (!job->job.paused && !job_is_completed(&job->job)) {
--        job_drain(&job->job);
--    }
--
--    job->job.aio_context =3D NULL;
--    job_unref(&job->job);
--}
--
- static char *child_job_get_parent_desc(BdrvChild *c)
- {
-     BlockJob *job =3D c->opaque;
-@@ -212,6 +173,8 @@ static void child_job_set_aio_ctx(BdrvChild *c, AioCo=
-ntext *ctx,
-         *ignore =3D g_slist_prepend(*ignore, sibling);
-         bdrv_set_aio_context_ignore(sibling->bs, ctx, ignore);
-     }
++static void test_propagate_mirror(void)
++{
++    IOThread *iothread =3D iothread_new();
++    AioContext *ctx =3D iothread_get_aio_context(iothread);
++    AioContext *main_ctx =3D qemu_get_aio_context();
++    BlockDriverState *src, *target;
++    BlockBackend *blk;
++    Job *job;
++    Error *local_err =3D NULL;
 +
-+    job->job.aio_context =3D ctx;
++    /* Create src and target*/
++    src =3D bdrv_new_open_driver(&bdrv_test, "src", BDRV_O_RDWR, &error_=
+abort);
++    target =3D bdrv_new_open_driver(&bdrv_test, "target", BDRV_O_RDWR,
++                                  &error_abort);
++
++    /* Start a mirror job */
++    mirror_start("job0", src, target, NULL, JOB_DEFAULT, 0, 0, 0,
++                 MIRROR_SYNC_MODE_NONE, MIRROR_OPEN_BACKING_CHAIN,
++                 BLOCKDEV_ON_ERROR_REPORT, BLOCKDEV_ON_ERROR_REPORT,
++                 false, "filter_node", MIRROR_COPY_MODE_BACKGROUND,
++                 &error_abort);
++    job =3D job_get("job0");
++
++    /* Change the AioContext of src */
++    bdrv_try_set_aio_context(src, ctx, &error_abort);
++    g_assert(bdrv_get_aio_context(src) =3D=3D ctx);
++    g_assert(bdrv_get_aio_context(target) =3D=3D ctx);
++    g_assert(job->aio_context =3D=3D ctx);
++
++    /* Change the AioContext of target */
++    aio_context_acquire(ctx);
++    bdrv_try_set_aio_context(target, main_ctx, &error_abort);
++    aio_context_release(ctx);
++    g_assert(bdrv_get_aio_context(src) =3D=3D main_ctx);
++    g_assert(bdrv_get_aio_context(target) =3D=3D main_ctx);
++
++    /* With a BlockBackend on src, changing target must fail */
++    blk =3D blk_new(0, BLK_PERM_ALL);
++    blk_insert_bs(blk, src, &error_abort);
++
++    bdrv_try_set_aio_context(target, ctx, &local_err);
++    g_assert(local_err);
++    error_free(local_err);
++
++    g_assert(blk_get_aio_context(blk) =3D=3D main_ctx);
++    g_assert(bdrv_get_aio_context(src) =3D=3D main_ctx);
++    g_assert(bdrv_get_aio_context(target) =3D=3D main_ctx);
++
++    /* ...unless we explicitly allow it */
++    aio_context_acquire(ctx);
++    blk_set_allow_aio_context_change(blk, true);
++    bdrv_try_set_aio_context(target, ctx, &error_abort);
++    aio_context_release(ctx);
++
++    g_assert(blk_get_aio_context(blk) =3D=3D ctx);
++    g_assert(bdrv_get_aio_context(src) =3D=3D ctx);
++    g_assert(bdrv_get_aio_context(target) =3D=3D ctx);
++
++    job_cancel_sync_all();
++
++    aio_context_acquire(ctx);
++    blk_set_aio_context(blk, main_ctx);
++    bdrv_try_set_aio_context(target, main_ctx, &error_abort);
++    aio_context_release(ctx);
++
++    blk_unref(blk);
++    bdrv_unref(src);
++    bdrv_unref(target);
++}
++
+ int main(int argc, char **argv)
+ {
+     int i;
+@@ -605,6 +675,7 @@ int main(int argc, char **argv)
+     g_test_add_func("/attach/blockjob", test_attach_blockjob);
+     g_test_add_func("/propagate/basic", test_propagate_basic);
+     g_test_add_func("/propagate/diamond", test_propagate_diamond);
++    g_test_add_func("/propagate/mirror", test_propagate_mirror);
+=20
+     return g_test_run();
  }
-=20
- static const BdrvChildRole child_job =3D {
-@@ -471,8 +434,6 @@ void *block_job_create(const char *job_id, const Bloc=
-kJobDriver *driver,
-=20
-     bdrv_op_unblock(bs, BLOCK_OP_TYPE_DATAPLANE, job->blocker);
-=20
--    blk_add_aio_context_notifier(blk, block_job_attached_aio_context,
--                                 block_job_detach_aio_context, job);
-     blk_set_allow_aio_context_change(blk, true);
-=20
-     /* Only set speed when necessary to avoid NotSupported error */
 --=20
 2.20.1
 
