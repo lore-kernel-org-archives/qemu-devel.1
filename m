@@ -6,61 +6,59 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1BA4C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 21:06:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B5C0C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 21:13:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 986442171F
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 21:06:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 986442171F
+	by mail.kernel.org (Postfix) with ESMTPS id 46799216B7
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 21:13:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46799216B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41911 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41984 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSpUM-0001al-Tu
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 17:06:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50814)
+	id 1hSpah-0003ac-97
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 17:13:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hSpTQ-00015V-Cg
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 17:05:33 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hSpZn-0003B5-Kx
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 17:12:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hSpTN-0002tp-MV
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 17:05:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46242)
+	(envelope-from <ehabkost@redhat.com>) id 1hSpZm-0005Zr-Ny
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 17:12:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36378)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hSpTN-0002sy-GD
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 17:05:29 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>)
+	id 1hSpZk-0005YR-8w; Mon, 20 May 2019 17:12:04 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B1CF63086272;
-	Mon, 20 May 2019 21:05:27 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 80BD0308FC4E;
+	Mon, 20 May 2019 21:11:56 +0000 (UTC)
 Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 214361001DE7;
-	Mon, 20 May 2019 21:05:26 +0000 (UTC)
-Date: Mon, 20 May 2019 18:05:25 -0300
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6F69D19C71;
+	Mon, 20 May 2019 21:11:53 +0000 (UTC)
+Date: Mon, 20 May 2019 18:11:51 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190520210525.GE10764@habkost.net>
-References: <1557813999-9175-1-git-send-email-wanpengli@tencent.com>
-	<dcbf44c3-2fb9-02c0-79cc-c8a30373d35a@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <20190520211151.GF10764@habkost.net>
+References: <20190520152921.15959-1-lvivier@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <dcbf44c3-2fb9-02c0-79cc-c8a30373d35a@redhat.com>
+In-Reply-To: <20190520152921.15959-1-lvivier@redhat.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Mon, 20 May 2019 21:05:27 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.43]);
+	Mon, 20 May 2019 21:12:03 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] i386: Enable IA32_MISC_ENABLE MWAIT bit
- when exposing mwait/monitor
+Subject: Re: [Qemu-devel] [PATCH] numa: improve cpu hotplug error message
+ with a wrong node-id
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,71 +70,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wanpeng Li <kernellwp@gmail.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+	Igor Mammedov <imammedo@redhat.com>,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 20, 2019 at 02:59:53PM +0200, Paolo Bonzini wrote:
-> On 14/05/19 08:06, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >=20
-> > The CPUID.01H:ECX[bit 3] ought to mirror the value of the MSR=20
-> > IA32_MISC_ENABLE MWAIT bit and as userspace has control of them=20
-> > both, it is userspace's job to configure both bits to match on=20
-> > the initial setup.
->=20
-> Queued, thanks.
->=20
-> Paolo
->=20
-> > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > ---
-> >  target/i386/cpu.c | 3 +++
-> >  target/i386/cpu.h | 1 +
-> >  2 files changed, 4 insertions(+)
-> >=20
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index 722c551..40b6108 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -4729,6 +4729,9 @@ static void x86_cpu_reset(CPUState *s)
-> > =20
-> >      env->pat =3D 0x0007040600070406ULL;
-> >      env->msr_ia32_misc_enable =3D MSR_IA32_MISC_ENABLE_DEFAULT;
-> > +    if (enable_cpu_pm) {
-> > +        env->msr_ia32_misc_enable |=3D MSR_IA32_MISC_ENABLE_MWAIT;
-> > +    }
+On Mon, May 20, 2019 at 05:29:21PM +0200, Laurent Vivier wrote:
+> On pseries, core-ids are strongly binded to a node-id by the command
+> line option. If a user tries to add a CPU to the wrong node, he has
+> an error but it is not really helpful:
+> 
+>   qemu-system-ppc64 ... -smp 1,maxcpus=64,cores=1,threads=1,sockets=1 \
+>                         -numa node,nodeid=0 -numa node,nodeid=1 ...
+> 
+>   (qemu) device_add power9_v2.0-spapr-cpu-core,core-id=30,node-id=1
+>   Error: node-id=1 must match numa node specified with -numa option
+> 
+> This patch improves this error message by giving to the user the good
+> node-id to use with the core-id he's providing:
+> 
+>   Error: core-id 30 can only be plugged into node-id 0
 
-What if enable_cpu_pm is false but we're running TCG, or if
-enable_cpu_pm is true but we're not using -cpu host?
+Why just core-id?  What about the other fields at slot->props?
 
-Shouldn't this be conditional on
-  (env->features[FEAT_1_ECX] & CPUID_EXT_MONITOR)
-instead?
+> 
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
+>  numa.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/numa.c b/numa.c
+> index 3875e1efda3a..c419c5b5b8ee 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -470,8 +470,9 @@ void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp)
+>                                      "node-id", errp);
+>          }
+>      } else if (node_id != slot->props.node_id) {
+> -        error_setg(errp, "node-id=%d must match numa node specified "
+> -                   "with -numa option", node_id);
+> +        error_setg(errp,
+> +                   "core-id %"PRId64" can only be plugged into node-id %"PRId64,
+> +                   slot->props.core_id, slot->props.node_id);
+>      }
+>  }
+>  
+> -- 
+> 2.20.1
+> 
 
-> > =20
-> >      memset(env->dr, 0, sizeof(env->dr));
-> >      env->dr[6] =3D DR6_FIXED_1;
-> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> > index 0128910..b94c329 100644
-> > --- a/target/i386/cpu.h
-> > +++ b/target/i386/cpu.h
-> > @@ -387,6 +387,7 @@ typedef enum X86Seg {
-> >  #define MSR_IA32_MISC_ENABLE            0x1a0
-> >  /* Indicates good rep/movs microcode on some processors: */
-> >  #define MSR_IA32_MISC_ENABLE_DEFAULT    1
-> > +#define MSR_IA32_MISC_ENABLE_MWAIT      (1ULL << 18)
-> > =20
-> >  #define MSR_MTRRphysBase(reg)           (0x200 + 2 * (reg))
-> >  #define MSR_MTRRphysMask(reg)           (0x200 + 2 * (reg) + 1)
-> >=20
->=20
-
---=20
+-- 
 Eduardo
 
