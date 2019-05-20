@@ -2,79 +2,84 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.1 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8127C04AAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 11:29:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C36C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 11:31:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFB8620644
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 11:29:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFB8620644
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 71B0020644
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 11:31:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i/JE7N6X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71B0020644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33652 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33695 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSgTo-0008JT-W9
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 07:29:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51434)
+	id 1hSgVt-0000g7-OK
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 07:31:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hSgSt-0007ul-PU
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 07:28:24 -0400
+	(envelope-from <mehta.aaru20@gmail.com>) id 1hSgUx-0000JT-0j
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 07:30:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hSgSs-0001Qn-RS
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 07:28:23 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:39374)
+	(envelope-from <mehta.aaru20@gmail.com>) id 1hSgUu-0002nq-6n
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 07:30:30 -0400
+Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:33621)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hSgSs-0001QH-Kc
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 07:28:22 -0400
-Received: by mail-wm1-f68.google.com with SMTP id n25so12235119wmk.4
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 04:28:22 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
+	id 1hSgUq-0002ln-8g
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 07:30:26 -0400
+Received: by mail-pg1-x52d.google.com with SMTP id h17so6683526pgv.0
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 04:30:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=message-id:subject:from:to:date:mime-version
+	:content-transfer-encoding;
+	bh=2CfyU5TJNQt7qc4D3IL6bgMjZPzIRTmeHboOlfS9TjE=;
+	b=i/JE7N6XgXHz0jlHlrwRT4R47OY2QmpIp2Xkos+t3ftNI/67caW3nlivBOVPrm64Q/
+	zDZ/+oXw3+JilRqMddMRLwNw3zEp80yjS0dXCugyqp8BsJCq9n/DfhogJDdNyVGQZ/g8
+	o/blTuj7TL6uHyt1ujxVx/jKbNQp7as0NgIODC7Ahtc6Twcgkssp0GUPbK2YqFa/J7EW
+	jcXRv7IEHx8FFO63HrBarikhpBqDCE/gFTYEyyrVy6AIBvhn2Hd0/oWavGVHeksCm3Yl
+	Qjc9a9OwuEsJkoI8PdrmjZbMXIZHufKMJHIB6WxuHCMRs536+R+drS/MHA9O0V3vqNtU
+	kgVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
+	h=x-gm-message-state:message-id:subject:from:to:date:mime-version
 	:content-transfer-encoding;
-	bh=8ID+Crhd01CRfQKaPeYbUbIbIdZ0sDX8xr2rkZFWDJU=;
-	b=sGE0zpJMw/OlT9fWnwgADSGgrcHqqf8dl4tQWpbKT1CeCZLJFxx7QaF+oMjkoeoJb5
-	51OFnqDyViaThiccdaKc+izgxu3A1sRpUx59f8EFBPga6E2sBTlVKYKK+x60xomuDeWL
-	t1LFi+b8G0k0jIjKdhfr/x54ZHjQWkwU50byEbmVy6qxhOlCynhZWtQ69ln4ehfw3/W6
-	RWdjan95zczYD+1jWaaGcixUlcKk4oNTdCU19ih3N5tIYHYDeJpGwP4d9D5RVCN0+aM3
-	vvTwef3O8wV3OlvMM2DVJUnfMoXpX4mEG//J96JVRDM6dYTaRdY3wnuyBWKl60bsfhVB
-	4Rwg==
-X-Gm-Message-State: APjAAAVaihlyYc3kEyc7HXVPoH1CboZfFcMExLPPu8rC2UrBHbtORpL/
-	fcTrKrHvPBsAgMDEQEK0IaSawg==
-X-Google-Smtp-Source: APXvYqwmTwziUj7UzdlWSdoUPRzg2U3ZJTd4I3W6+h3pFsRkSHXS4QzUdGgP7oAQUKkQBYzyjwgA2A==
-X-Received: by 2002:a1c:98d0:: with SMTP id
-	a199mr11001348wme.140.1558351701502; 
-	Mon, 20 May 2019 04:28:21 -0700 (PDT)
-Received: from [192.168.1.38] (228.red-83-52-173.dynamicip.rima-tde.net.
-	[83.52.173.228])
-	by smtp.gmail.com with ESMTPSA id 74sm2890335wma.7.2019.05.20.04.28.20
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 20 May 2019 04:28:21 -0700 (PDT)
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20190520081805.15019-1-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <6f4bcfe3-66b6-8c2b-e56b-d90c7c5bcfb1@redhat.com>
-Date: Mon, 20 May 2019 13:28:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190520081805.15019-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH] usb-tablet: fix serial compat property
+	bh=2CfyU5TJNQt7qc4D3IL6bgMjZPzIRTmeHboOlfS9TjE=;
+	b=cf6eZFZCjH2T6Q9tgqgKkrOtQGUrToWqZ9tFHpu783lAhtTEWCbz1+XwyqDJ04DsNp
+	Le+FT1R0Da+DvAe8c6ujc3ciY3KnZJots/yxk0SzQrq9JbJfOEWbCBzwhxKjFQ8s1/Xe
+	yRUAsHPLaH6ujgiFoH4vHc3QbPcIn7ZLgoVsf8mLVkypnNRaTCUjkuZzlcwOmGfHfP4p
+	Ogoi0xixGKQy4/Soa9osyYOmnmK0ZgCBei6sVJ8YqsmjdlKRnspj4MVzgY+bgBzVmW6z
+	QBn188La77+lAc1jKgf/yoVULMr2DXVW8FpWZ/2s7BrIsoSGoSTj6F1RWuYUg75SLrAh
+	ic2g==
+X-Gm-Message-State: APjAAAWdZkGT0YJ4zABO+C8RcrunSgOo4cFdBtVHWpBKkvBpXxd4naCd
+	FbLSeefRatB83NNqe2A6clumGPPjRNM=
+X-Google-Smtp-Source: APXvYqxLPIXqKwsJqluCBgtvHa64eLWAk1g+0vqqaVtpw+eJlbTZesAR9lLELOeXgKnrEH6ZDb12Zg==
+X-Received: by 2002:a65:4544:: with SMTP id x4mr51839417pgr.323.1558351820483; 
+	Mon, 20 May 2019 04:30:20 -0700 (PDT)
+Received: from am-swift ([120.57.121.233]) by smtp.gmail.com with ESMTPSA id
+	z11sm34893189pfg.187.2019.05.20.04.30.17
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Mon, 20 May 2019 04:30:19 -0700 (PDT)
+Message-ID: <8c0a113e959cc2419aa52253c261e111ac9caf4a.camel@gmail.com>
+From: Aarushi Mehta <mehta.aaru20@gmail.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, jsnow@redhat.com
+Date: Mon, 20 May 2019 17:00:15 +0530
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::52d
+Subject: [Qemu-devel] [Bug] Docs build fails at interop.rst
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,40 +91,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org, dgilbert@redhat.com,
-	Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/20/19 10:18 AM, Gerd Hoffmann wrote:
-> s/kbd/tablet/, fixes cut+paste bug.
-> 
-> Cc: qemu-stable@nongnu.org
-> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/core/machine.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 5d046a43e3d2..eb34f53a85b0 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -36,7 +36,7 @@ GlobalProperty hw_compat_3_1[] = {
->      { "tpm-tis", "ppi", "false" },
->      { "usb-kbd", "serial", "42" },
->      { "usb-mouse", "serial", "42" },
-> -    { "usb-kbd", "serial", "42" },
-> +    { "usb-tablet", "serial", "42" },
+https://paste.fedoraproject.org/paste/kOPx4jhtUli---TmxSLrlw
+running python3-sphinx-2.0.1-1.fc31.noarch on Fedora release 31
+(Rawhide)
 
-Ah! Now commit b63e10508be makes sense.
+uname - a
+Linux iouring 5.1.0-0.rc6.git3.1.fc31.x86_64 #1 SMP Thu Apr 25 14:25:32
+UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
 
-Fixes: b63e10508be
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reverting commmit 90edef80a0852cf8a3d2668898ee40e8970e431
+allows for the build to occur
 
->      { "virtio-blk-device", "discard", "false" },
->      { "virtio-blk-device", "write-zeroes", "false" },
->  };
-> 
+Regards
+Aarushi Mehta
+
 
