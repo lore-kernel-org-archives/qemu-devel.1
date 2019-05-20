@@ -2,100 +2,67 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24225C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 20:46:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA03BC04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 21:01:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0124821479
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 20:46:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0124821479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 870702171F
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 21:01:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 870702171F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41681 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41858 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSpAa-0004GP-HB
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 16:46:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46525)
+	id 1hSpPb-0007hB-Pf
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 17:01:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxiwell@linux.ibm.com>) id 1hSp9C-0003Rt-8S
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 16:44:39 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hSpOV-0007IZ-FT
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 17:00:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxiwell@linux.ibm.com>) id 1hSp9B-0006NC-10
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 16:44:38 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50552)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxiwell@linux.ibm.com>)
-	id 1hSp9A-0006LL-M5
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 16:44:36 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4KKb5UG129731
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 16:44:35 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2sm2m31w9y-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 16:44:35 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <maxiwell@linux.ibm.com>;
-	Mon, 20 May 2019 21:44:34 +0100
-Received: from b01cxnp23032.gho.pok.ibm.com (9.57.198.27)
-	by e17.ny.us.ibm.com (146.89.104.204) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Mon, 20 May 2019 21:44:32 +0100
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
-	[9.57.199.110])
-	by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	x4KKiVBM37027842
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Mon, 20 May 2019 20:44:31 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 38BC2AE05F;
-	Mon, 20 May 2019 20:44:31 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C54BAAE060;
-	Mon, 20 May 2019 20:44:29 +0000 (GMT)
-Received: from maxibm.ibmuc.com (unknown [9.85.147.231])
-	by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-	Mon, 20 May 2019 20:44:29 +0000 (GMT)
-From: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 20 May 2019 17:43:40 -0300
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190520204340.832-1-maxiwell@linux.ibm.com>
-References: <20190520204340.832-1-maxiwell@linux.ibm.com>
+	(envelope-from <ehabkost@redhat.com>) id 1hSpOT-00082Q-8o
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 17:00:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50198)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hSpOR-000815-GC
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 17:00:24 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E383EF74CC;
+	Mon, 20 May 2019 21:00:14 +0000 (UTC)
+Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C9B305DF27;
+	Mon, 20 May 2019 21:00:06 +0000 (UTC)
+Date: Mon, 20 May 2019 17:59:59 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Message-ID: <20190520205959.GC10764@habkost.net>
+References: <20190215103239.28640-1-berrange@redhat.com>
+	<20190215103239.28640-2-berrange@redhat.com>
+	<20190517190129.GA17245@habkost.net>
+	<20190520095611.GD21976@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19052020-0040-0000-0000-000004F20D6D
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011132; HX=3.00000242; KW=3.00000007;
-	PH=3.00000004; SC=3.00000286; SDB=6.01206188; UDB=6.00633353;
-	IPR=6.00987148; 
-	MB=3.00026975; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-20 20:44:33
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052020-0041-0000-0000-000008FE206E
-Message-Id: <20190520204340.832-2-maxiwell@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-20_08:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=962 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1905200129
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: [Qemu-devel] [PATCH 1/1] spapr: Do not re-read the clock on
- pre_save handler on migration
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190520095611.GD21976@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.38]);
+	Mon, 20 May 2019 21:00:20 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] hw: report invalid
+ disable-legacy|modern usage for virtio-1-only devs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -107,73 +74,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>,
-	david@gibson.dropbear.id.au
+Cc: Gonglei <arei.gonglei@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This handler was added in the commit:
-  42043e4f1241: spapr: clock should count only if vm is running
+On Mon, May 20, 2019 at 10:56:11AM +0100, Daniel P. Berrang=E9 wrote:
+> On Fri, May 17, 2019 at 04:01:29PM -0300, Eduardo Habkost wrote:
+> > Hi,
+> >=20
+> > Sorry for taking so long to look at this more closely:
+> >=20
+> > On Fri, Feb 15, 2019 at 10:32:38AM +0000, Daniel P. Berrang=E9 wrote:
+> > > A number of virtio devices (gpu, crypto, mouse, keyboard, tablet) o=
+nly
+> > > support the virtio-1 (aka modern) mode. Currently if the user launc=
+hes
+> > > QEMU, setting those devices to enable legacy mode, QEMU will silent=
+ly
+> > > create them in modern mode, ignoring the user's (mistaken) request.
+> > >=20
+> > > This patch introduces proper data validation so that an attempt to
+> > > configure a virtio-1-only devices in legacy mode gets reported as a=
+n
+> > > error to the user.
+> > >=20
+> > > Checking this required introduction of a new field to explicitly tr=
+ack
+> > > what operating model is to be used for a device, separately from th=
+e
+> > > disable_modern and disable_legacy fields that record the user's
+> > > requested configuration.
+> >=20
+> > I'm still trying to understand why we need to add a new field.
+> >=20
+> > If disable_modern, disable_legacy and mode are always expected to
+> > be consistent with each other, why do we need another field?
+> >=20
+> > If they are not always consistent with each other, when exactly
+> > do we want them to be inconsistent, and why?
+>=20
+> The pain point is that we're using the existing variables to record
+> two distinct pieces of information
+>=20
+>  - The user's request for modern vs legacy
+>  - The PCI bus requirements for modern vs legacy
+>=20
+> The existing code would overwrite the user's setting for
+> "disable_legacy" when deciding whether the device is in
+> a PCI or PCIe port. This happens in virtio_pci_realize.
+>=20
+> We can only report errors with the user's requested config
+> after the sub-classes call virtio_pci_force_virtio_1, but
+> this doesn't happen until virtio_${subclass}_pci_release.
+>=20
+> So by the time we're able to report errors, virtio_pci_realize
+> has already overwritten the user's disable_legacy setting, so
+> we've lost the very piece of info we need to check to report
+> errors with.
 
-In a scenario without migration, this pre_save handler is not
-triggered, so the 'stop/cont' commands save and restore the clock
-in the function 'cpu_ppc_clock_vm_state_change.' The SW clock
-in the guest doesn't know about this pause.
+Oh, that's the information I was missing.  Thanks!
 
-If the command 'migrate' is called between 'stop' and 'cont',
-the pre_save handler re-read the clock, and the SW clock in the
-guest will know about the pause between 'stop' and 'migrate.'
-If the guest is running a workload like HTC, a side-effect of
-this is a lot of process stall messages (with call traces) in
-the kernel guest.
+>=20
+> Given the ordering of virtio_pci_realize vs the calls
+> to virtio_pci_force_virtio_1 by subclasses, I don't see any
+> option other than to use separate variables for the two
+> distinct pieces of information.
 
-Signed-off-by: Maxiwell S. Garcia <maxiwell@linux.ibm.com>
----
- hw/ppc/ppc.c | 24 ------------------------
- 1 file changed, 24 deletions(-)
+We could replace the virtio_pci_force_virtio_1() calls with a new
+VirtioDeviceClass::virtio_1_only boolean field, to be handled by
+virtio_pci_realize() before overriding disable_legacy.
 
-diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
-index ad20584f26..3fb50cbeee 100644
---- a/hw/ppc/ppc.c
-+++ b/hw/ppc/ppc.c
-@@ -1056,35 +1056,11 @@ void cpu_ppc_clock_vm_state_change(void *opaque, int running,
-     }
- }
- 
--/*
-- * When migrating, read the clock just before migration,
-- * so that the guest clock counts during the events
-- * between:
-- *
-- *  * vm_stop()
-- *  *
-- *  * pre_save()
-- *
-- *  This reduces clock difference on migration from 5s
-- *  to 0.1s (when max_downtime == 5s), because sending the
-- *  final pages of memory (which happens between vm_stop()
-- *  and pre_save()) takes max_downtime.
-- */
--static int timebase_pre_save(void *opaque)
--{
--    PPCTimebase *tb = opaque;
--
--    timebase_save(tb);
--
--    return 0;
--}
--
- const VMStateDescription vmstate_ppc_timebase = {
-     .name = "timebase",
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .minimum_version_id_old = 1,
--    .pre_save = timebase_pre_save,
-     .fields      = (VMStateField []) {
-         VMSTATE_UINT64(guest_timebase, PPCTimebase),
-         VMSTATE_INT64(time_of_the_day_ns, PPCTimebase),
--- 
-2.20.1
+But this can be done as a follow up patch, so:
 
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+--=20
+Eduardo
 
