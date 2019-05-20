@@ -2,69 +2,73 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 674E1C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 20:14:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E893EC04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 20:21:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4115B20863
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 20:14:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4115B20863
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C4EAF216B7
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 20:21:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4EAF216B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41289 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41406 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSofc-00004r-Dl
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 16:14:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41206)
+	id 1hSon0-0004sK-OG
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 16:21:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hSoek-0008BM-Ob
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 16:13:11 -0400
+	(envelope-from <bounces@canonical.com>) id 1hSmIS-0007mw-Iw
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:42:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hSoei-0001ic-Mx
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 16:13:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52092)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1hSoeg-0001ex-Pl; Mon, 20 May 2019 16:13:08 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4CFBB8830F;
-	Mon, 20 May 2019 20:13:01 +0000 (UTC)
-Received: from x1.home (ovpn-117-92.phx2.redhat.com [10.3.117.92])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A837518793;
-	Mon, 20 May 2019 20:12:54 +0000 (UTC)
-Date: Mon, 20 May 2019 14:12:54 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Li Qiang <liq3ea@gmail.com>
-Message-ID: <20190520141254.1c97a9aa@x1.home>
-In-Reply-To: <CAKXe6SLsoyCh=O1yyOFOukYdFoeySpSS1H8QG7fhp1ZQ35vD+g@mail.gmail.com>
-References: <20190518032811.60341-1-liq3ea@163.com>
-	<20190518032811.60341-2-liq3ea@163.com>
-	<20190518082020.6b223ab0@x1.home>
-	<CAKXe6SLsoyCh=O1yyOFOukYdFoeySpSS1H8QG7fhp1ZQ35vD+g@mail.gmail.com>
-Organization: Red Hat
+	(envelope-from <bounces@canonical.com>) id 1hSmIK-0006D8-6N
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:41:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44692)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hSmI9-0005TT-Ln
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:41:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hSmHD-0006b5-AK
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 17:40:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4AA8A2E8050
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 17:40:43 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Mon, 20 May 2019 20:13:04 +0000 (UTC)
+Date: Mon, 20 May 2019 17:33:58 -0000
+From: Cleber Rosa <cleber.gnu@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: cleber-gnu
+X-Launchpad-Bug-Reporter: Cleber Rosa (cleber-gnu)
+X-Launchpad-Bug-Modifier: Cleber Rosa (cleber-gnu)
+Message-Id: <155837363818.14706.8629235118425908874.malonedeb@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18962";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: bfa0ea0df6adc980f1bde945350f8536956687e7
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/4] hw: vfio: drop TYPE_FOO MACRO in
- VMStateDescription
+X-Received-From: 91.189.90.7
+X-Mailman-Approved-At: Mon, 20 May 2019 16:20:23 -0400
+Subject: [Qemu-devel] [Bug 1829779] [NEW] qemu-system-arm and
+ qemu-system-aarch64 QMP hangs after kernel boots
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -73,126 +77,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, qemu-trivial@nongnu.org, Li Qiang <liq3ea@163.com>,
-	Qemu Developers <qemu-devel@nongnu.org>,
-	Philippe =?UTF-8?B?TWF0?= =?UTF-8?B?aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Reply-To: Bug 1829779 <1829779@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 20 May 2019 09:29:21 +0800
-Li Qiang <liq3ea@gmail.com> wrote:
+Public bug reported:
 
-> Alex Williamson <alex.williamson@redhat.com> =E4=BA=8E2019=E5=B9=B45=E6=
-=9C=8818=E6=97=A5=E5=91=A8=E5=85=AD =E4=B8=8B=E5=8D=8810:20=E5=86=99=E9=81=
-=93=EF=BC=9A
->=20
-> > On Fri, 17 May 2019 20:28:09 -0700
-> > Li Qiang <liq3ea@163.com> wrote:
-> > =20
-> > > As the vmstate structure names aren't related with
-> > > the QOM type names. =20
-> >
-> > Seems contrary to the first patch in the series.
-> >
-> > =20
-> No, once there is a discussion of this:
-> -->https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg02175.html =20
+After booting a Linux kernel on both arm and aarch64, the QMP sockets gets =
+unresponsive. Initially, this was thought to be limited to "quit" commands,=
+ but it reproduced with others (such as in this
+reproducer).  This is a partial log output:
+    =
 
-Ok, then rather than the commit log above, it would be more useful (at
-least to me) to state:
+   >>> {'execute': 'qmp_capabilities'}
+   <<< {'return': {}}
+   Booting Linux on physical CPU 0x0000000000 [0x410fd034]
+   Linux version 4.18.16-300.fc29.aarch64 (mockbuild@buildvm-aarch64-02.arm=
+.fedoraproject.org) (gcc version 8.2.1 20180801 (Red Hat 8.2.1-2) (GCC)) #1=
+ SMP Sat Oct 20 23:12:22 UTC 2018
+   ...
+   Policy zone: DMA32
+   Kernel command line: printk.time=3D0 console=3DttyAMA0
+   >>> {'execute': 'stop'}
+   <<< {'timestamp': {'seconds': 1558370331, 'microseconds': 470173}, 'even=
+t': 'STOP'}
+   <<< {'return': {}}
+   >>> {'execute': 'cont'}
+   <<< {'timestamp': {'seconds': 1558370331, 'microseconds': 470849}, 'even=
+t': 'RESUME'}
+   <<< {'return': {}}
+   >>> {'execute': 'stop'}
+    =
 
-  It's recommended that VMStateDescription names are decoupled from QOM
-  type names as the latter may freely change without consideration of
-  migration compatibility.
+Sometimes it takes just the first "stop" command.  Overall, I was able to r=
+eproduce 100% of times when applied on top of 6d8e75d41c58892ccc5d4ad61c4da=
+476684c1c83.
 
-  Link: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg02175.html
+The reproducer test can be seen/fetched at:
+ - https://github.com/clebergnu/qemu/commit/c778e28c24030c4a36548b714293b31=
+9f4bf18df
 
-Otherwise this appears as a rather arbitrary change.  Thanks,
+And test results from Travis CI can be seen at:
+ - https://travis-ci.org/clebergnu/qemu/jobs/534915669
 
-Alex
+For convenience purposes, here's qemu-system-aarch64 launching and hanging =
+on the first "stop":
+ - https://travis-ci.org/clebergnu/qemu/jobs/534915669#L3615
+ - https://travis-ci.org/clebergnu/qemu/jobs/534915669#L3645
 
-> > > CC: qemu-trivial@nongnu.org
-> > > Signed-off-by: Li Qiang <liq3ea@163.com>
-> > > ---
-> > >  hw/vfio/amd-xgbe.c      | 2 +-
-> > >  hw/vfio/ap.c            | 2 +-
-> > >  hw/vfio/calxeda-xgmac.c | 2 +-
-> > >  hw/vfio/ccw.c           | 2 +-
-> > >  hw/vfio/platform.c      | 2 +-
-> > >  5 files changed, 5 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/hw/vfio/amd-xgbe.c b/hw/vfio/amd-xgbe.c
-> > > index ee64a3b4a2..1b06c0f3ea 100644
-> > > --- a/hw/vfio/amd-xgbe.c
-> > > +++ b/hw/vfio/amd-xgbe.c
-> > > @@ -26,7 +26,7 @@ static void amd_xgbe_realize(DeviceState *dev, Erro=
-r =20
-> > **errp) =20
-> > >  }
-> > >
-> > >  static const VMStateDescription vfio_platform_amd_xgbe_vmstate =3D {
-> > > -    .name =3D TYPE_VFIO_AMD_XGBE,
-> > > +    .name =3D "vfio-amd-xgbe",
-> > >      .unmigratable =3D 1,
-> > >  };
-> > >
-> > > diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-> > > index d8b79ebe53..564751650f 100644
-> > > --- a/hw/vfio/ap.c
-> > > +++ b/hw/vfio/ap.c
-> > > @@ -155,7 +155,7 @@ static void vfio_ap_reset(DeviceState *dev)
-> > >  }
-> > >
-> > >  static const VMStateDescription vfio_ap_vmstate =3D {
-> > > -    .name =3D VFIO_AP_DEVICE_TYPE,
-> > > +    .name =3D "vfio-ap",
-> > >      .unmigratable =3D 1,
-> > >  };
-> > >
-> > > diff --git a/hw/vfio/calxeda-xgmac.c b/hw/vfio/calxeda-xgmac.c
-> > > index e7767c4b02..6cc608b6ca 100644
-> > > --- a/hw/vfio/calxeda-xgmac.c
-> > > +++ b/hw/vfio/calxeda-xgmac.c
-> > > @@ -26,7 +26,7 @@ static void calxeda_xgmac_realize(DeviceState *dev,=
- =20
-> > Error **errp) =20
-> > >  }
-> > >
-> > >  static const VMStateDescription vfio_platform_calxeda_xgmac_vmstate =
-=3D {
-> > > -    .name =3D TYPE_VFIO_CALXEDA_XGMAC,
-> > > +    .name =3D "vfio-calxeda-xgmac",
-> > >      .unmigratable =3D 1,
-> > >  };
-> > >
-> > > diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> > > index 31dd3a2a87..d9e39552e2 100644
-> > > --- a/hw/vfio/ccw.c
-> > > +++ b/hw/vfio/ccw.c
-> > > @@ -468,7 +468,7 @@ static Property vfio_ccw_properties[] =3D {
-> > >  };
-> > >
-> > >  static const VMStateDescription vfio_ccw_vmstate =3D {
-> > > -    .name =3D TYPE_VFIO_CCW,
-> > > +    .name =3D "vfio-ccw",
-> > >      .unmigratable =3D 1,
-> > >  };
-> > >
-> > > diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-> > > index 398db38f14..e59a0234dd 100644
-> > > --- a/hw/vfio/platform.c
-> > > +++ b/hw/vfio/platform.c
-> > > @@ -697,7 +697,7 @@ out:
-> > >  }
-> > >
-> > >  static const VMStateDescription vfio_platform_vmstate =3D {
-> > > -    .name =3D TYPE_VFIO_PLATFORM,
-> > > +    .name =3D "vfio-platform",
-> > >      .unmigratable =3D 1,
-> > >  };
-> > > =20
-> >
-> > =20
+And here's qemu-system-arm hanging the very same way:
+ - https://travis-ci.org/clebergnu/qemu/jobs/534915669#L3780
+ - https://travis-ci.org/clebergnu/qemu/jobs/534915669#L3800
 
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1829779
+
+Title:
+  qemu-system-arm and qemu-system-aarch64 QMP hangs after kernel boots
+
+Status in QEMU:
+  New
+
+Bug description:
+  After booting a Linux kernel on both arm and aarch64, the QMP sockets get=
+s unresponsive. Initially, this was thought to be limited to "quit" command=
+s, but it reproduced with others (such as in this
+  reproducer).  This is a partial log output:
+      =
+
+     >>> {'execute': 'qmp_capabilities'}
+     <<< {'return': {}}
+     Booting Linux on physical CPU 0x0000000000 [0x410fd034]
+     Linux version 4.18.16-300.fc29.aarch64 (mockbuild@buildvm-aarch64-02.a=
+rm.fedoraproject.org) (gcc version 8.2.1 20180801 (Red Hat 8.2.1-2) (GCC)) =
+#1 SMP Sat Oct 20 23:12:22 UTC 2018
+     ...
+     Policy zone: DMA32
+     Kernel command line: printk.time=3D0 console=3DttyAMA0
+     >>> {'execute': 'stop'}
+     <<< {'timestamp': {'seconds': 1558370331, 'microseconds': 470173}, 'ev=
+ent': 'STOP'}
+     <<< {'return': {}}
+     >>> {'execute': 'cont'}
+     <<< {'timestamp': {'seconds': 1558370331, 'microseconds': 470849}, 'ev=
+ent': 'RESUME'}
+     <<< {'return': {}}
+     >>> {'execute': 'stop'}
+      =
+
+  Sometimes it takes just the first "stop" command.  Overall, I was able to=
+ reproduce 100% of times when applied on top of 6d8e75d41c58892ccc5d4ad61c4=
+da476684c1c83.
+
+  The reproducer test can be seen/fetched at:
+   - https://github.com/clebergnu/qemu/commit/c778e28c24030c4a36548b714293b=
+319f4bf18df
+
+  And test results from Travis CI can be seen at:
+   - https://travis-ci.org/clebergnu/qemu/jobs/534915669
+
+  For convenience purposes, here's qemu-system-aarch64 launching and hangin=
+g on the first "stop":
+   - https://travis-ci.org/clebergnu/qemu/jobs/534915669#L3615
+   - https://travis-ci.org/clebergnu/qemu/jobs/534915669#L3645
+
+  And here's qemu-system-arm hanging the very same way:
+   - https://travis-ci.org/clebergnu/qemu/jobs/534915669#L3780
+   - https://travis-ci.org/clebergnu/qemu/jobs/534915669#L3800
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1829779/+subscriptions
 
