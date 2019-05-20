@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D129C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:21:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 424AFC04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:22:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 260B520675
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:21:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 260B520675
+	by mail.kernel.org (Postfix) with ESMTPS id 1718620675
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 17:22:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1718620675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39053 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39055 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSlyh-0006qb-8a
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 13:21:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53728)
+	id 1hSlzB-0007SR-1s
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 13:22:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hSlkF-0002Zl-N9
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:06:40 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hSlk7-0002Uf-OE
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:06:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hSlkE-0003i9-9L
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:06:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34100)
+	(envelope-from <cohuck@redhat.com>) id 1hSlk5-0003fX-PJ
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 13:06:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58688)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
-	id 1hSlkE-0003hy-4N; Mon, 20 May 2019 13:06:38 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	id 1hSlk5-0003fB-Hi; Mon, 20 May 2019 13:06:29 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5F365C057E3F;
-	Mon, 20 May 2019 17:06:37 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 409F27FDC9;
+	Mon, 20 May 2019 17:06:28 +0000 (UTC)
 Received: from localhost (ovpn-204-110.brq.redhat.com [10.40.204.110])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0CCCA60BEC;
-	Mon, 20 May 2019 17:06:31 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id F3B4A46E61;
+	Mon, 20 May 2019 17:06:21 +0000 (UTC)
 From: Cornelia Huck <cohuck@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 May 2019 19:02:26 +0200
-Message-Id: <20190520170302.13643-19-cohuck@redhat.com>
+Date: Mon, 20 May 2019 19:02:25 +0200
+Message-Id: <20190520170302.13643-18-cohuck@redhat.com>
 In-Reply-To: <20190520170302.13643-1-cohuck@redhat.com>
 References: <20190520170302.13643-1-cohuck@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Mon, 20 May 2019 17:06:37 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.27]);
+	Mon, 20 May 2019 17:06:28 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 18/54] s390x/tcg: Implement VECTOR EXCLUSIVE OR
+Subject: [Qemu-devel] [PULL 17/54] s390x/tcg: Implement VECTOR COUNT
+ TRAILING ZEROS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,47 +76,120 @@ Sender: "Qemu-devel"
 
 From: David Hildenbrand <david@redhat.com>
 
-Easy, we can reuse an existing gvec helper.
+Implement it similar to VECTOR COUNT LEADING ZEROS.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/insn-data.def      | 2 ++
- target/s390x/translate_vx.inc.c | 7 +++++++
- 2 files changed, 9 insertions(+)
+ target/s390x/helper.h           |  2 ++
+ target/s390x/insn-data.def      |  2 ++
+ target/s390x/translate_vx.inc.c | 28 ++++++++++++++++++++++++++++
+ target/s390x/vec_int_helper.c   | 14 ++++++++++++++
+ 4 files changed, 46 insertions(+)
 
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 670677427c10..60b8bd3c431a 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -152,6 +152,8 @@ DEF_HELPER_FLAGS_4(gvec_vavgl8, TCG_CALL_NO_RWG, void=
+, ptr, cptr, cptr, i32)
+ DEF_HELPER_FLAGS_4(gvec_vavgl16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
+ i32)
+ DEF_HELPER_FLAGS_3(gvec_vclz8, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
+ DEF_HELPER_FLAGS_3(gvec_vclz16, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
++DEF_HELPER_FLAGS_3(gvec_vctz8, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
++DEF_HELPER_FLAGS_3(gvec_vctz16, TCG_CALL_NO_RWG, void, ptr, cptr, i32)
+=20
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_3(servc, i32, env, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index a355b7f62f1e..b8400c191a7f 100644
+index be3c07aafb75..a355b7f62f1e 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1088,6 +1088,8 @@
+@@ -1086,6 +1086,8 @@
+     E(0xe7f9, VCHL,    VRR_b, V,   0, 0, 0, 0, vc, 0, TCG_COND_GTU, IF_V=
+EC)
+ /* VECTOR COUNT LEADING ZEROS */
      F(0xe753, VCLZ,    VRR_a, V,   0, 0, 0, 0, vclz, 0, IF_VEC)
- /* VECTOR COUNT TRAILING ZEROS */
-     F(0xe752, VCTZ,    VRR_a, V,   0, 0, 0, 0, vctz, 0, IF_VEC)
-+/* VECTOR EXCLUSIVE OR */
-+    F(0xe76d, VX,      VRR_c, V,   0, 0, 0, 0, vx, 0, IF_VEC)
++/* VECTOR COUNT TRAILING ZEROS */
++    F(0xe752, VCTZ,    VRR_a, V,   0, 0, 0, 0, vctz, 0, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index 2f13d6fa9f43..0935857eff09 100644
+index 948c9fbbb10f..2f13d6fa9f43 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -1476,3 +1476,10 @@ static DisasJumpType op_vctz(DisasContext *s, Disa=
+@@ -1448,3 +1448,31 @@ static DisasJumpType op_vclz(DisasContext *s, Disa=
 sOps *o)
      gen_gvec_2(get_field(s->fields, v1), get_field(s->fields, v2), &g[es=
 ]);
      return DISAS_NEXT;
  }
 +
-+static DisasJumpType op_vx(DisasContext *s, DisasOps *o)
++static void gen_ctz_i32(TCGv_i32 d, TCGv_i32 a)
 +{
-+    gen_gvec_fn_3(xor, ES_8, get_field(s->fields, v1), get_field(s->fiel=
-ds, v2),
-+                 get_field(s->fields, v3));
++    tcg_gen_ctzi_i32(d, a, 32);
++}
++
++static void gen_ctz_i64(TCGv_i64 d, TCGv_i64 a)
++{
++    tcg_gen_ctzi_i64(d, a, 64);
++}
++
++static DisasJumpType op_vctz(DisasContext *s, DisasOps *o)
++{
++    const uint8_t es =3D get_field(s->fields, m3);
++    static const GVecGen2 g[4] =3D {
++        { .fno =3D gen_helper_gvec_vctz8, },
++        { .fno =3D gen_helper_gvec_vctz16, },
++        { .fni4 =3D gen_ctz_i32, },
++        { .fni8 =3D gen_ctz_i64, },
++    };
++
++    if (es > ES_64) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++    gen_gvec_2(get_field(s->fields, v1), get_field(s->fields, v2), &g[es=
+]);
 +    return DISAS_NEXT;
 +}
+diff --git a/target/s390x/vec_int_helper.c b/target/s390x/vec_int_helper.=
+c
+index 016512547cc4..d1b1f2850990 100644
+--- a/target/s390x/vec_int_helper.c
++++ b/target/s390x/vec_int_helper.c
+@@ -60,3 +60,17 @@ void HELPER(gvec_vclz##BITS)(void *v1, const void *v2,=
+ uint32_t desc)          \
+ }
+ DEF_VCLZ(8)
+ DEF_VCLZ(16)
++
++#define DEF_VCTZ(BITS)                                                  =
+       \
++void HELPER(gvec_vctz##BITS)(void *v1, const void *v2, uint32_t desc)   =
+       \
++{                                                                       =
+       \
++    int i;                                                              =
+       \
++                                                                        =
+       \
++    for (i =3D 0; i < (128 / BITS); i++) {                              =
+         \
++        const uint##BITS##_t a =3D s390_vec_read_element##BITS(v2, i);  =
+         \
++                                                                        =
+       \
++        s390_vec_write_element##BITS(v1, i, a ? ctz32(a) : BITS);       =
+       \
++    }                                                                   =
+       \
++}
++DEF_VCTZ(8)
++DEF_VCTZ(16)
 --=20
 2.20.1
 
