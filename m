@@ -2,63 +2,64 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04374C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 13:09:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3894C04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 13:11:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B77A620815
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 13:09:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B77A620815
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id A57ED20815
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 13:11:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A57ED20815
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35453 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35532 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSi2b-0001Re-1A
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 09:09:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49320)
+	id 1hSi4F-0002gT-Sf
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 09:11:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Mateja.Marjanovic@rt-rk.com>) id 1hSi0y-0000jJ-Pb
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 09:07:47 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hShvA-0005Fc-Bn
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 09:01:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Mateja.Marjanovic@rt-rk.com>) id 1hSi0t-0007qW-8b
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 09:07:38 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:48257 helo=mail.rt-rk.com)
+	(envelope-from <kwolf@redhat.com>) id 1hShv5-0004eK-8q
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 09:01:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54042)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Mateja.Marjanovic@rt-rk.com>)
-	id 1hSi0r-0007od-KG
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 09:07:34 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id C9A351A2268;
-	Mon, 20 May 2019 15:07:30 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from [10.10.13.110] (rtrkw310-lin.domain.local [10.10.13.110])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 9E70D1A2266;
-	Mon, 20 May 2019 15:07:30 +0200 (CEST)
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <1554212605-16457-1-git-send-email-mateja.marjanovic@rt-rk.com>
-	<1554212605-16457-3-git-send-email-mateja.marjanovic@rt-rk.com>
-	<CAL1e-=j6+P=WVAyUfbEqh1iXLiN6cAjgv0YPZj+RSFaWgEVFog@mail.gmail.com>
-From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
-Message-ID: <cae74a66-b6ed-a2ef-ae10-d0c49c9ba11d@rt-rk.com>
-Date: Mon, 20 May 2019 15:07:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hShuy-0004aU-MA; Mon, 20 May 2019 09:01:28 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E1FF4308220B;
+	Mon, 20 May 2019 13:01:27 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-117-208.ams2.redhat.com
+	[10.36.117.208])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 739415D6A6;
+	Mon, 20 May 2019 13:01:26 +0000 (UTC)
+Date: Mon, 20 May 2019 15:01:24 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Klaus Birkelund Jensen <klaus@birkelund.eu>
+Message-ID: <20190520130124.GE5699@localhost.localdomain>
+References: <20190517084234.26923-1-klaus@birkelund.eu>
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=j6+P=WVAyUfbEqh1iXLiN6cAjgv0YPZj+RSFaWgEVFog@mail.gmail.com>
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v4 2/5] target/mips: Fix MSA instructions
- ST.<B|H|W|D> on big endian host
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190517084234.26923-1-klaus@birkelund.eu>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Mon, 20 May 2019 13:01:27 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/8] nvme: v1.3, sgls,
+ metadata and new 'ocssd' device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,411 +71,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com, aurelien@aurel32.net,
-	qemu-devel@nongnu.org
+Cc: Keith Busch <keith.busch@intel.com>, armbru@redhat.com,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Am 17.05.2019 um 10:42 hat Klaus Birkelund Jensen geschrieben:
+> Hi,
+> 
+> This series of patches contains a number of refactorings to the emulated
+> nvme device, adds additional features, such as support for metadata and
+> scatter gather lists, and bumps the supported NVMe version to 1.3.
+> Lastly, it contains a new 'ocssd' device.
+> 
+> The motivation for the first seven patches is to set everything up for
+> the final patch that adds a new 'ocssd' device and associated block
+> driver that implements the OpenChannel 2.0 specification[1]. Many of us
+> in the OpenChannel comunity have used a qemu fork[2] for emulation of
+> OpenChannel devices. The fork is itself based on Keith's qemu-nvme
+> tree[3] and we recently merged mainline qemu into it, but the result is
+> still a "hybrid" nvme device that supports both conventional nvme and
+> the OCSSD 2.0 spec through a 'dialect' mechanism. Merging instead of
+> rebasing also created a pretty messy commit history and my efforts to
+> try and rebase our work onto mainline was getting hairy to say the
+> least. And I was never really happy with the dialect approach anyway.
+> 
+> I have instead prepared this series of fresh patches that incrementally
+> adds additional features to the nvme device to bring it into shape for
+> finally introducing a new (and separate) 'ocssd' device that emulates an
+> OpenChannel 2.0 device by reusing core functionality from the nvme
+> device. Providing a separate ocssd device ensures that no ocssd specific
+> stuff creeps into the nvme device.
+> 
+> The ocssd device is backed by a new 'ocssd' block driver that holds
+> internal meta data and keeps state permanent across power cycles. In the
+> future I think we could use the same approach for the nvme device to
+> keep internal metadata such as utilization and deallocated blocks.
 
-On 20.5.19. 14:59, Aleksandar Markovic wrote:
->
->
-> On Apr 2, 2019 3:47 PM, "Mateja Marjanovic"=20
-> <mateja.marjanovic@rt-rk.com <mailto:mateja.marjanovic@rt-rk.com>> wrot=
-e:
-> >
-> > From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com=20
-> <mailto:Mateja.Marjanovic@rt-rk.com>>
-> >
-> > Fix the case when the host is a big endian machine, and change
-> > the approach toward ST.<B|H|W|D> instruction helpers.
-> >
-> > Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com=20
-> <mailto:mateja.marjanovic@rt-rk.com>>
-> > ---
->
-> Hello, Mateja.
->
-> There is unfortunatelly still a slight problem with the new=20
-> implementation: it looks like the invocations to=20
-> ensure_writable_pages() in new helpers are missing. Or, perhaps, there=20
-> is a reason you removed them. Please reanalyse and reexplain. But=20
-> thanks for previous efforts.
->
-I see, I deleted it by accident.
+A backend driver that is specific for a guest device model (i.e. the
+device model requires this driver, and the backend is useless without
+the device) sounds like a very questionable design.
 
-Thanks,
-Mateja
+Metadata like OcssdFormatHeader that is considered part of the image
+data, which means that the _actual_ image content without metadata isn't
+directly accessible any more feels like a bad idea, too. Simple things
+like what a resize operation means (change only the actual disk size as
+usual, or is the new size disk + metadata?) become confusing. Attaching
+an image to a different device becomes impossible.
 
-> Yours,
-> Aleksandar
->
-> > =C2=A0target/mips/op_helper.c | 188=20
-> ++++++++++++++++++++++++++++++++++++++++++------
-> > =C2=A01 file changed, 168 insertions(+), 20 deletions(-)
-> >
-> > diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-> > index 45be406..d94909a 100644
-> > --- a/target/mips/op_helper.c
-> > +++ b/target/mips/op_helper.c
-> > @@ -4565,31 +4565,179 @@ static inline void=20
-> ensure_writable_pages(CPUMIPSState *env,
-> > =C2=A0#endif
-> > =C2=A0}
-> >
-> > -#define MSA_ST_DF(DF, TYPE, ST_INSN, ...) =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0\
-> > -void helper_msa_st_ ## TYPE(CPUMIPSState *env, uint32_t wd,=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0=20
-> =C2=A0 =C2=A0 =C2=A0\
-> > -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 target_ulong addr) =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 \
-> > -{ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\
-> > -=C2=A0 =C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr); =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \
-> > -=C2=A0 =C2=A0 int mmu_idx =3D cpu_mmu_index(env, false); =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\
-> > -=C2=A0 =C2=A0 int i; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- \
-> > -=C2=A0 =C2=A0 MEMOP_IDX(DF) =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0\
-> > -=C2=A0 =C2=A0 ensure_writable_pages(env, addr, mmu_idx, GETPC()); =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\
-> > -=C2=A0 =C2=A0 for (i =3D 0; i < DF_ELEMENTS(DF); i++) { =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\
-> > -=C2=A0 =C2=A0 =C2=A0 =C2=A0 ST_INSN(env, addr + (i << DF), pwd->TYPE=
-[i],=20
-> ##__VA_ARGS__);=C2=A0 =C2=A0 \
-> > -=C2=A0 =C2=A0 } =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\
-> > +void helper_msa_st_b(CPUMIPSState *env, uint32_t wd,
-> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0target_ulong addr)
-> > +{
-> > +=C2=A0 =C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
-> > +=C2=A0 =C2=A0 MEMOP_IDX(DF_BYTE)
-> > +#if !defined(CONFIG_USER_ONLY)
-> > +#if !defined(HOST_WORDS_BIGENDIAN)
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (0=C2=A0 << DF_BYTE), p=
-wd->b[0],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (1=C2=A0 << DF_BYTE), p=
-wd->b[1],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (2=C2=A0 << DF_BYTE), p=
-wd->b[2],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (3=C2=A0 << DF_BYTE), p=
-wd->b[3],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (4=C2=A0 << DF_BYTE), p=
-wd->b[4],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (5=C2=A0 << DF_BYTE), p=
-wd->b[5],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (6=C2=A0 << DF_BYTE), p=
-wd->b[6],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (7=C2=A0 << DF_BYTE), p=
-wd->b[7],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (8=C2=A0 << DF_BYTE), p=
-wd->b[8],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (9=C2=A0 << DF_BYTE), p=
-wd->b[9],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b=
-[10], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b=
-[11], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b=
-[12], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b=
-[13], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b=
-[14], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b=
-[15], oi,=20
-> GETPC());
-> > +#else
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (7=C2=A0 << DF_BYTE), p=
-wd->b[0],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (6=C2=A0 << DF_BYTE), p=
-wd->b[1],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (5=C2=A0 << DF_BYTE), p=
-wd->b[2],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (4=C2=A0 << DF_BYTE), p=
-wd->b[3],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (3=C2=A0 << DF_BYTE), p=
-wd->b[4],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (2=C2=A0 << DF_BYTE), p=
-wd->b[5],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (1=C2=A0 << DF_BYTE), p=
-wd->b[6],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (0=C2=A0 << DF_BYTE), p=
-wd->b[7],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b=
-[8],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b=
-[9],=C2=A0 oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b=
-[10], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b=
-[11], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b=
-[12], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b=
-[13], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (9=C2=A0 << DF_BYTE), p=
-wd->b[14], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stb_mmu(env, addr + (8=C2=A0 << DF_BYTE), p=
-wd->b[15], oi,=20
-> GETPC());
-> > +#endif
-> > +#else
-> > +#if !defined(HOST_WORDS_BIGENDIAN)
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (0=C2=A0 << DF_BYTE), pwd->b[=
-0]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (1=C2=A0 << DF_BYTE), pwd->b[=
-1]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (2=C2=A0 << DF_BYTE), pwd->b[=
-2]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (3=C2=A0 << DF_BYTE), pwd->b[=
-3]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (4=C2=A0 << DF_BYTE), pwd->b[=
-4]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (5=C2=A0 << DF_BYTE), pwd->b[=
-5]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (6=C2=A0 << DF_BYTE), pwd->b[=
-6]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (7=C2=A0 << DF_BYTE), pwd->b[=
-7]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (8=C2=A0 << DF_BYTE), pwd->b[=
-8]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (9=C2=A0 << DF_BYTE), pwd->b[=
-9]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[10]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[11]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[12]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[13]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[14]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[15]);
-> > +#else
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (7=C2=A0 << DF_BYTE), pwd->b[=
-0]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (6=C2=A0 << DF_BYTE), pwd->b[=
-1]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (5=C2=A0 << DF_BYTE), pwd->b[=
-2]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (4=C2=A0 << DF_BYTE), pwd->b[=
-3]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (3=C2=A0 << DF_BYTE), pwd->b[=
-4]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (2=C2=A0 << DF_BYTE), pwd->b[=
-5]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (1=C2=A0 << DF_BYTE), pwd->b[=
-6]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (0=C2=A0 << DF_BYTE), pwd->b[=
-7]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[8]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[9]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[10]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[11]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[12]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[13]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (9=C2=A0 << DF_BYTE), pwd->b[=
-14]);
-> > +=C2=A0 =C2=A0 cpu_stb_data(env, addr + (8=C2=A0 << DF_BYTE), pwd->b[=
-15]);
-> > +#endif
-> > +#endif
-> > +}
-> > +
-> > +void helper_msa_st_h(CPUMIPSState *env, uint32_t wd,
-> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0target_ulong addr)
-> > +{
-> > +=C2=A0 =C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
-> > +=C2=A0 =C2=A0 MEMOP_IDX(DF_HALF)
-> > +#if !defined(CONFIG_USER_ONLY)
-> > +#if !defined(HOST_WORDS_BIGENDIAN)
-> > +=C2=A0 =C2=A0 helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[=
-0], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[=
-1], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[=
-2], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[=
-3], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[=
-4], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[=
-5], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[=
-6], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[=
-7], oi,=20
-> GETPC());
-> > +#else
-> > +=C2=A0 =C2=A0 helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[=
-0], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[=
-1], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[=
-2], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[=
-3], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[=
-4], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[=
-5], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[=
-6], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[=
-7], oi,=20
-> GETPC());
-> > +#endif
-> > +#else
-> > +#if !defined(HOST_WORDS_BIGENDIAN)
-> > +=C2=A0 =C2=A0 cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[0]);
-> > +=C2=A0 =C2=A0 cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[1]);
-> > +=C2=A0 =C2=A0 cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[2]);
-> > +=C2=A0 =C2=A0 cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[3]);
-> > +=C2=A0 =C2=A0 cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[4]);
-> > +=C2=A0 =C2=A0 cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[5]);
-> > +=C2=A0 =C2=A0 cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[6]);
-> > +=C2=A0 =C2=A0 cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[7]);
-> > +#else
-> > +=C2=A0 =C2=A0 cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[0]);
-> > +=C2=A0 =C2=A0 cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[1]);
-> > +=C2=A0 =C2=A0 cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[2]);
-> > +=C2=A0 =C2=A0 cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[3]);
-> > +=C2=A0 =C2=A0 cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[4]);
-> > +=C2=A0 =C2=A0 cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[5]);
-> > +=C2=A0 =C2=A0 cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[6]);
-> > +=C2=A0 =C2=A0 cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[7]);
-> > +#endif
-> > +#endif
-> > =C2=A0}
-> >
-> > +void helper_msa_st_w(CPUMIPSState *env, uint32_t wd,
-> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0target_ulong addr)
-> > +{
-> > +=C2=A0 =C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
-> > +=C2=A0 =C2=A0 MEMOP_IDX(DF_WORD)
-> > =C2=A0#if !defined(CONFIG_USER_ONLY)
-> > -MSA_ST_DF(DF_BYTE,=C2=A0 =C2=A0b, helper_ret_stb_mmu, oi, GETPC())
-> > -MSA_ST_DF(DF_HALF,=C2=A0 =C2=A0h, helper_ret_stw_mmu, oi, GETPC())
-> > -MSA_ST_DF(DF_WORD,=C2=A0 =C2=A0w, helper_ret_stl_mmu, oi, GETPC())
-> > -MSA_ST_DF(DF_DOUBLE, d, helper_ret_stq_mmu, oi, GETPC())
-> > +#if !defined(HOST_WORDS_BIGENDIAN)
-> > +=C2=A0 =C2=A0 helper_ret_stl_mmu(env, addr + (0 << DF_WORD), oi, GET=
-PC(),=20
-> pwd->w[0]);
-> > +=C2=A0 =C2=A0 helper_ret_stl_mmu(env, addr + (1 << DF_WORD), oi, GET=
-PC(),=20
-> pwd->w[1]);
-> > +=C2=A0 =C2=A0 helper_ret_stl_mmu(env, addr + (2 << DF_WORD), oi, GET=
-PC(),=20
-> pwd->w[2]);
-> > +=C2=A0 =C2=A0 helper_ret_stl_mmu(env, addr + (3 << DF_WORD), oi, GET=
-PC(),=20
-> pwd->w[3]);
-> > =C2=A0#else
-> > -MSA_ST_DF(DF_BYTE,=C2=A0 =C2=A0b, cpu_stb_data)
-> > -MSA_ST_DF(DF_HALF,=C2=A0 =C2=A0h, cpu_stw_data)
-> > -MSA_ST_DF(DF_WORD,=C2=A0 =C2=A0w, cpu_stl_data)
-> > -MSA_ST_DF(DF_DOUBLE, d, cpu_stq_data)
-> > +=C2=A0 =C2=A0 helper_ret_stl_mmu(env, addr + (1 << DF_WORD), oi, GET=
-PC(),=20
-> pwd->w[0]);
-> > +=C2=A0 =C2=A0 helper_ret_stl_mmu(env, addr + (0 << DF_WORD), oi, GET=
-PC(),=20
-> pwd->w[1]);
-> > +=C2=A0 =C2=A0 helper_ret_stl_mmu(env, addr + (3 << DF_WORD), oi, GET=
-PC(),=20
-> pwd->w[2]);
-> > +=C2=A0 =C2=A0 helper_ret_stl_mmu(env, addr + (2 << DF_WORD), oi, GET=
-PC(),=20
-> pwd->w[3]);
-> > =C2=A0#endif
-> > +#else
-> > +#if !defined(HOST_WORDS_BIGENDIAN)
-> > +=C2=A0 =C2=A0 cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[0]);
-> > +=C2=A0 =C2=A0 cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[1]);
-> > +=C2=A0 =C2=A0 cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[2]);
-> > +=C2=A0 =C2=A0 cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[3]);
-> > +#else
-> > +=C2=A0 =C2=A0 cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[0]);
-> > +=C2=A0 =C2=A0 cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[1]);
-> > +=C2=A0 =C2=A0 cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[2]);
-> > +=C2=A0 =C2=A0 cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[3]);
-> > +#endif
-> > +#endif
-> > +}
-> > +
-> > +void helper_msa_st_d(CPUMIPSState *env, uint32_t wd,
-> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0target_ulong addr)
-> > +{
-> > +=C2=A0 =C2=A0 wr_t *pwd =3D &(env->active_fpu.fpr[wd].wr);
-> > +=C2=A0 =C2=A0 MEMOP_IDX(DF_DOUBLE)
-> > +#if !defined(CONFIG_USER_ONLY)
-> > +=C2=A0 =C2=A0 helper_ret_stq_mmu(env, addr + (0 << DF_DOUBLE), pwd->=
-d[0], oi,=20
-> GETPC());
-> > +=C2=A0 =C2=A0 helper_ret_stq_mmu(env, addr + (1 << DF_DOUBLE), pwd->=
-d[1], oi,=20
-> GETPC());
-> > +#else
-> > +=C2=A0 =C2=A0 cpu_stq_data(env, addr + (0 << DF_DOUBLE), pwd->d[0]);
-> > +=C2=A0 =C2=A0 cpu_stq_data(env, addr + (1 << DF_DOUBLE), pwd->d[1]);
-> > +#endif
-> > +}
-> >
-> > =C2=A0void helper_cache(CPUMIPSState *env, target_ulong addr, uint32_=
-t op)
-> > =C2=A0{
-> > --
-> > 2.7.4
-> >
-> >
->
+The block format driver doesn't seem to actually add much functionality
+to a specially crafted raw image: It provides a convenient way to create
+such special images and it dumps some values in 'qemu-img info', but the
+actual interpretation of the data is left to the device model.
+
+Looking at the options it does provide, my impression is that these
+should really be qdev properties, and the place to store them
+persistently is something like the libvirt XML. The device doesn't
+change any of the values, so there is nothing that QEMU actually needs
+to store. What you invented is a one-off way to pass a config file to a
+device, but only for one specific device type.
+
+I think this needs to use a much more standard approach to be mergable.
+
+Markus (CCed) as the maintainer for the configuration mechanisms may
+have an opinion on this, too.
+
+> For now, the nvme device does not support the Deallocated and
+> Unwritten Logical Block Error (DULBE) feature or the Data Set
+> Management command as this would require such support.
+
+Doesn't bdrv_co_block_status() provide all the information you need for
+that?
+
+Kevin
+
