@@ -2,105 +2,87 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E537C04AAC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:41:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E5CC04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:43:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA699214DA
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:41:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA699214DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8A7BB2171F
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 16:43:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eE858BT9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A7BB2171F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38425 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38454 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSlMG-0004ss-2o
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 12:41:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43291)
+	id 1hSlOC-0007Fy-Ou
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 12:43:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1hSlAx-0004m6-DW
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:30:13 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hSl9B-00031Y-KO
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:28:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farman@linux.ibm.com>) id 1hSlAv-000232-Nf
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:30:11 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52546)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farman@linux.ibm.com>)
-	id 1hSlAv-00021o-9u
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:30:09 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4KGQwEk147260
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 12:30:02 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2skwdby0rm-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 12:30:02 -0400
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
-	Mon, 20 May 2019 17:30:01 +0100
-Received: from b01cxnp22034.gho.pok.ibm.com (9.57.198.24)
-	by e11.ny.us.ibm.com (146.89.104.198) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Mon, 20 May 2019 17:29:58 +0100
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
-	[9.57.199.109])
-	by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	x4KGTvA339780502
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Mon, 20 May 2019 16:29:57 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AB6E7112066;
-	Mon, 20 May 2019 16:29:57 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 05363112064;
-	Mon, 20 May 2019 16:29:56 +0000 (GMT)
-Received: from [9.80.203.191] (unknown [9.80.203.191])
-	by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-	Mon, 20 May 2019 16:29:56 +0000 (GMT)
-To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
-	Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
-References: <20190507154733.28604-1-cohuck@redhat.com>
-	<20190507154733.28604-3-cohuck@redhat.com>
-From: Eric Farman <farman@linux.ibm.com>
-Date: Mon, 20 May 2019 12:29:56 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <peter.maydell@linaro.org>) id 1hSl98-0001Fr-2K
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:28:19 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51087)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hSl95-0001Em-TV
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 12:28:17 -0400
+Received: by mail-wm1-x341.google.com with SMTP id f204so15202wme.0
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 09:28:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+	:content-transfer-encoding;
+	bh=TQvN/mWAlK741QKpEKQhjF7DDPH0rKnlVOvBsAJinxg=;
+	b=eE858BT9oM4qVPLyFxNriaIXSVdrnnIC54UhLvK6faBWTZWEzMUoFiT/poR81eWyS1
+	2qpzy4F0kw0P5T8vl+FniHqUywhjV10HmSXj9XdOJUKPWzOjCVbrcDUQmcBAjPvDNA1D
+	5SkSTki1k3qBeIxZORGAF5d9j6zOnjdjXyPx4KEzvkBDu+Q5UfnjqYz+Dyk2MjMDP7vw
+	tBCEZKgyvS9yEML1uWVG7ANz9kbAYl2dLKepWkwqVrBtAPL5aqI3pwDfIkZEf9Wktr0a
+	bvgna8UcEnrj4vzicr7S5pIEuwsqdLcbDCQCwMt7o0XbHRQBR13+KAE92GowwTFK2EpD
+	N8QA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=TQvN/mWAlK741QKpEKQhjF7DDPH0rKnlVOvBsAJinxg=;
+	b=tL2IDb72irExIhKWHVuvdJ1L0eznKIw/j/dzv2HRWeW+NWuKZlcusEQo10TGtbXSJD
+	Y2qKuPvwFb5CGSC5ZfmqKBWgVwrCdSZWIZH+eMZyyz45Ya/PEB4omhpj8ibmojyKPxcA
+	yYj1CgqDoYZe91BGYYnDwOcLiNNe8e/hWBYRX735k2XwR/49TNeKt5DJ49C1fvmGELjb
+	A/J7bdAMhqy8zsCoC0fIsXIPjj6gks7sdtmeVtHXRB1CFbTAOtfyZaxjusDOdosfOLXq
+	f2mQAxDSE2Y6NUB8mNxcKtDOYptV4t5PzuazrAGXksZH6pOUfP3H6BKpQDlXHbT0a6EE
+	cIVA==
+X-Gm-Message-State: APjAAAWA6AO4gJ7KVNsjpCFofrEYbyEqWrOovQ6IHHKTLKb4L+LaYkK5
+	JfyPIbyp4dTi9yGU29HmAzTis1ix61c=
+X-Google-Smtp-Source: APXvYqxNz0WTaNx/jS6t6EQ7UmhDm2Qf3qYpG3gcnQ2zLevMm4+MWeA6yWlH3PQldKFRuXk2WpjmsA==
+X-Received: by 2002:a7b:c549:: with SMTP id j9mr4712wmk.114.1558369694777;
+	Mon, 20 May 2019 09:28:14 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+	by smtp.gmail.com with ESMTPSA id x2sm5830394wrs.39.2019.05.20.09.28.13
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 20 May 2019 09:28:14 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Mon, 20 May 2019 17:28:07 +0100
+Message-Id: <20190520162809.2677-3-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190520162809.2677-1-peter.maydell@linaro.org>
+References: <20190520162809.2677-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190507154733.28604-3-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19052016-2213-0000-0000-00000391E9EB
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011131; HX=3.00000242; KW=3.00000007;
-	PH=3.00000004; SC=3.00000286; SDB=6.01206103; UDB=6.00633302;
-	IPR=6.00987063; 
-	MB=3.00026973; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-20 16:29:59
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052016-2214-0000-0000-00005E8264D5
-Message-Id: <f2c65517-f6d8-41a4-3f8a-88a530cdcd41@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-20_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1905200106
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: Re: [Qemu-devel] [PATCH v4 2/2] vfio-ccw: support async command
- subregion
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: [Qemu-devel] [PATCH 2/4] hw/intc/arm_gicv3: GICD_TYPER.SecurityExtn
+ is RAZ if GICD_CTLR.DS == 1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -112,261 +94,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
-	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The GICv3 specification says that the GICD_TYPER.SecurityExtn bit
+is RAZ if GICD_CTLR.DS is 1. We were incorrectly making it RAZ
+if the security extension is unsupported. "Security extension
+unsupported" always implies GICD_CTLR.DS == 1, but the guest can
+also set DS on a GIC which does support the security extension.
+Fix the condition to correctly check the GICD_CTLR.DS bit.
 
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/intc/arm_gicv3_dist.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-On 5/7/19 11:47 AM, Cornelia Huck wrote:
-> A vfio-ccw device may provide an async command subregion for
-> issuing halt/clear subchannel requests. If it is present, use
-> it for sending halt/clear request to the device; if not, fall
-> back to emulation (as done today).
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  hw/s390x/css.c              |  27 +++++++--
->  hw/vfio/ccw.c               | 110 +++++++++++++++++++++++++++++++++++-
->  include/hw/s390x/s390-ccw.h |   3 +
->  3 files changed, 134 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 8fc9e35ba5d3..5b21a74b5c29 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -22,6 +22,7 @@
->  #include "trace.h"
->  #include "hw/s390x/s390_flic.h"
->  #include "hw/s390x/s390-virtio-ccw.h"
-> +#include "hw/s390x/s390-ccw.h"
->  
->  typedef struct CrwContainer {
->      CRW crw;
-> @@ -1191,6 +1192,26 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
->  
->  }
->  
-> +static void sch_handle_halt_func_passthrough(SubchDev *sch)
-> +{
-> +    int ret;
-> +
-> +    ret = vfio_ccw_handle_halt(sch);
-> +    if (ret == -ENOSYS) {
-> +        sch_handle_halt_func(sch);
-> +    }
-> +}
-> +
-> +static void sch_handle_clear_func_passthrough(SubchDev *sch)
-> +{
-> +    int ret;
-> +
-> +    ret = vfio_ccw_handle_clear(sch);
-> +    if (ret == -ENOSYS) {
-> +        sch_handle_clear_func(sch);
-> +    }
-> +}
-> +
->  static IOInstEnding sch_handle_start_func_passthrough(SubchDev *sch)
->  {
->      SCHIB *schib = &sch->curr_status;
-> @@ -1230,11 +1251,9 @@ IOInstEnding do_subchannel_work_passthrough(SubchDev *sch)
->      SCHIB *schib = &sch->curr_status;
->  
->      if (schib->scsw.ctrl & SCSW_FCTL_CLEAR_FUNC) {
-> -        /* TODO: Clear handling */
-> -        sch_handle_clear_func(sch);
-> +        sch_handle_clear_func_passthrough(sch);
->      } else if (schib->scsw.ctrl & SCSW_FCTL_HALT_FUNC) {
-> -        /* TODO: Halt handling */
-> -        sch_handle_halt_func(sch);
-> +        sch_handle_halt_func_passthrough(sch);
->      } else if (schib->scsw.ctrl & SCSW_FCTL_START_FUNC) {
->          return sch_handle_start_func_passthrough(sch);
->      }
-> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> index 31dd3a2a87b6..175a17b1772a 100644
-> --- a/hw/vfio/ccw.c
-> +++ b/hw/vfio/ccw.c
-> @@ -2,9 +2,12 @@
->   * vfio based subchannel assignment support
->   *
->   * Copyright 2017 IBM Corp.
-> + * Copyright 2019 Red Hat, Inc.
-> + *
->   * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
->   *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
->   *            Pierre Morel <pmorel@linux.vnet.ibm.com>
-> + *            Cornelia Huck <cohuck@redhat.com>
->   *
->   * This work is licensed under the terms of the GNU GPL, version 2 or (at
->   * your option) any later version. See the COPYING file in the top-level
-> @@ -32,6 +35,9 @@ struct VFIOCCWDevice {
->      uint64_t io_region_size;
->      uint64_t io_region_offset;
->      struct ccw_io_region *io_region;
-> +    uint64_t async_cmd_region_size;
-> +    uint64_t async_cmd_region_offset;
-> +    struct ccw_cmd_region *async_cmd_region;
->      EventNotifier io_notifier;
->      bool force_orb_pfch;
->      bool warned_orb_pfch;
-> @@ -114,6 +120,87 @@ again:
->      }
->  }
->  
-> +int vfio_ccw_handle_clear(SubchDev *sch)
-> +{
-> +    S390CCWDevice *cdev = sch->driver_data;
-> +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-> +    struct ccw_cmd_region *region = vcdev->async_cmd_region;
-> +    int ret;
-> +
-> +    if (!vcdev->async_cmd_region) {
-> +        /* Async command region not available, fall back to emulation */
-> +        return -ENOSYS;
-> +    }
-> +
-> +    memset(region, 0, sizeof(*region));
-> +    region->command = VFIO_CCW_ASYNC_CMD_CSCH;
-
-Considering the serialization you added on the kernel side, what happens
-if another vcpu runs this code (or _halt) and clears the async region
-before the kernel code gains control from the pwrite() call below?
-Asked another way, there's nothing preventing us from issuing more than
-one asynchronous command concurrently, so how do we make sure the
-command gets to the kernel rather than "current command wins"  ?
-
-That possibly worrisome question aside, this seems generally fine.
-
-
-> +
-> +again:
-> +    ret = pwrite(vcdev->vdev.fd, region,
-> +                 vcdev->async_cmd_region_size, vcdev->async_cmd_region_offset);
-> +    if (ret != vcdev->async_cmd_region_size) {
-> +        if (errno == EAGAIN) {
-> +            goto again;
-> +        }
-> +        error_report("vfio-ccw: write cmd region failed with errno=%d", errno);
-> +        ret = -errno;
-> +    } else {
-> +        ret = region->ret_code;
-> +    }
-> +    switch (ret) {
-> +    case 0:
-> +    case -ENODEV:
-> +    case -EACCES:
-> +        return 0;
-> +    case -EFAULT:
-> +    default:
-> +        sch_gen_unit_exception(sch);
-> +        css_inject_io_interrupt(sch);
-> +        return 0;
-> +    }
-> +}
-> +
-> +int vfio_ccw_handle_halt(SubchDev *sch)
-> +{
-> +    S390CCWDevice *cdev = sch->driver_data;
-> +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-> +    struct ccw_cmd_region *region = vcdev->async_cmd_region;
-> +    int ret;
-> +
-> +    if (!vcdev->async_cmd_region) {
-> +        /* Async command region not available, fall back to emulation */
-> +        return -ENOSYS;
-> +    }
-> +
-> +    memset(region, 0, sizeof(*region));
-> +    region->command = VFIO_CCW_ASYNC_CMD_HSCH;
-> +
-> +again:
-> +    ret = pwrite(vcdev->vdev.fd, region,
-> +                 vcdev->async_cmd_region_size, vcdev->async_cmd_region_offset);
-> +    if (ret != vcdev->async_cmd_region_size) {
-> +        if (errno == EAGAIN) {
-> +            goto again;
-> +        }
-> +        error_report("vfio-ccw: write cmd region failed with errno=%d", errno);
-> +        ret = -errno;
-> +    } else {
-> +        ret = region->ret_code;
-> +    }
-> +    switch (ret) {
-> +    case 0:
-> +    case -EBUSY:
-> +    case -ENODEV:
-> +    case -EACCES:
-> +        return 0;
-> +    case -EFAULT:
-> +    default:
-> +        sch_gen_unit_exception(sch);
-> +        css_inject_io_interrupt(sch);
-> +        return 0;
-> +    }
-> +}
-> +
->  static void vfio_ccw_reset(DeviceState *dev)
->  {
->      CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
-> @@ -287,9 +374,13 @@ static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
->          return;
->      }
->  
-> +    /*
-> +     * We always expect at least the I/O region to be present. We also
-> +     * may have a variable number of regions governed by capabilities.
-> +     */
->      if (vdev->num_regions < VFIO_CCW_CONFIG_REGION_INDEX + 1) {
-> -        error_setg(errp, "vfio: Unexpected number of the I/O region %u",
-> -                   vdev->num_regions);
-> +        error_setg(errp, "vfio: too few regions (%u), expected at least %u",
-> +                   vdev->num_regions, VFIO_CCW_CONFIG_REGION_INDEX + 1);
->          return;
->      }
->  
-> @@ -309,11 +400,26 @@ static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
->      vcdev->io_region_offset = info->offset;
->      vcdev->io_region = g_malloc0(info->size);
->  
-> +    /* check for the optional async command region */
-> +    ret = vfio_get_dev_region_info(vdev, VFIO_REGION_TYPE_CCW,
-> +                                   VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD, &info);
-> +    if (!ret) {
-> +        vcdev->async_cmd_region_size = info->size;
-> +        if (sizeof(*vcdev->async_cmd_region) != vcdev->async_cmd_region_size) {
-> +            error_setg(errp, "vfio: Unexpected size of the async cmd region");
-> +            g_free(info);
-> +            return;
-> +        }
-> +        vcdev->async_cmd_region_offset = info->offset;
-> +        vcdev->async_cmd_region = g_malloc0(info->size);
-> +    }
-> +
->      g_free(info);
->  }
->  
->  static void vfio_ccw_put_region(VFIOCCWDevice *vcdev)
->  {
-> +    g_free(vcdev->async_cmd_region);
->      g_free(vcdev->io_region);
->  }
->  
-> diff --git a/include/hw/s390x/s390-ccw.h b/include/hw/s390x/s390-ccw.h
-> index 901d805d79a3..e9c7e1db5761 100644
-> --- a/include/hw/s390x/s390-ccw.h
-> +++ b/include/hw/s390x/s390-ccw.h
-> @@ -37,4 +37,7 @@ typedef struct S390CCWDeviceClass {
->      IOInstEnding (*handle_request) (SubchDev *sch);
->  } S390CCWDeviceClass;
->  
-> +int vfio_ccw_handle_clear(SubchDev *sch);
-> +int vfio_ccw_handle_halt(SubchDev *sch);
-> +
->  #endif
-> 
+diff --git a/hw/intc/arm_gicv3_dist.c b/hw/intc/arm_gicv3_dist.c
+index 335386ff3ac..d6ae576110d 100644
+--- a/hw/intc/arm_gicv3_dist.c
++++ b/hw/intc/arm_gicv3_dist.c
+@@ -378,8 +378,14 @@ static MemTxResult gicd_readl(GICv3State *s, hwaddr offset,
+          * ITLinesNumber == (num external irqs / 32) - 1
+          */
+         int itlinesnumber = ((s->num_irq - GIC_INTERNAL) / 32) - 1;
++        /*
++         * SecurityExtn must be RAZ if GICD_CTLR.DS == 1, and
++         * "security extensions not supported" always implies DS == 1,
++         * so we only need to check the DS bit.
++         */
++        bool sec_extn = !(s->gicd_ctlr & GICD_CTLR_DS);
+ 
+-        *data = (1 << 25) | (1 << 24) | (s->security_extn << 10) |
++        *data = (1 << 25) | (1 << 24) | (sec_extn << 10) |
+             (0xf << 19) | itlinesnumber;
+         return MEMTX_OK;
+     }
+-- 
+2.20.1
 
 
