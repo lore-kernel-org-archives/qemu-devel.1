@@ -2,65 +2,65 @@ Return-Path: <SRS0=S/IU=TU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23BECC04AAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 13:12:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B0CC04AAC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 13:27:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F03EA20815
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 13:12:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F03EA20815
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id BCF2320851
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 May 2019 13:27:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCF2320851
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35563 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35775 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSi5z-00042T-8W
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 09:12:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50667)
+	id 1hSiJf-0000Wk-T0
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 09:26:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hSi4g-0003Fz-Pq
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 09:11:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hSiIN-00080I-Us
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 09:25:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hSi4f-0001mn-OB
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 09:11:30 -0400
-Received: from 3.mo179.mail-out.ovh.net ([178.33.251.175]:38452)
+	(envelope-from <kwolf@redhat.com>) id 1hSiIM-0000Oj-VA
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 09:25:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45296)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hSi4f-0001lx-IU
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 09:11:29 -0400
-Received: from player694.ha.ovh.net (unknown [10.109.160.153])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id D0498131FD9
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 15:11:26 +0200 (CEST)
-Received: from kaod.org (deibp9eh1--blueice1n0.emea.ibm.com [195.212.29.162])
-	(Authenticated sender: clg@kaod.org)
-	by player694.ha.ovh.net (Postfix) with ESMTPSA id 2D9B65E1CF44;
-	Mon, 20 May 2019 13:11:19 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>
-References: <20190506142042.28096-1-clg@kaod.org>
-	<b12201c8-7d5f-2108-6666-75543c38f243@kaod.org>
-	<f1ca56fd-c83d-8ad6-29c9-a8fc6af4531c@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <270e510b-687a-6b43-8cd6-c1eb1aea41e6@kaod.org>
-Date: Mon, 20 May 2019 15:11:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hSiIJ-0000MW-QB; Mon, 20 May 2019 09:25:36 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id ED880C065135;
+	Mon, 20 May 2019 13:25:33 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-117-208.ams2.redhat.com
+	[10.36.117.208])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 903F25D719;
+	Mon, 20 May 2019 13:25:32 +0000 (UTC)
+Date: Mon, 20 May 2019 15:25:31 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190520132530.GF5699@localhost.localdomain>
+References: <20190515041541.12367-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f1ca56fd-c83d-8ad6-29c9-a8fc6af4531c@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 12069084054961687467
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddtkedgiedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Disposition: inline
+In-Reply-To: <20190515041541.12367-1-mreitz@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.31]);
+	Mon, 20 May 2019 13:25:35 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.251.175
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] aspeed: cleanups and extensions
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] block/file-posix: Fix unaligned
+ O_DIRECT block status
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,86 +72,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
-
-On 5/20/19 1:09 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 5/20/19 9:47 AM, C=C3=A9dric Le Goater wrote:
->> Hello,
->>
->> On 5/6/19 4:20 PM, C=C3=A9dric Le Goater wrote:
->>> Hello,
->>>
->>> Here is a series adding a couple of cleanups to the Aspeed SoCs to
->>> prepare ground for extensions and new SoCs.
->>>
->>> Thanks,
->>>
->>> C.
->>>
->>> Changes since v1:
->>>
->>>  - moved enum defining the Aspeed controller names under aspeed_soc.h
->>>  - removed AspeedSoCInfo 'sdram_base' field
->>>  - fixed clang compilation
->>>
->>> C=C3=A9dric Le Goater (3):
->>>   aspeed: add a per SoC mapping for the interrupt space
->>>   aspeed: add a per SoC mapping for the memory space
->>
->> I think these two patches are fine to go even if Philippe's comments=20
->> are not addressed. There are valid but not a blocker to me. =20
+Am 15.05.2019 um 06:15 hat Max Reitz geschrieben:
+> The user-visible problem:
+> $ echo > foo
+> $ qemu-img map --image-opts driver=3Dfile,filename=3Dfoo,cache.direct=3D=
+on
+> Offset          Length          Mapped to       File
+> qemu-img: block/io.c:2093: bdrv_co_block_status: Assertion `*pnum &&
+> QEMU_IS_ALIGNED(*pnum, align) && align > offset - aligned_offset'
+> failed.
 >=20
-> OK, so:
+> The internal problem: file-posix truncates status requests to the EOF.
+> If the EOF is not aligned at the request_alignment,
+> bdrv_co_block_status() won't like that.
 >=20
-> patches 1 & 2:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> See patch 1 for a deeper discussion (including two possible alternative=
+s
+> how we could address the problem).
+> (As I note there, I=E2=80=99ve looked through all block drivers, and I =
+didn=E2=80=99t
+> find any other which could have the same problem.  gluster uses the sam=
+e
+> block-status code, but it doesn=E2=80=99t set a request_alignment.  NBD
+> force-aligns the server response in nbd_parse_blockstatus_payload().
+> qcow2... Should be fine as long as no crypto driver has a block limit
+> exceeding the qcow2 cluster size.  And so on.)
 >=20
-> Peter, can you apply them?
->=20
->>
->>>   aspeed: use sysbus_init_child_obj() to initialize children
->>
->> Philippe has taken over this patch in a larger series which will go=20
->> through Eduardo's tree, if I understood well the emails. When merged,=20
->> we can try to re-merge the RTC patchset from Joel. I think we made=20
->> things a little more complex than they should have been.=20
->=20
-> Sorry if I made things more complex. I went on PTO after sending
+> Patch 2 adds a test.  After writing that test, I noticed that we alread=
+y
+> had one: 109 fails with -c none before patch 1.  Er, well, at least the
+> new test is more succinct and has the correct default cache mode, so it
+> will actually do the test if you run ./check without enforcing any cach=
+e
+> on a filesystem that supports O_DIRECT.
 
-PTO ?
+Thanks, applied to the block branch.
 
-> "hw/arm: Use object_initialize_child for correct reference counting" [*=
-]
-> then was slow to address Thomas/Markus comments.
-> Then maybe I should start pinging maintainer more aggressively when my
-> series are reviewed but not merged, to not delay further developments.
-
-Well, I don't know if there is a good method for transversal patchsets=20
-like this one. I guess it depends on the area.=20
-
-The overall merging process became more complex that expected after our=20
-three simple patchsets (Yours, Joel's and mine) collided.=20
-=20
-> I took note of your comment and will try to keep things simple the next
-> time.
-
-It's not a big issue. We have time to provide fixes before 4.1 is out.=20
-Let's put some energy to move on and get code merged.
-
-Peter,=20
-
-do you want me to resend with only the two first patches and include=20
-Joel's in the same series ? I would leave out the part Philippe is=20
-covering in his object_initialize_child() patchset.
-
-Thanks,
-
-C.
-
+Kevin
 
