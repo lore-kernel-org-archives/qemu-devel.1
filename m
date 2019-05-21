@@ -6,59 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43370C04AB4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 10:59:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B94C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 11:01:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D1AB21773
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 10:59:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D1AB21773
+	by mail.kernel.org (Postfix) with ESMTPS id 8F5CD21773
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 11:01:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F5CD21773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51360 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51413 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT2U5-00041h-7O
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 06:59:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56925)
+	id 1hT2WY-0006S1-PD
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 07:01:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hT2PU-0000F5-2h
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 06:54:21 -0400
+	(envelope-from <thuth@redhat.com>) id 1hT2PG-00005B-Af
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 06:54:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hT2PR-0004s0-8Q
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 06:54:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57434)
+	(envelope-from <thuth@redhat.com>) id 1hT2PF-0004gr-4g
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 06:54:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33932)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hT2PR-0004qx-3O
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 06:54:17 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hT2PE-0004gJ-O1
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 06:54:05 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F40EE7FDEE;
-	Tue, 21 May 2019 10:54:11 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 17D093092665;
+	Tue, 21 May 2019 10:54:04 +0000 (UTC)
 Received: from thuth.com (ovpn-116-22.ams2.redhat.com [10.36.116.22])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C298D6085B;
-	Tue, 21 May 2019 10:54:10 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D1C216085B;
+	Tue, 21 May 2019 10:54:00 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Date: Tue, 21 May 2019 12:53:40 +0200
-Message-Id: <20190521105344.11637-10-thuth@redhat.com>
+Date: Tue, 21 May 2019 12:53:36 +0200
+Message-Id: <20190521105344.11637-6-thuth@redhat.com>
 In-Reply-To: <20190521105344.11637-1-thuth@redhat.com>
 References: <20190521105344.11637-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Tue, 21 May 2019 10:54:12 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Tue, 21 May 2019 10:54:04 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 09/13] tests/qemu-iotests/005: Add a sanity
- check for large sparse file support
+Subject: [Qemu-devel] [PULL 05/13] tests/numa-test: Use qtest_init() instead
+ of qtest_start()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,44 +74,203 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"check -raw 005" fails when running on certain filesystems - these do not
-support such large sparse files. Use the same check as in test 220 to
-skip the test in this case.
+qtest_start() + qtest_end() should be avoided, since they use the
+global_qtest variable that we want to get rid of in the long run.
+Use qtest_init() and qtest_quit() instead.
 
-Suggested-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20190502084506.8009-2-thuth@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190515174328.16361-4-thuth@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/qemu-iotests/005 | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ tests/numa-test.c | 53 +++++++++++++++++++++++++++--------------------
+ 1 file changed, 30 insertions(+), 23 deletions(-)
 
-diff --git a/tests/qemu-iotests/005 b/tests/qemu-iotests/005
-index 2fef63af88..9c7681c19b 100755
---- a/tests/qemu-iotests/005
-+++ b/tests/qemu-iotests/005
-@@ -55,6 +55,15 @@ if [ "$IMGPROTO" =3D "sheepdog" ]; then
-     _notrun "image protocol $IMGPROTO does not support large image sizes=
-"
- fi
+diff --git a/tests/numa-test.c b/tests/numa-test.c
+index 9824fdd587..8de8581231 100644
+--- a/tests/numa-test.c
++++ b/tests/numa-test.c
+@@ -23,18 +23,19 @@ static void test_mon_explicit(const void *data)
+ {
+     char *s;
+     char *cli;
++    QTestState *qts;
 =20
-+# Sanity check: For raw, we require a file system that permits the creat=
-ion
-+# of a HUGE (but very sparse) file. Check we can create it before contin=
-uing.
-+if [ "$IMGFMT" =3D "raw" ]; then
-+    if ! truncate --size=3D5T "$TEST_IMG"; then
-+        _notrun "file system on $TEST_DIR does not support large enough =
-files"
-+    fi
-+    rm "$TEST_IMG"
-+fi
-+
- echo
- echo "creating large image"
- _make_test_img 5000G
+     cli =3D make_cli(data, "-smp 8 "
+                    "-numa node,nodeid=3D0,cpus=3D0-3 "
+                    "-numa node,nodeid=3D1,cpus=3D4-7 ");
+-    qtest_start(cli);
++    qts =3D qtest_init(cli);
+=20
+-    s =3D hmp("info numa");
++    s =3D qtest_hmp(qts, "info numa");
+     g_assert(strstr(s, "node 0 cpus: 0 1 2 3"));
+     g_assert(strstr(s, "node 1 cpus: 4 5 6 7"));
+     g_free(s);
+=20
+-    qtest_end();
++    qtest_quit(qts);
+     g_free(cli);
+ }
+=20
+@@ -42,16 +43,17 @@ static void test_mon_default(const void *data)
+ {
+     char *s;
+     char *cli;
++    QTestState *qts;
+=20
+     cli =3D make_cli(data, "-smp 8 -numa node -numa node");
+-    qtest_start(cli);
++    qts =3D qtest_init(cli);
+=20
+-    s =3D hmp("info numa");
++    s =3D qtest_hmp(qts, "info numa");
+     g_assert(strstr(s, "node 0 cpus: 0 2 4 6"));
+     g_assert(strstr(s, "node 1 cpus: 1 3 5 7"));
+     g_free(s);
+=20
+-    qtest_end();
++    qtest_quit(qts);
+     g_free(cli);
+ }
+=20
+@@ -59,24 +61,25 @@ static void test_mon_partial(const void *data)
+ {
+     char *s;
+     char *cli;
++    QTestState *qts;
+=20
+     cli =3D make_cli(data, "-smp 8 "
+                    "-numa node,nodeid=3D0,cpus=3D0-1 "
+                    "-numa node,nodeid=3D1,cpus=3D4-5 ");
+-    qtest_start(cli);
++    qts =3D qtest_init(cli);
+=20
+-    s =3D hmp("info numa");
++    s =3D qtest_hmp(qts, "info numa");
+     g_assert(strstr(s, "node 0 cpus: 0 1 2 3 6 7"));
+     g_assert(strstr(s, "node 1 cpus: 4 5"));
+     g_free(s);
+=20
+-    qtest_end();
++    qtest_quit(qts);
+     g_free(cli);
+ }
+=20
+-static QList *get_cpus(QDict **resp)
++static QList *get_cpus(QTestState *qts, QDict **resp)
+ {
+-    *resp =3D qmp("{ 'execute': 'query-cpus' }");
++    *resp =3D qtest_qmp(qts, "{ 'execute': 'query-cpus' }");
+     g_assert(*resp);
+     g_assert(qdict_haskey(*resp, "return"));
+     return qdict_get_qlist(*resp, "return");
+@@ -88,10 +91,11 @@ static void test_query_cpus(const void *data)
+     QDict *resp;
+     QList *cpus;
+     QObject *e;
++    QTestState *qts;
+=20
+     cli =3D make_cli(data, "-smp 8 -numa node,cpus=3D0-3 -numa node,cpus=
+=3D4-7");
+-    qtest_start(cli);
+-    cpus =3D get_cpus(&resp);
++    qts =3D qtest_init(cli);
++    cpus =3D get_cpus(qts, &resp);
+     g_assert(cpus);
+=20
+     while ((e =3D qlist_pop(cpus))) {
+@@ -115,7 +119,7 @@ static void test_query_cpus(const void *data)
+     }
+=20
+     qobject_unref(resp);
+-    qtest_end();
++    qtest_quit(qts);
+     g_free(cli);
+ }
+=20
+@@ -125,6 +129,7 @@ static void pc_numa_cpu(const void *data)
+     QDict *resp;
+     QList *cpus;
+     QObject *e;
++    QTestState *qts;
+=20
+     cli =3D make_cli(data, "-cpu pentium -smp 8,sockets=3D2,cores=3D2,th=
+reads=3D2 "
+         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
+@@ -132,8 +137,8 @@ static void pc_numa_cpu(const void *data)
+         "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D0 "
+         "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D1,thread-id=3D0 "
+         "-numa cpu,node-id=3D1,socket-id=3D1,core-id=3D1,thread-id=3D1")=
+;
+-    qtest_start(cli);
+-    cpus =3D get_cpus(&resp);
++    qts =3D qtest_init(cli);
++    cpus =3D get_cpus(qts, &resp);
+     g_assert(cpus);
+=20
+     while ((e =3D qlist_pop(cpus))) {
+@@ -168,7 +173,7 @@ static void pc_numa_cpu(const void *data)
+     }
+=20
+     qobject_unref(resp);
+-    qtest_end();
++    qtest_quit(qts);
+     g_free(cli);
+ }
+=20
+@@ -178,6 +183,7 @@ static void spapr_numa_cpu(const void *data)
+     QDict *resp;
+     QList *cpus;
+     QObject *e;
++    QTestState *qts;
+=20
+     cli =3D make_cli(data, "-smp 4,cores=3D4 "
+         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
+@@ -185,8 +191,8 @@ static void spapr_numa_cpu(const void *data)
+         "-numa cpu,node-id=3D0,core-id=3D1 "
+         "-numa cpu,node-id=3D0,core-id=3D2 "
+         "-numa cpu,node-id=3D1,core-id=3D3");
+-    qtest_start(cli);
+-    cpus =3D get_cpus(&resp);
++    qts =3D qtest_init(cli);
++    cpus =3D get_cpus(qts, &resp);
+     g_assert(cpus);
+=20
+     while ((e =3D qlist_pop(cpus))) {
+@@ -213,7 +219,7 @@ static void spapr_numa_cpu(const void *data)
+     }
+=20
+     qobject_unref(resp);
+-    qtest_end();
++    qtest_quit(qts);
+     g_free(cli);
+ }
+=20
+@@ -223,13 +229,14 @@ static void aarch64_numa_cpu(const void *data)
+     QDict *resp;
+     QList *cpus;
+     QObject *e;
++    QTestState *qts;
+=20
+     cli =3D make_cli(data, "-smp 2 "
+         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
+         "-numa cpu,node-id=3D1,thread-id=3D0 "
+         "-numa cpu,node-id=3D0,thread-id=3D1");
+-    qtest_start(cli);
+-    cpus =3D get_cpus(&resp);
++    qts =3D qtest_init(cli);
++    cpus =3D get_cpus(qts, &resp);
+     g_assert(cpus);
+=20
+     while ((e =3D qlist_pop(cpus))) {
+@@ -256,7 +263,7 @@ static void aarch64_numa_cpu(const void *data)
+     }
+=20
+     qobject_unref(resp);
+-    qtest_end();
++    qtest_quit(qts);
+     g_free(cli);
+ }
+=20
 --=20
 2.21.0
 
