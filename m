@@ -2,81 +2,63 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9EFCC04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 13:58:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5812CC04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 13:58:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9845021479
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 13:58:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fxN4wUw+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9845021479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 308B721479
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 13:58:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 308B721479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54238 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54242 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT5HP-0003rq-Oy
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 09:58:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34781)
+	id 1hT5Hy-0004NJ-Az
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 09:58:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hT5DW-0000oZ-F6
+	(envelope-from <pagupta@redhat.com>) id 1hT5DW-0000Uy-6C
 	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:54:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hT5DV-00067q-Af
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:54:10 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34463)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hT5DV-00066b-43
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:54:09 -0400
-Received: by mail-ot1-x342.google.com with SMTP id l17so16413784otq.1
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 06:54:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=yawR0T7c+6hBTgTGqXSPrYi32xrOTuLdWUT26nn60b8=;
-	b=fxN4wUw+rNYCW9RZT7SMquO/cZmj9sMotmZBRW0ZrFdDzAV26iP2VBzVhNsHpJmd5J
-	+bjnzKsSQgZJKHASOOdHSG9Kd2vzmyUgbZrmrQJ4lVyQJmck0nLJUZBlJ7FMv2ulAtj9
-	FMP+5VjRjiur7xr1z2XXMp2drhyJZGBTNZBqNNpgMSscRR8ulEsMeqkkIXS+psP4gpWH
-	FAWDbLdedzGCvGtKOag3MrnwF43QGuzF6veG7/ss9iOs/v5IaPZh3FuQGe/R4eeZrX+P
-	ntTB7zbwW4ALDVv10hpRFfZeX3f1AAROpZ9y7siXFPhrsjGlLYk1xNnK/S6blzIAuyha
-	sQGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=yawR0T7c+6hBTgTGqXSPrYi32xrOTuLdWUT26nn60b8=;
-	b=PvkPQKs0rhAGojY3pgHjkdX+kn8g7TK/1Fj+UqGjU7aQfFyGZuUGHBYN1use4QdmH9
-	+44wBNGiQBBC9iIi7/WjazBmMRwebF/HlWReWQ47ZxxLBzdPdJYPw7uHHzeoaaZRM1aJ
-	CcMehUX/wnsflF0VSzPolvBwfHtwmu00xSbI7B+JAiJkh2P5YvFZhSv9IYlxt7w2s4y9
-	G//H3K01dcLiCOy5A9Yedgr9Ow7+ZERZNAFZS7ae54FF3ZwS42Npz5jmIoOjpvuFhLRr
-	2b79wFBOpXWIk0yryv1BAtIgc/muHkLYjKMXATuJpD22FPWVbNBWULsxO8uff9pgw1ht
-	pTKQ==
-X-Gm-Message-State: APjAAAVV8EBHGxvLGdTPvc/R2qrHZWVbdm3LGh9xt7FhFGS9emomVexu
-	xU7Jp5ZWmwcol9lByWynoij1HjLKD13eijOj/Cdn6w==
-X-Google-Smtp-Source: APXvYqw/dtX8uVnBbSLJ5cCab9RAt1gCqvP1/GzvVZNhHqnr7EOyN1YINV/LJdEHDhCue4nNN7EnUFiyUCUJg5sJIbw=
-X-Received: by 2002:a05:6830:149a:: with SMTP id
-	s26mr19838243otq.221.1558446848181; 
-	Tue, 21 May 2019 06:54:08 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190521092048.28492-1-cohuck@redhat.com>
-	<CAFEAcA_9QZRyx8_8qT208vsopquW5j-bkyZpmRCAhP-sqJ+0kg@mail.gmail.com>
-	<20190521153104.403980b3.cohuck@redhat.com>
-In-Reply-To: <20190521153104.403980b3.cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 May 2019 14:53:57 +0100
-Message-ID: <CAFEAcA8QmPYzPeLt5LAg+7x5ySM0x3HUp_o54jo-iObG8ksy+A@mail.gmail.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PULL v2 00/54] s390x update
+	(envelope-from <pagupta@redhat.com>) id 1hT53k-0005n7-Ke
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:44:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34282)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hT53k-0005m6-Eu
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:44:04 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AF6A26EB84;
+	Tue, 21 May 2019 13:43:53 +0000 (UTC)
+Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-97.sin2.redhat.com
+	[10.67.116.97])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0B7C91001F5D;
+	Tue, 21 May 2019 13:43:21 +0000 (UTC)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
+	qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
+	linux-xfs@vger.kernel.org, dm-devel@redhat.com
+Date: Tue, 21 May 2019 19:07:13 +0530
+Message-Id: <20190521133713.31653-8-pagupta@redhat.com>
+In-Reply-To: <20190521133713.31653-1-pagupta@redhat.com>
+References: <20190521133713.31653-1-pagupta@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.25]);
+	Tue, 21 May 2019 13:44:03 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v10 7/7] xfs: disable map_sync for async flush
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,40 +70,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: pagupta@redhat.com, rdunlap@infradead.org, jack@suse.cz, snitzer@redhat.com,
+	mst@redhat.com, jasowang@redhat.com, david@fromorbit.com,
+	lcapitulino@redhat.com, adilger.kernel@dilger.ca,
+	zwisler@kernel.org, aarcange@redhat.com, dave.jiang@intel.com,
+	jstaron@google.com, darrick.wong@oracle.com,
+	vishal.l.verma@intel.com, david@redhat.com, willy@infradead.org,
+	hch@infradead.org, jmoyer@redhat.com, nilal@redhat.com,
+	lenb@kernel.org, kilobyte@angband.pl, riel@surriel.com,
+	yuval.shaia@oracle.com, stefanha@redhat.com, pbonzini@redhat.com,
+	dan.j.williams@intel.com, kwolf@redhat.com, tytso@mit.edu,
+	xiaoguangrong.eric@gmail.com, cohuck@redhat.com,
+	rjw@rjwysocki.net, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 May 2019 at 14:31, Cornelia Huck <cohuck@redhat.com> wrote:
->
-> On Tue, 21 May 2019 14:24:07 +0100
-> Peter Maydell <peter.maydell@linaro.org> wrote:
-> > ...it's copying the file into asm-arm/ rather than asm-arm64/.
-> > (I did a by-hand move of the file into the right directory and
-> > that was sufficient for the compile to succeed.)
->
-> I'm obviously not at my best at the moment :(
+Dont support 'MAP_SYNC' with non-DAX files and DAX files
+with asynchronous dax_device. Virtio pmem provides
+asynchronous host page cache flush mechanism. We don't
+support 'MAP_SYNC' with virtio pmem and xfs.
 
-No big deal, it's always awkward when you don't have access
-to the test hardware.
+Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
+---
+ fs/xfs/xfs_file.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-> >
-> > Also, can we keep the changes to scripts/ in a separate
-> > commit, please? The idea of header-update commits is that they
-> > should contain only the changes automatically generated
-> > by the script, with no hand-written additions.
->
-> This looks a bit like a chicken-and-egg problem, though... without the
-> change, we cannot point the script at a current kernel tree. I'd prefer
-> the two to stay together, but I can certainly point out the change to
-> the script more prominently.
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index a7ceae90110e..f17652cca5ff 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -1203,11 +1203,14 @@ xfs_file_mmap(
+ 	struct file	*filp,
+ 	struct vm_area_struct *vma)
+ {
++	struct dax_device 	*dax_dev;
++
++	dax_dev = xfs_find_daxdev_for_inode(file_inode(filp));
+ 	/*
+-	 * We don't support synchronous mappings for non-DAX files. At least
+-	 * until someone comes with a sensible use case.
++	 * We don't support synchronous mappings for non-DAX files and
++	 * for DAX files if underneath dax_device is not synchronous.
+ 	 */
+-	if (!IS_DAX(file_inode(filp)) && (vma->vm_flags & VM_SYNC))
++	if (!daxdev_mapping_supported(vma, dax_dev))
+ 		return -EOPNOTSUPP;
+ 
+ 	file_accessed(filp);
+-- 
+2.20.1
 
-I would structure it as:
-
-Commit 1: update the script
-Commit 2: result of running the script
-
-thanks
--- PMM
 
